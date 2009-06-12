@@ -5,6 +5,10 @@
 	Name="LaserficheCustomComponents"
 	ProjectGUID="{D61E72F0-0258-49EF-8513-42ED42E316E9}"
 	RootNamespace="LaserficheCustomComponents"
+	SccProjectName="LaserficheCustomComponents"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="AtlProj"
 	>
 	<Platforms>

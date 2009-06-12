@@ -5,6 +5,10 @@
 	Name="UCLIDImageUtils"
 	ProjectGUID="{CC01AE64-6B4C-4FEE-8A87-B13941098A6A}"
 	RootNamespace="UCLIDImageUtils"
+	SccProjectName="UCLIDImageUtils"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	>
 	<Platforms>

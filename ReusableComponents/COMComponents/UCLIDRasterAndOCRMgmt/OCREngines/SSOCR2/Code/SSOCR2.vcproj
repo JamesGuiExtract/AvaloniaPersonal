@@ -5,6 +5,10 @@
 	Name="SSOCR2"
 	ProjectGUID="{660413BE-8631-4C18-92C6-A28B3E550A57}"
 	RootNamespace="SSOCR2"
+	SccProjectName="SSOCR2"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="AtlProj"
 	>
 	<Platforms>

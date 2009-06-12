@@ -5,6 +5,10 @@
 	Name="LaserficheClientPlugin"
 	ProjectGUID="{44D8B5DE-33B1-45A9-B453-F385F2E076CA}"
 	RootNamespace="LaserficheClientPlugin"
+	SccProjectName="LaserficheClientPlugin"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	AssemblyReferenceSearchPaths="&quot;C:\Program Files\Common Files\Laserfiche\LFObjects&quot;;&quot;C:\Program Files\Common Files\Laserfiche\LFAPI&quot;"
 	>
