@@ -5,6 +5,10 @@
 	Name="COMLicenseEval"
 	ProjectGUID="{0D494CBA-0C43-4291-B52F-8D77DF44C4C4}"
 	RootNamespace="COMLicenseEval"
+	SccProjectName="COMLicenseEval"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	>
 	<Platforms>

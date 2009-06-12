@@ -5,6 +5,10 @@
 	Name="ModifyFile"
 	ProjectGUID="{18D4E906-74C0-4E25-A7E6-FD7F8CB8B6B8}"
 	RootNamespace="ModifyFile"
+	SccProjectName="ModifyFile"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	>
 	<Platforms>
 		<Platform
