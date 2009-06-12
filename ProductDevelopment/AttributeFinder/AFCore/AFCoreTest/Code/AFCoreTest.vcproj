@@ -5,6 +5,10 @@
 	Name="AFCoreTest"
 	ProjectGUID="{7B9B99C7-E636-48EF-84A8-E963EB8A875A}"
 	RootNamespace="AFCoreTest"
+	SccProjectName="AFCoreTest"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="AtlProj"
 	>
 	<Platforms>

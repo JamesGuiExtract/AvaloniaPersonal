@@ -5,6 +5,10 @@
 	Name="FlexDataEntry"
 	ProjectGUID="{9F1976BA-E68B-425C-8D7E-2DF5ED4CD2D0}"
 	RootNamespace="FlexDataEntry"
+	SccProjectName="FlexDataEntry"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	>
 	<Platforms>

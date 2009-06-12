@@ -5,6 +5,10 @@
 	Name="DocumentSorterConsoleApp"
 	ProjectGUID="{02C3852F-CE3D-4EA6-B99F-AFB25EF2EFCC}"
 	RootNamespace="DocumentSorterConsoleApp"
+	SccProjectName="DocumentSorterConsoleApp"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	>
 	<Platforms>

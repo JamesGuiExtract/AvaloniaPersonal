@@ -5,6 +5,10 @@
 	Name="Feedback"
 	ProjectGUID="{17B1361C-DC30-4E7A-8F98-F2FAB2AADE19}"
 	RootNamespace="Feedback"
+	SccProjectName="Feedback"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="MFCProj"
 	>
 	<Platforms>
