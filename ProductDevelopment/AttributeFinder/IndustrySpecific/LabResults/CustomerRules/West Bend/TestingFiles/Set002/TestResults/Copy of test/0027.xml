@@ -1,0 +1,383 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\TestResults\0027.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0027.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0027.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|Autolmmune Serology
+</Line>
+<Line>
+.CollectionDate|04/24/2020
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.Component|Centromere Antibody
+</Line>
+<Line>
+..Value|1.6
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|Autolmmune Serology
+</Line>
+<Line>
+.CollectionDate|04/24/2020
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.Component|RNP Antibody Screen
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|SCL-70 Antibody IgG
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|Smith Antibody
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|Centromere Antibody
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Value|1.6
+</Line>
+<Line>
+.Name|Other
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|RNP Antibody Screen
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|pg
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|SCL-70 Antibody IgG
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|fL
+</Line>
+<Line>
+.Component|Smith Antibody
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Value|4
+</Line>
+<Line>
+.Name|Other
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Wed May 27 16:57:56 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+Test
+</Title>
+<Detail>
+<Line>
+Total Expected: 2
+</Line>
+<Line>
+Total Correct: 2 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionDate
+</Title>
+<Detail>
+<Line>
+Total Expected: 2
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 2
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionTime
+</Title>
+<Detail>
+<Line>
+Total Expected: 2
+</Line>
+<Line>
+Total Correct: 1 (50.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 4 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Flag
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Range
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 4 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Units
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 2
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Value
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 2 (50.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 2
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 2
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Wed May 27 16:57:56 2009
+</ID>
+<Line>
+Total test cases executed: 1
+</Line>
+<Line>
+Total test cases passed: 0 (0.00%)
+</Line>
+<Line>
+Total test cases failed: 1 (100.00%)
+</Line>
+<Line>
+Total elapsed time: 0 second(s)
+</Line>
+</Summary>
+</ComponentTest>

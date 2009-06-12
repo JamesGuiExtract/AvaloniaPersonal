@@ -1,0 +1,1 @@
+Has its own version of isTab and tabRules to compensate for wide normal spacing

@@ -1,0 +1,37 @@
+ML/MIN/1.73 SQM
+umol/L
+MIU/ML
+MMOL/L
+UMOL/L
+MIL/UL
+UG/ML
+UG/DL
+MD/DL
+MG/DL
+IU/ML
+PG/ML
+% A1C
+NG/ML
+NG/DL
+GM/DL
+MIU/L
+MM/HR
+ng/mL
+mg/dL
+MMHG
+/HPF
+m/ul
+SECS
+g/dL
+M/UL
+/LPF
+K/UL
+G/DL
+U/L
+SEC
+L/%
+ML
+IV
+FL
+PG
+%

@@ -1,0 +1,3033 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+3_1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0001.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0001.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0001.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0001.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0001.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|GLEASON, JIM
+</Line>
+<Line>
+.MR_Number|09247643
+</Line>
+<Line>
+.DOB|02/06/1966
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.MR_Number|49247443
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_2
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0002.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0002.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0002.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0002.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0002.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|DOWNING, KEITH L
+</Line>
+<Line>
+.MR_Number|MX00344051
+</Line>
+<Line>
+.DOB|01/25/1932
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/25/1932
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.MR_Number|X00344051
+</Line>
+<Line>
+.Name|DOWNING, KEITH L
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_3
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0003.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0003.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0003.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0003.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0003.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|HERMAN, DAVID L
+</Line>
+<Line>
+.DOB|03/27/1939
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|03/27/1939
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|HERMAN, DAVID L
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_4
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0004.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0004.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0004.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0004.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0004.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|MEMMER, DOROTHA
+</Line>
+<Line>
+.DOB|11/27/1928
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|HEMMER, DOROTHA
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_5
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0005.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0005.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0005.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0005.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0005.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|GROSS, MICHAEL J
+</Line>
+<Line>
+.MR_Number|(00002)00287157
+</Line>
+<Line>
+.DOB|03/05/1959
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.MR_Number|(060021082137157
+</Line>
+<Line>
+.Name|GROSS, MICLIAEL
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_6
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0006.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0006.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0006.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0006.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0006.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|MALDONADO, YAHAIRA
+</Line>
+<Line>
+.DOB|04/18/1980
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|04/18/1980
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|MALDONADO, YAHAIRA
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_7
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0007.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0007.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0007.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0007.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0007.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|WALTER, ROBERT J
+</Line>
+<Line>
+.DOB|11/22/1939
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|WALTER, ROBERT J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_8
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0008.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0008.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0008.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0008.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0008.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|COOK, DONALD J
+</Line>
+<Line>
+.DOB|07/26/1925
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|COOK, DONALD J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_9
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0009.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0009.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0009.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0009.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0009.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|VANDEBOOM, KATHLEEN M
+</Line>
+<Line>
+.DOB|06/12/1958
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|06/12/1958
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|VANDEDOOM, HATHLEEN M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_10
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0010.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0010.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0010.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0010.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0010.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|BEACH, MARK
+</Line>
+<Line>
+.DOB|12/28/1954
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|12/28/1954
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|BEACH, MARK
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_11
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0011.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0011.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|NOTHEM, MARYANN E
+</Line>
+<Line>
+.DOB|09/24/1952
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|NOTHEM, MARYANN E
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_12
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0012.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0012.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0012.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0012.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0012.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|ELDER, RICHARD
+</Line>
+<Line>
+.DOB|08/20/1946
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|08/20/2019
+</Line>
+<Line>
+.Name|ELDER, RICHARD
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_13
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0013.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0013.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KUDEK, JESSICA L
+</Line>
+<Line>
+.DOB|01/04/1986
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/04/1986
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_14
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0014.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0014.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0014.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0014.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0014.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KAETTERHENRY, LYNN
+</Line>
+<Line>
+.DOB|05/05/1957
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_15
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0015.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0015.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0015.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0015.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0015.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|SCHUMANN, JEAN R
+</Line>
+<Line>
+.DOB|11/18/1929
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|SCHUMANN, JEAN R
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_16
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0016.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0016.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0016.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0016.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0016.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|WICHLACZ, CASH A
+</Line>
+<Line>
+.DOB|08/18/2005
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|08/18/2005
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|ICHLACZ, CASH A
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_17
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0017.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0017.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0017.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0017.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0017.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|PAIKOWSKI, MIRANDA
+</Line>
+<Line>
+.DOB|02/02/1998
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|02/02/1998
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|AIKOWSKI, MIRANDA
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_18
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0018.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0018.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0018.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0018.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0018.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|MOORE,ALEXA T
+</Line>
+<Line>
+.DOB|07/05/2007
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|07/05/2007
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|ID, UB
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_19
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0019.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0019.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0019.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0019.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0019.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|REX, KRISTIN
+</Line>
+<Line>
+.DOB|11/21/1964
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|11/21/1964
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|EX, KRISTIN SUB
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_20
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0020.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0020.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0020.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0020.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0020.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|FRITZ, KEITH A
+</Line>
+<Line>
+.DOB|01/29/1966
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/29/1966
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|FRITZ, KEITH A
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_21
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0021.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0021.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0021.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0021.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0021.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KANNENBERG, BEVERLY J
+</Line>
+<Line>
+.DOB|01/21/1942
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/21/1942
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|KANNENBERG, BEVERLY J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_22
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0022.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0022.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0022.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0022.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0022.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KIRKSEY-SMITH, ARMAND J
+</Line>
+<Line>
+.DOB|02/05/1999
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|02/05/1999
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|KIRKSEY-SMITH, ARMAND J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_23
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0023.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0023.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0023.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0023.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0023.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|ALFF, DORIS J
+</Line>
+<Line>
+.DOB|01/13/1928
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/13/1928
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|ALFF, DORIS J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_24
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0024.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0024.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0024.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0024.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0024.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|SCHALK, MARY J
+</Line>
+<Line>
+.DOB|11/08/1949
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|11/08/1949
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|SCHALK, MARY J
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_25
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0025.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0025.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0025.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0025.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0025.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|SCHRAUTH, ALTON R
+</Line>
+<Line>
+.DOB|09/28/1927
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|09/28/1927
+</Line>
+<Line>
+.Gender|M
+</Line>
+<Line>
+.Name|SCHRAUTH, ALTON R
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_26
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0026.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0026.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0026.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0026.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0026.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|JOHNSON, SAMANTHA
+</Line>
+<Line>
+.DOB|07/01/1992
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|JULINSON, IARNAIII
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_27
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0027.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0027.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0027.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|HUNKEL, DOREEN K
+</Line>
+<Line>
+.DOB|03/24/1961
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|03/24/1961
+</Line>
+<Line>
+.Name|HIMICEL, DOIEEN K
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_28
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0028.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0028.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0028.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0028.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0028.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|DOVE, LILY B
+</Line>
+<Line>
+.DOB|02/21/2005
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|02/21/2005
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|DOVE, LILY
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_29
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0029.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0029.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0029.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0029.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0029.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|POWERS, JOHN T
+</Line>
+<Line>
+.DOB|09/24/1963
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|09/24/1963
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_30
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0030.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0030.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0030.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0030.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0030.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|SCHEPP SR, ALLEN J
+</Line>
+<Line>
+.DOB|09/19/1945
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|09/19/1945
+</Line>
+<Line>
+.Name|SCHEPP SR, ALLEN I
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_31
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0031.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0031.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|CUTTANI, KATHERINE M
+</Line>
+<Line>
+.DOB|05/27/1984
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|CUTTANI, KATHERINE M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_32
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0032.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0032.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0032.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0032.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0032.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KOBY, STEPHANIE D
+</Line>
+<Line>
+.DOB|03/06/1984
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_33
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0033.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0033.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0033.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0033.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0033.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|MALDONADO, YAHAIRA
+</Line>
+<Line>
+.DOB|04/18/1980
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_34
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0034.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0034.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0034.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0034.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0034.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|WILKINSON, JERRY K
+</Line>
+<Line>
+.DOB|05/01/1965
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|WILKINSON, JERRY K
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_35
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0035.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0035.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0035.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0035.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0035.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|WIEDMEYER, ROBERT D
+</Line>
+<Line>
+.DOB|05/21/1949
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_36
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0036.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0036.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0036.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0036.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0036.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|BEINE, JOYCE P
+</Line>
+<Line>
+.DOB|01/01/1900
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|01/01/2019
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|PT, PHONE
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_37
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0037.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0037.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0037.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0037.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0037.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|NADER, CHRISTINE C
+</Line>
+<Line>
+.DOB|04/24/1972
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|04/24/2019
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|INFER, PT.
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_38
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0039.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0039.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0039.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0039.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0039.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|PIECHOWSKI, JANET M
+</Line>
+<Line>
+.DOB|07/10/1948
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|07/10/1940
+</Line>
+<Line>
+.Name|PIECHOWSKI, JANET REFERMNGCLMWD
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_39
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0040.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0040.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0040.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0040.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0040.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|HACK, HOWARD M
+</Line>
+<Line>
+.MR_Number|(00002)00226553
+</Line>
+<Line>
+.DOB|09/23/1962
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.MR_Number|(00002)00226553
+</Line>
+<Line>
+.MR_Number|100002100226553
+</Line>
+<Line>
+.Name|HACK, HOWARD M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_40
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0041.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0041.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0041.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0041.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0041.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|SCHNEIDER, CAROLE J
+</Line>
+<Line>
+.DOB|04/14/1967
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|04/14/1967
+</Line>
+<Line>
+.Name|OR, SCHNEIDIFR CAROLE
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_41
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0042.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0042.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0042.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0042.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0042.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|HAACK, PENNY M
+</Line>
+<Line>
+.MR_Number|3000222238-99400000007
+</Line>
+<Line>
+.DOB|09/17/1979
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|09/17/1979
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.MR_Number|3000222238
+</Line>
+<Line>
+.Name|HAACK, PENNY M
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_42
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0043.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0043.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0043.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0043.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0043.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KRUEGER, KIMBERLY
+</Line>
+<Line>
+.DOB|07/30/1988
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.DOB|07/30/1988
+</Line>
+<Line>
+.Gender|F
+</Line>
+<Line>
+.Name|KRUEGER, KIMBERLY
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_43
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0044.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0044.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0044.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0044.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0044.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|MISKE, DEBRA R
+</Line>
+<Line>
+.DOB|08/21/1956
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_44
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\PatientInfo.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestPatientInfo.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0045.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0045.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0045.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\0045.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\Images\0045.tif.PI.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Name|KOMANS, JOSEPHIENE M
+</Line>
+<Line>
+.DOB|12/16/1930
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+PatientInfo|N/A
+</Line>
+<Line>
+.Gender|F
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Thu May 21 08:29:18 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+PatientInfo
+</Title>
+<Detail>
+<Line>
+Total Expected: 44
+</Line>
+<Line>
+Total Correct: 44 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+PatientInfo.DOB
+</Title>
+<Detail>
+<Line>
+Total Expected: 44
+</Line>
+<Line>
+Total Correct: 23 (52.27%)
+</Line>
+<Line>
+Total Incorrectly Found: 4
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+PatientInfo.Gender
+</Title>
+<Detail>
+<Line>
+Total Expected: 41
+</Line>
+<Line>
+Total Correct: 33 (80.49%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+PatientInfo.MR_Number
+</Title>
+<Detail>
+<Line>
+Total Expected: 5
+</Line>
+<Line>
+Total Correct: 1 (20.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 5
+</Line>
+<Line>
+Approximate Extras: 1 (16.67%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+PatientInfo.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 44
+</Line>
+<Line>
+Total Correct: 20 (45.45%)
+</Line>
+<Line>
+Total Incorrectly Found: 15
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Thu May 21 08:29:18 2009
+</ID>
+<Line>
+Total test cases executed: 44
+</Line>
+<Line>
+Total test cases passed: 10 (22.73%)
+</Line>
+<Line>
+Total test cases failed: 34 (77.27%)
+</Line>
+<Line>
+Total elapsed time: 3 second(s)
+</Line>
+</Summary>
+</ComponentTest>

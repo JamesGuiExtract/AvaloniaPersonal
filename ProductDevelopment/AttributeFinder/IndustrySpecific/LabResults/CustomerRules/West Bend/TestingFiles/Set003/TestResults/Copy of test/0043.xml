@@ -1,0 +1,233 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults\0043.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0043.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0043.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA MUTATION ANALYSIS
+</Line>
+<Line>
+.CollectionDate|04/30/2009
+</Line>
+<Line>
+.CollectionTime|16:31
+</Line>
+<Line>
+.Component|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA
+</Line>
+<Line>
+..Value|POSITIVE FOR ONE COPY OF THE C677T MUTATION
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA
+</Line>
+<Line>
+..Value|RESULT:
+</Line>
+<Line>
+.Component|SHARED ASSAY COMPONENTS
+</Line>
+<Line>
+..Value|SEE NOTE
+</Line>
+<Line>
+.Name|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA MUTATION ANALYSIS
+</Line>
+<Line>
+.CollectionTime|16:31
+</Line>
+<Line>
+.CollectionDate|04/30/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Fri May 29 09:14:27 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+Test
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionDate
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionTime
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 1 (50.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Value
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 2
+</Line>
+<Line>
+Approximate Extras: 1 (50.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Fri May 29 09:14:27 2009
+</ID>
+<Line>
+Total test cases executed: 1
+</Line>
+<Line>
+Total test cases passed: 0 (0.00%)
+</Line>
+<Line>
+Total test cases failed: 1 (100.00%)
+</Line>
+<Line>
+Total elapsed time: 0 second(s)
+</Line>
+</Summary>
+</ComponentTest>

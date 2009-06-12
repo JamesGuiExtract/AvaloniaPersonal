@@ -1,0 +1,337 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\TestResults\0013.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0013.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0013.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0013.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|Other
+</Line>
+<Line>
+.CollectionDate|04/28/2009
+</Line>
+<Line>
+.Component|Anti-Gliadin IgG ELISA (AGA IgG)
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|U/ml
+</Line>
+<Line>
+..Range|&lt;10.0
+</Line>
+<Line>
+.Component|Anti-Gliadin IgA ELISA (AGA IgA)
+</Line>
+<Line>
+..Value|7.2
+</Line>
+<Line>
+..Units|U/ml
+</Line>
+<Line>
+..Range|&lt;5.0
+</Line>
+<Line>
+.Component|Anti-Human Tissue Transglutaminase IgA ELISA (TTG IgA)
+</Line>
+<Line>
+..Value|0.2
+</Line>
+<Line>
+..Units|U/ml
+</Line>
+<Line>
+..Range|&lt;4.0
+</Line>
+<Line>
+.Component|Anti-Endomysial IgA IFA (EMA IgA)
+</Line>
+<Line>
+..Value|Negative
+</Line>
+<Line>
+..Range|Negative
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|Other
+</Line>
+<Line>
+.Component|IgG
+</Line>
+<Line>
+..Range|&lt;10
+</Line>
+<Line>
+..Units|U/ml
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|IgA
+</Line>
+<Line>
+..Range|&lt;5.0
+</Line>
+<Line>
+..Units|U/ml
+</Line>
+<Line>
+..Value|7.2
+</Line>
+<Line>
+.Component|IgA
+</Line>
+<Line>
+..Range|&lt;4.0
+</Line>
+<Line>
+..Value|0.2
+</Line>
+<Line>
+.Component|IgA
+</Line>
+<Line>
+..Range|Negative
+</Line>
+<Line>
+..Value|IFA (EMA IgA) Negative
+</Line>
+<Line>
+.CollectionTime|20:09
+</Line>
+<Line>
+.CollectionDate|04/28/2020
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Wed May 27 16:50:41 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+Test
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionDate
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 4
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Range
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 4
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Units
+</Title>
+<Detail>
+<Line>
+Total Expected: 3
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 2
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Value
+</Title>
+<Detail>
+<Line>
+Total Expected: 4
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 4
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 1 (100.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionTime
+</Title>
+<Detail>
+<Line>
+Total Expected: 0
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 1 (100.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Wed May 27 16:50:41 2009
+</ID>
+<Line>
+Total test cases executed: 1
+</Line>
+<Line>
+Total test cases passed: 0 (0.00%)
+</Line>
+<Line>
+Total test cases failed: 1 (100.00%)
+</Line>
+<Line>
+Total elapsed time: 0 second(s)
+</Line>
+</Summary>
+</ComponentTest>

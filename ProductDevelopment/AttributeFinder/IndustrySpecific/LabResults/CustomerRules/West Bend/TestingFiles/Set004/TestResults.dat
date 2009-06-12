@@ -1,0 +1,4 @@
+<SETTING>;CASESENSITIVE=FALSE
+<SETTING>;OUTPUT_FINAL_STATS_ONLY=FALSE
+
+<TESTFOLDER>;..\TestTestResults.rsd;K:\Common\Engineering\Sample Files\West Bend\Set004\Images;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).TR.voa;K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\$FileNoExtOf(<SourceDocName>).eav

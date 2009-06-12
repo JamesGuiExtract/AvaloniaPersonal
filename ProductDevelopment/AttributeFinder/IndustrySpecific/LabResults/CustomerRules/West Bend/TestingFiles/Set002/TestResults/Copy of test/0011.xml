@@ -1,0 +1,70 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\TestResults\0011.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0011.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0011.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0011.tif.TR.voa
+</TestCaseFile>
+<TestCaseException>
+<Text>
+ELI09539: Invalid Attribute Specification.\n\nDebug information:\nLine = (W/ CREATININE) (string)\nCatchID = ELI07359 (string)\nCatchID = ELI07860 (string)\nHRESULT = 0x80020009 (string)\nHresult Error String = Exception occurred. (string)\nShort Error String = UNRECOGNIZED ERROR CODE (string)\nerr.WCode = 0 (int)\nCatchID = ELI09208 (string)\nHRESULT = 0x80020009 (string)\nHresult Error String = Exception occurred. (string)\nShort Error String = UNRECOGNIZED ERROR CODE (string)\nerr.WCode = 0 (int)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c49303935333920000000496e76616c6964204174747269627574652053706563696669636174696f6e2e00000000000c000000040000004c696e65000000000f00000028572f204352454154494e494e452907000000436174636849440000000008000000454c49303733353907000000436174636849440000000008000000454c4930373836300700000048524553554c54000000000a000000307838303032303030391400000048726573756c74204572726f7220537472696e670000000013000000457863657074696f6e206f636375727265642e1200000053686f7274204572726f7220537472696e670000000017000000554e5245434f474e495a4544204552524f5220434f4445090000006572722e57436f6465020000000000000007000000436174636849440000000008000000454c4930393230380700000048524553554c54000000000a000000307838303032303030391400000048726573756c74204572726f7220537472696e670000000013000000457863657074696f6e206f636375727265642e1200000053686f7274204572726f7220537472696e670000000017000000554e5245434f474e495a4544204552524f5220434f4445090000006572722e57436f6465020000000000000000000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Wed May 27 16:50:41 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Wed May 27 16:50:41 2009
+</ID>
+<Line>
+Total test cases executed: 1
+</Line>
+<Line>
+Total test cases passed: 0 (0.00%)
+</Line>
+<Line>
+Total test cases failed: 1 (100.00%)
+</Line>
+<Line>
+Total elapsed time: 0 second(s)
+</Line>
+</Summary>
+</ComponentTest>

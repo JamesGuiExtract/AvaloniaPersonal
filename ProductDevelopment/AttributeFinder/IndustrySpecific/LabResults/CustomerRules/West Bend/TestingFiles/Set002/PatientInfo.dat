@@ -1,0 +1,4 @@
+<SETTING>;CASESENSITIVE=FALSE
+<SETTING>;OUTPUT_FINAL_STATS_ONLY=FALSE
+
+<TESTFOLDER>;..\TestPatientInfo.rsd;K:\Common\Engineering\Sample Files\West Bend\Set002\Images;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).PI.voa;K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\PatientInfo\$FileNoExtOf(<SourceDocName>).eav

@@ -1,0 +1,112 @@
+//fixing addresses
+\bDRIVB\b~DRIVE
+\b(?:W.|[Vv]{2}[iIl1!])(?=.{0,3}5\d{4})~WI
+ALLI(?!ANCE).{0,10}WI\s*(\d{5}\b)~ALLIS, WI $1
+WE(?!ST.{0,3}LINCOLN).*WI 53227~WEST ALLIS, WI 53227
+\bWAY\b~WAY,
+(?:West.?)?(?:West|W.st|We.{0,2}|W.{0,2}t|W[^\.].{2,3}).?Wisconsin.?Av[eco]\.?(?!nue)~West Wisconsin Ave.
+([NESW])[.,]\s?(\w+\s(?:Ave|St\b|Street|Boule|Blvd|Parkway|Pkwy))~$1. $2
+M[iIl]{3}s.{0,3}St~Mills St
+(?:Madison|M.{0,3}son|Mad.{0,3}on|Madi.{0,3}n)~Madison
+Madison,.{0,3}(?:W.?|[Vv]{2}[iIl1!])\b|Madison.{0,3}WI\b~Madison, WI
+West.?Pl.nk.?Court~West Plank Court
+,\x20+..\x20+53(210|211|132|051|201|227)~, WI 53$1
+\b(?:P\.[O0]\.|P.{2,4}|.{1,2}\.O\.)\x20[BP][O0]X~P.O. BOX
+\b.lvd\b~Blvd
+\b.LVD\b~BLVD
+(?:Mitel|M.t+.l|Mit.{0,3}l|M.{0,2}tel|mittol)\b(?=.{0,3}.lvd\b)~Mittel
+(?:W[o0]{1,2}(?:d|[eoc][l1\|])).{0,3}(?:[Ddb]a[l1!\|][eco])\b~Wood Dale
+Wood.{0,3}Dale.{0,3}(?:IL|.L|I.|[Il1!\\\/][L])~Wood Dale, IL
+(Lenexa|LENEXA), .{2}\b~$1, KS
+(?:Menomonee|M.n.m.nee|Men.m.nee|Men[oe]m[oe]ne.?)~Menomonee
+Menomonee.{0,3}F.ll.|Menomonee.{0,3}Fa[lI1!\|nh]{1,2}s~Menomonee Falls
+\bW[a-zA-Z]{0,3}\x20*([NS]\d+.*Menomonee)~W180 $1
+53[2Zz]{2}6~53226
+(?:M[Il1!\/\\]L(?:W|VV)[A4](?:U|O|D|LI|Ll|L1)(?:K|IY)E{2})~MILWAUKEE
+(?:Mi[lI1!](?:w|vv)a(?:u|li|v)ke{2})~Milwaukee
+Milwaukee.{3,8}53222~Milwaukee, WI 53222
+7\s?0\s?7.{0,3}[S5$&9](\.)?.{0,3}Mills~707 S$1 Mills
+707.{0,3}(S.?).{0,3}Mills(.*?)Madison.{0,3}WI(?!.?\.).{0,3}?(53715|5371[^\.]|537.?5|53.?15|5.?715|.3715|\d{0,4}(?!\s*\d))~707 $1 Mills$2Madison, WI, 53715
+532[0OO][1lI\/\\]~53201
+Wauwatosa(.{0,3})(?:(?:W|VV)[Il1!]|.I|W.)(.{0,7}53226)~Wauwatosa$1WI$2
+K[ilI1!\|]nn[ilI1!\|]k[ilI1!\|]nn[ilI1!\|]c\x20*River~Kinnikinnic River
+NEWP[O0QD]RT~NEWPORT
+[71!lI]355.{0,3}(Mittel|MITTEL)~1355 $1
+W[\s,_]{0,4}Kinnikinnic~W. Kinnikinnic
+\\W\.~ W.
+\bM[a-z]([A-Z])~Mc$1
+Menomonee.{0,3}(?:Falls|Fa.{0,2}s|F.[lI1!]{2}s)~Menomonee Falls
+M[0OoD]nr[0OoD]e~Monroe
+DOD.{0,3}VILLE|DODGE.{0,3}LLE|D.{0,3}EVILLE~DODGEVILLE
+Junct[iIl][o0O]n~Junction
+507.{0,3}South.{0,3}Monroe.{0,3}Street.{0,3}L\w+.{0,3}Wisconsin~507 South Monroe Street Lancaster, Wisconsin
+S.{0,3}Mills.{0,3}Street.{0,3}Madison.{3,8}53716~S Mills Street Madison, WI 53716
+((?:BEAVER|.{0,3}AVER|BEA.{0,3}R).{0,3}[DO0][A4]M.{0,3}REFERENCE.{0,3}(?:LAB|LA.|L.B|.AB).{0,3}\s*)(University.{0,3}Avenue)~$1 707 S. University Avenue
+5391\$-3089~53916-3089
+//^(?:[Cc][Oo][Ll][Uu][Mm][Bb][Uu][Ss]|[Cc][Oo][Ll][Uu][Mm][Bb][Uu].?|[Cc][Oo][Ll][Uu][Mm][Bb].?[Ss]|[Cc][Oo][Ll][Uu][Mm].?[Uu][Ss]|[Cc][Oo][Ll][Uu].?[Bb][Uu][Ss]|[Cc][Oo][Ll].?[Mm][Bb][Uu][Ss]|[Cc][Oo].?[Uu][Mm][Bb][Uu][Ss]|[Cc].?[Ll][Uu][Mm][Bb][Uu][Ss]|.?[Oo][Ll][Uu][Mm][Bb][Uu][Ss]).{0,3}WI(?=.{3,10}\r?$)~Columbus, WI
+^COLUMBUS.{0,3}COMMUNITY.{0,3}HOSPITAL.{0,3}(\r\n)+(Columbus|COLUMBUS)~COLUMBUS COMMUNITY HOSPITAL$1$2
+(PARKWAY|Parkway|Pkwy|PKWY)(?=\s)~$1,
+\b[Ww][Iil!1]\x20*(5\d{4})\b~WI $1
+(?:2000|.?000|.{0,2}00).{0,3}North.{0,3}Dewey.{0,3}Ave.{0,4}(\s*)(?:Reedsburg|R.{0,3}dsburg|Ree.{0,3}burg|Reeds.{0,3}rg|Reedsbu.{0,3}\b).{0,3}\S{2}.{0,3}(?:53959|5395.?|539.?9|53.?59|5.?959|.?3959)~2000 North Dewey Ave., $1Reedsburg, WI 53959
+([A-Z]{2}.{0,3}\b\d{5})\D(\d{4})\b~$1-$2
+Pond\x20+du\x20+Lac~Fond du Lac
+
+//fixing names
+D.{0,4}ACARE|DYNA.{0,4}E|DY.{0,4}CARE|DYN.{0,4}CARE~DYNACARE
+^.{2,6}ACARE.{0,3}LABORATORIES~DYNACARE LABORATORIES
+D[^a-zA-Z\r\n]{0,3}Y[^a-zA-Z\r\n]{0,3}N[^a-zA-Z\r\n]{0,3}A[^a-zA-Z\r\n]{0,3}C[^a-zA-Z\r\n]{0,3}A[^a-zA-Z\r\n]{0,3}R[^a-zA-Z\r\n]{0,3}E~DYNACARE
+Dynacare.{0,4}aboratories~Dynacare Laboratories
+Medical.{0,3}(?:Center|C.nt.r|Cen.{0,3}|C.{0,3}ter|Cente.)~Medical Center
+^S.*Lukes~St. Lukes
+Laborat.{0,5}s|L.{0,4}ratories|Lab.{0,5}ories~Laboratories
+St\.?.{0,3}(?:Joseph|Jos.{0,4}h|J.{0,4}ph|Jo.{0,5}h)~St. Joseph
+[A4][CDO0][LIT1].{0,3}W[ITL1].{0,3}central~ACL-WI Central
+\b[A4R][RHBP]C.{0,3}Fond.{0,3}du~AHC Fond du
+(St\.?.?Mary.?s).{0,3}(?:Laboratory|L.{0,4}ratory|.{0,4}oratory|Lab.{0,4}tory|Labora.{0,4}y)~$1 Laboratory
+Memonal~Memorial
+El.{0,3}brook|Elm.{0,3}ok|Elmbr.{0,3}\b~Elmbrook
+(?:Quest|Qu.{0,3}t|Q.{0,3}st).{0,3}(?:Diagnostics|.{0,3}gnostics|Diag.{0,3}tics|Diagnost.{0,3}s|.{0,2}i[aoe]gnostic\w{0,2}\b)~Quest Diagnostics
+(?:PROHEALTH|PR\SH.{1,2}LTH|P.{1,3}HEALTH|PROHE.{1,3}H)\x20CARE~PROHEALTH CARE
+Quest.{0,3}Diagnostics.{0,3}Wood.{0,3}Dale~Quest Diagnostics Wood Dale
+A.?sociates|Ass.{0,3}iates|Associ.{0,3}es~Associates
+(?:COLUMBIA|COLU.{0,3}A|CO.{0,3}MBIA)~COLUMBIA
+COLUMBIA.{0,3}[a-zA-z]{1,2}.{0,3}MARY~COLUMBIA ST. MARY
+\*\*S.{1,5}Mary~**St. Mary
+\bACL.{0,6}Central.{0,3}Laboratory~ACL-WI Central Laboratory
+\bACL-WI.{0,3}(?:Central|C.{0,3}ral|Cen.{0,3}l|Cent.{0,3})\b~ACL-WI Central
+Lukes.{0,3}Medical.{0,3}Center~Lukes Medical Center
+(L\.L\.C\.?|L\.?L\.C\.|L\.L\.?C\.)~L.L.C.
+\b(?:ACL|A.L|.CL|AC.)-WI~ACL-WI
+BELLIN.{0,3}HEALTH.{0,3}SYSTXM~BELLIN HEALTH SYSTEM
+\bR(?=EALTH\b)~H
+HEALTII~HEALTH
+Fort.{0,3}HealthCare(?!.{0,3}Labor)~Fort Healthcare
+Fort.{0,3}Healthcare(?=.{0,3}Lab)~Fort HealthCare
+Edgerton.{0,3}Hospit.{2,7}Health.{0,3}Services~Edgerton Hospital and Health Services
+C\s*l\s*i\s*n\s*i\s*c~Clinic
+^.{0,6}(Monroe\s*)^.{0,6}Clinic~$1Clinic
+(?:BEAVER|.{0,3}AVER|BEA.{0,3}R).{0,3}[DO0][A4]M.{0,3}REFERENCE.{0,3}(?:LAB|LA.|L.B|.AB)~BEAVER DAM REFERENCE LAB
+//^(?:[Cc][Oo][Ll][Uu][Mm][Bb][Uu][Ss]|[Cc][Oo][Ll][Uu][Mm][Bb][Uu].?|[Cc][Oo][Ll][Uu][Mm][Bb].?[Ss]|[Cc][Oo][Ll][Uu][Mm].?[Uu][Ss]|[Cc][Oo][Ll][Uu].?[Bb][Uu][Ss][Cc][Oo][Ll].?[Mm][Bb][Uu][Ss]|[Cc][Oo].?[Uu][Mm][Bb][Uu][Ss]|[Cc].?[Ll][Uu][Mm][Bb][Uu][Ss]|.?[Oo][Ll][Uu][Mm][Bb][Uu][Ss]),\x20WI~Columbus, WI
+([a-z])0([a-z])~$1o$2
+([A-Z])0([A-Z])~$1O$2
+([a-z]{2,})0(\s)~$1o$2
+([A-Z]{2,})0(\s)~$1O$2
+(?:Reedsburg|Re.{0,3}sburg|Reeds.{0,3}rg).{0,3}(?:Area|.rea|A.ea|Ar.a|Are.).{0,3}\b(Medical|.{0,3}dical|Me.{0,3}cal|Med.{0,3}al|Medi.{0,3}l|Medic.{0,3})\b.{0,3}(Center|C.{0,3}ter|Cen.{0,3}r|Cente.)~Reedsburg Area Medical Center
+(?:Monroe|.{0,3}nroe|M.{0,3}roe|Mo.{0,3}oe|Mon.{0,3}e|Monr.{0,3}\b)(\s*)(?:Clinic|.{0,3}nic|C.{0,3}nic|Cl.{0,3}ic|Cli.{0,3}c|Clin.{0,3}\b)~Monroe$1Clinic
+(?:Divine|.{0,3}vine|D.{0,3}ine|Di.{0,3}ne|Div.{0,3}e|Divi.{0,3}\b).{0,3}(?:Savior|.{0,3}vior|S.{0,3}ior|Sa.{0,3}or|Sav.{0,3}r|Savi.{0,3}\b).{0,3}(?:Healthcare|.{0,3}althcare|He.{0,3}thcare|Heal.{0,3}care|Health.{0,3}re|Healthca.{0,3}\b)~ Divine Savior Healthcare
+\b\x20+OCONOMOWOC~, OCONOMOWOC
+Suite\x20*(\d+)\b~Suite $1,
+^1?9?\x20*Mon~Mon
+
+//fixing phone numbers
+\b1-000-~1-800-
+(\(\d{3}\))\D?(\d{3})\D{0,3}(\d{4})\b~$1 $2-$3
+
+//fixing clues
+Ordering\x20+(?:Loc|L.c|Loc|L.{0,3}c)[;:]?~Ordering Loc:
+([a-z]),+([a-z])~$1, $2
+^rocation~Location
+(\x20?)'(\x20?[^sS])~$1$2
+(\d+),(\d+)~$1$2
+[Oo0]rd#~Ord#
+(?:Laboratory|L.b.r.tory|Lab.{0,3}tory|Labor.{0,3}ry|Laborat.{0,3}).{0,3}(?:Report|R.p.rt|Rep.{0,3}t|R.{0,3}rt)~Laboratory Report

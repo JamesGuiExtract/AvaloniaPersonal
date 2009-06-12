@@ -1,0 +1,24 @@
+//\s+% 
+\s,%,
+\.+%.
+([a-z]{3,})\x20?\.%$1,
+([a-z]+),([a-z]+)%$1, $2
+([a-z])0([a-z])%$1O$2
+\bMRN?#[\s\S]*%
+\bSex:[\s\S]*%
+\bDOB:[\s\S]*%
+\([\s\S]*?\)%
+\breferring\s{0,4}client\b%
+.*client:.*%
+\bSorting\x20?Area/Route[:;]?%
+\/%,
+\bAccount[:;.][\s\S]*%
+\bSorting\x20Area[\s\S]*%
+^\s*([a-z]{3,})\x20([a-z]{3,})\x20([a-z])\s*$%$1, $2 $3
+\bAcct[\s\S]*%
+[\s\S]*\.wisc\.edu[\s\S]*%
+\bLAB\x20?ID\b%
+\bReport(?:ing)?\b%
+\bOrder(?:ing)?\b%
+([a-z]+)\x20(M\.?D\.?|JR\.?|SR\.?|I{3}|IV|VI{0,4}|Ph\.?D\.?)\x20?[,.]\x20?([a-z]+)(?:\x20([A-Z][a-z]*))?%$3 $4 $1, $2
+\d{2,}%

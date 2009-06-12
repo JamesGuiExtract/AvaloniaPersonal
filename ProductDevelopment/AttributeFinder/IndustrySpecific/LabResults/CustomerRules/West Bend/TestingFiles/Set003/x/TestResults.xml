@@ -1,0 +1,7062 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+3_1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0001.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0001.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0001.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0001.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0001.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|07:30
+</Line>
+<Line>
+.Component|ALT
+</Line>
+<Line>
+..Value|81
+</Line>
+<Line>
+..Units|UNITS/L
+</Line>
+<Line>
+..Range|22-72
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+.Component|AST
+</Line>
+<Line>
+..Value|44
+</Line>
+<Line>
+..Units|UNITS/L
+</Line>
+<Line>
+..Range|17-59
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|LIPID PANEL
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|07:30
+</Line>
+<Line>
+.Component|CHOLESTEROL
+</Line>
+<Line>
+..Value|180
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt;200
+</Line>
+<Line>
+.Component|TRIGLYCERIDE
+</Line>
+<Line>
+..Value|240
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt;150
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+.Component|DIRECT HDL CHOL
+</Line>
+<Line>
+..Value|27
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&gt;40
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|LDL CALCULATED
+</Line>
+<Line>
+..Value|105
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt;130
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.Component|ALT
+</Line>
+<Line>
+..Range|21-721
+</Line>
+<Line>
+..Value|81
+</Line>
+<Line>
+.Component|AST
+</Line>
+<Line>
+..Value|44
+</Line>
+<Line>
+.Component|CHOL
+</Line>
+<Line>
+..Range|&lt;2
+</Line>
+<Line>
+..Value|100
+</Line>
+<Line>
+.Component|TRIGLYCERIDE
+</Line>
+<Line>
+..Value|240
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_2
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0002.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0002.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0002.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0002.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0002.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COAGULATION
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|15:45
+</Line>
+<Line>
+.Component|INR
+</Line>
+<Line>
+..Value|2.2
+</Line>
+<Line>
+..Range|0.9-1.1
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+.Component|PROTIME
+</Line>
+<Line>
+..Value|21.4
+</Line>
+<Line>
+..Units|SEC
+</Line>
+<Line>
+..Range|8.8-12.6
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COAGULATION
+</Line>
+<Line>
+.Component|INR
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+..Range|0.9-1.1
+</Line>
+<Line>
+..Value|2.2
+</Line>
+<Line>
+.Component|PROTIME
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+..Range|8.8-12.6
+</Line>
+<Line>
+..Units|SEC
+</Line>
+<Line>
+..Value|21.4
+</Line>
+<Line>
+.CollectionTime|15:45
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_3
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0003.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0003.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0003.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0003.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0003.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COAGULATION
+</Line>
+<Line>
+.CollectionDate|04/16/2009
+</Line>
+<Line>
+.CollectionTime|10:00
+</Line>
+<Line>
+.Component|INR
+</Line>
+<Line>
+..Value|2.87
+</Line>
+<Line>
+..Range|0.91-1.16
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COAGULATION
+</Line>
+<Line>
+.Component|INR
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+..Range|0.91-1.16
+</Line>
+<Line>
+..Value|2.87
+</Line>
+<Line>
+.CollectionTime|10:00
+</Line>
+<Line>
+.CollectionDate|04/16/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_4
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0004.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0004.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0004.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0004.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0004.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|URIC ACID
+</Line>
+<Line>
+.CollectionDate|4/20/2009
+</Line>
+<Line>
+.CollectionTime|12:10 PM
+</Line>
+<Line>
+.Component|URIC ACID
+</Line>
+<Line>
+..Value|11.7
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|2.5-7.0
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_5
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0005.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0005.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0005.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0005.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0005.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|TUMOR MARKER STUDIES
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|09:05
+</Line>
+<Line>
+.Component|PSA
+</Line>
+<Line>
+..Value|&lt;0.1
+</Line>
+<Line>
+..Units|NG/ML
+</Line>
+<Line>
+..Range|0.0-4.0
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|PSA
+</Line>
+<Line>
+..Range|0.0-4.0
+</Line>
+<Line>
+.Name|TUMOR MARKER STUDIES
+</Line>
+<Line>
+.CollectionTime|09:05
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_6
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0006.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0006.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0006.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0006.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0006.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.Component|INSULIN, 2 HOUR
+</Line>
+<Line>
+..Value|93
+</Line>
+<Line>
+..Units|UIU/ML
+</Line>
+<Line>
+..Range|5-55
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|INSULIN, 2 HOUR
+</Line>
+<Line>
+..Range|5-55
+</Line>
+<Line>
+..Value|93 H
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_7
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0007.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0007.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0007.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0007.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0007.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CYTOMETRY
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.Component|CD57+
+</Line>
+<Line>
+..Value|6
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+.Component|CD57+
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Range|0-7
+</Line>
+<Line>
+.Component|CD57+
+</Line>
+<Line>
+..Value|76
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Range|0-741
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Value|2
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Range|0-12
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Value|&lt;1
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Range|0-4
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Value|27
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Range|0-468
+</Line>
+<Line>
+.Component|CD57+/CD8+
+</Line>
+<Line>
+..Value|4
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Range|0-12
+</Line>
+<Line>
+.Component|CD57+/CD8+
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Range|0-4
+</Line>
+<Line>
+.Component|CD57+/CD8+
+</Line>
+<Line>
+..Value|51
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Range|0-468
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Value|2
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Range|0-9
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Value|&lt;1
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Range|0-3
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Value|&lt;20
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Range|0-351
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CD57+
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Value|6
+</Line>
+<Line>
+.Component|CD57+
+</Line>
+<Line>
+..Range|0-741
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Range|0-12
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Value|2
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Range|0-4
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Value|&lt;1
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Range|0-468
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Value|27
+</Line>
+<Line>
+.Component|CD57+/CD8+
+</Line>
+<Line>
+..Range|0-12
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Value|4
+</Line>
+<Line>
+.Component|CD57+/CD8+
+</Line>
+<Line>
+..Range|0-4
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+.Component|CD57+/CD3+
+</Line>
+<Line>
+..Range|0-468
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Range|0-9
+</Line>
+<Line>
+..Units|% LYMPHOCYTE
+</Line>
+<Line>
+..Value|2
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Range|0-3
+</Line>
+<Line>
+..Units|% OF WBC
+</Line>
+<Line>
+..Value|&lt;1
+</Line>
+<Line>
+.Component|CD57+/CD3+/CD8+
+</Line>
+<Line>
+..Range|0-351
+</Line>
+<Line>
+..Units|CELLS/UL
+</Line>
+<Line>
+..Value|&lt;20
+</Line>
+<Line>
+.Name|CD57, CO3, CO8, FLOW
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_8
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0008.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0008.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0008.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0008.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0008.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|VITAMIN D, 1,25 DIHYDROXY LC/MS/MS
+</Line>
+<Line>
+.CollectionDate|04/21/2009
+</Line>
+<Line>
+.CollectionTime|11:19
+</Line>
+<Line>
+.Component|VITAMIN D, 1,25 (OH)2, TOTAL
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+..Units|PG/ML
+</Line>
+<Line>
+..Range|18-72
+</Line>
+<Line>
+.Component|VITAMIN D3, 1,25 (OH)2
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+.Component|VITAMIN D2, 1,25 (OH)2
+</Line>
+<Line>
+..Value|&lt;8
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VITAMIN D, 1,25 (OH)2, TOTAL
+</Line>
+<Line>
+..Range|18-72
+</Line>
+<Line>
+..Units|PG/ML
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+.Component|VITAMIN D3, 1,25 (OH)2
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+.Component|VITAMIN D2, 1,25 (OH)2
+</Line>
+<Line>
+.Name|VITAMIN D, 1,25 DIHYDROXY LC/MS/MS
+</Line>
+<Line>
+.CollectionTime|04:19
+</Line>
+<Line>
+.CollectionDate|
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_9
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0009.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0009.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0009.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0009.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0009.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|VITAMIN D, 1,25 DIHYDROXY
+</Line>
+<Line>
+.CollectionDate|04/21/2009
+</Line>
+<Line>
+.CollectionTime|08:04
+</Line>
+<Line>
+.Component|VITAMIN D, 1,25 (OH)2, TOTAL
+</Line>
+<Line>
+..Value|50
+</Line>
+<Line>
+..Units|PG/ML
+</Line>
+<Line>
+..Range|18-72
+</Line>
+<Line>
+.Component|VITAMIN D3, 1,25 (OH)2
+</Line>
+<Line>
+..Value|50
+</Line>
+<Line>
+.Component|VITAMIN D2, 1,25 (OH)2
+</Line>
+<Line>
+..Value|&lt;8
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VITAMIN D, 1,25 (OH)2, TOTAL
+</Line>
+<Line>
+..Range|18-72
+</Line>
+<Line>
+..Units|PG/ML
+</Line>
+<Line>
+.Component|VITAMIN D3, 1,25 (OH)2
+</Line>
+<Line>
+..Value|50
+</Line>
+<Line>
+.Component|VITAMIN D2, 1,25 (OH)2
+</Line>
+<Line>
+..Value|&lt;8
+</Line>
+<Line>
+.Name|VITAMIN D, 1,25 DIHYDROXY LC/MS/MS
+</Line>
+<Line>
+.CollectionTime|08:04
+</Line>
+<Line>
+.CollectionDate|04/21/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_10
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0010.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0010.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0010.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0010.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0010.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|HEPATITIS C VIRAL RNA GENOTYPE, LIPA
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.Component|HCV GENOTYPE, LIPA
+</Line>
+<Line>
+..Value|GENOTYPE 1A
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|HCV GENOTYPE, LIPA
+</Line>
+<Line>
+..Value|GENOTYPE LA
+</Line>
+<Line>
+.Name|HEPATITIS C VIRAL RNA GENOTYPE, LIPA
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_11
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0011.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0011.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0011.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0011.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0011.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CALCIUM, 24 HOUR URINE (W/ CREATININE)
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|09:00
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Value|146
+</Line>
+<Line>
+..Units|MG/G
+</Line>
+<Line>
+..Range|30-275
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Value|174
+</Line>
+<Line>
+..Units|MG/24 H
+</Line>
+<Line>
+.Component|CREATININE, 24 HOUR URINE
+</Line>
+<Line>
+..Value|1.19
+</Line>
+<Line>
+..Units|G/24 H
+</Line>
+<Line>
+..Range|0.63-2.50
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Range|30-275
+</Line>
+<Line>
+..Value|146
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Value|174
+</Line>
+<Line>
+.Name|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+.CollectionTime|09:00
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CREATININE, 24 HOUR URINE
+</Line>
+<Line>
+..Range|0.63-2.50
+</Line>
+<Line>
+..Value|1.19
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionTime|09:00
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_12
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0012.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0012.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0012.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0012.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0012.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|METABOLIC
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.Component|CA
+</Line>
+<Line>
+..Value|95
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&lt;250
+</Line>
+<Line>
+.Component|OX
+</Line>
+<Line>
+..Value|18
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&lt;45
+</Line>
+<Line>
+.Component|UA
+</Line>
+<Line>
+..Value|271
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&lt;700
+</Line>
+<Line>
+.Component|CIT
+</Line>
+<Line>
+..Value|488
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&gt;320
+</Line>
+<Line>
+.Component|PH
+</Line>
+<Line>
+..Value|6.3
+</Line>
+<Line>
+..Range|5.5-7.0
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|ENVIRONMENTAL
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.Component|TV
+</Line>
+<Line>
+..Value|1.55
+</Line>
+<Line>
+..Units|L/DAY
+</Line>
+<Line>
+..Range|&gt;2.00
+</Line>
+<Line>
+.Component|NA
+</Line>
+<Line>
+..Value|64
+</Line>
+<Line>
+..Units|MEQ/DAY
+</Line>
+<Line>
+..Range|&lt;200
+</Line>
+<Line>
+.Component|P
+</Line>
+<Line>
+..Value|352
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&lt;1100
+</Line>
+<Line>
+.Component|MG
+</Line>
+<Line>
+..Value|77
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|&gt;60
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|RELATIVE SUPERSATURATION
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.Component|CAOX
+</Line>
+<Line>
+..Value|0.91
+</Line>
+<Line>
+..Range|&lt;2.00
+</Line>
+<Line>
+.Component|BR
+</Line>
+<Line>
+..Value|0.67
+</Line>
+<Line>
+..Range|&lt;2.00
+</Line>
+<Line>
+.Component|NAU
+</Line>
+<Line>
+..Value|0.63
+</Line>
+<Line>
+..Range|&lt;2.00
+</Line>
+<Line>
+.Component|UA
+</Line>
+<Line>
+..Value|0.42
+</Line>
+<Line>
+..Range|&lt;2.00
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER VALUES
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.Component|K
+</Line>
+<Line>
+..Value|28
+</Line>
+<Line>
+..Units|MEQ/DAY
+</Line>
+<Line>
+..Range|19-135
+</Line>
+<Line>
+.Component|CREATININE
+</Line>
+<Line>
+..Value|848
+</Line>
+<Line>
+..Units|MG/DAY
+</Line>
+<Line>
+..Range|800-2000
+</Line>
+<Line>
+.Component|SO4
+</Line>
+<Line>
+..Value|5
+</Line>
+<Line>
+..Units|MMOL/DAY
+</Line>
+<Line>
+..Range|&lt;30
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_13
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0013.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0013.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0013.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0013.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0013.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/28/2009
+</Line>
+<Line>
+.Component|ANTI-GLIADIN IGG ELISA (AGA IGG)
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|U/ML
+</Line>
+<Line>
+..Range|&lt;10.0
+</Line>
+<Line>
+.Component|ANTI-GLIADIN IGA ELISA (AGA IGA)
+</Line>
+<Line>
+..Value|7.2
+</Line>
+<Line>
+..Units|U/ML
+</Line>
+<Line>
+..Range|&lt;5.0
+</Line>
+<Line>
+.Component|ANTI-HUMAN TISSUE TRANSGLUTAMINASE IGA ELISA (TTG IGA)
+</Line>
+<Line>
+..Value|0.2
+</Line>
+<Line>
+..Units|U/ML
+</Line>
+<Line>
+..Range|&lt;4.0
+</Line>
+<Line>
+.Component|ANTI-ENDOMYSIAL IGA IFA (EMA IGA)
+</Line>
+<Line>
+..Value|NEGATIVE
+</Line>
+<Line>
+..Range|NEGATIVE
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|ANTI-GLIADIN IGG ELISA (AGA IGG)
+</Line>
+<Line>
+..Range|&lt;10.0
+</Line>
+<Line>
+..Units| U/M1
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|ANTI-GLIADIN IGA ELISA (AGA IGA)
+</Line>
+<Line>
+..Range|&lt;5.0
+</Line>
+<Line>
+..Units| WM!
+</Line>
+<Line>
+..Value|7.2
+</Line>
+<Line>
+.Component|ANTI-HUMAN TISSUE TRANSGLUTAMINASE IGA ELISA (TTG IGA)
+</Line>
+<Line>
+..Range|&lt;4.0
+</Line>
+<Line>
+..Units| U/M1
+</Line>
+<Line>
+..Value|0.2
+</Line>
+<Line>
+.Component|ANTI-ENDOMYSIAL IGA IFA (EMA IGA)
+</Line>
+<Line>
+..Value|NEGATIVE
+</Line>
+<Line>
+.Component|TTOTAL SERUM IGA BY NEPHELOMETRY (TOTAL IGA)
+</Line>
+<Line>
+..Range|&lt; 3
+</Line>
+<Line>
+..Units| MG/DL
+</Line>
+<Line>
+..Value|153
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_14
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0014.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0014.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0014.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0014.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0014.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/14/2009
+</Line>
+<Line>
+.Component|BRCA1 SEQUENCING
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+<Line>
+.Component|5-SITE REARRANGEMENT PANEL
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+<Line>
+.Component|BRCA2 SEQUENCING
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|BRCA1 SEQUENCING
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+<Line>
+.Component|5-SITE REARRANGEMENT PANEL
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+<Line>
+.Component|BRCA2 SEQUENCING
+</Line>
+<Line>
+..Value|NO MUTATION DETECTED
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_15
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0015.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0015.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0015.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0015.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0015.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_16
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0016.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0016.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0016.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0016.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0016.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+<Line>
+.Component|BORDETELLA PERTUSSIS/PARAPERTUSSIS PCR
+</Line>
+<Line>
+..Value|NO BORDETELLA PERTUSSIS OR BORDETELLA PARAPERTUSSIS DNA DETECTED
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|BORDETELLA PERTUSSIS/PARAPERTUSSIS PCR
+</Line>
+<Line>
+..Value|NO BORDETELLA PERTUSSIS OR BORDETELLA PARAPERTUSSIS DNA DETECTED.
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_17
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0017.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0017.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0017.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0017.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0017.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/05/2009
+</Line>
+<Line>
+.Component|INFLUENZA A VIRUS PCR
+</Line>
+<Line>
+..Value|NO INFLUENZA A VIRUS RNA DETECTED
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_18
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0018.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0018.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0018.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0018.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0018.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/05/2009
+</Line>
+<Line>
+.Component|BORDETELLA PERTUSSIS/PARAPERTUSSIS PCR
+</Line>
+<Line>
+..Value|NO BORDETELLA PERTUSSIS OR BORDETELLA PARAPERTUSSIS DNA DETECTED.
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|BORDETELLA PERTUSSIS/PARAPERTUSSIS PCR
+</Line>
+<Line>
+..Value|NO BORDETELLA PERTUSSIS OR BORDETELLA PARAPERTUSSIS DNA DETECTED.
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/05/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_19
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0019.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0019.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0019.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0019.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0019.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/05/2009
+</Line>
+<Line>
+.Component|INFLUENZA A VIRUS PCR
+</Line>
+<Line>
+..Value|NO INFLUENZA A VIRUS RNA DETECTED
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_20
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0020.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0020.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0020.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0020.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0020.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CHEMISTRY - URINE
+</Line>
+<Line>
+.CollectionDate|05/01/2009
+</Line>
+<Line>
+.CollectionTime|05:15
+</Line>
+<Line>
+.Component|CREATININE (CRT), URINE
+</Line>
+<Line>
+..Value|1.03
+</Line>
+<Line>
+..Units|G/L
+</Line>
+<Line>
+..Range|0.30-3.00
+</Line>
+<Line>
+.Component|ARSENIC (TOTAL), URINE
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+..Range|0-50
+</Line>
+<Line>
+.Component|ARSENIC (INORGANIC), URINE
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+.Component|LEAD, URINE
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+..Range|0-49
+</Line>
+<Line>
+.Component|MERCURY, URINE
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+.Component|CADMIUM, URINE
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+..Range|NONE DETECTED
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CREATININE (CRT), URINE
+</Line>
+<Line>
+..Range|0.30-3.00
+</Line>
+<Line>
+..Value|1.03
+</Line>
+<Line>
+.Component|ARSENIC (TOTAL), URINE
+</Line>
+<Line>
+..Range|0-50
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+.Component|ARSENIC (INORGANIC), URINE
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+.Component|LEAD, URINE
+</Line>
+<Line>
+..Range|0-49
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+.Component|MERCURY, URINE
+</Line>
+<Line>
+..Range|0-19
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+.Component|CADMIUM, URINE
+</Line>
+<Line>
+..Range|NONE DETECTED
+</Line>
+<Line>
+..Value|NONE DETECTED
+</Line>
+<Line>
+.Name|CHEMISTRY - URINE
+</Line>
+<Line>
+.CollectionTime|05:15
+</Line>
+<Line>
+.CollectionDate|05/01/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_21
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0021.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0021.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0021.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0021.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0021.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - PROTEINS AND AMINO ACIDS
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+<Line>
+.CollectionTime|08:30
+</Line>
+<Line>
+.Component|C-PEPTIDE
+</Line>
+<Line>
+..Value|1.4
+</Line>
+<Line>
+..Units|NG/ML
+</Line>
+<Line>
+..Range|0.9-6.9
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|C-PEPTIDE
+</Line>
+<Line>
+..Range|0.9-6.9
+</Line>
+<Line>
+..Units|NG/ML
+</Line>
+<Line>
+..Value|1.4
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - PROTEINS AND AMINO ACIDS
+</Line>
+<Line>
+.CollectionTime|08:30
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_22
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0022.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0022.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0022.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0022.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0022.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|NON-HEMOLYTIC ANEMIA EVALUATION
+</Line>
+<Line>
+.CollectionDate|05/07/2009
+</Line>
+<Line>
+.CollectionTime|13:00
+</Line>
+<Line>
+.Component|IRON
+</Line>
+<Line>
+..Value|53
+</Line>
+<Line>
+..Units|UG/DL
+</Line>
+<Line>
+..Range|28-112
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|IRON
+</Line>
+<Line>
+..Range|28-112
+</Line>
+<Line>
+..Units|UG/DL
+</Line>
+<Line>
+..Value|53
+</Line>
+<Line>
+.Name|NON-HEMOLYTIC ANEMIA EVALUATION
+</Line>
+<Line>
+.CollectionTime|13:00
+</Line>
+<Line>
+.CollectionDate|05/07/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_23
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0023.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0023.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0023.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0023.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0023.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CALCIUM, 24 HOUR URINE (W/CREATININE)
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Value|155
+</Line>
+<Line>
+..Units|MG/G CREAT
+</Line>
+<Line>
+..Range|30-275
+</Line>
+<Line>
+.Component|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+..Value|170
+</Line>
+<Line>
+..Units|MG/24 H
+</Line>
+<Line>
+..Range|N/A
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.Component|CREATININE, 24 HOUR URINE
+</Line>
+<Line>
+..Value|1.10
+</Line>
+<Line>
+..Units|G/24 H
+</Line>
+<Line>
+..Range|0.63-2.50
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CREATININE
+</Line>
+<Line>
+.Component|CREATININE, 24 HOUR URINE
+</Line>
+<Line>
+..Range|0.63-2.50
+</Line>
+<Line>
+..Value|1.10
+</Line>
+<Line>
+.Name|CALCIUM, 24 HOUR URINE
+</Line>
+<Line>
+.CollectionTime|00:00
+</Line>
+<Line>
+.CollectionDate|05/06/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_24
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0024.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0024.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0024.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0024.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0024.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTOIMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionDate|05/04/2009
+</Line>
+<Line>
+.CollectionTime|14:15
+</Line>
+<Line>
+.Component|LIVER KIDNEY MICROSOMAL ANTIBODY
+</Line>
+<Line>
+..Value|2.5
+</Line>
+<Line>
+..Units|UNITS
+</Line>
+<Line>
+..Range|0.0-20.0
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|LIVER KIDNEY MICROSOMAL ANTIBODY
+</Line>
+<Line>
+..Range|0.0-20.0
+</Line>
+<Line>
+..Units|UNITS
+</Line>
+<Line>
+..Value|2.5
+</Line>
+<Line>
+.Name|AUTOIMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionTime|14:15
+</Line>
+<Line>
+.CollectionDate|05/04/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+SUCCESS
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_25
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0025.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0025.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0025.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0025.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0025.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|FECAL FAT, QUALITATIVE
+</Line>
+<Line>
+.CollectionDate|05/04/2009
+</Line>
+<Line>
+.CollectionTime|09:00
+</Line>
+<Line>
+.Component|NEUTRAL FAT
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+<Line>
+.Component|TOTAL FAT
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|NEUTRAL FAT
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+<Line>
+.Component|TOTAL FAT
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+<Line>
+.Name|FECAL FAT, QUALITATIVE
+</Line>
+<Line>
+.CollectionTime|09:00
+</Line>
+<Line>
+.CollectionDate|05/04/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_26
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0026.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0026.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0026.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0026.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0026.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|INFECTIOUS DISEASES
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|14:04
+</Line>
+<Line>
+.Component|HERPES SIMPLEX I AND II ANTIBODY IGG
+</Line>
+<Line>
+..Value|32.2
+</Line>
+<Line>
+..Units|INDEX
+</Line>
+<Line>
+..Range|0.0-0.8
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|SIT OPLEX I AND I1LUIT[1:.ODY
+</Line>
+<Line>
+..Units|INDEX
+</Line>
+<Line>
+..Value|32.2
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionTime|14:04
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_27
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0027.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0027.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0027.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0027.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0027.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTOLMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionDate|04/24/2020
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.Component|CENTROMERE ANTIBODY
+</Line>
+<Line>
+..Value|1.6
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTOLMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionDate|04/24/2020
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.Component|RNP ANTIBODY SCREEN
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|SCL-70 ANTIBODY IGG
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|SMITH ANTIBODY
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CENTROMERE ANTIBODY
+</Line>
+<Line>
+..Flag|HI
+</Line>
+<Line>
+..Range|0 0
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value|1.6
+</Line>
+<Line>
+.Name|AUTOIMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|RNP ANTIBODY SCREEN
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|SCL-70 ANTIBODY IGG
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value|2
+</Line>
+<Line>
+.Component|SMITH ANTIBODY
+</Line>
+<Line>
+..Range|0-0
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionTime|16:25
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_28
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0028.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0028.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0028.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0028.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0028.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|RAST TESTING
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.CollectionTime|09:45
+</Line>
+<Line>
+.Component|RAST IGE
+</Line>
+<Line>
+..Value|1.05
+</Line>
+<Line>
+..Units|KU/L
+</Line>
+<Line>
+..Range|&lt;0.35
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_29
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0029.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0029.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0029.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0029.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0029.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|THERAPEUTIC DRUG MONITORING
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|12:45
+</Line>
+<Line>
+.Component|LAMICTAL (LAMOTRIGINE)
+</Line>
+<Line>
+..Value|1.3
+</Line>
+<Line>
+..Units|NG/ML
+</Line>
+<Line>
+..Range|2.0-20.0
+</Line>
+<Line>
+..Flag|L
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_30
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0030.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0030.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0030.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0030.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0030.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - HORMONES
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|12:35
+</Line>
+<Line>
+.Component|RENIN ACTIVITY
+</Line>
+<Line>
+..Value|5.73
+</Line>
+<Line>
+..Units|NG/ML/HR
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_31
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0031.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0031.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0031.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0031.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0031.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|FLOW CYTOMETRY - SUBSETS
+</Line>
+<Line>
+.CollectionDate|04/28/2009
+</Line>
+<Line>
+.CollectionTime|18:14
+</Line>
+<Line>
+.Component|WHITE BLOOD CELL COUNT
+</Line>
+<Line>
+..Value|3.3
+</Line>
+<Line>
+..Units|10E3/UL
+</Line>
+<Line>
+..Range|4.0-10.0
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|% LYMPHOCYTES
+</Line>
+<Line>
+..Value|36
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|20-45
+</Line>
+<Line>
+.Component|ABSOLUTE LYMPHOCYTES
+</Line>
+<Line>
+..Value|1190
+</Line>
+<Line>
+..Units|/UL
+</Line>
+<Line>
+..Range|1000-3400
+</Line>
+<Line>
+.Component|(ABSOLUTE# T-HELPER) CD3+/CD4+
+</Line>
+<Line>
+..Value|476
+</Line>
+<Line>
+..Units|/UL
+</Line>
+<Line>
+..Range|467-1085
+</Line>
+<Line>
+.Component|(ABSOLUTE# T-SUPP) CD3+/CD8+
+</Line>
+<Line>
+..Value|488
+</Line>
+<Line>
+..Units|/UL
+</Line>
+<Line>
+..Range|109-656
+</Line>
+<Line>
+.Component|TOTAL CD3
+</Line>
+<Line>
+..Value|988
+</Line>
+<Line>
+..Units|/UL
+</Line>
+<Line>
+..Range|630-1546
+</Line>
+<Line>
+.Component|(HELP/SUPP) CD4+/CD8+ RATIO
+</Line>
+<Line>
+..Value|0.98
+</Line>
+<Line>
+..Range|0.86-4.60
+</Line>
+<Line>
+.Component|(%T-HELPER CD4) CD3+CD4+
+</Line>
+<Line>
+..Value|40
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|32-61
+</Line>
+<Line>
+.Component|(%T-SUPPRESSOR CD8) CD3+CD8+
+</Line>
+<Line>
+..Value|41
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|18-42
+</Line>
+<Line>
+.Component|(%T-CELLS CD3) TOTAL CD3
+</Line>
+<Line>
+..Value|83
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|53-88
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.Component|BLOOD
+</Line>
+<Line>
+..Range|4.0-11.0
+</Line>
+<Line>
+..Value|3.3
+</Line>
+<Line>
+.Component|ABSOLUTE LYMPH
+</Line>
+<Line>
+..Range|11000-34001
+</Line>
+<Line>
+..Units|/UL
+</Line>
+<Line>
+..Value|1190
+</Line>
+<Line>
+.Component|TOTAL CO2
+</Line>
+<Line>
+..Value|988
+</Line>
+<Line>
+.Component|CO
+</Line>
+<Line>
+..Range|132-61
+</Line>
+<Line>
+..Value|0
+</Line>
+<Line>
+.Component|CD8 T-SUPPRESSOR
+</Line>
+<Line>
+..Value|41
+</Line>
+<Line>
+.Component|T3, TOTAL
+</Line>
+<Line>
+..Range|73-881
+</Line>
+<Line>
+..Value|83
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_32
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0032.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0032.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0032.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0032.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0032.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD BANK - BLOOD GROUP AND TYPE
+</Line>
+<Line>
+.CollectionDate|04/20/2009
+</Line>
+<Line>
+.CollectionTime|14:22
+</Line>
+<Line>
+.Component|ABORH TYPE
+</Line>
+<Line>
+..Value|A NEG
+</Line>
+<Line>
+.Component|ABORH RERYPE
+</Line>
+<Line>
+..Value|A NEG
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD BANK - ANTIBODY SCREENING AND TESTING
+</Line>
+<Line>
+.CollectionDate|04/20/2009
+</Line>
+<Line>
+.CollectionTime|14:22
+</Line>
+<Line>
+.Component|ANTIBODY SCREEN
+</Line>
+<Line>
+..Value|POSITIVE
+</Line>
+<Line>
+.Component|ANTIBODY I
+</Line>
+<Line>
+..Value|ANTI-D
+</Line>
+<Line>
+.Component|DIRECT COOMBS
+</Line>
+<Line>
+..Value|NEGATIVE
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|ANTIBODY SCREEN
+</Line>
+<Line>
+..Value|POSITIVE
+</Line>
+<Line>
+.Component|ANTIBODY I
+</Line>
+<Line>
+..Value|17
+</Line>
+<Line>
+.Component|DIRECT COOMBS
+</Line>
+<Line>
+..Value|NEGATIVE
+</Line>
+<Line>
+.Component|ANTIBODY I
+</Line>
+<Line>
+.Name|COLLCULCD DATE
+</Line>
+<Line>
+.CollectionTime|14:22
+</Line>
+<Line>
+.CollectionDate|04/20/2002
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_33
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0033.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0033.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0033.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0033.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0033.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - HORMONES
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:55
+</Line>
+<Line>
+.Component|ANDROSTENEDIONE
+</Line>
+<Line>
+..Value|137
+</Line>
+<Line>
+..Units|NG/DL
+</Line>
+<Line>
+..Range|47-268
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_34
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0034.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0034.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0034.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0034.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0034.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - HORMONES
+</Line>
+<Line>
+.CollectionDate|04/22/2009
+</Line>
+<Line>
+.CollectionTime|00:01
+</Line>
+<Line>
+.Component|VITAMIN D 1.25-DIHYDROXY
+</Line>
+<Line>
+..Value|35.7
+</Line>
+<Line>
+..Units|PG/ML
+</Line>
+<Line>
+..Range|15.9-55.6
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VITAMIN D, 1,25-DIHYDROXY
+</Line>
+<Line>
+..Range|115.9-55.6
+</Line>
+<Line>
+..Value|35.7
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - HORMONES
+</Line>
+<Line>
+.CollectionDate|
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_35
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0035.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0035.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0035.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0035.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0035.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - PROTEINS AND AMINO ACIDS
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|08:40
+</Line>
+<Line>
+.Component|C-REACTIVE PROTEIN HIGH SENSITIVITY
+</Line>
+<Line>
+..Value|2.14
+</Line>
+<Line>
+..Units|MG/L
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|C-REACTIVE PROTEIN HIGH SENSITIVITY
+</Line>
+<Line>
+..Value|2.14
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY PROTEINS AND AMINO ACIDS
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_36
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0036.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0036.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0036.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0036.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0036.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD CHEMISTRY - PROTEINS AND AMINO ACIDS
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|15:00
+</Line>
+<Line>
+.Component|IGM
+</Line>
+<Line>
+..Value|195
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|45-281
+</Line>
+<Line>
+.Component|IGA
+</Line>
+<Line>
+..Value|244
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|66-433
+</Line>
+<Line>
+.Component|IGG
+</Line>
+<Line>
+..Value|1985
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|635-1741
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_37
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0037.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0037.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0037.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0037.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0037.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTOIMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:35
+</Line>
+<Line>
+.Component|CENTROMERE ANTIBODY
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTOIMMUNE SEROLOGY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:35
+</Line>
+<Line>
+.Component|RMP ANTIBODY SCREEN
+</Line>
+<Line>
+..Value|0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|SCL-70 ANTIBODY IGG
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+.Component|SMITH ANTIBODY
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CENTROMERE ANTIBODY
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value|&lt;0.2
+</Line>
+<Line>
+.Name|ATITOIRNRRTUNE
+</Line>
+<Line>
+.CollectionTime|10:35
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|RNP ANTIBODY SCREEN
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value| 9
+</Line>
+<Line>
+.Component|SCL-70 ANTIBODY IGG
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value|0.2
+</Line>
+<Line>
+.Component|SMITH ANTIBODY
+</Line>
+<Line>
+..Range|0.0-0.9
+</Line>
+<Line>
+..Units|AI
+</Line>
+<Line>
+..Value| 2
+</Line>
+<Line>
+.Name|ATITOIRNRRTUNE
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_38
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0039.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0039.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0039.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0039.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0039.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|HEME PROFILE
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:05
+</Line>
+<Line>
+.Component|WBC
+</Line>
+<Line>
+..Value|6.0
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|4.2-11.0
+</Line>
+<Line>
+.Component|RBC
+</Line>
+<Line>
+..Value|4.17
+</Line>
+<Line>
+..Units|MIL/MCL
+</Line>
+<Line>
+..Range|4.00-5.20
+</Line>
+<Line>
+.Component|HEMOGLOBIN
+</Line>
+<Line>
+..Value|13.7
+</Line>
+<Line>
+..Units|G/DL
+</Line>
+<Line>
+..Range|12.0-15.5
+</Line>
+<Line>
+.Component|HEMATOCRIT
+</Line>
+<Line>
+..Value|39.9
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|36.0-45.6
+</Line>
+<Line>
+.Component|MCV
+</Line>
+<Line>
+..Value|95.7
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Range|78.0-100.0
+</Line>
+<Line>
+.Component|MCH
+</Line>
+<Line>
+..Value|32.9
+</Line>
+<Line>
+..Units|PG
+</Line>
+<Line>
+..Range|26.0-34.0
+</Line>
+<Line>
+.Component|MCHC
+</Line>
+<Line>
+..Value|34.3
+</Line>
+<Line>
+..Units|G/DL
+</Line>
+<Line>
+..Range|32.0-36.5
+</Line>
+<Line>
+.Component|RDWCV
+</Line>
+<Line>
+..Value|11.5
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|11.0-15.0
+</Line>
+<Line>
+.Component|PLATELET
+</Line>
+<Line>
+..Value|175
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|140-450
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|AUTO DIFFERENTIAL
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:05
+</Line>
+<Line>
+.Component|NEU%
+</Line>
+<Line>
+..Value|66
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|33-69
+</Line>
+<Line>
+.Component|LYM%
+</Line>
+<Line>
+..Value|28
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|20-55
+</Line>
+<Line>
+.Component|MON%
+</Line>
+<Line>
+..Value|5
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|0-10
+</Line>
+<Line>
+.Component|EOS%
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|0-6
+</Line>
+<Line>
+.Component|BASO%
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|0-2
+</Line>
+<Line>
+.Component|NEU ABS
+</Line>
+<Line>
+..Value|3.9
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|1.8-7.7
+</Line>
+<Line>
+.Component|LYM ABS
+</Line>
+<Line>
+..Value|1.7
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|1.0-4.0
+</Line>
+<Line>
+.Component|MON ABS
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|0.3-0.9
+</Line>
+<Line>
+.Component|EOS ABS
+</Line>
+<Line>
+..Value|0.1
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|0.1-0.5
+</Line>
+<Line>
+.Component|BASO ABS
+</Line>
+<Line>
+..Value|0.0
+</Line>
+<Line>
+..Units|K/MCL
+</Line>
+<Line>
+..Range|0.0-0.3
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COMP METABOLIC PNL
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:05
+</Line>
+<Line>
+.Component|SODIUM
+</Line>
+<Line>
+..Value|135
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+..Range|135-145
+</Line>
+<Line>
+.Component|POTASSIUM
+</Line>
+<Line>
+..Value|3.9
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+..Range|3.5-5.1
+</Line>
+<Line>
+.Component|CHLORIDE
+</Line>
+<Line>
+..Value|95
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+..Range|98-107
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|CARBON DIOXIDE
+</Line>
+<Line>
+..Value|30
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+..Range|22-30
+</Line>
+<Line>
+.Component|ANION GAP
+</Line>
+<Line>
+..Value|14
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+..Range|10-20
+</Line>
+<Line>
+.Component|GLUCOSE
+</Line>
+<Line>
+..Value|83
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|65-99
+</Line>
+<Line>
+.Component|BUN
+</Line>
+<Line>
+..Value|13
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|10-20
+</Line>
+<Line>
+.Component|CREATININE
+</Line>
+<Line>
+..Value|0.66
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|0.50-1.10
+</Line>
+<Line>
+.Component|GFR EST.AFRICAN AMER
+</Line>
+<Line>
+..Value|&gt;60
+</Line>
+<Line>
+..Units|ML/MIN/1.73M2
+</Line>
+<Line>
+..Range|&gt;59
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COMP METABOLIC PNL
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:05
+</Line>
+<Line>
+.Component|GFR EST.NONAFRI AMER
+</Line>
+<Line>
+..Value|&gt;60
+</Line>
+<Line>
+..Units|ML/MIN/1.73M2
+</Line>
+<Line>
+..Range|&gt;59
+</Line>
+<Line>
+.Component|BUN/CREATININE RATIO
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+..Range|7-25
+</Line>
+<Line>
+.Component|BILIRUBIN TOTAL
+</Line>
+<Line>
+..Value|0.4
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|0.2-1.3
+</Line>
+<Line>
+.Component|GOT/AST
+</Line>
+<Line>
+..Value|15
+</Line>
+<Line>
+..Units|UNITS/L
+</Line>
+<Line>
+..Range|8-39
+</Line>
+<Line>
+.Component|ALK PHOSPHATASE
+</Line>
+<Line>
+..Value|89
+</Line>
+<Line>
+..Units|UNITS/L
+</Line>
+<Line>
+..Range|38-126
+</Line>
+<Line>
+.Component|ALBUMIN
+</Line>
+<Line>
+..Value|3.8
+</Line>
+<Line>
+..Units|G/DL
+</Line>
+<Line>
+..Range|3.5-5.0
+</Line>
+<Line>
+.Component|PROTEIN, TOTAL
+</Line>
+<Line>
+..Value|7.3
+</Line>
+<Line>
+..Units|G/DL
+</Line>
+<Line>
+..Range|6.0-8.2
+</Line>
+<Line>
+.Component|GLOBULIN
+</Line>
+<Line>
+..Value|3.5
+</Line>
+<Line>
+..Units|G/DL
+</Line>
+<Line>
+..Range|2.0-4.0
+</Line>
+<Line>
+.Component|A/G RATIO
+</Line>
+<Line>
+..Value|1.1
+</Line>
+<Line>
+..Range|1.0-2.4
+</Line>
+<Line>
+.Component|CALCIUM
+</Line>
+<Line>
+..Value|9.2
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|8.4-10.2
+</Line>
+<Line>
+.Component|GPT/ALT
+</Line>
+<Line>
+..Value|29
+</Line>
+<Line>
+..Units|UNITS/L
+</Line>
+<Line>
+..Range|9-52
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|10:05
+</Line>
+<Line>
+.Component|CANCER AG CA153
+</Line>
+<Line>
+..Value|34
+</Line>
+<Line>
+..Units|U/ML
+</Line>
+<Line>
+..Range|0-31
+</Line>
+<Line>
+..Flag|H
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|RBC
+</Line>
+<Line>
+..Range|4.2-11.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|6.0
+</Line>
+<Line>
+.Component|POC
+</Line>
+<Line>
+..Range|4.00-5.20
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|4.17
+</Line>
+<Line>
+.Component|HEMOGLOBIN
+</Line>
+<Line>
+..Range|12.0-15.5
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|1.3.7
+</Line>
+<Line>
+.Component|HEMATOCRIT
+</Line>
+<Line>
+..Range|36.0-45
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|39.9
+</Line>
+<Line>
+.Component|MCV
+</Line>
+<Line>
+..Range|78.0-100.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|95.7
+</Line>
+<Line>
+.Component|MCH
+</Line>
+<Line>
+..Range|26.0-34.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|32.9
+</Line>
+<Line>
+.Component|MCHC
+</Line>
+<Line>
+..Range|32.0-315.5
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|34.3
+</Line>
+<Line>
+.Component|RDWCV
+</Line>
+<Line>
+..Range|11.0-15.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|11.5
+</Line>
+<Line>
+.Component|PLATELET
+</Line>
+<Line>
+..Range|140-450
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|175
+</Line>
+<Line>
+.Name|HEME PROFILE
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|NEU
+</Line>
+<Line>
+..Range|33-69
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|66
+</Line>
+<Line>
+.Component|LYM
+</Line>
+<Line>
+..Range|20-55
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|28
+</Line>
+<Line>
+.Component|NOWT
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|5
+</Line>
+<Line>
+.Component|505%
+</Line>
+<Line>
+..Range|0-6
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|1
+</Line>
+<Line>
+.Component|BASO%
+</Line>
+<Line>
+..Range|0-2
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|1 E
+</Line>
+<Line>
+.Component|NEU ABS
+</Line>
+<Line>
+..Range|0-7.7
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|3.9K/MAL. 1.0-7.7
+</Line>
+<Line>
+.Component|LYM ABS
+</Line>
+<Line>
+..Range|1.0-4.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|1.7
+</Line>
+<Line>
+.Component|MON ABS
+</Line>
+<Line>
+..Range|0.3-0.9
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|EOS ABS
+</Line>
+<Line>
+..Range|0.1-0.5
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|0.1
+</Line>
+<Line>
+.Component|BASO ABS
+</Line>
+<Line>
+..Range|0.0-0.3
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|0.0
+</Line>
+<Line>
+.Name|AUTO DIFFERENTIAL
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|SODIUM
+</Line>
+<Line>
+..Range|135-145
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|135
+</Line>
+<Line>
+.Component|POTASSIUM
+</Line>
+<Line>
+..Range|3.5-5.1
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|3.9
+</Line>
+<Line>
+.Component|CHLORIDE
+</Line>
+<Line>
+..Range|90-107
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|95
+</Line>
+<Line>
+.Component|CARBON DIOXIDE
+</Line>
+<Line>
+..Range|22-30
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|30
+</Line>
+<Line>
+.Component|ANION GAP
+</Line>
+<Line>
+..Range|10-20
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|14
+</Line>
+<Line>
+.Component|GLUCOSE
+</Line>
+<Line>
+..Range|65-99
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|03
+</Line>
+<Line>
+.Component|BUN
+</Line>
+<Line>
+..Range|10-20
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|13
+</Line>
+<Line>
+.Component|CREATININE
+</Line>
+<Line>
+..Range|9.50-1.10
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|0.66
+</Line>
+<Line>
+.Component|EGFR AFRICAN AMERICAN
+</Line>
+<Line>
+..Range|&gt;59
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|&gt;60
+</Line>
+<Line>
+.Component|EFR EST.NONAFRI AMER
+</Line>
+<Line>
+..Range|&gt;59
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|&gt;60
+</Line>
+<Line>
+.Component|BUN/CREATININE RATIO
+</Line>
+<Line>
+..Range|7-25
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|20
+</Line>
+<Line>
+.Component|BILIRUBIN TOTAL
+</Line>
+<Line>
+..Range|0.2-1.3
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|0.4
+</Line>
+<Line>
+.Component|GOT/AST
+</Line>
+<Line>
+..Range|8-39
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|15 UNITS/L
+</Line>
+<Line>
+.Component|ALK PHOSPHATASE
+</Line>
+<Line>
+..Range|0-126
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+.Component|ALBUMIN
+</Line>
+<Line>
+..Range|3.5-5.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|3.0
+</Line>
+<Line>
+.Component|PROTEIN, TOTAL
+</Line>
+<Line>
+..Range|6.0-8.2
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|7.3
+</Line>
+<Line>
+.Component|GLOBULIN
+</Line>
+<Line>
+..Range|2.0-4.0
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|3.5
+</Line>
+<Line>
+.Component|A/G RATIO
+</Line>
+<Line>
+..Range|1.0-2.4
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|1.1
+</Line>
+<Line>
+.Component|CALCIUM
+</Line>
+<Line>
+..Range|8.4-10.2
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|9.2
+</Line>
+<Line>
+.Component|ALT
+</Line>
+<Line>
+..Range|9-62
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+..Value|29
+</Line>
+<Line>
+.Component|AST
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+.Name|COMP METABOLIC PNL
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CANCER AG CA153
+</Line>
+<Line>
+..Units|
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_39
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0040.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0040.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0040.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0040.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0040.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|HEMATOLOGY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|HGB
+</Line>
+<Line>
+..Value|13.6
+</Line>
+<Line>
+..Units|GM/DL
+</Line>
+<Line>
+..Range|13.0-17.0
+</Line>
+<Line>
+.Component|HCT
+</Line>
+<Line>
+..Value|40.4
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|39.0-51.0
+</Line>
+<Line>
+.Component|RBC
+</Line>
+<Line>
+..Value|4.42
+</Line>
+<Line>
+..Units|M/UL
+</Line>
+<Line>
+..Range|4.30-5.90
+</Line>
+<Line>
+.Component|WBC
+</Line>
+<Line>
+..Value|7.1
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|4.0-10.0
+</Line>
+<Line>
+.Component|PLT
+</Line>
+<Line>
+..Value|257
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|150-400
+</Line>
+<Line>
+.Component|MPV
+</Line>
+<Line>
+..Value|9.9
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Range|9.0-13.0
+</Line>
+<Line>
+.Component|MCV
+</Line>
+<Line>
+..Value|91.4
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Range|79.0-99.0
+</Line>
+<Line>
+.Component|MCH
+</Line>
+<Line>
+..Value|30.8
+</Line>
+<Line>
+..Units|PG
+</Line>
+<Line>
+..Range|26.0-34.0
+</Line>
+<Line>
+.Component|MCHC
+</Line>
+<Line>
+..Value|33.7
+</Line>
+<Line>
+..Units|GM/DL
+</Line>
+<Line>
+..Range|32.0-36.0
+</Line>
+<Line>
+.Component|RDW
+</Line>
+<Line>
+..Value|41.9
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Range|38.0-50.0
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|DIFFERENTIAL (AUTOMATED)
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|NEUT
+</Line>
+<Line>
+..Value|39.5
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|42.0-76.0
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|LYMPH
+</Line>
+<Line>
+..Value|48.3
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|15.0-45.0
+</Line>
+<Line>
+..Flag|H
+</Line>
+<Line>
+.Component|MONO
+</Line>
+<Line>
+..Value|10.3
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|4.0-12.0
+</Line>
+<Line>
+.Component|EOS
+</Line>
+<Line>
+..Value|1.6
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|0.0-6.0
+</Line>
+<Line>
+.Component|BASOS
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|0.0-2.0
+</Line>
+<Line>
+.Component|ABS# NEUT
+</Line>
+<Line>
+..Value|2.8
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|1.6-7.6
+</Line>
+<Line>
+.Component|ABS# LYMPH
+</Line>
+<Line>
+..Value|3.4
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|1.1-4.0
+</Line>
+<Line>
+.Component|ABS# MONO
+</Line>
+<Line>
+..Value|0.7
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|0.3-1.0
+</Line>
+<Line>
+.Component|ABS# EOS
+</Line>
+<Line>
+..Value|0.1
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|0.0-0.6
+</Line>
+<Line>
+.Component|ABS# BASO
+</Line>
+<Line>
+..Value|0.0
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Range|0.0-0.2
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CHEMISTRY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|CHOLESTEROL
+</Line>
+<Line>
+..Value|100
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt; 200
+</Line>
+<Line>
+.Component|TRIGLYCERIDES
+</Line>
+<Line>
+..Value|63
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt; 150
+</Line>
+<Line>
+.Component|HDL CHOLESTEROL
+</Line>
+<Line>
+..Value|32
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&gt; 40
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|NON HDL CHOL
+</Line>
+<Line>
+..Value|68
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt; 160
+</Line>
+<Line>
+.Component|LDL CHOL, CALC
+</Line>
+<Line>
+..Value|55
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|&lt; 130
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CHEMISTRY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|CHOL/HDL
+</Line>
+<Line>
+..Value|3.1
+</Line>
+<Line>
+..Range|&lt; 6.0
+</Line>
+<Line>
+.Component|PT FASTING?
+</Line>
+<Line>
+..Value|YES
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|ENDOCRINOLOGY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|TESTOST TOTAL
+</Line>
+<Line>
+..Value|140
+</Line>
+<Line>
+..Units|NG/DL
+</Line>
+<Line>
+..Range|280-800
+</Line>
+<Line>
+..Flag|L
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|HGB
+</Line>
+<Line>
+..Range|13.0-17.0
+</Line>
+<Line>
+..Units|GM/DL
+</Line>
+<Line>
+..Value|13.6
+</Line>
+<Line>
+.Component|HCT
+</Line>
+<Line>
+..Range|39.0-51.0
+</Line>
+<Line>
+..Value|40.4
+</Line>
+<Line>
+.Component|A1C
+</Line>
+<Line>
+..Range|4.30-5.90
+</Line>
+<Line>
+..Value|4.42
+</Line>
+<Line>
+.Component|WE2
+</Line>
+<Line>
+..Range|4.0-10.0
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Value|7.1
+</Line>
+<Line>
+.Component|PLT
+</Line>
+<Line>
+..Range|150-400
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Value|257
+</Line>
+<Line>
+.Component|MPV
+</Line>
+<Line>
+..Range|9.0-13.0
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Value|9.9
+</Line>
+<Line>
+.Component|MCV
+</Line>
+<Line>
+..Range|79.0-99.0
+</Line>
+<Line>
+..Value|91.4
+</Line>
+<Line>
+.Component|NCI)
+</Line>
+<Line>
+..Range|26.0-34.0
+</Line>
+<Line>
+..Units|PG
+</Line>
+<Line>
+..Value|30.8
+</Line>
+<Line>
+.Component|CHOL
+</Line>
+<Line>
+..Range|32.0-36.0
+</Line>
+<Line>
+..Units|GM/DL
+</Line>
+<Line>
+..Value|33.7
+</Line>
+<Line>
+.Component|RDW
+</Line>
+<Line>
+..Range|30.0-50.0
+</Line>
+<Line>
+..Units|FL
+</Line>
+<Line>
+..Value|41.9
+</Line>
+<Line>
+.Name|HEMATOLOGY
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|NEUT
+</Line>
+<Line>
+..Range|42.0-76.0
+</Line>
+<Line>
+.Component|LYMPH
+</Line>
+<Line>
+..Range|15.0-45.0
+</Line>
+<Line>
+.Component|MONO
+</Line>
+<Line>
+..Range|4.0-12.0
+</Line>
+<Line>
+..Value|10.3
+</Line>
+<Line>
+.Component|EOS
+</Line>
+<Line>
+..Range|0.0-6.0
+</Line>
+<Line>
+..Value|1.0
+</Line>
+<Line>
+.Component|BASOS
+</Line>
+<Line>
+..Range|0.0-2.0
+</Line>
+<Line>
+..Value|0.3
+</Line>
+<Line>
+.Component|ABS# NEUT
+</Line>
+<Line>
+..Range|1.6-7.6
+</Line>
+<Line>
+..Value|2.9
+</Line>
+<Line>
+.Component|LYMPH
+</Line>
+<Line>
+..Range|1.1-4.0
+</Line>
+<Line>
+..Value|3.4
+</Line>
+<Line>
+.Component|ABS# MONO
+</Line>
+<Line>
+..Range|0.3-1.0
+</Line>
+<Line>
+..Value|0.7
+</Line>
+<Line>
+.Component|ABS EOS
+</Line>
+<Line>
+..Range|0.0-0.6
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Value|0.1
+</Line>
+<Line>
+.Component|ABS# BASO
+</Line>
+<Line>
+..Range|0.0-0
+</Line>
+<Line>
+..Units|K/UL
+</Line>
+<Line>
+..Value|0.0
+</Line>
+<Line>
+.Name|DIFFERENTIAL (AUTOMATED)
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CHOLESTEROL
+</Line>
+<Line>
+..Value|100
+</Line>
+<Line>
+.Component|TRIGLYCERIDES
+</Line>
+<Line>
+..Value|63
+</Line>
+<Line>
+.Component|HDL CHOLESTEROL
+</Line>
+<Line>
+.Component|NON HDL CHOL
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Value|68
+</Line>
+<Line>
+.Component|CALC CALCIUM
+</Line>
+<Line>
+..Range|&lt; 130
+</Line>
+<Line>
+..Value|55
+</Line>
+<Line>
+.Name|04;23,09 0045
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CHOL/HDL
+</Line>
+<Line>
+..Range|&lt; 6.0
+</Line>
+<Line>
+..Value|3.1
+</Line>
+<Line>
+.Component|PT FASTING?
+</Line>
+<Line>
+..Value|YES
+</Line>
+<Line>
+.Name|CHEMISTRY
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|TESTOST TOTAL
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+..Range|200-800
+</Line>
+<Line>
+..Units|NG/DL
+</Line>
+<Line>
+..Value|140
+</Line>
+<Line>
+.Name|ENDOCRINOLOGY
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.CollectionDate|04/23/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_40
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0041.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0041.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0041.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0041.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0041.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|OTHER
+</Line>
+<Line>
+.CollectionDate|04/13/2009
+</Line>
+<Line>
+.CollectionTime|08:45
+</Line>
+<Line>
+.Component|HPV DNA (HIGH RISK)
+</Line>
+<Line>
+..Value|NOT DETECTED
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_41
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0042.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0042.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0042.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0042.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0042.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|FACTOR VIII ACTIVITY
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.Component|FACTOR VIII ACTIVITY
+</Line>
+<Line>
+..Value|96
+</Line>
+<Line>
+..Units|IU/DL
+</Line>
+<Line>
+..Range|60-195
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|VWF RISTOCETIN COFACTOR ACTIVITY
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.Component|VWF RISTOCETIN COFACTOR
+</Line>
+<Line>
+..Value|104
+</Line>
+<Line>
+..Units|IU/DL
+</Line>
+<Line>
+..Range|54-279
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|VWF ANTIGEN
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.Component|VWF ANTIGEN
+</Line>
+<Line>
+..Value|97
+</Line>
+<Line>
+..Units|IU/DL
+</Line>
+<Line>
+..Range|50-240
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|BLOOD GROUP FOR VWF INTERPRETATION
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.Component|BLOOD GROUP BY REVERSE TYPING
+</Line>
+<Line>
+..Value|O
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|VWF MULTIMERS
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.Component|VWF MULTIMER RESULT
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|FACTOR VIII ACTIVITY
+</Line>
+<Line>
+..Range|60-195
+</Line>
+<Line>
+..Value|96
+</Line>
+<Line>
+.Name|FACTOR VIII ACTIVITY
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VWF RISTOCETIN COFACTOR
+</Line>
+<Line>
+..Range|54-279
+</Line>
+<Line>
+..Units|IU/DL
+</Line>
+<Line>
+..Value|104
+</Line>
+<Line>
+.Name|VWF RISTOCETIN COFACTOR ACTIVITY
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VWF ANTIGEN
+</Line>
+<Line>
+..Range|50-240
+</Line>
+<Line>
+..Value|97
+</Line>
+<Line>
+.Name|VWF ANTIGEN
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|BLOOD GROUP BY REVERSE TYPING
+</Line>
+<Line>
+..Value|0
+</Line>
+<Line>
+.Name|BLOOD GROUP FOR VWF INTERPRETATION
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|VWF MULTIMER RESULT
+</Line>
+<Line>
+..Value|NORMAL
+</Line>
+<Line>
+.Name|VWF MULTIMERS
+</Line>
+<Line>
+.CollectionTime|12:00
+</Line>
+<Line>
+.CollectionDate|04/27/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_42
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0043.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0043.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0043.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA MUTATION ANALYSIS
+</Line>
+<Line>
+.CollectionDate|04/30/2009
+</Line>
+<Line>
+.CollectionTime|16:31
+</Line>
+<Line>
+.Component|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA
+</Line>
+<Line>
+..Value|POSITIVE FOR ONE COPY OF THE C677T MUTATION
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA
+</Line>
+<Line>
+..Value|RESULT: POSITIVE FOR ONE COPY OF THE C677T MUTATION
+</Line>
+<Line>
+.Component|SHARED ASSAY COMPONENTS
+</Line>
+<Line>
+..Value|SEE NOTE
+</Line>
+<Line>
+.Name|METHYLENETETRAHYDROFOLATE REDUCTASE (MTHFR), DNA MUTATION ANALYSIS
+</Line>
+<Line>
+.CollectionTime|16:31
+</Line>
+<Line>
+.CollectionDate|04/30/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_43
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0044.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0044.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0044.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0044.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0044.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|HEMATOLOGY - SPECIAL
+</Line>
+<Line>
+.CollectionDate|04/29/2009
+</Line>
+<Line>
+.CollectionTime|09:03
+</Line>
+<Line>
+.Component|FERRITIN
+</Line>
+<Line>
+..Value|86
+</Line>
+<Line>
+..Units|NG/ML
+</Line>
+<Line>
+..Range|10-291
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|COAGULATION
+</Line>
+<Line>
+.CollectionDate|04/29/2009
+</Line>
+<Line>
+.CollectionTime|09:03
+</Line>
+<Line>
+.Component|FIBRINOGEN
+</Line>
+<Line>
+..Value|215
+</Line>
+<Line>
+..Units|MG/DL
+</Line>
+<Line>
+..Range|180-350
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|FIBRINOGEN
+</Line>
+<Line>
+..Range|180-350
+</Line>
+<Line>
+..Value|215
+</Line>
+<Line>
+.Name|COAGULATION - GENERAL
+</Line>
+<Line>
+.CollectionTime|03:00
+</Line>
+<Line>
+.CollectionDate|12/30/1899
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+3_44
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set003\TestResults.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0045.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0045.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0045.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0045.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set003\Images\0045.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CHEMISTRY - URINE
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|08:18
+</Line>
+<Line>
+.Component|SODIUM URINE RANDOM
+</Line>
+<Line>
+..Value|80
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|CHEMISTRY - URINE
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+<Line>
+.CollectionTime|08:18
+</Line>
+<Line>
+.Component|SODIUM URINE RANDOM
+</Line>
+<Line>
+..Value|80
+</Line>
+<Line>
+..Units|MMOL/L
+</Line>
+</Detail>
+<Title>
+Found Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|SODIUM URINE RANDOM
+</Line>
+<Line>
+.Name|CHEMISTRY - URINE
+</Line>
+<Line>
+.CollectionTime|08:01
+</Line>
+<Line>
+.CollectionDate|01/24/2009
+</Line>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Component|CREATININE URINE RANDOM
+</Line>
+<Line>
+..Value|46
+</Line>
+<Line>
+.Name|CHEMISTRY
+</Line>
+<Line>
+.CollectionTime|08:20
+</Line>
+<Line>
+.CollectionDate|04/24/2009
+</Line>
+</Detail>
+</TestCaseCompareData>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Mon Jun 01 17:48:21 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+Test
+</Title>
+<Detail>
+<Line>
+Total Expected: 65
+</Line>
+<Line>
+Total Correct: 47 (72.31%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionDate
+</Title>
+<Detail>
+<Line>
+Total Expected: 65
+</Line>
+<Line>
+Total Correct: 32 (49.23%)
+</Line>
+<Line>
+Total Incorrectly Found: 8
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionTime
+</Title>
+<Detail>
+<Line>
+Total Expected: 54
+</Line>
+<Line>
+Total Correct: 28 (51.85%)
+</Line>
+<Line>
+Total Incorrectly Found: 5
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component
+</Title>
+<Detail>
+<Line>
+Total Expected: 187
+</Line>
+<Line>
+Total Correct: 111 (59.36%)
+</Line>
+<Line>
+Total Incorrectly Found: 42
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Flag
+</Title>
+<Detail>
+<Line>
+Total Expected: 19
+</Line>
+<Line>
+Total Correct: 4 (21.05%)
+</Line>
+<Line>
+Total Incorrectly Found: 1
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Range
+</Title>
+<Detail>
+<Line>
+Total Expected: 158
+</Line>
+<Line>
+Total Correct: 70 (44.30%)
+</Line>
+<Line>
+Total Incorrectly Found: 43
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Units
+</Title>
+<Detail>
+<Line>
+Total Expected: 146
+</Line>
+<Line>
+Total Correct: 30 (20.55%)
+</Line>
+<Line>
+Total Incorrectly Found: 55
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Value
+</Title>
+<Detail>
+<Line>
+Total Expected: 187
+</Line>
+<Line>
+Total Correct: 84 (44.92%)
+</Line>
+<Line>
+Total Incorrectly Found: 55
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 65
+</Line>
+<Line>
+Total Correct: 32 (49.23%)
+</Line>
+<Line>
+Total Incorrectly Found: 16
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Mon Jun 01 17:48:21 2009
+</ID>
+<Line>
+Total test cases executed: 44
+</Line>
+<Line>
+Total test cases passed: 7 (15.91%)
+</Line>
+<Line>
+Total test cases failed: 37 (84.09%)
+</Line>
+<Line>
+Total elapsed time: 4 second(s)
+</Line>
+</Summary>
+</ComponentTest>

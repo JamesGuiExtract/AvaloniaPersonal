@@ -1,0 +1,389 @@
+<ComponentTest>
+<Title>
+UCLIDAFCoreTest.AutomatedRuleSetTester.1
+</Title>
+<TestCase>
+<ID>
+1
+</ID>
+<Description>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\Set002\TestResults\0031.dat
+</Description>
+<TestCaseFile>
+D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\LabResults\CustomerRules\West Bend\TestingFiles\TestTestResults.rsd
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif.uss
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0031.tif.eav
+</TestCaseFile>
+<TestCaseFile>
+K:\Common\Engineering\Sample Files\West Bend\Set002\EAV\TestResults\0031.tif.nte
+</TestCaseFile>
+<TestCaseFile>
+k:\Common\Engineering\Sample Files\West Bend\Set002\Images\0031.tif.TR.voa
+</TestCaseFile>
+<TestCaseCompareData>
+<Title>
+Compare Attributes
+</Title>
+<Title>
+Expected Attributes
+</Title>
+<Detail>
+<Line>
+Test|N/A
+</Line>
+<Line>
+.Name|Flow Cytometry - Subsets
+</Line>
+<Line>
+.CollectionDate|04/28/2009
+</Line>
+<Line>
+.CollectionTime|18:14
+</Line>
+<Line>
+.Component|White Blood Cell Count
+</Line>
+<Line>
+..Value|3.3
+</Line>
+<Line>
+..Units|10e3/uL
+</Line>
+<Line>
+..Range|4.0-10.0
+</Line>
+<Line>
+..Flag|L
+</Line>
+<Line>
+.Component|% Lymphocytes
+</Line>
+<Line>
+..Value|36
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|20-45
+</Line>
+<Line>
+.Component|Absolute Lymphocytes
+</Line>
+<Line>
+..Value|1190
+</Line>
+<Line>
+..Units|/uL
+</Line>
+<Line>
+..Range|1000-3400
+</Line>
+<Line>
+.Component|(Absolute# T-Helper) CD3+/CD4+
+</Line>
+<Line>
+..Value|476
+</Line>
+<Line>
+..Units|/uL
+</Line>
+<Line>
+..Range|467-1085
+</Line>
+<Line>
+.Component|(Absolute# T-Supp) CD3+/CD8+
+</Line>
+<Line>
+..Value|488
+</Line>
+<Line>
+..Units|/uL
+</Line>
+<Line>
+..Range|109-656
+</Line>
+<Line>
+.Component|Total CD3
+</Line>
+<Line>
+..Value|988
+</Line>
+<Line>
+..Units|/uL
+</Line>
+<Line>
+..Range|630-1546
+</Line>
+<Line>
+.Component|(Help/Supp) CD4+/CD8+ Ratio
+</Line>
+<Line>
+..Value|0.98
+</Line>
+<Line>
+..Range|0.86-4.60
+</Line>
+<Line>
+.Component|(%T-Helper CD4) CD3+CD4+
+</Line>
+<Line>
+..Value|40
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|32-61
+</Line>
+<Line>
+.Component|(%T-Suppressor CD8) CD3+CD8+
+</Line>
+<Line>
+..Value|41
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|18-42
+</Line>
+<Line>
+.Component|(%T-Cells CD3) Total CD3
+</Line>
+<Line>
+..Value|83
+</Line>
+<Line>
+..Units|%
+</Line>
+<Line>
+..Range|53-88
+</Line>
+</Detail>
+<Title>
+No Found Attributes
+</Title>
+<Detail>
+ 
+</Detail>
+</TestCaseCompareData>
+<TestCaseException>
+<Text>
+ELI04767: No Found Attributes.\n\nDebug information:\nCatchID = ELI09208 (string)\nCatchID = ELI08491 (string)\n\n\n[FLEX Index Version 7.0.0.39]
+</Text>
+<Hex>
+1f00000055434c4944457863657074696f6e204f626a6563742056657273696f6e20320200000008000000454c493034373637140000004e6f20466f756e6420417474726962757465732e00000000000100000007000000436174636849440000000008000000454c49303932303800000000
+</Hex>
+</TestCaseException>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<TestCase>
+<ID>
+Wed May 27 16:50:43 2009
+</ID>
+<Description>
+Summary of Attribute Statistics:
+</Description>
+<TestCaseDetailNote>
+<Title>
+Test
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionDate
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.CollectionTime
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component
+</Title>
+<Detail>
+<Line>
+Total Expected: 10
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Flag
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Range
+</Title>
+<Detail>
+<Line>
+Total Expected: 10
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Units
+</Title>
+<Detail>
+<Line>
+Total Expected: 9
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Component.Value
+</Title>
+<Detail>
+<Line>
+Total Expected: 10
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseDetailNote>
+<Title>
+Test.Name
+</Title>
+<Detail>
+<Line>
+Total Expected: 1
+</Line>
+<Line>
+Total Correct: 0 (0.00%)
+</Line>
+<Line>
+Total Incorrectly Found: 0
+</Line>
+<Line>
+Approximate Extras: 0 (0.00%)
+</Line>
+</Detail>
+</TestCaseDetailNote>
+<TestCaseResult>
+FAILURE
+</TestCaseResult>
+</TestCase>
+<Summary>
+<ID>
+Wed May 27 16:50:43 2009
+</ID>
+<Line>
+Total test cases executed: 1
+</Line>
+<Line>
+Total test cases passed: 0 (0.00%)
+</Line>
+<Line>
+Total test cases failed: 1 (100.00%)
+</Line>
+<Line>
+Total elapsed time: 0 second(s)
+</Line>
+</Summary>
+</ComponentTest>
