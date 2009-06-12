@@ -1,0 +1,17 @@
+<SETTING>;VerificationCondition=HCData|LCData|MCData|Clues
+//<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues|Oil Gas and Mineral Lease
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+<SETTING>;AutomatedCondition=HCData|LCData|MCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;OutputFinalStatsOnly=1
+// output verification result
+//<SETTING>;CreateTestOutputVOAFiles=1   
+// Type of Redactions to be tested
+//<SETTING>;TypeToBeTested=^Account$|^Routing$|OtherRouting
+<SETTING>;OutputAttributeNamesFileLists=1
+<SETTING>;DocTypesToVerify=Oil Gas and Mineral Lease
+//OutputHybridStats=1
+
+// Master.rsd rule file
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Charles\Set002\RandomSubset\;$DirOf(<SourceDocName>)\$FileOf(<SourceDocName>).voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
