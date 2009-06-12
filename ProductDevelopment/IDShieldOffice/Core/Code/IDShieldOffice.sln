@@ -341,6 +341,47 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities",
 	EndProjectSection
 EndProject
 Global
+	GlobalSection(VaultVsipSolution-v2) = preSolution
+		VaultHost = http://white.extract.local/VaultService
+		VaultRepositoryID = 2
+		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
+		ProjectCount = 35
+		ProjectRelativeDiskPath1 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
+		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\Core\Code\Extract.csproj
+		ProjectRelativeDiskPath3 = ..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj
+		ProjectRelativeDiskPath4 = ..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj
+		ProjectRelativeDiskPath5 = ..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj
+		ProjectRelativeDiskPath6 = ..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj
+		ProjectRelativeDiskPath7 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj
+		ProjectRelativeDiskPath8 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj
+		ProjectRelativeDiskPath9 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDExceptionMgmt\Code\UCLIDExceptionMgmt.vcproj
+		ProjectRelativeDiskPath10 = IDShieldOffice.csproj
+		ProjectRelativeDiskPath11 = ..\..\..\..\RC.Net\Drawing\Core\Code\Extract.Drawing.csproj
+		ProjectRelativeDiskPath12 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj
+		ProjectRelativeDiskPath13 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj
+		ProjectRelativeDiskPath14 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.vcproj
+		ProjectRelativeDiskPath15 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR2\Code\SSOCR2.vcproj
+		ProjectRelativeDiskPath16 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.vcproj
+		ProjectRelativeDiskPath17 = ..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.vcproj
+		ProjectRelativeDiskPath18 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj
+		ProjectRelativeDiskPath19 = ..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj
+		ProjectRelativeDiskPath20 = ..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj
+		ProjectRelativeDiskPath21 = ..\..\..\Utils\UEXViewer\Code\UEXViewer.vcproj
+		ProjectRelativeDiskPath22 = ..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\Core\Code\ESPrintCaptureCore.vcproj
+		ProjectRelativeDiskPath23 = ..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\ESActMaskPCE\Code\ESActMaskPCE.vcproj
+		ProjectRelativeDiskPath24 = ..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\Utils\ESPrintManager\Code\ESPrintManager.vcproj
+		ProjectRelativeDiskPath25 = ..\..\..\..\ReusableComponents\COMComponents\ESPrintCapture\Utils\InstallPCE\Code\InstallPCE.vcproj
+		ProjectRelativeDiskPath26 = ..\..\Testing\Automated\IDShieldOffice.Test.csproj
+		ProjectRelativeDiskPath27 = ..\..\..\Utils\UserLicense\Code\UserLicense.vcproj
+		ProjectRelativeDiskPath28 = ..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj
+		ProjectRelativeDiskPath29 = ..\..\..\..\RC.Net\Encryption\Core\Testing\Automated\Extract.Encryption.Test.csproj
+		ProjectRelativeDiskPath30 = ..\..\..\..\RC.Net\Encryption\Utilities\EncryptFile2\Core\Code\EncryptFile2.csproj
+		ProjectRelativeDiskPath31 = ..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj
+		ProjectRelativeDiskPath32 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Testing\Automated\Extract.Imaging.Forms.Test.csproj
+		ProjectRelativeDiskPath33 = ..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj
+		ProjectRelativeDiskPath34 = ..\..\..\..\RC.Net\Utilities\Parsers\Code\Extract.Utilities.Parsers.csproj
+		ProjectRelativeDiskPath35 = ..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms

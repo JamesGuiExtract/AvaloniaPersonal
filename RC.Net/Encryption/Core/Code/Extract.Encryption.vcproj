@@ -5,6 +5,10 @@
 	Name="Extract.Encryption"
 	ProjectGUID="{C79815C7-A80A-41AA-AB02-F6AC83EFA579}"
 	RootNamespace="ExtractEncryption"
+	SccProjectName="Extract.Encryption"
+	SccAuxPath="http://white.extract.local/VaultService"
+	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+	SccProvider="SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
 	Keyword="ManagedCProj"
 	>
 	<Platforms>
