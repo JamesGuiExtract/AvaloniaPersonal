@@ -1,7 +1,9 @@
 using Extract.Interop;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlServerCe;
+using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -121,12 +123,42 @@ namespace Extract.LabResultsCustomComponents
                 string databaseFile = afUtility.ExpandTagsAndFunctions(_databaseFile, pDoc);
 
                 // Check for the database files existence
-                if (File.Exists(databaseFile))
+                if (!File.Exists(databaseFile))
                 {
                     ExtractException ee = new ExtractException("ELI26170",
                         "Database file does not exist!");
                     ee.AddDebugData("Database File Name", databaseFile, false);
                     throw ee;
+                }
+
+                string connectionString = "Data Source=" + databaseFile;
+                using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
+                {
+                    IUnknownVector newAttributes = new IUnknownVector();
+                    int size = pAttributes.Size();
+                    for (int i = 0; i < size; i++)
+                    {
+                        IAttribute attribute = (IAttribute)pAttributes.At(i);
+                        if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
+                        {
+                            List<IAttribute> mappedAttributes =
+                                MapOrders(attribute.SubAttributes, dbConnection);
+                            foreach (IAttribute newAttribute in mappedAttributes)
+                            {
+                                newAttributes.PushBack(newAttribute);
+                            }
+                        }
+                        else
+                        {
+                            // Not a test attribute, just copy it
+                            newAttributes.PushBack(attribute);
+                        }
+                    }
+
+                    // Clear the original attributes and set the attributes to the
+                    // newly mapped collection
+                    pAttributes.Clear();
+                    pAttributes.CopyFrom(newAttributes);
                 }
             }
             catch (Exception ex)
@@ -437,6 +469,355 @@ namespace Extract.LabResultsCustomComponents
         private static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractGuids.OutputHandlers);
+        }
+
+        /// <summary>
+        /// Performs the mapping from tests to order grouping.
+        /// </summary>
+        /// <param name="attributes">A vector of attributes to map.</param>
+        /// <param name="dbConnection">The database connection to use
+        /// for querying.</param>
+        private static List<IAttribute> MapOrders(IUnknownVector attributes,
+            SqlCeConnection dbConnection)
+        {
+            // Get the source doc name from the first attribute
+            string sourceDocName = "Unknown";
+            if (attributes.Size() > 0)
+            {
+                sourceDocName = ((IAttribute)attributes.At(0)).Value.SourceDocName;
+            }
+
+            // Get a map of names to attributes from the attribute collection
+            Dictionary<string, List<IAttribute>> nameToAttributes =
+                GetMapOfNamesToAttributes(attributes);
+
+            IAttribute dateAttribute = null;
+            IAttribute timeAttribute = null;
+
+            // Get the date and time from the attributes
+            List<IAttribute> temp;
+            if (nameToAttributes.TryGetValue("DATE", out temp))
+            {
+                // List should be size 1
+                ExtractException.Assert("ELI26231", "Attribute list should only have 1 date",
+                    temp.Count == 1, "Count Of Date Attributes", temp.Count);
+
+                dateAttribute = temp[0];
+            }
+            temp = null;
+            if (nameToAttributes.TryGetValue("TIME", out temp))
+            {
+                // List should be size 1
+                ExtractException.Assert("ELI26232", "Attribute list should only have 1 time",
+                    temp.Count == 1, "Count Of Time Attributes", temp.Count);
+
+                timeAttribute = temp[0];
+            }
+
+            List<IAttribute> mappedList = new List<IAttribute>();
+            foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
+            {
+                if (!pair.Key.Equals("COMPONENT", StringComparison.OrdinalIgnoreCase))
+                {
+                    mappedList.AddRange(pair.Value);
+                }
+                else
+                {
+                    // All attributes are unmatched at this point
+                    List<IAttribute> unmatchedTests = new List<IAttribute>();
+                    unmatchedTests.AddRange(pair.Value);
+
+                    while (unmatchedTests.Count > 0)
+                    {
+                        Dictionary<IAttribute, Dictionary<string, string>> mapAttributeToOrderMatches =
+                            new Dictionary<IAttribute, Dictionary<string, string>>();
+
+                        // Now try to map to an order
+                        Dictionary<string, int> countOrderMatches = new Dictionary<string, int>();
+                        foreach (IAttribute attribute in unmatchedTests)
+                        {
+                            string testName = attribute.Value.String.ToUpperInvariant();
+                            Dictionary<string, string> orderMatches =
+                                GetOrderCodesFromTestName(testName, dbConnection);
+                            mapAttributeToOrderMatches.Add(attribute, orderMatches);
+                            foreach (string code in orderMatches.Keys)
+                            {
+                                int count;
+                                if (countOrderMatches.TryGetValue(code, out count))
+                                {
+                                    count++;
+                                    countOrderMatches[code] = count;
+                                }
+                                else
+                                {
+                                    count = 1;
+                                    countOrderMatches.Add(code, count);
+                                }
+                            }
+                        }
+
+                        // Create a new IUnknown vector for the matched tests
+                        IUnknownVector vecMatched = new IUnknownVector();
+                        
+                        // Add the date and time attribute (if avaible)
+                        if (dateAttribute != null)
+                        {
+                            vecMatched.PushBack(dateAttribute);
+                        }
+                        if (timeAttribute != null)
+                        {
+                            vecMatched.PushBack(timeAttribute);
+                        }
+
+                        // Create the new order grouping attribute (default to UnknownOrder)
+                        // and add it to the vector
+                        AttributeClass orderGrouping = new AttributeClass();
+                        orderGrouping.Name = "Order";
+                        orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
+                        vecMatched.PushBack(orderGrouping);
+
+                        if (countOrderMatches.Count > 0)
+                        {
+                            // Now get the order code for the best match
+                            KeyValuePair<string, int> bestMatch = new KeyValuePair<string, int>("", 0);
+                            foreach (KeyValuePair<string, int> countPair in countOrderMatches)
+                            {
+                                if (countPair.Value > bestMatch.Value)
+                                {
+                                    bestMatch = countPair;
+                                }
+                            }
+
+                            // Order code is bestMatch.key
+                            string orderCode = bestMatch.Key;
+
+                            List<IAttribute> testsToRemove = new List<IAttribute>();
+                            foreach (IAttribute attribute in unmatchedTests)
+                            {
+                                Dictionary<string, string> codes;
+                                if (mapAttributeToOrderMatches.TryGetValue(attribute, out codes))
+                                {
+                                    string testCode;
+                                    if (codes.TryGetValue(orderCode, out testCode))
+                                    {
+                                        // Add the attribute to the list to remove
+                                        testsToRemove.Add(attribute);
+
+                                        // Replace the test name
+                                        SpatialString value = attribute.Value;
+                                        value.Replace(value.String,
+                                            GetTestNameFromOrderAndTestCode(orderCode, testCode, dbConnection),
+                                            false, 1, null);
+
+                                        vecMatched.PushBack(attribute);
+                                    }
+                                }
+                            }
+
+                            // Remove the matched tests
+                            foreach (IAttribute attribute in testsToRemove)
+                            {
+                                unmatchedTests.Remove(attribute);
+                            }
+
+                            // Store the order code
+                            AttributeClass orderCodeAttribute = new AttributeClass();
+                            orderCodeAttribute.Name = "Order Code";
+                            orderCodeAttribute.Value.CreateNonSpatialString(orderCode, sourceDocName);
+
+                            // Get the order name and epic code
+                            KeyValuePair<string, string> orderNameAndEpicCode =
+                                GetOrderNameAndEpicCodeFromOrderCode(orderCode, dbConnection);
+
+                            // Set the order group name
+                            orderGrouping.Value.ReplaceAndDowngradeToNonSpatial(
+                                orderNameAndEpicCode.Key);
+
+                            // Add the epic code
+                            AttributeClass epicCode = new AttributeClass();
+                            epicCode.Name = "EpicCode";
+                            epicCode.Value.CreateNonSpatialString(orderNameAndEpicCode.Value,
+                                sourceDocName);
+                            vecMatched.PushBack(epicCode);
+                        }
+                        else
+                        {
+                            // Add all of the unmatched tests since there is no group for them
+                            foreach (IAttribute attribute in unmatchedTests)
+                            {
+                                vecMatched.PushBack(attribute);
+                            }
+
+                            // Clear the vector of unmatched tests since they have now been
+                            // "matched" with the unknown order
+                            unmatchedTests.Clear();
+                        }
+
+                        AttributeClass newAttribute = new AttributeClass();
+                        newAttribute.Name = "Test";
+                        newAttribute.Value.CreateNonSpatialString("N/A", sourceDocName);
+                        newAttribute.SubAttributes = vecMatched;
+
+                        // Add the attribute to the return list
+                        mappedList.Add(newAttribute);
+                    }
+                }
+            }
+
+            return mappedList;
+        }
+
+        /// <summary>
+        /// Builds a map of names to <see cref="List{T}"/> of attributes.
+        /// </summary>
+        /// <param name="attributes">The vector of attributes to group.</param>
+        /// <returns>The map of names to attributes.</returns>
+        private static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
+            IUnknownVector attributes)
+        {
+            // Get an AFUtility object and use it to produce a StrToObject map for
+            // names to attributes
+            AFUtility afUtility = new AFUtility();
+            StrToObjectMap nameMap = afUtility.GetNameToAttributesMap(attributes);
+
+            // Create a dictionary to hold the values
+            Dictionary<string, List<IAttribute>> nameToAttributes =
+                new Dictionary<string, List<IAttribute>>();
+
+            // Loop through the StrToObject map and copy it into the dictionary.
+            int size = nameMap.Size;
+            for (int i = 0; i < size; i++)
+            {
+                string name;
+                object vecAttributes;
+                nameMap.GetKeyValue(i, out name, out vecAttributes);
+
+                IUnknownVector vectorOfAttributes = vecAttributes as IUnknownVector;
+                int vectorSize = vectorOfAttributes.Size();
+                List<IAttribute> listAttributes = new List<IAttribute>(vectorSize);
+                for (int j = 0; j < vectorSize; j++)
+                {
+                    listAttributes.Add((IAttribute)vectorOfAttributes.At(j));
+                }
+
+                nameToAttributes.Add(name.ToUpperInvariant(), listAttributes);
+            }
+
+            return nameToAttributes;
+        }
+
+        /// <summary>
+        /// Gets the order name and epic code from the database based on the specified order code.
+        /// </summary>
+        /// <param name="orderCode">The order code to search for.</param>
+        /// <param name="dbConnection">The database connection to use.</param>
+        /// <returns>A pair containing the order name and epic code.</returns>
+        private static KeyValuePair<string, string> GetOrderNameAndEpicCodeFromOrderCode(string orderCode,
+            SqlCeConnection dbConnection)
+        {
+            string query = "SELECT [Name], [EpicCode] FROM [LabOrder] WHERE [Code] = '"
+                + orderCode + "'";
+
+            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
+            {
+                using (DataTable dt = new DataTable())
+                {
+                    dt.Locale = CultureInfo.InvariantCulture;
+                    dataAdapter.Fill(dt);
+
+                    // Should only be 1 row, so just return the top row
+                    ExtractException.Assert("ELI26233", "Order name not found!",
+                        dt.Rows.Count == 1, "Order Code", orderCode ?? "null");
+
+                    return new KeyValuePair<string, string>((string)dt.Rows[0][0],
+                        (string)dt.Rows[0][1]);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the test name from the database based on the specified order code and test code.
+        /// </summary>
+        /// <param name="orderCode">The order code to search on.</param>
+        /// <param name="testCode">The test code to search on.</param>
+        /// <param name="dbConnection">The database connection to use.</param>
+        /// <returns>The test name for the specified order code and test code.</returns>
+        private static string GetTestNameFromOrderAndTestCode(string orderCode, string testCode,
+            SqlCeConnection dbConnection)
+        {
+            string query = "SELECT [Name] FROM [Test] WHERE [OrderCode] = '" + orderCode
+                + "' AND [Code] = '" + testCode + "'";
+
+            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
+            {
+                using (DataTable dt = new DataTable())
+                {
+                    dt.Locale = CultureInfo.InvariantCulture;
+                    dataAdapter.Fill(dt);
+
+                    // Should only be 1 row, so just return the top row
+                    ExtractException.Assert("ELI26234", "Could not find test name!",
+                        dt.Rows.Count == 1, "Order Code", orderCode ?? "null",
+                        "Test Code", testCode ?? "null");
+                    return (string)dt.Rows[0][0];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets a collection of order codes and test codes from a specified test name.
+        /// The test name specified may be the actual test name or a known alternate
+        /// test name.
+        /// </summary>
+        /// <param name="testName">The name of the test to search for.</param>
+        /// <param name="dbConnection">The database connection to use.</param>
+        /// <returns>A collection of order codes and test codes for the specified test name.
+        /// </returns>
+        private static Dictionary<string, string> GetOrderCodesFromTestName(string testName,
+            SqlCeConnection dbConnection)
+        {
+            Dictionary<string, string> orderCodes = new Dictionary<string, string>();
+
+            string query = "SELECT [OrderCode], [Code] FROM [Test] WHERE [Name] = '"
+                + testName + "' OR [Code] = '" + testName + "'";
+
+            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
+            {
+                using (DataTable dt = new DataTable())
+                {
+                    dt.Locale = CultureInfo.InvariantCulture;
+                    dataAdapter.Fill(dt);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        orderCodes.Add((string)row[0], (string)row[1]);
+                    }
+                }
+            }
+
+            // If a collection of order codes was found, just return the collection
+            if (orderCodes.Count > 0)
+            {
+                return orderCodes;
+            }
+
+            // No order codes found, check the table of alternate test names
+            query = "SELECT [OrderCode], [TestCode] FROM [AlternateTestName] WHERE [Name] = '"
+                + testName + "'";
+
+            using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
+            {
+                using (DataTable dt = new DataTable())
+                {
+                    dt.Locale = CultureInfo.InvariantCulture;
+                    dataAdapter.Fill(dt);
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        orderCodes.Add((string)row[0], (string)row[1]);
+                    }
+                }
+            }
+
+            return orderCodes;
         }
 
         #endregion Private Methods
