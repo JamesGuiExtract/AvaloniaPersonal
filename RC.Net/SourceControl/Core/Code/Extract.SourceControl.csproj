@@ -1,0 +1,94 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3019DD00-4096-4158-B1AE-09E537B6A520}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.SourceControl</RootNamespace>
+    <AssemblyName>Extract.SourceControl</AssemblyName>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>..\..\..\..\Binaries\Debug\Extract.SourceControl.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\Binaries\Release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
+    <DocumentationFile>..\..\..\..\Binaries\Release\Extract.SourceControl.XML</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="VaultClientIntegrationLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=500623c275bd78a9, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\Vault\VaultClientIntegrationLib.dll</HintPath>
+    </Reference>
+    <Reference Include="VaultClientNetLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\Vault\VaultClientNetLib.dll</HintPath>
+    </Reference>
+    <Reference Include="VaultClientOperationsLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=e372e94840f8a4d3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\Vault\VaultClientOperationsLib.dll</HintPath>
+    </Reference>
+    <Reference Include="VaultLib, Version=4.1.4.18402, Culture=neutral, PublicKeyToken=a74d7badb9387c36, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\APIs\Vault\VaultLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="LogOnDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="LogOnDialog.Designer.cs">
+      <DependentUpon>LogOnDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LogOnSettings.cs" />
+    <Compile Include="ISourceControl.cs" />
+    <Compile Include="ISourceControlItem.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SourceControlFactory.cs" />
+    <Compile Include="VaultSourceControl.cs" />
+    <Compile Include="VaultSourceControlItem.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="LogOnDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>LogOnDialog.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+</Project>
