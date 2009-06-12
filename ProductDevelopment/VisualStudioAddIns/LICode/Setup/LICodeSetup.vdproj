@@ -7,10 +7,10 @@
 "LanguageId" = "3:1033"
 "CodePage" = "3:1252"
 "UILanguageId" = "3:1033"
-"SccProjectName" = "8:"
-"SccLocalPath" = "8:"
-"SccAuxPath" = "8:"
-"SccProvider" = "8:"
+"SccProjectName" = "8:LICodeSetup"
+"SccLocalPath" = "8:2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
+"SccAuxPath" = "8:http://white.extract.local/VaultService"
+"SccProvider" = "8:SourceGear Vault Visual Studio 2005 Client:{1EA47954-8515-402d-82D9-B5C332120A8D}"
     "Hierarchy"
     {
         "Entry"
@@ -656,7 +656,7 @@
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:LICode, Version=1.0.3450.23593, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86"
+            "AssemblyAsmDisplayName" = "8:LICode, Version=1.0.3450.25447, Culture=neutral, PublicKeyToken=329544a1499f0564, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
                     "_9A406FBCF18C4E859C1FE76C143BFE28"

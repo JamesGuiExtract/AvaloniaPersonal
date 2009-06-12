@@ -2,14 +2,40 @@
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.VisualStudio.AddIns", "Extract.VisualStudio.AddIns.csproj", "{981AB0AA-D788-484A-A2BA-984426022F51}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.SourceControl", "..\..\..\..\SourceControl\Core\Code\Extract.SourceControl.csproj", "{3019DD00-4096-4158-B1AE-09E537B6A520}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LICode", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj", "{3C704CA9-B489-4FFE-BAAC-6E7DEA7594F9}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LICodeSetup", "..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Setup\LICodeSetup.vdproj", "{9775CA3F-83D2-4E51-BDC0-9C6E46B26853}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
 EndProject
 Global
+	GlobalSection(VaultVsipSolution-v2) = preSolution
+		VaultHost = http://white.extract.local/VaultService
+		VaultRepositoryID = 2
+		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
+		ProjectCount = 4
+		ProjectRelativeDiskPath1 = Extract.VisualStudio.AddIns.csproj
+		ProjectRelativeDiskPath2 = ..\..\..\..\SourceControl\Core\Code\Extract.SourceControl.csproj
+		ProjectRelativeDiskPath3 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Code\LICode.csproj
+		ProjectRelativeDiskPath4 = ..\..\..\..\..\ProductDevelopment\VisualStudioAddins\LICode\Setup\LICodeSetup.vdproj
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
