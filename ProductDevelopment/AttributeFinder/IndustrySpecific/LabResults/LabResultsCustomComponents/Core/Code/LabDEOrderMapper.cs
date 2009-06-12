@@ -1,4 +1,4 @@
-using Microsoft.Win32;
+using Extract.Interop;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlServerCe;
@@ -37,27 +37,6 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         private static readonly int _CURRENT_VERSION = 1;
 
-        /// <summary>
-        /// The GUID for the "UCLID Output Handler" COM category;
-        /// </summary>
-        private static readonly string _UCLID_OUTPUT_HANDLER_GUID =
-            "{1B84DB33-2B7E-49d2-BB16-A4A2283D5D9F}";
-
-        /// <summary>
-        /// An int to represnet COM's S_OK;
-        /// </summary>
-        private const int _S_OK = 0;
-
-        /// <summary>
-        /// An int to represnet COM's S_FALSE;
-        /// </summary>
-        private const int _S_FALSE = 1;
-
-        /// <summary>
-        /// A long to represnet COM's E_NOTIMPL;
-        /// </summary>
-        private const long _E_NOTIMPL = 0x80004001;
-
         #endregion Constants
 
         #region Fields
@@ -79,7 +58,8 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Initializes a new instance of the <see cref="LabDEOrderMapper"/> class.
         /// </summary>
-        public LabDEOrderMapper() : this(null)
+        public LabDEOrderMapper()
+            : this(null)
         {
         }
 
@@ -241,7 +221,7 @@ namespace Extract.LabResultsCustomComponents
             {
                 classID = this.GetType().GUID;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26180", ex);
                 throw new ExtractException("ELI26181", ee.AsStringizedByteStream());
@@ -256,7 +236,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                return _dirty ? _S_OK : _S_FALSE;
+                return HResult.FromBoolean(_dirty);
             }
             catch (Exception ex)
             {
@@ -354,13 +334,13 @@ namespace Extract.LabResultsCustomComponents
         /// Returns the size in bytes of the stream needed to save the object.
         /// <para>NOTE: Not implemented.</para>
         /// </summary>
-        /// <param name="size">Will always be E_NOTIMPL to indicate this method is not implemented.
-        /// </param>
+        /// <param name="size">Will always be <see cref="HResult.NotImplemented"/> to indicate this 
+        /// method is not implemented.</param>
         public void GetSizeMax(out long size)
         {
             try
             {
-                size = _E_NOTIMPL;
+                size = HResult.NotImplemented;
             }
             catch (Exception ex)
             {
@@ -444,15 +424,7 @@ namespace Extract.LabResultsCustomComponents
         [ComVisible(false)]
         private static void RegisterFunction(Type type)
         {
-            string keyName = @"\CLSID\{" + type.GUID.ToString() + @"}\Implemented Categories";
-
-            using (RegistryKey registryKey = Registry.ClassesRoot.OpenSubKey(keyName, true))
-            {
-                if (registryKey != null)
-                {
-                    registryKey.CreateSubKey(_UCLID_OUTPUT_HANDLER_GUID);
-                }
-            }
+            ComMethods.RegisterTypeInCategory(type, ExtractGuids.OutputHandlers);
         }
 
         /// <summary>
@@ -464,15 +436,7 @@ namespace Extract.LabResultsCustomComponents
         [ComVisible(false)]
         private static void UnregisterFunction(Type type)
         {
-            string keyName = @"\CLSID\{" + type.GUID.ToString() + @"}\Implemented Categories";
-
-            using (RegistryKey registryKey = Registry.ClassesRoot.OpenSubKey(keyName, true))
-            {
-                if (registryKey != null)
-                {
-                    registryKey.DeleteSubKey(_UCLID_OUTPUT_HANDLER_GUID);
-                }
-            }
+            ComMethods.UnregisterTypeInCategory(type, ExtractGuids.OutputHandlers);
         }
 
         #endregion Private Methods
