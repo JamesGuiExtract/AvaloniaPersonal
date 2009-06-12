@@ -1,0 +1,659 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""RedactionCustomComponents.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "FileDescription", "RedactionCustomComponents Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "RedactionCustomComponents"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "RedactionCustomComponents.DLL"
+            VALUE "ProductName", "RedactionCustomComponents Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_REDACTIONVERIFICATIONUI REGISTRY                "RedactionVerificationUI.rgs"
+IDR_REDACTIONVERIFICATIONUIPP REGISTRY                "RedactionVerificationUIPP.rgs"
+IDR_REDACTFILEPROCESSOR REGISTRY                "RedactFileProcessor.rgs"
+IDR_REDACTFILEPROCESSORPP REGISTRY                "RedactFileProcessorPP.rgs"
+IDR_IDSHIELDVOAFILECONTENTSCONDITION REGISTRY                "IDShieldVOAFileContentsCondition.rgs"
+IDR_IDSHIELDVOAFILECONTENTSCONDITIONPP REGISTRY                "IDShieldVOAFileContentsConditionPP.rgs"
+IDR_SELECTTARGETFILEUI  REGISTRY                "SelectTargetFileUI.rgs"
+IDR_SSNFINDER           REGISTRY                "SSNFinder.rgs"
+IDR_PROPPAGE_SSNFINDER  REGISTRY                "SSNFinderPP.rgs"
+IDR_IDSHIELDPRODUCTDBMGR REGISTRY                "IDShieldProductDBMgr.rgs"
+IDR_FILTERIDSHIELD      REGISTRY                "FilterIDShieldDataFileTask.rgs"
+IDR_FILTERIDSHIELDPP    REGISTRY                "FilterIDShieldDataFileTaskPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DATA_AREA_DLG DIALOGEX 0, 0, 212, 268
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "ID Shield"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Document type",IDC_STATIC_TYPE,7,7,100,10
+    EDITTEXT        IDC_EDIT_DOCTYPE,7,17,198,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Page summary (visited pages marked in green)",IDC_STATIC_SUMMARY,7,165,189,10
+    CONTROL         "Redaction data & clues to review",IDC_STATIC_DATA,
+                    "Static",SS_SIMPLE | SS_NOPREFIX | WS_GROUP,7,68,125,10
+    CONTROL         "Custom1",IDC_DATA_GRID,"GXWND",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,84,25,15
+    CONTROL         "Custom2",IDC_SUMMARY_GRID,"GXWND",WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,178,113,66
+    LTEXT           "Current document",IDC_STATIC,7,36,96,8
+    EDITTEXT        IDC_EDIT_DOC_NAME,7,46,198,12,ES_AUTOHSCROLL | ES_READONLY
+END
+
+IDD_REDACTIONVERIFICATIONUIPP DIALOGEX 0, 0, 244, 244
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    GROUPBOX        "General",IDC_STATIC,5,6,232,70
+    CONTROL         "Include all pages in redaction review",IDC_CHECK_INCLUDE_PAGES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,18,153,10
+    CONTROL         "Require users to specify redaction type for redactions",IDC_CHECK_REQUIRE_REDACTION_TYPES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,32,215,10
+    CONTROL         "Require users to specify exemption codes for redactions",IDC_CHECK_REQUIRE_EXEMPTION_CODES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,46,215,10
+    CONTROL         "Enable collection of redaction accuracy feedback",IDC_CHECK_COLLECT_FEEDBACK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,60,170,8
+    PUSHBUTTON      "Settings...",IDC_BUTTON_FEEDBACK,183,57,50,14,WS_DISABLED
+    GROUPBOX        "ID Shield data file location",IDC_STATIC,5,80,232,31
+    LTEXT           "Settings description",IDC_STATIC_DATA_FILE_DESCRIPTION,11,92,167,9
+    PUSHBUTTON      "Customize...",IDC_BUTTON_DATA_FILE,183,91,50,14
+    GROUPBOX        "Image output",IDC_STATIC,5,114,232,50
+    CONTROL         "Create output image for all documents",IDC_RADIO_CREATE_IMAGE_ALL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,10,124,213,10
+    CONTROL         "Create output image only for documents that contain redactions",IDC_RADIO_CREATE_IMAGE_REDACTED,
+                    "Button",BS_AUTORADIOBUTTON,10,136,219,10
+    PUSHBUTTON      "Image output settings...",IDC_BUTTON_IMAGE_OUTPUT,140,146,93,14
+    GROUPBOX        "Metadata output",IDC_STATIC,5,168,232,54
+    CONTROL         "Create metadata output for all documents",IDC_RADIO_META_OUT_ALL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,10,179,179,10
+    CONTROL         "Create metadata output only for documents that contain redactions",IDC_RADIO_META_OUT_ONLY,
+                    "Button",BS_AUTORADIOBUTTON | BS_TOP | BS_MULTILINE,10,191,226,10
+    PUSHBUTTON      "Metadata output settings...",IDC_BUTTON_METADATA,141,203,92,14
+    PUSHBUTTON      "Redaction text and color settings...",IDC_BUTTON_REDACTION_APPEARANCE,5,225,118,14
+END
+
+IDD_REDACTFILEPROCESSORPP DIALOGEX 0, 0, 378, 333
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Finding Rules File Name:",IDC_STATIC,5,5,85,10
+    EDITTEXT        IDC_RULES_FILENAME,5,17,335,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BTN_SELECT_RULES_FILE_TAG,345,17,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_RULES_BROWSE_FILE,358,17,15,12
+    CONTROL         "Extract data from USS file if the input file is an image and a corresponding USS file exists",IDC_CHK_FROM_USS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,31,290,12
+    CONTROL         "If the following ID Shield data file exists, use results from it instead of running rules",IDC_BTN_USEVOA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,45,291,12
+    EDITTEXT        IDC_VOA_FILENAME,17,59,323,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BTN_SELECT_VOA_FILE_TAG,345,59,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_VOA_BROWSE_FILE,358,59,15,12
+    GROUPBOX        "Data categories to redact",IDC_STATIC,5,75,342,87
+    CONTROL         "All",IDC_ALL_ATTRIBUTES,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,88,176,12
+    CONTROL         "Selected",IDC_SELECT_ATTRIBUTES,"Button",BS_AUTORADIOBUTTON,15,102,248,12
+    CONTROL         "High confidence data",IDC_CHK_HCDATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,116,92,12
+    CONTROL         "Medium confidence data",IDC_CHK_MCDATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,127,116,100,12
+    CONTROL         "Low confidence data",IDC_CHK_LCDATA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,238,116,100,12
+    CONTROL         "Other (separate names with commas)",IDC_CHK_OCDATA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,130,150,12
+    EDITTEXT        IDC_ATTRIBUTES,27,144,313,12,ES_AUTOHSCROLL
+    LTEXT           "Image Output File Name:",IDC_STATIC,5,165,89,10
+    EDITTEXT        IDC_OUTPUT_FILENAME,5,175,335,12,ES_AUTOHSCROLL | WS_GROUP
+    PUSHBUTTON      "",IDC_BTN_SELECT_IMAGE_FILE_TAG,345,175,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_OUTPUT_BROWSE_FILE,358,175,15,12
+    GROUPBOX        "Redactions in output file",IDC_STATIC,6,190,341,43
+    CONTROL         "Retain any previously existing redactions in the output file",IDC_USE_REDACTED_IMAGE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,15,202,207,12
+    CONTROL         "Output only redactions from this session",IDC_USE_ORIGINAL_IMAGE,
+                    "Button",BS_AUTORADIOBUTTON,15,216,248,12
+    GROUPBOX        "Create output file",IDC_STATIC,5,238,342,72
+    CONTROL         "For each input file",IDC_OUTPUT_ALWAYS,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,251,176,12
+    CONTROL         "For each input file in which redactable data is found",IDC_OUTPUT_ONLY,
+                    "Button",BS_AUTORADIOBUTTON,15,265,248,12
+    CONTROL         "Retain existing annotations in output file (tiff only)",IDC_CHECK_CARRY_ANNOTATIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,281,200,8
+    CONTROL         "Apply redactions as annotations in output file (tiff only)",IDC_CHECK_REDACTIONS_AS_ANNOTATIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,295,200,8
+    PUSHBUTTON      "Redaction text and color settings...",IDC_BUTTON_REDACT_APPEARANCE,5,314,124,14
+END
+
+IDD_SELECT_DOCTYPES DIALOG  0, 0, 218, 201
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Document Types"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,104,180,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,161,180,50,14
+    LISTBOX         IDC_LIST_DOCTYPES,7,23,204,150,NOT LBS_NOTIFY | LBS_MULTIPLESEL | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Select all desired document types",IDC_STATIC,7,7,122,12
+END
+
+IDD_REDACTIONVERIFICATION_OPTIONS_DLG DIALOGEX 0, 0, 183, 102
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Redaction Verification Options"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Auto-zoom to redactable data",IDC_CHECK_AUTOZOOM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,126,8
+    GROUPBOX        "Zoom Level",IDC_STATIC,7,18,169,42
+    LTEXT           "Zoom in",IDC_STATIC,12,30,36,8
+    LTEXT           "Zoom out",IDC_STATIC,128,30,30,8
+    CONTROL         "",IDC_ZOOM_SLIDER,"msctls_trackbar32",TBS_BOTH | TBS_NOTICKS | WS_TABSTOP,8,41,144,15
+    CTEXT           "",IDC_STATIC_ZOOM,153,43,13,12,SS_SUNKEN
+    CONTROL         "Enable",IDC_CHECK_AUTO_TOOL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,65,35,8
+    COMBOBOX        IDC_COMBO_AUTO_TOOL,43,63,65,30,CBS_DROPDOWNLIST | CBS_SORT | WS_DISABLED | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "tool after highlight",IDC_STATIC,111,65,60,8
+    DEFPUSHBUTTON   "OK",IDOK,72,84,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,126,84,50,14
+END
+
+IDD_IDSHIELDVOAFILECONTENTSCONDITIONPP DIALOGEX 0, 0, 230, 313
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Please note that ID Shield may not pick up 100% of the sensitive data or clues for reasons such as poor document quality.",IDC_STATIC,7,7,216,16
+    CONTROL         "The ID Shield data file contains",IDC_CHECK_CONTAINS_DATA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,27,113,10
+    COMBOBOX        IDC_COMBO_CONTAINS,122,25,81,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "of",IDC_STATIC,207,27,8,8
+    CONTROL         "High confidence sensitive data",IDC_CHECK_CONTAINS_HIGH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,39,197,10
+    CONTROL         "Medium confidence sensitive data",IDC_CHECK_CONTAINS_MEDIUM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,51,197,10
+    CONTROL         "Low confidence sensitive data",IDC_CHECK_CONTAINS_LOW,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,63,197,10
+    CONTROL         "Manually identified sensitive data",IDC_CHECK_CONTAINS_MANUAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,75,197,10
+    CONTROL         "Clues potentially identifying sensitive data",IDC_CHECK_CONTAINS_CLUES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,87,197,10
+    LTEXT           "- or -",IDC_STATIC,102,102,15,8
+    CONTROL         "Indicates one of the following as the document type",IDC_CHECK_DOCTYPE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,117,216,10
+    LISTBOX         IDC_LIST_DOCTYPE,18,129,150,78,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Select...",IDC_BTN_SELECT_DOCTYPE,174,129,48,14
+    GROUPBOX        "ID Shield Data File Location",IDC_STATIC,6,213,216,36
+    LTEXT           "You are using default settings.",IDC_STATIC_DATAFILE_STATUS,18,228,144,8
+    PUSHBUTTON      "Customize...",IDC_BTN_CONFIG_DATAFILE,168,225,48,14
+    GROUPBOX        "If Data File Does Not Exist",IDC_STATIC,6,255,216,51
+    CONTROL         "Record an error and continue",IDC_RECORD_ERROR,"Button",BS_AUTORADIOBUTTON,18,267,180,10
+    CONTROL         "Consider condition satisfied (without error)",IDC_CONDITION_SATISFIED,
+                    "Button",BS_AUTORADIOBUTTON,18,279,180,10
+    CONTROL         "Consider condition unsatisfied (without error)",IDC_CONDITION_UNSATISFIED,
+                    "Button",BS_AUTORADIOBUTTON,18,291,180,10
+END
+
+IDD_SELECTTARGETFILEUIDLG DIALOGEX 0, 0, 267, 57
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select File"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_FILENAME,6,18,219,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,231,18,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,246,18,15,12,BS_CENTER
+    PUSHBUTTON      "Reset",IDC_RESET,6,36,50,14
+    DEFPUSHBUTTON   "OK",IDOK,156,36,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,211,36,50,14
+    LTEXT           "Select target file",IDC_STATIC_INSTRUCTIONS,6,6,251,8
+END
+
+IDD_PROPPAGE_SSNFINDER DIALOGEX 0, 0, 250, 51
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    LTEXT           "Subattribute name:",IDC_STATIC,7,7,62,9
+    EDITTEXT        IDC_SSNFINDER_EDIT_SUBATTRIBUTE_NAME,69,7,123,12,ES_AUTOHSCROLL
+    CONTROL         "Discard spatial information for individual characters.",IDC_SSNFINDER_CHECK_SUBATTRIBUTE_SPATIAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,22,185,9
+    CONTROL         "Discard attribute if no social security number is found.",IDC_SSNFINDER_CHECK_CLEAR_IF_NONE_FOUND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,35,185,9
+END
+
+IDD_FEEDBACK_DLG DIALOGEX 0, 0, 248, 220
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Feedback collection settings"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Data storage and options",IDC_STATIC,7,7,234,64
+    LTEXT           "Feedback data folder",IDC_STATIC,16,18,198,10
+    EDITTEXT        IDC_EDIT_FEEDBACK_FOLDER,15,28,183,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_SELECT_FEEDBACK_FOLDER_TAG,203,28,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_FEEDBACK_FOLDER_BROWSE,219,28,16,12
+    CONTROL         "Include redaction information",IDC_CHECK_INCLUDE_REDACTION_INFO,
+                    "Button",BS_AUTOCHECKBOX | WS_DISABLED,15,44,201,10
+    CONTROL         "Include the original document as part of the feedback data",IDC_INCLUDE_FEEDBACK_IMAGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,56,215,10
+    GROUPBOX        "Filenames to use for feedback data",IDC_STATIC,7,78,234,57
+    CONTROL         "Use original filenames",IDC_RADIO_ORIGINAL_FEEDBACK_FILENAMES,
+                    "Button",BS_AUTORADIOBUTTON,15,89,203,9
+    CONTROL         "ID Shield should generate unique filenames",IDC_RADIO_GENERATE_FEEDBACK_FILENAMES,
+                    "Button",BS_AUTORADIOBUTTON,15,111,203,9
+    LTEXT           "(Original filenames are unique across the entire system.)",IDC_STATIC,28,100,202,9
+    LTEXT           "(Original filenames are only unique to a particular folder.)",IDC_STATIC,27,121,202,9
+    GROUPBOX        "Collect feedback for",IDC_STATIC,7,142,234,52
+    CONTROL         "All verified documents",IDC_CHECK_COLLECT_FEEDBACK_ALL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,154,201,10
+    CONTROL         "All verified documents that contain redactions",IDC_CHECK_COLLECT_FEEDBACK_REDACTIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,166,215,10
+    CONTROL         "All verified documents that contain user corrections",IDC_CHECK_COLLECT_FEEDBACK_CORRECTIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,178,215,10
+    DEFPUSHBUTTON   "OK",IDOK,138,199,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,192,199,50,14
+END
+
+IDD_METADATA_DLG DIALOGEX 0, 0, 232, 57
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Metadata output settings"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    LTEXT           "Name of metadata output file",IDC_STATIC,7,7,115,8
+    EDITTEXT        IDC_EDIT_META_OUT,7,20,182,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_SELECT_META_TAG,195,20,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_META_BROWSE,209,20,16,12
+    DEFPUSHBUTTON   "OK",IDOK,121,36,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,175,36,50,14
+END
+
+IDD_IMAGE_OUTPUT_DLG DIALOGEX 0, 0, 234, 126
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Image output settings"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    CONTROL         "Retain existing annotations in output file (tiff only)",IDC_CHECK_CARRY_ANNOTATIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,200,8
+    CONTROL         "Apply redactions as annotations in output file (tiff only)",IDC_CHECK_REDACTIONS_AS_ANNOTATIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,20,200,8
+    LTEXT           "Name of output image",IDC_STATIC,7,33,115,8
+    EDITTEXT        IDC_EDIT_IMG_OUT,7,44,182,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_SELECT_IMAGE_TAG,195,44,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_IMG_BROWSE,211,44,16,12
+    GROUPBOX        "Redactions in output file",IDC_STATIC,7,62,220,39
+    CONTROL         "Retain existing redactions in the output file",IDC_RADIO_RETAIN_REDACTIONS,
+                    "Button",BS_AUTORADIOBUTTON,14,73,204,10
+    CONTROL         "Output only redactions from this session",IDC_RADIO_USE_ORIGINAL_IMAGE,
+                    "Button",BS_AUTORADIOBUTTON,14,86,204,10
+    DEFPUSHBUTTON   "OK",IDOK,124,105,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,178,105,50,14
+END
+
+IDD_REDACTION_APPEARANCE_DLG DIALOGEX 0, 0, 213, 202
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Redaction text and color settings"
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    GROUPBOX        "Text to place in redaction zones",IDC_STATIC,7,7,199,74
+    LTEXT           "Redaction text",IDC_STATIC,14,19,70,8
+    COMBOBOX        IDC_COMBO_REDACTION_TEXT,14,30,173,30,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_REDACTION_TEXT_TAG,193,30,10,12,BS_ICON
+    LTEXT           "Sample text that uses above pattern",IDC_STATIC,14,49,124,8
+    EDITTEXT        IDC_EDIT_SAMPLE_TEXT,14,61,188,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    GROUPBOX        "Redaction colors",IDC_STATIC,7,82,199,42
+    LTEXT           "Border color",IDC_STATIC,14,95,42,8
+    LTEXT           "Fill color",IDC_STATIC,85,95,42,8
+    COMBOBOX        IDC_COMBO_BORDER_COLOR,14,106,53,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_FILL_COLOR,85,106,53,30,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Preferred text size and font",IDC_STATIC,7,126,199,51
+    EDITTEXT        IDC_EDIT_FONT,14,139,170,13,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "...",IDC_BUTTON_SELECT_FONT,186,139,16,12
+    LTEXT           "If text is too large to fit inside redaction zone, it will be automatically scaled to fit.",IDC_STATIC,14,156,144,18
+    DEFPUSHBUTTON   "OK",IDOK,102,181,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,156,181,50,14
+END
+
+IDD_FILTERIDSHIELDPP DIALOGEX 0, 0, 309, 221
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 400, 0, 0x0
+BEGIN
+    LTEXT           "Read the following ID Shield data file",IDC_STATIC,7,7,140,8
+    EDITTEXT        IDC_EDIT_FILTER_INPUT_FILE,7,18,260,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_FILTER_INPUT_TAGS,272,18,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_FILTER_INPUT_BROWSE,287,18,15,12
+    LTEXT           "and select the following data types from it",IDC_STATIC,7,37,160,8
+    CONTROL         "Social security numbers",IDC_CHECK_FILTER_SSN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,52,110,12
+    CONTROL         "Tax ID",IDC_CHECK_FILTER_TAXID,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,67,110,12
+    CONTROL         "Credit/debit card numbers",IDC_CHECK_FILTER_CREDIT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,82,110,12
+    CONTROL         "Drivers license numbers",IDC_CHECK_FILTER_DL,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,97,110,12
+    CONTROL         "Bank account numbers",IDC_CHECK_FILTER_BANK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,112,110,12
+    CONTROL         "Other account numbers",IDC_CHECK_FILTER_ACCOUNT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,127,110,12
+    CONTROL         "Dates of birth",IDC_CHECK_FILTER_DOB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,142,110,12
+    CONTROL         "Other (comma separated list)",IDC_CHECK_FILTER_OTHER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,157,110,12
+    EDITTEXT        IDC_EDIT_FILTER_OTHER,19,172,283,12,ES_AUTOHSCROLL
+    LTEXT           "And write them to this ID Shield data file",IDC_STATIC,7,191,200,8
+    EDITTEXT        IDC_EDIT_FILTER_OUTPUT_FILE,7,202,260,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectTag",IDC_BUTTON_FILTER_OUTPUT_TAGS,272,202,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BUTTON_FILTER_OUTPUT_BROWSE,287,202,15,12
+END
+
+IDD_DIALOG_EXEMPTION_CODES DIALOGEX 0, 0, 279, 289
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Exemption codes"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "&Select exemption codes to associate with the redaction(s)",IDC_STATIC,7,35,226,8
+    CONTROL         "",IDC_LIST_EXEMPTION_CODES,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,46,265,92
+    LTEXT           "Detailed explanation of selected code",IDC_STATIC,7,143,186,8
+    EDITTEXT        IDC_EDIT_EXEMPTION_DESCRIPTION,7,154,265,49,ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY | WS_VSCROLL
+    CONTROL         "&Additionally associate this exemption code or reason with the redaction(s)",IDC_CHECK_EXEMPTION_OTHER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,208,265,10
+    EDITTEXT        IDC_EDIT_EXEMPTION_OTHER,7,220,265,14,ES_AUTOHSCROLL | WS_DISABLED
+    LTEXT           "Exemption codes or reason you have selected for the redaction(s)",IDC_STATIC,7,239,251,8
+    EDITTEXT        IDC_EDIT_EXEMPTION_SAMPLE,7,250,265,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "&Clear All",IDC_BUTTON_EXEMPTION_CLEAR_ALL,7,268,50,14
+    PUSHBUTTON      "Apply &Last",IDC_BUTTON_EXEMPTION_APPLY_LAST,61,268,50,14,WS_DISABLED
+    DEFPUSHBUTTON   "OK",IDOK,168,268,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,222,268,50,14
+    LTEXT           "&Exemption code categories",IDC_STATIC,7,7,125,8
+    COMBOBOX        IDC_COMBO_EXEMPTION_CATEGORY,7,18,265,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DATA_AREA_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 205
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 261
+    END
+
+    IDD_REDACTIONVERIFICATIONUIPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 237
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 239
+    END
+
+    IDD_REDACTFILEPROCESSORPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 373
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 328
+    END
+
+    IDD_SELECT_DOCTYPES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 211
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 194
+    END
+
+    IDD_REDACTIONVERIFICATION_OPTIONS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 176
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+
+    IDD_IDSHIELDVOAFILECONTENTSCONDITIONPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 223
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 306
+    END
+
+    IDD_SELECTTARGETFILEUIDLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 261
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 51
+    END
+
+    IDD_PROPPAGE_SSNFINDER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 192
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 44
+    END
+
+    IDD_FEEDBACK_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 241
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 213
+    END
+
+    IDD_METADATA_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 225
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 50
+    END
+
+    IDD_IMAGE_OUTPUT_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 227
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 119
+    END
+
+    IDD_REDACTION_APPEARANCE_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 206
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 195
+    END
+
+    IDD_DIALOG_EXEMPTION_CODES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 272
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 282
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_DATAAREA_TOOLBAR TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_BUTTON_SAVE
+    BUTTON      ID_BUTTON_STOP
+    SEPARATOR
+    BUTTON      ID_BUTTON_PREVIOUS
+    BUTTON      ID_BUTTON_NEXT
+    SEPARATOR
+    BUTTON      ID_BUTTON_PREVIOUS_ITEM
+    BUTTON      ID_BUTTON_NEXT_ITEM
+    BUTTON      ID_BUTTON_TOGGLE_REDACTION
+    BUTTON      ID_BUTTON_ZOOM_TO_ITEM
+    SEPARATOR
+    BUTTON      ID_BUTTON_APPLY_EXEMPTION
+    BUTTON      ID_BUTTON_LAST_EXEMPTION
+    BUTTON      ID_BUTTON_ALL_EXEMPTION
+    SEPARATOR
+    BUTTON      ID_BUTTON_OPTIONS
+    BUTTON      ID_BUTTON_ABOUT_ID_SHIELD
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\DataAreaDialog.ico"
+IDI_ICON_REDACT         ICON                    "res\\icon_redact.ico"
+IDI_ICON_NOREDACT       ICON                    "res\\icon_noredact.ico"
+IDI_ICON_NA             ICON                    "res\\icon_na.ico"
+IDI_ICON_SELECT_TAG     ICON                    "res\\icon_sel.ico"
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_DATAAREA_TOOLBAR    BITMAP                  ".\\res\\dataarea.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "RedactionCustomComponents"
+    IDS_TITLERedactionVerificationUIPP "&Title"
+    IDS_HELPFILERedactionVerificationUIPP "Help File Name"
+    IDS_DOCSTRINGRedactionVerificationUIPP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLERedactFileProcessorPP "Redact Property Page"
+    IDS_HELPFILERedactFileProcessorPP "Help File Name"
+    IDS_DOCSTRINGRedactFileProcessorPP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_PREVIOUS_ITEM "Previous item (Shift+Tab)"
+    ID_BUTTON_NEXT_ITEM     "Next item (Tab)"
+    ID_BUTTON_SAVE          "Save redacted image (Ctrl+S)"
+    ID_BUTTON_TOGGLE_REDACTION "Toggle redaction (Space)"
+    ID_BUTTON_ZOOM_TO_ITEM  "Zoom to selected"
+    ID_BUTTON_OPTIONS       "Options..."
+    ID_BUTTON_ABOUT_ID_SHIELD "&About ID Shield..."
+    ID_BUTTON_PREVIOUS      "Previous reviewed document (Ctrl+Shift+Tab)"
+    ID_BUTTON_NEXT          "Next reviewed document (Ctrl+Tab)"
+    ID_BUTTON_STOP          "Stop reviewing"
+    ID_BUTTON_APPLY_EXEMPTION "Apply exemption codes... (E)"
+    ID_BUTTON_LAST_EXEMPTION "Apply last exemption codes (Ctrl+L)"
+    ID_BUTTON_ALL_EXEMPTION "Apply exemption codes to all... (Ctrl+E)"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEIDSHIELDVOAFILECONTENTSCONDITIONPP 
+                            "ID Shield Data File Contents Condition"
+    IDS_HELPFILEIDSHIELDVOAFILECONTENTSCONDITIONPP "Help File Name"
+    IDS_DOCSTRINGIDSHIELDVOAFILECONTENTSCONDITIONPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "RedactionCustomComponents.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+
