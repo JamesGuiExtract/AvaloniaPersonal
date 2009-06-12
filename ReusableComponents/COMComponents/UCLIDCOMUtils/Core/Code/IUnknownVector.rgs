@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.IUnknownVector.1 = s 'IUnknownVector Class'
+	{
+		CLSID = s '{C7C175F5-6264-4BF8-A5B9-4662CD4FB778}'
+	}
+	UCLIDCOMUtils.IUnknownVector = s 'IUnknownVector Class'
+	{
+		CLSID = s '{C7C175F5-6264-4BF8-A5B9-4662CD4FB778}'
+		CurVer = s 'UCLIDCOMUtils.IUnknownVector.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C7C175F5-6264-4BF8-A5B9-4662CD4FB778} = s 'IUnknownVector Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.IUnknownVector.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.IUnknownVector'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

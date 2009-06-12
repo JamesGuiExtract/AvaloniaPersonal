@@ -1,0 +1,96 @@
+//-----------------------------------------------------------------------------------
+// For Syntax details see:
+//   \ComponentData\GrantorGranteeFinder\Common\CommonDef.dat
+//-----------------------------------------------------------------------------------
+
+
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+PreGrantorKeywords=Quit Claim Deed|DocumentNo|Document No|Parcel Identification Number (PIN)|This Quit-Claim Deed
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\trimin\set001\images\quit claim deeds\000004ed.tif.uss
+QCD_GRANTEE_01=deed^30~between^300~grantor^5~and^?Grantee^400~grantee^10~grantor^5~quit^5~claims
+
+// 0002.tif;k:\common\engineering\sample files\trimin\set001\images\quit claim deeds\1938354.tif.uss
+//to accommodate bad zoning
+QCD_GRANTEE_02=deed^30~between^300~\r\nand^?Grantee^250~grantor^5~quit^50~claims
+
+//
+QCD_GRANTEE_03=grantor(s)|grantor^300~quit^5~claims^5~to^5~grantee(s)|grantee^?Grantee^250~the following
+
+QCD_GRANTEE_04a=deed^100~between^400~, grantor ,^?Grantee^160~, grantee
+// 0003.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272513.tif.uss
+// 0004.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272613.tif.uss
+// 0005.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272632.tif.uss
+// 0006.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\qcd\2005258210.tif.uss
+// 0007.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\qcd\2005257505.tif.uss
+// 0023.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\quitclaim deed\20059021924100.tif.uss
+QCD_GRANTEE_04=deed^100~between^400~grantor|seller|transferor^[and]|[to]^?<Grantee^400~grantee|buyer|transferee
+
+// 0008.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0061501.tif.uss
+QCD_GRANTEE_05=@PreGrantorKeywords^quit^3~claim^5~[to]^?Grantee^250~the following
+
+// 0009.tif;k:\common\engineering\sample files\trimin\set001\images\quit claim deeds\00000433.tif.uss
+QCD_GRANTEE_06=@PreGrantorKeywords^quit^5~claim^5~to^?Grantee^350~the following
+
+
+// 0010.tif;k:\common\engineering\sample files\trimin\set001\images\quit claim deeds\1938360.tif.uss
+// 0011.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\quit claim deed (grant deed)\20049000021100.001.tif.uss
+QCD_GRANTEE_07=quit^3~claim^50~[to]^?Grantee^250~name of grantee|grantee|following|the real property|address
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\quit claim deed (grant deed)\20049000059400.001.tif.uss
+QCD_GRANTEE_08=\r\nLessor:^?Grantee^250~Original Lessee
+
+//
+QCD_GRANTEE_09=Grantee^?Grantee^250~whose post
+
+// 0013.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0061525.tif.uss
+// 0014.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0061023.tif.uss
+QCD_GRANTEE_10=quit^5~claim^3~to^?Grantee^300~the^3~following^25~property
+
+// 0015.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0062237.tif.uss
+QCD_GRANTEE_11=hereby grant^5~to^?Grantee^250~following^25~property
+
+// 0016.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0060323.tif.uss
+QCD_GRANTEE_12=quit^3~claim^5~[to]^?Grantee^500~that|the^12~property
+
+// 0017.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272454.tif.uss
+// 0018.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\qcd\2005257661.tif.uss
+QCD_GRANTEE_13a=of^3~the^3~first^3~part^?Grantee^250~party^3~of^3~the^3~second
+QCD_GRANTEE_13=[by]^250~first^5~part^[to]|[o]|[to:]^?Grantee^250~second part
+
+// 0019.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0062248.tif.uss
+QCD_GRANTEE_14=quit^3~claim^5~[to]|[unto]^?Grantee^500~that|the^35~property
+
+// 0020.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272571.tif.uss
+QCD_GRANTEE_15=[by]^5~first party^500~[to]^5~second party^?Grantee^250~address is
+
+// 0021.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272624.tif.uss
+QCD_GRANTEE_16=deed^100~by^400~grantor^5~[to]^?Grantee^400~grantee
+
+// 0022.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\qcd\2005257425.tif.uss
+QCD_GRANTEE_17=paid by^?Grantee^250~herein^20~grantee
+
+// 0024.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\quitclaim deed\20059023895500.tif.uss
+QCD_GRANTEE_18=hereby grant^5~to^?Grantee^250~all^25~interest
+// 0025.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\QUITCLAIM DEED\20079001618800.003
+QCD_GRANTEE_19=hereby^3~deeds^3~all]^12~right^60~property^3~located^120~, to]|[to]^?Grantee^160~described^6~[as]|follows
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\QUITCLAIM DEED\20079001443500.004.uss
+QCD_GRANTEE_20=hereby^36~transfer^5~to]^?Grantee^250~, Grantee
+
+[PATTERNS_END]

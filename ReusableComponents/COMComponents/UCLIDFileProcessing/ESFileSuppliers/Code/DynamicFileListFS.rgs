@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFileSuppliers.DynamicFileListFS.1 = s 'DynamicFileListFS Class'
+	{
+		CLSID = s '{AD2EFC26-A67B-48d7-A069-B0EA5B215E18}'
+	}
+	ESFileSuppliers.DynamicFileListFS = s 'DynamicFileListFS Class'
+	{
+		CLSID = s '{AD2EFC26-A67B-48d7-A069-B0EA5B215E18}'
+		CurVer = s 'ESFileSuppliers.DynamicFileListFS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AD2EFC26-A67B-48d7-A069-B0EA5B215E18} = s 'DynamicFileListFS Class'
+		{
+			ProgID = s 'ESFileSuppliers.DynamicFileListFS.1'
+			VersionIndependentProgID = s 'ESFileSuppliers.DynamicFileListFS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{ABCBED34-5255-4717-A098-B9D9B505DE93}'
+		}
+	}
+}

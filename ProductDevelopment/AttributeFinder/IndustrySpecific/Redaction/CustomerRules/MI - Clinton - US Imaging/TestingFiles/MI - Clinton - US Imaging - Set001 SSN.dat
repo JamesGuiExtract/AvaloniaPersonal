@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues|Certificate of Death
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//<SETTING>;TypeToBeTested=SSN
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\US Imaging\MI - Clinton\Set001\Random10000Subset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

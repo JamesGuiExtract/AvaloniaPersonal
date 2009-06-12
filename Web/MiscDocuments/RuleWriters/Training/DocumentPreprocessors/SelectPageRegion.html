@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Select Page Region Preprocessor</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Select Page Region Preprocessor</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>Limits the pages passed to Value Finders for processing.</li>
+		<li>Can be used either as a page filter, or to re-OCR.</li>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>In the <b>Select Document Preprocessor</b> window:</li>
+		<li>Choose <b>Select page region</b> from the dropdown menu. Click <b>Configure...</b></li>
+		<li>The dropdown menu at the top allows you to either include or exclude the region you will define.</li>
+		<li><b>1) Select page(s)</b>.</li>
+		<ul>
+			<li><b>All pages</b> includes all pages, as expected.</li>
+			<li><b>Specific page(s)</b>.
+			<ul>
+				<li>Selects a single page. eg. "1"</li>
+				<li>Selects a list of pages. eg. "1,4,5"</li>
+				<li>Selects a range of pages. eg. "1-4"</li>
+				<li>Click the help balloon to the right of the field for more detailed info.</li>
+			</ul>
+			<li><b>All/Leading/Trailing pages that contain:</b> selects pages that contain a string.</li>
+			<ul>
+				<li>The dropdown menu toggles selector between All/Leading/Trailing.</li>
+				<li>Enter a string into the text field.</li>
+				<li>Activate the checkboxes to interpret your string as a <b>Regular Expression</b> and/or as <b>Case Sensitive</b>.</li>
+			</ul>
+		</ul>
+		<li><b>2) On each page in scope</b>.</li>
+		<ul>
+			<li>Checkboxes activate options to restrict pages horizontally and/or vertically.</li>
+			<li>Enter starting and ending percentages to define the ranges.</li>
+			<li>Note: You may want to enable <b>Display X, Y percentages in Spot Recognition Window</b> in the <b>RDT Configuration</b> utility.</li>
+		</ul>
+		<li><b>3) For each selected region</b>.</li>
+		<ul>
+			<li>Activate the checkbox to <b>OCR the included text</b>.</li>
+			<li>Enter an angle (in degrees) to rotate the image being OCR'd.</li>
+		</ul>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open the <b>RuleSet Editor</b>, load ".\Files\TestImageSSN.rsd", open the <b>Rule Tester</b>, load ".\Files\TestImage004.tif" and execute the rules.</li>
+		<li>Note that both SSN's found are on page one of this document. A more efficient approach would be to only process the first page.</li>
+		<li>Set up a <b>Select page region</b> preprocessor to include only the first page.</li>
+		<li>Additionally the SSN's are in a header to the document, so we can restrict the page horizontally as well. Adjust your preprocessor to do this.</li>
+		<li>Now load ".\Files\BadOCR.rsd" in the <b>RuleSet Editor</b> and ".\Files\BadOCR.tif" in the <b>Rule Tester</b>. Execute the rules.</li>
+		<li>They don't find anything. Let's investigate a bit. Open ".\Files\BadOCR.tif" in a <b>Spot Recognition</b> window and ".\Files\BadOCR.tif.uss" in the <b>USS File Viewer</b>.</li>
+		<li>In the top right corner of the document there is a "Taxpayer number" field which contains a number that could be based on a SSN. Note that the phrase<br>
+			"Taxpayer number" is not included in the USS file. Also note the fuzzy black borders in the image. These can confuse the OCR engine and prevent text from being<br>
+			correctly identified.</li>
+		<li>Create a <b>Select page region</b> preprocessor to allow the rule to find the SSN.</li>
+		<li>Hint: exclude the borders of the image and re-OCR it.</li>
+	</ol>
+
+</BODY>
+</HTML>

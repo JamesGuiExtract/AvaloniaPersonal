@@ -1,0 +1,16 @@
+Test1,Opening images,Opening_files.html
+Test2,Opening .gdd files,Opening_gdd_files.html
+Test3,Expected errors when opening incorrect filetypes,Opening_incorrect_filetypes.html
+Test4,Zooming,zoom.html
+Test5,Panning,pan.html
+Test6,Saving .gdd files,Saving_gdd_files.html
+Test7,Expected errors with read-only .gdd files,Saving_Read-Only_gdd_files.html
+Test8,Multi-page images,multi-page.html
+Test9,Spot recognition,spotrecognition.html
+Test10,Editing highlights,Editing_highlights.html
+Test11,Deleting highlights,Deleting_highlights.html
+Test12,Recognizing text within a window,Window_recognition.html
+Test13,Miscellaneous,tooltips.html
+Test14,Bringing up SpotRec-IR's,NewSpotRec.html
+Test15,Enabling/Disabling Input,Enable.html
+Test16,Manipulating entities,EntityManipulation.html

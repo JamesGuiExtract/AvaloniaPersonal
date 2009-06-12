@@ -1,0 +1,26 @@
+HKCR
+{
+	InputFinders.NothingInputFinder.1 = s 'NothingInputFinder Class'
+	{
+		CLSID = s '{ADAC8849-CBCF-46FA-B886-8190EEDDE4BF}'
+	}
+	InputFinders.NothingInputFinder = s 'NothingInputFinder Class'
+	{
+		CLSID = s '{ADAC8849-CBCF-46FA-B886-8190EEDDE4BF}'
+		CurVer = s 'InputFinders.NothingInputFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {ADAC8849-CBCF-46FA-B886-8190EEDDE4BF} = s 'NothingInputFinder Class'
+		{
+			ProgID = s 'InputFinders.NothingInputFinder.1'
+			VersionIndependentProgID = s 'InputFinders.NothingInputFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D76C8853-4347-11D6-826C-0050DAD4FF55}'
+		}
+	}
+}

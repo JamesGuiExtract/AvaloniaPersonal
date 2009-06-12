@@ -1,0 +1,26 @@
+HKCR
+{
+	AFSelectorsLib.QueryBasedASPP.1 = s 'QueryBasedASPP Class'
+	{
+		CLSID = s '{5CDBE4BF-96A5-4E6B-8838-2B3E2B6DF394}'
+	}
+	AFSelectorsLib.QueryBasedASPP = s 'QueryBasedASPP Class'
+	{
+		CLSID = s '{5CDBE4BF-96A5-4E6B-8838-2B3E2B6DF394}'
+		CurVer = s 'AFSelectorsLib.QueryBasedASPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5CDBE4BF-96A5-4E6B-8838-2B3E2B6DF394} = s 'QueryBasedASPP Class'
+		{
+			ProgID = s 'AFSelectorsLib.QueryBasedASPP.1'
+			VersionIndependentProgID = s 'AFSelectorsLib.QueryBasedASPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

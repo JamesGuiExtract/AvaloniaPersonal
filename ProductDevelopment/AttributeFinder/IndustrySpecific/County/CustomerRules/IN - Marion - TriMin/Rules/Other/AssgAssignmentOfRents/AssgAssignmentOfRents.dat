@@ -1,0 +1,3 @@
+[PATTERNS_BEGIN]
+rule01=executed^3~by^?Other^250~Borrower^16~made|payable
+[PATTERNS_END]

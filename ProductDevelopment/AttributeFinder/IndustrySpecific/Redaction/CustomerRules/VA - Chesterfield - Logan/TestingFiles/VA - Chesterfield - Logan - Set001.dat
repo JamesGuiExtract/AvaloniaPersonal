@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Set001
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\LoganSystems\VA - Chesterfield\Set001\Random8000Subset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+

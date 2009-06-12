@@ -1,0 +1,55 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Address Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Address Splitter tests
+// Test Type: Trailing Text
+// Note that comment lines should be removed by the RSD file
+
+<TESTCASE>|Kansas|ACME Consulting\r\n1234 University Ave\r\nApartment #2B\r\nKansas City, Kansas 80302\r\nAttn: Mrs. Jane Six
+Address|ACME Consulting\r\n1234 University Ave\r\nApartment #2B\r\nKansas City, Kansas 80302\r\nAttn: Mrs. Jane Six
+.Recipient1|ACME Consulting
+.Recipient2|Attn: Mrs. Jane Six
+.Address1|1234 University Ave
+.Address2|Apartment #2B
+.City|Kansas City
+.State|Kansas
+.ZipCode|80302
+
+<TESTCASE>|Zip on single line|Three Brothers Construction\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705\r\nJohn Three
+Address|Three Brothers Construction\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705\r\nJohn Three
+.Recipient1|Three Brothers Construction
+.Recipient2|John Three
+.Address1|14422 Division Lane
+.City|Madison
+.State|Wisconsin
+.ZipCode|53705
+
+<TESTCASE>|Zip with Country|Four Sisters Restaurant\r\n14422 Division Lane \r\nMadison, Wisconsin\r\nUSA 53705\r\nJane Four
+Address|Four Sisters Restaurant\r\n14422 Division Lane \r\nMadison, Wisconsin\r\nUSA 53705\r\nJane Four
+.Recipient1|Four Sisters Restaurant
+.Recipient2|Jane Four
+.Address1|14422 Division Lane
+.City|Madison
+.State|Wisconsin
+.ZipCode|53705
+
+<TESTCASE>|Trailing Loan Number|Four Sisters Restaurant\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705\r\nLoan #123-45
+Address|Four Sisters Restaurant\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705\r\nLoan #123-45
+.Recipient1|Four Sisters Restaurant
+.Recipient2|Loan #123-45
+.Address1|14422 Division Lane
+.City|Madison
+.State|Wisconsin
+.ZipCode|53705

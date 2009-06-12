@@ -1,0 +1,26 @@
+HKCR
+{
+	LMCoreAutoTest.LMDataTester.1 = s 'LMDataTester Class'
+	{
+		CLSID = s '{E577290A-0B1A-4F9F-A4F3-001431E9A187}'
+	}
+	LMCoreAutoTest.LMDataTester = s 'LMDataTester Class'
+	{
+		CLSID = s '{E577290A-0B1A-4F9F-A4F3-001431E9A187}'
+		CurVer = s 'LMCoreAutoTest.LMDataTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E577290A-0B1A-4F9F-A4F3-001431E9A187} = s 'LMDataTester Class'
+		{
+			ProgID = s 'LMCoreAutoTest.LMDataTester.1'
+			VersionIndependentProgID = s 'LMCoreAutoTest.LMDataTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{E3C303CE-7EFE-4934-85C1-C2BBCF7BD874}'
+		}
+	}
+}

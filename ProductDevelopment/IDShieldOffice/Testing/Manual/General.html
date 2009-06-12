@@ -1,0 +1,227 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO General Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>General Features Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><b>[IDShieldDesktop #4] Background OCR Support</b>
+	<ul>
+		<LI>Run <b>ID Shield Office</b> without opening an image.  Confirm that no status 
+	information is presented about OCR progress.
+		<LI>Open an image.
+		<ul>
+			<LI>Confirm that the status bar has a pane with <b>OCR 00%</b>.
+			<LI>Confirm that after a brief pause, OCR progress is provided 
+		in the status pane.
+			<LI>Confirm that when OCR is finished, the status bar text is 
+		<b>OCR Complete!</b> and that the font color of the text is green.
+		</ul>
+
+		<LI>Open another image.
+		<ul>
+			<LI>Confirm that the status bar resets to <b>OCR 00%</b> with 
+		the normal black font color.
+			<LI>Confirm that after a brief pause, OCR progress is provided 
+		in the status pane.
+			<LI>Before OCR finishes, open yet another image.  Confirm that 
+		the OCR status briefly flashes <b>OCR Canceled</b> with a blue 
+		font color.
+			<LI>Confirm that OCR progress then resets and starts over.
+		</ul>
+
+		<LI>Open an image that fails OCR.
+		<ul>
+			<LI>Use <b>I:\Common\Testing\Product 
+		Testing\IDShieldOffice\Images\BadOcr.tif</b>.
+			<LI>Confirm that the status bar eventually displays <b>OCR Error!</b> 
+		with a red font color.
+			<LI>Confirm that double-clicking on the status bar pane provides 
+			an exception dialog.
+			<!-- SCR# 28 -->
+			<li>Confirm that message showed in the dialog is <b>not</b> "Failure in OCR thread!
+			<!-- SCR# 27 -->
+			<li>Confirm that <b>a tooltip</b> will be displayed when hovering over the <b>OCR ERROR!</b> pane on the status bar.
+			<li>Confirm that double clicking the <b>OCR Error!</b> will display a meaningful message.
+		</ul>
+
+		<LI>Open another image.
+		<ul>
+			<LI>Confirm that the status bar resets to <b>OCR 00%</b> with 
+		the normal black font color.
+			<LI>Confirm that after a brief pause, OCR progress is provided 
+		in the status pane.
+			<LI>Before OCR finishes, exit ID Shield Office.  Confirm that 
+		the OCR status briefly flashes <b>OCR Canceled</b> with a blue 
+		font color.
+			<LI>Confirm that exit from <b>ID Shield Office</b> occurs without 
+		significant delay.
+		</ul>
+	</ul>
+	<p>
+
+	<LI><b>Preferences - General</b>
+	<ul>
+	<li>Open <b>ID Shield Office</b> and select the <b>Edit - Preferences</b> 
+	menu
+	<li>Select the <b>General</b> tab.
+	<li>Confirm that a slider is provided for specifying the <b>OCR tradeoff</b> between 
+	accuracy and speed.
+	<li>Confirm that the default setting is in the middle for <b>Balanced</b>.
+	<li>Confirm that a checkbox is provided for requiring all pages to have been visited before redacted document can be output.
+	<li>Confirm that the checkbox is checked by default.
+	<li>Confirm that the setting is persistent within the same session.
+	<li>Confirm that the setting is persistent between sessions.
+	<p>
+
+	<li>Confirm that a drop-down list is provided for <b>default redaction fill color</b> with 
+	the following entries:
+	<ul>
+		<li>Black
+		<li>White
+	</ul>
+	<li>Confirm that the default fill color is <b>Black</b>.
+	<li>Confirm that the default fill color is persistent within the same session.
+	<li>Confirm that the default fill color is persistent between sessions.
+	</ul>
+	<p>
+
+	<LI><b>Miscellaneous</b>
+	<ul>
+	<!-- SCR# 29 -->
+	<li>Confirm that <b>ID Shield Office</b> executable file has a proper icon
+	<li>Open <b>ID Shield Office</b>.
+	<!-- SCR# 21 -->
+	<li>Confirm that <b>splash screen</b> appears and has a proper resolution.
+	<li>Confirm that <b>Help - ID Shield Office help</b> displays 
+	<b>ID Shield Office 1.0 Help</b> including the following information
+	<ul>
+		<li>Getting started book
+		<li>redacting book
+		<li>Saving,Printing&Auditing book
+		<li>Glossary book
+	</ul>
+	<li>Confirm that <b>Help - Regular expression help</b> displays a web page 
+	for <b>Regular Expression Syntax (Scripting)</b>.
+	<li>Confirm that <b>Help - About ID Shield Office</b> displays an About 
+	box including the following information
+	<li>Confirm that the background of logo is transparent
+	<ul>
+		<li>ID Shield Office icon
+		<li>ID Shield Office version number
+		<li>Copyright date
+	</ul>
+	<p>
+
+	<!-- SCR# 159 -->
+	<li>Main window gets focus after non-model dialog closed
+	<ul>
+	<li>Launch IDSO without open an image file
+	<li>Click <b>Data type finder</b>, or <b>Bracketed text finder</b>, or <b>Wordlist finder</b> to display a non-model dialog.
+	<li>Switch to other application clicking taskbar icon
+	<li>Switch back to IDSO non-model dialog clicking non-model dialog icon in the taskbar
+	<li>Close non-model dialog
+	<li>Confirm that main window gets focused
+	<br># Currently it doesn't work with IE
+	</ul>
+	<p>
+
+	<!-- SCR# 31 -->
+	<li>Close IDSO while OCR not completing
+	<ul>
+		<li><b>[IDSO #31]</b> Open <b>0350pages.tif (350 pages)</b> image file.
+		<li>Close <b>ID Shield Office</b> while OCR is not completed.
+		<li>Confirm that <b>ID Shield Office</b> terminated normally.
+	</ul>
+	<p>
+	
+	<!-- SCR# 211 -->
+	<li>Large memory usage and slow closing of IDSO
+	<ul>
+		<li>Open an image in IDSO
+		<li>Create several redactions (at least 25)
+		<li>Open <b>Windows Task Manager</b>.
+		<li>Confirm that the memory usage is not exceptionally high (example: 102MB with 62 redactions)
+		<li>Close IDSO
+		<li>Confirm that <b>IDShieldOffice.exe</b> process disappears from task manager and no 
+		exceptional CPU usage spikes.
+	</ul>
+	<p>
+
+	<!-- SCR# 196 -->
+	<li>Confirm that IDSO window size is persistent across sessions.
+	<p>
+
+	<li>Confirm that all the following main menu shortcut keys works correctly.
+	<ul>
+	<li>Ctrl+O 				- open file
+	<li>Ctrl+F4				- close file
+	<li>Ctrl+s				- save file
+	<li>Ctrl+f				- word/pattern finder
+	<li>Ctrl+k				- bracketed text finder
+	<li>Ctrl+d				- data type finder
+	<li>Ctrl+P				- print
+	<li>Ctrl+A				- select all 
+ 	<li>del	   				- delete selection
+	<li>F12    				- user preference
+	<li>A      				- pan
+	<li>Z      				- zoom window
+	<li>P 					- Fit to page
+	<li>W	 				- Fit to width
+	<li>R (or Alt+left) 		- Zoom previous
+	<li>T (or Alt+right) 		- Zoom next
+	<li>F7 (or Ctrl++) 		- zoom in
+	<li>F8 (or Ctrl+-) 		- zoom out
+	<li>ESC				- Select redactions and other objects
+	<li>Ctrl+Home 			- Goto first page
+	<li>Ctrl+End   			- Goto last page
+	<li>PgUp   				- Previous page
+	<li>PgDn   				- Next page
+	<li>,     				- Previous tile
+	<li>.      				- Next tile
+	<li>Shift+F3 (or Ctrl+,) 	- Previous Object
+	<li>F3 (or Ctrl+.)		- Next Object
+	<li>Ctrl+R 				- Rotate clockwise
+	<li>Ctrl+Shift+R 		- Rotate counterclockwise
+	<li>Ctrl+L				- Show/Hide lay windows
+	<li>F10					- Show/Hide object properties window
+	<li>Ctrl+B				- apply Bates number
+	<li>F1					- IDSO help	
+	<li>Ctrl+G				- Move focus to page number textbox in the toolbar
+	</ul>
+
+	<li>Confirm that all the following context menu shortcut keys works correctly.
+	<ul>
+	<li>ESC					- Select redactions and other objects
+	<li>R (or Alt+left) 		- Zoom previous
+	<li>T (or Alt+right) 	- Zoom next
+	<li>A      				- pan
+	<li>Z      				- zoom window
+	<li>H					- redaction(switch between angular and rectangular tool)
+	</ul>
+	<!--
+       	<LI><b>[V2]</b> Undo and Redo Support
+		<ul>
+         	<LI>Undo and Redo is supported for adding redactions or 
+		related information
+       		<LI>Undo and Redo is supported for deleting redactions or 
+		related information
+       	 	<LI>Undo and Redo is supported for modifying redactions or 
+		related information
+         	<LI>Undo and Redo support is not limited within a document 
+		editing session 
+       		<LI>Undo and Redo history is cleared at the beginning of each 
+		document editing session
+	</ul>
+	</LI>
+	-->
+</UL>
+</BODY>
+</HTML>

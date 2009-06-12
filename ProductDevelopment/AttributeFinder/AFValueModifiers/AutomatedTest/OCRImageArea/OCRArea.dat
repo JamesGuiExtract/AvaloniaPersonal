@@ -1,0 +1,16 @@
+//*********************************************************************************
+// OCRArea.dat
+// This file contains testcases for OCR Image Area value modifier
+//*********************************************************************************
+
+// Handwriting digit and hyphen recognition
+<TESTCASE>;OCRArea1.rsd;00034226.002.tif.uss;;OCRArea1.eav
+
+// Machine printed text recognition
+<TESTCASE>;OCRArea2.rsd;0001pg3.tif.uss;;OCRArea2.eav
+
+// Handwriting alphanumeric and user-specified filter recognition
+<TESTCASE>;OCRArea3.rsd;SkewedImages.tif.uss;;OCRArea3.eav
+
+// Retain or discard attributes where no text is found
+<TESTCASE>;OCRArea4.rsd;00034226.002.tif.uss;;OCRArea4.eav

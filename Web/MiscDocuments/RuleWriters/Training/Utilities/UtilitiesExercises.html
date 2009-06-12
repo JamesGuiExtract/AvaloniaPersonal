@@ -1,0 +1,53 @@
+<HTML>
+	<HEAD>
+		<TITLE>File Action Manager and DB Administration Exercises</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>File Action Manager and DB Administration Exercises</h1>
+		<hr>
+		<ol>
+			<p>
+				<li>Use the File Action Manager and DB Administration applications to create USS files for all of the images in the <b>RedactionDemo\Images</b> folder.
+					<p>
+						<ul>
+							<li>Create a new database.</li>
+							<li>Add an action called "OCR" to the database.</li>
+							<li>Open the File Action Manager and use a <b>Files from folder</b> file supplier to queue all of the files in the <b>RedactionDemo\Images</b> folder.</li>
+							<li>Process the queued files using an <b>OCR document</b> task.</li>
+						</ul>
+					</p>
+				</li>
+			</p>
+			<p>
+				<li>Open <b>TestImage001.tif.uss</b>, which was created in the last exercise, in the USS File Viewer.
+					<p>
+						<ul>
+							<li>Try highlighting some text and note how the <b>Start Pos</b> and <b>End Pos</b> values change.</li>
+							<li>Search for the text <i>THE</i> and note that every time the <b>Find</b> button is pressed the next instance of <i>THE</i> is highlighted in the USS File Viewer.</li>
+							<li>Make the above search case sensitive.  Notice how the results change.</li>
+							<li>Use a regular expression to search for a social security number with the form ###-##-####.</li>
+							<li>Use the <b>AND</b> operator to confirm that the words <i>born</i>, <i>child</i>, and <i>defendant</i> are all present in this file.</li>
+						</ul>
+					</p>
+				</li>
+			</p>
+			<p>
+				<li>Create Expected Redaction .voa files for all of the images in the <b>Redaction Demo</b> folder.
+					<ul>
+						<li>Redact all of the social security numbers in these images and give them a type of <i>SSN</i>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li>Setup and run a Test Harness test that will test <b>SSN.rsd</b> on all of the images in the <b>Redaction Demo</b> folder.  Use the Expected Redaction files that were created in the previous exercise.</li>
+					<ul>
+						<li>Create the .tcl and .dat file.</li>
+						<li>What are the final automated statistics for <b>SSN.rsd</b>?</li>
+						<li>Look at the .uss files of the images on which there are missed redactions.  What rules could you add to catch some of these missed redactions?</li>
+					</ul>
+				</li>
+			</p>
+		</ol>
+	</BODY>
+</HTML>

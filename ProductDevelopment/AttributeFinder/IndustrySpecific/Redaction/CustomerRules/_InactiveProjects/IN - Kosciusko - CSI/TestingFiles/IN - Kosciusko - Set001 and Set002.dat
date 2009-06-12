@@ -1,0 +1,8 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;TypeToBeTested=SSN
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Kosciusko\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Kosciusko\Set002\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

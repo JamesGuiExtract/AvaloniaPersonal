@@ -1,0 +1,237 @@
+<html>
+<head>
+<title>Memory Leak Testing</title>
+	<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+<body>
+	<h1>Memory Leak Testing - Task Objects<br>
+	<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+	</h1>	
+<hr>
+<h2>NOTE: All tests require installation and licensure of the Rule Development Toolkit.</h2>
+
+<ol>
+	<li><b>General Instructions</b>
+		<ul>
+			<li>Each test specified below should be run as an individual 
+			instance of the <b>File Action Manager</b>.
+			<li><b>No</b> other File Action Manager instances should be run during the test.
+			<li>Please note the <b>machine name</b> and the <b>operating system</b>.
+			<li>Update the system PATH to include <b>I:\Common\Engineering\Tools\Utils</b>.
+			The \\fnp\internal folder may instead be mapped to drive P:.
+		</ul>
+<p>
+	<li><b>Database Instructions - If Needed</b>
+		<ul>
+			<li>Use the <b>DB Administration</b> utility to create a local 
+			MEMORY_LEAK database.  The server name should be <b>(local)</b>.
+			<li>Log in and add a <b>Test</b> action to the database.
+		</ul>
+<p>
+	<li><b>Memory Leak Test Instructions</b>
+		<ul>
+			<li>Clear the database from the <b>DB Administration</b> utility before each test 
+			if running additional Memory Leak tests on the same machine.
+			<li>Add a <b>Test</b> action to the database.
+			<li>Test sets - run each group
+			<ul>
+				<li>Open an Explorer window and navigate to the 
+				<b>UCLIDFileProcessing\AutomatedTest\MemoryLeak\<i>Task_Object</i></b> folder.
+				<li>Open an Explorer window and navigate to the 
+				<b>UCLIDFileProcessing\ESFileSuppliers\AutomatedTest\<i>Supplier_Object</i></b> 
+				folder.
+			</ul>
+			<li>Double click the associated <b>ExecuteTest_<i>N</i>.bat</b> batch file.
+			<li>Wait until the various command windows have opened and the 
+			File Action Manager has started processing.  It may be necessary in some 
+			cases to execute the batch file commands manually.
+<p>
+			<li>Review after test completion: 
+			<ul>
+				<li><u>File Action Manager processing results</u>.  Some tests expect 
+				many or all files to fail.  Some tests expect zero failures.
+				<li><u>Memory and handle usage</u>.  Open 
+				<b>I:\Common\Engineering\Tools\Utils\LogProcessStats\ImportData.xls</b>.
+				Use <b>Ctrl+Shift+I</b> to import the ProcessFiles.NNNN.csv file.
+				Use <b>Ctrl+Shift+I</b> to import the cpu.csv file.
+				Review the charts on the other tabs.
+				<li><u>Error logs</u>.  Use UEXViewer.exe to review the exception logs.
+				Note any unusual errors.
+			</ul>
+<p>
+			<li>Save the <b>LogProcessStats</b> results as noted below.
+			<li>Save the <b>Exception log(s)</b> if any interesting errors were noted.
+			<li>Save the <b>Database</b> if any errors occurred.
+		</ul>
+<p>
+	<li><b>Data Collection and Archiving</b>
+		<ul>
+			<li>The batch file associated with each memory leak test 
+			includes running an instance of LogProcessStats to record 
+			memory and handle usage.
+			<li>Task object data will be stored in subfolders under 
+			I:\Common\Testing\Product Testing\FLEX_Index_60\MemoryLeakTests\TaskObjects.
+			<li>Subfolders exist for each task object:
+			<ul>
+				<li>AddWatermark.</li>
+				<li>CleanupImage.</li>
+				<li>ConditionalTask.</li>
+				<li>ConvertToSearchablePDF.</li>
+				<li>CopyMoveDelete.</li>
+				<li>ExecuteRules.</li>
+				<li>LaunchApplication.</li>
+				<li>OCRDocument.</li>
+				<li>RedactImages.</li>
+				<li>SetFileActionStatus.</li>
+				<li>VerifyRedactions.</li>
+			</ul>
+			<li>File Supplier object data will be stored in subfolders under 
+			I:\Common\Testing\Product Testing\FLEX_Index_60\MemoryLeakTests\SupplierObjects.
+			<li>Subfolders exist for each file supplier object:
+			<ul>
+				<li>DynamicList.</li>
+				<li>Folder.</li>
+				<li>StaticList.</li>
+			</ul>
+			<li>Contents of the <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
+			named subfolder under the test number folder for the associated 
+			object subfolder.
+			<li>One or more Exception logs can be stored in a <b>UEX_Logs</b> subfolder.
+			This is useful if any unexpected errors are noticed during review. 
+			<li>SQL Server Management Studio can be used to backup the MEMORY_LEAK 
+			database files to a <b>Database</b> subfolder.
+			<li>An example path for a particular test is: <br>
+<b>I:\Common\Testing\Product Testing\FLEX_Index_60\MemoryLeakTests\TaskObjects\CopyMoveDelete\Test_13\2007-10-30</b>.
+			<li>Copy and update a <b>TestDetails.txt</b> file in the Test_N folder.
+			This file will contain a summary of the test environment and results.
+		</ul>
+<p>
+	<li><b>Task Object Tests</b>
+	<ol>
+		<li><b>Add Watermark</b>
+			<ul>
+				<li>Test 1: 1-Bit Stamps on Multipage Tiff</li>
+				<li>Test 2: 1-Bit Stamps on Multipage PDF</li>
+				<li>Test 3: 24-Bit Stamps on Multipage Tiff</li>
+				<li>Test 4: 24-Bit Stamps on Multipage PDF</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Cleanup Image</b>
+			<ul>
+				<li>Test 1: FillStripes</li>
+				<li>Test 2: RemoveHalftones</li>
+				<li>Test 3: CleanBorders + SmoothCharacters 
+				+ DeleteLines + Despeckle</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Conditionally Execute Task(s)</b>
+			<ul>
+				<li>Test 1: Five Conditional Tasks + Delete Files</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Convert To Searchable PDF</b>
+			<ul>
+				<li>Test 1: Convert TIF to PDF</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Copy Move or Delete File</b>
+			<ul>
+				<li>Test 1 : Copy - Success
+				<li>Test 2 : Copy - Record Error
+				<li>Test 3 : Copy - Skip Error
+				<li>Test 4 : Copy - Destination Record Error
+				<li>Test 5 : Copy - Destination Skip Error
+				<li>Test 6 : Copy - Destination Overwrite
+				<li>Test 7 : Move - Success
+				<li>Test 8 : Move - Record Error
+				<li>Test 9 : Move - Skip Error
+				<li>Test 10 : Move - Destination Record Error
+				<li>Test 11 : Move - Destination Skip Error
+				<li>Test 12 : Move - Destination Overwrite
+				<li>Test 13 : Delete - Success
+				<li>Test 14 : Delete - Record Error
+				<li>Test 15 : Delete - Skip Error
+			</ul>
+		</li>
+		<p>
+		<li><b>Execute Rules</b>
+			<ul>
+				<li>Test 1 : No USS Files
+				<li>Test 2 : From USS Files
+				<li>Test 3 : Make USS Files - All Pages
+				<li>Test 4 : Make USS Files - Page 2
+			</ul>
+		</li>
+		<p>
+		<li><b>Launch Application</b>
+			<ul>
+				<li>Test 1 : Blocking - Success
+				<li>Test 2 : Blocking - Failure
+				<li>Test 3 : Non-Blocking - Success
+				<li>Test 4 : Non-Blocking - Failure
+			</ul>
+		</li>
+		<p>
+		<li><b>OCR document</b>
+			<ul>
+				<li>Test 1 : All Pages
+				<li>Test 2 : Only Page 2
+				<li>Test 3 : Last Page
+			</ul>
+		</li>
+		<p>
+		<li><b>Redact Images (no verification)</b>
+			<ul>
+				<li>Test 1 : From Image and Various Rules To Execute
+				<li>Test 2 : From USS File and Various Rules To Execute
+				<li>Test 3 : From VOA and Various Rules To Execute
+				<li>Test 4 : Various Annotations Options
+			</ul>
+		</li>
+		<p>
+		<li><b>Set File-Action status in database</b>
+			<ul>
+				<li>Test 1 : Pending
+				<li>Test 2 : Completed
+				<li>Test 3 : Failed
+				<li>Test 4 : Unattempted
+			</ul>
+		</li>
+		<p>
+		<li><b>Verify Redactions</b>
+			<ul>
+				<li>TBD
+			</ul>
+		</li>
+	</ol>
+<p>
+	<li><b>File Supplier Object Tests</b>
+	<ol>
+		<li><b>Dynamic List</b>
+			<ul>
+				<li>Test 1: Lists of <b>TIF</b>s</li>
+				<li>Test 2: Lists of <b>PDF</b>s</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Folder</b>
+			<ul>
+				<li>Test 1: TIFs</li>
+				<li>Test 2: PDFs</li>
+			</ul>
+		</li>
+		<p>
+		<li><b>Static List</b>
+			<ul>
+				<li>Test 1: Lists of <b>TIF</b>s</li>
+				<li>Test 2: Lists of <b>PDF</b>s</li>
+			</ul>
+		</li>
+	</ol>
+</ol>
+</body> 
+</html>

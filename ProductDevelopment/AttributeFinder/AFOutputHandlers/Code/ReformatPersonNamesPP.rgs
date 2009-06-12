@@ -1,0 +1,23 @@
+HKCR
+{
+	AFOutputHandlers.ReformatPersonNamesPP.1 = s 'ReformatPersonNamesPP Class'
+	{
+		CLSID = s '{427B8630-7D2F-4A00-92AC-C1780FA87DDD}'
+	}
+	AFOutputHandlers.ReformatPersonNamesPP = s 'ReformatPersonNamesPP Class'
+	{
+		CLSID = s '{427B8630-7D2F-4A00-92AC-C1780FA87DDD}'
+		CurVer = s 'AFOutputHandlers.ReformatPersonNamesPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {427B8630-7D2F-4A00-92AC-C1780FA87DDD} = s 'ReformatPersonNamesPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

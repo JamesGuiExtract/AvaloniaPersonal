@@ -1,0 +1,7 @@
+// Legal Test
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+<TESTFOLDER>;WI - Waukesha County Legal.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment Of Mortgage;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\legal
+<TESTFOLDER>;WI - Waukesha County Legal.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Mortgage Bank;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\legal
+<TESTFOLDER>;WI - Waukesha County Legal.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\legal
+<TESTFOLDER>;WI - Waukesha County Legal.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Warranty Deed;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\legal

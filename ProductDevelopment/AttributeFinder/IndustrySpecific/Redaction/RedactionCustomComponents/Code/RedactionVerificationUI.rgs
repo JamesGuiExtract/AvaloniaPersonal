@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.RedactionVerificationUI.1 = s 'RedactionVerificationUI Class'
+	{
+		CLSID = s '{9B27EFA7-7DA2-4161-B903-6AD0BAE6B1F1}'
+	}
+	RedactionCustomComponents.RedactionVerificationUI = s 'RedactionVerificationUI Class'
+	{
+		CLSID = s '{9B27EFA7-7DA2-4161-B903-6AD0BAE6B1F1}'
+		CurVer = s 'RedactionCustomComponents.RedactionVerificationUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {9B27EFA7-7DA2-4161-B903-6AD0BAE6B1F1} = s 'RedactionVerificationUI Class'
+		{
+			ProgID = s 'RedactionCustomComponents.RedactionVerificationUI.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.RedactionVerificationUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

@@ -1,0 +1,31 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+// Bradford
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Bradford\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Columbia
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Columbia\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Franklin
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Franklin\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Hardee
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Hardee\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Layfayette
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Lafayette\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Manatee
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Manatee\Set003;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Manatee\Set004\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Putnam
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\FL - Putnam\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Inital Samples
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\Initial Samples\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\Initial Samples\Set002\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+// Test Images
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\FACC\Rules\Master.rsd;K:\Common\Engineering\Sample Files\FACC\TestImages\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

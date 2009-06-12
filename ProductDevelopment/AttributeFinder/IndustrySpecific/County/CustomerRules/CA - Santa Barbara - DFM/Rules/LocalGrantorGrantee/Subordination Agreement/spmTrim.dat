@@ -1,0 +1,1 @@
+(?:and\s{0,4})?(?:the\s{0,4})Redevelopment\s{0,4}Agency\s{0,4}for\s{0,4}(?:the\s{0,4})?(?=\s(?:City|Village|Town(?:ship)|County|State))%

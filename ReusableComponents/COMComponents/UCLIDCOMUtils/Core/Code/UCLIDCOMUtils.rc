@@ -1,0 +1,250 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""UCLIDCOMUtils.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "UCLIDCOMUtils Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "UCLIDCOMUtils"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "UCLIDCOMUtils.DLL"
+            VALUE "ProductName", "UCLIDCOMUtils Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_TOKEN               REGISTRY                "Token.rgs"
+IDR_VARIANTVECTOR       REGISTRY                "VariantVector.rgs"
+IDR_IUNKNOWNVECTOR      REGISTRY                "IUnknownVector.rgs"
+IDR_OBJECTPROPERTIESUI  REGISTRY                "ObjectPropertiesUI.rgs"
+IDR_OBJECTWITHDESCRIPTION REGISTRY                "ObjectWithDescription.rgs"
+IDR_OBJECTSELECTORUI    REGISTRY                "ObjectSelectorUI.rgs"
+IDR_CATEGORYMANAGER     REGISTRY                "CategoryManager.rgs"
+IDR_STRTOSTRMAP         REGISTRY                "StrToStrMap.rgs"
+IDR_STRTOOBJECTMAP      REGISTRY                "StrToObjectMap.rgs"
+IDR_STRINGPAIR          REGISTRY                "StringPair.rgs"
+IDR_OBJECTPAIR          REGISTRY                "ObjectPair.rgs"
+IDR_CLIPBOARDOBJECTMANAGER REGISTRY                "ClipboardObjectManager.rgs"
+IDR_STRINGPATTERNMATCHER REGISTRY                "StringPatternMatcher.rgs"
+IDR_LONGRECTANGLE       REGISTRY                "LongRectangle.rgs"
+IDR_MISCUTILS           REGISTRY                "MiscUtils.rgs"
+IDR_MULTIPLEOBJSELECTORPP REGISTRY                "MultipleObjSelectorPP.rgs"
+IDR_LONGTOOBJECTMAP     REGISTRY                "LongToObjectMap.rgs"
+IDR_LONGPOINT           REGISTRY                "LongPoint.rgs"
+IDR_LONGTOLONGMAP       REGISTRY                "LongToLongMap.rgs"
+IDR_COMMUTEX            REGISTRY                "COMMutex.rgs"
+IDR_DOUBLEPOINT         REGISTRY                "DoublePoint.rgs"
+IDR_PROGRESSSTATUS      REGISTRY                "ProgressStatus.rgs"
+IDR_PROGRESSSTATUSDIALOG REGISTRY                "ProgressStatusDialog.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_OBJ_PROPERTIES DIALOGEX 0, 0, 257, 129
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,145,110,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,200,110,50,14
+    GROUPBOX        "",IDC_STATIC_PROPERTIES,5,5,245,100
+END
+
+IDD_DLG_OBJ_SELECT DIALOG  0, 0, 265, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Title"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_DESC,7,17,251,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_OBJ,7,46,182,120,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configure...",IDC_BTN_CONFIGURE,198,46,60,13
+    DEFPUSHBUTTON   "OK",IDOK,152,69,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,208,69,50,14
+    LTEXT           "Description",IDC_STATIC_DESC,7,7,251,9
+    LTEXT           "Select",IDC_STATIC_SELECT,7,36,251,9
+    LTEXT           "The Object must be configured",IDC_STATIC_CONFIGURE,7,65,134,18
+END
+
+IDD_MULTIPLEOBJSELECTORPP DIALOGEX 0, 0, 391, 230
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Select objects:",IDC_STATIC_PROMPT,5,5,130,10
+    CONTROL         "List1",IDC_LIST_OBJECTS,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,15,315,210
+    PUSHBUTTON      "Add",IDC_BUTTON_INSERT,325,15,60,15
+    PUSHBUTTON      "Delete",IDC_BUTTON_DELETE,325,35,60,15
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIG,325,55,60,15
+    PUSHBUTTON      "",IDC_BUTTON_UP,325,75,25,20,BS_ICON
+    PUSHBUTTON      "",IDC_BUTTON_DOWN,360,75,25,20,BS_ICON
+END
+
+IDD_DIALOG_PROGRESS_STATUS DIALOGEX 0, 0, 264, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Progress Status Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Stop",IDC_STOP,107,72,50,14,NOT WS_VISIBLE
+    CONTROL         "Custom1",IDC_PROGRESS_GRID,"GXWND",WS_TABSTOP,6,6,252,60
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_UP             ICON                    "res\\icon_up.ico"
+IDI_ICON_DOWN           ICON                    "res\\icon_down.ico"
+IDI_ICON_DYNAMIC_LIST   ICON                    "res\\icon_dynamic_list.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_CONTEXT MENU 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "Cu&t",                        ID_EDIT_CUT
+        MENUITEM "&Copy",                       ID_EDIT_COPY
+        MENUITEM "&Paste",                      ID_EDIT_PASTE
+        MENUITEM "&Delete",                     ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_CONTEXT_CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DIALOG_PROGRESS_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 257
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "UCLIDCOMUtils"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEMultipleObjSelectorPP "MultipleObjectSelector"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "UCLIDCOMUtils.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

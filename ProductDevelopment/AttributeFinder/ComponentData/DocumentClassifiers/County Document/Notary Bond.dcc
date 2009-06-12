@@ -1,0 +1,48 @@
+#import "CommonDT.dcc"
+
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,NB_SURE_01,false
+		// 0001.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\notary bond\20059019877800.tif.uss
+		01=^.{0,35}NOTARY(?:.S)?\s*(?:PUBLIC)?\s*BOND(?:\r?$)
+		
+		02=^.{0,35}BOND\s*OF\s*NOTARY\s*PUBLIC\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,NB_PROBABLE_01,false
+		01=CALIFORNIA\s*NOTARY\s*PUBLIC\s*BOND
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+
+[MAYBE_END]

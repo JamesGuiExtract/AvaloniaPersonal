@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGridGenerator.DrawGrid.1 = s 'DrawGrid Class'
+	{
+		CLSID = s '{BB0B97FC-3F45-4D66-9E62-9EB2786115CF}'
+	}
+	UCLIDGridGenerator.DrawGrid = s 'DrawGrid Class'
+	{
+		CLSID = s '{BB0B97FC-3F45-4D66-9E62-9EB2786115CF}'
+		CurVer = s 'UCLIDGridGenerator.DrawGrid.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BB0B97FC-3F45-4D66-9E62-9EB2786115CF} = s 'DrawGrid Class'
+		{
+			ProgID = s 'UCLIDGridGenerator.DrawGrid.1'
+			VersionIndependentProgID = s 'UCLIDGridGenerator.DrawGrid'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{57355D04-CA9E-4BD8-9350-1F94B6DA0C68}'
+		}
+	}
+}

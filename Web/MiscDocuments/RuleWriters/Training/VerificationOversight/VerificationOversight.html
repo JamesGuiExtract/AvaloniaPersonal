@@ -1,0 +1,88 @@
+<HTML>
+<HEAD>
+<TITLE>Verification Oversight</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Verification Oversight</h1>
+<hr>
+	<h3>Purpose</h3>
+	<ul>
+		<li>To guarantee the highest accuracy in Expected Redactions.</li>
+		<li>To provide helpful feedback to verifiers regarding performance.</li>
+	</ul>
+
+<hr>
+	<h3>Procedure</h3>
+	<ol>
+		<li>Prepare the database for review:</li>
+		<ol>
+			<li>Create an appropriately named action (eg. "review") in the verification database if one does not already exist.</li>
+			<li>In SQL Server Management Studio Express, open and execute the files "Create Procedure 'CreateRandomSet'.sql",
+				then "Execute 'CreateRandomSet'.sql" on the verification database.</li> 
+				<ol>
+					<li>Open <b>SQL Server Management Studio Express</b> and connect to the machine hosting the verification database.</li>
+					<li>Select <b>File > Open > File...</b></li>
+					<li>Browse to ".\Files\Create Procedure 'CreateRandomSet'.sql" and open it.</li>
+					<li>Execute the script (<b>F5</b>).</li>
+					<li>In the <b>Object Explorer</b> on the left, expand the tree for the verification database. Expand the "Tables" folder, right-click
+						"dbo.Action", and click <b>Open Table</b>. Take note of the value in the "ID" column for the original verification action.</li>
+					<li>Expand the "Programmability" folder, then expand "Stored Procedures". Right click "sp_CreateRandomSet" and click
+						<b>Execute Stored Procedure...</b></li>
+					<li>In the <b>Execute Procedure</b> window, input appropriate values for each parameter:</li>
+					<ul>
+						<li><b>@ActionID</b> is the "ID" value we found in Step 1.2.5 above.</li>
+						<li><b>@startDate</b> is the beginning of the window to review. Format: month/day/year hour:minute (24 hour time. eg. 11/18/2008 14:53)</li>
+						<li><b>@endDate</b> is the end of the window to review formatted as above.</li>
+						<li><b>@ActionName</b> is the name of the review action you are going to use (eg. "review").</li>
+						<li><b>@PercentOfFiles</b> is the chance that a given document will be reviewed. It should be 5.</li>
+					</ul>
+					<li>Click <b>OK</b></li>
+					<li>See comments in "Execute 'CreateRandomSet'.sql"	for more help with parameters.</li>
+					<li>Procedure output displays how many documents were selected for review for each verifier (rows labeled 'P') and how many documents each verifier
+						verified in the time window specified (rows labeled 'U').</li>
+				</ol>
+			<li>The review action in the verification database should now have an appropriate number of documents pending.</li>
+		</ol>
+		<li>Verify the files selected for review.</li>
+		<li>Check for discrepancies:</li>
+		<ol>
+			<li>Copy the reviewed documents and their uss files into a seperate folder.</li>
+			<li>Set up a .dat and a .tcl file to compare the ExpectedRedaction .voa's to the Review .voa's.</li>
+			<ul>
+				<li>See ".\Files\review.tcl" and ".\Files\review.dat" for examples.</li>
+			</ul>
+			<li>Run the test harness.</li>
+		</ol>
+		<li>When the test is complete, send an email to your supervisor outlining your results.</li>
+		<ul>
+			<li>Example:</li>
+		</ul>
+		<p>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Project:	OH - Muskingum - Cott Day Forward<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Verifier Name: Some Verifier Person<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Time Range: 9/23/2008 11:00am - 9/24/2008 9:00am<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Files Verified: 839<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Files Re-verified: 39<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sensitive Items, Verifier: 5<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sensitive Items, Rule Writer:	5<br>
+		</p>
+		<li>If you find that a verifier missed a redaction, determine whose mistake it was (check the owner of the
+			file) and alert either your supervisor or bring constructive criticism to the verifier directly.</li>
+	</ol>
+
+<hr>
+	<h3>Additional Resources</h3>
+	<ul>
+		<li>A helpful <a href=http://www.w3schools.com/sql/default.asp>SQL Tutorial</a>.</li>
+	</ul>
+
+<!--
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>TBD.</li>
+	</ol>
+-->
+</BODY>
+</HTML>

@@ -1,0 +1,11 @@
+1.57    **pass**  
+
+3.14    **pass**  
+
+6.5    * FAIL (not match)*    NOT match standard string
+
+0.46    **pass**  
+
+4.26    **pass**  
+
+

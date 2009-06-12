@@ -1,0 +1,64 @@
+// CountyCustomComponents.idl : IDL source for CountyCustomComponents.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (CountyCustomComponents.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(3C187D28-0950-4498-A607-B122D7544DBA),
+	version(1.0),
+	helpstring("UCLID CountyCustomComponents 1.0 Type Library")
+]
+library UCLID_COUNTYCUSTOMCOMPONENTSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\AFUtils\Code\AFUtils.tlb");
+	importlib("..\..\..\..\AFCore\Code\AFCore.tlb");
+
+	// Interfaces
+	[
+		object,
+		uuid(18F5529F-A5E8-4418-B983-92F0C96625B2),
+		dual,
+		helpstring("IGrantorGranteeFinderV2 Interface"),
+		pointer_default(unique)
+	]
+	interface IGrantorGranteeFinderV2 : IDispatch
+	{
+		[propget, id(1), helpstring("property UseSelectedDatFiles")] HRESULT UseSelectedDatFiles([out, retval] BOOL *pVal);
+		[propput, id(1), helpstring("property UseSelectedDatFiles")] HRESULT UseSelectedDatFiles([in] BOOL newVal);
+		[propget, id(2), helpstring("property DocTypeToFileMap")] HRESULT DocTypeToFileMap([out, retval] IStrToObjectMap* *pVal);
+		[propput, id(2), helpstring("property DocTypeToFileMap")] HRESULT DocTypeToFileMap([in] IStrToObjectMap *newVal);
+		[id(3), helpstring("method GetAFUtility")] HRESULT GetAFUtility([out, retval] IAFUtility **ppAFUtil);
+	};
+
+
+	// Coclasses
+	[
+		uuid(23A9D2D3-675D-4CA7-BCE1-3650E3CF9171),
+		helpstring("GrantorGranteeFinderV2 Class")
+	]
+	coclass GrantorGranteeFinderV2
+	{
+		[default] interface IGrantorGranteeFinderV2;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(90F99A8B-0856-42EE-9CBF-94D9EDCE0BF3),
+		helpstring("GrantorGranteeFinderV2PP Class")
+	]
+	coclass GrantorGranteeFinderV2PP
+	{
+		interface IUnknown;
+	};
+};

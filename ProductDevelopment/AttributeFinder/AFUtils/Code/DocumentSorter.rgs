@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.DocumentSorter.1 = s 'DocumentSorter Class'
+	{
+		CLSID = s '{C7C2E208-F02E-4826-860C-52D1A3BDB313}'
+	}
+	UCLIDAFUtils.DocumentSorter = s 'DocumentSorter Class'
+	{
+		CLSID = s '{C7C2E208-F02E-4826-860C-52D1A3BDB313}'
+		CurVer = s 'UCLIDAFUtils.DocumentSorter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C7C2E208-F02E-4826-860C-52D1A3BDB313} = s 'DocumentSorter Class'
+		{
+			ProgID = s 'UCLIDAFUtils.DocumentSorter.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.DocumentSorter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{AC966E48-1A26-40C7-B61E-AC4C09C9D565}'
+		}
+	}
+}

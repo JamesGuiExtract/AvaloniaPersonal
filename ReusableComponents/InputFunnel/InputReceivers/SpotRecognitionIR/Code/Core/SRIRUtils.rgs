@@ -1,0 +1,26 @@
+HKCR
+{
+	SpotRecognitionIR.SRIRUtils.1 = s 'SRIRUtils Class'
+	{
+		CLSID = s '{B4720DFA-4FE5-4CEC-A577-D3268D936552}'
+	}
+	SpotRecognitionIR.SRIRUtils = s 'SRIRUtils Class'
+	{
+		CLSID = s '{B4720DFA-4FE5-4CEC-A577-D3268D936552}'
+		CurVer = s 'SpotRecognitionIR.SRIRUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B4720DFA-4FE5-4CEC-A577-D3268D936552} = s 'SRIRUtils Class'
+		{
+			ProgID = s 'SpotRecognitionIR.SRIRUtils.1'
+			VersionIndependentProgID = s 'SpotRecognitionIR.SRIRUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{CF01D58E-0C0B-434F-83D2-ABFA24BA834F}'
+		}
+	}
+}

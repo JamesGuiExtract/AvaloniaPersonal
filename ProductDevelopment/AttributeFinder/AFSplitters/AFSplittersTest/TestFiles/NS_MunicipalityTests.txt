@@ -1,0 +1,47 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Name Splitter tests
+// Test Type: Municipalities with various Identifiers
+// Purpose: Check Proper (Company) SubAttributes
+
+// City Of, County Of, State Of, Commonwealth Of
+<TESTCASE>|Municipality with City Of|The City of Madison
+Names|The City of Madison
+.Company|The City of Madison
+
+<TESTCASE>|Municipality with County Of|County Of Dane
+Names|County Of Dane
+.Company|County Of Dane
+
+<TESTCASE>|Municipality with State Of|State Of Iowa
+Names|State Of Iowa
+.Company|State Of Iowa
+
+<TESTCASE>|Municipality with Commonwealth Of|Commonwealth Of Virginia
+Names|Commonwealth Of Virginia
+.Company|Commonwealth Of Virginia
+
+<TESTCASE>|Municipality with X County|Los Angeles County
+Names|Los Angeles County
+.Company|Los Angeles County
+
+<TESTCASE>|Municipality with X County Plus1|Los Angeles County Department of Corrections
+Names|Los Angeles County Department of Corrections
+.Company|Los Angeles County Department of Corrections
+
+<TESTCASE>|Municipality with X County Plus2|Los Angeles County DCSS
+Names|Los Angeles County DCSS
+.Company|Los Angeles County DCSS

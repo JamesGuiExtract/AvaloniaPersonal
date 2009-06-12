@@ -1,0 +1,51 @@
+//test1 "Blocks are separated by" and "Find blocks containing at least" both selected.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 "Blocks are defined between" and "Find all blocks" both selected.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 "Blocks are separated by" and "Find blocks containing at least" both selected with "Above clues 
+//are defined as Regualar Expressions"checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 "Blocks are separated by" and "Find blocks containing at least" both selected with "Each clue
+//could be a part of a word in the input text" checked.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 "Blocks are separated by" and "Find blocks containing at least" both selected with "Above clues
+//are defined as Regular Expressions" checked. The Separator and regular expression used are different from test3.    
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 "Blocks are separated" and "Find Blocks containing at least" both selected with "Get block(s) only if it 
+//contains maximum number" checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 "Blocks are separated by" and "Find Blocks containing at least" both selected and "Get blocks(s)..." and "Each clue..."checked.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 "Blocks are separated" and "Find blocks containing at least(10)" both selected with "Get blocks(s)..." and 
+//"Each clue could..." both checked, also there are two clues.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 "Blocks are defined between" and "Find blocks containing" both selected with "Above clues..." and "Each clue..." both checked.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 "Blocks are separated by" and "Find blocks containing" both selected with all three check boxes "Above clues...",
+//"Get Blocks(s)..." and "Each clue..." checked. Limited to page 1 to avoid page 2 OCR error with ScanSoft V15
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 "Blocks are defined between" and "Find all blocks" both selected.
+<TESTCASE>;Test11.rsd;Input.txt;;Test11.eav
+
+//test12 "Blocks are defined between" and "Find all blocks" are selected with "Pair beginning and ending strings"checked.
+//This testcase is to test the functionality of "Pair beginning and ending strings" checkbox. 
+<TESTCASE>;Test12.rsd;Input.txt;;Test12.eav
+
+//test13  This testcase setting is the same as testcase 12 except "Pair beginning and ending strings"
+//is not checked, so the result from 12 and 13 can be compared to show the functionality of the object.
+<TESTCASE>;Test13.rsd;Input.txt;;Test13.eav
+
+//test14 invalid entry is put in for "Blocks are separated by", with "if no block separator is found" is
+//checked, and "Find all blocks" is selected to test the validity of "if no block separator is found,
+//assume that the entire input text is one block". 
+<TESTCASE>;Test14.rsd;Input.txt;;Test14.eav

@@ -1,0 +1,23 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+SOJ_DEFENDANT_04=Respondent^3~defendant^?Defendant^120~Other^3~parent
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\acknowledgement of satisfaction of judgment\20049000003700.003.tif.uss
+// 0001.tif was modified so that OCR of "GRASS I" properly becomes "GRASSI" : WEL 01/06/2009
+SOJ_DEFENDANT_01=Defendant^?Defendant^250~\r\n\r\n
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\acknowledgement of satisfaction of judgment\20049000948200.003.tif.uss
+SOJ_DEFENDANT_02=Plaintiff/Petitioner^50~\r\nvs.^?Defendant^250~defendant
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Release of Lien\20049000001500.004.uss
+SOJ_DEFENDANT_03=against^3~defendant(s)|defendant^?Defendant^250~in the^80~district|court
+
+[PATTERNS_END]

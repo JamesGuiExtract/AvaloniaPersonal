@@ -1,0 +1,48 @@
+<HTML>
+	<HEAD>
+		<TITLE>Remove Characters Output Handler</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Remove Characters Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Remove Characters output handler is used to trim, remove, or consolidate specified characters in the found data.</li>
+			<li>For example, you can consolidate white space, remove the period from "Mr.", or trim the dollar sign from dollar amounts.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Remove Characters output handler, you must first specify the characters you want to remove.
+				<ul>
+					<li>Because removing white space is so common, there are checkboxes to specify different kinds of white space.</li>
+					<li>You can specify other characters by selecting <b>Others</b> and then typing the desired characters into the edit box.</li>
+					<li>You can make the characters case sensitive.</li>
+				</ul>
+			</li>
+			<li>Next, you need to select what you want to do with the specified characters.
+				<ul>
+					<li>You can remove all of the characters.</li>
+					<li>You can consolidate multiple characters into one.</li>
+					<li>You can trim off leading or trailing characters.</li>
+				</ul>
+			</li>
+			<p>
+				<li><b>Example</b>:
+					<p>
+						<ul>
+							<li>Open <b>RemoveCharacters.rsd</b> and run it on <b>RemoveCharacters.txt</b>.</li>
+							<li>This rules file is finding names and dollar amounts.</li>
+							<li>Add a Remove Characters output handler that removes the commas from the dollar amounts.  Run the rules again.</li>
+							<li>We want to remove the period after the middle initial.  Add a Remove Characters output handler that removes periods.  Run the rules again and notice how this output handler also effects the dollar amount.</li>
+							<li>Change the output handler to consolidate the periods.  Run the rules again and note the difference in the output.</li>
+							<li>Change the output handler to trim the leading dollar sign from the beginning of the dollar amounts. Run the rules again.</li>
+						</ul>
+					</p>
+				</li>
+			</p>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFPreProcessors.SelectPageRegionPP.1 = s 'SelectPageRegionPP Class'
+	{
+		CLSID = s '{C1ECC9BB-1C69-4D96-AD5A-F0CC2D3DEAD6}'
+	}
+	UCLIDAFPreProcessors.SelectPageRegionPP = s 'SelectPageRegionPP Class'
+	{
+		CLSID = s '{C1ECC9BB-1C69-4D96-AD5A-F0CC2D3DEAD6}'
+		CurVer = s 'UCLIDAFPreProcessors.SelectPageRegionPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C1ECC9BB-1C69-4D96-AD5A-F0CC2D3DEAD6} = s 'SelectPageRegionPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

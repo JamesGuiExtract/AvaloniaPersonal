@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.DocumentClassifier.1 = s 'DocumentClassifier Class'
+	{
+		CLSID = s '{F8325D2F-23ED-4748-AA8B-7BD643663887}'
+	}
+	UCLIDAFUtils.DocumentClassifier = s 'DocumentClassifier Class'
+	{
+		CLSID = s '{F8325D2F-23ED-4748-AA8B-7BD643663887}'
+		CurVer = s 'UCLIDAFUtils.DocumentClassifier.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F8325D2F-23ED-4748-AA8B-7BD643663887} = s 'DocumentClassifier Class'
+		{
+			ProgID = s 'UCLIDAFUtils.DocumentClassifier.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.DocumentClassifier'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{AC966E48-1A26-40C7-B61E-AC4C09C9D565}'
+		}
+	}
+}

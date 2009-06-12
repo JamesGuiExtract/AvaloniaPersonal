@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.AddressFinder.1 = s 'AddressFinder Class'
+	{
+		CLSID = s '{80918C98-C47C-4B3D-BF28-1D8469189515}'
+	}
+	UCLIDAFValueFinders.AddressFinder = s 'AddressFinder Class'
+	{
+		CLSID = s '{80918C98-C47C-4B3D-BF28-1D8469189515}'
+		CurVer = s 'UCLIDAFValueFinders.AddressFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {80918C98-C47C-4B3D-BF28-1D8469189515} = s 'AddressFinder Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.AddressFinder.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.AddressFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

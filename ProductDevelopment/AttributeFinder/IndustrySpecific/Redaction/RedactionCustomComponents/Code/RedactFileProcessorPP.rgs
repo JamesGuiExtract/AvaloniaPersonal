@@ -1,0 +1,23 @@
+HKCR
+{
+	RedactionCustomComponents.RedactFileProcessorPP.1 = s 'RedactFileProcessorPP Class'
+	{
+		CLSID = s '{0E51486F-AFE4-41FC-9A44-FAED6C7E2903}'
+	}
+	RedactionCustomComponents.RedactFileProcessorPP = s 'RedactFileProcessorPP Class'
+	{
+		CLSID = s '{0E51486F-AFE4-41FC-9A44-FAED6C7E2903}'
+		CurVer = s 'RedactionCustomComponents.RedactFileProcessorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0E51486F-AFE4-41FC-9A44-FAED6C7E2903} = s 'RedactFileProcessorPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

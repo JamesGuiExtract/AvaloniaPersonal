@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.FileExistence.1 = s 'FileExistence Class'
+	{
+		CLSID = s '{69F8FA9D-5C3D-4569-9EE0-55B3FC63F630}'
+	}
+	ESFAMConditions.FileExistence = s 'FileExistence Class'
+	{
+		CLSID = s '{69F8FA9D-5C3D-4569-9EE0-55B3FC63F630}'
+		CurVer = s 'ESFAMConditions.FileExistence.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {69F8FA9D-5C3D-4569-9EE0-55B3FC63F630} = s 'FileExistence Class'
+		{
+			ProgID = s 'ESFAMConditions.FileExistence.1'
+			VersionIndependentProgID = s 'ESFAMConditions.FileExistence'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

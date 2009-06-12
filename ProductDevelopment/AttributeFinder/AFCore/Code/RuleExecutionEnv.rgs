@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.RuleExecutionEnv.1 = s 'RuleExecutionEnv Class'
+	{
+		CLSID = s '{D0D5A44F-6D66-4708-84D9-8FA682EB9CFB}'
+	}
+	UCLIDAFCore.RuleExecutionEnv = s 'RuleExecutionEnv Class'
+	{
+		CLSID = s '{D0D5A44F-6D66-4708-84D9-8FA682EB9CFB}'
+		CurVer = s 'UCLIDAFCore.RuleExecutionEnv.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D0D5A44F-6D66-4708-84D9-8FA682EB9CFB} = s 'RuleExecutionEnv Class'
+		{
+			ProgID = s 'UCLIDAFCore.RuleExecutionEnv.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.RuleExecutionEnv'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

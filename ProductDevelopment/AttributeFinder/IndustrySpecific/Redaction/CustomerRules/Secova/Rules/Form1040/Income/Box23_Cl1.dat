@@ -1,0 +1,3 @@
+^23.{0,3}Educator.{0,3}expenses
+|
+Educator.{0,3}expenses(?=[\s\S]{0,80}(?:Certain\W*bus|siness\W*expenses))

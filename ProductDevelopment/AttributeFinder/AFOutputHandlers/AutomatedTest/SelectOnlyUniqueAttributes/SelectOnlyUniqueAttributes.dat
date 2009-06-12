@@ -1,0 +1,11 @@
+// Ensure one unique attribute is selected
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// ensure 2 unique attributes are selected
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// ensure a non-unique attribute is not selected
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// ensure a non-unique attribute is not selected when there are no unique attributes
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav

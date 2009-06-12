@@ -1,0 +1,50 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Affidavit
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Affidavit;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Affidavit Termination
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Affidavit Termination;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Annexation
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Annexation;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Breach
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Breach;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Certificate
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Certificate;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Certificate of Location
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Certificate of Location;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Easement
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Easement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Interest
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Interest;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Miscellaneous
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Miscellaneous;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Order
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Order;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Request Notice
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Request Notice;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Substitution
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Substitution;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Trust Deed & Assignment
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trust Deed & Assignment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Trustee Deed
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trustee Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//UCC Finance Statement Amendment
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\UCC Finance Statement Amendment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Unclassified
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Unclassified;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+

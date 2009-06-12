@@ -1,0 +1,15 @@
+[CharsAlwaysEnabled]
+0123456789
+
+[InputTypes]
+Angle
+
+[Choices]
+
+1|45°22'14"|°'"
+2|45d22'14"|d'"
+3|45-22-14|-
+4|45d22m14s|dms
+13|45deg 22min 14sec|degminsc
+14|45 degrees 22 minutes 14 seconds|degrsminutco
+

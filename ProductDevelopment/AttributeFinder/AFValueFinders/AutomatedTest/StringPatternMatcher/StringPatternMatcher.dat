@@ -1,0 +1,82 @@
+//test1 The entry is consisted of a single SPM rule to capture Property address.
+//"Greedy search", "Treat multiple white spaces as one white space character",
+//"Return first match only" checkboxes are checked.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 A single SPM rule to capture borrower name with "Treat multiple
+//white spaces as one white space character", "Return first match only" checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 The entries are consisted of two SPM rules with "Treat mulitple white
+//spaces as one", "Return first match only" checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 The SPM rules are the same as in test3, with "Treat multiple white
+//spaces as one", and "Return all matches" checked.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 The SPM rules are the same as test3. "Treat mutiple white spaces as one",
+//"Use following DataScorer object determine", and "Return best match" are selected.
+//Minimum match score is set at 0.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 The entry has three SPM rules. "Teat multiple spaces as one",
+//"Use following DataScorer object to determine validity of match", and
+//"Return best match" are selected. Minimum match score is set at 0.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 The SPM rules are the same as in test6. "Treat multiple white spaces as one",
+//"Data Scorer", "Return all matches" are selected. Minimum match score is set at 1.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 The SPM rules are the same as in test6, but the order is different. 
+//"Treat multiple white spaces as one", "Data Scorer" and
+//"Return first match>=10 of best match" are selected. Minimum match score is set at 0.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 The SPM rules are the same as in test8. "Teat multiple spaces as one",
+//"Data Scorer", and "Return all matches" are selected. "Minimum match score" is at 11.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 The SPM rules are same as as in test9. "Case Sensitive", "Teat multiple 
+//white spaces as one", and "Return all matches" are selected.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 The contents of the SPM rules are the same as in test10, but the case of
+//the letters are different. The settings of the checkboxes are the sames as in test9.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 The SPM rules are the same as test10, but directives "#ifdef","#endif","#else" are added.
+//"Teat multiple white spaces as one", "Return all matches" are selected.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 The patterns are the same as in test12. "Treat multiple white spaces as one"
+//and "Return all matches" are selected. A preprocesser is defined.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 The entries are the same as test13. "Treat multiple white spaces as one"
+//,"Return all matches" are selected. Two preprocessors are defined.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 Everything is the same as in test13 except a different preprocessor is defined. 
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 The SPM rules used are the same as in test5, but the order of the rules and 
+//placement of directives are different. "Treat multiple white spaces as one",
+//"Return all matches" are checked.
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//test17 A single SPM rule with "Return all matches" selected.
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 It has the same SPM rule as in test17. "Greedy search" and "Return all matches" are checked.
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
+
+//test19 "Read patterns from file:" checkbox is checked. The .dat file loaded contains the 
+//same SPM patterns as test13, "Store ID(s) of successfully executed rules as document tags"
+//is checked. The selections of the rest of the checkboxes are the same as test13.
+<TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav
+
+//test20 The selections of the checkboxes and the .dat file loaded are the same as in test19,
+//the only differences is it has a different preprocessor.
+<TESTCASE>;Test20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test20.eav

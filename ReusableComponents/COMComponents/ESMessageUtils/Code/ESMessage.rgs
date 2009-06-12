@@ -1,0 +1,26 @@
+HKCR
+{
+	ESMessageUtils.ESMessage.1 = s 'ESMessage Class'
+	{
+		CLSID = s '{8641F9B2-A2A3-4BA4-9B9A-F57F326D55F5}'
+	}
+	ESMessageUtils.ESMessage = s 'ESMessage Class'
+	{
+		CLSID = s '{8641F9B2-A2A3-4BA4-9B9A-F57F326D55F5}'
+		CurVer = s 'ESMessageUtils.ESMessage.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8641F9B2-A2A3-4BA4-9B9A-F57F326D55F5} = s 'ESMessage Class'
+		{
+			ProgID = s 'ESMessageUtils.ESMessage.1'
+			VersionIndependentProgID = s 'ESMessageUtils.ESMessage'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{036AC2B6-6B38-4EB2-B42E-657891B3833F}'
+		}
+	}
+}

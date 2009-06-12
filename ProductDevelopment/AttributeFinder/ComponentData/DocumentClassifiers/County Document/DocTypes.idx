@@ -1,0 +1,72 @@
+// *****************************************************************************
+// This document contains all document types for current industry
+// specific category, for instance, "County Documents", etc.
+// 
+// Each document type name is critical. Each .dcc (document classification 
+// criteria file) is fully dependent on the document type name listed here.
+// *****************************************************************************
+ 
+Abatement - Misc
+Abstract of Judgment
+Abstract of Support Judgment
+Affidavit - Misc
+Affidavit of Death
+Agreement - Misc
+Annual Accounting
+Assignment - Misc
+Assignment of Mortgage
+Assignment of Rents
+Assumed Name
+Certificate - Misc
+Certificate of Copy of Record
+Certificate of Death
+Certificate of Delinquency of Personal Property Tax
+Certificate of Redemption
+Certificate of Survey
+Contract - Misc
+Conveyance - Misc
+Declaration of Condominium
+Declaration of Domicile
+Deed - Misc
+Discharge from Active Duty
+Divorce
+Easement - Misc
+Financing Statement
+Homestead Designation
+Judgment
+Lien - Misc
+Lis Pendens
+Mechanics Lien
+Modification of Deed of Trust
+Mortgage - Deed of Trust
+Notary Bond
+Notice - Misc
+Notice of Commencement
+Notice of Completion
+Notice of Default
+Notice of Federal Tax Lien
+Notice of Hearing
+Notice of Hospital Lien
+Notice of Rescission
+Notice of State Tax Lien
+Oil Gas and Mineral Lease
+Power of Attorney
+Quit Claim Deed
+Release of Assignment of Rents
+Release of Federal Tax Lien
+Release of Hospital Lien
+Release of Lien - Misc
+Release of Lis Pendens
+Release of Mechanics Lien
+Release of State Tax Lien
+Request for Notice of Default
+Revocation of Power of Attorney
+Satisfaction of Judgment
+Satisfaction of Mortgage
+Sheriffs Deed
+Special
+Statement of Abandonment
+Subordination Agreement
+Substitution of Trustee
+Warranty Deed
+Will - Misc

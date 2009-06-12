@@ -1,0 +1,125 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Tests of trimming based on Alias keywords
+
+// Company Aliases
+Division_1|lower case BAHAMAS NATIONAL BANK, A DIVISION OF MY BANK plus more|BAHAMAS NATIONAL BANK, A DIVISION OF MY BANK
+
+Division_2|lower case BAHAMAS NATIONAL BANK, A DIV OF MY BANK plus more|BAHAMAS NATIONAL BANK, A DIV OF MY BANK
+
+Branch|lower case BAHAMAS NATIONAL BANK, A BRANCH OF MY BANK plus more|BAHAMAS NATIONAL BANK, A BRANCH OF MY BANK
+
+DBA_1|lower case BAHAMAS NATIONAL BANK, D/B/A MY BANK plus more|BAHAMAS NATIONAL BANK, D/B/A MY BANK
+
+DBA_2|lower case BAHAMAS NATIONAL BANK, DBA MY BANK plus more|BAHAMAS NATIONAL BANK, DBA MY BANK
+
+DBA_3|lower case BAHAMAS NATIONAL BANK, doing business as MY BANK plus more|BAHAMAS NATIONAL BANK, doing business as MY BANK
+
+DBA_4|lower case First American Title Insurance Company of Oregon, an assumed business name of Title Insurance Company of Oregon plus more|First American Title Insurance Company of Oregon, an assumed business name of Title Insurance Company of Oregon
+
+DBA_5|lower case BAHAMAS NATIONAL BANK, D.B.A. bnatbank.com plus more|BAHAMAS NATIONAL BANK, D.B.A. bnatbank.com
+
+TA|lower case BAHAMAS NATIONAL BANK, T/A MY BANK plus more|BAHAMAS NATIONAL BANK, T/A MY BANK
+
+Successor_1|lower case BAHAMAS NATIONAL BANK, successor by merger to MY BANK plus more|BAHAMAS NATIONAL BANK, successor by merger to MY BANK
+
+Successor_2|lower case BAHAMAS NATIONAL BANK, successor by merger with MY BANK plus more|BAHAMAS NATIONAL BANK, successor by merger with MY BANK
+
+Successor_3|lower case BAHAMAS NATIONAL BANK, successor in interest to MY BANK plus more|BAHAMAS NATIONAL BANK, successor in interest to MY BANK
+
+Successor_4|lower case BAHAMAS NATIONAL BANK, successor to MY BANK plus more|BAHAMAS NATIONAL BANK, successor to MY BANK
+
+Successor_5|lower case BAHAMAS NATIONAL BANK, as successor to MY BANK plus more|BAHAMAS NATIONAL BANK, as successor to MY BANK
+
+Successor_6|lower case MY BANK as humbug to BAHAMAS NATIONAL BANK, plus more|MY BANK
+
+Successor_7|lower case BAHAMAS NATIONAL BANK, S/B/M MY BANK plus more|BAHAMAS NATIONAL BANK, S/B/M MY BANK
+
+Successor_8|lower case BAHAMAS NATIONAL BANK, S/B/M/T MY BANK plus more|BAHAMAS NATIONAL BANK, S/B/M/T MY BANK
+
+Successor_9|lower case MY BANK sbm. BAHAMAS NATIONAL BANK, plus more|MY BANK sbm. BAHAMAS NATIONAL BANK
+
+Successor_10|lower case MY BANK s/i/i BAHAMAS NATIONAL BANK, plus more|MY BANK s/i/i BAHAMAS NATIONAL BANK
+
+Merger_1|lower case BAHAMAS NATIONAL BANK, by merger to MY BANK plus more|BAHAMAS NATIONAL BANK, by merger to MY BANK
+
+Merger_2|lower case BAHAMAS NATIONAL BANK, by merge to MY BANK plus more|BAHAMAS NATIONAL BANK, by merge to MY BANK
+
+Assigned Over To|lower case BAHAMAS NATIONAL BANK, assigned over to MY BANK plus more|BAHAMAS NATIONAL BANK, assigned over to MY BANK
+
+Now By Chartered Conversion|lower case BAHAMAS NATIONAL BANK, now by chartered conversion MY BANK plus more|BAHAMAS NATIONAL BANK, now by chartered conversion MY BANK
+
+// Person Aliases
+NKA_1|lower case BAHAMAS NATIONAL BANK, N/K/A MY BANK plus more|BAHAMAS NATIONAL BANK, N/K/A MY BANK
+
+NKA_2|lower case BAHAMAS NATIONAL BANK, nka MY BANK plus more|BAHAMAS NATIONAL BANK, nka MY BANK
+
+NKA_3|lower case BAHAMAS NATIONAL BANK, now known as MY BANK plus more|BAHAMAS NATIONAL BANK, now known as MY BANK
+
+KNA|lower case BAHAMAS NATIONAL BANK, K/N/A MY BANK plus more|BAHAMAS NATIONAL BANK, K/N/A MY BANK
+
+CKA|lower case BAHAMAS NATIONAL BANK, currently known as BAHAMAS BANK plus more|BAHAMAS NATIONAL BANK, currently known as BAHAMAS BANK
+
+FKA_1|lower case BAHAMAS NATIONAL BANK, F/K/A MY BANK plus more|BAHAMAS NATIONAL BANK, F/K/A MY BANK
+
+FKA_2|lower case BAHAMAS NATIONAL BANK, fka MY BANK plus more|BAHAMAS NATIONAL BANK, fka MY BANK
+
+FKA_3|lower case BAHAMAS NATIONAL BANK, formerly known as MY BANK plus more|BAHAMAS NATIONAL BANK, formerly known as MY BANK
+
+FKA_4|lower case BAHAMAS NATIONAL BANK, formerly MY BANK plus more|BAHAMAS NATIONAL BANK, formerly MY BANK
+
+AKA_1|lower case BAHAMAS NATIONAL BANK, A/K/A MY BANK plus more|BAHAMAS NATIONAL BANK, A/K/A MY BANK
+
+AKA_2|lower case BAHAMAS NATIONAL BANK, aka MY BANK plus more|BAHAMAS NATIONAL BANK, aka MY BANK
+
+AKA_3|lower case BAHAMAS NATIONAL BANK, also known as MY BANK plus more|BAHAMAS NATIONAL BANK, also known as MY BANK
+
+AKA_4|lower case BAHAMAS NATIONAL BANK, also know as MY BANK plus more|BAHAMAS NATIONAL BANK, also know as MY BANK
+
+// FlexIDSCore #813
+AKA_5|lower case Alejandro Reyes (AKA) Alejandro Reyes Dolores plus more|Alejandro Reyes AKA Alejandro Reyes Dolores
+
+IsSame_1|lower case John Smith is the same person as John H. Smith plus more|John Smith is the same person as John H. Smith
+
+IsSame_2|lower case John Smith was the same person as John H. Smith plus more|John Smith was the same person as John H. Smith
+
+IsSame_3|lower case John Smith WATA John H. Smith plus more|John Smith WATA John H. Smith
+
+IsSame_4|lower case John Smith being one and the same person as John H. Smith plus more|John Smith being one and the same person as John H. Smith
+
+IsSame_5|lower case John Smith erroneously spelled Jon Smith plus more|John Smith erroneously spelled Jon Smith
+
+IsSame_6|lower case John Smith who acquired title as John H. Smith plus more|John Smith who acquired title as John H. Smith
+
+IsSame_7|lower case John Smith who also took title as John H. Smith plus more|John Smith who also took title as John H. Smith
+
+// Person Designators + Extra
+Plus Extra1|lower case John and Mary Smith, H/W and Peter Smith plus more|John and Mary Smith, H/W and Peter Smith
+
+Plus Extra2|lower case John and Mary Smith, H/W and Peter Smith, AKA Peter J. Smith|John and Mary Smith, H/W and Peter Smith, AKA Peter J. Smith
+
+Plus Extra3|lower case John and Mary Smith, H/W, Peter Smith plus more|John and Mary Smith, H/W, Peter Smith
+
+Plus Extra4|lower case John and Mary Smith, H/W with Peter Smith plus more|John and Mary Smith, H/W
+
+Plus Extra5|lower case John and Mary Smith, H/W of Pittsburgh plus more|John and Mary Smith, H/W
+
+// Person + Company Aliases
+// FlexIDSCore #1186
+Person_DBA_1|lower case JOHN W SMITH, D.B.A. SMITH TRUCKING plus more|JOHN W SMITH, D.B.A. SMITH TRUCKING

@@ -1,0 +1,5 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData
+<SETTING>;OutputAttributeNamesFileLists=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set007\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

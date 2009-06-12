@@ -1,0 +1,12 @@
+%
+fL
+g/dL
+GM/DL
+K/mcL
+K/UL
+M/UL
+mg/dL
+mil/mcL
+mmol/L
+pg
+Units/L

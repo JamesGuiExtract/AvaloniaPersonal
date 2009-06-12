@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFeatureMgmt.CommaDelimitedFeatureAttributeDataInterpreter.1 = s 'CommaDelimitedFeatureAttributeDataInterpreter Class'
+	{
+		CLSID = s '{9E9EE551-B637-4783-9329-022315F427F8}'
+	}
+	UCLIDFeatureMgmt.CommaDelimitedFeatureAttributeDataInterpreter = s 'CommaDelimitedFeatureAttributeDataInterpreter Class'
+	{
+		CLSID = s '{9E9EE551-B637-4783-9329-022315F427F8}'
+		CurVer = s 'UCLIDFeatureMgmt.CommaDelimitedFeatureAttributeDataInterpreter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {9E9EE551-B637-4783-9329-022315F427F8} = s 'CommaDelimitedFeatureAttributeDataInterpreter Class'
+		{
+			ProgID = s 'UCLIDFeatureMgmt.CommaDelimitedFeatureAttributeDataInterpreter.1'
+			VersionIndependentProgID = s 'UCLIDFeatureMgmt.CommaDelimitedFeatureAttributeDataInterpreter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{691AD683-B1D9-42E1-99B8-3398A794CDB1}'
+		}
+	}
+}

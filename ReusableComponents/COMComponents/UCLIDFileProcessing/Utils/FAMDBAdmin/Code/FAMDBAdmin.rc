@@ -1,0 +1,494 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_FAMDBADMIN     ICON                    "res\\FAMDBAdmin.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 240, 62
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About FAMDBAdmin"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDI_ICON_FAMDBADMIN,IDC_STATIC,11,17,21,20
+    DEFPUSHBUTTON   "OK",IDOK,183,7,50,16,WS_GROUP
+    EDITTEXT        IDC_EDIT_VERSION,40,11,115,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Copyright (C) 2009\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,41,28,119,25
+END
+
+IDD_FAMDBADMIN_DIALOG DIALOGEX 0, 0, 320, 153
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "File Action Manager Database Administration"
+MENU IDR_MENU_FAMDBADMIN
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+END
+
+IDD_DLG_EXPORT_FILES DIALOGEX 0, 0, 229, 227
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Export File List"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "Export a list of all files",IDC_RADIO_ALL_FILES,"Button",BS_AUTORADIOBUTTON,13,18,86,10
+    CONTROL         "Export a list of file names for files that are in the",IDC_RADIO_STATUS,
+                    "Button",BS_AUTORADIOBUTTON,13,31,169,10
+    COMBOBOX        IDC_CMB_ACTION_STATUS,23,45,104,79,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_ACTION_NAME,23,62,104,69,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Export a list of all files that result from this SQL query:",IDC_RADIO_SQL_QUERY,
+                    "Button",BS_AUTORADIOBUTTON,13,75,188,20
+    EDITTEXT        IDC_EDIT_SQL_QUERY,23,105,192,39,ES_MULTILINE | ES_AUTOVSCROLL | WS_VSCROLL
+    EDITTEXT        IDC_EDT_FILE_NAME,12,179,181,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,199,179,15,14
+    DEFPUSHBUTTON   "OK",IDOK,116,206,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,172,206,50,14
+    GROUPBOX        "Export Scope",IDC_STATIC,7,4,215,146
+    LTEXT           "SELECT FAMFile.FileName FROM",IDC_STATIC,24,95,104,8
+    GROUPBOX        "Output",IDC_STATIC,7,155,215,44
+    LTEXT           "Export file name (must be an absolute path)",IDC_STATIC,13,167,144,8
+    LTEXT           "state for the",IDC_STATIC,131,46,42,8
+    LTEXT           "action.",IDC_STATIC,130,65,23,8
+END
+
+IDD_DLG_RENAME_ACTION DIALOGEX 0, 0, 277, 97
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Rename Action"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,164,76,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,220,76,50,14
+    LTEXT           "Select action to rename in the database",IDC_STATIC,7,10,166,10
+    COMBOBOX        IDC_CMB_ACTION_NAMES,7,22,263,64,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Specify new name for the action",IDC_STATIC,7,44,145,8
+    EDITTEXT        IDC_EDT_NEW_ACTION,7,55,263,12,ES_AUTOHSCROLL
+END
+
+IDD_DLG_ADD_ACTION DIALOGEX 0, 0, 224, 123
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Add Action"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDT_ACTION_NAME,7,19,210,12,ES_AUTOHSCROLL
+    CONTROL         "Set to",IDC_RDSETTO,"Button",BS_AUTORADIOBUTTON,11,54,35,10
+    COMBOBOX        IDC_CMB_STATUS,61,54,151,62,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Copy from",IDC_RDCOPYFROM,"Button",BS_AUTORADIOBUTTON,11,74,49,10
+    COMBOBOX        IDC_CMB_COPY_FROM,61,72,151,60,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,110,102,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,167,102,50,14
+    LTEXT           "Specify name of action to add",IDC_STATIC,7,7,99,8
+    GROUPBOX        "Default status for action",IDC_STATIC,7,37,210,56
+END
+
+IDD_DLG_SET_ACTION_STATUS DIALOGEX 0, 0, 198, 201
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Manually Set Action Status"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_CMB_ACTION_SET,36,19,112,54,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Select action to change action status for",IDC_STATIC,7,7,184,34
+    CONTROL         "All files referenced in the database",IDC_RADIO_ALL_FILES,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,13,57,127,10
+    CONTROL         "All files for which",IDC_RADIO_FILES_UNDER_STATUS,
+                    "Button",BS_AUTORADIOBUTTON,13,71,69,10
+    COMBOBOX        IDC_CMB_FILE_ACTION,55,83,112,56,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_FILE_STATUS,55,100,112,60,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "Select files to update status for",IDC_STATIC,7,46,184,74
+    CONTROL         "",IDC_RADIO_NEW_STATUS,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,138,10,10
+    COMBOBOX        IDC_CMB_NEW_STATUS,27,137,112,57,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Status of action",IDC_RADIO_STATUS_OF_ACTION,"Button",BS_AUTORADIOBUTTON,13,155,62,10
+    COMBOBOX        IDC_CMB_STATUS_OF_ACTION,79,154,105,58,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "OK",IDOK,30,180,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,86,180,50,14
+    LTEXT           "Action",IDC_STATIC,13,21,21,8
+    LTEXT           "Action",IDC_STATIC,24,85,21,8
+    LTEXT           "Status is",IDC_STATIC,22,102,28,8
+    GROUPBOX        "Specify new value for action status",IDC_STATIC,7,126,184,48
+    PUSHBUTTON      "Apply",IDC_BTN_APPLY_ACTION_STATUS,141,180,50,14
+END
+
+IDD_DLG_LOGIN DIALOGEX 0, 0, 201, 86
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "File Action Manager Database Login"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,89,65,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,145,65,50,14
+    LTEXT           "Username",IDC_STATIC,6,4,37,8
+    EDITTEXT        IDC_EDIT_LOGIN_USER_NAME,7,14,187,14,ES_AUTOHSCROLL
+    LTEXT           "Password",IDC_STATIC,7,32,32,8
+    EDITTEXT        IDC_EDIT_LOGIN_PASSWORD,7,42,187,14,ES_PASSWORD | ES_AUTOHSCROLL
+END
+
+IDD_DIALOG_SELECT_DB_TO_ADMINISTER DIALOGEX 0, 0, 246, 169
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Select database to administer"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_SELECT_DB_SERVER,14,35,218,82,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Login to existing database",IDC_RADIO_LOGIN_EXISTING,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,14,77,100,10
+    CONTROL         "Create new database",IDC_RADIO_CREATE_NEW_DB,"Button",BS_AUTORADIOBUTTON,14,91,85,10
+    COMBOBOX        IDC_COMBO_SELECT_DB_NAME,14,119,218,82,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    DEFPUSHBUTTON   "Next",IDOK,133,147,50,14
+    PUSHBUTTON      "Exit",IDCLOSE,189,147,50,14
+    GROUPBOX        "Server",IDC_STATIC,7,7,231,49
+    LTEXT           "Database server name",IDC_STATIC,14,21,74,8
+    GROUPBOX        "Database",IDC_STATIC,7,63,231,77
+    LTEXT           "Database name",IDC_STATIC,14,105,51,8
+END
+
+IDD_DATABASEPAGE DIALOGEX 0, 0, 367, 198
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Database"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "...",IDC_BUTTON_SQL_SERVER_BROWSE,279,20,16,14
+    PUSHBUTTON      "...",IDC_BUTTON_DB_NAME_BROWSE,280,50,16,14
+    PUSHBUTTON      "Refresh",IDC_BUTTON_REFRESH,238,79,37,14
+    LTEXT           "Database Server",IDC_STATIC,7,8,54,8
+    EDITTEXT        IDC_EDIT_DB_SERVER,7,20,268,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "Database Name",IDC_STATIC,7,38,52,8
+    EDITTEXT        IDC_EDIT_DB_NAME,7,50,268,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    LTEXT           "Connection Status",IDC_STATIC,7,68,59,8
+    EDITTEXT        IDC_EDIT_CONNECT_STATUS,7,80,225,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    DEFPUSHBUTTON   "Connect to last used database",IDC_BUTTON_LAST_USED_DB,7,98,107,14,NOT WS_VISIBLE
+    LTEXT           "DO NOT MAKE CHANGES TO THIS FORM IN THIS PROJECT!  If changes need to be made to this form they should be made in the FAMUtils IDD_DATABASEPAGE dialog and copy them to this project.",IDC_STATIC,7,115,353,47,NOT WS_VISIBLE
+END
+
+IDD_DLG_DBSUMMARY DIALOGEX 0, 0, 367, 198
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+CAPTION "Summary"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST_ACTIONS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,7,353,163
+    LTEXT           "Total number of files referenced in the database:",IDC_STATIC_TOTAL_LABEL,7,179,155,10
+    EDITTEXT        IDC_EDIT_FILE_TOTAL,162,177,45,14,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "Refresh",IDC_BUTTON_REFRESH_SUMMARY,214,177,37,14
+END
+
+IDD_DIALOG_SELECT_REPORT DIALOGEX 0, 0, 310, 184
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Choose Report"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Select report:",IDC_STATIC,7,7,80,10
+    DEFPUSHBUTTON   "OK",ID_RUN_REPORT_OK,196,163,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,253,163,50,14
+    CONTROL         "",IDC_LIST_REPORTS,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,7,24,296,132
+END
+
+IDD_DIALOG_CLEAR_WARNING DIALOGEX 0, 0, 284, 118
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Title"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Caption",IDC_CAPTION,7,7,270,86
+    CONTROL         "Retain actions",IDC_CHECK_RETAIN_ACTIONS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,61,10
+    PUSHBUTTON      "Yes",IDYES,90,97,50,14
+    DEFPUSHBUTTON   "No",IDNO,144,97,50,14
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems"
+            VALUE "FileDescription", "FAMDBAdmin"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "FAMDBAdmin.exe"
+            VALUE "LegalCopyright", "(c) 2009 Extract Systems.  All rights reserved."
+            VALUE "OriginalFilename", "FAMDBAdmin.exe"
+            VALUE "ProductName", "FAMDBAdmin"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 233
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_FAMDBADMIN_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 146
+    END
+
+    IDD_DLG_EXPORT_FILES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 222
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 220
+    END
+
+    IDD_DLG_RENAME_ACTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 270
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 90
+    END
+
+    IDD_DLG_ADD_ACTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 217
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 116
+    END
+
+    IDD_DLG_SET_ACTION_STATUS, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 191
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 194
+    END
+
+    IDD_DLG_LOGIN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 194
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 79
+    END
+
+    IDD_DIALOG_SELECT_DB_TO_ADMINISTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 239
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 162
+    END
+
+    IDD_DATABASEPAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 360
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 191
+    END
+
+    IDD_DLG_DBSUMMARY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 360
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 191
+    END
+
+    IDD_DIALOG_SELECT_REPORT, DIALOG
+    BEGIN
+        RIGHTMARGIN, 303
+        BOTTOMMARGIN, 177
+    END
+
+    IDD_DIALOG_CLEAR_WARNING, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 277
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 111
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_FAMDBADMIN MENU 
+BEGIN
+    POPUP "&Database"
+    BEGIN
+        MENUITEM "&Clear...",                   ID_DATABASE_CLEAR
+        MENUITEM "&Reset lock\tCtrl+R",         ID_DATABASE_RESETLOCK
+        MENUITEM SEPARATOR
+        MENUITEM "C&hange password...\tCtrl+H", ID_DATABASE_CHANGEPASSWORD
+        MENUITEM "Log&out",                     ID_DATABASE_LOGOUT
+        MENUITEM SEPARATOR
+        MENUITEM "&Exit",                       ID_DATABASE_EXIT
+    END
+    POPUP "&Action"
+    BEGIN
+        MENUITEM "&Add...\tCtrl+A",             ID_ACTION_ADD
+        MENUITEM "&Remove...",                  ID_ACTION_REMOVE
+        MENUITEM "Re&name...",                  ID_ACTION_RENAME
+        MENUITEM SEPARATOR
+        MENUITEM "&Manually set action status...\tCtrl+M", ID_ACTION_MANUALLYSETACTIONSTATUS
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "Check for new components",    ID_TOOLS_CHECKFORNEWCOMPONENTS
+        MENUITEM SEPARATOR
+        MENUITEM "E&xport file lists...",       ID_TOOLS_EXPORTFILELISTS
+        MENUITEM SEPARATOR
+        MENUITEM "&File Action Manager...",     ID_TOOLS_FILEACTIONMANAGER
+        MENUITEM SEPARATOR
+        MENUITEM "&Reports...",                 ID_TOOLS_REPORTS
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "File Action Manager &Help",   ID_HELP_FILEACTIONMANAGERHELP
+        MENUITEM SEPARATOR
+        MENUITEM "&About this application...",  ID_HELP_ABOUTTHISAPPLICATION
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATORS ACCELERATORS 
+BEGIN
+    "A",            ID_ACTION_ADD,          VIRTKEY, CONTROL, NOINVERT
+    "M",            ID_ACTION_MANUALLYSETACTIONSTATUS, VIRTKEY, CONTROL, NOINVERT
+    "L",            ID_DATABASE_LOGIN,      VIRTKEY, CONTROL, NOINVERT
+    "R",            ID_DATABASE_RESETLOCK,  VIRTKEY, CONTROL, NOINVERT
+    "H",            ID_DATABASE_CHANGEPASSWORD, VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About FAMDBAdmin..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

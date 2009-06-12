@@ -1,0 +1,7 @@
+//find law firm (partnership)
+//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257626.tif.uss
+//^^^allow prepared to be messed up, don't require second line
+pared\s*by\s*(?:and\s*return\s*to)?.{0,55}(?:\r\n){1,2}(?:.+(?:\r\n){1,2}){0,2}(?:Attorney\s*at\s*Law(?:\r\n){1,2})?(?:\w+,?\x20)+&\x20\w+(?:\x20?,?\x20?p\.?(?:a|l)\.?)?\r\n
+//pared\s*by\s*(?:and\s*return\s*to)?.{0,55}(?:\r\n){1,2}(?:.+(?:\r\n){1,2}){0,2}(?:Attorney\s*at\s*Law(?:\r\n){1,2})?(?:\w+,?\x20)+&\x20\w+(?:\x20?,\x20?p\.(?:l|a)\.)?\r\n
+//pared\s*by\s*(?:and\s*return\s*to)?:.{0,55}(?:\r\n){1,2}(?:.+(?:\r\n){1,2}){0,2}(?:Attorney\s*at\s*Law(?:\r\n){1,2})?(?:\w+,?\x20)+&\x20\w+(?:\x20?,\x20?p\.(?:l|a)\.)?\r\n
+//pared\s*by\s*(?:and\s*return\s*to)?:.{0,55}(?:\r\n){1,2}(?:.+(?:\r\n){1,2})?(?:Attorney\s*at\s*Law(?:\r\n){1,2})?(?:\w+,?\x20)+&\x20\w+(?:\x20?,\x20?p\.(?:l|a)\.)?\r\n

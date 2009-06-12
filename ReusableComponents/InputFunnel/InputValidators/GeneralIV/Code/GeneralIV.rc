@@ -1,0 +1,194 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "1 TYPELIB ""GeneralIV.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems, LLC\0"
+            VALUE "FileDescription", "GeneralIV Module\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "GeneralIV\0"
+            VALUE "LegalCopyright", "Copyright 2009\0"
+            VALUE "OriginalFilename", "GeneralIV.DLL\0"
+            VALUE "ProductName", "GeneralIV Module\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+            VALUE "OLESelfRegister", "\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_INTEGERINPUTVALIDATOR REGISTRY DISCARDABLE    "IntegerInputValidator.rgs"
+IDR_DOUBLEINPUTVALIDATOR REGISTRY DISCARDABLE    "DoubleInputValidator.rgs"
+IDR_FLOATINPUTVALIDATOR REGISTRY DISCARDABLE    "FloatInputValidator.rgs"
+IDR_SHORTINPUTVALIDATOR REGISTRY DISCARDABLE    "ShortInputValidator.rgs"
+IDR_DATEINPUTVALIDATOR  REGISTRY DISCARDABLE    "DateInputValidator.rgs"
+IDR_INTEGERINPUTVALIDATORPP REGISTRY DISCARDABLE    "IntegerInputValidatorPP.rgs"
+IDR_DOUBLEINPUTVALIDATORPP REGISTRY DISCARDABLE    "DoubleInputValidatorPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_INTEGERINPUTVALIDATORPP DIALOGEX 0, 0, 207, 96
+STYLE WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Minimum",IDC_STATIC,7,7,93,61
+    CONTROL         "Has Limit",IDC_CHECK_HAS_MIN,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,17,79,10
+    EDITTEXT        IDC_EDIT_MINIMUM,14,30,79,12,ES_AUTOHSCROLL
+    CONTROL         "Include minimum in range",IDC_CHECK_INCLUDE_MIN,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,46,79,18
+    GROUPBOX        "Maximum",IDC_STATIC,107,7,93,61
+    CONTROL         "Has Limit",IDC_CHECK_HAS_MAX,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,114,17,79,10
+    EDITTEXT        IDC_EDIT_MAXIMUM,114,30,79,12,ES_AUTOHSCROLL
+    CONTROL         "Include maximum in range",IDC_CHECK_INCLUDE_MAX,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,114,46,79,18
+    CONTROL         "Include zero in range",IDC_CHECK_INCLUDE_ZERO,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,75,86,10
+    CONTROL         "Include negative numbers in range",
+                    IDC_CHECK_INCLUDE_NEGATIVE,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,114,71,79,18
+END
+
+IDD_DOUBLEINPUTVALIDATORPP DIALOGEX 0, 0, 207, 96
+STYLE WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Minimum",IDC_STATIC,7,7,93,61
+    CONTROL         "Has Limit",IDC_CHECK_HAS_MIN,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,14,17,79,10
+    EDITTEXT        IDC_EDIT_MINIMUM,14,30,79,12,ES_AUTOHSCROLL
+    CONTROL         "Include minimum in range",IDC_CHECK_INCLUDE_MIN,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,46,79,18
+    GROUPBOX        "Maximum",IDC_STATIC,107,7,93,61
+    CONTROL         "Has Limit",IDC_CHECK_HAS_MAX,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,114,17,79,10
+    EDITTEXT        IDC_EDIT_MAXIMUM,114,30,79,12,ES_AUTOHSCROLL
+    CONTROL         "Include maximum in range",IDC_CHECK_INCLUDE_MAX,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,114,46,79,18
+    CONTROL         "Include zero in range",IDC_CHECK_INCLUDE_ZERO,"Button",
+                    BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,14,75,86,10
+    CONTROL         "Include negative numbers in range",
+                    IDC_CHECK_INCLUDE_NEGATIVE,"Button",BS_AUTOCHECKBOX | 
+                    BS_MULTILINE | WS_TABSTOP,114,71,79,18
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_PROJNAME            "GeneralIV"
+    IDS_TITLEIntegerInputValidatorPP "Title"
+    IDS_HELPFILEIntegerInputValidatorPP "Help File Name"
+    IDS_DOCSTRINGIntegerInputValidatorPP "Your Help String"
+END
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDS_TITLEDoubleInputValidatorPP "&Title"
+    IDS_HELPFILEDoubleInputValidatorPP "Help File Name"
+    IDS_DOCSTRINGDoubleInputValidatorPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "GeneralIV.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

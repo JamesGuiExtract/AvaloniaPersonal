@@ -1,0 +1,7 @@
+//*********************************************************************************
+// TestSelectMultipleDocumentPreprocessors.dat
+// 		This file test cases for testing SelectMultipleDocumentPreprocessors PreProcessor
+//*********************************************************************************
+
+// Test for including several preprocessors
+<TESTCASE>;SelectMultipleDocumentPreprocessors.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;SelectMultipleDocumentPreprocessors.voa

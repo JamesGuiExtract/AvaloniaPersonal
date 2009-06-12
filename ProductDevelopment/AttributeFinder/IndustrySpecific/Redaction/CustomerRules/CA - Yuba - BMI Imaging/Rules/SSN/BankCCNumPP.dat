@@ -1,0 +1,185 @@
+// Case insensitive preprocessors for BankCCNum.rsd
+// the delimiter š is produced by Alt+0154 (on the number pad) in Notepad, etc. or Ctrl+K then SC in Vim
+//
+//00131, #; 00160, 0|1; Remove Loan #|0|1 w/ following digits
+//(Loan\s+(#|0|1)\s*|Lo\S\S\s+(#|0|1)\x20*)[\d.:-]+[\d.:\x20-]*š
+//00105; 00203; Remove Loan Number w/ following digits
+//00219; remove loan reference number
+(?:Loan\s*(?:i\.?d\.?|(?:i\.?d\.?|reference\s*)?(?:N\S{1,8}|[#01]))\s*|Lo\S\S\s*(?:i\.?d\.?|(?:i\.?d\.?|reference\s*)?(?:N\S{1,8}|[#01]))\x20*)[-\d.:\x20]*\d[\d\W_]*(?!\b[a-z])šXo% Xo% Xo% Xo% 
+//00132; Remove "insured under Section" Numbers
+//insured[\s,\.]+under[\s,\.]+Section(s)?[\s,\.]+[\d\.:\s,]+š
+//00128; Remove Sections w/ following digits
+//Sections\s*[\d\.:\x20-]+(\s*and\s*[\d\.:\x20-]+)?š
+Sections?[\s,.]*[\d.,:\s-]*\d[\d.,:\s-]*(?:\s*and\s*[\d.,:\s-]*\d[\d.,:\s-]*)?(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00204; remove MERS # plus digits
+//\bMERS\s*(#|N\D{1,8})\s*:?\s*[-\d\x20]+š
+//00191; remove Application No. w/ following digits
+//application\s*(#|no\.?)\s*[-\d\x20]*š
+//00001; remove Folio No. w/ following digits
+//Folio\s*No.?\s*[\d\x20-]+š
+//00181; remove phone # w/ following digits
+//phone\s*#?\s*:?\s*[-.\d]+š
+//00167; remove AEMC# w/ following digits
+//AEMC\s*#\x20*[\d\.:\x20-]+š
+//00006; Remove FSA-R.S. plus digits
+//LSA\s*-\s*R.S.\s*[:\.]*\s*[\d\.:\x20-]*š
+//00117; Remove POLICY # w/ following digits
+//POLICY\s*#\s*(:)?\x20*[\d\.:\x20-]+š
+//00127; Remove CID # w/ following digits
+//CID\s*#\x20*[\d\.:\x20-]+š
+//00119; Remove ORDER # w/ following digits
+//ORDER\s*(N\S{1,8}|#)\x20*[\d\.:\x20-]+š
+//00120; Remove Bar No w/ following digits
+//Bar\s+No(:|\.)?\x20*[\d\.:\x20-]+š
+//00118; Remove IRS # w/ following digits
+//IRS\s*#\x20*[\d\.:\x20-]+š
+//00114; Remove Certificate No w/ following digits
+//Certificate\s*(N\S{1,8}|#)\x20*(:|\.)?\s*[\d\.:\x20-]+š
+//00113; Remove OBTS Number w/ following digits
+//OBTS\s+N[\s\S]{2,10}\d+š
+//00108; 00005; Remove OBTS# w/ following digits
+//^OBTS\s*(#)?\s*[:\d\x20]+š
+//00110; Remove Agency # w/ following digits
+//Agency\s*(/)?\s*#\s*[\d\.:\x20-]+š
+//00109; 00063; Remove Claim #|number w/ following digits
+//Claim\s+(#|number)\x20*[\d\.:\x20-]*š
+//00135; Remove FNMA or GNMA No. w/ following digits
+//(F|G)NMA\s+No\s*[:\.]*\s*[\d\.:\x20-]*š
+//00133; Remove FHA/VA No. w/ following digits
+//FHA\s*/\s*VA\s*No\s*[:\.]*\s*[\d\.:\x20-]*š
+//00134; Remove FHA Case No. w/ following digits
+//FHA\s+Case\s+(No\s*(\.)?|#)\s*[\d\.:\x20-]*š
+//OH 200034600214-01-0001; remove Lease Number plus digits
+//Lease\s*(#|N\D{1,8})\x20*(:)?\s*[\d\.:\x20-]*š
+//OH 200102900302-01-0001; Remove A.B.A. No. w/ following digits
+//A[.,]B[.,]A[.,]\s*(#|N\D{1,8})\x20*(:)?\s*[\d\.:\x20-]*š
+//OH 200112302560-01-0002; remove Customer|Batch Number plus digits
+//(Customer|Batch)\s*(#|N\D{1,8})\x20*(:)?\s*[\d\.:\x20-]*š
+//OH 200113002082-01-0001; remove Legal Number plus digits
+//Legal\s*(#|N\D{1,8})\x20*(:)?\s*[\d\.:\x20-]*š
+//Remove License Number w/ following digits
+//Licenses?\s*(N\S{1,8}|#)\s*[\d\.:\x20-]+š
+//00116; Remove Serial Number w/ following digits
+//Serial\s*(#|\N\S{1,8})\s*(:)?\s*[-\d]+š
+//00117; Remove Job # w/ following digits
+//Job\s*(#|\N\S{1,8})\s*(:)?\s*[-\d]+š
+//00106; 00117; Remove Case Number w/ following digits
+//C(a)?se.{0,2}N\D{1,8}\x20*(:)?\s*[\d\.:\x20-]*š
+////00208; remove A.P.N. plus digits
+//A[.,]P[.,]N[.,]\x20*:\x20*[-/\d]+š
+(?:A(?:[.,]?(?:B[.,]?A[.,]?|P[.,]?N[.,]?)|EMC|gency\s*/?|pplication|ppl)|B(?:ar|atch)|C(?:a?se.{0,2}|ertificate|ID|laim|ustomer)|escrow|F(?:HA\s*/\s*VA|olio)|[FG]NMA|IRS|Job|L(?:aw\b|ease|egal|icenses?|SA\s*-\s*R.S.)|\bMERS|note,?|O(?:RDER|BTS)|p(?:hone|olicy|roperty)|R(?:ule|CD)|Serial|warrant)\s*(?:tax\s*)?(?:i\.?d\.?(?:entif\S*)?)?\s*(?:N\S{1,8}|#)?\s*(?:(?:is|are)\s*)?[.:;]*\s*[-\d.:;\x20]*\d[\d\x20-\x40\x5b-\x60\x7b-\x7e]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00189; remove TLN # w/ following digits
+//TLN\x20*#?\x20*[\d-]+š
+//00105; Remove FHA # w/ following digits
+//FHA\s*(#)?\s*[\.:]*\s*[\d\.:\x20-]*š
+//00206; remove MIN plus digits
+(?:FHA|\bMIN|TLN|\bLLC)\s*(?:N\S{1,8}|#)?[.:]*\x20*[\d.:-]*\d[\d.:\x20-]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00087; Remove Printing Office: w/ following digits
+printing\s*office\s*:?\s*[-\d\x20]*\d[-\d\x20]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00136; Remove Model # w/ following digits
+//Model\s*(#)?\s*\S{0,1}\s*[\d\.:\x20-]*š
+//00137; Remove Certified Mail # w/ following digits
+(?:Model|Certified\s*Mail)\s*#?\s*\S{0,2}\s*[\d\.:-]*\d[\d.:\x20-]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00011; 00148; 00140, preceding; Remove Parcel Id... (Num|No)... + following and preceding digits
+[\W\d_]*\s*(?:Parc.{0,3}|.{0,3}rcel)\s*(?:tax\s*)?I\.?\s*d[\s\S]{0,15}\s*(?:Num|No|\#\x20*)\S{1,12}\s*[\W\d\s_]*\d[\W\d\s_]*(?:and[\W\d\s_]*\d[\W\d\s_]*)?(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00138; Remove Pa.. Id.. (Folio) Nu..
+Pa\S{1,8}\s+Id[\s\S]{5,15}\s*Fo[\s\S]{2,7}\s*N\S{1,15}\s*[\W\d\s_]*\d[\W\d\s_]*(?:and[\W\d\s_]*\d[\W\d\s_]*)?(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00139; 00202; remove (tax)? Parcel Number w/ following digits
+(?:tax\s*)?(?:Parc.{0,3}|.{0,3}rcel)\s*(?:\n\S{1,8}|\S{0,4})\s*:?\#?[\W\d\s_]*\d[\W\d\s_]*(?:and[\W\d\s_]*\d[\W\d\s_]*)?(?!\b[a-z])šXo% Xo% Xo% Xo
+//00107; Remove IAD w/ following digits
+^IAD\s*[:\d\s/-]*\d[:\d\s/-]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00106; 00215; Remove Date/expires w/ following digits
+(?:Dated?|expires?)\x20*:?\x20*\d+[\d\W_]*(?!\b[a-z])šXo% Xo% Xo% Xo% 
+//00111; Remove Circuit Court w/ 000 and following digits
+Circuit\s+Court\s+000\d+šXo% Xo% Xo% Xo% Xo% 
+//OH 200102900302-01-0001; Remove File Number w/ following digits
+//File\s*(\#|N\D{1,8})?\x20*(:)?\s*[\d\.:\x20-]*š
+//00112; 00171; Remove File Number w/ following digits
+File\s*.{0,2}\s*(?:\#|N\S{1,8})?\x20*[\s\S]{0,4}\s*[\d.:;-]*\d[\d.:;\x20-]*(?:and\s*[\d.:;-]*\d[\d.:;\x20-]*)?(?!\b[a-z])šXo% Xo% Xo% Xo
+//00115; Remove W/M & B/M w/ following digits
+^.[WB]/M\s*[\d.]*\d[\d.\x20]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00121; Remove Power No w/ following digits
+Power\s+No[:.]?[\s\S]{3,10}[\d.:-]*\d[\d\.:\x20-]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00122; 00067; Remove TEL or FAX w/ following digits
+(?:FAX|TEL)\s*(?:\#|NO|Num\S{0.6})?[,.:]?\x20*[\d\W_]*\d[\d\W\x20_]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00123; Remove SAO \# w/ following digits
+^SAO\s*\#\x20*:?\x20*\d+.{1,3}[\d\s]*\d[\d\s]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00126; Remove MSO w/ following digits
+//\bMSO\s*(:|\.)?\s*[\d-]+š
+//00124; Remove SAO No. w/ following digits
+\b(?:MSO|SAO\s*NO)\s*[:.]?\s*[\d-]*\d[\d-]*šXo% Xo% Xo% Xo
+//00125; Remove Dkt: w/ preceding digits
+^\d+\r?$\s+[DU]kt\s*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00161; Remove Glendale Federal (GF FL) w/ following digits
+^[og]f\s+FL\s*\d\S{1,3}[\s\d\-\.]+(?!\b[a-z])šXo% Xo% Xo% Xo
+//00045; Remove Instrument #|No. plus digits
+//00116; Remove copyright plus digits
+(?:copyright|\b(?:.?n[s5\$]t|[i1l|!]n[s5\$]t?)(?:rument)?)\s*(?:[\s\S]{2,6}|Num.{0,5}|\#)?:?\s*[-\d]*\d[-\d]*šXo% Xo% Xo% Xo% Xo% 
+//00092; remove notarial seal plus digits
+//not\S{3,7}\s+seal.\s+[-\d]+š
+//00162; remove FL rev w/ following digits
+//FL\s+[ra]ev\s*\d+š
+//00165; remove notary public .{30} no. w/ following digits
+(?:not\S{3,7}\s+seal.|FL\s*[ra]ev|notary\s*public[\s\S]{0,30}no\.)\s*[-\d]*\d[-\d]*šXo% Xo% Xo% Xo
+//00063; remove phone numbers (digits plus (voice or (tty
+[-\x20\d]*\d[-\x20\d]*\((?:voice|tty)šXo% Xo% Xo% Xo
+//00063; remove docket id w/ following digits
+//docket\s*id\s*:\s*\d+š
+//00063; remove work number w/ following digits
+(?:docket\s*id|work\s*number)\s*:?\s*\d+šXo% Xo% Xo% Xo% Xo% 
+//00166; 00196; remove form w/ following digits
+(?:[-\d]*\d[-\d\x20]*)?form(?:\(?s\)?)?\x20*\#?\x20*[-\d]*\d[-\x20\d]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00166; 00196; remove form w/ preceding digits
+[-\d]*\d[-\d\x20]*form(?:\(?s\)?)?(?:\x20*\#?\x20*[-\d]*\d[\x20\d]*)?(?!\b[a-z])šXo% Xo% Xo% Xo
+//00168; remove house numbers plus \d+(th|nd|st|rd) avenue|street
+\d+\x20+\d{1,4}(?:th|nd|st|rd)\x20+(?:ave|st)šXo% Xo% Xo% Xo
+//00169; Remove Rev. Rul. w/ following digits
+Rev\.\s*Ru\S{0,3}\s*[\d.,\x20-]*\d[\d.,\x20-]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00076; remove Panel (\#|No.|Num) w/ following digits
+panel\s*(?:[\#1]|No\.?|Num.{0,5})\s*\d+šXo% Xo% Xo% Xo
+//00063; remove QESP w/ following digits
+qesp\)?[-:.\x20\w]*\d[-:.\x20\w]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00171; remove radius point w/ following digits
+//radius\s*(point[\s\S]{0,8}|of\s*)[-.;\d\x20°]+š
+//00175; remove Thence ... plus coordinates
+//thence[\s\S]{0,8}[.'\d"\x20°]+š
+//00176; remove angle of w/ following digits
+(?:(?:radius\s*point|thence)[\s\S]{0,8}|(?:radius|angle)\s*of)\s*[\W\d]*\d[\W\d]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00187; remove (north|south|east|west) w/ following digits "
+//(north|south|east|west)\x20*[.\d]+"š
+//00177; remove Area Code w/ following digits
+//area\s*code\s*[-\d.]+š
+//00179; remove Lot w/ following digits
+(?:north|south|east|west|feet|area\s*code|Lot)\s*[-\d.]*\d[-\d.]*šXo% Xo% Xo% Xo
+//00180; remove P.O. Box w/ following digits
+P.?\s*[0o].?\s*Box\s*[-\d]*\d[-\d\x20]*(?!\b[a-z])šXo% Xo% Xo% Xo
+//00184; remove lying | bearing of w/ following digits
+(?:lying|bearing\s*of)[\s\S]{0,8}[\d]+[\d\W]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00185; remove modification agreement w/ preceding digits
+[-\d]*\d[-\d]*\s*modification\s*agreešXo% Xo% Xo% Xo% Xo% 
+//00186; remove Covenants w/ following digits
+Covenants\s*[.\d]*\d[.\d\x20]*šXo% Xo% Xo% Xo% Xo% 
+//00188; remove motor|trailer\boat ID #
+(?:motor|trailer|boat),?\s*I\.?D\.?\s*(?:\#|No.|Num{0,5})?\s*\w*\d\w*šXo% Xo% Xo% Xo
+//00192; remove Filed and Recorded w/ preceding digits
+\d+\s*filed\s*and\s*recšXo% Xo% Xo% Xo
+//00193; remove Dollars (U.S w/following digits
+Dollars\s*\(U\.S[\s\S]{0,5}[-,.\d]*\d[-,.\d]*šXo% Xo% Xo% Xo% Xo% 
+//00195; remove official record, page (O.R. \d+ PG \d+) and preceding digits
+\d+\s*[o0]\.\x20*r\.\x20*\d+\x20*p[gc]\x20*\d+šXo% Xo% Xo% Xo% Xo% 
+//00196; remove modular number an following digits
+modular\s*N\S{1,10}\s*[-\d,.]*[-\d,.]*šXo% Xo% Xo% Xo% Xo% 
+//00201; 00207; remove Document No. w/ following digits
+(?:doc.?|\w*cument)\s*(?:id)?\s*(?:\#|N\S{1,8})\s*[\s\S]{0,4}\s*[-\d]*\d[-\d\x20]*(?!\b[a-z])šXo% Xo% Xo% Xo% Xo% 
+//00202; remove page \d of \d
+page\x20*\d+\x20*of\x20*\d+šXo% Xo% Xo% Xo
+//00204; remove Lender ID plus digits
+lender\s*I.?D.?\s*:?\s*\D*[-\d/]*\d[-\d/]*šXo% Xo% Xo% Xo% Xo% 
+//00205; remove mortgage record plus digits
+gage\s*record\s*[-\d]*\d[-\d]*šXo% Xo% Xo% Xo% Xo% 
+//00211, record; 00212, recorded; remove Record (\#|No.|Num) w/ following digits
+\b[rf][ea]c(?:ord(?:ed)?|[,.])?\x20*(?:[\#1]|No\.?|Num.{0,5})?\s*:?[-;&.\d]*\d[-;&.\d]*šXo% Xo% Xo% Xo
+//00213; remove four digit year dates plus time
+\b\d{2}/\d{2}/\d{4}\b(?:\x20*\d{1,2}:\d{2}:\d{2})?šXo% Xo% Xo% Xo
+//00063; remove , state plus zip code
+\b(?:ALABAMA|AL|ALASKA|AK|AMERICAN\s+SAMOA|AS|ARIZONA|AZ|ARKANSAS|AR|CALIFORNIA|CA|COLORADO|CO|CONNECTICUT|CT|DELAWARE|DE|DISTRICT\s+OF\s+COLUMBIA|DC|FEDERATED\s+STATES\s+OF\s+MICRONESIA|FM|FLORIDA|FL|GEORGIA|GA|GUAM|GU|HAWAII|HI|IDAHO|ID|ILLINOIS|IL|INDIANA|IN|IOWA|IA|KANSAS|KS|KENTUCKY|KY|LOUISIANA|LA|MAINE|ME|MARSHALL\s+ISLANDS|MH|MARYLAND|MD|MASSACHUSETTS|MA|MICHIGAN|MI|MINNESOTA|MN|MISSISSIPPI|MS|MISSOURI|MO|MONTANA|MT|NEBRASKA|NE|NEVADA|NV|NEW\s+HAMPSHIRE|NH|NEW\s+JERSEY|NJ|NEW\s+MEXICO|NM|NEW\s+YORK|NY|NORTH\s+CAROLINA|NC|NORTH\s+DAKOTA|ND|NORTHERN\s+MARIANA\s+ISLANDS|MP|OHIO|OH|OKLAHOMA|OK|OREGON|OR|PALAU|PW|PENNSYLVANIA|PA|PUERTO\s+RICO|PR|RHODE\s+ISLAND|RI|SOUTH\s+CAROLINA|SC|SOUTH\s+DAKOTA|SD|TENNESSEE|TN|TEXAS|TX|UTAH|UT|VERMONT|VT|VIRGIN\s+ISLANDS|VI|VIRGINIA|VA|WASHINGTON|WA|WEST\s+VIRGINIA|WV|WISCONSIN|WI|WYOMING|WY)[.,]?\x20+\d{5}\b(?:\x20*[-.]\x20*\d{4}\b)?šXo% Xo% Xo% Xo% Xo% Xo% Xo

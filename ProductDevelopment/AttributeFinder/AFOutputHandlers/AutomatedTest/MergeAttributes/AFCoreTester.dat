@@ -1,0 +1,22 @@
+// Specifies Name, Value & type of "Merged", don't preserve sub-attributes (50% overlap requirement)
+<TESTCASE>;Test07.rsd;Images\Image2.tif.uss;;Test07.voa
+
+// Specifies Name, Value & type of "Merged", preserve sub-attributes (50% overlap requirement)
+<TESTCASE>;Test08.rsd;Images\Image2.tif.uss;;Test08.voa
+
+// Preserves name from RegEx, LegalDescription, BoxFinder.  Merges types (0.1% overlap requirement)
+<TESTCASE>;Test09.rsd;Images\Image2.tif.uss;;Test09.voa
+
+// Preserves name from LegalDescription (preventing first overlapping set from merging), Merges types (0.1% overlap requirement)
+<TESTCASE>;Test10.rsd;Images\Image2.tif.uss;;Test10.voa
+
+// Test combining varied and multiple types.
+<TESTCASE>;Test11.rsd;Images\Image2.tif.uss;;Test11.voa
+
+// Test merging hybrid areas [LegacyRCAndUtils:5164]
+<TESTCASE>;Test12.rsd;Images\Image2.tif.uss;;Test12.voa
+
+// Test merging non-spatial areas [FlexIDSCore:3328]
+<TESTCASE>;Test13.rsd;Images\Image2.tif.uss;;Test13.voa
+
+

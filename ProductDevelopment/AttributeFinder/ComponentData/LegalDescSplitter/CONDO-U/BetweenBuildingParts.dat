@@ -1,0 +1,4 @@
+// This file is used for a regular expression to separate
+// Added -? in subdivision because of Whatcom-31100787.tif
+
+//said|thence|being|Sub-?division\sof|as\sshown|"|amended|Replat|CONDOMINIUM

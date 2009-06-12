@@ -1,0 +1,193 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.12 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.12 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3168]</b> Selected attribute is always visible
+	       	<ul>
+	      		<li>Exercise redaction verification and process images containing several attributes.
+			<li>Navigate between attributes and confirm that the active item is always 
+			shown as selected in the image viewer.
+	      		<li>Select other image viewer tools such as Zoom, Pan and Highlight.  Confirm that 
+			the active item is always shown as selected in the image viewer.
+			<li>Confirm that the highlight's grip handles are only visible when the Selection 
+			tool is selected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3204]</b> Address Splitter error with missing zip code
+	       	<ul>
+	      		<li>Exercise the rule set and image attached to the SCR.
+			<li>Confirm that no <b>Invalid Index</b> errors are displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3213, 3225, 3228, 3229, 3230, 3231, 3233, 3310]</b> Support 
+		for Exemption codes in Verification
+	       	<ul>
+	      		<li>Confirm that the Verification property page includes a checkbox that 
+			requires verifiers to use exemption codes with each redaction.
+			<li>Confirm that a redacted document <b>cannot</b> be saved without exemption codes 
+			if this check box is checked.
+			<li>Confirm that a redacted document <b>can</b> be saved without exemption codes 
+			if this check box is not checked.
+<p>
+	      		<li>Confirm that a new button for <b>Set exemption code for the currently selected 
+			redaction</b> is available on the Verification toolbar.
+	      		<li>Confirm that the button is only enabled when a redaction is selected.
+	      		<li>Confirm that <b>E</b> works as a shortcut for the new button.
+	      		<li>Confirm that clicking the button displays the <b>Exemption codes</b> dialog.
+	      		<li>Confirm that previous <b>Exemption codes</b> settings are displayed when 
+			re-opening the dialog.
+<p>
+	      		<li>Confirm that the <b>Exemption codes</b> dialog supports exemption codes 
+			for the <b>Freedom of Information Act (FOIA)</b>.
+	      		<li>Confirm that the <b>Exemption codes</b> dialog supports exemption codes 
+			for the <b>Privacy Act (US)</b>.
+	      		<li>Confirm that XML files for each <b>group</b> of supported exemption codes 
+			can be found in the <b>.\IDShield\ExemptionCodes</b> folder.
+<p>
+	      		<li>Confirm that the user can navigate the <b>Exemption codes</b> dialog 
+			using the keyboard.
+	      		<li>Confirm that the Data Area dialog contains a new column for display of 
+			<b>Exemption codes</b>.
+	      		<li>Confirm that the user can double-click in the <b>Exemption codes</b> cell 
+			to display an appropriately populated dialog.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3227]</b> Page summary label
+	       	<ul>
+			<li>Confirm that the label in the Data Area dialog has changed to <b>Page 
+			summary (visited pages marked in green)</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3288]</b> Second Routing number found by MICR Finder
+	       	<ul>
+	      		<li>Exercise the <b>MICR Finder</b>.
+			<li>Confirm that the second routing number sub-attribute is generally found.
+			<li>Confirm that the sub-attribute name is <b>OtherRouting</b>.
+<p>
+	      		<li>Exercise the images noted in the SCR.
+			<li>Confirm that information is found appropriately.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3295]</b> Rule Set Editor Help file
+	       	<ul>
+	      		<li>Confirm that <b>Help - Attribute Finder Help</b> displays the SDK Help file.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3298]</b> Automated Rule Tester
+	       	<ul>
+	      		<li>Exercise <b>Test.tcl</b> found in Jennifer's public TestHarnessBug folder.
+	      		<li>Confirm that each of the green nodes is an exact match between expected 
+			and found attributes.
+	      		<li>Confirm that each of the red nodes is a mismatch between expected 
+			and found attributes.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3301]</b> Copyright dates in DLLs and EXEs
+	       	<ul>
+	      		<li>Check the <b>Version tab</b> (if present) in the Properties dialog for each 
+			of the Extract Systems DLLs and EXEs.
+	      		<li>Confirm that the copyright text includes only one year and that it is 2009.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5125, 5147]</b> Report Viewer
+	       	<ul>
+	      		<li>Open the Report Viewer from the <b>DB Admin</b> utility.
+	      		<li>Confirm that everything functions as expected.
+<p>
+	      		<li>Rename one of the thumbnail images for a report.
+	      		<li>Confirm that selecting that report now displays a text message in 
+			the Preview pane that an image is not available.
+	      		<li>Resize the Report Viewer.
+	      		<li>Confirm that the text message in the Preview pane remains centered.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5139]</b> Unable to move file
+	       	<ul>
+	      		<li>Repeat the third memory leak test for the <b>Archive and Restore</b> 
+			task.
+	      		<li>Confirm that <b>Unable to move file</b> errors are not seen in the 
+			exception log.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5148]</b> Renamed exception log
+	       	<ul>
+	      		<li>Confirm that exceptions are now logged to <b>ExtractException.uex</b>.
+	      		<li>Confirm that the <b>UEX Viewer</b> successfully opens both old and new 
+			UEX files.
+	      		<li>Confirm that the <b>UEX Viewer</b> successfully navigates between old 
+			and new UEX files.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5157]</b> Write-caching errors for file supplying
+	       	<ul>
+	      		<li>Run a small memory leak test for file supplying.
+			<ul>
+		      		<li>Use files on FNP2.
+		      		<li>Enable listening for new files.
+		      		<li>Add more files one or more times while the test is running.
+			</ul>
+	      		<li>Confirm that <b>file access</b> or other caching-related errors are not 
+			seen in the exception log.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

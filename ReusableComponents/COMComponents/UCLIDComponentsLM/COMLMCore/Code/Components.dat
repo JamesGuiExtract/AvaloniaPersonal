@@ -1,0 +1,67 @@
+//
+// Components.dat
+//
+// This file should be located in the same directory as the executable.
+//
+// Contains list of component IDs and associated names.
+// Format: 
+//   ID1,<name of component group or feature>
+//
+// NOTE:
+//   Component IDs include a base offset that is modified for each major release
+//          MAJOR BUILD                     OFFSET
+//   FLEX Index & ID Shield 5.0             1000
+//          IcoMap 4.2                      1000
+//   FLEX Index & ID Shield 6.0             2000
+//   ID Shield for Laserfiche 1.0           2000
+//   ID Shield Office 1.0                   2000
+//   FLEX Index & ID Shield 7.0             3000
+//
+
+// IDs for core objects and collections
+3000,Unused object
+3001,Extract_Systems_Core_Objects
+3002,Input_Funnel_Core_Objects
+3003,FlexIndex_IDShield_Core_Objects
+3004,FlexIndex_Core_Objects
+3005,IDShield_Core_Objects
+3006,Rule_Development_Toolkit_Objects
+3007,IcoMap_Core_Objects
+3008,IcoMap_ArcGIS_Objects
+
+// IDs for core features
+3021,OCR_On_Server_Feature
+3022,OCR_On_Client_Feature
+3023,FlexIndex_Server_Objects
+3024,Rule_Writing_Core_Objects
+3025,FlexIndex_IDShield_Server_Core
+3026,IDShield_Rule_Writing_Objects
+3027,FlexIndex_Rule_Writing_Objects
+
+// IDs for special individual components
+3043,Pagination_FileProcessor_Object
+3044,IDShield_AutoRedaction_Object
+3045,IDShield_Verification_Object
+3046,RuleSet_Editor_UI_Object
+3047,File_Action_Manager_Object
+3048,Run_Rules_Object
+3049,IDShield_Office_Object
+
+// IDs for individually licensed features
+3070,Anti_Aliasing_Feature
+3071,IgnoreUSB_IDCheck_Feature
+3072,IgnoreUSB_Decrement_Feature
+3073,PDF_ReadWrite_Feature
+3074,GridTool_Query_Feature
+3075,GridTool_Draw_Feature
+3076,RotatedImages_And_Annotation_Feature
+3077,Image_Cleanup_Engine_Feature
+3078,Handwriting_Recognition_Feature
+3079,Create_Searchable_PDF_Feature
+3080,Scansoft_OEM_OCR_Feature
+3081,MICR_Finding_Engine_Feature
+
+// IDs for FLEX Index / ID Shield integration efforts
+3101,Laserfiche_Integration_Verification
+3102,Laserfiche_Integration_Desktop
+3103,Laserfiche_Integration_Server

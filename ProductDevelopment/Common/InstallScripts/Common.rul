@@ -1,0 +1,465 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:    Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                          
+//                                                                            
+//  Comments:     This minimal project is intended for advanced users. 
+//                To create a robust project with step-by-step 
+//				  instructions, use the Project Wizard. 
+//                                                                                                               
+/////////////////////////////////////////////////////////////////////////////
+
+// Include header files /////////////////////////////////////////////////////
+#include "ifx.h"
+
+////////////////////// string defines ////////////////////////////
+    #define UCLID_DIR "\\UCLID Software\\CommonComponents"
+    #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
+    #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
+    #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
+    #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
+    #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
+    #define IDSHIELD_PRODUCT_CODE "{158160CD-7B55-462F-8477-7E18B2937D40}"  
+    #define LASERFICHE_PRODUCT_CODE "{74E1DF54-C96E-479F-915D-A0A721F9AC8B}"
+    #define IDSHIELDOFFICE_PRODUCT_CODE "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}"
+    #define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
+    #define LABDE_PRODUCT_CODE "{0E412937-E4FA-4737-A321-00AED69497C7}"
+    #define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles\\Misc"
+    #define CRYSTAL_REPORTS_GUID "{C484CC8D-03CF-4022-89C4-DB4F02E8A15B}"
+    #define INLITE_INSTALLER_EXE "ClearImageEUK_5_7_3.exe"
+    #define EXCEPTION_FILE_NAME "ExtractException.uex"
+    #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
+//////////////////// installation declarations ///////////////////
+
+    // In order to have your InstallScript function executed as a custom
+    // action by the Windows Installer, it must be prototyped as an 
+    // entry-point function.
+
+    // The keyword export identifies MyFunction() as an entry-point function.
+    // The argument it accepts must be a handle to the Installer database.
+    
+      /* export prototype MyFunction(HWND); */  
+
+    // To Do:  Declare global variables, define constants, and prototype user-
+    //         defined and DLL functions here.
+
+
+// ----- DLL function prototypes -----
+
+
+    // your DLL function prototypes
+
+
+// ---- script function prototypes -----
+
+
+    // your script function prototypes    
+    prototype MoveRegKeys();
+    prototype CopyLicFiles();
+	prototype InstallSQLNativeClient();     
+	prototype detectRDTInstall();
+	prototype InstallDotNET();
+    prototype CheckOtherExtractProducts();
+    prototype RenameUEXFile();
+    prototype InstallInliteKeyDrivers();
+    prototype UnInstallInliteKeyDrivers();
+    prototype InstallCrystalReports();
+    prototype CloseApps();
+    prototype UnnstallCrystalReports12();
+    prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
+    
+    // your global variables
+    BOOL gbInstalled;
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: MoveRegKeys
+//
+//  Purpose: This function moves registry keys and values from the old UCLID Software keys
+//			 to the Extract Systems keys
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function MoveRegKeys()
+begin
+	// Move any remaining old keys to the new key path
+	// Move the keys for Local machine to new Extract Systems settings
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	if ( RegDBKeyExist ("Software\\UCLID Software" ) > 0 )  then
+		RegDBCopyKeys("Software\\UCLID Software",
+					  "Software\\Extract Systems",
+					  HKEY_LOCAL_MACHINE,
+					  HKEY_LOCAL_MACHINE );
+		RegDBDeleteKey("Software\\UCLID Software");
+	endif;
+	
+	// Move the keys for current user to new Extract Systems settings
+	RegDBSetDefaultRoot(HKEY_CURRENT_USER);
+	if ( RegDBKeyExist ("Software\\UCLID Software" ) > 0 )  then
+		RegDBCopyKeys("Software\\UCLID Software",
+					  "Software\\Extract Systems",
+					  HKEY_CURRENT_USER,
+					  HKEY_CURRENT_USER );
+		RegDBDeleteKey("Software\\UCLID Software");
+	endif;
+end; 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: CopyLicFiles
+//
+//  Purpose: This function copies the .lic files from the C:\Program Files\UCLID Software\CommonComponents directory
+// 			 to the c:\Program Files\Extract Systems\CommonComponents directory
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function CopyLicFiles()
+	STRING strSource;
+begin
+	strSource  = PROGRAMFILES + UCLID_DIR;
+	if ( Is( PATH_EXISTS, strSource )) then
+		SRCDIR = strSource;
+		TARGETDIR = PROGRAMFILES + EXTRACT_DIR;
+		// Copy lic file from old dir to new	
+		XCopyFile( "*.lic", "", EXCLUDE_SUBDIR | COMP_UPDATE_DATE);
+	endif;
+end;
+// --- include script file section ---
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallSQLNativeClient
+//
+//  Purpose: This function installs the SQL Native Client if it is not instaled
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallSQLNativeClient()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0) then
+		// Install SQL Native Client
+		szProgram = "msiexec";
+		if ( SYSINFO.bIsWow64 ) then
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli_x64.msi /passive";
+		else
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\sqlncli.msi /passive";
+		endif;
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
+		SdShowMsg("Setup is Installing SQL Native Client", FALSE);
+		if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0  ) then
+			MessageBox("SQL Native Client was not successfully Installed, installation will be aborted", SEVERE);
+			gbInstalled = FALSE;
+			abort;
+		endif;
+	endif;
+
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   detectRDTInstall
+//
+//  EVENT:      Check for installed RDT
+//
+///////////////////////////////////////////////////////////////////////////////
+function detectRDTInstall()
+	STRING strRDTUninstallKey;
+	NUMBER nSize, nType;
+begin     
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	// check uninstall key in registry     
+	strRDTUninstallKey = REG_PATH_UNINSTALL ^ "\\InstallShield_{735E1622-3990-445F-9E5D-B0D7FDE292A3}";
+	
+	if (RegDBKeyExist(strRDTUninstallKey) = 1 ) then
+		// this means FLEX Index RDT is installed the uninstall can not continue
+		MessageBox("RDT must be uninstalled before " + @PRODUCT_NAME + " can be removed", SEVERE);
+		gbInstalled = FALSE;
+		abort;
+	endif;	
+	
+	return 0;
+end;	
+            
+            
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   InstallDotNET
+//
+//  EVENT:      Installs .NET 2.0 if it is not installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function InstallDotNET()
+STRING szProgram;
+int nResult, svServiceState;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0) then
+		if ( SYSINFO.bIsWow64 ) then
+			szProgram = SUPPORTDIR ^ "\\NetFx64.exe";
+		else
+			szProgram = SUPPORTDIR ^ "\\dotnetfx.exe";
+		endif;
+		LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
+		SdShowMsg("Setup is Installing .NET Framework 2.0", FALSE);
+		if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0  ) then
+			MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
+			gbInstalled = FALSE;
+			abort;
+		endif;
+	endif;
+
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   CheckProductKeyInstalled
+//
+//  EVENT:      Checks for install of a product
+//				if bCheckForSame returns true if same version is installed
+//				if different version or none returns false
+//				if bCheckForSame is false returns true if different version is installed
+//				and false if same or not installed.
+//
+///////////////////////////////////////////////////////////////////////////////
+function BOOL CheckProductKeyInstalled(strExpectedVersion, strProductKey, svInstalledVersion, bCheckForSame)
+	STRING strUninstallKey;
+	STRING strVersion, strEnvVersion, strRtn;
+	NUMBER nSize, nType;
+	STRING strMsg;
+	STRING strProductName;
+	NUMBER nEnd; 
+	NUMBER i;
+begin 
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	
+	// Get the version from the version string
+	nEnd = StrLengthChars(strExpectedVersion);
+	for i = nEnd-1 downto 0
+		if ( StrSub(strRtn, strExpectedVersion, i, 1) = " ") then
+			StrSub(strVersion, strExpectedVersion, i +1, nEnd-i);
+		endif;
+	endfor;
+	  
+	// Create the path for the uninstall key
+	strUninstallKey = REG_PATH_UNINSTALL ^ strProductKey;
+	                                        
+	// If key exists get the version
+	if (RegDBKeyExist(strUninstallKey) = 1 ) then
+		// Read the key if it does not match the version being installed exit
+		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, svInstalledVersion, nSize); 
+		
+		if (bCheckForSame) then
+			return strVersion == svInstalledVersion;                            
+		else
+			return strVersion != svInstalledVersion;
+		endif;
+	endif;
+	                    
+	// No previous version was found
+	return FALSE;	
+end;   
+            
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   CheckOtherExtractProducts
+//
+//  EVENT:      Checks for install a different version
+//				than the version being installed.
+//
+///////////////////////////////////////////////////////////////////////////////
+function CheckOtherExtractProducts()
+	STRING strUninstallKey;
+	STRING strVersion;
+	NUMBER nSize, nType;
+	STRING strMsg;
+	STRING strProductName;
+	BOOL bInstalled;
+begin
+	bInstalled = FALSE;     
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+    
+    // Check each of the expected version against any installed versions
+    if (CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
+    	strMsg = "ID Shield version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+	elseif (CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, FALSE)) then
+    	strMsg = "FLEX Index version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+	elseif (CheckProductKeyInstalled(@ReusableComponentsVersion, EXTRACT_LM_PRODUCT_CODE, strVersion, FALSE)) then 
+		strMsg = "Extract LM version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+	elseif (CheckProductKeyInstalled(@LaserficheVersion, LASERFICHE_PRODUCT_CODE, strVersion, FALSE)) then 
+		strMsg = "ID Shield for Laserfiche version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+	elseif (CheckProductKeyInstalled(@IDShieldOfficeVersion, IDSHIELDOFFICE_PRODUCT_CODE, strVersion, FALSE)) then 
+		strMsg = "ID Shield Office version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+   	elseif (CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, FALSE)) then 
+		strMsg = "LabDE version " + strVersion + " must be uninstalled before product can be installed.";	
+    	bInstalled = TRUE;
+	endif;    	
+    
+    // If one of the products was installed display dialog and terminate install
+	if ( bInstalled ) then
+		MessageBox(strMsg, SEVERE);
+		gbInstalled = FALSE;
+		abort;
+	endif;	
+
+	return 0;
+end;	
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: RenameUEXFile
+//
+//  Purpose: This function renames exception file if it exist to
+//			 "YYYY-MM-DD HHhMMmSSs <EXCEPTION_FILE_NAME>" where the YYYY/MM/DD/etc 
+//			 are the year/month/day and other time related fields
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function RenameUEXFile()
+	STRING strSource;
+	STRING strDest;
+	NUMBER nvResult;
+	STRING strDate;
+	STRING strTime;
+	LIST listDateID;
+	LIST listTimeID;
+	STRING strMonth, strDay, strYear;
+	STRING strHour, strMinute, strSeconds;
+begin
+	strSource  = LOG_FILE_PATH ^ EXCEPTION_FILE_NAME;
+	
+	// Check if the exception file exists
+	if ( Is( FILE_EXISTS, strSource )) then  
+		// Get the date
+		GetSystemInfo ( DATE , nvResult , strDate );
+		
+		// Separate date into Month, Day, year
+		listDateID = ListCreate(STRINGLIST);
+		StrGetTokens ( listDateID , strDate , "-" );
+		ListGetFirstString ( listDateID, strMonth );
+		ListGetNextString ( listDateID, strDay );
+		ListGetNextString ( listDateID, strYear );
+
+		// Get the time
+		GetSystemInfo ( TIME , nvResult , strTime );  
+		
+		// Separate the Time into Hours, Minutes, Seconds
+		listTimeID = ListCreate(STRINGLIST);
+		StrGetTokens ( listTimeID , strTime , ":" );
+		ListGetFirstString ( listTimeID, strHour );
+		ListGetNextString ( listTimeID, strMinute );
+		ListGetNextString ( listTimeID, strSeconds );
+	
+		// Create the new filename for the exception file
+		strDest = LOG_FILE_PATH ^ "\\";
+		strDest = strDest + strYear + "-" + strMonth + "-" + strDay;
+		strDest = strDest + " " + strHour + "h" + strMinute + "m" + strSeconds + "s ";
+		strDest = strDest + EXCEPTION_FILE_NAME;
+		
+		// Rename exception file
+		RenameFile ( strSource , strDest );
+	endif;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallInliteKeyDrivers
+//
+//  Purpose: This function installs the drivers for the Inlite Key
+///////////////////////////////////////////////////////////////////////////////
+function InstallInliteKeyDrivers()
+	string szProgram;
+begin  
+	szProgram = SUPPORTDIR ^ "\\CBUSetup.exe";
+	LaunchAppAndWait(szProgram, "/Q /CRYPTOKEN", LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	
+	szProgram = SUPPORTDIR ^ INLITE_INSTALLER_EXE;
+	LaunchAppAndWait(szProgram, "/s ", LAAW_OPTION_WAIT);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UnInstallInliteKeyDrivers
+//
+//  Purpose: This function uninstalls the drivers for the Inlite Key
+///////////////////////////////////////////////////////////////////////////////
+function UnInstallInliteKeyDrivers()
+	string szProgram;
+begin       
+  	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);                        	
+   
+   	szProgram = SUPPORTDIR ^ "\\CBUSetup.exe";
+	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT); 
+	
+	szProgram = SUPPORTDIR ^ "\\UninstallInlite.bat";
+	LaunchAppAndWait("cmd", "/c "+ szProgram,
+		LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+
+ 	SdShowMsg("Setup is Uninstalling Inlite drivers.", FALSE);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallCrystalReports
+//
+//  Purpose: This function installs the Crystal Reports Runtime.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallCrystalReports()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin
+	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", TRUE);
+	
+	// Install Crystal Reports
+	szProgram = "msiexec";
+	szCmdLine = " /qn /i " + SUPPORTDIR ^ "\\CRRuntime_12_1_mlb.msi";
+	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	
+	SdShowMsg("Setup is Installing Crystal Reports 12 Runtime", FALSE);
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: CloseApps
+//
+//  Purpose: To close running apps before installing or uninstalling
+///////////////////////////////////////////////////////////////////////////////
+function CloseApps()
+	string strExtractTRPPath;
+begin
+	strExtractTRPPath = PROGRAMFILES ^ EXTRACT_DIR ^ "ExtractTRP2.exe";
+	LaunchAppAndWait(strExtractTRPPath , "/exit", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallCrystalReports
+//
+//  Purpose: This function uninstalls the Crystal Reports Runtime.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function UnnstallCrystalReports12()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin
+		// Ask user if they wish to unintall CrystalReports
+	nResult = MessageBox("Do you wish to uninstall Crystal Reports 12 Runtime?" + 
+		"\r\nOther installed applications may use this and uninstalling " + 
+		" will cause those applications to work incorrectly." , MB_YESNO );
+
+	if (nResult = IDYES) then
+	    UninstallApplication(CRYSTAL_REPORTS_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+  	endif;
+end;

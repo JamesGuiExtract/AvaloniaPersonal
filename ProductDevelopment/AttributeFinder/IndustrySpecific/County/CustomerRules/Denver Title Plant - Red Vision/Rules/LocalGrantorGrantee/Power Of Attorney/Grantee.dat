@@ -1,0 +1,33 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000427400.016.uss
+LocalGrantee08=[if]^?Grantee^80~[dies]^160~appoint
+LocalGrantee02=appoint^10~following^240~namely^?Grantee^360~[each^8~whom
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000508200.007.uss
+LocalGrantee03=appoint]^?Grantee^160~[as my^36~[true]|[lawful]|[attor
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000671600.003
+LocalGrantee04=appoint^3~attorney^?Grantee^160~[my^3~true^36~attorney|[fact]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079001564800.003.uss
+LocalGrantee05=appoint^?Grantee^160~[my]^7~true^36~lawful|attorney|[fact]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079007581300.003.uss
+LocalGrantee07=appoints^3~[all]^3~indiv^60~signatory^3~authority^160~employee^5~[of]^?Grantee^160~[and^3~such^3~other
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079009586200.001.uss
+//sample misclassifies but try
+LocalGrantee07=appoints^?Grantee^160~[its true^36~attorney
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079005553500.005.uss
+LocalGrantee08=appoints^?Grantee^160~[hereinafter^3~called^160~attorney^8~fact
+[PATTERNS_END]

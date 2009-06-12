@@ -1,0 +1,1 @@
+Federal(?=[\s\S]{0,10}Employer[\s\S]{0,15}(?:Ident|tification)[\s\S]{0,15}Number[\s\S]{0,80}for\s*all\s*other\s*entit)

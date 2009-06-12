@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputTargetFramework.InputTargetManager.1 = s 'InputTargetManager Class'
+	{
+		CLSID = s '{58B184A2-B24C-4651-86CA-C7AA9F498586}'
+	}
+	UCLIDInputTargetFramework.InputTargetManager = s 'InputTargetManager Class'
+	{
+		CLSID = s '{58B184A2-B24C-4651-86CA-C7AA9F498586}'
+		CurVer = s 'UCLIDInputTargetFramework.InputTargetManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {58B184A2-B24C-4651-86CA-C7AA9F498586} = s 'InputTargetManager Class'
+		{
+			ProgID = s 'UCLIDInputTargetFramework.InputTargetManager.1'
+			VersionIndependentProgID = s 'UCLIDInputTargetFramework.InputTargetManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{9B58A9D5-9CDD-4ADA-82BD-E6A1E784E79B}'
+		}
+	}
+}

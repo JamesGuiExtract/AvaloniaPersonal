@@ -1,0 +1,68 @@
+// DT:0001  Whatcom-31100760.TIF.uss
+// 	(Block|blk)[\(\)s]{0,4}\s+((\s?\d+)|\band\b|[,\s])*
+
+// DT:0002  DTC-00021.TIF.uss
+//	Added Spelled out numbers with \band\b|\s?-\s? 
+//	Added \(? and \)? for the beginning Block Part
+
+// DT:0006  Waukesha-8-19-U1-WD00000196.TIF.USS
+//	("?[a-zA-Z]"?(?=\s|,|\.|$))
+
+// DT:0008  WAUKESHA-7-7-03-MB-001578.TIF.uss
+//	("?[a-zA-Z]"?(?=\s|,|\.|$)) was changed to allow pickup of Block 6G
+
+// DT:0078
+// 		added lettered
+
+// DT:0057
+//		addded blck
+
+// DT:0058
+// 		added '
+// Beginning Block Part
+(
+	Block|
+	Circle|
+	blk|
+	blck
+)
+[\(\)s\.]{0,4}
+(
+	\s+
+		(
+			number(ed)?|
+			lettered
+		)
+		|\s+no(\.)?
+)?
+\s+
+
+// Digits or single letter or both
+(
+	(
+		[\.\s]*\(?\s*\d+[a-zA-Z]?\s*\)?
+//[,\s\.]?
+		|
+		['"]?\b[a-zA-Z]['"]?
+		(
+			?=
+//				[^A-Za-z\.]|
+// Removed \.  for doc K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage\3008135.tif.uss
+				[^A-Za-z]|
+				_|
+				(?=\r?$)
+		)
+	)
+
+// Or Number could be spelled out
+|
+\s?(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(Y|EEN)?)|(NINE(TY|TEEN)?)|
+\bTEN\b|ELEVEN|TWELVE|THIRTEEN|FIFTEEN|
+TWENTY|THIRTY|FORTY|FIFTY|
+HUNDRED|THOUSAND|\band\b|\s?-\s?
+
+// End of spelled out number or number separators
+)*
+// Block part should always only have one block not multiple
+//|[,\s]
+)*

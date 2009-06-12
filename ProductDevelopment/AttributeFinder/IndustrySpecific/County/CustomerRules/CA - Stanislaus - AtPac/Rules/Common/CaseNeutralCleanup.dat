@@ -1,0 +1,2 @@
+^\W*in\W*favor\W*of\W*;
+(Corporation)\W*\w{1,2}\W*(?=\r?$);$1

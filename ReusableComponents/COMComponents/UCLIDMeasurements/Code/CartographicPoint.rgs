@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDMeasurements.CartographicPoint.1 = s 'CartographicPoint Class'
+	{
+		CLSID = s '{FAD6DEAF-C5A8-11D6-8301-0050DAD4FF55}'
+	}
+	UCLIDMeasurements.CartographicPoint = s 'CartographicPoint Class'
+	{
+		CLSID = s '{FAD6DEAF-C5A8-11D6-8301-0050DAD4FF55}'
+		CurVer = s 'UCLIDMeasurements.CartographicPoint.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FAD6DEAF-C5A8-11D6-8301-0050DAD4FF55} = s 'CartographicPoint Class'
+		{
+			ProgID = s 'UCLIDMeasurements.CartographicPoint.1'
+			VersionIndependentProgID = s 'UCLIDMeasurements.CartographicPoint'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FAD6DEA1-C5A8-11D6-8301-0050DAD4FF55}'
+		}
+	}
+}

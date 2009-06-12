@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.ExtractLine.1 = s 'ExtractLine Class'
+	{
+		CLSID = s '{DB2C885D-8E39-4206-B8CF-205761C795C4}'
+	}
+	UCLIDAFValueFinders.ExtractLine = s 'ExtractLine Class'
+	{
+		CLSID = s '{DB2C885D-8E39-4206-B8CF-205761C795C4}'
+		CurVer = s 'UCLIDAFValueFinders.ExtractLine.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DB2C885D-8E39-4206-B8CF-205761C795C4} = s 'ExtractLine Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.ExtractLine.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.ExtractLine'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

@@ -1,0 +1,27 @@
+HKCR
+{
+	BaseUtilsTest.StringCSISTester.1 = s 'StringCSISTester Class'
+	{
+		CLSID = s '{E072747D-9C0B-4781-8C73-FB83CFD41087}'
+	}
+	BaseUtilsTest.StringCSISTester = s 'StringCSISTester Class'
+	{
+		CLSID = s '{E072747D-9C0B-4781-8C73-FB83CFD41087}'
+		CurVer = s 'BaseUtilsTest.StringCSISTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E072747D-9C0B-4781-8C73-FB83CFD41087} = s 'StringCSISTester Class'
+		{
+			ProgID = s 'BaseUtilsTest.StringCSISTester.1'
+			VersionIndependentProgID = s 'BaseUtilsTest.StringCSISTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{}'
+		}
+	}
+}

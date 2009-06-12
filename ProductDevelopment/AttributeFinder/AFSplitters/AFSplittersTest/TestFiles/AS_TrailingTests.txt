@@ -1,0 +1,31 @@
+// Trailing Text test cases for address splitting
+// Note that comment lines should be removed
+
+// Kansas
+ACME Consulting
+1234 University Ave
+Apartment #2B
+Kansas City, Kansas 80302
+Attn: Mrs. Jane Six
+
+// Zip on single line
+Three Brothers Construction
+14422 Division Lane 
+Madison, Wisconsin
+53705
+John Three
+
+// Zip with Country
+Four Sisters Restaurant
+14422 Division Lane 
+Madison, Wisconsin
+USA 53705
+Jane Four
+
+// Trailing Loan Number
+Four Sisters Restaurant
+14422 Division Lane 
+Madison, Wisconsin
+53705
+Loan #123-45
+

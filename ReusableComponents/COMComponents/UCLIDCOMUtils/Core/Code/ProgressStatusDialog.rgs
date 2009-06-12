@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.ProgressStatusDialog.1 = s 'ProgressStatusDialog Class'
+	{
+		CLSID = s '{D0D75884-5964-4DF0-98F7-26B6B7C00CB3}'
+	}
+	UCLIDCOMUtils.ProgressStatusDialog = s 'ProgressStatusDialog Class'
+	{
+		CLSID = s '{D0D75884-5964-4DF0-98F7-26B6B7C00CB3}'
+		CurVer = s 'UCLIDCOMUtils.ProgressStatusDialog.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D0D75884-5964-4DF0-98F7-26B6B7C00CB3} = s 'ProgressStatusDialog Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.ProgressStatusDialog.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.ProgressStatusDialog'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Free'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

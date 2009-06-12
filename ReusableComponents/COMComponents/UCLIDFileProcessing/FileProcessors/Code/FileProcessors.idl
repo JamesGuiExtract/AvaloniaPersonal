@@ -1,0 +1,557 @@
+// FileProcessors.idl : IDL source for FileProcessors.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (FileProcessors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(961EB40F-4291-4EB7-B615-FAB2ABD620CE),
+	version(1.0),
+	helpstring("FileProcessors 1.0 Type Library")
+]
+library UCLID_FILEPROCESSORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	importlib("..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\..\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(01604DB3-BD44-4ef6-BD66-4A62CCC73D58), 
+		helpstring("UCLID OCR Page Range Types")
+	]
+    enum
+	{
+		kOCRNothing = 0,
+		kOCRAll = 1,
+        kOCRSpecifiedPages = 2
+    } EOCRFPPageRangeType;
+
+	typedef 
+	[
+		uuid(9E22B812-2E51-43cd-9B5D-31AA28C3C766), 
+		helpstring("UCLID Copy Move Delete FileProcessor Types")
+	]
+    enum
+	{
+		kCMDOperationCopyFile = 0,
+		kCMDOperationMoveFile = 1,
+        kCMDOperationDeleteFile = 2
+    } ECopyMoveDeleteOperationType;
+
+	typedef 
+	[
+		uuid(90FEEE43-4FC2-4bb7-9C33-D41A69C9965F), 
+		helpstring("UCLID CMD FP SourceMissing Types")
+	]
+    enum
+	{
+		kCMDSourceMissingError = 0,
+		kCMDSourceMissingSkip = 1
+    } ECMDSourceMissingType;
+
+	typedef 
+	[
+		uuid(B005FEE6-9CA3-4ca8-9C19-8CF2D2DEF4B5), 
+		helpstring("UCLID CMD FP DestinationPresent Types")
+	]
+    enum
+	{
+		kCMDDestinationPresentError = 0,
+		kCMDDestinationPresentSkip = 1,
+		kCMDDestinationPresentOverwrite = 2
+    } ECMDDestinationPresentType;
+
+	typedef
+	[
+		uuid(44D63670-1A24-4BCB-BDAC-BCEBB30B9C1A),
+		helpstring("Extract File Archive Operation Types")
+	]
+	enum
+	{
+		kCMDOperationArchiveFile = 0,
+		kCMDOperationRestoreFile = 1
+	} EArchiveRestoreOperationType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	// IOCRFileProcessor interface
+	[
+		object,
+		uuid(A2A7F171-642E-4ddc-B874-ECF1671484A5),
+		dual,
+		helpstring("IOCRFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRFileProcessor : IDispatch
+	{
+		// OCR all pages or only OCR specific pages
+		[propget, id(1), helpstring("property OCRPageRangeType")] HRESULT OCRPageRangeType([out, retval] EOCRFPPageRangeType *pVal);
+		[propput, id(1), helpstring("property OCRPageRangeType")] HRESULT OCRPageRangeType([in] EOCRFPPageRangeType newVal);
+		// If OCRPageRangeType = kOCRAll, this property specifies certain page numbers in a string
+		[propget, id(2), helpstring("property SpecificPages")] HRESULT SpecificPages([out, retval] BSTR *strSpecificPages);
+		[propput, id(2), helpstring("property SpecificPages")] HRESULT SpecificPages([in] BSTR strSpecificPages);
+		// use a cleaned image if available
+		[propget, id(3), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage(
+			[out, retval] VARIANT_BOOL* pbUsedCleaned);
+		[propput, id(3), helpstring("property UseCleanedImage")] HRESULT UseCleanedImage(
+			[in] VARIANT_BOOL bUseCleaned);
+	};
+
+	// ICopyMoveDeleteFileProcessor interface
+	[
+		object,
+		uuid(EED66CCA-1567-4F3E-8DDC-31CB2E165D97),
+		dual,
+		helpstring("ICopyMoveDeleteFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface ICopyMoveDeleteFileProcessor : IDispatch
+	{
+		[id(1), helpstring("method SetMoveFiles")] HRESULT SetMoveFiles([in] BSTR bstrSrcDoc, [in] BSTR bstrDstDoc);
+		[id(2), helpstring("method SetCopyFiles")] HRESULT SetCopyFiles([in] BSTR bstrSrcDoc, [in] BSTR bstrDstDoc);
+		[id(3), helpstring("method SetDeleteFiles")] HRESULT SetDeleteFiles([in] BSTR bstrSrcDoc);
+
+		[propget, id(4), helpstring("property Operation")] HRESULT Operation([out, retval] ECopyMoveDeleteOperationType *pRetVal);
+		[propget, id(5), helpstring("property SourceFileName")] HRESULT SourceFileName([out, retval] BSTR *pRetVal);
+		[propget, id(6), helpstring("property DestinationFileName")] HRESULT DestinationFileName([out, retval] BSTR *pRetVal);
+		[propget, id(7), helpstring("property CreateFolder")] HRESULT CreateFolder([out, retval] VARIANT_BOOL *pRetVal);
+		[propput, id(7), helpstring("property CreateFolder")] HRESULT CreateFolder([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property SourceMissingType")] HRESULT SourceMissingType([out, retval] ECMDSourceMissingType *pVal);
+		[propput, id(8), helpstring("property SourceMissingType")] HRESULT SourceMissingType([in] ECMDSourceMissingType newVal);
+		[propget, id(9), helpstring("property DestinationPresentType")] HRESULT DestinationPresentType([out, retval] ECMDDestinationPresentType *pVal);
+		[propput, id(9), helpstring("property DestinationPresentType")] HRESULT DestinationPresentType([in] ECMDDestinationPresentType newVal);
+		[propget, id(10), helpstring("property AllowReadonly")] HRESULT AllowReadonly([out, retval] VARIANT_BOOL* pRetVal);
+		[propput, id(10), helpstring("property AllowReadonly")] HRESULT AllowReadonly([in] VARIANT_BOOL newVal);
+	};
+
+	// ILaunchAppFileProcessor interface
+	[
+		object,
+		uuid(461CE34C-CF52-4643-AFBA-E308C4E584FA),
+		dual,
+		helpstring("ILaunchAppFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface ILaunchAppFileProcessor : IDispatch
+	{
+		[propget, id(1), helpstring("property CommandLine")] HRESULT CommandLine([out, retval] BSTR *pRetVal);
+		[propput, id(1), helpstring("property CommandLine")] HRESULT CommandLine([in] BSTR newVal);
+
+		[propget, id(2), helpstring("property WorkingDirectory")] HRESULT WorkingDirectory([out, retval] BSTR *pRetVal);
+		[propput, id(2), helpstring("property WorkingDirectory")] HRESULT WorkingDirectory([in] BSTR newVal);
+
+		[propget, id(3), helpstring("property IsBlocking")] HRESULT IsBlocking([out, retval] VARIANT_BOOL *pRetVal);
+		[propput, id(3), helpstring("property IsBlocking")] HRESULT IsBlocking([in] VARIANT_BOOL newVal);
+
+		[propget, id(4), helpstring("property Parameters")] HRESULT Parameters([out, retval] BSTR* pRetVal);
+		[propput, id(4), helpstring("property Parameters")] HRESULT Parameters([in] BSTR newVal);
+	};
+
+	// ISetActionStatusFileProcessor interface
+	[
+		object,
+		uuid(536DCD64-71C7-4DD0-A4F9-69CB80ABCF87),
+		dual,
+		nonextensible,
+		helpstring("ISetActionStatusFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface ISetActionStatusFileProcessor : IDispatch
+	{
+		[propget, id(1), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *pstrRetVal);
+		[propput, id(1), helpstring("property ActionName")] HRESULT ActionName([in] BSTR strNewVal);
+
+		// TODO: why does this not work?
+		//[propget, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([out, retval] UCLID_FILEPROCESSINGLib.EActionStatus *pRetVal);
+		//[propput, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([in] UCLID_FILEPROCESSINGLib.EActionStatus newVal);
+		
+		[propget, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([out, retval] long *pRetVal);
+		[propput, id(2), helpstring("property ActionStatus")] HRESULT ActionStatus([in] long newVal);
+	};
+
+	[
+		object,
+		uuid(6EE613D7-65DB-459C-9267-DB9B6544C221),
+		dual,
+		nonextensible,
+		helpstring("IConditionalTask Interface"),
+		pointer_default(unique)
+	]
+	interface IConditionalTask : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return IObjectWithDescription( IFAMCondition ) object that determines which 
+		//			collection of specified tasks will be executed.
+		[propget, id(1), helpstring("property FAMCondition")] HRESULT FAMCondition([out, retval] IObjectWithDescription* *pVal);
+		[propput, id(1), helpstring("property FAMCondition")] HRESULT FAMCondition([in] IObjectWithDescription * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the collection of IObjectWithDescription( IFileProcessingTask ) items to 
+		//			be executed if the FAMCondition test returns True.
+		[propget, id(2), helpstring("property TasksForConditionTrue")] HRESULT TasksForConditionTrue([out, retval] IIUnknownVector* *pVal);
+		[propput, id(2), helpstring("property TasksForConditionTrue")] HRESULT TasksForConditionTrue([in] IIUnknownVector * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the collection of IObjectWithDescription( IFileProcessingTask ) items to 
+		//			be executed if the FAMCondition test returns False.
+		[propget, id(3), helpstring("property TasksForConditionFalse")] HRESULT TasksForConditionFalse([out, retval] IIUnknownVector* *pVal);
+		[propput, id(3), helpstring("property TasksForConditionFalse")] HRESULT TasksForConditionFalse([in] IIUnknownVector * newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	// ICleanupImageFileProcessor
+	[
+		object,
+		uuid(BECF0402-2CF1-4D7F-9F84-C6779272DC9D),
+		dual,
+		nonextensible,
+		helpstring("ICleanupImageFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface ICleanupImageFileProcessor : IDispatch{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the name of the image cleanup settings file associated with this
+		//			file processor
+		[propget, id(1), helpstring("property ImageCleanupSettingsFileName")] HRESULT
+			ImageCleanupSettingsFileName([out, retval] BSTR* strFileName);
+		[propput, id(1), helpstring("property ImageCleanupSettingsFileName")] HRESULT
+			ImageCleanupSettingsFileName([in] BSTR strFileName);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	// IConvertToPDFTask
+	[
+		object,
+		uuid(A1E504A3-722E-48ca-A48E-EB6EC13E3C94),
+		dual,
+		nonextensible,
+		helpstring("IConvertToPDFTask Interface"),
+		pointer_default(unique)
+	]
+	interface IConvertToPDFTask : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set/get all user options for the convert to pdf task.
+		// PARAMS:  (1) bstrInputFile - input image filename
+		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] BSTR bstrInputFile);
+		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] BSTR* pbstrInputFile);
+	};
+
+	// IAddWatermarkTask
+	[
+		object,
+		uuid(5189F8F7-2724-4495-AB68-279418A2BB1C),
+		dual,
+		nonextensible,
+		helpstring("IAddWatermarkTask Interface"),
+		pointer_default(unique)
+	]
+	interface IAddWatermarkTask : IDispatch
+	{
+	//----------------------------------------------------------------------------------------------
+	// IAddWatermarkTask
+	//----------------------------------------------------------------------------------------------
+		// The source image to be stamped
+		[propput, id(1), helpstring("property InputImageFile")] HRESULT 
+			InputImageFile([in] BSTR bstrInputImageFile);
+		[propget, id(1), helpstring("property InputImageFile")] HRESULT 
+			InputImageFile([out, retval] BSTR* pbstrInputImageFile);
+		//------------------------------------------------------------------------------------------
+		// The image file that will be used as the stamp
+		[propput, id(2), helpstring("property StampImageFile")] HRESULT 
+			StampImageFile([in] BSTR bstrStampImageFile);
+		[propget, id(2), helpstring("property StampImageFile")] HRESULT 
+			StampImageFile([out, retval] BSTR* pbstrStampImageFile);
+		//------------------------------------------------------------------------------------------
+		// The horizontal offset from the top left of the image to place stamp at
+		[propput, id(3), helpstring("property HorizontalPercentage")] HRESULT 
+			HorizontalPercentage([in] double dHorizPercentage);
+		[propget, id(3), helpstring("property HorizontalPercentage")] HRESULT 
+			HorizontalPercentage([out, retval] double* dHorizPercentage);
+		//------------------------------------------------------------------------------------------
+		// The vertical offset from the top left of the image to place stamp at
+		[propput, id(4), helpstring("property VerticalPercentage")] HRESULT 
+			VerticalPercentage([in] double dVertPercentage);
+		[propget, id(4), helpstring("property VerticalPercentage")] HRESULT 
+			VerticalPercentage([out, retval] double* dVertPercentage);
+		//------------------------------------------------------------------------------------------
+		// The page number to place the stamp at
+		[propput, id(5), helpstring("property PageToStamp")] HRESULT 
+			PageToStamp([in] long lPageNumber);
+		[propget, id(5), helpstring("property PageToStamp")] HRESULT 
+			PageToStamp([out, retval] long* plPageNumber);
+		//------------------------------------------------------------------------------------------
+	};
+
+	// IArchiveRestoreTask
+	[
+		object,
+		uuid(85E680F9-FA49-4532-92AF-1DDBF131FF25),
+		dual,
+		nonextensible,
+		helpstring("IFileArchive Interface"),
+		pointer_default(unique)
+	]
+	interface IArchiveRestoreTask : IDispatch
+	{
+	//----------------------------------------------------------------------------------------------
+	// IArchiveRestoreTask
+	//----------------------------------------------------------------------------------------------
+		// The operation to be performed (Archive or Restore)
+		[propput, id(1), helpstring("property Operation")]
+			HRESULT Operation([in] EArchiveRestoreOperationType newVal);
+		[propget, id(1), helpstring("property Operation")]
+			HRESULT Operation([out, retval] EArchiveRestoreOperationType *pVal);
+		//------------------------------------------------------------------------------------------
+		// The root folder for the archive/restore operation (must be absolute path)
+		[propput, id(2), helpstring("property ArchiveFolder")]
+			HRESULT ArchiveFolder([in] BSTR bstrArchiveFolder);
+		[propget, id(2), helpstring("property ArchiveFolder")]
+			HRESULT ArchiveFolder([out, retval] BSTR* pbstrArchiveFolder);
+		//------------------------------------------------------------------------------------------
+		// Tag for file to archive/restore
+		[propput, id(3), helpstring("property FileTag")]
+			HRESULT FileTag([in] BSTR bstrFileTag);
+		[propget, id(3), helpstring("property FileTag")]
+			HRESULT FileTag([out, retval] BSTR* pbstrFileTag);
+		//------------------------------------------------------------------------------------------
+		// Whether to allow file overwriting or not
+		[propput, id(4), helpstring("property AllowOverwrite")]
+			HRESULT AllowOverwrite([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property AllowOverwrite")]
+			HRESULT AllowOverwrite([out, retval] VARIANT_BOOL* pVal);
+		//------------------------------------------------------------------------------------------
+		// The file to be archived
+		[propput, id(5), helpstring("property FileToArchive")]
+			HRESULT FileToArchive([in] BSTR bstrFileToArchive);
+		[propget, id(5), helpstring("property FileToArchive")]
+			HRESULT FileToArchive([out, retval] BSTR* pbstrFileToArchive);
+		//------------------------------------------------------------------------------------------
+		// Whether or not to delete the original file after archiving
+		[propput, id(6), helpstring("property DeleteFileAfterArchive")]
+			HRESULT DeleteFileAfterArchive([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property DeleteFileAfterArchive")]
+			HRESULT DeleteFileAfterArchive([out, retval] VARIANT_BOOL* pVal);
+		//------------------------------------------------------------------------------------------
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	// OCRFileProcessor CoClass and its Property page
+	[
+		uuid(F7A6E3C1-FED5-4271-BE7E-1F5DD2667433),
+		helpstring("OCRFileProcessor Class")
+	]
+	coclass OCRFileProcessor
+	{
+		[default] interface IOCRFileProcessor;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(545E87D3-C76F-4098-9D36-FBF91DD39F2B),
+		helpstring("OCRFileProcessorPP Class")
+	]
+	coclass OCRFileProcessorPP
+	{
+		interface IUnknown;
+	};
+
+	// CopyMoveDeleteFileProcessor CoClass and its Property page
+	[
+		uuid(D9451FFE-8588-4C01-88E0-4FC0D157C0A5),
+		helpstring("CopyMoveDeleteFileProcessor Class")
+	]
+	coclass CopyMoveDeleteFileProcessor
+	{
+		[default] interface ICopyMoveDeleteFileProcessor;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(C283556F-79FD-4275-897B-AA81BCD61C64),
+		helpstring("CopyMoveDeleteFileProcessorPP Class")
+	]
+	coclass CopyMoveDeleteFileProcessorPP
+	{
+		interface IUnknown;
+	};
+
+	// LaunchAppFileProcessor CoClass and its Property page
+	[
+		uuid(2D4A0AE7-2B5B-4139-A5C7-3E23D0B81E9F),
+		helpstring("LaunchAppFileProcessor Class")
+	]
+	coclass LaunchAppFileProcessor
+	{
+		[default] interface ILaunchAppFileProcessor;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(811123C9-80A7-40F7-BB1A-09140C5F97DD),
+		helpstring("LaunchAppFileProcessorPP Class")
+	]
+	coclass LaunchAppFileProcessorPP
+	{
+		interface IUnknown;
+	};
+
+	// SetActionStatusFileProcessor CoClass and its Property page
+	[
+		uuid(C6AF1E5C-B2F5-49D9-9684-6F46663BE76E),
+		helpstring("SetActionStatusFileProcessor Class")
+	]
+	coclass SetActionStatusFileProcessor
+	{
+		[default] interface ISetActionStatusFileProcessor;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(C7628327-D222-4D2C-A0A2-589EA57FD35A),
+		helpstring("SetActionStatusFileProcessorPP Class")
+	]
+	coclass SetActionStatusFileProcessorPP
+	{
+		[default] interface IUnknown;
+	};
+	
+	// ConditionalTask CoClass and its Property page
+	[
+		uuid(FBC1072B-446C-4F59-B67B-A843A0936BB1),
+		helpstring("ConditionalTask Class")
+	]
+	coclass ConditionalTask
+	{
+		[default] interface IConditionalTask;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(61B2E085-C0E2-48FF-9DC6-B8253E429461),
+		helpstring("ConditionalTaskPP Class")
+	]
+	coclass ConditionalTaskPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// CleanupImageFileProcessor CoClass and its Property page
+	[
+		uuid(1311D1B5-4D63-4471-9FEC-B553701A5190),
+		helpstring("CleanupImageFileProcessor Class")
+	]
+	coclass CleanupImageFileProcessor
+	{
+		[default] interface ICleanupImageFileProcessor;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(617F9088-A1FB-4E0F-A085-2EF3CE871849),
+		helpstring("CleanupImageFileProcessorPP Class")
+	]
+	coclass CleanupImageFileProcessorPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// ConvertToPDFTask CoClass and its Property page
+	[
+		uuid(23251295-C946-403e-BDBB-E7F797FD32C1),
+		helpstring("ConvertToPDFTask Class")
+	]
+	coclass ConvertToPDFTask
+	{
+		[default] interface IConvertToPDFTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(7718F938-AEA0-4a84-A14B-0998F05D71D2),
+		helpstring("ConvertToPDFTaskPP Class")
+	]
+	coclass ConvertToPDFTaskPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// AddWatermarkTask CoClass and its Property page
+	[
+		uuid(E679DE4E-960B-4D81-A5AA-63C3D3F3B16F),
+		helpstring("AddWatermarkTask Class")
+	]
+	coclass AddWatermarkTask
+	{
+		[default] interface IAddWatermarkTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(58E38D1D-E67C-48DF-931B-EEA7AD7B96AA),
+		helpstring("AddWatermarkTaskPP Class")
+	]
+	coclass AddWatermarkTaskPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// ArchiveRestoreTask CoClass and its Property page
+	[
+		uuid(6AA0D59E-0284-46C9-8E7E-8FEE999963DA),
+		helpstring("ArchiveRestoreTask Class")
+	]
+	coclass ArchiveRestoreTask
+	{
+		[default] interface IArchiveRestoreTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(1CAA317D-3358-415E-8D8A-999419E05AC9),
+		helpstring("ArchiveRestoreTaskPP Class")
+	]
+	coclass ArchiveRestoreTaskPP
+	{
+		[default] interface IUnknown;
+	};
+};

@@ -1,0 +1,78 @@
+<HTML>
+	<HEAD>
+		<TITLE>Modify Attributes</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Modify Attributes Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Modify Attributes output handler is used to change the name, value, or type of the queried attribute.</li>
+			<li>It can also be used to create sub-attributes.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+			<ul>
+				<li>To use the Modify Attributes output handler, you must first query the attributes that you wish to modify.
+					<ul>
+						<li>To query a single attribute, simply enter that attribute's name into the query box.</li>
+						<li>To query multiple attributes, enter each attribute's name separated by |'s.
+							<ul>
+								<li><i>PhoneNumber|Name</i> will select both the <i>PhoneNumber</i> and <i>Name</i> attributes.</li>
+							</ul>
+						</li>
+						<li>To query a sub-attribute, enter the query as <i>AttributeName/SubattributeName</i>.
+							<ul>
+								<li><i>Name/Middle</i> will select the <i>Middle</i> sub-attribute of <i>Name</i>.</li>
+							</ul>
+						</li>
+						<li>To query an attribute with a certain type, enter the query as <i>AttributeName@AttributeType</i> 
+							<ul>
+								<li><i>Name@Buyer</i> will select the <i>Name</i> attribute if it has a type of <i>Buyer</i>.</li>
+							</ul>
+						</li>
+						<li>To query an attribute only if it has a certain sub-attribute, enter the query as <i>AttributeName{/SubattributeName}</i>.
+							<ul>
+								<li><i>PhoneNumber{/AreaCode}</i> will select the <i>PhoneNumber</i> attribute only if it has an <i>AreaCode</i> sub-attribute.</li>
+							</ul>
+						</li>
+						<li>To query all attributes, enter * as the query
+							<ul>
+								<li><i>Name/*</i> will select all of the sub-attributes of <i>Name</i>.</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li>To modify the selected attribute, select the <b>Modify each selected attribute</b> option.</li>
+					<ul>
+						<li>You can change the name, value, or type of the attribute by checking the appropriate box.</li>
+					</ul>
+				</li>
+				<li>To create a new sub-attribute for the selected attribute, select the <b>Create a new sub-attribute for each attribute</b> option.</li>
+					<ul>
+						<li>You must give the new sub-attribute a name.</li>
+						<li>You can also give the new sub-attribute a type and/or value.</li>
+					</ul>
+				</li>
+			</ul>
+		<hr>
+		<h3>Exercises</h3>
+			<p>
+				<ol>
+					<li>Open <b>PartyNames.rsd</b> and run it on <b>PartyNames.txt</b>.  Note how the attributes are named.</li>
+						<ul>
+							<li>Use a Modify Attributes output handler to change the name of both the <i>Buyer</i> and <i>Seller</i> attributes to <i>Party</i>.</li>
+							<li>Use two Modify Attributes output handlers to change the output so that the all of the attributes are named "Party", but the sellers have a type of <i>Seller</i> and the buyers have a type of <i>Buyer</i>.</li>
+						</ul>
+					</li>
+					<p>
+						<li>Delete all output handlers from <b>PartyNames.rsd</b>.  Add one or more Modify Attributes output handlers to create a sub-attribute named <i>Party</i> for each attribute. The <i>Party</i> sub-attribute should have a value of <i>Buyer</i> for buyers and <i>Seller</i> for sellers.</li>
+					</p>
+					</li>
+				</ol>
+
+			</p>
+
+	</BODY>
+</HTML>

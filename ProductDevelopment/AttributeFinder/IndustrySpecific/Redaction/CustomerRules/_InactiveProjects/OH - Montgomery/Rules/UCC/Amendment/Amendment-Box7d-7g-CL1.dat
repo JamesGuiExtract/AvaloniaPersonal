@@ -1,0 +1,15 @@
+^7d\.\s*TAX\s*ID\s*\S{0,3}\s*SSN\s*OR\s*EIN
+^7[d5].?\s*TAX\s*[LI][DGO]
+^7[d5].?\s*SEE\s*(INST|.{0,5}(NSTR|STRU)|.{0,7}(TRUCT|UCTIO)|.{0,9}(RUCTI|CTION))
+^7d[,.]?[\s\S]{5,12}?SSN\s*[O0]R\s*EIN
+^7[\s\S]{3,17}?SSN\s*[O0D]R\s*EIN
+\s+7\S{1,4}\s*TAX\s*ID\s*#?:?\s*SSN\s*OR\s*[FE]IN
+^.?AX\s*ID[\s\S]{1,4}SSN\s*OR\s*[FE]IN
+\s+7[\s\S]{0,6}(TA|.?AX)[\s\S]{3,18}(SSN\s*[O0]R|[O0]R\s*[FE]IN|SSN[\s\S]{0,5}[FE]IN)
+\s+7[\s\S]{0,5}TAX[\s\S]{1,8}SSN\s*OR\s*\SIN
+\s+7[\s\S]{0,8}ID[\s\S]{3,7}[O0]R\s*[FE]IN
+\s+7[\s\S]{0,6}SEE\s*(INST|.{0,5}(NSTR|STRU)|.{0,7}(TRUCT|UCTIO)|.{0,9}(RUCTI|CTION))
+\s+7[\s\S]{1,9}?TY[PR][EF]\s*[O0]F\s*[O0]R
+\s+7[\s\S]{1,9}?JUR.SD.CT.[O0]N\s*[O0]F\s*[O0]RG
+\s+7[\s\S]{1,9}?[O0]RGAN.ZAT.[O0]NAL
+^7[\s\S]{3,17}?[71lI\]]d[.,]?\x20*TA

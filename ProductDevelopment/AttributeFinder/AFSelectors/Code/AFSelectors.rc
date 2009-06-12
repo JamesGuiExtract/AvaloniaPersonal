@@ -1,0 +1,258 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFSelectors.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems, LLC"
+            VALUE "FileDescription", "AFSelectors Module"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "AFSelectors.dll"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFSelectors.dll"
+            VALUE "ProductName", "AFSelectors Module"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_AFSELECTORS         REGISTRY                "AFSelectors.rgs"
+IDR_QUERYBASEDAS        REGISTRY                "QueryBasedAS.rgs"
+IDR_SPATIALCONTENTBASEDAS REGISTRY                "SpatialContentBasedAS.rgs"
+IDR_QUERYBASEDASPP      REGISTRY                "QueryBasedASPP.rgs"
+IDR_SPATIALCONTENTBASEDASPP REGISTRY                "SpatialContentBasedASPP.rgs"
+IDR_SPATIALPROXIMITYAS  REGISTRY                "SpatialProximityAS.rgs"
+IDR_SPATIALPROXIMITYASPP REGISTRY                "SpatialProximityASPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_QUERYBASEDASPP DIALOGEX 0, 0, 226, 77
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Query the attributes to be removed:",IDC_STATIC,5,5,200,10
+    EDITTEXT        IDC_EDIT_QUERY,5,17,215,55,ES_MULTILINE
+END
+
+IDD_SPATIALCONTENTBASEDASPP DIALOGEX 0, 0, 247, 88
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Select Attributes whose spatial zones",IDC_STATIC,7,8,119,9
+    COMBOBOX        IDC_COMBO_CONTAINS,127,7,63,33,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "the following",IDC_STATIC,195,8,45,8
+    EDITTEXT        IDC_EDIT_PIXEL_ROWS,12,21,40,12,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "Consecutive rows of pixels with a minimum of",IDC_STATIC,54,24,142,8
+    EDITTEXT        IDC_EDIT_MIN_PERCENT,12,36,40,12,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "Percent black pixels and a maximum of ",IDC_STATIC,54,39,125,8
+    EDITTEXT        IDC_EDIT_MAX_PERCENT,12,52,40,12,ES_AUTOHSCROLL | ES_NUMBER,WS_EX_RIGHT
+    LTEXT           "Percent black pixels",IDC_STATIC,54,55,64,8
+    CONTROL         "Attributes without spatial information should be included in selection.",IDC_CHECK_INCLUDE_NONSPATIAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,70,229,10
+END
+
+IDD_SPATIALPROXIMITYASPP DIALOGEX 0, 0, 353, 319
+STYLE DS_SETFONT | WS_CHILD | WS_SYSMENU
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_TARGET_QUERY,5,13,342,30,ES_MULTILINE | ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_INCLUSION_METHOD,22,46,107,50,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_REFERENCE_QUERY,5,64,342,30,ES_MULTILINE | ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_BORDER_TOP,89,125,44,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_REFERENCE_TOP,161,124,84,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EXPAND_DIR_TOP,123,143,34,37,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_EXPAND_AMOUNT_TOP,169,143,22,13,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_EXPAND_UNITS_TOP,195,143,50,61,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BORDER_LEFT,11,182,44,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_REFERENCE_LEFT,83,182,84,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EXPAND_DIR_LEFT,45,200,34,37,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_EXPAND_AMOUNT_LEFT,91,200,22,13,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_EXPAND_UNITS_LEFT,117,200,50,64,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BORDER_RIGHT,186,182,44,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_REFERENCE_RIGHT,258,181,84,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EXPAND_DIR_RIGHT,220,200,34,37,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_EXPAND_AMOUNT_RIGHT,266,200,22,13,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_EXPAND_UNITS_RIGHT,292,200,50,58,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_BORDER_BOTTOM,89,239,44,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_REFERENCE_BOTTOM,161,238,84,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_EXPAND_DIR_BOTTOM,123,257,34,37,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_EXPAND_AMOUNT_BOTTOM,169,257,22,13,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_EXPAND_UNITS_BOTTOM,195,257,50,67,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "each line of the attributes separately.",IDC_RADIO_SEPARATE_LINES,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,79,280,179,10
+    CONTROL         "the overall bounds of each attribute.",IDC_RADIO_OVERALL_BOUNDS,
+                    "Button",BS_AUTORADIOBUTTON | WS_TABSTOP,79,293,129,10
+    CONTROL         "Add defined regions as sub-attributes, but do not select any attributes the regions contain. (debug)",IDC_CHECK_INCLUDE_DEBUG_ATTRIBUTES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,305,342,10
+    LTEXT           "Select attributes matching this query",IDC_STATIC,5,2,273,8
+    LTEXT           "of the reference attribute",IDC_STATIC,138,127,19,8
+    LTEXT           "by",IDC_STATIC,159,144,8,8
+    LTEXT           "expanded",IDC_STATIC,89,145,33,8
+    GROUPBOX        "Define the TOP of the region as the",IDC_STATIC,83,109,167,53
+    LTEXT           "that",IDC_STATIC,6,48,15,8
+    LTEXT           "a region based on a reference attribute matching this query",IDC_STATIC,133,48,187,8
+    LTEXT           "where the region is defined as follows:",IDC_STATIC,5,97,233,8
+    LTEXT           "of the reference attribute",IDC_STATIC,60,184,19,8
+    LTEXT           "by",IDC_STATIC,81,201,8,8
+    LTEXT           "expanded",IDC_STATIC,11,202,33,8
+    GROUPBOX        "Define the LEFT of the region as the",IDC_STATIC,5,166,167,53
+    LTEXT           "of the reference attribute",IDC_STATIC,234,184,19,8
+    LTEXT           "by",IDC_STATIC,256,201,8,8
+    LTEXT           "expanded",IDC_STATIC,186,202,33,8
+    GROUPBOX        "Define the RIGHT of the region as the",IDC_STATIC,180,166,167,53
+    LTEXT           "of the reference attribute",IDC_STATIC,138,241,19,8
+    LTEXT           "by",IDC_STATIC,159,258,8,8
+    LTEXT           "expanded",IDC_STATIC,89,259,33,8
+    GROUPBOX        "Define the BOTTOM of the region as the",IDC_STATIC,83,223,167,53
+    LTEXT           "Select attributes using",IDC_STATIC,6,280,72,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SPATIALCONTENTBASEDASPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 240
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 81
+    END
+
+    IDD_SPATIALPROXIMITYASPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 346
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 312
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SPATIALCONTENTBASEDASPP DLGINIT
+BEGIN
+    IDC_COMBO_CONTAINS, 0x403, 8, 0
+0x6f63, 0x746e, 0x6961, 0x006e, 
+    IDC_COMBO_CONTAINS, 0x403, 14, 0
+0x6f64, 0x276e, 0x2074, 0x6f63, 0x746e, 0x6961, 0x006e, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFSelectors"
+    IDS_TITLEQUERYBASEDASPP "Query Based AS Properties"
+    IDS_TITLESPATIALCONTENTBASEDASPP "Spatial Content Based AS Properties"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFSelectors.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

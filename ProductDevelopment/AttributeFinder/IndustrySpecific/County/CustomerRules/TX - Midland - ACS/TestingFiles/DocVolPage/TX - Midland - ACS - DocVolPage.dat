@@ -1,0 +1,477 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Warranty Deed
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+//unsupported start here
+//ABANDMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ABANDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ABANDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ABANDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ABANDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ABSTRACT JUDGEMT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ABSTRACT JUDGEMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ABSTRACT JUDGEMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ABSTRACT JUDGEMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ABSTRACT JUDGEMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//AFFIDAVIT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AFFIDAVIT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\AFFIDAVIT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\AFFIDAVIT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\AFFIDAVIT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//AGREEMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AGREEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\AGREEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\AGREEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\AGREEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//AMENDMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AMENDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\AMENDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\AMENDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\AMENDMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//APPOINT SUB TTEE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\APPOINT SUB TTEE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\APPOINT SUB TTEE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\APPOINT SUB TTEE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\APPOINT SUB TTEE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ASG ORR ROY INTR
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASG ORR ROY INTR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ASSUMED NME
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSUMED NME;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSUMED NME;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSUMED NME;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSUMED NME;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Easements
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Easements;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Judgment
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Judgment;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Mechanics Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Mechanics Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT ORIG\Assignment of Mechanics Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Mineral Rights
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Mineral Rights;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSIGNMENT ORIG\Assignment of Mineral Rights;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT ORIG\Assignment of Mineral Rights;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Rent
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT ORIG\Assignment of Rent;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Rent;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Rents
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSIGNMENT ORIG\Assignment of Rents;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT ORIG\Assignment of Rents;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Salt Water Disposal
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Salt Water Disposal;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Tax Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Assignment of Tax Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//BILL OF SAL
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\BILL OF SAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\BILL OF SAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//BOND-DEPUTATIONS
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\BOND-DEPUTATIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\BOND-DEPUTATIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\BOND-DEPUTATIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\BOND-DEPUTATIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CC PROBATE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CC PROBATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CC PROBATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\CC PROBATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CC PROBATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CERTIFICATE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CERTIFICATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CERTIFICATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\CERTIFICATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CERTIFICATE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CERTIFIED COPY
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CERTIFIED COPY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CERTIFIED COPY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\CERTIFIED COPY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CERTIFIED COPY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CONTINUATION F-S
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CONTINUATION F-S;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CONTINUATION FS
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CONTINUATION FS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CONTRACT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CONTRACT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CONTRACT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\CONTRACT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CONTRACT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CONVEYANCE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CONVEYANCE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CONVEYANCE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\CONVEYANCE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CONVEYANCE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//CORRECTION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CORRECTION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\CORRECTION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\CORRECTION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//D-T TO SEC ASMPT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\D-T TO SEC ASMPT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//DECLARATION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DECLARATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//DEDICATION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEDICATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//DISCLAIMER
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DISCLAIMER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DISCLAIMER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DISCLAIMER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//EASEMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\EASEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\EASEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\EASEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\EASEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//EXTENSION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\EXTENSION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\EXTENSION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\EXTENSION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\EXTENSION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//FEDERAL TAX LN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\FEDERAL TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\FEDERAL TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\FEDERAL TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\FEDERAL TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//FINANC STMT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\FINANC STMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\FINANC STMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\FINANC STMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\FINANC STMT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Gift Deed
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Gift Deed;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//HOME EQUITY
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\HOME EQUITY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\HOME EQUITY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\HOME EQUITY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//HOMESTD DESIGNAT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOMESTD DESIGNAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\HOMESTD DESIGNAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\HOMESTD DESIGNAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\HOMESTD DESIGNAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//HOSPITAL LIEN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOSPITAL LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\HOSPITAL LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\HOSPITAL LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\HOSPITAL LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//JUDGMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\JUDGMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\JUDGMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\JUDGMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\JUDGMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//LEASE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//LIS PENDENS
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\LIS PENDENS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\LIS PENDENS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MECH LIEN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\MECH LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\MECH LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\MECH LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\MECH LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MEMORANDUM
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\MEMORANDUM;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\MEMORANDUM;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MINERAL DEED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\MINERAL DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\MINERAL DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\MINERAL DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MISCELLANEOUS OTHER
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\MISCELLANEOUS OTHER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MODIFICATION AGR
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\MODIFICATION AGR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\MODIFICATION AGR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\MODIFICATION AGR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\MODIFICATION AGR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//MORTGAGE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\MORTGAGE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//NOT INDEXED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\NOT INDEXED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\NOT INDEXED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\NOTICE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\NOTICE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\NOTICE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//OIL & GAS LEASE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\OIL & GAS LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\OIL & GAS LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\OIL & GAS LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\OIL & GAS LEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//OPTION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\OPTION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\OPTION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ORDER
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ORDER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ORDER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ORDER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ORDINANCE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ORDINANCE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Other
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT ORIG\Other;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Other;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Other;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//PLAT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\PLAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\PLAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\PLAT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//POWER OF ATTORNY
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\POWER OF ATTORNY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\POWER OF ATTORNY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//PTL ASG
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\PTL ASG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\PTL ASG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//PTL RELEASE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\PTL RELEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\PTL RELEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\PTL RELEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\PTL RELEASE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT ORIG\Quit Claim;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Quit Claim Deed;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//RATIFICATION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RATIFICATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RATIFICATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RATIFICATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RATIFICATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REINSTATEMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REINSTATEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REINSTATEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REL FED TAX LIEN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL FED TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REL FED TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REL FED TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REL FED TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REL HOSPITAL LN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL HOSPITAL LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REL HOSPITAL LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REL HOSPITAL LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REL HOSPITAL LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REL OF JUDGEMENT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL OF JUDGEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REL OF JUDGEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REL OF JUDGEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REL OF JUDGEMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REL STATE TAX LN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL STATE TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REL STATE TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REL STATE TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REL STATE TAX LN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REMV &APP SUB TR
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REMV &APP SUB TR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REMV &APP SUB TR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REMV&APP TR
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REMV&APP TR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REMV&APP TR;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//RENEWAL
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RENEWAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RENEWAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RENEWAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//RESCIND ACCELERATION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RESCIND ACCELERATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RESCIND ACCELERATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RESCIND ACCELERATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//RESTRICTIONS
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RESTRICTIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RESTRICTIONS;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REVOC POWER ATTY
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REVOC POWER ATTY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\REVOC POWER ATTY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//REVOCATION
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REVOCATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\REVOCATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\REVOCATION;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//RIGHT WAY
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RIGHT WAY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RIGHT WAY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RIGHT WAY;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//ROYALTY DEED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ROYALTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Child Support Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Child Support Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\Release of Child Support Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\Release of Child Support Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\Release of Child Support Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Mechanic Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\Release of Mechanic Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\Release of Mechanic Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\Release of Mechanic Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Tax Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\Release of Tax Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\Release of Tax Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Utility Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Utility Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\Release of Utility Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\Release of Utility Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\Release of Utility Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Utillity Lien
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\Release of Utillity Lien;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//SHERIFFS SALE
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\SHERIFFS SALE;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//STATE TAX LIEN
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\STATE TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\STATE TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\STATE TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\STATE TAX LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//SUB TRUSTEE DEED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\SUB TRUSTEE DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\SUB TRUSTEE DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\SUB TRUSTEE DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\SUB TRUSTEE DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//SUBORD&ATTORN AG
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\SUBORD&ATTORN AG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\SUBORD&ATTORN AG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\SUBORD&ATTORN AG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\SUBORD&ATTORN AG;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Sheriff's Deed
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Sheriff's Deed;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//TERMINATION F-S
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\TERMINATION F-S;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\TERMINATION F-S;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\TERMINATION F-S;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//TRANSFER
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\TRANSFER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\TRANSFER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\TRANSFER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//TRUST
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//TRUSTEES DEED
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\TRUSTEES DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\TRUSTEES DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\TRUSTEES DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\TRUSTEES DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//UNIT
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\UNIT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Unwarranted Deed
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Unwarranted Deed;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//WAIVER
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WAIVER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\WAIVER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WAIVER;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+
+//WITHDRAWAL
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WITHDRAWAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestDocVolPage.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\WITHDRAWAL;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\DocVolPage\$FileNoExtOf(<SourceDocName>).eav
+

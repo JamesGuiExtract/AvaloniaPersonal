@@ -1,0 +1,68 @@
+<HTML>
+<HEAD>
+<TITLE>Test HTML page for InputFunnel</TITLE>
+<STYLE TYPE="text/css">
+</STYLE>
+</HEAD>
+
+<SCRIPT LANGUAGE="VBScript">
+    Dim CurrentInputObj
+
+    Sub IFunnel_NotifyInputReceived(pTextInput)
+           CurrentInputObj.value = pTextInput.GetText
+           If (CurrentInputObj.name = "myInput1") Then
+               Set CurrentInputObj = myInput2
+           ElseIf (CurrentInputObj.name = "myInput2") Then
+               Set CurrentInputObj = myInput3
+           ElseIf (CurrentInputObj.name = "myInput3") Then
+               Set CurrentInputObj = myInput1
+           End If
+    End Sub
+
+    Sub InitForm()
+        Call MyLM.InitializeFromFile("UCLID_InputFunnelSDK.lic", 1014511645, 1475429147, 1491151923, 1694502977)
+        Call IFunnel.EnableInput1("Text", "Please enter data1", Nothing)
+        Set CurrentInputObj = myInput1
+    End Sub
+
+    Sub ResetControls()
+        Msgbox "Record added to database successfully!"
+        myInput1.value = ""
+        myInput2.value = ""
+	myInput3.value = ""
+        Set CurrentInputObj = myInput1
+    End Sub
+</SCRIPT>
+
+<BODY OnLoad='InitForm'>
+
+<OBJECT classid="CLSID:775ACCAD-32AC-11D6-8259-0050DAD4FF55"
+height=0 id="IFunnel" 0=429></OBJECT>
+
+<OBJECT classid="CLSID:E129D8F2-E327-4FC1-8CBC-977FA876EFC2"
+height=0 id="MyLM" width=0></OBJECT>
+
+<INPUT id=NewSpotRec name=NewImageWindow type=button value="New Image Window"
+OnClick='Call IFunnel.CreateNewInputReceiver("Spot Recognition Window")' >
+
+<INPUT id=NewTextRecWindow name=NewTextRecWindow type=button value="New Text Window"
+OnClick='Call IFunnel.CreateNewInputReceiver("Highlighted Text Window")' >
+<HR>
+<P>
+<P>
+<P>
+<P>
+Enter PIN #: &nbsp &nbsp &nbsp &nbsp &nbsp<INPUT id=myInput1 name=myInput1 >
+<P>
+Enter Acreage: &nbsp &nbsp &nbsp <INPUT id=myInput2 name=myInput2 >
+<P>
+Enter Perimeter: &nbsp &nbsp <INPUT id=myInput3 name=myInput3 >
+<P>
+<P>
+<P>
+
+<INPUT id=Submit name=Submit type=button value="Submit"
+OnClick='ResetControls' >
+
+</BODY>
+</HTML>

@@ -1,0 +1,50 @@
+<HTML>
+	<HEAD>
+		<TITLE>Input Validator Purpose</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Input Validator Purpose and Basics</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<p>
+				<li>Input validators are used in conjunction with the Remove Invalid Entries output handler to remove incorrectly found data from the output of the rules.
+					<ul>
+						<li>For example, you can use a Regular Expression input validator to remove telephone numbers that have non-digit characters.</li>
+						<li>You can use a Date validator to remove invalid dates like "June 56, 2008".</li>
+					</ul>
+				</li>
+				<li>Input validators check to make sure that the data inputted into them match a specified criteria for being "valid" data.  
+					<ul>
+						<li>If these criteria are not meet, the input validator will flag the data as "invalid" in memory.</li>
+						<li>Data items that are flagged as "invalid" can later be removed by using a Remove Invalid Entries output handler.</li>
+					</ul>
+				</li>
+				
+			</p>
+		</ul>
+		<hr>
+		<h3>Input Validator Basics</h3>
+		<ul>
+			<p>
+				<li>Input Validators can be added by clicking on the <b>Commands</b> button and selecting the <b>Select Input Validator...</b> option.
+					<ul>
+						<li>This will bring up a dialog where you can choose which type of input validator you want and give it a description.</li>
+					</ul>
+				</li>
+				<li>You can modify an existing input validator using the <b>Commands</b> button.
+					<ul>
+						<li>Choosing the <b>Select Input Validator...</b> option will let you change the type of the input validator.</li>
+						<li>Choosing the <b>Configure Input Validator...</b> option will let you change the settings of the input validator.</li>
+						<li>Choosing the <b>Configure description...</b> option will let you change the description of the input validator.</li>
+					</ul>
+				</li>
+				<li>You can remove the input validator by changing its type to <b>&ltNone&gt</b>.</li>
+				<li>If you right click on the input validator, it will bring up a context menu that you can use to <b>Cut</b>, <b>Copy</b>, <b>Paste</b>, and <b>Delete</b> the input validator.</li>
+				<li>You can turn off the input validator by un-checking the checkbox in front of it.  This can be useful for testing.</li>
+			</p>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

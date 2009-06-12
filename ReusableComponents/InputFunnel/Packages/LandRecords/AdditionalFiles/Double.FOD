@@ -1,0 +1,8 @@
+[CharsAlwaysEnabled]
+-eE0123456789.
+
+[InputTypes]
+Double
+Float
+
+[Choices]

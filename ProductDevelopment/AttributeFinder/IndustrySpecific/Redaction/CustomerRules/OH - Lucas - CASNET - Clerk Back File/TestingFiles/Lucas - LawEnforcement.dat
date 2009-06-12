@@ -1,0 +1,8 @@
+<SETTING>;TypeToBeTested=LawEnforcement
+<SETTING>;VerificationCondition=HCData|LCData|MCData|Clues
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+<SETTING>;AutomatedCondition=HCData|LCData|MCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;OutputFinalStatsOnly=1
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set005\RandomSubset;$DirOf(<SourceDocName>)\$FileOf(<SourceDocName>).Officer.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

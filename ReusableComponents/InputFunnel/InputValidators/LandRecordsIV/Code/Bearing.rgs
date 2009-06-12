@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.Bearing.1 = s 'Bearing Class'
+	{
+		CLSID = s '{D08B8B70-3AA3-11D6-8260-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.Bearing = s 'Bearing Class'
+	{
+		CLSID = s '{D08B8B70-3AA3-11D6-8260-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.Bearing.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D08B8B70-3AA3-11D6-8260-0050DAD4FF55} = s 'Bearing Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.Bearing.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.Bearing'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

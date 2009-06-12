@@ -1,0 +1,227 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.0.2 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.0.2 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3320]</b> Selection of redactions while selecting exemption codes
+	       	<ul>
+	      		<li>Exercise <b>verification</b>.
+	      		<li>Hit the <b>Escape</b> key and select a redaction.
+	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
+	      		<li>Cancel out of the dialog and click the <b>Stop</b> button on 
+			the Verification toolbar.
+	      		<li>Confirm that a prompt is displayed about changes not being saved.
+	      		<li>Select <b>Yes</b> to close the verification window.
+	      		<li>Without closing the FAM, start processing to continue verifying documents.
+	      		<li>Hit the <b>Escape</b> key and select a redaction.
+	      		<li>Use the <b>E</b> shortcut to display the Exemption Codes dialog.
+	      		<li>Confirm that interaction with the <b>Data Grid</b> is still not allowed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3448]</b> No auto-zoom for new redactions
+	       	<ul>
+	      		<li>Exercise <b>verification</b>.
+	      		<li>Enable auto-zoom and set the zoom level to 10.
+	      		<li>Open an image in the verification UI and zoom in close enough to see only 3-4 
+			words at a time.
+	      		<li>Redact a word.
+	      		<li>Confirm that the Image Viewer <b>does not</b> automatically zoom to the new 
+			manual redaction.
+	      		<li>Tab to a new row in the Data Grid and confirm that the Image Viewer 
+			<b>does</b> auto-zoom to the item.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3453, #3485]</b> Metadata total time incorrect after navigation
+	       	<ul>
+	      		<li>Supply two files and wait for document 1 to come up for verification.
+	      		<li>Wait one minute and save document 1.
+	      		<li>Confirm that document 2 appears.
+	      		<li>Confirm that the metadata XML file for document 1 shows a total verification 
+			time of approximately one minute.
+	      		<li>Wait one minute with document 2 and navigate back to document 1.
+	      		<li>Wait one more minute without making or saving any changes and navigate 
+			forward to document 2.
+	      		<li>Save document 2.
+	      		<li>Confirm that the metadata XML file for document 1 shows a total verification 
+			time of approximately two minutes.
+	      		<li>Confirm that the metadata XML file for document 2 shows a total verification 
+			time of approximately one minute.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3462]</b> Auto-zoom problem for redactions at page edge
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield.
+	      		<li>Enable auto-zoom and set the zoom level to 10.
+	      		<li>Open image 7 in the verification UI and note that the right side of the 
+			redaction is not visible plus no horizontal scrollbar is provided.
+	      		<li>Confirm that the redaction can be resized by first moving the redaction.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3473]</b> Thread exited with exception
+	       	<ul>
+	      		<li>TBD.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3487]</b> Adjust auto-zoom scale factors
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield and TestImage001.tif.
+	      		<li>Enable auto-zoom and set the zoom level to 1.
+	      		<li>Confirm that the width of the <b>SSN:</b> clue almost completely fills 
+			the window.
+	      		<li>Set the zoom level to 2.
+	      		<li>Confirm that the width of the <b>SSN:</b> clue is significantly reduced.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3490]</b> MICR Finder speed and accuracy
+	       	<ul>
+	      		<li>Exercise rules that use a <b>MICR Finder</b>.
+	      		<li>Confirm that a registry key exists for <b>HKCU/Software/Extract 
+			Systems/AttributeFinder/ValueFinders/MicrFinder/Flags</b>.
+	      		<li>Measure the time taken to process a MICR image with <b>Flags = 23</b>.
+	      		<li>Confirm that the time taken to process a MICR image with <b>Flags = 20</b> 
+			is decreased.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3491]</b> Declining to overwrite exemption codes
+	       	<ul>
+	      		<li>Exercise <b>verification</b> and select one or more exemption codes 
+			for <b>all</b> redactions.
+	      		<li>Select a different set of exemption codes for <b>all</b> redactions.
+	      		<li>Confirm that a confirmation dialog is presented to the user.
+	      		<li>Select <b>No</b> to not overwrite the previously selected exemption 
+			codes.
+	      		<li>Confirm that toolbar buttons still work, new redactions can be added, 
+			and that the image can be saved.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3493]</b> VOA Viewer and merging attributes
+	       	<ul>
+	      		<li>Open the <b>VOA Viewer</b> and a VOA file with multiple spatial attributes.
+	      		<li>Select two of the attributes and merge them.
+	      		<li>Confirm that the merged attribute shows only the combined spatial 
+			areas and not a large bounding rectangle.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3502]</b> MICR Finder and bad images
+	       	<ul>
+	      		<li>Exercise the delivered <b>St Johns</b> rules against the images in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3502</b>.
+	      		<li>Confirm that <b>Internal error: Function/Method requirements not met</b> 
+			exceptions are not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5117]</b> Faster queuing of PDFs
+	       	<ul>
+	      		<li>Select a folder of PDF images for queuing and processing.
+	      		<li>Start queuing and processing.
+	      		<li>Confirm that queuing of PDFs now takes less than 7 seconds each.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5231]</b> Double-click to open reports in Report Viewer
+	       	<ul>
+	      		<li>Open <b>Report Viewer</b> from FAM DB Admin.
+	      		<li>Confirm that each report can be selected by double-clicking in the report list.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5248]</b> Support for JPEG-compressed TIFs
+	       	<ul>
+			<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5248</b> image files.
+			<li>Exercise automated redaction using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+			<li>Exercise verification using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5277]</b> License file for ConvertFAMDB
+	       	<ul>
+	      		<li>Rename the license file.
+	      		<li>Confirm that <b>ConvertFAMDB</b> displays a meaingingful error message 
+			at application start.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5279]</b> Create Multi Page Image test file
+	       	<ul>
+	      		<li>Exercise <b>test_CreateMultiPageImage.bat</b> from the InteractiveTest 
+			folder.
+	      		<li>Confirm that the batch runs and that each test passes without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5295]</b> Excessive memory use by LogProcessStats
+	       	<ul>
+	      		<li>Exercise the <b>File Access Errors</b> portion of the <b>Customer Errors</b> 
+			testing checklist.
+	      		<li>Confirm that the <b>LogProcessStats</b> memory usage is under 500 MB 
+			after 24 hours.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5298]</b> PDF page sizes from Image Format Converter
+	       	<ul>
+			<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
+			image files.  Use <b>Image Format Converter</b> to convert them from PDF 
+			format to TIF.
+			<li>Open each image file in the Image Viewer.  Confirm that pages of different 
+			size are displayed without black areas.
+			<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
+			OCR'd text is correct for both legal-size and letter-size pages.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

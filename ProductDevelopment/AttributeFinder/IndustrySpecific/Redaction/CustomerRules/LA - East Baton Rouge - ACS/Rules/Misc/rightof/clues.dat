@@ -1,0 +1,1 @@
+\b(?:I?SSN|S.SN|SS.N|[Ss][Ss][Mm])\b[;:#]?|[S5s]\.*[S5s]\.*#|\b[Ss]\s[Ss]\s#|SS\s?#|\bSSII\b|(?:S[Oo][Cc].{2,4})\s(?:S[Ee][Cc][Uu].{3,5})\s?(?:N[Oo]|#|[Nn][Uu][Mm].{2,4})

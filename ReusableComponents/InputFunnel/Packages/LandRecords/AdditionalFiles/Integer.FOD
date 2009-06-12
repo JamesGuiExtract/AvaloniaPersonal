@@ -1,0 +1,8 @@
+[CharsAlwaysEnabled]
+-0123456789
+
+[InputTypes]
+Long Integer
+Short Integer
+
+[Choices]

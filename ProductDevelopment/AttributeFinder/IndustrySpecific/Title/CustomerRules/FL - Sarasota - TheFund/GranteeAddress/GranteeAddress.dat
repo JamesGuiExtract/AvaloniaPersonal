@@ -1,0 +1,61 @@
+// *******
+// Imports
+// *******
+// #import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005258178.tif.uss
+ALL_GRANTEEADDRESS_01=whose|who's^50~address is^250~grantor|party of the first part^10~[to]|[AND]^250~whose|who's^50~address is^?GranteeAddress^250~grantee|party of the second part
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005258323.tif.uss
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005257809.tif.uss
+ALL_GRANTEEADDRESS_02=grantor^5~whose^50~address is^250~[and]|paid by|convey to^250~grantee|TRUSTEE^5~whose^50~address is^?GranteeAddress^250~\r\nwitness|quit claim|property
+ALL_GRANTEEADDRESS_02b=grantor^250~whose^50~address is^250~[and]|paid by|convey to^50~grantee|TRUSTEE^250~whose^50~address is^?GranteeAddress^250~\r\nwitness|quit claim|property
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005258331.tif.uss
+ALL_GRANTEEADDRESS_03=hereinafter^50~grantor^20~[to]^250~whose^50~address is^?GranteeAddress^250~hereinafter^50~grantee 
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\D\2005258265.tif.uss
+ALL_GRANTEEADDRESS_04=hereinafter^50~trustee^10~whose^50~address is^?GranteeAddress^250~\r\n\r\n(
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\QCD\2005257548.tif.uss
+ALL_GRANTEEADDRESS_05=FIRST PARTY^250~[and]|[TO]^250~whose^50~address is^?GranteeAddress^250~SECOND PARTY
+
+ALL_GRANTEEADDRESS_06=party of the second part^5~whose^50~address is^?GranteeAddress^250~\r\n\r\n
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\QCD\2005258184.tif.uss
+ALL_GRANTEEADDRESS_07=grantor^250~quitclaims^50~[to]^250~grantee|TRUSTEE^5~whose^50~address is^?GranteeAddress^250~\r\nwitness|quit claim
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\TRD\2005258239.tif.uss
+ALL_GRANTEEADDRESS_08=grantee^5~whose^50~address^5~is^?GranteeAddress^250~\r\nwitness
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005257409.tif.uss
+ALL_GRANTEEADDRESS_09=hereinafter^50~grantor^20~[to]^250~husband^5~and wife,^?GranteeAddress^250~hereinafter^50~grantee 
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005258228.tif.uss
+ALL_GRANTEEADDRESS_10=whose^50~address^5~is^?GranteeAddress^150~HEREINAFTER^20~GRANTEE
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\QCD\2005257505.tif.uss
+ALL_GRANTEEADDRESS_11=grantor^20~[and]^250~whose^50~address^5~is^?GranteeAddress^250~GRANTEE
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\QCD\2005257655.tif.uss
+ALL_GRANTEEADDRESS_12=whose^50~address is^250~whose^50~address is^?GranteeAddress^250~grantor^10~[and]^10~grantee
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005257887.tif.uss
+ALL_GRANTEEADDRESS_13=whose^50~address^5~is^?GranteeAddress^150~GRANTEE
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005258206.tif.uss
+ALL_GRANTEEADDRESS_14=Grantee's Post Office Address:^?GranteeAddress^150~PROPERTY
+
+ALL_GRANTEEADDRESS_15=party^10~of the first^25~[and]^?GranteeAddress^250~party^10~of the second
+
+ALL_GRANTEEADDRESS_16=between^250~hereinafter^50~seller^25~[and]^?GranteeAddress^250~hereinafter^50~buyer
+
+[PATTERNS_END]
+

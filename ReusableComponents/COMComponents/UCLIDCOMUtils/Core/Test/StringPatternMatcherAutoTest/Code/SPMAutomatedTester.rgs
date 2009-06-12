@@ -1,0 +1,26 @@
+HKCR
+{
+	StringPatternMatcherAutoTest.SPMAutomatedTester.1 = s 'SPMAutomatedTester Class'
+	{
+		CLSID = s '{54C8D41F-530A-4564-BDCA-4FA678F28D8E}'
+	}
+	StringPatternMatcherAutoTest.SPMAutomatedTester = s 'SPMAutomatedTester Class'
+	{
+		CLSID = s '{54C8D41F-530A-4564-BDCA-4FA678F28D8E}'
+		CurVer = s 'StringPatternMatcherAutoTest.SPMAutomatedTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {54C8D41F-530A-4564-BDCA-4FA678F28D8E} = s 'SPMAutomatedTester Class'
+		{
+			ProgID = s 'StringPatternMatcherAutoTest.SPMAutomatedTester.1'
+			VersionIndependentProgID = s 'StringPatternMatcherAutoTest.SPMAutomatedTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{49823B6C-F9CB-4B89-8867-099C2852F970}'
+		}
+	}
+}

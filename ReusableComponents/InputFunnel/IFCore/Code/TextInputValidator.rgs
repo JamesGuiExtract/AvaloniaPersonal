@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.TextInputValidator.1 = s 'TextInputValidator Class'
+	{
+		CLSID = s '{775ACCAB-32AC-11D6-8259-0050DAD4FF55}'
+	}
+	UCLIDInputFunnel.TextInputValidator  = s 'TextInputValidator Class'
+	{
+		CLSID = s '{775ACCAB-32AC-11D6-8259-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFunnel.TextInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {775ACCAB-32AC-11D6-8259-0050DAD4FF55} = s 'TextInputValidator Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.TextInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.TextInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

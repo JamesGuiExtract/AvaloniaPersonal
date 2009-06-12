@@ -1,0 +1,416 @@
+<HTML>
+
+<HEAD>
+<TITLE>USB Counter Key Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>USB Counter Key Testing Checklist<BR>
+<IMG src="../../../COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Install Extract Systems LM (Windows 2000)</h2>
+<UL>
+  	<LI>Without a key attached install Extract Systems LM.</LI>
+  	<LI>Attach a USB License Key and confirm that drivers for key have installed.</LI>
+  	<LI>Confirm that <b>USB License Key Manager</b> is available from the Start menu.</LI>
+  	<LI>Confirm that <b>Field Activation Utility</b> is available from the Start menu.</LI>
+</UL>
+<br>
+</LI>
+<LI><h2>Other operating systems: (XP, Vista, 2003 Server, 2008 Server)</h2>
+<UL>
+  	<LI>See <b>Installation</b> checklist.</LI>
+</UL>
+<br>
+</LI>
+<br>
+<LI><h2>USB License Key Manager</h2>
+<UL>
+	<LI><b>[LegacyRC #4699]</b> From a fresh install on a ghosted machine, confirm that 
+	the application does <b>not</b> require two minutes to come up.
+	<LI>Confirm that the default License Server is <b>Local Machine</b>.
+	<LI><b>[LegacyRC #5207]</b> Errors logged at startup
+	<ul>
+      		<li>Open the <b>USB Key License Manager</b> utility.
+      		<li>Adjust settings so that the utility will look for a local USB key.
+      		<li>Close the utility and remove any local key.
+      		<li>Open the <b>USB Key License Manager</b> utility again.
+      		<li>Confirm that after a short delay, zeros are displayed for counts.
+      		<li>Review the exception log and confirm that multiple retry error messages 
+		have not been logged.
+	</ul>
+	<LI>Confirm that the <b>Counter Value For Counter Serial #</b> edit box is populated.
+	<LI>Confirm that counter values are listed.
+	<LI>Select <b>Remote Machine</b>, set the edit box to the name of the current machine, 
+	and click Apply.
+	<LI>Confirm that <b>Refresh</b> still shows the same counter values.
+	<LI>Select a different Remote Machine with a key attached and Extract Systems LM or SDK 
+	installed. Click Apply and confirm that <b>Refresh</b> shows a new counter serial # and 
+	values for the counter on the selected machine.
+	<LI><b>[LegacyRC #4348]</b> Confirm that <b> Refresh</b> shows the hard limit
+      (Max #) and the soft limit (#) in 
+	separate read-only edit boxes.
+	<LI>Confirm that the <b>Alert Level</b> cells are editable.
+	<LI>Confirm that <b>Alert Multiple</b> cells are editable.
+	<LI>Select the <b>Server Status</b> button.
+	<UL>
+		<LI>Confirm that the first time should prompt for installation of the Java runtime.
+		<LI>After Java installation has completed, confirm that a Web page is displayed 
+		with <b>Sentinel License Manager</b> showing information about the key installed 
+		on the selected machine.
+	</UL>
+	<LI>Confirm that the <b>Send Alert to support@extractsystems.com</b> checkbox is selectable.
+	<UL>
+		<LI>Confirm that with no email Settings set and only this item checked 
+		clicking <b> Apply</b> displays an <b>SMTP Server not set in email settings</b> error.
+		<LI>Confirm that with no email Settings set and only this item checked clicking
+          <b> OK</b> 
+		displays an <b>SMTP Server not set in email settings</b> error.
+	</UL>
+	<LI>Confirm that the <b>If Counter Value ... following addresses:</b> checkbox is selectable.
+	<UL>
+		<LI>Confirm that with no email Settings set and only this item checked 
+		clicking <b> Apply</b> displays an <b>SMTP Server not set in email settings</b> error.
+		<LI>Confirm that with no email Settings set and only this item checked clicking
+          <b> 
+		OK</b> displays an <b>SMTP Server not set in email settings</b> error.
+	</UL>
+	<LI>Confirm that clicking the <b>Email Settings</b> button displays the <b>Email Settings 
+	Dialog</b>.
+	<h2>Email Settings Dialog</h2>
+	<UL>
+		<LI>Confirm that the <b>Outgoing mail (SMTP):</b> edit box is editable.
+		<LI>Confirm that when blank, clicking OK displays an <b>SMTP Sever name must not 
+		be blank</b> error.
+		<LI>Confirm that the <b>Requires Authentication to Send</b> checkbox is selectable.					<LI>Confirm that when selected the <b>User Name</b> and <b>Password</b> edit boxes 
+		are enabled.
+<p>
+		<LI>Confirm that the <b>Sender Display Name</b> edit box is enabled.
+		<LI>Confirm that when blank, clicking OK displays a <b>Sender display name 
+		must not be blank</b> error if the <b>Outgoing mail (SMTP):</b> item is set.
+		<LI>Confirm that the <b>Sender Email Address</b> edit box is enabled.
+		<LI>Confirm that if it is not set to a proper email address format clicking OK 
+		displays a <b>Sender email address is not valid</b> error.
+		<LI>Confirm that the <b>Email Signature</b> edit box is enabled.
+		<LI>Confirm that <b>OK</b> saves the changes and exits the dialog.
+		<LI>Confirm that <b>Cancel</b> ignores the changes and exits the dialog.
+		<LI>Confirm that the <b>X</b> button ignores the changes and exits the dialog.
+	</UL>
+<p>
+	<LI>Confirm that the <b>Address</b> edit box is enabled only when the <b>If Counter 
+	value...</b> checkbox is checked.
+	<LI>Confirm that when the edit box is empty and the <b>If Counter value...</b> checkbox is 
+	checked then clicking Ok displays a <b>No Address list set</b> error.
+<p>
+	<li><b>[LegacyRCAndUtils #5163]</b> USB License Key Manager crash
+	<ul>
+		<li>Configure and run an FPS file.
+		<li>Use the task manager to end the process ProcessFiles.exe.
+		<li>While the database is still locked, open the USB License Key Manager.
+		<li>Confirm that it opens without error.
+		<li>Hit the "Refresh" button and confirm that there is still no error.
+	</ul>
+</UL>
+<br>
+<LI><h2>Disable USB Key Via License File</h2>
+<UL>
+  	<LI>Create a simple RSD file without counters or internal-use flag.  Create an ID Shield 
+	Rule Writing license file (using Simple Rules passwords) that allows Rule Set Editor 
+	execution.  Confirm that the rules execute without an attached USB key. Note that it may 
+	be necessary to edit the <b>Packages.dat</b> file in the license generator folder.</LI>
+  	<LI>Use the same RSD file.  Modify the Ruleset properties to include the internal-use 
+	only flag.  Confirm that the rules do not execute and that an informative exception 
+	is thrown.</LI>
+  	<LI>Create an additional license file that includes only <b>Disable USB Key Serial 
+	Numbers</b>. Modify the RSD file properties to remove the internal-use flag.
+      Confirm that the rules execute with a USB key that has a different SN than the rules.</LI>
+  	<LI>Modify the RSD file properties to require an 
+	<b>Indexing</b> counter.  Do NOT use a USB Key.  Confirm that the rules do not execute 
+	and that an informative exception is thrown.</LI>
+  	<LI>Use the same modified RSD file, insert any USB key, and configure the USB License 
+	Key Manager to use the local USB key.  Confirm that the rules execute.</LI>
+  	<LI>Modify the RSD file to include a specified USB key serial number different than 
+	the serial number of the attached key.  Confirm that the rules execute.</LI>
+  	<LI>Use the same modified RSD file and delete the <b>Disable USB Key Serial
+      Numbers</b> license.  Confirm that the rules do not execute and that an informative 
+	exception is thrown.</LI>
+  	<LI>Create an additional license file that includes only <b>Disable USB Counters 
+	(locked to PC)</b>.  Confirm that the rules execute without a USB key.</LI>
+</UL>
+<br>
+</LI>
+<LI><h2>Test Alert message levels</h2>
+</ol>
+The following test require the email settings to be configured to a valid SMTP server
+(i.e. mail.extractsystems.com) with sender display name and address with an email signature set in the email settings
+The &quot;<b>If Counter value...</b>&quot; option should be checked with valid email addresses in the edit box. The ruleset editor will be used to set rules that will decrement the indicated counter when ran.
+<p>
+<br><br>
+<p>
+The email alert received for all of the tests should have the sender <b>display name</b> and sender
+<b> address</b> as specified in the Email Settings.  The email body should indicate the counter the alert is for with the SN and remaining counts.  The email should end with the text specified in the email signature in the email settings Dialog
+<p>
+<br><br>
+<UL>
+	<h2>Indexing Counter</h2>
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value. Run rules to decrement 
+	the counter. Confirm that an email is received as specified above.
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value and the <b>Alert 
+	Multiple</b> to 2. Run rules to decrement the counter 3 times. Confirm that <b>2</b> emails 
+	are received as specified above.
+	<h2>Pagination Counter</h2>
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value. Run rules to 
+	decrement the counter. Confirm that an email is received as specified above.
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value and the <b>Alert 
+	Multiple</b> to 2. Run rules to decrement the counter 3 times. Confirm that <b>2</b> emails 
+	are received as specified above.
+	<h2>Redaction Counter</h2>
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value. Run rules to decrement 
+	the counter. Confirm that an email is received as specified above.
+	<LI>Set the <b>Alert Level</b> to value 1 less than the counter value and the <b>Alert 
+	Multiple</b> to 2. Run rules to decrement the counter 3 times. Confirm that <b>2</b> emails 
+	are received as specified above.
+</UL>
+<br>
+<ul>
+<LI><h2>Test Counter "Out of counts"</h2>
+</ul>
+The following test require the email settings to be configured to a valid SMTP server with sender display name and address with an email signature set in the email settings
+The "If Counter value..." option should be checked with valid email addresses in the edit box. The File Action Manager will be used for the following tests with a ruleset that
+decrements that appropriate counter and at least 3 files should be processed. A USB counter should be setup that has 1 count for each of the counters.
+For information on setting count levels, see <b>Part 7</b> of this checklist.
+<p>
+<br><br>
+<p>
+The email alert received for all of the tests should have the Sender Display name and sender address as specified in the Email Settings.  The email body should indicate the counter the alert is for with the SN and remaining counts.  The email should end with the text specified in the email signature in the email settings Dialog
+<p>
+<br><br>
+<UL>
+	<h2>Indexing Counter</h2>
+	<LI>Start FAM running rules on the 3 files. Confirm that on the 2nd file a dialog is displayed 
+	indicating that the counter is out and the OK button should include a count down of the number 
+	of seconds until a retry. 
+	<LI>Click <b>Cancel</b>. Confirm that the 2nd file fails and the Counter out dialog is displayed 
+	again for the 3rd file.
+	<LI>Add counts to the key while the dialog is displayed. Confirm that once the counts have 
+	been updated the dialog should close (after the timeout) and the 3nd file should pass.
+	<h2>Pagination Counter</h2>
+	<LI>Start FAM running rules on the 3 files. Confirm that on the 2nd file a dialog is displayed 
+	indicating that the counter is out and the OK button should include a count down of the number 
+	of seconds until a retry. 
+	<LI>Click <b>Cancel</b>. Confirm that the 2nd file fails and the Counter out dialog is displayed 
+	again for the 3rd file.
+	<LI>Add counts to the key while the dialog is displayed. Confirm that once the counts have 
+	been updated the dialog should close (after the timeout) and the 3nd file should pass.
+	<h2>Redaction Counter</h2>
+	<LI>Start FAM running rules on the 3 files. Confirm that on the 2nd file a dialog is displayed 
+	indicating that the counter is out and the OK button should include a count down of the number 
+	of seconds until a retry. 
+	<LI>Click <b>Cancel</b>. Confirm that the 2nd file fails and the Counter out dialog is displayed 
+	again for the 3rd file.
+	<LI>Add counts to the key while the dialog is displayed. Confirm that once the counts have 
+	been updated the dialog should close (after the timeout) and the 3nd file should pass.
+</UL>
+<br>
+<ul>
+<LI><h2>Add increments to Counter - Should be repeated for each Counter type</h2>
+<UL>
+	<h2>Indexing Counter</h2>
+	<LI>Open the <b>Field Activation Utility</b> with USB Key attached.
+	<LI>Click <b>Get Locking Code</b> and copy the code to a file.
+	<LI>Using Sentinel Key Manager with the Distributor's Key
+	<br>
+</ul>
+Note: Sentinel Key Manager is located at I:\Common\Engineering\Tools\SecureClients\USBKey\USBKeyManager
+	<UL>
+		<LI>If DST file has not been imported - Import the DST file named <b>KeyManager.dst</b>.
+		<LI>Load the saved file on the <b>Key Activator</b> tab.
+		<LI>Select IncIndexing... 
+		<LI>Generate License Code
+		<LI>Save License Code to File
+	</UL>
+<ul>
+	<LI>With Field Activation Utility 
+	<UL>
+		<LI>Load License Code
+		<LI>Click Update License, Should say success.
+	</UL>
+	<LI>With USB License Key Manager
+	<UL>
+		<LI>Click Refresh, The amount of the increase should be added to the counter.
+	</UL>
+</UL>
+<UL>
+	<h2>Pagination Counter</h2>
+	<LI>Open the <b>Field Activation Utility</b> with USB Key attached.
+	<LI>Click <b>Get Locking Code</b> and copy the code to a file.
+	<LI>Using Sentinel Key Manager with the Distributor's Key
+	<br>
+</ul>
+Note: Sentinel Key Manager is located at I:\Common\Engineering\Tools\SecureClients\USBKey\USBKeyManager
+	<UL>
+		<LI>If DST file has not been imported - Import the DST file named <b>KeyManager.dst</b>.
+		<LI>Load the saved file on the <b>Key Activator</b> tab.
+		<LI>Select IncPagination... 
+		<LI>Generate License Code
+		<LI>Save License Code to File
+	</UL>
+<ul>
+	<LI>With Field Activation Utility 
+	<UL>
+		<LI>Load License Code
+		<LI>Click Update License, Should say success.
+	</UL>
+	<LI>With USB License Key Manager
+	<UL>
+		<LI>Click Refresh, The amount of the increase should be added to the counter.
+	</UL>
+</UL>
+<UL>
+	<h2>Redaction Counter</h2>
+	<LI>Open the <b>Field Activation Utility</b> with USB Key attached.
+	<LI>Click <b>Get Locking Code</b> and copy the code to a file.
+	<LI>Using Sentinel Key Manager with the Distributor's Key
+	<br>
+</ul>
+Note: Sentinel Key Manager is located at I:\Common\Engineering\Tools\SecureClients\USBKey\USBKeyManager
+	<UL>
+		<LI>If DST file has not been imported - Import the DST file named <b>KeyManager.dst</b>.
+		<LI>Load the saved file on the <b>Key Activator</b> tab.
+		<LI>Select IncRedaction... 
+		<LI>Generate License Code
+		<LI>Save License Code to File
+	</UL>
+<ul>
+	<LI>With Field Activation Utility 
+	<UL>
+		<LI>Load License Code
+		<LI>Click Update License, Should say success.
+	</UL>
+	<LI>With USB License Key Manager
+	<UL>
+		<LI>Click Refresh, The amount of the increase should be added to the counter.
+	</UL>
+</UL>
+
+<p>
+
+<LI><h2>Error Handling</h2>
+<ol>
+	<li>Multi-threaded execution of RunRules.exe
+	<UL>
+  		<LI>Use <b>MultiThreadedRunRules</b> located under SafeNetUtils/Utils
+		<li>Open the SLN file on the build machine using Visual Studio and the current 
+		software baseline.
+		<li>Build the EXE.
+		<li>Build the Installer project also included in the SLN.
+<p>
+		<li>Copy the MSI file to the test machine.
+		<li>Run the MSI file to install the EXE.  Select the <b>FlexIndexComponents/Bin</b> folder 
+		as the location for the EXE.  The EXE expects to be in the same folder as RunRules.exe.
+<p>
+		<li>Run the EXE and define the number of threads.
+		<li>Use the <b>File</b> menu to select a folder of images to be processed 
+		and a rules file.
+		<li>Click Run.  The application will process the specified images and re-process them 
+		over and over to continue exercising the USB key.
+		<li>Click Exit to stop the application.
+<p>
+		<li>The test is expected to run for at least two days without a USB key failure.
+		<li>The Exception log may contain one or more <b>ELI18226</b> or <b>ELI18243</b> 
+		exceptions indicating that access to the USB key was retried.
+	</UL>
+	</li>
+<p>
+	<li>Test Setup for next numbered items
+	<UL>
+  		<LI>Prepare a set of local images to use with the File Action Manager where the 
+		specified rules require a USB counter.
+		<LI>Confirm that FLEX Index / ID Shield is configured to use a local USB key.
+		<LI>Start processing and confirm that some files are processed successfully.
+		<LI>If desired, change the <b>NumberOfUSBKeyRetries</b> and <b>WaitTimeoutUSBKeyRetry
+          </b>registry settings at <b>HKLM\SOFTWARE\Extract Systems\SafeNetUtils</b>.
+	</UL>
+	</li>
+<p>
+	<li>(ONE) Removal of USB Key from port
+	<UL>
+  		<LI>During processing, remove the local USB key.
+		<LI>Confirm that the file or files being processed <b>do not</b> immediately fail.
+  		<LI>Replace the USB key within the time defined in the registry and confirm that the currently processing 
+		files finish without failure.
+  		<LI>Remove the USB key again and keep it removed for more than the time
+          defined in the registry.
+  		<LI>Confirm that the first of the currently processing files fail after
+          the time defined in the registry and 
+		newly processing files fail after the same wait.
+  		<LI>Replace the USB key and confirm that the currently processing files finish 
+		without failure.
+	</UL>
+	</li>
+<p>
+	<li>(TWO) Stop and restart of Sentinel service
+	<UL>
+  		<LI>Open the Administrative Tools - Services element of the Windows Control Panel.
+  		<LI>Find the Sentinel Protection Server item and Stop the service.
+		<LI>Confirm that the file or files being processed <b>do not</b> immediately fail.
+  		<LI>Start the service within the time defined in the registry and confirm that the currently processing 
+		files finish without failure.
+  		<LI>Stop the service again and keep it stopped for more than the time
+          defined in the registry.
+  		<LI>Confirm that the first of the currently processing files fail after
+          the time defined in the registry and 
+		newly processing files fail after the same wait.
+  		<LI>Start the service and confirm that the currently processing files finish 
+		without failure.
+	</UL>
+	</li>
+<p>
+	<li>(THREE) Locked USB key
+	<UL>
+  		<LI>Use the USB Key Tester utility under I:\Common\Engineering\Tools\Utils to 
+		lock the USB key (Note that this utility does not exist yet).
+		<LI>Confirm that the file or files being processed <b>do not</b> immediately fail.
+		<LI>Confirm that the USB key is automatically unlocked within about 2 minutes and 
+		that the currently processing files finish successfully.
+  		<LI>Lock the key again and then remove it from the system.
+  		<LI>Confirm that the currently processing files fail after about 20 minutes and 
+		newly processing files fail after the same 20 minute wait.
+  		<LI>Replace the key and confirm that the currently processing files finish 
+		without failure.
+	</UL>
+	</li>
+<p>
+	<li>(FOUR) Disruption of network connection
+	<UL>
+  		<LI>Modify the configuration to use a network USB key (usually on LISA).
+  		<LI>During processing, unplug the network cable to simulate a disrupted network connection.
+		<LI>Confirm that the file or files being processed <b>do not</b> immediately fail.
+  		<LI>Replace the network connection within the time defined in the
+          registry and confirm that the currently processing 
+		files finish without failure.
+  		<LI>Remove the network connection again and keep it removed for more than
+          the time defined in the registry.
+  		<LI>Confirm that the first of the currently processing files fail after
+          the time defined in the registry and 
+		newly processing files fail after the same wait.
+  		<LI>Replace the network connection and confirm that the currently processing files finish 
+		without failure.
+	</UL>
+	</li>
+</ol>
+<br>
+</LI>
+
+
+<!-- *********************************************** -->
+</body>
+
+</HTML>

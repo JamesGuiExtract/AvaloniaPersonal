@@ -1,0 +1,26 @@
+HKCR
+{
+	AFSelectorsLib.SpatialProximityASPP.1 = s 'SpatialProximityASPP Class'
+	{
+		CLSID = s '{ECBBA2EA-2EE9-43F2-9375-0AE950F55D1A}'
+	}
+	AFSelectorsLib.SpatialProximityASPP = s 'SpatialProximityASPP Class'
+	{
+		CLSID = s '{ECBBA2EA-2EE9-43F2-9375-0AE950F55D1A}'
+		CurVer = s 'AFSelectorsLib.SpatialProximityASPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {ECBBA2EA-2EE9-43F2-9375-0AE950F55D1A} = s 'SpatialProximityASPP Class'
+		{
+			ProgID = s 'AFSelectorsLib.SpatialProximityASPP.1'
+			VersionIndependentProgID = s 'AFSelectorsLib.SpatialProximityASPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

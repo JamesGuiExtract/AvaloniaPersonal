@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtilsTest.AFUtilityTester.1 = s 'AFUtilityTester Class'
+	{
+		CLSID = s '{5F0CC11E-739C-4D9C-8AB4-57D729C9FEAD}'
+	}
+	UCLIDAFUtilsTest.AFUtilityTester = s 'AFUtilityTester Class'
+	{
+		CLSID = s '{5F0CC11E-739C-4D9C-8AB4-57D729C9FEAD}'
+		CurVer = s 'UCLIDAFUtilsTest.AFUtilityTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5F0CC11E-739C-4D9C-8AB4-57D729C9FEAD} = s 'AFUtilityTester Class'
+		{
+			ProgID = s 'UCLIDAFUtilsTest.AFUtilityTester.1'
+			VersionIndependentProgID = s 'UCLIDAFUtilsTest.AFUtilityTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63AB2AE7-7499-4975-96FD-6532DF6FA946}'
+		}
+	}
+}

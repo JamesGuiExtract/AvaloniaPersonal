@@ -1,0 +1,47 @@
+(?imnsx)
+
+(?#
+#------------------------------------------------
+# A savings or checking clue...
+#------------------------------------------------
+)
+
+(?:
+
+	(?#
+	#--------------------------------------------
+	# Various forms of "savings number", 
+	# "checking number", "savings account number",
+	# and "checking account number"
+	#--------------------------------------------
+	)
+	
+	(?:\bSA?V(?:INGS?)?|CHECKI|CKING|\bCKG?)(?:[\s\S]{0,11}?(?:ACC|COUNT|ACCT))?[\s\S]{0,9}(?:NUM(?:BER)?|\bN[0O]|\#)|
+	
+	(?#
+	#--------------------------------------------
+	# Various forms of "bank number" and
+	# "bank account number",
+	#--------------------------------------------
+	)
+	
+	BANK(?:[\s\S]{0,5}?(?:ACC|COUNT|ACCT))?[\s\S]{0,9}(?:NUM(?:BER)?|\bN[0O]|\#)
+	
+)
+
+(?#
+#------------------------------------------------
+# ...within ten characters of...
+#------------------------------------------------
+)
+
+\D{0,10}
+
+(?#
+#------------------------------------------------
+# ...something that looks like an account number.
+# Capture the account number!
+#------------------------------------------------
+)
+
+(?<SavingsChecking_Data>\d([A-Z]?[\d\x20-]{1,2}){1,10}\d)

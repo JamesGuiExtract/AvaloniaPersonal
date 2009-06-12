@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.TaskCondition.1 = s 'TaskCondition Class'
+	{
+		CLSID = s '{F98475F4-6EED-4367-8340-16D6D05E43F6}'
+	}
+	ESFAMConditions.TaskCondition = s 'TaskCondition Class'
+	{
+		CLSID = s '{F98475F4-6EED-4367-8340-16D6D05E43F6}'
+		CurVer = s 'ESFAMConditions.TaskCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F98475F4-6EED-4367-8340-16D6D05E43F6} = s 'TaskCondition Class'
+		{
+			ProgID = s 'ESFAMConditions.TaskCondition.1'
+			VersionIndependentProgID = s 'ESFAMConditions.TaskCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{}'
+		}
+	}
+}

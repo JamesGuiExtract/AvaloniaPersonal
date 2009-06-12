@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//Set001
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Muskingum - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\OH - Muskingum\Set001;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

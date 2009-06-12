@@ -1,0 +1,53 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,ROPOA_SURE_01,false
+		// 
+		01=^REVOCATION\s*OF\s*POWER OF\s*ATTORNEY\s*\(JUVENILES\)\s*(?:\r?$)
+		02=^REVOCATION\s*OF\s*(?:.?STATUTORY\s*DURABLE\s*|GENERAL\s*)POWER\s*OF\s*ATTORNEY\s*(?:\r?$)
+		03=^NOTICE\s*OF\s*REVOCATION\s*OF\s*POWER\s*OF\s*ATTORNEY\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.3,1,2
+
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+
+SCOPE_END
+
+[MAYBE_END]

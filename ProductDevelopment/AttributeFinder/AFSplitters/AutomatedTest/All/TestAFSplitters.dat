@@ -1,0 +1,12 @@
+//*********************************************************************************
+// TestAFSplitters.dat
+// 	This file contains File test cases that point to the dat files 
+//      for running individual test cases for Splitters
+//*********************************************************************************
+
+// Test Date/Time Splitter
+<FILE>;..\DateTimeSplitter\DateTimeSplitter.dat
+<FILE>;..\LegalDescriptionSplitter\LegalDescriptionSplitter.dat
+<FILE>;..\RSDFileSplitter\RSDFileSplitter.dat
+<FILE>;..\StringTokenizerSplitter\StringTokenizerSplitter.dat
+

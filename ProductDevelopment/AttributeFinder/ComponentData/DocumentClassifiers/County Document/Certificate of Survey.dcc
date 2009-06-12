@@ -1,0 +1,56 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,COS_SURE_01,false
+		01=^CERTIFICATE\s*OF\s*SURVEY\s*(?:\r?$)
+		02=^I\s*hereby\s*certify\s*that\s*I\s*have\s*Surveyed[\s\S]{0,300}PROFESSIONAL\s*SURVEYOR\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,COS_SURE_02,TRUE
+
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+// 0001.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set012\Set12f\Images\B04174AAAT2.TIF.uss
+SCOPE_BEGIN,0,0.2,1,2
+	OR_BEGIN,COS_MAYBE_01,TRUE
+		01=^CERTIFICATE\s*OF\s*SURVEY
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,COS_MAYBE_02,TRUE
+		01=hereby\s*certify\s*that\s*I\s*have\s*surveyed
+	OR_END
+SCOPE_END
+
+[MAYBE_END]

@@ -1,0 +1,25 @@
+HKCR
+{
+	AFValueFinders.ImageRegionWithLinesPP.1 = s 'ImageRegionWithLinesPP Class'
+	{
+		CLSID = s '{E2D32EC9-5412-43C0-83F4-DB7617AD9FB7}'
+	}
+	AFValueFinders.ImageRegionWithLinesPP = s 'ImageRegionWithLinesPP Class'
+	{
+		CLSID = s '{E2D32EC9-5412-43C0-83F4-DB7617AD9FB7}'
+		CurVer = s 'AFValueFinders.ImageRegionWithLinesPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E2D32EC9-5412-43C0-83F4-DB7617AD9FB7} = s 'ImageRegionWithLinesPP Class'
+		{
+			ProgID = s 'AFValueFinders.ImageRegionWithLinesPP.1'
+			VersionIndependentProgID = s 'AFValueFinders.ImageRegionWithLinesPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

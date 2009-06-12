@@ -1,0 +1,9 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;CreateTestOutputVOAFiles=1
+<SETTING>;OutputAttributeNamesFileLists=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\OH - Clermont\Set001\Images\DEED;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\OH - Clermont\Set001\Images\MTG;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\OH - Clermont\Set001\Images\ORBK;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

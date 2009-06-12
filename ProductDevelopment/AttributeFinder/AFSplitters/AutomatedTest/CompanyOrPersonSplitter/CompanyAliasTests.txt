@@ -1,0 +1,87 @@
+// Company Or Person Name Splitter tests
+// Company Alias
+// This is a subset of the NS_Abc.txt test files from the AFSplittersTest\TestFiles folder
+Wisconsin National Bank AKA Wisconsin Bank
+
+Wisconsin National Bank A/K/A Wisconsin Bank
+
+Wisconsin National Bank Also Known As Wisconsin Bank
+
+Wisconsin Service Teachers Credit Union Currently Known As Wisconsin Credit Union
+
+Pacific Service Employees\r\nCredit Union currently known as Pacific Service Credit Union
+
+Wisconsin National Bank FKA Wisconsin Bank
+
+Wisconsin National Bank F/K/A Wisconsin Bank
+
+Wisconsin National Bank Formerly Known As Wisconsin Bank
+
+Wisconsin National Bank Formerly Wisconsin Bank
+
+Wisconsin National Bank DBA Wisconsin Bank
+
+Wisconsin National Bank D/B/A Wisconsin Bank
+
+Wisconsin National Bank Doing Business As Wisconsin Bank
+
+Wisconsin National Bank D.B.A. wisbank.com
+
+Wisconsin National Bank OBA Wisconsin Bank
+
+Wisconsin National Bank T/A Wisconsin Bank
+
+Wisconsin National Bank Assigned Over To Wisconsin Bank
+
+Wisconsin National Bank Now By Chartered Conversion Wisconsin Bank
+
+Wisconsin National Bank SBM Wisconsin Bank
+
+Wisconsin National Bank S/B/M/T Wisconsin Bank
+
+Wisconsin National Bank successor by merger to Wisconsin Bank
+
+Wisconsin National Bank survivor by merger Wisconsin Bank
+
+Wisconsin National Bank by merge to Wisconsin Bank
+
+Wisconsin National Bank S/B/M To Wisconsin Bank
+
+Wisconsin National Bank successor by merger with Wisconsin Bank
+
+Wisconsin National Bank survivor by merger with Wisconsin Bank
+
+Wisconsin National Bank S/B/M/W Wisconsin Bank
+
+Wisconsin National Bank SII Wisconsin Bank
+
+Wisconsin National Bank S/I/I Wisconsin Bank
+
+Wisconsin National Bank successor in interest to Wisconsin Bank
+
+Wisconsin National Bank successor to Wisconsin Bank
+
+Wisconsin National Bank as successor to Wisconsin Bank
+
+Wisconsin National Bank by merger with Wisconsin Bank
+
+Wisconsin National Bank a division of Wisconsin Bank
+
+Wisconsin National Bank a branch of Wisconsin Bank
+
+Wisconsin National Bank a subdivision of Wisconsin Bank
+
+Wisconsin National Bank a branch of Wisconsin Bank
+
+Wisconsin National Bank a subsidiary of Wisconsin Bank
+
+First Wisconsin Bank FKA Wisconsin Bank S/B/M/T Wisconsin National Bank
+
+20/20 CUSTOM AUDIO VIDEO SYSTEMS
+
+First American Title Insurance Company of Oregon, an assumed business name of Title Insurance Company of Oregon
+
+Citifinancial formerly known as Commercial Credit Corporation
+
+First Franklin A Division Of National City Bank Of Indiana
+

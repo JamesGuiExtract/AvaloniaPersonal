@@ -1,0 +1,21 @@
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Old Stats
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
+
+//Hybrid Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=only any
+//<SETTING>;AutomatedCondition=HCData
+//<SETTING>;OutputHybridStats=1
+
+<SETTING>;OutputFinalStatsOnly=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set006\FIN;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set006\LIE;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set006\MIL;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set006\MTG;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

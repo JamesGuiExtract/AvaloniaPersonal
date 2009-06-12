@@ -1,0 +1,27 @@
+HKCR
+{
+	VBScriptUtils.ImageData.1 = s 'ImageData Class'
+	{
+		CLSID = s '{543249E3-59C3-4379-AF33-008DDB5A0E2A}'
+	}
+	VBScriptUtils.ImageData = s 'ImageData Class'
+	{
+		CLSID = s '{543249E3-59C3-4379-AF33-008DDB5A0E2A}'
+		CurVer = s 'VBScriptUtils.ImageData.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {543249E3-59C3-4379-AF33-008DDB5A0E2A} = s 'ImageData Class'
+		{
+			ProgID = s 'VBScriptUtils.ImageData.1'
+			VersionIndependentProgID = s 'VBScriptUtils.ImageData'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{7318A7D4-817E-4D52-ACE6-3245C350BACF}'
+		}
+	}
+}

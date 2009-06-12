@@ -1,0 +1,5 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Lien - Misc
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Lien;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Mechanic Lien;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber

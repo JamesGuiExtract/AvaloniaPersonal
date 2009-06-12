@@ -1,0 +1,715 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Output Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Output Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+   	<LI><b>Configuration</b>
+	<ul>
+		<li>Open <b>ID Shield Office</b> and select the <b>Edit - Preferences</b> 
+		menu.
+		<li>Select the <b>Output files</b> tab.
+		<li>Confirm that a checkbox is provided for automatically saving an <b>ID Shield 
+		Office file</b> whenever an output file is created.
+		<li>Confirm that the checkbox is checked by default.
+		<li>Confirm that the checkbox setting is persistent within the same session.
+		<li>Confirm that the checkbox setting is persistent between sessions.
+		<p>
+
+		<li>Confirm that a drop-down list is provided for default save format with 
+		the following entries:
+		<ul>
+			<li>TIF
+			<li>PDF
+			<li>IDSO
+		</ul>
+		<li>Confirm that the default save format is <b>TIF</b>.
+		<li>Confirm that the save format is persistent within the same session.
+		<li>Confirm that the save format is persistent between sessions.
+		<p>
+
+		<li>Confirm that a checkbox is provided for using expressions as default output path for redacted files.
+		<li>Confirm that a hyper link is provided behind the checkbox.
+		<li>Confirm that clicking the hyper link will open the <b>Examples of Output File Settings</b> help page.
+		<li>Confirm that the checkbox is <b>unchecked</b> by default.
+		<li>Confirm that checking the checkbox <b>enables</b> the default output path editbox.
+		<li>Confirm that unchecking the checkbox <b>disables</b> the default output path editbox.
+		<p>
+
+		<li>Check the "using following expressions as the default output path for redacted files" checkbox
+		<li>Confirm that an editbox is provided for default output path for redacted file.
+		<li>Confirm that the default output path for TIF is
+		<b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b>.
+		<li>Confirm that the default output path for PDF is
+		<b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.pdf</b>.
+		<li>Confirm that the default output path for IDSO is
+		<b>&lt;SourceDocName&gt;.idso</b> and read-only.
+		<li>Confirm that tags button is disabled when saving <b>IDSO</b> files by default.
+		<li>Confirm that an associated <b>Tags &gt;</b> button is provided.
+		<li>Confirm that the <b>Tags &gt;</b> button provides a drop-down list of functions 
+		including ( among others ):
+		<ul>
+			<li>&lt;SourceDocName&gt;
+			<li>$DirNoDriveof()
+			<li>$DirOf()
+			<li>$DriveOf()
+			<li>$ExtOf()			
+			<li>$FileNoExtOf()
+			<li>$FileOf()
+			<li>$InsertBefortExt()
+			<li>$Offset()
+			<li>$PadValue()
+			<li>$Replace()
+			<li>$TrimAndConsolidateWS()
+		</ul>
+		<li>Confirm that the selected tag replaces text selected in the edit box.
+		<li>Confirm that the selected tag is inserted at the cursor position in the 
+		edit box.
+		<li>Confirm that the default output path is persistent within the same session.
+		<li>Confirm that the default output path is persistent between sessions.
+		<p>
+
+		<li>Confirm that read-only text is provided for <b>Sample original input file name</b> 
+		when the checkbox is checked.
+		<li>Confirm that read-only text is provided for <b>Sample redacted output file name</b>
+		when the checkbox is checked.
+		<li>Confirm that the <b>Sample redacted output file name</b> changes with changes 
+		in the <b>Default save format</b>.
+		<li>Confirm that the <b>Sample redacted output file name</b> changes with changes 
+		in the <b>Default output path</b>.
+		<li>Confirm that read-only text is <b>not</b> provided when the checkbox is <b>unchecked</b>.
+		<p>
+
+		<li><b>[IDSD #336]</b> Currently open filename is used as the example in output files preferences
+		<ul>
+			<li> Open ID Shield Office.
+			<li> Go to <b>Edit | Preference | Output Files</b>
+			<li> Check <b>Use the following expression as the default output path for redacted files</b>
+			<li> Confirm the <b>Sample original input file name</b> is <b>C:\Images\FolderA\Image001.tif</b>
+			<li> Confirm that for each default save format, the sample output file name is correct given the sample input file.
+			<li> Press <b>OK</b> to close the preferences dialog.
+			<li> Open the file: <b>\\fnp\internal\Common\Testing\Product Testing\IDShieldOffice\Images\LongFileNameTest\FindTextTest.tif</b>
+			(use the complete UNC path rather than a drive mapping)
+			<li> Go to <b>Edit | Preference | Output Files</b>
+			<li> Confirm the <b>Sample original input file name</b> is 
+			<b>\\fnp\internal\Common\Testing\Product Testing\IDShieldOffice\Images\LongFileNameTest\FindTextTest.tif.</b>
+			<li> Confirm that though the filename is too long for the text box, the end of the filename is visible by default.
+			<li> Confirm that you can scroll to the beginning and end of the filename and copy the path, but that it cannot be edited.
+			<li> Confirm that if the preferences dialog is resized that the entire filename becomes visible once it is big enough.
+			<li> Confirm that for each default save format, the sample output file name is correct given the sample input file.
+		</ul>
+		<p>
+	</ul>
+	<p>
+
+	<li><b>Save/Save As functionality - Print to ID Shield printer from Other Applications</b>
+	<ul>
+		<!-- default output TIF format -->
+		<li>Print a document to ID Shield virtual printer to launch IDSO
+		<li>Confirm that main window caption shows that the current image file is located in a temp folder
+		<li>Apply a Bates number to the image.
+		<li>Open <b>User preferences</b> dialogs
+		<li>Confirm following configuration:
+		<ul>
+			<li>Check <b>automatically save IDSO file</b> checkbox
+			<li>Default save format as TIF
+			<li>Check the "using following expressions as the default output path for redacted files" checkbox
+			<li>Set the default save path as <b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b> 
+		</ul>
+		<li>Click <b>Save</b> button.
+		<li>Confirm that <b>Save document</b> appears.
+		<li>Confirm that the initial save path in the dialog is <b>My documents</b>
+		<li>Confirm that filename editbox in the dialog is empty
+		<li>Confirm that current <b>Save as types</b> is <b>TIFF files (*.tif)</b>
+		<li>Confirm that <b>Save as types</b> dropdown list has no <b>IDSO files (*.idso)</b> file type.
+		<li>Specify filename as <b>temp_save.tif</b>.
+		<li>Click <b>Cancel</b> in the dialog.
+		<li>Confirm that <b>temp_save.tif</b> is not saved under the destination folder.
+<p>
+		<li>Click <b>Save</b> button again.
+		<li>Specify filename as <b>temp_save.tif</b> and Click <b>Save</b> in the dialog.
+		<li>Confirm that <b>temp_save.tif</b> is saved.
+		<li>Confirm that no file with idso extension is saved.
+<p>
+		<li>Draw an angular redaction on the image file.
+		<li>Click <b>Save</b> button again.
+		<li>Confirm that <b>no dialog</b> appears.
+		<li>Confirm that the angular redaction is saved into <b>temp_save.tif</b>
+<p>
+		<li>Draw a rectangular redaction on the image file
+		<li>Select <b>File - Save As...</b>
+		<li>Confirm that <b>Save document</b> appears.
+		<li>Confirm that the initial save path in the dialog is <b>My documents</b>
+		<li>Confirm that filename editbox in the dialog is <b>temp_save.tif</b>
+		<li>Confirm that current <b>Save as types</b> is <b>TIFF files (*.tif)</b>
+		<li>Confirm that <b>Save as types</b> dropdown list has no <b>IDSO files (*.idso)</b> file type.
+		<li>Specify filename as <b>temp_saveas.tif</b>.
+		<li>Click <b>Save</b> in the dialog.
+		<li>Confirm that <b>temp_saveas.tif</b> is saved.
+		<li>Confirm that no file with idso extension is saved.
+		<li>Confirm that the <b>rectangular redaction</b> is saved into <b>temp_saveas.tif</b>.
+		<li>Confirm that the <b>rectangular redaction</b> is not saved into <b>temp_save.tif</b>.
+		<li>Close the image file.
+<p>
+		<!-- default output PDF format -->
+		<li>Print a document to ID Shield virtual printer to launch IDSO.
+		<li>Apply a Bates number to the image file.
+		<li>Open the <b>User preferences</b> dialog.
+		<li>Change configuration to the following:
+		<ul>
+			<li>Check <b>automatically save IDSO file</b> checkbox.
+			<li>Default save format as PDF.
+			<li>Check the "using following expressions as the default output path for redacted files" checkbox.
+			<li>Default save path as <b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.pdf</b>.
+		</ul>
+		<li>Click <b>Save</b> toolbar button.
+		<li>Confirm that <b>Save document</b> appears.
+		<li>Confirm that the initial save path in the dialog is <b>C:\My Documents</b>
+		<li>Confirm that filename editbox in the dialog is empty
+		<li>Confirm that current <b>Save as types</b> is <b>PDF files (*.pdf)</b>
+		<li>Confirm that <b>Save as types</b> dropdown list has no <b>IDSO files (*.idso)</b> file type
+		<li>Specify filename as <b>temp_save.pdf</b>.
+		<li>Click <b>Save</b> in the dialog.
+		<li>Confirm that <b>temp_save.pdf</b> is saved under the destination folder.
+		<li>Close the temporary image file.
+		<p>
+
+		<!-- default output IDSO format -->
+		<li>Print a document to ID Shield virtual printer to launch IDSO
+		<li>Apply a Bates number to the image file
+		<li>Open <b>User preference</b> dialog
+		<li>Change configuration to the following:
+		<ul>
+			<li>Check <b>automatically save IDSO file</b> checkbox.
+			<li>Default save format as IDSO.
+			<li>Check the "using following expressions as the default output path for redacted files" checkbox.
+		</ul>
+		<li>Confirm that <b>Save</b> button and menu are disabled.
+		<li>Click <b>file - Save As...</b> menu.
+		<li>Confirm that <b>Save document</b> appears.
+		<li>Confirm that the initial save path in the dialog is <b>My documents</b>.
+		<li>Confirm that filename editbox in the dialog is empty.
+		<li>Confirm that current <b>Save as types</b> is <b>TIFF files (*.tif)</b>.
+		<li>Confirm that <b>Save as types</b> dropdown list has no <b>IDSO files (*.idso)</b> file type.
+		<li>Specify filename as <b>temp_save.tif</b>.
+		<li>Click <b>Save</b> in the dialog.
+		<li>Confirm that <b>temp_save.tif</b> is saved under the destination folder.
+	</ul>
+	<p>
+
+	<li><b>Save/Save As functionality - physical image file</b>
+	<ul>
+		<li>
+			<!-- default output TIF format -->
+			<li>Open an image file from local folder
+			<li>Apply Bates# to the image file
+			<li>Open <b>User preference</b> dialog
+			<li>Confirm following configuration:
+			<br>Uncheck <b>automatically save IDSO file</b> checkbox
+			<br>Default save format as TIF
+			<br>Check the "using following expressions as the default output path for redacted files" checkbox
+			<br>Default save path as <b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b> 
+			<li>Click <b>Save</b> button
+			<li>Confirm that <b>Save document</b> appears.
+			<li>Confirm that the initial save path in the dialog is <b>the same folder as the image file</b>
+			<li>Confirm that filename editbox in the dialog is <b>$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b>
+			<li>Confirm that current <b>Save as types</b> is <b>TIFF files(*.tif)</b>
+			<li>Confirm that <b>Save as types</b> dropdown list has <b>IDSO files(*.idso)</b> file type
+			<li>Specify filename as <b>temp_save.tif</b>
+			<li>Click <b>Cancel</b> in the dialog
+			<li>Confirm that <b>temp_save.tif</b> is not saved under the destination folder
+			<p>
+
+			<li>Click <b>Save</b> button again.
+			<li>Specify filename as <b>temp_save.tif</b> and Click <b>Save</b> in the dialog
+			<li>Confirm that <b>temp_save.tif</b> is saved.	
+			<p>
+
+			<li>Draw an angular redaction on the image file
+			<li>Click <b>Save</b> button again
+			<li>Confirm that <b>no dialog</b> appears.
+			<li>Confirm that angular redaction is saved into <b>temp_save.tif</b>
+			<p>
+
+			<li>Draw a rectangular redaction on the image file
+			<li>Select <b>File - Save As...</b>
+			<li>Confirm that <b>Save document</b> appears.
+			<li>Confirm that the initial save path in the dialog is <b>the same as the image file</b>
+			<li>Confirm that filename editbox in the dialog is <b>$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b>
+			<li>Confirm that current <b>Save as types</b> is <b>TIFF files(*.tif)</b>
+			<li>Confirm that <b>Save as types</b> dropdown list has <b>IDSO files(*.idso)</b> file type
+			<li>Specify filename as <b>temp_saveas.tif</b>
+			<li>Click <b>Save</b> in the dialog
+			<li>Confirm that <b>temp_saveas.tif</b> is saved.
+			<li>Confirm that no other file with idso extension is saved.
+			<li>Confirm that <b>rectangular redaction</b> is saved into <b>temp_saveas.tif</b>
+			<li>Confirm that <b>rectangular redaction</b> is not saved into <b>temp_save.tif</b>
+			<li>Close the image file
+			<p>
+
+			<!-- default output PDF format -->
+			<li>Open an image file from local folder
+			<li>Apply a Bates number to the image file
+			<li>Open <b>User preferences</b> dialog
+			<li>Change configuration to the following:
+			<ul>
+				<li>Check <b>automatically save IDSO file</b> checkbox.
+				<li>Default save format as PDF.
+				<li>Check the "using following expressions as the default output path for 
+				redacted files" checkbox.
+				<li>Set the default save path as <b>$DirOf(&lt;SourceDocName&gt;)\$FileNoExtOf(&lt;SourceDocName&gt;).redacted.tif</b> 
+			</ul>
+			<li>Click <b>Save</b> toolbar button.
+			<li>Confirm that <b>Save document</b> appears.
+			<li>Confirm that the initial save path in the dialog is the same as the image file.
+			<li>Confirm that filename editbox in the dialog is <b>$FileNoExtOf(&lt;SourceDocName&gt;).redacted.pdf</b>
+			<li>Confirm that current <b>Save as types</b> is <b>PDF files (*.pdf)</b>.
+			<li>Confirm that <b>Save as types</b> dropdown list has <b>IDSO files (*.idso)</b> file type.
+			<li>Specify filename as <b>temp_save.pdf</b>.
+			<li>Click <b>Save</b> in the dialog.
+			<li>Confirm that <b>temp_save.pdf</b> is saved in the destination folder.
+			<li>Confirm that <b>&lt;SourceDocName&gt;.idso</b> is saved in the same folder as the image file.
+			<li>Close the image file.
+			<p>
+
+			<!-- default output IDSO format -->
+			<li>Open an image file from local folder.
+			<li>Apply a Bates number to the image file.
+			<li>Open <b>User preference</b> dialog.
+			<li>Change configuration to the following:
+			<ul>
+				<li>Check <b>automatically save IDSO file</b> checkbox.
+				<li>Default save format as IDSO.
+				<li>Check the "using following expressions as the default output path for 
+				redacted files" checkbox.
+				<li>Default save path as <b>&lt;SourceDocName&gt;.idso</b>.
+			</ul>
+			<li>Click <b>file - Save...</b> menu 
+			<li>Confirm that <b>Save document</b> appears.
+			<li>Confirm that the initial save path in the dialog is <b>the same as the image file</b>.
+			<li>Confirm that filename editbox in the dialog is <b>&lt;SourceDocName&gt;.idso</b>.
+			<li>Confirm that current <b>Save as types</b> is <b>IDSO files (*.idso)</b>.
+			<li>Confirm that <b>Save as types</b> dropdown list has <b>IDSO files (*.idso)</b> file type.
+			<li>Specify filename as <b>temp_save.idso</b>.
+			<li>Click <b>Save</b> in the dialog.
+			<li>Confirm that <b>Save document</b> messagebox appears.
+			<li>Click <b>No</b> in the <b>Save document</b> messagebox.
+			<li>Specify destination location as upper folder of current folder.
+			<li>Click <b>Save</b> in the dialog.
+			<li>Confirm that <b>Save document</b> messagebox appears.
+			<li>Click <b>Yes</b> in the <b>Save document</b> messagebox.
+			<li><b>&lt;SourceDocName&gt;.idso</b> is saved in the same folder as the image file.
+			<p>
+
+		<li><b>[IDSD #334]</b> Don't allow overwrite of input file 
+		<ul>
+			<li> Open a tif file.
+			<li> Press the <b>Save</b> button.
+			<li> When the save as dialog appears, select the currently open file and use the tif file type.
+			<li> Press <b>Save</b>.
+			<li> You will first be prompted to overwrite the existing file-- Press <b>Yes</b>.
+			<li> Confirm that you are then presented with a second prompt saying you cannot save to the currently open file.
+		</ul>
+		<p>
+
+		<li><b>[IDSD #341]</b> Save As - Wrong extension when switching from .idso to image format
+		<ul>
+			<li> Open an image in ID Shield Office
+			<li> Open the <b>preferences dialog (F12)</b> and go to the <b>Output files</b> tab.
+			<li> Set the default output format to IDSO. Uncheck the <b>Use following expression as default output format</b> checkbox. Hit <b>OK</b>.
+			<li> Reopen the preferences dialog and set the default output format to TIF. Do NOT check the <b>Use following expression as 
+			default outputformat</b> checkbox. Hit <b>OK</b>.
+			<li> Click <b>Save As</b>
+			<li> Confirm the default file name ends with the ".tif" extension. 
+		</ul>
+		<p>
+
+		<li><b>[.NetRCAndUtils #254]</b> Save - layer objects incorrect on rotated image
+		<ul>
+			<li> Open an image.
+			<li> Create some redactions.
+			<li> Rotate the image.
+			<li> Save the image (as an image type, not IDSO).
+			<li> Open the output image and ensure the redactions as in their correct rotated positions.
+		</ul>
+		<p>
+
+		<li><b>[.NetRCAndUtils #239]</b> Save - layer objects that are not visible should still be 
+		saved in output image  
+		<ul>
+			<li> Open an image that contains text that IDSO's rules will find both clues and matches in.
+			<li> Press the <b>Data type finder</b> button and select all data types.
+			<li> Press <b>Redact All</b>
+			<li> Press the <b>Apply bates</b> number button.
+			<li> Open the <b>layers pane</b> if it is not already open and turn off all layers.
+			<li> Press <b>Save</b> and save the image as type IDSO.
+			<li> Re-open the image.
+			<li> Turn on all layers.
+			<li> Confirm that all clues redactions and bates numbers are present.
+		</ul>
+	</ul>
+	<p>
+
+	<li><b>Dirty flag check</b>
+	<ul>
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Confirm that no dirty flag(an asterisk) on the titlebar
+
+		<!-- Data type finder -->
+		<li>Click <b>Data type finder</b> to display <b>Find and redact - Data types</b> dialog
+		<li>Check <b>all the checkboxes</b> and click <b>Find next</b> button
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Find next</b> again to next highlight until the last highlight
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Redact all</b> to redact all matches
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Close image file without saving it
+		<p>
+
+		<!-- Bracketed text finder -->
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>Bracketed text finder</b> to display <b>Find and redact - Bracketed text</b> dialog
+		<li>Check <b>all the checkboxes</b> and click <b>Find next</b> button
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Find next</b> again to next highlight until the last match
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Redact all</b> to redact all matches
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Close image file without saving it
+		<p>
+
+		<!-- Wordlist finder -->
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>Word list finder</b> to display <b>Find and redact - Words/Patterns</b> dialog
+		<li>Input <b>test</b> into the words/patterns editbox and click <b>Find next</b> button
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Find next</b> again to next highlight until the last match
+		<li>Confirm that <b>no dirty flag (an asterisk)</b> on the titlebar
+		<li>Click <b>Redact all</b> to redact all matches
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Close image file without saving it
+		<p>
+
+		<!-- draw/delete an angular redaction -->
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>angular redaction</b> toolbar button
+		<li>Draw an angular redaction on the image
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Save the image file without applying bates#
+		<li>Reopen the image file
+		<li>Delete the angular redaction drawn before
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Save the image file without applying bates#
+		<p>
+
+		<!-- draw/delete a rectangular redaction -->
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>rectangular redaction</b> toolbar button
+		<li>Draw an rectangular redaction on the image
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Save the image file without applying bates#
+		<li>Reopen the image file
+		<li>Delete the rectangular redaction drawn before
+		<li>Confirm that <b>a dirty flag (an asterisk)</b> on the titlebar
+		<li>Save the image file without applying bates#
+		<p>
+
+		<!-- apply bates number -->		
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Click <b>Apply Bates number</b> toolbar button.
+		<li>Confirm that <b>an asterisk is appended to the filename</b> on the titlebar.
+		<li>Save and close the image file.
+		<li>Reopen the image file.
+		<li>Delete the Bates number applied before.
+		<li>Confirm that <b>an asterisk is appended to the filename</b> on the titlebar.
+		<li>Save the image file without applying a Bates number.
+		<p>
+
+		<li>Confirm that other image view action will not trigger an asterisk on the titlebar.
+		<li>Confirm that object selection will not trigger an asterisk on the titlebar.
+		<p>
+
+		<!-- Close image while dirty -->
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Click <b>Apply Bates number</b> toolbar button.
+		<li>Select <b>File - close</b>.
+		<li>Confirm that <b>File not saved</b> dialog appears.
+		<li>Click <b>Cancel</b> in the dialog.
+		<li>Confirm that <b>image file</b> is neither saved nor closed.
+		<li>Select <b>File - close</b>.
+		<li>Click <b>Yes</b> in the <b>File not saved</b> dialog.
+		<li>Confirm that <b>Save document</b> dialog appears.
+		<li>Click <b>Cancel</b> in the <b>Save document</b> dialog.
+		<li>Confirm that <b>image file</b> is neither saved  nor closed.
+		<li>Select <b>File - close</b>.
+		<li>Click <b>Yes</b> in the <b>File not saved</b> dialog.
+		<li>Confirm that <b>Save document</b> dialog appears.
+		<li>Click <b>Yes</b> in the <b>Save document</b> dialog.
+		<li>Confirm that <b>image file</b> is both saved and closed.
+		<li>Reopen <b>FindTextTest.tif</b> image file.
+		<li>Draw a redaction on the image file.
+		<li>Select <b>File - close</b>.
+		<li>Click <b>Cancel</b> in the <b>File not saved</b> dialog.
+		<li>Confirm that <b>image file</b> is closed but not saved.
+	</ul>
+	<p>
+
+	<li><b>visiting all pages prompt</b>
+	<ul>
+		<!-- Check visitiong all pages -->
+		<li>Check "Require visiting all pages before a redacted document can be output" in the user preferences.
+		<!-- Not dirty document -->
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Close the image file.
+		<li>Confirm that no prompt dialog appears.
+
+		<!-- dirty document -->
+		<li>Open <b>FindTextTest.tif</b> image file agian.
+		<li>Draw a redaction on the first page.
+		<!-- print -->
+		<li>Click <b>File - Print</b>
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>Yes</b> 
+		<li>Click <b>Cancel</b> in the <b>Print</b> dialog.
+		<!-- print preview -->
+		<li>Click <b>File - Print preview</b>
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>Yes</b> 
+		<li>Click <b>Print</b> in the <b>Print preview</b> dialog.
+		<li>Confirm that <b>Print</b> dialog appears.
+		<li>Cancel the print.		
+
+		<!-- close -->
+		<li>Click <b>File - close</b>.
+		<li>Click <b>Yes</b> in the <b>File not saved</b> dialog.
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>Yes</b>.
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+		<!-- save as -->
+		<li>Click <b>File - Save as</b> menu item.
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>Yes</b> 
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+		<!-- save -->
+		<li>Click <b>Save</b> button.
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>Yes</b> 
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+		
+		<li>Click <b>Save</b> button again.
+		<li>Confirm that <b>Continue without visiting all pages?</b> dialog appears.
+		<li>Click <b>No</b> 
+		<li>Confirm that <b>the second page</b> is displayed.
+		<li>Click <b>Save</b> button again.
+		<li>Confirm that <b>Save</b> dialog appears.
+		<p>
+
+		<!-- Uncheck visting all pages -->
+		<li>Uncheck "Require visiting all pages before a redacted document can be output" in the user preference.
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Draw a redaction on the first page.
+		<!-- print -->
+		<li>Click <b>File - print</b>
+		<li>Confirm that <b>Print</b> dialog appears.
+		<li>Click <b>Cancel</b> in the <b>Print</b> dialog.
+		<!-- close -->
+		<li>Click <b>File - close</b>
+		<li>Click <b>Yes</b> in the <b>File not saved</b> dialog
+		<li>Confirm that <b>Save</b> dialog appears.
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+		<!-- save as -->
+		<li>Click <b>File - Save as</b> button.
+		<li>Confirm that <b>Save</b> dialog appears.
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+		<!-- save -->
+		<li>Click <b>Save</b> button.
+		<li>Confirm that <b>Save</b> dialog appears.
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog.
+	</ul>
+	<p>
+
+	<!-- SCR# 309 -->
+	<li>Partially visible objects prompt
+	<ul>
+		<!-- Redactions -->
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Draw several redactions inside first page.
+		<li>Navigate to second page and draw several redactions.
+		<li>Move one redaction in the second page partially outside the page.		
+		<!-- print -->
+		<li>Click <b>Print</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Print</b> dialog appears.
+		<li>Cancel the print
+
+		<li>Click <b>Print</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- print preview -->
+		<li>Click <b>Print preview</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Print preview</b> dialog appears.
+		<li>Click <b>Print</b> button
+		<li>Confirm that <b>Print</b> dialog appears
+		<li>Cancel the print
+
+		<li>Click <b>Print preview</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- close -->
+		<li>Click <b>File - close</b> menu
+		<li>Confirm that <b>file has not been saved</b> dialog appears.
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- save as -->
+		<li>Click <b>File - save as</b> menu
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Save</b> dialog appears.
+		<li>Cancel the save
+
+		<li>Click <b>File - save as</b> menu again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- save -->
+		<li>Click <b>Save</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Save</b> dialog appears.
+		<li>Cancel the save
+
+		<li>Click <b>Save</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<p>
+
+		<!-- Bates# -->
+		<li>Open <b>FindTextTest.tif</b> image file.
+		<li>Apply Bates#.
+		<li>Navigate to second page and move Bates# in the second page partially outside the page.		
+		<!-- print -->
+		<li>Click <b>Print</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Print</b> dialog appears.
+		<li>Cancel the print
+
+		<li>Click <b>Print</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- print preview -->
+		<li>Click <b>Print preview</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Print preview</b> dialog appears.
+		<li>Click <b>Print</b> button
+		<li>Confirm that <b>Print</b> dialog appears
+		<li>Cancel the print
+
+		<li>Click <b>Print preview</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- close -->
+		<li>Click <b>File - close</b> menu
+		<li>Confirm that <b>file has not been saved</b> dialog appears.
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- save as -->
+		<li>Click <b>File - save as</b> menu
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Save</b> dialog appears.
+		<li>Cancel the save
+
+		<li>Click <b>File - save as</b> menu again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+		<!-- save -->
+		<li>Click <b>Save</b> button
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>Yes</b>
+		<li>Confirm the <b>Save</b> dialog appears.
+		<li>Cancel the save
+
+		<li>Click <b>Save</b> button again
+		<li>Confirm that <b>continue with partially visible layer objects?</b> dialog appears.
+		<li>Click <b>No</b>
+		<li>Confirm the first partially visible object is displayed.
+	</ul>	
+	<p>
+
+	<li><b>Save Supported File Formats</b></li>
+	<ul>
+		<li>Single-page TIF
+			<ul>	
+			<li>Confirm that default output file and IDSO file are saved.
+			<li>Confirm that it can be saved as a TIF file.
+			<li>Confirm that it can be saved as a PDF file.
+			<li>Confirm that saved TIF is compressed.
+			<li>Confirm that saved PDF is compressed.		
+			</ul>
+		<li>Multi-page TIF*
+		<li>Single-page PDF*
+		<li>Multi-page PDF*
+	</ul>
+	* Same as single-page TIF
+	<p>
+
+	<li><b>Other</b>
+	<ul>
+		<li>Confirm that around 200~300 pages file can be saved
+		<li>Confirm that saved file size is proper
+		<li>Confirm that save time is not too long
+
+		<!-- SCR# 259 -->
+		<li><b>[IDSO #259 VISTA ONLY?]</b> Default save location
+		<ul>
+			<li>Open an image and add some manual redactions.
+			<li>Click the save button and save to some folder other than the default suggested folder (which is based upon the default save location settings).
+			<li>Close the document
+			<li>Open another document
+			<li>Add some redactions and click the save button
+			<li>Confirm that the default folder shown in the save dialog is the default save location configured in <b>User preference</b>
+		</ul>
+		<p>
+		
+		<li><b>[IDSD #333]</b> Default filename for save when default save location setting turned off.
+		<ul>
+			<li> Open ID Shield Office.
+			<li> Go to Edit | Preference | Output Files
+			<li> Uncheck "Use the following expression as the default output path for redacted files" if it is checked.
+			<li> Select a default save format of type IDSO.
+			<li> Open an image then press Save.
+			<li> Confirm the Save As dialog opens with the currently filename filled in and that it is set to save to the same directory the file was loaded from.
+			<li> Open an image from 2 more folders and confirm the Save As dialog is defaulted as described in the previous step.
+			<li> Go to Edit | Preference | Output Files
+			<li> Select a default save format of type tif.
+			<li> Open then attempt to save the same 3 images.
+			<li> Confirm that for each image the Save As dialog opens with the currenty filename filled in, but that it is set to the 
+			directory Windows defaults to (generally the last directory a file was saved to).
+		</ul>	
+	</ul>
+</UL>
+<ul>
+</ul>
+</BODY>
+</HTML>

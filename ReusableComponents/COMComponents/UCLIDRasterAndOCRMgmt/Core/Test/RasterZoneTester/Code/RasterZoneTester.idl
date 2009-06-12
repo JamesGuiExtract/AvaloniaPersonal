@@ -1,0 +1,32 @@
+// RasterZoneTester.idl : IDL source for RasterZoneTester.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (RasterZoneTester.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(B449B45E-363E-4457-8E32-717A3A1AA1F0),
+	version(1.0),
+	helpstring("UCLID RasterZoneTester 1.0 Type Library")
+]
+library UCLID_RASTERZONETESTERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+	importlib("..\..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+
+	[
+		uuid(FE4098EC-D232-4271-95EC-873CA7091E4B),
+		helpstring("TestIntersection Class")
+	]
+	coclass TestIntersection
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

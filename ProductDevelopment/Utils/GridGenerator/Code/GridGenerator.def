@@ -1,0 +1,9 @@
+; GridGenerator.def : Declares the module parameters.
+
+LIBRARY      "GridGenerator.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

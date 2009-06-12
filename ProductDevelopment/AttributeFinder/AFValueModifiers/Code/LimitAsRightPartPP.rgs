@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.LimitAsRightPartPP.1 = s 'LimitAsRightPartPP Class'
+	{
+		CLSID = s '{DBF61D34-0315-48D5-BD14-F5E0A51EB90A}'
+	}
+	UCLIDAFValueModifiers.LimitAsRightPartPP = s 'LimitAsRightPartPP Class'
+	{
+		CLSID = s '{DBF61D34-0315-48D5-BD14-F5E0A51EB90A}'
+		CurVer = s 'UCLIDAFValueModifiers.LimitAsRightPartPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DBF61D34-0315-48D5-BD14-F5E0A51EB90A} = s 'LimitAsRightPartPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

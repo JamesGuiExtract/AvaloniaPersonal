@@ -1,0 +1,4 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment Of Mortgage;;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav

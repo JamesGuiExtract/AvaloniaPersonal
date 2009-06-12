@@ -1,0 +1,2730 @@
+using Extract;
+using Extract.Interop;
+using Extract.Licensing;
+using Extract.Utilities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
+using System.Windows.Forms;
+using UCLID_AFCORELib;
+using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
+
+namespace Extract.DataEntry
+{
+    /// <summary>
+    /// Specifies whether an <see cref="IAttribute"/> is a hint and, if so, what type of
+    /// hint that it is.
+    /// </summary>
+    public enum HintType
+    {
+        /// <summary>
+        /// The <see cref="IAttribute"/> is truely spatial (not a hint).
+        /// </summary>
+        None,
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> is a direct hint (specifies the region one would expect to
+        /// find the data related to this hint.
+        /// </summary>
+        Direct,
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> is an indirect hint (specifies spatial clues that will help
+        /// determine where the <see cref="IAttribute"/>'s data may be found, but not necessarily
+        /// where one would expect to actually find the data).
+        /// </summary>
+        Indirect
+    }
+
+    /// <summary>
+    /// An object that represents the current state of a particular <see cref="IAttribute"/>
+    /// This includes whether the attribute's data has been validated, fully propagated and whether it
+    /// has been viewed by the user. The object is intended to occupy the 
+    /// <see cref="IAttribute.DataObject"/> field of the <see cref="IAttribute"/> it is associated
+    /// with.
+    /// </summary>
+    [Guid("BC86C004-F2C7-4a90-80F7-F6C49B201AD4")]
+    [ProgId("Extract.DataEntry.AttributeStatusInfo")]
+    [ComVisible(true)]
+    public class AttributeStatusInfo : IPersistStream, ICopyableObject
+    {
+        #region Delegates
+
+        /// <summary>
+        /// Used as a parameter for an attribute scan to define what should be done for each 
+        /// attribute in the tree.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance associated with 
+        /// the <see cref="IAttribute"/> in question.</param>
+        /// <param name="value">A value to either be set or confirmed depending upon the purpose of
+        /// each specific AccessorMethod implementation.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private delegate bool AccessorMethod(IAttribute attribute, AttributeStatusInfo statusInfo, 
+            bool value);
+
+        #endregion Delegates
+
+        #region AttributeScanner
+
+        /// <summary>
+        /// A helper class for <see cref="AttributeStatusInfo"/> that allows an 
+        /// <see cref="IAttribute"/> tree to be scanned to either apply a status info change or to
+        /// look for specific status values.  The attribute tree will be scanned in logical viewing
+        /// order (either forward or backward).
+        /// <para>Requirements:</para>
+        /// The scanning will work only as long as the following assumptions are true:
+        /// <list type="bullet">
+        /// <bullet>All attributes mapped to owning controls have had their
+        /// <see cref="AttributeStatusInfo.DisplayOrder"/> value set according to the order in
+        /// which the corresponding controls appear in the form.</bullet>
+        /// <bullet>All sibling attributes have been sorted according to their DisplayOrder and
+        /// all sibilings with equal DisplayOrder values are ordered in the order they appear in the
+        /// form.</bullet>
+        /// <bullet>No more that two generations of attributes share the same DisplayOrder. (This
+        /// is currently assured by the fact that no <see cref="IDataEntryControl"/> implementations
+        /// control more that two generations of attributes.</bullet>
+        /// </list>
+        /// </summary>
+        private class AttributeScanner
+        {
+            #region Fields
+
+            /// <summary>
+            /// The set of attributes to be scanned.
+            /// </summary>
+            public IUnknownVector _attributes;
+
+            /// <summary>
+            /// A genealogy of attributes describing the point at which the scan should be 
+            /// started.  The scan will start with the first attribute after the target attribute 
+            /// (the target being the attribute at the bottom of the stack) and will end with
+            /// the target attribute (assuming the scan isn't aborted somewhere in between).
+            /// </summary>
+            public Stack<IAttribute> _startingPoint;
+
+            /// <summary>
+            /// An attribute genealogy specifying the attribute that caused a scan to abort based
+            /// on the <see cref="AttributeStatusInfo.AccessorMethod"/> returning
+            /// <see langword="false"/>.
+            /// </summary>
+            public Stack<IAttribute> _resultAttributeGenealogy;
+
+            /// <summary>
+            /// <see langword="true"/> if scanning from the specified starting point to the end of  
+            /// the vector of attributes, <see langword="false"/> if looping back from the beginning of
+            /// the attribute vector to the specified starting point.
+            /// </summary>
+            public bool _firstPass = true;
+
+            /// <summary>
+            /// <see langword="true"/> if scanning forward through the attribute hierarchy,
+            /// <see langword="false"/> if scanning backward.
+            /// </summary>
+            public bool _forward = true;
+
+            /// <summary>
+            /// The index of the attribute where the scan should start for the current pass.
+            /// </summary>
+            public int _startIndex = -1;
+
+            /// <summary>
+            /// The index of the attribute where the scan should end for the current pass.
+            /// </summary>
+            public int _endIndex = -1;
+
+            /// <summary>
+            /// The index of the attribute described by the _startingPoint genealogy. This is only
+            /// set if the specified attribute at the bottom of the _startingPoint stack is one of
+            /// the attributes to search in this node (it is not set if the starting attribute is 
+            /// a descendent to one of the attributes to scan).
+            /// </summary>
+            public int _startAttributeIndex = -1;
+
+            /// <summary>
+            /// The <see cref="AttributeStatusInfo.DisplayOrder"/> of the attribute that triggered
+            /// the scan to end.
+            /// </summary>
+            public string _resultDisplayOrder;
+
+            /// <summary>
+            /// <see langword="true"/> if all attributes were scanned without any triggered the
+            /// scan to be aborted (with a return value of <see langword="false"/> from the 
+            /// <see cref="AttributeStatusInfo.AccessorMethod"/>), <see langword="false"/> if the
+            /// scan was aborted.
+            /// </summary>
+            public bool _result = true;
+
+            /// <summary>
+            /// A method used to get or set an <see cref="AttributeStatusInfo"/> field for each 
+            /// attribute.
+            /// </summary>
+            public AccessorMethod _accessorMethod;
+
+            /// <summary>
+            /// Either specifies the value an <see cref="AttributeStatusInfo"/> field should be set
+            /// to or specifies the value a field is required to be.
+            /// </summary>
+            public bool _value;
+
+            #endregion Fields
+
+            #region Constructors
+
+            /// <summary>
+            /// Initializes a new <see cref="AttributeScanner"/> instance used to scan a generation
+            /// of <see cref="IAttribute"/>s.
+            /// <para><b>Note:</b></para>
+            /// This constructor is private. Instances are constructed only via the Scan method.
+            /// </summary>
+            /// <param name="attributes">An <see cref="IUnknownVector"/> of 
+            /// <see cref="IAttribute"/>s to scan.</param>
+            /// <param name="accessorMethod">A method used to get or set an 
+            /// <see cref="AttributeStatusInfo"/> field for each attribute.</param>
+            /// <param name="value">Either specifies the value an <see cref="AttributeStatusInfo"/>
+            /// field should be set to or specifies the value a field is  required to be.</param>
+            /// <param name="resultAttributeGenealogy">An attribute genealogy specifying the 
+            /// attribute that caused a scan to abort based on the 
+            /// <see cref="AttributeStatusInfo.AccessorMethod"/> returning <see langword="false"/>.
+            /// </param>
+            /// <param name="forward"><see langword="true"/> if scanning forward through the 
+            /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
+            private AttributeScanner(IUnknownVector attributes, AccessorMethod accessorMethod,
+                bool value, bool forward, Stack<IAttribute> resultAttributeGenealogy)
+            {
+                try
+                {
+                    _attributes = attributes;
+                    _accessorMethod = accessorMethod;
+                    _value = value;
+                    _forward = forward;
+                    _resultAttributeGenealogy = resultAttributeGenealogy;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI24854", ex);
+                }
+            }
+
+            #endregion Constructors
+
+            #region Methods
+
+            /// <summary>
+            /// Performs a scan of the specified <see cref="IAttribute"/>s.
+            /// </summary>
+            /// <param name="attributes">The <see cref="IUnknownVector"/> of 
+            /// <see cref="IAttribute"/>s to scan.</param>
+            /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+            /// the point at which the scan should be started with each attribute further down the
+            /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+            /// The scan will start with the first attribute after the target attribute (the target 
+            /// being the attribute at the bottom of the stack) and will end with the target attribute 
+            /// (assuming the scan isn't aborted somewhere in between).</param>
+            /// <param name="accessorMethod">A method used to get or set an 
+            /// <see cref="AttributeStatusInfo"/> field for each attribute.</param>
+            /// <param name="value">Either specifies the value an <see cref="AttributeStatusInfo"/>
+            /// field should be set to or specifies the value a field is  required to be.</param>
+            /// <param name="forward"><see langword="true"/> if scanning forward through the 
+            /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
+            /// <param name="loop"><see langword="true"/> to resume scanning from the beginning of
+            /// the <see cref="IAttribute"/>s (back to the starting point) if the end was reached 
+            /// successfully, <see langword="false"/> to end the scan once the end of the 
+            /// <see cref="IAttribute"/> vector is reached.</param>
+            /// <param name="resultAttributeGenealogy">A genealogy of <see cref="IAttribute"/>s 
+            /// specifying the attribute that caused a scan to abort based on the 
+            /// <see cref="AttributeStatusInfo.AccessorMethod"/> returning <see langword="false"/>
+            /// </param>
+            public static bool Scan(IUnknownVector attributes,
+                Stack<IAttribute> startingPoint, AccessorMethod accessorMethod, bool value,
+                bool forward, bool loop, Stack<IAttribute> resultAttributeGenealogy)
+            {
+                try
+                {
+                    // Validate the license
+                    LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26132",
+                        _OBJECT_NAME);
+
+                    // Create a node in charge of scanning the root-level attributes.
+                    AttributeScanner rootScanNode = new AttributeScanner(attributes, accessorMethod,
+                        value, forward, resultAttributeGenealogy);
+
+                    // Initialize the scan node for the first pass of the scan (from the starting
+                    // point to the end of the attribute vector.
+                    rootScanNode = rootScanNode.GetScanNode(attributes, startingPoint, true);
+                    rootScanNode.Scan(null);
+
+                    if (loop && rootScanNode._result)
+                    {
+                        // If looping is requested and the first pass of the scan completed (was not
+                        // aborted), initialize the scan node for the second pass of the scan (from
+                        // the beginning of the attribute vector back to the starting point)
+                        rootScanNode = rootScanNode.GetScanNode(attributes, startingPoint, false);
+                        rootScanNode.Scan(null);
+                    }
+
+                    return rootScanNode._result;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI24855", ex);
+                }
+            }
+
+            #endregion Methods
+
+            #region Private Members
+
+            /// <summary>
+            /// Retrieves a child <see cref="AttributeScanner"/> instance responsible for scanning
+            /// the specified attributes (which are descendents to an attribute in the calling 
+            /// instance).
+            /// </summary>
+            /// <param name="attributes">The <see cref="IUnknownVector"/> of 
+            /// <see cref="IAttribute"/>s to scan.</param>
+            /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+            /// the point at which the scan should be started with each attribute further down the
+            /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+            /// </param>
+            /// <param name="firstPass"><see langword="true"/> if scanning from the specified 
+            /// starting point to the end of the vector of attributes, <see langword="false"/> if 
+            /// looping back from the beginning of the attribute vector to the specified starting 
+            /// point.</param>
+            /// <returns>A <see cref="AttributeScanner"/> instance.</returns>
+            private AttributeScanner GetScanNode(IUnknownVector attributes, 
+                Stack<IAttribute> startingPoint, bool firstPass)
+            {
+                // Create and initialize the child AttributeScanner instance.
+                AttributeScanner childStatusinfo = new AttributeScanner(attributes, _accessorMethod,
+                    _value, _forward, _resultAttributeGenealogy);
+                childStatusinfo._attributes = attributes;
+                childStatusinfo._firstPass = firstPass;
+
+                // Determine the initial starting and ending attribute indexes based on the scan
+                // direction.
+                childStatusinfo._startIndex = (_forward ? 0 : attributes.Size() - 1);
+                childStatusinfo._endIndex = (_forward ? attributes.Size() : -1);
+
+                // Adjust the start or end index to reflect the starting point (if specified).
+                if (startingPoint != null && startingPoint.Count > 0)
+                {
+                    // Create a copy of the starting point attribute stack.
+                    childStatusinfo._startingPoint =
+                        CollectionMethods.CopyStack<IAttribute>(startingPoint);
+     
+                    // Since this instance is to scan the next generation, remove the first
+                    // generation from the stack.
+                    IAttribute startingAttribute = childStatusinfo._startingPoint.Pop();
+
+                    // Locate the starting point (if specified)
+                    int index = -1;
+                    if (attributes.Size() > 0)
+                    {
+                        attributes.FindByReference(startingAttribute, 0, ref index);
+                    }
+
+                    // If no starting point was found, or the starting point stack is now empty, 
+                    // clear the startingPoint.
+                    if (index == -1)
+                    {
+                        childStatusinfo._startingPoint = null;
+                    }
+                    // If a starting point was found and this is the first pass, adjust the
+                    // starting index appropriately.
+                    else if (firstPass)
+                    {
+                        childStatusinfo._startIndex = index;
+
+                        if (childStatusinfo._startingPoint.Count == 0)
+                        {
+                            childStatusinfo._startAttributeIndex = childStatusinfo._startIndex;
+                            childStatusinfo._startingPoint = null;
+                        }
+                    }
+                    // If a starting point was found and this is the second pass, adjust the
+                    // ending index appropriately.
+                    else
+                    {
+                        childStatusinfo._endIndex = (_forward ? index + 1 : index - 1);
+                    }
+                }
+
+                return childStatusinfo;
+            }
+
+            /// <summary>
+            /// Performs a scan of the current <see cref="AttributeScanner"/> node.
+            /// </summary>
+            /// <param name="cutoffDisplayOrder">The <see cref="AttributeStatusInfo.DisplayOrder"/>
+            /// value to use as a cutoff value to prevent attributes before or after the starting 
+            /// point from processing (depending upon whether this is the first or second pass).
+            /// </param>
+            /// <returns>Any <see cref="AttributeStatusInfo.DisplayOrder"/> that was applied during
+            /// processing as a result of encountering the starting point.</returns>
+            private string Scan(string cutoffDisplayOrder)
+            {
+                // Initialized the applied cutoff value to null.
+                string appliedCutoffDisplayOrder = null;
+
+                // Loop through the provided attributes.
+                for (int i = _startIndex;
+                    (_forward && i < _endIndex) || (!_forward && i > _endIndex);
+                    i += (_forward ? 1 : -1))
+                {
+                    // Obtain the status info for each attribute.
+                    IAttribute attribute = (IAttribute)_attributes.At(i);
+                    AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+
+                    // Initialize the current cutoff to use to null.
+                    string currentCutoffDisplayOrder = null;
+
+                    // If this is the starting attribute apply the attribute's display order as the
+                    // cutoff value.
+                    if (i == _startAttributeIndex)
+                    {
+                        currentCutoffDisplayOrder = statusInfo.DisplayOrder;
+                        appliedCutoffDisplayOrder = currentCutoffDisplayOrder;
+                    }
+                    // If the starting attribute is not a decendent of this specific attribute, ignore
+                    // the specified starting point.
+                    else if (i != _startIndex)
+                    {
+                        _startingPoint = null;
+                    }
+
+                    AttributeScanner childScanNode = null;
+
+                    // If this attribute has sub-attributes, perform a scan of the sub-attributes
+                    if (attribute.SubAttributes.Size() > 0)
+                    {
+                        childScanNode = GetScanNode(attribute.SubAttributes, _startingPoint, _firstPass);
+                        currentCutoffDisplayOrder = childScanNode.Scan(currentCutoffDisplayOrder);
+
+                        // If a cutoff was applied, use it.
+                        if (currentCutoffDisplayOrder != null)
+                        {
+                            appliedCutoffDisplayOrder = currentCutoffDisplayOrder;
+                        }
+                    }
+
+                    // If a cutoff hasn't been applied, use the cutoff value provided by the caller.
+                    if (string.IsNullOrEmpty(currentCutoffDisplayOrder))
+                    {
+                        currentCutoffDisplayOrder = cutoffDisplayOrder;
+                    }
+
+                    // Call the accessor method unless the attribute should be skipped per the
+                    // order cutoff.
+                    if (!this.SkipAttribute(i, statusInfo.DisplayOrder, currentCutoffDisplayOrder) &&
+                        !_accessorMethod(attribute, statusInfo, _value))
+                    {
+                        // If accessMethod returned false, check to see if this an existing result
+                        // from a sub-attribute should be used in place of this result.
+                        if (childScanNode == null || childScanNode._result ||
+                            IsBefore(statusInfo.DisplayOrder, childScanNode._resultDisplayOrder))
+                        {
+                            // Apply this result.
+                            _result = false;
+                            _resultDisplayOrder = statusInfo.DisplayOrder;
+
+                            // Clear any current result genealogy.
+                            if (_resultAttributeGenealogy.Count > 0)
+                            {
+                                _resultAttributeGenealogy.Clear();
+                            }
+                        }
+                    }
+
+                    // If the current accessor method was skipped or succeeded, but a sub attribute
+                    // failed the accessor method, use the child's result.
+                    if (_result && childScanNode != null && !childScanNode._result)
+                    {
+                        _result = false;
+                        _resultDisplayOrder = childScanNode._resultDisplayOrder;
+                    }
+
+                    // In the case of a negative result, apply the current attribute to the result's
+                    // geneology and stop scanning.
+                    if (!_result)
+                    {
+                        _resultAttributeGenealogy.Push(attribute);
+                        break;
+                    }
+                }
+
+                return appliedCutoffDisplayOrder;
+            }
+
+            /// <summary>
+            /// Determines whether the <see cref="AccessorMethod"/> for the <see cref="IAttribute"/>
+            /// at the specified attribute should be skipped based on the cutoff value.
+            /// </summary>
+            /// <param name="index">The index of the <see cref="IAttribute"/> to check.</param>
+            /// <param name="displayOrder">The display order of teh <see cref="IAttribute"/>.</param>
+            /// <param name="cutoffDisplayOrder">The cutoff display order to compare against.
+            /// </param>
+            /// <returns><see langword="true"/> if the <see cref="IAttribute"/> should be skipped,
+            /// <see langword="false"/> if the accessory method should be called.</returns>
+            private bool SkipAttribute(int index, string displayOrder, string cutoffDisplayOrder)
+            {
+                // If this is the attribute specified by the starting point, skip it.
+                if (index == _startAttributeIndex)
+                {
+                    return true;
+                }
+
+                // Check to see if a cutoff display order has been specified.
+                if (!string.IsNullOrEmpty(cutoffDisplayOrder))
+                {
+                    // If the display order value comes before the cutoff on the first pass, skip it.
+                    if (_firstPass && IsBefore(displayOrder, cutoffDisplayOrder))
+                    {
+                        return true;
+                    }
+
+                    // If the display order value does not come before the cutoff on the second pass, 
+                    // skip it.
+                    if (!_firstPass && !IsBefore(displayOrder, cutoffDisplayOrder))
+                    {
+                        return true;
+                    }
+                }
+
+                // Don't skip; call the accessor method.
+                return false;
+            }
+
+            /// <summary>
+            /// Checks to see whether one display order is before another display order in the scan
+            /// order.
+            /// </summary>
+            /// <param name="displayOrder1">The first display order</param>
+            /// <param name="displayOrder2">The display order to compare against.</param>
+            /// <returns>Returns <see langword="true"/> if displayOrder1 comes before displayOrder2,
+            /// <see langword="false"/> if they are equal or displayOrder2 comes first.</returns>
+            private bool IsBefore(string displayOrder1, string displayOrder2)
+            {
+                if (_forward)
+                {
+                    // When scanning forward, check to see displayOrder1 < displayOrder2
+                    return string.Compare(displayOrder1, displayOrder2,
+                        StringComparison.CurrentCultureIgnoreCase) < 0;
+                }
+                else
+                {
+                    // When scanning backward, check to see displayOrder2 < displayOrder1
+                    return string.Compare(displayOrder2, displayOrder1,
+                        StringComparison.CurrentCultureIgnoreCase) < 0;
+                }
+            }
+
+            #endregion Private Members
+        }
+
+        #endregion AttributeScanner
+
+        #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(AttributeStatusInfo).ToString();
+
+        /// <summary>
+        /// The current version of this object.
+        /// <para><b>Versions 2:</b></para>
+        /// Added persistence of _isAccepted.
+        /// <para><b>Versions 3:</b></para>
+        /// Added persistence of _hintEnabled.
+        /// </summary>
+        private const int _CURRENT_VERSION = 3;
+        
+        #endregion Constants
+
+        #region Fields
+
+        /// <summary>
+        /// The active attribute hierarchy.
+        /// </summary>
+        private static IUnknownVector _attributes;
+
+        /// <summary>
+        /// A database available for use in validation or auto-update queries.
+        /// </summary>
+        private static DbConnection _dbConnection;
+
+        /// <summary>
+        /// Caches the info object for each <see cref="IAttribute"/> for quick reference later on.
+        /// </summary>
+        private static Dictionary<IAttribute, AttributeStatusInfo> _statusInfoMap =
+            new Dictionary<IAttribute, AttributeStatusInfo>();
+
+        /// <summary>
+        /// A dictionary that keeps track of which attribute collection each attribute belongs to.
+        /// Used to help in assigning _parentAttribute fields.
+        /// </summary>
+        private static Dictionary<IUnknownVector, IAttribute> _subAttributesToParentMap =
+            new Dictionary<IUnknownVector, IAttribute>();
+
+        /// <summary>
+        /// A dictionary of auto-update triggers that exist on the attributes stored in the keys of
+        /// this dictionary.
+        /// </summary>
+        private static Dictionary<IAttribute, AutoUpdateTrigger> _autoUpdateTriggers =
+            new Dictionary<IAttribute, AutoUpdateTrigger>();
+
+        /// <summary>
+        /// A dictionary of validation triggers that exist on the attributes stored in the keys of
+        /// this dictionary.
+        /// </summary>
+        private static Dictionary<IAttribute, AutoUpdateTrigger> _validationTriggers =
+            new Dictionary<IAttribute, AutoUpdateTrigger>();
+
+        /// <summary>
+        /// Keeps track of the attributes that have been modified since the last time EndEdit was
+        /// called in order to determine for which attributes an AttributeValueModified event needs
+        /// to be fired.
+        /// </summary>
+        private static List<IAttribute> _attributesBeingModified =
+            new List<IAttribute>();
+
+        /// <summary>
+        /// Keeps track of whether EndEdit is currently being processed.
+        /// </summary>
+        private static bool _endEditInProgress;
+
+        /// <summary>
+        /// Indicates whether the object has been modified since being loaded via the 
+        /// IPersistStream interface. This is an int because that is the return type of 
+        /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
+        /// <see cref="HResult.False"/>.
+        /// </summary>
+        private int _dirty;
+
+        /// <summary>
+        /// The control in charge of displaying the attribute.
+        /// </summary>
+        private IDataEntryControl _owningControl;
+
+        /// <summary>
+        /// The validator used to validate the attribute's data.
+        /// </summary>
+        private DataEntryValidator _validator;
+
+        /// <summary>
+        /// Indicates whether the user has viewed the attribute's data.
+        /// </summary>
+        private bool _hasBeenViewed;
+
+        /// <summary>
+        /// Whether this attribute has been propagated (ie, its children have been mapped to
+        /// any dependent child controls.
+        /// </summary>
+        private bool _hasBeenPropagated;
+
+        /// <summary>
+        /// <see langword="true"/> if the attribute's data is viewable in the DEP, 
+        /// <see langword="false"/> otherwise.
+        /// </summary>
+        private bool _isViewable;
+
+        /// <summary>
+        /// <see langword="true"/> if the attribute's data is currently know to be valid.
+        /// <see langword="false"/> otherwise.
+        /// </summary>
+        private bool _dataIsValid = true;
+
+        /// <summary>
+        /// A string that allows attributes to be sorted by compared to other display order values.
+        /// </summary>
+        private string _displayOrder;
+
+        /// <summary>
+        /// Specifies whether the <see cref="IAttribute"/> is a hint and, if so, what type
+        /// of hint that it is.
+        /// </summary>
+        private HintType _hintType;
+
+        /// <summary>
+        /// Specifies the spatial area that defines a hint.
+        /// </summary>
+        private IEnumerable<Extract.Imaging.RasterZone> _hintRasterZones;
+
+        /// <summary>
+        /// Specifies whether the user has accepted the highlight associated with the attribute.
+        /// </summary>
+        private bool _isAccepted;
+
+        /// <summary>
+        /// Specifies whether hints are enabled for the attribute. The fact that hints are enabled
+        /// doesn't necessarily mean the attribute has one.
+        /// </summary>
+        private bool _hintEnabled = true;
+
+        /// <summary>
+        /// Specifies the parent of this attribute (if one exists).
+        /// </summary>
+        private IAttribute _parentAttribute;
+
+        /// <summary>
+        /// A query which will cause the attribute's value to automatically be updated using values
+        /// from other attributes and/or a database query.
+        /// </summary>
+        private string _autoUpdateQuery;
+
+        /// <summary>
+        /// A query which will cause the validation list to be updated using the values from other
+        /// <see cref="IAttribute"/>'s and/or a database query.
+        /// </summary>
+        private string _validationQuery;
+
+        /// <summary>
+        /// Keeps track of if an AttributeValueModified value event is currently being raised to
+        /// prevent recursion via autoUpdateQueries.
+        /// </summary>
+        private bool _raisingAttributeValueModified;
+
+        /// <summary>
+        /// Specifies the full path (from the attribute hierarchy root).  Used to assist registering
+        /// AutoUpdateTrigger attributes more efficiently.
+        /// </summary>
+        private string _fullPath;
+        
+        /// <summary>
+        /// Specifies whether tab should always stop on the attribute or whether it can be skipped
+        /// if empty and valid.
+        /// </summary>
+        private bool _tabStopRequired = true;
+
+        #endregion Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Creates a new <see cref="AttributeStatusInfo"/> instance.  This contructor should never
+        /// be called directly by an outside class except via the <see cref="IPersistStream"/>
+        /// COM interface.
+        /// </summary>
+        public AttributeStatusInfo()
+        {
+            try
+            {
+                // Load licenses in design mode
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
+
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24485",
+                    _OBJECT_NAME);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24493", ex);
+            }
+        }
+
+        #endregion Constructors
+
+        #region Properties
+
+        /// <summary>
+        /// Gets the <see cref="IDataEntryControl"/> in charge of displaying the associated
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <value>The <see cref="IDataEntryControl"/> in charge of displaying the associated
+        /// <see cref="IAttribute"/>.</value>
+        /// <returns>The <see cref="IDataEntryControl"/> in charge of displaying the associated
+        /// <see cref="IAttribute"/>.</returns>
+        public IDataEntryControl OwningControl
+        {
+            get
+            {
+                return _owningControl;
+            }
+
+            set
+            {
+                _owningControl = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="DataEntryValidator"/> used to validate the associated 
+        /// <see cref="IAttribute"/>'s data.
+        /// </summary>
+        /// <value>The <see cref="DataEntryValidator"/> used to validate the associated 
+        /// <see cref="IAttribute"/>'s data.</value>
+        /// <returns>The <see cref="DataEntryValidator"/> used to validate the associated 
+        /// <see cref="IAttribute"/>'s data.</returns>
+        public DataEntryValidator Validator
+        {
+            get
+            {
+                return _validator;
+            }
+
+            set
+            {
+                _validator = value;
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether tab should always stop on the attribute or whether it can be skipped
+        /// if empty and valid.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="IAttribute"/> should always be a tabstop,
+        /// <see langword="false"/> if the attribute can be skipped if empty and valid.</value>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> is always be a tabstop,
+        /// <see langword="false"/> if the attribute will be skipped if empty and valid.</returns>
+        public bool TabStopRequired
+        {
+            get
+            {
+                return _tabStopRequired;
+            }
+
+            set
+            {
+                _tabStopRequired = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a <see langword="string"/> that allows <see cref="IAttribute"/>s to be
+        /// sorted by compared to other <see cref="IAttribute"/>'s <see cref="DisplayOrder"/>values.
+        /// <see cref="IAttribute"/>s will be sorted from lowest to highest using the result of
+        /// <see cref="String.Compare(string, string, StringComparison)"/>.
+        /// </summary>
+        /// <value>A <see langword="string"/> that allows <see cref="IAttribute"/>s to be
+        /// sorted by compared to other <see cref="IAttribute"/>'s <see cref="DisplayOrder"/>values.
+        /// </value>
+        /// <returns>A <see langword="string"/> that allows <see cref="IAttribute"/>s to be
+        /// sorted by compared to other <see cref="IAttribute"/>'s <see cref="DisplayOrder"/>values.
+        /// </returns>
+        public string DisplayOrder
+        {
+            get
+            {
+                return _displayOrder;
+            }
+
+            set
+            {
+                _displayOrder = value;
+            }
+        }
+
+        /// <summary>
+        /// A query which will cause the <see cref="IAttribute"/>'s value to automatically be
+        /// updated using values from other <see cref="IAttribute"/>s and/or a database query.
+        /// </summary>
+        public string AutoUpdateQuery
+        {
+            get
+            {
+                return _autoUpdateQuery;
+            }
+
+            set
+            {
+                _autoUpdateQuery = value;
+            }
+        }
+
+        /// <summary>
+        /// A query which will cause the <see cref="IAttribute"/>'s validation list to be
+        /// automatically updated using values from other <see cref="IAttribute"/>s and/or a
+        /// database query.
+        /// </summary>
+        public string ValidationQuery
+        {
+            get
+            {
+                return _validationQuery;
+            }
+
+            set
+            {
+                _validationQuery = value;
+            }
+        }
+
+        /// <summary>
+        /// Specifies the full path (from the attribute hierarchy root). Used to assist registering
+        /// <see cref="AutoUpdateTrigger"/> attributes more efficiently.
+        /// </summary>
+        /// <returns></returns>
+        public string FullPath
+        {
+            get
+            {
+                return _fullPath;
+            }
+
+            set
+            {
+                _fullPath = value;
+            }
+        }
+
+        #endregion Properties
+
+        #region Static Methods
+
+        /// <summary>
+        /// Returns the <see cref="AttributeStatusInfo"/> object associated with the provided
+        /// <see cref="IAttribute"/>.  A new <see cref="AttributeStatusInfo"/> instance is
+        /// created if necessary.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which an 
+        /// <see cref="AttributeStatusInfo"/> instance is needed.</param>
+        /// <returns>The <see cref="AttributeStatusInfo"/> instance associated with the provided
+        /// <see cref="IAttribute"/>.</returns>
+        [ComVisible(false)]
+        public static AttributeStatusInfo GetStatusInfo(IAttribute attribute)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26109",
+                    _OBJECT_NAME);
+
+                AttributeStatusInfo statusInfo;
+                if (!_statusInfoMap.TryGetValue(attribute, out statusInfo))
+                {
+                    statusInfo = attribute.DataObject as AttributeStatusInfo;
+                    
+                    if (statusInfo == null)
+                    {
+                        statusInfo = new AttributeStatusInfo();
+                        attribute.DataObject = statusInfo;
+                    }
+
+                    _statusInfoMap[attribute] = statusInfo;
+                }
+
+                return statusInfo;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24477", ex);
+            }
+        }
+
+        /// <summary>
+        /// Clears the internal cache used for efficient lookups of <see cref="AttributeStatusInfo"/>
+        /// objects. This should be every time new data is loaded and called with
+        /// <see langword="null"/> every time a document is closed (or <see cref="IAttribute"/>s are
+        /// otherwise unloaded).
+        /// </summary>
+        /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
+        /// <param name="dbConnection">A compact SQL database available for use in validation or
+        /// auto-update queries. (Can be <see langword="null"/> if not required).</param>
+        [ComVisible(false)]
+        public static void ResetData(IUnknownVector attributes, DbConnection dbConnection)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26133",
+                    _OBJECT_NAME);
+
+                _attributes = attributes;
+                _dbConnection = dbConnection;
+                _statusInfoMap.Clear();
+                _subAttributesToParentMap.Clear();
+                _attributesBeingModified.Clear();
+                _endEditInProgress = false;
+
+                foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
+                {
+                    autoUpdateTrigger.Dispose();
+                }
+                _autoUpdateTriggers.Clear();
+
+                foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                {
+                    validationTrigger.Dispose();
+                }
+                _validationTriggers.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25624", ex);
+            }
+        }
+
+        /// <summary>
+        /// Initializes a <see cref="AttributeStatusInfo"/> instance for the specified
+        /// <see cref="IAttribute"/> with the specified parameters.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which an 
+        /// <see cref="AttributeStatusInfo"/> instance is being initialized.</param>
+        /// <param name="sourceAttributes">The vector of <see cref="IAttribute"/>s to which the
+        /// specified <see cref="IAttribute"/> is a member.</param>
+        /// <param name="owningControl">The <see cref="IDataEntryControl"/> in charge of displaying 
+        /// the specified <see cref="IAttribute"/>.</param>
+        /// <param name="displayOrder">A <see langword="string"/> that allows the 
+        /// <see cref="IAttribute"/> to be sorted by compared to other <see cref="IAttribute"/>'s 
+        /// <see cref="DisplayOrder"/>values. Specify <see langword="null"/> to allow the 
+        /// <see cref="IAttribute"/> to keep any display order it already has.</param>
+        /// <param name="considerPropagated"><see langword="true"/> to consider the 
+        /// <see cref="IAttribute"/> already propagated; <see langword="false"/> otherwise.</param>
+        /// <param name="validator">An object to be used to validate the data contained in the
+        /// <see cref="IAttribute"/>.  Can be <see langword="null"/> to keep the existing validator
+        /// or if data validation is not required.</param>
+        /// <param name="tabStopRequired"><see langword="true"/> if the <see cref="IAttribute"/> 
+        /// should always be a tabstop, <see langword="false"/> if the attribute can be skipped if
+        /// empty and valid.</param>
+        /// <param name="autoUpdateQuery">A query which will cause the <see cref="IAttribute"/>'s
+        /// value to automatically be updated using values from other <see cref="IAttribute"/>s
+        /// and/or a database query.</param>
+        /// <param name="validationQuery">A query which will cause the validation list for the 
+        /// validator associated with the attribute to be updated using values from other
+        /// <see cref="IAttribute"/>'s and/or a database query.</param>
+        /// <returns><see langword="true"/> if the the call resulted in 
+        /// <see cref="AttributeStatusInfo"/> data being set or modified, or <see langword="false"/>
+        /// if the <see cref="IAttribute"/> already was configured with the specified parameters.
+        /// </returns>
+        [ComVisible(false)]
+        public static bool Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
+            IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
+            bool tabStopRequired, DataEntryValidator validator, string autoUpdateQuery,
+            string validationQuery)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26134",
+                    _OBJECT_NAME);
+
+                bool modified = false;
+
+                // Create a new statusInfo instance (or retrieve an existing one).
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                // Set/update the owningControl value if necessary.
+                if (statusInfo._owningControl != owningControl)
+                {
+                    modified = true;
+                    statusInfo._owningControl = owningControl;
+                }
+
+                // Check to see if the display order should be set.
+                if (displayOrder != null)
+                {
+                    // Set/update the displayOrder value if necessary.
+                    string fullDisplayOrder = DataEntryMethods.GetTabIndex((Control)owningControl) +
+                        "." + ((int)displayOrder).ToString(CultureInfo.CurrentCulture);
+
+                    if (statusInfo._displayOrder != fullDisplayOrder)
+                    {
+                        modified = true;
+                        statusInfo._displayOrder = fullDisplayOrder;
+                    }
+                }
+
+                // Set/update the propogated status if necessary.
+                if (considerPropagated && !statusInfo._hasBeenPropagated)
+                {
+                    modified = true;
+                    statusInfo._hasBeenPropagated = considerPropagated;
+                }
+
+                // Set/update the validator if necessary.
+                if (validator != null && statusInfo._validator != validator)
+                {
+                    modified = true;
+                    statusInfo._validator = validator;
+                }
+
+                // Update the tabStopRequired if necessary
+                if (tabStopRequired != statusInfo._tabStopRequired)
+                {
+                    modified = true;
+                    statusInfo._tabStopRequired = tabStopRequired;
+                }
+
+                // If an entry doesn't exist in _subAttributesToParentMap for this attribute's
+                // sub-attributes, this is the first time it has been initialized.
+                bool previouslyInitialized = 
+                    _subAttributesToParentMap.ContainsKey(attribute.SubAttributes);
+
+                // If the attribute's source attributes are have known parent, use it to generate
+                // the attribute to parent mapping.
+                IAttribute parentAttribute;
+                if (_subAttributesToParentMap.TryGetValue(sourceAttributes, out parentAttribute))
+                {
+                    statusInfo._parentAttribute = parentAttribute;
+                }
+
+                // Add a mapping for the attribute's subattributes for future reference.
+                _subAttributesToParentMap[attribute.SubAttributes] = attribute;
+
+                if (autoUpdateQuery != statusInfo._autoUpdateQuery)
+                {
+                    modified = true;
+
+                    // Dispose of any previously existing auto-update trigger.
+                    AutoUpdateTrigger existingAutoUpdateTrigger;
+                    if (_autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger))
+                    {
+                        existingAutoUpdateTrigger.Dispose();
+                        _autoUpdateTriggers.Remove(attribute);
+                    }
+
+                    statusInfo._autoUpdateQuery = autoUpdateQuery;
+
+                    if (!string.IsNullOrEmpty(autoUpdateQuery))
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for AutoUpdateTrigger to creation to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        _autoUpdateTriggers[attribute] =
+                            new AutoUpdateTrigger(attribute, autoUpdateQuery, _dbConnection, false);
+                    }
+                }
+
+                foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
+                {
+                    if (!autoUpdateTrigger.IsResolved)
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for RegisterTriggerCandidate to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        autoUpdateTrigger.RegisterTriggerCandidate(attribute);
+                    }
+                }
+
+                if (validationQuery != statusInfo._validationQuery)
+                {
+                    modified = true;
+
+                    // Dispose of any previously existing validation trigger.
+                    AutoUpdateTrigger existingValidationTrigger;
+                    if (_validationTriggers.TryGetValue(attribute, out existingValidationTrigger))
+                    {
+                        existingValidationTrigger.Dispose();
+                        _validationTriggers.Remove(attribute);
+                    }
+
+                    statusInfo._validationQuery = validationQuery;
+
+                    if (!string.IsNullOrEmpty(validationQuery))
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for AutoUpdateTrigger to creation to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        _validationTriggers[attribute] =
+                            new AutoUpdateTrigger(attribute, validationQuery, _dbConnection, true);
+                    }
+                }
+                else
+                {
+                    // If a validation trigger is in place, use it to update the control's
+                    // validationlist now since by virtue of the fact that the attribute is being
+                    // re-initialized, the control was likely previously displaying a different
+                    // attribute with a different validation list.
+                    AutoUpdateTrigger validationTrigger = null;
+                    if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
+                    {
+                        validationTrigger.UpdateValue();
+                    }
+                }
+
+                foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
+                {
+                    if (!validationTrigger.IsResolved)
+                    {
+                        // We need to ensure that the attribute is a part of the sourceAttributes
+                        // in order for RegisterTriggerCandidate to work. When creating a new
+                        // attribute, this won't be the case.  Add it now, even though it will still
+                        // need to be re-ordered later.
+                        sourceAttributes.PushBackIfNotContained(attribute);
+
+                        validationTrigger.RegisterTriggerCandidate(attribute);
+                    }
+                }
+
+                // [DataEntry:197]
+                // Empty fields should be considered viewed.
+                // [DataEntry:167]
+                // Checking the value also ensure the value is accessed and, thus, created.
+                if (string.IsNullOrEmpty(attribute.Value.String))
+                {
+                    statusInfo._hasBeenViewed = true;
+                }
+
+                // Raise the AttributeInitialized event if it hasn't already been raised for this
+                // attribute.
+                if (!previouslyInitialized)
+                {
+                    OnAttributeInitialized(attribute, sourceAttributes, owningControl);
+                }
+
+                return modified;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24684", ex);
+            }
+        }
+
+        /// <overloads>Applies the specified value to the specified <see cref="IAttribute"/> and
+        /// raises <see cref="AttributeValueModified"/> when appropriate.</overloads>
+        /// <summary>
+        /// Applies the specified value to the specified <see cref="IAttribute"/> and raises
+        /// <see cref="AttributeValueModified"/> when appropriate.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose value is to be updated.
+        /// </param>
+        /// <param name="value">The <see cref="SpatialString"/> value to apply to the
+        /// <see cref="IAttribute"/>.</param>
+        /// <param name="acceptSpatialInfo"><see langword="true"/> if the attribute's value should
+        /// be marked as accepted, <see langword="false"/> if it should be left as-is.</param>
+        /// <param name="endOfEdit"><see langword="true"/> if this change represents the end of the
+        /// current edit, <see langword="false"/> if it is or may be part of an ongoing edit.
+        /// </param>
+        [ComVisible(false)]
+        public static void SetValue(IAttribute attribute, SpatialString value,
+            bool acceptSpatialInfo, bool endOfEdit)
+        {
+            try
+            {
+                attribute.Value = value;
+
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                if (_endEditInProgress)
+                {
+                    // If EndEdit is currently being processed (and this is a result of it), raise
+                    // the non-incremental modification event now.
+                    statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo);
+                }
+                else
+                {
+                    if (!endOfEdit)
+                    {
+                        // If not the end of the edit raise an incremental modification event and
+                        // queue the value for an eventual non-incremental event.
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
+                    }
+
+                    if (!_attributesBeingModified.Contains(attribute))
+                    {
+                        _attributesBeingModified.Add(attribute);
+                    }
+
+                    // After queing the modification, call EndEdit if directed.
+                    if (endOfEdit)
+                    {
+                        EndEdit();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26090", ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies the specified value to the specified <see cref="IAttribute"/> and raises
+        /// <see cref="AttributeValueModified"/> when appropriate.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose value is to be updated.
+        /// </param>
+        /// <param name="value">The <see langword="string"/> value to apply to the
+        /// <see cref="IAttribute"/>.</param>
+        /// <param name="acceptSpatialInfo"><see langword="true"/> if the attribute's value should
+        /// be marked as accepted, <see langword="false"/> if it should be left as-is.</param>
+        /// <param name="endOfEdit"><see langword="true"/> if this change represents the end of the
+        /// current edit, <see langword="false"/> if it is or may be part of an ongoing edit.
+        /// </param>
+        [ComVisible(false)]
+        public static void SetValue(IAttribute attribute, string value, bool acceptSpatialInfo,
+            bool endOfEdit)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26135",
+                    _OBJECT_NAME);
+
+                // Don't do anything if the specified value matches the existing value.
+                if (attribute.Value.String != value)
+                {
+                    // If the attribute doesn't contain any spatial information, just
+                    // change the text.
+                    if (attribute.Value.GetMode() == ESpatialStringMode.kNonSpatialMode)
+                    {
+                        attribute.Value.ReplaceAndDowngradeToNonSpatial(value);
+                    }
+                    // If the attribute contains spatial information, it needs to be converted to
+                    // hybrid mode to update the text.
+                    else
+                    {
+                        attribute.Value.ReplaceAndDowngradeToHybrid(value);
+                    }
+
+                    AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                    if (_endEditInProgress)
+                    {
+                        // If EndEdit is currently being processed (and this is a result of it), raise
+                        // the non-incremental modification event now.
+                        statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo);
+                    }
+                    else
+                    {
+                        if (!endOfEdit)
+                        {
+                            // If not the end of the edit raise an incremental modification event and
+                            // queue the value for an eventual non-incremental event.
+                            statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
+                        }
+
+                        if (!_attributesBeingModified.Contains(attribute))
+                        {
+                            _attributesBeingModified.Add(attribute);
+                        }
+                    }
+                }
+
+                // Call EndEdit if directed (whether or not the value actually changed).
+                if (endOfEdit)
+                {
+                    EndEdit();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26093", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes the specified attribute from the DataEntry framework. This releases all mappings
+        /// and events tied to the attribute.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to delete from the system.</param>
+        [ComVisible(false)]
+        public static void DeleteAttribute(IAttribute attribute)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26136",
+                    _OBJECT_NAME);
+
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                statusInfo.OnAttributeDeleted(attribute);
+
+                // Recursively process all child attributes that are deleted as a result.
+                ProcessDeletedAttributes(attribute.SubAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26107", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified <see cref="IAttribute"/>'s data has been viewed by the
+        /// user. (This usually means that the control displaying the attribute has received focus).
+        /// <para><b>NOTE:</b></para>
+        /// An <see cref="IAttribute"/> is always considered as "viewed" if it is un-viewable.
+        /// (See <see cref="IsViewable"/>).
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be checked for whether it has
+        /// been viewed.</param>
+        /// <param name="recursive"><see langword="false"/> to check only the specified
+        /// <see cref="IAttribute"/>, <see langword="true"/> to check all descendant
+        /// <see cref="IAttribute"/>s as well.</param>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> has been viewed, or
+        /// <see langword="false"/> if it has not.</returns>
+        [ComVisible(false)]
+        public static bool HasBeenViewed(IAttribute attribute, bool recursive)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                if (statusInfo._isViewable && !statusInfo._hasBeenViewed)
+                {
+                    // This attribute has not been viewed.
+                    return false;
+                }
+                else if (recursive)
+                {
+                    // Check to see that all subattributes have been viewed as well.
+                    return AttributeScanner.Scan(attribute.SubAttributes, null,
+                        ConfirmDataViewed, true, true, true, null);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24480", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified <see cref="IUnknownVector"/> of 
+        /// <see cref="IAttribute"/>'s (and their sub-attributes) have been viewed by the user. If 
+        /// not, the first <see cref="IAttribute"/> that has not been viewed is specified.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/> to be checked for whether it has
+        /// been viewed.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="forward"><see langword="true"/> to scan forward through the attribute 
+        /// hierarchy, <see langword="false"/> to scan backward.</param>
+        /// <param name="loop"><see langword="true"/> to resume scanning from the beginning of
+        /// the <see cref="IAttribute"/>s (back to the starting point) if the end was reached 
+        /// successfully, <see langword="false"/> to end the scan once the end of the 
+        /// <see cref="IAttribute"/> vector is reached.</param>
+        /// <returns>A stack of <see cref="IAttribute"/>s
+        /// where the first attribute in the stack represents the root-level attribute
+        /// the unviewed attribute is descended from, and each successive attribute represents
+        /// a sub-attribute to the previous until the final attribute is the first unviewed 
+        /// attribute.</returns>
+        [ComVisible(false)]
+        public static Stack<IAttribute> FindNextUnviewedAttribute(IUnknownVector attributes, 
+            Stack<IAttribute> startingPoint, bool forward, bool loop)
+        {
+            try
+            {
+                Stack<IAttribute> unviewedAttributes = new Stack<IAttribute>();
+
+                if (!AttributeScanner.Scan(attributes, startingPoint, ConfirmDataViewed, true,
+                    forward, loop, unviewedAttributes))
+                {
+                    return unviewedAttributes;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24647", ex);
+            }
+        }
+
+        /// <summary>
+        /// Marks the specified <see cref="IAttribute"/> as viewed or not viewed.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> which should be marked as viewed
+        /// or not viewed.</param>
+        /// <param name="hasBeenViewed"><see langword="true"/> to indicate that the 
+        /// <see cref="IAttribute"/> has been viewed, <see langword="false"/> to indicate it has
+        /// not been viewed.</param>
+        [ComVisible(false)]
+        public static void MarkAsViewed(IAttribute attribute, bool hasBeenViewed)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                // If the viewed status of the attribute has changed from its previous value,
+                // raise the ViewedStateChanged event to notify listeners of the new status.
+                if (statusInfo._isViewable && statusInfo._hasBeenViewed != hasBeenViewed)
+                {
+                    statusInfo._hasBeenViewed = hasBeenViewed;
+
+                    OnViewedStateChanged(attribute, hasBeenViewed);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24481", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified <see cref="IUnknownVector"/> of 
+        /// <see cref="IAttribute"/>'s (and their sub-attributes) have passed data validation. If 
+        /// not, the first invalid <see cref="IAttribute"/> is specified.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
+        /// to be checked for whether its data is valid.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="forward"><see langword="true"/> to scan forward through the attribute 
+        /// hierarchy, <see langword="false"/> to scan backward.</param>
+        /// <param name="loop"><see langword="true"/> to resume scanning from the beginning of
+        /// the <see cref="IAttribute"/>s (back to the starting point) if the end was reached 
+        /// successfully, <see langword="false"/> to end the scan once the end of the 
+        /// <see cref="IAttribute"/> vector is reached.</param>
+        /// <returns><see langword="true"/> if the data <see cref="IAttribute"/>s' data 
+        /// and the data of all sub-<see cref="IAttribute"/>s is know to be valid; 
+        /// <see langword="false"/> if any of descendants contain invalid data or if
+        /// the validity of their data has not yet been checked.</returns>
+        /// <returns>A stack of <see cref="IAttribute"/>s
+        /// where the first attribute in the stack represents the root-level attribute
+        /// the first invalid attribute is descended from, and each successive attribute represents
+        /// a sub-attribute to the previous until the final attribute is the first invalid attribute.
+        /// </returns>
+        [ComVisible(false)]
+        public static Stack<IAttribute> FindNextInvalidAttribute(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, bool forward, bool loop)
+        {
+            try
+            {
+                Stack<IAttribute> invalidAttributes = new Stack<IAttribute>();
+
+                if (!AttributeScanner.Scan(attributes, startingPoint, ConfirmDataValidity, true,
+                    forward, loop, invalidAttributes))
+                {
+                    return invalidAttributes;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24410", ex);
+            }
+        }
+
+        /// <summary>
+        /// Mark the data associated with the specified attribute as valid or invalid.  This applies
+        /// only to the associated attribute's data, not to any subattributes.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the data should be marked
+        /// valid or invalid.</param>
+        /// <param name="dataIsValid"><see langword="true"/> if the attribute's data should be
+        /// considered valid; <see langword="false"/> otherwise.</param>
+        [ComVisible(false)]
+        public static void MarkDataAsValid(IAttribute attribute, bool dataIsValid)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                // If the validation status of the attribute has changed from its previous value,
+                // raise the ValidationStateChanged event to notify listeners of the new status.
+                if (statusInfo._isViewable && statusInfo._dataIsValid != dataIsValid)
+                {
+                    statusInfo._dataIsValid = dataIsValid;
+
+                    OnValidationStateChanged(attribute, dataIsValid);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24494", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see if the specified <see cref="IAttribute"/>'s data is valid.
+        /// <para><b>NOTE:</b></para>
+        /// An <see cref="IAttribute"/> is never considered invalid if it is not viewable.
+        /// (See <see cref="IsViewable"/>).
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be checked.</param>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/>'s data is valid or 
+        /// <see langword="false"/> if it is not valid.</returns>
+        [ComVisible(false)]
+        public static bool IsDataValid(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return (!statusInfo._isViewable || statusInfo._dataIsValid);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24919", ex);
+            }
+        }
+
+        /// <summary>
+        /// Checks to see whether the associated <see cref="IAttribute"/> has been fully propagated
+        /// into <see cref="IDataEntryControl"/>s.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/> to be checked for whether it has
+        /// been propagated.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="unPropagatedAttributes">A stack of <see cref="IAttribute"/>s
+        /// where the first attribute in the stack represents the root-level attribute
+        /// the first unpropagated attribute is descended from, and each successive attribute 
+        /// represents a sub-attribute to the previous until the final attribute is the first 
+        /// unpropagated attribute.
+        /// </param>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> and all subattributes
+        /// have been flagged as propagated; <see langword="false"/> otherwise.</returns>
+        [ComVisible(false)]
+        public static bool HasBeenPropagated(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, Stack<IAttribute> unPropagatedAttributes)
+        {
+            try
+            {
+                return AttributeScanner.Scan(attributes, startingPoint, ConfirmHasBeenPropagated,
+                    true, true, true, unPropagatedAttributes);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24450", ex);
+            }
+        }
+
+        /// <summary>
+        /// Mark the data associated with the specified <see cref="IAttribute"/> as propagated.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the data should be marked
+        /// propagated or not propagated.</param>
+        /// <param name="propagated"><see langword="true"/> to indicate the 
+        /// <see cref="IAttribute"/> has been propagated, <see langword="false"/> to indicate the
+        /// <see cref="IAttribute"/> has not been propagated.</param>
+        /// <param name="recursive">If <see langword="false"/> only the specified 
+        /// <see cref="IAttribute"/> will be marked as propagated.  If <see langword="true"/> all 
+        /// descendents <see cref="IAttribute"/>s will be marked as propagated as well.</param>
+        [ComVisible(false)]
+        public static void MarkAsPropagated(IAttribute attribute, bool propagated, bool recursive)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._hasBeenPropagated = propagated;
+
+                if (recursive)
+                {
+                    // Mark all descendant attributes as propagated as well.
+                    AttributeScanner.Scan(attribute.SubAttributes, null, MarkAsPropagated,
+                        propagated, true, true, null);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24478", ex);
+            }
+        }
+
+        /// <summary>
+        /// Specifies whether the specified <see cref="IAttribute"/> is viewable or not.
+        /// "Viewable" means the value can be displayed, but is not necessarily currently displayed
+        /// depending on which attributes are propagated.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose viewable status is to be
+        /// set.</param>
+        /// <param name="isViewable"><see langword="true"/> if the <see cref="IAttribute"/> is
+        /// viewable, <see langword="false"/> if it is not.</param>
+        /// <returns><see langword="true"/> in all cases to continue the scan.</returns>
+        [ComVisible(false)]
+        public static bool MarkAsViewable(IAttribute attribute, bool isViewable)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                if (statusInfo._isViewable != isViewable)
+                {
+                    statusInfo._isViewable = isViewable;
+
+                    // If the attribute was not previously viewable, it would not have been
+                    // considered unviewed.  Now it will be considered unviewed so the 
+                    // ViewedStateChanged event needs to be raised (assuming the attribute
+                    // is actually unviewed).
+                    if (!statusInfo._hasBeenViewed)
+                    {
+                        OnViewedStateChanged(attribute, false);
+                    }
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24856", ex);
+            }
+        }
+
+        /// <summary>
+        /// Indicates whether the specified <see cref="IAttribute"/> is viewable in the 
+        /// <see cref="DataEntryControlHost"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose viewable status is to be
+        /// checked.</param>
+        /// <returns><see langword="true"/> if the specified <see cref="IAttribute"/> is viewable;
+        /// <see langword="false"/> if it is not.</returns>
+        [ComVisible(false)]
+        public static bool IsViewable(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._isViewable;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25138", ex);
+            }
+        }
+        
+        /// <summary>
+        /// Finds the first <see cref="IAttribute"/> that is a tabstop in the DEP after the
+        /// specified starting point.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s from which a tabstop
+        /// <see cref="IAttribute"/> is to be sought.</param>
+        /// <param name="startingPoint">A genealogy of <see cref="IAttribute"/>s describing 
+        /// the point at which the scan should be started with each attribute further down the
+        /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack.
+        /// </param>
+        /// <param name="forward"><see langword="true"/> to scan forward through the
+        /// <see cref="IAttribute"/>s, <see langword="false"/> to scan backward.</param>
+        /// <returns>A genealogy of <see cref="IAttribute"/>s specifying the next tabstop 
+        /// <see cref="IAttribute"/>.</returns>
+        [ComVisible(false)]
+        public static Stack<IAttribute> GetNextTabStopAttribute(IUnknownVector attributes,
+            Stack<IAttribute> startingPoint, bool forward)
+        {
+            try
+            {
+                Stack<IAttribute> nextTabStopAttributeGenealogy = new Stack<IAttribute>();
+
+                if (!AttributeScanner.Scan(
+                        attributes, startingPoint, ConfirmIsTabStop, false, forward, true,
+                        nextTabStopAttributeGenealogy))
+                {
+                    return nextTabStopAttributeGenealogy;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24984", ex);
+            }
+        }
+
+        /// <summary>
+        /// Updates the <see cref="AttributeStatusInfo.DisplayOrder"/> value associated with the 
+        /// specified <see cref="IAttribute"/> using the provided displayOrder value.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose 
+        /// <see cref="AttributeStatusInfo.DisplayOrder"/> value is to be updated.</param>
+        /// <param name="displayOrder">An <see langword="integer"/> representing the display order
+        /// of the <see cref="IAttribute"/> within its immediate containing control.</param>
+        [ComVisible(false)]
+        public static void UpdateDisplayOrder(IAttribute attribute, int displayOrder)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                ExtractException.Assert("ELI24688",
+                    "Cannot update display order without owning control!",
+                    statusInfo._owningControl != null);
+
+                statusInfo._displayOrder = 
+                    DataEntryMethods.GetTabIndex((Control)statusInfo._owningControl) + "." +
+                    displayOrder.ToString(CultureInfo.CurrentCulture);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24687", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="HintType"/> associated with the <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose hint type is to be checked.
+        /// </param>
+        /// <returns>The <see cref="HintType"/> associated with the <see cref="IAttribute"/>.
+        /// </returns>
+        [ComVisible(false)]
+        public static HintType GetHintType(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._hintType;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25230", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets the <see cref="HintType"/> associated with the <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose hint type is to be set.
+        /// </param>
+        /// <param name="hintType">The <see cref="HintType"/> to be associated with the 
+        /// <see cref="IAttribute"/>.</param>
+        [ComVisible(false)]
+        public static void SetHintType(IAttribute attribute, HintType hintType)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._hintType = hintType;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25359", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the user has accepted the value of the <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be checked.</param>
+        /// <returns><see langword="true"/> if the user has accepted the value of the
+        /// <see cref="IAttribute"/>; <see langword="false"/> otherwise.
+        /// </returns>
+        [ComVisible(false)]
+        public static bool IsAccepted(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._isAccepted;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25388", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets whether the <see cref="IAttribute"/>'s spatial info has been accepted by the user.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose spatial info is to be 
+        /// accepted/unaccepted.</param>
+        /// <param name="accept"><see langword="true"/> to indicated the value of the
+        /// <see cref="IAttribute"/> has been accepted by the user; <see langword="false"/>
+        /// otherwise.</param>
+        [ComVisible(false)]
+        public static void AcceptValue(IAttribute attribute, bool accept)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._isAccepted = accept;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25389", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether hints are enabled for the <see cref="IAttribute"/>. The fact that hints
+        /// are enabled doesn't necessarily mean the attribute has one.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose whose hint enabled status is
+        /// to be checked.</param>
+        /// <returns><see langword="true"/> if hints are enabled for the specified
+        /// <see cref="IAttribute"/>; <see langword="false"/> otherwise.
+        /// </returns>
+        [ComVisible(false)]
+        public static bool HintEnabled(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._hintEnabled;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25979", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets whether hints are enabled for the <see cref="IAttribute"/>. The fact that hints
+        /// are enabled doesn't necessarily mean the attribute has one.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose whose hint enabled status is
+        /// to be set.</param>
+        /// <param name="hintEnabled"><see langword="true"/> to enable hints for the specified
+        /// <see cref="IAttribute"/>; <see langword="false"/> otherwise.
+        /// </param>
+        [ComVisible(false)]
+        public static void EnableHint(IAttribute attribute, bool hintEnabled)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._hintEnabled = hintEnabled;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25980", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IDataEntryControl"/> that the <see cref="IAttribute"/> is associated
+        /// with.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose owning control is to be
+        /// checked.</param>
+        /// <returns>The <see cref="IDataEntryControl"/> that the specified <see cref="IAttribute"/>
+        /// is associated with.
+        /// </returns>
+        [ComVisible(false)]
+        public static IDataEntryControl GetOwningControl(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._owningControl;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25350", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Extract.Imaging.RasterZone"/>s that define a hint for the specified
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the spatial hint is
+        /// defined.</param>
+        /// <param name="rasterZones">A list of <see cref="Extract.Imaging.RasterZone"/>s 
+        /// that define the spatial hint.</param>
+        [ComVisible(false)]
+        public static void SetHintRasterZones(IAttribute attribute, 
+            IEnumerable<Extract.Imaging.RasterZone> rasterZones)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._hintRasterZones = rasterZones;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25501", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="Extract.Imaging.RasterZone"/>s that define a hint for the specified
+        /// <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the spatial hint is needed.
+        /// </param>
+        /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s that define the spatial hint.
+        /// </returns>
+        [ComVisible(false)]
+        public static IEnumerable<Extract.Imaging.RasterZone> GetHintRasterZones(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._hintRasterZones;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI25506", ex);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the parent <see cref="IAttribute"/> of the specified attribute.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose parent is needed.</param>
+        /// <returns>The parent <see cref="IAttribute"/> if there is one, <see langword="null"/> if
+        /// there is not.</returns>
+        [ComVisible(false)]
+        public static IAttribute GetParentAttribute(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._parentAttribute;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26097", ex);
+            }
+        }
+
+        /// <overloads>Obtains the full path of the <see cref="IAttribute"/> from the root of the
+        /// hierarchy.</overloads>
+        /// <summary>
+        /// Obtains the full path of the <see cref="IAttribute"/> from the root of the hierarchy.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which a path is needed.</param>
+        /// <returns>The full path of the <see cref="IAttribute"/> of blank if the specified
+        /// attribute is <see langword="null"/>.</returns>
+        [ComVisible(false)]
+        public static string GetFullPath(IAttribute attribute)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26138",
+                    _OBJECT_NAME);
+
+                // If the specified attribute is null, just return blank.
+                if (attribute == null)
+                {
+                    return "";
+                }
+
+                // Obtain the path of this attribute's parent.
+                string parentPath = GetFullPath(GetStatusInfo(attribute)._parentAttribute);
+
+                // If the parent doesn't exist, just return this attribute's name.
+                if (string.IsNullOrEmpty(parentPath))
+                {
+                    return attribute.Name;
+                }
+                // Otherwise, append the name of this attribute to the parent attribute's path.
+                else
+                {
+                    return parentPath + "/" + attribute.Name;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26137", ex);
+            }
+        }
+
+        /// <summary>
+        /// Obtains the full path of the specified path when the specified query is applied to it.
+        /// </summary>
+        /// <param name="startingPath">The starting path.</param>
+        /// <param name="query">The attribute query to apply to <see paramref="startingPath"/>.
+        /// </param>
+        /// <returns>The resulting full path.</returns>
+        [ComVisible(false)]
+        public static string GetFullPath(string startingPath, string query)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26139",
+                    _OBJECT_NAME);
+
+                // Tokenize the query and process each element in order.
+                string[] pathTokens =
+                         query.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string pathToken in pathTokens)
+                {
+                    // If the parent is specified, remove the last level from the startingPath.
+                    if (pathToken == "..")
+                    {
+                        ExtractException.Assert("ELI26105", "Invalid attribute path!",
+                            !string.IsNullOrEmpty(startingPath));
+
+                        // If the starting path has any remaining slashes, remove the end of the
+                        // paths (starting with the last slash).
+                        int lastSlash = startingPath.LastIndexOf('/');
+                        if (lastSlash >= 0)
+                        {
+                            startingPath = startingPath.Substring(0, lastSlash);
+                        }
+                        // Otherwise the starting path is now empty.
+                        else
+                        {
+                            startingPath = "";
+                        }
+                    }
+                    // Add the next specified attribute from the query to the path.
+                    else if (pathToken != ".")
+                    {
+                        if (!string.IsNullOrEmpty(startingPath))
+                        {
+                            startingPath += "/";
+                        }
+
+                        startingPath += pathToken;
+                    }
+                }
+
+                return startingPath;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26110", ex);
+            }
+        }
+
+        /// <summary>
+        /// Returns the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s which match the
+        /// specified query applied to the specified root attribute.
+        /// </summary>
+        /// <param name="rootAttribute">The <see cref="IAttribute"/> on which the query is to be
+        /// executed.</param>
+        /// <param name="query">The query to execute on the specified <see cref="IAttribute"/>.
+        /// </param>
+        /// <returns>The <see cref="IUnknownVector"/> of all <see cref="IAttribute"/>s matching the
+        /// query.</returns>
+        [ComVisible(false)]
+        public static IUnknownVector ResolveAttributeQuery(IAttribute rootAttribute, string query)
+        {
+            try
+            {
+                IUnknownVector results = (IUnknownVector)new IUnknownVectorClass();
+
+                // Trim off any leading slash.
+                if (!string.IsNullOrEmpty(query) && query[0] == '/')
+                {
+                    query = query.Remove(0, 1);
+                }
+
+                // If there is nothing left in the query, return the root attribute.
+                if (string.IsNullOrEmpty(query) || query == ".")
+                {
+                    ExtractException.Assert("ELI26140", "Invalid attribute query!",
+                        rootAttribute != null);
+
+                    // Return the rootAttribute if the query is null.
+                    results.PushBack(rootAttribute);
+                    return results;
+                }
+                // If the parent attribute is specified, return the result of running the remaining
+                // query on the parent attribute.
+                else if (query.Substring(0, 2) == "..")
+                {
+                    ExtractException.Assert("ELI26141", "Invalid attribute query!",
+                        rootAttribute != null);
+
+                    results.Append(ResolveAttributeQuery(GetStatusInfo(rootAttribute)._parentAttribute,
+                        (query.Length > 3) ? query.Substring(3) : null));
+                }
+                // Otherwise, apply the next element of the query.
+                else
+                {
+                    // Determine the remaining query after this element.
+                    string nextQuery = null;
+                    int queryEnd = query.IndexOf('/');
+                    if (queryEnd != -1)
+                    {
+                        nextQuery = query.Substring(queryEnd);
+                        query = query.Substring(0, queryEnd);
+                    }
+
+                    // If we are at the root of the heirarchy, _attributes needs to be used for the
+                    // query as there will be no rootAttribute.
+                    IUnknownVector attributesToQuery =
+                        (rootAttribute == null) ? _attributes : rootAttribute.SubAttributes;
+
+                    // Query the current element.
+                    IUnknownVector attributes = DataEntryMethods.AFUtility.QueryAttributes(
+                        attributesToQuery, query, false);
+
+                    // Apply the remaining query to all results from the current element.
+                    int count = attributes.Size();
+                    for (int i = 0; i < count; i++)
+                    {
+                        results.Append(
+                            ResolveAttributeQuery((IAttribute)attributes.At(i), nextQuery));
+                    }
+                }
+
+                return results;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26102", ex);
+                ee.AddDebugData("rootAttribute", 
+                    (rootAttribute == null) ? "null" : rootAttribute.Name, false);
+                ee.AddDebugData("query", query, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// End the current edit by raising AttributeValueModified with IncrementalUpdate = false.
+        /// </summary>
+        [ComVisible(false)]
+        public static void EndEdit()
+        {
+            try
+            {
+                if (_endEditInProgress)
+                {
+                    return;
+                }
+
+                // If attributes have been modified since the last end edit, raise 
+                // IncrementalUpdate == false AttributeValueModified events now.
+                if (_attributesBeingModified.Count > 0)
+                {
+                    try
+                    {
+                        _endEditInProgress = true;
+
+                        foreach (IAttribute attribute in _attributesBeingModified)
+                        {
+                            AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                            statusInfo.OnAttributeValueModified(attribute, false, false);
+                        }
+
+                        _attributesBeingModified.Clear();
+                    }
+                    finally
+                    {
+                        _endEditInProgress = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26118", ex);
+            }  
+        }
+
+        #endregion Static Methods
+
+        #region Events
+
+        /// <summary>
+        /// An event that indicates an attribute is being initialized into an 
+        /// <see cref="IDataEntryControl"/>.
+        /// </summary>
+        public static event EventHandler<AttributeInitializedEventArgs> AttributeInitialized;
+
+        /// <summary>
+        /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
+        /// as unviewed has now been marked as viewed (or vice-versa).
+        /// </summary>
+        public static event EventHandler<ViewedStateChangedEventArgs> ViewedStateChanged;
+
+        /// <summary>
+        /// Fired to notify listeners that an <see cref="IAttribute"/> that was previously marked 
+        /// as having invalid data has now been marked as valid (or vice-versa).
+        /// </summary>
+        public static event EventHandler<ValidationStateChangedEventArgs> ValidationStateChanged;
+
+        /// <summary>
+        /// Raised to notify listeners that an Attribute's value was modified.
+        /// </summary>
+        public event EventHandler<AttributeValueModifiedEventArgs> AttributeValueModified;
+
+        /// <summary>
+        /// Raised to notify listeners that an Attribute was deleted.
+        /// </summary>
+        public event EventHandler<AttributeDeletedEventArgs> AttributeDeleted;
+
+        #endregion Events
+
+        #region Private Methods
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
+        /// have been viewed (or not viewed)
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm all attributes have been viewed
+        /// or <see langword="false"/> to confirm all attributes have not been viewed.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private static bool ConfirmDataViewed(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            return (!statusInfo._isViewable || statusInfo._hasBeenViewed == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
+        /// have valid data.
+        /// <para><b>Note</b></para>
+        /// An attribute that does not have an <see cref="OwningControl"/> 
+        /// specified will pass this test (return <see langword="true"/>) whether the specfied 
+        /// value is <see langword="true"/> or <see langword="false"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm all attributes have valid data
+        /// or <see langword="false"/> to confirm all attributes do not have valid data.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private static bool ConfirmDataValidity(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            return (statusInfo._owningControl == null || !statusInfo._isViewable ||
+                statusInfo._dataIsValid == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to confirm all attributes
+        /// have been propagated into <see cref="IDataEntryControl"/>s.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm all attributes have been propagated
+        /// or <see langword="false"/> to confirm all attributes have not been propagated.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private static bool ConfirmHasBeenPropagated(IAttribute attribute,
+            AttributeStatusInfo statusInfo, bool value)
+        {
+            return (statusInfo._owningControl == null || statusInfo._hasBeenPropagated == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to check whether attributes are
+        /// tabstops or not.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to confirm the attribute tabstop status
+        /// matches the provided value, <see langword="false"/> if it does not.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private static bool ConfirmIsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            bool isTabStop = statusInfo._isViewable && statusInfo._owningControl != null &&
+                (statusInfo._tabStopRequired || !statusInfo._dataIsValid ||
+                 !string.IsNullOrEmpty(attribute.Value.String));
+
+            return (isTabStop == value);
+        }
+
+        /// <summary>
+        /// An <see cref="AccessorMethod"/> implementation used to mark all attributes
+        /// as propagated or not propagated.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> in question.</param>
+        /// <param name="statusInfo">The <see cref="AttributeStatusInfo"/> instance containing
+        /// the status information for the attribute in question.</param>
+        /// <param name="value"><see langword="true"/> to mark all attributes as propagated,
+        /// <see langword="false"/> to mark all attributes as not propagated.</param>
+        /// <returns><see langword="true"/> to continue traversing the attribute tree, 
+        /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
+        /// without traversing any more attributes.</returns>
+        private static bool MarkAsPropagated(IAttribute attribute, AttributeStatusInfo statusInfo,
+            bool value)
+        {
+            statusInfo._hasBeenPropagated = value;
+            return true;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ViewedStateChanged"/> event.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> associated with the event.</param>
+        /// <param name="dataIsViewed"><see langword="true"/> if the <see cref="IAttribute"/>'s data
+        /// has now been marked as viewed, <see langword="false"/> if it has now been marked as 
+        /// unviewed.</param>
+        private static void OnViewedStateChanged(IAttribute attribute, bool dataIsViewed)
+        {
+            if (AttributeStatusInfo.ViewedStateChanged != null)
+            {
+                ViewedStateChanged(null,
+                    new ViewedStateChangedEventArgs(attribute, dataIsViewed));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ValidationStateChanged"/> event. 
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> associated with the event.</param>
+        /// <param name="dataIsValid"><see langword="true"/> if the <see cref="IAttribute"/>'s data
+        /// has now been marked as valid, <see langword="false"/> if it has now been marked as 
+        /// invalid.</param>
+        private static void OnValidationStateChanged(IAttribute attribute, bool dataIsValid)
+        {
+            if (AttributeStatusInfo.ValidationStateChanged != null)
+            {
+                ValidationStateChanged(null, 
+                    new ValidationStateChangedEventArgs(attribute, dataIsValid));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="AttributeInitialized"/> event.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> being initialized.</param>
+        /// <param name="sourceAttributes">The <see cref="IUnknownVector"/> of 
+        /// <see cref="IAttribute"/>s from which the attribute is from.</param>
+        /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> that the
+        /// <see cref="IAttribute"/> is associated with.</param>
+        private static void OnAttributeInitialized(IAttribute attribute,
+            IUnknownVector sourceAttributes, IDataEntryControl dataEntryControl)
+        {
+            if (AttributeStatusInfo.AttributeInitialized != null)
+            {
+                AttributeInitialized(null,
+                    new AttributeInitializedEventArgs(attribute, sourceAttributes, dataEntryControl));
+            }
+        }
+        
+        /// <summary>
+        /// Raises the AttributeValueModified event.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose value was modified.</param>
+        /// <param name="incrementalUpdate">see langword="true"/>if the modification is part of an
+        /// ongoing edit; <see langword="false"/> if the edit has finished.</param>
+        /// <param name="acceptSpatialInfo"><see langword="true"/> if the modification should
+        /// trigger the <see cref="IAttribute"/>'s spatial info to be accepted,
+        /// <see langword="false"/> if the spatial info acceptance state should be left as is.
+        /// </param>
+        private void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
+            bool acceptSpatialInfo)
+        {
+            // Don't raise the event if it is already being raised (prevents recursion).
+            if (this.AttributeValueModified != null && !_raisingAttributeValueModified)
+            {
+                try
+                {
+                    _raisingAttributeValueModified = true;
+
+                    AttributeValueModified(this,
+                        new AttributeValueModifiedEventArgs(
+                            attribute, incrementalUpdate, acceptSpatialInfo));
+                }
+                finally
+                {
+                    _raisingAttributeValueModified = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Raises the AttributeDeleted event.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> that was deleted.</param>
+        private void OnAttributeDeleted(IAttribute attribute)
+        {
+            if (this.AttributeDeleted != null)
+            {
+                AttributeDeleted(this, new AttributeDeletedEventArgs(attribute));
+            }
+        }
+
+        /// <summary>
+        /// Process all <see cref="IAttribute"/>s in the provided vector for deletion by releasing
+        /// all events and triggers associated with the attribute.
+        /// </summary>
+        /// <param name="deletedAttributes"></param>
+        private static void ProcessDeletedAttributes(IUnknownVector deletedAttributes)
+        {
+            ExtractException.Assert("ELI26131", "Null argument exception!",
+                deletedAttributes != null);
+
+            // Cycle through each deleted attribute.
+            int count = deletedAttributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                IAttribute attribute = (IAttribute)deletedAttributes.At(i);
+
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+                statusInfo.OnAttributeDeleted(attribute);
+
+                // Dispose of any auto-update trigger for the attribute.
+                AutoUpdateTrigger autoUpdateTrigger = null;
+                if (_autoUpdateTriggers.TryGetValue(attribute, out autoUpdateTrigger))
+                {
+                    _autoUpdateTriggers.Remove(attribute);
+
+                    autoUpdateTrigger.Dispose();
+                }
+
+                // Dispose of any validation trigger for the attribute.
+                AutoUpdateTrigger validationTrigger = null;
+                if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
+                {
+                    _validationTriggers.Remove(attribute);
+
+                    validationTrigger.Dispose();
+                }
+
+                _subAttributesToParentMap.Remove(attribute.SubAttributes);
+
+                // Recursively process the attribute's descendents.
+                ProcessDeletedAttributes(attribute.SubAttributes);
+            }
+        }
+
+        #endregion Private Methods
+
+        #region IPersistStream Members
+
+        /// <summary>
+        /// Returns the class identifier (CLSID) <see cref="Guid"/> for the component object.
+        /// </summary>
+        /// <param name="classID">Pointer to the location of the CLSID <see cref="Guid"/> on 
+        /// return.</param>
+        public void GetClassID(out Guid classID)
+        {
+            classID = this.GetType().GUID;
+        }
+
+        /// <summary>
+        /// Checks if the object for changes since it was last saved.
+        /// </summary>
+        /// <returns><see langword="true"/> if the object has changes since it was last saved;
+        /// <see langword="false"/> otherwise.</returns>
+        public int IsDirty()
+        {
+            return _dirty;
+        }
+
+        /// <summary>
+        /// Initializes an object from the <see cref="IStream"/> where it was previously saved.
+        /// </summary>
+        /// <param name="stream"><see cref="IStream"/> from which the object should be loaded.
+        /// </param>
+        public void Load(IStream stream)
+        {
+            MemoryStream memoryStream = null;
+
+            try
+            {
+                // Get the size of data stream to load
+                byte[] dataLengthBuffer = new Byte[4];
+                stream.Read(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
+                int dataLength = BitConverter.ToInt32(dataLengthBuffer, 0);
+
+                // Read the data from the provided stream into a buffer
+                byte[] dataBuffer = new byte[dataLength];
+                stream.Read(dataBuffer, dataLength, IntPtr.Zero);
+
+                // Read the settings from the buffer; 
+                // Create a memory stream and binary formatter to deserialize the settings.
+                memoryStream = new MemoryStream(dataBuffer);
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+                // Read the version of the object being loaded.
+                int version = (int)binaryFormatter.Deserialize(memoryStream);
+                ExtractException.Assert("ELI24394", "Unable to load newer AttributeStatusInfo object!",
+                    version <= _CURRENT_VERSION);
+
+                // Read the settings from the memory stream
+                _hasBeenViewed = (bool)binaryFormatter.Deserialize(memoryStream);
+                
+                if (version >= 2)
+                {
+                    _isAccepted = (bool)binaryFormatter.Deserialize(memoryStream);
+                }
+
+                if (version >= 3)
+                {
+                    _hintEnabled = (bool)binaryFormatter.Deserialize(memoryStream);
+                }
+
+                _dirty = HResult.False;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI24395",
+                    "Error loading AttributeStatusInfo settings!", ex);
+                throw new ExtractException("ELI24396", ee.AsStringizedByteStream());
+            }
+            finally
+            {
+                if (memoryStream != null)
+                {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the <see cref="AttributeStatusInfo"/> object into the specified 
+        /// <see cref="IStream"/> and indicates whether the object should reset its dirty flag.
+        /// </summary>
+        /// <param name="stream"><see cref="IStream"/> into which the object should be saved.
+        /// </param>
+        /// <param name="clearDirty">Value that indicates whether to clear the dirty flag after the
+        /// save is complete. If <see langref="true"/>, the flag should be cleared. If 
+        /// <see langref="false"/>, the flag should be left unchanged.</param>
+        public void Save(IStream stream, bool clearDirty)
+        {
+            MemoryStream memoryStream = null;
+
+            try
+            {
+                ExtractException.Assert("ELI24397", "Memory stream is null!", stream != null);
+
+                // Create a memory stream and binary formatter to serialize the settings.
+                memoryStream = new MemoryStream();
+                BinaryFormatter binaryFormatter = new BinaryFormatter();
+
+                // Write the version of the object being saved.
+                binaryFormatter.Serialize(memoryStream, _CURRENT_VERSION);
+
+                // Save the settings to the memory stream (save only the settings that cannot be
+                // reconstructed with using the DataEntryControlHost)
+                binaryFormatter.Serialize(memoryStream, _hasBeenViewed);
+                binaryFormatter.Serialize(memoryStream, _isAccepted);
+                binaryFormatter.Serialize(memoryStream, _hintEnabled);
+
+                // Write the memory stream to the provided IStream.
+                byte[] dataBuffer = memoryStream.ToArray();
+                byte[] dataLengthBuffer = BitConverter.GetBytes(dataBuffer.Length);
+                stream.Write(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
+                stream.Write(dataBuffer, dataBuffer.Length, IntPtr.Zero);
+
+                if (clearDirty)
+                {
+                    _dirty = HResult.False;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI24398",
+                    "Error saving data entry application settings!", ex);
+                throw new ExtractException("ELI24399", ee.AsStringizedByteStream());
+            }
+            finally
+            {
+                if (memoryStream != null)
+                {
+                    memoryStream.Dispose();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the size in bytes of the stream needed to save the object.
+        /// <para>NOTE: Not implemented.</para>
+        /// </summary>
+        /// <param name="size">Will always be <see cref="HResult.NotImplemented"/> to indicate this
+        /// method is not implemented.
+        /// </param>
+        public void GetSizeMax(out long size)
+        {
+            size = HResult.NotImplemented;
+        }
+
+        #endregion IPersistStream Members
+
+        #region ICopyableObject Members
+
+        /// <summary>
+        /// Creates a copy of the current <see cref="AttributeStatusInfo"/> instance.
+        /// </summary>
+        /// <returns>A copy of the current <see cref="AttributeStatusInfo"/> instance.
+        /// </returns>
+        public object Clone()
+        {
+            try
+            {
+                AttributeStatusInfo clone = new AttributeStatusInfo();
+
+                clone.CopyFrom(this);
+
+                return clone;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI24909", ex);
+                throw new ExtractException("ELI24910", ee.AsStringizedByteStream());
+            }
+        }
+
+        /// <summary>
+        /// Copies the value of the provided <see cref="AttributeStatusInfo"/> instance into the 
+        /// current one.
+        /// </summary>
+        /// <param name="pObject">The object to copy from.</param>
+        /// <exception cref="ExtractException">If the supplied object is not of type
+        /// <see cref="AttributeStatusInfo"/>.</exception>
+        public void CopyFrom(object pObject)
+        {
+            try
+            {
+                ExtractException.Assert("ELI24983", "Cannot copy from an object of a different type!",
+                    pObject.GetType() == this.GetType());
+
+                AttributeStatusInfo source = (AttributeStatusInfo)pObject;
+
+                // Copy fields from source
+                _hasBeenPropagated = source._hasBeenPropagated;
+                _isViewable = source._isViewable;
+                _displayOrder = source._displayOrder;
+                _hasBeenViewed = source._hasBeenViewed;
+                _dataIsValid = source._dataIsValid;
+                _owningControl = source._owningControl;
+                _hintType = source._hintType;
+                _hintRasterZones = source._hintRasterZones;
+                _isAccepted = source._isAccepted;
+                _hintEnabled = source._hintEnabled;
+                _parentAttribute = source._parentAttribute;
+                _fullPath = source._fullPath;
+                _validator = (source._validator == null) 
+                    ? null : (DataEntryValidator)source._validator.Clone();
+                _tabStopRequired = source._tabStopRequired;
+                
+                // _raisingAttributeValueModified is intentionally not copied.
+                // Do not copy _autoUpdateQuery or _validationQuery since a query is specified to
+                // its location in the attribute hierarchy and persisting the query values will
+                // prevent new triggers from being created when the attribute is re-initialized.
+                _raisingAttributeValueModified = false;
+                _autoUpdateQuery = null;
+                _validationQuery = null;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI24911", ex);
+                throw new ExtractException("ELI24912", ee.AsStringizedByteStream());
+            }
+        }
+
+        #endregion ICopyableObject Members
+    }
+}

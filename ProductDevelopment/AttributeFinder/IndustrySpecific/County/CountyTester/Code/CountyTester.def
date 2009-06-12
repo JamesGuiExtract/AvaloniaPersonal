@@ -1,0 +1,9 @@
+; CountyTester.def : Declares the module parameters.
+
+LIBRARY      "CountyTester.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

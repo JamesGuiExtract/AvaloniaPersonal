@@ -1,0 +1,626 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFCore.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFCore Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFCore"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFCore.DLL"
+            VALUE "ProductName", "AFCore Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_ATTRIBUTERULE       REGISTRY                "AttributeRule.rgs"
+IDR_RULESET             REGISTRY                "RuleSet.rgs"
+IDR_ATTRIBUTE           REGISTRY                "Attribute.rgs"
+IDR_ATTRIBUTEFINDERENGINE REGISTRY                "AttributeFinderEngine.rgs"
+IDR_ATTRIBUTEFINDINFO   REGISTRY                "AttributeFindInfo.rgs"
+IDR_AFDOCUMENT          REGISTRY                "AFDocument.rgs"
+IDR_RULEEXECUTIONENV    REGISTRY                "RuleExecutionEnv.rgs"
+IDR_RULEEXECUTIONSESSION REGISTRY                "RuleExecutionSession.rgs"
+IDR_RULETESTERUI        REGISTRY                "RuleTesterUI.rgs"
+IDR_ATTRIBUTEFINDERENGINEPP REGISTRY                "AttributeFinderEnginePP.rgs"
+IDR_CONDITIONALRULEPP   REGISTRY                "ConditionalRulePP.rgs"
+IDR_SPATIALLYCOMPAREATTRIBUTES REGISTRY                "SpatiallyCompareAttributes.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_RSEDITOR            ICON                    "res\\RSEditor.ico"
+IDI_ICON_DOC            ICON                    "res\\icon_doc.ico"
+IDI_ICON_DOWN           ICON                    "res\\icon_down.ico"
+IDI_ICON_UP             ICON                    "res\\icon_up.ico"
+IDI_ICON_RULE_TESTER    ICON                    "res\\RuleTester.ico"
+IDI_ID_SHIELD           ICON                    "..\\..\\IndustrySpecific\\Redaction\\RedactionCustomComponents\\Code\\res\\DataAreaDialog.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 272, 79
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Attribute Finder"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    ICON            IDR_RSEDITOR,IDC_APPICON,11,17,21,20
+    LTEXT           "Copyright (C) 2009\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,46,119,25
+    DEFPUSHBUTTON   "OK",IDOK,215,7,50,14,WS_GROUP
+    EDITTEXT        IDC_EDIT_PRD_VERSION,40,7,158,16,ES_MULTILINE | ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_EDIT_FKB_VERSION,40,28,158,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+IDD_DLG_EDITOR DIALOGEX 0, 0, 294, 326
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES
+CAPTION "Rule Set Editor"
+MENU IDR_MNU_EDITOR
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_CHECK_DOCUMENT_PP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,19,8,10
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECTPP,211,18,60,13
+    COMBOBOX        IDC_COMBO_ATTRIBUTES,15,66,180,80,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add...",IDC_BTN_ADDATTR,211,49,60,13
+    PUSHBUTTON      "Delete",IDC_BTN_DELATTR,211,66,60,13
+    PUSHBUTTON      "Rename...",IDC_BTN_RENATTR,211,83,60,13
+    GROUPBOX        "Attributes",IDC_STATIC_ATTR,7,39,280,240
+    CONTROL         "List2",IDC_LIST_RULES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,22,113,180,74
+    PUSHBUTTON      "Insert...",IDC_BTN_ADDRULE,211,113,60,13
+    PUSHBUTTON      "Delete",IDC_BTN_DELRULE,211,130,60,13
+    PUSHBUTTON      "Modify...",IDC_BTN_CONRULE,211,147,60,13
+    PUSHBUTTON      "",IDC_BTN_RULEUP,211,166,21,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_RULEDOWN,250,166,21,21,BS_ICON
+    CONTROL         "Stop searching after first value found",IDC_CHECK_STOP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,191,154,10
+    GROUPBOX        "Attribute Rules",IDC_STATIC_RULES,14,103,266,104
+    CONTROL         "",IDC_CHECK_INPUT_VALIDATOR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,229,8,10
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECTIV,212,227,60,13
+    CONTROL         "",IDC_CHECK_ATT_SPLITTER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,260,8,10
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECT_ATTRIBUTE_SPLITTER,212,258,60,13
+    LTEXT           "Use the following AttributeSplitter to split the value into sub-parts:",IDC_STATIC_SPLIT,14,248,208,10
+    LTEXT           "Use the following Input Validator:",IDC_STATIC_IV,14,216,151,10
+    LTEXT           "",IDC_EDIT_IV,27,228,175,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "",IDC_EDIT_ATTRIBUTE_SPLITTER,27,259,175,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "Use the following Document Preprocessor:",IDC_STATIC_PP,7,7,151,10
+    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,19,182,10,SS_NOTIFY | SS_SUNKEN
+    CTEXT           "The Rule Set is encrypted and cannot be viewed or modified.\r\n\r\nTesting is available from the Tools menu.",IDC_STATIC_PROMPT,35,78,204,27
+    CONTROL         "",IDC_CHECK_OUTPUT_HANDLER,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,300,8,10
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECTOH,212,299,60,13
+    LTEXT           "Use the following Output Handler:",IDC_STATIC_OH,7,288,151,10
+    LTEXT           "",IDC_EDIT_OH,20,300,182,10,SS_NOTIFY | SS_SUNKEN
+END
+
+IDD_DLG_ADDRULE DIALOGEX 0, 0, 346, 314
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "Add Attribute Finding Rule"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    COMBOBOX        IDC_COMBO_RULE,7,77,262,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_DESC,7,48,332,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Configure...",IDC_BTN_CONRULE2,279,77,60,13
+    CONTROL         "Apply the following modifying rules",IDC_CHECK_MODIFY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,96,135,9
+    PUSHBUTTON      "Add",IDC_BTN_ADDRULE,279,107,60,13
+    PUSHBUTTON      "Remove",IDC_BTN_DELRULE,279,124,60,13
+    PUSHBUTTON      "Commands >",IDC_BTN_CONRULE,279,142,60,13
+    PUSHBUTTON      "",IDC_BTN_RULEUP,279,159,21,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_RULEDOWN,318,159,21,21,BS_ICON
+    DEFPUSHBUTTON   "OK",IDOK,231,293,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,289,293,50,14
+    LTEXT           "Description",IDC_STATIC,7,38,64,9
+    LTEXT           "Select rule to find value for attribute",IDC_STATIC_DESC,7,67,332,9
+    CONTROL         "List1",IDC_LIST_RULES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP,7,107,262,173
+    LTEXT           "The Value Finding Rule must be configured",IDC_STATIC_CONFIGURE,7,289,134,18
+    CONTROL         "",IDC_CHECK_AFRULE_DOC_PP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,18,8,10
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECTPP,279,18,60,13
+    LTEXT           "Use the following Document Preprocessor:",IDC_STATIC,7,7,151,10
+    LTEXT           "",IDC_EDIT_PREPROCESSOR,20,18,249,12,SS_NOTIFY | SS_SUNKEN
+END
+
+IDD_DLG_TESTER DIALOGEX 0, 0, 248, 174
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_ACCEPTFILES
+CAPTION "Rule Tester"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "NOTE: A property sheet and splitter control will dynamically be shown in this area at runtime.",IDC_STATIC,35,15,155,30,NOT WS_VISIBLE
+    CONTROL         "Custom1",IDC_TREE_LIST,"LANTIVTREELISTCTRL",WS_TABSTOP,29,83,175,68
+    CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,221,86,14,22
+END
+
+IDD_DLG_TESTER_EDIT DIALOG  0, 0, 235, 150
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Edit Attribute"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,121,129,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,178,129,50,14
+    LTEXT           "Name",IDC_STATIC,7,7,50,9
+    EDITTEXT        IDC_EDIT_NAME,7,17,221,12,ES_AUTOHSCROLL
+    LTEXT           "Value",IDC_STATIC,7,36,50,9
+    EDITTEXT        IDC_EDIT_VALUE,7,46,221,48,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "Type",IDC_STATIC,7,101,50,9
+    EDITTEXT        IDC_EDIT_TYPE,7,111,221,12,ES_AUTOHSCROLL
+END
+
+IDD_ENGINE_PROGRESS_DLG DIALOGEX 0, 0, 297, 150
+STYLE DS_SETFONT | DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_TOOLWINDOW
+CAPTION "Attribute Finding Progress"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Current attribute :",IDC_STATIC,10,60,55,10
+    LTEXT           "Current rule :",IDC_STATIC,10,95,55,10
+    LTEXT           "ABC",IDC_STATIC_ATTRIBUTE_NAME,70,60,215,10
+    LTEXT           "123",IDC_STATIC_RULE_DESCRIPTION,70,95,215,10
+    CONTROL         "Progress1",IDC_PROGRESS_ATTR,"msctls_progress32",WS_BORDER | 0x1,10,71,275,15
+    CONTROL         "Progress1",IDC_PROGRESS_RULE,"msctls_progress32",WS_BORDER | 0x1,10,106,275,15
+    CONTROL         213,IDC_STATIC_ANIMATION,"Static",SS_BITMAP | SS_CENTERIMAGE,102,10,18,13
+    PUSHBUTTON      "Cancel",ID_CANCEL_SEARCH,121,130,55,15
+END
+
+IDD_DLG_IMPORT_ATTRIBUTES DIALOG  0, 0, 254, 177
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+CAPTION "Import Attributes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,138,156,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,197,156,50,14
+    LTEXT           "Select attributes to import",IDC_STATIC_SELECT,7,7,111,9
+    CONTROL         "Custom1",IDC_GRID,"GXWND",WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,17,240,133
+    CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,27,155,39,15
+END
+
+IDD_TESTERDLG_SETTINGS_PAGE DIALOG  0, 0, 117, 49
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "General Settings"
+FONT 8, "MS Sans Serif"
+BEGIN
+    GROUPBOX        "Select testing scope",IDC_STATIC_SCOPE,10,5,100,38
+    CONTROL         "All attributes",IDC_RADIO_ALL,"Button",BS_AUTORADIOBUTTON | BS_VCENTER | WS_GROUP,15,15,85,10
+    CONTROL         "Current attribute",IDC_RADIO_CURRENT,"Button",BS_AUTORADIOBUTTON | BS_VCENTER,15,28,85,10
+END
+
+IDD_TESTERDLG_INPUT_PAGE DIALOG  0, 0, 225, 103
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Input"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_COMBO_INPUT,55,9,163,50,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "...",ID_BROWSE,203,26,15,13
+    EDITTEXT        IDC_EDIT_FILE,55,26,143,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_TESTINPUT,7,44,211,52,ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN | WS_VSCROLL
+    LTEXT           "File name:",IDC_STATIC_FILENAME,7,25,35,10,SS_CENTERIMAGE
+    LTEXT           "Input:",IDC_STATIC_INPUT,7,10,35,10,SS_CENTERIMAGE
+END
+
+IDD_TESTERDLG_OUTPUTHANDLERS_PAGE DIALOG  0, 0, 226, 116
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Output Handlers"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LISTBOX         IDC_LIST_OUTPUTHANDLERS,7,7,153,85,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Add...",IDC_BTN_ADD,169,7,50,14
+    PUSHBUTTON      "Delete",IDC_BTN_REMOVE,169,26,50,14
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY,169,45,50,14
+    PUSHBUTTON      "",IDC_BTN_UP,169,64,21,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN,197,64,21,21,BS_ICON
+    CONTROL         "Ignore above output handlers",IDC_CHK_IGNORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,99,109,10
+END
+
+IDD_TESTERDLG_RULESET_PAGE DIALOG  0, 0, 324, 105
+STYLE DS_SETFONT | WS_CHILD | WS_CAPTION
+CAPTION "Ruleset"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Rule Set",IDC_STATIC_RULESET,6,13,29,14,SS_CENTERIMAGE
+    EDITTEXT        IDC_RULESET,35,13,261,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_RSD,299,13,15,14
+END
+
+IDD_CONDITIONALRULEPP DIALOGEX 0, 0, 246, 86
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_CMB_TRUE_FALSE,95,3,40,35,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_CONDITION,5,20,165,105,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configure...",IDC_BTN_CONFIG_CONDITION,180,20,60,13
+    COMBOBOX        IDC_CMB_RULE,5,55,165,110,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configure...",IDC_BTN_CONFIG_RULE,180,55,60,13
+    LTEXT           "If the following condition is",IDC_STATIC,5,5,85,10
+    LTEXT           "then run the following rule",IDC_STATIC,5,40,85,10
+    LTEXT           "The condition object must be configured",IDC_TEXT_MUST_CONFIG,5,75,235,8
+END
+
+IDD_RULESET_PROPERTIES_DLG DIALOG  0, 0, 262, 145
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Ruleset Properties"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,150,124,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,205,124,50,14
+    CONTROL         "List1",IDC_COUNTER_LIST,"SysListView32",LVS_REPORT | WS_BORDER | WS_TABSTOP,5,16,250,69
+    LTEXT           "Counters to decrement",IDC_STATIC,5,5,90,10
+    CONTROL         "RuleSet can be executed only internally (i.e. it cannot be executed directly)",IDC_CHECK_INTERNAL_USE_ONLY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,110,250,10
+    LTEXT           "Key Serial #'s",IDC_STATIC,5,92,44,8
+    EDITTEXT        IDC_SERIAL_NUMBERS,51,91,204,12,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 72
+    END
+
+    IDD_DLG_EDITOR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 287
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 315
+    END
+
+    IDD_DLG_ADDRULE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 339
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 307
+    END
+
+    IDD_DLG_TESTER, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 241
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 167
+    END
+
+    IDD_ENGINE_PROGRESS_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 290
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 143
+    END
+
+    IDD_DLG_IMPORT_ATTRIBUTES, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 247
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 170
+    END
+
+    IDD_TESTERDLG_SETTINGS_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 110
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 42
+    END
+
+    IDD_TESTERDLG_INPUT_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 218
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 96
+    END
+
+    IDD_TESTERDLG_OUTPUTHANDLERS_PAGE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 219
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 109
+    END
+
+    IDD_CONDITIONALRULEPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 211
+        BOTTOMMARGIN, 81
+    END
+
+    IDD_RULESET_PROPERTIES_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 255
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 138
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MNU_EDITOR MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN
+        MENUITEM SEPARATOR
+        MENUITEM "&Import...\tCtrl+I",          ID_FILE_IMPORT
+        MENUITEM "&Export...\tCtrl+E",          ID_FILE_EXPORT
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE
+        MENUITEM "Save &As...",                 ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        POPUP "Recent Files"
+        BEGIN
+            MENUITEM "No File",                     ID_FILE_MRU, GRAYED
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties...\tF2",          ID_FILE_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "Tools"
+    BEGIN
+        MENUITEM "&Open Rule Tester...\tCtrl+T", ID_TOOLS_TEST
+        MENUITEM SEPARATOR
+        MENUITEM "&Check for New Components",   ID_TOOLS_CHECK
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "Attribute Finder &Help",      ID_HELP_HELP
+        MENUITEM SEPARATOR
+        MENUITEM "&About FLEX Index...",         ID_HELP_ABOUT
+    END
+END
+
+IDR_MNU_CONTEXT MENU 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "Cu&t",                        ID_EDIT_CUT
+        MENUITEM "&Copy",                       ID_EDIT_COPY
+        MENUITEM "&Paste",                      ID_EDIT_PASTE
+        MENUITEM "&Delete",                     ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TESTERDLG_TOOLBAR TOOLBAR  16, 16
+BEGIN
+    BUTTON      ID_BUTTON_SRIR
+    SEPARATOR
+    BUTTON      ID_BUTTON_CLEAR
+    BUTTON      ID_BUTTON_EXECUTE
+    SEPARATOR
+    BUTTON      ID_BUTTON_VOA
+    BUTTON      ID_BUTTON_FEEDBACK
+    BUTTON      ID_BUTTON_KEY_SR
+    SEPARATOR
+    BUTTON      ID_BUTTON_ABOUT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TESTERDLG_TOOLBAR   BITMAP                  "res\\testerdl.bmp"
+IDB_BITMAP_PROGRESS_FRAME1 BITMAP                  "res\\bitmap_p.bmp"
+IDB_BUTTON_UP           BITMAP                  "res\\Up.bmp"
+IDB_BUTTON_DOWN         BITMAP                  "res\\Down.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// GIF
+//
+
+IDR_PROGRESS_ANIMATION  GIF                     "res\\ProgressAnimation.gif"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATOR_TESTERDLG ACCELERATORS 
+BEGIN
+    "E",            ID_BUTTON_EXECUTE,      VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_BUTTON_SRIR,         VIRTKEY, CONTROL, NOINVERT
+    "T",            ID_BUTTON_HTIR,         VIRTKEY, CONTROL, NOINVERT
+END
+
+IDR_ACCELERATOR_EDITORDLG ACCELERATORS 
+BEGIN
+    "E",            ID_FILE_EXPORT,         VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_FILE_IMPORT,         VIRTKEY, CONTROL, NOINVERT
+    "N",            ID_FILE_NEW,            VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE,           VIRTKEY, CONTROL, NOINVERT
+    "T",            ID_TOOLS_TEST,          VIRTKEY, CONTROL, NOINVERT
+    VK_F2,          ID_FILE_PROPERTIES,     VIRTKEY, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFCore"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_NEW             "New rule set"
+    ID_FILE_OPEN            "Open rule set"
+    ID_FILE_SAVE            "Save rule set"
+    ID_INDICATOR_COUNTERS   "Counters: NNN"
+    ID_INDICATOR_INTERNAL_USE_ONLY "InternalUseOnly = Yes"
+    ID_INDICATOR_SERIAL_NUMBERS "SNs"
+    IDS_FLEXINDEX_PRODUCT   "FLEX Index"
+    IDS_IDSHIELD_PRODUCT    "ID Shield"
+    IDS_UNKNOWN_PRODUCT     "Unknown"
+    IDS_RULETESTER_PRODUCT  "Rule Tester"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_FILE_SAVEAS          "Save rule set"
+    ID_FILE_EXIT            "Exit"
+    ID_TOOLS_TEST           "Test rule set"
+    ID_TOOLS_CHECK          "Check component updates"
+    ID_HELP_ABOUT           "&About Attribute Finder..."
+    ID_HELP_HELP            "Attribute Finder Help"
+    ID_BUTTON_SRIR          "Open a new Image Viewer"
+    ID_BUTTON_HTIR          "Open a new Highlighted Text Window"
+    ID_FILE_IMPORT          "Import rule(s)"
+    ID_FILE_EXPORT          "Export rule(s)"
+    ID_BUTTON_EXECUTE       "Execute rules"
+    ID_BUTTON_CLEAR         "Clear output window"
+END
+
+STRINGTABLE 
+BEGIN
+    ID_BUTTON_VOA           "Save attributes to VOA file"
+    ID_BUTTON_FEEDBACK      "Save attributes to Feedback"
+    ID_BUTTON_KEY_SR        "Disable Image Viewer when pressed"
+    ID_BUTTON_ABOUT         "About Rule Tester..."
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLETesterDlgRulesetPage "Rule Set"
+    IDS_TITLEAttributeFinderEnginePP "AttributeFinderEnginePP"
+    IDS_HELPFILEAttributeFinderEnginePP "AttributeFinderEnginePP"
+    IDS_DOCSTRINGAttributeFinderEnginePP "AttributeFinderEnginePP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEConditionalRulePP "&Title"
+    IDS_HELPFILEConditionalRulePP "Help File Name"
+    IDS_DOCSTRINGConditionalRulePP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFCore.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

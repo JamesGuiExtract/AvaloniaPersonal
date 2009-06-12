@@ -1,0 +1,251 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+	"\r\n"
+	"#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+	"#ifdef _WIN32\r\n"
+	"LANGUAGE 9, 1\r\n"
+	"#pragma code_page(1252)\r\n"
+	"#endif //_WIN32\r\n"
+	"#include ""res\\Feedback.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+	"#include ""afxres.rc""  	// Standard components\r\n"
+	"#endif\r\n"
+    "\0"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\Feedback.ico"
+
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_CONFIG DIALOG DISCARDABLE  0, 0, 261, 317
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Feedback Data Collection Configuration"
+FONT 8, "MS Sans Serif"
+BEGIN
+    CONTROL         "Enable Feedback collection",IDC_CHECK_ENABLE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,7,7,125,12
+    EDITTEXT        IDC_EDIT_FOLDER,7,37,215,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSEFOLDER,229,37,25,12
+    CONTROL         "Automatically turn off feedback collection:",
+                    IDC_CHECK_TURNOFF,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    7,57,160,12
+    CONTROL         "On",IDC_RADIO_ONDATE,"Button",BS_AUTORADIOBUTTON | 
+                    WS_GROUP,22,71,30,12
+    EDITTEXT        IDC_EDIT_DATE,56,71,50,12,ES_AUTOHSCROLL
+    CONTROL         "After",IDC_RADIO_AFTER,"Button",BS_AUTORADIOBUTTON,22,
+                    85,30,12
+    EDITTEXT        IDC_EDIT_COUNT,56,85,50,12,ES_AUTOHSCROLL
+    CONTROL         "Do not collect source documents",IDC_RADIO_NOCOLLECT,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,12,126,125,12
+    CONTROL         "Collect source documents at rule execution time",
+                    IDC_RADIO_ATEXECUTION,"Button",BS_AUTORADIOBUTTON,12,140,
+                    173,12
+    CONTROL         "Collect source documents at packaging time",
+                    IDC_RADIO_ATPACKAGING,"Button",BS_AUTORADIOBUTTON,12,168,
+                    173,12
+    CONTROL         "Convert source documents to text to save disk space",
+                    IDC_CHECK_TOTEXT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,
+                    25,154,186,12
+    CONTROL         "Collect feedback data for all attributes",IDC_RADIO_ALL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,12,200,173,12
+    CONTROL         "Collect feedback data only for the following attributes",
+                    IDC_RADIO_SOME,"Button",BS_AUTORADIOBUTTON | WS_DISABLED,
+                    12,214,185,12
+    PUSHBUTTON      "Add...",IDC_BTN_ADD,197,229,50,14,WS_DISABLED
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY,197,248,50,14,WS_DISABLED
+    PUSHBUTTON      "Delete",IDC_BTN_DELETE,197,267,50,14,WS_DISABLED
+    PUSHBUTTON      "Clear Feedback Data",IDC_BTN_CLEAR,7,296,90,14
+    DEFPUSHBUTTON   "OK",IDOK,147,296,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,204,296,50,14
+    LTEXT           "Folder in which to collect feedback data",IDC_STATIC,7,
+                    24,133,10
+    LTEXT           "rule executions",IDC_STATIC,112,86,57,10
+    GROUPBOX        "Source Document Collection Options",IDC_STATIC,7,116,
+                    247,69
+    GROUPBOX        "Attribute Selection",IDC_STATIC,7,190,247,99
+    CONTROL         "List1",IDC_LIST_ATTRIBUTES,"SysListView32",LVS_REPORT | 
+                    LVS_SINGLESEL | WS_DISABLED | WS_BORDER | WS_TABSTOP,25,
+                    229,165,52
+    LTEXT           "Skip",IDC_STATIC,34,100,18,10
+    LTEXT           "items between collections",IDC_STATIC,112,100,86,10
+    EDITTEXT        IDC_EDIT_SKIPCOUNT,56,99,50,12,ES_AUTOHSCROLL
+END
+
+IDD_DLG_PACKAGE DIALOG DISCARDABLE  0, 0, 246, 105
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Package Feedback Data"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "Package Data",IDOK,121,84,61,14
+    PUSHBUTTON      "Cancel",IDCANCEL,189,84,50,14
+    LTEXT           "Estimated package file size:",IDC_STATIC,7,7,97,10
+    LTEXT           "123 MB",IDC_STATIC_SIZE,111,7,50,10
+    LTEXT           "Select feedback package output file",IDC_STATIC,7,24,
+                    140,10
+    EDITTEXT        IDC_EDIT_FILE,7,37,193,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSEFOLDER,209,37,30,12
+    CONTROL         "Clear feedback data after it has been packaged",
+                    IDC_CHECK_CLEAR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,
+                    56,177,12
+    LTEXT           "NOTE: Please exit all applications using the FLEX Index technology before clicking OK.",
+                    IDC_STATIC,7,73,108,25
+    PUSHBUTTON      "&Read Database",ID_BTN_READINDEX,169,7,70,14
+END
+
+IDD_DLG_CHOICE DIALOG DISCARDABLE  0, 0, 154, 74
+STYLE DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Select Feedback Option"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,40,53,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,97,53,50,14
+    PUSHBUTTON      "&Configure Feedback Data Collection...",
+                    IDC_BTN_CONFIGURE,7,7,140,16
+    PUSHBUTTON      "&Package Feedback Data...",IDC_BTN_PACKAGE,7,30,140,16
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO     VERSIONINFO
+  FILEVERSION       1,0,0,1
+  PRODUCTVERSION    1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+	BLOCK "StringFileInfo"
+	BEGIN
+        BLOCK "040904B0"
+		BEGIN 
+			VALUE "CompanyName",     "\0"
+			VALUE "FileDescription", "Feedback MFC Application\0"
+			VALUE "FileVersion",     "1, 0, 0, 1\0"
+			VALUE "InternalName",    "Feedback\0"
+			VALUE "LegalCopyright",  "Copyright (C) 2009\0"
+			VALUE "LegalTrademarks", "\0"
+			VALUE "OriginalFilename","Feedback.EXE\0"
+			VALUE "ProductName",     "Feedback Application\0"
+			VALUE "ProductVersion",  "1, 0, 0, 1\0"
+		END
+	END
+	BLOCK "VarFileInfo" 
+	BEGIN 
+		VALUE "Translation", 0x409, 1200
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_FEEDBACK_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 313
+        TOPMARGIN, 7
+        BOTTOMMARGIN,193 
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+#endif
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\\Feedback.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"  	// Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

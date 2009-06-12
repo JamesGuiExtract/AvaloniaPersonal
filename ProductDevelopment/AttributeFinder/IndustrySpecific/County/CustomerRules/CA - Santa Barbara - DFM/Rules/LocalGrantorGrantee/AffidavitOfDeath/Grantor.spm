@@ -1,0 +1,31 @@
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0056136.tif
+Grantor01=died on^50~said settlor|is the^12~same person as^?Grantor01^who^12~decedent
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057301.tif
+Grantor02=that|1.|1]^?Grantor02^the decedent^6~mentioned|named^12~attached^50~certificate|death^25~same^6~person^6~named|as
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057666.tif
+Grantor05=that|1^?Grantor05^is the|the^6~decedent^6~mentioned|named^12~attached^50~certificate|death^25~who^6~died
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057322.tif
+Grantor03=originally^6~named^6~trustees|trustee^?Grantor03^died^50~indicated^12~attached^6~certified^50~certificate|death
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057491.tif
+Grantor04=6^?Grantor04^mentioned^12~attached^6~certified^25~certificate|death^25~same person^named|mentioned^25~trustee
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0058259.tif
+Grantor07=[on]|2.^?Grantor07^died^50~attached|evidenced^25~certified^25~certificate|death
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0058275.tif
+Grantor08=)^?Grantor08^50~died^50~evidenced^12~certified^50~certificate|death
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0058420.tif
+Grantor09=[on]^?Grantor09^Trustee|same^25~person^50~decedent^6~mentioned^12~attached|certified^50~certificate|death
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\AffidavitOfDeath\2009-0000727.tif
+Grantor10=\r\n^?Grantor10^80~[the decedent|decedent^5~described
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\AffidavitOfDeath\2009-0000741.tif
+Grantor11=deposes^10~says^5~\r\n^?Grantor^80~one^5~of^400~below^9~died
+Grantor12=\r\n1^?Grantor^80~[the decedent|decedent
+[PATTERNS_END]

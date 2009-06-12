@@ -1,0 +1,15 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;CreateTestOutputVOAFiles=1
+<SETTING>;OutputAttributeNamesFileLists=1
+
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch01\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch02\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch03\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch04\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch05\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch06\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch07\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\NIC\Alabama Interactive\AL - Secretary of State\Set001\Images\batch08\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

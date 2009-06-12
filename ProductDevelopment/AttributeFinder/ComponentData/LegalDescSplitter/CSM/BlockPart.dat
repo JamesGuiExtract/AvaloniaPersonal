@@ -1,0 +1,28 @@
+// DT:0001  Whatcom-31100760.TIF.uss
+// 	(Block|blk)[\(\)s]{0,4}\s+((\s?\d+)|\band\b|[,\s])*
+
+// DT:0002  DTC-00021.TIF.uss
+//	Added Spelled out numbers with \band\b|\s?-\s? 
+//	Added \(? and \)? for the beginning Block Part
+
+// DT:0006  Waukesha-8-19-U1-WD00000196.TIF.USS
+//	("?[a-zA-Z]"?(?=\s|,|\.|$))
+
+// DT:0008  WAUKESHA-7-7-03-MB-001578.TIF.uss
+//	("?[a-zA-Z]"?(?=\s|,|\.|$)) was changed to allow pickup of Block 6G
+
+// Beginning Block Part
+(Block|Circle|blk)[\(\)s\.]{0,5}(\s+number|\s+no(\.)?)?\s+
+
+// Digits or single letter or both
+(([\.\s]*\(?\d+\)?)|("?[a-zA-Z]"?(?=\s|,|\.|(?=\r?$)))
+
+// Or Number could be spelled out
+|\s?(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(Y|EEN)?)|(NINE(TY|TEEN)?)|
+  TEN|ELEVEN|TWELVE|THIRTEEN|FIFTEEN|
+  TWENTY|THIRTY|FORTY|FIFTY|
+  HUNDRED|THOUSAND|\band\b|\s?-\s?
+
+// End of spelled out number or number separators
+)*
+|[,\s])*

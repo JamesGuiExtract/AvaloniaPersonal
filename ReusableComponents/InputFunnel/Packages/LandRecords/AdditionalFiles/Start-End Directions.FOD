@@ -1,0 +1,14 @@
+[CharsAlwaysEnabled]
+
+[InputTypes]
+Bearing
+Direction
+
+[Choices]
+1|Northerly Southerly Westerly Easterly|NorthelySuWsEa
+2|North South West East|NorthSuWesEa
+3|Nor Sou Wst Est|NorSuWstE
+4|Nth Sth Wst Est|NthSWsE
+5|N S W E|NSWE
+6|- (Hyphen symbol)|-
+7|. (Period symbol)|.

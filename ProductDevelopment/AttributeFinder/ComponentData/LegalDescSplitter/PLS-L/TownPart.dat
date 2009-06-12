@@ -1,0 +1,20 @@
+// DT:0028
+//	Added initial expression
+
+// DT:0029
+// 	Format of:  T. 3 S.
+
+T(own)?(ship)?[\.\s]*
+
+((\(?\d+\)?[,\s]?)
+
+// Or Number could be spelled out
+|\s{0,4}(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(Y|EEN)?)|(NINE(TY|TEEN)?)|
+  TEN|ELEVEN|TWELVE|THIRTEEN|FIFTEEN|
+  TWENTY|THIRTY|FORTY|FIFTY|
+  HUNDRED|THOUSAND|\band\b|\s?-\s?|&
+// End of spelled out number or number separators
+)*
+|[-&,\s]+)*
+
+\s*(N\b|S\b|North|South)

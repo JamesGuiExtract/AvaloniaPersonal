@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.CreateValue.1 = s 'CreateValue Class'
+	{
+		CLSID = s '{E5FCEC86-A47A-483E-9A6C-280A84B78041}'
+	}
+	AFValueFinders.CreateValue = s 'CreateValue Class'
+	{
+		CLSID = s '{E5FCEC86-A47A-483E-9A6C-280A84B78041}'
+		CurVer = s 'AFValueFinders.CreateValue.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E5FCEC86-A47A-483E-9A6C-280A84B78041} = s 'CreateValue Class'
+		{
+			ProgID = s 'AFValueFinders.CreateValue.1'
+			VersionIndependentProgID = s 'AFValueFinders.CreateValue'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

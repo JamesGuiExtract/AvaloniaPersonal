@@ -1,0 +1,33 @@
+(?:
+
+	(?:MORTGAGE)[\s\S]{0,75}?
+	
+	(?:\bMAD|ADE\b|EXEC|CUTED|GIVE|IVEN|ENTERED|\bis\b)[\s\S]{0,350}?
+	
+	(?:MORTGAGEE|TGAGEE)
+
+	(?<MORTGAGEE>[\s\S]{0,200}?)
+	
+	(nominee\s?for[\s\S]{0,300}-MERS(?<MORTGAGEE2>[\s\S]{0,500}?))?
+	
+	(?:[('"].{0,3}LENDER|WHICH)
+	
+)
+
+|
+
+(?#K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTG\0085220.TIF)
+
+(?:
+	
+	(?:SECUR|CURITY)[\s\S]{0,15}(?:INSTR|RUMENT)[\s\S]{0,16}(?:GIV|VEN)[\s\S]{0,6}t[o0]
+		
+	(?<MORTGAGEE>[\s\S]{0,200}?)
+	
+	(nominee\s?for[\s\S]{0,500}-MERS(?<MORTGAGEE2>[\s\S]{0,500}?))?
+	
+	(?:[('"].{0,3}LENDER|WHICH)
+
+)
+
+

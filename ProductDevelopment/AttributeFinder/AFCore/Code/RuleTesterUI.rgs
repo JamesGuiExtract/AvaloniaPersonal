@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.RuleTesterUI.1 = s 'RuleTesterUI Class'
+	{
+		CLSID = s '{AC714C5E-96DF-4184-8E45-6EA8768037C5}'
+	}
+	UCLIDAFCore.RuleTesterUI = s 'RuleTesterUI Class'
+	{
+		CLSID = s '{AC714C5E-96DF-4184-8E45-6EA8768037C5}'
+		CurVer = s 'UCLIDAFCore.RuleTesterUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AC714C5E-96DF-4184-8E45-6EA8768037C5} = s 'RuleTesterUI Class'
+		{
+			ProgID = s 'UCLIDAFCore.RuleTesterUI.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.RuleTesterUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

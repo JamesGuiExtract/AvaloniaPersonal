@@ -1,0 +1,39 @@
+[VARS_BEGIN]
+
+Numbers=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0055115.tif
+AOD_01=\r\n^?Grantee^66~of^4~legal^4~age
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0055161.tif
+AOD_02=\r\n^?Grantee^66~("Declarant")
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0055924.tif
+AOD_03=,^?Grantee^66~,^4~being^4~duly^4~sworn
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0056416.tif
+AOD_04=\r\n^?Grantee^66~Trustee^4~of^4~legal^4~age
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0059044.tif
+AOD_05=\r\n^?Grantee^66~being^4~of^4~legal^4~age
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057301.tif
+AOD_06=\r\n^?Grantee^75~being^4~first|duly
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057491.tif
+AOD_07=1^?Grantee^75~as^4~Trustor|Settlor
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0058488.tif
+AOD_08=\r\n^?Grantee^75~the^4~undersign
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0058955.tif
+AOD_09=\r\n^?Grantee^75~,^4~Trustee^4~of
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0060359.tif
+AOD_10=\r\n^?Grantee^75~declare
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0061231.tif
+AOD_11=\r\n^?Grantee^75~is^4~filing^4~this
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0062697.tif
+AOD_12=undersigned^?Grantee^75~being^4~first|duly
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0055924.tif
+AOD_13=Trustee^4~of^?Grantee^75~hereafter|Amended|[on]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0057198.tif
+AOD_14=Trust^4~known^4~[as]^?Grantee^75~Dated
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\AffidavitOfDeath\2009-0000552.tif.uss
+AOD_15=[gran^10~[to]^?Grantee^250~[as grantee
+[PATTERNS_END]

@@ -1,0 +1,157 @@
+// ******************************************************************************************
+// 	Certificate Of Death.dcc
+// ******************************************************************************************
+
+// **********
+// Zero Block
+// **********
+
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,CODTH_ZERO_01,false
+		01=^AFFIDAVIT\s*(?:-|OF)\s*DEATH
+		02=INTERNAL\s*REVENUE\s*SERVICE(?![\s\S]{0,4}AGENT)
+		03=DEPARTMENT\s*OF\s*THE\s*TREASURY
+		04=(ESTATE|GIFT|DEATH)\s*TAX
+	OR_END
+SCOPE_END
+
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,CODTH_SURE_01,true
+		
+		//----------------------------------------------------------------
+		//"CERTIFICATE OF DEATH"
+		// 0003.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set004\Images\DEATH RECORD\1981-A717523.tif
+		//"CERTIFICATE OF DEATH"(With extra text at end of line)
+		// 0001.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\123.bin
+		//----------------------------------------------------------------
+		01=^CERTIFICATE\s*OF\s*DEATH
+		
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,.3,1,2
+	SINGLE_BEGIN,CODTH_PROBABLE_01,true
+	
+		//"CERTIFICATE OF DEATH" (Not required to be on a new line in this case.)
+		// 0006.tif;K:\Common\Engineering\Sample Files\Ingham County - MI\Set001\1340\Images\13400895.001
+		\bCERTIFICATE\s*OF\s*DEATH\b
+		
+	SINGLE_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+
+	OR_BEGIN,CODTH_PROBABLE_02,false
+		
+		//0002.tif;0008.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\124.bin.uss
+		01=METHOD\s*OF\s*DISPOSITION
+		
+		02=PLACE\s*OF\s*DISPOSITION
+		
+		//0007.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\172.bin
+		03=DEATH\s*Certified\s*by\s*Medical\s*Investigator
+
+		//
+		04=^.{0,3}City\s*of\s*Death
+
+	OR_END
+
+	OR_BEGIN,CODTH_PROBABLE_03,true
+		//0004.tif;K:\Common\Engineering\Sample Files\Ingham County - MI\Set001\1340\Images\13400131.001
+		01=CAUSE\s*OF\s*DEATH
+		02=^.{0,6}PLACE\s*OF\s*DEATH
+		//0008.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\124.bin
+		03=^.{0,6}MANNER\s*OF\s*DEATH
+		//0009.tif;0010.tif;0011.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\125.bin
+		04=^.{0,6}PRONOUNCED\s*DEAD
+		//0009.tif;0010.tif;0011.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\125.bin
+		05=^.{0,6}HOUR\s*OF\s*DEATH
+		//0009.tif;0010.tif;0011.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\125.bin
+		07=^.{0,6}COUNTY\s*OF\s*DEATH
+		//0012.tif;K:\Common\Engineering\Sample Files\Redaction\Images\Death Certificates\B04286AAB0B.TIF
+		08=^.{0,6}LOCATION\s*OF\s*DEATH
+		//0013.tif;K:\Common\Engineering\Sample Files\Redaction\Images\Death Certificates\B04288AAA70.TIF
+		09=^.{0,6}DECEDENT'?S\s*NAME
+		//0012.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\DEATH CERTIFICATE\2005-000428.tif
+		10=^.{0,6}TIME\s*OF\s*DEATH
+		// 0013.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set012\Set12a\Images\B02030AAL83.TIF.uss
+		11=^LOCAL\s*REGISTRAR.?S\s*CERTIFICATION\s*OF\s*DEATH(?:\r?$)
+	OR_END
+
+SCOPE_END
+
+[PROBABLE_END]
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+
+	//0005.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\170.bin
+	AND_BEGIN,CODTH_MAYBE_01,false
+		DECEDENT
+		death
+		(?:examination|autopsy|funeral\s*home|(?:homi|sui)cide|BURIAL|CREMAT(?:ION|ORY)|CEMETERY)
+	AND_END
+	// 0014.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set012\Set12g\Images\B04174AABKX.TIF.uss
+//	AND_BEGIN,CODTH_MAYBE_02,false
+//		DEATH\s*WAS\s*CAUSED	
+//		(?:OTHER\s*SIGNIFICANT\s*CONDITIONS|AUTOPSY|CREMAT(?:ION|ORY)|CEMETERY|examination|funeral\s*home|(?:homi|sui)cide)
+//	AND_END
+	// 0015.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set012\Set12j\Images\B05186AAAI6.TIF.uss
+	AND_BEGIN,CODTH_MAYBE_03,false
+		(?:SURVIVING\s*SPOUSE|IMMEDIATE\s*CAUSE|DEATH\s*WAS\s*CAUSED|PRONOUNCED\s*DEAD)
+		(?:OTHER\s*SIGNIFICANT\s*CONDITIONS|BURIAL|CREMAT(?:ION|ORY)|CEMETERY|examination|autopsy|funeral\s*home|(?:homi|sui)cide)
+	AND_END
+	// 0016.tif;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\RandomSubsetOfSet001\Death Certificates\0345195-0001.tif.uss
+	AND_BEGIN,CODTH_MAYBE_04,false
+		CERTIFIED\W*COPY\W*OF\W*VITAL\W*RECORD
+		(?:death|decedent|(?:homi|sui)cide|autopsy|CREMAT(?:ION|ORY)|CEMETERY|SURVIVING\s*SPOUSE|IMMEDIATE\s*CAUSE|DEATH\s*WAS\s*CAUSED|PRONOUNCED\s*DEAD|FUNERAL)
+	AND_END
+	AND_BEGIN,CODTH_MAYBE_05,true
+	// 0001.tif;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Death Certificate\123.bin
+		DEATH
+		[Mm][Ee][Dd][Ii][Cc][Aa][Ll]\s*(?:[Ee][Xx][Aa][Mm][Ii][Nn][Ee][Rr]|[Ii][Nn][Vv][Ee][Ss][Tt][Ii][Gg][Aa][Tt][Oo][Rr])
+	AND_END
+	AND_BEGIN,CODTH_MAYBE_06,true
+	// K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Death Certificates\0627793-0001.tif
+		OF\s*DEATH
+		OF\s*VITAL\s*RECORD
+	AND_END
+	AND_BEGIN,CODTH_MAYBE_07,false
+	// 0017.tif;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Death Certificates\067538-0001.tif
+		(?:(?!a?ffidavit)[\s\S]{9}\s*of\s*death[\s\S]*?){5}
+	AND_END
+SCOPE_END
+
+SCOPE_BEGIN,0,.3,1,2
+	SINGLE_BEGIN,CODTH_MAYBE_08,true
+		(?:(?:CERTI|ERTIF).{0,8}|(?:RTIFI|TIFIC|IFICA).{0,6}|(?:FICAT|ICATE).{0,3})\W*[Oo][Ff]\W*DEATH
+	SINGLE_END
+	SINGLE_BEGIN,CODTH_MAYBE_09,true
+		\bC.RT.F.C.T.\W*.F\W*D..TH\b
+	SINGLE_END
+SCOPE_END
+	
+[MAYBE_END]
+

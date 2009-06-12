@@ -1,0 +1,191 @@
+<HTML>
+
+<HEAD>
+<TITLE>File Action Manager System Tests</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>File Action Manager System Tests<BR>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<!-- *********************************************** -->
+<LI><h2>Purpose</h2>
+
+  FAM system tests are designed to test basic functionality of FlexIndex and 
+  IDShield 5.0.  The performance and benchmark tests are designed to both qualify 
+  and quantify performance using a range of different hardware configurations.  The 
+  software requirements are defined in "FPM Scalability Specs.rtf".
+<p>
+
+<!-- *********************************************** -->
+<LI><h2>Tests</h2>
+
+<OL>
+<LI>SANITY TEST</LI>
+  <UL>
+   <LI>Goals</LI>
+    <UL>
+     <LI>Provide basic testing sequence to be used with each build</LI>
+     <LI>Complete test should run from start to finish in a few hours</LI>
+     <LI>Test(s) should exercise as much as possible of happy-case basic functionality</LI>
+     <LI>Test(s) should exercise a plausible real-world situation</LI>
+     <LI>Test should be sized to run on workstation-class or server-class machine</LI>
+    </UL>
+
+   <LI>Use FAMDBAdmin tool to create database with three actions { OCR, Redaction, Cleanup }</LI>
+
+   <LI>Create FPS file to supply files for OCR Action</LI>
+     <UL>
+      <LI>enable 3 of 5 file suppliers described below where folder FS is chosen based 
+       on processing power of the test machine</LI>
+     </UL>
+
+   <LI>Define 5 file suppliers ( three of these will be used for any specific test )</LI>
+     <UL>
+      <LI>files from static list ( PDFs )</LI>
+      <LI>files from dynamic list</LI>
+      <LI>files from folder A ( 100 TIFs )</LI>
+      <LI>files from folder B ( 300 TIFs )</LI>
+      <LI>files from folder C ( 1000 TIFs )</LI>
+     </UL>
+
+   <LI>Create FPS file ( Action = OCR ) to OCR the images</LI>
+
+   <LI>Create FPS file ( Action = Redaction ) to auto-redact the images</LI>
+
+   <LI>Create FPS file ( Action = Cleanup ) to delete the USS files</LI>
+
+   <LI>Use FAMDBAdmin tool to export file lists for each action</LI>
+     <UL>
+       <LI>file counts should be as expected based on the enabled File Suppliers</LI>
+     </UL>
+
+   <LI>Check file system to count number of redacted images</LI>
+     <UL>
+       <LI>counts should be as expected based on the enabled File Suppliers</LI>
+     </UL>
+  </UL>
+<p>
+
+<LI>PERFORMANCE TESTS</LI>
+  <UL>
+
+   <LI>One File Supplier to supply > 1M files</LI>
+     <UL>
+       <LI>to demonstrate that DB backend can support a large queue</LI>
+       <LI>to demonstrate that FAM can source a large queue</LI>
+     </UL>
+
+   <LI>Multiple File Suppliers to supply > 1M files in total</LI>
+     <UL>
+       <LI>to demonstrate that the DB can build a large queue from multiple suppliers
+      without losing any files</LI>
+       <LI>to demonstrate that multiple file suppliers "play well with others"</LI>
+     </UL>
+
+   <LI>One Listening Folder File Supplier</LI>
+     <UL>
+       <LI>to demonstrate that listening will catch all appropriate file system changes</LI>
+       <LI>to include listening for an extended period of time</LI>
+       <LI>to include adding many files in a single file system action</LI>
+       <LI>to include deleting files</LI>
+       <LI>to include renaming files</LI>
+       <LI>to include adding a nested folder below the main ( defined ) level</LI>
+     </UL>
+
+   <LI>One Fast File Processor Working Through > 1M Files</LI>
+     <UL>
+       <LI>Fast FP being something like copying the file to a local folder and then deleting it</LI>
+       <LI>to demonstrate that FAM can sink a large queue</LI>
+       <LI>to stress the ability of the database to smoothly provide files at a high rate</LI>
+     </UL>
+
+   <LI>Multiple Fast File Processors Working Through > 1M Files</LI>
+     <UL>
+       <LI>Fast FP being something like copying the file to a local folder and then deleting it</LI>
+       <LI>to demonstrate that FAM can sink a large queue</LI>
+       <LI>to stress the ability of the database to smoothly provide files to multiple users</LI>
+     </UL>
+
+   <LI>Multiple Standard File Processor Instances Working Through a Large Queue</LI>
+     <UL>
+       <LI>Standard FP being something expected in a production environment</LI>
+       <LI>to demonstrate that FAM can smoothly provide files to multiple production-level users</LI>
+     </UL>
+
+   <LI>One FAM Instance Both Supplying and Processing A Fast Task</LI>
+     <UL>
+       </LI>Fast FP being something like copying the file to a local folder and then deleting it</LI>
+     </UL>
+
+   <LI>One FAM Instance Both Supplying and Processing A Standard Task</LI>
+     <UL>
+       <LI>Standard FP being something expected in a production environment</LI>
+     </UL>
+  </UL>
+
+<p>
+
+<LI>BENCHMARK TESTS</LI>
+  <UL>
+    <LI>Goals</LI>
+      <UL>
+        <LI>Quantify performance differences between machine types</LI>
+        <LI>Determine feasibility of hosting SQL Server on a processing machine</LI>
+      </UL>
+
+    <LI>Determine Standard Processing Rate on Server-Level Machine With DB Host</LI>
+      <UL>
+        <LI>Standard FP being something expected in a production environment</LI>
+        <LI>Hosting SQL Server on this machine</LI>
+      </UL>
+
+    <LI>Determine Standard Processing Rate on Server-Level Machine Without DB Host</LI>
+      <UL>
+        <LI>Standard FP being something expected in a production environment</LI>
+        <LI>Not hosting SQL Server on this machine</LI>
+      </UL>
+
+    <LI>Determine Standard Processing Rate on Workstation-Level Machine With DB Host</LI>
+      <UL>
+        <LI>Standard FP being something expected in a production environment</LI>
+        <LI>Hosting SQL Server on this machine</LI>
+      </UL>
+
+    <LI>Determine Standard Processing Rate on Workstation-Level Machine Without DB Host</LI>
+      <UL>
+        <LI>Standard FP being something expected in a production environment</LI>
+        <LI>Not hosting SQL Server on this machine</LI>
+      </UL>
+
+    <LI>Determine Standard Processing Rate on Multiple Workstation-Level Machines</LI>
+      <UL>
+        <LI>Standard FP being something expected in a production environment</LI>
+        <LI>Not hosting SQL Server on these machines</LI>
+        <LI>Does performance scale directly with the number of machines?</LI>
+        <LI>How many machines can be connected to a single DB host running W2K Server?</LI>
+        <LI>How many machines can be connected to a single DB host running W2003 Server?</LI>
+      </UL>
+
+    <LI>Determine Maximum USB Counter Decrement Rate</LI>
+      <UL>
+        <LI>Execute rules on previously OCR'd documents</LI>
+        <LI>Host USB key on server hosting SQL Server</LI>
+        <LI>Connect multiple workstation-level machines to DB to "process" files</LI>
+        <LI>Previous testing indicated that limit is ~50,000 decrements per day</LI>
+      </UL>
+  </UL>
+
+<br>
+
+
+<!-- *********************************************** -->
+</OL>
+
+</BODY>
+
+</HTML>

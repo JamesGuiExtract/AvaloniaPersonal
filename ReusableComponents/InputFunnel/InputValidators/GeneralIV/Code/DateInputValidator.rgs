@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGeneralIV.DateInputValidator.1 = s 'DateInputValidator Class'
+	{
+		CLSID = s '{EAE4A620-2D07-40AD-AD19-9613998C0DE7}'
+	}
+	UCLIDGeneralIV.DateInputValidator = s 'DateInputValidator Class'
+	{
+		CLSID = s '{EAE4A620-2D07-40AD-AD19-9613998C0DE7}'
+		CurVer = s 'UCLIDGeneralIV.DateInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {EAE4A620-2D07-40AD-AD19-9613998C0DE7} = s 'DateInputValidator Class'
+		{
+			ProgID = s 'UCLIDGeneralIV.DateInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDGeneralIV.DateInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{203E8934-0C8B-4607-B2F5-84A9167B1107}'
+		}
+	}
+}

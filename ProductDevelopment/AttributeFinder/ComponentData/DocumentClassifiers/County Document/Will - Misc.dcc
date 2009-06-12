@@ -1,0 +1,51 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,CONV_SURE_01,false
+		01=^LAST\s*WILL\s*AND\s*TESTAMENT\s*(?:\r?$)
+		02=^APPLICATION\s*FOR\s*PROBATE\s*OF\s*WILL\s*AND\s*ISSUANCE\s*OF\s*LETTERS\s*TESTAMENTARY\s*(?:\r?$)
+		03=^ORDER\s*ADMITTING\s*WILL\s*TO\s*PROBATE\s*AND\s*AUTHORIZING\s*LETTERS\s*TESTAMENTARY\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,CONV_SURE_02,true
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.4,1,2
+	OR_BEGIN,CONV_PROBABLE_01,TRUE
+		
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

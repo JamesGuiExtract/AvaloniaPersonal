@@ -1,0 +1,50 @@
+// Move .Person to top, remove parent
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Move .Person to top, do not remove parent
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// Move .Person up one (to top), do not remove parent
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// Move .Person up one (to top), remove parent
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+// Move .First up one (not top), try to remove parent
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// Move .First, .Middle, .Last up one (not top), try to remove parent(succeed)
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// Move .First, .Middle, .Last to top, try to remove parent(fail)
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// Move everything to top, use root name
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+// Move everything to top, specify name
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// Move everything up one, use parent name (do not remove)
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+// Move everything up one, use parent name & type (remove)
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+// Move everything up one, use parent name & type, retain type
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+// Move everything up one, use parent name & type, empty type
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+// Move everything up one, use parent name & type, retain type, specify type
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+// Move everything up one, use parent name & type, empty type, add Name, specify type
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+// Move everything up one, use parent name & type(multiple type), empty type, add Name, specify type
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+// ensure type changes don't get propegated
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav

@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//uncomment as verification progresses
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set002\RandomSubset\;;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+

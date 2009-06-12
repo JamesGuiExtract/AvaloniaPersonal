@@ -1,0 +1,88 @@
+<SETTING>;VerificationCondition=Test
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=Test
+<SETTING>;AutomatedCondition=Test
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+//test1 All four clues have value.
+<TESTFOLDER>;Test1B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test1B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test1B.voa
+
+//test2 clue1 and clue2 have value, "Above clue texts will be treated as regular expression" is checked.
+<TESTFOLDER>;Test2B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test2B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test2B.voa
+
+//test3 The setting is the same as test2 except Define the LEFT of the Region and Define the RIGHT of the Region 
+//are set to different values.
+<TESTFOLDER>;Test3B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test3B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test3B.voa
+
+//test4 The setting is the same as test2 and 3 except Define the LEFT of the Region and Define the Right of
+//the Region are set to different values.
+<TESTFOLDER>;Test4B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test4B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test4B.voa
+
+//test5 The setting is the same as test1 except Define the LEFT of the Region and Define the Right of
+//the Region are set to different values.
+<TESTFOLDER>;Test5B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test5B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test5B.voa
+
+//test6 Only cluelist1 has value, "Above clue tests will be treated as regular expression(s)"
+//is checked. All four Region Boundaries are set based on value of ClueList1.
+<TESTFOLDER>;Test6B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test6B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test6B.voa
+
+//test7 The setting is the same as test6 except "Characters" is selected in "Words|Characters" that intersect 
+//region boundaries".
+<TESTFOLDER>;Test7B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test7B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test7B.voa
+
+//test8 Only ClueList1 has value. All regional boundaries are set based on ClueList1. 
+<TESTFOLDER>;Test8B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test8B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test8B.voa
+
+//test9 The setting is the same as test8 except "Case Sensitive" checkbox is checked.
+<TESTFOLDER>;Test9B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test9B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test9B.voa
+
+//test10 The setting is the same as test8 except ClueList1 value is moved to ClueList2.
+<TESTFOLDER>;Test10B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test10B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test10B.voa
+
+//test11 The setting is the same as test10 except "Case Sensitive" checkbox is checked.
+<TESTFOLDER>;Test11B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test11B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test11B.voa
+
+//test12 The setting is same as test10 except cluelist2 value is moved to ClueList3.
+<TESTFOLDER>;Test12B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test12B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test12B.voa
+
+//test13 The setting is same as test12 except "case Sensitive" checkbox is checked.
+<TESTFOLDER>;Test13B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test13B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test13B.voa
+
+//test14 The setting is same as test12 except cluelist3 value is moved to ClueList4.
+<TESTFOLDER>;Test14B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test14B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test14B.voa
+
+//test15 The setting is the same as test14 except "case Sensitive" checkbox is checked.
+<TESTFOLDER>;Test15B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test15B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test15B.voa
+
+//test16 All four ClueLists have regular expression values and the "Above clue texts will be treated as
+//regular expressions" checkbox is checked. 
+<TESTFOLDER>;Test16B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test16B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test16B.voa
+
+//test17 Clue List2,3,4 have the same values as test16, clueList1's entry is different from test16
+//and is invalid which will result in no output being generated. 
+<TESTFOLDER>;Test17B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test17B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test17B.voa
+
+//test18 Only ClueList1 has value, "Outside" is selected in "Inside|Outside" the specified boundaries
+<TESTFOLDER>;Test18B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test18B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test18B.voa
+
+//test19 The main purpose of this test is to test the "Restrict search to the region defined
+//by the results from clue list" check box. It is checked in settings for Clue List2.
+<TESTFOLDER>;Test19B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test19B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test19B.voa
+
+//test 20 The setting is the same as test19 except "Restrict search to the region defined
+//by the results from clue list" check box is not checked.
+<TESTFOLDER>;Test20B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test20B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test20B.voa
+
+//test21
+<TESTFOLDER>;Test21B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test21B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test21B.voa
+
+//test22 This TESTFOLDER is to test the Dynamic File List feature. ClueList 1 and 2 both
+//utilize the file:// feature, ClueList3 does not and ClueList4 has no entry. 
+<TESTFOLDER>;Test22B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test22B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test22B.voa
+
+//test23 Also to test the Dynamic File List feature, all four Clue Lists have entries, and all the
+//checkboxes are selected checked. The tags in Clue List 3 and Clue List 4 are written
+//as "File://" and "FILE://" to test case insensitivity.
+<TESTFOLDER>;Test23B.rsd;.\TestFiles\Images;$DirOf(<SourceDocName>)\..\ActualVOA\Test23B.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test23B.voa
+

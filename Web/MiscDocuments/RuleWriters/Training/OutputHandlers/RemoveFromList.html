@@ -1,0 +1,36 @@
+<HTML>
+<HEAD>
+<TITLE>Remove Entries From List Output Handler</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Remove Entries From List Output Handler</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>The <b>Remove Entries From List</b> Output Handler is used to remove all instances of one or more specific results from the Output.</li>
+		<li>Example:  <i>000-32-4324</i> is not a valid Social Security Number.  If your rules are finding this, you could use <b>Remove Entries From List</b> to keep that from showing up in your output, and thus reducing your false positives.</li>
+		<li>In some cases, you could have a rule that's meant to find and eliminate false positives.  You could set a Value Modifier to change the value to a catch-all, such as <i>false</i>, and use the <b>Remove Entries From List</b> Output Handler to remove them.  This is only useful in specific cases.</li>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>Click the Add button to insert values into the list to be removed.</li>
+		<li>There are also the Modify and Delete buttons, which allow you to edit or remove entries from the list.</li>
+		<li>A checkbox below allows you to make the list entries case sensitive.</li>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open <b>Phone.rsd</b> and run it on <b>Phone.txt</b></li>
+		<ul>
+			<li>Note that <i>333-5555</i> comes up multiple times.</li>
+			<li>Use <b>Remove Entries From List</b> to eliminate that number from the output.</li>
+			<li>Run the rules again to confirm.</li>
+		</ul>
+	</ol>
+
+</BODY>
+</HTML>

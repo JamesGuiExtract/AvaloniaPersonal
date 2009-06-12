@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueFinders.ReturnAddrFinderPP.1 = s 'ReturnAddrFinderPP Class'
+	{
+		CLSID = s '{C8435CA1-AE29-419A-922D-240949E756F9}'
+	}
+	UCLIDAFValueFinders.ReturnAddrFinderPP = s 'ReturnAddrFinderPP Class'
+	{
+		CLSID = s '{C8435CA1-AE29-419A-922D-240949E756F9}'
+		CurVer = s 'UCLIDAFValueFinders.ReturnAddrFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C8435CA1-AE29-419A-922D-240949E756F9} = s 'ReturnAddrFinderPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

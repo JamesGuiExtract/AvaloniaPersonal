@@ -1,0 +1,1629 @@
+// UCLIDCOMUtils.idl : IDL source for UCLIDCOMUtils.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDCOMUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14),
+	version(1.0),
+	helpstring("UCLID COMUtils 1.0 Type Library")
+]
+library UCLID_COMUTILSLib
+{
+	//---------------------------------------------------------------------------------------------
+	//-I M P O R T S ------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	//---------------------------------------------------------------------------------------------
+	//-E N U M S ----------------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(C1941A94-5A66-421e-B371-8AB1A7028B07), 
+		helpstring("UCLID Conditional Operators")
+	]
+    enum
+	{
+		kEQ = 0,
+        kNEQ = 1,
+        kLT = 2,
+		kGT = 3,
+		kLEQ = 4,
+		kGEQ = 5
+    } EConditionalOp;
+
+	typedef 
+	[
+		uuid(0F049611-7D7C-4881-8C01-657C8A788438), 
+		helpstring("UCLID Merge Method")
+	]
+    enum
+	{
+		kKeepOriginal = 0,
+        kOverwriteOriginal = 1,
+        kAppend = 2
+    } EMergeMethod;
+
+	//---------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S ------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(550266C3-6C98-499c-88EC-BCBF197E3C36),
+		dual,
+		helpstring("ICopyableObject Interface"),
+		pointer_default(unique)
+	]
+	interface ICopyableObject : IDispatch
+	{
+		[id(10001), helpstring("method Clone")] HRESULT Clone([out, retval] IUnknown* *pObject);
+		[id(10002), helpstring("method CopyFrom")] HRESULT CopyFrom([in] IUnknown *pObject);
+	};
+	[
+		object,
+		uuid(C1D9B337-3D1B-4322-B2A2-A09AA2C9C4E9),
+		dual,
+		helpstring("IShallowCopyable Interface"),
+		pointer_default(unique)
+	]
+	interface IShallowCopyable : IDispatch
+	{
+		[id(1), helpstring("method ShallowCopy")] HRESULT ShallowCopy(
+			[out, retval] IUnknown** pObject);
+	};
+	[
+		object,
+		uuid(EFD1C465-8ABA-4d81-A983-73E15A8C202F),
+		dual,
+		helpstring("ISortCompare Interface"),
+		pointer_default(unique)
+	]
+	interface ISortCompare : IDispatch
+	{
+		// REQUIRE: pObj1 != NULL and pObj2 != NULL
+		// PROMISE: This method will return VARIANT_TRUE if pObj1 is LessThan pObj2
+		//			where the meaning of LessThan is defined by the implementation of
+		//			this method
+		[id(1), helpstring("method LessThan")] HRESULT LessThan(
+			[in] IUnknown* pObj1, 
+			[in] IUnknown* pObj2, 
+			[out, retval] VARIANT_BOOL* pbRetVal);
+	};
+	[
+		object,
+		uuid(9D45CAE9-7052-4AE1-BD83-68C213E8BA22),
+		dual,
+		helpstring("IIUnknownVector Interface"),
+		pointer_default(unique)
+	]
+	interface IIUnknownVector : ICopyableObject
+	{
+		[id(1), helpstring("method Size")] HRESULT Size([out, retval] long *plSize);
+		[id(2), helpstring("method At")] HRESULT At([in] long lPos, [out, retval] IUnknown **pObj);
+		[id(3), helpstring("method PushBack")] HRESULT PushBack([in] IUnknown *pObj);
+		[id(4), helpstring("method Clear")] HRESULT Clear();
+		[id(5), helpstring("method Front")] HRESULT Front([out, retval] IUnknown **pObj);
+		[id(6), helpstring("method Back")] HRESULT Back([out, retval] IUnknown **pObj);
+		[id(7), helpstring("method PopBack")] HRESULT PopBack();
+		[id(8), helpstring("method Remove")] HRESULT Remove([in] long nIndex);
+		[id(9), helpstring("method Append")] HRESULT Append([in] IIUnknownVector *pVector);
+		[id(10), helpstring("method Insert")] HRESULT Insert([in] long lPos, [in] IUnknown *pObj);
+		[id(11), helpstring("method Set")] HRESULT Set([in] long lPos, [in] IUnknown* pObj);
+		[id(12), helpstring("method Swap")] HRESULT Swap([in] long lPos1, [in] long lPos2);
+		// Compares two vectors in an order independent fashion
+		// Require: any object contained in these two vector must implement IComparableObject
+		// Return true if two are the same, false otherwise.
+		[id(13), helpstring("method IsOrderFreeEqualTo")] HRESULT IsOrderFreeEqualTo(
+			[in] IIUnknownVector *pVector, [out, retval] VARIANT_BOOL * pbValue);
+		// Finds the specified object in the vector starting at the specified index.
+		// Requires: Object to be found and vector contents much implement IComparableObject
+		// Returns item index if found, -1 otherwise
+		[id(14), helpstring("method FindByValue")] HRESULT FindByValue([in] IUnknown *pObj, 
+			[in] long nStartIndex, [out, retval] long *plIndex);
+		[id(15), helpstring("method InsertVector")] HRESULT InsertVector([in] long lPos, 
+			[in] IIUnknownVector *pObj);
+		[id(16), helpstring("method RemoveRange")] HRESULT RemoveRange([in] long nStart, 
+			[in] long nEnd);
+		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bSetDirtyFlagToTrue);
+		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bClearDirty);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To remove all entries from the vector that are equal
+		//			to pObj
+		[id(19), helpstring("method RemoveValue")] HRESULT RemoveValue(
+			[in] IUnknown *pObj);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	lPos >=0 and lPos <= Size() - 1
+		// PROMISE: To return the IDispatch interface to the object at 
+		// 		the index position lPos.  If the object at that index does not
+		//		support the IDispatch interface, then NULL will be returned.
+		[id(20), helpstring("method At2")] HRESULT At2([in] long lPos,
+			[out, retval] IDispatch **pObj);
+		//-----------------------------------------------------------------------------------------
+		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by refrence)
+		[id(21), helpstring("method PushBackIfNotContained")] HRESULT PushBackIfNotContained(
+			[in] IUnknown *pObj);
+		//-----------------------------------------------------------------------------------------
+		// Pushes pObj onto the end of the vector if pObj is not already in the vector (by refrence)
+		[id(22), helpstring("method FindByReference")] HRESULT FindByReference([in] IUnknown *pObj,
+			[in] long nStartPos, long* pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: pSortCompare must adhere to StrictWeakOrdering in its implementation of the
+		//			less than method i.e. 
+		//			if a<b then NOT b<a
+		//			if a==b then NOT a<b and NOT b<a 
+		//			if a<b and b<c then a<c
+		//			if a==b and b==c
+		[id(23), helpstring("method Sort")] HRESULT Sort([in] ISortCompare* pSortCompare);
+	};
+	[
+		object,
+		uuid(1701CB58-9AB2-4BC1-B328-0658855834D4),
+		dual,
+		helpstring("IToken Interface"),
+		pointer_default(unique)
+	]
+	interface IToken : IDispatch
+	{
+		[id(1), helpstring("method InitToken")] HRESULT InitToken([in] long nTokenStart, 
+			[in] long nTokenEnd, [in] BSTR strName, [in] BSTR strValue);
+		[id(2), helpstring("method GetTokenInfo")] HRESULT GetTokenInfo([in, out] long* pnTokenStart, 
+			[in, out] long* pnTokenEnd, [in, out] BSTR *pName, [in, out] BSTR *pValue);
+		[propget, id(3), helpstring("property StartPosition")] HRESULT StartPosition(
+			[out, retval] long  *pVal);
+		[propput, id(3), helpstring("property StartPosition")] HRESULT StartPosition(
+			[in] long  newVal);
+		[propget, id(4), helpstring("property EndPosition")] HRESULT EndPosition(
+			[out, retval] long *pVal);
+		[propput, id(4), helpstring("property EndPosition")] HRESULT EndPosition([in] long newVal);
+		[propget, id(5), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
+		[propget, id(6), helpstring("property Value")] HRESULT Value([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property Value")] HRESULT Value([in] BSTR newVal);
+		[id(7), helpstring("method GetStartAndEndPosition")] HRESULT GetStartAndEndPosition(
+			[in, out] long* plStartPos, [in, out] long* plEndPos);
+	};
+
+	[
+		object,
+		uuid(EA70F8CD-DF5C-4668-BF2D-39704095D199),
+		dual,
+		helpstring("IVariantVector Interface"),
+		pointer_default(unique)
+	]
+	interface IVariantVector : ICopyableObject
+	{
+		// The variant vector does not support VT_BYREF, VT_SAFEARRAY, or VT_CARRAY objects
+		// at this time.  If any of these objects are needed then the appropriate code changes
+		// must be made in the CopyFrom method to deep copy these types as well as changing
+		// the validateType method to allow the newly supported type in its type checking.
+		// An example of an unsupported VT_REF object would be a long*.  To add support for
+		// the long* you would need to add the following code in the CopyFrom where the type
+		// of the variant_t is being checked:
+		// else if(varType == (VT_I4 | VT_BYREF))
+		// {
+		//		long* pNewLong = new long;
+		//		*pNewLong = *(vtTemp.plVal);
+		//		vtTemp = pNewLong;
+		// }
+		// You will also need to update the validateType to allow (VT_I4 | VT_BYREF) as a valid
+		// type
+		[propget, id(0), helpstring("property Item")] HRESULT Item([in] long nIndex, 
+			[out, retval] VARIANT *pVal);
+		[propget, id(1), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		[id(2), helpstring("method Clear")] HRESULT Clear();
+		[id(3), helpstring("method PushBack")] HRESULT PushBack([in] VARIANT vtItem);
+		[id(4), helpstring("method Remove")] HRESULT Remove([in] long nBeginIndex, 
+			[in] long nNumOfItems);
+		[id(5), helpstring("method Contains")] HRESULT Contains([in] VARIANT vtItem, 
+			[out, retval] VARIANT_BOOL *bValue);
+		[id(6), helpstring("method Find")] HRESULT Find([in] VARIANT vtItem, 
+			[out, retval] long *pVal);
+		[id(7), helpstring("method Insert")] HRESULT Insert([in] long nIndex, [in] VARIANT vtItem);
+		[id(8), helpstring("method Append")] HRESULT Append([in] IVariantVector *pVector);
+		[id(9), helpstring("method InsertString")] HRESULT InsertString([in] long nIndex, 
+			[in] BSTR newVal);
+		[id(10), helpstring("method Set")] HRESULT Set([in] long nIndex, [in] VARIANT vtItem);
+	};
+
+	[
+		object,
+		uuid(7016C198-4F69-4D35-B30A-C2BF24523489),
+		dual,
+		helpstring("IRegularExprParser Interface"),
+		pointer_default(unique)
+	]
+	interface IRegularExprParser : IDispatch
+	{
+		[propget, id(1), helpstring("property Pattern")] HRESULT Pattern([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Pattern")] HRESULT Pattern([in] BSTR pVal);
+		[propget, id(2), helpstring("property IgnoreCase")] HRESULT IgnoreCase(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IgnoreCase")] HRESULT IgnoreCase(
+			[in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Find method will return an IUnknownVector of ObjectPair, which 
+		//			has Token(1) and IUnknownVector of Tokens(2).  The Token(1) is 
+		//			top level string match for the search, and the Token(2) is
+		//			submatch string of each top level string match. Token(2) could be
+		//			null if no sub match is found. Furthermore, Token(2) might
+		//			return -1 for start and end position if no position info is
+		//			available for the submatch.
+		// PARAM:	bFindFirstMatch -- true: Find first match and return
+		//							   false: Find all matches and then return
+		//			bReturnNamedMatches -- true: Named captures specified in the regulare expression
+		//											will be return as named submatches
+		//							    -- false: Object2 parameter of ObjectPairs in the 
+		//										returned vector will be NULL.
+		// TODO:    Currently if bReturnNamedMatches is true all sub matches will be returned
+		//			This is so objects that require the unamed matches that VBScriptParser 
+		//			returns will still work with the DotNetParser. Once only the DotNetParser
+		//			is used code should be modified to use named submathces and this should be
+		//			changed to only return named sub matches
+		[id(3), helpstring("method Find")] HRESULT Find([in] BSTR strInput, 
+			[in] VARIANT_BOOL bFindFirstMatchOnly, [in] VARIANT_BOOL bReturnNamedMatches,
+			[out, retval] IIUnknownVector **ippObjectPairs);
+		//-----------------------------------------------------------------------------------------
+		// whether or not the pattern matches exactly with the input string
+		[id(4), helpstring("method StringMatchesPattern")] HRESULT StringMatchesPattern(
+			[in] BSTR strInput, [out, retval] VARIANT_BOOL* bMatch);
+		// PARAM:	bReplaceFirstMatch -- true: Replace first match and return
+		//								  false: Replace all matches and then return
+		[id(5), helpstring("method ReplaceMatches")] HRESULT ReplaceMatches([in] BSTR strInputText, 
+			[in] BSTR strReplaceWith, [in] VARIANT_BOOL bReplaceFirstMatchOnly, 
+			[out,retval] BSTR *strResult);
+		//-----------------------------------------------------------------------------------------
+		// whether or not the pattern is found in the input string
+		[id(6), helpstring("method StringContainsPattern")] HRESULT StringContainsPattern(
+			[in] BSTR strInput, [out, retval] VARIANT_BOOL* bContain);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check whether or not one or more patterns are found in an input string
+		//			whether or not the pattern is found in the input string.
+		// REQUIRE: pvecExpressions contains valid regular expression strings
+		// PROMISE: If bAndRelation == VARIANT_TRUE, then true is returned only if each
+		//			and every of the expressions in pvecExpressions is found in strInput.
+		//			If bAndRelation == VARIANT_FALSE, then true is returned if at least
+		//			one of the expressions in pvecExpressions is found in strInput.
+		[id(7), helpstring("method StringContainsPatterns")] HRESULT 
+			StringContainsPatterns([in] BSTR strInput, 
+			[in] IVariantVector *pvecExpressions, [in] VARIANT_BOOL bAndRelation, 
+			[out, retval] VARIANT_BOOL* bContain);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Return an IUnknownVector of Tokens, where the positions are expressed prior to 
+		//          performing the replacement and the value of the token represents the text 
+		//          after performing the replacement.
+		// PARAM:	bFindFirstMatch -- true: Find first match and return
+		//							   false: Find all matches and then return
+		[id(8), helpstring("method FindReplacements")] HRESULT FindReplacements(
+			[in] BSTR bstrInput, [in] BSTR bstrReplacement, [in] VARIANT_BOOL bFindFirstMatchOnly, 
+			[out, retval] IIUnknownVector **ippObjectPairs);
+	};
+	[
+		object,
+		uuid(59074414-D48F-48A9-8AA2-5C515AA9EC35),
+		dual,
+		helpstring("IObjectPropertiesUI Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectPropertiesUI : IDispatch
+	{
+		[id(1), helpstring("method DisplayProperties1")] HRESULT DisplayProperties1(
+			[in] IUnknown *pObj, [in] BSTR strTitle);
+	};
+	[
+		object,
+		uuid(20913199-DEFB-4E53-A6FB-1728902751F6),
+		dual,
+		helpstring("IObjectWithDescription Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectWithDescription : ICopyableObject
+	{
+		[propget, id(1), helpstring("property Object")] HRESULT Object(
+			[out, retval] IUnknown* *pVal);
+		[propput, id(1), helpstring("property Object")] HRESULT Object([in] IUnknown* newVal);
+		[propget, id(2), helpstring("property Description")] HRESULT Description(
+			[out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property Description")] HRESULT Description([in] BSTR newVal);
+		[propget, id(3), helpstring("property Enabled")] HRESULT Enabled(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property Enabled")] HRESULT Enabled([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(D4D065C1-DE3B-404E-A537-82386983A015),
+		dual,
+		helpstring("IObjectSelectorUI Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectSelectorUI : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:		To display a dialog allowing the customer to select an object of the 
+		//				specified category, to configure the object as necessary, and to specify a 
+		//				description for the object.
+		// ARGS:		strTitleAfterSelect- The title bar of the dialog will display 
+		//					"Select [strTitleAfterSelect]"
+		//				strPrompt1- The static text that should appear above the description edit box
+		//				strPrompt2- The static text that should appear above the object selection 
+		//					combo box.
+		//				strCategory- The registered category name (ie, FP_FILE_PROC_CATEGORYNAME)
+		//				pObj- An ObjectWithDescription to initialize the object selection box, 
+		//					configuration info and description and to receive the user's changes. 
+		//				vbAllowNone- Should the user be allowed to select "<NONE>"
+		// RETURNS:     VARIANT_TRUE if user selected OK, VARIANT_FALSE otherwise
+		// REQUIRED:	A valid pointer for pObj
+		[id(1), helpstring("method ShowUI1")] HRESULT ShowUI1([in] BSTR strTitleAfterSelect, 
+			[in] BSTR strPrompt1, [in] BSTR strPrompt2, [in] BSTR strCategory,  
+			[in] IObjectWithDescription *pObj, [in] VARIANT_BOOL vbAllowNone, 
+			[out, retval] VARIANT_BOOL* bOK);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:		To display a dialog allowing the customer to select an object of the 
+		//				specified category, to configure the object as necessary, and to specify a 
+		//				description for the object
+		// ARGS:		strTitleAfterSelect- The title bar of the dialog will display 
+		//					"Select [strTitleAfterSelect]"
+		//				strPrompt1- The static text that should appear above the description edit box
+		//				strPrompt2- The static text that should appear above the object selection combo box
+		//				strCategory- The registered category name (ie, FP_FILE_PROC_CATEGORYNAME)
+		//				pObj- An ObjectWithDescription to initialize the object selection box, configuration 
+		//					info and description and to receive the user's changes.
+		//				vbAllowNone- Should the user be allowed to select "<NONE>"
+		//				nNumRequiredIIDs- If user should only be allowed to select from objects that implement
+		//					particular interfaces, how many interfaces are to be specified?
+		//				pRequiredIIDs- The array interface IDs the object is required to
+		//					implement in order to be included as an option in the combo box.
+		// RETURNS:     VARIANT_TRUE if user selected OK, VARIANT_FALSE otherwise
+		// REQUIRED:	A valid pointer for pObj. If nNumRequiredIIDs is specified, pRequiredIIDs must 
+		//				be non-NULL and of the size specified by nNumRequiredIIDs
+		[id(2), helpstring("method ShowUI2")] HRESULT ShowUI2([in] BSTR strTitleAfterSelect, 
+			[in] BSTR strPrompt1, [in] BSTR strPrompt2, [in] BSTR strCategory, 
+			[in] IObjectWithDescription *pObj, 
+			[in] VARIANT_BOOL vbAllowNone, [in] long nNumRequiredIIDs, 
+			[in, size_is(nNumRequiredIIDs)] IID pRequiredIIDs[], [out, retval] VARIANT_BOOL *pbOK);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:		To display a dialog allowing the customer to select an object of the 
+		//				specified category and to configure the object as necessary.  Unlike 
+		//				ShowUI1 or ShowUI2, this method does not allow the user to specify a 
+		//				description for the object
+		// ARGS:		bstrTitleAfterSelect- The title bar of the dialog will display 
+		//					"Select [strTitleAfterSelect]"
+		//				bstrPrompt- The static text that should appear above the object selection combo box
+		//				bstrCategory- The registered category name (ie, FP_FAM_REPORTS_CATEGORYNAME)
+		//				pObj- An ObjectWithDescription to initialize the object selection box 
+		//					and configuration info receive the user's changes. 
+		//				NOTE: The ObjectWithDescription's descripton will never be set or modified
+		//				nNumRequiredIIDs- If user should only be allowed to select from objects that implement
+		//					particular interfaces, how many interfaces are to be specified?
+		//				pRequiredIIDs- The array interface IDs the object is required to
+		//					implement in order to be included as an option in the combo box.
+		// RETURNS:     VARIANT_TRUE if user selected OK, VARIANT_FALSE otherwise
+		// REQUIRED:	A valid pointer for pObj. If nNumRequiredIIDs is specified, pRequiredIIDs must
+		//				be non-NULL and of the size specified by nNumRequiredIIDs
+		[id(3), helpstring("method ShowUINoDescription")] HRESULT ShowUINoDescription(
+			[in] BSTR bstrTitleAfterSelect, 
+			[in] BSTR bstrPrompt, [in] BSTR bstrCategory, [in] IObjectWithDescription *pObj, 
+			[in] long nNumRequiredIIDs, [in, size_is(nNumRequiredIIDs)] IID pRequiredIIDs[],
+			[out, retval] VARIANT_BOOL *pbOK);
+	};
+	[
+		object,
+		uuid(F6B1AFD6-3A1A-4B87-8EE0-39DE7069E17D),
+		dual,
+		helpstring("IStrToStrMap Interface"),
+		pointer_default(unique)
+	]
+	interface IStrToStrMap : IDispatch
+	{
+		[id(1), helpstring("method Set")] HRESULT Set([in] BSTR key, [in] BSTR value);
+		[id(2), helpstring("method GetValue")] HRESULT GetValue([in] BSTR key, 
+			[out, retval] BSTR *pValue);
+		[id(3), helpstring("method Contains")] HRESULT Contains([in] BSTR key, 
+			[out, retval] VARIANT_BOOL *bFound);
+		[id(4), helpstring("method RemoveItem")] HRESULT RemoveItem([in] BSTR key);
+		[id(5), helpstring("method Clear")] HRESULT Clear();
+		[id(6), helpstring("method GetKeys")] HRESULT GetKeys([out, retval] IVariantVector** pKeys);
+		[propget, id(7), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		[id(8), helpstring("method GetKeyValue")] HRESULT GetKeyValue([in] long nIndex, 
+			[out] BSTR *pstrKey, [out] BSTR *pstrValue);
+		[id(9), helpstring("method RenameKey")] HRESULT RenameKey([in] BSTR strKey, 
+			[in] BSTR strNewKeyName);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Merge the specified map with this one, using the specified method
+		// ARGS:	pMapToMerge- The map to merge into this one
+		//			eMergeMethod- kKeepOriginal		 = If a specified key already exists, use the key 
+		//											   from this map, not pMapToMerge
+		//						  kOverwriteOriginal = If a specified key already exists, use the  
+		//											   key from pMapToMerge not this map
+		//						  kAppend			 = If a specified key already exists, insert the 
+		//											   key from pMapToMerge under a new name
+		//											   (append _x to the key where x is an interger)
+		[id(10), helpstring("method Merge")] HRESULT Merge([in] IStrToStrMap *pMapToMerge, 
+			[in] EMergeMethod eMergeMethod);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Merge the specified key/value pair into this map, using the specified method
+		// ARGS:	bstrKey- The key to merge
+		//			bstrValue- The value to assign to this key
+		//			eMergeMethod- kKeepOriginal		 = If a specified key already exists, use the key 
+		//											   from this map, not pMapToMerge
+		//						  kOverwriteOriginal = If a specified key already exists, use the  
+		//											   key from pMapToMerge not this map
+		//						  kAppend			 = If a specified key already exists, insert the 
+		//											   key from pMapToMerge under a new name
+		//											   (append _x to the key where x is an interger)
+		[id(11), helpstring("method MergeKeyValue")] HRESULT MergeKeyValue(
+			[in] BSTR bstrKey, [in] BSTR bstrValue, [in] EMergeMethod eMergeMethod);
+	};
+	[
+		object,
+		uuid(D504C8B8-06A0-42AC-A23B-1DB641BDCEFA),
+		dual,
+		helpstring("ICategorizedComponent Interface"),
+		pointer_default(unique)
+	]
+	interface ICategorizedComponent : IDispatch
+	{
+		[id(1), helpstring("method GetComponentDescription")] HRESULT GetComponentDescription(
+			[out, retval] BSTR *pstrComponentDescription);
+	};
+	[
+		object,
+		uuid(A1B91A69-FC54-4EF4-8252-34D6956D085B),
+		dual,
+		helpstring("ICategoryManager Interface"),
+		pointer_default(unique)
+	]
+	interface ICategoryManager : IDispatch
+	{
+		[id(1), helpstring("method GetCategoryNames")] HRESULT GetCategoryNames([in] BSTR strPrefix, 
+			[out, retval] IVariantVector **pCategoryNames);
+		[id(2), helpstring("method GetDescriptionToProgIDMap1")] HRESULT GetDescriptionToProgIDMap1(
+			[in] BSTR strCategoryName, [out, retval] IStrToStrMap **pMap);
+		[id(3), helpstring("method GetDescriptionToProgIDMap2")] HRESULT GetDescriptionToProgIDMap2(
+			[in] BSTR strCategoryName, [in] long nNumIIDs, [in, size_is(nNumIIDs)] IID pIIDs[], 
+			[out, retval] IStrToStrMap **pMap);
+		[id(4), helpstring("method DeleteCache")] HRESULT DeleteCache([in] BSTR strCategoryName);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	To delete the cache for specified categories and reload it by seeking components 
+		// that implement the specified COM categories
+		// ARGS:	pCategoryNames- The categories to reload.
+		// REQUIRED: Nothing
+		[id(5), helpstring("method CheckForNewComponents")] HRESULT CheckForNewComponents(
+			[in] IVariantVector *pCategoryNames);
+	};
+	[
+		object,
+		uuid(0247AB16-CCA0-44CA-9DFD-72ECDF4CE5ED),
+		dual,
+		helpstring("IStrToObjectMap Interface"),
+		pointer_default(unique)
+	]
+	interface IStrToObjectMap : IDispatch
+	{
+		[id(1), helpstring("method Set")] HRESULT Set([in] BSTR key, [in] IUnknown* pObject);
+		[id(2), helpstring("method GetValue")] HRESULT GetValue([in] BSTR key, 
+			[out, retval] IUnknown* *pObject);
+		[id(3), helpstring("method Contains")] HRESULT Contains([in] BSTR key, 
+			[out, retval] VARIANT_BOOL *bFound);
+		[id(4), helpstring("method RemoveItem")] HRESULT RemoveItem([in] BSTR key);
+		[id(5), helpstring("method Clear")] HRESULT Clear();
+		[id(6), helpstring("method GetKeys")] HRESULT GetKeys([out, retval] IVariantVector** pKeys);
+		[propget, id(7), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		[id(8), helpstring("method GetKeyValue")] HRESULT GetKeyValue([in] long nIndex, 
+			[out] BSTR *pstrKey, [out] IUnknown* *pObject);
+		[id(9), helpstring("method RenameKey")] HRESULT RenameKey([in] BSTR strKey, 
+			[in] BSTR strNewKeyName);
+
+		//-----------------------------------------------------------------------------------------
+		// NOTE:When setting the CaseSensitive flag if the current value is false and the new value
+		//		will be true the Map object will be cleared sense there may be multiple values
+		//		
+		[propget, id(10), helpstring("property CaseSensitive")] HRESULT CaseSensitive(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property CaseSensitive")] HRESULT CaseSensitive(
+			[in] VARIANT_BOOL newVal);
+
+//		[id(11), helpstring("method Merge")] HRESULT Merge([in] IStrToObjectMap *pMapToMerge, 
+//			[in] EMergeMethod eMergeMethod);
+//		[id(12), helpstring("method MergeKeyValue")] HRESULT MergeKeyValue(
+//			[in] BSTR bstrKey, [in] IUnknown *pValue, [in] EMergeMethod eMergeMethod);
+	};
+	[
+		object,
+		uuid(48545C2A-E332-477F-A2CF-3FC0F7E2F691),
+		dual,
+		helpstring("IMustBeConfiguredObject Interface"),
+		pointer_default(unique)
+	]
+	interface IMustBeConfiguredObject : IDispatch
+	{
+		[id(1), helpstring("method IsConfigured")] HRESULT IsConfigured(
+			[out, retval] VARIANT_BOOL *bConfigured);
+	};
+	[
+	object,
+	uuid(CBA156B6-6364-44B2-977D-7AC37810DCF6),
+	dual,
+	helpstring("IConfigurableObject Interface"),
+	pointer_default(unique)
+	]
+	interface IConfigurableObject : IDispatch
+	{
+		// PROMISE: Implemented by an object that requires or allows for configuration,
+		//			RunConfiguration does whatever is necessary to configure the object for use
+		//			(usually displays a window allowing the user to specify the settings).
+		//			Similar to ISpecifyPropertyPages, but simplified and more generalized so that 
+		//			configuration can occur without needing to work within an ATL-specific property
+		//			page.
+		// RETURNS: VARIANT_TRUE if settings were committed to the object, VARIANT_FALSE if
+		//			configuration was cancelled or aborted and settings were not applied.
+		[id(1), helpstring("method RunConfiguration")] HRESULT RunConfiguration(
+			[out, retval] VARIANT_BOOL *pAppliedChanges);
+	};
+	[
+		object,
+		uuid(A5398D80-02F4-42A1-8275-381B885A90DD),
+		dual,
+		helpstring("IStringPair Interface"),
+		pointer_default(unique)
+	]
+	interface IStringPair : IDispatch
+	{
+		[propget, id(1), helpstring("property StringKey")] HRESULT StringKey([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property StringKey")] HRESULT StringKey([in] BSTR newVal);
+		[propget, id(2), helpstring("property StringValue")] HRESULT StringValue([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property StringValue")] HRESULT StringValue([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(3FB306E9-9EBF-4996-816D-40914E405F14),
+		dual,
+		helpstring("IObjectPair Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectPair : IDispatch
+	{
+		[propget, id(1), helpstring("property Object1")] HRESULT Object1([out, retval] IUnknown* *pVal);
+		[propput, id(1), helpstring("property Object1")] HRESULT Object1([in] IUnknown* newVal);
+		[propget, id(2), helpstring("property Object2")] HRESULT Object2([out, retval] IUnknown* *pVal);
+		[propput, id(2), helpstring("property Object2")] HRESULT Object2([in] IUnknown* newVal);
+	};
+	[
+		object,
+		uuid(4A81559E-AB57-456F-AB3F-E00738F01DF5),
+		dual,
+		helpstring("IClipboardObjectManager Interface"),
+		pointer_default(unique)
+	]
+	interface IClipboardObjectManager : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To clear the Windows clipboard
+		[id(1), helpstring("method Clear")] HRESULT Clear();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a pointer to a UCLID COM Object that was most recently
+		//			copied to the Windows clipboard.  If no UCLID COM object is
+		//			available in the clipboard, then NULL is returned.
+		[id(2), helpstring("method GetObjectInClipboard")] HRESULT GetObjectInClipboard(
+			[out, retval] IUnknown **pObj);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: pObj must implement IPersistStream interface.
+		// PROMISE: To copy the specified object to the Windows clipboard so that
+		//			subsequent calls to GetObjectInClipboard return this object.
+		[id(3), helpstring("method CopyObjectToClipboard")] HRESULT CopyObjectToClipboard(
+			[in] IUnknown *pObj);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetObjectInClipboard() returns a non-NULL pointer
+		// PROMISE: To return VARIANT_TRUE only if the object currently in clipboard
+		//			implements the interface riid.
+		[id(4), helpstring("method ObjectIsOfType")] HRESULT ObjectIsOfType([in] IID riid, 
+			[out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetObjectInClipboard() returns a non-NULL pointer
+		// PROMISE: To return VARIANT_TRUE only if the object currently in clipboard
+		//			is an IIUnknownVector object, and if each element in the vector
+		//			implements the interface riid.
+		[id(5), helpstring("method ObjectIsIUnknownVectorOfType")] HRESULT ObjectIsIUnknownVectorOfType(
+			[in] IID riid, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetObjectInClipboard() returns a non-NULL pointer
+		// PROMISE: To return VARIANT_TRUE only if the object currently in clipboard
+		//			is an IObjectWithDescription object, and if the "Object" member
+		//			of that object implements the interface riid.
+		[id(6), helpstring("method ObjectIsTypeWithDescription")] HRESULT ObjectIsTypeWithDescription(
+			[in] IID riid, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetObjectInClipboard() returns a non-NULL pointer
+		// PROMISE: To return VARIANT_TRUE only if the object currently in the clipboard
+		//			is an IUnknownVector of IObjectWithDescriptions objects and the
+		//			objects in the vector each implement the interface riid.
+		[id(7), helpstring("method IUnknownVectorIsOWDOfType")] HRESULT IUnknownVectorIsOWDOfType(
+			[in] IID riid, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(1B295652-7017-4727-AFE5-AFEB59611DE5),
+		dual,
+		helpstring("IComparableObject Interface"),
+		pointer_default(unique)
+	]
+	interface IComparableObject : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: The actual CoClass represented by pObj is of the same type as the
+		//			CoClass on which this method is being called.
+		// PROMISE: To return VARIANT_TRUE only if pObj's state (i.e. data members)
+		//			is equivalent to the state (i.e. data members) of the object on
+		//			which this method is being invoked.
+		[id(1), helpstring("method IsEqualTo")] HRESULT IsEqualTo([in] IUnknown *pObj, 
+			[out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(42944ACE-DAD2-4bbc-94EF-76E17D35E740),
+		dual,
+		helpstring("IStringizableObject Interface"),
+		pointer_default(unique)
+	]
+	interface IStringizableObject : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: Nothing.
+		// PROMISE: To return a string representing the state (i.e. data members) of
+		//			this object.
+		[id(1), helpstring("method GetObjectAsString")] HRESULT GetObjectAsString(
+			[out, retval] BSTR *pbstrText);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(ACFF8FD6-4008-4A81-A86A-4628650F48A3),
+		dual,
+		helpstring("IStringPatternMatcher Interface"),
+		pointer_default(unique)
+	]
+	interface IStringPatternMatcher : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: strPattern is a syntactically valid pattern;
+		// PROMISE: To return an IStrToObjectMap (where object is of type IToken) 
+		//			representing the matches
+		//			Each IToken object will contain the starting position of the match,
+		//			ending position of the match, and the match string
+		//			If the pattern is executed successfully, the pattern start and
+		//			and end position are returned via pnPatternStartPos, and
+		//			pnPatternEndPos.
+		[id(1), helpstring("method Match1")] HRESULT Match1([in] BSTR strText, 
+			[in] BSTR strPattern, [in] IStrToStrMap *pExprMap, 
+			[in] VARIANT_BOOL bGreedy, [out, retval] IStrToObjectMap **pMatches);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(2), helpstring("property CaseSensitive")] HRESULT CaseSensitive(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property CaseSensitive")] HRESULT CaseSensitive(
+			[in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property TreatMultipleWSAsOne")] HRESULT TreatMultipleWSAsOne(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property TreatMultipleWSAsOne")] HRESULT TreatMultipleWSAsOne(
+			[in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: strPattern is a syntactically valid pattern;
+		// PROMISE: This method "executes" the search for patterns just like
+		//			the Match() method with the only difference being that the
+		//			start and end positions of the match are additionally returned.
+		[id(4), helpstring("method Match2")] HRESULT Match2([in] BSTR strText, 
+			[in] BSTR strPattern, [in] IStrToStrMap *pExprMap, 
+			[in] VARIANT_BOOL bGreedy, long *pnPatternStartPos, 
+			long *pnPatternEndPos, [out, retval] IStrToObjectMap **pMatches);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(53DC293E-DAA8-4DA3-99DE-607C86F03C16),
+		dual,
+		helpstring("ILongRectangle Interface"),
+		pointer_default(unique)
+	]
+	interface ILongRectangle  : ICopyableObject
+	{
+		[propget, id(1), helpstring("property Left")] HRESULT Left([out, retval] long *pVal);
+		[propput, id(1), helpstring("property Left")] HRESULT Left([in] long newVal);
+		[propget, id(2), helpstring("property Top")] HRESULT Top([out, retval] long *pVal);
+		[propput, id(2), helpstring("property Top")] HRESULT Top([in] long newVal);
+		[propget, id(3), helpstring("property Right")] HRESULT Right([out, retval] long *pVal);
+		[propput, id(3), helpstring("property Right")] HRESULT Right([in] long newVal);
+		[propget, id(4), helpstring("property Bottom")] HRESULT Bottom([out, retval] long *pVal);
+		[propput, id(4), helpstring("property Bottom")] HRESULT Bottom([in] long newVal);
+		[id(5), helpstring("method SetBounds")] HRESULT SetBounds([in] long nLeft, [in] long nTop, 
+			[in] long nRight, [in] long nBottom);
+		[id(6), helpstring("method Offset")] HRESULT Offset([in] long nX, [in] long nY);
+		[id(7), helpstring("method Expand")] HRESULT Expand([in] long nX, [in] long nY);
+		[id(8), helpstring("method Clip")] HRESULT Clip([in] long nLeft, [in] long nTop, 
+			[in] long nRight, [in] long nBottom);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Rotates the object by nAngleInDegrees.
+		// REQUIRE: nAngleInDegrees = {0, +-90, +-180, +-270, 360}
+		//			Top, Left, Bottom, Right >= 0
+		//			Top, Left, Bottom, Right <= nXLimit depending on Angle
+		//			Top, Left, Bottom, Right <= nYLimit depending on Angle
+		//			nXLimit & nYLimit are provided to constrain the rectangle within the assumed page
+		// PROMISE: Modifies Top, Left, Bottom, Right properties based on a rotation of the 
+		//			object by {0, 90, 180, 270} degrees.
+		[id(9), helpstring("method Rotate")] HRESULT Rotate([in] long nXLimit, [in] long nYLimit, 
+			[in] long nAngleInDegrees);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get the bounds of the rectangle via a single call
+		[id(10), helpstring("method GetBounds")] HRESULT GetBounds([in] long* plLeft,
+			[in] long* plTop, [in] long* plRight, [in] long* plBottom);
+	};
+
+	[
+		object,
+		uuid(DBF05620-69E2-4C36-B964-53B5424191B8),
+		dual,
+		helpstring("IMiscUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IMiscUtils : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To encrypt files
+		// PROMISE: If strFile does not have a final extension of .etf, or if the 
+		//			user does not have a license to do encryption, or if the 
+		//			basefile (the file that would normally be encrypted) doesn't 
+		//			exist, then this method does nothing.
+		//			If strFile has a final extension of .etf,
+		//			and the basefile (where "a.dat" is the base file of
+		//			"a.dat.etf") exists, and the registry key value associated with
+		//			strRegistryKey is "1", and ((strFile does not exist) or (the base
+		//			file has a newer timestamp than strFile)), then the basefile
+		//			is encrypted into the filename specified with strFile.
+		// NOTE:	strRegistryKey will be interpreted as a key under HKEY_CURRENT_USER
+		[id(1), helpstring("method AutoEncryptFile")] HRESULT AutoEncryptFile([in] BSTR strFile, 
+			[in] BSTR strRegistryKey);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Quickly access data returned by a regular expression parser
+		// REQUIRE: pFoundData is a vector returned by IRegularExprParser::Find or is of the same 
+		//			format.  nIndex a valid index into pFoundData and nSubIndex is a valid subAttribute
+		// PROMISE: return the start and end position of the requested found string in the original data
+		[id(2), helpstring("method GetRegExpData")] HRESULT GetRegExpData(
+			[in] IIUnknownVector* pFoundData, [in] long nIndex, [in] long nSubIndex, 
+			[out] long* pnStartPos, [out] long* pnEndPos);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a new regular expression object based on a ProgID specified in the 
+		//			registry that is stored under the key specified by the component name. 
+		// PROMISE: return a valid IRegularExprParser object based on ProgID specified in registry
+		//			under the key specified with strComponentName. If no entry is in the registry
+		//			the value under Default key in the registry will be used.  If that does not 
+		//			exist the IEVBScriptParser will be used. 
+		//			strComponentName - Name of the component regexpression parser is for. Used to
+		//				obtain the value of a key in the registry.
+		// TODO:	The default may be changed to DotNetRegExParser, or this will be changed to 
+		//			always return a DotNetRegExParser.
+		[id(3), helpstring("method GetNewRegExpParserInstance")] HRESULT GetNewRegExpParserInstance(
+			[in] BSTR strComponentName, [out, retval] IRegularExprParser **pRegExpParser);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the uncommented string inside a file if the bstrFileName is a valid 
+		// file name, if the file name is invalid, just return bstrFileName
+		[id(4), helpstring("method GetStringOptionallyFromFile")] HRESULT GetStringOptionallyFromFile(
+			[in] BSTR bstrFileName, [out, retval] BSTR *pbstrFromFile);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the header of a file name as a string, usually the header of a file name is "file://"
+		[id(5), helpstring("method GetFileHeader")] HRESULT GetFileHeader(
+			[out, retval] BSTR *pbstrFileHeader);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of strings if the string bstrFileName contains a file name,
+		// if it is not, return an empty IUnknowVector
+		[id(7), helpstring("method GetColumnStringsOptionallyFromFile")] HRESULT GetColumnStringsOptionallyFromFile([in] BSTR bstrFileName, [out, retval] IVariantVector* *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To remove the file name header from a string if it is a file name, otherwise just return the string
+		[id(8), helpstring("method GetFileNameWithoutHeader")] 
+			HRESULT GetFileNameWithoutHeader([in] BSTR bstrText, [out, retval] BSTR *pbstrFileName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Prompts the user to configure the properties of the specified object.
+		// REQUIRE: pObject is a valid ObjectWithDescription containing a CategorizedComponent.
+		// PROMISE: modifies pObject according to user changes, otherwise makes no changes to pObject.
+		//          returns VARIANT_TRUE if and only if pObject was modified, VARIANT_FALSE otherwise
+		[id(9), helpstring("method AllowUserToConfigureObjectProperties")] 
+			HRESULT AllowUserToConfigureObjectProperties(
+			[in] IObjectWithDescription* pObject, [out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PURPOSE: Prompts the user to configure the description of a specified object.
+		// REQUIRE: pObject is a valid ObjectWithDescription containing a CategorizedComponent.
+		// PROMISE: modifies pObject according to user changes, otherwise makes no changes to pObject.
+		//          returns VARIANT_TRUE if and only if pObject was modified, VARIANT_FALSE otherwise
+		[id(10), helpstring("method AllowUserToConfigureObjectDescription")] 
+			HRESULT AllowUserToConfigureObjectDescription(
+			[in] IObjectWithDescription* pObject, [out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PURPOSE: Prompts user to change object properties on double-click and prompts user to 
+		//          change object description on ALT + double-click. If no object is defined, 
+		//          allows the user to select an object from a list of objects that are in the 
+		//          specified category and that implement the specified interfaces.
+		// REQUIRE: pObject is a valid ObjectWithDescription containing a CategorizedComponent or NULL.
+		//			bstrCategory is the name of pObject's category.
+		//          bstrAFAPICategory is the name of an AFAPI category.
+		//			vbAllowNone should be VARIANT_TRUE if and only if the user is allowed to select <None>.
+		//          lNumRequiredIIDS is the number of interfaces the object is required to implement beyond
+		//            what is required of interfaces in the selected category.
+		//          pRequiredIIDs is a pointer to the first element in an array of length lNumRequiredIIDS
+		//          that contains the IIDs of interfaces an object is required to implement.
+		//          pRequiredIIDs may be NULL if and only if lNumRequiredIIDS is zero.
+		// PROMISE: modifies pObject according to user changes, otherwise makes no changes to pObject.
+		//          displays bstrCategory in prompts for user to select and configure pObject.
+		//          if pObject is NULL, allows user to select from a group of objects that implement 
+		//          the required interfaces and are in bstrAFAPICategory.
+		//          returns VARIANT_TRUE if and only if pObject was modified, VARIANT_FALSE otherwise
+		[id(11), helpstring("method HandlePlugInObjectDoubleClick")] HRESULT HandlePlugInObjectDoubleClick(
+			[in] IObjectWithDescription* pObject, [in] BSTR bstrCategory, [in] BSTR bstrAFAPICategory,
+			[in] VARIANT_BOOL bAllowNone, [in] LONG lNumRequiredIIDs, [in] GUID* pRequiredIIDs, 
+			[out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PURPOSE: Prompts the user with a context menu to select an object, configure the selected 
+		//          object's properties, or configure the selected object's description. An object 
+		//          may be selected from a list of objects that are in a specified category and that 
+		//			implement the specified interfaces.
+		// REQUIRE: pObject is a valid ObjectWithDescription containing a CategorizedComponent or NULL.
+		//			bstrCategory is the name of pObject's category.
+		//          bstrAFAPICategory is the name of an AFAPI category.
+		//			vbAllowNone should be VARIANT_TRUE if and only if the user is allowed to select <None>.
+		//          lNumRequiredIIDS is the number of interfaces the object is required to implement beyond
+		//            what is required of interfaces in the selected category.
+		//          pRequiredIIDs is a pointer to the first element in an array of length lNumRequiredIIDS
+		//          that contains the IIDs of interfaces an object is required to implement.
+		//          pRequiredIIDs may be NULL if and only if lNumRequiredIIDS is zero.
+		//			iLeft and iTop are the coordinates for the top and left points of the context menu.
+		// PROMISE: modifies pObject according to user input, otherwise makes no changes to pObject.
+		//          displays bstrCategory in prompts for user to select and configure pObject.
+		//          allows user to select from a group of objects that implement the required interfaces 
+		//          and are in bstrAFAPICategory.
+		//          returns VARIANT_TRUE if and only if pObject was modified, VARIANT_FALSE otherwise
+		[id(12), helpstring("method HandlePlugInObjectCommandButtonClick")] 
+			HRESULT HandlePlugInObjectCommandButtonClick(
+			[in] IObjectWithDescription* pObject, [in] BSTR bstrCategory, [in] BSTR bstrAFAPICategory, 
+			[in] VARIANT_BOOL bAllowNone, [in] LONG lNumRequiredIIDs, [in] GUID* pRequiredIIDs, 
+			[in] int iLeft, [in] int iTop, [out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PURPOSE: Prompts the user to configure the description and properties of an object selected 
+		//          from a list of objects that are in a specified category and that implement the 
+		//			specified interfaces.
+		// REQUIRE: pObject is a valid ObjectWithDescription containing a CategorizedComponent or NULL.
+		//			bstrCategory is the name of the category to display for the user.
+		//          bstrAFAPICategory is the name of an AFAPI category.
+		//			vbAllowNone should be VARIANT_TRUE if and only if the user is allowed to select <None>.
+		//          lNumRequiredIIDS is the number of interfaces the object is required to implement beyond
+		//            what is required of interfaces in the selected category.
+		//          pRequiredIIDs is a pointer to the first element in an array of length lNumRequiredIIDS
+		//          that contains the IIDs of interfaces an object is required to implement.
+		//          pRequiredIIDs may be NULL if and only if lNumRequiredIIDs is zero.
+		// PROMISE: modifies pObject according to user input, otherwise makes no changes to pObject.
+		//          displays bstrCategory in prompts for user to select and configure pObject.
+		//          allows user to select from a group of objects that implement the required interfaces 
+		//          and are in bstrAFAPICategory.
+		//          returns VARIANT_TRUE if and only if pObject was modified, VARIANT_FALSE otherwise
+		[id(13), helpstring("method AllowUserToSelectAndConfigureObject")] 
+			HRESULT AllowUserToSelectAndConfigureObject(
+			[in] IObjectWithDescription* pObject, [in] BSTR bstrCategory, [in] BSTR bstrAFAPICategory, 
+			[in] VARIANT_BOOL bAllowNone, [in] LONG lNumRequiredIIDs, [in] GUID* pRequiredIIDs, 
+			[out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: As with AllowUserToSelectAndConfigureObject, except that it returns the selected object
+		//			directly (rather than an ObjectWithDescription containing the object) and does not
+		//			allow for setting the description. Intended to be used to choose a category
+		//			implementation without the need to save the selected object or its configuration for later use.
+		// REQUIRE: bstrTitleAfterSelect- The title bar of the dialog will display "Select [strTitleAfterSelect]"
+		//			bstrCategory- The name of the category to display for the user.
+		//          bstrAFAPICategory is the name of an AFAPI category.
+		//          lNumRequiredIIDS is the number of interfaces the object is required to implement beyond
+		//				what is required of interfaces in the selected category.
+		//          pRequiredIIDs is a pointer to the first element in an array of length lNumRequiredIIDS
+		//          that contains the IIDs of interfaces an object is required to implement.
+		//          pRequiredIIDs may be NULL if and only if lNumRequiredIIDs is zero.
+		// RETURNS: An IUnknown pointer to the selected object if the user pressed OK.  NULL if the user
+		//			cancelled
+		[id(20), helpstring("method AllowUserToSelectAndConfigureObject2")] 
+			HRESULT AllowUserToSelectAndConfigureObject2(
+			[in] BSTR bstrTitleAfterSelect, [in] BSTR bstrCategory, [in] BSTR bstrAFAPICategory, 
+			[in] LONG lNumRequiredIIDs,
+			[in] GUID* pRequiredIIDs, [out, retval] IUnknown **ppObject);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To count the number of enabled ObjectWithDescription objects in a IUnknownVector
+		// REQUIRE: IUnknownVector must be non-NULL
+		// PROMISE: lNumEnabledObjects will be the number of elements in IUnknownVector that
+		//          implement the ObjectWithDescription interface and are enabled. Objects
+		//          that don't implement the ObjectWithDescription interface are simply not counted.
+		[id(14), helpstring("method CountEnabledObjectsIn")] HRESULT CountEnabledObjectsIn(
+			[in] IIUnknownVector* pVector, [out, retval] long* lNumEnabledObjects);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return Enabled state of the specified ObjectWithDescription object in the 
+		//			specified IUnknownVector
+		// REQUIRE: pVector != NULL.
+		//			0 <= nItemIndex < pVector->Size()
+		//			pVector->At( nItemIndex ) implements IObjectWithDescription
+		// PROMISE: Returns VARIANT_TRUE if the specified ObjectWithDescription is Enabled, 
+		//			otherwise VARIANT_FALSE.
+		[id(15), helpstring("method GetEnabledState")] HRESULT GetEnabledState(
+			[in] IIUnknownVector* pVector, [in] LONG nItemIndex, [out, retval] VARIANT_BOOL* pvbEnabled);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the Enabled state of the specified ObjectWithDescription object in the 
+		//			specified IUnknownVector
+		// REQUIRE: pVector != NULL.
+		//			0 <= nItemIndex < pVector->Size()
+		//			pVector->At( nItemIndex ) implements IObjectWithDescription
+		// PROMISE: The Enabled state of the specified ObjectWithDescription = bEnabled.
+		[id(16), helpstring("method SetEnabledState")] HRESULT SetEnabledState(
+			[in] IIUnknownVector* pVector, [in] LONG nItemIndex, [in] VARIANT_BOOL bEnabled);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check the dirty flag of the specified COM object.
+		// REQUIRE: pObject implements IPersistStream.
+		// PROMISE: Returns VARIANT_TRUE if pObject is dirty, VARIANT_FALSE otherwise.
+		[id(17), helpstring("method IsAnyObjectDirty1")] HRESULT IsAnyObjectDirty1(
+			[in] IUnknown* pObject, [out, retval] VARIANT_BOOL* pvbDirty);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check the dirty flag of each specified COM object.
+		// REQUIRE: pObject1 implements IPersistStream
+		//			pObject2 implements IPersistStream
+		// PROMISE: Returns VARIANT_TRUE if pObject1 OR pObject2 are dirty, VARIANT_FALSE otherwise.
+		[id(18), helpstring("method IsAnyObjectDirty2")] HRESULT IsAnyObjectDirty2(
+			[in] IUnknown* pObject1, [in] IUnknown* pObject2, [out, retval] VARIANT_BOOL* pvbDirty);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check the dirty flag of each specified COM object.
+		// REQUIRE: pObject1 implements IPersistStream
+		//			pObject2 implements IPersistStream
+		//			pObject3 implements IPersistStream
+		// PROMISE: Returns VARIANT_TRUE if pObject1 OR pObject2 OR pObject3 are dirty, 
+		//			VARIANT_FALSE otherwise.
+		[id(19), helpstring("method IsAnyObjectDirty3")] HRESULT IsAnyObjectDirty3(
+			[in] IUnknown* pObject1, [in] IUnknown* pObject2, [in] IUnknown* pObject3, 
+			[out, retval] VARIANT_BOOL* pvbDirty);
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Requests windows shell to open the specified document with the application registered
+		//			to the filetype of the document. Throws an execption if the request fails.
+		// ARGS:	bstrFilename- The filename of the document to open
+		[id(22), helpstring("method ShellOpenDocument")] HRESULT ShellOpenDocument([in] BSTR bstrFilename);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To take a COM object that implements IPersistStream, convert it to a
+		//			string of bytes and copy those bytes into a BSTR.
+		// REQUIRE: pObject implements IPersistStream
+		[id(23), helpstring("method GetObjectAsStringizedByteStream")]
+			HRESULT GetObjectAsStringizedByteStream([in] IUnknown* pObject,
+				[out, retval] BSTR* pbstrByteStream);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To take a bytestream that represents a COM object and to
+		//			rebuild the COM object from the bytestream.
+		// REQUIRE: ppObject implements IPersistStream
+		[id(24), helpstring("method GetObjectFromStringizedByteStream")]
+			HRESULT GetObjectFromStringizedByteStream([in] BSTR bstrByteStream,
+				[out, retval] IUnknown** ppObject);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To calculate bstrString with its tags in expanded form.
+		// PARAMS:  (1) bstrString - The string to be expanded.
+		//			(2) bstrSourceDocName - The file name of the source document
+		// EXAMPLE: If:
+		//          (1) bstrString = "$DirOf(<SourceDocName>)\$FileOf(<SourceDocName>)"	
+		//          (2) bstrSourceDocName = "C:\123.dat"
+		//          Then:
+		//          pbstrExpanded = "C:\123.dat"			
+		[id(25), helpstring("method GetExpandedTags")] HRESULT GetExpandedTags(
+			[in] BSTR bstrString, [in] BSTR bstrSourceDocName, [out, retval] BSTR* pbstrExpanded);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns an IVariantVector of BSTRs containing the name of expansion functions
+		// EXAMPLE: May return values such as "$DirOf()", "$InsertBeforeExt()", etc.
+		[id(26), helpstring("method GetExpansionFunctionNames")] HRESULT GetExpansionFunctionNames(
+			[out, retval] IVariantVector** ppFunctionNames);
+	};
+	[
+		object,
+		uuid(C1B76592-C888-4D5E-95D9-FA86562C2212),
+		dual,
+		helpstring("IMultipleObjectHolder Interface"),
+		pointer_default(unique)
+	]
+	interface IMultipleObjectHolder : IDispatch
+	{
+		[id(1), helpstring("method GetObjectCategoryName")] HRESULT GetObjectCategoryName(
+			[out, retval] BSTR *pstrCategoryName);
+		[propget, id(2), helpstring("property ObjectsVector")] HRESULT ObjectsVector(
+			[out, retval] IIUnknownVector * *pVal);
+		[propput, id(2), helpstring("property ObjectsVector")] HRESULT ObjectsVector(
+			[in] IIUnknownVector * newVal);		
+		//------------------------------------------------------------------------------------------
+		// PROMISE: The returned string will represent a singular term (like "Output Handler") and
+		//			not a plural term (like "Output Handlers")
+		[id(3), helpstring("method GetObjectType")] HRESULT GetObjectType(
+			[out, retval] BSTR *pstrObjectType);
+		//------------------------------------------------------------------------------------------
+		// PROMISE: Will return the ID of the Interface that objects held by this holder must 
+		//			implement
+		[id(4), helpstring("method GetRequiredIID")] HRESULT GetRequiredIID(
+			[out, retval] IID *riid);
+		//------------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(00BAD0A6-A87E-4FC6-94E4-5A7F2E494F53),
+		dual,
+		helpstring("ILongToObjectMap Interface"),
+		pointer_default(unique)
+	]
+	interface ILongToObjectMap : IDispatch
+	{
+		[id(1), helpstring("method Set")] HRESULT Set([in] long key, [in] IUnknown* pObject);
+		[id(2), helpstring("method GetValue")] HRESULT GetValue([in] long key, 
+			[out, retval] IUnknown* *pObject);
+		[id(3), helpstring("method Contains")] HRESULT Contains([in] long key, 
+			[out, retval] VARIANT_BOOL *bFound);
+		[id(4), helpstring("method RemoveItem")] HRESULT RemoveItem([in] long key);
+		[id(5), helpstring("method Clear")] HRESULT Clear();
+		[id(6), helpstring("method GetKeys")] HRESULT GetKeys([out, retval] IVariantVector** pKeys);
+		[propget, id(7), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		[id(8), helpstring("method GetKeyValue")] HRESULT GetKeyValue([in] long nIndex, 
+			[out] long *pstrKey, [out] IUnknown* *pObject);
+		[id(9), helpstring("method RenameKey")] HRESULT RenameKey([in] long strKey, 
+			[in] long strNewKeyName);
+	};
+	[
+		object,
+		uuid(23437AC7-B67E-4968-B9FA-E4084534DA59),
+		dual,
+		helpstring("ILongPoint Interface"),
+		pointer_default(unique)
+	]
+	interface ILongPoint : IDispatch
+	{
+		[propget, id(1), helpstring("property X")] HRESULT X([out, retval] long *pVal);
+		[propput, id(1), helpstring("property X")] HRESULT X([in] long newVal);
+		[propget, id(2), helpstring("property Y")] HRESULT Y([out, retval] long *pVal);
+		[propput, id(2), helpstring("property Y")] HRESULT Y([in] long newVal);
+	};
+	[
+		object,
+		uuid(F478D5E3-AD08-4003-922B-1E5D0B27C9BB),
+		dual,
+		helpstring("ILongToLongMap Interface"),
+		pointer_default(unique)
+	]
+	interface ILongToLongMap : IDispatch
+	{
+		[id(1), helpstring("method Set")] HRESULT Set([in] long key, [in] long value);
+		[id(2), helpstring("method GetValue")] HRESULT GetValue([in] long key, 
+			[out, retval] long *pValue);
+		[id(3), helpstring("method Contains")] HRESULT Contains([in] long key, 
+			[out, retval] VARIANT_BOOL *bFound);
+		[id(4), helpstring("method RemoveItem")] HRESULT RemoveItem([in] long key);
+		[id(5), helpstring("method Clear")] HRESULT Clear();
+		[id(6), helpstring("method GetKeys")] HRESULT GetKeys([out, retval] IVariantVector** pKeys);
+		[propget, id(7), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		[id(8), helpstring("method GetKeyValue")] HRESULT GetKeyValue([in] long nIndex, 
+			[out] long *pKey, [out] long *pValue);
+		[id(9), helpstring("method RenameKey")] HRESULT RenameKey([in] long key, [in] long newKeyName);
+	};
+	[
+		object,
+		uuid(FB4518FD-2F9C-42F7-BB92-F9E4FA665F13),
+		dual,
+		helpstring("IObjectUserInterface Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectUserInterface : IDispatch
+	{
+		[id(1), helpstring("method DisplayReadOnly")] HRESULT DisplayReadOnly();
+		[id(2), helpstring("method DisplayReadWrite")] HRESULT DisplayReadWrite();
+		[id(3), helpstring("method SupportsReadOnly")] HRESULT SupportsReadOnly(
+			[out, retval] VARIANT_BOOL *bSupportsReadOnly);
+		[id(4), helpstring("method SupportsReadWrite")] HRESULT SupportsReadWrite(
+			[out, retval] VARIANT_BOOL *bSupportsReadWrite);
+	};
+	[
+		object,
+		uuid(5CF55B51-A98E-4AC8-B0BF-2C4AE4F3A19E),
+		dual,
+		helpstring("IObjectSettings Interface"),
+		pointer_default(unique)
+	]
+	interface IObjectSettings : IDispatch
+	{
+		[id(1), helpstring("method LoadFromRegistry")] HRESULT LoadFromRegistry([in] BSTR bstrKey);
+		[id(2), helpstring("method SaveToRegistry")] HRESULT SaveToRegistry([in] BSTR bstrKey);
+	};
+
+	[
+		object,
+		uuid(C6972580-8201-4BBC-9929-212DB43352A6),
+		dual,
+		helpstring("ICOMMutex Interface"),
+		pointer_default(unique)
+	]
+	//-----------------------------------------------------------------------------------------
+	// PURPOSE: To provide named mutex functionality in a COM wrapper
+	//-----------------------------------------------------------------------------------------
+	interface ICOMMutex : IDispatch{
+		
+		// PROMISE:		To create a named mutex that can be used to synchronize separate processes.
+		// REQUIRES:	bstrMutexName must be a non empty string, if bstrMutexName is NULL or "" 
+		//				an exception will be thrown.
+		// NOTE:		If this function is called more than once with different names
+		//				an exception will be thrown.  If bstrMutexName is the same as 
+		//				the first call, no exception will be thrown
+		[id(1), helpstring("method CreateNamed")] HRESULT CreateNamed(BSTR bstrMutexName);
+		// PROMISE:		To return after the Mutex named with a call to CreateNamed is aquired
+		[id(2), helpstring("method Acquire")] HRESULT Acquire(void);
+		// PROMISE:		To releas the named mutex
+		[id(3), helpstring("method ReleaseNamedMutex")] HRESULT ReleaseNamedMutex(void);
+	};
+
+	[
+		object,
+		uuid(508258C6-D18B-401c-BC25-C910713843CE),
+		dual,
+		helpstring("IDoublePoint Interface"),
+		pointer_default(unique)
+	]
+	interface IDoublePoint : IDispatch
+	{
+		[propget, id(1), helpstring("property X")] HRESULT X([out, retval] double *pVal);
+		[propput, id(1), helpstring("property X")] HRESULT X([in] double newVal);
+		[propget, id(2), helpstring("property Y")] HRESULT Y([out, retval] double *pVal);
+		[propput, id(2), helpstring("property Y")] HRESULT Y([in] double newVal);
+	};
+
+	//---------------------------------------------------------------------------------------------
+	// IProgressStatus ----------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(125A649E-E231-4B43-AD6B-B689E1083B49),
+		dual,
+		nonextensible,
+		helpstring("IProgressStatus Interface"),
+		pointer_default(unique)
+	]
+	interface IProgressStatus : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To initialize multiple properties of this object in one method call.
+		// REQUIRE:	nNumItemsTotal > 0
+		//			nNumItemsCompleted >= 0
+		//			nNumItemsCompleted <= nNumItemsTotal
+		// PROMISE: For strText, nNumItemsCompleted, and nNumItemsTotal, the passed in values will
+		//			be used to update the corresponding properties.
+		//			If bCreateOrResetSubProgressStatus is VARIANT_TRUE, then this method will
+		//			guarantee that a sub progress status object exists (by creating it if necessary)
+		//			and ensure that it is in its default/reset status.
+		//			If bCreateOrResetSubProgressStatus is VARIANT_FALSE, then nothing is done with
+		//			respect to the sub progress status.
+		//			Subsequent calls to retrieve the NumItemsInCurrentGroup property will return
+		//			zero.
+		[id(1), helpstring("method InitProgressStatus")] HRESULT InitProgressStatus([in] BSTR strText, 
+			[in] long nNumItemsCompleted, [in] long nNumItemsTotal,
+			[in] VARIANT_BOOL bCreateOrResetSubProgressStatus);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To notify the progress status object that the previous group of items (if any)
+		//			have completed and that a new group of items is about to be started.
+		// REQUIRE: nNumItemsInNextGroup > 0
+		// PROMISE:	To set the Text property to strNextGroupText, and to remember the number of items
+		//			in the next group so that a subsequent call to GetProgressPercent() returns the
+		//			correct results.  See documentation of GetProgressPercent() for how the number
+		//			of items in the next group is used to determine the progress percent.
+		//			If a previous group of progress items was already started and not yet 
+		//			explicitly completed using the CompleteCurrentItemGroup() method, 
+		//			that group will automatically be completed.
+		//			Subsequent calls to retrieve the NumItemsInCurrentGroup property value 
+		//			will return nNumItemsInNextGroup.
+		[id(2), helpstring("method StartNextItemGroup")] HRESULT StartNextItemGroup(
+			[in] BSTR strNextGroupText, [in] long nNumItemsInNextGroup);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To notify the progress status object that the current group of items (if any)
+		//			have been completed.  If there is no current group of progress items, calling
+		//			this method does not change the state of the progress status object.
+		//			Subsequent calls to retrieve the NumItemsInCurrentGroup property value 
+		//			will return zero.
+		// NOTES:	Typically, this method will be called for the last group of items.  For all
+		//			groups other than the last, it is better to call StartNextItemGroup()
+		//			instead because that method automatically completes the current group and
+		//			starts the next group, and provides a way to update the status text at the
+		//			same time.
+		[id(3), helpstring("method CompleteCurrentItemGroup")] HRESULT CompleteCurrentItemGroup();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return the current text value associated with this progress status object.
+		//			The text value can be set using the InitProgressStatus() or StartNextItemGroup()
+		//			methods.
+		// NOTES:	If no text value has been set, an empty string will be returned by default.
+		[propget, id(4), helpstring("property Text")] HRESULT Text([out, retval] BSTR *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return the total number of progress items associated with this progress 
+		//			status object.  This represents how many items of "equal" work need to be
+		//			completed for the progress can be considered 100%.
+		// NOTE:	The value for this property is to be set using the InitProgressStatus() method.
+		[propget, id(5), helpstring("property NumItemsTotal")] HRESULT NumItemsTotal(
+			[out, retval] long *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return the total number of progress items completed so far.
+		// NOTE:	The value for this property is initialized by a call to InitProgressStatus() and
+		//			updated thereafter by calls to StartNextItemGroup() and 
+		//			CompleteCurrentItemGroup().
+		[propget, id(6), helpstring("property NumItemsCompleted")] HRESULT NumItemsCompleted(
+			[out, retval] long *pVal);
+		//------------------------------------------------------------------------------------------
+		// PURPOSE:	To return the total number of progress items in the current progress group.
+		// NOTE:	The value for this property is set by a calls to the StartNextItemGroup()
+		//			or CompleteCurrentItemGroup() methods.
+		[propget, id(7), helpstring("property NumItemsInCurrentGroup")] HRESULT NumItemsInCurrentGroup(
+			[out, retval] long *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Some objects that are capable of reporting progress may want to break down their
+		//			work into smaller work items each of which can individually report progress.
+		//			The SubProgressStatus property is used to hold the progress status of an 
+		//			individual work item executed in the context of this progress status object.
+		// NOTES:	This property may be set to NULL to indicate that there is no
+		//			sub-progress-status information.
+		[propget, id(8), helpstring("property SubProgressStatus")] HRESULT SubProgressStatus(
+			[out, retval] IProgressStatus **pVal);
+		[propput, id(8), helpstring("property SubProgressStatus")] HRESULT SubProgressStatus(
+			[in] IProgressStatus *newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return the total progress represented by this progress status object taking
+		//			into account all available SubProgressStatus information.
+		// PROMISE:	The returned progress percent will take into account the progress at this
+		//			progress status object's level, the number of items in the current group of
+		//			items that have started, and the progress status at all the sublevels 
+		//			represented by the hierarchy of SubProgressStatus objects.
+		//			For example, if NumItemsTotal = 10, and NumItemsCompleted = 2, and 
+		//			NumItemsInCurrentGroup = 3, and a SubProgressStatus object exists, and 
+		//			its NumItemsTotal = 5 and NumItemsCompleted is 3, and NumItemsInCurrentGroup = 2,
+		//			and it does not have a SubProgressStatus object, then this method will return
+		//			2/10 + (3/10)*(3/5) = 38%
+		// NOTES:	The NumItemsInCurrentGroup property of a ProgressStatus object participates in
+		//			the GetProgressPercent() calculation only if the ProgressStatus object has a
+		//			SubProgressStatus object.
+		//			In the above example, when the current group of the sub progress status object
+		//			completes, the value returned by this method will be:
+		//			2/10 + (3/10)*(5/5) = 50%
+		[id(9), helpstring("method GetProgressPercent")] HRESULT GetProgressPercent(
+			[out, retval] double *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If SubProgressStatus == NULL, then this method does not do anything.
+		//			If SubProgressStatus != NULL, then this method will perform 4 operations on the
+		//			SubProgressStatus object:
+		//				(1) set the NumItemsTotal to 1
+		//				(2) set the NumItemsCompleted to 0
+		//				(3) set the Text property to an empty string
+		//				(4) call ResetSubProgressStatus() so that all levels of progress downstream
+		//					are also reset.
+		[id(10), helpstring("method ResetSubProgressStatus")] HRESULT ResetSubProgressStatus();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To notify the progress status object that the specified number of progress items
+		//			have completed, set the next group's name, and clear the next group's progress.
+		// REQUIRE: nNumItemsCompleted >= 0
+		// PROMISE:	(1) Add nNumItemsCompleted to the total completed progress items.
+		//          (2) Set the Text property to strNextGroupText.
+		//          (3) Reset NumItemsInCurrentGroup to 0.
+		//			(4) Call ResetSubProgressStatus() so that all levels of progress downstream
+		//				are also reset.
+		[id(11), helpstring("method CompleteProgressItems")] HRESULT CompleteProgressItems(
+			[in] BSTR strNextGroupText, [in] long nNumItemsCompleted);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(E97DCC5C-4CEF-4B1C-9C5E-87F4E8008D9B),
+		dual,
+		nonextensible,
+		helpstring("IProgressStatusDialog Interface"),
+		pointer_default(unique)
+	]
+	interface IProgressStatusDialog : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To instantiate and show a modeless version of the progress status dialog.
+		// REQUIRE: pProgressStatus != NULL && pProgressStatus points to a valid progress status
+		//			object.
+		// PROMISE:	To bring up a modeless version of the progress status dialog box and update
+		//			the progress status at the specified refresh rate. The handle of the 
+		//			progress status dialog window is returned, which the caller can use with 
+		//			standard Win32 API functions (such as to center the dialog relative to another
+		//			window, etc).
+		// NOTES:	The title of the progress status window and the top level progress status object
+		//			used for progress updates are instantiated with the values provided as
+		//			arguments to this method.  The window title and top level progress status 
+		//			object can be changed while the progress status window is up (see documentation
+		//			for the ProgressStatusObject and Title properties).
+		//			Since this method brings up the progress status dialog as a modelesss dialog,
+		//			the dialog will still be open after this method call returns.  The dialog is
+		//			closed automatically when this object goes out of scope, or when the Close()
+		//			method is called.
+		//			Also, the progress status dialog is created the first time the 
+		//			ShowModelessDialog() method is called on this object.  All subsequent calls
+		//			to ShowModelessDialog() will merely re-show the window that became hidden
+		//			due to the Close() method being called, or due to the user closing the window
+		//			by clicking the X in the top-right corner.
+		// ARGUMENTS:
+		//			hWndParent - the window handle to the window that should be treated as the
+		//				parent for the progress status dialog. If there is no parent window, pass
+		//				NULL for this parameter.
+		//			strWindowTitle - the caption for the progress status dialog.  This parameter
+		//				is used to set the Title property (see documentation of the Title property).
+		//			pProgressStatus - the top level progress status object whose progress 
+		//				information and sub-progress information (depending upon nNumProgressLevels)
+		//				is to be displayed in the progress status dialog.  This parameter is used
+		//				to set the ProgressStatusObject property (see documentation of that property).
+		//			nNumProgressLevels - the number of levels of progress status objects to 
+		//				graphically display in the progress status dialog.  The progress status 
+		//				dialog will display N levels of progress status at any given time where
+		//				N = min(nNumProgressLevels, X) where X is the total depth of the 
+		//				progress status objects represented by pProgressStatus.  This argument
+		//				therefore affects the height of the progress status dialog.
+		//			nDelayBetweenRefreshes - the delay, in milliseconds, between updates of the 
+		//				progress status information in the progress status dialog.
+		//			bShowCloseButton - if set to VARIANT_TRUE, the close button will be shown, 
+		//				thereby allowing the user to close the window.  When the user closes the
+		//				window, it is merely hidden.  Subsequent calls to this method will merely
+		//				re-show the hidden window.
+		//			hStopEvent - If non-NULL a stop button is displayed on the progress dialog.
+		//				In the event the stop button is pressed, the hStopEvent will be signaled
+		//				to notify the caller.  The progress dialog will remain displayed with 
+		//				"Stopping..." as the progress message until it is closed by the caller.
+		[id(1), helpstring("method ShowModelessDialog")] HRESULT ShowModelessDialog(
+			[in] HANDLE hWndParent, [in] BSTR strWindowTitle, [in] IProgressStatus *pProgressStatus, 
+			[in] long nNumProgressLevels, [in] long nDelayBetweenRefreshes, 
+			[in] VARIANT_BOOL bShowCloseButton, [in] HANDLE hStopEvent, 
+			[out, retval] long *phWndProgressStatusDialog);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Methods to get/set the top level progress status object that is being used to
+		//			display progress status information in the progress status dialog.
+		// REQUIRE:	ShowModelessDialog() must have been called prior to accessing or setting
+		//			this property.  It does not matter whether the window is currently shown or
+		//			hidden.
+		// PROMISE: The progress status dialog will use the new progress status object in
+		//			subsequent refreshes of the progress status information.
+		[propget, id(2), helpstring("property ProgressStatusObject")] HRESULT ProgressStatusObject(
+			[out, retval] IProgressStatus **pVal);
+		[propput, id(2), helpstring("property ProgressStatusObject")] HRESULT ProgressStatusObject(
+			[in] IProgressStatus *newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Methods to get/set the title of the progress status dialog.
+		// REQUIRE:	ShowModelessDialog() must have been called prior to accessing or setting
+		//			this property.  It does not matter whether the window is currently shown or
+		//			hidden.
+		// PROMISE: The progress status dialog's title will be changed to the new value.
+		//			If the new title specified for the window is an empty string, the window
+		//			title will be reset to its default value.
+		[propget, id(3), helpstring("property Title")] HRESULT Title([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property Title")] HRESULT Title([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To close the progress status dialog.
+		// REQUIRE:	ShowModelessDialog() must have been called prior to calling this method.
+		// PROMISE:	This method merely hides the progress status dialog, and behaves the same way
+		//			as if the user clicked the X button in the upper-right corner of the window.
+		//			Subsequent calls to ShowModelessDialog() will re-show the hidden window.
+		[id(4), helpstring("method Close")] HRESULT Close();
+		//-----------------------------------------------------------------------------------------
+	};
+
+	//---------------------------------------------------------------------------------------------
+	//-C O C L A S S E S --------------------------------------------------------------------------
+	//---------------------------------------------------------------------------------------------
+	[
+		uuid(C7C175F5-6264-4BF8-A5B9-4662CD4FB778),
+		helpstring("IUnknownVector Class")
+	]
+	coclass IUnknownVector
+	{
+		[default] interface IIUnknownVector;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IShallowCopyable;
+	};
+	[
+		uuid(90BDF690-D7A8-4AFD-96DF-2816E789CBB3),
+		helpstring("Token Class")
+	]
+	coclass Token
+	{
+		[default] interface IToken;
+	};
+	[
+		uuid(47EF79D6-1862-41DE-B777-C9EB02660484),
+		helpstring("VariantVector Class")
+	]
+	coclass VariantVector
+	{
+		[default] interface IVariantVector;
+		interface ICopyableObject;
+		interface IShallowCopyable;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(E00B3EAE-264B-451C-82DF-1704196AB53A),
+		helpstring("ObjectPropertiesUI Class")
+	]
+	coclass ObjectPropertiesUI
+	{
+		[default] interface IObjectPropertiesUI;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(33EFAB00-9014-47C4-884E-8B157E945239),
+		helpstring("ObjectWithDescription Class")
+	]
+	coclass ObjectWithDescription
+	{
+		[default] interface IObjectWithDescription;
+		interface ICopyableObject;
+	};
+	[
+		uuid(786ABD38-3B24-482D-9393-847FA7B34401),
+		helpstring("ObjectSelectorUI Class")
+	]
+	coclass ObjectSelectorUI
+	{
+		[default] interface IObjectSelectorUI;
+	};
+	[
+		uuid(AC73C5D4-EB59-42CF-AAF0-9E19A184CF57),
+		helpstring("CategoryManager Class")
+	]
+	coclass CategoryManager
+	{
+		[default] interface ICategoryManager;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(8784D61E-61DD-4AD1-8EEE-EF6078D8B7F8),
+		helpstring("StrToStrMap Class")
+	]
+	coclass StrToStrMap
+	{
+		[default] interface IStrToStrMap;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(5E5DDC3D-7928-4155-8501-4C16DCCCDB91),
+		helpstring("StrToObjectMap Class")
+	]
+	coclass StrToObjectMap
+	{
+		[default] interface IStrToObjectMap;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IShallowCopyable;
+	};
+	[
+		uuid(86B136D0-280A-42C5-8A65-3D9FE5CE6237),
+		helpstring("StringPair Class")
+	]
+	coclass StringPair
+	{
+		[default] interface IStringPair;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(8D618639-4E25-48C8-A43B-48720FB60263),
+		helpstring("ObjectPair Class")
+	]
+	coclass ObjectPair
+	{
+		[default] interface IObjectPair;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(A611A231-CE63-41BF-A2EE-B43B5CA23235),
+		helpstring("ClipboardObjectManager Class")
+	]
+	coclass ClipboardObjectManager
+	{
+		[default] interface IClipboardObjectManager;
+	};
+	[
+		uuid(8CD557BC-C36B-42C8-88D4-971A3F1E52EC),
+		helpstring("StringPatternMatcher Class")
+	]
+	coclass StringPatternMatcher
+	{
+		[default] interface IStringPatternMatcher;
+	};
+	[
+		uuid(A11BDEAA-6068-4161-B75C-ACA56E9E5F67),
+		helpstring("LongRectangle Class")
+	]
+	coclass LongRectangle
+	{
+		[default] interface ILongRectangle;
+		interface ICopyableObject;
+	};
+	[
+		uuid(30358025-3FF2-44D9-9EF7-ED342C338231),
+		helpstring("MiscUtils Class")
+	]
+	coclass MiscUtils
+	{
+		[default] interface IMiscUtils;
+	};
+	[
+		uuid(6781EC39-F065-4019-AB6A-64FBA17E9832),
+		helpstring("MultipleObjSelectorPP Class")
+	]
+	coclass MultipleObjSelectorPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(F1752718-D153-4458-BEEE-F1C51F398C79),
+		helpstring("LongToObjectMap Class")
+	]
+	coclass LongToObjectMap
+	{
+		[default] interface ILongToObjectMap;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IShallowCopyable;
+	};
+	[
+		uuid(20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC),
+		helpstring("LongPoint Class")
+	]
+	coclass LongPoint
+	{
+		[default] interface ILongPoint;
+		interface ILicensedComponent;
+		interface ICopyableObject;	
+	};
+	[
+		uuid(E23C61A0-9780-4F41-9D21-A0E4A3EE9927),
+		helpstring("LongToLongMap Class")
+	]
+	coclass LongToLongMap
+	{
+		[default] interface ILongToLongMap;
+	};
+	[
+		uuid(4897CD96-0E80-4343-8727-3478FDB13523),
+		helpstring("COMMutex Class")
+	]
+	coclass COMMutex
+	{
+		[default] interface ICOMMutex;
+	};
+	[
+		uuid(31229082-2278-4371-B1FB-E7654AA27E95),
+		helpstring("DoublePoint Class")
+	]
+	coclass DoublePoint
+	{
+		[default] interface IDoublePoint;
+		interface ILicensedComponent;
+		interface ICopyableObject;	
+	};
+	[
+		uuid(1E8D1709-087C-4B48-B8DA-3C30F75D831D),
+		helpstring("ProgressStatus Class")
+	]
+	coclass ProgressStatus
+	{
+		[default] interface IProgressStatus;
+	};
+	[
+		uuid(D0D75884-5964-4DF0-98F7-26B6B7C00CB3),
+		helpstring("ProgressStatusDialog Class")
+	]
+	coclass ProgressStatusDialog
+	{
+		[default] interface IProgressStatusDialog;
+		interface ILicensedComponent;
+	};
+};

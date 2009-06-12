@@ -1,0 +1,571 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFValueModifiers.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFValueModifiers Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFValueModifiers"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFValueModifiers.DLL"
+            VALUE "ProductName", "AFValueModifiers Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_LIMITASLEFTPART     REGISTRY                "LimitAsLeftPart.rgs"
+IDR_LIMITASRIGHTPART    REGISTRY                "LimitAsRightPart.rgs"
+IDR_LIMITASMIDPART      REGISTRY                "LimitAsMidPart.rgs"
+IDR_LIMITASLEFTPARTPP   REGISTRY                "LimitAsLeftPartPP.rgs"
+IDR_TRANSLATEVALUE      REGISTRY                "TranslateValue.rgs"
+IDR_REMOVECHARACTERS    REGISTRY                "RemoveCharacters.rgs"
+IDR_REPLACESTRINGS      REGISTRY                "ReplaceStrings.rgs"
+IDR_TRANSLATETOCLOSESTVALUEINLIST REGISTRY                "TranslateToClosestValueInList.rgs"
+IDR_LIMITASMIDPARTPP    REGISTRY                "LimitAsMidPartPP.rgs"
+IDR_LIMITASRIGHTPARTPP  REGISTRY                "LimitAsRightPartPP.rgs"
+IDR_REMOVECHARACTERSPP  REGISTRY                "RemoveCharactersPP.rgs"
+IDR_REPLACESTRINGSPP    REGISTRY                "ReplaceStringsPP.rgs"
+IDR_TRANSLATEVALUEPP    REGISTRY                "TranslateValuePP.rgs"
+IDR_TRANSLATETOCLOSESTVALUEINLISTPP REGISTRY                "TranslateToClosestValueInListPP.rgs"
+IDR_ADVANCEDREPLACESTRING REGISTRY                "AdvancedReplaceString.rgs"
+IDR_ADVANCEDREPLACESTRINGPP REGISTRY                "AdvancedReplaceStringPP.rgs"
+IDR_INSERTCHARACTERS    REGISTRY                "InsertCharacters.rgs"
+IDR_INSERTCHARACTERSPP  REGISTRY                "InsertCharactersPP.rgs"
+IDR_STRINGTOKENIZERMODIFIER REGISTRY                "StringTokenizerModifier.rgs"
+IDR_STRINGTOKENIZERMODIFIERPP REGISTRY                "StringTokenizerModifierPP.rgs"
+IDR_CHANGECASE          REGISTRY                "ChangeCase.rgs"
+IDR_CHANGECASEPP        REGISTRY                "ChangeCasePP.rgs"
+IDR_PADVALUE            REGISTRY                "PadValue.rgs"
+IDR_PADVALUEPP          REGISTRY                "PadValuePP.rgs"
+IDR_CONDITIONALATTRIBUTEMODIFIER REGISTRY                "ConditionalAttributeModifier.rgs"
+IDR_OCRAREA             REGISTRY                "OCRArea.rgs"
+IDR_PROPPAGE_OCRAREA    REGISTRY                "OCRAreaPP.rgs"
+IDR_SPLITREGIONINTOCONTENTAREAS REGISTRY                "SplitRegionIntoContentAreas.rgs"
+IDR_SPLITREGIONINTOCONTENTAREASPP REGISTRY                "SplitRegionIntoContentAreasPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_LIMITASLEFTPARTPP DIALOGEX 0, 0, 147, 79
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Extract characters",IDC_RADIO_EXTRACT,"Button",BS_AUTORADIOBUTTON,5,5,72,10
+    CONTROL         "Remove characters",IDC_RADIO_REMOVE,"Button",BS_AUTORADIOBUTTON,5,18,85,10
+    EDITTEXT        IDC_EDIT_NUM_OF_CHARS_LEFT,110,33,32,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Accept if total number of characters found less than specified above",IDC_CHK_ACCEPT_LEFT,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,53,137,18
+    LTEXT           "Number of characters to limit :",IDC_STATIC,5,35,100,8
+END
+
+IDD_LIMITASMIDPARTPP DIALOGEX 0, 0, 136, 90
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Extract characters",IDC_RADIO_EXTRACT,"Button",BS_AUTORADIOBUTTON,5,5,72,10
+    CONTROL         "Remove characters",IDC_RADIO_REMOVE,"Button",BS_AUTORADIOBUTTON,5,18,85,10
+    EDITTEXT        IDC_EDIT_START_POS,5,45,57,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_END_POS,74,45,57,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Accept if found text is shorter than specified above.",IDC_CHK_ACCEPT_SHORTER_MID,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,65,126,18
+    LTEXT           "Starting position : ",IDC_STATIC,5,35,55,8
+    LTEXT           "Ending position :",IDC_STATIC,74,35,57,8
+END
+
+IDD_LIMITASRIGHTPARTPP DIALOGEX 0, 0, 147, 79
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Extract characters",IDC_RADIO_EXTRACT,"Button",BS_AUTORADIOBUTTON,5,5,72,10
+    CONTROL         "Remove characters",IDC_RADIO_REMOVE,"Button",BS_AUTORADIOBUTTON,5,18,85,10
+    EDITTEXT        IDC_EDIT_NUM_OF_CHARS_RIGHT,110,33,32,14,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Accept if total number of characters found less than specified above",IDC_CHK_ACCEPT_RIGHT,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,5,53,137,18
+    LTEXT           "Number of characters to limit :",IDC_STATIC,5,35,94,8
+END
+
+IDD_REMOVECHARACTERSPP DIALOGEX 0, 0, 262, 175
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Space",IDC_CHK_SPACE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,17,37,10
+    CONTROL         "Tab",IDC_CHK_TAB,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,74,17,29,10
+    CONTROL         "New line",IDC_CHK_RETURN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,126,17,43,10
+    CONTROL         "Others",IDC_CHK_OTHER_CHARS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,35,37,10
+    EDITTEXT        IDC_EDIT_OTHER_CHARS,53,33,119,13,ES_AUTOHSCROLL
+    CONTROL         "All characters specified are Case Sensitive",IDC_CHK_CASE4,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,64,151,10
+    CONTROL         "Remove all characters as specified",IDC_RADIO_REMOVE_ALL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,10,107,128,10
+    CONTROL         "Select following :",IDC_RADIO_SELECT_FOLLOW,"Button",BS_AUTORADIOBUTTON,10,120,78,10
+    CONTROL         "Consolidate multiple consecutive characters into one",IDC_CHK_CONSOLIDATE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,133,181,10
+    ICON            IDI_ICON_INFO,IDC_CONSOLIDATE_INFO,207,134,20,20,SS_NOTIFY
+    CONTROL         "Trim off all leading characters as specified",IDC_CHK_TRIM_LEADING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,145,147,10
+    CONTROL         "Trim off all trailing characters as specified",IDC_CHK_TRIM_TRAILING,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,22,157,145,10
+    LTEXT           "Select one or more of the follow ways to modify characters of the input string",IDC_STATIC,7,95,251,8
+    GROUPBOX        "Specify the character(s) to be modified",IDC_STATIC,7,6,246,72
+END
+
+IDD_REPLACESTRINGSPP DIALOGEX 0, 0, 289, 179
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Add",IDC_BTN_ADD2,230,13,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE2,230,30,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY2,230,47,50,14
+    PUSHBUTTON      "",IDC_BTN_UP,230,68,21,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN,260,68,21,21,BS_ICON
+    PUSHBUTTON      "&Load List...",IDC_BTN_LOADFILE2,230,105,50,14
+    PUSHBUTTON      "&Save List...",IDC_BTN_SAVEFILE2,230,123,50,14
+    CONTROL         "Strings defined above are treated as Regular Expressions",IDC_CHK_AS_REGEXP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,145,196,10
+    CONTROL         "Strings in first column are Case Sensitive",IDC_CHK_CASE2,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,161,151,10
+    LTEXT           "Define the replacement string pair(s):",IDC_STATIC,8,1,116,8
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,125,2,21,20,SS_NOTIFY
+    CONTROL         "List1",IDC_LIST_REPLACE_STRING,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,8,13,212,125
+END
+
+IDD_TRANSLATEVALUEPP DIALOGEX 0, 0, 276, 186
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Value",IDC_RADIO_TRANSLATE_VALUE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,20,35,10
+    CONTROL         "Type",IDC_RADIO_TRANSLATE_TYPE,"Button",BS_AUTORADIOBUTTON,70,20,40,10
+    CONTROL         "List1",IDC_LIST_TRANS_VALUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | WS_BORDER | WS_TABSTOP,10,35,196,125
+    CONTROL         "Strings in first column are Case Sensitive",IDC_CHK_CASE1,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,165,148,10
+    PUSHBUTTON      "&Add",IDC_BTN_ADD,216,35,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,216,52,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY,216,69,50,14
+    PUSHBUTTON      "&Load List..",IDC_BTN_LOAD_FROM_FILE,216,128,50,14
+    PUSHBUTTON      "&Save List..",IDC_BTN_SAVE_TO_FILE,216,146,50,14
+    LTEXT           "Which field do you want to translate?",IDC_STATIC,10,10,140,10
+END
+
+IDD_TRANSLATETOCLOSESTVALUEINLISTPP DIALOGEX 0, 0, 226, 157
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "List1",IDC_LIST_VALUE_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,28,155,90
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_VALUE,169,28,50,13
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_VALUE,169,45,50,13
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_VALUE,169,62,50,13
+    PUSHBUTTON      "&Load List...",IDC_BTN_LOAD_FILE_VALUES,169,89,50,13
+    PUSHBUTTON      "&Save List...",IDC_BTN_SAVE_FILE_VALUES,170,105,50,13
+    CONTROL         "String comparison is Case Sensitive",IDC_CHK_CASE3,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,127,136,10
+    CONTROL         "Force selection of best match",IDC_CHK_FORCE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,140,136,10
+    LTEXT           "Provide string value(s) that the input string might resemble:",IDC_STATIC,10,8,150,18
+END
+
+IDD_ADVANCEDREPLACESTRINGPP DIALOGEX 0, 0, 257, 149
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FIND_FILE,236,15,15,14
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_REPLACE_FILE,236,44,15,14
+    CONTROL         "All occurrences",IDC_RADIO_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,65,62,65,10
+    CONTROL         "First occurrence",IDC_RADIO_FIRST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,65,75,67,10
+    CONTROL         "Last occurrence",IDC_RADIO_LAST,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,65,88,67,10
+    CONTROL         "Specified occurrence :",IDC_RADIO_SPECIFIED,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,65,101,87,10
+    EDITTEXT        IDC_EDIT_SPECIFIED_OCC,155,99,32,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Case Sensitive",IDC_CHK_CASE_ARS,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,123,63,10
+    CONTROL         "Above specified strings are treated as Regular Expression",IDC_CHK_AS_REG_EXPR_ARS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,135,197,10
+    LTEXT           "Replace the :",IDC_STATIC,10,63,44,8,NOT WS_GROUP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_FIND_DOC_TAG,220,15,10,14,BS_ICON | NOT WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_REPLACE_DOC_TAG,220,44,10,14,BS_ICON | NOT WS_TABSTOP
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_DYNAMIC_FIND_HELP,56,5,21,20,SS_NOTIFY
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_DYNAMIC_REPLACE_HELP,58,34,21,20,SS_NOTIFY
+    LTEXT           "Replace with : ",IDC_STATIC,10,34,48,8,NOT WS_GROUP
+    LTEXT           "String to find : ",IDC_STATIC,10,5,46,8,NOT WS_GROUP
+    EDITTEXT        IDC_EDIT_TO_BE_REPLACED,9,15,205,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_REPLACEMENT,9,44,205,13,ES_AUTOHSCROLL
+END
+
+IDD_INSERTCHARACTERSPP DIALOGEX 0, 0, 268, 94
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_CHAR_INSERT,88,8,172,13,ES_AUTOHSCROLL
+    CONTROL         "Always append to the end of the string",IDC_RADIO_APPEND,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,15,40,137,10
+    CONTROL         "Specified position at ",IDC_RADIO_SPECIFIED,"Button",BS_AUTORADIOBUTTON,15,55,79,10
+    EDITTEXT        IDC_EDIT_POSITION,99,54,48,12,ES_AUTOHSCROLL | ES_NUMBER
+    ICON            IDI_ICON_INFO,IDC_POSITION_INFO,150,55,20,20,SS_NOTIFY | SS_REALSIZEIMAGE | WS_TABSTOP
+    COMBOBOX        IDC_CMB_LENGTH_TYPE,144,76,30,80,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_NUM_OF_CHARS,173,76,30,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Characters to insert : ",IDC_STATIC,16,10,68,8
+    LTEXT           "Position to insert:",IDC_STATIC,16,27,54,8
+    LTEXT           "Insert characters if input string length is",IDC_STATIC,16,79,123,8
+    LTEXT           "characters long",IDC_STATIC,206,79,50,8
+    LTEXT           "1)",IDC_STATIC,5,10,8,8
+    LTEXT           "2)",IDC_STATIC,5,26,8,8
+    LTEXT           "3)",IDC_STATIC,5,79,8,8
+END
+
+IDD_STRINGTOKENIZERMODIFIERPP DIALOGEX 0, 0, 244, 106
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Delimiter for parsing input string into tokens:",IDC_STATIC,14,4,137,8
+    EDITTEXT        IDC_EDIT_DELIMITER,154,3,16,12,ES_AUTOHSCROLL
+    LTEXT           "Result expression defined:",IDC_STATIC,14,19,84,8
+    EDITTEXT        IDC_EDIT_RESULT,14,31,213,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_EXPR_INFO,229,32,20,20,SS_NOTIFY | WS_TABSTOP
+    LTEXT           "If range(s) of tokens is (are) defined, what text do you wish to put in between every two adjacent tokens? This is optional.",IDC_STATIC,14,47,213,18
+    EDITTEXT        IDC_EDIT_TEXT_IN_BETWEEN,13,68,213,12,ES_AUTOHSCROLL
+    LTEXT           "Use this modifier if number of token found is",IDC_STATIC,14,89,138,8
+    COMBOBOX        IDC_CMB_NUM_OF_TOKENS_TYPE,155,87,35,56,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_NUM_OF_TOKENS,191,87,36,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "1)",IDC_STATIC,3,4,8,8
+    LTEXT           "2)",IDC_STATIC,3,19,8,8
+    LTEXT           "4)",IDC_STATIC,3,89,8,8
+    LTEXT           "3)",IDC_STATIC,3,47,8,8
+END
+
+IDD_CHANGECASEPP DIALOGEX 0, 0, 132, 84
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Change the string case to:",IDC_STATIC,10,10,89,10,NOT WS_GROUP
+    CONTROL         "Do not change case",IDC_RADIO_NOCHANGE,"Button",BS_AUTORADIOBUTTON | WS_GROUP | WS_TABSTOP,15,22,85,10
+    CONTROL         "Upper case (UPPER CASE)",IDC_RADIO_UPPERCASE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,15,35,111,10
+    CONTROL         "Lower case (lower case)",IDC_RADIO_LOWERCASE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,15,48,104,10
+    CONTROL         "Title case (Title Case)",IDC_RADIO_TITLECASE,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,15,61,85,10
+END
+
+IDD_PADVALUEPP DIALOGEX 0, 0, 140, 60
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Pad left",IDC_RADIO_PADLEFT,"Button",BS_AUTORADIOBUTTON,5,5,43,10
+    CONTROL         "Pad right",IDC_RADIO_PADRIGHT,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,5,18,43,10
+    EDITTEXT        IDC_EDIT_REQUIRED_LENGTH,5,43,59,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_PADDING_CHARACTER,76,43,59,12,ES_AUTOHSCROLL
+    LTEXT           "Required Length:",IDC_STATIC,5,32,52,8
+    LTEXT           "Padding Character:",IDC_STATIC,76,32,59,8
+END
+
+IDD_PROPPAGE_OCRAREA DIALOGEX 0, 0, 329, 142
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Filter options",IDC_STATIC,7,7,156,128
+    CONTROL         "Alphabetic characters (a-z and A-Z)",IDC_OCRAREA_CHECK_ALPHA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,18,146,9
+    CONTROL         "Digits (0-9)",IDC_OCRAREA_CHECK_DIGIT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,29,146,9
+    CONTROL         "Period (.)",IDC_OCRAREA_CHECK_PERIOD,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,40,146,9
+    CONTROL         "Hyphen (-)",IDC_OCRAREA_CHECK_HYPHEN,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,51,146,9
+    CONTROL         "Underscore (_)",IDC_OCRAREA_CHECK_UNDERSCORE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,62,146,9
+    CONTROL         "Comma (,)",IDC_OCRAREA_CHECK_COMMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,73,146,9
+    CONTROL         "Forward slash (/)",IDC_OCRAREA_CHECK_FORWARD_SLASH,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,84,146,9
+    CONTROL         "Unrecognized characters (returned as %)",IDC_OCRAREA_CHECK_UNRECOGNIZED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,95,146,9
+    CONTROL         "Other characters (please specify):",IDC_OCRAREA_CHECK_CUSTOM,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,106,146,9
+    EDITTEXT        IDC_OCRAREA_EDIT_CUSTOM_CHARS,13,117,144,12,ES_AUTOHSCROLL
+    GROUPBOX        "Text type",IDC_STATIC,169,7,153,35
+    CONTROL         "Machine printed",IDC_OCRAREA_RADIO_PRINTED,"Button",BS_AUTORADIOBUTTON | WS_GROUP,175,18,142,8
+    CONTROL         "Handwriting",IDC_OCRAREA_RADIO_HANDWRITING,"Button",BS_AUTORADIOBUTTON,175,29,142,8
+    GROUPBOX        "If no text is found",IDC_STATIC,169,45,153,36
+    CONTROL         "Discard attribute",IDC_OCRAREA_RADIO_CLEAR_IF_NONE_FOUND,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,175,55,140,11
+    CONTROL         "Retain original attribute",IDC_OCRAREA_RADIO_RETAIN_IF_NONE_FOUND,
+                    "Button",BS_AUTORADIOBUTTON,175,66,140,11
+END
+
+IDD_SPLITREGIONINTOCONTENTAREASPP DIALOGEX 0, 0, 388, 243
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    GROUPBOX        "Filter results",IDC_STATIC,6,3,375,97
+    LTEXT           "Minimum width of areas to be returned (units = average char width):",IDC_STATIC,18,16,222,8
+    EDITTEXT        IDC_EDIT_MINIMUM_WIDTH,246,14,36,12,ES_AUTOHSCROLL
+    LTEXT           "Minimum height of areas to be returned (units = average char height):",IDC_STATIC,18,32,228,8
+    EDITTEXT        IDC_EDIT_MINIMUM_HEIGHT,246,30,36,12,ES_AUTOHSCROLL
+    CONTROL         "Include areas based on well OCR'd text with this attribute type:",IDC_CHECK_INCLUDE_GOOD_OCR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,49,240,10
+    EDITTEXT        IDC_EDIT_GOOD_OCR_TYPE,286,47,88,12,ES_AUTOHSCROLL
+    CONTROL         "Include areas based on poorly OCR'd text or un-OCR'd markings with this type:",IDC_CHECK_INCLUDE_POOR_OCR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,65,264,10
+    EDITTEXT        IDC_EDIT_POOR_OCR_TYPE,286,64,88,12,ES_AUTOHSCROLL
+    LTEXT           "Treat text as well OCRed if the character confidence is at least:",IDC_STATIC,18,82,204,8
+    EDITTEXT        IDC_EDIT_OCR_THRESHOLD,224,80,24,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "%",IDC_STATIC,251,83,8,8
+    GROUPBOX        "Result properties",IDC_STATIC,6,105,375,132
+    CONTROL         "Exclude pixel content of lines from content areas",IDC_CHECK_USE_LINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,117,180,10
+    CONTROL         "If the text in the final area is not OCR'd well, attempt to re-OCR the area with handwriting recognition.",IDC_CHECK_RE_OCR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,133,342,10
+	LTEXT           "(May yield better results versus re-OCRing the original attribute's spatial region as a whole)",IDC_STATIC,28,144,296,8
+	CONTROL         "Include the area's OCR'd text as a true spatial sting in a grandchild attribute.",IDC_CHECK_OCR_AS_SUBATTRIBUTE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,18,159,342,10
+    EDITTEXT        IDC_EDIT_SUBATTRIBUTE_NAME,18,188,196,12,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_DEFAULT_TEXT,18,217,196,12,ES_AUTOHSCROLL
+    LTEXT           "Default content text value:",IDC_STATIC,18,206,114,8
+    LTEXT           "Sub-attribute name:",IDC_STATIC,18,176,114,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_LIMITASLEFTPARTPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 142
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 71
+    END
+
+    IDD_LIMITASMIDPARTPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 131
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 83
+    END
+
+    IDD_LIMITASRIGHTPARTPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 142
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 71
+    END
+
+    IDD_TRANSLATEVALUEPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 163
+    END
+
+    IDD_TRANSLATETOCLOSESTVALUEINLISTPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 224
+        BOTTOMMARGIN, 155
+    END
+
+    IDD_ADVANCEDREPLACESTRINGPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 247
+    END
+
+    IDD_PADVALUEPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 135
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_PROPPAGE_OCRAREA, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 322
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 135
+    END
+
+    IDD_SPLITREGIONINTOCONTENTAREASPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 381
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 235
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_UP             ICON                    "..\\..\\AFCore\\Code\\res\\icon_up.ico"
+IDI_ICON_DOWN           ICON                    "..\\..\\AFCore\\Code\\res\\icon_down.ico"
+IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\res\\icon_info.ico"
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+IDI_ICON_DYNAMIC_LIST   ICON                    "..\\..\\..\\..\\ReusableComponents\\COMComponents\\UCLIDCOMUtils\\Core\\Code\\res\\icon_dynamic_list.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFValueModifiers"
+    IDS_TITLELimitAsLeftPartPP "Title"
+    IDS_HELPFILELimitAsLeftPartPP "Help File Name"
+    IDS_DOCSTRINGLimitAsLeftPartPP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLELimitAsMidPartPP "LimitAsMidPart"
+    IDS_HELPFILELimitAsMidPartPP "Help File Name"
+    IDS_DOCSTRINGLimitAsMidPartPP "Your Help String"
+    IDS_TITLELimitAsRightPartPP "LimitAsRightPart"
+    IDS_HELPFILELimitAsRightPartPP "Help File Name"
+    IDS_DOCSTRINGLimitAsRightPartPP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLERemoveCharactersPP "RemoveCharacters"
+    IDS_HELPFILERemoveCharactersPP "Help File Name"
+    IDS_DOCSTRINGRemoveCharactersPP "Your Help String"
+    IDS_TITLEReplaceStringsPP "ReplaceStrings"
+    IDS_HELPFILEReplaceStringsPP "Help File Name"
+    IDS_DOCSTRINGReplaceStringsPP "Your Help String"
+    IDS_TITLETranslateValuePP "TranslateValue"
+    IDS_HELPFILETranslateValuePP "Help File Name"
+    IDS_DOCSTRINGTranslateValuePP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLETranslateToClosestValueInListPP "TranslateToClosestValueInList"
+    IDS_HELPFILETranslateToClosestValueInListPP "Help File Name"
+    IDS_DOCSTRINGTranslateToClosestValueInListPP "Your Help String"
+    IDS_TITLEAdvancedReplaceStringPP "AdvancedReplaceStringPP"
+    IDS_HELPFILEAdvancedReplaceStringPP "AdvancedReplaceStringPP"
+    IDS_DOCSTRINGAdvancedReplaceStringPP "AdvancedReplaceStringPP"
+    IDS_TITLEInsertCharactersPP "InsertCharactersPP"
+    IDS_HELPFILEInsertCharactersPP "InsertCharactersPP"
+    IDS_DOCSTRINGInsertCharactersPP "InsertCharactersPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEStringTokenizerModifierPP "StringTokenizerModifierPP"
+    IDS_HELPFILEStringTokenizerModifierPP "StringTokenizerModifierPP"
+    IDS_DOCSTRINGStringTokenizerModifierPP "StringTokenizerModifierPP"
+    IDS_TITLEChangeCasePP   "ChangeCasePP"
+    IDS_HELPFILEChangeCasePP "ChangeCasePP"
+    IDS_DOCSTRINGChangeCasePP "ChangeCasePP"
+    IDS_TITLEPadValuePP     "&Title"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFValueModifiers.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

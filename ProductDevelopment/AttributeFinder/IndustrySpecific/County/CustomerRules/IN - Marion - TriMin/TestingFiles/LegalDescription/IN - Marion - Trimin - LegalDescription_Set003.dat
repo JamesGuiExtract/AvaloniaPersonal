@@ -1,0 +1,6 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+//Top 80 Percent: 
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\ASMT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).LD.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTG;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).LD.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).LD.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTGR;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).LD.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav

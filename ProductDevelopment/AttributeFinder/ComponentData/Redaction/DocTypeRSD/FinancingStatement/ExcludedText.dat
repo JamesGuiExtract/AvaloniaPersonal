@@ -1,0 +1,1 @@
+(?:\bn/a\b|\bsame\b|applied\s*for|not\s*(?:required|appl)|.ppl.c.bl.|\babove\b|space|(?:one|n.ne|no.e|non)[\S\s]{0,10}(?:one|n.ne|no.e|non)|any\s*\S{0,2}\s*(?:none|\bna\b)|\sid(?:\s*\S\s*){0,4}none|do\s*not|\bnot\b|provide|needed)

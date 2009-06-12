@@ -1,0 +1,51 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,ROHL_ZERO_01,false
+
+	OR_END
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,ROHL_SURE_01,false
+		^RELEASE\s*OF\s*HOSPITAL\s*LIEN\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,ROHL_MAYBE_01,true
+
+	OR_END
+SCOPE_END
+
+[MAYBE_END]

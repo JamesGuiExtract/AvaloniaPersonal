@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueFinders.ExtractLinePP.1 = s 'ExtractLinePP Class'
+	{
+		CLSID = s '{8A00EEB4-9343-417C-A083-46E9219BDDD1}'
+	}
+	UCLIDAFValueFinders.ExtractLinePP = s 'ExtractLinePP Class'
+	{
+		CLSID = s '{8A00EEB4-9343-417C-A083-46E9219BDDD1}'
+		CurVer = s 'UCLIDAFValueFinders.ExtractLinePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8A00EEB4-9343-417C-A083-46E9219BDDD1} = s 'ExtractLinePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

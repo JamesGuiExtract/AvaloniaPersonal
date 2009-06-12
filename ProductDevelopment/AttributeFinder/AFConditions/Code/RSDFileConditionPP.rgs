@@ -1,0 +1,23 @@
+HKCR
+{
+	AFConditions.RSDFileConditionPP.1 = s 'RSDFileConditionPP Class'
+	{
+		CLSID = s '{BD0F7A85-B524-467A-B2E2-034F104777B7}'
+	}
+	AFConditions.RSDFileConditionPP = s 'RSDFileConditionPP Class'
+	{
+		CLSID = s '{BD0F7A85-B524-467A-B2E2-034F104777B7}'
+		CurVer = s 'AFConditions.RSDFileConditionPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BD0F7A85-B524-467A-B2E2-034F104777B7} = s 'RSDFileConditionPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

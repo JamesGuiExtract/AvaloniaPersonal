@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGeneralIV.IntegerInputValidator.1 = s 'IntegerInputValidator Class'
+	{
+		CLSID = s '{DA063302-E6BA-43E6-8084-8E3821ECBB69}'
+	}
+	UCLIDGeneralIV.IntegerInputValidator = s 'IntegerInputValidator Class'
+	{
+		CLSID = s '{DA063302-E6BA-43E6-8084-8E3821ECBB69}'
+		CurVer = s 'UCLIDGeneralIV.IntegerInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DA063302-E6BA-43E6-8084-8E3821ECBB69} = s 'IntegerInputValidator Class'
+		{
+			ProgID = s 'UCLIDGeneralIV.IntegerInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDGeneralIV.IntegerInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{203E8934-0C8B-4607-B2F5-84A9167B1107}'
+		}
+	}
+}

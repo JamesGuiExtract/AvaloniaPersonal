@@ -1,0 +1,134 @@
+// Test the intersection of two rectangles with the result got from AutoCAD
+// The CAD file can be found in the same folder
+
+//DESCRIPTION OF ONE TEST CASE
+//<TEST_CASE>;3A;-11263,-3412,-9364,-3412,632;-10212,-2538,-8670,-3163,940;105793
+// "<TEST_CASE>" IS THE HEADER OF A TEST CASE. "3A" IS THE TEST CASE ID
+// "-11263,-3412,-9364,-3412,632" IS THE STARTING POINT, END POINT AND HEIGHT
+// OF THE FIRST RECTANGLE
+//-"10212,-2538,-8670,-3163,940" IS THE STARTING POINT, END POINT AND HEIGHT
+// OF THE SECOND RECTANGLE
+// THE LAST NUMBER "105793" IS THE INTERSECTION AREA GOT FROM CAD
+
+
+// testcase ID     first rectangle        second rectangle     area from CAD
+
+////////////
+// Example 0 - two rectangle has no intersection
+////////////
+// Example 0A
+<TEST_CASE>;0A;-10878,6119,-9111,6840,468;-11254,5497,-9363,5233,468;0.0
+
+// Example 0B
+<TEST_CASE>;0B;-6891,5088,-6487,6954,468;-5929,5794,-4039,5530,468;0.0
+
+// Example 0C - second rectangle is inside the first rectangle
+<TEST_CASE>;0C;-2484,6176,-657,6176,1421;-1922,6108,-1036,6108,555;491730.0
+
+
+////////////
+// Example 1 - the intersection of the two rectangles is a point
+////////////
+// Example 1A
+<TEST_CASE>;1A;-11136,2555,-9407,2555,423;-10794,2940,-9964,3288,378;0.0
+
+// Example 1B
+<TEST_CASE>;1B;-6809,2851,-5978,3199,378;-5905,3237,-4176,3237,423;0.0
+
+// Example 1C
+<TEST_CASE>;1C;-2776,3237,-1047,3237,423;-925,3087,308,4099,387;0.0
+
+
+////////////
+// Example 2 - the intersection of the two rectangles is a line
+////////////
+// Example 2A 
+<TEST_CASE>;2A;-11327,364,-10309,364,378;-10309,314,-9318,314,477;0.0
+
+// Example 2B
+<TEST_CASE>;2B;-7212,346,-5996,346,340;-7212,-9,-5762,-9,370;0.0
+
+// Example 2C
+<TEST_CASE>;2C;-2872,-271,-982,-271,424;-2241,763,-2241,-59,628;0.0
+
+
+////////////
+// Example 3 - the intersection of the two rectangles is a triangle
+////////////
+// Example 3A
+<TEST_CASE>;3A;-11263,-3412,-9364,-3412,632;-10212,-2538,-8670,-3163,940;105793.8407627
+
+// Example 3B 
+<TEST_CASE>;3B;-7094,-2247,-4544,-2247,655;-6233,-3328,-4544,-2574,913;233965.0541504
+
+// Example 3C
+<TEST_CASE>;3C;-2723,-3532,-256,-2559,690;-1616,-2481,-383,-2481,487;299770.6313916
+
+
+////////////
+// Example 4 - the intersection of the two rectangles is a quadrangle
+////////////
+// Example 4A
+<TEST_CASE>;4A;-11263,-7389,-9364,-7389,632;-10481,-7014,-8820,-7106,940;500466.6183809
+
+// Example 4B
+<TEST_CASE>;4B;-7094,-6224,-4544,-6224,655;-6244,-6003,-5821,-7803,913;514422.4877809
+
+// Example 4C
+<TEST_CASE>;4C;-2723,-7509,-256,-6535,690;-1141,-6732,911,-6732,1426;656473.7084705
+
+// Example 4D
+<TEST_CASE>;4D;-12617,-10781,-8845,-10781,570;-11870,-10816,-9818,-10816,1426;1169657.8125
+
+// Example 4E - three edges of the second rectangle is overlapped with the first one
+<TEST_CASE>;4E;-7084,-10821,-3873,-10821,1284;-5479,-10821,-3873,-10821,1284;2062104.0
+
+// Example 4F
+<TEST_CASE>;4F;-1418,-10670,488,-10670,466;-937,-11534,81,-9924,466;256924.1762671
+
+
+////////////
+// Example 5 - the intersection of the two rectangles is a pentagon
+////////////
+
+// Example 5A 
+<TEST_CASE>;5A;13459,6351,15350,6087,468;13835,6119,15603,6840,468;359278.8836153
+
+// Example 5B 
+<TEST_CASE>;5B;17822,5088,18226,6954,468;17761,5860,19015,5860,790;356646.8807250
+
+// Example 5C 
+<TEST_CASE>;5C;22287,5649,24111,6211,468;22392,6001,24283,5737,468;490975.0501393
+
+
+////////////
+// Example 6 - the intersection of the two rectangles is a hexagon
+////////////
+
+// Example 6A 
+<TEST_CASE>;6A;13243,1884,14991,2880,913;13379,2442,14841,2442,1009;1193326.1767754
+
+// Example 6B 
+<TEST_CASE>;6B;17527,2746,19150,2746,428;18100,2529,19674,3243,423;351949.7875285
+
+// Example 6C 
+<TEST_CASE>;6C;21946,2911,23979,2911,882;22364,3364,23555,2501,767;936405.9373691
+
+
+////////////
+// Example 7 - the intersection of the two rectangles is a heptagon
+////////////
+
+// Example 7A 
+<TEST_CASE>;7A;13533,-1216,15215,-1216,1083;13006,-1865,15158,-953,978;1456658.1278576
+
+// Example 7B
+<TEST_CASE>;7B;16878,-1410,19166,-1410,1140;17007,-922,19265,-2219,921;1722158.9484285
+
+////////////
+// Example 8 - the intersection of the two rectangles is a octagon
+////////////
+// Example 8A
+<TEST_CASE>;8A;12944,-5217,15124,-5217,2050;13395,-4328,14687,-6083,2050;3718861.2357868
+
+// End of test cases

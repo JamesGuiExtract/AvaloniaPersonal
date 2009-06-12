@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDCOMUtils.MultipleObjSelectorPP.1 = s 'MultipleObjSelectorPP Class'
+	{
+		CLSID = s '{6781EC39-F065-4019-AB6A-64FBA17E9832}'
+	}
+	UCLIDCOMUtils.MultipleObjSelectorPP = s 'MultipleObjSelectorPP Class'
+	{
+		CLSID = s '{6781EC39-F065-4019-AB6A-64FBA17E9832}'
+		CurVer = s 'UCLIDCOMUtils.MultipleObjSelectorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6781EC39-F065-4019-AB6A-64FBA17E9832} = s 'MultipleObjSelectorPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

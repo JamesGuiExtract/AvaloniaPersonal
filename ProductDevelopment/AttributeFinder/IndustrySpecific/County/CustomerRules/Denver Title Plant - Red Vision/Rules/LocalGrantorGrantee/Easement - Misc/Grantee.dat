@@ -1,0 +1,18 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+Numbers=0|1|2|3|4|5|6|7|8|9
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\E\9900095674.tif.uss
+LocalGrantee01=constructing^40~facilities^40~under^3~[the]^3~supervision^3~[of]^40~[and]^3~[for]^3~[the]^?Grantee^120~[and]^3~other^3~good^3~[and]^3~valuable
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\E\9900095681.tif.uss
+LocalGrantee02=hereby^3~grant^3~convey^10~release^3~[to]^3~[the]^?Grantee^120~[a]^3~municipal
+
+[PATTERNS_END] 

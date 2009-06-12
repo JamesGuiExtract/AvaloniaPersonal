@@ -1,0 +1,54 @@
+// ParagraphTextHandlers.idl : IDL source for ParagraphTextHandlers.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ParagraphTextHandlers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(7F2B40B7-4A96-49E5-A184-3AAAE4D938B4),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR ParagraphTextHandlers 1.0 Type Library")
+]
+library UCLID_PARAGRAPHTEXTHANDLERSLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\\..\\..\\..\\..\\..\\..\\ReusableComponents\\COMComponents\\UCLIDComponentsLM\\COMLM\\Code\\COMLM.tlb");
+	importlib("..\\..\\Core\\SpotRecognitionIR.tlb");
+	importlib("..\\..\\..\\..\\..\\IFCore\\Code\\IFCore.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(13F0C1FB-F35C-4D63-9292-23288C0B17C0),
+		dual,
+		helpstring("IHighlightedTextWindowPTH Interface"),
+		pointer_default(unique)
+	]
+	interface IHighlightedTextWindowPTH : IDispatch
+	{
+		[id(1), helpstring("method SetInputManager")] HRESULT SetInputManager([in] IInputManager *pInputManager);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(4F0FBD42-A8B7-4DF1-BF1A-0165930ADD11),
+		helpstring("HighlightedTextWindowPTH Class")
+	]
+	coclass HighlightedTextWindowPTH
+	{
+		[default] interface IHighlightedTextWindowPTH;
+		interface IParagraphTextHandler;
+		interface ILicensedComponent;
+	};
+};

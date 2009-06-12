@@ -1,0 +1,135 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.2 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.2 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3021]</b> OCR of blank region
+	       	<ul>
+	      		<li>Exercise the rules file attached to SCR #3021.  An image link is provided.
+	      		<li>Confirm that an exception is not thrown during processing of the 
+			associated image.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3186]</b> Internal Error with VA - York - Unity rules
+	       	<ul>
+	      		<li>Make a local copy of the recent rules delivery for <b>VA - York - Unity</b>.
+	      		<li>Make a local copy of the associated <b>Day Forward</b> images.
+	      		<li>Confirm that the <b>HKCU/Software/Extract Systems/AttributeFinder/Settings/CacheRSD</b> 
+			registry key is set to 1.
+	      		<li>Queue and process the images for a few minutes, confirming that no unusual 
+			errors are seen.
+	      		<li>Modify the <b>HKCU/Software/Extract Systems/AttributeFinder/Settings/CacheRSD</b> 
+			registry key to 0.
+	      		<li>Queue and process the images again for a few minutes, confirming that no unusual 
+			errors are seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3194]</b> Loop Finder Validation
+	       	<ul>
+	      		<li>Create and configure a <b>Loop Finder</b> rule.
+	      		<li>Modify the rule settings to change the number of iterations to a non-numeric value.
+	      		<li>Confirm that the error is handled and displayed in an appropriate manner.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3198, #3199]</b> Files Installed to CommonComponents
+	       	<ul>
+	      		<li>Check the <b>CommonComponents</b> folder.
+		       	<ul>
+		      		<li>Should contain all EXEs and DLLs
+	      			<li>There should not be any other <b>Bin</b> subfolders
+	      			<li>The ID Shield report files should be found in the
+				<b>CommonComponents/FileProcessingComponents/Reports/Standard</b> folder.
+	       		</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3200]</b> RSD Files with Internal Use Only flag
+	       	<ul>
+	      		<li>Confirm that the Sanity test runs correctly for the <b>Rule Tester</b> 
+			utility application.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3201, #3202]</b> MICR Finder and Check Finder
+	       	<ul>
+	      		<li>Confirm that these two new <b>Value Finders</b> are available in the <b>Rule 
+			Set Editor</b>.  It may be necessary to run <b>Check For New Components</b>.
+	      		<li>Test these rule objects using the St Johns Set001 images.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3206]</b> Default location of Component Data folder
+	       	<ul>
+	      		<li>Confirm that the <b>ID Shield Testing</b> section of the Sanity test runs correctly.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4861, #4830]</b> Manual Zones
+	       	<ul>
+	      		<li>Make a local copy of the LA - Lafourche images from 
+			K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images.
+	      		<li>Confirm that OCR works properly for most or all of the images.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5115]</b> Image Format Converter for JPG Files
+	       	<ul>
+	      		<li>Exercise the <b>Image Format Converter</b> portion of the <b>Miscellaneous 
+			Utilities</b> testing checklist.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,200 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.5 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.5 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3093]</b> Ordering of attributes within Automated Ruleset Tester
+	       	<ul>
+	      		<li>Exercise the usual automated tests - confirm that the capture rate has not 
+			declined.
+	      		<li>Exercise zip file contents from <b>I:\Common\Testing\PVCS_Test\FlexIDSCore\3093</b>.
+		       	<ul>
+		      		<li>Exercise the TCL file from <b>Tests.zip</b> using TestHarness.exe.  
+				Confirm that the actual results match the expected results.  Note that 
+				it will not be a collection of perfect matches.
+		      		<li>Exercise the TCL file from <b>Tests2.zip</b> using TestHarness.exe.  
+				Confirm that the actual results match the expected results.  Note that 
+				it will not be a collection of perfect matches.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3195]</b> Loop Finder exceptions
+	       	<ul>
+	      		<li>Exercise the <b>Loop Finder</b> such that an exception is thrown by one of the 
+			components.  Confirm that descriptive exception information is provided.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3196]</b> Loop Preprocessor exceptions
+	       	<ul>
+	      		<li>Exercise the <b>Loop Preprocessor</b> such that an exception is thrown by one of the 
+			components.  Confirm that descriptive exception information is provided.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3201, #3202, #3222]</b> MICR Finder and Check Finder
+	       	<ul>
+	      		<li>Confirm that these two new <b>Value Finders</b> are available in the <b>Rule 
+			Set Editor</b>.  It may be necessary to run <b>Check For New Components</b>.
+	      		<li>Confirm that the associated automated tests pass.
+	      		<li>Test these rule objects using the St Johns Set001 images.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3211 - #3218, #3223]</b> Verification and Auto-redact Property Pages
+	       	<ul>
+	      		<li>Confirm that the <b>property pages</b> have changed in the following ways.
+		       	<ul>
+		      		<li><b>Metadata output</b> settings are configured in a separate dialog.
+		      		<li>The <b>Metadata output</b> settings include controls for the existing settings.
+			       	<ul>
+			      		<li>A pre-populated combo box for <b>Output version</b>.
+			      		<li>An edit box for <b>Name of metadata output file</b>.
+			      		<li>An associated <b>tag selector</b>.
+			      		<li>An associated <b>...</b> (Browse) button.
+			       	</ul>
+		      		<li><b>Feedback collection</b> settings are configured in a separate dialog.
+		      		<li><b>Image output</b> settings for verification are configured in a 
+				separate dialog.
+		      		<li><b>General settings</b> on the verification property page include a 
+				check box for <b>Require users to specify exemption codes for redactions</b>.
+		      		<li>The Verification property page includes a groupbox and Customize... button 
+				for <b>ID Shield Data File Location</b>.
+		      		<li>The <b>Verification</b> property page includes a button to configure 
+				<b>Redaction text and color settings</b>.
+		      		<li>The <b>Auto redaction</b> property page includes a button to configure 
+				<b>Redaction text and color settings</b>.
+		      		<li>The <b>Redaction text and color settings</b> dialog includes the 
+				following elements.
+			       	<ul>
+			      		<li>A group box for <b>Text to place in redaction zones</b>.
+			      		<li>A pre-populated combo box for <b>Redaction text</b>.
+			      		<li>An associated <b>tag selector</b>.
+			      		<li>An associated read-only edit box for <b>Sample text that uses 
+					the above pattern</b>.
+			      		<li>A group box for <b>Redaction colors</b>.
+			      		<li>A pre-populated combo box for <b>Border color</b>.
+			      		<li>A pre-populated combo box for <b>Fill color</b>.
+			      		<li>Color support for <b>Black</b> and <b>White</b>.
+			      		<li>A group box for <b>Preferred text size and font</b>.
+			      		<li>An associated read-only edit box that displays the font name and size.
+			      		<li>An associated <b>...</b> (Browse) button that displays a 
+					Font selection dialog.
+			      		<li>An associated label with <b>If text is too large to fit inside 
+					redaction zone, it will automatically be scaled to fit</b>.
+			       	</ul>
+		      		<li>Check boxes for <b>Data categories to redact</b> in the <b>Auto redaction</b> 
+				property page have been rearranged to save space.
+		      		<li>The <b>Auto redaction</b> property page includes a group box for 
+				<b>Redactions in output file</b>.
+		      		<li><b>Redactions in output file</b> settings includes radio buttons for 
+				<b>Retain any previously existing redactions in the output file</b> and 
+				<b>Output only redactions from this session</b> (the default).
+		       	</ul>
+	      		<li>Confirm that the various changes are stable and persistent.
+	      		<li><b>NOTE:</b> Complete functionality may not be implemented yet.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3221]</b> User License with ID Shield
+	       	<ul>
+	      		<li>Confirm that <b>User License</b> displays the expected version number for the 
+			ID Shield installation.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3244]</b> Automated Rule Tester and relative paths
+	       	<ul>
+	      		<li>Exercise the DAT file attached to the SCR.
+	      		<li>Confirm that the relative path is supported.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3246]</b> Licensing for Address Finder and Return Address Finder
+	       	<ul>
+	      		<li>Confirm that only an <b>ID Shield Server</b> license file is present.
+	      		<li>Check for new components.
+	      		<li>Confirm that an RSD file using <b>Address Finder</b> runs without error.
+	      		<li>Confirm that an RSD file using <b>Return Address Finder</b> runs without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3250]</b> Larger border for verification highlights
+	       	<ul>
+	      		<li>Confirm that selected redactions in verification always have a dashed 
+			border and grip handles.
+	      		<li>Confirm that the grip handles are located at the midpoints of the edges 
+			as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5086]</b> Extract Systems LM installation
+	       	<ul>
+	      		<li>Confirm that Extract Systems LM installs properly on <b>Vista</b>.
+	      		<li>Confirm that Extract Systems LM installs properly on <b>2008 Server</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5119]</b> Archive or Restore task
+	       	<ul>
+	      		<li>Exercise the <b>Archive or Restore Associated File</b> portion of the 
+			<b>FAM Processing Tasks</b> testing checklist.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5124]</b> FAM from DB Admin utility
+	       	<ul>
+	      		<li>Open a database that contains a space in the name using <b>FAM DB Admin</b>.
+	      		<li>Confirm that <b>Tools - File Action Manager</b> properly opens the FAM.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

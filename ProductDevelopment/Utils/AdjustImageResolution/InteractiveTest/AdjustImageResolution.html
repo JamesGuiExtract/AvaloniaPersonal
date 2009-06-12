@@ -1,0 +1,69 @@
+<HTML>
+
+<HEAD>
+<TITLE>Adjust Image Resolution Utility (AIR) - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Adjust Image Resolution Utility (AIR) - Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  	<li><h2>Basic Operation and Command-Line Arguments</h2></li>
+  	<ul>
+		<li>Get a local copy of <b>TooCoarse.tif</b> and <b>ThreeCoarsePages.tif</b> 
+		test images from <b>ProductDevelopment/Utils/AdjustImageResolution/InteractiveTest</b>.</li>
+		<li>Confirm that AIR requires a license file.</li>
+    		<li>Confirm that an error message is displayed if AIR executes with only 
+		two arguments.</li>
+    		<li>Confirm that an error message is displayed if AIR executes with four arguments.</li>
+    		<li>Confirm that an error message is displayed if AIR executes with six arguments.</li>
+    		<li>Create and confirm existence of a copy of the original <b>TooCoarse.tif</b> 
+		and <b>ThreeCoarsePages.tif</b> test images.</li>
+    		<li>Confirm that AIR supports infile, XResolution, and YResolution, arguments.</li>
+    		<li>Confirm that AIR supports the above arguments, plus maximum height and maximum 
+		width arguments in inches where format is: -Hn -Wn.</li>
+  	</ul></li>
+<br>
+  	<li><h2>Testing Conditions and Success Cases</h2></li>
+  	<ul>
+    		<li>Basic command-line is: <b>&ltfilename&gt 300 300</b>.</li>
+    		<li>Advanced command-line is: <b>&ltfilename&gt 300 300 -H12 -W9</b>.</li>
+    		<li>Confirm that OCR of <b>filename</b> before AIR execution yields an 
+		empty USS file.</li>
+    		<li>Confirm that OCR of <b>filename</b> after AIR execution yields a 
+		non-empty USS file.</li>
+    		<li>Confirm proper behavior for <b>TooCoarse.tif</b>.</li>
+    		<li>Confirm proper behavior for <b>ThreeCoarsePages.tif</b>.</li>
+    		<li>Confirm proper behavior for <b>TooCoarse.tif</b> with -H12 and 
+		-W0 parameters.</li>
+    		<li>Confirm proper behavior for <b>TooCoarse.tif</b> with -H0 
+		and -W9 parameters.</li>
+    		<li>Confirm proper behavior for <b>TooCoarse.tif</b> without -H12 
+		and -W9 parameters.</li>
+  	</ul></li>
+<br>
+  	<li><h2>Error Cases</h2></li>
+  	<ul>
+    		<li>Confirm usage dialog displayed for <b>TooCoarse.tif</b> with -H0 
+		and -W0 parameters.</li>
+    		<li>Confirm empty USS file for <b>TooCoarse.tif</b> with only 100 
+		and 100 parameters.</li>
+    		<li>Confirm empty USS file for <b>TooCoarse.tif 100 100 -H12 -W9</b>.</li>
+    		<li><b>[LegacyRCAndUtils #5009]</b>
+    		<ul>
+    			<li>Examine the image attached to the SCR.
+    			<li>Confirm that the image resolution is <b>300x300</b> on the first pages.
+    			<li>Confirm that the image resolution is <b>96x96</b> on the last page.
+    			<li>Use Adjust Image Resolution to set the resolution to <b>300x300</b>
+    			<li>Confirm that <b>each</b> page now has the expected resolution.
+    		</ul>
+  	</ul></li>
+  	
+</ol>
+</body>
+</html>

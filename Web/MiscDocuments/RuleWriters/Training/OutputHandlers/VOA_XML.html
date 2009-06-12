@@ -1,0 +1,115 @@
+<HTML>
+	<HEAD>
+		<TITLE>VOA and XML Output Handlers</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Output to VOA and XML</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>It is often useful to store the data found by the rules in an output file.</li>
+			<li>There are two different types of output files: .xml files and .voa files.</li>
+				<ul>
+					<li>The <b>Output data to XML file</b> output handler is used to output the data found by the rules into an .xml file.</li>
+					<li>The <b>Output data to VOA file</b> output handler is used to output the data found by the rules into an .voa file.</li>
+				</ul>
+			</li>
+			<li>These two output handlers are generally the last object in the rules.</li>
+			<li>In general, these output handlers are used to output one .xml and/or .voa file per image.</li>
+		</ul>
+		<hr>
+		<h3>Output Data to XML File</h3>
+		<ul>
+			<li>This output handler outputs the data found by the rules into an .xml file.</li>
+			<li>This .xml file is often used by customers to feed in the found data into their own custom applications.</li>
+			<li>To use this output handler you must first specify the file name of the output file.
+				<ul>
+					<li>You can use the tags that you learned earlier to specify a relative path.</li>
+					<li>Make sure you give the file a .xml extension!</li>
+				</ul>
+			</li>
+			<li>Next, you must specify what Version of XML output that you want.
+				<ul>
+					<li>Version 1 XML
+					<li>Version 2 XML
+						<ul>
+							<li>Version 2 XML can be formatted by attribute name.</li>
+							<li>You can include a schema name in Version 2 XML.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>It is generally recommended that you use Version 2 xml formatted with attribute names.</li>
+			<p>
+				<li><b>Example</b>:
+					<ul>
+						<li>Add an <b>Output Data to XML File</b> that outputs Version 1 XML to<i>&ltSourceDocName&gt.xml </i>to <b>Output.rsd</b>.  Run the rules on <b>TestImage001.tif</b>.</li>
+						<li>Note how an .xml file is created.  Open the .xml file and examine it.</li>
+						<li>Change the output handler to output a Version 2 XML file that is formatted by attribute name to <i>&ltSourceDocName&gt2.xml. </i> Run the rules again and compare the two xml files.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+		<h3>Output Data to VOA File</h3>
+		<ul>
+			<li>This output handler outputs the data found by the rules into an .voa file.</li>
+			<li>To use this output handler you only need to specify the file name of the output file.
+				<ul>
+					<li>You can use the tags that you learned earlier to specify a relative path.</li>
+					<li>Make sure you give the file a .voa extension!</li>
+				</ul>
+			</li>
+						<p>
+			<li><b>Example</b>:
+					<ul>
+						<li>Add an <b>Output Data to VOA File</b> that outputs to <i>&ltSourceDocName&gt.voa </i>to <b>Output.rsd</b>.  Run the rules on <b>TestImage001.tif</b></li>
+						<li>Note how a .voa file is created.  Open the .voa file and examine it.</li>
+					</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>The Execute Rules Task</h3>
+		<ul>
+			<li>You can generate .voa or .xml files for a large number of images using the <b>Execute Rules</b> task.</li>
+			<li>To use the execute rules task you will need to specify the .rsd file that you want to execute.</li>
+			<li>If you created .uss files for the images earlier, you can choose to use the pre-existing .uss files.</li>
+			<li>If you did not create .uss files for the images earlier, you can choose to create .uss files while the rules are run on the images.</li>
+			<p>
+				<li><b>Example</b>:
+					<ul>
+						<li>Add an <b>Output Data to VOA File</b> that outputs to <i>&ltSourceDocName&gt.voa </i>to <b>Output.rsd</b>.</li>
+						<li>Queue up <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b> in a new action in a new database.</li>
+						<li>Add an <b>Execute Rules</b> task and execute <b>Output.rsd</b>.</li>
+						<li>Click the "Play" button. Note that as each document finishes processing the .voa files appears.</li>
+					</ul>
+				</li>
+			</p>
+			<li>These output .voa files have two main uses for rule writing:
+				<ul>
+					<p>
+						<li>They can be used to pre-populate the verification window when using the <b>Verify Redactions</b> task.</li>
+						<li><b>Example</b>:
+							<ul>
+								<li>Replace the <b>Execute Rules</b> task with a <b>Verify redactions</b> task.</li>
+								<li>Set that status of the files in the database to "Pending" and then begin processing. Note how the redactions stored in the .voa files are now displayed in the verification window.</li>
+							</ul>
+						</li>
+						<li>By default, the verification window accepts only attributes named <i>HCData</i>, <i>MCData</i>, <i>LCData</i>, and <i>Clues</i>.</li>
+					</p>
+					<p>
+						<li>They can be compared to the Expected Redaction .voa files using the Test Harness.</li>
+						<li><b>Example</b>:
+							<ul>
+								<li>Set up a .tcl file and a .dat file to test <b>Output.rsd</b> on <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b>. Make sure that the third token points to <i>&ltSourceDocName&gt.voa</i>.</li>
+								<li>Run the .tcl file.  Note how the Expected Redactions are compared to the output .voa files rather than taking the time to run the rules on each document.</li>
+							</ul>
+						</li>
+					</p>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

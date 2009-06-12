@@ -1,0 +1,66 @@
+// Basic test cases for address splitting
+// Note that comment lines should be removed
+// by the RSD file
+
+// No info lines
+John One and Jane One
+123 Main Street
+Madison, WI  53704
+
+// Two-line address
+John Two and Jane Two
+123 Main Street, 
+Apartment 321
+Madison, wi  53704
+
+// Zip on single line
+John Three and Jane Three
+14422 Division Lane 
+Madison, Wisconsin
+53705
+
+// Two word state
+John Four and Jane Four
+14422 Maple Court 
+Morgantown, 
+West Virginia 41234-3322
+
+// Three word city
+Mr. John Five Jr
+1234 University Ave, Apt 2B 
+East Grand Forks, MN 56711-1234
+
+// Just leading digits for address line
+Howard Hughes
+W123 N456 Jamison
+Hollywood, California  91122
+
+// Just street type
+Mickey Mouse
+Walt Disney Street
+Hollywood, California  91122
+
+// Just Post Office Box
+Gerald Ford
+P O Box 22
+Lansing, Michigan  62211
+
+// Check for Attention
+UCLID Software
+Attention: Human Resources
+8383 Greenway Blvd, #500
+Middleton, WI  53562
+
+// Check for Attn
+UCLID Software
+Attn Human Resources
+8383 Greenway Blvd, #500
+Middleton, WI  53562
+
+// Check for Return To
+Return To:
+Human Resources
+UCLID Software
+8383 Greenway Blvd, #500
+Middleton, WI  53562
+

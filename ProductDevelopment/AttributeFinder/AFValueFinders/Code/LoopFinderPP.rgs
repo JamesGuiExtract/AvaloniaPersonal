@@ -1,0 +1,25 @@
+HKCR
+{
+	UCLID_AFVALUEFINDERSLib.LoopFinderPP.1 = s 'LoopFinderPP Class'
+	{
+		CLSID = s '{5B81790B-FA5D-40DD-9BD7-802420B44933}'
+	}
+	UCLID_AFVALUEFINDERSLib.LoopFinderPP = s 'LoopFinderPP Class'
+	{
+		CLSID = s '{5B81790B-FA5D-40DD-9BD7-802420B44933}'
+		CurVer = s 'UCLID_AFVALUEFINDERSLib.LoopFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5B81790B-FA5D-40DD-9BD7-802420B44933} = s 'LoopFinderPP Class'
+		{
+			ProgID = s 'UCLID_AFVALUEFINDERSLib.LoopFinderPP.1'
+			VersionIndependentProgID = s 'UCLID_AFVALUEFINDERSLib.LoopFinderPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

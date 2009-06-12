@@ -1,0 +1,57 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+GrantsKeyword=[grant]|[grants]|[granted]|[assign]|[assigns]|[assigned]|[transfer]|[transfers]|[transferred]|[sell]|[sells]|[sold]|[bargain]|[bargains]|[bargained]|[convey]|[conveys]|[conveyed]|[deliver]|[delivers]|[delivered]|set over|sets over
+
+UntoKeyword=[unto:|[to:|[unto :|[to :|[unto]|[to]|[t0]
+//Digits=0123456789
+Numbers=0|1|2|3|4|5|6|7|8|9
+Transfer=transfer
+Months=January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|Jun|Jul|Aug|Sep|Oct|Nov|Dec
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample\s*Files\DTS\NV\s*-\s*Clark\Set001\Images\Lien\200406290000958.tif
+LIEN_GRANTOR_00=notice^24~given^3~that^?Grantor^80~hereby claims|claims^8~lien
+LIEN_GRANTOR_0a=notice^24~given^360~inclusive^?Grantor^80~hereinafter^60~claimant
+LIEN_GRANTOR_0b=given^3~that^?Grantor^80~[has^3~rendered^24~hospit
+//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Mechanic Lien\200406300003799.tif
+LIEN_GRANTOR_0B=Pursuant^160~inclusive^?Grantor^120~herein^32~referred|Claimant
+LIEN_GRANTOR_01=Obligee/Claimant:^?Grantor^80~\r\n
+// 0001.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06172AA.AFL.TIF.uss
+LIEN_GRANTOR_02=Board^12~Directors^5~[of]^?Grantor^120~[has]^5~authorized^54~commencement|action
+
+// 0010.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06179AA.AFJ.TIF.uss
+LIEN_GRANTOR_03a=NOTICE|HEREBY|GIVEN^24~[that]^40~@Months^10~@Numbers^3~ |,^6~@Numbers^3~,| |\r\n^?<Grantor^160~first^5~provided
+// 0002.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06172AA.AH0.TIF.uss
+LIEN_GRANTOR_03=NOTICE|HEREBY|GIVEN^24~[that]^40~@Months^10~@Numbers^3~,| |\r\n^?<Grantor^160~first^5~provided
+
+// 0003.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06172AA.AKX.TIF.uss
+// 0008.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06178AA.GMM.TIF.uss
+// 0007.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FTS.TIF.uss
+LIEN_GRANTOR_04=undersigned^50~sworn|deposes|states^50~agent|attorney|manager^12~[for]^?Grantor^240~[and]|that^36~duly|authorized
+
+// 0004.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06174AA.AG0.TIF.uss
+LIEN_GRANTOR_05=attorney|agent|manager^5~[for]^?Grantor^240~[and]^15~authorized^8~make
+
+// 0005.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FSC.TIF.uss
+LIEN_GRANTOR_06=This^16~Lien^28~made^5~[by]^?Grantor^160~[under]^10~terms
+
+// 0006.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FTN.TIF.uss
+LIEN_GRANTOR_07=[law]^5~[firm]^?Grantor^160~[hereby^5~[claim^9~attorney^9~[lien]|[lein]
+
+// 0009.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06180AA.CRZ.TIF.uss
+LIEN_GRANTOR_08A=pursuant^60~statutes^?Grantor^160~[claims]^36~[Lien]|[lein]
+LIEN_GRANTOR_08=[notice]^18~[given]^5~[that]^?Grantor^160~[claims]^36~[Lien]|[lein]
+
+LIEN_GRANTOR_09=[notice]^18~[given]^5~[that]^50~[Lien]|[Lein]^5~claimant^?Grantor^160~[first]^5~[provided]
+//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Lien\200406290002538.tif.uss
+LIEN_GRANTOR_10=records of|official records^48~Nevada^?Grantor^120~[has^6~a lien|lien
+//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Lien\200406290002549.tif
+LIEN_GRANTOR_11=executed by^?Grantor^120~and affecting|affecting
+[PATTERNS_END]

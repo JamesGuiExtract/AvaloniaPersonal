@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDExceptionMgmt.COMUCLIDException.1 = s 'COMUCLIDException Class'
+	{
+		CLSID = s '{FC391C54-6F67-436E-B7C5-DA799737752E}'
+	}
+	UCLIDExceptionMgmt.COMUCLIDException = s 'COMUCLIDException Class'
+	{
+		CLSID = s '{FC391C54-6F67-436E-B7C5-DA799737752E}'
+		CurVer = s 'UCLIDExceptionMgmt.COMUCLIDException.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FC391C54-6F67-436E-B7C5-DA799737752E} = s 'COMUCLIDException Class'
+		{
+			ProgID = s 'UCLIDExceptionMgmt.COMUCLIDException.1'
+			VersionIndependentProgID = s 'UCLIDExceptionMgmt.COMUCLIDException'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{454F2387-F8A9-4F64-9A5E-7B06784E8751}'
+		}
+	}
+}

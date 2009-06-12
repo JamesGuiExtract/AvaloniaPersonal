@@ -1,0 +1,184 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.0.0.77 Patch C Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.0.0.77 Patch C Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>Patch C Changes</b>
+	       	<ul>
+  	   		<LI><b>[FlexIDSCore #3073, #3076]</b> FAM and Test Harness crash 
+	       		<ul>
+	      			<li>Exercise <b>#3073</b> using 6.0.0.77 + Patch B 
+				and confirm the crash.</li>
+	      			<li>Exercise <b>#3076</b> using 6.0.0.77 + Patch B 
+				and confirm the crash.</li>
+<p>
+	      			<li>Apply <b>Patch C</b>.</li>
+	      			<li>Confirm that <b>#3073</b> runs without a crash.</li>
+	      			<li>Confirm that <b>#3076</b> runs without a crash.</li>
+		       	</ul>
+<p>
+  	   		<LI><b>Processing Rate Impact</b>
+	       		<ul>
+	      			<li>This test can be used to satisfy a <b>Sanity Test</b> 
+				item listed below.</li>
+	      			<li>Exercise <b>PA - Mercer - Cott</b> rules using 
+				6.0.0.77 + Patch B and the <b>Sanity Test</b> 
+				images.  Note the processing time.</li>
+<p>
+	      			<li>Apply <b>Patch C</b> to the test machine used 
+				above.</li>
+	      			<li>Exercise <b>PA - Mercer - Cott</b> rules using 
+				the <b>Sanity Test</b> images.  Note the 
+				processing time.</li>
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>Patch B Changes</b>
+	       	<ul>
+	  	   	<LI><b>[FlexIDSCore #2795, #2884, #3004, #3005, #3018, #3040, 
+			#3041, #3068, #3069]</b> Box Finder and Line Finder
+	       		<ul>
+	      			<li>Exercise <b>Box Finder</b> automated test from 
+				<b>RDT</b> patch.</li>
+		      		<li>Exercise <b>Line Finder</b> automated test from 
+				<b>RDT</b> patch.</li>
+	      			<li>Confirm proper <b>PA - Mercer - Cott</b> 
+				capture rate.  Also confirm that no unusual delay or 
+				memory usage is seen.</li>
+		       	</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #2744, #3066, #3069]</b> Box Finder 
+			and Line Finder
+	       		<ul>
+	      			<li>Exercise <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2744</b> included
+				image with included rule. 
+				<ul>
+					<li>Ensure processing takes no more than 
+					10 seconds.</li>
+					<li>Ensure the resulting attribute encompasses 
+					the signature area of the page.</li>
+				</ul>
+				<li>Exercise <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3066</b> included
+				image with included rule.</li>
+				<ul>
+					<li>Ensure processing takes no more than 20 seconds.
+					(No attributes will be found)</li>
+					<li>Verify an exception was logging indicating 
+					results may not be complete</li>
+				</ul>
+				<li>Exercise <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3069</b> included
+				image with included rule.  
+				<ul>
+					<li>Ensure no exceptions are generated.
+					(No attributes will be found)</li>
+				</ul>
+	       		</ul>
+<p>
+  	   		<LI><b>[LegacyRC #4411, #4982]</b> USB License Key Manager updates 
+	       		<ul>
+	      			<li>Exercise <b>User Key Generator</b> portion of 
+				<b>Public Licensing Applications</b> checklist below.</li>
+		       	</ul>
+	       	</ul>
+<p>
+  		<LI><b>Patch A Changes</b>
+	       	<ul>
+	      		<li><b>[FlexIDSCore #3046]</b> - Exercise <b>ID Shield</b> 
+			checklist below.</li>
+	      		<li><b>[LegacyRC #4966, #4967]</b> - Exercise <b>Set File 
+			Action Status</b> portion of <b>File Processors</b> 
+			checklist below.</li>
+	      		<li><b>[LegacyRC #4969]</b> - Exercise <b>Sleep.exe</b> 
+			via Launch Application and confirm that delay occurs without 
+			display of a DOS window.</li>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing and Analysis Results</h3>
+       	<ul>
+  	   	<LI>Automated Tests - after application of <b>RDT</b> patch
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+<p>
+      		<li><u>FLEX Index - Analysis Results</u></li>
+	       	<ul>
+	      		<li>MI - Washtenaw - ACS : Basic</li>
+	      		<li>MN - Scott - Trimin : Lots of fields</li>
+	       	</ul>
+<p>
+      		<li><u>ID Shield - Analysis Results</u></li>
+	       	<ul>
+	      		<li>IN - Districts - ACS : Basic and bland</li>
+	      		<li>LA - East Baton Rouge - ACS : Handwriting rules and re-OCR</li>
+	      		<li>MA - Secretary of Commonwealth : PDFs </li>
+	      		<li>NY - Secretary of State ( sets 1 and 3 ) : Lots of fields</li>
+	      		<li>PA - Mercer - Cott : Specific test for Patch B</li>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<li><h3>Demo Applications & Utilities Checklists</h3></li>
+	<UL>
+          	<LI><a href="../IDShieldTesting.html">ID Shield</a></LI>
+          	<LI><a href="../../IndustrySpecific/Redaction/InteractiveTest/IDShieldObjects.html">ID Shield Objects</a></LI>
+		<LI><a href="../../../../ReusableComponents/InputFunnel/InputReceivers/SpotRecognitionIR/InteractiveTest\SpotRecognition.html">Spot Recognition Window</a></LI>
+<p>
+          	<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessFilesTasks.html">File Processors (partial - see above)</a></LI>
+          	<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDComponentsLM/Testing/PublicLicensing.html">Public Licensing Applications (partial - see above)</a></LI>
+	</UL>
+<p>
+	<LI><h3>Installation of Patch</h3>
+       	<ul>
+          	<li>Confirm successful installation on 32-bit Windows XP.</li>
+          	<li>Confirm successful installation on 64-bit Windows XP.</li>
+          	<li>Confirm successful installation on 32-bit Windows Vista.</li>
+          	<li>Confirm successful installation on 64-bit Windows Vista.</li>
+<p>
+          	<li>Confirm successful installation on 32-bit Windows 2003 Server.</li>
+          	<li>Confirm successful installation on 64-bit Windows 2003 Server.</li>
+          	<li>Confirm successful installation on 32-bit Windows 2008 Server.</li>
+          	<li>Confirm successful installation on 64-bit Windows 2008 Server.</li>
+<p>
+          	<li>Confirm that the correct version number and patch letter are displayed 
+		in the <b>About Rule Tester</b> dialog.</li>
+	</ul>
+	</LI>
+<P>
+	<LI><h3>General Stability Testing</h3>
+	<h2>Basic Stability</h2>
+		<ul>
+			<LI><a href="../SanityTests/SanityTests.html">FAM Sanity Tests (#22)</a></LI>
+		       	<ul>
+          			<li>32-bit Windows XP</li>
+		          	<li>32-bit Windows Vista</li>
+		          	<li>32-bit Windows 2003 Server</li>
+          			<li>64-bit Windows 2003 Server</li>
+			</ul>
+<p>
+         		<li><a href="../StabilityTesting/PDF_Stability.html">PDF Testing (#31) 
+			- ID Shield</a> with duration &gt;= 1 day</li>
+		</ul>						 
+<p>
+	<h2>Endurance Testing ( ID Shield - 5+ days )</h2>
+		<ul>
+         		<li><a href="../EnduranceTesting/EnduranceTests.html">Instructions</a></li>
+			<li>Use <b>PA - Mercer - Cott</b> rules and images.</li> 
+			<li>Include original Set001 image set, new Set002 image set, and specific
+			images that were known to cause issues in unpatched testing.</li> 
+		</ul>
+	</LI>
+</OL>
+</BODY>
+</HTML>

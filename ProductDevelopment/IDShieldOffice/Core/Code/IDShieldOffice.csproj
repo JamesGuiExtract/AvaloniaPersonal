@@ -1,0 +1,402 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{66DF381F-FDBB-4983-ACAD-D8D433452D69}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>IDShieldOffice</RootNamespace>
+    <AssemblyName>IDShieldOffice</AssemblyName>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\RC.Net\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+    <ApplicationIcon>Resources\IDShieldOffice.ico</ApplicationIcon>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\binaries\debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\binaries\debug\IDShieldOffice.XML</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\binaries\release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>..\..\..\..\binaries\release\IDShieldOffice.XML</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Leadtools, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Annotations, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Bmp, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Bmp.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Cal, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Cal.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Cmp, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Cmp.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Eps, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Eps.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Fax, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Fax.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Gif, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Gif.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Pcx, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Pcx.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Pdf, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Png, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Png.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Psd, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Psd.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Raw, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Raw.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Tif, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Tif.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Wmf, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Wmf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Kernel.Annotations, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Kernel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Pdf, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="SandDock, Version=3.0.3.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\RC.Net\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutIDShieldOfficeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutIDShieldOfficeForm.Designer.cs">
+      <DependentUpon>AboutIDShieldOfficeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatesNumberFormat.cs" />
+    <Compile Include="BatesNumberGenerator.cs" />
+    <Compile Include="BatesNumberManager.cs" />
+    <Compile Include="BatesNumberManagerAppearancePropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BatesNumberManagerAppearancePropertyPage.Designer.cs">
+      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatesNumberManagerFormatPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BatesNumberManagerFormatPropertyPage.Designer.cs">
+      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatesNumberManagerPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BatesNumberManagerPropertyPage.Designer.cs">
+      <DependentUpon>BatesNumberManagerPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BracketedTextRule.cs" />
+    <Compile Include="BracketedTextRulePropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BracketedTextRulePropertyPage.Designer.cs">
+      <DependentUpon>BracketedTextRulePropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DataTypeRule.cs" />
+    <Compile Include="DataTypeRulePropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="DataTypeRulePropertyPage.Designer.cs">
+      <DependentUpon>DataTypeRulePropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FindResult.cs" />
+    <Compile Include="IDShieldOfficeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IDShieldOfficeForm.Designer.cs">
+      <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IDShieldOfficeForm_EventHandlers.cs">
+      <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IDShieldOfficeRuleForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="IDShieldOfficeRuleForm.Designer.cs">
+      <DependentUpon>IDShieldOfficeRuleForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="IIDShieldOfficeRule.cs" />
+    <Compile Include="MatchResult.cs" />
+    <Compile Include="ModificationHistory.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="RegistryManager.cs" />
+    <Compile Include="UserPreferences.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="BracketedTextRulePropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>BracketedTextRulePropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DataTypeRulePropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>DataTypeRulePropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IDShieldOfficeForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>IDShieldOfficeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IDShieldOfficeRuleForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>IDShieldOfficeRuleForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="WordOrPatternListRulePropertyPage.resx">
+      <DependentUpon>WordOrPatternListRulePropertyPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Settings.cs" />
+    <Compile Include="UserPreferencesPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserPreferencesPropertyPage.Designer.cs">
+      <DependentUpon>UserPreferencesPropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WordOrPatternListRulePropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="WordOrPatternListRulePropertyPage.Designer.cs">
+      <DependentUpon>WordOrPatternListRulePropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WordOrPatternsListRule.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AddBatesNumber.png" />
+    <None Include="Resources\FindBracketedText.png" />
+    <None Include="Resources\FindDataTypes.png" />
+    <None Include="Resources\FindWords.png" />
+    <None Include="Resources\LayerObjectProperties.png" />
+    <None Include="Resources\ShowHideLayers.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\RC.Net\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Encryption\Core\Code\Extract.Encryption.vcproj">
+      <Project>{C79815C7-A80A-41AA-AB02-F6AC83EFA579}</Project>
+      <Name>Extract.Encryption</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Imaging\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj">
+      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
+      <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>False</Private>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <Private>False</Private>
+    </COMReference>
+    <COMReference Include="UCLID_SSOCRLib">
+      <Guid>{C0F50AC4-62B2-4D15-A26F-404FEC1D58B2}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AboutIDShieldOfficeForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>AboutIDShieldOfficeForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BatesNumberManagerAppearancePropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BatesNumberManagerFormatPropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BatesNumberManagerPropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>BatesNumberManagerPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Splash.bmp" />
+    <EmbeddedResource Include="UserPreferencesPropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>UserPreferencesPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CheckAllButton.png" />
+    <None Include="Resources\FindDataTypesSmall.png" />
+    <None Include="Resources\AddBatesNumberSmall.png" />
+    <None Include="Resources\AngularRedactionButtonSmall.png" />
+    <None Include="Resources\DeleteSelectionButtonSmall.png" />
+    <None Include="Resources\FindBracketedTextSmall.png" />
+    <None Include="Resources\FindWordsSmall.png" />
+    <None Include="Resources\FitToPageButtonSmall.png" />
+    <None Include="Resources\FitToWidthButtonSmall.png" />
+    <None Include="Resources\FirstPageButtonSmall.png" />
+    <None Include="Resources\IDShieldOffice.ico" />
+    <None Include="Resources\OpenImageButtonSmall.png" />
+    <None Include="Resources\ShowHideLayersSmall.png" />
+    <None Include="Resources\LayerObjectPropertiesSmall.png" />
+    <None Include="Resources\NextLayerObjectButtonSmall.png" />
+    <None Include="Resources\PreviousLayerObjectButtonSmall.png" />
+    <None Include="Resources\RotateCounterclockwiseButtonSmall.png" />
+    <None Include="Resources\RotateClockwiseButtonSmall.png" />
+    <None Include="Resources\LastPageButtonSmall.png" />
+    <None Include="Resources\NextPageButtonSmall.png" />
+    <None Include="Resources\PreviousPageButtonSmall.png" />
+    <None Include="Resources\PreviousTileButtonSmall.png" />
+    <None Include="Resources\NextTileButtonSmall.png" />
+    <None Include="Resources\ZoomWindowButtonSmall.png" />
+    <None Include="Resources\ZoomPreviousButtonSmall.png" />
+    <None Include="Resources\ZoomNextButtonSmall.png" />
+    <None Include="Resources\ZoomOutButtonSmall.png" />
+    <None Include="Resources\ZoomInButtonSmall.png" />
+    <None Include="Resources\SaveImageButtonSmall.png" />
+    <None Include="Resources\IDSOLogo.png" />
+    <None Include="Resources\IDSOLogo.bmp" />
+    <None Include="Resources\UncheckAllButton.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

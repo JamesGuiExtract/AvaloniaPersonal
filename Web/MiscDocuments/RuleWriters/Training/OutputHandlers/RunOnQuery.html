@@ -1,0 +1,73 @@
+<HTML>
+	<HEAD>
+		<TITLE>Run Object On Query</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Run Object On Query Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Run Object On Query output handler is used to run an Attribute Modifier, Output Handler, or Attribute Splitter on a specified attribute or sub-attribute.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Run Object On Query output handler, you must first query the attributes that you wish to run the selected object on.
+				<ul>
+					<li>To query a single attribute, simply enter that attribute's name into the query box.</li>
+					<li>To query multiple attributes, enter each attribute's name separated by |'s.
+						<ul>
+							<li><i>PhoneNumber|Name</i> will run the selected rule object on both the <i>PhoneNumber</i> and <i>Name</i> attributes.</li>
+						</ul>
+					</li>
+					<li>To query a sub-attribute, enter the query as <i>AttributeName/SubattributeName</i>.
+						<ul>
+							<li><i>Name/Middle</i> will run the selected rule object on the <i>Middle</i> sub-attribute of <i>Name</i>.</li>
+						</ul>
+					</li>
+					<li>To query an attribute with a certain type, enter the query as <i>AttributeName@AttributeType</i> 
+						<ul>
+							<li><i>Name@Buyer</i> will run the selected rule object on the <i>Name</i> attribute if it has a type of <i>Buyer</i>.</li>
+						</ul>
+					</li>
+					<li>To query an attribute only if it has a certain sub-attribute, enter the query as <i>AttributeName{/SubattributeName}</i>.
+						<ul>
+							<li><i>PhoneNumber{/AreaCode}</i> will run the selected rule object on the <i>PhoneNumber</i> attribute only if it has an <i>AreaCode</i> sub-attribute.</li>
+						</ul>
+					</li>
+					<li>To query all attributes, enter * as the query
+						<ul>
+							<li><i>Name/*</i> will run the selected rule object on the all of the sub-attributes of <i>Name</i>.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>You can select the category of rule object that you want by using the drop down menu labeled <b>Select a type of object:</b></li>
+			<li>You can select the type of rule object that you want by using the drop down menu labeled <b>Select an object to run on the selected attribute:</b></li>
+			<li>You must configure the selected rule object.</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<p>
+				<li>Open <b>RemoveCharacters.rsd</b> and run it on <b>RemoveCharacters.txt</b>. Note that this .rsd file finds both names and dollar amounts.</li>
+					<ul>
+						<li>We want to remove the periods from the names without removing the decimal points from the dollar amounts.</li>
+						<li>Add a Remove Characters output handler that removes periods.  Run the rules and note that the periods are removed from both the names and the dollar amounts.</li>
+						<li>Remove the previous output handler and add a Run Object on Query output handler that queries the attribute <i>Name</i>.  Have the query execute a Remove Characters output handler that removes periods.</li>
+						<li>Run the rules.  Note that the periods are now only removed from the names.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li>Open <b>Names.rsd</b> and run it on <b>Names.txt</b>.</li>
+					<ul>
+						<li>Add a Run Object On Query output handler to the current Select Multiple Output Handlers output handler that will capitalize the data in the <i>First</i> sub-attribute of the <i>Name</i> attribute without capitalizing the data in the <i>Middle</i> or <i>Last</i> sub-attributes.</li>
+					</ul>
+				</li>
+			</p>
+		</ol>
+		<hr>
+	</BODY>
+</HTML>

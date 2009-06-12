@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.COMMutex.1 = s 'COMMutex Class'
+	{
+		CLSID = s '{4897CD96-0E80-4343-8727-3478FDB13523}'
+	}
+	UCLIDCOMUtils.COMMutex = s 'COMMutex Class'
+	{
+		CLSID = s '{4897CD96-0E80-4343-8727-3478FDB13523}'
+		CurVer = s 'UCLIDCOMUtils.COMMutex.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4897CD96-0E80-4343-8727-3478FDB13523} = s 'COMMutex Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.COMMutex.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.COMMutex'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

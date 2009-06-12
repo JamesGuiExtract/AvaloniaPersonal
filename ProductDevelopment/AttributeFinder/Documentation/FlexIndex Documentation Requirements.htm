@@ -1,0 +1,219 @@
+<head>
+
+<title>Flex Index Documentation Requirements</title>
+
+</head>
+
+<body lang=EN-US style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<ol start=1 type=1>
+ <li>FlexIndex Integration Guide</li>
+ <ol start=1 type=1>
+  <li>What is the FlexIndex SDK?</li>
+  <li>Integration Overview -
+      summarize &amp; include flow charts</li>
+  <li>FlexIndex Integration Tutorial</li>
+  <ol start=1 type=1>
+   <li>Part 1 - Creating a simple data entry application [also initialize license]</li>
+   <li>Part 2 - Implementing automated data capture</li>
+   <ol start=1 type=1>
+    <li>Section 1 - Running the FlexIndex engine [Add &quot;Find data&quot; button, and run a
+        specific .rsd file against a specific image and select-with-UI output
+        handler]</li>
+    <li>Section 2 - How does the engine return the captured data? [summarize that vec&lt;attribute&gt;
+        is being returned.]</li>
+    <li>Section 3 - Processing of captured data [put the attribute values in specific fields, expect
+        exactly 5 attribute values to be returned, etc. At the end of this
+        step, we should have the functionality of our VBDemoApp except for the
+        green-highlight-on-image feature and that the .RSD file and .TIF
+        file being used are predetermined at code time. Also, remove or
+        comment out the output handler code. Also, rename field labels to
+        match attribute names in .RSD file]</li>
+    <li>Section 4 - Capturing data from user-specified images [add &quot;Open image&quot; button, create
+        InputFunnel, enable text selection, and run predetermined .RSD file
+        against currently loaded image. Call
+        ISRIRUtils.IsExactlyOneImageOpen(pInputManager, BSTR *pstrCurrentlyOpenImageName)
+        to make sure only one image is open].</li>
+    <li>Section 5 - Showing captured data on image [add code to demonstrate how to highlight
+        spatial string on image. Include call to
+        ISRIRUtils.GetSRIR(pInputManager, strFileName, bAutoCreate) to find the
+        image window easily]</li>
+    <li>Section 6 - Processing of
+        captured grantor/grantee information [multiple grantors/grantees appear
+        on same line separated with semicolon. Also mention other ways to
+        do it.]</li>
+    <li>Section 7 - Effectively processing captured data (questions to think about)</li>
+    <ol start=1 type=1>
+     <li>How should your app deal
+         with multiple values being found for the same attribute (such as
+         grantor, grantee, lot #, etc)</li>
+     <li>How should your app deal
+         with invalid data being found</li>
+     <li>How should your app deal with data not being captured in some cases?</li>
+     <li>Do you want to setup
+         validation for your attributes? What do you want to do with the
+         invalid values?</li>
+     <li>Does the data you're
+         trying to capture have sub-attributes? If so, you'll need to
+         plan for where to put those sub-attributes, how to deal with the fact
+         that not all expected sub-attributes may be there, or there may be
+         multiple sub-attributes of the same type, etc.</li>
+     <li>[insert other similar
+         questions here that integration developer should think about]</li>
+    </ol>
+   </ol>
+   <li>Part 3 - Adding
+       text-swiping functionality (semi-automated data entry) using UCLID's
+       image/text windows</li>
+   <ol start=1 type=1>
+    <li>Section 1 - Bring up
+        UCLID's text window and image window [includes initializing the
+        InputFunnel]</li>
+    <li>Section 2 - Handling
+        Input notification from the InputFunnel for single-line input [send input
+        to txtField1 only]</li>
+    <li>Section 3 - Implement
+        &quot;auto-goto-next-field&quot; and field highlighting</li>
+    <li>Section 4 - Handling
+        multi-line input from the Image/Text window [implement ITextProcessor
+        and IParagraphTextHandler for putting multi-line data in txtField5]</li>
+   </ol>
+   <li>Part 4 - Adding
+       text-swiping functionality (semi-automated data entry) using Vendor
+       application's image window</li>
+   <ol start=1 type=1>
+    <li>Section 1 - Initialize
+        licensing</li>
+    <li>Section 2 - Implement
+        swiping/highlighting effect in your image window</li>
+    <li>Section 3 - OCR'ing text
+        in the image underneath the highlight [include a picture depicting
+        IRasterZone + how to create IRasterzone + extract image + OCR]</li>
+    <li>Section 4 - Other topics
+        (draw rectangle for OCR-in-window feature and talk about converting
+        rectangle's coords into IRasterZone, etc and also refer them to
+        read sections in Part 3.</li>
+   </ol>
+   <li>Part 5 - OCRing
+       documents in a batch</li>
+   <ol start=1 type=1>
+    <li>Section 1 - How to OCR documents in a batch</li>
+         <ul>
+            <li>Discuss command-line options</li>
+            <li>Note use of Spatial String Viewer utility</li>
+         </ul>
+    <li>Section 2 - Running the
+        FlexIndex engine [Run a specific .rsd file against a specific .uss file
+        and select-with-UI output handler - similar to section 1 of part 2]</li>
+    <li>Section 3 - Other topics
+        [refer the reader to Part 2 of this tutorial to see other topics such
+        as processing the captured data, etc]</li>
+   </ol>
+  </ol>
+ </ol>
+ <li>FlexIndex SDK Reference</li>
+   <ol start=1 type=1>
+      <li>TBD</li>
+   </ol>
+ <li>RuleSet Editor Tutorial</li>
+   <ol start=1 type=1>
+      <li>TBD</li>
+   </ol>
+ <li>InputFunnel SDK Reference</li>
+   <ol start=1 type=1>
+      <li>TBD</li>
+   </ol>
+ <li>Flex Index Extensions</li>
+   <ol start=1 type=1>
+      <li>Create VB Output Handler ( Clear Sub-Attributes )</li>
+         <ul>
+            <li>Removes sub-attributes if found</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Tester Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VC Output Handler ( Clear Attributes w/o Sub-Attributes )</li>
+         <ul>
+            <li>Removes Attributes if no sub-attributes found</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Tester Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VB Document Preprocessor ( Results By Year )</li>
+         <ul>
+            <li>Reviews timestamp on input file</li>
+            <li>Provides year as string in Type column of Tester dialog [ Can we do this in VB? ]</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Editor Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VC Document Preprocessor ( ? )</li>
+      <li>Create VB Attribute Splitter ( ? )</li>
+      <li>Create VC Attribute Splitter ( Street Splitter )</li>
+         <ul>
+            <li>Creates sub-attributes for</li>
+               <ol start=1 type=1>
+                  <li>House Number</li>
+                  <li>Street Name</li>
+                  <li>Street Type</li>
+               </ol>
+            <li>Discuss extending sub-attributes to</li>
+               <ol start=1 type=1>
+                  <li>Apartment Number</li>
+                  <li>Street Direction</li>
+               </ol>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Tester Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VB Value Finder ( Odd Lines )</li>
+         <ul>
+            <li>Extracts 1st, 3rd, 5th, etc. non-empty line from input</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Attribute Rule Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VC Value Finder ( Even Lines )</li>
+         <ul>
+            <li>Extracts 2nd, 4th, 6th, etc. non-empty line from input</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Attribute Rule Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VB Value Modifier ( Inverse Title Case )</li>
+         <ul>
+            <li>&quot;Name text&quot; becomes &quot;nAME tEXT&quot;</li>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Attribute Rule Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+      <li>Create VC Value Modifier ( Date Formatter )</li>
+         <ul>
+            <li>Has Property Page</li>
+               <ol start=1 type=1>
+                  <li>Format String</li>
+                  <li>Edit box for test date (not persistent)</li>
+                  <li>Button to test the format and input</li>
+                  <li>Test output to read-only edit box (not persistent)</li>
+               </ol>
+            <li>Register the Component</li>
+            <li>Check for New Components</li>
+            <li>Show on Attribute Rule Dialog</li>
+            <li>Demonstrate results with appropriate RSD and input files</li>
+         </ul>
+   </ol>
+
+</div>
+
+</body>
+
+</html>

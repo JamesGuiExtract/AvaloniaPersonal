@@ -1,0 +1,151 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.0.0.77 Patch A Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.0.0.77 Patch A Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[P16 #3046]</b> Retaining annotations for files without annotations
+	       	<ul>
+	      		<li>Initial stress test on UltraTester of patch release candidate.</li>
+		       	<ul>
+		      		<li>Used <b>NY - Rockland - Cott</b> rules from 
+				<b>2008-03-03</b> delivery.</li>
+		      		<li>Used <b>131,652</b> images as 4 copies of 
+				<b>Cott/NY - Rockland/Set001/Images</b>.</li>
+		       	</ul>
+	      		<li>Exercise <b>ID Shield</b> checklist linked below.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>[P13 #4966]</b> Error message if target action not in DB
+	       	<ul>
+	      		<li>Exercise <b>Set File Action Status</b> portion of the 
+			<b>File Processors</b> checklist linked below.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>[P13 #4967]</b> Action names not persistent in Set File Action 
+		Status property page
+	       	<ul>
+	      		<li>Exercise <b>Set File Action Status</b> portion of the 
+			<b>File Processors</b> checklist linked below.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>[P13 #4969]</b> Sleep.exe as an MFC project
+	       	<ul>
+	      		<li>Exercise the EXE via <b>LaunchApplication</b> and 
+			confirm that an appropriate delay is introduced without 
+			display of a DOS window.</li>
+		       	<ul>
+		          	<li>Confirm successful installation on 32-bit Windows XP.</li>
+          			<li>Confirm successful installation on 64-bit Windows XP.</li>
+		          	<li>Confirm successful installation on 32-bit Windows Vista.</li>
+          			<li>Confirm successful installation on 64-bit Windows Vista.</li>
+<p>
+		          	<li>Confirm successful installation on 32-bit Windows 2003 Server.</li>
+          			<li>Confirm successful installation on 64-bit Windows 2003 Server.</li>
+		          	<li>Confirm successful installation on 32-bit Windows 2008 Server.</li>
+          			<li>Confirm successful installation on 64-bit Windows 2008 Server.</li>
+		       	</ul>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing and Analysis Results</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+<p>
+      		<li><u>FLEX Index - Analysis Results</u></li>
+	       	<ul>
+	      		<li>MI - Washtenaw - ACS : Basic</li>
+	      		<li>MN - Scott - Trimin : Lots of fields</li>
+	       	</ul>
+<p>
+      		<li><u>ID Shield - Analysis Results</u></li>
+	       	<ul>
+	      		<li>IN - Districts - ACS : Basic and bland</li>
+	      		<li>LA - East Baton Rouge - ACS : Handwriting rules and re-OCR</li>
+	      		<li>MA - Secretary of Commonwealth : PDFs </li>
+	      		<li>NY - Secretary of State ( sets 1 and 3 ) : Lots of fields</li>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<li><h3>Demo Applications & Utilities Checklists</h3></li>
+	<UL>
+          	<LI><a href="../IDShieldTesting.html">ID Shield</a></LI>
+          	<LI><a href="../../IndustrySpecific/Redaction/InteractiveTest/IDShieldObjects.html">ID Shield Objects</a></LI>
+<p>
+		<LI><a href="../../../Utils/AdjustImageResolution/InteractiveTest/AdjustImageResolution.html">Adjust Image Resolution</a></LI>
+		<LI><a href="../../../Utils\CreateMultiPageImage\InteractiveTest\CreateMultiPageImage.html">Create Multi Page Image</a></LI>
+		<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDRasterAndOCRMgmt/Utils/ESOCR/InteractiveTest/ESOCR.html">ESOCR</a></LI>
+		<LI><a href="../../../../ReusableComponents/InputFunnel/InputReceivers/SpotRecognitionIR/InteractiveTest\SpotRecognition.html">Spot Recognition Window</a></LI>
+       	</ul>
+    	</LI>
+<p>
+	<li><h3>File Action Manager Checklists</h3></li>
+	<UL>
+			<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessFilesTasks.html">File Processors</a></LI>
+       	</ul>
+    	</LI>
+<p>
+	<LI><h3>Installation of Patch</h3>
+       	<ul>
+          	<li>Confirm successful installation on 32-bit Windows XP.</li>
+          	<li>Confirm successful installation on 64-bit Windows XP.</li>
+          	<li>Confirm successful installation on 32-bit Windows Vista.</li>
+          	<li>Confirm successful installation on 64-bit Windows Vista.</li>
+<p>
+          	<li>Confirm successful installation on 32-bit Windows 2003 Server.</li>
+          	<li>Confirm successful installation on 64-bit Windows 2003 Server.</li>
+          	<li>Confirm successful installation on 32-bit Windows 2008 Server.</li>
+          	<li>Confirm successful installation on 64-bit Windows 2008 Server.</li>
+<p>
+          	<li>Confirm that the correct version number and patch letter are displayed 
+		in the <b>About Rule Tester</b> dialog.</li>
+	</ul>
+	</LI>
+<P>
+	<LI><h3>General Stability Testing</h3>
+	<h2>Basic Stability</h2>
+		<ul>
+			<LI><a href="../SanityTests/SanityTests.html">FAM Sanity Tests (#22)</a></LI>
+		       	<ul>
+          			<li>32-bit Windows XP</li>
+		          	<li>32-bit Windows Vista</li>
+		          	<li>32-bit Windows 2003 Server</li>
+          			<li>64-bit Windows 2003 Server</li>
+			</ul>
+<p>
+         		<li><a href="../StabilityTesting/TIF_Stability.html">TIF Testing 
+			(#3A, #3C, #3E) - FLEX Index</a></li>
+         		<li><a href="../StabilityTesting/TIF_Stability.html">TIF Testing 
+			(#3A, #3C, #3E) - ID Shield</a></li>
+         		<li><a href="../StabilityTesting/PDF_Stability.html">PDF Testing (#31) 
+			- ID Shield</a></li>
+		</ul>						 
+<p>
+	<h2>Large-Scale Verification Testing</h2>
+		<ul>
+         		<li><a href="../ScalabilityTests/VerificationTesting.html">Instructions 
+			(#33)</a></li>
+		</ul>						 
+<p>
+	<h2>Endurance Testing ( ID Shield - 5+ days )</h2>
+		<ul>
+         		<li><a href="../EnduranceTesting/EnduranceTests.html">Instructions</a></li>
+		</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

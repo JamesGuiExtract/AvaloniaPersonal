@@ -1,0 +1,25 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+AOJ_GRANTEE_01=judgment creditor (name and address):^?Grantee^250~judgment debtor
+
+AOJ_GRANTEE_02a=judgment creditor^3~(name):^?Grantee^250~judgment debtor|judgement debtor|whose address
+AOJ_GRANTEE_02=judgment creditor^20~(name):|\r\n^?Grantee^250~judgment debtor|judgement debtor|whose address
+
+AOJ_GRANTEE_03=in favor of^?Grantee^250~and against
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\support order\20059020645100.tif.uss
+AOJ_GRANTEE_04=make^25~current^25~payments^25~to^25~:^?Grantee^250~\r\nc.\r\n|the judgment debtor 
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\support order\20059020645700.tif.uss
+AOJ_GRANTEE_05=substituted as payee^?Grantee^250~\r\nc.\r\n
+
+[PATTERNS_END]

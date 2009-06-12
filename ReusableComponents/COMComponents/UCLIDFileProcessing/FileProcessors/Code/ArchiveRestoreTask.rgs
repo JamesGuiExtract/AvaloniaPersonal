@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.ArchiveRestoreTask.1 = s 'ArchiveRestoreTask Class'
+	{
+		CLSID = s '{6AA0D59E-0284-46C9-8E7E-8FEE999963DA}'
+	}
+	FileProcessors.ArchiveRestoreTask = s 'ArchiveRestoreTask Class'
+	{
+		CLSID = s '{6AA0D59E-0284-46C9-8E7E-8FEE999963DA}'
+		CurVer = s 'FileProcessors.ArchiveRestoreTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6AA0D59E-0284-46C9-8E7E-8FEE999963DA} = s 'ArchiveRestoreTask Class'
+		{
+			ProgID = s 'FileProcessors.ArchiveRestoreTask.1'
+			VersionIndependentProgID = s 'FileProcessors.ArchiveRestoreTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

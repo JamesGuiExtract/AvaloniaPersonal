@@ -1,0 +1,16 @@
+// All lines beginning with // are ignored as well as all whitespace " \f\n\r\t\v"
+
+// DT:0070
+//	Prepared By: ... \d{5)
+
+(
+(:?
+ (prepared\s+by)
+ |
+ (mail\s+tax\s+statement\s+to)
+)
+// The comma, semi-colon, "*" and hyphen are to account for ocr errors
+// they are not in any document template
+(\s*[:\.,\-;*\s]\s*)
+(\s*\(name,?\s*address,?\s*city,?\s+and\s+state\))?
+){1,}

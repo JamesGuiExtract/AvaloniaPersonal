@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.ImageRegionWithLines.1 = s 'ImageRegionWithLines Class'
+	{
+		CLSID = s '{9E3925AC-3685-4A6E-A769-995AA4DEE874}'
+	}
+	AFValueFinders.ImageRegionWithLines = s 'ImageRegionWithLines Class'
+	{
+		CLSID = s '{9E3925AC-3685-4A6E-A769-995AA4DEE874}'
+		CurVer = s 'AFValueFinders.ImageRegionWithLines.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {9E3925AC-3685-4A6E-A769-995AA4DEE874} = s 'ImageRegionWithLines Class'
+		{
+			ProgID = s 'AFValueFinders.ImageRegionWithLines.1'
+			VersionIndependentProgID = s 'AFValueFinders.ImageRegionWithLines'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

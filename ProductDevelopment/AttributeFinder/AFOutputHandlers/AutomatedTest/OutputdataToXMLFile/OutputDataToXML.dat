@@ -1,0 +1,13 @@
+//test1 "Version 1 format with <SubAttributes>" is selected.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 "Version 2 format with<SpatialLine>" and "Include schema name in output" are 
+//selected.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 "Version 2 format with<SpatialLine>", "Formatted with attribute names",
+//and "Include schema name output" are selected.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 "Version 2 format with<SpatialLine>", "Formatted with attribute names" selected.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test4.eav

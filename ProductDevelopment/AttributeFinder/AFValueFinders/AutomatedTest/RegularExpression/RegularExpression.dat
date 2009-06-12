@@ -1,0 +1,51 @@
+//test1 A single word regular expression with \s* as word boundary.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 The regular expression is the same as test1, "Case Sensitive"
+//checkbox is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 The regular expression is the same as test1 except the first letter
+//is of different case, "Case Sensitive" is checked. 
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 A single word regular expression(same as test3) with \b as 
+//word boudary.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 A regular expression to capture the word "Address". 
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 The same regular expression as in test5 with "Case Sensitive" is checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 The regular expression to capture "address" is loaded from a .dat file, "Case Sensitive" 
+//is checked.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 The same .dat file as in test7 is loaded. 
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 A different regular expression from test7 but also to capture the word "address"
+//is loaded. "Case Sensitive" is checked.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 The same regular expression as in test9 is loaded.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 A .dat file which contains both a regular expression and a reference to another .dat
+//file is loaded. 
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 The same .dat file as in test11 is loaded. "Case Sensitive" is checked.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 The entire content of the .dat file used in test11 is copied as the regular expression
+//entry.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 The regular expression used is the same as test13, "Case Sensitive" is checked.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 The regular expression entry consists of loading a .dat file and a regular expression. 
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav

@@ -1,0 +1,35 @@
+HKCR
+{
+	UCLIDInputFunnel.InputManager.1 = s 'InputManager Class'
+	{
+		CLSID = s '{775ACCAD-32AC-11D6-8259-0050DAD4FF55}'
+		'Insertable'
+	}
+	UCLIDInputFunnel.InputManager = s 'InputManager Class'
+	{
+		CLSID = s '{775ACCAD-32AC-11D6-8259-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFunnel.InputManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {775ACCAD-32AC-11D6-8259-0050DAD4FF55} = s 'InputManager Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.InputManager.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.InputManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			ForceRemove 'Control'
+			ForceRemove 'Insertable'
+			ForceRemove 'ToolboxBitmap32' = s '%MODULE%, 108'
+			'MiscStatus' = s '0'
+			{
+			    '1' = s '132497'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+			'Version' = s '1.0'
+		}
+	}
+}

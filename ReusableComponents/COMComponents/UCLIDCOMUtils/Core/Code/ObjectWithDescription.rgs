@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.ObjectWithDescription.1 = s 'ObjectWithDescription Class'
+	{
+		CLSID = s '{33EFAB00-9014-47C4-884E-8B157E945239}'
+	}
+	UCLIDCOMUtils.ObjectWithDescription = s 'ObjectWithDescription Class'
+	{
+		CLSID = s '{33EFAB00-9014-47C4-884E-8B157E945239}'
+		CurVer = s 'UCLIDCOMUtils.ObjectWithDescription.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {33EFAB00-9014-47C4-884E-8B157E945239} = s 'ObjectWithDescription Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.ObjectWithDescription.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.ObjectWithDescription'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

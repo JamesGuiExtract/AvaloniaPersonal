@@ -1,0 +1,9 @@
+; ESFileSuppliers.def : Declares the module parameters.
+
+LIBRARY      "ESFileSuppliers.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE

@@ -1,0 +1,2094 @@
+<html>
+
+<head>
+<title>Report Viewer - Testing Checklist</title>
+<link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</head>
+
+<body>
+<h1>Report Viewer<br>
+	<img src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>Command-line Use</h2>
+<ul>
+	<li>Confirm that <b>ReportViewer.exe</b> exists in the CommonComponents folder.
+	<li><b>ReportViewer.exe</b> can be opened when using a full license</li>
+	<li><b>ReportViewer.exe</b> can be opened when using an evaluation license</li>
+	<li><b>[LegacyRC #5261]</b> /prompt option
+	<ul>
+		<li>Run ReportViewer specifying a server, database, report file, and 
+		<b>/prompt</b>.  
+		<li>Fill in data for the prompt and click okay.</li>
+		<li>Confirm that the desired report is generated.</li>
+		<li>Confirm that an exception is not thrown.</li>
+	</ul>
+</ul>
+
+<h2>FAM DB Admin Use</h2>
+<ul>
+	<li>Confirm that a <b>Open Report</b> dialog appears.
+	<li>Confirm that a <b>Standard Reports</b> tab is available.
+	<li>Confirm that a <b>Saved Reports</b> tab is available.
+<p>
+	<li>Confirm that a <b>Report Viewer</b> thumbnail image is available - for each of 
+	the installed reports.
+	<li><b>[LegacyRC #5084, #5147]</b> Missing thumbnail image
+	<ul>
+		<li>Open the Report Viewer.
+		<li>Rename one of the thumbnail images for a report.
+		<li>Confirm that selecting that report now displays a text message in the preview pane that the image
+		is not available.
+		<li>Resize the Report Viewer.
+		<li>Confirm that the text message in the preview pane remains centered.
+	</ul>
+</ul>
+
+<h2>FLEX Index and ID Shield Installed Reports</h2>
+<ul>
+	<li><b>Detailed report for specific document</b>
+	<li><b>Documents processed on machines</b>
+	<li><b>List of all actions in the project</b>
+	<li><b>List of all machines used in the project</b>
+	<li><b>List of all users in the project</b>
+	<li><b>Machines used for processing (by action)</b>
+	<li><b>Summary of actions and associated document counts</b>
+	<li><b>Summary of actions and associated document page counts</b>
+	<li><b>Summary of processing times (by action)</b>
+<p>
+	<li><b>ID Shield data types and document counts</b>
+	<li><b>ID Shield detailed report for specific document</b>
+	<li><b>ID Shield list of documents processed but not verified</b>
+	<li><b>ID Shield list of documents verified by specific user</b>
+	<li><b>ID Shield project summary</b>
+	<li><b>ID Shield redaction counts (by document)</b>
+	<li><b>ID Shield verification document, page, and redaction counts (by user)</b>
+	<li><b>ID Shield verification times and rates (by user)</b>
+</ul>
+
+<h2>Open Report dialog</h2>
+<ul>
+	<li>Confirm that selecting a report and clicking <b>Cancel</b> does not change the 
+	displayed report.
+	<li>Confirm that selecting a report and clicking <b>OK</b> displays the selected report.
+	<li><b>[LegacyRC #5231]</b> Confirm that <b>double-clicking</b> a report displays the selected report.
+	<li>Confirm that the <b>Delete selected report</b> button is disabled for each 
+	<b>Standard report</b>.
+	<li>Confirm that the <b>Delete selected report</b> button is enabled for each 
+	<b>Saved report</b>.
+	<li><b>[LegacyRC #5113]</b> Resize the window and confirm that the preview image 
+	resizes smoothly.</li>
+	<li><b>[LegacyRC #5084]</b> Rename a thumbnail image and confirm that selecting the associated 
+	report changes the preview image into a meaningful text message.</li>
+</ul>
+
+<h2>Report Viewer user interface</h2>
+<ul>
+	<li>Confirm that the window title without a report is <b>Report Viewer</b>.
+	<li>Select a non-parameterized report such as <b>List of all actions in the project</b>.
+	<li>Confirm that a <b>Parameter entry</b> dialog does not appear.
+	<li>Confirm that a marquee-style wait cursor appears while the report is generated.
+	<li>Confirm that the report appears in the report viewer window.
+	<li>Confirm that the window title with a report is <b>Report Viewer - &lt;report name&gt;</b>.
+<p>
+	<li><b>File menu</b>
+	<ul>
+		<li>Confirm that <b>Open report...</b> displays the associated dialog and 
+		allows the user to select another report.
+		<li>Confirm that <b>Save report template...</b> displays the associated dialog and 
+		allows the user to provide a report name.
+		<ul>
+			<li>Confirm that the saved report appears in the <b>Saved reports</b> tab.
+			<li><b>[LegacyRC #5178]</b> Confirm that the name of the saved report cannot match 
+			an existing <b>Standard report</b>.
+			<li>Confirm that if the name of the saved report matchs an existing 
+			<b>Saved report</b>, an <b>Overwrite Existing Report</b> confirmation 
+			dialog is presented.
+			<li>Confirm that clicking <b>Cancel</b> does not save the report.
+		</ul>
+		<li>Confirm that <b>Export to PDF...</b> displays a <b>Save As</b> dialog 
+		allowing the user to save the report to a PDF file.
+		<li><b>[LegacyRC #5158]</b> Confirm that <b>Export...</b> displays a 
+		<b>Save As</b> dialog allowing the user to save the report to various formats.  
+		<li>Confirm that a report can be saved to each of the formats as provided below and 
+		confirm that an <b>Export completed</b> message is displayed.
+		<ul>
+			<li>Crystal reports (*.rpt)
+			<li>PDF (*.pdf)
+			<li>Microsoft Excel (97-2003) (*.xls)
+			<li>Microsoft Excel (97-2003) Data Only (*.xls)
+			<li>Microsoft Word (97-2003) (*.doc)
+			<li>Microsoft Word (97-2003) - Editable (*.rtf)
+			<li>Rich Text Format (*.rtf)
+			<li>XML (*.xml)
+		</ul>
+		<li>Confirm that <b>Exit</b> closes the <b>Report Viewer</b>.
+	</ul>
+<p>
+	<li><b>Help menu</b>
+	<ul>
+		<li>Confirm that <b>About Report Viewer...</b> displays an appropriate About box.
+		<li><b>[LegacyRC #5161]</b> Confirm that the <b>About box</b> contains an appropriate 
+		image and copyright information.
+	</ul>
+<p>
+	<li><b>Toolbar</b>
+	<ul>
+		<li>Confirm that all toolbar buttons are disabled if no report is visible.
+		<li>Open a report.
+		<li>Confirm that the <b>Export Report</b> button displays the appropriate dialog.
+		<li>Confirm that the <b>Print Report</b> button displays the appropriate dialog.
+<p>
+		<li>Confirm that the <b>Go To First Page</b> button is disabled for a single-page 
+		report.
+		<li>Confirm that the <b>Go To First Page</b> button is disabled when displaying the 
+		first page of a multi-page report.
+		<li>Confirm that the <b>Go To First Page</b> button is enabled when displaying a 
+		non-first page of a multi-page report.
+		<li>Confirm that the <b>Go To First Page</b> button navigates to the first page.
+<p>
+		<li>Confirm that the <b>Go To Previous Page</b> button is disabled for a single-page 
+		report.
+		<li>Confirm that the <b>Go To Previous Page</b> button is disabled when displaying the 
+		first page of a multi-page report.
+		<li>Confirm that the <b>Go To Previous Page</b> button is enabled when displaying a 
+		non-first page of a multi-page report.
+		<li>Confirm that the <b>Go To Previous Page</b> button navigates to the previous page.
+<p>
+		<li>Confirm that the <b>Go To Next Page</b> button is disabled for a single-page 
+		report.
+		<li>Confirm that the <b>Go To Next Page</b> button is enabled when displaying the 
+		non-last page of a multi-page report.
+		<li>Confirm that the <b>Go To Next Page</b> button is disabled when displaying a 
+		last page of a multi-page report.
+		<li>Confirm that the <b>Go To Next Page</b> button navigates to the next page.
+<p>
+		<li>Confirm that the <b>Go To Last Page</b> button is disabled for a single-page 
+		report.
+		<li>Confirm that the <b>Go To Last Page</b> button is enabled when displaying the 
+		non-last page of a multi-page report.
+		<li>Confirm that the <b>Go To Last Page</b> button is disabled when displaying a 
+		last page of a multi-page report.
+		<li>Confirm that the <b>Go To Last Page</b> button navigates to the last page.
+<p>
+		<li>Confirm that <b>/ &lt;pagecount&gt;</b> text is provided after the <b>Go To Page</b> 
+		edit box.
+		<li>Confirm that the <b>Go To Page</b> edit box is disabled for a single-page 
+		report.
+		<li>Confirm that the <b>Go To Page</b> edit box is enabled when displaying a 
+		multi-page report.
+		<li>Confirm that the <b>Go To Page</b> edit box navigates to the specified page.
+		<li>Confirm that the <b>Go To Page</b> edit box navigates to the last page if 
+		the specified page number is beyond the page count.
+<p>
+		<li>Confirm that the <b>Find Text</b> button can successfully locate text in each 
+		column of each table of the report.
+		<li>Confirm that the <b>Find Text</b> button does not find text located on a previous 
+		page in the report.
+<p>
+		<li>Confirm that the <b>Zoom</b> button displays a drop-down menu with <b>Page Width</b>, 
+		<b>Whole Page</b>, <b>Customize...</b>, and various percentages.
+		<li>Confirm that selecting the <b>Customize</b> zoom setting displays a <b>Zooming</b> 
+		dialog allowing the user to specify a custom zoom level. 
+		<li>Confirm that the <b>minimum</b> custom zoom factor is 25 percent. 
+		<li>Confirm that the <b>maximum</b> custom zoom factor is 400 percent. 
+		<li>Confirm that selecting one of the <b>Zoom</b> settings modifies the zoom level 
+		in the displayed report. 
+	</ul>
+<p>
+	<li><b>Status Bar</b>
+	<ul>
+		<li>Confirm that <b>Current Page No.:</b> is correctly displayed on the status bar. 
+		<li>Confirm that <b>Total Page No.:</b> is correctly displayed on the status bar. 
+		<li>Confirm that <b>Zoom Factor:</b> is correctly displayed on the status bar. 
+	</ul>
+</ul>
+
+<h2>Individual Reports</h2>
+<ol>
+	<li><b>Detailed report for specific file</b>
+	<ul>
+		<li>Confirm that a <b>DocumentName</b> parameter is required. 
+		<li>Confirm that a meaningful report is presented when a fully-qualified path 
+		to a processed file is provided.
+		<li>Create a saved report and confirm that the associated XML file contains a 
+		<b>TextParameter</b> node with <b>Name = &quot;DocumentName&quot;</b> 
+		and <b>Default = &quot;&lt;path&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Detailed Report For Specific File</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is correct.
+			<li>Confirm that the <b>File size (bytes)</b> information is correct.
+			<li>Confirm that the <b>Number of pages</b> information is correct.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>action</b> and that action 
+			status is correct.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>From status</b> column is provided.
+			<li>Confirm that an <b>To status</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<li><b>Test with nonsense filename</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Detailed Report For Specific File</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is as specified.
+			<li>Confirm that the <b>File size (bytes)</b> information is empty.
+			<li>Confirm that the <b>Number of pages</b> information is empty.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with cells either <b>N/A</b> or empty.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>From status</b> column is provided.
+			<li>Confirm that an <b>To status</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with cells either <b>N/A</b> or empty.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>Documents processed on machines</b> 
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Documents Processed On Machines</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Total number of documents processed for each action</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that the <b>Machine</b> column information is correct.
+			<li>Confirm that one additional column is provided for each <b>action</b> in 
+			the database.
+			<li>Confirm that the <b>Machine</b> name in the last row is <b>Total</b>.
+			<li>Confirm that the <b>Total</b> information is correct for each action.
+			<li>Confirm that the <b>Total</b> information is displayed with a distinct 
+			background color.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Documents Processed On Machines</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the only <b>Machine</b> name is labeled <b>N/A</b>.
+			<li>Confirm that the only <b>Action</b> name is labeled <b>n/a</b>.
+			<li>Confirm that the count is <b>0</b>.
+			<li>Confirm that the <b>Total</b> is <b>0</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>List of all actions in the project</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Actions In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Action List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action ID</b> column information is correct.
+			<li>Confirm that the <b>Action</b> column information is correct.
+			<li>Confirm that one row is provided for each <b>action</b> in 
+			the database.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Actions In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Action List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action ID</b> column information is correct.
+			<li>Confirm that the <b>Action</b> column information is correct.
+			<li>Confirm that one row is provided with <b>Action ID</b> and 
+			<b>Action</b> empty.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>List of all machines used in the project</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Machines Used In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Computer List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Machine ID</b> column information is correct.
+			<li>Confirm that the <b>Machine Name</b> column information is correct.
+			<li>Confirm that one row is provided for each <b>machine</b> in 
+			the database.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Actions In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Action List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Machine ID</b> column information is correct.
+			<li>Confirm that the <b>Machine Name</b> column information is correct.
+			<li>Confirm that one row is provided with <b>Machine ID</b> and 
+			<b>Machine Name</b> empty.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>List of all users in the project</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Users In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>User List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>User ID</b> column information is correct.
+			<li>Confirm that the <b>User</b> column information is correct.
+			<li>Confirm that one row is provided for each <b>user</b> in 
+			the database.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>List Of All Users In The Project</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>User List</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>User ID</b> column information is correct.
+			<li>Confirm that the <b>User</b> column information is correct.
+			<li>Confirm that one row is provided with <b>User ID</b> and 
+			<b>User</b> empty.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>Machines used for processing (by action)</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Machines Used For Processing (By Action)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that an <b>Action: &ltaction name&gt;</b> table exists for 
+			each action in the database.
+			<li>Confirm that the <b>Action: &ltaction name&gt;</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
+			displayed in a distinct background color.
+			<li>Confirm that one row is provided for each <b>machine name</b> for each of 
+			the actions.
+			<li>Confirm that blank space is provided between each 
+			<b>Action: &ltaction name&gt;</b> table.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Machines Used For Processing (By Action)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that an <b>Action: </b> table exists and that it 
+			is formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
+			displayed in a distinct background color.
+			<li>Confirm that one row is provided with <b>empty</b> cells.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that an <b>Action: ABC</b> table exists and that it 
+			is formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the next row is <b>Machines used for processing</b> and is 
+			displayed in a distinct background color.
+			<li>Confirm that one row is provided with <b>empty</b> cells.
+		</ul>
+	</ul>
+<p>
+	<li><b>Summary of actions and associated document counts</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Summary Of Actions And Associated 
+			Document Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> column information is correct.
+			<li>Confirm that the <b>Unattempted</b> column information is correct.
+			<li>Confirm that the <b>Pending</b> column information is correct.
+			<li>Confirm that the <b>Processing</b> column information is correct.
+			<li>Confirm that the <b>Complete</b> column information is correct.
+			<li>Confirm that the <b>Failed</b> column information is correct.
+			<li>Confirm that the <b>Total</b> column information is correct.
+			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
+			Complete and Failed counts.
+<p>
+			<li>Confirm that after the <b>File Summary</b> table is an entry for 
+			<b>Total number of files referenced in the database</b>.
+			<li>Confirm that the <b>Total number of files referenced in the database</b> count 
+			is <b>&gt;=</b> the largest individual total count.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Summary Of Actions And Associated 
+			Document Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> column contains one entry with <b>N/A</b>.
+			<li>Confirm that the <b>Unattempted</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+<p>
+			<li>Confirm that after the <b>File Summary</b> table is an entry for 
+			<b>Total number of files referenced in the database</b>.
+			<li>Confirm that the <b>Total number of files referenced in the database</b> count 
+			is <b>0</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that the <b>File Summary</b> table exists.
+			<li>Confirm that the <b>Action</b> column contains one entry with <b>ABC</b>.
+			<li>Confirm that the <b>Unattempted</b> column contains one entry with the same count 
+			as provided by <b>Total number of files referenced in the database</b>.
+			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+		</ul>
+	</ul>
+<p>
+	<li><b>Summary of actions and associated document page counts</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Summary Of Actions And Associated 
+			Document Page Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Page Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> column information is correct.
+			<li>Confirm that the <b>Unattempted</b> column information is correct.
+			<li>Confirm that the <b>Pending</b> column information is correct.
+			<li>Confirm that the <b>Processing</b> column information is correct.
+			<li>Confirm that the <b>Complete</b> column information is correct.
+			<li>Confirm that the <b>Failed</b> column information is correct.
+			<li>Confirm that the <b>Total</b> column information is correct.
+			<li>Confirm that each <b>Total</b> is the sum of the Pending, Processing, 
+			Complete and Failed counts.
+<p>
+			<li>Confirm that after the <b>Page Summary</b> table is an entry for 
+			<b>Total number of pages referenced in the database</b>.
+			<li>Confirm that the <b>Total number of pages referenced in the database</b> count 
+			is <b>&gt;=</b> the largest individual total count.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Summary Of Actions And Associated 
+			Document Page Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Page Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> column contains one entry with <b>N/A</b>.
+			<li>Confirm that the <b>Unattempted</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+<p>
+			<li>Confirm that after the <b>Page Summary</b> table is an entry for 
+			<b>Total number of pages referenced in the database</b>.
+			<li>Confirm that the <b>Total number of pages referenced in the database</b> count 
+			is <b>0</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that the <b>Page Summary</b> table exists.
+			<li>Confirm that the <b>Action</b> column contains one entry with <b>ABC</b>.
+			<li>Confirm that the <b>Unattempted</b> column contains one entry with the same count 
+			as provided by <b>Total number of pages referenced in the database</b>.
+			<li>Confirm that the <b>Pending</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Processing</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Complete</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Failed</b> column contains one entry with <b>0</b>.
+			<li>Confirm that the <b>Total</b> column contains one entry with <b>0</b>.
+		</ul>
+	</ul>
+<p>
+	<li><b>Summary of processing times (by action)</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Summary Of Processing Times (By Action)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Processing Times</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> column information is correct.
+			<li>Confirm that the <b>Time*</b> column information is correct.
+			<li>Confirm that the <b>Average Time Per Document</b> column information is correct.
+			<li>Confirm that one row is provided in the table for each <b>Action</b>.
+<p>
+			<li>Confirm that a <b>Total:</b> row is provided at the bottom of the table.
+			<li>Confirm that a total is provided for the <b>Time*</b> column.
+<p>
+			<li>Confirm that after the <b>Processing Times</b> table is text for 
+			<b>*This represents machine time</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>Machines Used For Processing (By Action)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Processing Times</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> information is <b>N/A</b>.
+			<li>Confirm that the <b>Time*</b> information is <b>0m 0s</b>.
+			<li>Confirm that the <b>Average Time Per Document</b> information is <b>0m 0s</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with an unused &quot;ABC&quot; action (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that an <b>Processing Times</b> table exists and that it 
+			is formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a distinct background color.
+			<li>Confirm that the <b>Action</b> information is <b>ABC</b>.
+			<li>Confirm that the <b>Time*</b> information is <b>0m 0s</b>.
+			<li>Confirm that the <b>Average Time Per Document</b> information is <b>0m 0s</b>.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield data types and document counts</b> 
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Data Types And Document Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Types and Counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>Data types*</b> column information is correct.
+			<ul>
+				<li>HC Data
+				<li>MC Data
+				<li>LC Data
+				<li>Clues
+				<li>HC or MC Data
+				<li>HC or LC Data
+				<li>Clues or HC Data
+				<li>MC or LC Data
+				<li>Clues or MC Data
+				<li>Clues or LC Data
+				<li>HC, MC or LC Data
+				<li>Clues or HC or MC Data
+				<li>Clues or HC or LC Data
+				<li>Clues or MC or LC Data
+				<li>Clues or HC or MC or LC Data
+			</ul>
+			<li>Confirm that the <b>Count of files with specified data types</b> column 
+			information is correct.
+<p>
+			<li>Confirm that after the <b>Types and Counts</b> table is text for 
+			<b>*HC Data = High confidence data, MC Data = Medium confidence data, LC 
+			Data = Low confidence data</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Data Types And Document Counts</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Types and Counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>Data types*</b> column information is correct.
+			<li>Confirm that the <b>Count of files with specified data types</b> column 
+			information is correct with <b>0</b> entries for each row.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield detailed report for specific document</b>
+	<ul>
+		<li>Confirm that a <b>DocumentName</b> parameter is required. 
+		<li>Confirm that a meaningful report is presented when a fully-qualified path 
+		to a processed file is provided.
+		<li>Create a saved report and confirm that the associated XML file contains a 
+		<b>TextParameter</b> node with <b>Name = &quot;DocumentName&quot;</b> 
+		and <b>Default = &quot;&lt;path&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Detailed Report For Specific Document</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is correct.
+			<li>Confirm that the <b>File size (bytes)</b> information is correct.
+			<li>Confirm that the <b>Number of pages</b> information is correct.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>action</b> and that action 
+			status is correct.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that a <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that a <b>From status</b> column is provided.
+			<li>Confirm that a <b>To status</b> column is provided.
+			<li>Confirm that a <b>Machine</b> column is provided.
+			<li>Confirm that a <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>Redaction summary</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that a <b>Time stamp</b> column is provided.
+			<li>Confirm that a <b>Mode</b> column is provided.
+			<li>Confirm that an <b>HC*</b> column is provided.
+			<li>Confirm that an <b>MC*</b> column is provided.
+			<li>Confirm that an <b>LC*</b> column is provided.
+			<li>Confirm that an <b>Clues</b> column is provided.
+			<li>Confirm that an <b>Manual</b> column is provided.
+			<li>Confirm that an <b>Total</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that after the <b>Redaction summary</b> table is text for 
+			<b>*HC Data = High confidence data, *MC Data = Medium confidence data, *LC 
+			Data = Low confidence data</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<li><b>Test with nonsense filename</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Detailed Report For Specific File</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is as specified.
+			<li>Confirm that the <b>File size (bytes)</b> information is empty.
+			<li>Confirm that the <b>Number of pages</b> information is empty.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>From status</b> column is provided.
+			<li>Confirm that an <b>To status</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>empty</b> cells.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield list of documents processed but not verified</b> 
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents Processed 
+			But Not Verified</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that the single <b>File</b> column correctly displays the full path to 
+			each image.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents Processed 
+			But Not Verified</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield list of documents verified by specific user</b> 
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>Confirm that a <b>VerifyUserName</b> parameter is required. 
+		<li>For a particular user name, and for each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+			<li>Confirm that the associated XML file also contains a <b>TextParameter</b> 
+			node with <b>Name = &quot;VerifyUserName&quot;</b> 
+			and <b>Default = &quot;&lt;name&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+		<li>Confirm that the associated XML file also contains a <b>TextParameter</b> 
+		node with <b>Name = &quot;VerifyUserName&quot;</b> 
+		and <b>Default = &quot;&lt;name&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents 
+			Verified By Specific User</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>&lt;name&gt;</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that the single <b>File</b> column correctly displays the full path to 
+			each image.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents 
+			Verified By Specific User</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>N/A</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+<p>
+		<li><b>Test with &quot;ABC&quot; (nonsense) user (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents 
+			Verified By Specific User</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>ABC</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield project summary</b> 
+	<ul>
+		<li>Confirm that a parameter is <b>not required</b>. 
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Project Summary</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Project Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the row headings and column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>Documents</b>.
+			<li>Confirm that a column exists for <b>Pages contained</b>.
+			<li>Confirm that a row exists for <b>Total documents in project</b> and that the 
+			associated counts <b>do not include</b> percentages.
+			<li>Confirm that a row exists for <b>Total documents verified</b> and that the 
+			associated counts <b>do include</b> percentages.
+			<li>Confirm that a row exists for <b>Total documents redacted</b> and that the 
+			associated counts <b>do include</b> percentages.
+			<li>Confirm that a row exists for <b>Total documents verified but not redacted</b> 
+			and that the associated counts <b>do include</b> percentages.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Project Summary</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Project Summary</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the row headings and column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>Documents</b>.
+			<li>Confirm that a column exists for <b>Pages contained</b>.
+			<li>Confirm that a row exists for <b>Total documents in project</b> and that the 
+			associated counts are <b>0</b> are <b>0</b>.
+			<li>Confirm that a row exists for <b>Total documents verified</b> and that the 
+			associated counts are <b>0 (0%)</b> are <b>0 (0%)</b>.
+			<li>Confirm that a row exists for <b>Total documents redacted</b> and that the 
+			associated counts are <b>0 (0%)</b> are <b>0 (0%)</b>.
+			<li>Confirm that a row exists for <b>Total documents verified but not redacted</b> 
+			and that the associated counts are <b>0 (0%)</b> are <b>0 (0%)</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield redaction counts (by document)</b> 
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Redaction Counts (By Document)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Redaction counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headers are displayed in a distinct background color.
+			<li>Confirm that a column exists for <b>File ID</b>.
+			<li>Confirm that a column exists for <b>File</b>.
+			<li>Confirm that a column exists for <b>Clues</b>.
+			<li>Confirm that a column exists for <b>HCData</b>.
+			<li>Confirm that a column exists for <b>MCData</b>.
+			<li>Confirm that a column exists for <b>LCData</b>.
+			<li>Confirm that a column exists for <b>Manual</b>.
+			<li>Confirm that a column exists for <b>Total Redactions</b>.
+			<li>Confirm that the <b>File</b> column correctly displays the full path to 
+			each image.
+			<li>Confirm that the <b>Total Redactions</b> column correctly displays the sum of 
+			the actual redactions applied to the image.  This may be equal to but will <b>not</b> 
+			be larger than the sum of HCData, MCData, LCData, and Manual.
+<p>
+			<li>Confirm that after the last listed file a row is included for <b>Average:</b>.
+			<li>Confirm that the <b>Average:</b> counts are provided with one decimal place for 
+			the Clues, HCData, MCData, LCData, Manual and Total columns.
+			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
+			<li>Confirm that the <b>Average</b> counts are provided without digits to the right 
+			of the decimal point for the Clues, HCData, MCData, LCData, Manual and Total columns.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents 
+			Verified By Specific User</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Redaction counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headers are displayed in a distinct background color.
+			<li>Confirm that a column exists for <b>File ID</b> and the content is <b>N/A</b>.
+			<li>Confirm that a column exists for <b>File</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Clues</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>HCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>MCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>LCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Manual</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Total Redactions</b> and the cell is empty.
+<p>
+			<li>Confirm that after the last listed file a row is included for <b>Average:</b>.
+			<li>Confirm that the <b>Average:</b> counts are all empty.
+			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
+			<li>Confirm that the <b>Average</b> counts are all empty.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield verification document, page, and redaction counts (by user)</b>
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Verification Document, 
+			Page,And Redaction Counts (By User)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time:</b> information is correct.
+			<li>Confirm that the <b>End time:</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b># documents verified</b>.
+			<li>Confirm that a column exists for <b># pages in verified documents</b>.
+			<li>Confirm that a column exists for <b># documents redacted</b>.
+			<li>Confirm that a column exists for <b># pages in redacted documents</b>.
+			<li>Confirm that a column exists for <b># redactions made (including manual)</b>.
+			<li>Confirm that a column exists for <b># manual redactions made</b>.
+			<li>Confirm that a row exists for each user.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Project Summary</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time:</b> information is correct.
+			<li>Confirm that the <b>End time:</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b># documents verified</b>.
+			<li>Confirm that a column exists for <b># pages in verified documents</b>.
+			<li>Confirm that a column exists for <b># documents redacted</b>.
+			<li>Confirm that a column exists for <b># pages in redacted documents</b>.
+			<li>Confirm that a column exists for <b># redactions made (including manual)</b>.
+			<li>Confirm that a column exists for <b># manual redactions made</b>.
+			<li>Confirm that a single user row exists and is empty.
+			<li>Confirm that the counts are either <b>0</b> or <b>empty</b>.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b> and that the appropriate counts are 
+			<b>0</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+<p>
+	<li><b>ID Shield verification times and rates (by user)</b>
+	<ul>
+		<li>Confirm that a <b>ReportingPeriod</b> parameter is required. 
+		<li>For each of the <b>Range</b> options provided below:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+		</ul>
+		<li><b>Range</b> options: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Create a saved report with a <b>Custom</b> date range and confirm that the 
+		associated XML file contains a <b>DateRangeParameter</b> node with <b>Name = 
+		&quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>, <b>Min = 
+		&quot;&lt;start time&gt;&quot;</b>, <b>Max = &quot;&lt;end time&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield Verification Times And Rates 
+			(By User)</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification time information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b>Screen verification time</b> and that 
+			information is formatted as <b>1h 12m 34s</b>.
+			<li>Confirm that a column exists for <b>Screen verification rate</b> and that 
+			information is formatted as <b>1,234 pages/hr</b>.
+			<li>Confirm that a column exists for <b>Project verification time*</b> and that 
+			information is formatted as <b>1h 12m 34s</b>.
+			<li>Confirm that a column exists for <b>Project verification rate*</b> and that 
+			information is formatted as <b>1,234 pages/hr</b>.
+			<li>Confirm that one row is provided for each <b>User</b> and that they are 
+			presented in alphabetical order.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+			<li>Confirm that after the <b>Verification time information</b> table is 
+			text for <b>*These times are estimates</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents Processed 
+			But Not Verified</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification time information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b>Screen verification time</b>.
+			<li>Confirm that a column exists for <b>Screen verification rate</b>.
+			<li>Confirm that a column exists for <b>Project verification time*</b>.
+			<li>Confirm that a column exists for <b>Project verification rate*</b>.
+			<li>Confirm that one row is provided with an empty user, 
+			<b>0m 0s</b> for each verification time, and <b>0 pages/hr</b> for each 
+			verification rate.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+			<li>Confirm that after the <b>Verification time information</b> table is 
+			text for <b>*These times are estimates</b>.
+<p>
+			<li>Confirm that a shadowed footer is provided at the bottom of each page.
+			<li>Confirm that the left side of the first line is <b>Printed</b> along 
+			with a date and time of printing.
+			<li>Confirm that the left side of the second line is <b>By</b> along 
+			with the user name of the person who generated the report.
+			<li>Confirm that the right side of the first line is the name of the report, 
+			identical to the second line of the header.
+			<li>Confirm that the right side of the second line is <b>Page <i>M</i> of 
+			<i>N</i></b>.
+			<li>Confirm that there is a distinct background color.
+		</ul>
+	</ul>
+</ol>
+
+<h2>Parameter Entry Form</h2>
+<ol>
+	<li><b>DocumentName</b> 
+	<ul>
+		<li>Confirm that a meaningful report is presented for 
+		<b>&lt;fully_qualified_path_to_supplied_image&gt;</b>.
+		<li>Confirm that a report without useful data is presented for each of the following:
+		<ul>
+			<li>Abc123.tif 
+			<li>&lt;supplied_image_without_fully_qualified_path&gt;
+		</ul>
+		<li>Confirm that a meaningful error message is presented if a blank name is specified.
+	</ul>
+<p>
+	<li><b>ReportingPeriod</b> 
+	<ul>
+		<li>Confirm that a meaningful report (especially the times and dates in the Reporting 
+		period table) is presented for each of the <b>Range</b> options including: 
+		<ul>
+			<li>All 
+			<li>Previous week
+			<li>Previous month
+			<li>Previous year
+			<li>Last 30 days
+			<li>Last 7 days
+			<li>Last hour
+			<li>Last 2 hours
+			<li>Last 5 hours
+			<li>Last 10 hours
+			<li>Current week
+			<li>Current month
+			<li>Current year
+			<li>Today
+			<li>Yesterday
+		</ul>
+		<li>Confirm that selecting <b>Custom</b> as a range enables the <b>Begin date</b> 
+		and <b>End date</b> combo boxes.
+		<li>Confirm that selecting the <b>Begin date</b> combo box drops down a calendar control.
+		<li>Confirm that the selected <b>Begin date</b> is displayed in the combo box.
+		<li>Confirm that selecting the <b>End date</b> combo box drops down a calendar control.
+		<li>Confirm that the selected <b>End date</b> is displayed in the combo box.
+	</ul>
+<p>
+	<li><b>VerifyUserName</b> 
+	<ul>
+		<li>Confirm that a meaningful report is presented for each of the following: 
+		<ul>
+			<li>Administrator 
+			<li>&lt;your_name&gt;
+			<li>&lt;Another_Extract_User&gt;
+			<li>&lt;nonsense_name&gt;
+		</ul>
+		<li>Confirm that a meaningful error message is presented if a blank name is specified.
+	</ul>
+<p>
+</ol>
+<p>
+<h2>Miscellaneous</h2>
+<ul>
+	<li><b>[LegacyRCAndUtils #5113]</b> Report Viewer - Rescaling preview image</li>
+	<ul>
+		<li>Open the Report Viewer and select a report.</li>
+		<li>Resize the window and confirm that the preview image resizes smoothly.</li>
+	</ul>
+<p>
+	<li><b>[LegacyRCAndUtils #5114]</b> Report Viewer - Remember window position.</li>
+	<ul>
+		<li>Confirm that window size is persisted across sessions.</li>
+		<li>Confirm that window position is persisted across sessions.</li>
+	</ul>
+<p>
+	<li>Check help files</li>
+	<ul>
+		<li>Confirm that the <b>FLEXIndex.chm</b> screen shot for each report is consistent 
+		with the latest version.</li>
+		<li>Confirm that the <b>IDShield.chm</b> screen shot for each report is consistent 
+		with the latest version.</li>
+	</ul>
+</ul>
+</body>
+</html>

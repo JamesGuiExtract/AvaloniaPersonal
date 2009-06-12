@@ -1,0 +1,149 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//AFFID OF MAILING TRUSTEE NOTICE OF SALE FOR TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\AFFID OF MAILING TRUSTEE NOTICE OF SALE FOR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//AFFIDAVIT OF REMONUMENTATION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\AFFIDAVIT OF REMONUMENTATION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//AFFIDAVIT TO CONSENT TO PLAT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\AFFIDAVIT TO CONSENT TO PLAT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//AGREEMENT INCLUDES EASEMENT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\AGREEMENT INCLUDES EASEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//AMENDMENT OF FIXTURE FILING-UCC
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\AMENDMENT OF FIXTURE FILING-UCC;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//APPLICATION TO EXEMPT MOBILE HOME FROM REGISTR and TITLING
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\APPLICATION TO EXEMPT MOBILE HOME FROM REGISTR and TITLING;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//APPOINT SUCC TRUSTEEx SUBSTx DESIGNATIONx APPOINT TR-TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\APPOINT SUCC TRUSTEEx SUBSTx DESIGNATIONx APPOINT TR-TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//ASSIGNMENT OF CONTRACT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSIGNMENT OF CONTRACT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//ASSIGNMENT OF LEASES and RENTS, MORTGAGE OR TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSIGNMENT OF LEASES and RENTS, MORTGAGE OR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//ASSUMPTION OF MORTGAGE OR TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSUMPTION OF MORTGAGE OR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//COMPLETION NOTICE-LIEN
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\COMPLETION NOTICE-LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//CONSTRUCTION LIEN
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\CONSTRUCTION LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//CREATING AN ESTATE-BY-THE ENTIRETY DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\CREATING AN ESTATE-BY-THE ENTIRETY DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//DEATH CERTIFICATE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\DEATH CERTIFICATE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//DECLARATION and SUPPLEMENTAL DECLARATION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\DECLARATION and SUPPLEMENTAL DECLARATION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//DISCHARGE PAPERS FROM MILITARY SERVICE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\DISCHARGE PAPERS FROM MILITARY SERVICE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//EASEMENT CONSENT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\EASEMENT CONSENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//EASEMENT, ST IMPROVE AGREE, RECIP EASE INGRESS and EGRESS
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\EASEMENT, ST IMPROVE AGREE, RECIP EASE INGRESS and EGRESS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING-UCC
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\FIXTURE FILING-UCC;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//GRANT DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\GRANT DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//INSTRUMENTS PRESENTED BY POLITICAL SUBDIVISIONS
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\INSTRUMENTS PRESENTED BY POLITICAL SUBDIVISIONS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LEASE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN FEDERAL
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN FEDERAL;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN FEDERAL PARTIAL RELEASE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN FEDERAL PARTIAL RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN FEDERAL RELEASE OR SATISFACTION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN FEDERAL RELEASE OR SATISFACTION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN RECORD ABSTRACT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN RECORD ABSTRACT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//LIEN,JUDGMT,WRIT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//MEDICAL LIEN
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\HOSPITAL\MEDICAL LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//MEDICAL LIEN SATISFACTION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\HOSPITAL\MEDICAL LIEN SATISFACTION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//MODIFICATION, AMEND, SUPPL AGREE OF MORTGAGE OR TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\MODIFICATION, AMEND, SUPPL AGREE OF MORTGAGE OR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE OF DEFAULT and ELECTION TO SELL-TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\NOTICE OF DEFAULT and ELECTION TO SELL-TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//ORDER OF COURT DEED RECORD
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ORDER OF COURT DEED RECORD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//PARTIAL RELEASE, PARTIAL RECON-TRUST DEED, PARTIAL SATISFACTION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\PARTIAL RELEASE, PARTIAL RECON-TRUST DEED, PARTIAL SATISFACTION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//PARTIAL SATISFACTION OF LIEN OR JUDGMENT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\PARTIAL SATISFACTION OF LIEN OR JUDGMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//PERSONAL REPRESENTATIVE DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\PERSONAL REPRESENTATIVE DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//PLAT, CONDOMINIUM, MINOR PARTITION, SUBDIVISION
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\PLAT, CONDOMINIUM, MINOR PARTITION, SUBDIVISION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//POWER OF ATTORNEY
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\POWER OF ATTORNEY;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//QUITCLAIM DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\QUITCLAIM DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE FOR SURETY OR CASH BOND, LIEN
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\RELEASE FOR SURETY OR CASH BOND, LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE OF LIS PENDENS-MORTGAGE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\RELEASE OF LIS PENDENS-MORTGAGE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE OF TAX DEFERRED PROPERTIES
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\RELEASE OF TAX DEFERRED PROPERTIES;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//RESCISSION OF NOTICE OF DEFAULT-TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\RESCISSION OF NOTICE OF DEFAULT-TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//RESIGNATION OF TRUSTEE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\RESIGNATION OF TRUSTEE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//SATISF LIEN
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SATISF LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//SATISFACTION OF JUDGMENT
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SATISFACTION OF JUDGMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//SUBORDINATION AGREEMENT-MORTGAGE OR TRUST DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SUBORDINATION AGREEMENT-MORTGAGE OR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//SUBORDINATION OF LEASE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SUBORDINATION OF LEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//TERMINATION (SATISFACTION) OF FIXTURE  FILING-UCC
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\TERMINATION (SATISFACTION) OF FIXTURE  FILING-UCC;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//TRUSTEE'S DEED
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\TRUSTEE'S DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+

@@ -1,0 +1,43 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Doc Stamp Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Document Stamp Testing Checklist </h1>
+<hr>
+<UL>
+       	<LI><b>Configuration</b>
+	<ul>
+		<li>Can specify a bitmap to be used as a document stamp
+		<li>Can specify text to be used as a document stamp.  
+		Font style and size can also be specified
+	</ul>
+<p>
+       	<LI><b>Functionality</b>
+	<ul>
+	       	<LI>User can move the stamp's location after placement
+       		<LI>Resolution and color depth of stamp bitmap shall be scaled 
+		down to match document
+       		<LI>Stamp bitmap shall be smaller than page size
+	       	<LI>Document stamp can be deleted after application
+       		<LI>If document stamp extends beyond page bounds, only the 
+		visible portion shall be displayed on the page
+        	<LI>Document stamp can be placed manually
+		<ul>
+			<li>Stamp location specified by mouse position
+			<li>Position is anchored to one of nine points on 
+			bitmap or text stamp ( top, center, bottom ) + 
+			( left, center, right )
+			<li>Stamp is displayed during manual drag operation
+<p>
+			<li>Stamp location can be defined using a corner-based 
+			anchor point and a fixed offset
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

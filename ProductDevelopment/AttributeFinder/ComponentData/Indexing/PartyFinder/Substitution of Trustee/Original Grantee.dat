@@ -1,0 +1,33 @@
+[PATTERNS_BEGIN]
+
+// This rule seems to get the Original Trustee which is not going to be the New Trustee which should be the Grantee
+// 0001.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0061727.tif.uss
+SOT_ORIGINAL_GRANTEE_01=Original Trustee:^?OriginalGrantee^250~Original Beneficiary:|Date of DOT
+
+// 0009.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062413.tif.uss
+SOT_ORIGINAL_GRANTEE_09=ORIGINAL TRUSTEE:^?OriginalGrantee^250~\r\nBENEFICIARY: 
+
+// 0010.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0064267.tif.uss
+SOT_ORIGINAL_GRANTEE_10=as Trustor to^?OriginalGrantee^250~as original Trustee
+
+
+// 0004.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060237.tif.uss
+SOT_ORIGINAL_GRANTEE_04=Trustor^7~[to]^?OriginalGrantee^250~as trustee
+
+// 0006.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0061776.tif.uss
+SOT_ORIGINAL_GRANTEE_06=as Trustor^?OriginalGrantee^250~as Trustee 
+
+
+// 0008.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060332.tif.uss
+SOT_ORIGINAL_GRANTEE_08=Trustor^5~[to]^?OriginalGrantee^250~Trustee for
+
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000172.tif.uss
+SOT_ORIGINAL_GRANTEE_09=undersigned is the present beneficiary^120~Deed of Trust^48~made by^for the benefit of^?OriginalGrantee^240~[as the original beneficiary
+
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000176.tif.uss
+SOT_ORIGINAL_GRANTEE_10=original Trustee, and^?OriginalGrantee^160~[was|[as]the original Beneficiary under that certain Deed of Trust
+
+[PATTERNS_END]
+
+
+

@@ -1,0 +1,28 @@
+//documents amount doc proceed agreement agree company co. for association default 'in default' bank 'up to' 'is more' undersigned 'at the rate' treasury index guaranteed term corporation effect established 'to which' advances easement recorded
+(?:[li]oa[nm]|\b[li]o.n\b|\b[li].an\b|\bloa.)[\s\S]{0,5}(?:d.c.m.nts|.m..nt(?!.{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n[0o]|#))|doc|pr.c..d|.gr..m.nt|agree|c.mp.ny|co\.|\bfor\b|Ass|.ss.c..t|d.f..lt|in\W*defa|b.nk|up\W*to|is\W*more|.nd.rs.gn.d|at\W*the\W*rate|tr..sury|index|g..r.nt..d|\bterm|c.rp.r.t|.ff.ct|.st.bli|to\W*which|.dv.nc.s|eas.m.nt|r.c.rd.d|\bact\b|rider|\bdept|m.n.g.r|.{0,7}.v.d.nc.|ind.bt|hereby|the\W*.ddr.ss)šxo% xo% xo% xo%
+(?:s.v.ng|p.rs..nt|pl.ce|.nt.r.st|.nd.x\W*v.lue.{0,13}|rate|table|am..nt|B..LD.NG|said|f.t.r.|d.r.ct|b.l.nc.|of\W*.np..d|c.nc.l)[\s\S]{0,10}(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo% xo% xo%
+(?:\bc.ty\b|(?:up|of|by)\W*the|wh.ch|on\W*this)[\s\S]{0,5}(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo% xo% xo%
+(?:and)\x20*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo% xo%
+\bR\s*\.\s*C\s*\.\W*[\d.]+šxo% xo% xo%
+the\W*["'](?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)["']šxo% xo% xo%
+\(the\W*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)\W*\)šxo% xo% xo%
+&\W*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo
+\bSloan\bšxo% xo
+(?:\bLinda|Linda\b)šxo% xo
+WILLIAMšxo% xo % x
+^OF\W*LOAN.{0,25}$šxo% xo
+\bloan\W*\d+\.\d\d\W*%šxo% xo
+^.{0,5}}OHIO\W*S.ngl.\W*F.m.ly.*[\r\n]+.*šxo% xo xo% xoxo% xo
+^LO(?=.*-84$)šxo% xo
+Dated\W*\d\d/\d\d/\d\d(?:\d\d)?šxo% xo xo
+F.rm\W*[-\x20\d]+šxo% xo xo
+^City\W*Loan$šxo% xo xo
+\bLot\b(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n[0o](?![a-z])|#))?šxo% xo xo%o 
+^(Boo.|.ook|B.ok|Bo.k).{0,27}$šxo% xo xo%o
+(?:as|of)\W*a\W*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo
+\ba\W*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)\W*(?:by\b|herein)šxo% xo
+(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)\W*to\W*themšxo% xo xo
+F.n.nc.šXXXXXXX
+\B(?:inan|LOPM)\BšXXXXXXX
+^.{0,5}(?:VA|f.rm).*(?:[li]oan|\b[li]o.n\b|\b[li].an\b|\bloa.)šxo% xo xo%o xo% xo
+\(\W*[a-z]+\W*loan\)šxo% xo xo%o 

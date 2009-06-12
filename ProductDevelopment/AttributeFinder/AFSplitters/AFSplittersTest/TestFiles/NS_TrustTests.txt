@@ -1,0 +1,212 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Trust and Trustee Entities
+// Purpose: Check Division
+
+// NOTE: Success requires MoveLastNameToFront = 1 in 
+// [HKEY_CURRENT_USER\Software\UCLID Software\AttributeFinder\AFSplitters\EntityNameSplitter]
+
+<TESTCASE>|Simple Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Trust
+Names|John L. Smith, Trustee of the John Smith Trust
+.Trust|John Smith Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Personal Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Personal Trust
+Names|John L. Smith, Trustee of the John Smith Personal Trust
+.Trust|John Smith Personal Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Irrevocable Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Irrevocable Trust
+Names|John L. Smith, Trustee of the John Smith Irrevocable Trust
+.Trust|John Smith Irrevocable Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Revocable Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Revocable Trust
+Names|John L. Smith, Trustee of the John Smith Revocable Trust
+.Trust|John Smith Revocable Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Living Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Living Trust
+Names|John L. Smith, Trustee of the John Smith Living Trust
+.Trust|John Smith Living Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Marital Trust with 1 Trustee|John L. Smith, Trustee of the John Smith Marital Trust
+Names|John L. Smith, Trustee of the John Smith Marital Trust
+.Trust|John Smith Marital Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Simple Trust with 2 Trustees A|John Smith and Mary Smith, as Trustees of the John and Mary Smith Family Trust
+Names|John Smith and Mary Smith, as Trustees of the John and Mary Smith Family Trust
+.Trust|John and Mary Smith Family Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Simple Trust with 2 Trustees B|John Smith and Mary Smith, Co-Trustees of the John and Mary Smith Joint Trust
+Names|John Smith and Mary Smith, Co-Trustees of the John and Mary Smith Joint Trust
+.Trust|John and Mary Smith Joint Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Trust with Successor Trustee A|John L. Smith, or his successor, Trustee of the John Smith Trust
+Names|John L. Smith, or his successor, Trustee of the John Smith Trust
+.Trust|John Smith Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Trust with Successor Trustee B|Mary Smith, or her successor, Trustee of the Mary Smith Trust
+Names|Mary Smith, or her successor, Trustee of the Mary Smith Trust
+.Trust|Mary Smith Trust
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Trust with Successor Trustee C|John Smith and Mary Smith, or their successors, Trustees of the John and Mary Smith Family Trust
+Names|John Smith and Mary Smith, or their successors, Trustees of the John and Mary Smith Family Trust
+.Trust|John and Mary Smith Family Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Trust with Successor Trustee D|John Smith and Mary Smith, or their successors, as Co-Trustees of the John and Mary Smith Family Trust
+Names|John Smith and Mary Smith, or their successors, as Co-Trustees of the John and Mary Smith Family Trust
+.Trust|John and Mary Smith Family Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Trust with Trust Manager 1|John L. Smith, Trust Manager of the John Smith Trust
+Names|John L. Smith, Trust Manager of the John Smith Trust
+.Trust|John Smith Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Trust with Trust Manager 2|John L. Smith, Trustmanager of the John Smith Trust
+Names|John L. Smith, Trustmanager of the John Smith Trust
+.Trust|John Smith Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|Trustee with Under The Trust A|John Smith and Mary Smith, Co-Trustees under the John and Mary Smith Joint Trust
+Names|John Smith and Mary Smith, Co-Trustees under the John and Mary Smith Joint Trust
+.Trust|John and Mary Smith Joint Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Trustee with Under The Trust B|John Smith and Mary Smith, As Trustees under the John and Mary Smith Joint Trust
+Names|John Smith and Mary Smith, As Trustees under the John and Mary Smith Joint Trust
+.Trust|John and Mary Smith Joint Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|John Smith Trustee Style 1|John L. Smith Trustee, Trustee of the John Smith Trust
+Names|John L. Smith Trustee, Trustee of the John Smith Trust
+.Trust|John Smith Trust
+..Person|John L. Smith|Trustee
+...First|John
+...Last|Smith
+...Middle|L.
+
+<TESTCASE>|John Smith Trustee Style 2|John Smith Trustee and Mary Smith Trustee, Co-Trustees under the John and Mary Smith Joint Trust
+Names|John Smith Trustee and Mary Smith Trustee, Co-Trustees under the John and Mary Smith Joint Trust
+.Trust|John and Mary Smith Joint Trust
+..Person|John Smith|Trustee
+...First|John
+...Last|Smith
+..Person|Mary Smith|Trustee
+...First|Mary
+...Last|Smith
+
+<TESTCASE>|Amended and Restated Trust|Karey J. Nay, Trustee of the Karey J. Nay Amended and Restated Trust
+Names|Karey J. Nay, Trustee of the Karey J. Nay Amended and Restated Trust
+.Trust|Karey J. Nay Amended and Restated Trust
+..Person|Karey J. Nay|Trustee
+...First|Karey
+...Last|Nay
+...Middle|J.
+
+
+/////////////////
+// NonTrust Items
+/////////////////
+
+<TESTCASE>|Trust Company|ACME Trust Company
+Names|ACME Trust Company
+.Company|ACME Trust Company
+
+<TESTCASE>|Bank and Trust|ACME Bank and Trust
+Names|ACME Bank and Trust
+.Company|ACME Bank and Trust
+
+<TESTCASE>|Bank & Trust|ACME Bank & Trust
+Names|ACME Bank & Trust
+.Company|ACME Bank & Trust
+
+<TESTCASE>|Trust Bank|ACME Trust Bank
+Names|ACME Trust Bank
+.Company|ACME Trust Bank
+
+// K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set001\Images\SUBSTITUTION OF TRUSTEE\20059019676400.tif.uss
+<TESTCASE>|Trustee Services|Trustee Services, Inc.
+Names|Trustee Services, Inc.
+.Company|Trustee Services, Inc.

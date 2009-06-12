@@ -1,0 +1,39 @@
+// ParcelIDFinder.idl : IDL source for ParcelIDFinder.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ParcelIDFinder.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(C750BDF7-45E3-46E2-81B3-C923354F6AFE),
+	version(1.0),
+	helpstring("ParcelIDFinder 1.0 Type Library")
+]
+library PARCELIDFINDERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		object,
+		uuid(C67E1FD5-520B-4FED-AA1A-CDEB4D56C7AB),
+		dual,
+		helpstring("IParcelIDIF Interface"),
+		pointer_default(unique)
+	]
+	interface IParcelIDIF : IDispatch
+	{
+	};
+
+	[
+		uuid(7E28D7C6-9F4E-4CB7-806B-D0002F2AD220),
+		helpstring("ParcelIDIF Class")
+	]
+	coclass ParcelIDIF
+	{
+		[default] interface IParcelIDIF;
+	};
+};

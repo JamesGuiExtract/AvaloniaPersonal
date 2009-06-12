@@ -1,0 +1,3 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;..\..\Rules\PolicyAmount\PolicyAmount.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set011\Images;;K:\Common\Engineering\Sample Files\ByteManagers\Set011\EAV\PolicyAmount\$FileNoExtOf(<SourceDocName>).eav
+

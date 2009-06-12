@@ -1,0 +1,427 @@
+<html>
+
+<head>
+<title>Miscellaneous Utilities Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Miscellaneous Utilities Testing Checklist<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
+
+<ol>
+
+<!-- *********************************************** -->
+<li><h2>Image Format Converter - Functionality</h2>
+<ul>
+   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
+	will be needed for these tests.</li>
+   	<li>Confirm that <b>ImageFormatConverter</b> without additional arguments provides 
+	a usage message.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
+	/pdf</b> creates a PDF file that is a copy of the TIF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;PDF_File.tif&gt; 
+	/tif</b> creates a TIF file that is a copy of the PDF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;JPG_File.jpg&gt; 
+	/jpg</b> creates a JPG file that is a copy of the TIF file.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;PDF_File.pdf&gt; &lt;JPG_File.jpg&gt; 
+	/jpg</b> creates a JPG file that is a copy of the PDF file.</li>
+   	<li>Confirm that other output types such as <b>/bmp</b> are not supported and provide 
+	a meaningful error message.</li>
+<p>
+	<li><b>[LegacyRC #5206]</b> Proper handling of large images
+	<ul>
+		<li>Work with the images in <b>I:\Common\Engineering\ProductTesting\ManyPage Images</b>
+	   	<li>Confirm that the 275-page TIF can be converted to a PDF without error. 
+	   	<li>Confirm that the resulting PDF has 275 pages. 
+	   	<li>Confirm that the 275-page PDF can be converted back to a TIF without error. 
+	   	<li>Confirm that the resulting TIF has 275 pages. 
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Image Format Converter - Error Logging</h2>
+<ul>
+   	<li>Execute the following test cases from a command window.  A TIF image and a PDF image 
+	will be needed for these tests.</li>
+   	<li>Confirm that <b>ImageFormatConverter &lt;TIF_File.tif&gt; &lt;TIF_File.pdf&gt; 
+	/pABC /ef C:\tiflog.uex</b> does not create a the desired PDF file and creates a 
+	non-empty <b>C:\tiflog.uex</b> log file.</li>
+   	<li>Confirm that <b>C:\tiflog.uex</b> contains an exception that complains about 
+	unsupported file types.</li>
+   	<li>Re-run the same ImageFormatConverter command and confirm that the existing 
+	<b>C:\tiflog.uex</b> log is not overwritten.</li>
+<p>
+   	<li>Execute the following test cases from the File Action Manager.  A folder containing 
+	3 or more PDF images will be needed for these tests.</li>
+   	<li>Create a separate FPS file to supply the PDF images from the test folder.  Confirm that 
+	running this FPS file successfully supplies the files to the database.</li>
+   	<li>Create a separate FPS file to perform auto-redaction on the previously supplied PDF 
+	images.  Before running this FPS file, rename two of the images.</li>
+   	<li>Run the auto-redaction FPS file.</li>
+	<ul>
+	   	<li>Confirm that the two renamed files fail processing.</li>
+	   	<li>Confirm that the exceptions associated with the failures complain about the 
+		file not being found.</li>
+	   	<li>Confirm that the remaining files are processed without error.</li>
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>ESConvertToPDF - Functionality</h2>
+<ul>
+   	<li>Double-click on the EXE within the CommonComponents folder.  Confirm that a usage 
+	message is provided.
+   	<li><b>[LegacyRC #4931]</b> Confirm that a non-default icon is provided for the application.
+   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
+	<li>Use image files from the UCLIDFileProcessing/AutomatedTest/MemoryLeak/ConvertToSearchablePDF 
+	folder for the following tests.
+	<ul>
+   		<li>Confirm that <b>ESConvertToPDF 0001.tif 0001.pdf</b> 
+		creates a searchable PDF file that is a copy of the TIF file.
+   		<li>Confirm that <b>ESConvertToPDF 0001_ABC.tif 0001.pdf</b> 
+		displays an error message and does not create a searchable PDF file.
+   		<li>Confirm that <b>ESConvertToPDF 0001_ABC.tif 0001.pdf 
+		/ef C:\TIF_Error.uex</b> creates the UEX file, does not display an error message 
+		and does not create a searchable PDF file.
+   		<li>Make an extra copy of <b>0001.tif</b>.
+   		<li>Confirm that <b>ESConvertToPDF 0001.tif 0001.pdf /R</b> 
+		creates the searchable PDF file and deletes the original TIF image.
+   		<li>Replace the deleted <b>0001.tif</b>.
+<p>
+   		<li>Confirm that <b>ESConvertToPDF PDF_Image.pdf PDF_Image2.pdf</b> 
+		creates a searchable PDF file that is a copy of the PDF file.
+   		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf</b> 
+		displays an error message and does not create a searchable PDF file.
+   		<li>Confirm that <b>ESConvertToPDF PDF_Image_ABC.pdf PDF_Image2.pdf 
+		/ef PDF_Error.uex</b> creates the UEX file, does not display an error message 
+		and does not create a searchable PDF file.
+   		<li>Make an extra copy of <b>PDF_Image.pdf</b>.
+   		<li>Confirm that <b>ESConvertToPDF PDF_Image.pdf PDF_Image2.pdf /R</b> 
+		creates the searchable PDF file and deletes the original PDF image.
+   		<li>Replace the deleted <b>PDF_Image.pdf</b>.
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Image Cleanup Settings Editor - User Interface</h2>
+<ul>
+   	<li>Confirm that <b>ImageCleanupSettingsEditor.exe</b> is installed only with the 
+	<b>RDT</b>.</li>
+   	<li>Confirm that <b>ImageCleanupSettingsEditor.exe</b> requires an <b>RDT</b> license.</li>
+<p>
+	<li><b>Menus</b>
+	<ul>
+	   	<li>Confirm that the <b>File</b> menu includes items for <b>New</b>, <b>Open...</b>, 
+		<b>Save</b>, <b>Save As...</b>, <b>Recent Files</b> and <b>Exit</b>.
+		<ul>
+		   	<li>Confirm that <b>New</b> clears the settings presents an empty dialog.
+		   	<li>Confirm that <b>New</b> prompts the user to save changes if necessary.
+		   	<li>Confirm that <b>Ctrl + N</b> is a shortcut for <b>New</b>.
+<p>
+		   	<li>Confirm that <b>Open...</b> displays a File - Open dialog.  
+			<li>Confirm that image cleanup settings files (*.ics; *.ics.etf) is the 
+			default file type.
+		   	<li>Confirm that <b>Open...</b> prompts the user to save changes if necessary.
+		   	<li>Confirm that <b>Ctrl + O</b> is a shortcut for <b>Open...</b>.
+<p>
+		   	<li>Confirm that <b>Save...</b> displays a File - Save dialog.  
+		   	<li>Confirm that <b>Save...</b> is enabled only when settings have 
+			been defined.  
+		   	<li>Confirm that <b>Ctrl + S</b> is a shortcut for <b>Save</b>.
+		   	<li><b>[LegacyRC #4764]</b> Open an <b>existing</b> ICS file.  Modify an existing cleanup 
+			operation such as Despeckle.  Confirm that <b>Save...</b> is enabled and 
+			that the change can be saved.  
+<p>
+		   	<li>Confirm that <b>Save As...</b> displays a File - Save dialog.  
+		   	<li>Confirm that <b>Save As...</b> is enabled only when settings have 
+			been defined.  
+<p>
+		   	<li>Confirm that <b>Recent Files</b> displays a popup menu with a list of 
+			recently opened settings files.
+		   	<li>Confirm that selecting one of the settings files opens the file.  
+<p>
+		   	<li>Confirm that <b>Exit</b> closes the application.  
+		   	<li>Confirm that <b>Exit</b> prompts the user to save changes if necessary.
+		</ul>
+<p>
+	   	<li>Confirm that the <b>Tools</b> menu includes an item for <b>Check for new components</b>.
+	   	<li>Confirm that <b>Check for new components</b> updates <b>Extract Image Cleanup 
+		Operations.lst</b>.
+<p>
+	   	<li>Confirm that the <b>Help</b> menu includes an item for <b>About Image Cleanup 
+		Settings Editor...</b>.
+	   	<li>Confirm that <b>About Image Cleanup Settings Editor...</b> displays an About box.
+	   	<li>Confirm that the <b>About box</b> includes the current version number.
+	</ul>
+<p>
+	<li><b>Cleanup operations to perform</b>
+	<ul>
+	   	<li>Confirm that the list box includes columns for <b>Run</b> and <b>Cleanup Operation</b>.
+   		<li>Confirm presence of associated buttons for <b>Add...</b>, <b>Remove</b> and <b>Commands 
+		&gt;</b>.
+   		<li>Confirm presence of associated <b>Up</b> arrow and <b>Down</b> arrow buttons. 
+<p>
+	   	<li>Confirm that the <b>Add...</b> button is always enabled.
+   		<li>Confirm that the <b>Remove</b> button is only enabled when one or more list items 
+		is selected.
+   		<li>Confirm that the <b>Remove</b> button provides a confirmation dialog before removing 
+		items from the list.
+   		<li>Confirm that the <b>Remove</b> button can remove multiple items at once.
+	   	<li>Confirm that the <b>Commands &gt;</b> button is only enabled when one list item 
+		is selected.
+	   	<li>Confirm that the <b>Up</b> arrow is only enabled when one list item 
+		is selected and it is not already the top item in the list.
+	   	<li>Confirm that the <b>Down</b> arrow is only enabled when one list item 
+		is selected and it is not already the bottom item in the list.
+<p>
+	   	<li>Add a cleanup operation such as <b>Delete lines and repair</b> that has a 
+		configuration page.
+	   	<li>Confirm that <b>double-click</b> on the list item displays the configuration dialog.
+   		<li>Confirm that <b>Ctrl + double-click</b> on the list item displays the <b>Select 
+		Task</b> dialog.
+   		<li>Confirm that <b>Alt + double-click</b> on the list item displays the <b>Configure 
+		description</b> dialog.
+	</ul>
+<p>
+	<li><b>Scope of cleaning</b>
+	<ul>
+   		<li>Confirm presence of radio buttons for <b>All pages</b>, <b>First pages</b>, 
+		<b>Last pages</b> and <b>Selected pages</b>.
+   		<li>Confirm that the edit box associated with <b>First pages</b> is enabled only 
+		when the radio button is selected. 
+   		<li>Confirm that the edit box associated with <b>First pages</b> accepts only 
+		numeric input.
+   		<li>Confirm that the edit box associated with <b>Last pages</b> is enabled only 
+		when the radio button is selected. 
+   		<li>Confirm that the edit box associated with <b>Last pages</b> accepts only 
+		numeric input.
+   		<li>Confirm that the edit box associated with <b>Selected pages</b> is enabled only 
+		when the radio button is selected. 
+   		<li>Confirm that the edit box associated with <b>Selected pages</b> displays an error 
+		message if alphabetic characters are provided.
+	</ul>
+<p>
+	<li><b>Test</b>
+	<ul>
+	   	<li>Confirm presence of an <b>Input file:</b> edit box.
+   		<li>Confirm presence of associated buttons for <b>...</b> ( Browse ) and <b>Test</b>.
+	   	<li>Confirm that selecting the Browse button displays a File - Open dialog.
+	   	<li>Confirm that selecting an input file enables the <b>Test</b> button and 
+		populates the <b>Output file:</b> edit box.
+	   	<li>Confirm that the default <b>Output file:</b> includes the full path to the 
+		input file with the addition of <b>.clean</b> before the original file extension.
+<p>
+	   	<li>Confirm presence of an <b>Overwrite output file if it exists</b> check box.
+	   	<li>Confirm presence of an <b>Override output filename</b> check box.
+	   	<li>Confirm that checking the <b>Override output filename</b> check box clears 
+		the default text and enables both the edit box and the associated <b>...</b> 
+		( Browse ) button.
+	   	<li>Confirm that unchecking the <b>Override output filename</b> check box restores 
+		the default text and disables both the edit box and the associated <b>...</b> 
+		( Browse ) button.
+	   	<li>With the <b>Override output filename</b> check box checked, confirm that 
+		the Browse button displays a File - Open dialog.
+	   	<li>Confirm that the name of the selected file is displayed in the <b>Override 
+		output filename</b> edit box.
+<p>
+	   	<li>Confirm presence of an <b>Open Input</b> button.
+	   	<li>Confirm presence of an <b>Open Output</b> button.
+	   	<li>Confirm that the <b>Open Output</b> button is enabled only when a filename 
+		is present in the <b>Override output filename</b> edit box.
+	   	<li>Confirm presence of associated radio buttons for <b>Use Extract Systems image 
+		window</b> and <b>Use registered application</b>.
+		<ul>
+	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, the 
+			<b>Open Input</b> button opens the input file in the Spot Recognition Window.
+	   		<li>Confirm that with <b>Use Extract Systems image window</b> selected, the 
+			<b>Open Output</b> button opens the output file in the Spot Recognition Window.
+	   		<li>Confirm that with <b>Use registered application</b> selected, the 
+			<b>Open Input</b> button opens the input file in the registered application.
+	   		<li>Confirm that with <b>Use registered application</b> selected, the 
+			<b>Open Output</b> button opens the output file in the registered application.
+		</ul>
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Image Cleanup Settings Editor - Functionality</h2>
+<ul>
+   	<li>Confirm that the following cleanup operations are available in the editor: 
+	<b>Clean borders</b>, <b>Delete lines and repair</b>, <b>Despeckle</b>, <b>Fill stripes</b>, 
+	<b>Remove halftones</b> and <b>Smooth characters</b>.</li>
+	<li>Use FPS files and image files from the 
+	UCLIDFileProcessing/AutomatedTest/MemoryLeak/CleanupImage 
+	folder for the following tests.  A local <b>MEMORY_LEAK</b> database is required with a 
+	<b>Test</b> action.
+	<li>Exercise each cleanup option.
+	<ul>
+		<li>Exercise <b>1_FillStripes.fps</b>.  Add a new static list file 
+		supplier and clean <b>striped.tif</b>.
+		<li>Open <b>striped.tif</b> and <b>striped.clean.tif</b> in separate Spot 
+		Recognition Windows.
+		<li>Zoom in closely to a text region and confirm that the characters 
+		no longer have one-pixel wide vertical white stripes.
+<p>
+		<li>Exercise <b>2_RemoveHalftones.fps</b>.  Add a new static list file 
+		supplier and clean <b>halftones.tif</b>.
+		<li>Open <b>halftones.tif</b> and <b>halftones.clean.tif</b> in separate Spot 
+		Recognition Windows.
+		<li>Confirm that the shaded regions on page 1 were removed.
+		<li>Confirm that page 2 is still clean and readable.
+<p>
+		<li>Exercise <b>3_BorderSmoothDeleteDespeckle.fps</b>.  Add a new static list file 
+		supplier and clean <b>BorderSmoothDeleteDespeckle.tif</b>.
+		<li>Open <b>BorderSmoothDeleteDespeckle.tif</b> and 
+		<b>BorderSmoothDeleteDespeckle.clean.tif</b> 
+		in separate Spot Recognition Windows.
+		<ul>
+			<li>Confirm that the black border areas on the left and the bottom of the 
+			image were removed.
+			<li>Zoom in and review the <b>STATE of UTAH</b> address block in each image. 
+			Confirm that the edges of the <b>P</b> and the <b>4</b> in the PO BOX line 
+			have been smoothed.
+			<li>Confirm that the signature lines were removed.
+			<li>Confirm that the three specks near the top left corner of the image 
+			were removed.  Confirm that most periods and commas were also removed.
+		</ul>
+<p>
+		<li><b>[LegacyRC #4824]</b> Clean Borders shifts the image.
+		<ul>
+			<li>Confirm that the before and after images in the above test show 
+			no pixel shifting.
+			<li>Exercise <b>3_BorderSmoothDeleteDespeckle.fps</b> with an image 
+			that does not have a border.  Confirm that the before and after images 
+			also show no pixel shifting.
+		</ul>
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>ESConvertUSSToTXT - Functionality</h2>
+<ul>
+   	<li>Double-click on the EXE within the <b>CommonComponents</b> folder.  Confirm that a usage 
+	message is provided.
+   	<li><b>[LegacyRC #4936]</b> Special licensing required
+	<ul>
+   		<li>Confirm that <b>ESConvertUSSToTXT</b> does not run with only an 
+		<b>RDT</b> license.
+   		<li>Confirm that <b>ESConvertUSSToTXT</b> does run with a 
+		<b>Scansoft OEM OCR</b> license.
+   		<li>Confirm that a <b>USB key</b> is required to run the application.
+	</ul>
+   	<li>Confirm that a non-default icon is provided for the application.
+   	<li>Confirm that a DOS Window does not appear on the task bar when the application is running.
+	<li>Use image files from the RedactionDemo folder for the following tests.  The application 
+	should be exercised via <b>LaunchApplication</b> from the File Action Manager.
+	<ul>
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt</b> successfully creates output text files.
+   		<li>Rename one of the USS files so that it will be missing when the 
+		source document is processed.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt</b> displays an error message for the missing 
+		<b>USS</b> file.  Other files will be processed successfuly.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /m:none</b> processes successfully without an 
+		output file created for the missing USS file.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /m:zero</b> processes successfully with a zero-length 
+		output file created for the missing USS file.
+   		<li>Delete the previous <b>TXT</b> files. 
+   		<li>Confirm that <b>ESConvertUSSToTXT &lt;SourceDocName&gt;.uss 
+		&lt;SourceDocName&gt;.txt /ef C:\errortest.uex</b> processes successfully without an 
+		output file created for the missing USS file.
+   		<li>Confirm that <b>C:\errortest.uex</b> exists and contains one entry.
+   		<li>Run the same test again and confirm that <b>C:\errortest.uex</b> exists and 
+		contains two entries.
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Email File - Functionality</h2>
+<ul>
+   	<li>Create <b>C:\A.txt</b> (a simple text file) to be emailed during this test.</li>
+   	<li>Note that <b>SELF</b> refers to your email address during this test.</li>
+   	<li>Note that <b>OTHER</b> refers to another tester's email address during this test.</li>
+<p>
+   	<li>Confirm that <b>EmailFile /c</b> displays a configuration dialog for 
+	email settings.</li>
+   	<li>Confirm that the settings are persistent.</li>
+   	<li>Configure some invalid settings and attempt to send an email.  Confirm that an 
+	exception dialog is presented to the user.</li>
+   	<li>Confirm that <b>EmailFile C:\A.txt SELF</b> emails the file to you. 
+   	<li>Confirm that <b>EmailFile /z C:\A.txt SELF</b> emails the file to you and that the file 
+	has been zipped. 
+   	<li>Confirm that <b>EmailFile C:\A.txt SELF;OTHER</b> emails the file to both you and 
+	the other tester. 
+   	<li>Confirm that <b>EmailFile C:\A.txt SELF,OTHER</b> emails the file to both you and 
+	the other tester. 
+   	<li>Confirm that <b>EmailFile /subject &quot;SEND FILE&quot; C:\A.txt SELF</b> emails the file 
+	to you with <b>SEND FILE</b> as the subject line. 
+   	<li>Confirm that <b>EmailFile C:\AB.txt SELF</b> sends an email without an attachment.
+<p>
+   	<li><b>Error testing</b>
+	<ul>
+   		<li>Prepare an error situation by using bad SMTP settings.
+   		<li>Confirm that <b>EmailFile C:\AB.txt SELF /ef C:\error.uex</b> creates an error log with 
+		a meaningful error message and does not display an error message
+   		<li>Confirm that repeating <b>EmailFile C:\AB.txt SELF /ef C:\error.uex</b> appends an entry 
+		to the error log.
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Other</h2>
+<ul>
+   	<li><b>[LegacyRC #4419]</b> Create and run a multiple-thread FPS file that OCRs documents.  
+	<ul>
+		<li>Use Task Manager to kill <b>ProcessFiles.exe</b>.</li> 
+		<li>Repeat this process if necessary until more than one instance of <b>SSOCR2.exe</b> is running without an active ProcessFiles.exe instance.</li> 
+		<li>Confirm that <b>KillOCRInstances.bat</b> from the CommonComponents folder successfully closes each open SSOCR2.exe instance.</li>
+		<li>Prepare additional instances of SSOCR2.exe.  Confirm that 
+                    <b>KillOCRInstances.bat /q</b> successfully closes each open SSOCR2.exe 
+                    instance without a confirmation prompt.</li>
+		<li>Confirm that <b>KillOCRInstances.bat /?</b> displays a usage message.</li>
+		<li>Confirm that <b>KillOCRInstances.bat /Z</b> or another undefined command-line 
+                    argument displays an error with the usage message.</li>
+	</ul>
+<p>
+   	<li><b>[LegacyRC #4969]</b> Sleep EXE does not open a DOS window.  
+	<ul>
+		<li>Use the FAM to process some files.</li> 
+		<li>Include a <b>Launch Application</b> task that calls <b>Sleep.exe 5s</b>.</li> 
+		<li>Confirm that a five-second delay is noted during processing of each file.
+		<li>Confirm that a DOS window is not displayed.
+	</ul>
+</ul>
+</li>
+<br />
+
+</ol>
+
+</body>
+
+</html>

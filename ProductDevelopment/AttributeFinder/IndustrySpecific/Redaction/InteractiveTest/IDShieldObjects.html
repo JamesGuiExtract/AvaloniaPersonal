@@ -1,0 +1,470 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Objects Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Objects Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Redaction Demo Installation</h2>
+<UL>
+	<LI>Install RedactionDemo or Copy the <b>RedactionDemo</b> folder to the local C: drive.
+<p>
+	<LI>Confirm presence of <b>Automatically Perform Redactions</b> shortcut in 
+	RedactionDemo folder.
+	<LI>Confirm presence of <b>Compute Redactions</b> shortcut in RedactionDemo folder.
+	<LI>Confirm presence of <b>Perform Manual Redactions</b> shortcut in RedactionDemo folder.
+	<LI>Confirm presence of <b>Verify Redactions</b> shortcut in RedactionDemo folder.
+	<LI>Confirm presence of <b>Clean</b> batch file in RedactionDemo folder.
+	<LI>Confirm presence of non-empty FPS, Images,&nbsp; and Rules subfolders.
+</UL>
+<p>
+<!-- *********************************************** -->
+<LI><h2>Redaction Demo DB Creation</h2>
+<UL>
+	<li>Run the <b>Clean.bat</b> file.</li>
+	<li>Run the <b>FAM DB Admin</b> utility.</li>
+	<li>Set the Database Server Name to <b>(local).</b></li>
+	<li>Set the Database Name to <b>Demo_IDShield.</b></li>
+	<li>Login to the existing database with the password <b>a</b>.</li>
+	<ul>
+		<li>Open the <b>Summary</b> tab.</li>
+		<li>Confirm the presence of two actions: <b>Compute</b> and <b>Verify</b>.</li>
+	</ul>
+<p>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Test Images - Compute Redaction</h2>
+<UL>
+	<li>Open and execute the <b>Compute Redactions</b> FPS file.  
+<p>
+	<LI>With a local USB Key confirm that a test image opens and processes 
+	without error.
+	<LI>Remove the local USB Key and restart processing.  Confirm that processing 
+	the test image does not finish processing and that the UEX contains errors
+      related to USB key connectivity.
+	<LI>Connect to a remote USB Key and restart processing.  Confirm that the test 
+	image opens and processes without error.
+<p>
+	<LI>Confirm that each test image opens and processes without error.
+	<LI>Remove or rename the USS file for one test image. Confirm that processing this 
+	image runs OCR before finding and redacting Attributes.
+<p>
+	<LI><b>[FlexIDSCore #2762]</b> Execute the <b>Automatically Perform
+      Redactions</b>  FPS file, then execute the <b>Compute Redactions</b> FPS file 
+	again.  Confirm that the previously created redacted images are <b>NOT</b> supplied 
+	and processed.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Test Images - Verification</h2>
+<UL>
+	<li>Open the <b>Verify Redactions</b> FPS file.
+	<li>Process the images - <b>do not require</b> users to specify redaction type, <b>do not 
+	define</b> DefaultRedactionDataType.
+	<UL>
+		<LI>Confirm that <b>TestImage001.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage001.tif</b> displays two <b>Clue</b> and two <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage002.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage002.tif</b> displays one <b>Clue</b> and two <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage003.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage003.tif</b> displays one <b>Clue</b> and one <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage004.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage004.tif</b> displays zero <b>Clue</b> and two
+          <b>Medium</b> items in the ID Shield window.
+		<LI>Confirm that <b>TestImage005.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage005.tif</b> displays two <b>Clue</b> and two <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage006.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage006.tif</b> displays zero <b>Clue</b>, one <b>High</b>,
+          and three <b>Medium</b> items in the ID Shield window.
+		<LI>Confirm that <b>TestImage007.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage007.tif</b> displays one <b>Clue</b> and two <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage008.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage008.tif</b> displays two <b>Clue</b> and one <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage009.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage009.tif</b> displays one <b>Clue</b> and one <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage010.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage010.tif</b> displays one <b>Clue</b> and zero <b>High</b> 
+		items in the ID Shield window.
+		<ul>
+			<LI>Add one manual redaction.
+			<LI><b>[FlexIDSCore #2835]</b> Confirm that the drop-down list of types for the manual 
+			redaction defaults to an empty string as the type.
+			<LI><b>[FlexIDSCore #2753]</b> Confirm that the drop-down list background color 
+			is the normal Windows background color for controls.
+			<LI><b>[FlexIDSCore #2716]</b> Confirm that the drop-down list of types for the manual 
+			redaction includes <b>SSN</b> and <b>TaxID</b>.
+			<LI><b>[FlexIDSCore #2721]</b> Confirm that the drop-down list of types for the manual 
+			redaction <b>does not</b> include <b>Manual</b>.
+			<LI>Add another manual redaction and set a non-empty <b>Type</b>.
+			<LI>Confirm that the redacted image saves without error.
+		</ul>
+		<LI>Confirm that <b>TestImage011.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage011.tif</b> displays one <b>Clues</b> and two <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage012.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage012.tif</b> displays one <b>Clues</b> and one <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage013.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage013.tif</b> displays three <b>Clues</b> and three <b>High</b> 
+		items in the ID Shield window.
+		<LI>Confirm that <b>TestImage014.tif</b> opens without error.
+		<LI>Confirm that <b>TestImage014.tif</b> displays zero <b>Clues</b> and zero <b>High</b> 
+		and two <b>Medium</b> items in the ID Shield window.
+	</UL>
+<p>
+	<li>Open the <b>FAM DB Admin</b> utility and reset the action status for all <b>Verify</b> items
+		back to <b>Pending</b>.
+	<li><b>[FlexIDSCore #2833]</b> Process the images again - <b>require</b> users to specify redaction type, 
+	<b>do not define</b> DefaultRedactionDataType.
+	<UL>
+		<LI>Remove or rename the VOA file for <b>TestImage011.tif</b>.
+		<LI>Accept and <b>Save</b> the found items without change through <b>TestImage003.tif</b>.
+		<LI>For <b>TestImage004.tif</b>:
+		<ul>
+			<LI>Add a manual redaction and set a <b>Type</b>.
+			<ul>
+				<LI><b>[FlexIDSCore #2832]</b> Confirm that the new manual redaction is added 
+				immediately below the previously selected item.
+				<LI>Confirm that a drop-down list appears that contains the available 
+				redaction types.
+				<LI>Confirm that the first entry in the list is empty. 
+				<LI>Confirm that a type can be selected by typing the first letter 
+				of the type.
+				<LI>Confirm that clicking <b>Tab</b> after selecting a type accepts 
+				the type and navigates to the next item in the list.
+				<LI>Confirm that clicking <b>Shift+Tab</b> navigates to the previous 
+				item in the list and does not drop down the list of types.
+				<LI><b>[FlexIDSCore #2836]</b> Confirm that clicking <b>T</b> with a redaction 
+				or clue item selected, drops down the list of <b>Types</b>.
+				<LI><b>[FlexIDSCore #2753]</b> Confirm that the initial selection is the 
+				previously selected type.
+				<LI><b>[FlexIDSCore #2864]</b> Navigate through the listed items until reaching 
+				page 2, page 3 or page 4 where no items will be selected.  Confirm that clicking 
+				<b>T</b> has no effect.
+			</ul>
+			<LI>Confirm that the redacted image saves without error.
+			<LI>Confirm that the active image is <b>TestImage005.tif</b>.
+			<LI>Click the <b>Previous reviewed document</b> button to return to TestImage004.tif.
+			<LI>Add another manual redaction and do not set a <b>Type</b>.
+			<ul>
+				<LI><b>[FlexIDSCore #2835]</b> Confirm that the initial type selection matches 
+				the type selected with the most recent manual redaction.
+				<LI>Navigate the list of types with the arrow keys and select the empty 
+				string for the type.
+			</ul>
+			<LI>Click the <b>Next reviewed document</b> button to return to TestImage005.tif.
+			<LI>Confirm that an error is displayed and that <b>TestImage004.tif</b> 
+			remains active.
+			<LI>Add the missing Type setting and confirm that the redacted image saves 
+			without error.
+		</ul>
+		<LI>For <b>TestImage005.tif</b>:
+		<ul>
+			<LI>Add one manual redaction without setting a <b>Type</b>.
+			<LI>Click the <b>Previous reviewed document</b> button to return to TestImage004.tif.
+			<LI><b>[FlexIDSCore #2865]</b> Confirm that <b>TestImage004.tif</b> becomes the active document.
+			<LI>Click the <b>Next reviewed document</b> button to return to TestImage005.tif.
+			<LI>Confirm that the manual redaction is still present with no type setting.
+			<LI>Add the missing Type setting. 
+			<LI>Click the <b>Previous reviewed document</b> button to return to TestImage004.tif.
+			<LI>Confirm that <b>TestImage004.tif</b> is now the active image.
+			<LI>Add a manual redaction to <b>TestImage004.tif</b> without setting a 
+			<b>Type</b>.
+			<LI>Click the <b>Next reviewed document</b> button to return to TestImage005.tif.
+			<LI><b>[FlexIDSCore #2865]</b> Confirm that an error is displayed and that 
+			<b>TestImage004.tif</b> remains active.
+			<LI>Add the missing Type setting. 
+			<LI>Click the <b>Next reviewed document</b> button to return to TestImage005.tif.
+			<LI><b>[FlexIDSCore #2866]</b> Confirm that a <b>Changes have been made to document 
+			settings</b> message appears prompting the user to save changes. 
+			<LI>Click <b>Yes</b> to save the changes and continue to TestImage005.tif.
+			<LI>Click the <b>Save</b> button to move on.
+		</ul>
+		<LI>For <b>TestImage011.tif</b>:
+		<ul>
+			<li>Confirm that processing this image begins with no data in the 
+			<b>ID Shield</b> window.
+			<LI>Add one manual redaction and set a <b>Type</b>.
+			<LI>Add a second manual redaction without setting a <b>Type</b>.
+			<LI>Toggle the second manual redaction to <b>Off</b>.
+			<LI>Confirm that a warning message is displayed.
+			<LI>Click <b>Yes</b>.
+			<LI>Click the <b>Save</b> button to move on.
+			<LI><b>[FlexIDSCore #2868]</b> Confirm that the redacted image is saved without error.
+		</ul>
+		<LI>Accept and <b>Save</b> the remaining images.
+	</UL>
+<p>
+	<li>Open the <b>FAM DB Admin</b> utility and reset the action status for all <b>Verify</b> items
+		back to <b>Pending</b>.
+	<li><b>[FlexIDSCore #2858]</b> Process the images again - <b>require</b> users to specify redaction type, 
+	<b>do not define</b> DefaultRedactionDataType.
+	<UL>
+		<LI>Modify the VOA file for <b>TestImage004.tif</b>.  Change one of the Type settings 
+		to something unique such as <b>Hello</b>.
+		<LI>For <b>TestImage004.tif</b>:
+		<ul>
+			<LI>Add one manual redaction.
+			<LI>Confirm that the drop-down list <b>contains</b> the unique 
+			redaction type.
+			<LI>Select the unique redaction type.
+			<LI>Confirm that the redacted image saves without error.
+		</ul>
+		<LI>For <b>TestImage005.tif</b>:
+		<ul>
+			<LI>Add one manual redaction.
+			<LI>Confirm that the drop-down list of types for the manual 
+			redaction defaults to the empty string as the type.
+			<LI>Confirm that the drop-down list <b>does not contain</b> the unique 
+			redaction type.
+			<LI>Select a different redaction type.
+			<LI><b>[FlexIDSCore #2859]</b> Add another manual redaction - clicking <b>Tab</b> 
+			to move on without making a change to the default redaction type.
+			<LI>Confirm that the redacted image saves without error.
+		</ul>
+		<LI>Accept and <b>Save</b> the remaining images.
+<p>
+		<LI>Review the metadata output files.
+		<ul>
+			<LI><b>[FlexIDSCore #2723]</b> Confirm that the unique Type provided for one of the 
+			redactions in <b>TestImage004.tif</b> is included in the expected <b>Type</b> 
+			element.
+			<LI><b>[FlexIDSCore #2722]</b> Confirm that the manual redactions in <b>TestImage005.tif</b> 
+			have the expected <b>Type</b> elements.
+		</ul>
+	</UL>
+<p>
+	<li>Open the <b>FAM DB Admin</b> utility and reset the action status for all <b>Verify</b> items
+		back to <b>Pending</b>.
+	<li>Open the <b>IDShield.ini</b> file and under the <b>RedactionDataTypes</b> section
+		define <b>DefaultRedactionDataType=SSN</b>.
+	<li><b>[FlexIDSCore #2834]</b> Process the images again - <b>require</b> users to specify redaction type.
+	<UL>
+		<LI>Accept and <b>Save</b> the found items without change through <b>TestImage004.tif</b>.
+		<LI>For <b>TestImage005.tif</b>:
+		<ul>
+			<LI>Add a manual redaction.
+			<LI>Confirm that the drop-down list of types for the manual 
+			redaction defaults to <b>SSN</b> as the type.
+			<LI>Add a second manual redaction and modify the type to something different 
+			than the default.
+			<LI>Add a third manual redaction.
+			<LI><b>[FlexIDSCore #2835]</b> Confirm that the drop-down list of types for the manual 
+			redaction still defaults to <b>SSN</b> as the type.
+			<LI>Confirm that the redacted image saves without error.
+		</ul>
+		<LI>Accept and <b>Save</b> the remaining images.
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Filter ID Shield Data File Task</h2>
+<UL>
+	<li>Use the Add button to select <b>Filter ID Shield data file</b> as the task.</li>
+	<li>Confirm presence of a <b>Read the following ID Shield data file</b> edit box.</li>
+	<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
+   	<ul> 
+		<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop 
+		down list.</li>
+		<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the 
+		drop down list.</li>
+		<li>Confirm that the usual functions are provided in the drop down list.</li>
+   	</ul> 
+	<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
+<p>
+	<li>Confirm presence of a <b>check box</b> for each of the following data types.</li>
+   	<ul> 
+		<li>Social Security numbers</li>
+		<li>Tax ID</li>
+		<li>Credit/debit card numbers</li>
+		<li>Driver's license numbers</li>
+		<li>Bank account numbers</li>
+		<li>Other account numbers</li>
+		<li>Dates of birth</li>
+		<li>Other</li>
+	   	<ul> 
+			<li>Confirm presence of an associated <b>edit box</b>.</li>
+			<li>Confirm that the edit box is enabled only when the check box 
+			is checked.</li>
+	   	</ul> 
+   	</ul> 
+<p>
+	<li>Confirm presence of an <b>And write them to this ID Shield data file</b> edit box.</li>
+	<li>Confirm presence of an associated <b>Tag Selector</b> button.</li>
+   	<ul> 
+		<li>Confirm that <b>&lt;FPSFileDir&gt;</b> is provided in the drop 
+		down list.</li>
+		<li>Confirm that <b>&lt;SourceDocName&gt;</b> is provided in the 
+		drop down list.</li>
+		<li>Confirm that the usual functions are provided in the drop down list.</li>
+   	</ul> 
+	<li>Confirm presence of an associated <b>...</b> ( Browse ) button.</li>
+	<li>Confirm that settings are persistent.</li>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>ID Shield Data File Contents Condition</h2>
+<UL>
+  	<li>Begin configuring a <b>Conditional Task</b> object, selecting the <b>ID Shield data file 
+	condition</b> object.
+   	<li><b>[FlexIDSCore #2709]</b> Confirm presence of a disclaimer at the top of the configuration dialog.
+   	<li>Confirm presence of an enabled <b>The ID Shield data file contains any of the following</b> 
+	checkbox.
+   	<li>Confirm that associated checkboxes exist for <b>High confidence sensitive data</b>, 
+	<b>Medium confidence sensitive data</b>, <b>Low confidence sensitive data</b>, <b>Manually 
+	identified sensitive data</b>, and <b>Clues potentially identifying sensitive data</b>.
+   	<li>Confirm that the associated checkboxes are disabled when the main checkbox is unchecked.
+   	<li>Confirm that the associated checkboxes are enabled when the main checkbox is checked.
+<p>
+   	<li>Confirm presence of an enabled <b>Indicates one of the following as the document type</b> 
+	checkbox.
+   	<li>Confirm that an associated list box and <b>Select...</b> button exist.
+   	<li>Confirm that the associated controls are disabled when the main checkbox is unchecked.
+   	<li>Confirm that the associated controls are enabled when the main checkbox is checked.
+   	<li>Confirm that the <b>Select...</b> button displays a <b>Select Document Types</b> dialog.
+	<UL>
+	   	<li>Confirm that the <b>Document Category</b> combo box contains <b>County Document</b>.
+	   	<li>Confirm that the list box allows multiple selection of various document types.
+	   	<li>Confirm that the list box includes <b>Any Unique</b> and <b>Unclassified</b> items 
+		at the top of the list.
+	</UL>
+   	<li>Confirm that the selected document types are displayed in the main list box.
+   	<li>Confirm that the selected document types replace any previous document types in the main 
+	list box.
+<p>
+   	<li>Confirm that the initial value for <b>ID Shield Data File Location</b> is <b>You are 
+	using default settings.</b>
+   	<li>Confirm that a <b>Customize...</b> button is enabled.
+   	<li>Confirm that the <b>Customize...</b> button displays a <b>Customize ID Shield Data 
+	File Path</b> dialog.
+	<UL>
+	   	<li>Confirm that the dialog includes an enabled edit box for a file path.
+	   	<li>Confirm that the dialog includes an associated <b>Tag Selector</b> button.
+	   	<li>Confirm that the dialog includes an associated <b>...</b> ( Browse ) button.
+	   	<li>Confirm that the dialog includes a <b>Reset</b> button.
+	   	<li>Confirm that the Reset button restores the default file path.
+	   	<li>Confirm that the default file path is <b>&lt;SourceDocName&gt;.voa</b>.
+	</UL>
+   	<li>Confirm that the non-default file location is displayed in the main dialog if the path 
+	is customized.
+   	<li>Confirm that the previously defined custom location is displayed in the Customize 
+	dialog if the <b>Customize...</b> button is clicked.
+   	<li>Confirm that <b>You are using default settings.</b> is displayed in the main dialog if 
+	the customized path is Reset.
+<p>
+   	<li>Confirm that enabled options are available for handling non-existence of the data file.
+	<UL>
+	   	<li>Confirm that one option is <b>Record an error and continue</b>.
+	   	<li>Confirm that one option is <b>Consider condition satisfied (without error)</b>.
+	   	<li>Confirm that one option is <b>Consider condition unsatisfied (without error)</b>.
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Miscellaneous</h2>
+<OL>
+	<li><b>[FlexIDSCore #2742] - ID Shield Tester : Expected VOAs With Newlines</b>  
+	<UL>
+	   	<li>Navigate to I:\Common\Testing\PVCS_Testing\FlexIDSCore\2742.
+	   	<li>Start the Test Harness application and load <b>IDShieldTester.tcl</b>.
+	   	<li>Click the <b>Run Automated Tests</b> button and confirm that all the test cases 
+		complete successfully.
+	</UL>
+<p>
+	<li><b>[FlexIDSCore #2332] - Fit to buttons unpressed</b>  
+	<UL>
+	   	<li>Start a <b>Verification</b> test.
+	   	<li>Modify the <b>zoom</b> level to automatically zoom in to data items.
+	   	<li>Select another data item and confirm that the <b>fit-to-page</b> and 
+		<b>fit-to-width</b> buttons are unpressed in the Spot Recognition Window.
+	</UL>
+<p>
+	<li><b>[FlexIDSCore #2346] - Image timeout</b>  
+	<UL>
+	   	<li>Use image and VOA file from I:\Common\Testing\PVCS_Testing\FlexIDSCore\2346.
+	   	<li>Supply the TIF for verification.
+	   	<li>Confirm that the image and VOA file load successfully without error.
+	   	<li><b>[P16 #2390]</b> Use image and VOA file from I:\Common\Testing\PVCS_Testing\FlexIDSCore\2390.
+	   	<li>Supply the TIFs for verification.
+	   	<li>Confirm that the images and VOA files load successfully without error.
+	</UL>
+<p>
+	<li><b>[FlexIDSCore6 #2347] - Cannot save PDF with manual redaction</b>
+	<UL>
+	   	<li>Use image from I:\Common\Testing\PVCS_Testing\FlexIDSCore\2347.
+	   	<li>Supply the PDF for verification.
+	   	<li>Add one or more manual redactions during verification.
+	   	<li>Confirm that the redacted image saves successfully without error.
+	   	<li><b>[P16 #2366]</b> Confirm that the redacted image is approximately the same 
+		size as (or smaller than) the original image.
+	</UL>
+<p>
+	<LI><b>[FlexIDSCore #3073]</b> Running rule set causes FAM to crash
+		<ul>
+			<li>Prepare a test database
+			<li>Modify the associated Crash.fps
+			<li>Queue the associated MTG image
+			<li>Exercise the associated RSD file
+			<li>Confirm that the FAM <b>does not</b> crash.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3093]</b> Order of attributes within Automated Ruleset Tester
+		<ul>
+			<li>Exercise the zip file contents from <b>I:\Common\Testing\PVCS_Test\FlexIDSCore\3093</b></li>
+			<ul>
+				<li>Exercise the TCL file from <b>Tests.zip</b> using TestHarness.exe.</li>
+				<li>Confirm that the actual results match the expected results. Note that it will not be a collection
+				of perfect matches.</li>
+				<li>Exercise the TCL file from <b>Tests2.zip</b> using TestHarness.exe</li>
+				<li>Confirm that the actual results match the expected results. Note that it will not be a collection
+				of perfect matches.</li>
+			</ul>
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3193]</b> Color display when extra attributes are found by Automated Ruleset Tester</li>
+		<ul>
+			<li>Exercise the TCL file attached to SCR #3093</li>
+			<li>Confirm that the <b>Summary of Attribute Statistics</b> node is red.</li>
+		</ul>
+		
+
+		
+<p>
+    &nbsp;
+
+	<li><b>[FlexIDSCore #3244]</b> AutomatedRuleTest - allow relative path to EAV file
+	<ul>
+		<li>Exercise the DAT file attached to the SCR.
+		<li>Confirm that the relative path is supported.
+	</ul>
+		
+</OL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</HTML>

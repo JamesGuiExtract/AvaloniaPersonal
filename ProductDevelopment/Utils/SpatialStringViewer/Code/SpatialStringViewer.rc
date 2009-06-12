@@ -1,0 +1,389 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\SpatialStringViewer.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\SpatialStringViewer.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOG  0, 0, 272, 57
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About USS File Viewer"
+FONT 8, "MS Sans Serif"
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,21,20
+    LTEXT           "Copyright (C) 2009\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,40,25,119,25
+    DEFPUSHBUTTON   "OK",IDOK,215,5,50,14,WS_GROUP
+    EDITTEXT        IDC_EDIT_VERSION,40,7,168,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+IDD_SPATIALSTRINGVIEWER_DIALOG DIALOGEX 0, 0, 275, 257
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
+CAPTION "Extract Systems USS File Viewer"
+MENU IDR_MAIN_MENU
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_TEXT,0,0,275,257,ES_MULTILINE | ES_NOHIDESEL | ES_READONLY | NOT WS_BORDER | WS_VSCROLL | WS_HSCROLL | NOT WS_TABSTOP
+END
+
+IDD_DLG_FIND_REGEXPR DIALOG  0, 0, 334, 214
+STYLE DS_SETFONT | DS_MODALFRAME | DS_SETFOREGROUND | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Find"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_EXPRS,7,15,269,64,ES_MULTILINE | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    CONTROL         "Regular Expression",IDC_CHK_AS_REGEX,"Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,7,85,77,10
+	CONTROL			"Treat each line as separate regular expression", IDC_CHK_MULTI_REGEX, "Button",
+						BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP, 21, 98, 160, 10
+    CONTROL         "Case Sensitive",IDC_CHK_CASE_SENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,111,63,10
+    CONTROL         "OR",IDC_RADIO_OR,"Button",BS_AUTORADIOBUTTON | WS_GROUP,148,129,27,10
+    CONTROL         "AND",IDC_RADIO_AND,"Button",BS_AUTORADIOBUTTON,182,129,31,10
+    EDITTEXT        IDC_EDIT_FROM,105,143,40,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_TO,179,143,40,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Beginning of document",IDC_RADIO_BEGIN,"Button",BS_AUTORADIOBUTTON | WS_GROUP,71,188,89,10
+    CONTROL         "Current position",IDC_RADIO_CUR_POS,"Button",BS_AUTORADIOBUTTON,71,201,65,10
+    PUSHBUTTON      "&Find",IDC_BTN_FIND,281,20,48,14
+    PUSHBUTTON      "&Cancel",IDCANCEL,281,40,48,14
+    LTEXT           "Find what :",IDC_STATIC,7,3,36,8
+    LTEXT           "Search scope : ",IDC_STATIC,8,143,51,8
+    LTEXT           "%   to ",IDC_STATIC,152,145,20,8
+    LTEXT           "%",IDC_STATIC,225,145,8,8
+    LTEXT           "Start search at :",IDC_STATIC,8,188,51,8
+    LTEXT           "Operator to use between each pattern :",IDC_STATIC,8,129,125,8
+    PUSHBUTTON      "&Advanced >>",IDC_BTN_ADVANCE,281,60,48,14
+    EDITTEXT        IDC_EDIT_FONTSIZEFROM,104,173,40,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_FONTSIZETO,179,173,40,12,ES_RIGHT | ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "pt   to ",IDC_STATIC,152,175,21,8
+    LTEXT           "pt",IDC_STATIC,225,175,8,8
+    COMBOBOX        IDC_CMB_FONTSIZEINCLUDE,184,158,35,40,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "the range from:",IDC_STATIC,224,158,48,8
+    CONTROL         "From",IDC_CHK_RANGE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,143,30,10
+    CONTROL         "Find only in text with font sizes",IDC_CHK_FONTSIZERANGE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,71,158,110,10
+END
+
+IDD_DLG_FONTSIZEDISTRIBUTION DIALOG  0, 0, 187, 194
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Font Sizes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,130,175,50,14
+    CONTROL         "List1",IDC_LIST_FONT_SIZE_DIST,"SysListView32",LVS_REPORT | LVS_SORTASCENDING | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,175,150
+    LTEXT           "Total Number of Characters",IDC_TEXT_NUMCHARS,5,5,175,10
+END
+
+IDD_DLG_PROPERTY DIALOGEX 0, 0, 321, 211
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Property"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Close",IDOK,264,189,50,14
+    EDITTEXT        IDC_EDIT_SOURCE,7,17,307,14,ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
+    LTEXT           "Source Document:",IDC_STATIC,7,7,60,8
+    LTEXT           "Original Source Document:",IDC_STATIC,7,42,86,8
+    EDITTEXT        IDC_EDIT_ORIGINAL,7,52,307,14,ES_AUTOHSCROLL | ES_READONLY,WS_EX_CLIENTEDGE
+    CONTROL         "",IDC_LIST_PAGE_INFO,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,82,307,98
+    LTEXT           "Page Information:",IDC_STATIC,7,74,59,8
+END
+
+IDD_CHAR_INFO DIALOGEX 0, 0, 275, 145
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Character Information"
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Guess 1",IDC_STATIC,6,6,36,8
+    LTEXT           "Guess 2",IDC_STATIC,6,36,36,8
+    LTEXT           "Guess 3",IDC_STATIC,6,66,36,8
+    EDITTEXT        IDC_GUESS_1,6,16,44,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_GUESS_2,6,46,44,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_GUESS_3,6,76,44,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "End Of Zone",IDC_STATIC,17,99,60,8
+    LTEXT           "End Of Paragraph",IDC_STATIC,17,118,60,8
+    CHECKBOX        "",IDC_ZONE_END,6,95,11,18,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_PARAGRAPH_END,6,114,10,18,BS_VCENTER | WS_DISABLED
+    LTEXT           "Page #",IDC_STATIC,80,6,30,8
+    EDITTEXT        IDC_EDIT_FONT_SIZE_LABEL,80,36,55,8,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    EDITTEXT        IDC_EDIT_CONFIDENCE_LABEL,80,66,55,8,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    EDITTEXT        IDC_PAGE_NUM,80,16,30,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_FONT_SIZE,80,46,30,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_CONFIDENCE,80,76,30,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Top",IDC_STATIC,140,6,36,8
+    LTEXT           "Left",IDC_STATIC,140,36,36,8
+    LTEXT           "Bottom",IDC_STATIC,140,66,36,8
+    LTEXT           "Right",IDC_STATIC,140,96,36,8
+    EDITTEXT        IDC_TOP,140,16,34,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_LEFT,140,46,34,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_BOTTOM,140,76,34,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_RIGHT,140,106,34,12,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Font",IDC_STATIC,200,6,30,8
+    LTEXT           "Italic",IDC_STATIC,210,19,40,10
+    LTEXT           "Bold",IDC_STATIC,210,31,40,10
+    LTEXT           "SansSerif",IDC_STATIC,210,43,45,10
+    LTEXT           "Serif",IDC_STATIC,210,55,40,10
+    LTEXT           "Proportional",IDC_STATIC,210,67,42,10
+    LTEXT           "Underline",IDC_STATIC,210,79,45,10
+    LTEXT           "SuperScript",IDC_STATIC,210,91,40,10
+    LTEXT           "SubScript",IDC_STATIC,210,103,45,10
+    CHECKBOX        "",IDC_FONT_ITALIC,200,17,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_BOLD,200,29,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_SANSSERIF,200,41,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_SERIF,200,53,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_PROPORTIONAL,200,65,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_UNDERLINE,200,77,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_SUPERSCRIPT,200,89,8,13,BS_VCENTER | WS_DISABLED
+    CHECKBOX        "",IDC_FONT_SUBSCRIPT,200,101,8,13,BS_VCENTER | WS_DISABLED
+END
+
+IDD_DLG_WORDLENGTHDISTRIBUTION DIALOG  0, 0, 237, 194
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Word Lengths"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,180,175,50,14
+    CONTROL         "",IDC_LIST_WORD_LENGTH_DIST,"SysListView32",
+		LVS_REPORT | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,225,150
+    LTEXT           "Total Number of Words",IDC_TEXT_NUMWORDS,5,5,175,10
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems"
+            VALUE "FileDescription", "USSFileViewer MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "USS File Viewer"
+            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "OriginalFilename", "USSFileViewer.EXE"
+            VALUE "ProductName", "USSFileViewer Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 50
+    END
+
+    IDD_DLG_FIND_REGEXPR, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 176
+    END
+
+    IDD_DLG_FONTSIZEDISTRIBUTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 180
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 187
+    END
+
+    IDD_DLG_PROPERTY, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 314
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 203
+    END
+
+    IDD_CHAR_INFO, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 259
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 138
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MAIN_MENU MENU 
+BEGIN
+    POPUP "&File"
+    BEGIN
+        MENUITEM "&Open ...",                   ID_FILE_OPEN
+        MENUITEM "&Close",                      ID_FILE_CLOSE
+        MENUITEM SEPARATOR
+        MENUITEM "&Properties ...",             ID_FILE_PROPERTIES
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "&Tools"
+    BEGIN
+        MENUITEM "&Find...\tCtrl+F",            ID_MNU_FIND_REGEXPR
+        MENUITEM "&Character Info\tCtrl+I",     ID_MNU_OPEN_CHAR_INFO
+        MENUITEM "Font &Size Distribution...",   ID_MNU_FONTSIZEDISTRIBUTION
+		MENUITEM "&Word Length Distribution...", ID_MNU_WORDLENGTHDISTRIBUTION
+    END
+    POPUP "&Help"
+    BEGIN
+        MENUITEM "&About USS File Viewer...",   ID_HELP_ABOUTUCLIDSPATIALSTRINGVIEWER
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATORS ACCELERATORS 
+BEGIN
+    "F",            ID_MNU_FIND_REGEXPR,    VIRTKEY, CONTROL, NOINVERT
+    "I",            ID_MNU_OPEN_CHAR_INFO,  VIRTKEY, CONTROL, NOINVERT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About USS File Viewer..."
+END
+
+STRINGTABLE 
+BEGIN
+    ID_INDICATOR_START      "Start Pos : %d               "
+    ID_INDICATOR_END        "End Pos : %d                        "
+    ID_INDICATOR_PERCENT    "%d%% "
+    ID_INDICATOR_PAGE       "Page: %d"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\SpatialStringViewer.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

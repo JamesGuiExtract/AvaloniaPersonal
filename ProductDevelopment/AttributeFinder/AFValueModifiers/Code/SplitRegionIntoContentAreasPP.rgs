@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.SplitRegionIntoContentAreasPP.1 = s 'SplitRegionIntoContentAreasPP Class'
+	{
+		CLSID = s '{85A0A974-737E-4A34-B630-3AA0B3AA20F3}'
+	}
+	UCLIDAFValueModifiers.SplitRegionIntoContentAreasPP = s 'SplitRegionIntoContentAreasPP Class'
+	{
+		CLSID = s '{85A0A974-737E-4A34-B630-3AA0B3AA20F3}'
+		CurVer = s 'UCLIDAFValueModifiers.SplitRegionIntoContentAreasPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {85A0A974-737E-4A34-B630-3AA0B3AA20F3} = s 'SplitRegionIntoContentAreasPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

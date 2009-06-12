@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFilters.DistanceFilter.1 = s 'DistanceFilter Class'
+	{
+		CLSID = s '{F6B618D1-595B-11D6-8286-0050DAD4FF55}'
+	}
+	UCLIDFilters.DistanceFilter = s 'DistanceFilter Class'
+	{
+		CLSID = s '{F6B618D1-595B-11D6-8286-0050DAD4FF55}'
+		CurVer = s 'UCLIDFilters.DistanceFilter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F6B618D1-595B-11D6-8286-0050DAD4FF55} = s 'DistanceFilter Class'
+		{
+			ProgID = s 'UCLIDFilters.DistanceFilter.1'
+			VersionIndependentProgID = s 'UCLIDFilters.DistanceFilter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F6B618C1-595B-11D6-8286-0050DAD4FF55}'
+		}
+	}
+}

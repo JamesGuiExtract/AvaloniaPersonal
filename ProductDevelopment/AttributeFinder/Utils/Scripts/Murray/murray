@@ -1,0 +1,607 @@
+#!/bin/sh
+#now in UYNIX format
+###  FILE VARIABLES
+
+if [ "$1" = "" ];then
+    echo "Usage: murray \"[directories to run on]\" [current run]";
+	echo "";
+    echo "      e.g. murray \"Images Images2\" FirstRun";
+    echo "      to run on Images/MetaDataFirstRun & Images2/MetaDataFirstRun";
+    echo "      To run on more than one directory, the directory listing";
+    echo "      MUST BE IN QUOTES.";
+	echo "";
+	echo "      Reports directory for the above example would be:";
+	echo "      Reports__Images__Images2";
+    exit;
+fi
+   
+curr_run="$2";
+
+run_dir="MetaData"$curr_run"/*.xml"; 	#DEFAULT SCOPE OF FILES TO RUN ON
+#rep_dir="Reports";					#REPORTS DIRECTORY TO STORE SEGREGATED DATA OUTPUT	
+
+
+#create report directory(s)
+#for x in $1; do
+rep_dir="Reports__"`echo "$1" | sed -e 's/\ /__/g'`;					#REPORTS DIRECTORY TO STORE SEGREGATED DATA OUTPUT	
+if [ ! -e $rep_dir ]; then mkdir -p $rep_dir; fi
+
+#create time-stamped report subdirectory
+
+if [ "$curr_run" = "" ]; then
+    folder=`date +%Y-%m-%d_%k.%M`;
+else
+    folder=$curr_run"__"`date +%Y-%m-%d_%k.%M`;
+fi
+
+if [ ! -e "$rep_dir/~$folder" -a ! -e "$rep_dir/$folder" ]; then
+	folder="$rep_dir/~$folder";
+	mkdir "$folder";
+	else
+		int=1;	
+		while [ -e "$rep_dir/$folder.$int" -o  -e "$rep_dir/~$folder.$int" ]; do
+		int=$(( $int+1 ));	done ;
+		folder="$rep_dir/~$folder.$int";
+		mkdir "$folder";
+fi
+#done
+
+
+
+
+
+curr_file="";						#CURRENT FILE WHICH IS PROCESSING
+
+###  DATA VARIABLES
+Man1TOTAL=0;
+HC0TOTAL=0;
+HC1TOTAL=0;
+MC0TOTAL=0;
+MC1TOTAL=0;
+LC0TOTAL=0;
+LC1TOTAL=0;
+ClueTOTAL=0;
+
+###  FILE TOTALS
+SensitiveDocTOTAL=0;
+AllDocTOTAL=0;
+FilesWithAnythingOfImport=0;
+#AutoMissedTOTAL=0;
+
+#		categorical variables
+#############################################################
+HCwClueDocTOTAL=0;	HCDocTOTAL=0;
+MCwClueDocTOTAL=0;	MCDocTOTAL=0;
+LCwClueDocTOTAL=0;	LCDocTOTAL=0;
+ClueOnlyDocTOTAL=0;
+ManOnlyDocTOTAL=0;
+HCwClueManCnt=0;	HCwClueLCCnt=0;	HCwClueMCCnt=0;	HCwClueHCCnt=0;
+HCManCnt=0;	HCLCCnt=0;	HCMCCnt=0;	HCHCCnt=0;
+MCwClueManCnt=0;	MCwClueLCCnt=0;	MCwClueMCCnt=0;
+MCManCnt=0;	MCLCCnt=0;	MCMCCnt=0;
+LCwClueManCnt=0;	LCwClueLCCnt=0;
+LCManCnt=0;	LCLCCnt=0;
+ClueOnlyManCnt=0;
+ManOnlyManCnt=0;
+	_HCwClueDocTOTAL=0;	_HCDocTOTAL=0;
+	_MCwClueDocTOTAL=0;	_MCDocTOTAL=0;
+	_LCwClueDocTOTAL=0;	_LCDocTOTAL=0;
+	_ClueOnlyDocTOTAL=0;
+	_ManOnlyDocTOTAL=0;
+	_HCwClueManCnt=0;	_HCwClueLCCnt=0;	_HCwClueMCCnt=0;	_HCwClueHCCnt=0;
+	_HCManCnt=0;	_HCLCCnt=0;	_HCMCCnt=0;	_HCHCCnt=0;
+	_MCwClueManCnt=0;	_MCwClueLCCnt=0;	_MCwClueMCCnt=0;
+	_MCManCnt=0;	_MCLCCnt=0;	_MCMCCnt=0;
+	_LCwClueManCnt=0;	_LCwClueLCCnt=0;
+	_LCManCnt=0;	_LCLCCnt=0;
+	_ClueOnlyManCnt=0;
+	_ManOnlyManCnt=0;
+
+
+
+folder="../$folder";
+iter="1";
+
+# echo "original" $folder;
+
+#for directory in `ls -d *`; do
+for directory in $1; do
+if [ -e $directory/MetaData"$curr_run" ]; then
+	cd $directory;
+	
+	
+#	figure out what directory i'm in
+	curr_dir=${PWD##*'/'};	
+
+####OUTPUT COLUMN HEADERS, SO PEOPLE KNOW WHAT THE HECK THIS THING IS TRYING TO SAY
+###############################################
+echo "";
+echo -e '\033[1m\E[3m''\033[1m'$PWD;
+echo "          MAN HC1 HC0 MC1 MC0 LC1 LC0";
+echo "         ---- --- --- --- --- --- -----";
+tput sgr0;
+
+
+
+#THE LOOP
+################
+for xml_file in $run_dir; do
+
+	#echo $xml_file;
+	#reset pertinent variable values
+	HC0Cnt=0;
+	HC1Cnt=0;
+	LC0Cnt=0;
+	LC1Cnt=0;
+	MC0Cnt=0;
+	MC1Cnt=0;
+	Man1Cnt=0;
+	ClueCnt=0;
+	
+	
+	#GET NAME OF CURRENT INPUT FILE
+	line=`egrep -o '<InputFile>.*</InputFile>' "$xml_file"`;
+	junk='</InputFile>';
+	curr_file=${line%*$junk};
+	full_file=${curr_file##*'>'};
+	curr_file=${curr_file##*'\'};
+#	echo  $full_file ;#| tee>> file.txt; echo -e 
+
+
+	###  GET TALLY COUNTS
+	HC0Cnt=`egrep -o 'Redaction\ Type=\"High\"\ Output=\"0\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	HC1Cnt=`egrep -o 'Redaction\ Type=\"High\"\ Output=\"1\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	MC0Cnt=`egrep -o 'Redaction\ Type=\"Medium\"\ Output=\"0\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	MC1Cnt=`egrep -o 'Redaction\ Type=\"Medium\"\ Output=\"1\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	LC0Cnt=`egrep -o 'Redaction\ Type=\"Low\"\ Output=\"0\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	LC1Cnt=`egrep -o 'Redaction\ Type=\"Low\"\ Output=\"1\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	Man1Cnt=`egrep -o 'Redaction\ Type=\"Man\"\ Output=\"1\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;
+	ClueCnt=`egrep -o 'Redaction\ Type=\"Clue\"\ Output=\"[01]\"' "$xml_file" | sed -e 's/$/\n/'| grep -c 'Output'`;	
+	
+		
+	color="";
+	#### FIGURE OUT APPROPRIATE X - COLOR FOR LEADING, OVERALL INDICAATOR
+	if [ ! $Man1Cnt = "0" ]; then 
+		if [ ! $HC1Cnt = "0" -o ! $MC1Cnt = "0"  -o ! $LC1Cnt = "0" ]; then color='\033[1m\E[33m''\033[1m'; #yellow 
+		else color='\033[1m\E[31m''\033[1m'; fi				#red	-manual
+		elif [ ! $HC1Cnt = "0" ]; then color='\033[1m\E[32m''\033[1m'; 			#green	-high
+		elif [ ! $MC1Cnt = "0" ]; then color='\033[1m\E[36m''\033[1m'; 			#cyan	-medium
+		elif [ ! $LC1Cnt = "0" ]; then color='\033[1m\E[34m''\033[1m'; 			#blue	-lo
+		elif [ ! $HC0Cnt = "0"  -o ! $MC0Cnt = "0" -o ! $LC0Cnt = "0" ]; then 
+			color='\033[1m\E[35m''\033[1m'; 										#magenta	-FALSE POSITIVE
+		else color='\033[1m\E[3m''\033[1m';					# bold white
+	fi
+	echo -en "$color";
+	echo -n $iter"  "; iter=$[++iter];
+#	output_progress;
+	tput sgr0;
+	
+	
+	### OUTPUT DOC TYPE OF ONE WAS IDENTIFIED
+	doc_type="`egrep -o '<DocType>.*</DocType>' "$xml_file" | egrep -o '>[^<]+<' | egrep -o '[^<>]+'`";	
+	if [ ! "$doc_type" = "Unclassified" ]; then echo -n "$full_file">>"$folder"/FilesWithKnownDocType.txt; echo -e ":  $doc_type"'\r'>>"$folder"/FilesWithKnownDocType.txt; fi
+	
+	###	OUTPUT if CLUES WERE FOUND
+	if [ ! $ClueCnt = "0" ]; 
+		then echo -en '\033[1m\E[3m''\033[1m'" !";
+		echo -n '['$ClueCnt"] ""$full_file">>"$folder"/FilesWithClues.txt;
+		tput sgr0;
+ 		echo -n `egrep -o "Redaction Type=\"Clue\" Output=\"[01]\"><Line>[^<]+<Zone[^>]+></Line>" $xml_file | egrep -o ">[^<]+<"`>>"$folder"/FilesWithClues.txt;
+		echo -e '\r'>>"$folder"/FilesWithClues.txt;
+	else echo -en "  "; 
+	fi
+		
+	
+	#### OUTPUT MORE-DETAILED, COLORED SCREEN INFO
+	#########################################
+	echo -n " [  ";
+	if [ ! $Man1Cnt = "0" ]; 
+		then echo -en '\033[1m\E[31m''\033[1m'; 		#RED		MANUAL
+		echo -n '['$Man1Cnt']'' '"$full_file">>"$folder"/FilesHavingManualRedactions.txt; echo -e '\r'>>"$folder"/FilesHavingManualRedactions.txt;
+	fi	
+		echo -n $Man1Cnt;
+	tput sgr0;	echo -n "   ";
+	if [ ! $HC1Cnt = "0" ]; 
+		then echo -en '\033[1m\E[32m''\033[1m'; 		#GREEN		HCDATA
+		echo -n '['$HC1Cnt']'' '"$full_file">>"$folder"/FilesWithHCData.txt;echo -e '\r'>>"$folder"/FilesWithHCData.txt;
+	fi	
+	echo -n $HC1Cnt"   ";
+	tput sgr0;	
+	if [ ! $HC0Cnt = "0" ]; 
+		then echo -en '\033[1m\E[35m''\033[1m';		#MAGENTA
+		echo -n HC: '['$HC0Cnt']'' '"$full_file"' '>>"$folder"/FilesWithFalsePositives.txt;
+		if [ "`egrep -o 'Redaction\ Type=\"High\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file`" != "" ]; 
+			then egrep -o 'Redaction\ Type=\"High\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file |
+				sed -e 's/<Zone[^>]\+><\/Line><Line>/\\r\\n/' | egrep -o ">[^<]+<" | egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		else
+		 	egrep -o "Redaction Type=\"High\" Output=\"0\"><Line>[^<]+<Zone[^>]+></Line>" $xml_file | egrep -o ">[^<]+<" | 
+		 		egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		fi		
+		echo -e '\r'>>"$folder"/FilesWithFalsePositives.txt;				
+	fi	
+	echo -n $HC0Cnt;
+	tput sgr0;	echo -n "   ";		
+	if [ ! $MC1Cnt = "0" ]; 
+		then echo -en '\033[1m\E[36m''\033[1m'; 		#CYAN		MCDATA
+		echo -n '['$MC1Cnt']' ''"$full_file">>"$folder"/FilesWithMCData.txt;echo -e '\r'>>"$folder"/FilesWithMCData.txt;
+	fi	
+	echo -n $MC1Cnt"   ";
+	tput sgr0;	
+	if [ ! $MC0Cnt = "0" ]; 
+		then echo -en '\033[1m\E[35m''\033[1m'; 		#MAGENTA
+		echo -n MC: '['$MC0Cnt']'' '"$full_file"' '>>"$folder"/FilesWithFalsePositives.txt;
+		if [ "`egrep -o 'Redaction\ Type=\"Medium\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file`" != "" ]; 
+			then egrep -o 'Redaction\ Type=\"Medium\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file |
+				sed -e 's/<Zone[^>]\+><\/Line><Line>/\\r\\n/' | egrep -o ">[^<]+<" | egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		else
+		 	egrep -o "Redaction Type=\"Medium\" Output=\"0\"><Line>[^<]+<Zone[^>]+></Line>" $xml_file | egrep -o ">[^<]+<" | 
+		 		egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		fi		
+		echo -e '\r'>>"$folder"/FilesWithFalsePositives.txt;	
+	fi	
+	echo -n $MC0Cnt;
+	tput sgr0;	echo -n "   ";
+	if [ ! $LC1Cnt = "0" ]; 
+		then echo -en '\033[1m\E[34m''\033[1m'; 		#BLUE		LCDATA
+		echo -n '['$LC1Cnt']'' '"$full_file">>"$folder"/FilesWithLCData.txt;echo -e '\r'>>"$folder"/FilesWithLCData.txt;
+	fi	
+	echo -n $LC1Cnt"   ";
+	tput sgr0;	
+	if [ ! $LC0Cnt = "0" ]; 
+		then echo -en '\033[1m\E[35m''\033[1m'; 		#MAGENTA
+		echo -n LC: '['$LC0Cnt']'' '"$full_file"' '>>"$folder"/FilesWithFalsePositives.txt;
+		if [ "`egrep -o 'Redaction\ Type=\"Low\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file`" != "" ]; 
+			then egrep -o 'Redaction\ Type=\"Low\"\ Output=\"0\"><Line>[^<]+<Zone[^>]+></Line><Line>[^<]+<Zone' $xml_file |
+				sed -e 's/<Zone[^>]\+><\/Line><Line>/\\r\\n/' | egrep -o ">[^<]+<" | egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		else
+		 	egrep -o "Redaction Type=\"Low\" Output=\"0\"><Line>[^<]+<Zone[^>]+></Line>" $xml_file | egrep -o ">[^<]+<" | 
+		 		egrep -o "[^<>]+">>"$folder"/FilesWithFalsePositives.txt;
+		fi		
+		echo -e '\r'>>"$folder"/FilesWithFalsePositives.txt;
+	fi	
+	echo -n $LC0Cnt;
+	tput sgr0;	
+	echo -e "  ]  ->   $curr_dir/.../$color$curr_file";
+	tput sgr0;
+#	echo "     :  $xml_file";
+	
+
+	##UPDATE Tally TOTALS
+	HC0TOTAL=$(( $HC0TOTAL+$HC0Cnt ));
+	HC1TOTAL=$(( $HC1TOTAL+$HC1Cnt ));
+	MC0TOTAL=$(( $MC0TOTAL+$MC0Cnt ));
+	MC1TOTAL=$(( $MC1TOTAL+$MC1Cnt ));
+	LC0TOTAL=$(( $LC0TOTAL+$LC0Cnt ));
+	LC1TOTAL=$(( $LC1TOTAL+$LC1Cnt ));
+	Man1TOTAL=$(( $Man1TOTAL+$Man1Cnt ));
+	ClueTOTAL=$(( $ClueTOTAL+$ClueCnt ));
+	AllDocTOTAL=$[++AllDocTOTAL];
+	if [ ! $Man1Cnt = "0" -o ! $HC1Cnt = "0" -o ! $MC1Cnt = "0" -o ! $LC1Cnt = "0" ]; 
+		then SensitiveDocTOTAL=$[++SensitiveDocTOTAL];
+	fi
+
+			
+	####update more complex totals
+	#accuracy of idshield's AUTOMATED process WILL BE PROCESSED 
+	#WITH THE FOLOWING CATEGORIZED (and exclusive )DATA sets
+	if   [  ! $LC1Cnt = "0"  -o ! $LC0Cnt = "0" ]; then 
+		if [ ! $ClueCnt = "0" ]; then
+			LCwClueDocTOTAL=$[++LCwClueDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	LCwClueManCnt=$[LCwClueManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	LCwClueHCCnt=$[LCwClueHCCnt+HC1Cnt];	fi
+			if [  ! $MC1Cnt = "0" ]; then	LCwClueMCCnt=$[LCwClueMCCnt+MC1Cnt];	fi
+			if [  ! $LC1Cnt = "0" ]; then	LCwClueLCCnt=$[LCwClueLCCnt+LC1Cnt];	fi
+		else
+			LCDocTOTAL=$[++LCDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	LCManCnt=$[LCManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	LCHCCnt=$[LCHCCnt+HC1Cnt];		fi
+			if [  ! $MC1Cnt = "0" ]; then	LCMCCnt=$[LCMCCnt+MC1Cnt];		fi
+			if [  ! $LC1Cnt = "0" ]; then	LCLCCnt=$[LCLCCnt+LC1Cnt];		fi		
+		fi
+	elif [  ! $MC1Cnt = "0"  -o ! $MC0Cnt = "0" ]; then 
+		if [ ! $ClueCnt = "0" ]; then
+			MCwClueDocTOTAL=$[++MCwClueDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	MCwClueManCnt=$[MCwClueManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	MCwClueHCCnt=$[MCwClueHCCnt+HC1Cnt];	fi
+			if [  ! $MC1Cnt = "0" ]; then	MCwClueMCCnt=$[MCwClueMCCnt+MC1Cnt];	fi
+		else
+			MCDocTOTAL=$[++MCDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	MCManCnt=$[MCManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	MCHCCnt=$[MCHCCnt+HC1Cnt];		fi
+			if [  ! $MC1Cnt = "0" ]; then	MCMCCnt=$[MCMCCnt+MC1Cnt];		fi
+		fi
+	elif [  ! $HC1Cnt = "0"  -o ! $HC0Cnt = "0" ]; then
+		if [ ! $ClueCnt = "0" ]; then 
+			HCwClueDocTOTAL=$[++HCwClueDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	HCwClueManCnt=$[HCwClueManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	HCwClueHCCnt=$[HCwClueHCCnt+HC1Cnt];	fi
+		else
+			HCDocTOTAL=$[++HCDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	HCManCnt=$[HCManCnt+Man1Cnt];	fi
+			if [  ! $HC1Cnt = "0" ]; then	HCHCCnt=$[HCHCCnt+HC1Cnt];		fi
+		fi
+	elif [ ! $ClueCnt = "0" ]; then 
+		ClueOnlyDocTOTAL=$[++ClueOnlyDocTOTAL];
+		if [ ! $Man1Cnt = "0" ]; then	ClueOnlyManCnt=$[ClueOnlyManCnt+Man1Cnt];	fi		
+	elif [ ! $Man1Cnt = "0" ]; then 
+		ManOnlyDocTOTAL=$[++ManOnlyDocTOTAL];
+		if [ ! $Man1Cnt = "0" ]; then	ManOnlyManCnt=$[ManOnlyManCnt+Man1Cnt];		fi	
+	fi	
+		
+		
+	#ADD TO entry to TEXT FILES LISTING THE FILES THAT ARE OF INTEREST AND THEIR UNINTERESTING COUNTERPARTS
+	if [ ! $Man1Cnt = "0" -o ! $HC1Cnt = "0" -o ! $HC0Cnt = "0" -o ! $MC1Cnt = "0" -o ! $MC0Cnt = "0" -o ! $LC1Cnt = "0" -o ! $LC0Cnt = "0" -o ! $ClueCnt = "0" ]; then 
+		echo -n "$full_file">>"$folder"/FilesWithSensitiveDataOrClues.txt;echo -e '\r'>> "$folder"/FilesWithSensitiveDataOrClues.txt;	
+		FilesWithAnythingOfImport=$[++FilesWithAnythingOfImport];
+	else echo -n "$full_file">>"$folder"/FilesWithoutSensitiveDataOrClues.txt;echo -e '\r'>> "$folder"/FilesWithoutSensitiveDataOrClues.txt;		
+	fi			
+
+	if [ ! $Man1Cnt = "0" -o ! $HC1Cnt = "0" -o ! $MC1Cnt = "0" -o ! $LC1Cnt = "0" ]; then 
+		echo -n "$full_file">>"$folder"/FilesWithSensitiveData.txt;echo -e '\r'>> "$folder"/FilesWithSensitiveData.txt;	
+	else
+		echo -n "$full_file">>"$folder"/FilesWithoutSensitiveData.txt;echo -e '\r'>> "$folder"/FilesWithoutSensitiveData.txt;	
+	fi
+
+	##
+	###
+	##SPECIAL CLAUSE FOR OPTIONAL (ADDITIONAL INFO
+	###
+	###########################################################################
+
+		if   [  ! $HC1Cnt = "0"  -o ! $HC0Cnt = "0" ]; then 
+			if [ ! $ClueCnt = "0" ]; then
+				_HCwClueDocTOTAL=$[++_HCwClueDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_HCwClueManCnt=$[_HCwClueManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_HCwClueLCCnt=$[_HCwClueLCCnt+LC1Cnt];	fi
+				if [  ! $MC1Cnt = "0" ]; then	_HCwClueMCCnt=$[_HCwClueMCCnt+MC1Cnt];	fi
+				if [  ! $HC1Cnt = "0" ]; then	_HCwClueHCCnt=$[_HCwClueHCCnt+HC1Cnt];	fi
+			else
+				_HCDocTOTAL=$[++_HCDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_HCManCnt=$[_HCManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_HCLCCnt=$[_HCLCCnt+LC1Cnt];		fi
+				if [  ! $MC1Cnt = "0" ]; then	_HCMCCnt=$[_HCMCCnt+MC1Cnt];		fi
+				if [  ! $HC1Cnt = "0" ]; then	_HCHCCnt=$[_HCHCCnt+HC1Cnt];		fi		
+			fi
+		elif [  ! $MC1Cnt = "0"  -o ! $MC0Cnt = "0" ]; then 
+			if [ ! $ClueCnt = "0" ]; then
+				_MCwClueDocTOTAL=$[++_MCwClueDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_MCwClueManCnt=$[_MCwClueManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_MCwClueLCCnt=$[_MCwClueLCCnt+LC1Cnt];	fi
+				if [  ! $MC1Cnt = "0" ]; then	_MCwClueMCCnt=$[_MCwClueMCCnt+MC1Cnt];	fi
+			else
+				_MCDocTOTAL=$[++_MCDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_MCManCnt=$[_MCManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_MCLCCnt=$[_MCLCCnt+LC1Cnt];		fi
+				if [  ! $MC1Cnt = "0" ]; then	_MCMCCnt=$[_MCMCCnt+MC1Cnt];		fi
+			fi
+		elif [  ! $LC1Cnt = "0"  -o ! $LC0Cnt = "0" ]; then
+			if [ ! $ClueCnt = "0" ]; then 
+				_LCwClueDocTOTAL=$[++_LCwClueDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_LCwClueManCnt=$[_LCwClueManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_LCwClueLCCnt=$[_LCwClueLCCnt+LC1Cnt];	fi
+			else
+				_LCDocTOTAL=$[++_LCDocTOTAL];
+				if [ ! $Man1Cnt = "0" ]; then	_LCManCnt=$[_LCManCnt+Man1Cnt];	fi
+				if [  ! $LC1Cnt = "0" ]; then	_LCLCCnt=$[_LCLCCnt+LC1Cnt];		fi
+			fi
+		elif [ ! $ClueCnt = "0" ]; then 
+			_ClueOnlyDocTOTAL=$[++_ClueOnlyDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	_ClueOnlyManCnt=$[_ClueOnlyManCnt+Man1Cnt];	fi		
+		elif [ ! $Man1Cnt = "0" ]; then 
+			_ManOnlyDocTOTAL=$[++_ManOnlyDocTOTAL];
+			if [ ! $Man1Cnt = "0" ]; then	_ManOnlyManCnt=$[_ManOnlyManCnt+Man1Cnt];		fi	
+		fi	
+				
+done
+cd ..;
+fi
+
+done
+
+
+folder=${folder#*../};         
+#echo "newfolder name: "$folder;
+
+#figure out what directory i'm in
+curr_dir=${PWD##*'/'};
+
+
+
+#one or two  (or 47)  straight-forward variable calculations (more or less)
+SensitiveItemsTOTAL=$[Man1TOTAL + HC1TOTAL + MC1TOTAL + LC1TOTAL];
+	#FoundDocTotals (FDT) -- given arbitrary names, cuz im not feeling that creative
+FDTa=$[LCDocTOTAL +LCwClueDocTOTAL];                                                         
+FDTb=$[LCDocTOTAL +LCwClueDocTOTAL +MCDocTOTAL +MCwClueDocTOTAL];                                             
+FDTc=$[LCDocTOTAL +LCwClueDocTOTAL +MCDocTOTAL +MCwClueDocTOTAL +HCDocTOTAL +HCwClueDocTOTAL];                                 
+FDTd=$[ClueOnlyDocTOTAL +LCwClueDocTOTAL +MCwClueDocTOTAL +HCwClueDocTOTAL];
+FDTe=$[ClueOnlyDocTOTAL +LCwClueDocTOTAL +MCwClueDocTOTAL +HCwClueDocTOTAL +LCDocTOTAL];                        
+FDTf=$[ClueOnlyDocTOTAL +LCwClueDocTOTAL +MCwClueDocTOTAL +HCwClueDocTOTAL +LCDocTOTAL +MCDocTOTAL];            
+FDTg=$[ClueOnlyDocTOTAL +LCwClueDocTOTAL +MCwClueDocTOTAL +HCwClueDocTOTAL +LCDocTOTAL +MCDocTOTAL +HCDocTOTAL];
+	#MissedItemTotals (MIT)
+MITa=$[(ManOnlyManCnt +ClueOnlyManCnt +HCManCnt +HCHCCnt +HCwClueManCnt +HCwClueHCCnt +MCManCnt +MCHCCnt +MCMCCnt +MCwClueManCnt +MCwClueHCCnt +MCwClueMCCnt)];
+MITb=$[(ManOnlyManCnt +ClueOnlyManCnt +HCManCnt +HCHCCnt +HCwClueManCnt +HCwClueHCCnt)];                                                                       
+MITc=$[(ManOnlyManCnt +ClueOnlyManCnt)];                                                                                                                       
+MITd=$[(ManOnlyManCnt +HCManCnt +HCHCCnt +MCManCnt +MCHCCnt +MCMCCnt +LCManCnt +LCHCCnt +LCMCCnt +LCLCCnt)];                                                   
+MITe=$[(ManOnlyManCnt +HCManCnt +HCHCCnt +MCManCnt +MCHCCnt +MCMCCnt)];                                                                                        
+MITf=$[(ManOnlyManCnt +HCManCnt +HCHCCnt)];                                                                                                                    
+MITg=$[ManOnlyManCnt];                                                                                                                                         
+ 
+ ##
+###
+##SPECIAL CLAUSE FOR ADDITIONAL INFO
+###
+###########################################################################
+
+	_FDTa=$[_HCDocTOTAL +_HCwClueDocTOTAL];                                                         
+	_FDTb=$[_HCDocTOTAL +_HCwClueDocTOTAL +_MCDocTOTAL +_MCwClueDocTOTAL];                                             
+#	_FDTc=$[_HCDocTOTAL +_HCwClueDocTOTAL +_MCDocTOTAL +_MCwClueDocTOTAL +_LCDocTOTAL +_LCwClueDocTOTAL];                                 
+	_FDTd=$[_ClueOnlyDocTOTAL +_HCwClueDocTOTAL +_MCwClueDocTOTAL +_LCwClueDocTOTAL];
+	_FDTe=$[_ClueOnlyDocTOTAL +_HCwClueDocTOTAL +_MCwClueDocTOTAL +_LCwClueDocTOTAL +_HCDocTOTAL];                        
+	_FDTf=$[_ClueOnlyDocTOTAL +_HCwClueDocTOTAL +_MCwClueDocTOTAL +_LCwClueDocTOTAL +_HCDocTOTAL +_MCDocTOTAL];            
+	_FDTg=$[_ClueOnlyDocTOTAL +_HCwClueDocTOTAL +_MCwClueDocTOTAL +_LCwClueDocTOTAL +_HCDocTOTAL +_MCDocTOTAL +_LCDocTOTAL];
+	
+	_MITa=$[(_ManOnlyManCnt +_ClueOnlyManCnt +_LCManCnt +_LCLCCnt +_LCwClueManCnt +_LCwClueLCCnt +_MCManCnt +_MCLCCnt +_MCMCCnt +_MCwClueManCnt +_MCwClueLCCnt +_MCwClueMCCnt)];
+	_MITb=$[(_ManOnlyManCnt +_ClueOnlyManCnt +_LCManCnt +_LCLCCnt +_LCwClueManCnt +_LCwClueLCCnt)];                                                                       
+#	_MITc=$[(_ManOnlyManCnt +_ClueOnlyManCnt)];                                                                                                                       
+#	_MITd=$[(_ManOnlyManCnt +_LCManCnt +_LCLCCnt +_MCManCnt +_MCLCCnt +_MCMCCnt +_HCManCnt +_HCLCCnt +_HCMCCnt +_HCHCCnt)];                                                   
+	_MITe=$[(_ManOnlyManCnt +_LCManCnt +_LCLCCnt +_MCManCnt +_MCLCCnt +_MCMCCnt)];                                                                                        
+	_MITf=$[(_ManOnlyManCnt +_LCManCnt +_LCLCCnt)];                                                                                                                    
+#	_MITg=$[_ManOnlyManCnt];   
+
+ 
+ 
+  ##
+###
+##  dump all categorized info to a file
+###
+##############################################
+#####  output pertinent totals
+echo -e "TOTAL Num Docs\t"$AllDocTOTAL>>"$folder"/raw.data;
+echo -e "SENSITIVE Docs\t"$SensitiveDocTOTAL>>"$folder"/raw.data;
+echo -e "SENSITIVE Items\t"$SensitiveItemsTOTAL>>"$folder"/raw.data;	
+echo "">>"$folder"/raw.data;		
+#echo -e "LC -> HC\t\t\t\t\t\t\t\tHC -> LC">>"$folder"/raw.data;	
+echo -e "\tFoundDocs\tMissedItems">>"$folder"/raw.data;
+echo -e "LC\t$FDTa\t$MITa">>"$folder"/raw.data;
+echo -e "LC|MC\t$FDTb\t$MITb">>"$folder"/raw.data;
+echo -e "LC|MC|HC\t$FDTc\t$MITc">>"$folder"/raw.data;
+echo -e "Clue\t$FDTd\t$MITd">>"$folder"/raw.data;
+echo -e "Clue|LC\t$FDTe\t$MITe">>"$folder"/raw.data;
+echo -e "Clue|LC|MC\t$FDTf\t$MITf">>"$folder"/raw.data;
+echo -e "Clue|LC|MC|HC\t$FDTg\t$MITg">>"$folder"/raw.data;
+echo -e "HC\t$_FDTa\t$_MITa">>"$folder"/raw.data;
+echo -e "HC|MC\t$_FDTb\t$_MITb">>"$folder"/raw.data;
+#echo -e "HC|MC|LC\t$_FDTc\t$_MITc">>"$folder"/raw.data;
+#echo -e "Clue\t$_FDTd\t$_MITd">>"$folder"/raw.data;
+echo -e "Clue|HC\t$_FDTe\t$_MITe">>"$folder"/raw.data;
+echo -e "Clue|HC|MC\t$_FDTf\t$_MITf">>"$folder"/raw.data;
+#echo -e "Clue|HC|MC|LC\t$_FDTg\t$_MITg">>"$folder"/raw.data;
+
+
+
+## OUTPUT RAW TOTALS to screen
+#####################################
+##
+echo "";echo "";
+echo -n "                                TOTAL [  ";
+if [ ! $Man1TOTAL = "0" ]; then echo -en '\033[1m\E[31m''\033[1m'; fi
+echo -n $Man1TOTAL;
+tput sgr0;	echo -n "   ";
+if [ ! $HC1TOTAL = "0" ]; then echo -en '\033[1m\E[32m''\033[1m'; fi
+echo -n $HC1TOTAL"   ";
+tput sgr0;
+if [ ! $HC0TOTAL = "0" ]; then echo -en '\033[1m\E[35m''\033[1m'; fi
+echo -n $HC0TOTAL;
+tput sgr0;	echo -n "   ";
+if [ ! $MC1TOTAL = "0" ]; then echo -en '\033[1m\E[36m''\033[1m'; fi
+echo -n $MC1TOTAL"   ";
+tput sgr0;
+if [ ! $MC0TOTAL = "0" ]; then echo -en '\033[1m\E[35m''\033[1m'; fi
+echo -n $MC0TOTAL;
+tput sgr0;	echo -n "   ";
+if [ ! $LC1TOTAL = "0" ]; then echo -en '\033[1m\E[34m''\033[1m'; fi
+echo -n $LC1TOTAL"   ";
+tput sgr0;
+if [ ! $LC0TOTAL = "0" ]; then echo -en '\033[1m\E[35m''\033[1m'; fi
+echo -n $LC0TOTAL;
+tput sgr0;	
+echo "  ]";
+
+#output raw totals to raw.data file
+echo "TOTAL [ $Man1TOTAL  $HC1TOTAL  $HC0TOTAL  $MC1TOTAL  $MC0TOTAL  $LC1TOTAL  $LC0TOTAL ]">>"$folder"/raw.data;
+
+function find_percent ()
+{	echo -en $[(100 * $1) /$2]'.'$[((1000 * $1) /$2) % 10]$[((10000 * $1) /$2) % 10]"%";
+}
+
+function find_percent_invert ()
+{	if [ ! "$2" = "0" ]; then
+		leftofdot=$[(100 * $1) / $2];
+		rightofdot=$[((1000 * $1) / $2) % 10]$[((10000 * $1) / $2) % 10];
+		if [ $[rightofdot%10] = "0" -a $[rightofdot/10] = "0"  ]; then
+			echo -en $[100-leftofdot]".00%";
+			elif [ $[rightofdot%10] = "0" ]; then echo -en $[99-leftofdot]'.'$[100-rightofdot]"%";	
+			else echo -en $[99-leftofdot]'.'$[9-rightofdot/10]$[10-rightofdot%10]"%";
+		fi				
+	fi
+}
+#		OUTPUT simple STATS.txt
+#############################################################################
+##############################################################################
+cyg_prefix="/cygdrive/";
+meta_postfix="/MetaData";
+here=${PWD#*$cyg_prefix};
+here=${here%%'/'*}":/"${here#*'/'};
+echo -e "$here"'\r'>>"$folder"/STATS.txt
+
+	echo -en '\033[1m\E[31m''\033[1m';
+	echo -e "\r\n\r\nCount of files processed & sensitive data items found\r"| tee -a "$folder"/STATS.txt;
+	tput sgr0;
+	echo -e " ---------------------------------------------------------------------\r"| tee -a "$folder"/STATS.txt;
+	echo -e "  Number of Files Selected for Computing These Stats:         \t"$AllDocTOTAL'\r'| tee -a "$folder"/STATS.txt;
+	echo -e "  Number of Sensitive Data Items Identified by User:          \t"$SensitiveItemsTOTAL'\r'| tee -a "$folder"/STATS.txt;
+	echo -e "  Number of Files that Contain Redactions:                    \t"$SensitiveDocTOTAL'\r'| tee -a "$folder"/STATS.txt;
+	echo -e "  Percent of Files that Contain Redactions:                   \t"$[(100 * SensitiveDocTOTAL) / AllDocTOTAL]'.'$[((1000 * SensitiveDocTOTAL) / AllDocTOTAL) % 10]"%\r"| tee -a "$folder"/STATS.txt;
+
+	echo -en '\033[1m\E[31m''\033[1m';
+	echo -e "\r\n\r\n\r\nEfficiency & Accuracy of IDShied's VERIFICATION PROCESS\r"| tee -a "$folder"/STATS.txt;
+	tput sgr0;
+	echo -e " ----------------------------------------------------------------------------------------------\r"| tee -a "$folder"/STATS.txt;
+
+
+	#	NEW OUTPUT WITH ADDED BREAKDOWNS
+	##################################
+	echo -e "               Files to Review	     Redactions That Would Have Been Missed \r" | tee -a "$folder"/STATS.txt;
+	echo -e "              -------------------------------------------------------------\r" | tee -a "$folder"/STATS.txt;
+	echo -e "\r"| tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "LC             " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTa\t`find_percent $FDTa $AllDocTOTAL`\t\t$MITa\t`find_percent_invert $MITa $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "LC|MC          " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTb\t`find_percent $FDTb $AllDocTOTAL`\t\t$MITb\t`find_percent_invert $MITb $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "LC|MC|HC       " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTc\t`find_percent $FDTc $AllDocTOTAL`\t\t$MITc\t`find_percent_invert $MITc $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;	echo -e "---------     -------------------------------------------\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue           " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTd\t`find_percent $FDTd $AllDocTOTAL`\t\t$MITd\t`find_percent_invert $MITd $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue|LC        " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTe\t`find_percent $FDTe $AllDocTOTAL`\t\t$MITe\t`find_percent_invert $MITe $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue|LC|MC     " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTf\t`find_percent $FDTf $AllDocTOTAL`\t\t$MITf\t`find_percent_invert $MITf $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue|LC|MC|HC  " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$FDTg\t`find_percent $FDTg $AllDocTOTAL`\t\t$MITg\t`find_percent_invert $MITg $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;	echo -e "---------     -------------------------------------------\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "HC             " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$_FDTa\t`find_percent $_FDTa $AllDocTOTAL`\t\t$_MITa\t`find_percent_invert $_MITa $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "HC|MC          " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$_FDTb\t`find_percent $_FDTb $AllDocTOTAL`\t\t$_MITb\t`find_percent_invert $_MITb $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue|HC        " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$_FDTe\t`find_percent $_FDTe $AllDocTOTAL`\t\t$_MITe\t`find_percent_invert $_MITe $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; echo -n "Clue|HC|MC     " | tee -a "$folder"/STATS.txt; tput sgr0; echo -e "$_FDTf\t`find_percent $_FDTf $AllDocTOTAL`\t\t$_MITf\t`find_percent_invert $_MITf $SensitiveItemsTOTAL`\r" | tee -a "$folder"/STATS.txt;
+
+	
+	echo -en '\033[1m\E[31m''\033[1m';
+	echo -e "\r\n\r\n\r\nAccuracy of IDShield's AUTOMATED PROCESS\r"| tee -a "$folder"/STATS.txt;
+	tput sgr0;
+	echo -e " ----------------------------------------------------------------------------------------------\r"| tee -a "$folder"/STATS.txt;
+	echo -en "                                                     "| tee -a "$folder"/STATS.txt;
+	echo -en '\033[1m\E[32m''\033[1m'; 
+	echo -e "   LC&MC&HC\tMC&HC\t\tHC\r"| tee -a "$folder"/STATS.txt;
+	tput sgr0;
+	echo -e "\r\n  Number of Sensitive Data Items Found by IDShield:     "$[HC1TOTAL+MC1TOTAL+LC1TOTAL]"\t\t"$[HC1TOTAL+MC1TOTAL]"\t\t"$HC1TOTAL"\r"| tee -a "$folder"/STATS.txt;
+	echo -en "\r\n  Accuracy of the IDShield automated process:           "| tee -a "$folder"/STATS.txt;
+
+	echo -en `find_percent $[HC1TOTAL+MC1TOTAL+LC1TOTAL] $SensitiveItemsTOTAL`'\t''\t'| tee -a "$folder"/STATS.txt;
+	echo -en `find_percent $[HC1TOTAL+MC1TOTAL] $SensitiveItemsTOTAL`'\t''\t'| tee -a "$folder"/STATS.txt;
+	echo -en `find_percent $HC1TOTAL $SensitiveItemsTOTAL`| tee -a "$folder"/STATS.txt;
+	
+	echo -e "\r\n\r\n  Number of False Positives Found by IDShield:          "$[HC0TOTAL+MC0TOTAL+LC0TOTAL]"\t\t"$[HC0TOTAL+MC0TOTAL]"\t\t"$HC0TOTAL"\r"| tee -a "$folder"/STATS.txt;
+	echo -e "\r\n  Ratio of Correctly Identified\r"| tee -a "$folder"/STATS.txt;
+	echo -en "   Sensitive Data Items to False Positives:             "| tee -a "$folder"/STATS.txt;
+	
+	function calc_ratio ()
+	{	if [ ! $2 = "0" ]; then
+			echo -en $[$1/$2]'.'$[((10*$1)/$2) % 10]$[((100*$1)/$2) % 10]"\t\t"| tee -a "$folder"/STATS.txt;
+		else echo -en "DNE\t\t"| tee -a "$folder"/STATS.txt;
+		fi
+	}
+	calc_ratio $[HC1TOTAL+MC1TOTAL+LC1TOTAL] $[HC0TOTAL+MC0TOTAL+LC0TOTAL];
+	calc_ratio $[HC1TOTAL+MC1TOTAL] $[HC0TOTAL+MC0TOTAL];
+	calc_ratio $[HC1TOTAL] $[HC0TOTAL];echo "";
+
+	
+#####	REMOVE FLAG WHICH SIGNIFIED THAT THE SCRIPT HAD NOT COMPLETED AND FINISH EXECUTING		
+new_location=${folder%'~'*}${folder#*'~'};
+mv "$folder" "$new_location";
+
+echo "";echo -e '\033[1m\E[33m''\033[1m';
+echo "                 ** see \"$curr_dir/$new_location\" directory for further breakdowns";
+echo "";echo "";
+tput sgr0;

@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

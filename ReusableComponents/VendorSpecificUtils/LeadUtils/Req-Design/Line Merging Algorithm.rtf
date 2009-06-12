@@ -1,0 +1,84 @@
+{\rtf1\ansi\ansicpg1252\uc1 \deff0\deflang1033\deflangfe1033{\fonttbl{\f0\froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman;}{\f1\fswiss\fcharset0\fprq2{\*\panose 020b0604020202020204}Arial;}
+{\f2\fmodern\fcharset0\fprq1{\*\panose 02070309020205020404}Courier New;}{\f34\froman\fcharset238\fprq2 Times New Roman CE;}{\f35\froman\fcharset204\fprq2 Times New Roman Cyr;}{\f37\froman\fcharset161\fprq2 Times New Roman Greek;}
+{\f38\froman\fcharset162\fprq2 Times New Roman Tur;}{\f39\froman\fcharset177\fprq2 Times New Roman (Hebrew);}{\f40\froman\fcharset178\fprq2 Times New Roman (Arabic);}{\f41\froman\fcharset186\fprq2 Times New Roman Baltic;}
+{\f42\fswiss\fcharset238\fprq2 Arial CE;}{\f43\fswiss\fcharset204\fprq2 Arial Cyr;}{\f45\fswiss\fcharset161\fprq2 Arial Greek;}{\f46\fswiss\fcharset162\fprq2 Arial Tur;}{\f47\fswiss\fcharset177\fprq2 Arial (Hebrew);}
+{\f48\fswiss\fcharset178\fprq2 Arial (Arabic);}{\f49\fswiss\fcharset186\fprq2 Arial Baltic;}{\f50\fmodern\fcharset238\fprq1 Courier New CE;}{\f51\fmodern\fcharset204\fprq1 Courier New Cyr;}{\f53\fmodern\fcharset161\fprq1 Courier New Greek;}
+{\f54\fmodern\fcharset162\fprq1 Courier New Tur;}{\f55\fmodern\fcharset177\fprq1 Courier New (Hebrew);}{\f56\fmodern\fcharset178\fprq1 Courier New (Arabic);}{\f57\fmodern\fcharset186\fprq1 Courier New Baltic;}}{\colortbl;\red0\green0\blue0;
+\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;\red255\green0\blue255;\red255\green0\blue0;\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue128;\red0\green128\blue128;\red0\green128\blue0;\red128\green0\blue128;
+\red128\green0\blue0;\red128\green128\blue0;\red128\green128\blue128;\red192\green192\blue192;}{\stylesheet{\ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \fs24\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 \snext0 Normal;}{
+\s1\ql \li0\ri0\sb240\sa60\keepn\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \b\f1\fs32\lang1033\langfe1033\kerning32\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext0 heading 1;}{\*\cs10 \additive Default Paragraph Font;}{
+\s15\ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \f2\fs20\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 \sbasedon0 \snext15 Body Text;}}{\info{\title Line Merging Algorithm}{\author Steve Kurth}{\operator Steve Kurth}
+{\creatim\yr2008\mo3\dy11\hr14\min35}{\revtim\yr2008\mo3\dy13\hr9\min9}{\version7}{\edmins1}{\nofpages1}{\nofwords374}{\nofchars2135}{\*\company Extract System, LLC}{\nofcharsws0}{\vern8269}}
+\widowctrl\ftnbj\aenddoc\noxlattoyen\expshrtn\noultrlspc\dntblnsbdb\nospaceforul\hyphcaps0\formshade\horzdoc\dgmargin\dghspace180\dgvspace180\dghorigin1800\dgvorigin1440\dghshow1\dgvshow1
+\jexpand\viewkind1\viewscale100\pgbrdrhead\pgbrdrfoot\splytwnine\ftnlytwnine\htmautsp\nolnhtadjtbl\useltbaln\alntblind\lytcalctblwd\lyttblrtgr\lnbrkrule \fet0\sectd \linex0\endnhere\sectlinegrid360\sectdefaultcl {\*\pnseclvl1
+\pnucrm\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl2\pnucltr\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl3\pndec\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl4\pnlcltr\pnstart1\pnindent720\pnhang{\pntxta )}}{\*\pnseclvl5
+\pndec\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl6\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl7\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl8\pnlcltr\pnstart1\pnindent720\pnhang
+{\pntxtb (}{\pntxta )}}{\*\pnseclvl9\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}\pard\plain \s1\qc \li0\ri0\sb240\sa60\keepn\widctlpar\aspalpha\aspnum\faauto\outlinelevel0\adjustright\rin0\lin0\itap0 
+\b\f1\fs32\lang1033\langfe1033\kerning32\cgrid\langnp1033\langfenp1033 {\ul Line Merging Algorithm
+\par }\pard\plain \ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \fs24\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 {\f2\fs20 
+\par As the AddLine functions is called via either LeadTools reporting the coordinates of a line in lineRemoveCB or via the extendLines method, attemptMerge is calle
+d which will attempt to merge the incoming line with one or more existing lines.  attemptMerge compares the specified line to all existing lines and will consider the lines qualified for merging under 2 different circumstances.
+\par 
+\par In both cases, a vertical allowance will be calculated to determine whether the lines are placed close enough vertically with each other to be qualified for merging. }{\f2\fs20\lang1024\langfe1024\noproof 
+To determine the vertical allowance, the lesser of half of the average of the width of the two lines or NTERSECTION_A
+LLOWANCE_MAX (currently 20 pixels) is used. For example, if the width of one line is 10 pixels and the width of the other is 14, the vertical allowance will be 6 pixels. However, if half the average width of the two lines came out to be 25, the vertical a
+llowance would be capped at 20 pixels.}{\f2\fs20 
+\par 
+\par }{\b\f2\fs20\ul Case 1}{\f2\fs20 : Two lines stacked closely on top of one another.
+\par 
+\par }{\fs20\lang1024\langfe1024\noproof {\shp{\*\shpinst\shpleft4995\shptop169\shpright7830\shpbottom409\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz3\shplid1026
+{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}{\sp{\sn fillColor}{\sv 8421504}}{\sp{\sn fillOpacity}{\sv 32768}}
+{\sp{\sn fFilled}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8195\dppolygon\dppolycount40\dpptx41\dppty0\dpptx36\dppty0\dpptx32\dppty1\dpptx27\dppty3\dpptx18\dppty7\dpptx14\dppty12
+\dpptx9\dppty18\dpptx5\dppty25\dpptx0\dppty32\dpptx0\dppty40\dpptx0\dppty200\dpptx0\dppty208\dpptx5\dppty215\dpptx9\dppty222\dpptx14\dppty228\dpptx18\dppty233\dpptx27\dppty237\dpptx32\dppty239\dpptx36\dppty240\dpptx41\dppty240\dpptx2794\dppty240
+\dpptx2799\dppty240\dpptx2803\dppty239\dpptx2812\dppty237\dpptx2817\dppty233\dpptx2821\dppty228\dpptx2830\dppty222\dpptx2830\dppty215\dpptx2835\dppty208\dpptx2835\dppty200\dpptx2835\dppty40\dpptx2835\dppty32\dpptx2830\dppty25\dpptx2830\dppty18
+\dpptx2821\dppty12\dpptx2817\dppty7\dpptx2812\dppty3\dpptx2803\dppty1\dpptx2799\dppty0\dpptx2794\dppty0\dpx4995\dpy169\dpxsize2835\dpysize240
+\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr128\dpfillbgcg128\dpfillbgcb128\dpfillpat1\dplinew15\dplinecor0\dplinecog0\dplinecob0}}}}{\f2\fs20 
+\par }{\fs20\lang1024\langfe1024\noproof {\shp{\*\shpinst\shpleft150\shptop215\shpright7860\shpbottom410\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz5\shplid1027
+{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}{\sp{\sn fillOpacity}{\sv 32768}}{\sp{\sn fFilled}{\sv 0}}{\sp{\sn lineWidth}{\sv 25400}}{\sp{\sn lineDashing}{\sv 2}}{\sp{\sn fLine}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}
+{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8197\dppolygon\dppolycount40\dpptx37\dppty0\dpptx37\dppty0\dpptx25\dppty1\dpptx25\dppty2\dpptx12\dppty6\dpptx12\dppty10\dpptx0\dppty14\dpptx0\dppty20\dpptx0\dppty26\dpptx0\dppty32
+\dpptx0\dppty163\dpptx0\dppty169\dpptx0\dppty175\dpptx0\dppty181\dpptx12\dppty185\dpptx12\dppty189\dpptx25\dppty193\dpptx25\dppty194\dpptx37\dppty195\dpptx37\dppty195\dpptx7673\dppty195\dpptx7673\dppty195\dpptx7685\dppty194\dpptx7685\dppty193
+\dpptx7698\dppty189\dpptx7698\dppty185\dpptx7710\dppty181\dpptx7710\dppty175\dpptx7710\dppty169\dpptx7710\dppty163\dpptx7710\dppty32\dpptx7710\dppty26\dpptx7710\dppty20\dpptx7710\dppty14\dpptx7698\dppty10\dpptx7698\dppty6\dpptx7685\dppty2\dpptx7685\dppty1
+\dpptx7673\dppty0\dpptx7673\dppty0\dpx150\dpy215\dpxsize7710\dpysize195\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr255\dpfillbgcg255\dpfillbgcb255\dpfillpat0\dplinew40\dplinecor0\dplinecog0\dplinecob0}}}}{\f2\fs20 
+\par }{\fs20\lang1024\langfe1024\noproof {\shp{\*\shpinst\shpleft165\shptop16\shpright7635\shpbottom166\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz2\shplid1028
+{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}{\sp{\sn fillColor}{\sv 8421504}}{\sp{\sn fillOpacity}{\sv 32768}}
+{\sp{\sn fFilled}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8194\dppolygon\dppolycount40\dpptx24\dppty0\dpptx24\dppty0\dpptx24\dppty0\dpptx12\dppty2\dpptx12\dppty4\dpptx12\dppty7
+\dpptx0\dppty11\dpptx0\dppty15\dpptx0\dppty20\dpptx0\dppty25\dpptx0\dppty125\dpptx0\dppty130\dpptx0\dppty135\dpptx0\dppty139\dpptx12\dppty143\dpptx12\dppty146\dpptx12\dppty148\dpptx24\dppty150\dpptx24\dppty150\dpptx24\dppty150\dpptx7446\dppty150
+\dpptx7446\dppty150\dpptx7446\dppty150\dpptx7458\dppty148\dpptx7458\dppty146\dpptx7458\dppty143\dpptx7470\dppty139\dpptx7470\dppty135\dpptx7470\dppty130\dpptx7470\dppty125\dpptx7470\dppty25\dpptx7470\dppty20\dpptx7470\dppty15\dpptx7470\dppty11
+\dpptx7458\dppty7\dpptx7458\dppty4\dpptx7458\dppty2\dpptx7446\dppty0\dpptx7446\dppty0\dpptx7446\dppty0\dpx165\dpy16\dpxsize7470\dpysize150
+\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr128\dpfillbgcg128\dpfillbgcb128\dpfillpat1\dplinew15\dplinecor0\dplinecog0\dplinecob0}}}}{\f2\fs20 
+\par 
+\par 
+\par }\pard\plain \s15\ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \f2\fs20\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 {
+In this case, if more than half of the length of the shorter line overlaps with the longer of the two lines and if the space between the 2 lines is les
+s than the vertical allowance described above, the lines will be merged.  When merging lines in this fashion, the combined length of the two lines is used, but only the vertical positioning of the longer line is used.  This is because in most cases, the s
+horter line tends to be text on top of a line that is mistakenly identified as a line.  In such cases, the vertical position of the text is not representative of the position of the line.
+\par }\pard\plain \ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \fs24\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 {\f2\fs20 
+\par }{\b\f2\fs20\ul Case 2}{\f2\fs20 : Two lines in the same plane separated by a small gap.
+\par }{\fs20\lang1024\langfe1024\noproof {\shp{\*\shpinst\shpleft135\shptop172\shpright7845\shpbottom442\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz4\shplid1029
+{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}{\sp{\sn fillOpacity}{\sv 32768}}{\sp{\sn fFilled}{\sv 0}}{\sp{\sn lineWidth}{\sv 25400}}{\sp{\sn lineDashing}{\sv 2}}{\sp{\sn fLine}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}
+{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8196\dppolygon\dppolycount40\dpptx49\dppty0\dpptx49\dppty0\dpptx37\dppty1\dpptx37\dppty3\dpptx25\dppty8\dpptx12\dppty13\dpptx12\dppty20\dpptx0\dppty28\dpptx0\dppty36\dpptx0\dppty45
+\dpptx0\dppty225\dpptx0\dppty234\dpptx0\dppty242\dpptx12\dppty250\dpptx12\dppty257\dpptx25\dppty262\dpptx37\dppty267\dpptx37\dppty269\dpptx49\dppty270\dpptx49\dppty270\dpptx7661\dppty270\dpptx7661\dppty270\dpptx7673\dppty269\dpptx7685\dppty267
+\dpptx7685\dppty262\dpptx7698\dppty257\dpptx7698\dppty250\dpptx7710\dppty242\dpptx7710\dppty234\dpptx7710\dppty225\dpptx7710\dppty45\dpptx7710\dppty36\dpptx7710\dppty28\dpptx7698\dppty20\dpptx7698\dppty13\dpptx7685\dppty8\dpptx7685\dppty3\dpptx7673\dppty1
+\dpptx7661\dppty0\dpptx7661\dppty0\dpx135\dpy172\dpxsize7710\dpysize270\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr255\dpfillbgcg255\dpfillbgcb255\dpfillpat0\dplinew40\dplinecor0\dplinecog0\dplinecob0}}}
+{\shp{\*\shpinst\shpleft165\shptop201\shpright3870\shpbottom426\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz0\shplid1030{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}
+{\sp{\sn fillColor}{\sv 8421504}}{\sp{\sn fillOpacity}{\sv 32768}}{\sp{\sn fFilled}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8192\dppolygon\dppolycount40\dpptx36\dppty0\dpptx30\dppty0
+\dpptx30\dppty1\dpptx24\dppty3\dpptx18\dppty6\dpptx12\dppty11\dpptx6\dppty17\dpptx6\dppty23\dpptx0\dppty30\dpptx0\dppty37\dpptx0\dppty188\dpptx0\dppty195\dpptx6\dppty202\dpptx6\dppty208\dpptx12\dppty214\dpptx18\dppty219\dpptx24\dppty222\dpptx30\dppty224
+\dpptx30\dppty225\dpptx36\dppty225\dpptx3669\dppty225\dpptx3675\dppty225\dpptx3675\dppty224\dpptx3681\dppty222\dpptx3687\dppty219\dpptx3693\dppty214\dpptx3699\dppty208\dpptx3705\dppty202\dpptx3705\dppty195\dpptx3705\dppty188\dpptx3705\dppty37
+\dpptx3705\dppty30\dpptx3705\dppty23\dpptx3699\dppty17\dpptx3693\dppty11\dpptx3687\dppty6\dpptx3681\dppty3\dpptx3675\dppty1\dpptx3675\dppty0\dpptx3669\dppty0\dpx165\dpy201\dpxsize3705\dpysize225
+\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr128\dpfillbgcg128\dpfillbgcb128\dpfillpat1\dplinew15\dplinecor0\dplinecog0\dplinecob0}}}
+{\shp{\*\shpinst\shpleft4125\shptop201\shpright7830\shpbottom426\shpfhdr0\shpbxcolumn\shpbxignore\shpbypara\shpbyignore\shpwr3\shpwrk0\shpfblwtxt0\shpz1\shplid1031{\sp{\sn shapeType}{\sv 2}}{\sp{\sn fFlipH}{\sv 0}}{\sp{\sn fFlipV}{\sv 0}}
+{\sp{\sn fillColor}{\sv 8421504}}{\sp{\sn fillOpacity}{\sv 32768}}{\sp{\sn fFilled}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}{\sp{\sn fLayoutInCell}{\sv 1}}}{\shprslt{\*\do\dobxcolumn\dobypara\dodhgt8193\dppolygon\dppolycount40\dpptx36\dppty0\dpptx30\dppty0
+\dpptx30\dppty1\dpptx24\dppty3\dpptx18\dppty6\dpptx12\dppty11\dpptx6\dppty17\dpptx6\dppty23\dpptx0\dppty30\dpptx0\dppty37\dpptx0\dppty188\dpptx0\dppty195\dpptx6\dppty202\dpptx6\dppty208\dpptx12\dppty214\dpptx18\dppty219\dpptx24\dppty222\dpptx30\dppty224
+\dpptx30\dppty225\dpptx36\dppty225\dpptx3669\dppty225\dpptx3675\dppty225\dpptx3675\dppty224\dpptx3681\dppty222\dpptx3687\dppty219\dpptx3693\dppty214\dpptx3699\dppty208\dpptx3705\dppty202\dpptx3705\dppty195\dpptx3705\dppty188\dpptx3705\dppty37
+\dpptx3705\dppty30\dpptx3705\dppty23\dpptx3699\dppty17\dpptx3693\dppty11\dpptx3687\dppty6\dpptx3681\dppty3\dpptx3675\dppty1\dpptx3675\dppty0\dpptx3669\dppty0\dpx4125\dpy201\dpxsize3705\dpysize225
+\dpfillfgcr255\dpfillfgcg255\dpfillfgcb255\dpfillbgcr128\dpfillbgcg128\dpfillbgcb128\dpfillpat1\dplinew15\dplinecor0\dplinecog0\dplinecob0}}}}{\f2\fs20 
+\par 
+\par 
+\par In this case, if the gap in pixels between the two lines is less than }{\f2\fs20\lang1024\langfe1024\noproof m_nBridgeGapSmallerThan 
+and either the two top edges or the two bottom edges are within the vertical allowance of each other, the lines will be qualified for merg
+ing.  In this case the total area of the lines is combined to determine the merged line (both vertically and horizontally).
+\par 
+\par }{\f2\fs20 Once a line has been qualified for merging with another line, the index of the line with which it was merged will be stored, and the
+ algorithm will continue to compare the new, expanded line coordinates to the remaining lines.  It is possible that further lines will be merged into this same line.  After comparing to all lines, line at the last matching index will be changed to match t
+he coordinates of the cumulatively merged line, and the lines all earlier indexes that matched the incoming line will be erased.  
+\par }}

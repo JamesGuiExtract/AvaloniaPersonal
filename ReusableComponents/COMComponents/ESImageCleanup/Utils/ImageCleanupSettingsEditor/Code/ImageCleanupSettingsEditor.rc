@@ -1,0 +1,285 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res\\ImageCleanupSettingsEditor.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\ImageCleanupSettingsEditor.ico"
+ICI_ICON_UP             ICON                    "..\\..\\..\\..\\..\\BaseUtils\\Code\\res\\icon_up.ico"
+ICI_ICON_DOWN           ICON                    "..\\..\\..\\..\\..\\BaseUtils\\Code\\res\\icon_down.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 272, 50
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Image Cleanup Settings Editor"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,215,7,50,14
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,15,21,21
+    LTEXT           "Copyright (C) 2009\nExtract Systems, LLC\nAll rights reserved.",IDC_STATIC,38,20,119,25
+    EDITTEXT        IDC_EDIT_VERSION,38,7,158,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+IDD_IMAGECLEANUPSETTINGSEDITOR_DIALOG DIALOGEX 0, 0, 377, 362
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_ACCEPTFILES | WS_EX_APPWINDOW
+CAPTION "ImageCleanupSettingsEditor"
+MENU IDR_MENU1
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    CTEXT           "The Image Cleanup Settings are encrypted and cannot be viewed or modified.",IDC_STATIC_PROMPT,35,78,204,27
+    LTEXT           "Cleanup operations to perform",IDC_STATIC,7,7,109,8
+    CONTROL         "",IDC_LIST_TASKS,"SysListView32",LVS_REPORT | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,20,296,107
+    PUSHBUTTON      "Add...",IDC_BTN_ADD,310,20,60,13
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE,310,40,60,13
+    PUSHBUTTON      "Commands >",IDC_BTN_CONFIG,310,60,60,13
+    PUSHBUTTON      "Up",IDC_BTN_UP,310,80,26,26,BS_ICON
+    PUSHBUTTON      "Dn",IDC_BTN_DN,344,80,26,26,BS_ICON
+    GROUPBOX        "Scope of cleaning",IDC_GROUP_SCOPE,7,134,296,79
+    CONTROL         "All pages",IDC_RADIO_ALLPAGES,"Button",BS_AUTORADIOBUTTON | WS_GROUP,14,144,66,10
+    CONTROL         "First",IDC_RADIO_FIRSTPAGES,"Button",BS_AUTORADIOBUTTON,14,161,25,10
+    CONTROL         "Last",IDC_RADIO_LASTPAGES,"Button",BS_AUTORADIOBUTTON,14,178,25,10
+    CONTROL         "Selected pages",IDC_RADIO_SPECIFIEDPAGES,"Button",BS_AUTORADIOBUTTON,14,195,60,10
+    EDITTEXT        IDC_EDIT_FIRSTPAGES,46,161,20,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "pages",IDC_STATIC_FIRSTPAGES,73,161,44,10
+    EDITTEXT        IDC_EDIT_LASTPAGES,46,178,20,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "pages",IDC_STATIC_LASTPAGES,73,178,44,10
+    EDITTEXT        IDC_EDIT_SPECIFIEDPAGES,81,195,104,12,ES_AUTOHSCROLL
+    GROUPBOX        "Test",IDC_GROUP_TEST,7,220,296,135
+    LTEXT           "Input file:",IDC_STATIC,14,231,60,8
+    EDITTEXT        IDC_EDIT_TEST_FILE_NAME,14,244,208,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_TEST_FILE_NAME,229,244,15,12
+    PUSHBUTTON      "Test",IDC_BTN_TEST,251,244,45,13
+    LTEXT           "Output file:",IDC_STATIC,14,264,37,8
+    CONTROL         "Overwrite output file if it exists",IDC_CHECK_OVERWRITE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,277,200,10
+    CONTROL         "Override output filename",IDC_CHECK_OUT_FILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,290,200,10
+    EDITTEXT        IDC_EDIT_TEST_OUT_FILE,14,303,208,12,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_TEST_OUT_FILE,229,303,15,12
+    PUSHBUTTON      "Open Input",IDC_BTN_OPEN_IN_IMAGE,14,322,60,13
+    PUSHBUTTON      "Open Output",IDC_BTN_OPEN_OUT_IMAGE,81,322,60,13
+    CONTROL         "Use Extract Systems image window",IDC_RADIO_EXTRACT,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,148,322,131,10
+    CONTROL         "Use registered application",IDC_RADIO_REGISTERED,"Button",BS_AUTORADIOBUTTON,148,340,131,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems"
+            VALUE "FileDescription", "ImageCleanupSettingsEditor"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "ImageCleanupSettingsEditor.exe"
+            VALUE "LegalCopyright", "(c) 2009 Extract Systems.  All rights reserved."
+            VALUE "OriginalFilename", "ImageCleanupSettingsEditor.exe"
+            VALUE "ProductName", "ImageCleanupSettingsEditor"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 265
+        TOPMARGIN, 7
+    END
+
+    IDD_IMAGECLEANUPSETTINGSEDITOR_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 370
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 381
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU1 MENU 
+BEGIN
+    POPUP "File"
+    BEGIN
+        MENUITEM "&New\tCtrl+N",                ID_FILE_NEW_SETTINGS
+        MENUITEM "&Open...\tCtrl+O",            ID_FILE_OPEN_SETTINGS
+        MENUITEM SEPARATOR
+        MENUITEM "&Save\tCtrl+S",               ID_FILE_SAVE_SETTINGS
+        MENUITEM "S&ave As...",                 ID_FILE_SAVEAS
+        MENUITEM SEPARATOR
+        POPUP "Recent Files"
+        BEGIN
+            MENUITEM "No File",                     ID_FILE_MRU, GRAYED
+        END
+        MENUITEM SEPARATOR
+        MENUITEM "E&xit",                       ID_FILE_EXIT
+    END
+    POPUP "Tools"
+    BEGIN
+        MENUITEM "&Check for New Components",   ID_TOOLS_CHECKFORNEWCOMPONENTS
+    END
+    POPUP "Help"
+    BEGIN
+        MENUITEM "&About Image Cleanup Settings Editor...", ID_HELP_ABOUT
+    END
+END
+
+IDR_MNU_CONTEXT MENU 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "Cu&t",                        ID_EDIT_CUT
+        MENUITEM "&Copy",                       ID_EDIT_COPY
+        MENUITEM "&Paste",                      ID_EDIT_PASTE
+        MENUITEM "&Delete",                     ID_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      ID_CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "&About ImageCleanupSettingsEditor..."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Accelerator
+//
+
+IDR_ACCELERATORS ACCELERATORS 
+BEGIN
+    "N",            ID_FILE_NEW_SETTINGS,	VIRTKEY, CONTROL, NOINVERT
+    "O",            ID_FILE_OPEN_SETTINGS,  VIRTKEY, CONTROL, NOINVERT
+    "S",            ID_FILE_SAVE_SETTINGS,  VIRTKEY, CONTROL, NOINVERT
+END
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "res\ImageCleanupSettingsEditor.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

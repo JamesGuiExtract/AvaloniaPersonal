@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.AdvancedReplaceStringPP.1 = s 'AdvancedReplaceStringPP Class'
+	{
+		CLSID = s '{828CEA19-C36A-4A60-AF35-CFBC69F03E74}'
+	}
+	UCLIDAFValueModifiers.AdvancedReplaceStringPP = s 'AdvancedReplaceStringPP Class'
+	{
+		CLSID = s '{828CEA19-C36A-4A60-AF35-CFBC69F03E74}'
+		CurVer = s 'UCLIDAFValueModifiers.AdvancedReplaceStringPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {828CEA19-C36A-4A60-AF35-CFBC69F03E74} = s 'AdvancedReplaceStringPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

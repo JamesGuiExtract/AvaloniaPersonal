@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDImageUtils.ImageStats.1 = s 'ImageStats Class'
+	{
+		CLSID = s '{E2938FFB-4DD0-486D-B88E-ADAD410E989F}'
+	}
+	UCLIDImageUtils.ImageStats = s 'ImageStats Class'
+	{
+		CLSID = s '{E2938FFB-4DD0-486D-B88E-ADAD410E989F}'
+		CurVer = s 'UCLIDImageUtils.ImageStats.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E2938FFB-4DD0-486D-B88E-ADAD410E989F} = s 'ImageStats Class'
+		{
+			ProgID = s 'UCLIDImageUtils.ImageStats.1'
+			VersionIndependentProgID = s 'UCLIDImageUtils.ImageStats'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{}'
+		}
+	}
+}

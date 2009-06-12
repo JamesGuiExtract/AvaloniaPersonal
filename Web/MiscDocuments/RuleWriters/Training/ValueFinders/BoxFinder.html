@@ -1,0 +1,69 @@
+<HTML>
+	<HEAD>
+		<TITLE>Box Finder</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Box Finder</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Box Finder is used to redact or extract text from a specified box on a form-like document.</li>
+			<li>The Box Finder uses the lines on a document to locate a box that contains or is near a specified clue.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>Clues can be added, deleted, or modified using the <b>Add...</b>, <b>Remove</b>, and <b>Modify...</b> buttons.</li>
+				<ul>
+					<li>You can make the clues case sensitive.</li>
+					<li>The clues can be plain text or regular expressions.</li>
+					<li>You can choose to stop searching after the first box is found.</li>
+				</ul>
+			</li>
+			<li>You can click on the grid labeled <b>Select location of clue relative to box</b> to specify where the clue will be in relation to the box you want to find.</li>
+			<li>You must select which pages of the document you want to search.
+				<ul>
+					<li>By default, all pages will be searched.</li>
+					<li>You can choose to search the first few pages of the document.</li>
+					<li>You can choose to search the last few pages of the document.</li>
+					<li>You can list specific pages of the document that you want to search.</li>
+				</ul>
+			</li>
+			<li>You can optionally specify a minimum and maximum height and width of the box you want to find.
+				<ul>
+					<li>Boxes that are too big or too small will be ignored.</li>
+				</ul>
+			</li>
+			<li>Next, you must choose what you would like the Box Finder to return:
+				<ul>
+					<li>If you choose the <b>Return spatial information of found box and artificially associated the spatial area with the following text</b> option, the Box Finder will only return the spatial information of the box.
+						<ul>
+							<li>This option is only useful for ID Shield redaction rules.</li>
+							<li>You must specify some "placeholder" text for the spatial information.</li>
+							<li>You can choose to exclude the clue from the output.</li>
+						</ul>
+					</li>
+					<li>If you choose the <b>Return text found within the box</b> option, the Box Finder will return the text contained in the found box.
+						<ul>
+							<li>This option is most often used for FLEX Index indexing rules.</li>
+							<li>You can choose to include the clue as part of the found text.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>If you check the <b>Include all lines that are found in the output</b> checkbox, when you run the Rule Tester, the Box Finder will output an attribute that contains all of the lines that were found in the document.  This can be useful for debugging Box Finder rules.</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Write a single Box Finder rule that will redact the "Social Security Number" box on both <b>TestImage009.tif</b> and <b>TestImage012.tif</b>.</li>
+			<li>Write a Box Finder rule that will extract the date of birth from the "Date of Birth" box on <b>TestImage012.tif</b>.</li>
+			<li>Modify the above rule to use the clue "Date of Death" to extract the date of birth from <b>TestImage012.tif</b>.
+				<ul>
+					<li>HINT: You will have to change the <b>Select location of clue relative to box</b> grid.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

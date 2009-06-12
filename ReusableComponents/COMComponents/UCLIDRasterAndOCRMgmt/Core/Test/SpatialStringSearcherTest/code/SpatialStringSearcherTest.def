@@ -1,0 +1,9 @@
+; SpatialStringSearcherTest.def : Declares the module parameters.
+
+LIBRARY      "SpatialStringSearcherTest.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

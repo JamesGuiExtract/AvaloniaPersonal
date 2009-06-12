@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFSplitters.RSDSplitterPP.1 = s 'RSDSplitterPP Class'
+	{
+		CLSID = s '{33CFE972-1333-460C-A5A7-054D7B715CDD}'
+	}
+	UCLIDAFSplitters.RSDSplitterPP = s 'RSDSplitterPP Class'
+	{
+		CLSID = s '{33CFE972-1333-460C-A5A7-054D7B715CDD}'
+		CurVer = s 'UCLIDAFSplitters.RSDSplitterPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {33CFE972-1333-460C-A5A7-054D7B715CDD} = s 'RSDSplitterPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

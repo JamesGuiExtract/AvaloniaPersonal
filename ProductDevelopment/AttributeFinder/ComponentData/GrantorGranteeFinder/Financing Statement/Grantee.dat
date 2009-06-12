@@ -1,0 +1,13 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+temp=temp
+[PATTERNS_END]

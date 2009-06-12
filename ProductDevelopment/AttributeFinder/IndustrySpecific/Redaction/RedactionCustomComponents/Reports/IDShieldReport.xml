@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet type="text/xsl" href="IDShieldReport.xsl"?>
+<IDShieldVerificationReport>
+  <ReportInfo>
+    <DBServerName>DELHI\SQLEXPRESS</DBServerName>
+    <DBName>IDSheildDB_Project23</DBName>
+    <GeneratedBy>arvind_ganesan</GeneratedBy>
+    <GeneratedOn>11/07/2007 14:28:53</GeneratedOn>
+  </ReportInfo>
+  <ProjectInfo>
+    <TotalDocsInProject>167956</TotalDocsInProject>
+    <TotalPagesInProject>496343</TotalPagesInProject>
+    <TotalDocsVerified>26873</TotalDocsVerified>
+    <TotalPagesInVerifiedDocs>69488</TotalPagesInVerifiedDocs>
+    <TotalDocsRedacted>22990</TotalDocsRedacted>
+    <TotalPagesInRedactedDocs>58558</TotalPagesInRedactedDocs>
+	<TotalProjectTime>600254</TotalProjectTime>
+    <TotalDocsVerifiedNotRedacted>15374</TotalDocsVerifiedNotRedacted>
+    <TotalPagesInVerifiedNotRedactedDocs>56635</TotalPagesInVerifiedNotRedactedDocs>
+  </ProjectInfo>
+  <VerifierInfo>
+     <Verifier Name="John Smith">
+      <TotalDocsVerified>9998</TotalDocsVerified>
+      <TotalPagesInVerifiedDocs>24064</TotalPagesInVerifiedDocs>
+      <TotalDocsRedacted>7843</TotalDocsRedacted>
+      <TotalPagesInRedactedDocs>18965</TotalPagesInRedactedDocs>
+      <RedactionCount>
+        <Total>10135</Total>
+        <Manual>543</Manual>
+      </RedactionCount>
+      <VerificationTimeInSeconds>
+        <Screen>172817</Screen>
+        <Project>421817</Project>
+      </VerificationTimeInSeconds>
+    </Verifier>
+    <Verifier Name="Mary Smith">
+      <TotalDocsVerified>16875</TotalDocsVerified>
+      <TotalPagesInVerifiedDocs>45424</TotalPagesInVerifiedDocs>
+      <TotalDocsRedacted>15147</TotalDocsRedacted>
+      <TotalPagesInRedactedDocs>39593</TotalPagesInRedactedDocs>
+      <RedactionCount>
+        <Total>19617</Total>
+        <Manual>948</Manual>
+      </RedactionCount>
+      <VerificationTimeInSeconds>
+        <Screen>199588</Screen>
+        <Project>470489</Project>
+      </VerificationTimeInSeconds>
+    </Verifier>
+  </VerifierInfo>
+</IDShieldVerificationReport>

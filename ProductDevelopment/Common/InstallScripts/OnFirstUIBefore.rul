@@ -1,0 +1,122 @@
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   OnFirstUIBefore                                            
+//                                                                           
+//  EVENT:      FirstUIBefore event is sent when installation is run for the first
+//              time on given machine. In the handler installation usually displays
+//              UI allowing end user to specify installation parameters. After this
+//              function returns, ComponentTransferData is called to perform file
+//              transfer.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIBefore()
+    NUMBER nResult, nSetupType, nvSize, nUser;
+    NUMBER bOpt1, bOpt2;
+    STRING szTitle, szMsg, szQuestion, svName, svCompany, szFile;
+    STRING szLicenseFile;
+    STRING szMsg1;
+    LIST list, listStartCopy;
+    BOOL bCustom;
+begin	        
+    // Set installed flag to false
+	gbInstalled = FALSE;
+	
+    // TO DO: if you want to enable background, window title, and caption bar title                                                                   
+    // SetTitle( @PRODUCT_NAME, 24, WHITE );                                        
+    // SetTitle( @PRODUCT_NAME, 0, BACKGROUNDCAPTION ); 	                  
+    // Enable( FULLWINDOWMODE );						   
+    // Enable( BACKGROUND );							  
+    // SetColor(BACKGROUND,RGB (0, 128, 128));					   
+ 
+ 	// make sure the user has administrative privilege
+	if (Is(USER_ADMINISTRATOR, "") <= 0) then
+		MessageBox("You must have administrative privileges on this computer to install the software package. Setup will terminate.", WARNING);
+		abort;
+	endif;                    
+	                            
+	// Check for different versions of Extract products
+	CheckOtherExtractProducts();
+	
+    SHELL_OBJECT_FOLDER = @PRODUCT_NAME;	   
+    
+    nSetupType = TYPICAL;	
+
+Dlg_SdWelcome:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SdWelcome(szTitle, szMsg);
+    if (nResult = BACK) goto Dlg_SdWelcome;
+	
+    szTitle   = "";
+    svName    = "";
+    svCompany = "";
+    
+Dlg_SdLicense:
+	nResult = SdLicense2(szTitle, "", "", "License.txt", FALSE);
+	if nResult = BACK goto Dlg_SdWelcome;
+
+Dlg_SdAskDestPath:    	
+    nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
+    if (nResult = BACK) goto Dlg_SdLicense;
+/*
+Dlg_SetupType:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SetupType(szTitle, szMsg, "", nSetupType, 0);
+    if (nResult = BACK) then
+        goto Dlg_SdAskDestPath;
+    else
+        nSetupType = nResult;
+        if (nSetupType != CUSTOM) then
+            nvSize = 0;
+            FeatureCompareSizeRequired(MEDIA, INSTALLDIR, nvSize);
+            // if there's no enough space for installation
+            if (nvSize != 0) then      
+            	MessageBox(szSdStr_NotEnoughSpace, WARNING);
+                goto Dlg_SetupType;
+            endif;
+            bCustom = FALSE;
+        else
+            bCustom = TRUE;
+        endif;
+    endif;    
+
+Dlg_SdFeatureTree: 
+    szTitle    = "";
+    szMsg      = "";
+    if (nSetupType = CUSTOM) then
+        nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
+        if (nResult = BACK) goto Dlg_SetupType;  
+    endif;
+
+Dlg_SdStartCopy:	
+    if (nResult = BACK) then
+        if (!bCustom) then
+            goto Dlg_SetupType;    
+    	else
+            goto Dlg_SdFeatureTree;
+    	endif;
+    endif;
+*/
+    // setup default status
+    Enable(STATUSEX);
+	// Move old reg keys before setup moves files but the ui is finished
+   	MoveRegKeys();
+   	CopyLicFiles();
+   	                
+   	// Install .NET if required
+   	InstallDotNET();
+   	
+   	// Install SQL Native Client if required
+   	InstallSQLNativeClient();
+
+	// Install Inlite Key drivers
+   	InstallInliteKeyDrivers();
+
+	// Install Crystal Reports
+   	InstallCrystalReports();
+   	
+   	gbInstalled = TRUE;
+
+    return 0;
+end;

@@ -1,0 +1,252 @@
+////////////////////////////////////////////////////////////////////////////////////
+// Warranty Deed - Grantee
+/////////////////////////////////////////////////////////////////////////////////////
+
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+Granted=Granted|Conveyed|Sold
+GrantKeywords=[Grant]|[grants]|[Bargain]|[bargains]|[Sell]|[sells]|[C onvey]|[conveys]
+PresentThat=presents: that|presents, that|presents that|presents:|presents
+GrantorWords=Grantor|Grantor(s)|Grantors|"Grantor"|"Grantor(s)"|"Grantors"|Seller|Seller(s)|Sellers|"Seller"|"Seller(s)"|"Sellers"
+GranteeWords=Grantee|Grantee(s)|Grantees|"Grantee"|"Grantee(s)"|"Grantees"|Buyer|Buyer(s)|Buyers|"Buyer"|"Buyer(s)"|"Buyers"
+
+// plural-only versions of above definitions
+GrantorsWords=Grantor(s)|Grantors|"Grantor(s)"|"Grantors"|Seller(s)|Sellers|"Seller(s)"|"Sellers"
+GranteesWords=Grantee(s)|Grantees|"Grantee(s)"|"Grantees"|Buyer(s)|Buyers|"Buyer(s)"|"Buyers"
+Numbers=0|1|2|3|4|5|6|7|8|9
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// 0082.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016750.tif.uss
+//WD_GRANTEE_01=between^250~grantor^250~whose address^100~, and^?Grantee^250~grantee
+
+// 0001.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272399.tif.uss
+WD_GRANTEE_01_02=between^250~grantor|[granter]^100~whose^50~address^150~[and]^?Grantee^250~[grante
+
+// 0002.tif;k:\common\engineering\sample files\waukesha\set003\images\warranty deed\002940.tif.uss
+// 0003.tif;k:\common\engineering\sample files\trimin\set001\images\warranty deed\1938483.tif.uss
+WD_GRANTEE_02A=between^250~grantor|[granter]^6~\r\nand|, and^?Grantee^250~grantee^100~valuable^3~consideration
+WD_GRANTEE_02=between^250~grantor|[granter]^6~[and]^?Grantee^250~grantee^100~valuable^3~consideration
+
+// 0004.tif;k:\common\engineering\sample files\waukesha\set004\images\warranty deed\00000150.tif.uss
+WD_GRANTEE_03=convey^10~warrant^3~to]^?Grantee^300~grantee|following described
+
+// 0005.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016573.tif.uss
+WD_GRANTEE_04=\r\n\r\n* grantee^?Grantee^250~\r\n\r\n
+
+// 0006.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\warranty deed\00006924.tif.uss
+//WD_GRANTEE_05=convey^3~unto]^?Grantee^250~grantee
+
+// 0007.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\deed\2003132951.tif.uss
+// 0008.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\deed\2003134272.tif.uss
+WD_GRANTEE_06=paid^24~[by]^?Grantee^250~hereinafter^20~grantee
+
+WD_GRANTEE_998=hereby^10~Grant|Sell^10~Convey^5~unto^?Grantee^100~Grantee^5~whose^3~address
+// 0009.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016824.tif.uss
+// 0010.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016847.tif.uss
+// 0011.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\warranty deed\00009200.tif.uss
+WD_GRANTEE_07=paid^24~[by]^?Grantee^250~as follows:|whether one or more|have granted|grantee|whose mailing
+
+// 0013.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272591.tif.uss
+WD_GRANTEE_08A=grantor^5~[to]|[t0]^?Grantee<^250~hereinafter^20~grantee|granted
+// 0012.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016932.tif.uss
+WD_GRANTEE_08=grantor^5~[to]|[t0]^?Grantee<^250~[the]^5~grantee|granted
+
+// 0015.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\warranty deed\00006764.tif.uss
+WD_GRANTEE_10=Grantee^?Grantee^County Clerk Grantee
+
+// 0016.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set005\images\deed\2003139274.tif.uss
+// 0017.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\deed\2003132955.tif.uss
+// 0018.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\deed\2003133805.tif.uss
+WD_GRANTEE_11=grantee:|grantee :|Grantees:|Grantees :^?Grantee^300~grantee^10~mailing|address
+WD_GRANTEE_12=grantee:|grantee :|Grantees:|Grantees :^?Grantee^250~consideration:
+
+// 0019.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04289aaago.tif.uss
+WD_GRANTEE_13=to^3~second^3~party^5~grantee^?Grantee^250~whose^25~address
+WD_GRANTEE_14=to^3~second^3~party^5~grantee^?Grantee^250~@-NonTP
+
+// 0020.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015598.tif.uss
+// 0021.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015601.tif.uss
+// 0022.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015616.tif.uss
+// 0023.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015645.tif.uss
+// 0024.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015671.tif.uss
+// 0025.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015530.tif.uss
+// 0026.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015630.tif.uss
+// 0027.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015741.tif.uss
+// 0028.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015778.tif.uss
+// 0029.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015526.tif.uss
+// 0030.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015665.tif.uss
+// 0031.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015537.tif.uss
+// <FIX>NEED SPATIAL RULE;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015614.tif.uss
+// 0032.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015858.tif.uss
+WD_GRANTEE_15A=hereinafter^12~grantor^?Grantee^250~hereinafter^12~grantee
+WD_GRANTEE_15B="Grantor|Grantor"|Grantors"^9~consideration^?Grantee^250~"Grantee|Grantee"|Grantees"
+WD_GRANTEE_15C="Grantor|Grantor"|Grantors"^?Grantee^250~"Grantee|Grantee"|Grantees"^12~Grantee^5~heir^9~assigns
+WD_GRANTEE_15=grantor^?Grantee^250~grantee^witnesseth
+
+// 0033.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\deed\2003132971.tif.uss
+WD_GRANTEE_16=conveys|convey|warrant|warrants^50~unto|[to]|[t0]^?Grantee^300~herein^30~grantee
+// 0061.tif;k:\common\engineering\sample files\acs\tx - midland\set003\images\warranty deed\00011655.tif.uss
+WD_GRANTEE_30=executed^3~[by]^?Grantee^250~(|grantee
+
+// 0050.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00017477.tif.uss
+// 0052.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00017103.tif.uss
+//WD_GRANTEE_23=grantor^conveys to^?Grantee^grantee
+WD_GRANTEE_23=conveys|convey|warrant|warrants^3~[to]|[t0]|[unto]^?Grantee^250~grantee
+
+// 0068.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04288aaad1.tif.uss
+WD_GRANTEE_37=convey|warrant^25~[to grantee|[to the grantee|[to]|[t0]^?Grantee^250~whose|the following described
+
+// 0053.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set002\images\deed\2003131549.tif.uss
+// 0054.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016290.tif.uss
+// 0055.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016402.tif.uss
+// 0056.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016681.tif.uss
+WD_GRANTEE_26=convey^5~unto|[to]|[t0]^?Grantee^250~[all that certain|subject to and upon|following described|real property
+
+// 0014.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00017051.tif.uss
+WD_GRANTEE_09=sell^5~and convey^?Grantee^250~grantee
+
+// 0034.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015740.tif.uss
+WD_GRANTEE_17=grantors^[and]^?Grantee^300~witnesseth^100~said grantors
+
+// 0035.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015666.tif.uss
+WD_GRANTEE_18=grantor^hereby^confirm to^?Grantee^250~grantee^all that property
+
+// 0036.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015518.tif.uss
+// <FIX>NEED SPATIAL RULE;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015540.tif.uss
+// 0037.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015551.tif.uss
+// 0038.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015627.tif.uss
+// 0039.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015609.tif.uss
+// 0040.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015624.tif.uss
+// 0041.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015644.tif.uss
+// 0042.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015696.tif.uss
+WD_GRANTEE_19A=between^[and]^of the first part^?Grantee^500~parties of the second part
+WD_GRANTEE_19=between^[and]^of the first part^?Grantee^250~party of the second part
+WD_GRANTEE_19B=between^350~grantor|granter^5~[and]^?Grantee^350~Grantee
+
+// 0043.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\dee\00006-9977.tif.uss
+WD_GRANTEE_20=between^350~party|parties^5~of the first part^?Grantee^250~party|parties^5~of the second part
+
+// 0044.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\d\2005272526.tif.uss
+WD_GRANTEE_60=between^350~grantor|[granter]^5~[and]^?Grantee^350~whose^3~address
+
+// 0045.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\dee\00007-2489.tif.uss
+WD_GRANTEE_21=between^350~the first part|grantor|the first party^?Grantee^250~parties of the second part|party of the second part|grantee|the second party
+
+// 0046.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015683.tif.uss
+// 0047.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015737.tif.uss
+// 0048.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015607.tif.uss
+// 0049.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00015608.tif.uss
+WD_GRANTEE_22=between^350~[and]^?Grantee^250~witnesseth
+// 0051.tif;k:\common\engineering\sample files\acs\pa - allegheny\set002\images\d\00018158.tif.uss
+WD_GRANTEE_24=deed^3~from^250~[to]|[t0]^?Grantee^250~premises
+
+// 0052.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00017103.tif.uss
+//WD_GRANTEE_25=transfer and convey^5~unto^?Grantee^250~grantee
+
+// 0057.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set003\images\deed\2003134463.tif.uss
+WD_GRANTEE_27=paid^24~[by]^?Grantee^250~grantee
+
+// 0058.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016361.tif.uss
+WD_GRANTEE_28=[sell]^10~convey^?Grantee^300~herein^40~grantee
+
+// 0059.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\warranty deed\00013819.tif.uss
+// 0060.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\warranty deed\00016832.tif.uss
+WD_GRANTEE_29=[sell]^10~convey^?Grantee^300~grantee|whose address|whose mailing
+
+
+
+// 0062.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04292aaanp.tif.uss
+WD_GRANTEE_31=grantee^?Grantee^250~whose^50~address
+
+// 0063.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\warranty deed\00013920.tif.uss
+WD_GRANTEE_32=grantee:|grantee :^?Grantee^250~\r\naddress:
+
+// 0064.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04288aaa2n.tif.uss
+// 0065.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04286aab16.tif.uss
+WD_GRANTEE_33=warrant|convey^5~[to]|[unto]|[t0]^?Grantee^400~grantee|whose^24~address^120~the following|following described
+
+// 0065.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04286aab16.tif.uss
+//WD_GRANTEE_34=warrant^5~and|or^5~convey^5~[to]^?Grantee^300~whose^50~address
+
+// 0066.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04288aabte.tif.uss
+WD_GRANTEE_35=convey^5~and|or^5~warrant^5~[to]|[t0]^?Grantee^250~\r\n\r\n
+
+// 0067.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\wdd\b04317aaahf.tif.uss
+//WD_GRANTEE_36=convey|warrant^25~[to]|[t0]^5~grantee^?Grantee^250~whose|the following described
+
+// 0085.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\BARGAIN and SALE DEED\2005-025262.tif.uss
+// 0087.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\BARGAIN and SALE DEED\2005-001220.tif.uss
+//WD_GRANTEE_52=grantor|grantors^5~convey^3~[to]^?Grantee^250~grantee
+
+// 0086.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\WARRANTY DEED\2005-028247.tif.uss
+//WD_GRANTEE_53=Grantor^48~warrants^3~[to]^?Grantee<^160~grantee 
+
+
+
+// 0069.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed\20049000000900.002.tif.uss
+WD_GRANTEE_38=GRANT(S)^5~[to]|[t0]^?Grantee^800~the following|REAL PROPERTY
+
+// 0079.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\deed\20059022614700.tif.uss
+WD_GRANTEE_39=GRANT^10~to]^?Grantee^800~the following|REAL PROPERTY|see attached|legal description
+
+// 0070.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed\20049000052700.001.tif.uss
+WD_GRANTEE_40=sets^3~over^10~unto^?Grantee^800~the following|REAL PROPERTY
+
+//0090.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Warranty Deed\3013002.tif
+WD_GRANTEE_56=conveys^9~warrants^9~property^36~below to|[to]^?Grantee^250~Grantee
+// 0071.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\wdd\b04320aaabt.tif.uss
+WD_GRANTEE_41=hereinafter|[as the]^50~"Grantor|Grantor"^120~[and]^?Grantee^250~"Grantee|Grantee"
+
+// 0072.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\wdd\b04293aaan8.tif.uss
+WD_GRANTEE_42=\r\nto]^?Grantee^250~whose^50~address
+
+// 0073.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\wdd\b04317aaabh.tif.uss
+WD_GRANTEE_43=\r\nto]^?Grantee^250~following described
+
+// 0074.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0060463.tif.uss
+WD_GRANTEE_44=grant^3~real^3~property^3~[to]|[t0]^?Grantee^250~[dated
+
+// 0075.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0060663.tif.uss
+// 0080.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\grant deed\20059019790400.tif.uss
+WD_GRANTEE_45=grant^5~[to]|[t0]^?Grantee^250~that property|the land
+
+// 0083.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0062034.tif.uss
+WD_GRANTEE_46=hereby^5~@GrantKeywords^?Grantee^350~[the]|that^5~property|real estate
+WD_GRANTEE_46b=hereby^5~@GrantKeywords^?Grantee^350~[the]|that^35~property|real estate
+
+// 0076.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\dee\00007-2872.tif.uss
+WD_GRANTEE_47=between^the first^3~[pa^3~y]^?Grantee^250~[the^3~second^3~[pa^3~y]
+WD_GRANTEE_47a=between^the first^3~[pa^3~y]^?Grantee^250~residing^5~[at]
+
+// 0077.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\dee\00007-2826.tif.uss
+WD_GRANTEE_48=deed^45~between^450~the^5~city^5~[and]^?Grantee^300~the "buyer"
+
+// 0078.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\dee\00007-1969.tif.uss
+WD_GRANTEE_49=indenture^5~made^120~be^5~n^450~the first part^?Grantee^450~[the second part
+
+// 0084.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\deed\2005-0060428.tif.uss
+WD_GRANTEE_50=QUIT^5~CLAIM^5~[to]|[t0]^?Grantee^250~the following described
+
+// 0081.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\deed\20059019667700.tif.uss
+WD_GRANTEE_51=grants^50~interest in^100~property^100~[to:]^?Grantee^250~dated:
+// 0088.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\BARGAIN and SALE DEED\2005-002267.tif.uss
+WD_GRANTEE_54=conveys^30~to\r\n^10~\r\n^?Grantee^180~\r\n
+// 0090.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\WARRANTY DEED\2005-027885.tif.uss
+WD_GRANTEE_56=GRANTEE'S NAME\r\n^10~\r\n^?Grantee^180~\r\n
+// 0089.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\WARRANTY DEED\2005-030685.tif.uss
+WD_GRANTEE_55=after recording^10~return to:\r\n^10~\r\n^?Grantee^180~\r\n
+[PATTERNS_END]

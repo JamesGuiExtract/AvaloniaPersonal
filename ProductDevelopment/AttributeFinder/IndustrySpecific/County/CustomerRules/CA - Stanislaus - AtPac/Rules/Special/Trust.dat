@@ -1,0 +1,22 @@
+// *******
+// Imports
+// *******
+//#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000060900.006.uss
+LocalAodTrust01=capacity^6~Successor^3~Trustee^3~of]^?Grantee^120~That^3~the^3~value
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000060100.003.uss
+LocalAodTrust02=successors^5~[as]^3~Trustee^3~[of the]|[of]^?Grantee^120~pursuant^9~declaration
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000358300.004.uss
+LocalAodTrust03=trustee^3~of]|of the]^?Grantee^120~Exemption trust|recorded
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000549800.003.uss
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000166900.004.uss
+LocalAodTrust03=trustees|trustee^3~[of the]|[of]^?Grantee^160~dated
+LocalAodTrust04=trustees|trustee^3~[of the]|[of]^?Grantee^160~recorded|Exemption Trust
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000663900.007.uss
+LocalAodTrustee05=executed by^120~to]^60~, TRUSTEE|Trustee^3~,^?Grantee^120~recorded as]
+[PATTERNS_END]

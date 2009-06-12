@@ -1,0 +1,28 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000009800.001
+LocalNORGrantee01=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^240~deed^240~[in which^?Beneficiary^120~[is^3~named^7~benefic
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000031300.001
+LocalNORGrantee02=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~secure|obliga^240~[favor^3~of]^?NomineeFor^120~acting^16~[as^3~Nominee^3~for^?Beneficiary^120~as^3~benefic
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000449500.001.uss
+LocalNORGrantee02a=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~secure|obliga^240~[favor^3~of]^?NomineeFor^120~[as^3~Nominee^3~for^?Beneficiary^120~as^3~benefic
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000488200.001.uss
+LocalNORGrantee03a=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~secure|obliga^240~[favor^3~of]^?NomineeFor^120~acting|[as]^16~Nominee^3~for^?Beneficiary^120~as^3~benefic
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000010500.001
+LocalNORGrantee03=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~secure|obliga^240~[favor^3~of]^?Beneficiary^120~[as^3~benefic
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000161500.002.uss
+LocalNORGrantee00=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~deed^240~\r\n^3~Beneficiary:^?NomineeFor^80~[as^3~nominee^3~for]^?Beneficiary^120~\r\n\r\n|recorded
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000109100.001.uss 
+LocalNORGrantee00=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee^360~deed^240~\r\n^3~Beneficiary:^?Beneficiary^120~\r\n\r\n|recorded
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RESCISSION\20079000050300.001.uss
+LocalNORGrantee00=given^5~that]^?Trustee^120~[is]|[duly^16~appointed^3~Trustee
+[PATTERNS_END]
+

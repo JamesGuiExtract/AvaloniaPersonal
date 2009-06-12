@@ -1,0 +1,23 @@
+(?:
+\bn/a\b
+|
+\bsame\b
+|
+applied\s*for
+|
+not\s*required
+|
+// do not provide | not needed | do not use
+do\s*not|\bnot\b|provide|needed|\buse\b|NONE
+|
+// 4 words of 4 or more letters
+(?:\b[a-z]{4,}\b[\s\S]*?){4}
+|
+// Pre paid Acct
+\bpre-|\bpaid\b|Acct
+|
+\bX\s*X\b
+|
+// for SSN-allvariations and TaxID-allvariations
+~exclude~
+)

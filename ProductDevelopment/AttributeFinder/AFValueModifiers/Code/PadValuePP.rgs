@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.PadValuePP.1 = s 'PadValuePP Class'
+	{
+		CLSID = s '{DD5CA018-3858-4C9D-B074-D5E45A703720}'
+	}
+	UCLIDAFValueModifiers.PadValuePP = s 'PadValuePP Class'
+	{
+		CLSID = s '{DD5CA018-3858-4C9D-B074-D5E45A703720}'
+		CurVer = s 'UCLIDAFValueModifiers.PadValuePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DD5CA018-3858-4C9D-B074-D5E45A703720} = s 'PadValuePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

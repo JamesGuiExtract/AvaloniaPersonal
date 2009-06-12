@@ -1,0 +1,16 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\1995;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\1996;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\1997;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\1998;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\1999;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2001;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2002;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2003;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2004;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2005;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2006;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Rockwall\Set001\2007;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

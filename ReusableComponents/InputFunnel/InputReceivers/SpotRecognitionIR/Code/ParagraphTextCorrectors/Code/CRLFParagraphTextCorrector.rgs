@@ -1,0 +1,26 @@
+HKCR
+{
+	ParagraphTextCorrectors.CRLFParagraphTextCorrector.1 = s 'CRLFParagraphTextCorrector Class'
+	{
+		CLSID = s '{2F8070FB-69D2-478D-8131-1CE44E3CC80D}'
+	}
+	ParagraphTextCorrectors.CRLFParagraphTextCorrector = s 'CRLFParagraphTextCorrector Class'
+	{
+		CLSID = s '{2F8070FB-69D2-478D-8131-1CE44E3CC80D}'
+		CurVer = s 'ParagraphTextCorrectors.CRLFParagraphTextCorrector.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2F8070FB-69D2-478D-8131-1CE44E3CC80D} = s 'CRLFParagraphTextCorrector Class'
+		{
+			ProgID = s 'ParagraphTextCorrectors.CRLFParagraphTextCorrector.1'
+			VersionIndependentProgID = s 'ParagraphTextCorrectors.CRLFParagraphTextCorrector'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA7C4DC6-E679-461A-BE65-25B50DD25597}'
+		}
+	}
+}

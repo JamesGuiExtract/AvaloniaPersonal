@@ -1,0 +1,9 @@
+; RedactionCustomComponents.def : Declares the module parameters.
+
+LIBRARY      "RedactionCC.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

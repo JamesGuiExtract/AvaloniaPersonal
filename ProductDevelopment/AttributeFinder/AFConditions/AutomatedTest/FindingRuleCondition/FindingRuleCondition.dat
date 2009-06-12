@@ -1,0 +1,76 @@
+//Test1 Conditional Finding Rule = (if true) Create Value "Test (conditional)"
+//	Finding Rule = Create Value "Test (output)
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//Test2 Conditional Finding Rule = (if false) Create Value "Test (conditional)"
+//	Finding Rule = Create Value "Test (output)
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//Test3 Conditional Finding Rule = (if true) Conditionally find value:
+//		Sub Conditional Finding Rule = (if true) Create Value "Test (condition 1)"
+//		Sub Finding Rule = "Test (condition 2)
+//	Finding Rule = Create Value "Test (output)
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//Test4 Conditional Finding Rule = (if true) Conditionally find value:
+//		Sub Conditional Finding Rule = (if false) Create Value "Test (condition 1)"
+//		Sub Finding Rule = "Test (condition 2)
+//	Finding Rule = Create Value "Test (output)
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//Test5 Conditional Finding Rule = (if false) Conditionally find value:
+//		Sub Conditional Finding Rule = (if false) Create Value "Test (condition 1)"
+//		Sub Finding Rule = "Test (condition 2)
+//	Finding Rule = Create Value "Test (output)
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//Test6 Conditional Finding Rule = (if true) Grantee/Grantor finder - OriginalGrantor only
+//	Finding Rule = Grantee/Grantor finder (all types)
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//Test7 Conditional Finding Rule = (if true) Grantee/Grantor finder - OriginalGrantor only
+//	Finding Rule = Grantee/Grantor finder (all types)
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test7.eav
+
+//Test8 Conditional Finding Rule = (if true) LocateImageRegion
+//	Finding Rule = Value After Clue
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//Test9 Conditional Finding Rule = (if false) LocateImageRegion
+//	Finding Rule = Value After Clue
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//Test10 Address Finder
+//	 Conditional Modifying Rule = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = ".*Record.*\r\n"
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//Test11 Address Finder
+//	 Conditional Modifying Rule = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = ".*Record.*\r\n"
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test11.eav
+
+//Test12 Address Finder
+//	 Conditional Modifying Rule = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = ".*Record.*\r\n"
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//Test13 Address Finder
+//	 Conditional Modifying Rule = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = ".*Record.*\r\n"
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test13.eav
+
+//Test14 Address Finder
+//	 Conditional Output handler = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = Change case (upper)
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//Test15 Address Finder
+//	 Conditional Output handler = (if true) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = Change case (upper)
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test15.eav
+
+//Test16 Address Finder
+//	 Conditional Output handler = (if false) Regular expression "DOC\s*\d{3,}.*\S{2}\s*[1,9]{2}7"
+//	 Modifyier = Change case (upper)
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test16.eav

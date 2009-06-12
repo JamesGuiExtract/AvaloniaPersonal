@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.RemoveHalftonesICO.1 = s 'RemoveHalftonesICO Class'
+	{
+		CLSID = s '{CDEA8B94-E0A9-444A-B389-894BC7475989}'
+	}
+	ESImageCleanup.RemoveHalftonesICO = s 'RemoveHalftonesICO Class'
+	{
+		CLSID = s '{CDEA8B94-E0A9-444A-B389-894BC7475989}'
+		CurVer = s 'ESImageCleanup.RemoveHalftonesICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {CDEA8B94-E0A9-444A-B389-894BC7475989} = s 'RemoveHalftonesICO Class'
+		{
+			ProgID = s 'ESImageCleanup.RemoveHalftonesICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.RemoveHalftonesICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

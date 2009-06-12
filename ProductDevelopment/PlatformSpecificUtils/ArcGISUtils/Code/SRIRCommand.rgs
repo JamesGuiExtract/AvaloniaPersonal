@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDArcGISUtils.SRIRCommand.1 = s 'SRIRCommand Class'
+	{
+		CLSID = s '{B210E15F-A9CD-40E2-AAE5-790DFBEBE876}'
+	}
+	UCLIDArcGISUtils.SRIRCommand = s 'SRIRCommand Class'
+	{
+		CLSID = s '{B210E15F-A9CD-40E2-AAE5-790DFBEBE876}'
+		CurVer = s 'UCLIDArcGISUtils.SRIRCommand.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B210E15F-A9CD-40E2-AAE5-790DFBEBE876} = s 'SRIRCommand Class'
+		{
+			ProgID = s 'UCLIDArcGISUtils.SRIRCommand.1'
+			VersionIndependentProgID = s 'UCLIDArcGISUtils.SRIRCommand'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{EC0C8698-B764-429F-8CFF-EB0A540603C6}'
+		}
+	}
+}

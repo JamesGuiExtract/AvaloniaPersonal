@@ -1,0 +1,872 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFValueFinders.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFValueFinders Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFValueFinders"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFValueFinders.DLL"
+            VALUE "ProductName", "AFValueFinders Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_VALUEAFTERCLUE      REGISTRY                "ValueAfterClue.rgs"
+IDR_VALUEBEFORECLUE     REGISTRY                "ValueBeforeClue.rgs"
+IDR_VALUEFROMLIST       REGISTRY                "ValueFromList.rgs"
+IDR_REGEXPRRULE         REGISTRY                "RegExprRule.rgs"
+IDR_REGEXPRRULEPP       REGISTRY                "RegExprRulePP.rgs"
+IDR_VALUEAFTERCLUEPP    REGISTRY                "ValueAfterCluePP.rgs"
+IDR_VALUEBEFORECLUEPP   REGISTRY                "ValueBeforeCluePP.rgs"
+IDR_VALUEFROMLISTPP     REGISTRY                "ValueFromListPP.rgs"
+IDR_EXTRACTLINE         REGISTRY                "ExtractLine.rgs"
+IDR_EXTRACTLINEPP       REGISTRY                "ExtractLinePP.rgs"
+IDR_LEGALDESCRIPTIONFINDER REGISTRY                "LegalDescriptionFinder.rgs"
+IDR_BLOCKFINDER         REGISTRY                "BlockFinder.rgs"
+IDR_BLOCKFINDERPP       REGISTRY                "BlockFinderPP.rgs"
+IDR_SPMFINDER           REGISTRY                "SPMFinder.rgs"
+IDR_SPMFINDERPP         REGISTRY                "SPMFinderPP.rgs"
+IDR_RETURNADDRFINDER    REGISTRY                "ReturnAddrFinder.rgs"
+IDR_LOCATEIMAGEREGION   REGISTRY                "LocateImageRegion.rgs"
+IDR_LOCATEIMAGEREGIONPP REGISTRY                "LocateImageRegionPP.rgs"
+IDR_ADDRESSFINDER       REGISTRY                "AddressFinder.rgs"
+IDR_RETURNADDRFINDERPP  REGISTRY                "ReturnAddrFinderPP.rgs"
+IDR_CREATEVALUE         REGISTRY                "CreateValue.rgs"
+IDR_CREATEVALUEPP       REGISTRY                "CreateValuePP.rgs"
+IDR_FINDFROMRSD         REGISTRY                "FindFromRSD.rgs"
+IDR_FINDFROMRSDPP       REGISTRY                "FindFromRSDPP.rgs"
+IDR_CONDITIONALVALUEFINDER REGISTRY                "ConditionalValueFinder.rgs"
+IDR_IMAGEREGIONWITHLINES REGISTRY                "ImageRegionWithLines.rgs"
+IDR_IMAGEREGIONWITHLINESPP REGISTRY                "ImageRegionWithLinesPP.rgs"
+IDR_BOXFINDER           REGISTRY                "BoxFinder.rgs"
+IDR_BOXFINDERPP         REGISTRY                "BoxFinderPP.rgs"
+IDR_LOOPFINDERPP        REGISTRY                "LoopFinderPP.rgs"
+IDR_LOOPFINDER          REGISTRY                "LoopFinder.rgs"
+IDR_MICRFINDER          REGISTRY                "MicrFinder.rgs"
+IDR_MICRFINDERPP        REGISTRY                "MicrFinderPP.rgs"
+IDR_CHECKFINDER         REGISTRY                "CheckFinder.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_REGEXPRRULEPP DIALOGEX 0, 0, 370, 188
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Read regular expression from file :",IDC_RADIO_FILE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,5,7,122,10
+    EDITTEXT        IDC_EDIT_REG_EXP_FILE,16,22,289,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_REG_EXP,326,22,15,14
+    ICON            IDI_ICON_INFO,IDC_REG_EXP_FILE_INFO,351,6,21,20,SS_NOTIFY
+    PUSHBUTTON      "",IDC_BTN_OPEN_NOTEPAD,347,22,16,14,BS_ICON
+    CONTROL         "Please specify regular expression that should be used to find text:",IDC_RADIO_TEXT,
+                    "Button",BS_AUTORADIOBUTTON,5,46,222,10
+    EDITTEXT        IDC_EDIT_PATTERN,16,61,344,88,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    CONTROL         "Case Sensitive",IDC_CHK_REG_EXP_CASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,158,63,10
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,310,22,10,14,BS_ICON
+    CONTROL         "Create sub-attributes for named group matches",IDC_CHK_NAMED_MATCHES_AS_SUBATTRIBUTES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,174,163,10
+END
+
+IDD_VALUEAFTERCLUEPP DIALOGEX 0, 0, 492, 250
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_AFTER_CLUE,203,18,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_AFTER_CLUE,203,36,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_AFTER_CLUE,203,54,50,14
+    CONTROL         "Above defined clue text(s) will be treated as Regular Expression(s)",IDC_CHK_AS_REGEXPR_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,73,223,10
+    CONTROL         "Include all strings after the clue text until the end of the input",IDC_RADIO_NO_TYPE_AC,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,8,105,205,10
+    CONTROL         "Include all strings after the clue text until the end of the line",IDC_RADIO_CLUE_LINE_AC,
+                    "Button",BS_AUTORADIOBUTTON,8,118,200,10
+    CONTROL         "Up to X number of words after the clue text : ",IDC_RADIO_UPTO_XWORDS_AC,
+                    "Button",BS_AUTORADIOBUTTON,253,105,157,10
+    EDITTEXT        IDC_EDIT_NUM_OF_WORDS_AC,345,124,120,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Carriage Return and New Line characters",IDC_CHK_STOP_AT_NEWLINE_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,156,147,10
+    CONTROL         "Other :",IDC_CHK_OTHER_STOP_AC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,168,37,10
+    EDITTEXT        IDC_EDIT_OTHER_STOP_AC,321,167,144,13,ES_AUTOHSCROLL
+    CONTROL         "Space, Tab, Carriage Return and New Line characters",IDC_CHK_SPACES_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,196,188,10
+    CONTROL         "Other :",IDC_CHK_OTHER_PUNC_AC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,281,212,37,10
+    EDITTEXT        IDC_EDIT_OTHER_PUNC_AC,321,209,144,13,ES_AUTOHSCROLL
+    CONTROL         "Up to X number of lines after the clue text :",IDC_RADIO_UPTO_XLINES_AC,
+                    "Button",BS_AUTORADIOBUTTON,8,176,150,10
+    EDITTEXT        IDC_EDIT_NUM_OF_LINES_AC,96,193,149,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Include text after the clue on the line that contains the clue",IDC_CHK_INCLUDE_CLUE_LINE_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,36,211,201,10
+    CONTROL         "Include all strings between the clue text and the string specified :",IDC_RADIO_CLUE_TO_STRING_AC,
+                    "Button",BS_AUTORADIOBUTTON,8,131,219,10
+    EDITTEXT        IDC_EDIT_STRING_SPEC_AC,20,144,231,13,ES_AUTOHSCROLL
+    CONTROL         "All strings defined in this window are case-sensitive",IDC_CHK_CASE_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,235,175,10
+    LTEXT           "Define the clue text(s) : ",IDC_STATIC,5,6,76,8
+    LTEXT           "Please pick one of the following choices to fine-tune the search : ",IDC_STATIC,5,92,206,9
+    LTEXT           "Number of words : ",IDC_STATIC,281,127,60,8
+    LTEXT           "Define character(s) to separate each word :",IDC_STATIC,281,185,138,8
+    LTEXT           "1)",IDC_STATIC,269,127,8,8
+    LTEXT           "2)",IDC_STATIC,269,144,8,8
+    LTEXT           "3)",IDC_STATIC,269,185,8,8
+    GROUPBOX        "",IDC_STATIC,20,185,233,42
+    LTEXT           "1)",IDC_STATIC,24,195,8,8
+    LTEXT           "2)",IDC_STATIC,24,211,8,8
+    LTEXT           "Number of lines : ",IDC_STATIC,36,195,56,8
+    LTEXT           "Define character(s) for which to stop further searching :",IDC_STATIC,281,144,174,8
+    CONTROL         "List1",IDC_LIST_AFTER_CLUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,17,190,52
+    CONTROL         "Above defined string will be treated as a Regular Expression",IDC_CHK_STRING_AS_REGEXPR_AC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,20,161,204,10
+    ICON            IDI_ICON_INFO,IDC_STOP_CHAR_HELP_VA,467,168,20,20,SS_NOTIFY
+    ICON            IDI_ICON_INFO,IDC_SEPERATOR_HELP_VA,467,211,20,20,SS_NOTIFY
+    GROUPBOX        "",IDC_STATIC,264,116,221,111
+END
+
+IDD_VALUEBEFORECLUEPP DIALOGEX 0, 0, 526, 260
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_BEFORE_CLUE,231,17,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_BEFORE_CLUE,231,35,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_BEFORE_CLUE,231,53,50,14
+    CONTROL         "Above defined clue text(s) will be treated as Regular Expression(s)",IDC_CHK_AS_REGEXPR_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,72,223,10
+    CONTROL         "Include all strings from the beginning of the input text until the clue text",IDC_RADIO_NO_TYPE_BC,
+                    "Button",BS_AUTORADIOBUTTON | BS_MULTILINE | WS_GROUP,8,107,236,10
+    CONTROL         "Include all strings from the beginning of the line containing the clue text to the clue text",IDC_RADIO_CLUE_LINE_BC,
+                    "Button",BS_AUTORADIOBUTTON | BS_MULTILINE,8,120,225,18
+    CONTROL         "Up to X number of words before the clue text : ",IDC_RADIO_UPTO_XWORDS_BC,
+                    "Button",BS_AUTORADIOBUTTON,247,107,156,10
+    CONTROL         "Up to X number of lines before the clue text :",IDC_RADIO_UPTO_XLINES_BC,
+                    "Button",BS_AUTORADIOBUTTON,8,190,156,10
+    CONTROL         "Include all strings between the string specified and the clue text :",IDC_RADIO_CLUE_TO_STRING_BC,
+                    "Button",BS_AUTORADIOBUTTON,8,144,219,10
+    EDITTEXT        IDC_EDIT_NUM_OF_WORDS_BC,339,129,162,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Carriage Return and New Line characters",IDC_CHK_STOP_AT_NEWLINE_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,275,159,147,10
+    CONTROL         "Other :",IDC_CHK_OTHER_STOP_BC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,275,172,36,10
+    EDITTEXT        IDC_EDIT_OTHER_STOP_BC,315,171,186,13,ES_AUTOHSCROLL
+    CONTROL         "Space, Tab, Carriage Return and New Line characters",IDC_CHK_SPACES_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,275,200,188,10
+    CONTROL         "Other :",IDC_CHK_OTHER_PUNC_BC,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,275,214,36,10
+    EDITTEXT        IDC_EDIT_OTHER_PUNC_BC,315,212,186,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_NUM_OF_LINES_BC,97,208,140,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Include text before the clue on the line that contains the clue",IDC_CHK_INCLUDE_CLUE_LINE_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,37,225,205,10
+    EDITTEXT        IDC_EDIT_STRING_SPEC_BC,20,157,227,13,ES_AUTOHSCROLL
+    CONTROL         "All strings defined in this window are case-sensitive",IDC_CHK_CASE_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,8,246,175,10
+    LTEXT           "Define the clue text(s) : ",IDC_STATIC,5,6,76,8
+    LTEXT           "Please pick one of the following choices to fine-tune the search : ",IDC_STATIC,5,91,214,9
+    LTEXT           "Number of words : ",IDC_STATIC,275,131,60,8
+    LTEXT           "Define punctuation to separate each word :",IDC_STATIC,275,188,138,8
+    LTEXT           "1)",IDC_STATIC,263,131,8,8
+    LTEXT           "2)",IDC_STATIC,263,147,8,8
+    LTEXT           "3)",IDC_STATIC,263,188,8,8
+    GROUPBOX        "",IDC_STATIC,19,199,227,42
+    LTEXT           "1)",IDC_STATIC,24,209,8,8
+    LTEXT           "2)",IDC_STATIC,24,225,8,8
+    LTEXT           "Number of lines : ",IDC_STATIC,37,209,56,8
+    LTEXT           "Define characters for which to stop further searching :",IDC_STATIC,275,147,170,8
+    CONTROL         "List1",IDC_LIST_BEFORE_CLUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,17,220,50
+    CONTROL         "Above defined string will be treated as a Regular Expression",IDC_CHK_STRING_AS_REGEXPR_BC,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,19,175,204,10
+    ICON            IDI_ICON_INFO,IDC_STOP_CHAR_HELP_VB,504,171,20,20,SS_NOTIFY
+    ICON            IDI_ICON_INFO,IDC_SEPERATOR_HELP_VB,504,212,20,20,SS_NOTIFY
+    GROUPBOX        "",IDC_STATIC,259,118,259,114
+END
+
+IDD_VALUEFROMLISTPP DIALOGEX 0, 0, 228, 149
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Provide value(s) to be found in the input string",IDC_STATIC,8,10,145,8
+    CONTROL         "List1",IDC_LIST_VALUE_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,5,20,155,105
+    CONTROL         "Strings are Case Sensitive",IDC_CHK_CASE_FROM_LIST,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,11,133,98,10
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_VALUE_TO_LIST,166,25,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_VALUE_FROM_LIST,166,41,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_VALUE_IN_LIST,166,57,50,14
+    PUSHBUTTON      "&Load List...",IDC_BTN_LOAD_VALUE_LIST_FILE,165,95,50,14
+    PUSHBUTTON      "&Save List...",IDC_BTN_SAVE_VALUE_LIST_FILE,165,111,50,14
+END
+
+IDD_EXTRACTLINEPP DIALOGEX 0, 0, 288, 59
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Extract specific line(s) including line breaks :",IDC_RADIO_EXTRACT_LINES,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,3,6,152,10
+    CONTROL         "Extract specific line(s) excluding line breaks :",IDC_RADIO_EXTRACT_LINES2,
+                    "Button",BS_AUTORADIOBUTTON,3,20,151,10
+    CONTROL         "Extract each line (excluding line breaks) as a unique value for current attribute",IDC_RADIO_UNIQUE,
+                    "Button",BS_AUTORADIOBUTTON,3,35,260,10
+    EDITTEXT        IDC_EDIT_LINE_NUMBER,162,5,118,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_LINE_NUMBER2,162,19,118,13,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_LINE_INFO,272,44,21,20,SS_NOTIFY | WS_TABSTOP
+END
+
+IDD_BLOCKFINDERPP DIALOGEX 0, 0, 284, 316
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "1) Define Blocks: ",IDC_STATIC,4,6,69,8
+    CONTROL         "Blocks are separated by",IDC_RADIO_DEFINE_BLOCKS_SEPERATOR,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,10,20,92,10
+    EDITTEXT        IDC_EDIT_SEPERATOR,25,33,225,13,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_BLOCK_SEPERATOR_HELP_BF,262,35,20,20,SS_NOTIFY
+    CONTROL         "If no block separator is found, assume that the entire input text is one block",IDC_CHK_INPUT_AS_BLOCK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,49,250,10
+    CONTROL         "Blocks are defined between",IDC_RADIO_DEFINE_BLOCKS_BEGINEND,
+                    "Button",BS_AUTORADIOBUTTON,10,62,104,10
+    LTEXT           "Begin:",IDC_STATIC,25,80,30,8
+    EDITTEXT        IDC_EDIT_BLOCK_BEGIN,60,75,90,13,ES_AUTOHSCROLL
+    LTEXT           "End:",IDC_STATIC,155,80,20,8
+    EDITTEXT        IDC_EDIT_BLOCK_END,180,75,90,13,ES_AUTOHSCROLL
+    CONTROL         "Pair beginning and ending strings",IDC_CHK_PAIRBEGINEND,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,91,120,10
+    LTEXT           "2) Find what?",IDC_STATIC,5,110,50,8
+    CONTROL         "Find all blocks",IDC_RADIO_FIND_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,11,124,61,10
+    CONTROL         "Find blocks containing at least",IDC_RADIO_BLOCK_WITH_CLUE,
+                    "Button",BS_AUTORADIOBUTTON,11,137,111,10
+    EDITTEXT        IDC_EDIT_MIN_NUMBER,125,136,30,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "of the clue(s) defined below:",IDC_STATIC,159,137,90,8
+    CONTROL         "List1",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,21,153,188,89
+    ICON            IDI_ICON_INFO,IDC_CLUES_HELP_BF,221,153,20,20,SS_NOTIFY
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_BF,221,191,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_BF,221,209,50,14
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_BF,221,227,50,14
+    CONTROL         "Above clues are defined as Regular Expressions",IDC_CHK_AS_REG_EXP,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,248,168,10
+    CONTROL         "Get block(s) only if it contains maximum number of clue(s) defined above",IDC_CHK_GET_MAX,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,261,242,10
+    ICON            IDI_ICON_INFO,IDC_MAX_HELP_BF,262,260,20,20,SS_NOTIFY
+    CONTROL         "Each clue could be a part of a word in the input text",IDC_CHK_PART_OF_WORD,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,21,274,179,10
+    ICON            IDI_ICON_INFO,IDC_PART_WORD_HELP_BF,203,275,20,20,SS_NOTIFY
+END
+
+IDD_SPMFINDERPP DIALOGEX 0, 0, 366, 351
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Read patterns from file :",IDC_RADIO_FILE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,14,91,10
+    EDITTEXT        IDC_EDIT_RULE_FILE,28,27,257,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_SPM,305,27,15,14
+    PUSHBUTTON      "",IDC_BTN_OPEN_NOTEPAD,325,27,16,14,BS_ICON
+    CONTROL         "Read patterns as specified below:",IDC_RADIO_TEXT,
+                    "Button",BS_AUTORADIOBUTTON,15,65,123,10
+    EDITTEXT        IDC_EDIT_PATTERN_TEXT,27,78,312,86,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    ICON            IDI_ICON_INFO,IDC_PATTERN_FILE_INFO,345,27,20,20,SS_NOTIFY
+    ICON            IDI_ICON_INFO,IDC_PATTERN_TEXT,345,68,20,20,SS_NOTIFY
+    GROUPBOX        "Pattern",IDC_STATIC,5,2,355,168
+    CONTROL         "Case Sensitive",IDC_CHK_CASE_SPM,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,187,63,10
+    CONTROL         "Greedy search",IDC_CHK_GREEDY,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,89,187,62,10
+    CONTROL         "Treat multiple white spaces as one white space character",IDC_CHK_MULTIPLE_WS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,155,187,197,10
+    CONTROL         "Store rule ID(s) of successfully executed rule(s) as document tag named",IDC_CHK_STORE_RULE_WORKED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,202,241,10
+    EDITTEXT        IDC_EDIT_RULE_WORKED_NAME,259,202,80,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_RULEID_TAG_INFO,345,202,20,20,SS_NOTIFY
+    LTEXT           "Define preprocessor(s) :",IDC_STATIC,15,222,76,8
+    CONTROL         "List1",IDC_LIST_PREPROCESSORS,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,103,222,184,40
+    PUSHBUTTON      "&Add",IDC_BTN_ADD_SPM,295,222,45,12
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE_SPM,295,236,45,12
+    PUSHBUTTON      "&Modify",IDC_BTN_MODIFY_SPM,295,250,45,12
+    ICON            IDI_ICON_INFO,IDC_PREPROCESSOR_INFO,345,224,20,20,SS_NOTIFY
+    LTEXT           "Static",IDC_STATIC_DATA_SCORER,15,282,155,15,0,WS_EX_STATICEDGE
+    PUSHBUTTON      "Select ...",IDC_BUTTON_SELECT_DATA_SCORER,175,282,45,15
+    LTEXT           "Minimum match score:",IDC_STATIC_MIN_SCORE_LABEL,235,284,55,8
+    EDITTEXT        IDC_EDIT_MIN_SCORE,295,283,30,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_MIN_SCORE_INFO,345,285,20,20,SS_NOTIFY
+    LTEXT           "or best match",IDC_STATIC_MIN_FIRST_SCORE_LABEL,293,331,46,10
+    EDITTEXT        IDC_EDIT_MIN_FIRST_SCORE,261,330,30,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_MIN_FIRST_SCORE_INFO,345,331,20,20,SS_NOTIFY
+    GROUPBOX        "Return Options",IDC_STATIC,5,303,354,43
+    CONTROL         "Return first match only",IDC_RADIO_RETURN_FIRST_MATCH,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,47,316,92,10
+    CONTROL         "Return best match",IDC_RADIO_RETURN_BEST_MATCH,"Button",BS_AUTORADIOBUTTON,177,316,78,10
+    CONTROL         "Return all matches",IDC_RADIO_RETURN_ALL_MATCHES,"Button",BS_AUTORADIOBUTTON,47,331,78,10
+    CONTROL         "Return first match  >=",IDC_RADIO_RETURN_FIRST_OR_BEST,
+                    "Button",BS_AUTORADIOBUTTON,177,331,78,10
+    LTEXT           "Use following DataScorer object to determine validity of match",IDC_STATIC,15,270,225,10
+    GROUPBOX        "Match Options",IDC_STATIC,5,172,354,130
+    CONTROL         "If, when expanding any tag in the above filename, the tag does not exist, return no attributes and do not throw an exception",IDC_CHK_IGNORE_NO_TAGS,
+                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,28,45,327,20
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,290,27,10,14,BS_ICON
+END
+
+IDD_LOCATEIMAGEREGIONPP DIALOGEX 0, 0, 458, 259
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Find",IDC_STATIC,8,8,14,8
+    COMBOBOX        IDC_CMB_FIND_TYPE,25,5,64,43,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_INSIDE,93,5,43,32,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "the specified boundaries and",IDC_STATIC,140,8,92,8
+    COMBOBOX        IDC_CMB_INCLUDE,236,5,43,33,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_INTERSECTING,284,5,51,48,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "that intersect region boundaries.",IDC_STATIC,339,8,102,8
+    LTEXT           "<this set in code>",IDC_STATIC_REGION_ON,8,24,58,8
+    COMBOBOX        IDC_CMB_MATCH_PER_DOC,67,21,43,32,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "matching page(s).",IDC_STATIC,113,24,57,8
+    LTEXT           "Assign the following text to the image region:",IDC_STATIC,7,41,142,8
+    EDITTEXT        IDC_EDT_IMAGE_REGION_TEXT,149,38,302,14,ES_AUTOHSCROLL
+    GROUPBOX        "Clues",IDC_STATIC,4,57,275,189
+    CONTROL         "Clue List 1",IDC_OPT_LIST1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,33,69,49,10
+    ICON            IDI_ICON_EMPTY,IDC_PIC_ICON_1,89,69,20,20
+    CONTROL         "Clue List 2",IDC_OPT_LIST2,"Button",BS_AUTORADIOBUTTON,33,84,49,10
+    ICON            IDI_ICON_EMPTY,IDC_PIC_ICON_2,89,84,20,20
+    CONTROL         "Clue List 3",IDC_OPT_LIST3,"Button",BS_AUTORADIOBUTTON,152,69,49,10
+    ICON            IDI_ICON_EMPTY,IDC_PIC_ICON_3,208,69,20,20
+    CONTROL         "Clue List 4",IDC_OPT_LIST4,"Button",BS_AUTORADIOBUTTON,152,84,49,10
+    ICON            IDI_ICON_EMPTY,IDC_PIC_ICON_4,208,84,20,20
+    LTEXT           "Define the Clue Text(s):",IDC_STATIC,10,101,75,8
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,89,101,20,20,SS_NOTIFY
+    CONTROL         "List1",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,10,112,216,95
+    PUSHBUTTON      "Add...",IDC_BTN_ADD_LR,231,112,43,14
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_LR,231,128,43,14
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_LR,231,143,43,14
+    PUSHBUTTON      "",IDC_BTN_UP_LR,231,158,18,17,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN_LR,256,158,18,17,BS_ICON
+    PUSHBUTTON      "Load List...",IDC_BTN_LOAD_LIST,231,176,43,14
+    PUSHBUTTON      "Save List...",IDC_BTN_SAVE_LIST,231,191,43,14
+    CONTROL         "Case sensitive",IDC_CHK_CASE_SENSITIVE_LR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,210,61,10
+    CONTROL         "Above clue texts(s) will be treated as regular expression(s)",IDC_CHK_AS_REGEXPR_LR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,222,197,10
+    CONTROL         "Restrict search to the region defined by the results from clue list",IDC_CHK_RESTRICT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,234,211,10
+    LTEXT           "1, 2, 3",IDC_TEXT_LIST_NUM,222,235,21,8
+    LTEXT           "Note: Clues must all be found on the same page.",IDC_STATIC,5,250,154,8
+    GROUPBOX        "Region Boundaries",IDC_STATIC,289,57,163,200
+    LTEXT           "Define the TOP of the Region as the",IDC_STATIC,294,68,116,8
+    COMBOBOX        IDC_CMB_SIDE1,295,81,41,33,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "of",IDC_STATIC,342,84,8,8
+    COMBOBOX        IDC_CMB_CONDITION1,356,81,91,60,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Expand",IDC_STATIC,295,102,26,8
+    COMBOBOX        IDC_CMB_EXPAND_DIR_TOP,323,97,42,39,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "by",IDC_STATIC,367,100,8,8
+    EDITTEXT        IDC_EDIT_NUM1,377,97,25,12,ES_AUTOHSCROLL
+    LTEXT           "Spatial lines.",IDC_STATIC,404,100,40,8
+    LTEXT           "Define the BOTTOM of the Region as the",IDC_STATIC,294,116,132,8
+    COMBOBOX        IDC_CMB_SIDE2,295,129,41,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "of",IDC_STATIC,342,132,8,8
+    COMBOBOX        IDC_CMB_CONDITION2,356,129,91,61,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Expand",IDC_STATIC,295,147,26,8
+    COMBOBOX        IDC_CMB_EXPAND_DIR_BOTTOM,322,145,42,38,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "by",IDC_STATIC,366,147,8,8
+    EDITTEXT        IDC_EDIT_NUM2,377,145,25,12,ES_AUTOHSCROLL
+    LTEXT           "Spatial lines.",IDC_STATIC,406,147,40,8
+    LTEXT           "Define the LEFT of the Region as the",IDC_STATIC,294,164,119,8
+    COMBOBOX        IDC_CMB_SIDE3,295,177,41,34,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "of",IDC_STATIC,343,180,8,8
+    COMBOBOX        IDC_CMB_CONDITION3,356,177,91,61,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Expand",IDC_STATIC,295,196,26,8
+    COMBOBOX        IDC_CMB_EXPAND_DIR_LEFT,323,193,42,37,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "by",IDC_STATIC,367,196,8,8
+    EDITTEXT        IDC_EDIT_NUM3,378,193,25,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Characters.",IDC_STATIC,407,196,37,8
+    LTEXT           "Define the RIGHT of the Region as the",IDC_STATIC,294,211,124,8
+    COMBOBOX        IDC_CMB_SIDE4,295,225,41,36,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "of",IDC_STATIC,343,227,8,8
+    COMBOBOX        IDC_CMB_CONDITION4,356,225,91,62,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Expand",IDC_STATIC,295,245,26,8
+    COMBOBOX        IDC_CMB_EXPAND_DIR_RIGHT,324,241,42,39,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "by",IDC_STATIC,369,245,8,8
+    EDITTEXT        IDC_EDIT_NUM4,380,241,24,13,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Characters.",IDC_STATIC,408,245,37,8
+END
+
+IDD_RETURNADDRFINDERPP DIALOGEX 0, 0, 221, 31
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "If no Return Addresses are found search for other addresses",IDC_CHECK_FIND_NON_RETURN_ADDRESSES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,10,210,10
+END
+
+IDD_CREATEVALUEPP DIALOGEX 0, 0, 251, 71
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_VALUE,5,15,235,15,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_TYPE,5,45,235,15,ES_AUTOHSCROLL
+    LTEXT           "Set attribute Value to:",IDC_STATIC,5,5,160,10
+    LTEXT           "Set attribute Type to:",IDC_STATIC,5,35,160,10
+END
+
+IDD_FINDFROMRSDPP DIALOGEX 0, 0, 221, 61
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_ATTRIBUTE_NAME,5,10,210,15,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_RSD_FILE,5,40,170,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE,195,40,20,15
+    LTEXT           "Attribute name:",IDC_STATIC,5,0,135,8
+    LTEXT           "RSD File name:",IDC_STATIC,5,30,135,10
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,180,40,10,14,BS_ICON
+END
+
+IDD_IMAGEREGIONWITHLINESPP DIALOGEX 0, 0, 266, 314
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_LINES_MIN,72,30,72,102,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_LINES_MAX,168,30,72,103,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_COLUMNS_MIN,72,48,72,106,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_COLUMNS_MAX,168,48,72,105,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_WIDTH_MIN,72,66,72,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_WIDTH_MAX,168,66,72,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LINE_SPACING_MIN,72,84,72,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LINE_SPACING_MAX,168,84,72,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_COLUMN_SPACING_MAX,168,102,72,13,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "All pages",IDC_RADIO_ALL_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,169,78,10
+    CONTROL         "First",IDC_RADIO_FIRST_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,186,30,10
+    CONTROL         "Last",IDC_RADIO_LAST_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,203,29,10
+    CONTROL         "Specified Pages",IDC_RADIO_SPECIFIED_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,220,66,10
+    EDITTEXT        IDC_EDIT_FIRST_PAGE_NUMS,42,185,36,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LAST_PAGE_NUMS,42,202,36,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SPECIFIED_PAGE_NUMS,78,219,116,13,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_ATTRIBUTE_TEXT,12,270,240,13,ES_AUTOHSCROLL
+    CONTROL         "Output lines in attribute (debug)",IDC_CHK_INCLUDE_LINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,288,114,10
+    GROUPBOX        "Region Dimensions",IDC_STATIC,6,6,252,144
+    CTEXT           "Minimum",IDC_STATIC,90,18,36,8
+    CTEXT           "Maximum",IDC_STATIC,186,18,36,8
+    LTEXT           "Columns",IDC_STATIC,12,50,54,8
+    LTEXT           "Rows",IDC_STATIC,12,32,54,8
+    LTEXT           "Column width",IDC_STATIC,12,68,54,8
+    LTEXT           "Line spacing",IDC_STATIC,12,87,54,8
+    LTEXT           "Column spacing",IDC_STATIC,12,104,54,8
+    LTEXT           "Column width",IDC_STATIC,12,68,54,8
+    CTEXT           "(distances expressed as a percentage of the size of the page)",IDC_STATIC,12,120,239,8
+    GROUPBOX        "Search Scope",IDC_STATIC,6,156,252,84,BS_LEFT
+    LTEXT           "pages",IDC_STATIC,84,187,54,8
+    LTEXT           "pages",IDC_STATIC,84,204,54,8
+    GROUPBOX        "Attribute",IDC_STATIC,6,246,252,60,BS_LEFT
+    LTEXT           "Assign the following text to any regions that are found:",IDC_STATIC,12,258,202,8
+    LTEXT           "%",IDC_STATIC,148,68,8,8
+    LTEXT           "%",IDC_STATIC,148,87,8,8
+    LTEXT           "%",IDC_STATIC,244,68,8,8
+    LTEXT           "%",IDC_STATIC,244,87,8,8
+    LTEXT           "%",IDC_STATIC,244,104,8,8
+    CTEXT           "(values can be blank for unspecified)",IDC_STATIC,12,133,239,8
+END
+
+IDD_BOXFINDERPP DIALOGEX 0, 0, 430, 282
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_PICT_CLUE_DIAGRAM,"Static",SS_BITMAP | SS_CENTERIMAGE,286,25,126,74
+    CONTROL         "All pages",IDC_RADIO_ALL_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,140,78,10
+    CONTROL         "First",IDC_RADIO_FIRST_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,157,28,10
+    CONTROL         "Last",IDC_RADIO_LAST_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,174,29,10
+    CONTROL         "Specified Pages",IDC_RADIO_SPECIFIED_PAGES,"Button",BS_AUTORADIOBUTTON | WS_TABSTOP,12,191,64,10
+    EDITTEXT        IDC_EDIT_FIRST_PAGE_NUMS,42,156,36,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_LAST_PAGE_NUMS,42,173,36,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SPECIFIED_PAGE_NUMS,78,190,87,13,ES_AUTOHSCROLL
+    GROUPBOX        "Search Scope",IDC_STATIC,6,128,168,83,BS_LEFT
+    LTEXT           "pages",IDC_STATIC,84,158,54,8
+    LTEXT           "pages",IDC_STATIC,84,175,54,8
+    LTEXT           "Clues to find box:",IDC_STATIC,12,15,55,8
+    ICON            IDI_ICON_DYNAMIC_LIST,IDC_CLUE_DYNAMIC_LIST_HELP,71,15,20,20,SS_NOTIFY
+    PUSHBUTTON      "Add...",IDC_BTN_ADD_CLUE,235,25,42,13
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_CLUE,235,43,42,13
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_CLUE,235,62,42,13
+    CONTROL         "",IDC_LIST_CLUES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,12,25,216,52
+    CONTROL         "Case sensitive",IDC_CHK_CASE_SENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,82,61,10
+    CONTROL         "Above clue is a regular expression",IDC_CHK_AS_REGEXPR,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,95,123,10
+    GROUPBOX        "Clues to find box",IDC_STATIC,6,3,416,120
+    LTEXT           "Select location of clue relative to box:",IDC_STATIC,286,14,129,8
+    GROUPBOX        "Return value",IDC_STATIC,182,128,240,147,BS_LEFT
+    CONTROL         "Return spatial information of found box and artificially associate",IDC_RADIO_RETURN_BOX_AREA,
+                    "Button",BS_AUTORADIOBUTTON,187,141,216,10
+    LTEXT           "the spatial area with the following text:",IDC_STATIC,198,152,120,8
+    EDITTEXT        IDC_EDIT_ATTRIBUTE_TEXT,198,163,117,13,ES_AUTOHSCROLL
+    CONTROL         "Exclude vertical spatial area of clue from box",IDC_CHECK_EXCLUDE_CLUE_AREA,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,182,198,10
+    CONTROL         "Return text found within the box",IDC_RADIO_RETURN_TEXT,
+                    "Button",BS_AUTORADIOBUTTON,187,203,216,10
+    CONTROL         "Include clue text as part of the return value",IDC_CHECK_INCLUDE_CLUE_TEXT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,198,217,198,10
+    GROUPBOX        "Expected size of box",IDC_STATIC,6,216,168,59,BS_LEFT
+    LTEXT           "Width (% of page width):",IDC_STATIC,12,241,79,8
+    LTEXT           "Height (% of page height):",IDC_STATIC,11,258,87,8
+    LTEXT           "Minimum",IDC_STATIC,101,226,28,8
+    LTEXT           "Maximum",IDC_STATIC,137,226,30,8
+    EDITTEXT        IDC_EDIT_BOX_WIDTH_MIN,101,238,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MIN,101,256,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_BOX_WIDTH_MAX,138,238,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_BOX_HEIGHT_MAX,138,256,27,13,ES_AUTOHSCROLL | ES_NUMBER
+    GROUPBOX        "Debug information",IDC_STATIC,190,237,223,31,BS_LEFT
+    CONTROL         "Include all lines that are found in the output",IDC_CHECK_INCLUDE_LINES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,197,250,198,10
+    CONTROL         "Stop searching after first box is found",IDC_CHK_FIRST_BOX_ONLY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,108,132,10
+    PUSHBUTTON      "",IDC_BTN_CLUE_UP,235,81,18,18,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_CLUE_DOWN,259,81,18,18,BS_ICON
+END
+
+IDD_LOOPFINDERPP DIALOGEX 0, 0, 290, 241
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Loop Type",IDC_LOOP_TYPE,6,6,276,48,WS_GROUP
+    CONTROL         "Do",IDC_RADIO_DO,"Button",BS_AUTORADIOBUTTON,12,18,25,10
+    CONTROL         "While",IDC_RADIO_WHILE,"Button",BS_AUTORADIOBUTTON,12,30,34,10
+    CONTROL         "For",IDC_RADIO_FOR,"Button",BS_AUTORADIOBUTTON,12,42,26,10
+    GROUPBOX        "Loop setup",IDC_STATIC_LOOP_SETUP,6,60,276,128
+    LTEXT           "Do",IDC_STATIC_BEGIN_LOOP_TEXT,12,74,72,8
+    LTEXT           "{",IDC_STATIC_BEGIN_LOOP_BRACE,12,86,8,8
+    LTEXT           "Execute finding rule",IDC_STATIC_FINDING_RULE,24,98,63,8
+    CONTROL         "",IDC_EDIT_FINDING_RULE,"Static",SS_LEFTNOWORDWRAP | SS_NOTIFY | WS_GROUP,24,108,198,12,WS_EX_STATICEDGE
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIGURE_FINDING_RULE,228,108,48,13
+    LTEXT           "Execute Preprocessor",IDC_STATIC_PRE_PROCESSOR,24,125,70,8
+    CONTROL         "",IDC_EDIT_PREPROCESSOR,"Static",SS_LEFTNOWORDWRAP | SS_NOTIFY | WS_GROUP,24,136,198,12,WS_EX_STATICEDGE
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIGURE_PREPROCESSOR,228,136,48,13
+    LTEXT           "} while this condition is",IDC_STATIC_END_LOOP_TEXT,12,158,72,8,SS_NOTIFY
+    COMBOBOX        IDC_COMBO_CONDITION_VALUE,90,154,42,36,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_EDIT_CONDITION,"Static",SS_LEFTNOWORDWRAP | SS_NOTIFY | WS_GROUP,24,169,198,12,WS_EX_STATICEDGE
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIGURE_CONDITION,228,169,48,13
+    GROUPBOX        "Loop options",IDC_STATIC,6,192,276,42
+    LTEXT           "Maximum number of iterations:",IDC_STATIC_ITERATION_TEXT,12,205,96,8
+    EDITTEXT        IDC_EDIT_ITERATIONS,114,203,48,12,ES_AUTOHSCROLL
+    CONTROL         "Log exceptions if above maximum number of iterations is reached",IDC_CHECK_LOG_EXCEPTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,219,220,10
+END
+
+IDD_MICRFINDERPP DIALOGEX 0, 0, 200, 147
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Split found MICR text into the following subattributes",IDC_STATIC,5,5,185,90
+    CONTROL         "Routing number",IDC_CHECK_SPLIT_ROUTING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,22,80,10
+    CONTROL         "Account number",IDC_CHECK_SPLIT_ACCOUNT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,39,80,10
+    CONTROL         "Check number",IDC_CHECK_SPLIT_CHECK,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,56,80,10
+    CONTROL         "Amount",IDC_CHECK_SPLIT_AMOUNT,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,73,80,10
+    GROUPBOX        "Search for MICR in the following rotations",IDC_STATIC,5,105,185,37
+    CONTROL         "0°",IDC_CHECK_0_ROTATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,10,122,35,10
+    CONTROL         "90°",IDC_CHECK_90_ROTATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,50,122,35,10
+    CONTROL         "180°",IDC_CHECK_180_ROTATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,90,122,35,10
+    CONTROL         "270°",IDC_CHECK_270_ROTATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,130,122,35,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_VALUEBEFORECLUEPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 259
+    END
+
+    IDD_EXTRACTLINEPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 58
+    END
+
+    IDD_BLOCKFINDERPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 283
+    END
+
+    IDD_SPMFINDERPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 347
+    END
+
+    IDD_LOCATEIMAGEREGIONPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 452
+        BOTTOMMARGIN, 258
+    END
+
+    IDD_RETURNADDRFINDERPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 146
+    END
+
+    IDD_FINDFROMRSDPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 216
+    END
+
+    IDD_IMAGEREGIONWITHLINESPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 259
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 307
+    END
+
+    IDD_BOXFINDERPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 423
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 275
+    END
+
+    IDD_LOOPFINDERPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 234
+    END
+
+    IDD_MICRFINDERPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 170
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 85
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\res\\icon_info.ico"
+IDI_ICON_NOTEPAD        ICON                    "res\\notepad.ico"
+IDI_ICON_UP             ICON                    "..\\..\\AFCore\\Code\\res\\icon_up.ico"
+IDI_ICON_DOWN           ICON                    "..\\..\\AFCore\\Code\\res\\icon_down.ico"
+IDI_ICON_POPULATED      ICON                    "res\\icon_pop.ico"
+IDI_ICON_EMPTY          ICON                    "res\\icon_empty.ico"
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+IDI_ICON_DYNAMIC_LIST   ICON                    "..\\..\\..\\..\\ReusableComponents\\COMComponents\\UCLIDCOMUtils\\Core\\Code\\res\\icon_dynamic_list.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_LOCATEIMAGEREGIONPP DLGINIT
+BEGIN
+    IDC_CMB_SIDE1, 0x403, 1, 0
+"\000" 
+    0
+END
+
+IDD_LOOPFINDERPP DLGINIT
+BEGIN
+    IDC_COMBO_CONDITION_VALUE, 0x403, 5, 0
+0x7254, 0x6575, "\000" 
+    IDC_COMBO_CONDITION_VALUE, 0x403, 6, 0
+0x6146, 0x736c, 0x0065, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BITMAP_CLUESAME     BITMAP                  "res\\ClueChartSame.bmp"
+IDB_BITMAP_CLUETOPLEFT  BITMAP                  "res\\ClueChartTopLeft.bmp"
+IDB_BITMAP_CLUETOP      BITMAP                  "res\\ClueChartTop.bmp"
+IDB_BITMAP_CLUETOPRIGHT BITMAP                  "res\\ClueChartTopRight.bmp"
+IDB_BITMAP_CLUELEFT     BITMAP                  "res\\ClueChartLeft.bmp"
+IDB_BITMAP_CLUERIGHT    BITMAP                  "res\\ClueChartRight.bmp"
+IDB_BITMAP_CLUEBOTTOMLEFT BITMAP                  "res\\ClueChartBottomLeft.bmp"
+IDB_BITMAP_CLUEBOTTOM   BITMAP                  "res\\ClueChartBottom.bmp"
+IDB_BITMAP_CLUEBOTTOMRIGHT BITMAP                  "res\\ClueChartBottomRight.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFValueFinders"
+    IDS_TITLERegExprRulePP  "Title"
+    IDS_HELPFILERegExprRulePP "Help File Name"
+    IDS_DOCSTRINGRegExprRulePP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEValueAfterCluePP "ValueAfterCluePP"
+    IDS_HELPFILEValueAfterCluePP "ValueAfterCluePP"
+    IDS_DOCSTRINGValueAfterCluePP "ValueAfterCluePP"
+    IDS_TITLEValueBeforeCluePP "ValueBeforeCluePP"
+    IDS_HELPFILEValueBeforeCluePP "ValueBeforeCluePP"
+    IDS_DOCSTRINGValueBeforeCluePP "ValueBeforeCluePP"
+    IDS_TITLEValueFromListPP "ValueFromListPP"
+    IDS_HELPFILEValueFromListPP "ValueFromListPP"
+    IDS_DOCSTRINGValueFromListPP "ValueFromListPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEExtractLinePP  "ExtractLinePP"
+    IDS_HELPFILEExtractLinePP "ExtractLinePP"
+    IDS_DOCSTRINGExtractLinePP "ExtractLinePP"
+    IDS_TITLEBlockFinderPP  "BlockFinderPP"
+    IDS_HELPFILEBlockFinderPP "BlockFinderPP"
+    IDS_DOCSTRINGBlockFinderPP "BlockFinderPP"
+    IDS_TITLESPMFinderPP    "SPMFinderPP"
+    IDS_HELPFILESPMFinderPP "SPMFinderPP"
+    IDS_DOCSTRINGSPMFinderPP "SPMFinderPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLELocateImageRegionPP "LocateImageRegionPP"
+    IDS_HELPFILELocateImageRegionPP "LocateImageRegionPP"
+    IDS_DOCSTRINGLocateImageRegionPP "LocateImageRegionPP"
+    IDS_TITLEReturnAddrFinderPP "ReturnAddrFinderPP"
+    IDS_HELPFILEReturnAddrFinderPP "ReturnAddrFinderPP"
+    IDS_DOCSTRINGReturnAddrFinderPP "ReturnAddrFinderPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLECreateValuePP  "CreateValuePP"
+    IDS_HELPFILECreateValuePP "CreateValuePP"
+    IDS_DOCSTRINGCreateValuePP "CreateValuePP"
+    IDS_TITLEFindFromRSDPP  "FindFromRSDPP"
+    IDS_HELPFILEFindFromRSDPP "FindFromRSDPP"
+    IDS_DOCSTRINGFindFromRSDPP "FindFromRSDPP"
+    IDS_TITLEIMAGEREGIONWITHLINESPP "ImageRegionWithLinesPP"
+    IDS_HELPFILEIMAGEREGIONWITHLINESPP "ImageRegionWithLinesPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLELOOPFINDERPP   "Loop Finder"
+    IDS_HELPFILELOOPFINDERPP "Help File Name"
+    IDS_DOCSTRINGLOOPFINDERPP "Your Help String"
+    IDS_TITLEMICRFINDERPP   "Micr Finder"
+    IDS_HELPFILEMICRFINDERPP "Help File Name"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DOCSTRINGMICRFINDERPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFValueFinders.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

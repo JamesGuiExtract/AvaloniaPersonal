@@ -1,0 +1,5 @@
+^Spa,(.*)Day$%DIVINE DAY SPA
+^Club,(.*)Athletic$%$1ATHLETIC CLUB
+(.*?),\x20Golds\x20Gym\b(.*)%GOLDS GYM $2 $1
+Knight, Broadcasting%KNIGHT BROADCASTING
+\bFAIRVIEW, UNOCAL\b%FAIRVIEW UNOCAL

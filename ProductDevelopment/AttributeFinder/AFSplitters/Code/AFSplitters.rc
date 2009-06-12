@@ -1,0 +1,286 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_PERSONNAMESPLITTER  REGISTRY                "PersonNameSplitter.rgs"
+IDR_STRINGTOKENIZERSPLITTER REGISTRY                "StringTokenizerSplitter.rgs"
+IDR_STRINGTOKENIZERSPLITTERPP REGISTRY                "StringTokenizerSplitterPP.rgs"
+IDR_ENTITYNAMESPLITTER  REGISTRY                "EntityNameSplitter.rgs"
+IDR_RSDSPLITTER         REGISTRY                "RSDSplitter.rgs"
+IDR_RSDSPLITTERPP       REGISTRY                "RSDSplitterPP.rgs"
+IDR_ADDRESSSPLITTER     REGISTRY                "AddressSplitter.rgs"
+IDR_LEGALDESCSPLITTER   REGISTRY                "LegalDescSplitter.rgs"
+IDR_ADDRESSSPLITTERPP   REGISTRY                "AddressSplitterPP.rgs"
+IDR_ENTITYNAMESPLITTERPP REGISTRY                "EntityNameSplitterPP.rgs"
+IDR_DATETIMESPLITTER    REGISTRY                "DateTimeSplitter.rgs"
+IDR_DATETIMESPLITTERPP  REGISTRY                "DateTimeSplitterPP.rgs"
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFSplitters.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFSplitters Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFSplitters"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFSplitters.DLL"
+            VALUE "ProductName", "AFSplitters Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_STRINGTOKENIZERSPLITTERPP DIALOGEX 0, 0, 336, 186
+STYLE DS_SETFONT | DS_CONTROL | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Split string into parts using the following delimiting character:",IDC_STATIC,10,10,195,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_DELIMITER,210,10,35,15,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_DELIMITER_HELP,247,13,20,20,SS_NOTIFY
+    CONTROL         "Create each part as a sub-attribute",IDC_RADIO1,"Button",BS_AUTORADIOBUTTON | WS_GROUP,10,30,235,10
+    CONTROL         "Create following sub-attributes:",IDC_RADIO2,"Button",BS_AUTORADIOBUTTON,10,65,110,10
+    LTEXT           "Sub-attribute name expression:",IDC_STATIC_NAME_EXPRESSION_LABEL,22,45,108,15,SS_CENTERIMAGE
+    EDITTEXT        IDC_EDIT_NAME_EXPRESSION,130,45,115,15,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_NAME_EXPRESSION_HELP,247,47,20,20,SS_NOTIFY
+    CONTROL         "List1",IDC_LIST_SUB_ATTRIBUTES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,22,81,223,95
+    ICON            IDI_ICON_INFO,IDC_SUB_ATTRIBUTES_HELP,248,80,20,20,SS_NOTIFY
+    PUSHBUTTON      "Add ...",IDC_BUTTON_ADD,270,80,55,15
+    PUSHBUTTON      "Remove",IDC_BUTTON_REMOVE,270,100,55,15
+    PUSHBUTTON      "Modify ...",IDC_BUTTON_MODIFY,270,120,55,15
+    PUSHBUTTON      "",IDC_BTN_UP,270,140,21,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN,304,140,21,21,BS_ICON
+END
+
+IDD_RSDSPLITTERPP DIALOGEX 0, 0, 260, 40
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Provide the RSD file for further splitting found attribute into sub attributes:",IDC_STATIC,5,6,229,8
+    EDITTEXT        IDC_EDIT_RSD_FILE,5,19,215,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_RSD,240,19,14,14
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,225,19,10,14,BS_ICON
+END
+
+IDD_ADDRESSSPLITTERPP DIALOGEX 0, 0, 244, 24
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Name and Address lines are each split as Address lines",IDC_CHECK_COMBINE_NAME_ADDRESS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,209,10
+END
+
+IDD_ENTITYNAMESPLITTERPP DIALOGEX 0, 0, 229, 71
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Specify how to handle entity aliases",IDC_STATIC,7,7,115,12
+    CONTROL         "Ignore aliases",IDC_RADIO_IGNORE,"Button",BS_AUTORADIOBUTTON,7,19,77,14
+    CONTROL         "Make aliases into Attributes",IDC_RADIO_ATTRIBUTES,
+                    "Button",BS_AUTORADIOBUTTON,7,35,125,14
+    CONTROL         "Make aliases into sub-Attributes",IDC_RADIO_SUBATTRIBUTES,
+                    "Button",BS_AUTORADIOBUTTON,7,51,125,14
+END
+
+IDD_DATETIMESPLITTERPP DIALOGEX 0, 0, 370, 168
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Split Month as:",IDC_STATIC,4,1,89,37
+    CONTROL         "Number (i.e. 8)",IDC_RADIO_MONTHNUMBER,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,12,70,10
+    CONTROL         "Name (i.e. August)",IDC_RADIO_MONTHNAME,"Button",BS_AUTORADIOBUTTON,12,25,80,10
+    GROUPBOX        "Display Year as:",IDC_STATIC,100,1,102,37
+    CONTROL         "Four digits (i.e. 2004)",IDC_RADIO_YEARFOUR,"Button",BS_AUTORADIOBUTTON | WS_GROUP,108,12,84,10
+    CONTROL         "Two digits (i.e. 04)",IDC_RADIO_YEARTWO,"Button",BS_AUTORADIOBUTTON,108,25,80,10
+    GROUPBOX        "Display Time as:",IDC_STATIC,209,1,155,37
+    CONTROL         "Normal (i.e. Hour = 8, AMPM = PM)",IDC_RADIO_TIMENORMAL,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,217,12,128,10
+    CONTROL         "Military (i.e. Hour = 20, AMPM not shown)",IDC_RADIO_TIMEMILITARY,
+                    "Button",BS_AUTORADIOBUTTON,217,25,143,10
+    CONTROL         "Generate Default sub-attributes (i.e. Month, Day, Year, Time)",IDC_CHECK_DEFAULTS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,45,214,10
+    CONTROL         "Generate Day of Week sub-attribute (i.e. Monday)",IDC_CHECK_DAYOFWEEK,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,62,175,10
+    CONTROL         "Generate Formatted sub-attribute from specified format string",IDC_CHECK_SHOWFORMATTED,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,79,207,10
+    ICON            IDI_ICON_INFO,IDC_FORMAT_INFO,214,72,20,20,SS_NOTIFY
+    EDITTEXT        IDC_EDIT_FORMAT,24,92,296,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Test",IDC_BTN_TESTFORMAT,327,92,37,14
+    EDITTEXT        IDC_EDIT_TEST,24,109,340,12,ES_AUTOHSCROLL | ES_READONLY
+    GROUPBOX        "Interpret Two-Digit Year as:",IDC_STATIC,4,127,129,37
+    CONTROL         "On or after the year",IDC_RADIO_TWO_DIGIT_YEAR_SPECIFIED,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,12,138,73,10
+    CONTROL         "On or before the current year",IDC_RADIO_TWO_DIGIT_YEAR_CURRENT,
+                    "Button",BS_AUTORADIOBUTTON,12,151,105,10
+    EDITTEXT        IDC_EDIT_TWO_DIGIT_YEAR,90,136,27,12,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_UP             ICON                    "..\\..\\AFCore\\Code\\Res\\icon_up.ico"
+IDI_ICON_DOWN           ICON                    "..\\..\\AFCore\\Code\\Res\\icon_down.ico"
+IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\Res\\icon_info.ico"
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ADDRESSSPLITTERPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 237
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 17
+    END
+
+    IDD_DATETIMESPLITTERPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 364
+        BOTTOMMARGIN, 164
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFSplitters"
+    IDS_TITLEStringTokenizerSplitterPP "Title"
+    IDS_HELPFILEStringTokenizerSplitterPP "Help File Name"
+    IDS_DOCSTRINGStringTokenizerSplitterPP "Your Help String"
+    IDS_TITLEEntityNameSplitterPP "Title"
+    IDS_HELPFILEEntityNameSplitterPP "Help File Name"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DOCSTRINGEntityNameSplitterPP "EntityNameSplitter"
+    IDS_TITLEAddressSplitterPP "AddressSplitterPP"
+    IDS_HELPFILEAddressSplitterPP "AddressSplitterPP"
+    IDS_DOCSTRINGAddressSplitterPP "AddressSplitterPP"
+    IDS_TITLERSDSplitterPP  "RSDSplitterPP"
+    IDS_HELPFILERSDSplitterPP "RSDSplitterPP"
+    IDS_DOCSTRINGRSDSplitterPP "RSDSplitterPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEENSplitterPP   "EntityNameSplitter"
+    IDS_HELPFILEENSplitterPP "EntityNameSplitter"
+    IDS_DOCSTRINGENSplitterPP "EntityNameSplitter"
+    IDS_TITLEDateTimeSplitterPP "Date Time Splitter"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFSplitters.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

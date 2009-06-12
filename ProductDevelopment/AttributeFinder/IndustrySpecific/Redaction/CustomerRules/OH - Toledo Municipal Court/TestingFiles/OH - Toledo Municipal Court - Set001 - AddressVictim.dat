@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;TypeToBeTested=AddressVictim
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\OH - Toledo Municipal Court\Set001\Civil_Images;;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\OH - Toledo Municipal Court\Set001\Criminal_Images;;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

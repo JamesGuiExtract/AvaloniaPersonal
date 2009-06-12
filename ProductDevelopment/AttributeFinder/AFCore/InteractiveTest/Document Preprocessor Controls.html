@@ -1,0 +1,136 @@
+<html>
+
+<HEAD>
+<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+h3           {  }
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Document Preprocessor Controls<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  <li><h2>Display Box</h2>
+    <ul>
+      <li>Displays description and type of preprocessor correctly</li>
+	  <li>Checkbox is present
+		<ul>
+			<li>Checkbox is disabled when no preprocessor is selected</li>
+			<li>Checkbox is checkable when a preprocessor is selected</li>
+			<li>Checkbox setting is persistent</li>
+		</ul>
+	  </li>
+      <li><b>[P16 #966]</b> Double-click on defined preprocessor displays configuration dialog.
+      <li><b>[P16 #966]</b> Ctrl + Double-click on defined preprocessor displays the <b>Select 
+	Document Preprocessor</b> dialog.
+      <li><b>[P16 #966]</b> Alt + Double-click on defined preprocessor displays the <b>Configure 
+	description</b> dialog.
+      <li>Right click displays context menu
+        <h3>Context Menu Options</h3>
+        <ol>
+          <li>&quot;<b>Cut</b>&quot; exists
+            <ol>
+              <li>Items can be successfully cut to the clipboard</li>
+              <li>Click on &quot;<b>Cut</b>&quot; loads confirm delete dialog.</li>
+			  <li>Checkbox disables when cut takes place</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Copy</b>&quot; exists
+            <ol>
+              <li>Items can be successfully copied to the clipboard</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Paste</b>&quot; exists
+            <ol>
+              <li>Items can be successfully pasted from clipboard</li>
+			  <li>Paste enables checkbox</li>
+			  <li>Checkbox retains state that the copied/cut preprocessor had</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Delete</b>&quot; exists
+            <ol>
+              <li>Item is deleted successfully.</li>
+              <li>Click on &quot;<b>Delete</b>&quot; loads confirm delete
+                dialog.</li>
+			  <li>Checkbox disables when preprocessor is deleted</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Cancel</b>&quot; exists
+            <ol>
+              <li>Exits context menu successfully.</li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <p>&nbsp;
+  <li><h2>Select Button</h2>
+    <ul>
+   		<LI>Brings up &quot;<b>Select Document Preprocessor</b>&quot; dialog
+			<h3>Select Document Preprocessor Dialog</h3>
+  			<ol>
+	  			<li>&quot;<b>Document Preprocessor Description</b>&quot; edit box is working</li>
+  				<li>&quot;<b>Select Document Preprocessor</b>&quot; combo box is working
+                  <ol>
+                    <li>&quot;<b>&lt;None&gt;</b>&quot; listed
+                      <ol>
+                        <li>Selecting &quot;<b>&lt;None&gt;</b>&quot; clears and
+                          grays out &quot;<b>Description</b>&quot; edit box and
+                          &quot;<b>Configure</b>&quot; button</li>
+                      </ol>
+                    </li>
+                    <li>&quot;<b>Advanced Replace String</b>&quot; listed</li>
+                    <li>&quot;<b>Conditionally Preprocess</b>&quot; listed</li>
+                    <li>&quot;<b>Document Classifier</b>&quot; listed</li>
+                    <li>&quot;<b>Locate Image Region</b>&quot; listed</li>
+                    <li>&quot;<b>Remove Spatial Info</b>&quot; listed</li>
+                    <li>&quot;<b>Replace Strings</b>&quot; listed</li>
+                    <li>&quot;<b>Select Multiple Document Preprocessors</b>&quot;
+                      listed</li>
+                    <li>&quot;<b>Select Page Region</b>&quot; listed</li>
+                  </ol>
+                </li>
+          </ol>
+  			<ol>
+  				<li>&quot;<b>The Document Preprocessor must be configured</b>&quot;
+                  text appears when a preprocessor is selected</li>
+  				<li>&quot;<b>The Document Preprocessor must be configured</b>&quot;
+                  text disappears when a preprocessor is configured</li>
+  				<li>&quot;<b>Configure</b>&quot; button brings up corresponding document preprocessor dialog</li>
+  				<li>&quot;<b>OK</b>&quot; - Preprocessor changes to selected
+                  type
+                  <ol>
+                    <li>&quot;<b>OK</b>&quot; - Brings up &quot;<b>Configuration</b>&quot;
+                      message box if preprocessor is not configured
+                      <ol>
+                        <li>&quot;<b>OK</b>&quot; on &quot;<b>Configuration</b>&quot;
+                          message box brings up configuration dialog for
+                          selected component</li>
+                        <li>&quot;<b>X</b>&quot; button on &quot;<b>Configuration</b>&quot;
+                          message box brings up configuration dialog for
+                          selected component</li>
+                      </ol>
+                    </li>
+                  </ol>
+  				</li>
+  				<li>&quot;<b>Cancel</b>&quot; - Exits dialog and does not change
+                  preprocessor</li>
+          </ol>
+  			<ol>
+                <li>Changes made are persistent</li>
+          </ol>
+          <p>&nbsp;
+	  	</li>
+     </ul>
+	</li>
+</OL>
+
+</body>
+</html>

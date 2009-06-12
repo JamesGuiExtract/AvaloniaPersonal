@@ -1,0 +1,83 @@
+using System;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using System.Windows.Forms;
+using System.Drawing;
+using System.Diagnostics.CodeAnalysis;
+
+namespace Extract.Imaging.Forms
+{
+    /// <summary>
+    /// Represents a <see cref="ImageViewerCommandToolStripMenuItem"/> that allows the user to
+    /// print an image.
+    /// </summary>
+    [ToolboxBitmap(typeof(PrintImageToolStripMenuItem),
+        ToolStripButtonConstants._PRINT_IMAGE_BUTTON_IMAGE_SMALL)]
+    public partial class PrintImageToolStripMenuItem : ImageViewerCommandToolStripMenuItem
+    {
+        #region PrintImageToolStripMenuItem Constructors
+
+        /// <summary>
+        /// Initializes a new <see cref="PrintImageToolStripMenuItem"/> class.
+        /// </summary>
+        // Don't fight with auto-generated code.
+        [SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]        
+        public PrintImageToolStripMenuItem()
+            : base(ToolStripButtonConstants._PRINT_IMAGE_MENU_ITEM_TEXT,
+            ToolStripButtonConstants._PRINT_IMAGE_BUTTON_IMAGE_SMALL,
+            typeof(PrintImageToolStripMenuItem))
+        {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region PrintImageToolStripMenuItem Events
+
+        /// <summary>
+        /// Raises the <see cref="Control.Click"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="Control.Click"/> event.</param>
+        /// <seealso cref="Control.OnClick"/>
+        protected override void OnClick(EventArgs e)
+        {
+            try
+            {
+                if (base.ImageViewer != null && base.ImageViewer.IsImageAvailable)
+                {
+                    base.ImageViewer.Print();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI21416", ex);
+                ee.AddDebugData("Event arguments", e, false);
+                ee.Display();
+            }
+            finally
+            {
+                base.OnClick(e);
+            }
+        }
+
+        #endregion
+
+        #region PrintImageToolStripMenuItem Methods
+
+        /// <summary>
+        /// Retrieves an array of the shortcut keys associated with the menu item.
+        /// </summary>
+        /// <returns>Retrieves an array of the shortcut keys associated with the menu item. 
+        /// May be <see langword="null"/> if no keys are associated with the menu item.</returns>
+        protected override Keys[] GetKeys()
+        {
+            return base.ImageViewer == null ? null :
+                base.ImageViewer.Shortcuts.GetKeys(base.ImageViewer.SelectPrint);
+        }
+
+        #endregion PrintImageToolStripMenuItem Methods
+    }
+}

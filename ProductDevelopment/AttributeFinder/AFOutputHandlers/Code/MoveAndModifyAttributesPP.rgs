@@ -1,0 +1,23 @@
+HKCR
+{
+	AFOutputHandlers.MoveAndModifyAttributesPP.1 = s 'MoveAndModifyAttributesPP Class'
+	{
+		CLSID = s '{A781F68D-49D0-40A9-A95D-54DB4785212C}'
+	}
+	AFOutputHandlers.MoveAndModifyAttributesPP = s 'MoveAndModifyAttributesPP Class'
+	{
+		CLSID = s '{A781F68D-49D0-40A9-A95D-54DB4785212C}'
+		CurVer = s 'AFOutputHandlers.MoveAndModifyAttributesPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A781F68D-49D0-40A9-A95D-54DB4785212C} = s 'MoveAndModifyAttributesPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

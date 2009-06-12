@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFSplitters.StringTokenizerSplitter.1 = s 'StringTokenizerSplitter Class'
+	{
+		CLSID = s '{AC4FC3A7-B932-4BB6-B84E-00C66C6DADC2}'
+	}
+	UCLIDAFSplitters.StringTokenizerSplitter = s 'StringTokenizerSplitter Class'
+	{
+		CLSID = s '{AC4FC3A7-B932-4BB6-B84E-00C66C6DADC2}'
+		CurVer = s 'UCLIDAFSplitters.StringTokenizerSplitter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AC4FC3A7-B932-4BB6-B84E-00C66C6DADC2} = s 'StringTokenizerSplitter Class'
+		{
+			ProgID = s 'UCLIDAFSplitters.StringTokenizerSplitter.1'
+			VersionIndependentProgID = s 'UCLIDAFSplitters.StringTokenizerSplitter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{9C61A6A5-6789-4648-9777-5405D6C517DF}'
+		}
+	}
+}

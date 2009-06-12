@@ -1,0 +1,4 @@
+[PATTERNS_BEGIN]
+rule02=executed^3~by^300~party of|[of]^3~the^3~first^3~[p^1~rt]^?Grantor^240~party^3~of^3~the^3~second^3~[p^1~rt]
+rule01=made^10~executed^3~by^240~[to]^?Grantor^240~and^3~recorded
+[PATTERNS_END]

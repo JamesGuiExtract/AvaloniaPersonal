@@ -1,0 +1,52 @@
+// Basic input file for Entity Name Splitter Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) <FILE> | Path1 | Path2
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path1  = a fully qualified path to a text file with input and output.
+//             OR a filename for file located in same folder as TestEntityNameSplitter.dat
+//
+// 2) <TESTCASE> - a test to be executed
+//        next token - label for test case
+//        last token - input string for Name Splitter test
+//      Text - precedes text of main Attribute
+//      .Sub - precedes text of first-level sub-Attribute
+//      ..Of - precedes text of second-level sub-Attribute
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Basic extraction of Title, First, Middle, Last, Suffix from single persons
+<FILE>|NS_PersonTests.txt
+
+// Identify single entities as Companies
+<FILE>|NS_CompanyTests.txt
+
+// Extract Name and Alias with appropriate sub-attributes
+<FILE>|NS_AliasTests.txt
+
+// Extract Company Name and Alias with appropriate sub-attributes
+<FILE>|NS_CompanyAliasTests.txt
+
+// Extract Persons from strings with Person Designators
+<FILE>|NS_CoupleTests.txt
+<FILE>|NS_SingleTests.txt
+
+// Extract Persons from strings with Person Identifiers
+<FILE>|NS_IdentifierTests.txt
+
+// Extract Persons without Designators or Identifiers
+<FILE>|NS_CoupleTests2.txt
+
+// Extract More than Two Persons
+<FILE>|NS_MultipleTests.txt
+
+// Extract Entities and Discard Invalid
+<FILE>|NS_InvalidTests.txt
+
+// Identify Municipalities as Companies
+<FILE>|NS_MunicipalityTests.txt
+
+// Extract Trust and Trustee with appropriate sub-attributes
+<FILE>|NS_TrustTests.txt

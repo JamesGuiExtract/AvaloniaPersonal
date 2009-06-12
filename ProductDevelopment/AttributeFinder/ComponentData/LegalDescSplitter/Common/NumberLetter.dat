@@ -1,0 +1,20 @@
+// DT:0001  Whatcom-31100760.tif.uss
+//	(\s?\d+\s?(through|-|thru|to)?\s?\d*)
+
+// DT:0006  Waukesha-8-19-U1-WD00000196.TIF.USS
+//	("?[a-zA-Z]"?(?=\s|,|\.|$))
+
+// DT:0008  WAUKESHA-7-7-03-MB-001578.TIF.uss
+//	("?[a-zA-Z]"?(?=\s|,|\.|$))
+
+// DT:0058
+// 		added '
+
+// DT:0047
+// 		added \b[a-z]\d+
+
+// DT:0064
+// added (-?[a-z]?
+
+(\d+(-?[a-z]\b)?(\s*(through|-|thru|to)\s*\d+)?)|\s(["']?[a-zA-Z]["']?(?=\s|,|\.|(?=\r?$)))|\b[a-z]\d+
+//(\s?\d+(-?[a-z]\b)?\s*((through|-|thru|to)?\s*\d+)?)|\s(["']?[a-zA-Z]["']?(?=\s|,|\.|$))|\b[a-z]\d+

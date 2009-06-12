@@ -1,0 +1,446 @@
+#1
+RESET
+SET ArcTangentInBearing=East
+SET ArcConcaveLeft=0
+TEST ArcRadialInBearing=4.7123
+TEST canCalculateAllParameters=0
+#2
+RESET
+SET ArcTangentInBearing=East
+SET ArcConcaveLeft=1
+TEST ArcRadialInBearing=1.570796
+TEST canCalculateAllParameters=0
+#3
+RESET
+SET ArcRadialInBearing=0
+SET ArcConcaveLeft=0
+TEST ArcTangentInBearing=1.570796
+TEST canCalculateAllParameters=0
+#4
+RESET
+SET ArcRadialInBearing=0
+SET ArcConcaveLeft=1
+TEST ArcTangentInBearing=4.712388
+TEST canCalculateAllParameters=0
+#5
+RESET
+SET ArcTangentOutBearing=East
+SET ArcConcaveLeft=0
+TEST ArcRadialOutBearing=1.570796
+TEST canCalculateAllParameters=0
+#6
+RESET
+SET ArcTangentOutBearing=East
+SET ArcConcaveLeft=1
+TEST ArcRadialOutBearing=4.712388
+TEST canCalculateAllParameters=0
+#7
+RESET
+SET ArcRadialOutBearing=0
+SET ArcConcaveLeft=0
+TEST ArcTangentOutBearing=4.712388
+TEST canCalculateAllParameters=0
+#8
+RESET
+SET ArcRadialOutBearing=0
+SET ArcConcaveLeft=1
+TEST ArcTangentOutBearing=1.570796
+TEST canCalculateAllParameters=0
+#9
+RESET
+SET ArcTangentInBearing=East
+SET ArcConcaveLeft=0
+TEST ArcStartAngle=1.570796
+TEST canCalculateAllParameters=0
+#10
+RESET
+SET ArcTangentInBearing=East
+SET ArcConcaveLeft=1
+TEST ArcStartAngle=4.712388
+TEST canCalculateAllParameters=0
+#11
+RESET
+SET ArcStartAngle=0
+SET ArcConcaveLeft=0
+TEST ArcTangentInBearing=4.712388
+TEST canCalculateAllParameters=0
+#12
+RESET
+SET ArcStartAngle=0
+SET ArcConcaveLeft=1
+TEST ArcTangentInBearing=1.570796
+TEST canCalculateAllParameters=0
+#13
+RESET
+SET ArcTangentOutBearing=East
+SET ArcConcaveLeft=0
+TEST ArcEndAngle=1.570796
+TEST canCalculateAllParameters=0
+#14
+RESET
+SET ArcTangentOutBearing=East
+SET ArcConcaveLeft=1
+TEST ArcEndAngle=4.712388
+TEST canCalculateAllParameters=0
+#15
+RESET
+SET ArcEndAngle=0
+SET ArcConcaveLeft=0
+TEST ArcTangentOutBearing=4.712388
+TEST canCalculateAllParameters=0
+#16
+RESET
+SET ArcEndAngle=0
+SET ArcConcaveLeft=1
+TEST ArcTangentOutBearing=1.570796
+TEST canCalculateAllParameters=0
+#17
+RESET
+SET ArcRadius=1
+SET ArcDelta=1.570796
+TEST ArcMiddleOrdinate=0.292893
+TEST canCalculateAllParameters=0
+#18
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=East
+SET ArcRadius=1
+SET ArcDelta=1.5707963
+SET ArcConcaveLeft=0
+TEST ArcEndingPoint=1,0
+TEST ArcCenter=0,0
+#19
+RESET
+SET ArcMiddleOrdinate=0.292893
+SET ArcDelta=1.570796267948966192313216916398
+TEST ArcRadius=.999999
+TEST canCalculateAllParameters=0
+#20
+RESET
+SET ArcTangentInBearing=East
+SET ArcDelta=1.570796
+SET ArcConcaveLeft=0
+TEST ArcChordBearing=5.497787
+TEST canCalculateAllParameters=0
+#21
+RESET
+SET ArcTangentInBearing=East
+SET ArcDelta=1.570796
+SET ArcConcaveLeft=1
+TEST ArcChordBearing=0.785398
+TEST canCalculateAllParameters=0
+#22
+RESET
+SET ArcTangentInBearing=East
+SET ArcChordBearing=0.785398
+SET ArcConcaveLeft=1
+TEST ArcDelta=1.570796
+TEST canCalculateAllParameters=0
+#23
+RESET
+SET ArcTangentInBearing=East
+SET ArcConcaveLeft=1
+SET ArcChordBearing=0.785398
+TEST ArcDelta=1.570796
+TEST canCalculateAllParameters=0
+#24
+RESET
+SET ArcDelta=1.570796
+SET ArcConcaveLeft=0
+SET ArcChordBearing=5.497787
+TEST ArcTangentInBearing=6.283185
+TEST canCalculateAllParameters=0
+#25
+RESET
+SET ArcRadius=1
+SET ArcDelta=1.570796
+TEST ArcChordLength=1.414213
+TEST canCalculateAllParameters=0
+#26
+RESET
+SET ArcRadius=1
+SET ArcChordLength=1.414213
+TEST ArcDelta=1.570795
+TEST canCalculateAllParameters=0
+#27
+RESET
+SET ArcChordLength=1.414213
+SET ArcDelta=1.570796
+TEST ArcRadius=0.999999
+TEST canCalculateAllParameters=0
+#28
+RESET
+SET ArcRadius=1
+SET ArcDelta=1.570796
+TEST ArcLength=1.570796
+TEST canCalculateAllParameters=0
+#29
+RESET
+SET ArcRadius=1
+SET ArcLength=1.570796
+TEST ArcDelta=1.570796
+TEST canCalculateAllParameters=0
+#30
+RESET
+SET ArcDelta=1.570796
+SET ArcLength=1.570796
+TEST ArcRadius=1
+TEST canCalculateAllParameters=0
+#31
+RESET
+SET ArcStartingPoint=0,1
+SET ArcRadius=1
+SET ArcRadialInBearing=1.570796
+TEST ArcCenter=0,1.999999
+TEST canCalculateAllParameters=0
+#32
+RESET
+SET ArcCenter=0,2
+SET ArcRadius=1
+SET ArcRadialInBearing=1.5707965
+TEST ArcStartingPoint=0,1
+TEST canCalculateAllParameters=0
+#33
+RESET
+SET ArcStartingPoint=0,1
+SET ArcRadius=1
+SET ArcCenter=0,2
+TEST ArcRadialInBearing=1.570796
+TEST canCalculateAllParameters=0
+#34
+RESET
+SET ArcStartingPoint=0,1
+SET ArcChordLength=1
+SET ArcChordBearing=1.570796
+TEST ArcEndingPoint=0,1.999999
+TEST canCalculateAllParameters=0
+#35
+RESET
+SET ArcChordLength=1
+SET ArcChordBearing=1.5707965
+SET ArcEndingPoint=0,2
+TEST ArcStartingPoint=0,1
+TEST canCalculateAllParameters=0
+#36
+RESET
+SET ArcCenter=0,0
+SET ArcRadius=1
+SET ArcChordBearing=1.570796
+SET ArcConcaveLeft=0
+TEST ArcMidPoint=-0.999999,0
+TEST canCalculateAllParameters=0
+#37
+RESET
+SET ArcCenter=0,0
+SET ArcRadius=1
+SET ArcChordBearing=1.5707965
+SET ArcConcaveLeft=1
+TEST ArcMidPoint=1,0
+TEST canCalculateAllParameters=0
+#38
+RESET
+SET ArcMidPoint=1,0
+SET ArcRadius=1
+SET ArcChordBearing=1.5707967
+SET ArcConcaveLeft=0
+TEST ArcCenter=1.999999,0
+TEST canCalculateAllParameters=0
+#39
+RESET
+SET ArcMidPoint=1,0
+SET ArcRadius=1
+SET ArcChordBearing=1.570796
+SET ArcConcaveLeft=1
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=0
+#40
+RESET
+SET ArcCenter=0,0
+SET ArcRadius=1
+SET ArcConcaveLeft=0
+SET ArcMidPoint=-1,0
+TEST ArcChordBearing=1.570796
+TEST canCalculateAllParameters=0
+#41
+RESET
+SET ArcCenter=0,0
+SET ArcChordBearing=1.570796
+SET ArcConcaveLeft=1
+SET ArcMidPoint=1,0
+TEST ArcRadius=1
+TEST canCalculateAllParameters=0
+#42
+RESET
+SET ArcRadius=1
+TEST ArcDegreeOfCurveArcDef=100
+TEST canCalculateAllParameters=0
+#43
+RESET
+SET ArcDegreeOfCurveArcDef=1
+TEST ArcRadius=100
+TEST canCalculateAllParameters=0
+#44
+RESET
+SET ArcRadius=50
+TEST ArcDegreeOfCurveChordDef=3.1415925
+TEST canCalculateAllParameters=0
+#45
+RESET
+SET ArcDegreeOfCurveChordDef=3.1415926
+TEST ArcRadius=50
+TEST canCalculateAllParameters=0
+#46
+RESET
+SET ArcDelta=1.570796
+SET ArcRadius=1
+TEST ArcTangentDistance=0.999999
+TEST canCalculateAllParameters=0
+#47
+RESET
+SET ArcRadius=1
+SET ArcTangentDistance=1
+TEST ArcDelta=1.570796
+TEST canCalculateAllParameters=0
+#48
+RESET
+SET ArcDelta=1.570796
+SET ArcTangentDistance=1
+TEST ArcRadius=1
+TEST canCalculateAllParameters=0
+#49
+RESET
+SET ArcDelta=1.570796
+SET ArcRadius=1
+TEST ArcExternalDistance=0.414213
+TEST canCalculateAllParameters=0
+#50
+RESET
+SET ArcRadius=1
+SET ArcExternalDistance=0.414213
+TEST ArcDelta=1.570795
+TEST canCalculateAllParameters=0
+#51
+RESET
+SET ArcTangentInBearing=East
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=0
+TEST ArcTangentOutBearing=3.1415925
+TEST canCalculateAllParameters=0
+#52
+RESET
+SET ArcTangentInBearing=East
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=1
+TEST ArcTangentOutBearing=3.1415925
+TEST canCalculateAllParameters=0
+#53
+RESET
+SET ArcTangentOutBearing=-3.1415926
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=0
+TEST ArcTangentInBearing=0
+TEST canCalculateAllParameters=0
+#54
+RESET
+SET ArcTangentOutBearing=3.1415926
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=1
+TEST ArcTangentInBearing=0
+TEST canCalculateAllParameters=0
+#55
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=East
+SET ArcRadius=1
+SET ArcDelta=1.5707963267948966192313216916398
+SET ArcConcaveLeft=0
+TEST ArcEndingPoint=1,0
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=1
+#56
+RESET
+SET ArcStartingPoint=0,1
+SET ArcEndingPoint=1,0
+SET ArcRadius=1
+SET ArcDelta=1.570796
+SET ArcConcaveLeft=0
+TEST ArcTangentInBearing=0
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=1
+#57
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=East
+SET ArcEndingPoint=1,0
+SET ArcDelta=1.570796
+SET ArcConcaveLeft=0
+TEST ArcRadius=1
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=1
+#58
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=West
+SET ArcRadius=1
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=1
+TEST ArcEndingPoint=0,-1
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=1
+#59
+RESET
+SET ArcStartingPoint=0,1
+SET ArcEndingPoint=0,-1
+SET ArcRadius=1
+SET ArcDelta=3.1415926
+SET ArcConcaveLeft=1
+TEST ArcTangentInBearing=3.1415925
+TEST ArcCenter=0,0
+TEST canCalculateAllParameters=1
+#60
+RESET
+SET ArcDelta=3.5
+TEST ArcDeltaGreaterThan180Degrees=1
+#61
+RESET
+SET ArcRadius=1
+TEST canCalculateAllParameters=0
+#62
+RESET 
+SET ArcRadius=1
+SET ArcDelta=3.1415926535897932384626433832795
+TEST ArcExternalDistance=0
+TEST canCalculateAllParameters=0
+#63
+RESET 
+SET ArcRadius=1
+SET ArcDelta=3.1415926535897932384626433832795
+TEST ArcTangentDistance=0
+TEST canCalculateAllParameters=0
+#64
+RESET 
+SET ArcChordLength=1
+SET ArcDelta=1.570796267948966192313216916398
+TEST ArcTangentDistance=0.707106
+TEST canCalculateAllParameters=0
+#65
+RESET
+SET ArcTangentInBearing=1.570796267948966192313216916398
+SET ArcDelta=1.570796267948966192313216916398
+SET ArcRadius=1
+SET ArcStartingPoint=1,1
+TEST ArcMidPoint=1.292893,1.707106
+TEST canCalculateAllParameters=1
+#66
+RESET
+SET ArcCenter=0,0
+SET ArcRadius=10
+SET ArcChordBearing=0.78539816339744830961566084581988
+SET ArcTangentInBearing=East
+TEST ArcMidPoint=7.071067,-7.071067
+#67
+RESET
+SET ArcStartingPoint=1,1
+SET ArcTangentInBearing=East
+SET ArcChordBearing=1.5
+TEST ArcConcaveLeft=1

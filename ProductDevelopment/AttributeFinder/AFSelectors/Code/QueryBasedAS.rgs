@@ -1,0 +1,27 @@
+HKCR
+{
+	AFSelectors.QueryBasedAS.1 = s 'QueryBasedAS Class'
+	{
+		CLSID = s '{66653897-FFAA-4030-BCB1-9C6BE70B4E99}'
+	}
+	AFSelectors.QueryBasedAS = s 'QueryBasedAS Class'
+	{
+		CLSID = s '{66653897-FFAA-4030-BCB1-9C6BE70B4E99}'
+		CurVer = s 'AFSelectors.QueryBasedAS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {66653897-FFAA-4030-BCB1-9C6BE70B4E99} = s 'QueryBasedAS Class'
+		{
+			ProgID = s 'AFSelectors.QueryBasedAS.1'
+			VersionIndependentProgID = s 'AFSelectors.QueryBasedAS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

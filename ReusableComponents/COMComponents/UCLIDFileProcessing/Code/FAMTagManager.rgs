@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.FAMTagManager.1 = s 'FAMTagManager Class'
+	{
+		CLSID = s '{F6E7D96F-5592-4e13-9E1C-5A16FB07D2E3}'
+	}
+	UCLIDFileProcessing.FAMTagManager = s 'FAMTagManager Class'
+	{
+		CLSID = s '{F6E7D96F-5592-4e13-9E1C-5A16FB07D2E3}'
+		CurVer = s 'UCLIDFileProcessing.FAMTagManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F6E7D96F-5592-4e13-9E1C-5A16FB07D2E3} = s 'FAMTagManager Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.FAMTagManager.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.FAMTagManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

@@ -1,0 +1,7 @@
+Test|M. PAUL PEACOCK, RENEE LYNCH PEACOCK
+.Person|M.|Type1+Type2+First+Specific
+.Person|RENEE|Type1+Type2+First+Specific
+.Person|PAUL|Type1+Type2+Middle+Specific
+.Person|LYNCH|Type1+Type2+Middle+Specific
+.Person|PEACOCK|Type1+Type2+Last+Specific
+.Person|PEACOCK|Type1+Type2+Last+Specific

@@ -1,0 +1,2 @@
+(?:\bTaxa.{0,6}|xable).{0,3}interest
+(?=[\s\S]{0,10}Attach.{0,3}Schedule.{0,3}B.{0,3}if.{0,3}required|[\s\S]{0,80}Tax.{0,3}exempt.{0,9}(?:inte|terest))

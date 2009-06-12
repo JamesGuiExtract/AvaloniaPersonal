@@ -1,0 +1,275 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Printing and Integration Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Printing and Integration Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<OL>
+<LI><h3>Printing</h3>
+   <ul>
+		<!-- 
+		<li><b>Configuration</b></li>
+		<ul>
+			<li>Can print or not print the Bates numbers
+			<li><b>[V2]</b> Can print or not print the document stamps
+			<li><b>[V2]</b> Can print or not print the exemption codes
+		</ul>
+		-->
+		<li><b>Print preview</b>
+		<ul>
+			<li>Confirm that page is autofit to the initial preview window
+			<li>The redacted document can be previewed with opaque redactions
+			<li>Confirm that <b>Bates#</b> and <b>redactions</b> always previewed even if layer is off
+			<li>Confirm that <b>Clues</b> are never previewed
+			<li>Confirm that <b>Black</b> and <b>White</b> redaction color appear properly
+			<li>Confirm that watermark can be previewed with evaluation license
+			<li>Confirm that watermark can be printed with evaluation license
+			<!-- SCR# 253 -->
+			<li>Confirm that initial zoom mode is set to <b>Auto</b>
+			<li>Click <b>Two pages</b> button in the <b>Print preview</b> dialog
+			<li>Confirm that preview window are auto zoomed to fit two pages
+			<li>Confirm that <b>Zoom</b> works in <b>Print preview</b> dialog
+			<li>Confirm that <b>One page, two pages, Three pages, Four pages, Six pages</b> work
+			<li>Confirm that <b>Page setup</b> options applied to print preview
+		</ul>
+		<p>
+
+		<li><b>Print to physical printer</b>
+		<ul>
+			<li>Confirm that can not print to <b>ID Shield</b> virtual printer.
+			<li><b>[V2]</b> Confirm that the original document can be printed without any redactions, 
+			document stamps, or Bates numbers.
+			<li>Create an image file with Bates#, redactions and clues from IDSO.
+			<li>Confirm that the redacted document can be printed with opaque redactions
+			<li>Confirm that Bates# and redactions always printed even if layer is off
+			<li>Confirm that <b>Clues</b> are never printed
+			<li>Confirm that <b>Black</b> and <b>White</b> redaction color appear properly
+			<li>Confirm that watermark printed with evaluation license
+			<li>Confirm that <b>Page setup</b> options applied to print
+			<!-- SCR# 318,319 -->
+			<li>Confirm that Bates# position are correctly printed
+			<li>Confirm that Bates# are visible in the printed document
+		</ul>
+		<p>
+
+		<li><b>Printing progress dialog icon</b>
+		<ul>
+			<li>Open an image at least 2 pages
+			<li>Click <b>File - Print preview</b> menu 
+			<li>Confirm that icon for <b>Generating previews</b> dialog is correct
+		</ul>
+		<p>
+
+		<!-- SCR# 321 -->
+		<li><b>Printing margin</b>
+		<ul>
+			<li>Open an image in IDSO
+			<li>Draw some redactions on it
+			<li>Open the page setup menu 
+			<li>Set margins to 1" in all edit boxes
+			<li>Select Print preview
+			<li>Confirm that redactions are rendered in right position
+		</ul>
+		<!--
+		<p>
+		<LI><b>Print to virtual printer</b>
+		<ul>
+			<li>The original document can be printed without any redactions
+			,document stamps, or Bates numbers.
+			<li>The redacted document can be printed with opaque redactions
+			<li>Confirm that Bates#, Clues(?) and redactions always printed even if layer is off
+			<li>Confirm that <b>Black</b> and <b>White</b> redaction color appear properly
+			<li>Confirm that watermark printed with evaluation license
+			<li>Confirm that <b>Page setup</b> options applied to print preview
+		</ul>
+		-->
+
+		<p>
+		<li><b>[IDSD:329] Print/Print preview - need intuitive message with no printer</b>
+		<ul>
+			<li> Uninstall any currently installed printers other than ID Shield
+			<li> Open an image and select <b>File | Print</b>.
+			<li> Confirm an error message is displayed explaining that a printer other than ID Shield needs to be installed.
+			<li> Select <b>File | Print preview</b>.
+			<li> Confirm the same message is displayed.
+			<li> Select <b>File | Page setup</b>.
+			<li> Confirm the same message is displayed.
+		</ul>
+		<p>
+
+		<li><b>[.NetRCAndUtils:241] Print and PrintPreview - Need to handle rotated images properly</b>
+		<ul>
+			<li> Open an image in ID Shield Office.
+			<li> Draw a couple redactions and press <b>Apply bates numbers</b> (and remember their exact locations).
+			<li> Press the <b>Rotate clockwise</b> button.
+			<li> Select <b>File | Print Preview</b>.
+			<li> Ensure the print preview shows the redactions and bates number(s) in the correct locations.
+			<li> Press <b>Print</b>.
+			<li> Ensure the page is printed with the redactions and bates number(s) in the correct locations.
+			<li> Press the <b>Rotate clockwise</b> button so that the page is now upside down.
+			<li> Select <b>File | Print Preview</b>.
+			<li> Ensure the print preview shows the redactions and bates number(s) in the correct locations.
+			<li> Press <b>Print</b>.
+			<li> Ensure the page is printed with the redactions and bates number(s) in the correct locations.
+		</ul>
+		<p>
+
+		<li><b>[.NetRCAndUtils:254] Print - doesn't print non-visible layer objects</b>
+		<ul>
+			<li> Open an image in ID Shield Office.
+			<li> Make a redaction.
+			<li> Press <b>Apply bates numbers</b>.
+			<li> Make the redaction and bates number layers non-visible.
+			<li> Press <b>Print</b>.
+			<li> Confirm the printed document contains both the redaction and the layer object.
+		</ul>
+		<p>
+
+
+		<li><b>[.NetRCAndUtils:258] Print preview - Exception when viewing second lesser-page document</b>
+		<ul>
+			<li> Open a multi-page document.
+			<li> View the print preview.
+			<li> Open another document that has fewer pages than the first document.
+			<li> View the print preview.
+			<li> Ensure no errors are displayed.
+		</ul>
+	</ul>
+</LI>
+<p>
+
+<LI><h3>Command line</h3>
+	<ul>
+		<li>Command line help/reset settings
+		<ul>
+			<li>Open command line window
+			<li>Change current directory to <b>C:\Program Files\Extract Systems\IDShieldOffice\Bin</b>
+			<li>Execute <b>IDShieldOffice.exe /?</b> in the command line
+			<li>Confirm that a <b>Usage</b> messagebox appears to show the usage.
+			<li>Click <b>OK</b>
+			<li>Confirm that <b>ID Shield Office</b> is not launched.
+			<li>Confirm that <b>IDShieldOffice.exe</b> process doesn't exist in the task manager
+			<p>
+
+			<li>Open IDSO from desktop shortcut.
+			<li>Relocate toolstrip and form locations and close IDSO.
+			<li>Execute <b>IDShieldOffice.exe /reset</b> in the command line
+			<li>Confirm that toolstrip and form locations are reset to default.
+		</ul>
+		<p>
+
+		<!-- SCR# 283 -->
+		<li>Command line license switch
+		<ul>
+			<li>Open command line window
+			<li>Change current directory to <b>C:\Program Files\Extract Systems\IDShieldOffice\Bin</b>
+			<li>Execute <b>IDShieldOffice.exe /license</b> in the command line
+			<li>Confirm that UserLicense.exe is launched.
+			<li>Confirm that the corresponding help page in the documentation is displayed.
+			<li>Confirm that IDSO instance is not launched.
+		</ul>
+		<p>
+
+		<li><b>[IDSD #109]</b> Open supported image from command line
+		<ul>
+			<li>Open command line window
+			<li>Change current directory to <b>C:\Program Files\Extract Systems\IDShieldOffice\Bin</b>
+			<li>Execute <b>IDShieldOffice.exe C:\Images\FindTextTest.tif</b> on the command line.  
+			<b>Note</b> that the path may need to be modified depending on the test file location.
+			<li>Confirm that <b>ID Shield Office</b> is launched and the image file is opened.
+			<p>
+
+			<!-- test /d switch -->
+			<li>Copy <b>FindTextTest.tif</b> to <b>FindTextTest_copy.tif</b>
+			<li>Execute <b>IDShieldOffice.exe C:\Images\FindTextTest.tif /d</b> on the command line.  
+			<b>Note</b> that the path may need to be modified depending on the test file location.
+			<li>Close the launched instance of <b>ID Shield Office</b>.
+			<li>Confirm that <b>FindTextTest_copy.tif</b> is deleted.
+			<p>
+
+			<!-- open non-existing file -->
+			<li>Execute <b>IDShieldOffice.exe C:\Images\FindTextTest.tif</b> on the command line.  
+			<b>Note</b> that the path may need to be modified depending on the previous location of the 
+			test file.
+			<li>Confirm that an <b>Error</b> message appears.
+			<li>Click <b>OK</b> in the messagebox.
+			<li>Confirm that <b>ID Shield Office</b> is launched. 
+		</ul>
+		<p>
+
+		<!-- SCR# 247 -->
+		<li>Open large PDF from command line
+		<ul>
+			<li>Open command line window
+			<li>Change current directory to <b>C:\Program Files\Extract Systems\IDShieldOffice\Bin</b>
+			<li>Execute <b>IDShieldOffice.exe C:\Images\0050pages.pdf</b> on the command line.
+			<b>Note</b> that the path may need to be modified depending on the previous location of the 
+			test file.
+			<li>Confirm that <b>ID Shield Office</b> is launched first.
+			<li>Confirm that <b>Load document,please waiting...</b> displayed on the status bar.
+			<li>Confirm that the image file can be opened.
+		</ul>
+	</ul>
+</LI>
+<p>
+
+	<LI><h3>Integration</h3>
+       	<ul>
+		<li>Can right-click on a supported image file and select <b>Open with ID Shield Office</b>
+		<li><b>[V2]</b> Can right-click on a pdf file and select <b>Open with ID Shield Office</b>
+		<li><b>[V2]</b> Can right-click on IDSO file and select <b>Open with ID Shield Office</b>
+		<li><b>[IDSD #193]</b> Can double-click on IDSO file and <b>Open with ID Shield Office</b>
+		<ul>
+			<li>Confirm that <b>OCR complete</b> appears on the status bar
+			<li>Confirm that full path not only filename is added to MRU.
+		</ul>
+		<p>
+
+		<li><b>[IDSD #278]</b> Open file into existing IDSO instance
+		<ul>
+			<li>Can right-click on a supported image file and delegate open to an empty instance
+			<li>Can right-click on a pdf file and delegate open to an empty instance
+			<li>Can right-click on IDSO file and delegate open to an empty instance
+			<li>Can double-click on IDSO file and delegate open to an empty instance
+		</ul>
+		<p>
+
+		<!-- SCR# 106 -->
+		<li>Can drag a supported image file and drop it to IDSO to open it with ID Shield Office
+		<li>Can drag a pdf file and drop it to IDSO to open it with ID Shield Office
+		<li>Can drag an IDSO file and drop it to IDSO to open it with ID Shield Office
+	
+		<!--
+		<li><b>[V2]</b> Can right-click on a folder and 
+		select <b>Open with ID Shield Office</b> to initiate 
+		batch processing
+		<li><b>[V2]</b> Can initiate batch processing by 
+		right-clicking on a <b>.list</b> file and 
+		selecting <b>Open with ID Shield Office</b>
+		<p>
+
+		<li><b>[V2]</b> Add an <b>ID Shield Office</b> toolbar button to 
+		print the document, capture the print output as a multi-page 
+		image, and open the image in ID Shield Office
+		<ul>
+			<li><b>Microsoft Office 2003</b>: Word, Excel, Outlook, 
+			Powerpoint
+			<li><b>Microsoft Office 2007</b>: Word, Excel, Outlook, 
+			Powerpoint
+			<li><b>Acrobat Reader</b>
+			<li><b>Word Perfect</b>
+			<li><b>OpenOffice</b> applications
+		</ul>
+		-->
+   	</LI>
+       	</ul>
+</OL>
+</BODY>
+</HTML>

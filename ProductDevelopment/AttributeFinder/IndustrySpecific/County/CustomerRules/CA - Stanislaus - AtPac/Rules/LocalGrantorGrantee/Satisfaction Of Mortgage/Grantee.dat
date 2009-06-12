@@ -1,0 +1,17 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+Numbers=0|1|2|3|4|5|6|7|8|9
+Digit=0123456789
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000382500.001.uss
+LocalGrantee01=executed^3~by]^?Grantee^160~whose^3~address^120~; and]|;and]^?SecondGrantee^240~Trustor
+LocalGrantee01a=executed^3~by]^?Grantee^160~whose^3~address^120~[and]^?SecondGrantee^240~Trustor
+LocalGrantee02=GRANTOR : ^?Grantee^40~\r\nCOUNTY
+LocalGrantee03=whereas^[on]^16~by^?Grantee^hereinafter|mortgagor
+[PATTERNS_END] 

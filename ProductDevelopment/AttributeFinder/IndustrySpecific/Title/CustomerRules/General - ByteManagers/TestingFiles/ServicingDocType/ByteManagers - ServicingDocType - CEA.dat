@@ -1,0 +1,28 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000034.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000034.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000035.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000035.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000036.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000036.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000037.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000037.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000038.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000038.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000060.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000060.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000061.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000061.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000062.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000062.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000063.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000063.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000182.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000182.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000186.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000186.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000223.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000223.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000224.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000224.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000225.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000225.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000226.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000226.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000227.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000227.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000228.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000228.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000229.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000229.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000230.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000230.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000231.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000231.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000232.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000232.tif.eav
+<TESTCASE>;..\..\Rules\ServicingDocType\ServicingDocType.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set013\Images\Scan000233.tif.uss;;K:\Common\Engineering\Sample Files\ByteManagers\Set013\EAV\Servicing\Scan000233.tif.eav
+
+
+
+
+

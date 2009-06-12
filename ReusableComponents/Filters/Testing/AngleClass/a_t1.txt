@@ -1,0 +1,13 @@
+35Deg14min24sec, 35.24DEGREES, 35.24, 35.24DEGREES
+45, 45DEGREES, 45, 45DEGREES
+35.6 degrees, 35.60DEGREES, 35.6, 35.60DEGREES
+north 35 deg, NONE,NONE,north 35 deg
+45deg88min67sec, 45.64DEGREES, 45.64, 45.64DEGREES
+4L degree, NONE, NONE, 4Ldegree | 47 degree
+4B deg, NONE, NONE, 48 deg | 4B deg
+3)Degree 3j minute 3W sec, NONE, NONE, 33Degree33minute33sec 
+-45d, 315DEGREES, 315, 315DEGREES
+
+
+
+

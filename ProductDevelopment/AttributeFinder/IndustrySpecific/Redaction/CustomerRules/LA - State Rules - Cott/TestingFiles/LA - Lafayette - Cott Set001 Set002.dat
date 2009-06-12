@@ -1,0 +1,15 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Set001
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\1997;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\1998;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\1999;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\2000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\2001;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\2002;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set001\Images\2003;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Set002
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set002\Images\COV;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set002\Images\MTG;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

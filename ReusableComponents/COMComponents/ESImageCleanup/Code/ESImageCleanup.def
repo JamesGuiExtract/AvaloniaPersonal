@@ -1,0 +1,9 @@
+; ESImageCleanup.def : Declares the module parameters.
+
+LIBRARY      "ESImageCleanup.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE

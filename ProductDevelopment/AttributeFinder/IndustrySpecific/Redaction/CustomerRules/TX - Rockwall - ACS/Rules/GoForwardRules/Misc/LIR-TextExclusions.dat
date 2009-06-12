@@ -1,0 +1,5 @@
+(?:
+#import ..\UCC\SSN-allvariations.dat.etf
+|
+(?:\D|^)\d{2}\x20*-\x20*\d{7}(?!\x20*-\x20*\d)(?!\x20*-\x20*[\d\w])(?:\D|$)
+)

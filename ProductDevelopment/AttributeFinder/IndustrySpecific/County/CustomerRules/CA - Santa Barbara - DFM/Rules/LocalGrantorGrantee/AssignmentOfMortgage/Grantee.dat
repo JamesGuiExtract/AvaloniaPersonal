@@ -1,0 +1,21 @@
+[VARS_BEGIN]
+
+Numbers=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0056347.tif
+//AOM_01=due^4~thereon^4~[to]^?Grantee^66~,
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0055163.tif
+//AOM_02=transfers^4~to^?Grantee^75~[FOR]
+//AOM_03=TRUSTEE^4~FOR^?Grantee^75~[all]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0064722.tif
+//AOM_04=transfers^4~to^?Grantee^75~\r\n
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #4\ATDE-Atty in Fact\2009-0008312.tif
+AOM_10=any rights due^8~become^6~due thereon^4~to^?Grantee^100~AS TRUSTEE FOR
+
+[PATTERNS_END]

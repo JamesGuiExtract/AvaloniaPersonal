@@ -1,0 +1,227 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.27 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.27 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+      		<li><b>[FlexIDSCore #3175]</b> COM Exception in FlexDataEntry
+		<ul>
+	      		<li>Exercise the scenario in the SCR several times.
+			<li>Confirm that no errors are added to the exception log.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3291]</b> Text centered on angled redactions
+		<ul>
+	      		<li>Exercise <b>Verification</b> adding text to each redaction.
+			<li>Verify some images and draw some angled redactions.
+			<li>Confirm that each output file has the text centered in redaction area. 
+			Note that the text may extend a little bit above or below the redaction zone.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3349]</b> Close FAM after stopping verification
+		<ul>
+	      		<li>Exercise <b>Verification</b> while queueing from a listening folder.
+			<li>Stop verifying from the <b>Verification</b> toolbar.
+			<li>Confirm that the <b>FAM</b> stops queuing and processing as expected.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3350]</b> Metadata and exemption codes
+		<ul>
+	      		<li>Exercise <b>Verification</b> adding <b>Exemption codes</b> to some but 
+			not all redactions.
+			<li>Review the metadata output files.
+			<li>Confirm that <b>ExemptionCode</b> nodes are only added to those redactions 
+			where exemption codes were specified.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3373]</b> Grip handles on current selection
+		<ul>
+	      		<li>Exercise <b>Verification</b> and create a manual redaction.
+			<li>Click the <b>Select highlight</b> toolbar button.
+			<li>Confirm that grip handles are visible on the recently created manual redaction.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3377, #3378, #3379]</b> Metadata and exemption codes
+		<ul>
+	      		<li>Exercise <b>Verification</b> and add 4 large redactions.
+			<li>Try to move each redaction past the left and top edges of the page.
+			<li>Confirm that the displayed redactions do not appear to move past the page bounds.
+			<li>Confirm that the output redactions did not move past the page bounds.
+<p>
+	      		<li>Exercise <b>Verification</b> and add 1 large redaction in the middle 
+			of the page.
+			<li>Click near the top-right corner of the redaction and drag it toward the 
+			top left of the page.
+			<li>Release the mouse only after the cursor is approximately two inches from the 
+			left edge of the page.
+			<li>Start dragging the moved redaction back toward the right edge.
+			<li>Confirm that there <b>is not</b> two inches of mouse drag before the redaction 
+			starts moving.
+<p>
+	      		<li>Exercise <b>Verification</b> and add 1 large redaction in the middle 
+			of the page.
+			<li>Click near the top-right corner of the redaction and drag it toward the 
+			top left of the page.
+			<li>Release the mouse only after the cursor is approximately two inches from the 
+			left edge of the page.
+			<li>Save the document and move on to the next document.
+			<li>Return to the previous document.
+		       	<ul>
+				<li>Confirm that no exception about negative coordinates is thrown.
+				<li>Confirm that verification properly returns to the previous document.
+				<li>Confirm that the <b>Previous reviewed document</b> toolbar button is 
+				properly disabled.
+		       	</ul>
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3381]</b> Prompt on stop after document navigation
+		<ul>
+	      		<li>Exercise <b>Verification</b> and create a manual redaction.
+			<li>Click the <b>Stop</b> button.
+			<li>Confirm that a <b>Confirmation</b> message is presented.  Click <b>No</b> 
+			and save the document.
+	      		<li>Create a manual redaction on the next document.
+	      		<li>Navigate back to the previous document and click the <b>Stop</b> button.
+			<li>Confirm that a <b>Confirmation</b> message is presented.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3382]</b> Default VOA file in auto-redaction task
+		<ul>
+	      		<li>Open the <b>Configure Redact images (no verification)</b> page.
+			<li>Confirm that the VOA file edit box reads <b>&lt:SourceDocName&gt;</b> and 
+			is disabled by default.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3397]</b> CASESENSITIVE setting in Automated Rule Tester
+		<ul>
+	      		<li>Exercise the <b>TCL</b> file attached to the SCR.
+			<li>Confirm that the results are as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4857]</b> ProcessFiles /m switch
+	       	<ul>
+	      		<li>Start with a clean database.
+	      		<li>Exercise <b>ProcessFiles.exe /s /fc /m:4</b> from a command window.
+	      		<li>Confirm that exactly four files are processed, no other files are pending, 
+			and that the FAM closes automatically.
+<p>
+	      		<li>Exercise <b>ProcessFiles.exe /s /fc /m:4</b> again from a command window.
+	      		<li>Confirm that four more files are processed, no other files are pending, 
+			and that the FAM closes automatically.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4940]</b> Add SetOp to the RDT
+	       	<ul>
+	      		<li>Confirm that <b>SetOp.exe</b> is installed as part of the RDT.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5031]</b> Verbose logging for CSharpDatabaseUtils
+	       	<ul>
+	      		<li>Add a <b>Verbose logging</b> key to <b>HKCU\Software\Extract Systems\ReusableComponents\CSharpDatabaseUtilities</b> .
+	      		<li>With the key set to "0", confirm that attempting to connect to a 
+			non-existent server or database, logs simple error information.
+	      		<li>With the key set to "1", confirm that attempting to connect to a 
+			non-existent server or database, logs more complex error information.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5169]</b> Additional error info for OCR failures
+	       	<ul>
+	      		<li>OCR one or more documents that demonstrate decomposition failure.
+	      		<li>Confirm that the displayed exception includes detailed information 
+			about what went wrong.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5201]</b> Shortcut key for Select Highlight tool
+	       	<ul>
+	      		<li>Verify some images.
+	      		<li>Confirm that <b>Esc</b> works as a shortcut to select the <b>Select 
+			Highlight</b> tool.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5205]</b> Line-fitting for right-to-left swiping
+	       	<ul>
+	      		<li>Exercise <b>Verification</b> and draw a manual redaction from left-to-right 
+			while holding down <b>Ctrl</b>.
+	      		<li>Confirm that the redaction region is properly split into separate lines.
+	      		<li>Draw another manual redaction from right-to-left 
+			while holding down <b>Ctrl</b>.
+	      		<li>Confirm that the redaction region is properly split into separate lines.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5208, #5210]</b> USS File Viewer opening files from .001 extension
+	       	<ul>
+	      		<li>Open <b>USS File Viewer</b>.
+	      		<li>Drag a TIF image with a <b>.00x</b> extension onto the window.
+	      		<li>Confirm that the associated USS file opens without error.
+	      		<li>Drag a VOA file with a <b>.00x.voa</b> extension onto the window.
+	      		<li>Confirm that the associated USS file opens without error.
+	      		<li>Drag an XML file with a <b>.00x.xml</b> extension onto the window.
+	      		<li>Confirm that the associated USS file opens without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5220]</b> Cannot Adjust Image Resolution
+	       	<ul>
+	      		<li>Run <b>Adjust Image Resolution</b> on the image 
+			attached to the SCR.
+	      		<li>Confirm that the image resolution can be adjusted without error.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

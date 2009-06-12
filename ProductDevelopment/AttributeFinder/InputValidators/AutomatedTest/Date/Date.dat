@@ -1,0 +1,29 @@
+// Minimum - Has Limit, include Minimum, include Zero, include Negative
+<TESTCASE>;Test1.rsd;Input.txt;;Test1.eav
+
+// Minimum - Has Limit, include Minimum, not include Zero, include Negative
+<TESTCASE>;Test2.rsd;Input.txt;;Test2.eav
+
+// Minimum - Has Limit, not include Minimum, not include Zero, include Negative
+<TESTCASE>;Test3.rsd;Input.txt;;Test3.eav
+
+// Maximum - Has Limit, include Maximum, include Zero, include Negative
+<TESTCASE>;Test4.rsd;Input.txt;;Test4.eav
+
+// Maximum - Has Limit, include Maximum, not include Zero, include Negative
+<TESTCASE>;Test5.rsd;Input.txt;;Test5.eav
+
+// Maximum - Has Limit, not include Maximum, not include Zero, not include Negative
+<TESTCASE>;Test6.rsd;Input.txt;;Test6.eav
+
+// MinMax - Has Limit, include Minimum, include Maximum, include Zero, include Negative
+<TESTCASE>;Test7.rsd;Input.txt;;Test7.eav
+
+// MinMax - Has Limit, include Minimum, not include Maximum, include Zero, include Negative
+<TESTCASE>;Test8.rsd;Input.txt;;Test8.eav
+
+// MinMax - Has Limit, not include Minimum, include Maximum, not include Zero, include Negative
+<TESTCASE>;Test9.rsd;Input.txt;;Test9.eav
+
+// MinMax - Has Limit, not include Minimum, not include Maximum, not include Zero, include Negative
+<TESTCASE>;Test10.rsd;Input.txt;;Test10.eav

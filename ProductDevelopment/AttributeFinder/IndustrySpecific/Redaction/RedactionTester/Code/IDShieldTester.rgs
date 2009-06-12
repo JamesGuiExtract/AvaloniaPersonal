@@ -1,0 +1,27 @@
+HKCR
+{
+	EXTRACTRedactionTester.IDShieldTester.1 = s 'IDShieldTester Class'
+	{
+		CLSID = s '{42C705E2-CB7A-49D0-8F94-D1D0CB852359}'
+	}
+	EXTRACTRedactionTester.IDShieldTester = s 'IDShieldTester Class'
+	{
+		CLSID = s '{42C705E2-CB7A-49D0-8F94-D1D0CB852359}'
+		CurVer = s 'RedactionTester.IDShieldTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {42C705E2-CB7A-49D0-8F94-D1D0CB852359} = s 'IDShieldTester Class'
+		{
+			ProgID = s 'RedactionTester.IDShieldTester.1'
+			VersionIndependentProgID = s 'EXTRACTRedactionTester.IDShieldTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{A4A34C92-B83C-46C6-8904-CB131E50CC25}'
+		}
+	}
+}

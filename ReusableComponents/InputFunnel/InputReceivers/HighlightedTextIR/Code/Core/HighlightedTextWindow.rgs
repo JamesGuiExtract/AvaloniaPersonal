@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLID_HighlightedTextIR.HighlightedTextWindow.1 = s 'HighlightedTextWindow Class'
+	{
+		CLSID = s '{839523B4-F053-4651-B4EB-4382E46E2226}'
+	}
+	UCLID_HighlightedTextIR.HighlightedTextWindow = s 'HighlightedTextWindow Class'
+	{
+		CLSID = s '{839523B4-F053-4651-B4EB-4382E46E2226}'
+		CurVer = s 'UCLID_HighlightedTextIR.HighlightedTextWindow.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {839523B4-F053-4651-B4EB-4382E46E2226} = s 'HighlightedTextWindow Class'
+		{
+			ProgID = s 'UCLID_HighlightedTextIR.HighlightedTextWindow.1'
+			VersionIndependentProgID = s 'UCLID_HighlightedTextIR.HighlightedTextWindow'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{940DE945-DA5B-4B16-A11C-125AD3894F1D}'
+		}
+	}
+}

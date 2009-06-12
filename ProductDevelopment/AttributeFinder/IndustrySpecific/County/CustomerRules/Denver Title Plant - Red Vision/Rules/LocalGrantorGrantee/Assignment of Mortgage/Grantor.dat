@@ -1,0 +1,15 @@
+[PATTERNS_BEGIN]
+rule01=[under^4~gned]^3~holder^9~[mo^4~gage]^?Grantor^120~does^3~hereby
+rule02=holder^10~mortgage^?Grantor^120~does^5~hereby
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\9400090277.tif
+rule03=sufficiency|hereby|acknowledged^60~undersigned]^?Grantor^120~whose add^60~Assigno
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\9500062632.tif
+rule04=notary|appeared|sworn^300~vice^3~president^3~of said|of]^?Grantor^160~that^3~said^3~instrument^9~signed
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\9100047018.tif
+rule05=presents^5~that]^?Grantor^160~"Assignor|Assignor"
+rule06=presents^5~that]^?Grantor^160~Assignor^9~consideration
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\9400090279.tif.uss
+rule07=the^3~undersigned^?Grantor^160~whose^3~address^150~convey|grant|bargain
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\9600074942.tif
+rule08=THESE^3~PRESENTS^?Grantor^160~whose^3~address^3~is^160~herein|inafter^40~assignor
+[PATTERNS_END]

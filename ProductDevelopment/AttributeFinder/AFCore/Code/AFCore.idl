@@ -1,0 +1,790 @@
+// AFCore.idl : IDL source for AFCore.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFCore.tlb) and marshalling code.
+
+//--------------------------------------------------------------------------------------------------
+// NOTES
+//--------------------------------------------------------------------------------------------------
+// Notes regarding the pProgressStatus argument passed to many interface methods:
+// 1.	pProgressStatus method argument: If the caller is interested in receiving progress status,
+//			information, a non-NULL pointer value should be passed in for pProgressStatus.
+//			CoClasses implementing this interface are free to create sub-progress status
+//			objects as they deem appropriate.  Please note that CoClasses are not
+//			required to provide progress status information.
+//--------------------------------------------------------------------------------------------------
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(69D40760-8162-4822-85D6-C10B02044E9D),
+	version(1.0),
+	helpstring("UCLID Attribute Finder Engine Core 1.0 Type Library")
+]
+library UCLID_AFCORELib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
+
+	/////////////////////////
+	// forward declarations
+	/////////////////////////
+	interface IAttributeSplitter;
+	interface IFeedbackMgr;
+
+	//////////////
+	// Enums
+	//////////////
+	typedef
+	[
+		uuid(1A825253-D99D-4a55-8866-86367CF5AE8C), 
+		helpstring("UCLID EHelpAboutType")
+	]
+	enum EHelpAboutType
+	{
+		kUndefinedHelpAbout = 0,
+		kFlexIndexHelpAbout = 1,
+		kIDShieldHelpAbout = 2,
+		kRuleTesterHelpAbout = 3
+	} EHelpAboutType;
+
+	//////////////
+	// Interfaces
+	//////////////
+	[
+		object,
+		uuid(F30B389F-1D80-4A43-A3FA-E4B75FDCBC47),
+		dual,
+		helpstring("IAttribute Interface"),
+		pointer_default(unique)
+	]
+	interface IAttribute : IDispatch
+	{
+		[propget, id(1), helpstring("property Name")] HRESULT Name([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
+		[propget, id(2), helpstring("property Value")] HRESULT Value([out, retval] ISpatialString **pVal);
+		[propput, id(2), helpstring("property Value")] HRESULT Value([in] ISpatialString *newVal);
+		[propget, id(3), helpstring("property InputValidator")] HRESULT InputValidator([out, retval] IInputValidator* *pVal);
+		[propput, id(3), helpstring("property InputValidator")] HRESULT InputValidator([in] IInputValidator* newVal);
+		// pAttributes -- vector of IAttribute
+		[propget, id(4), helpstring("property SubAttributes")] HRESULT SubAttributes([out, retval] IIUnknownVector **pAttributes);
+		[propput, id(4), helpstring("property SubAttributes")] HRESULT SubAttributes([in] IIUnknownVector *);
+		[propget, id(5), helpstring("property AttributeSplitter")] HRESULT AttributeSplitter([out, retval] IAttributeSplitter * *pVal);
+		[propput, id(5), helpstring("property AttributeSplitter")] HRESULT AttributeSplitter([in] IAttributeSplitter * newVal);
+		[propget, id(6), helpstring("property Type")] HRESULT Type([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property Type")] HRESULT Type([in] BSTR newVal);
+		[id(7), helpstring("method AddType")] HRESULT AddType([in] BSTR newVal);
+		[id(8), helpstring("method ContainsType")] HRESULT ContainsType([in] BSTR strType, [out, retval] VARIANT_BOOL *pVal);
+		// Will compare text of the Name, Value, Type elements plus the same elements of the sub-attributes.
+		// Returns VARIANT_TRUE if the Attributes match, VARIANT_FALSE otherwise
+		[id(9), helpstring("method IsNonSpatialMatch")] HRESULT IsNonSpatialMatch([in] IAttribute* pTest, [out, retval] VARIANT_BOOL *pVal);
+		// A general data element that can be used by processes that need to associate additional
+		// information with an IAttribute instance.
+		[propget, id(10), helpstring("property DataObject")] HRESULT DataObject([out, retval] IUnknown **pVal);
+		[propput, id(10), helpstring("property DataObject")] HRESULT DataObject([in] IUnknown *newVal);
+	};
+	[
+		object,
+		uuid(27BAF8A9-8078-4366-8236-24DDDDAD93F9),
+		dual,
+		helpstring("IAFDocument Interface"),
+		pointer_default(unique)
+	]
+	interface IAFDocument : IDispatch
+	{
+		[propget, id(1), helpstring("property Text")] HRESULT Text([out, retval] ISpatialString* *pVal);
+		[propput, id(1), helpstring("property Text")] HRESULT Text([in] ISpatialString* newVal);
+		[propget, id(2), helpstring("property StringTags")] HRESULT StringTags([out, retval] IStrToStrMap* *pVal);
+		[propput, id(2), helpstring("property StringTags")] HRESULT StringTags([in] IStrToStrMap* newVal);
+		[propget, id(3), helpstring("property ObjectTags")] HRESULT ObjectTags([out, retval] IStrToObjectMap* *pVal);
+		[propput, id(3), helpstring("property ObjectTags")] HRESULT ObjectTags([in] IStrToObjectMap* newVal);
+	};
+	[
+		object,
+		uuid(3221CE1F-1AE3-40e9-86C4-17B780C30DD2),
+		dual,
+		helpstring("IAttributeSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeSplitter : IDispatch
+	{
+		//------------------------------------------------------------------------------------------
+		// PURPOSE: To split attributes.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(1), helpstring("method SplitAttribute")] HRESULT SplitAttribute([in] IAttribute* pAttribute, 
+			[in] IAFDocument *pAFDoc, [in] IProgressStatus *pProgressStatus);
+		//------------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(ACE8CB9F-98C4-41C6-8EFC-4A89EEB5E683),
+		dual,
+		helpstring("IAttributeFindingRule Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeFindingRule : IDispatch
+	{
+		//------------------------------------------------------------------------------------------
+		// PURPOSE: To parse the text in the input documetn and return a vector of found
+		//			IAttribute objects.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(1), helpstring("method ParseText")] HRESULT ParseText([in] IAFDocument* pDocument, 
+			[in] IProgressStatus *pProgressStatus, [out, retval] IIUnknownVector** pAttributes);
+		//------------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(95A74DE3-67BA-44A7-AC6C-6597BFDA5B68),
+		dual,
+		helpstring("IValueModifyingRule Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeModifyingRule : IDispatch
+	{
+		//------------------------------------------------------------------------------------------
+		// PURPOSE:	To modify an attribute value
+		// ARGUMENTS:
+		//			pAttributeToBeModified - IAttribute expected to be modified by the Value Modifier
+		//			pOriginInput - Original input text
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(1), helpstring("method ModifyValue")] HRESULT ModifyValue([in] IAttribute* pAttributeToBeModified, 
+			[in] IAFDocument* pOriginInput, [in] IProgressStatus *pProgressStatus);
+		//------------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(0E5E90F8-988E-421B-813D-7B206E6F0846),
+		dual,
+		helpstring("IAttributeRule Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeRule : IDispatch
+	{
+		[propget, id(1), helpstring("property Description")] HRESULT Description([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Description")] HRESULT Description([in] BSTR newVal);
+		[propget, id(2), helpstring("property IsEnabled")] HRESULT IsEnabled([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IsEnabled")] HRESULT IsEnabled([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property AttributeFindingRule")] HRESULT AttributeFindingRule([out, retval] IAttributeFindingRule* *pVal);
+		[propput, id(3), helpstring("property AttributeFindingRule")] HRESULT AttributeFindingRule([in] IAttributeFindingRule* newVal);
+		// pModifyingRuleInfos -- vector of IObjectWithDescription (which has IAttributeModifyingRule with description)
+		[propget, id(4), helpstring("property AttributeModifyingRuleInfos")] HRESULT AttributeModifyingRuleInfos([out, retval] IIUnknownVector **pModifyingRuleInfos);
+		[propput, id(4), helpstring("property AttributeModifyingRuleInfos")] HRESULT AttributeModifyingRuleInfos([in] IIUnknownVector* pModifyingRuleInfos);
+		//------------------------------------------------------------------------------------------
+		// PURPOSE:	To execute this AttributeRule on the specified document text and return
+		//			the found attributes.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		//			pFoundAttributes - The returned value containing an IIUnknownVector of
+		//				IAttribute objects.
+		[id(5), helpstring("method ExecuteRuleOnText")] HRESULT ExecuteRuleOnText([in] IAFDocument* pAFDoc, 
+			[in] IProgressStatus *pProgressStatus, [out, retval] IIUnknownVector** pFoundAttributes);
+		//------------------------------------------------------------------------------------------
+		[propget, id(6), helpstring("property ApplyModifyingRules")] HRESULT ApplyModifyingRules([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property ApplyModifyingRules")] HRESULT ApplyModifyingRules([in] VARIANT_BOOL newVal);
+		// return IDocumentPreprocessor with a description
+		[propget, id(7), helpstring("property RuleSpecificDocPreprocessor")] HRESULT RuleSpecificDocPreprocessor([out, retval] IObjectWithDescription **pVal);
+		[propput, id(7), helpstring("property RuleSpecificDocPreprocessor")] HRESULT RuleSpecificDocPreprocessor([in] IObjectWithDescription *newVal);
+	};
+
+	[
+		object,
+		uuid(F574797E-4898-47A1-8498-0501A5454F63),
+		dual,
+		helpstring("IAttributeFindInfo Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeFindInfo : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// id(1): R/W Property - IgnoreValues has been removed 10/17/03
+		//-----------------------------------------------------------------------------------------
+		[propget, id(2), helpstring("property InputValidator")] HRESULT InputValidator(
+			[out, retval] IObjectWithDescription* *pVal);
+		[propput, id(2), helpstring("property InputValidator")] HRESULT InputValidator(
+			[in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+		// IIUnknownVector of IAttributeRule objects
+		[propget, id(3), helpstring("property AttributeRules")] HRESULT AttributeRules(
+			[out, retval] IIUnknownVector * *pVal);
+		[propput, id(3), helpstring("property AttributeRules")] HRESULT AttributeRules(
+			[in] IIUnknownVector * newVal);
+		//-----------------------------------------------------------------------------------------
+		// Boolean property flag indicating whether to stop searching after a value is found.
+		[propget, id(4), helpstring("property StopSearchingWhenValueFound")] HRESULT StopSearchingWhenValueFound(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property StopSearchingWhenValueFound")] HRESULT StopSearchingWhenValueFound(
+			[in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To execute the rules on the specified document object and return the
+		//			found attributes.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		//			pAttributes - An IIUnknownVector of IAttribute objects; will be returned by this 
+		//				method, and will include a hierarchy of found attributes.
+		[id(5), helpstring("method ExecuteRulesOnText")] HRESULT ExecuteRulesOnText(
+			[in] IAFDocument* pAFDoc, [in] IProgressStatus *pProgressStatus, 
+			[out, retval] IIUnknownVector **pAttributes);
+		//-----------------------------------------------------------------------------------------
+		// Splitter object property
+		[propget, id(6), helpstring("property AttributeSplitter")] HRESULT AttributeSplitter(
+			[out, retval] IObjectWithDescription* *pVal);
+		[propput, id(6), helpstring("property AttributeSplitter")] HRESULT AttributeSplitter(
+			[in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(F89D7396-7648-4f11-A553-7375D1DAD73C),
+		dual,
+		helpstring("IRuleSetUI Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleSetUI : IDispatch
+	{
+		[id(1), helpstring("method ShowUIForEditing")] HRESULT ShowUIForEditing([in] BSTR strFileName, [in] BSTR strBinFolder);
+	}
+
+	[
+		object,
+		uuid(39754207-0180-4DF6-AC8D-DA95318E0C5B),
+		dual,
+		helpstring("IRuleTesterUI Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleTesterUI : IDispatch
+	{
+		[id(1), helpstring("method ShowUI")] HRESULT ShowUI([in] BSTR strFileName);
+
+	};
+
+	[
+		object,
+		uuid(3877E84A-42DF-451A-8CC8-E230D8CEB630),
+		dual,
+		helpstring("IRuleSet Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleSet : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If bSetDirtyFlagToTrue == VARIANT_TRUE, the internal dirty flag
+		//			is set to True.  If bSetDirtyFlagToTrue == VARIANT_FALSE, then
+		//			the default behavior of the dirty flag being set to false
+		//			takes effect.
+		[id(1), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bSetDirtyFlagToTrue);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If bClearDirty  == VARIANT_TRUE, the internal dirty flag's
+		//			value is set to false.  If bClearDirty == VARIANT_FALSE
+		//			then the internal dirty flag's value is unchanged.
+		[id(2), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bClearDirty);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Execute the rules for one or more attributes in this RuleSet on the 
+		//			specified AFDocument.
+		// ARGUMENTS:
+		//			pvecAttributeNames - A IVariantVector containing the names of attributes for
+		//				which rules should be executed.  If this pointer is NULL, all rules are
+		//				executed.
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		//			pAttributes - The IIUnknownVector of IAttribute objects returned from this
+		//				method will contain the found hierarchy of attributes.
+		[id(3), helpstring("method ExecuteRulesOnText")] HRESULT ExecuteRulesOnText(
+			[in] IAFDocument* pAFDoc, [in] IVariantVector *pvecAttributeNames, 
+			[in] IProgressStatus *pProgressStatus, [out, retval] IIUnknownVector** pAttributes);
+		//-----------------------------------------------------------------------------------------
+		// The method below has been commented out, but left in the IDL file to remind future
+		// developers that id(4) should not be reused for another method or property.
+		// [id(4), helpstring("method SetProgressEventHandler")] HRESULT SetProgressEventHandler(
+		//	[in] IProgressEventHandler* pEventHandler);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT AttributeNameToInfoMap(
+			[out, retval] IStrToObjectMap * *pVal);
+		[propput, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT AttributeNameToInfoMap(
+			[in] IStrToObjectMap * newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT GlobalDocPreprocessor(
+			[out, retval] IObjectWithDescription **pVal);
+		[propput, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT GlobalDocPreprocessor(
+			[in] IObjectWithDescription *newVal);
+		//-----------------------------------------------------------------------------------------
+		// The FileName property is used to retrieve the filename associated with
+		// this RuleSet object.  Retrieving the FileName property will return the
+		// name of the file from which this object was last loaded, or to which
+		// this object was last saved.
+		// The FileName put-property is primarily exposed for the sake of 
+		// implementing ICopyableObject, but can theoretically be used to overwrite
+		// (or disassociate) the filename associated with this object.
+		[propget, id(7), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(8), helpstring("property IsEncrypted")] HRESULT IsEncrypted([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler([out, retval] IObjectWithDescription **pVal);
+		[propput, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler([in] IObjectWithDescription *newVal);
+		[propget, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter([in] VARIANT_BOOL newVal);
+		[propget, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT UsePagesRedactionCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT UsePagesRedactionCounter([in] VARIANT_BOOL newVal);
+		[propget, id(12), helpstring("property UsePaginationCounter")] HRESULT UsePaginationCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(12), helpstring("property UsePaginationCounter")] HRESULT UsePaginationCounter([in] VARIANT_BOOL newVal);
+		[propget, id(13), helpstring("property ForInternalUseOnly")] HRESULT ForInternalUseOnly([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(13), helpstring("property ForInternalUseOnly")] HRESULT ForInternalUseOnly([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// Returns a string with comma separated serial numbers for valid keys to use with this ruleset
+		[propget, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList([out, retval] BSTR *pVal);
+		//-----------------------------------------------------------------------------------------
+		// Sets the serial number list
+		// newVal is a string with comma separated serial numbers for the valid keys to use with this ruleset
+		[propput, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	To return the version number associated with the RuleSet object
+		[propget, id(15), helpstring("property VersionNumber")] HRESULT VersionNumber([out, retval] long *nVersion);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT UseDocsRedactionCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT UseDocsRedactionCounter([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(28A2337C-2F24-4F0B-ADBC-95FE5E51AB59),
+		dual,
+		helpstring("IOutputHandler Interface"),
+		pointer_default(unique)
+	]
+	interface IOutputHandler : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To process the output of the rule running process (a IIUnknownVector of
+		//			IAttribute objects) in some meaningful way.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(1), helpstring("method ProcessOutput")] HRESULT ProcessOutput([in] IIUnknownVector* pAttributes, 
+			[in] IAFDocument *pDoc, [in] IProgressStatus *pProgressStatus);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(FDC8A439-7ABB-421F-AD66-7D9085C6BBF4),
+		dual,
+		helpstring("IAttributeFinderEngine Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeFinderEngine : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		//
+		// Methods (1 - 5) replaced by generalized FindAttributes() method 06/22/04 - WEL
+		//
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	All pointers passed are valid pointers except those
+		//			that may be NULL per following comments.
+		//			pvecAttributeNames should be NULL if all rules for 
+		//			attributes in the ruleset must be executed.
+		//			if pvecAttributeNames is not NULL, it must contain valid
+		//			strings that are valid attribute names in pRuleSet.
+		// PROMISE:	To return an IIUnknownVector of found attributes in accordance
+		//			with above comments.  If bShowProgressDlg == VARIANT_TRUE, then
+		//			the progress dialog will be displayed while attributes are being
+		//			found.  Otherwise, no progress dialog will be displayed.
+		// ARGUMENTS:
+		//			nNumOfPagesToRecognize - how many pages of the image file to be OCRed.
+		//					If -1 is defined, the entire image will be processed
+		//					If SrcDoc is not an image file, NumPages is ignored
+		//			varRuleSet - this variant argument must either be of BSTR type (in which
+		//					case it is expected to be the name of the RSD file name from which
+		//					the ruleset is to be loaded), or must be of either IUnknown * type
+		//					or IDispatch * type (in which case the object passed in is expected
+		//					to also have implemented IRuleSet)
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(6), helpstring("method FindAttributes")] HRESULT FindAttributes(
+			[in] IAFDocument *pDoc,
+			[in] BSTR strSrcDocFileName,
+			[in] long nNumOfPagesToRecognize,
+			[in] VARIANT varRuleSet, // see important note about this argument
+			[in] IVariantVector* pvecAttributeNames,
+			[in] IProgressStatus *pProgressStatus,
+			[out, retval] IIUnknownVector** pAttributes);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(7), helpstring("property FeedbackManager")] HRESULT FeedbackManager([out, retval] IFeedbackMgr **pVal);
+		//-----------------------------------------------------------------------------------------
+		// Displays a product-specific About box
+		[id(8), helpstring("method ShowHelpAboutBox")] HRESULT ShowHelpAboutBox([in] EHelpAboutType eType, [in] BSTR strProductVersion);
+		//-----------------------------------------------------------------------------------------
+		// Retrieve the full path to the component data folder
+		[id(9), helpstring("method GetComponentDataFolder")] HRESULT GetComponentDataFolder([out, retval] BSTR *pbstrComponentDataFolder);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(8A07FC69-4D3E-4a62-8684-C17D35A4C84B),
+		dual,
+		helpstring("IDocumentPreprocessor Interface"),
+		pointer_default(unique)
+	]
+	interface IDocumentPreprocessor : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To execute the pre-processing operations on a document.
+		// ARGUMENTS:
+		//			pProgressStatus - see note # 1 in the "Notes" section at the top of the document.
+		[id(1), helpstring("method Process")] HRESULT Process([in] IAFDocument* pDocument,
+			[in] IProgressStatus *pProgressStatus);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(A17CD84D-DAD8-444F-B108-3384E6873AAD),
+		dual,
+		helpstring("IRuleExecutionEnv Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleExecutionEnv : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// Following methods allow push/pop/get access to the RSD file
+		// name associated with the currently executing thread.
+		// NOTE: we have the stack concept here because RSD files can execute
+		// other RSD files which execeute other RSD files, etc.
+		// PROMISE:	The PushRSDFileName() method will push a filename onto the stack and
+		//			the PopRSDFileName() method will pop a filename from the stack.  Both operations
+		//			return the size of the stack at the end of the respective operations.
+		[id(1), helpstring("method PushRSDFileName")] HRESULT PushRSDFileName([in] BSTR strFileName, [out, retval] long *pnStackSize);
+		[id(2), helpstring("method PopRSDFileName")] HRESULT PopRSDFileName([out, retval] long *pnStackSize);
+		//-----------------------------------------------------------------------------------------
+		[id(3), helpstring("method GetCurrentRSDFileName")] HRESULT GetCurrentRSDFileName([out, retval] BSTR *pstrFileName);
+		[id(4), helpstring("method GetCurrentRSDFileDir")] HRESULT GetCurrentRSDFileDir([out, retval] BSTR *pstrRSDFileDir);
+		[id(5), helpstring("method IsRSDFileExecuting")] HRESULT IsRSDFileExecuting([in] BSTR strFileName, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+	};
+	
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To guarantee that the Rule Execution Environment's current thread's
+	// stack gets pushed ***AND*** popped, no matter whether errors occur
+	// during rule execution, etc.
+	[
+		object,
+		uuid(48565161-D0AC-45DC-A534-D34F6181B0A4),
+		dual,
+		helpstring("IRuleExecutionSession Interface"),
+		pointer_default(unique)
+	]
+	interface IRuleExecutionSession : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	The specified filename will be pushed on to the rule execution environment's
+		//			RSD file stack.  And the stack will be popped when the object
+		//			implementing this interface is destructed.
+		// PROMISE:	To set the RSDfilename associated with the current rule execution session
+		//			in the rule execution stack, and to return the size of the rule
+		//			execution stack after the specified RSD file has been pushed unto
+		//			the stack.
+		[id(1), helpstring("method SetRSDFileName")] HRESULT SetRSDFileName([in] BSTR strFileName, [out, retval] long *pnStackSize);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	//---------------------------------------------------------------------------------------------
+	
+	[
+		object,
+		uuid(41BBDD42-760E-4544-A870-F2446DBE9ADB),
+		dual,
+		helpstring("IDataScorer Interface"),
+		pointer_default(unique)
+	]
+	interface IDataScorer : IDispatch
+	{
+		// Returns a long value of 0 to 100 as a score for the attribute passed
+		//		0    is the worst score
+		//		100  is the best score
+		[id(1), helpstring("method GetDataScore1")] HRESULT GetDataScore1(
+			[in] IAttribute* pAttribute, 
+			[out, retval] long* pScore );
+
+		// Method will return a long value of 0 to 100 as a score for the attributes passed
+		//		0    is the worst score
+		//		100  is the best score
+		[id(2), helpstring("method GetDataScore2")] HRESULT GetDataScore2(
+			[in] IIUnknownVector* pAttributes,
+			[out, retval] long* pScore );
+
+	};
+
+	//---------------------------------------------------------------------------------------------
+
+	[
+		object,
+		uuid(4E432DEA-68DC-44B5-9EAD-CE48BFF660BC),
+		dual,
+		helpstring("IFeedbackMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IFeedbackMgr : IDispatch
+	{
+		// Saves a copy of the vector of Attributes as "ID.correct.voa" in the 
+		// Feedback folder.  Also stores the system time in the appropriate 
+		// CorrectTime field in the Feedback database.
+		[id(1), helpstring("method RecordCorrectData")] HRESULT RecordCorrectData([in] BSTR strRuleExecutionID, [in] IIUnknownVector* pData);
+	};
+
+	//---------------------------------------------------------------------------------------------
+
+	[
+		object,
+		uuid(02A62A96-E2CE-454B-AF5E-EFF091EF27E0),
+		dual,
+		helpstring("IFeedbackMgrInternals Interface"),
+		pointer_default(unique)
+	]
+	interface IFeedbackMgrInternals : IDispatch
+	{
+		// Saves a copy of the vector of Attributes as "ID.found.voa" in the 
+		// Feedback folder.  Also stores the difference between the system time and 
+		// previously stored StartTime in the Duration field in the Feedback database.
+		[id(1), helpstring("method RecordFoundData")] HRESULT RecordFoundData([in] BSTR strRuleExecutionID, [in] IIUnknownVector* pData);
+
+		// Saves a copy of the exception as "ID.uex" in the Feedback folder.
+		[id(2), helpstring("method RecordException")] HRESULT RecordException([in] BSTR strRuleExecutionID, [in] BSTR strException);
+
+		// Saves a copy of the vector of Attributes as "ID.found.voa" in the 
+		// Feedback folder.  Also stores the system time in the appropriate 
+		// StartTime field in the Feedback database.
+		[id(3), helpstring("method RecordRuleExecution")] HRESULT RecordRuleExecution([in] IAFDocument *pAFDoc, [in] BSTR strRSDFileName, [out, retval] BSTR *pstrRuleExecutionID);
+
+		// Displays the Configure Feedback dialog allowing the user to enable/disable
+		// feedback collection, set skip counts and set handling of source documents.
+		// Moved this functionality to Feedback EXE 1/25/05 - WEL
+//		[id(4), helpstring("method ShowConfigUI")] HRESULT ShowConfigUI();
+
+		// Displays the Package Feedback dialog.
+		// Moved this functionality to Feedback EXE 1/25/05 - WEL
+//		[id(5), helpstring("method ShowPackagingUI")] HRESULT ShowPackagingUI();
+
+		// Not used at this time
+//		[id(6), helpstring("method ShowUnpackagingUI")] HRESULT ShowUnpackagingUI();
+
+		// Displays a dialog allowing the user to show either the Configure dialog
+		// of the Package dialog.  This is the default display from the Feedback EXE.
+		// Moved this functionality to Feedback EXE 1/25/05 - WEL
+//		[id(7), helpstring("method ShowChoiceUI")] HRESULT ShowChoiceUI();
+
+		// Deletes all files from the Feedback folder.  Deletes all records from 
+		// the Feedback database.
+		[id(8), helpstring("method ClearFeedbackData")] HRESULT ClearFeedbackData([in] VARIANT_BOOL bShowPrompt);
+
+		// Returns an ADO Recordset object containing all records and all fields from 
+		// the RuleExecution table in the Feedback database.  An IUnknown object is 
+		// returned here to avoid the need for AFCore to #import msado15.dll
+		[id(9), helpstring("method GetFeedbackRecords")] HRESULT GetFeedbackRecords([out, retval] IUnknown **pFeedbackRecords);
+
+		// Closes the database connection to allow independent file access.
+		[id(10), helpstring("method CloseConnection")] HRESULT CloseConnection();
+	};
+	//---------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(975EF59B-82AE-4810-A0F6-820AEE753AB7),
+		dual,
+		helpstring("IAFCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IAFCondition : IDispatch
+	{
+		//---------------------------------------------------------------------------------------------
+		// REQUIRE: pAFDoc != NULL
+		// PROMISE: This method will return VARIANT_TRUE if the condition is met
+		[id(1), helpstring("method ProcessCondition")] HRESULT ProcessCondition([in] IAFDocument* pAFDoc, [out, retval] VARIANT_BOOL* pbRet);
+		//---------------------------------------------------------------------------------------------
+	};
+	//---------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(105F98B6-AEF2-417f-B4AB-C1ADA3B050D3),
+		dual,
+		helpstring("IConditionalRule Interface"),
+		pointer_default(unique)
+	]
+	interface IConditionalRule : IDispatch
+	{
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Will return the IID of the rule returned by GetRule
+		[id(1), helpstring("method GetRuleIID")] HRESULT GetRuleIID([out, retval] IID* pIID);
+		//---------------------------------------------------------------------------------------------
+		// Note: we use set and get here instead of a property because we 
+		// may change this signature to SetCondition(IIUnknown*, IID*)
+		// REQUIRE: ppCondition != NULL
+		// PROMISE: This method will return the conditional object that will be used by this
+		//			ConditionalRule to evaluate whether or not to run the rule returned by GetRule
+		[id(2), helpstring("method GetCondition")] HRESULT GetCondition([out, retval] IAFCondition** ppCondition);
+		// REQUIRE: pCondition != NULL
+		// PROMISE: This method will set the conditional object that will be used by this
+		//			ConditionalRule to evaluate whether or not to run the rule returned by GetRule
+		[id(3), helpstring("method SetCondition")] HRESULT SetCondition([in] IAFCondition* pCondition);
+		//---------------------------------------------------------------------------------------------
+		// REQUIRE: ppRule != NULL
+		// PROMISE: The rule returned by this method will implement the interface returned by GetRuleIID
+		//			or it will be NULL
+		[id(4), helpstring("method GetRule")] HRESULT GetRule([out, retval] IUnknown** ppRule);
+		// REQUIRE: pRule must implement the interface returned by GetRuleIID 
+		//			pRule != NULL
+		[id(5), helpstring("method SetRule")] HRESULT SetRule([in] IUnknown* pRule);
+		//---------------------------------------------------------------------------------------------
+		[propget, id(6), helpstring("property InvertCondition")] HRESULT InvertCondition([out, retval] VARIANT_BOOL * pbRetVal);
+		[propput, id(6), helpstring("property InvertCondition")] HRESULT InvertCondition([in] VARIANT_BOOL bNewVal);
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Will return the name of a com category in which every object implements the IID
+		//			returned by GetRuleIID
+		//			This name can be used in conjunction with the ICategoryManager Interface in UCLIDComUtils
+		[id(7), helpstring("method GetCategoryName")] HRESULT GetCategoryName([out, retval] BSTR *pstrCategoryName);
+	};
+	[
+		object,
+		uuid(193C27CE-B571-4B65-B9C6-BDA718FD218C),
+		dual,
+		helpstring("ISpatiallyCompareAttributes Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatiallyCompareAttributes : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(EADB307B-0400-4361-ACD7-9DC3F892CF51),
+		dual,
+		helpstring("IAttributeSelector Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeSelector : IDispatch
+	{
+		//---------------------------------------------------------------------------------------------
+		// PROMISE: Will return an IUnknownVector with attributes that are selected from the input IUnknownVector
+		//			by the implementation of this method 
+		[id(1), helpstring("method SelectAttributes")] HRESULT SelectAttributes( [in] IIUnknownVector *pAttrIn, [in] IAFDocument *pAFDoc, [out, retval] IIUnknownVector **pAttrOut);
+	};
+
+	//---------------------------------------------------------------------------------------------
+	/////////////////
+	// CoClasses
+	////////////////
+	[
+		uuid(8A7249F0-DE76-43D8-8DA1-89B23677985D),
+		helpstring("AttributeRule Class")
+	]
+	coclass AttributeRule
+	{
+		[default] interface IAttributeRule;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(BD457649-B6B8-4B3C-946D-448F3BF5F720),
+		helpstring("RuleSet Class")
+	]
+	coclass RuleSet
+	{
+		[default] interface IRuleSet;
+		interface IRuleSetUI;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(28D7B760-37BC-43C6-9627-11E3FD2D73B9),
+		helpstring("Attribute Class")
+	]
+	coclass Attribute
+	{
+		[default] interface IAttribute;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(BBDE6205-9193-4959-8922-630A9F920ADB),
+		helpstring("AFDocument Class")
+	]
+	coclass AFDocument
+	{
+		[default] interface IAFDocument;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(6C9B5C0F-D0AD-477C-82C1-44E2EDDD7C36),
+		helpstring("AttributeFinderEngine Class")
+	]
+	coclass AttributeFinderEngine
+	{
+		[default] interface IAttributeFinderEngine;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(17C3100D-3464-4EC4-A18E-198DDA0E618E),
+		helpstring("AttributeFindInfo Class")
+	]
+	coclass AttributeFindInfo
+	{
+		[default] interface IAttributeFindInfo;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(D0D5A44F-6D66-4708-84D9-8FA682EB9CFB),
+		helpstring("RuleExecutionEnv Class")
+	]
+	coclass RuleExecutionEnv
+	{
+		[default] interface IRuleExecutionEnv;
+	};
+	[
+		uuid(25763BA4-6151-42F1-A307-1608860D157C),
+		helpstring("RuleExecutionSession Class")
+	]
+	coclass RuleExecutionSession
+	{
+		[default] interface IRuleExecutionSession;
+	};
+	[
+		uuid(AC714C5E-96DF-4184-8E45-6EA8768037C5),
+		helpstring("RuleTesterUI Class")
+	]
+	coclass RuleTesterUI
+	{
+		[default] interface IRuleTesterUI;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(D8938C93-36E0-4980-AA6D-0296CFBB2B16),
+		helpstring("ConditionalRulePP Class")
+	]
+	coclass ConditionalRulePP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(794FB907-9D86-4466-A9A7-DE245C2EA0B6),
+		helpstring("SpatiallyCompareAttributes Class")
+	]
+	coclass SpatiallyCompareAttributes
+	{
+		[default] interface ISpatiallyCompareAttributes;
+		interface ISortCompare;
+		interface ILicensedComponent;
+	};
+};

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.MiscUtils.1 = s 'MiscUtils Class'
+	{
+		CLSID = s '{30358025-3FF2-44D9-9EF7-ED342C338231}'
+	}
+	UCLIDCOMUtils.MiscUtils = s 'MiscUtils Class'
+	{
+		CLSID = s '{30358025-3FF2-44D9-9EF7-ED342C338231}'
+		CurVer = s 'UCLIDCOMUtils.MiscUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {30358025-3FF2-44D9-9EF7-ED342C338231} = s 'MiscUtils Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.MiscUtils.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.MiscUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

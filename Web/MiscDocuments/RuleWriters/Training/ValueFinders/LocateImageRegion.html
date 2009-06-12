@@ -1,0 +1,110 @@
+<HTML>
+	<HEAD>
+		<TITLE>Locate Image Region Value Finder</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Locate Image Region Value Finder</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Locate Image Region value finder is used to redact or extract text from a specified region of a document.</li>
+			<li>It uses the position of specified clues in the document to find the desired region.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Locate Image Region value finder, you must first specify whether you want to find an image region or text.
+				<ul>
+					<li>Image regions contain only the spatial information of the found region.
+						<ul>
+							<li>They are primarily used to redact the region in the ID Shield product.</li>
+							<li>When you create an image region, you will have to assign some "placeholder" text for the found spatial information in the <b>Assign the following text to the image region</b> box.</li>
+						</ul>
+					</li>
+					<li>If you choose to find text, the Locate Image Region value finder will extract and return all of the text contained in the found region.
+						<ul>
+							<li>This option is primarily used to extract data from a certain region of the document for the FLEX Index product.</li>
+							<li>You can choose to whether to include or exclude characters or words that intersect the boundaries of the region.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>You can choose whether to return only the first region that is found or to return all of the regions that are found.</li>
+			<li>Next, you will need to specify the clues that will be used to find the region as well as where the region is located in relation to the specified clues.
+				<ul>
+					<li>Clues can be added, deleted, and modified using the <b>Add...</b>, <b>Remove</b>, and <b>Modify...</b> buttons.
+						<ul>
+							<li>The clues can be plain text or regular expressions.</li>
+							<li>The clues can be made case sensitive.</li>
+							<li>You can have up to four separate clue lists that you can use to find the image region.</li>
+						</ul>
+					</li>
+					<li>You can specify were the region is relative to the clues by using <b>Region Boundaries</b> box.
+						<ul>
+							<li>You will need to define the location of the top, bottom, left, and right boundaries of the region.</li>
+							<p>
+								<li><b>Example:</b>
+									<ul>
+										<li>Look at <b>TestImage012.tif</b>.  We want to redact the <i>Social Security Number</i> box.</li>
+										<li>Note that the top of the <i>Social Security Number</i> box is near the top of the text "4. SOCIAL SECURITY NUMBER".</li>
+										<li>Note that the bottom of the <i>Social Security Number</i> box is near the top of the text  "7. BIRTH PLACE".</li>
+										<li>Note that the left of the <i>Social Security Number</i> box is near the left of the text "4. SOCIAL SECURITY NUMBER".</li>
+										<li>Note that the right of the <i>Social Security Number</i> box is to the left of the text "5a. AGE".</li>
+										<li>Add a Locate Image Region value finder that finds an Image Region and gives it the placeholder text "000-00-0000".</li>
+										<li>Add the clue "4. SOCIAL SECURITY NUMBER" to Clue List 1.</li>
+										<li>Add the clue "7. BIRTHPLACE" to Clue List 2.</li>
+										<li>Add the clue "5a. AGE" to Clue List 3.</li>
+										<li>We want the top of the region to be the top of the clue "4. SOCIAL SECURITY NUMBER".  We can do this by defining the top of the region to be the <b>Top</b> of <b>Clue List 1</b>.</li>
+										<li>We want the bottom of the region to be the top of the clue "7. BIRTHPLACE".  We can do this by defining the bottom of the region to be the <b>Top</b> of <b>Clue List 2</b>.</li>
+										<li>We want the left of the region to be the left side of the clue "4. SOCIAL SECURITY NUMBER".  We can do this by defining the left side of the region to be the <b>Left</b> of <b>Clue List 1</b>.</li>
+										<li>We want the right of the region to be the left of the clue "5a. AGE".  We can do this by defining the right side of the region as the <b>Left</b> of <b>Clue List 3</b>.</li>
+										<li>Run this Locate Image Region rule on <b>TestImage012.tif</b> and examine the results.</li>
+										<li>Change the above rule from an Image Region to Text.</li>
+										<li>Run the rule again and notice that the text within the <i>Social Security Number</i> box has been extracted.</li>
+									</ul>
+								</li>
+							<p>
+						</ul>
+					</li>
+					<li>You can also expand the boundaries of the region to be a specified distance away from the specified clues.</li>
+						<ul>
+							<li>You can expand the top and bottom boundaries up or down by a specified number of lines.
+								<ul>
+									<li>A "line" is defined as the average height of the text in the document.</li>
+									<li>You can specify fractional numbers of lines.</li>
+								</ul>
+							</li>
+							<li>You can expand the left and right boundaries left or right by a specified number of characters.</li>
+							<p>
+								<li><b>Example:</b>
+									<ul>
+										<li>We can redact the <i>Social Security Number</i> box in <b>TestImage012.tif</b> using only the "4. SOCIAL SECURITY NUMBER" clue.</li>
+										<li>Add a Locate Image Region value finder that finds an Image Region and gives it the placeholder text "000-00-0000".</li>
+										<li>Add the clue "4. SOCIAL SECURITY NUMBER" to Clue List 1.</li>
+										<li>Define the top of the region to be the <b>Top</b> of <b>Clue List 1</b>.</li>
+										<li>Define the bottom of the region to be the <b>Bottom</b> of <b>Clue List 1</b> expanded <b>Down</b> by 2.5 lines.</li>
+										<li>Define the left of the region to be the <b>Left</b> of <b>Clue List 1</b>.</li>
+										<li>Define the right of the region to be the <b>Right</b> of <b>Clue List 1</b> expanded <b>Right</b> by 15 characters.</li>
+										<li>Run this Locate Image Region rule on <b>TestImage012.tif</b> and examine the results.</li>
+									</ul>
+								</li>
+							</ul>
+						</p>
+					</li>
+				</ul>
+			</li>			
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Write a Locate Image Region rule that will redact the <i>Social Security Number</i> box on <b>TestImage009.tif</b>.</li>
+			<li>Write a Locate Image Region rule that will extract the text from the <i>Date of Birth</i> box on <b>TestImage012.tif</b>.</li>
+			<li>Write rules that will redact both of the social security numbers on <b>TestImage007.tif</b>.
+				<ul>
+					<li><b>HINT:</b>  The Locate Image Region value finder will only find one region per page.  However, you can find the second region on the page by having a second rule that has an Advanced Replace Strings preprocessor that removes the first "Social Security Number" clue before running the Locate Image Region value finder.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

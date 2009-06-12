@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.DespeckleICOPP.1 = s 'DespeckleICOPP Class'
+	{
+		CLSID = s '{8C0D6A39-3DD4-41C4-88D9-FAAA8925605E}'
+	}
+	ESImageCleanup.DespeckleICOPP = s 'DespeckleICOPP Class'
+	{
+		CLSID = s '{8C0D6A39-3DD4-41C4-88D9-FAAA8925605E}'
+		CurVer = s 'ESImageCleanup.DespeckleICOPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8C0D6A39-3DD4-41C4-88D9-FAAA8925605E} = s 'DespeckleICOPP Class'
+		{
+			ProgID = s 'ESImageCleanup.DespeckleICOPP.1'
+			VersionIndependentProgID = s 'ESImageCleanup.DespeckleICOPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

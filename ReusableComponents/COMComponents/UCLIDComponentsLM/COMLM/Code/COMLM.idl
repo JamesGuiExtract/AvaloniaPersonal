@@ -1,0 +1,67 @@
+// COMLM.idl : IDL source for COMLM.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (COMLM.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(A71EE8CD-A2C1-4C5B-A593-12FF4931C820),
+	version(1.0),
+	helpstring("UCLID ComponentLM 1.0 Type Library")
+]
+library UCLID_COMLMLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	// Interfaces
+	[
+		object,
+		uuid(F9C06E02-5CD4-4DA1-A413-2F8D6906E254),
+		dual,
+		helpstring("IUCLIDComponentLM Interface"),
+		pointer_default(unique)
+	]
+	interface IUCLIDComponentLM : IDispatch
+	{
+		[id(1), helpstring("method InitializeFromFile")] HRESULT InitializeFromFile([in] BSTR bstrLicenseFile, [in] long ulKey1, [in] long ulKey2, [in] long ulKey3, [in] long ulKey4);
+		[id(2), helpstring("method IgnoreLockConstraints")] HRESULT IgnoreLockConstraints([in] long lKey);
+		[id(3), helpstring("method IsLicensed")] HRESULT IsLicensed([in] long ulComponentID, [out,retval] VARIANT_BOOL *pbValue);
+	};
+	[
+		object,
+		uuid(ADC5CF15-2359-4C20-B4BE-F649AEEE441D),
+		dual,
+		helpstring("ILicensedComponent Interface"),
+		pointer_default(unique)
+	]
+	interface ILicensedComponent : IDispatch
+	{
+		[id(1), helpstring("method IsLicensed")] HRESULT IsLicensed([out,retval] VARIANT_BOOL *pbValue);
+	};
+	[
+		object,
+		uuid(D75CE2A8-BBD5-433f-A125-78F5C469B19A),
+		dual,
+		helpstring("IPrivateLicensedComponent Interface"),
+		pointer_default(unique)
+	]
+	interface IPrivateLicensedComponent : IDispatch
+	{
+		[id(1), helpstring("method InitPrivateLicense")] HRESULT InitPrivateLicense([in] BSTR strPrivateLicenseKey);
+		[id(2), helpstring("method IsPrivateLicensed")] HRESULT IsPrivateLicensed([out, retval] VARIANT_BOOL *pbIsLicensed);
+	};
+
+	// Coclasses
+	[
+		uuid(E129D8F2-E327-4FC1-8CBC-977FA876EFC2),
+		helpstring("UCLIDComponentLM Class")
+	]
+	coclass UCLIDComponentLM
+	{
+		[default] interface IUCLIDComponentLM;
+	};
+};

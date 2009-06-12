@@ -1,0 +1,143 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.25 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.25 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3173]</b> Enable/disable caching of RSD files
+	       	<ul>
+	      		<li>Confirm that the HKCU/Software/Extract Systems/Settings/CacheRSD key is <b>1</b> 
+			by default.
+	      		<li>Exercise a recent <b>Redaction</b> delivery with a local copy of sample images
+			<ul>
+		      		<li>Save <b>LogProcessStats</b> information regarding memory usage and 
+				handle usage.
+		      		<li>Record <b>processing time</b> information.
+			</ul>
+	      		<li>Turn off caching and repeat the above exercise.
+			<ul>
+		      		<li>Save <b>LogProcessStats</b> information regarding memory usage and 
+				handle usage.
+		      		<li>Record <b>processing time</b> information.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5063, #5064, #5067, #5081, #5082, #5084]</b> Various Reporting Changes
+	       	<ul>
+	      		<li>Exercise the following items for each installed report as noted below.
+			<ul>
+	      			<li>Confirm that the report conforms to the <b>Report Design Standards</b> 
+				section of the <b>7.0 Reporting Features Specification</b>.
+	      			<li>Confirm that an XML file associated with the report is present in the 
+				reports folder.  Note that <b>DateRange</b> values should be the enumeration 
+				such as <b>LastWeek</b>.
+	      			<li>Confirm that a thumbnail image of the selected report is provided.
+	      			<li>Confirm that a PDF output file can be auto-generated using command-line 
+				parameters.
+	      			<li>Confirm that the <b>/ow</b> command-line parameter allows the PDF output 
+				file to be overwritten.
+	      			<li>Confirm that not using the <b>/ow</b> command-line parameter raises an 
+				exception if the output PDF file already exists.
+	      			<li>Confirm that the <b>/prompt</b> command-line parameter forces display of 
+				a parameters prompt if the report requires parameters.
+			</ul>
+<p>
+	      		<li>Installed reports
+			<ul>
+	      			<li>File Action Manager Action List Report
+	      			<li>File Action Manager Computer List Report
+	      			<li>File Action Manager File Summary Report
+	      			<li>File Action Manager Machines Used For Processing Report
+	      			<li>File Action Manager Page Summary Report
+	      			<li>File Action Manager User List Report
+			</ul>
+<p>
+	      		<li>Confirm that the caption on the main UI has <b>Report Viewer</b>.
+	      		<li>Rename a thumbnail image file for one of the installed reports.  Confirm that 
+			no exception is thrown when selecting this report.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5090, #5092]</b> Various issues with write-caching - <b>exercised by Jeff</b>
+	       	<ul>
+	      		<li>Locate a collection of several thousand sample images on <b>FNP2</b>.
+	      		<li>Create an FPS file to <b>queue</b> the images.
+	      		<li>Create an FPS file to <b>process</b> the images.  Include an <b>OCR document</b> 
+			task, an <b>Execute rules</b> task and a <b>Conditionally evaluate VOA file</b> task.  
+			If file is sensitive, set <b>Verify</b> action to Pending.  If file is not sensitive, 
+			set <b>Export</b> action to Pending.
+	      		<li>Create an FPS file to <b>Export</b> the images.  Several <b>Delete</b> tasks 
+			remove the image file, the USS file, the VOA file, and the XML file.
+	      		<li>Confirm that <b>no</b> file access exceptions are seen in the UEX logs.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5096]</b> Extra queue event when setting file action status
+	       	<ul>
+	      		<li>Create a database with multiple actions.
+	      		<li>Create FPS file #1 to <b>queue</b> images for <b>Process</b> action.  The 
+			<b>Force Processing</b> flag is checked and <b>listening</b> for files to be added to 
+			the folder is checked.
+	      		<li>Create FPS file #2 to <b>process</b> the images.  Include an <b>Execute rules</b> 
+			task and a <b>Set file action status</b> task to set <b>CleanUp</b> status to 
+			<b>Pending</b>.
+	      		<li>Confirm that <b>no</b> extra file added queue events are seen.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

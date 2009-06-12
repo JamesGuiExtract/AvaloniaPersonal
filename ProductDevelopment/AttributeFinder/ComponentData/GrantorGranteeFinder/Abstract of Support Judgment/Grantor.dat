@@ -1,0 +1,25 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+//replaced with LIR Rule
+AOJ_GRANTOR_01=Judgment debtor^10~full name as^10~appears in judgment^?Grantor^250~Form Adopted|\r\n5.|\r\n6.
+//replaced with LIR Rule
+AOJ_GRANTOR_02=Judgment debtor(s) (full name as it appears in judgment)^?Grantor^250~\r\n\r\n
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\support order\20059020645100.tif.uss
+AOJ_GRANTOR_03=The Judgment Debtor^25~Name and^15~address^?Grantor^250~\r\nb. Driver|\r\n2.
+
+AOJ_GRANTOR_04=DEFENDANT^?Grantor^250~\r\nCase Number|\r\nABSTRACT
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Support Judgment\20049000158800.002.tif.uss
+AOJ_GRANTOR_05=Judgment^5~debtor^7~Name^5~last^5~known^10~address^?Grantor^250~Driver^5~license
+AOJ_GRANTOR_06=RESPONDENT :^?Grantor^160~ABSTRACT OF SUPPORT|CASE NUM
+[PATTERNS_END]

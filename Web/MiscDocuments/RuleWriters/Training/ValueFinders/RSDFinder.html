@@ -1,0 +1,32 @@
+<HTML>
+<HEAD>
+<TITLE>Find From RSD File</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Find From RSD File</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>The Find From RSD value finder is used to find attributes by calling another RSD file and returning all of its output as attributes.</li>
+		<li>The RSD file called can have as many rules, preprocessors and output handlers as needed.</li>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>Select Find from RSD file rule and click the configure button to enter the Attribute name of the attributes the rule will be finding and specify the path name to etf file of the RSD file to be called.</li>
+			<ul><li>Note: Always call the etf file of the RSD file you wish to call.</li>
+			</ul>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open <b>FindFromRSD.rsd</b> and run it on <b>TestImage001.tiff</b>.  Observe that it finds a social security number.  Notice that it is calling <b>SSN.rsd</b>.</li>
+	<p>
+		<li>Write another rule that calls <b>FileNumber_RegExp.rsd</b> and test it on <b>FileNumbers.txt</b>.</li>
+	</ol>
+
+</BODY>
+</HTML>

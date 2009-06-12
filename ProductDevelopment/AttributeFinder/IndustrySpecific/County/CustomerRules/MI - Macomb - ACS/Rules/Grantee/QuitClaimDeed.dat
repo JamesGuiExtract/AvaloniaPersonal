@@ -1,0 +1,10 @@
+[VARS_BEGIN]
+Numbers=0|1|2|3|4|5|6|7|8|9
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set016\Images\QUIT CLAIM DEED\B08074AAAC1.TIF
+rule01=[to^3~second^3~part^3~Grantee^?Grantee^100~whose^3~addr
+rule02=[to^3~second^3~part^?Grantee^100~whose^3~addr
+rule03=that^?Grantee^120~[the^3~grantee
+[PATTERNS_END]

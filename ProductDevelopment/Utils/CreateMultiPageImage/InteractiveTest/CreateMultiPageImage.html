@@ -1,0 +1,97 @@
+<html>
+<head>
+    <title>CreateMultiPageImage Utility - Testing Checklist</title>
+    <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+<body>
+<h1>CreateMultiPageImage Utility - Testing Checklist<br>
+        <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<ol>
+	<li><h2>General</h2>
+     	<ul>
+           	<li>Confirm that <b>CreateMultiPageImage</b> requires a suitable license file.
+           	<li><b>[LegacyRCAndUtils #4345]</b> Confirm that <b>CreateMultiPageImage /?</b> displays 
+		usage text.
+          	<li>Confirm that CreateMultiPageImage displays a <b>usage</b> message if other 
+		than 1, 2, 3, or 7 arguments are provided on the command-line.
+      	</ul>
+     	</li>
+<p>
+     	<li><h2>File Name Formats - using InteractiveTest folder as command-line argument</h2>
+	The batch file <b>test_CreateMultiPageImage.bat</b> that is found in
+	the <b>InteractiveTest</b> folder will run the following tests
+	automatically.  In order to use it, copy the three images and the
+	batch file to a local folder and run it.
+	<br><br>
+      	<ul>
+           	<li><b>Name_Dot_DDD_Dot_Tif</b>.  
+            	<ul>
+                 	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A.001.tif</b>, <b>A.002.tif</b>, <b>A.003.tif</b>.  
+			Run the application.</li>  
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+             	<li><b>Name_Dot_DDD</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A.001</b>, <b>A.002</b>, <b>A.003</b>.  
+			Run the application.</li>
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+             	<li><b>Name_Hyphen_D_Dot_Tif</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A-1.tif</b>, <b>A-2.tif</b>, <b>A-3.tif</b>.  
+			Run the application.</li>
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+            	<li><b>Name_Underscore_P_D_Dot_Tif</b>.  
+            	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A_P1.tif</b>, <b>A_P2.tif</b>, <b>A_P3.tif</b>.  
+			Run the application.</li>
+                  	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+             	<li><b>Name_Underscore_DDDD_Dot_Tif</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>A_0001.tif</b>, <b>A_0002.tif</b>, <b>A_0003.tif</b>.  
+			Run the application.</li>
+                  	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+<p>
+             	<li><b>DDDDDDDD_Dot_Tif</b>.  
+             	<ul>
+                    	<li>Delete any existing <b>A.tif</b>.</li>  
+                    	<li>Copy test pages as <b>00000001.tif</b>, <b>00000002.tif</b>, 
+			<b>00000003.tif</b>.  Run the application.</li>
+                    	<li>Confirm that a three-page <b>A.tif</b> file exists.</li>
+             	</ul>
+     	</ul>
+     	</li>
+<p>
+     	<li><h2>File Names From Input File - using InputFiles.txt</h2>
+      	<ul>
+           	<li><b>Command-line Arguments</b>.  TBD.
+       	</ul>
+     	</li>
+<p>
+     	<li><h2>Miscellaneous Items</h2>
+      	<ul>
+            	<li>Confirm that CreateMultiPageImage documentation is available in the 
+		<b>FLEX Index</b> Help file.
+            	<li>Confirm that CreateMultiPageImage documentation is available in the 
+		<b>ID Shield</b> Help file.
+            	<li>Confirm that CreateMultiPageImage documentation includes either a 
+		Start menu path or a fully-qualified path to the EXE.
+     	</ul>
+     	</li>
+</ol>
+</body>
+</html>

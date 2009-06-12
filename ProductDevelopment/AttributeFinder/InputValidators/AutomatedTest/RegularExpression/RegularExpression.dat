@@ -1,0 +1,14 @@
+// Finds 5-digit numbers
+<TESTCASE>;Test1.rsd;Input.txt;;Test1.eav
+
+// Finds "insured under Section" Numbers
+<TESTCASE>;Test2.rsd;Input.txt;;Test2.eav
+
+// Finds "insured under Section" Numbers - Case Sensitive
+<TESTCASE>;Test3.rsd;Input.txt;;Test3.eav
+
+// Finds "License Number" with following digits
+<TESTCASE>;Test4.rsd;Input.txt;;Test4.eav
+
+// Finds "License Number" with following digits - Case Sensitive
+<TESTCASE>;Test5.rsd;Input.txt;;Test5.eav

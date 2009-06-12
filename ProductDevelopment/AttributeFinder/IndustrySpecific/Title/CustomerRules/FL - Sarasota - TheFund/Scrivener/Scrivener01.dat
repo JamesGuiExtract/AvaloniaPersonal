@@ -1,0 +1,5 @@
+\r\nThis\s*Mortgage\s*prepared\s*by:\r\n\r\nName:\s*(?:\w+[,x20.;]{0,3})+\r\n\r\nCompany:\s*(?:\w+[,x20.;]{0,3})+\r\nAddress:
+//\(w+[,x20.;]{0,3})+
+
+
+

@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//Set001
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\LA - Ascension\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

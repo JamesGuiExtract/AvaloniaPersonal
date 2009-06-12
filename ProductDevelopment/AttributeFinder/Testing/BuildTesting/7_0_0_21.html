@@ -1,0 +1,291 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.21 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.21 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>Test Harness items</b>
+	       	<ul>
+	      		<li><b>[FlexIDSCore #2646, #2806]</b> Number of correct redactions shows percentage
+			<ul>
+		      		<li>Exercise <b>ID Shield Tester</b>.
+				<li>Review the <b>Summary Statistics</b>.
+				<li>Confirm that a percentage correct is also provided along with 
+				the number of correct redactions.
+			</ul>
+<p>
+	      		<li><b>[FlexIDSCore #3081]</b> Test Harness is too slow
+			<ul>
+		      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+				<li>Measure the processing time using <b>OutputFinalStatsOnly=0</b> as a 
+				DAT file setting.
+				<li>Measure the processing time using <b>OutputFinalStatsOnly=1</b> as a 
+				DAT file setting.
+				<li>Confirm that processing time is less with <b>OutputFinalStatsOnly=1</b>.
+				<li>Confirm that the required/desired output files are still present.
+			</ul>
+<p>
+	      		<li><b>[FlexIDSCore #3344, #3359]</b> Support for conditions and condition quantifiers
+			<ul>
+		      		<li>Review the VOA files in 
+				<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3344</b>.  Note that files 
+				are present with each combination of HCData, MCData, LCData, Manual, and 
+				Clues attributes.
+		      		<li>Review the FPS file.  It uses <b>local</b> as a database server and 
+				<b>SANITY_TEST</b> as a database name.  The action is <b>Compute</b>. 
+		      		<li>Run the processing task as is to exercise <b>ID Shield data file 
+				contents</b> condition for <b>any HCData</b>.  
+				<li>Confirm that the 16 completed VOA files each contain HCData.
+				<li>Confirm that the 16 failed VOA files each do not contain HCData.
+				<li>Create a list of at least 12 different configurations changing the 
+				data types and the accepted combinations of data types.
+				<li>Exercise each configuration and confirm that results are as expected.
+				<ul>
+					<li>Configuration #01 ---> 
+					<li>Configuration #02 ---> 
+					<li>Configuration #03 ---> 
+					<li>Configuration #04 ---> 
+					<li>Configuration #05 ---> 
+					<li>Configuration #06 ---> 
+					<li>Configuration #07 ---> 
+					<li>Configuration #08 ---> 
+					<li>Configuration #09 ---> 
+					<li>Configuration #10 ---> 
+					<li>Configuration #11 ---> 
+					<li>Configuration #12 ---> 
+				</ul>
+			</ul>
+<p>
+	      		<li><b>[FlexIDSCore #3346, #3347, #3358, #3364]</b> Support for hybrid and/or 
+			document type statistics
+			<ul>
+		      		<li>Review the XLS file in 
+				<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3346</b>.
+				<li><b>Normal Statistics</b>
+				<ul>
+			      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+					<li>Add <b>OutputHybridStats=0</b> to the DAT file.
+			      		<li>Exercise each of the <b>Automated Redaction</b> queries.
+			      		<li>Confirm that the reported results match the XLS expectations.
+			      		<li>Exercise each of the <b>Redaction with Manual Verification</b> queries.
+			      		<li>Confirm that the reported results match the XLS expectations.
+				</ul>
+<p>
+				<li><b>Hybrid Statistics</b>
+				<ul>
+			      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+					<li>Add <b>OutputHybridStats=1</b> to the DAT file.
+			      		<li>Exercise each of the <b>Hybrid Redaction</b> queries.
+			      		<li>Confirm that the reported results match the XLS expectations.
+				</ul>
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3038]</b> VOA Viewer displays multiple selected highlights
+	       	<ul>
+	      		<li>Open a VOA file that contains multiple attributes from a single page.
+			<li>Confirm that more than one of the attributes can be selected at 
+			one time.
+			<li>Confirm that the group of selected attributes is highlighted in 
+			the Image Viewer.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3089]</b> Modify attributes OH to use spatial info of replacement string
+	       	<ul>
+	      		<li>Exercise the RSD file and image file attached to the SCR.
+			<li>Confirm that appropriate spatial information is provided for the attribute and 
+			sub-attributes whether or not the output handler is enabled.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3280]</b> Resized highlights are always of legal height
+	       	<ul>
+	      		<li>Exercise verification.
+	      		<li>Create many individual highlights and resize heights and widths.
+			<li>Save the output file and confirm that each highlight is converted to a redaction.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3290]</b> Option to auto-select the Select Highlight Tool
+	       	<ul>
+	      		<li>Exercise verification and display the <b>Options</b> dialog.
+			<li>Confirm that the <b>Enable ... tool after highlight</b> checkbox is available.
+			<li>Confirm that the associated combo box is enabled only if the checkbox is checked.
+			<li>Confirm that the setting is persistent.
+<p>
+			<li>Confirm that selecting <b>pan</b> in the combo box results in the Pan tool 
+			being activated after each highlight.
+			<li>Confirm that selecting <b>select highlight</b> in the combo box results in the 
+			Select Highlight tool being activated after each highlight.
+			<li>Confirm that <b>unchecking</b> the check box results in the Highlight tool 
+			remaining activated after each highlight.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3304]</b> Splash screen copyrights
+	       	<ul>
+	      		<li>Install <b>ID Shield</b> and confirm that the splash screen displays the 
+			correct copyright date.
+	      		<li>Install <b>FLEX Index</b> and confirm that the splash screen displays the 
+			correct copyright date.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3331]</b> Prompt user if stopping verification and file is dirty
+	       	<ul>
+	      		<li>Exercise verification and make one or more changes to the image.
+	      		<li>Click the <b>Stop reviewing</b> toolbar button.
+	      		<li>Confirm that a <b>Close and lose changes</b> prompt dialog is displayed.
+	      		<li>Confirm that the response to the prompt is handled correctly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3340]</b> Exemption code icons
+	       	<ul>
+	      		<li>Confirm that a meaningful icon is provided for <b>Apply exemption codes</b>.
+	      		<li>Confirm that a meaningful icon is provided for <b>Apply last exemption codes</b>.
+	      		<li>Confirm that a meaningful icon is provided for <b>Apply exemption codes to all</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3344]</b> ID Shield data file condition includes new options
+	       	<ul>
+	      		<li>Create an FPS file with a <b>Conditional task</b>.
+	      		<li>Configure the conditional task to use an <b>ID Shield data file contents</b> 
+			condition.
+	      		<li>Confirm that a combo box exists for selecting <b>any of</b>, <b>only any of</b>, 
+			<b>at least one of each of</b>, or <b>none of</b> of the items.
+	      		<li>Confirm that settings are persistent.
+	      		<li>Note <b>Test Harness</b> test cases above.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3345]</b> Exemption codes shown by default
+	       	<ul>
+	      		<li>Configure a <b>Redact images (no verification)</b> task.
+	      		<li>Configure the <b>Redaction text and color settings</b>.
+	      		<li>Confirm that <b>&lt;ExemptionCodes&gt;</b> is selected by default 
+			in the Redaction text combo box.
+<p>
+	      		<li>Configure a <b> Verify redactions</b> task.
+	      		<li>Configure the <b>Redaction text and color settings</b>.
+	      		<li>Confirm that <b>&lt;ExemptionCodes&gt;</b> is selected by default 
+			in the Redaction text combo box.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3354]</b> RedactFromXml after modifying a redaction
+	       	<ul>
+	      		<li>Verify a document that contains a redaction and move on to the next document.
+	      		<li>Return to the previous document and turn off the redaction.
+	      		<li>Continue with the next document.
+	      		<li>Run <b>RedactFromXml</b> and confirm that the redaction area that was turned 
+			remains visible.
+<p>
+	      		<li>Verify a document that contains a redaction and move on to the next document.
+	      		<li>Return to the previous document and move the redaction to a different location.
+	      		<li>Continue with the next document.
+	      		<li>Run <b>RedactFromXml</b> and confirm that the redaction area was moved.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3355]</b> /ef option in RunRules
+	       	<ul>
+	      		<li>Exercise a rule set and image that logs an exception.
+      			<li>Confirm that using <b>RunRules</b> and the /ef &lt;filename&gt; option, the 
+			exception is logged to the specified file and not displayed.
+      			<li>Confirm that using <b>RunRules</b> and the /ef option without a filename, the 
+			exception is logged to the usual exception log and not displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3362]</b> Verify files with apostrophes
+	       	<ul>
+	      		<li>Exercise the Redaction Demo rules and images, modifying one or more images 
+			and VOA files to include an apostrophe within the filename.
+	      		<li>Confirm that verification works without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4851]</b> Summary tab updates with database activity
+	       	<ul>
+	      		<li>Open <b>FAM DB Admin</b> and confirm that non-trivial Summary results 
+			are available.
+	      		<li>Confirm that the Summary results automatically update with the following
+			activities.
+		       	<ul>
+				<li>Add Action
+				<li>Remove Action
+				<li>Rename Action
+				<li>Manually Set Action Status
+				<li>Clear Database
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5110]</b> Consistent USB Key retries
+	       	<ul>
+	      		<li>Exercise the <b>Error Handling</b> section of the 
+			<b>USB Counters</b> checklist.
+	      		<li>Modify the registry keys for retry timeout and number of retries 
+			as specified in the SCR.
+	      		<li>Confirm that the registry settings are honored.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5192]</b> Clear Database can retain actions
+	       	<ul>
+	      		<li>Open <b>FAM DB Admin</b> and confirm that non-trivial Summary results 
+			are available.
+	      		<li>Clear the database and confirm that a prompt message is displayed 
+			asking if exisitng actions should be retained.
+	      		<li>Confirm that the actions are retained if requested.
+	      		<li>Confirm that the actions are removed if requested.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

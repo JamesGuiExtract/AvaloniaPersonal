@@ -1,0 +1,4 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Random300Subset;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).ld.voa;K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+

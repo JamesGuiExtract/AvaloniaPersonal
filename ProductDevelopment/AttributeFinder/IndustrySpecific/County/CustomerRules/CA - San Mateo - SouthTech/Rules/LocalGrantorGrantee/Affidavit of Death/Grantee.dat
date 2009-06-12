@@ -1,0 +1,34 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_11_2008014258.tif.uss
+rule01=that^?Trustee^160~[is^3~the^3~successor^3~trustee
+rule02=\r\nI,^?Trustee^160~further^3~declare^3~that^100~[I^3~became^9~successor^3~trustee
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_12_2008014512.tif
+rule09=\r\n^6~[I,^?Trustee^160~[am^9~named^3~successor^3~trustee
+rule07=joint^3~tenant^500~undersigned^40~previously^3~known^3~as]^?Grantee^120~[of legal|being first^60~sworn|deposed
+rule06=joint^3~tenant^500~undersigned^?Grantee^120~[of legal|being first^60~sworn|depose
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_11_2008014278.tif
+rule03=joint^3~tenant^500~county^3~of^36~\r\n\r\n^?Grantee^120~[of^3~legal^40~deposed^19~[says
+rule06a=joint^3~tenant^500~county^3~of^36~\r\n\r\n^?Grantee^120~[of legal|being first^40~sworn|depose
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_11_2008014281.tif
+rule05=death^8~of^12~trustee^500~county^3~of^36~\r\nI,|\r\n\r\n^?Trustee^120~[of legal|being first^60~sworn|deposed
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_11_2008014339.tif
+rule08=terms|provisions^12~of^3~the^60~[trust]^120~distributed^3~to]^?Trustee^160~[in^3~equal^3~shares
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_13_2008015235.tif.uss
+rule09=DEATH^5~OF^5~TRUSTEE]|TRUSTOR]^?Trustee^120~[as^5~Surviving^5~Trustee
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_15_2008016449.tif
+rule10=DEATH^5~OF^5~TRUSTEE]|TRUSTOR]^8~[I,^?Trustee^120~declare^3~as^3~follows
+
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_13_2008015134.tif
+rule11=provides^3~that]^?Trustee^120~thereupon became^9~sole^3~trustee
+rule12=upon the death of]^80~[his]|[her]^3~[son]|[daughter]^?Trustee^80~[is^3~to^3~act^3~as^3~successor^3~trustee
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_4_2008011157.tif
+rule13=death^3~of^3~trustee\r\n\r\n^?Trustee^80~[of legal|being first|first duly^40~sworn|depose
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_15_2008016466.tif.uss
+rule14=duly^3~appointed^40~of^3~said^3~trust]^?Trustee^80~who^3~agrees^30~trustee
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\AFFIDAVIT OF DEATH\FEB_5_2008012002.tif
+rule15=death^8~of^12~trustee|trustor^500~\r\nI,|\r\n1,^?Trustee^120~hereby^3~declare
+[PATTERNS_END]

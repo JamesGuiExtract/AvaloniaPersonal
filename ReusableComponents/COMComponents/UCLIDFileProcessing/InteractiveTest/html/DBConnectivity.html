@@ -1,0 +1,214 @@
+<html>
+
+<HEAD>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+<body>
+<h1>Automatic Database Reconnection<br>
+         <IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>	
+<hr>
+<h3><u>Purpose</u></h3>
+<ul>
+    	<li><b>[LegacyRC #5051]</b> Automatically reconnect database connections if connection is lost. 
+    	<li><b>[LegacyRC #5053]</b> FAM UI is unresponsive if database connection is lost or locked.
+<p>
+    	<li>Exercise various scenarios where database connectivity is lost.
+    	<li>Exercise various scenarios where network connectivity is lost.
+</ul>
+<p>
+<h3><u>Setup</u></h3>
+<ul>
+	<li>Create the following <b>StopSQL</b> batch file.  This will repeatedly stop the SQL service 
+	for two minutes and start the SQL service for two minutes.</li>
+    	<ul> 
+       		<li>rem Stop SQL Server batch file 
+       		<li>:begin
+       		<li>sc stop MSSQLSERVER
+       		<li>sleep 120000
+       		<li>sc start MSSQLSERVER
+       		<li>sleep 120000
+       		<li>goto begin
+    	</ul> 
+<p>
+	<li>Create the following <b>StopNetwork</b> batch file.  This will repeatedly disable the network card 
+	for one minute and enable the network card for five minutes.</li>
+    	<ul> 
+       		<li>rem Stop network batch file 
+       		<li>:begin
+       		<li>ipconfig /release
+       		<li>sleep 60000
+       		<li>ipconfig /renew
+       		<li>sleep 300000
+       		<li>goto begin
+    	</ul> 
+<p>
+    	<li>Copy 1000+ files to a remote image server.
+    	<li>Copy the same 1000+ files to a local test machine.
+    	<li>Copy the rules delivery associated with the test images to the local test machine.
+<p>
+    	<li>Allow processing to continue long enough to be confident that the automatic reconnection 
+	is working properly.
+    	<li>Review the <b>UEX log</b> for any unexpected error messages.
+</ul>
+<p>
+<h3><u>Database Connectivity</u></h3>
+<ul>
+    	<li><b>Scenario 1</b> :  Local images, local database, local processing - 1 PC
+    	<ul> 
+       		<li>Create a local database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopSQL</b> batch file on the local test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
+    	</ul> 
+<p>
+    	<li><b>Scenario 2</b> :  Remote images, local database, local processing - 2 PCs
+    	<ul> 
+       		<li>Create a local database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopSQL</b> batch file on the local test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
+    	</ul> 
+<p>
+    	<li><b>Scenario 3</b> :  Remote images and database, local processing - 2 PCs
+    	<ul> 
+       		<li>Create a remote database for the remote images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopSQL</b> batch file on the remote test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
+    	</ul> 
+<p>
+    	<li><b>Scenario 4</b> :  Remote images, remote database, local processing - 3 PCs
+    	<ul> 
+       		<li>Create a database for the test images on a remote machine.
+       		<li>Create a FAM instance to queue and process the test images from another remote machine.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopSQL</b> batch file on the remote test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first SQL outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each SQL outage.
+    	</ul> 
+</ul>
+<p>
+<h3><u>Network Connectivity</u></h3>
+<ul>
+    	<li><b>Scenario 1</b> :  Local images, local database, local processing - 1 PC
+    	<ul> 
+       		<li>Create a local database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Connect to a remote USB key for processing.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopNetwork</b> batch file on the local test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> is not affected.
+       		<li>Confirm that <b>processing</b> is not affected.
+       		<li>Confirm that <b>USB counter</b> is not affected.
+    	</ul> 
+<p>
+    	<li><b>Scenario 2</b> :  Remote images, local database, local processing - 2 PCs
+    	<ul> 
+       		<li>Create a local database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Connect to a remote USB key for processing.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopNetwork</b> batch file on the local test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
+			<br>Note: It is expected behavior that a few files fail, the objective of this test is to confirm that queueing and processing starts again automatically.
+<p>				
+       		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
+		network outage.
+    	</ul> 
+<p>
+    	<li><b>Scenario 3</b> :  Remote images and database, local processing - 2 PCs
+    	<ul> 
+       		<li>Create a remote database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Connect to a remote USB key for processing.
+       		<li>Start queuing and processing.
+       		<li>Begin using the <b>StopNetwork</b> batch file on the local test machine.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
+       		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
+		network outage.
+			<br>Note: A bunch of files should fail.
+<p>
+		</ul>
+    	<li><b>Scenario 4</b> :  Remote images, local database, local processing - 2 PCs
+    	<ul> 
+       		<li>Create a local database for the test images.
+       		<li>Create a FAM instance to queue and process the test images.
+       		<li>Connect to a remote USB key for processing.
+       		<li>Start queuing and processing.
+       		<li>Unplug the network cable on the test machine for about two minutes and then plug it 
+		back in for a few minutes.  Repeat as needed.
+<p>
+       		<li>Confirm that <b>queuing</b> gracefully restarts after the first network outage.
+       		<li>Confirm that <b>processing</b> gracefully restarts after each network outage.
+       		<li>Confirm that connection to the <b>USB counter</b> gracefully restarts after each 
+		network outage.
+		<br>Note: A file should fail.
+    	</ul> 
+</ul>
+<p>
+<h3><u>SQL Server Versions</u></h3>
+<ul>
+    	<li><b>Connecting to SQL Server 2005</b>
+    	<ul> 
+       		<li>Install <b>SQL Server 2005 (not Express)</b> on a clean test machine.
+       		<li>Install <b>ID Shield</b>.
+       		<li>Confirm that <b>FAM DB Admin</b> can successfully create and modify a database.
+       		<li>Confirm that the <b>Redaction Demo</b> can successfully process and verify images.
+<p>
+       		<li>Restore the test machine to a clean state and install <b>ID Shield</b>.
+       		<li>Confirm that the test machine can successfully process images by connecting to a 
+		<b>SQL Server 2005</b> database located on a different computer.
+    	</ul> 
+<p>
+    	<li><b>Connecting to SQL Server 2008</b>
+    	<ul> 
+       		<li>Install <b>SQL Server 2008 Express</b> on a clean test machine.
+       		<li>Install <b>ID Shield</b>.
+       		<li>Confirm that <b>FAM DB Admin</b> can successfully create and modify a database.
+       		<li>Confirm that the <b>Redaction Demo</b> can successfully process and verify images.
+<p>
+       		<li>Restore the test machine to a clean state.
+       		<li>Install <b>SQL Server 2008 (not Express)</b> on a clean test machine.
+       		<li>Install <b>ID Shield</b>.
+       		<li>Confirm that <b>FAM DB Admin</b> can successfully create and modify a database.
+       		<li>Confirm that the <b>Redaction Demo</b> can successfully process and verify images.
+<p>
+       		<li>Restore the test machine to a clean state and install <b>ID Shield</b>.
+       		<li>Confirm that the test machine can successfully process images by connecting to a 
+		<b>SQL Server 2008</b> database located on a different computer.
+    	</ul> 
+</ul>
+<p>
+<h3><u>Miscellaneous</u></h3>
+<ul>
+    	<li><b>[LegacyRC #5076]</b> Testing file processing timeout
+    	<ul> 
+       		<li>Prepare a <b>Scenario 1</b> testing setup.
+       		<li>Modify the <b>ConnectionRetryTimeout</b> setting in the <b>DBInfo</b> table to 30.
+       		<li>Modify the <b>NumberOfConnectionRetries</b> setting in the <b>DBInfo</b> table to 1.
+       		<li>Start queuing and processing.
+       		<li>Manually stop network connection from the command line using "ipconfig/release".
+<p>
+       		<li>Confirm that after processing times out, the files are automatically moved to the 
+		<b>failed</b> grid on the Processing Log page.
+		<br>Note: It may take up to 5 or more minutes for the files to be moved to the <b>failed</b> grid.
+    	</ul> 
+</ul> 
+</body> 
+</html>

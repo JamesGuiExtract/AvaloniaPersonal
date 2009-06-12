@@ -1,0 +1,52 @@
+<HTML>
+	<HEAD>
+		<TITLE>Split Attributes Using RSD File Attribute Splitter</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Split Attributes Using RSD File Attribute Splitter</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Split Attributes Using RSD File attribute splitter can be used to create a custom attribute splitter.</li>
+				<ul>
+					<li>It does this by inputting the data found by the rules into an external "splitting" .rsd file.</li>
+					<li>Any data found by the splitting .rsd file will be added as sub-attribute of the original found data.</li>
+					<li>These splitting .rsd files are just a normal .rsd files and as such can use any rules objects.</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Split Attributes Using RSD File attribute splitter you simply need to specify a splitting .rsd file.</li>
+			<p>
+				<li><b>Example:</b>
+					<ul>
+						<li>Open <b>SplitPhone.rsd</b> and run it on <b>PhoneNumbers.txt</b>.  Note that several phone numbers are found.</li>
+						<li>We want to split the phone numbers to create an "AreaCode" sub-attribute and a "Number" sub-attribute for each number.</li>
+						<li>To do this, we must first create our splitting .rsd file.
+							<ul>
+								<li>Open a new .rsd file and add two new attributes, one named <b>AreaCode</b> and one named <b>Number</b>.</li>
+								<li>Add a Regular Expression Rule to the <b>AreaCode</b> attribute that contains the regular expression <b>\(\d{3}\)</b>.  This regular expression will "grab" the area code from the phone number.</li>
+								<li>Add a Regular Expression Rule to the <b>Number</b> attribute that contains the regular expression <b>\d{3}-\d{4}</b>.  This regular expression will "grab" the number part of the phone number.</li>
+								<li>Save the rules as <b>Splitter.rsd</b>.
+							</ul>
+						</li>
+						<li>Add a Split Attributes Using RSD File attribute splitter to <b>SplitPhone.rsd</b> and configure it to point to <b>Splitter.rsd</b>.</li>
+						<li>Run the rules and note that the phone number now has two sub-attributes.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>StreetAddresses.rsd</b> and run it on <b>Address.txt</b>. Note that the rules find several street addresses.
+				<ul>
+					<li>Use a Split Attributes Using RSD File attribute splitter to create a custom attribute splitter that will split each street address to create a "StreetNumber" and a "StreetName" sub-attribute.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

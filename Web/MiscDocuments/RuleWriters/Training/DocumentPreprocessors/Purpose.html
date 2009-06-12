@@ -1,0 +1,50 @@
+<HTML>
+	<HEAD>
+		<TITLE>Document Preprocessor Purpose</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Document Preprocessor Purpose and Basics</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<p>
+				<li>Document preprocessors are generally used to remove text that could cause false positives.
+					<ul>
+						<li>I once used an Advanced Replace Strings preprocessor to remove "State Project No: 333-11-2222" so that it would not be caught by my social security number rules.</li> 
+						<li>When you are looking for dates of birth, a Replace Strings preprocessor can be used to remove other dates that are not dates of birth.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+		<h3>Preprocessor Basics</h3>
+		<ul>
+			<p>
+				<li>There are two types of preprocessors:
+					<ul>
+						<li>Global preprocessors affect all attribute rules in an .rsd file.</li>
+						<li>Local preprocessors only affect the attribute rule that they are in.</li>
+						<li>Other than scope, the two types of preprocessors function the same.</li>
+					</ul>
+				</li>
+				<li>Preprocessors can be added by clicking on the <b>Commands</b> button and selecting the <b>Select Rule-Specific Document Preprocessor...</b> option.
+					<ul>
+						<li>This will bring up a dialog where you can choose which type of preprocessor you want and give it a description.</li>
+					</ul>
+				</li>
+				<li>You can modify an existing preprocessor using the <b>Commands</b> button.
+					<ul>
+						<li>Choosing the <b>Select Document Preprocessor...</b> option will let you change the type of the preprocessor.</li>
+						<li>Choosing the <b>Configure Document Preprocessor...</b> option will let you change the settings of the preprocessor.</li>
+						<li>Choosing the <b>Configure description...</b> option will let you change the description of the preprocessor.</li>
+					</ul>
+				</li>
+				<li>You can remove the preprocessor by changing its type to <b>&ltNone&gt</b>.</li>
+				<li>If you right click on the preprocessor, it will bring up a context menu that you can use to <b>Cut</b>, <b>Copy</b>, <b>Paste</b>, and <b>Delete</b> the preprocessor.</li>
+				<li>You can turn off the preprocessor by un-checking the checkbox in front of it.  This can be useful for testing.</li>
+			</p>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

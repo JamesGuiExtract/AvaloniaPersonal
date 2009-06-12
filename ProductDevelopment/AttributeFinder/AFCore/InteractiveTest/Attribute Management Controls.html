@@ -1,0 +1,133 @@
+<html>
+
+<HEAD>
+<title>Dialog Controls</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<body>
+
+<h1>Ruleset Editor - Attribute Management Controls<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+
+<LI><h2>Attributes - Combo Box</h2>
+<h3>Add Attribute&nbsp;</h3>
+<ul>
+    <li>&quot;<b>Add</b>&quot; button displays &quot;<b>Add Attribute</b>&quot; dialog
+      <ul>
+        <li>&quot;<b>Define Attribute name</b>&quot; edit box is editable
+          <ul>
+      	<li>&quot;<b>OK</b>&quot; button is inactive until a name is entered</li>
+      	<li>&quot;<b>OK</b>&quot; button saves changes and exits dialog
+        		<ul>
+  		      	<li>&quot;<b>OK</b>&quot; button throws exception when an invalid attribute name is entered (i.e. &quot;a-b&quot;)</li>
+        		</ul>
+      	</li>
+      	<li>&quot;<b>Cancel</b>&quot; button ignores changes and exits dialog</li>
+		<li>&quot;<b>X</b>&quot; button ignores changes and exits dialog</li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li>&quot;<b>Delete</b>&quot; button displays &quot;<b>Confirm Delete</b>&quot; dialog
+      <ul>
+        <li>&quot;<b>YES</b>&quot; button deletes attribute</li>
+        <li>&quot;<b>NO</b>&quot; button cancels dialog and does not delete</li>
+      </ul>
+    </li>
+    <li>&quot;<b>Rename</b>&quot; button displays &quot;<b>Rename Attribute</b>&quot; dialog
+       <ul>
+      	<li>Existing name is pre-populated in the edit box</li>
+	      <li>&quot;<b>OK</b>&quot; button becomes inactive if the name is cleared</li>
+      	<li>&quot;<b>OK</b>&quot; button saves changes and exits dialog
+			<ul>
+          			<li>&quot;<b>OK</b>&quot; button throws exception when an invalid attribute name is entered (i.e. &quot;a-b&quot;)</li>
+	 	      </ul>
+      	</li>
+      	<li>&quot;<b>Cancel</b>&quot; button ignores changes and exits dialog</li>
+	      <li>&quot;<b>X</b>&quot; button ignores changes and exits dialog</li>
+      	<li>New name is displayed on &quot;<b>Ruleset Editor</b>&quot; dialog</li>
+       </ul>
+    </li>
+</ul>
+  <p>
+
+<!-- *********************************************** -->
+<LI><h2>Attribute Rules - List Box</h2>
+    <ul>
+      <li>&quot;<b>Insert</b>&quot; button displays &quot;<b>Add Attribute Finding Rule</b>&quot; dialog<br>&nbsp;&nbsp;&nbsp; See &quot;<b>Add Attribute Finding Dialog</b>&quot;</li>
+    </ul>
+    <ul>
+      <li>Highlighting an existing clue in the list box entry activates &quot;<b>Delete</b>&quot; and &quot;<b>Modify</b>&quot;</li>
+      <li>&quot;<b>CTRL + Left Click</b>&quot; allows for multiple selection of list box items.</li>
+      <li>&quot;<b>SHIFT + Left Click</b>&quot; allows for multiple selection of list box items.</li>
+      <li>&quot;<b>Right Click</b>&quot; on list box displays context menu
+        <h3>Context Menu Options</h3>
+        <ol>
+          <li>&quot;<b>Cut</b>&quot; exists
+            <ol>
+              <li>Items can be successfully cut to the clipboard</li>
+              <li>Click on &quot;<b>Cut</b>&quot; loads confirm delete dialog.</li>
+              <li>Successfully cuts multiple selected items.</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Copy</b>&quot; exists
+            <ol>
+              <li>Items can be successfully copied to the clipboard</li>
+              <li>Successfully copies multiple selected items.</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Paste</b>&quot; exists
+            <ol>
+              <li>Items can be successfully pasted from clipboard</li>
+              <li>Successfully pastes multiple cut or copied items.</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Delete</b>&quot; exists
+            <ol>
+              <li>Item is deleted successfully.</li>
+              <li>Click on &quot;<b>Delete</b>&quot; loads confirm delete dialog.</li>
+              <li>Successfully deletes multiple selected items.</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Cancel</b>&quot; exists
+            <ol>
+              <li>Exits context menu successfully.<br><br></li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+    </ul>
+    <ul>
+      <li>&quot;<b>Delete</b>&quot; button displays &quot;<b>Confirm Delete</b>&quot; dialog
+        <h3>Confirm Delete Dialog</h3>
+        <ul>
+   		<li>&quot;<b>YES</b>&quot; button deletes the finding rule and exits dialog</li>
+        </ul>
+        <ul>
+	      <li>&quot;<b>NO</b>&quot; button ignores delete request and exits dialog<br><br></li>
+        </ul>
+      </li>
+      <li>&quot;<b>Modify</b>&quot; button displays a pre-populated &quot;<b>Add Attribute Finding Rule</b>&quot; dialog
+        <ul>
+        	<li>Changes made are persistent.</li>
+        </ul>
+      </li>
+      <li>Graphical &quot;<b>UP&quot; </b>arrow button moves the selected item up in the list box</li>
+      <li>Graphical &quot;<b>DOWN&quot; </b>arrow button moves the selected item down in the list box</li>
+      <li>Graphical &quot;<b>UP</b>&quot; and &quot;<b>DOWN</b>&quot; arrow buttons become inactive when reaching top or bottom of the list</li>
+    	<li>&quot;<b>Stop searching after first value found</b>&quot; check box is checkable
+      </li>
+    </ul>
+
+  &nbsp;
+
+</OL>
+
+</body>
+
+</html>

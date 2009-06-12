@@ -1,0 +1,3 @@
+number\W*of\W*securities;
+(?:lot|parcel|plat|fiche)s?(?:\x20I\.?D\.?)?(?:.{0,3}|\s*)(?:Num(?:ber)?|\bNo\b|\#);
+electric\s*acc(?:oun)?t;

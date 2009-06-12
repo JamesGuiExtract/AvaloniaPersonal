@@ -1,0 +1,28 @@
+// This file maps paths to rsd file names and eav file locations
+// <Path>;<RSDFileName>;<RelativeFolderPathForEAV>
+// 		<Path> is the path to the image file being processed, 
+// 		<RSDFileName> is the name of the rsd file including path to be used with all of the image/USS files with that path
+// 		<RelativeFolderPathForEAV> is the path relative to the <Path> to find EAV files
+
+// ACS Allegheny Set
+PA - Allegheny\;..\..\CountyTester\TestFiles\GGFinder - PA - Allegheny - ACS.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+// ACS Midland sets
+TX - Midland;..\..\CountyTester\TestFiles\GGFinder - TX - Midland - ACS.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+// ACS Oakland set
+MI - Oakland;..\..\CountyTester\TestFiles\GGFinder - MI - OAKLAND - ACS.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+// Waukesha
+Waukesha\Set005;..\..\CountyTester\TestFiles\GGFinder - WI - Waukesha - Initial - Ready.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+Waukesha\Set008;..\..\CountyTester\TestFiles\GGFinder - WI - Waukesha.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+Waukesha;..\..\CountyTester\TestFiles\GGFinder - WI - Waukesha - Initial.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+
+// Fort Bend
+Fort Bend Central Appraisal District - TX;..\..\CountyTester\TestFiles\GGFinder - TX - Fort Bend - CAD.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+// Trimin -- EAV files have the Document type in there path -- there are only three Doc types from trimin represented in the NRS
+Trimin;..\..\CountyTester\TestFiles\GGFinder - WI - Waukesha - Initial.rsd;<ImageFileDir>..\..\eav\GrantorGrantee
+
+CA - Fresno;..\..\CountyTester\TestFiles\GGFinder - CA - Fresno - AtPac.rsd;<ImageFileDir>..\..\eav\GrantorGrantee

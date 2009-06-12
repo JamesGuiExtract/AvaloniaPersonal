@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.RegExprRule.1 = s 'RegExprRule Class'
+	{
+		CLSID = s '{5B7C7985-3659-4249-BF9D-40A26B50E1AF}'
+	}
+	UCLIDAFValueFinders.RegExprRule = s 'RegExprRule Class'
+	{
+		CLSID = s '{5B7C7985-3659-4249-BF9D-40A26B50E1AF}'
+		CurVer = s 'UCLIDAFValueFinders.RegExprRule.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5B7C7985-3659-4249-BF9D-40A26B50E1AF} = s 'RegExprRule Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.RegExprRule.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.RegExprRule'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

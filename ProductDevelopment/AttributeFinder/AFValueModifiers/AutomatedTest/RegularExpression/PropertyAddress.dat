@@ -1,0 +1,12 @@
+//the first word we want is property
+// Split on multiple lines to ensure that line breaks and space dont count
+P
+ r
+  o
+   p
+	e
+	 r t	y
+// then a space
+\s*
+// then import the word address
+#import Address.dat

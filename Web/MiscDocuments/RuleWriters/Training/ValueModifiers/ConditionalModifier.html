@@ -1,0 +1,39 @@
+<HTML>
+<HEAD>
+<TITLE>Conditional Value Modifier</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+</HEAD>
+<BODY>
+<h1>Conditional Value Modifier</h1>
+<hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>Applies a value modifier based on a specific condition.</li>
+	</ul>
+
+<hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>In the <b>Add Attribute Finding Rule</b> window:</li>
+		<li>Click the <b>Apply the following modifying rules</b> checkbox.</li>
+		<li>Click <b>Add</b> and select <b>Conditionally modify attribute</b> from the dropdown menu. Click <b>Configure...</b></li>
+		<li>Toggle whether the condition must be true or false in the first dropdown menu.</li>
+		<li>Select the condition in the second dropdown menu.</li>
+		<li>Click <b>Configure...</b> to configure the condition.</li>
+		<li>Select the rule in the third dropdown menu.</li>
+		<li>Click <b>Configure...</b> to configure the rule.</li>
+		<li><b>Important:</b> The condition tests the input passed to the value finder, not the value finder's output.</li>
+	</ul>
+
+<hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open the <b>RuleSet Editor</b> and load ".\Files\FileNumber_VAC.rsd"</li>
+		<li>Open the <b>Rule Tester</b> and load ".\Files\FileNumbers.txt"</li>
+		<li>Add a Conditional value modifier to the finding rule to extract the last four characters from attributes if the document contains at least one pound sign ("#").</li>
+		<li>Verify that eight attributes are returned in the form XXXX. The first attribute should be "0456"</li>
+		<li>Also verify that eight attributes with more than four characters are returned when the condition is toggled to false. eg. "1230456"</li>
+	</ol>
+
+</BODY>
+</HTML>

@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.DespeckleICO.1 = s 'DespeckleICO Class'
+	{
+		CLSID = s '{3893279D-C24E-4350-B05C-1C1DF265673D}'
+	}
+	ESImageCleanup.DespeckleICO = s 'DespeckleICO Class'
+	{
+		CLSID = s '{3893279D-C24E-4350-B05C-1C1DF265673D}'
+		CurVer = s 'ESImageCleanup.DespeckleICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3893279D-C24E-4350-B05C-1C1DF265673D} = s 'DespeckleICO Class'
+		{
+			ProgID = s 'ESImageCleanup.DespeckleICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.DespeckleICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

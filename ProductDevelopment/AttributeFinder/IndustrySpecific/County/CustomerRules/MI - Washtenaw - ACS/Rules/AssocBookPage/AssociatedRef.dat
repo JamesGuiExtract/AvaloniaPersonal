@@ -1,0 +1,134 @@
+//============================================================================================
+// Washtenaw County: Associated Book Number - Set 008
+//============================================================================================
+
+[VARS_BEGIN]
+
+mortEndClue=paid|discharged|situated|released|described|located|instrument
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+//--------------------------------------------------------------------------------------------
+// Rules Ref1 - Ref9 find the Associated Book and Page Numbers in a Release
+//--------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------
+// Ref1: Example Files 
+//  (Discharge of Mortgage Type 1, Discharge of Claim of Lein, Certificate of Satisfaction, 
+//   Satisfaction of Mortgage Type 1, Discharge of Construction Lien)
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AF2.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AF1.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AF3.TIF
+//--------------------------------------------------------------------------------------------
+
+Ref1a=Discharge^5~of^25~Mortgage^900~recorded^?AssociatedRef^200~@mortEndClue
+Ref1b=Discharge^5~of^25~Lien^900~recorded^200~[in]^?AssociatedRef^500~@mortEndClue
+Ref1c=Certificate^5~of^5~Satisfaction^900~recorded^200~[in]^?AssociatedRef^200~@mortEndClue
+Ref1d=Satisfaction^5~of^5~Mortgage^900~recorded^?AssociatedRef^200~@mortEndClue
+Ref1e=Release^5~of^25~Mortgage^900~recorded^?AssociatedRef^200~@mortEndClue
+Ref1f=made^5~and^5~executed^5~by^900~recorded^?AssociatedRef^200~@mortEndClue
+
+//--------------------------------------------------------------------------------------------
+// Ref2: Example Files (Certificate of Discharge, Discharge of Mortgage Type 2)
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06184AA.AAY.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06181AA.AEN.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06177AA.ABL.TIF
+//--------------------------------------------------------------------------------------------
+
+Ref2a=Certificate^5~of^5~discharge^1000~recorded^?AssociatedRef^700~property
+Ref2b=Discharge^5~of^5~Mortgage^1000~recorded^?AssociatedRef^700~property
+
+//--------------------------------------------------------------------------------------------
+// Ref3: Example Files (Satisfaction of Mortgage Type 2)
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AE1.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AE0.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AE4.TIF
+//--------------------------------------------------------------------------------------------
+
+Ref3=satisfaction^5~[of]^5~mortgage^600~[record]^?AssociatedRef^300~paid
+
+//--------------------------------------------------------------------------------------------
+// Ref4: Example Files (Mortgage Release, Satisifaction and Discharge)
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06178AA.ADH.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06178AA.ADG.TIF
+//  K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06178AA.ADI.TIF
+//--------------------------------------------------------------------------------------------
+  
+Ref4=Mortgage^5~RELEASE^5~SATISFACTION^1200~date^?AssociatedRef^150~official^5~records
+
+//--------------------------------------------------------------------------------------------
+// Ref5-Ref9 :  These rules just tie up a few loose ends in the releases
+//--------------------------------------------------------------------------------------------
+
+Ref5=Authority^5~to^5~Cancel^500~[in]^?AssociatedRef^200~instrument
+Ref6=Discharge^5~of^5~Construction|Assessment^1000~[in]^?AssociatedRef^100~released|discharged
+Ref7=Discharge^5~of^25~Mortgage|Assignment^300~Place^5~of^5~Recording^?AssociatedRef^300~Legal
+Ref8=Discharge|Release^5~of^5~Levy^?AssociatedRef^500~satisfied|County
+Ref9=Release^5~of^5~Affidavit|Pendens^250~recorded^200~[in]^?AssociatedRef^300~County^5~records
+
+//--------------------------------------------------------------------------------------------
+// Ref10: for Assignments
+//--------------------------------------------------------------------------------------------
+
+Ref10=Assignment^5~of^25~Mortgage^1200~recorded^?AssociatedRef^700~property|records
+
+//--------------------------------------------------------------------------------------------
+// Ref11: for Sheriff's Deeds
+//--------------------------------------------------------------------------------------------
+
+Ref11=Sheriff^5~Deed^1000~recorded^25~[in]^?AssociatedRef^400~assigned|whereas
+
+//--------------------------------------------------------------------------------------------
+// Ref12: for Agreements
+//--------------------------------------------------------------------------------------------
+
+Ref12a=Agreement^1000~recorded^?AssociatedRef^200~records^25~County
+Ref12b=Agreement^1000~A.|1.^1000~recorded^?AssociatedRef^200~County^5~Records
+
+//--------------------------------------------------------------------------------------------
+// Ref13: for Amendments
+//--------------------------------------------------------------------------------------------
+
+Ref13=amendment^5~to^1000~A.|whereas^500~recorded^?AssociatedRef^80~[and]|County
+
+//--------------------------------------------------------------------------------------------
+// Ref14: for County Treasurer Redemption Certificates.
+//--------------------------------------------------------------------------------------------
+
+Ref14=ously^15~issued^?AssociatedRef^300~treasurer
+
+//--------------------------------------------------------------------------------------------
+// Ref15: for Michigan Tax Lien Releases
+//--------------------------------------------------------------------------------------------
+
+Ref15=Initial^10~Recording^?AssociatedRef^300~Initial^10~Filing
+
+//--------------------------------------------------------------------------------------------
+// Ref16: for Partial Releases
+//--------------------------------------------------------------------------------------------
+
+Ref16=Judgment^50~[in]^?AssociatedRef^300~Register^10~[of]
+
+//--------------------------------------------------------------------------------------------
+// Ref17: for Court Documents
+//--------------------------------------------------------------------------------------------
+
+//Ref17=Notice^5~of^5~Lis^5~Pendens^250~recorded^?AssociatedRef^2000~County
+
+//--------------------------------------------------------------------------------------------
+// Ref18: for Modifications
+//--------------------------------------------------------------------------------------------
+
+Ref18a=Modification^5~[of]^5~Mortgage^1500~recorded^?AssociatedRef^300~County^5~Records
+Ref18b=Modification^5~[of]^5~Mortgage^1500~recorded^?AssociatedRef^300~real
+
+//--------------------------------------------------------------------------------------------
+// Ref19: for Fixture Filing
+//--------------------------------------------------------------------------------------------
+
+Ref19a=INITIAL^5~FINANCING^?AssociatedRef^700~FINANCING ^5~STATEMENT
+Ref19b=Optional^5~Filer^?AssociatedRef^700~First^5~Name
+
+[PATTERNS_END]

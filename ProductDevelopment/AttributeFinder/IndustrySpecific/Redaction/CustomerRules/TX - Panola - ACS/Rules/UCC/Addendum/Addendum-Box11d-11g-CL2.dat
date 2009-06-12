@@ -1,0 +1,3 @@
+^([1lIt]|Ad.?)2.[\s\S]{0,4}ADDITION
+([1lIt]|Ad.?)2[\s\S]{0,6}ADDITIONAL
+^.{0,9}(ADDI.{2,9}|.{0,5}DITIO.{0,5}|.{0,7}ITIO.{0,4}|.{2,9}ITION.{0,4}|.{2,11}IONAL)\s*(SEC|.{0,3}ECUR|.{0,5}URED)

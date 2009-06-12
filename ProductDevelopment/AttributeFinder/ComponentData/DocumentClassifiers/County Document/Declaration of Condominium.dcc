@@ -1,0 +1,45 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,DOC_SURE_01,false
+		01=^\s*DECLARATION\s*OF\s*CONDOMINIUM\s*(?:\r?$)
+		02=^AMENDMENT\s*TO\s*DECLARATION\s*OF\s*CONDOMINIUM
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+//SCOPE_BEGIN,0,0.4,1,2
+//	OR_BEGIN,DOC_PROBABLE_01,TRUE
+//		
+//	OR_END
+//SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

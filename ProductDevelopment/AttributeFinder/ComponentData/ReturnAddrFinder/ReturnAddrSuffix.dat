@@ -1,0 +1,102 @@
+// DT:0003
+//	Mail To: ... \d{5}-\d{4}[^0-9] -dddd in additon to Zip code
+// DT:0010
+//	Return To: ... \d{5} Attn: <Name>
+// DT:0011**
+//	Return To: ... \d{5} Attn.: <Name>
+// DT:0016
+//	When Recorded Return To: ... City, ST.  \d{5} 
+//	ADDED an optional "." after state
+// DT:0018
+//	Return To: ... City, State USA \d{5}
+// 	ADDED optional "USA" after state
+// DT:0020
+//	Name and Return Address ... \d{5} \d{4}[^0-9]
+//	space instead of a dash in zipcode (55555 4444) instead of (55555-4444)
+// DT:0024
+//	After Recording Return To: ... City State \d{5}
+//	A space inbetween city and state instead of a period or comma
+// DT:0056
+//	After Recording Return To ... CITY,ST,\d{5}
+// DT:0061
+//	Please Return To: ... \d{5}
+//    Attention: <name>ENDOFDOCUMENT
+// DT:0062
+//	Please Record And Return To: ... \d{5}-\d{4}ENDOFDOCUMENT
+
+
+// $3 is the state
+// State Part of Address
+(
+	ALABAMA|AL|
+	ALASKA|AK|
+	AMERICAN\s+SAMOA|AS|
+	ARIZONA|AZ|
+	ARKANSAS|AR|
+	CALIFORNIA|CA|
+	COLORADO|CO|
+	CONNECTICUT|CT|
+	DELAWARE|DE|
+	DISTRICT\s+OF\s+COLUMBIA|DC|
+	FEDERATED\s+STATES\s+OF\s+MICRONESIA|FM|
+	FLORIDA|FL|
+	GEORGIA|GA|
+	GUAM|GU|
+	HAWAII|H[I1l]|
+	IDAHO|ID|
+	ILLINOIS|IL|
+	INDIANA|IN|
+	IOWA|IA|
+	KANSAS|KS|
+	KENTUCKY|KY|
+	LOUISIANA|LA|
+	MAINE|ME|
+	MARSHALL ISLANDS|MH|
+	MARYLAND|MD|
+	MASSACHUSETTS|MA|
+	MICHIGAN|M[I1l]|
+	MINNESOTA|MN|
+	MISSISSIPPI|MS|
+	MISSOURI|MO|
+	MONTANA|MT|
+	NEBRASKA|NE|
+	NEVADA|NV|
+	NEW\s+HAMPSHIRE|NH|
+	NEW\s+JERSEY|NJ|
+	NEW\s+MEXICO|NM|
+	NEW\s+YORK|NY|
+	NORTH\s+CAROLINA|NC|
+	NORTH\s+DAKOTA|ND|
+	NORTHERN\s+MARIANA\s+ISLANDS|MP|
+	OHIO|OH|
+	OKLAHOMA|OK|
+	OREGON|OR|
+	PALAU|PW|
+	PENNSYLVANIA|PA|
+	PUERTO\s+RICO|PR|
+	RHODE\s+ISLAND|R[I1l]|
+	SOUTH\s+CAROLINA|SC|
+	SOUTH\s+DAKOTA|SD|
+	TENNESSEE|TN|
+	TEXAS|TX|
+	UTAH|UT|
+	VERMONT|VT|
+	VIRGIN\s+ISLANDS|VI|
+	VIRGINIA|VA|
+	WASHINGTON|WA|
+	WEST\s+VIRGINIA|WV|
+	WISCONSIN|W[I1l]|
+	WYOMING|WY
+)
+(?:
+(?:\s*\.\s*)?
+(?:\s*U\s*(?:\.\s*)?S\s*(?:\.\s*)?A(?:\.\s*)?)?
+(?:\s*[,\._]?\s*)
+)
+// $4 $5 is the ZIP CODE
+//Zip Code
+(\d{5})(?:(?:(?:\s*)|(?:\s*[\.-]*\s*))(\d{4}(?:[^0-9]|(?=\r?$))))?
+//(?:[^0-9]|$)
+// $6 is the TRAILING ATTN BLOCKS
+// Trailing Attn Blocks
+(\s*att(?:ention|n)?\s*[:\.,;\x20]+\s*\S[\s\S]*?(?:\n|(?=\r?$)))?

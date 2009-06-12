@@ -1,0 +1,23 @@
+HKCR
+{
+	FileProcessors.LaunchAppFileProcessorPP.1 = s 'LaunchAppFileProcessorPP Class'
+	{
+		CLSID = s '{811123C9-80A7-40F7-BB1A-09140C5F97DD}'
+	}
+	FileProcessors.LaunchAppFileProcessorPP = s 'LaunchAppFileProcessorPP Class'
+	{
+		CLSID = s '{811123C9-80A7-40F7-BB1A-09140C5F97DD}'
+		CurVer = s 'FileProcessors.LaunchAppFileProcessorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {811123C9-80A7-40F7-BB1A-09140C5F97DD} = s 'LaunchAppFileProcessorPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

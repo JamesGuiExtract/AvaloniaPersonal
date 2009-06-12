@@ -1,0 +1,9 @@
+; AFSplitters.def : Declares the module parameters.
+
+LIBRARY      "UCLIDAFSplitters.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

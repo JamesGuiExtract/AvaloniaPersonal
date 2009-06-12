@@ -1,0 +1,112 @@
+<HTML>
+	<HEAD>
+		<TITLE>Basic Concepts and the Rule Set Editor</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	
+	<BODY>
+		<h1>Basic Concepts and the Rule Set Editor</h1>
+		<hr>
+		<p>
+			<h3>Optical Character Recognition</h3>
+			<ul>
+				<li>What is OCR?
+					<ul>
+						<li>OCR stands for "Optical Character Recognition."</li>
+						<li>It is a complex set of algorithms that examine the pixels in an image file and recognize what characters they represent.</li>
+						<li>Basically, an OCR engine "grabs" the text out of an image!</li>
+					</ul>
+				</li>
+				<li>Example:
+					<ul>
+						<li>Review a hardcopy of <b>TestImage002.tif</b>.</li>
+						<li>Preview <b>TestImage002.tif</b> in the Spot Recognition Window.</li>
+						<li>Use the <b>Recognize text and process</b> button to OCR the entire image.</li>
+						<li>Compare the OCR output to the image.</li>
+						<li>Note that the OCR output is not always perfect.</li>
+					</ul>
+				</li>
+			</ul>
+			<hr>
+			<h3>Rule Set Editor</h3>
+			<ul>					
+				<li>The Rule Set Editor is used to create and modify rules.</li>
+				<li>These rules are used to search through the OCR output of an image to find specific data.</li>
+				<li>Rules are saved into .rsd files.</li>
+			</ul>
+			<hr>
+			<h3>Attributes</h3>
+			<ul>
+				<li>What is an attribute?
+					<ul>
+						<li>It is the piece of data that we are looking for.</li>
+						<li>For example, we can have an attribute for Telephone Number, Street Address, Grantor Name, Social Security Number, etc.</li>
+					</ul>
+				</li>
+				<li>There are buttons on the Rule Set Editor that can be used to Add, Delete, and Rename Attributes.</li>
+				<li>You can have several attributes in one .rsd file</li>
+				<li>You can switch between attributes using the dropdown menu.</li>
+			</ul>
+			<hr>
+			<h3>Introduction to the Rule Set Editor</h3>
+			<ul>
+				<li>Global Preprocessors
+					<ul>
+						<li>Used to prepare a document before you search for data.</li>
+						<li>For example, remove items that cause false positives.</li>
+						<li>Global preprocessors affect all attribute rules.</li>
+					</ul>
+				</li>
+				<li>Attribute Rules
+					<ul>
+						<li>These are the "rules" that are used to find the attribute.</li>
+						<li>You can have multiple rules per attribute.</li>
+						<li>Each attribute rule has three parts:
+							<ul>
+								<li>Local Preprocessors
+									<ul>
+										<li>Used to prepare document before you search for data.</li>
+										<li>For example, remove items that cause false positives.</li>
+										<li>Local preprocessors affect only one attribute rule.</li>
+									</ul>
+								</li>
+								<li>Value Finder
+									<ul>
+										<li>The value finder is the object that finds the desired data.</li>
+										<li>It is the "workhorse" of the attribute rule.</li>
+									</ul>
+								</li>
+								<li>Value Modifiers
+									<ul>
+										<li>These objects are used to "clean up" the data found by the Value Finder.</li>
+										<li>For example, you can strip the $ symbol off of dollar amounts, or pull out more specific text with a regular expression.</li>
+									</ul>
+								</li>
+							</ul>
+					</ul>
+				</li>
+
+				<li>Input Validators
+					<ul>
+						<li>These objects are used to "erase" invalid data.</li>
+						<li>For example, you can remove telephone numbers that contain letter characters.</li>
+					</ul>
+				</li>
+				<li>Attribute Splitters
+					<ul>
+						<li>Can be used to split data into sub-attributes.</li>
+						<li>For example, you can split a name into the first name, last name, and middle name.</li>
+					</ul>
+				</li>
+				<li>Output Handlers
+					<ul>
+						<li>Used to format data for output.</li>
+						<li>They are basically value modifiers that affect all attribute rules.</li>
+						<li>For example, you can capitalize all of the data, change "Junior" to "Jr", etc.</li>
+					</ul>
+				</li>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>

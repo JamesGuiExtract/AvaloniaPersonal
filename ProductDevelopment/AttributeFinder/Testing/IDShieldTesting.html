@@ -1,0 +1,1133 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>ID Shield Testing Checklist<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>General User Interface Tests - Verify Redactions and Manual Redactions</h2>
+<UL>
+	<li>Open and execute the <b>Compute Redactions</b> FPS file from the
+      Redaction Demo.  
+<p>
+	<li>Exercise verification by opening the <b>Verify Redactions</b> FPS file.  
+   	<LI>Confirm that if <b>C:\Program Files\Extract Systems\CommonComponents\IDShield.ini</b> 
+	is missing, a meaningful error message appears and the application exits gracefully.
+  	<LI>Confirm that the <b>ID Shield</b> dialog and <b>Image Viewer</b> appear 
+	at startup and that they cover one-third and two-thirds of the window area, respectively.
+   	<LI>Confirm that processing of images can be halted by clicking the <b>Stop Processing</b> 
+	button on the <b>File Action Manager</b> toolbar.
+	<LI>Confirm that each test image displays a <b>Document Type</b> (possibly Unclassified).
+	<LI>Confirm that the displayed Document Type can be selected and copied to the Clipboard.
+<p>
+   	<LI>Run <b>Clean.bat</b>.  Confirm that the USS and VOA files have been removed.
+   	<LI><b>[FlexIDSCore #2997]</b> Also confirm that the <b>Demo_IDShield</b> database has been cleared.
+	<li>Run the <b>Perform Manual Redactions</b> FPS file.  Confirm that each image 
+	appears and that the <b>ID Shield</b> dialog has no entries.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Process Files - Configure Automatic Redaction task</h2>
+<UL>
+	<li>Confirm that the <b>Finding Rules File Name</b> edit box is editable.
+	<li>Confirm proper behavior of the associated <b>Tag Selector</b> button.
+	<li>Confirm proper behavior of the associated <b>...</b> ( Browse ) button.
+	<li>Confirm that the <b>Extract data from USS file</b> check box is enabled and 
+	checked by default.
+<p>
+	<li>Confirm that the <b>If VOA file exists</b> check box is enabled and 
+	unchecked by default.
+	<li>Confirm that checking the <b>If VOA file exists</b> check box enables the 
+	associated edit box, tag selector and browse button.
+	<li>Confirm proper behavior of the enabled <b>Tag Selector</b> button.
+	<li>Confirm proper behavior of the associated <b>...</b> ( Browse ) button.
+<p>
+	<LI>Within the Rules to execute groupbox, confirm that the <b>All</b> radio 
+	button is selectable.
+	<LI>Confirm that the <b>Selected</b> radio button is selectable.
+	<LI>Confirm that checkboxes associated with the <b>Selected</b> radio button exist for 
+	<b>High confidence data</b>, <b>Medium confidence data</b>, <b>Low confidence data</b>, 
+	and <b>Other</b>.
+	<LI>Confirm that the edit box associated with the <b>Selected</b> radio 
+	button is disabled when the radio button <b>is not</b> selected or when the <b>Other</b>
+	check box is not selected.
+	<LI>Confirm that the edit box associated with the <b>Selected</b> radio 
+	button is enabled when the radio button <b>is</b> selected and when the <b>Other</b>
+	check box is selected.
+	<LI><b>[FlexIDSCore #2751]</b> Confirm that the default settings are the <b>Selected</b> radio 
+	button and the <b>High confidence</b>, <b>Medium confidence</b> and <b>Low confidence</b> 
+	checkboxes.
+	<LI><b>[FlexIDSCore #2680]</b> Case sensitivity of attribute names
+	<UL>
+		<LI>Choose the <b>Selected</b> radio button along with the <b>Other</b> checkbox.  
+		Do not check any other checkboxes.
+		<LI>Add <b>hcdata</b> to the edit box and save the FPS file.  
+		<LI>Close and re-open the saved FPS file.  Confirm that the lower-case <b>hcdata</b> 
+		entry has been changed to the <b>High confidence data</b> checkbox.
+		<LI><b>[FlexIDSCore #2571]</b> Repeat the above test with <b>hcdata;lcdata</b> as the 
+		contents of the <b>Other</b> edit box.  Confirm that both the <b>High confidence 
+		data</b> checkbox and the <b>Low confidence data</b> checkbox are now checked.
+	</UL>
+<p>
+	<li>Confirm that the <b>Image Output File Name</b> edit box is editable.
+	<li><b>[FlexIDSCore #2677]</b> Confirm that the edit box displays the complete text of the 
+	default string.
+	<li><b>[FlexIDSCore #2660]</b> Confirm that the edit box has a default setting 
+	of <b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b>.
+	<li>Confirm proper behavior of the associated <b>Tag Selector</b> button.
+	<li>Confirm proper behavior of the associated <b>...</b> ( Browse ) button.
+	<li><b>[LegacyRCAndUtils #3278]</b> RedactionFileProcessor Property page - Error message caption
+	<ul>
+		<li>Select the image output to be <b>&lt;SourceDocName&gt;</b> and click OK.
+		<li>Confirm that an error message pops up with a sensible and helpful error message.
+	</ul>
+<p>
+	<LI>Within the Create output file groupbox, confirm that the <b>For each input file</b> 
+	radio button is selectable.
+	<LI>Confirm that the <b>For each input file in which redactable data is found</b> 
+	radio button is selectable.
+	<LI>Confirm that the <b>Retain existing annotations in output file</b> 
+	checkbox is selectable.
+	<LI>Confirm that the <b>Apply redactions as annotations in output file</b> 
+	checkbox is selectable.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Shortcut Keys - Verify Redactions</h2>
+<UL>
+   	<LI><b>ID Shield Dialog</b>
+      	<ul>
+		<LI>Confirm that <b>TAB</b> advances selection to the next item in the 
+		Data grid.
+		<LI>Confirm that <b>SHIFT+TAB</b> advances selection to the previous 
+		item in the Data grid.
+		<LI>Confirm that <b>CTRL+S</b> applies redactions to the current image 
+		and advances to the next image.
+		<LI>Confirm that <b>SPACE</b> toggles the redaction setting for the current 
+		selection.
+		<LI>Confirm that <b>F2</b> automatically zooms in to the currently selected item.
+		<LI><b>[FlexIDSCore #2836]</b> Confirm that <b>T</b> displays the list of types defined 
+		for the selected redaction or clue item.
+      </ul>
+<p>
+   	<LI><b>Image Viewer</b>
+      	<ul>
+		<LI>Confirm that <b>F7</b> zooms in.
+		<LI>Confirm that <b>F8</b> zooms out.
+		<li><b>[FlexIDSCore #2925]</b> Confirm that <b>P</b> ( only once ) fits the entire image 
+		in the window.
+		<li>Confirm that <b>W</b> fits to the image to the width of the window.
+		<LI>Confirm that <b>X</b> zooms to the image extents.
+		<LI>Confirm that <b>R</b> reverts to the previous zoom setting.
+		<LI>Confirm that <b>A</b> activates the Pan tool.
+		<LI><b>[LegacyRC #5201]</b> Confirm that <b>Esc</b> activates the Select Highlight tool.
+		<LI>Confirm that <b>H</b> activates the Highlight tool.
+		<LI>Confirm that <b>H</b> toggles between Highlight tools if the 
+		highlight tool is already active.
+		<LI>Confirm that both <b>F3</b> and <b>Page Up</b> move to the previous page.
+		<LI>Confirm that both <b>F4</b> and <b>Page Down</b> move to the next page.
+		<LI>Confirm that <b>Ctrl+Home</b> moves to the first page.
+		<LI>Confirm that <b>Ctrl+End</b> moves to the last page.
+		<LI>Confirm that <b>Z</b> activates the Zoom tool.
+		<LI>Confirm that <b>F5</b> reloads / refreshes the image.
+      	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Options - Verify Redactions</h2>
+<UL>
+   	<LI><b>INI File Warnings</b>
+      	<ul>
+		<LI>Enter a value for <b>AutoZoomScale</b> in IDShield.ini less than 
+		1, or greater than 20, save the file, and open the options window. Verify 
+		that a meaningful exception is thrown.
+		<LI>Erase the entry for <b>AutoZoomScale</b> in the INI file and open 
+		the options dialog. Verify that the INI file is updated with a value.
+<p>
+		<LI>For the [Level4] group ( <b>HCData</b> ), make sure that 
+		<b>WarnIfNonRedact=1</b> exists.  Confirm that toggling an HCData item to 
+		non-redacted results in a warning message being displayed to the user.
+		<LI>Confirm that <b>Yes</b> toggles the HCData entry to non-redacted.
+		<LI>Confirm that <b>No</b> leaves the HCData entry as redacted.
+<p>
+		<LI>For the [Level2] group ( <b>Clues</b> ), make sure that 
+		<b>WarnIfRedact=1</b> exists.  Confirm that toggling a Clue item to 
+		redacted results in a warning message being displayed to the user.
+		<LI>Confirm that <b>Yes</b> toggles the Clue entry to redacted.
+		<LI>Confirm that <b>No</b> leaves the Clue entry as non-redacted.
+      	</ul>
+<p>
+   	<LI><b>Options Dialog</b>
+      	<ul>
+		<LI>Verify that checking the auto zoom checkbox enables the <b>Zoom Level</b> 
+		slider and un-checking the checkbox disables the slider.
+		<LI>Verify that the <b>Auto-zoom to redactable data</b> checkbox is checkable.
+		<LI>Verify that the <b>Zoom Level</b> edit box is read-only and is updated 
+		with each change in slider position.
+		<LI>Verify that the <b>Enable pan tool after highlight</b> checkbox is checkable.
+<p>
+		<LI>Confirm that with <b>Auto-Zoom = 1</b>, selection of a data item 
+		or clue zooms the Image Viewer in to the selected item - changing 
+		pages if needed.
+		<LI>Verify that adjusting the zoom level changes the actual zoom accordingly.
+		<LI>Confirm that with <b>Auto-Zoom = 0</b>, selection of a data item or clue does not 
+		change the zoom or pan setting in the Image Viewer.
+<p>
+		<LI>Confirm that with <b>Enable Pan = true</b>, the Image Viewer activates the 
+		Pan tool after each Manual swipe.
+		<LI>Confirm that with <b>Enable Pan = false</b>, the Image Viewer remains 
+		in Highlight mode after each Manual swipe.
+      	</ul>
+</ul>
+<p>
+<LI><h2>Process Files - Configure Verify Redactions task</h2>
+<ul>
+	<LI><b>General</b>
+	<ul>
+		<LI>Confirm that with <b>Include All Pages</b> checked, TAB steps through each page in a 
+		test image even when the page does not contain any redactable data or clues.
+		<LI>Confirm that with <b>Include All Pages</b> unchecked, TAB steps through each page in a 
+		test image that does contain redactable data or clues.  Pages without data or clues 
+		are skipped.
+		<ul>
+			<li><b>[LegacyRCAndUtils # 4925]</b> Verify an image with an empty or non-existent voa file and <b>Include All Pages</b> unchecked.</li>
+			<ul>	
+				<li>Confirm that page 1 is highlighted in the summary grid when the image is loaded.</li>
+				<li>Confirm that when tab is pressed, the correct number of pages reviewed is shown in the message. I.E. "You have reviewed
+                  &lt;x&gt of &lt;y&gt pages in the document. Do you want to save and move to next document?"</li>
+			</ul>
+		</ul>
+<p>
+		<LI><b>[FlexIDSCore #2833]</b> Confirm that <b>Require users to specify redaction type 
+		for enabled redactions</b> is checked by default.
+		<LI><b>[FlexIDSCore #2833]</b> Confirm that with <b>Require users to specify redaction type 
+		for enabled redactions</b> checked, a redacted image <b>cannot</b> be saved with an 
+		<b>empty</b> Type setting.
+		<LI><b>[FlexIDSCore #2833]</b> Confirm that with <b>Require users to specify redaction type 
+		for enabled redactions</b> unchecked, a redacted image <b>can</b> be saved with an 
+		<b>empty</b> Type setting.
+<p>
+  	   	<LI><b>[FlexIDSCore #3211 - #3218, #3223]</b> Verification Property Page
+	       	<ul>
+	      		<li>Confirm that the <b>property pages</b> have changed in the following ways.
+		       	<ul>
+		      		<li><b>Metadata output</b> settings are configured in a separate dialog.
+		      		<li>The <b>Metadata output</b> settings include controls for the existing settings.
+			       	<ul>
+			      		<li>An edit box for <b>Name of metadata output file</b>.
+			      		<li>An associated <b>tag selector</b>.
+			      		<li>An associated <b>...</b> (Browse) button.
+			       	</ul>
+		      		<li><b>Feedback collection</b> settings are configured in a separate dialog.
+		      		<li><b>Image output</b> settings for verification are configured in a 
+				separate dialog.
+		      		<li><b>General settings</b> on the verification property page include a 
+				check box for <b>Require users to specify exemption codes for redactions</b>.
+		      		<li>The Verification property page includes a groupbox and Customize... button 
+				for <b>ID Shield Data File Location</b>.
+		      		<li>The <b>Verification</b> property page includes a button to configure 
+				<b>Redaction text and color settings</b>.
+		      		<li>The <b>Redaction text and color settings</b> dialog includes the 
+				following elements.
+			       	<ul>
+			      		<li>A group box for <b>Text to place in redaction zones</b>.
+			      		<li>A pre-populated combo box for <b>Redaction text</b>.
+			      		<li>An associated <b>tag selector</b>.
+			      		<li>An associated read-only edit box for <b>Sample text that uses 
+					the above pattern</b>.
+			      		<li>A group box for <b>Redaction colors</b>.
+			      		<li>A pre-populated combo box for <b>Border color</b>.
+			      		<li>A pre-populated combo box for <b>Fill color</b>.
+			      		<li>Color support for <b>Black</b> and <b>White</b>.
+			      		<li>A group box for <b>Preferred text size and font</b>.
+			      		<li>An associated read-only edit box that displays the font name and size.
+			      		<li>An associated <b>...</b> (Browse) button that displays a 
+					Font selection dialog.
+			      		<li>An associated label with <b>If text is too large to fit inside 
+					redaction zone, it will automatically be scaled to fit</b>.
+			       	</ul>
+		       	</ul>
+	      		<li>Confirm that the various changes are stable and persistent.
+	       	</ul>
+<p>
+		<LI>Confirm that the settings are persistent when the <b>OK</b> button is clicked.
+		<LI>Confirm that clicking the <b>Cancel</b> button or the <b>X</b> cancels all changes.
+	</ul>
+<p>
+   	<LI><b>Image Output</b>
+      	<ul>
+
+		<LI>Confirm that settings are persistent.
+		<LI>Confirm that <b>Create output image only for documents that contain redactions</b> 
+		is selected by default.
+		<LI>With <b>Create output image only for documents that contain redactions</b> selected, 
+		confirm that an output image is not created for a document that has no redactable 
+		items after verification.
+		<LI>With <b>Create output image for all documents</b> checked, confirm that an 
+		output image is created for a document that has no redactable items after verification.
+<p>
+		<li>Confirm that checkboxes exist for <b>Retain existing annotations in output file</b> 
+		and <b>Apply redactions as annotations</b>.
+		<li>Confirm that both annotation checkboxes are <b>unchecked</b> by default. 
+<p>
+		<li><b>[FlexIDSCore #2660]</b> Confirm that the <b>Name of output image</b> edit box has a default 
+		setting of <b>$InsertBeforeExt(&lt;SourceDocName&gt;,.redacted)</b>.
+		<li>Confirm that a <b>Tag Selector</b> button is associated with the Name of output 
+		image edit box.
+		<li>Confirm that a <b>Browse</b> button is associated with the Name of output 
+		image edit box.
+		<LI>With the <b>Name of output images</b> edit box empty, confirm that an <b>Output Image 
+		Name must not be empty</b> error is produced.
+      	</ul>
+<p>
+   	<LI><b>Metadata Output</b>
+      	<ul>
+		<LI>Confirm that settings are persistent.
+		<LI>Confirm that <b>Create metadata output for all documents</b> is selected by default.
+		<LI>With <b>Create metadata output for all documents</b> selected, confirm that 
+		a metadata file is created for each document, verified or not verified.
+		<LI>With <b>Create metadata output only for documents that contain redactions</b> 
+		selected, confirm that a metadata file is created for each document that contains 
+		redactions, verified or not verified. 
+		<li><b>[FlexIDSCore #2379]</b> Confirm that the root metadata node includes a <b>Version = 
+		<i>N</i></b> attribute where <i>N</i> is the version number for versions >= 2. 
+<p>
+		<li>Confirm that the <b>Name of metadata output file</b> edit box has a default
+          setting (&lt;SourceDocName&gt;.xml).
+		<li>Confirm that a <b>Tag Selector</b> button is associated with the Name of metadata 
+		output file edit box.
+		<li>Confirm that a <b>Browse</b> button is associated with the Name of metadata output 
+		file edit box.
+<p>
+		<li><b>[FlexIDSCore #2356]</b> XML File with Hex characters.
+	      	<ul>
+			<li>Save a local copy of the image file saved with this SCR.
+			<li><b>Compute Redactions</b> using the Redaction Demo rules to process the image.
+			<li>Save the redacted image via <b>Verify Redactions</b>.
+			<li>Confirm that the XML output file does not contain any hex or unprintable 
+			characters.
+			<li><b>[FlexIDSCore #2357]</b> Confirm that the XML file contains a populated 
+			<b>VOAFileName</b> element within the <b>VerificationInfo</b> section.
+			<li><b>[FlexIDSCore #2357]</b> Confirm that the XML file contains a populated 
+			<b>VOAFilePresent</b> element within the <b>VerificationInfo</b> section.
+      		</ul>
+      	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3217, #3216]</b> Redaction supports addition of redaction text
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> images for automated redaction.
+			<li>Configure the task to add text to the redactions, testing at least each of the following items.
+		       	<ul>
+		      		<li>Pre-defined text from the combo box
+		      		<li>Pre-defined text plus Type from the combo box
+		      		<li>Custom redaction text
+		      		<li>Custom redaction text plus Type
+		      		<li>White text by selecting <b>Black</b> fill color
+		      		<li>Black text by selecting <b>White</b> fill color
+		      		<li>Non-default font name
+		      		<li>Non-default font size
+		       	</ul>
+				</ul>
+</UL>
+<p>
+    &nbsp;
+<ul>
+   	<LI><b>Feedback Collection</b>
+      	<ul>
+		<LI>Confirm that <b>Enable collection of redaction accuracy feedback</b> is 
+		unselected by default.
+		<li>Confirm that the <b>Settings</b> button is disabled when the checkbox is unchecked.
+		<li>Confirm that the <b>Settings</b> button is enabled when the 
+		checkbox is checked.
+		<li>Confirm that the <b>Settings</b> button opens a dialog that contains
+          group boxes for <b>Data storage and options</b>, <b>Filenames to use
+          for feedback data</b>, and <b>Collect feedback for</b>.
+		<li>Confirm that the <b>All verified documents</b> checkbox is enabled in 
+		the <b>Collect feedback for</b> group box when feedback collection is enabled.
+		
+      	</ul>
+</UL>
+</OL>
+
+      	<ul><ul><ul>
+		<li><b>Data storage and options</b>
+	      	<ul>
+			<li>Confirm that a <b>Feedback data folder</b> edit box is included.
+			<li>Confirm that the edit box has a completely readable default folder.
+			<li>Confirm that an associated <b>Tag Selector</b> button is included.
+			<li>Confirm that an associated <b>... (Browse)</b> button is included.
+			<li>Confirm that a checkbox for <b>Include redaction information</b> 
+			is included.
+			<li>Confirm that the <b>Include redaction information</b> checkbox 
+			is both checked and disabled.
+			<li>Confirm that a checkbox for <b>Include original document as part of 
+			the feedback data</b> is included.
+			<li>Confirm that the <b>Include original document as part of 
+			the feedback data</b> checkbox is checked by default.
+	      	</ul>
+<p>
+		<li><b>Filenames to use for feedback data</b>
+	      	<ul>
+			<li>Confirm that radio buttons exist for <b>Use original filenames</b> 
+			and <b>ID Shield should generate unique filenames</b>.
+			<li>Confirm that the <b>Use original filenames</b> radio button is 
+			selected by default.
+	      	</ul>
+<p>
+		<li><b>Collect feedback for</b>
+	      	<ul>
+			<li>Confirm that checkboxes exist for <b>All verified documents</b>, 
+			<b>All verified documents that contain redactions</b> and <b>All 
+			verified documents contain user corrections</b>.
+			<li>Confirm that all three checkboxes are checked by default. 
+			<li>Confirm that the <b>All verified documents that contain 
+			redactions</b> checkbox is disabled.
+			<li>Confirm that the <b>All verified documents contain user 
+			corrections</b> checkbox is disabled.
+			<LI>Confirm that settings are persistent.
+	      	</ul>
+		</ul>
+      	</ul>
+  <p>&nbsp;</p>
+  <p>&nbsp;
+<ul>
+		<li><b>[FlexIDSCore #3235]</b> Autoredaction task UI changes
+		<ul>
+			<li>Confirm that the <b>Rules to execute</b> group box has changed to <b>Data categories to redact</b>
+			<li>Confirm that the usual HC, MC, LC checkboxes have are side-by-side.
+			<li>The property page includes a group box for <b>Redactions in
+              output file</b>.
+			<li><b>Redactions in output file</b> settings include radio buttons
+              for <b>Retain any previously existing redactions in the output
+              file</b> and <b>Output only redactions from this session</b> (the
+              default).
+			<li>The property page includes a button to configure <b>Redaction
+              text and color settings</b>.&nbsp;
+			<li>The <b>Redaction text and color settings</b> dialog should
+              contain the same elements as the dialog in the verification task.
+		</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+
+<OL>
+
+<LI><h2>Toolbar Buttons - Verify Redactions</h2>
+<UL>
+   	<LI><b>[LegacyRC #5184]</b> Confirm that no extra toolbar separators are present in the 
+	Image Viewer - especially near the rotate image buttons.
+	<li><b>[LegacyRC #5034]</b> Confirm presence of a <b>Select highlight</b> toolbar 
+	button that allows the selected highlight to be moved and resized.
+	<li><b>[FlexIDSCore #3348]</b> Confirm absence of a <b>Recognize text and process</b> toolbar 
+	button.
+	<li><b>[FlexIDSCore #3113]</b> Confirm absence of an <b>Edit highlight text</b> toolbar 
+	button.
+<p>
+   	<LI><b>Pages1and3 Test Image (I:\Common\Testing\Annotation_Images\)</b>
+      	<ul>
+		<LI>Confirm that no navigation occurs for <b>SHIFT+TAB</b> (or button 1) when the 
+		first item is selected.
+		<LI>Confirm that data items that have not been selected are displayed in bold font.
+		<LI>Confirm that data items that have been selected are displayed in normal font.
+<p>
+		<LI>With <b>Include All Pages = false</b>, confirm that repeated SHIFT+TAB's 
+		automatically step backwards through the sorted data items.  Page 2 will <b>NOT</b> 
+		be displayed.
+		<LI>With <b>Include All Pages = false</b>, confirm that repeated TAB's (or button 2) 
+		automatically advance through the sorted data items.  Page 2 will <b>NOT</b> 
+		be displayed.
+		<LI>With <b>Include All Pages = false</b> and the last item selected, confirm that 
+		TAB asks the user if the redactions should be saved and the next document reviewed.  
+		Confirm that the user prompt notes that <b>2 of 3</b> pages have been reviewed.
+<p>
+		<LI>With <b>Include All Pages = true</b>, confirm that repeated TAB's automatically 
+		advance through the sorted data items.  Page 2 will be displayed after the 4 data 
+		items on page 1 and before the data item on page 3.
+		<LI>With <b>Include All Pages = true</b>, confirm that repeated SHIFT+TAB's 
+		automatically step backwards through the sorted data items.  Page 2 will be 
+		displayed.
+		<LI>With <b>Include All Pages = true</b> and the last item selected, confirm 
+		that TAB asks the user if the redactions should be saved and the next document 
+		reviewed.  Confirm that the user prompt notes that all pages have been reviewed.
+<p>
+		<LI>With <b>Auto-Zoom = false</b>, confirm that advancing through the sorted data 
+		items does not change the zoom settings in the Image Viewer.
+		<LI>With <b>Auto-Zoom = false</b>, confirm that Zoom To Selected (button 3) zooms 
+		to the current selection in the Image Viewer.
+<p>
+		<LI>Select the Low item on page 3.  Confirm that initial Redact text is a green 
+		checkmark and that the Toggle Redaction toolbar button (or button 4) toggles the 
+		text to a red X and then back to a green checkmark.
+      	</ul>
+<p>
+   	<LI><b>Pages2and4 Test Image (I:\Common\Testing\Annotation_Images\)</b>
+      	<ul>
+		<LI>Set <b>Include All Pages = false</b>.  Confirm that the first data item on 
+		page 2 is selected and that page 2 is displayed in the Image Viewer.
+		<LI>Set <b>Include All Pages = true</b>.  Confirm that there is no initial data 
+		item selection and that page 1 is displayed in the Image Viewer.
+		<LI><b>[FlexIDSCore #2027]</b> Click Tab.  Confirm that the first data item is selected and 
+		that page 2 is displayed in the Image Viewer.
+<p>
+		<LI>Select the first Clue item on page 2.  Confirm that initial Redact text is 
+		<b>N/A</b> and that the Toggle Redaction toolbar button toggles the text to a 
+		green checkmark and then to a red X.
+		<LI>Select the first High item on page 2.  Confirm that initial Redact text is 
+		a green checkmark and that the Toggle Redaction toolbar button toggles the text 
+		to a red X and then back to a green checkmark.
+      	</ul>
+<p>
+	<LI><b>Previous/Next Reviewed Document Buttons</b>
+	<ul>
+		<li>Create an .FPS file that queues and verifies all the images in the 
+		<i>RedactionDemo\Images</i> folder. Run the .FPS file.
+		<li>When the ID Shield dialog window appears, confirm that the 
+		<b>Previous Reviewed Document</b> and <b>Next Reviewed Document</b> buttons 
+		are disabled.
+		<li>Save the first document.
+		<li>Confirm that the <b>Previous Reviewed Document</b> button is now enabled.
+		<li>Save two more documents.
+		<li>Confirm that clicking the <b>Previous Reviewed Document</b> button 
+		backtracks to the previous document in the queue.
+		<LI><b>[FlexIDSCore #3009]</b> Doc Type should persist when reviewing verification results.
+	    <ul>
+	      	<li>Confirm that document type information is displayed.
+	      	<li>Review recent previous redacted images from within the verification UI.
+		<li>Confirm that document type information is displayed.
+	    </ul>
+		<li>Continue to use the <b>Previous Reviewed Document</b> button to go backward 
+		through the queued documents and confirm that the <b>Previous Reviewed Document</b> 
+		button is disabled when the first document in the queue is reached.
+		<li>Confirm that clicking the <b>Next Reviewed Document</b> button advances to 
+		the next document in the queue.
+		<li>Continue to use the <b>Next Reviewed Document</b> button to go forward through 
+		the queued documents and confirm that the <b>Next Reviewed Document</b> button is 
+		disabled when the document that is currently being processed is reached.
+		<li>Save four more documents.
+		<li>Use the <b>Previous Reviewed Document</b> button to go backward through the 
+		queued documents and confirm that only the last five documents can be viewed. 
+		(The <b>Previous Reviewed Document</b> button should be disabled on the fifth 
+		document.)
+		<li>Make a change on the current document. (For example, add a manual redaction).
+		<li>Click the <b>Next Reviewed Document</b> button and confirm that a dialog 
+		appears that asks whether or not to save the change.
+		<li>Choose to save the change by clicking the <b>Yes</b> button. Confirm that 
+		the change was written by looking at the redacted document. Also confirm that 
+		the IDSheild UI advances to the next document in the queue.
+		<li>Make a change on the current document. Click the <b>Next Reviewed Document</b> 
+		button and this time choose <b>not</b> to save the change by selecting <b>No</b> 
+		in the dialog that appears.
+		<li>Confirm that the change was <b>not</b> written by looking at the redacted 
+		document. Also confirm that the IDSheild UI advances to the next document in the queue.
+		<li>Use the <b>Previous Reviewed Document</b> button to return to the previous 
+		document and confirm that the change has been discarded.
+		<li>Make a change on the current document. Click the <b>Next Reviewed Document</b> 
+		button and this time choose <b>Cancel</b> in the dialog window that appears.
+		<li>Confirm that the change was <b>not</b> written by looking at the redacted 
+		document. Also confirm that the UI does <b>not</b> advance to the next document in 
+		the queue.
+		<li>Confirm that <b>CTRL + Tab</b> performs the same function as the 
+		<b>Next Reviewed Document</b> button.
+		<li>Confirm that <b>CTRL + Shift + Tab</b> performs the same function as the 
+		<b>Previous Reviewed Document</b> button.
+		</ul>
+<p>
+		<li><b>[FlexIDSCore #3107] Verification - Add Stop button</b></li>
+		<ul>
+		<li>Ensure that the <b>Stop</b> button in the Verification UI stops the FAM during verification.</li>
+		</ul>
+
+	</ul>
+<p>
+	<LI><b>[FlexIDSCore #3232] Support for Exemption codes in Verification</b>
+	<ul>
+<p>
+		<li>Confirm that the Verification property page includes a checkbox that requires 
+		verifiers to use exemption codes with each redaction.
+		<li>Confirm that a redacted document <b>cannot</b> be saved without exemption codes if 
+		this check box is checked.
+		<li>Confirm that a redacted document <b>can</b> be saved without exemption codes if this 
+		check box is not checked.  Note that <b>Require users to specify redaction type for 
+		redactions</b> must also be unchecked.
+<p>
+		<li>Confirm that a new button for <b>Apply exemption codes</b> is available on the 
+		Verification toolbar.
+		<li>Confirm that the button is only enabled when a redaction is selected.
+		<li>Confirm that <b>E</b> works as a shortcut for the new button.
+		<li>Confirm that clicking the button displays the <b>Exemption codes</b> dialog.
+		<li>Confirm that previous <b>Exemption codes</b> settings are displayed when re-opening the dialog.
+<p>
+		<li>Confirm that the <b>Exemption codes</b> dialog supports exemption codes for the <b>Freedom of Information Act (FOIA)</b>.
+		<li>Confirm that the <b>Exemption codes</b> dialog supports exemption codes for the <b>Privacy Act (US)</b>.
+		<li>Confirm that XML files for each <b>group</b> of supported exemption codes can be found in the <b>.\IDShield\ExemptionCodes</b> folder.
+<p>
+		<li>Confirm that the user can navigate the <b>Exemption codes</b> dialog using the keyboard.
+		<li>Confirm that the Data Area dialog contains a new column for display of <b>Exemption codes</b>.
+		<li>Confirm that the user can double-click in the <b>Exemption codes</b> cell to display an appropriately populated dialog.
+		</ul>
+          </ol>
+</UL>
+<p>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Summary Grid With Test Image = "Pages2and4.tif"&nbsp;</h2>
+<UL>
+   	<LI><b>Set Include All Pages = false</b>
+      	<ul>
+		<LI>Confirm that the first data item on page 2 is selected and that page 2 is the 
+		only green cell in the Summary Grid.
+		<LI>Advance through the data items until the first data item on page 4 is selected.  
+		Confirm that a second cell in the Summary Grid (page 4) is green.
+		<LI>Select page 1 in the Summary Grid.  Confirm that the page 1 cell turns green.  
+		Confirm that selection in the Data Grid is removed.  Confirm that page 1 is displayed 
+		in the Image Viewer.
+		<LI>Use the toolbar to advance to the <b>Next</b> data item.  Confirm that selection 
+		in the Data Grid moves to the second item on page 4.  Confirm that page 4 is displayed 
+		in the Image Viewer.
+      	</ul>
+<p>
+   	<LI><b>Set Include All Pages = true</b>
+	<ul>
+		<LI>Confirm that no data item is selected and that page 1 is the only green cell 
+		in the Summary Grid.
+		<LI>Select page 3 in the Summary Grid.  Confirm that the page 3 cell turns green.  
+		Confirm that Data Grid items remain unselected.  Confirm that page 3 is displayed in 
+		the Image Viewer.
+		<LI>Advance to the <b>Next</b> data item.  Confirm that selection in the Data Grid 
+		moves to the first item on page 2.  Confirm that page 2 is displayed in the Spot 
+		Recognition Window.  Confirm that the page 2 cell turns green.
+		<LI>Select a cell in the Summary Grid past the number of available pages.  Confirm 
+		that the displayed page does not change and that no error message is displayed.
+      	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<ul>
+<LI><h2>Image Viewer Highlights</h2>
+<UL>
+   	<LI><b>Clue Data Items</b>
+      	<ul>
+		<LI>Confirm that a selected and non-redacted <b>Clue</b> has a red rectangular border 
+		around the outside of a light gray border.  Confirm that the interior of the rectangle 
+		is transparent.
+		<LI>Confirm that a selected and redacted <b>Clue</b> has a red rectangular border 
+		around the outside of a light gray border.  Confirm that the interior of the rectangle 
+		is medium blue.
+		<LI>Confirm that a non-selected and non-redacted <b>Clue</b> has a light gray border.  
+		Confirm that the interior of the rectangle is transparent.
+		<LI>Confirm that a non-selected and redacted <b>Clue</b> has a light gray border.  
+		Confirm that the interior of the rectangle is medium blue.
+      	</ul>
+<p>
+   	<LI><b>Low Data Items</b>
+      	<ul>
+		<LI>Confirm that a selected and non-redacted <b>Low</b> has a red rectangular border 
+		around the outside of a pink border.  Confirm that the interior of the rectangle 
+		is transparent.
+		<LI>Confirm that a selected and redacted <b>Low</b> has a red rectangular border 
+		around the outside of a pink border.  Confirm that the interior of the rectangle 
+		is medium blue.
+		<LI>Confirm that a non-selected and non-redacted <b>Low</b> has a pink border.  
+		Confirm that the interior of the rectangle is transparent.
+		<LI>Confirm that a non-selected and redacted <b>Low</b> has a pink border.  
+		Confirm that the interior of the rectangle is medium blue.
+      	</ul>
+<p>
+   	<LI><b>Medium Data Items</b>
+      	<ul>
+		<LI>Confirm that a selected and non-redacted <b>Medium</b> has a red rectangular border 
+		around the outside of a gold border.  Confirm that the interior of the rectangle 
+		is transparent.
+		<LI>Confirm that a selected and redacted <b>Medium</b> has a red rectangular border 
+		around the outside of a gold border.  Confirm that the interior of the rectangle 
+		is medium blue.
+		<LI>Confirm that a non-selected and non-redacted <b>Medium</b> has a gold border.  
+		Confirm that the interior of the rectangle is transparent.
+		<LI>Confirm that a non-selected and redacted <b>Medium</b> has a gold border.  
+		Confirm that the interior of the rectangle is medium blue.
+      	</ul>
+<p>
+   	<LI><b>High Data Items</b>
+      	<ul>
+		<LI>Confirm that a selected and non-redacted <b>High</b> has a red rectangular border 
+		around the outside of a light green border.  Confirm that the interior of the rectangle 
+		is transparent.
+		<LI>Confirm that a selected and redacted <b>High</b> has a red rectangular border 
+		around the outside of a light green border.  Confirm that the interior of the rectangle 
+		is medium blue.
+		<LI>Confirm that a non-selected and non-redacted <b>High</b> has a light green border.  
+		Confirm that the interior of the rectangle is transparent.
+		<LI>Confirm that a non-selected and redacted <b>High</b> has a light green border.  
+		Confirm that the interior of the rectangle is medium blue.
+      	</ul>
+<p>
+   	<LI><b>Manual Data Items</b>
+      	<ul>
+		<LI>Confirm that a selected and non-redacted <b>Man</b> has a red rectangular border 
+		around the outside of a dark green border.  Confirm that the interior of the rectangle 
+		is transparent.
+		<LI>Confirm that a selected and redacted <b>Man</b> has a red rectangular border 
+		around the outside of a dark green border.  Confirm that the interior of the rectangle 
+		is medium blue.
+		<LI>Confirm that a non-selected and non-redacted <b>Man</b> has a dark green border.  
+		Confirm that the interior of the rectangle is transparent.
+		<LI>Confirm that a non-selected and redacted <b>Man</b> has a dark green border.  
+		Confirm that the interior of the rectangle is medium blue.
+      	</ul>
+<p>
+   	<LI><b>[FlexIDSCore #3251] Verification - Selection border color should be configurable in IDShield.ini</b>
+      	<ul>
+		<LI>Confirm that the color of the border that is used to indicate selection in the 
+		verification UI is configurable by adjusting the <b>SelectionBorderColor</b> setting in the 
+		IDShield.ini file.
+      	</ul>
+<p>
+	<LI><b>[FlexIDSCore #3119], [LegacyRC #5049]</b> The Highlight tool no longer toggles redaction state 
+	in the verification UI
+	<ul>
+		<li>Confirm that the Highlight tool does not select existing highlights, only creates new ones.
+		<li>Confirm that the redaction state is not toggled when an existing highlight is clicked.
+	</ul>
+<p>
+	<LI><b>[FlexIDSCore #3115, 3118, 3120, 3121, 3128, 3129], [LegacyRC #5037]</b> Highlights are moveable and 
+	resizable in the verification UI using the Select Highlights tool.
+	<ul>
+		<li>Exercise the <b>Redaction Demo</b> images and rules.
+		<li><b>[LegacyRC #5040]</b> Confirm that the <b>Select Highlight</b> tool is disabled 
+		in the Image Viewer with no image open.</li>
+		<li>Test the ability to move and resize highlights found by rules.
+		<li>Confirm that modified highlights persist when re-reviewing a saved image.
+		<li><b>[LegacyRC #5042]</b> Confirm that the Select Highlights icon is an arrow.
+<p>
+		<li>Add both rectangular and angular manual redactions.
+		<li>Test the ability to move and resize the manual highlights.
+		<li>Confirm that modified highlights persist when re-reviewing a saved image.
+		<li><b>[FlexIDSCore #3250]</b> Confirm that the selected redaction has a second outer 
+		border with the same thickness as the inner border.
+		<li>Confirm that the outer border is red by default.
+		<li>Confirm that the outer border appears when Pan, Select Highlight, and Highlight 
+		tools are selected.
+	</ul>
+<p>
+	<li><b>[FlexIDSCore #3127]</b> Verification - Highlights should be resizable during verification </li>
+	<ul>
+		<li>Ensure that, during verification, highlights can be selected and resized using grip handles.</li>
+	</ul>
+<p>
+	<li><b>[LegacyRC # 4849]</b> Scrolling while highlighting.</li>
+	<ul>
+		<li>From the verification UI, confirm that the image cannot be scrolled during 
+		creation, movement, or resize of a manual redaction.
+	</ul>
+<p>
+	<LI><b>[LegacyRC #5041]</b> No Flicker in Move and Resize of Highlights
+	<ul>
+		<li>Exercise the <b>Redaction Demo</b> images and rules.
+		<li>Move and resize some highlights found by rules.
+		<li>Move and resize some manual highlights.
+		<li>Confirm that excessive flicker is not seen in the Image Viewer.
+	</ul>
+<p>
+	<LI><b>[LegacyRC #5062]</b> Block Fitting
+	<ul>
+		<li>Exercise the <b>Redaction Demo</b> rules and images and begin verification.
+		<li>Use the rectangle tool to highlight a line of text while holding down the 
+		<b>Ctrl +Shift</b> key.
+		<li>Confirm that one attribute is created that contains the highlighted text.
+		<li>Confirm that the highlight automatically shrunk to fit the pixels within 
+		the rectangular area.
+		<li>Confirm that the highlighted region retains its rectangular shape.
+<p>
+		<li>Use the angle tool to highlight a line of text while holding down the
+          <b>Ctrl + Shift</b> key.
+		<li>Confirm that one attribute is created that contains the highlighted text.
+		<li>Confirm that the highlight automatically shrunk to fit the pixels within 
+		the rectangular area.
+		<li>Confirm that the highlighted region retains its angle.
+<p>
+		<li>Confirm that Block Fitting also works within the <b>Image Viewer</b>.
+	</ul>
+<p>
+	<LI><b>[FlexIDSCore #3148, #3157], [LegacyRC #5065, #5066, #5073]</b> Line Fitting
+	<ul>
+		<li>Exercise the <b>Redaction Demo</b> rules and images and begin verification.
+		<li>Use the rectangle tool to highlight multiple lines of text while holding down the 
+		<b>Ctrl</b> key.
+		<li>Confirm that one attribute is created that contains individual lines of 
+		highlighted text.
+		<li>Confirm that each highlighted line automatically shrunk to fit the pixels within 
+		the rectangular area.
+		<li>Confirm that the highlighted region retains its rectangular shape.
+<p>
+		<li>Confirm that the same functionality is seen with a multi-line <b>angled</b> 
+		highlight.
+<p>
+		<li>Confirm that line fitting within the <b>Image Viewer</b> 
+		produces only one dialog with OCR results.
+		<li>Confirm that clicking on one highlight will select the entire group.
+		</ul>
+<p>
+	<li><b>[FlexIDSCore #2923]</b> using mousewheel while highlighting behaves oddly.</li>
+	<ul>
+		<li>Ensure that the following behavior does not occur when scrolling the mousewheel while highlighting:</li>
+		<ul>
+			<li>All highlights (both previously made and currently being created) disappear.</li>
+			<li>If an angular zone is being created, only the top and bottom lines of the 
+			zone are highlighted.</li>
+			<li>If the mouse is moved after the mousewheel scroll with the left mouse button 
+			still held down, location of the highlight prior to the mousewheel scroll is still 
+			visible. It is XORed with the currently created highlight.</li>
+		</ul>
+	</ul>
+<p>	
+	<li><b>[FlexIDSCore #3108]</b> Image Viewer - lots of flicker when drawing highlights.</li>
+	<ul>
+		<li>Run the rules in 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3108\test.rsd' on an image 
+		and bring it up for verification.</li>
+		<li>Change the Type of the matches spatial string using the drop down menu in the grid 
+		of the data area dialog.</li>
+		<li>Ensure that there is no (or virtually no) flicker.</li>
+	</ul>
+<p>	
+	<li><b>[FlexIDSCore #3110]</b> Verification - multiline sensitive data not displayed when returning to document.</li>
+	<ul>
+		<li>Run the rules in 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3108\test.rsd' on several 
+		images and bring them up for verification.</li>
+		<li>In the verification UI, go on the to next (ie. second) document.</li>
+		<li>Note what the sensitive data on this page looks like. Go back to the previous 
+		(i.e. first) document.</li>
+		<li>Go forward to return to the second document.</li>
+		<li>Ensure that the highlighted sensitive data  still spans the entire page.</li>
+	</ul>
+</UL>
+<p>
+	<UL>
+	<li><b>[LegacyRCAndUtils #5035]</b> SRW - mousewheel causes highlights to disappear
+	<ul>
+		<li>Open an image in the Image Viewer.</li>
+		<li>Draw several highlights.</li>
+		<li>Ensure that highlights remain visible. The image should scroll vertically.</li>
+	</ul>
+<p>
+	<li><b>[LegacyRCAndUtils #5036]</b> Edit Highlight Height - Activates functionality of last used cursor tool </li>
+	<ul>
+		<li>Open a document in the Image Viewer</li>
+		<li>Draw a highlight</li>
+		<li>Select the Select tool</li>
+		<li>Select the Set Highlight Height tool</li>
+		<li>Click and drag a few pixels of the highlight. (i.e. Click a point on a highlight, 
+		move a small distance keeping the cursor over the highlight, release the mouse).</li>
+		<li>Ensure that the cursor tool reverts to the last used tool, but that the tool 
+		is not activated.</li>
+	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Annotation Support - Verify Redactions</h2>
+<UL>
+	<LI>This section uses images located at <b>I:\Common\Testing\Annotation_Images</b>.
+	<LI>Confirm that <b>FourPagesWithAnnoA.tif</b> contains four pages, with each page 
+	having an annotation strip near a different margin ( top, bottom, left, right ).  
+	Annotations can be readily seen in the Windows Picture and Fax Viewer.
+	<LI>Confirm that <b>FourPagesWithAnnoB.tif</b> contains four pages, with each page 
+	having an annotation strip near a different margin ( top, bottom, left, right ).  
+	Annotations can be readily seen in the Windows Picture and Fax Viewer.
+	<LI>Confirm that <b>AnnotationTypes.tif</b> contains one or more examples of different 
+	types of annotations.  Note that the annotations are red, unless otherwise specified.  
+	Annotations can be readily seen in the Windows Picture and Fax Viewer.
+	<ul>
+		<li><b>Arrow</b> - black, next to the Grape box</li>
+		<li><b>Button</b> - rectangle, to the right of the UPC digits</li>
+		<li><b>Closed Curve</b> - a triangle, to the right of the Ellipse</li>
+		<li><b>Cross Product</b> - two intersecting lines, to the right of the UPC text</li>
+		<li><b>Curve</b> - a two-segment line, above the word Apple</li>
+		<li><b>Ellipse</b> - below the Peach box</li>
+		<li><b>Freehand</b> - a closed polygon, around "UPC version A"</li>
+		<li><b>Highlight</b> - yellow, over the word Grape</li>
+		<li><b>Hot Spot</b> - small square box, below the UPC digits</li>
+		<li><b>Line</b> - horizontal, directly below the word Peach</li>
+		<li><b>Note</b> - red text with yellow background, left of the Rectangle</li>
+		<li><b>Polygon</b> - a pentagon, to the right of the Arrow</li>
+		<li><b>Polyline</b> - to the left of the three words</li>
+		<li><b>Poly Ruler</b> - four line segments, below the Hot Spot</li>
+		<li><b>Protractor</b> - two line segments with 54 degree angle opening SE, below the Ruler</li>
+		<li><b>Push Pin</b> - red text in a yellow box, below the Ellipse</li>
+		<li><b>Rectangle</b> - directly below the line</li>
+		<li><b>Redact</b> - solid black rectangle, to the right of the barcode</li>
+		<li><b>Rubber Stamp</b> - the label is below a FAX stamp located to the right of 
+		the Closed Curve</li>
+		<li><b>Ruler</b> - a straight line, to the right of the Hot Spot</li>
+		<li><b>Stamp</b> - rectangle, below the left side of the barcode</li>
+		<li><b>Text</b> - several examples as labels, including Freehand, Hotspot, Protractor, Redact</li>
+	</ul>
+<p>
+	<LI>*Confirm that each different type of annotation in <b>AnnotationTypes.tif</b> can 
+	be displayed in the Image Viewer.  Display of annotations can be disabled 
+	via registry setting ( HKEY_CURRENT_USER/Software/ExtractSystems/ReusableComponents/OcxAndDlls/ImageEdit/Annotation = 0 ).
+	<LI>Confirm that the <b>Master.rsd.etf</b> rules from the RedactionDemo can be executed 
+	against the above images.  VOA files will be created.
+	<LI>Create or clear a database named <b>Demo_IDShield</b> with actions: <b>Compute</b> and 
+	<b>Verify</b>.</LI>  Note that this database also uses these actions for the 
+	<b>Redaction Demo</b>.
+<p>
+	<LI>Process the local annotated and non-annotated TIFs. 
+	<ul>
+		<li>Confirm that the <b>RedactionDemo</b> folder has been copied to C:\.
+		<li>Run the <b>ComputeVOAs.fps</b> file.  This file uses the <b>Compute</b> action to 
+		queue the local TIFs and executes the Redaction Demo ruleset to create VOA files.
+		<li>Confirm that each TIF has a corresponding USS file and VOA file.
+	</ul>
+<p>
+	<LI>Open the <b>VerifyRetain.fps</b> file. 
+	<ul>
+		<li>Confirm that the <b>Verify</b> action is pending for each file - resetting 
+		status if necessary.
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Verify the images, accepting the default redactions, and adding additional 
+		manual redactions if desired.
+		<li>Make sure to redact the UPC digits for <b>AnnotationTypes.tif</b> so that a 
+		redacted image is created.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding output image.
+		<li>Confirm that each output image has the redactions burned in.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>VerifyRetainApply.fps</b> file. 
+	<ul>
+		<li>Confirm that the <b>Verify</b> action is pending for each file - resetting 
+		status if necessary.
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Verify the images, accepting the default redactions.
+		<LI><b>[FlexIDSCore #2957]</b> Redactions as annotations are skewed.</LI>
+		<ul>
+			<li>Create one or more manual redactions, being careful with swipe 
+			alignment.</li>
+			<li>Confirm that the new annotations from the manual redactions are 
+			properly aligned.</li>
+		</ul>
+		<li>Make sure to redact the UPC digits for <b>AnnotationTypes.tif</b> so that a 
+		redacted image is created.
+		<li>Confirm that each input image has a corresponding output image.
+		<li>Confirm that each output image has the redactions saved as annotations.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>VerifyApply.fps</b> file. 
+	<ul>
+		<li>Confirm that the <b>Verify</b> action is pending for each file - resetting 
+		status if necessary.
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Verify the images, accepting the default redactions, and adding additional 
+		manual redactions if desired.
+		<li>Make sure to redact the UPC digits for <b>AnnotationTypes.tif</b> so that a 
+		redacted image is created.
+		<li>Confirm that each input image has a corresponding output image.
+		<li>Confirm that each output image has the redactions saved as annotations.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were <b>not</b> retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>VerifyNoAnno.fps</b> file. 
+	<ul>
+		<li>Confirm that the <b>Verify</b> action is pending for each file - resetting 
+		status if necessary.
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Verify the images, accepting the default redactions, and adding additional 
+		manual redactions if desired.
+		<li>Make sure to redact the UPC digits for <b>AnnotationTypes.tif</b> so that a 
+		redacted image is created.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding output image.
+		<li>Confirm that each output image has the redactions burned in.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were <b>not</b> retained in the output images.
+	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Annotation Support - Automatic Redactions</h2>
+<UL>
+	<LI>Create or clear a database named <b>Demo_IDShield</b> with actions: <b>Compute</b> and 
+	<b>Verify</b>.</LI>  Note that this database also uses these actions for the 
+	<b>Redaction Demo</b>.
+<p>
+	<LI>Process the local annotated and non-annotated TIFs. 
+	<ul>
+		<li>Confirm that the <b>RedactionDemo</b> folder has been copied to C:\.
+		<li>Run the <b>ComputeVOAs.fps</b> file.  This file uses the <b>Compute</b> action to 
+		queue the local TIFs and executes the Redaction Demo ruleset to create VOA files.
+		<li>Confirm that each TIF has a corresponding USS file and VOA file.
+	</ul>
+<p>
+	<LI>Open the <b>RedactRetain.fps</b> file. 
+	<ul>
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Process the images.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding 
+		output image.
+		<li>Confirm that each output image has the redactions burned in.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>RedactRetainApply.fps</b> file. 
+	<ul>
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Process the images.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding 
+		output image.
+		<li>Confirm that each output image has the redactions saved as annotations.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>RedactApply.fps</b> file. 
+	<ul>
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Process the images.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding 
+		output image.
+		<li>Confirm that each output image has the redactions saved as annotations.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were <b>not</b> retained in the output images.
+	</ul>
+<p>
+	<LI>Open the <b>RedactNoAnno.fps</b> file. 
+	<ul>
+		<li>Delete any previous redacted images <b>*.redacted.tif</b> in the local folder.
+		<li>Process the images.
+		<li><b>[FlexIDSCore #3046]</b> Confirm that each input image has a corresponding 
+		output image.
+		<li>Confirm that each output image has the redactions burned in.
+		<li>Confirm that the pre-existing annotations from the appropriate input images 
+		were <b>not</b> retained in the output images.
+	</ul>
+<p>
+	<li><b>[FlexIDSCore #3131]</b> Process PDF - Add redactions as annotations no redactions in output image.</li>
+	<ul>
+		<li>In the processing tab, open the <b>Redact images (no verification)</b> configuration window.</li>
+		<li>Under <b>Create output file</b>, confirm that the text for the <b>Retain existing annotations</b> and 
+			<b>Apply redactions as annotations</b> checkboxes are marked 'tiff only'.</li>
+		<li>Set up automatic redaction using sample pdf's located at 'I:\Common\Testing\PVCS_Testing\FlexIDsCore\3131'.</li>
+		<li>Confirm that if either checkbox is selected, redactions are burned into the pdf image. Confirm that an
+			application trace exception is logged if there were annotations to retain or redaction annotations.</li>
+	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Metadata Output - Verify Redactions</h2>
+<UL>
+   	<LI><b>Process any document</b>
+      	<ul>
+		<LI>Confirm that a <b>DocumentInfo</b> element exists containing populated 
+		sub-elements for <b>InputFile</b>, <b>OutputFile</b> and <b>DocType</b>.
+		<LI>Confirm that a <b>VerificationInfo</b> element exists containing a <b>User</b> 
+		sub-element containing populated sub-elements for <b>LoginID</b> and <b>Computer</b>.
+		<LI>Confirm that a <b>VerificationInfo</b> element exists containing populated 
+		sub-elements for <b>VerifiedByUser</b>, <b>Date</b>, <b>TimeStarted</b> and 
+		<b>TotalSeconds</b>.
+<p>
+	   	<LI>For XML Output Version 2
+	      	<ul>
+			<LI>Confirm that the <b>VerificationInfo</b> element also contains populated 
+			sub-elements for <b>VOAFileName</b> and <b>VOAFilePresent</b>.
+      		</ul>
+      	</ul>
+<p>
+   	<LI><b>Process a document with redacted data - XML Output Version 1</b>
+      	<ul>
+		<LI>Confirm that a non-empty <b>Redactions</b> element exists.
+		<LI>Confirm that each Redaction element includes <b>Type</b> and <b>Output</b> 
+		values.
+		<LI>Confirm that each Redaction element includes one or more <b>Line</b> elements.
+		<LI>Confirm that each Line element includes text and exactly one <b>Zone</b> 
+		element.
+		<LI>Confirm that each Zone element includes <b>StartX</b>, <b>StartY</b>, <b>EndX</b>, 
+		<b>EndY</b>, <b>Height</b> and <b>PageNumber</b> values.
+<p>
+	   	<LI>For XML Output Version 2
+	      	<ul>
+			<LI>Confirm that the <b>Redaction</b> element also includes a <b>Category</b>
+			element.
+			<LI>Confirm that the <b>Line</b> element also includes a <b>FullText</b>
+			sub-element.
+      		</ul>
+      	</ul>
+<p>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Miscellaneous</h2>
+<UL>
+   	<LI><b>[FlexIDSCore #2627]</b> Configure the desktop so that the Start Menu is on the 
+	left-hand side of the display.  Exercise <b>Redaction Verification</b> and confirm that 
+	both windows are completely visible and that the desktop is completely covered.
+
+<p>
+	<li><b>[LegacyRCAndUtils #3716]</b> Redacted PDF files are much larger than the originals
+	<ul>
+		<li>Configure a redaction task and execute it on some pdf files.
+		<li>Confirm that the redacted output pdf files are close to the same size as the original files.
+	</ul>
+<p>
+	<li><b>[FlexIDSCore #3239]</b> Redaction zone shifted in verification UI
+	<ul>
+		<li>Exercise the steps in the SCR following the directions in the <b>Investigation note</b>.
+		<li>Confirm that the problem is fixed.
+	</ul>
+</UL>
+<p>
+  	   	<UL>
+  	   	<LI><b>[FlexIDSCore #3212]</b> Verification supports display of previously redacted image
+	       	<ul>
+	      		<li>Create several different VOA files for specified image files ( use the 
+			Filter ID Shield data file task ).
+			<li>Redact some documents for one data type.
+			<li>Create an FPS file to re-redact the same documents for a different 
+			data type.  Configure the task to use the output image from the initial 
+			redaction test.
+			<li>Confirm that the initial output image is properly displayed in the 
+			Verification UI.
+	       	</ul>
+<p>
+	<LI><b>ID Shield data file location</b>
+	<ul>
+		<LI><b>[FlexIDSCore #3214]</b> Confirm that ID Shield data file location has a Customize button that brings up a
+          Specify ID Shield data file path dialog.
+	      		<li>Create several different VOA files for specified image files ( use the 
+			Filter ID Shield data file task ).
+			<li>Confirm that configuring the Verification task to use something other 
+			than the default &lt;SourceDocName&gt;.voa works properly.
+      	</ul>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</BODY>
+
+</HTML>

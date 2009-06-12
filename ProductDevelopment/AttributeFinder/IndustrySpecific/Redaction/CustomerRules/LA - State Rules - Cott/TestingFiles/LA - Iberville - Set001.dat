@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//Set001
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Iberville\Set001\Images\COV;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Iberville\Set001\Images\MTG;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

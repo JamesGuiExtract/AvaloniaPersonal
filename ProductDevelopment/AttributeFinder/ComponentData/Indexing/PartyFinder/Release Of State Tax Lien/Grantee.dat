@@ -1,0 +1,31 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+//
+ROSTL_GRANTEE_04=Lien date assessee/address^?Grantee^250~\r\nTherefore
+
+//
+ROSTL_GRANTEE_05=Certificate^15~\r\n\r\n^?Grantee^250~\r\nTherefore
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\release of state tax lien\20049000992100.001.tif.uss
+ROSTL_GRANTEE_01=Filed Against^?Grantee^250~FTB Account Number
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\release of state tax lien\20049000869700.001.tif.uss
+ROSTL_GRANTEE_02=Government^10~from^?Grantee^250~in the amount
+
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\release of state tax lien\20049001256500.001.tif.uss
+ROSTL_GRANTEE_03=amounts due from^?Grantee^250~for Sales
+
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\release lien\20059020303100.tif.uss
+ROSTL_GRANTEE_07=NAME^10~LAST KNOWN ADDRESSES:^?Grantee^250~YEAR
+
+[PATTERNS_END]
+

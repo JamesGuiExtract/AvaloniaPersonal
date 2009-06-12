@@ -1,0 +1,34 @@
+// FeedbackManager.idl : IDL source for FeedbackManager.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (FeedbackManager.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(CB6DDDB9-8603-4FF2-B753-C9FED66ED9CB),
+	version(1.0),
+	helpstring("UCLID FeedbackManager 1.0 Type Library")
+]
+library UCLID_FEEDBACKMANAGERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\AFCore\Code\AFCore.tlb");
+
+	//////////////
+	// CoClasses
+	//////////////
+	[
+		uuid(70CF4E4F-61A6-4C27-B548-7C0C7B9C5A71),
+		helpstring("FeedbackMgr Class")
+	]
+	coclass FeedbackMgr
+	{
+		[default] interface IFeedbackMgr;
+		interface IFeedbackMgrInternals;
+	};
+};

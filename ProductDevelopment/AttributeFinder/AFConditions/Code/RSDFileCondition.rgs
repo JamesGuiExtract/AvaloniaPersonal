@@ -1,0 +1,26 @@
+HKCR
+{
+	AFConditions.RSDFileCondition.1 = s 'RSDFileCondition Class'
+	{
+		CLSID = s '{FCAD538E-C1B3-48F4-AC24-3DB8FD96384A}'
+	}
+	AFConditions.RSDFileCondition = s 'RSDFileCondition Class'
+	{
+		CLSID = s '{FCAD538E-C1B3-48F4-AC24-3DB8FD96384A}'
+		CurVer = s 'AFConditions.RSDFileCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FCAD538E-C1B3-48F4-AC24-3DB8FD96384A} = s 'RSDFileCondition Class'
+		{
+			ProgID = s 'AFConditions.RSDFileCondition.1'
+			VersionIndependentProgID = s 'AFConditions.RSDFileCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D3DC98FB-A212-409B-B68C-64D1DC430594}'
+		}
+	}
+}

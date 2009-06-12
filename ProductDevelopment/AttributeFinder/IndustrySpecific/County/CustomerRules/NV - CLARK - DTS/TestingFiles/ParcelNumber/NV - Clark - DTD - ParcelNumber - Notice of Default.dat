@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Notice of Default
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Default;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber

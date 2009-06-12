@@ -1,0 +1,123 @@
+<html>
+
+<HEAD>
+<TITLE>Text Function Expander - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<body>
+
+<h1>Text Function Expander<br>
+	<IMG src="../../COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+Test &quot;D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\Test&nbsp;&nbsp;Image.tif&quot;
+
+<hr>
+<ol>
+	<li><b>***CREATE A DRIVE MAPPING TO H***</b> The <b>$DirNoDriveOf()</b> 
+	test requires write privileges on drive H:\.</li> 
+	<li><b>***ENABLE FEEDBACK***</b> Without Feedback enabled, some of these tests will not work.&nbsp;</b></li> 
+<p>
+	<li>Navigate to <b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
+        <li>Run <b>clean.bat</b> to remove leftover xml files from previous tests.</li> 
+        <li>Run <b>TestFunctionExpanderTest.bat</b>. The test will create files in the directory 		<b>D:\Engineering\ReusableComponents\BaseUtils\InteractiveTest\</b>.</li> 
+<p>
+	<li>Test <b>&lt;SourceDocName&gt;</b>,<b>$DirOf()</b>, and <b>$FileOf()</b>:
+	<ul>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> 
+		exists.</li>
+	</ul> 
+	</li> 
+	<li>Test <b>$FileNoExtOf()</b>:
+	<ul>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.xml</b> 
+		exists.</li>
+	</ul> 
+	</li>
+	<li>Test <b>$TrimAndConsolidateWS()</b>:
+	<ul>
+		<li>Verify that the file <b>Test Image.xml</b> 
+		exists.</li>
+	</ul> 
+	</li>
+	<li>Test <b>$PadValue()</b>, <b>$Offset()</b> and <b>$ExtOf()</b>:
+	<ul>
+		<li>Verify that the file <b>Test01.tif.xml</b> 
+		exists.</li>
+	</ul> 
+	</li>
+<p>
+	<li>Test <b>&lt;RSDFileDir&gt;</b>:
+	<ul> 
+		<li>Verify that the file <b>TestRSDFileDirTag.xml</b>
+		exists.</li>
+	</ul> 
+	</li>
+	<li>Test <b>&lt;XMLOutputFile&gt;</b>:
+	<ul> 
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml.test</b>
+		exists.</li>
+	</ul> 
+	</li>
+	<li>Test <b>&lt;VOAOutputFile&gt;</b>:
+	<ul> 
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.voa.test</b>
+		exists.<br />
+	</ul> 
+	</li>
+	<li>Test <b>&lt;DocType&gt;</b>: 
+	<ul>
+		<li>Verify that the file <b>TestWarranty Deed.xml</b>
+		exists.</li>
+	</ul> 
+	</li>
+	<li><b>[FlexIDSCore #3024]</b> Test <b>&lt;RuleExecutionID&gt;</b>: 
+	<ul>
+		<li>Verify that the file <b>TestRuleExecutionID10.xml</b> 
+		exists.</li>
+	</ul> 
+	</li> 
+<p>
+	<li>Test <b>$DriveOf()</b>:
+	<ul>
+		<li>Verify that the file <b>TestDriveOfTag.xml</b>
+		exists.</li>
+		<li><b>[LegacyRC #3662]</b> Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> also exists 
+		with a current timestamp in I:\users\wayne_lenius\Public\Write\ABD.</li>
+	</ul> 
+	</li>
+	<li>Test <b>$DirNoDriveOf()</b>:
+	<ul>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> exists in the 
+		appropriate subfolder under drive H:\.</li>
+		<li><b>[LegacyRC #4610]</b> Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> also exists 
+		directly under drive H:\.</li>
+		<li><b>[LegacyRC #4611]</b> Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> also exists 
+		with a current timestamp in \\fnp2\internal\users\wayne_lenius\Public\Write.</li>
+		<li><b>[LegacyRC #4611]</b> Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> also exists 
+		with a current timestamp in \\fnp2\internal\users\wayne_lenius\Public\Write\ABC.</li>
+	</ul> 
+	</li>
+	<li>Test <b>$InsertBeforeExt()</b>:
+	<ul>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.INSERT1.tif.xml</b> exists.</li>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.INSERT2.xml</b> exists.</li>
+	</ul>
+	</li>
+	<li>Test <b>$Replace()</b>:
+	<ul>
+		<li>Verify that the file <b>Tst&nbsp;&nbsp;Imag.tif.xml</b> exists.</li>
+		<li>Verify that the file <b>TestFile.tif.xml</b> exists.</li>
+		<li>Verify that the file <b>Test&nbsp;&nbsp;Image.tif.xml</b> exists.</li>
+	</ul> 
+	</li>
+<p>
+	<li>The test is complete. Run <b>clean.bat</b> to remove the files created by the test.</li>
+	<li>Remove the <b>Test&nbsp;&nbsp;Image.tif.xml</b> file in the appropriate subfolder under 
+	drive <b>H:\</b> as created by the test.</li>
+	<li>Remove the drive mapping for <b>H:\</b>.</li>
+</ol>
+</body>
+</html>

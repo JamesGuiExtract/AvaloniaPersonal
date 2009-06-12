@@ -1,0 +1,38 @@
+// TestEncryptFileMgr.idl : IDL source for TestEncryptFileMgr.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (TestEncryptFileMgr.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(5E223C4C-2EC5-4027-B056-7412F6D65630),
+		dual,
+		helpstring("IEFMAutomatedTester Interface"),
+		pointer_default(unique)
+	]
+	interface IEFMAutomatedTester : IDispatch
+	{
+	};
+
+[
+	uuid(B5462DA5-ACF5-44AC-AAD8-7A629189C353),
+	version(1.0),
+	helpstring("TestEncryptFileMgr 1.0 Type Library")
+]
+library TESTENCRYPTFILEMGRLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(EFD596C4-CFA1-450B-B63B-2EF059212FEC),
+		helpstring("EFMAutomatedTester Class")
+	]
+	coclass EFMAutomatedTester
+	{
+		[default] interface IEFMAutomatedTester;
+	};
+};

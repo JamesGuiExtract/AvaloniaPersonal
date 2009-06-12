@@ -1,0 +1,87 @@
+<HTML>
+	<HEAD>
+		<TITLE>Move And Modify Attributes</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Move And Modify Attributes Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Move and Modify Attributes output handler is used to promote sub-attributes and change their name and type.</li>
+			<li>The promoted sub-attributes are moved and not copied.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Move And Modify Attributes output handler, you must first query the attributes that you wish to modify.
+				<ul>
+					<li>To query a single attribute, simply enter that attribute's name into the query box.</li>
+					<li>To query multiple attributes, enter each attribute's name separated by |'s.
+						<ul>
+							<li><i>PhoneNumber|Name</i> will select both the <i>PhoneNumber</i> and <i>Name</i> attributes.</li>
+						</ul>
+					</li>
+					<li>To query a sub-attribute, enter the query as <i>AttributeName/SubattributeName</i>.
+						<ul>
+							<li><i>Name/Middle</i> will select the <i>Middle</i> sub-attribute of <i>Name</i>.</li>
+						</ul>
+					</li>
+					<li>To query an attribute with a certain type, enter the query as <i>AttributeName@AttributeType</i> 
+						<ul>
+							<li><i>Name@Buyer</i> will select the <i>Name</i> attribute if it has a type of <i>Buyer</i>.</li>
+						</ul>
+					</li>
+					<li>To query an attribute only if it has a certain sub-attribute, enter the query as <i>AttributeName{/SubattributeName}</i>.
+						<ul>
+							<li><i>PhoneNumber{/AreaCode}</i> will select the <i>PhoneNumber</i> attribute only if it has an <i>AreaCode</i> sub-attribute.</li>
+						</ul>
+					</li>
+					<li>To query all attributes, enter * as the query
+						<ul>
+							<li><i>Name/*</i> will select all of the sub-attributes of <i>Name</i>.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>Next, you must choose what you wish to do with the queried attribute:
+				<ul>
+					<li>You can promote the attribute up one level.</li>
+					<li>You can promote the attribute to the top level.</li>
+				</ul>
+			</li>
+			<li>Next, you will have to decide what to name the promoted sub-attribute:
+				<ul>
+					<li>You can leave its name unchanged.</li>
+					<li>You can change its name to that of its parent.</li>
+					<li>You can specify an entirely new name.</li>
+				</ul>
+			</li>
+			<li>Next, you will have to decide what the type of the promoted sub-attribute will be
+				<ul>
+					<li>You can leave its type unchanged.</li>
+					<li>You can leave its type blank.</li>
+					<li>You can add its type to that of its parent.</li>
+					<li>You can add the attribute's name to its type.</li>
+					<li>You can specify an entirely new name to add.</li>
+				</ul>
+			</li>
+			<li>If you check the <b>If, after the above operations, the root ancestor has no children, delete it</b> checkbox, the parent attribute will be deleted if all of its sub-attributes are promoted.</li>
+					
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>SplitPhone.rsd</b> and run it on <b>SplitPhone.txt</b>.  Notice that the <i>PhoneNumber</i> attribute has been split to create an <i>AreaCode</i> sub-attribute and a <i>Number</i> sub-attribute.</li>
+				<ul>
+					<li>Add a Move and Modify Attributes output handler that promotes the <i>AreaCode</i> sub-attribute to the top level to the existing Select Multiple Output Handlers output handler.  Leave the default configurations.</li>
+					<li>Run the rules and note the difference in output.</li>
+					<li>Open the Move and Modify Attributes output handler and select <b>Use the root ancestor's name</b> option.  Run the rules again and note that the promoted sub-attribute is now named <i>PhoneNumber</i>.</li>
+					<li>Open the Move and Modify Attributes output handler and check <b>Add the root ancestor's type</b> option.  Run the rules again and note that the promoted sub-attribute now has a type of <i>PhoneNum</i>.</li>
+					<li>Open the Move and Modify Attributes output handler and change the query to <i>PhoneNumber/AreaCode|PhoneNumber/Number</i>.  Run the rules again and notice that the parent attribute is deleted.</li>
+					<li>Open the Move and Modify Attributes output handler and uncheck the <b>If, after the above operations, the root ancestor has no children, delete it</b> checkbox.  Run the rules again and notice that the parent attribute is not deleted.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

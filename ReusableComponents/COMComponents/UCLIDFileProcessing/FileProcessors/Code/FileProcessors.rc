@@ -1,0 +1,434 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""FileProcessors.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "FileProcessors Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "FileProcessors"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "FileProcessors.DLL"
+            VALUE "ProductName", "FileProcessors Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_OCRFILEPROCESSOR    REGISTRY                "OCRFileProcessor.rgs"
+IDR_OCRFILEPROCESSORPP  REGISTRY                "OCRFileProcessorPP.rgs"
+IDR_COPYMOVEDELETEFILEPROCESSOR REGISTRY                "CopyMoveDeleteFileProcessor.rgs"
+IDR_COPYMOVEDELETEFILEPROCESSORPP REGISTRY                "CopyMoveDeleteFileProcessorPP.rgs"
+IDR_LAUNCHAPPFILEPROCESSOR REGISTRY                "LaunchAppFileProcessor.rgs"
+IDR_LAUNCHAPPFILEPROCESSORPP REGISTRY                "LaunchAppFileProcessorPP.rgs"
+IDR_SETACTIONSTATUSFILEPROCESSOR REGISTRY                "SetActionStatusFileProcessor.rgs"
+IDR_SETACTIONSTATUSFILEPROCESSORPP REGISTRY                "SetActionStatusFileProcessorPP.rgs"
+IDR_CONDITIONALTASK     REGISTRY                "ConditionalTask.rgs"
+IDR_CONDITIONALTASKPP   REGISTRY                "ConditionalTaskPP.rgs"
+IDR_CLEANUPIMAGEFILEPROCESSOR REGISTRY                "CleanupImageFileProcessor.rgs"
+IDR_CLEANUPIMAGEFILEPROCESSORPP REGISTRY                "CleanupImageFileProcessorPP.rgs"
+IDR_CONVERT_TO_PDF_TASK REGISTRY                "ConvertToPDFTask.rgs"
+IDR_PROPPAGE_CONVERT_TO_PDF_TASK REGISTRY                "ConvertToPDFTaskPP.rgs"
+IDR_ADD_WATERMARK_TASK  REGISTRY                "AddWatermarkTask.rgs"
+IDR_ADD_WATERMARK_TASKPP REGISTRY                "AddWatermarkTaskPP.rgs"
+IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
+IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OCRFILEPROCESSORPP DIALOGEX 0, 0, 221, 52
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Use cleaned image if available",IDC_CHECK_OCR_USE_CLEAN,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,5,122,10
+    CONTROL         "OCR all pages",IDC_RADIO_OCR_ALL,"Button",BS_AUTORADIOBUTTON | WS_GROUP,5,20,61,10
+    CONTROL         "OCR specified pages :",IDC_RADIO_OCR_SPECIFIED,"Button",BS_AUTORADIOBUTTON,5,35,87,10
+    EDITTEXT        IDC_EDIT_PAGE_NUMBERS,93,35,119,12,ES_AUTOHSCROLL
+END
+
+IDD_COPYMOVEDELETEFILEPROCESSORPP DIALOGEX 0, 0, 283, 248
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Copy File",IDC_RADIO_COPY,"Button",BS_AUTORADIOBUTTON | WS_GROUP,7,5,85,10
+    CONTROL         "Move File",IDC_RADIO_MOVE,"Button",BS_AUTORADIOBUTTON,7,15,85,10
+    CONTROL         "Delete File",IDC_RADIO_DELETE,"Button",BS_AUTORADIOBUTTON,7,25,85,10
+    COMBOBOX        IDC_CMB_SRC_FILE,14,52,220,58,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_SRC_DOC_TAG,239,52,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_SRC,255,52,15,14
+    CONTROL         "Allow read only file to be deleted",IDC_CHECK_ALLOW_READONLY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,69,165,12
+    CONTROL         "Record an error and continue",IDC_RADIO_NOSRC_ERR,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,96,119,10
+    CONTROL         "Skip the operation without error",IDC_RADIO_NOSRC_NOERR,
+                    "Button",BS_AUTORADIOBUTTON,21,109,119,10
+    COMBOBOX        IDC_CMB_DST_FILE,14,150,220,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DST_DOC_TAG,239,150,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_DST,255,150,15,14
+    CONTROL         "Create destination folder if not present",IDC_CHECK_DIRECTORY,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,14,167,145,12
+    CONTROL         "Skip the operation and record an error",IDC_RADIO_DEST_ERR,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,21,196,181,10
+    CONTROL         "Skip the operation without error",IDC_RADIO_DEST_NOERR,
+                    "Button",BS_AUTORADIOBUTTON,21,209,177,10
+    CONTROL         "Overwrite the file and continue",IDC_RADIO_DEST_OVERWRITE,
+                    "Button",BS_AUTORADIOBUTTON,21,222,177,10
+    GROUPBOX        "From",IDC_STATIC,7,40,268,93
+    GROUPBOX        "If Source File Does Not Exist",IDC_STATIC,14,86,220,40
+    GROUPBOX        "To",IDC_STATIC,7,138,268,105
+    GROUPBOX        "If Destination File Already Exists",IDC_STATIC,14,184,220,53
+END
+
+IDD_LAUNCHAPPFILEPROCESSORPP DIALOGEX 0, 0, 310, 107
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Application",IDC_STATIC,5,5,90,10
+    EDITTEXT        IDC_EDIT_CMD_LINE,5,15,259,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_CMD_LINE_DOC_TAG,270,14,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_CMD_LINE,285,14,15,14
+    LTEXT           "Launch Directory",IDC_STATIC,5,30,90,10
+    EDITTEXT        IDC_EDIT_WORKING_DIR,5,40,259,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_WORKING_DIR_DOC_TAG,270,39,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_WORKING_DIR,285,39,15,14
+	LTEXT			"Parameters (Any parameter that contains spaces must be quoted)", IDC_STATIC,5,55,230,10
+	EDITTEXT		IDC_EDIT_PARAMETERS,5,65,259,12,ES_AUTOHSCROLL
+	PUSHBUTTON		"SelectDocTag",IDC_BTN_PARAMETERS_DOC_TAG,270,64,10,14,BS_ICON
+	PUSHBUTTON		"...",IDC_BTN_PARAMETERS_BROWSE,285,64,15,14
+    CONTROL         "Blocking",IDC_RADIO_BLOCKING,"Button",BS_AUTORADIOBUTTON,5,81,85,10
+    CONTROL         "Non-Blocking",IDC_RADIO_NON_BLOCKING,"Button",BS_AUTORADIOBUTTON,5,92,85,10
+END
+
+IDD_SETACTIONSTATUSFILEPROCESSORPP DIALOGEX 0, 0, 200, 62
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Status of the action",IDC_STATIC,6,24,72,9
+    COMBOBOX        IDC_COMBO_ACTION,78,22,114,68,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_COMBO_STATUS,78,42,114,66,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "For the document being processed, set the",IDC_STATIC,6,6,144,9
+    LTEXT           "To",IDC_STATIC,6,42,53,9
+END
+
+IDD_CONDITIONALTASKPP DIALOGEX 0, 0, 256, 254
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "&Add...",IDC_BTN_ADD,199,49,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,199,69,50,14
+    PUSHBUTTON      "Commands >",IDC_BTN_MODIFY,199,89,50,14
+    PUSHBUTTON      "",IDC_BTN_UP,199,109,22,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN,227,109,22,21,BS_ICON
+    CONTROL         "",IDC_LIST_TRUE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,48,184,90
+    PUSHBUTTON      "Commands >",IDC_BTN_SELECT_CONDITION,199,18,50,14
+    LTEXT           "Evaluate the following condition",IDC_STATIC,7,7,101,8
+    LTEXT           "",IDC_EDIT_CONDITION,7,19,184,10,SS_NOTIFY | SS_SUNKEN
+    LTEXT           "Execute these tasks if the condition is met",IDC_STATIC,7,36,133,8
+    PUSHBUTTON      "&Add...",IDC_BTN_ADD2,199,158,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE2,199,178,50,14
+    PUSHBUTTON      "Commands >",IDC_BTN_MODIFY2,199,198,50,14
+    PUSHBUTTON      "",IDC_BTN_UP2,199,218,22,21,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_DOWN2,227,218,22,21,BS_ICON
+    CONTROL         "",IDC_LIST_FALSE,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,7,157,184,90
+    LTEXT           "Execute these tasks if the condition is not met",IDC_STATIC,7,145,145,8
+END
+
+IDD_CLEANUPIMAGEFILEPROCESSORPP DIALOGEX 0, 0, 270, 34
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Specify name of image cleanup settings (.ics.etf) file",IDC_STATIC,5,5,217,10
+    EDITTEXT        IDC_EDIT_ICS_FILENAME,5,15,220,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_ICS_FILENAME_DOC_TAG,231,15,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_ICS_FILENAME,246,15,15,12
+END
+
+IDD_CONVERTTOPDFTASKPP DIALOGEX 0, 0, 332, 82
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Image (or PDF file) to convert to a searchable PDF file",1,7,7,198,10
+    EDITTEXT        IDC_EDIT_CONVERT_TO_PDF_INPUT_IMAGE,7,17,283,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_CONVERT_TO_PDF_INPUT_IMAGE_DOC_TAG,296,17,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_CONVERT_TO_PDF_BROWSE_INPUT_IMAGE,310,17,15,12
+    LTEXT           "Note: This task will replace the unsearchable image (or PDF file) with the searchable PDF file.\r\n\r\nIf the above file is an image file, it will be deleted after the searchable PDF file is created.",3,7,34,306,25
+    LTEXT           "If the above file is a PDF file, it will be overwritten with the corresponding searchable version.",IDC_STATIC,7,65,308,10
+END
+
+IDD_ADD_WATERMARK_TASKPP DIALOGEX 0, 0, 278, 218
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "File names",IDC_STATIC,7,5,262,73
+    LTEXT           "Document to apply the stamp on",IDC_STATIC,12,15,150,10
+    EDITTEXT        IDC_EDIT_WATERMARK_INPUT_IMAGE,12,27,218,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_WATERMARK_INPUT_IMAGE_DOC_TAG,235,27,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_WATERMARK_BROWSE_INPUT_IMAGE,250,27,15,12
+    LTEXT           "Image file to apply as the stamp on the document",IDC_STATIC,12,46,200,10
+    EDITTEXT        IDC_EDIT_WATERMARK_STAMP_IMAGE,12,58,218,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_WATERMARK_STAMP_IMAGE_DOC_TAG,235,58,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_WATERMARK_BROWSE_STAMP_IMAGE,250,58,15,12
+    GROUPBOX        "Stamp location",IDC_STATIC,7,85,262,126
+    LTEXT           "By default, align the top left corner of the stamp image file as follows:",IDC_STATIC,12,95,250,10
+    LTEXT           "Horizontally",IDC_STATIC,12,113,37,10
+    EDITTEXT        IDC_EDIT_WATERMARK_HORIZONTAL_PERCENT,57,111,30,12,ES_AUTOHSCROLL
+    LTEXT           "% from the left of the page",IDC_STATIC,94,113,150,10
+    LTEXT           "Vertically",IDC_STATIC,12,132,30,10
+    EDITTEXT        IDC_EDIT_WATERMARK_VERTICAL_PERCENT,57,130,30,12,ES_AUTOHSCROLL
+    LTEXT           "% from the top of the page",IDC_STATIC,94,132,150,10
+    LTEXT           "Page to place stamp on:",IDC_STATIC,12,149,80,10
+    CONTROL         "First page",IDC_RADIO_WATERMARK_FIRSTPAGE,"Button",BS_AUTORADIOBUTTON,12,164,45,12
+    CONTROL         "Last page",IDC_RADIO_WATERMARK_LASTPAGE,"Button",BS_AUTORADIOBUTTON,12,179,45,12
+    CONTROL         "Specified page:",IDC_RADIO_WATERMARK_SPECIFIEDPAGE,
+                    "Button",BS_AUTORADIOBUTTON,12,194,60,12
+    EDITTEXT        IDC_EDIT_WATERMARK_SPECIFIEDPAGE,79,194,20,12,ES_AUTOHSCROLL | ES_NUMBER
+END
+
+IDD_ARCHIVE_RESTORE_TASKPP DIALOGEX 0, 0, 274, 251
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Select operation",IDC_STATIC,7,5,260,40
+    CONTROL         "Archive file",IDC_RADIO_ARCHIVE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,15,50,12
+    CONTROL         "Restore file",IDC_RADIO_RESTORE,"Button",BS_AUTORADIOBUTTON,12,30,50,12
+    EDITTEXT        IDC_EDIT_ARCHIVE_NOTE,7,52,260,40,ES_MULTILINE | ES_READONLY | NOT WS_BORDER | NOT WS_TABSTOP
+    LTEXT           "Root of archive folder",IDC_STATIC,7,98,200,10
+    EDITTEXT        IDC_EDIT_ARCHIVE_FOLDER,7,109,225,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_ARCHIVE_FOLDER_DOC_TAG,237,109,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_ARCHIVE_FOLDER_BROWSE,252,109,15,12
+    LTEXT           "Tag to associate with",IDC_ARCHIVE_TAG_LABEL,7,128,200,10
+    COMBOBOX        IDC_CMB_ARCHIVE_TAG,7,141,260,66,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "File to",IDC_ARCHIVE_FILE_LABEL,7,160,150,10
+    EDITTEXT        IDC_EDIT_ARCHIVE_FILE,7,173,225,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_ARCHIVE_FILE_DOC_TAG,237,173,10,12,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_ARCHIVE_FILE_BROWSE,252,173,15,12
+    CONTROL         "Delete above file after archiving",IDC_CHECK_ARCHIVE_DELETE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,188,115,12
+	GROUPBOX		"If the file to <ACTION> exists", IDC_ARCHIVE_GROUP_OVERWRITE,7,207,260,40
+	CONTROL			"Overwrite file (task will succeed)", IDC_RADIO_ARCHIVE_OVERWRITE, "Button",
+					BS_AUTORADIOBUTTON | WS_GROUP,12,217,115,12
+	CONTROL			"Don't overwrite file (task will fail)", IDC_RADIO_ARCHIVE_FAIL, "Button",
+					BS_AUTORADIOBUTTON,12,232,120,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+IDI_ICON_UP             ICON                    "..\\..\\Code\\res\\icon_up.ico"
+IDI_ICON_DOWN           ICON                    "..\\..\\Code\\res\\icon_down.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_COPYMOVEDELETEFILEPROCESSORPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 4
+        RIGHTMARGIN, 278
+        TOPMARGIN, 5
+        BOTTOMMARGIN, 225
+    END
+
+    IDD_LAUNCHAPPFILEPROCESSORPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 61
+    END
+
+    IDD_SETACTIONSTATUSFILEPROCESSORPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 193
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 55
+    END
+
+    IDD_CONDITIONALTASKPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 249
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 247
+    END
+
+    IDD_CONVERTTOPDFTASKPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 325
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 75
+    END
+
+    IDD_ADD_WATERMARK_TASKPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 269
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 219
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_CONTEXT MENU 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "Cu&t",                        IDC_EDIT_CUT
+        MENUITEM "&Copy",                       IDC_EDIT_COPY
+        MENUITEM "&Paste",                      IDC_EDIT_PASTE
+        MENUITEM "&Delete",                     IDC_EDIT_DELETE
+        MENUITEM SEPARATOR
+        MENUITEM "Cancel",                      IDC_CONTEXT_CANCEL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "FileProcessors"
+    IDS_TITLEOCRFileProcessorPP "&Title"
+    IDS_HELPFILEOCRFileProcessorPP "Help File Name"
+    IDS_DOCSTRINGOCRFileProcessorPP "Your Help String"
+    IDS_TITLECopyMoveDeleteFileProcessorPP "Title"
+    IDS_HELPFILECopyMoveDeleteFileProcessorPP "Help File Name"
+    IDS_DOCSTRINGCopyMoveDeleteFileProcessorPP "Your Help String"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLELaunchAppFileProcessorPP "&Title"
+    IDS_HELPFILELaunchAppFileProcessorPP "Help File Name"
+    IDS_DOCSTRINGLaunchAppFileProcessorPP "Your Help String"
+    IDS_TITLESETACTIONSTATUSFILEPROCESSORPP "Set action status"
+    IDS_HELPFILESETACTIONSTATUSFILEPROCESSORPP "None"
+    IDS_DOCSTRINGSETACTIONSTATUSFILEPROCESSORPP "None"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLECONDITIONALTASKPP "Title"
+    IDS_HELPFILECONDITIONALTASKPP "Help File Name"
+    IDS_DOCSTRINGCONDITIONALTASKPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "FileProcessors.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

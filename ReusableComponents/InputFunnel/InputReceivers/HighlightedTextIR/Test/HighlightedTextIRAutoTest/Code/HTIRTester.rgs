@@ -1,0 +1,26 @@
+HKCR
+{
+	HTIRAutoTest.HTIRTester.1 = s 'HTIRTester Class'
+	{
+		CLSID = s '{AA427C4C-49E6-420F-9799-616B2AE7B19E}'
+	}
+	HTIRAutoTest.HTIRTester = s 'HTIRTester Class'
+	{
+		CLSID = s '{AA427C4C-49E6-420F-9799-616B2AE7B19E}'
+		CurVer = s 'HTIRAutoTest.HTIRTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AA427C4C-49E6-420F-9799-616B2AE7B19E} = s 'HTIRTester Class'
+		{
+			ProgID = s 'HTIRAutoTest.HTIRTester.1'
+			VersionIndependentProgID = s 'HTIRAutoTest.HTIRTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{34C19C20-8C57-40B7-90EC-1058F238F975}'
+		}
+	}
+}

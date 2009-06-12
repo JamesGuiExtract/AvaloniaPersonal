@@ -1,0 +1,454 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Two Persons with Designators
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Plain Names|John Smith and Mary Smith, Husband and Wife
+Names|John Smith and Mary Smith, Husband and Wife
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Short Names|John and Mary, Husband and Wife
+Names|John and Mary, Husband and Wife
+.Person|John
+..First|John
+.Person|Mary
+..First|Mary
+
+<TESTCASE>|Names with Married Woman & Her Husband|Mary Smith, a married woman and John H. Smith her husband
+Names|Mary Smith, a married woman and John H. Smith her husband
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Names with Married Woman & Her Husband+|Mary Smith, a married woman and John H. Smith her husband
+Names|Mary Smith, a married woman and John H. Smith her husband
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Names with Initial|John H Smith and Mary W Smith, A Married Couple
+Names|John H Smith and Mary W Smith, A Married Couple
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+
+// P16 #1190
+<TESTCASE>|Married To Each Other|John H Smith and Mary W Smith, Married To Each Other
+Names|John H Smith and Mary W Smith, Married To Each Other
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+
+// FlexIDSCore #1175
+<TESTCASE>|Married To|John H Smith, Married To Mary W Smith
+Names|John H Smith, Married To Mary W Smith
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+
+// FlexIDSCore #1160
+<TESTCASE>|Blank Line|RICHARD DANIELS An Unmarried Man and JENIFER WEST AN Unmarried Woman, \r\n\r\n AS JOINT TENANTS
+Names|RICHARD DANIELS An Unmarried Man and JENIFER WEST AN Unmarried Woman, \r\n\r\n AS JOINT TENANTS
+.Person|RICHARD DANIELS
+..First|RICHARD
+..Last|DANIELS
+.Person|JENIFER WEST
+..First|JENIFER
+..Last|WEST
+
+// FlexIDSCore #1155
+<TESTCASE>|Blank Line|JANE E WHITE Unmarried \r\n\r\n NANCY E GROTT Unmarried
+Names|JANE E WHITE Unmarried \r\n\r\n NANCY E GROTT Unmarried
+.Person|JANE E WHITE
+..First|JANE
+..Last|WHITE
+..Middle|E
+.Person|NANCY E GROTT
+..First|NANCY
+..Last|GROTT
+..Middle|E
+
+<TESTCASE>|Names with ET UX|John H Smith et ux Mary W Smith
+Names|John H Smith et ux Mary W Smith
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+
+<TESTCASE>|Names with ETUX|John H Smith etux Mary W Smith
+Names|John H Smith etux Mary W Smith
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+
+<TESTCASE>|Names with Initial.|John H. Smith, a Married Man and Mary W. Smith, a Married Woman
+Names|John H. Smith, a Married Man and Mary W. Smith, a Married Woman
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary W. Smith
+..First|Mary
+..Last|Smith
+..Middle|W.
+
+<TESTCASE>|Name without Last Name|John H and Mary Smith, Husband and Wife
+Names|John H and Mary Smith, Husband and Wife
+.Person|John H Smith
+..First|John
+..Middle|H
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Two Big Names|Prof John Henry Smith II & Dr. Mary Anne Williams-Smith, H / W
+Names|Prof John Henry Smith II & Dr. Mary Anne Williams-Smith, H / W
+.Person|Prof John Henry Smith II
+..Title|Prof
+..Suffix|II
+..First|John
+..Last|Smith
+..Middle|Henry
+.Person|Dr. Mary Anne Williams-Smith
+..Title|Dr.
+..First|Mary
+..Last|Williams-Smith
+..Middle|Anne
+
+<TESTCASE>|Two Men|John Smith, a Single Man and Henry Jones, a Single Man
+Names|John Smith, a Single Man and Henry Jones, a Single Man
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+
+<TESTCASE>|Two Women|Mary Smith, Jane Jones, Single Women
+Names|Mary Smith, Jane Jones, Single Women
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Tenants|John Smith III & Jane Jones, Joint Tenants
+Names|John Smith III & Jane Jones, Joint Tenants
+.Person|John Smith III
+..Suffix|III
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Married To|John Smith III Married To Jane Jones
+Names|John Smith III Married To Jane Jones
+.Person|John Smith III
+..Suffix|III
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Debtors|John Smith III & Jane Jones, Joint Debtors
+Names|John Smith III & Jane Jones, Joint Debtors
+.Person|John Smith III
+..Suffix|III
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Not Stated|John Smith III & Jane Jones, Not Stated
+Names|John Smith III & Jane Jones, Not Stated
+.Person|John Smith III
+..Suffix|III
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|As Joint Tenants|John Smith IV & Jane Jones as Joint Tenants
+Names|John Smith IV & Jane Jones as Joint Tenants
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Tenants In Entirety|John Smith IV & Jane Jones as Tenants in Entirety
+Names|John Smith IV & Jane Jones as Tenants in Entirety
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Tenants By Entireties|John Smith IV & Jane Jones as Tenants by Entireties
+Names|John Smith IV & Jane Jones as Tenants by Entireties
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Tenants By the Entirety|John Smith IV & Jane Jones as Tenants by the Entirety
+Names|John Smith IV & Jane Jones as Tenants by the Entirety
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|And Daughter|John Smith IV and daughter Jane Jones
+Names|John Smith IV and daughter Jane Jones
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Tenants WROS1|John Smith IV & Jane Jones as Joint Tenants with rights of survivorship
+Names|John Smith IV & Jane Jones as Joint Tenants with rights of survivorship
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Tenants WROS2|John Smith IV & Jane Jones as Joint Tenants w/ rights of survivorship
+Names|John Smith IV & Jane Jones as Joint Tenants w/ rights of survivorship
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Tenants WFROS|John Smith IV & Jane Jones as Joint Tenants with full rights of survivorship
+Names|John Smith IV & Jane Jones as Joint Tenants with full rights of survivorship
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint Tenancy WFROS|John Smith IV & Jane Jones Joint Tenancy with full rights of survivorship
+Names|John Smith IV & Jane Jones Joint Tenancy with full rights of survivorship
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint With Spouse|John Smith IV joint with spouse Jane Jones
+Names|John Smith IV joint with spouse Jane Jones
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+// FlexIDSCore #996
+<TESTCASE>|As Joint Debtors|Peter Smith and Jane Jones As Joint Debtors
+Names|Peter Smith and Jane Jones As Joint Debtors
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Joint With His Spouse|John Smith IV joint with his spouse Jane Jones
+Names|John Smith IV joint with his spouse Jane Jones
+.Person|John Smith IV
+..Suffix|IV
+..First|John
+..Last|Smith
+.Person|Jane Jones
+..First|Jane
+..Last|Jones
+
+<TESTCASE>|Both Single|John Smith and Henry Jones, both Single
+Names|John Smith and Henry Jones, both Single
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+
+<TESTCASE>|Names with Who Are Married|John H. Smith, Jr. and Mary Smith who are married
+Names|John H. Smith, Jr. and Mary Smith who are married
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with Married But Separated|John H. Smith, Jr. and Mary Smith married But Separated
+Names|John H. Smith, Jr. and Mary Smith married But Separated
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+// FlexIDSCore #1028
+<TESTCASE>|Names with Dealing In|RICKY W. BAKER and RICHARD W. BAKER\r\ndealing in his sole and separate property
+Names|RICKY W. BAKER and RICHARD W. BAKER\r\ndealing in his sole and separate property
+.Person|RICKY W. BAKER
+..First|RICKY
+..Last|BAKER
+..Middle|W.
+.Person|RICHARD W. BAKER
+..First|RICHARD
+..Last|BAKER
+..Middle|W.
+
+<TESTCASE>|Names with H W Community Property|John H. Smith, Jr. and Mary Smith husband and wife Community Property
+Names|John H. Smith, Jr. and Mary Smith husband and wife Community Property
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with Who Are H/W|Dr. John H. Smith, Jr. and Mary Smith who are husband and wife
+Names|Dr. John H. Smith, Jr. and Mary Smith who are husband and wife
+.Person|Dr. John H. Smith, Jr.
+..Title|Dr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with Formerly H / W|John H. Smith, Jr. and Mary Jones Formerly Husband & Wife
+Names|John H. Smith, Jr. and Mary Jones Formerly Husband & Wife
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Jones
+..First|Mary
+..Last|Jones
+
+<TESTCASE>|Names with Formerly W / H|Dr. Mary Jones and John H. Smith Formerly Wife and Husband
+Names|Dr. Mary Jones and John H. Smith Formerly Wife and Husband
+.Person|Dr. Mary Jones
+..Title|Dr.
+..First|Mary
+..Last|Jones
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Names with As Wife and Husband|Mary Smith and John H. Smith as wife and husband
+Names|Mary Smith and John H. Smith as wife and husband
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Names with Non Vested Spouse|Mary Smith and John H. Smith, Non Vested Spouse
+Names|Mary Smith and John H. Smith, Non Vested Spouse
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.

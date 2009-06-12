@@ -1,0 +1,133 @@
+<html>
+
+<head>
+<title>PDF Stability Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>PDF Stability Tests (Test ID 31)<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<ol>
+<li><h2>Goals</h2>
+	<ul>
+		<li>Exercise processing of PDF images to check overall stability.
+		<li>Test FLEX Index and ID Shield.
+	</ul>
+<p>
+<li><h2>Database Preparation</h2>
+	<ul>
+		<li>Use the <b>DB Admin</b> utility to create one or both databases.  The recommended 
+                    names are <b>Flex_Stability_31</b> and <b>IDShield_Stability_31</b>.
+		<li>Add the action <b>Test</b>.
+	</ul>
+<p>
+<li><h2>Test 31 - FLEX Index</h2>
+	<ul>
+		<li>Create a <b>PDF_Flex</b> folder that will contain subfolders for
+		<b>Rules</b>, <b>Images</b>, and <b>Statistics</b>.
+		<li>Select a FLEX Index ruleset.  Copy the desired rules to a local 
+		<b>Rules</b> folder under <b>PDF_Flex</b>.
+		<li>Select one or more folders of images for processing.  Good candidates 
+		for indexing PDFs are: <b>iDocket</b> and <b>Investors Title</b>.  Note 
+		that multiple copies of the folders may be required to provide an 
+		extended stability test.
+		<li>Copy the folder(s) of images to the local <b>Images</b> folder 
+		under <b>PDF_Flex</b>.  Note that a single file supplier will be 
+		queueing these images.
+<p>
+		<li>Create an FPS file for both queueing and processing.
+		<li>Configure a <b>Folder file supplier</b> to supply existing *.pdf images.  
+		Browse to the <b>Images</b> folder.  Remember to supply recursively if 
+		the PDFs are in one or more subfolders.
+		<li>Configure an <b>Execute Rules</b> task to use the Master RSD file 
+		previously copied to the <b>Rules</b> folder.  
+<p>
+		<li>Begin collection of process statistics.  Use the following command from a 
+		command window open in the <b>PDF_Flex</b> folder.
+<p>
+		<b>LogProcessStats ProcessFiles 2m .\Statistics\Test_31 /el</b>
+<p>
+		<li>Start processing with the FPS file.
+		<li>Test 31 is expected to continue processing for at least 48 hours.
+	</ul>
+<p>
+<li><h2>Test 31 - ID Shield</h2>
+	<ul>
+		<li>Create a <b>PDF_Shield</b> folder that will contain subfolders for
+		<b>Rules</b>, <b>Images</b>, and <b>Statistics</b>.
+		<li>Select a ID Shield ruleset.  Copy the desired rules to a local 
+		<b>Rules</b> folder under <b>PDF_Shield</b>.
+		<li>Select one or more folders of images for processing.  Good candidates 
+		for redaction PDFs are: <b>MA - Secretary of Commonwealth</b>.  Note 
+		that multiple copies of the folders may be required to provide an 
+		extended stability test.
+		<li>Copy the folder(s) of images to the local <b>Images</b> folder 
+		under <b>PDF_Shield</b>.  Note that a single file supplier will be 
+		queueing these images.
+<p>
+		<li>Create an FPS file for both queueing and processing.
+		<li>Configure a <b>Folder file supplier</b> to supply existing *.pdf images.  
+		Browse to the <b>Images</b> folder.  Remember to supply recursively if 
+		the PDFs are in one or more subfolders.
+		<li>Configure a <b>Redact images (no verification)</b> task 
+		to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+		Redact HCData and MCData items.
+<p>
+		<li>Begin collection of process statistics.  Use the following command from a 
+		command window open in the <b>PDF_Shield</b> folder.
+<p>
+		<b>LogProcessStats ProcessFiles 2m .\Statistics\Test_31 /el</b>
+<p>
+		<li>Start processing with the FPS file.
+		<li>Test 31 is expected to continue processing for at least 48 hours.
+	</ul>
+<p>
+<li><h2>Test Review and Data Analysis</h2>
+	<ul>
+		<li>Any processing failures listed on the <b>Processing Log</b> page should be 
+		noted.  Any unexpected failures should be saved as individual UEX files in the 
+		<b>UEX_Logs</b> folder.
+		<li>The following items should be checked when processing finishes or is stopped.
+		<ul>
+			<li>Collection of process statistics should be stopped via <b>Ctrl+C</b> in 
+			the appropriate command window.
+			<li>Open the process statistics spreadsheet <b>ImportData.xls</b>.  
+			Import using <b>Ctrl+Shift+I</b> the following CSV files from the Statistics folder.
+			<ul>
+				<li>cpu.csv
+				<li>ProcessFiles.NNN.csv where NNN is the process ID.  
+				Import the larger of the two files.
+			</ul>
+			<li>Save the spreadsheet with a meaningful name to include <b>PDF_Flex_31</b> 
+			or <b>PDF_Shield_31</b> as the test number.
+		</ul>
+	</ul>
+<p>
+<li><h2>Saving Test Results</h2>
+	<ul>
+		<li>Data will be stored in subfolders under 
+		I:\Common\Testing\Product Testing\FLEX_Index_60\StabilityTests.
+		<li>Subfolders exist for:
+		<ul>
+			<li><b>Test_31_FLEXIndex</b>
+			<li><b>Test_31_IDShield</b>
+		</ul>
+		<li>The <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
+		named subfolder under the associated test subfolder.
+		<li>One or more Exception logs can be stored in a <b>UEX_Logs</b> subfolder.
+		This is useful if any unexpected errors are noticed during review. 
+		<li>SQL Server Management Studio can be used to backup the Flex_Stability_31 
+		or IDShield_Stability_31 database files to a <b>Database</b> subfolder.
+		<li>An example path for a particular test is: <br>
+<b>I:\Common\Testing\Product Testing\FLEX_Index_60\StabilityTests\Test_31_IDShield\2007-10-30</b>.
+		<li>Copy and update a <b>TestDetails.txt</b> file in the YYYY-MM-DD folder.
+		This file will contain a summary of the test environment and results.
+	</ul>
+</ol>
+
+</body>
+</html>

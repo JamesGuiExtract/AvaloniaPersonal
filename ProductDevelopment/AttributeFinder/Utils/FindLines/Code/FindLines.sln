@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FindLines", "FindLines.vcproj", "{13FF7DD5-9123-415E-B1E3-D4B7DF06225B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13FF7DD5-9123-415E-B1E3-D4B7DF06225B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{13FF7DD5-9123-415E-B1E3-D4B7DF06225B}.Debug|Win32.Build.0 = Debug|Win32
+		{13FF7DD5-9123-415E-B1E3-D4B7DF06225B}.Release|Win32.ActiveCfg = Release|Win32
+		{13FF7DD5-9123-415E-B1E3-D4B7DF06225B}.Release|Win32.Build.0 = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.Build.0 = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.ActiveCfg = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.Build.0 = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.Build.0 = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.ActiveCfg = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.Build.0 = Release|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Debug|Win32.ActiveCfg = Debug|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Debug|Win32.Build.0 = Debug|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Release|Win32.ActiveCfg = Release|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

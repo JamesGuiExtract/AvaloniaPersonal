@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.LongPoint.1 = s 'LongPoint Class'
+	{
+		CLSID = s '{20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC}'
+	}
+	UCLIDCOMUtils.LongPoint = s 'LongPoint Class'
+	{
+		CLSID = s '{20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC}'
+		CurVer = s 'UCLIDCOMUtils.LongPoint.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {20430EB0-7AA6-4DA1-A372-8EC38FCBE6AC} = s 'LongPoint Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.LongPoint.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.LongPoint'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

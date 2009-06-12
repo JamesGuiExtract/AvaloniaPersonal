@@ -1,0 +1,6 @@
+; ManagedLicenseUtilities.def : Declares the module parameters for the DLL.
+
+LIBRARY      "Extract.Licensing.dll"
+
+EXPORTS
+    ; Explicit exports can go here

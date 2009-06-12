@@ -1,0 +1,118 @@
+// UCLIDTestingFramework.idl : IDL source for UCLIDTestingFramework.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDTestingFramework.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8),
+	version(1.0),
+	helpstring("UCLID Testing Framework Interfaces 1.0 Type Library")
+]
+library UCLID_TESTINGFRAMEWORKINTERFACESLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S------------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef
+	[
+		uuid(DE980814-5D38-453d-806D-E77CB6B8B762),
+		helpstring("UCLID Test Case Types")
+	]
+	enum ETestCaseType
+	{
+		kInvalidTestCaseType = 0,
+		kAutomatedTestCase,
+		kInteractiveTestCase,
+		kOtherTestCase // used for summaries, etc
+	} ETestCaseType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(A13ABB77-C895-49EA-97A2-E69106FB1C96),
+		dual,
+		helpstring("ITestResultLogger Interface"),
+		pointer_default(unique)
+	]
+	interface ITestResultLogger : IDispatch
+	{
+		[id(1), helpstring("method StartTestHarness")] HRESULT StartTestHarness([in] BSTR strHarnessDescription);
+		// strOutputFileName - is not a fully qualified file name. It only contains the output file name
+		// without any specific path point to it. It could be empty, which means that there is no output
+		// file to be created.
+		[id(2), helpstring("method StartComponentTest")] HRESULT StartComponentTest([in] BSTR strComponentDescription, [in] BSTR strOutputFileName);
+		[id(3), helpstring("method StartTestCase")] HRESULT StartTestCase([in] BSTR strTestCaseID, [in] BSTR strTestCaseDescription, [in] ETestCaseType eTestCaseType);
+		[id(4), helpstring("method AddTestCaseNote")] HRESULT AddTestCaseNote([in] BSTR strTestCaseNote);
+		[id(5), helpstring("method AddTestCaseException")] HRESULT AddTestCaseException([in] BSTR strTestCaseException);
+		[id(6), helpstring("method EndTestCase")] HRESULT EndTestCase([in] VARIANT_BOOL bResult);
+		[id(7), helpstring("method EndComponentTest")] HRESULT EndComponentTest();
+		[id(8), helpstring("method EndTestHarness")] HRESULT EndTestHarness();
+		// The detail text will be brought up in message box
+		[id(9), helpstring("method AddTestCaseDetailNote")] HRESULT AddTestCaseDetailNote([in] BSTR strTitle, [in] BSTR strTestCaseDetailNote);
+		// The memo item, the memo text will be bought up in NotePad
+		[id(10), helpstring("method AddTestCaseMemo")] HRESULT AddTestCaseMemo([in] BSTR strTitle, [in] BSTR strTestCaseMemo);
+		// The file item will be opened in the registered application when double-clicked on
+		[id(11), helpstring("method AddTestCaseMemo")] HRESULT AddTestCaseFile([in] BSTR strFileName);
+		// If an exception occurs while executing a component test
+		[id(12), helpstring("method AddComponentTestException")] HRESULT AddComponentTestException([in] BSTR strComponentTestException);
+		// Display the found and expected data side by side in the lower window with 2 labels.
+		[id(13), helpstring("method AddTestCaseCompareData")] HRESULT AddTestCaseCompareData(	[in] BSTR strTitle,
+																								[in] BSTR strLabel1, [in] BSTR strInput1,
+																								[in] BSTR strLabel2, [in] BSTR strInput2);
+	};
+	[
+		object,
+		uuid(4AE8E81F-CB68-45E9-80F5-E56F0409F109),
+		dual,
+		helpstring("IInteractiveTestExecuter Interface"),
+		pointer_default(unique)
+	]
+	interface IInteractiveTestExecuter : IDispatch
+	{
+		[id(1), helpstring("method SetResultLogger")] HRESULT SetResultLogger([in] ITestResultLogger *pLogger);
+		[id(2), helpstring("method ExecuteITCFile")] HRESULT ExecuteITCFile([in] BSTR strITCFile);
+	};
+	[
+		object,
+		uuid(8FD8FFF3-E015-4962-BDB8-8A441401D76E),
+		dual,
+		helpstring("ITestableComponent Interface"),
+		pointer_default(unique)
+	]
+	interface ITestableComponent : IDispatch
+	{
+		// pArguments - a vector of parameters only the testable component knows how to deal with them
+		[id(1), helpstring("method RunAutomatedTests")] HRESULT RunAutomatedTests([in] IVariantVector* pParams, [in] BSTR strTCLFile);
+		[id(2), helpstring("method RunInteractiveTests")] HRESULT RunInteractiveTests();
+		[id(3), helpstring("method SetResultLogger")] HRESULT SetResultLogger([in] ITestResultLogger *pLogger);
+		[id(4), helpstring("method SetInteractiveTestExecuter")] HRESULT SetInteractiveTestExecuter([in] IInteractiveTestExecuter *pInteractiveTestExecuter);
+	};
+	[
+		object,
+		uuid(9698C412-8D45-4F15-9C18-4E2E374077B5),
+		dual,
+		helpstring("ITestHarness Interface"),
+		pointer_default(unique)
+	]
+	interface ITestHarness : IDispatch
+	{
+		[id(1), helpstring("method RunAutomatedTests")] HRESULT RunAutomatedTests();
+		[id(2), helpstring("method RunInteractiveTests")] HRESULT RunInteractiveTests();
+		[id(3), helpstring("method RunAllTests")] HRESULT RunAllTests();
+		[id(4), helpstring("method SetTCLFile")] HRESULT SetTCLFile([in] BSTR strTCLFile);
+		[id(5), helpstring("method ExecuteITCFile")] HRESULT ExecuteITCFile([in] BSTR strITCFile);
+	};
+};

@@ -1,0 +1,14 @@
+Brainstorm
+- Test Invalid rectangles
+- Test rectangles that go off the page
+- test a rectangle that is really only a point
+- test a rectangle that is really a line ( inside and outside )
+- test in region, test out of region
+- Test that new lines are in corrrect places
+- Test a small rectangle (letter size or smaller)
+- Test A giant rectangle (larger than the page)
+- Test a rectangle that is completely off the page
+	- test it with both insiade and outside
+- Test A valid rectangle for both inside and outside
+- test all the boudary conditions
+- Test it on a blank spatial string

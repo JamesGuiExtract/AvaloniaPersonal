@@ -1,0 +1,64 @@
+<HTML>
+	<HEAD>
+		<TITLE>Basic Value Modifier Exercises</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Value Modifier Exercises</h1>
+		<hr>
+		<ol>
+			<li><b>Regular Expression Value Modifier</b>
+				<ul>
+					<p>
+						<li>Open <b>FileNumber_VAC.rsd</b> and run it on <b>FileNumbers.txt</b>.</li>
+						<li>Add Regular Expression value modifiers to the "Value after clue rule" value finder to accomplish the following:
+							<ul>
+								<li>Select only attributes that contain a zero.
+									<ul>
+										<li>Hint: [\s\S]*0 will capture all characters up to and including a zero.</li>
+									</ul>
+								</li>
+								<li>Now extract only the numerical characters from each of those attributes (go ahead and keep any non-leading or non-trailing hyphen).
+									<ul>
+										<li>Hint: Don't delete anything, just add an additional value modifier to your list.</li>
+									</ul>
+								</li>
+								<li>Lastly, remove any leading zeros from the found attributes.
+									<ul>
+										<li>Hint: [^0] will match any character <i>other than</i> zero.</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+					</p>
+				</ul>
+			</li>
+			<p>
+				<li><b>Replace Strings Value Modifier</b>
+					<ul>
+						<p>
+							<li>Open <b>Dates.rsd</b> and run it on <b>Dates.txt</b>.</li>
+							<li>Add a Replace Strings value modifier to the attribute called <b>Dates</b> that will change <i>Jan</i> into <i>JANUARY</i>. Run the Rule Tester and confirm that <i>JAN</i> has been replaced with <i>JANUARY</i>.</li>
+							<li>Now try checking the <b>Strings in the first column are Case Sensitive</b> checkbox, and run the Rule Tester again.  Note that <i>JAN</i> has not been replaced. Unchecking this checkbox, or changing <i>Jan</i> to <i>JAN</i> in the replacement pair will solve this. </li>
+							<li>Remove the Replace Strings Value Modifier which you created.</li>
+							<li>The regular expression symbol <b>\W</b> matches any non-word character, meaning any character that is not a letter, numeral, or underscore. For example, to change <b>Foo, Bar</b> to <b>Foo-Bar</b>, you could type <b>\W+</b> in the <b>Specify string to be replaced</b> edit box and type <b>-</b> in the <b>Specify string to replace</b> edit box.</li>
+								<ul>
+									<li>Add a new Replace Strings value modifier, and, using this example as a guide, change all of the dates in <b>Dates.txt</b> to look like:<br>
+									JANUARY/17/1984<br>
+									JAN/23/2008<br>
+									etc.
+									</li>
+									<li>Now, without deleting the first replacement string pair you created, add replacement string pairs to change<br>
+									JANUARY/17/1984 to 01/17/2008<br>
+									JAN/23/2008 to 01/23/2008<br>
+									etc.
+									</li>
+								</ul>
+							</li>
+						</p>
+					</ul>
+				</li>
+			</p>
+		</ol>
+	</BODY>
+</HTML>

@@ -1,0 +1,6 @@
+[VARS_BEGIN]
+hc_clues=15a. member|15a member|19a. mailing|19a mailing|4a. grade,|4a grade|7a. place|7a place|8a. last|8a last|SHADED AREAS
+[VARS_END]
+[PATTERNS_BEGIN]
+rule1=?HC_2000^@hc_clues
+[PATTERNS_END]

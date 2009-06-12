@@ -1,0 +1,6 @@
+^20\s*[,.]?\s*SOC
+^.{0,6}SOCIAL\s*S[ec]
+^.{0,8}CIAL\s*SEC
+^.{0,15}S[ec]{1,2}urity\s*(N\s*u|[\s\S]{0,4}mber)
+^20.{0,15}SECURITY
+20\s*[,.]?\s*SOCIAL\s*SECURITY

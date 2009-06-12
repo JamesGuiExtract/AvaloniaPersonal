@@ -1,0 +1,78 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Tests trimming Leading Nonsense
+Leading LC Text|given to ABC Company|ABC Company
+
+Leading Whitespace|\r\n ABC Company|ABC Company
+
+Leading Digits1|by 21st Century Mortgage|21st Century Mortgage
+
+Leading Digits2|by a21st Century Mortgage|Century Mortgage
+
+Leading Digits3|by 21st2 Century Mortgage|Century Mortgage
+
+Leading Digits4|by 21 Century Mortgage|Century Mortgage
+
+Leading Left Paren|by (ABC) Century Mortgage|Century Mortgage
+
+No Leading Left Paren|by ABC) Century Mortgage|ABC Century Mortgage
+
+Leading Punctuation|., by Century Mortgage|Century Mortgage
+
+Leading Spaces|  by Century Mortgage|Century Mortgage
+
+Leading Embedded UC|by xxYYzz Century Mortgage|Century Mortgage
+
+Leading TO 1|To Century Mortgage|Century Mortgage
+
+Leading TO 2|TO Century Mortgage|Century Mortgage
+
+Leading TO 3|To: Century Mortgage|Century Mortgage
+
+Leading AND 1|And Century Mortgage|Century Mortgage
+
+Leading AND 2|AND Century Mortgage|Century Mortgage
+
+Leading AND 3|And: Century Mortgage|Century Mortgage
+
+Leading AND 4|A N D Century Mortgage|Century Mortgage
+
+Leading AND 5|A \r\n\r\nN \r\n\r\nD Century Mortgage|Century Mortgage
+
+Leading MADE|Made by Century Mortgage|Century Mortgage
+
+Leading BETWEEN|Between Century Mortgage and |Century Mortgage
+
+Leading FROM|From Century Mortgage and |Century Mortgage
+
+Leading THE UNDERSIGNED|The Undersigned Century Mortgage and |Century Mortgage
+
+Leading WITH|With Century Mortgage and |Century Mortgage
+
+Leading THROUGH|Through Century Mortgage and |Century Mortgage
+
+Leading THAT|That Century Mortgage and |Century Mortgage
+
+Leading WE|We Century Mortgage and |Century Mortgage
+
+Leading PAID BY|Paid By Century Mortgage and |Century Mortgage
+
+Leading I/WE|I/We, John Smith and Mary Smith with|John Smith and Mary Smith
+
+Leading I|I, John Smith and |John Smith

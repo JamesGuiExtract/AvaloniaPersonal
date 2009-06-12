@@ -1,0 +1,753 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Redaction Finding Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Redaction Finding Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+NOTE: Files can be found at <b>I:\Common\Testing\Product Testing\IDShieldOffice\Images</b> unless otherwise specified.
+<hr>
+<UL>
+	<LI><b>Find and Redact Data Types</b>
+	<ul>
+		<li>Default behavior
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Data type finder</b> button.
+			<li>Confirm that the <b>Find and redact - Data types</b> 
+			dialog appears.
+			<!-- SCR# 69 -->
+			<li>Confirm that <b>dialog icon</b> is the same as main window.
+			<li>Confirm that checkboxes are included for:
+			<ul>
+				<li><b>Account numbers - Credit and debit card numbers</b>
+				<li><b>Account numbers - Savings, checking, and bank account numbers</b>
+				<li><b>Account numbers - Other account numbers</b>
+				<li><b>Driver's license numbers</b>
+				<li><b>E-mail addresses</b>
+				<li><b>Federal tax identification numbers</b>
+				<li><b>Social security numbers</b>
+			</ul>
+			<li>Confirm that the checkboxes are <b>unchecked</b>.
+			<li>Confirm that buttons are provided for <b>Reset search</b>, <b>Find next</b>, 
+			<b>Redact</b>, <b>Redact all</b>, and <b>Close</b>.
+			<li>Confirm that results grid is provided.
+			<li>Confirm that status bar is provided.
+			<li>Confirm that tab order is correct.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Confirm that the <b>Close</b> button closes the dialog.
+		</ul>
+		<p>
+
+		<li>Enable and disable of buttons
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Data type finder</b> button.
+			<li>Uncheck each checkbox.
+			<li>Open an image file.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Check one checkbox.
+			<li>Confirm that the <b>Find next</b> and <b>Redact all</b> buttons 
+			are also enabled.
+			<li>Confirm that tab order is correct.
+			<li>Close the image file.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Close the dialog.
+			<li>Leave <b>ID Shield Office</b> open.
+		</ul>
+		<p>
+
+		<li>Settings persistence
+		<ul>
+			<li>Reopen the <b>Find and redact - Data types</b> dialog.
+			<li>Confirm that the same checkbox is checked and that the others are 
+			unchecked.
+			<li>Uncheck the one checkbox and check the other checkboxes.
+			<li>Close and reopen the dialog.
+			<li>Confirm that the appropriate checkboxes are checked.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Data Types</b> dialog.
+			<li>Confirm that the checkboxes are unchecked.
+			<p>
+
+			<li>Open the <b>FindTextTest.tif</b> test image.
+			<li>Confirm that the same checkbox is checked and that the others are 
+			unchecked.
+			<li>Uncheck the one checkbox and check the other checkboxes.
+			<li>Close and reopen the dialog.
+			<li>Confirm that the appropriate checkboxes are checked.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Data Types</b> dialog.
+			<li>Confirm that the checkboxes are unchecked.
+		</ul>
+		<p>
+
+		<li>Note: Find functionality of the following data types are tested using NUnit
+		<ul>
+			<li>Account numbers - Credit and debit card numbers
+			<li>Account numbers - Savings, checking, and bank account numbers
+			<li>Account numbers - Other account numbers
+			<li>Driver's license number
+			<li>E-mail addresses
+			<li>Federal tax identification number 
+			<li>Social security number
+		</ul>
+		<p>
+
+		<li>Results navigation
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Click <b>Data type finder</b>
+			<li>Check <b>Social security number</b>
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and results grid is correct.
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and information in results grid is correct again.
+			<li>Confirm that all the clues and redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that all the added redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that <b>Find next</b> button is disabled.
+			<li>Click <b>Reset search</b> button.
+			<li>Confirm that status bar and results grid is reset.
+			<li>Check all the checkboxes.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that message on the status bar and information in results grid is correct again.
+			<li>Confirm that newly added clues and redactions can be navigated by using <b>Find next</b> button.
+			<li>Delete several redactions.
+			<li>Click <b>Find next</b>.
+			<li>Confirm message on the status bar and results grid is correct.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that message in the status bar is correct.
+			<li>Confirm that <b>Find next</b> button is enabled.
+			<li>Confirm that newly added redactions can be navigated by clicking <b>Find next</b> button.
+			<p>
+			<li>Open <b>QuickOCR.tif</b> image file.
+			<li>Check all the checkboxes and click <b>Find next</b> button.
+			<li>Confirm that <b>No matched</b> dialog appears.		
+		</ul>
+		<p>
+
+		<!-- SCR# 46 -->
+		<li> Redact all - without other buttons clicking
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Check <b>all</b> checkboxes and click the <b>Redact all</b> button.
+			<li>Confirm that no exception is thrown and proper items are redacted
+		</ul>
+	</ul>
+	<p>
+
+	<LI><b>Find and Redact Bracketed Text</b>
+	<ul>
+		<li>Default behavior
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Find bracketed text</b> button.
+			<li>Confirm that the <b>Find and redact - Bracketed Text</b> 
+			dialog appears.
+			<!-- SCR# 69 -->
+			<li>Confirm that <b>dialog icon</b> is the same as main window.
+			<li>Confirm that checkboxes are included for: <b>Square brackets</b>, 
+			<b>Curly brackets</b>, and <b>Parenthesis</b>.
+			<li>Confirm that the checkboxes are <b>unchecked</b>.
+			<li>Confirm that buttons are provided for <b>Reset search</b>, <b>Find next</b>, 
+			<b>Redact</b>, <b>Redact all</b>, and <b>Close</b>.
+			<li>Confirm that results grid is provided.
+			<li>Confirm that status bar is provided.
+			<li>Confirm that tab order is correct.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Confirm that the <b>Close</b> button closes the dialog.
+		</ul>
+		<p>
+
+		<li>Enable and disable of buttons
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Find bracketed text</b> button.
+			<li>Uncheck each checkbox.
+			<li>Open an image file.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Check one checkbox.
+			<li>Confirm that the <b>Find next</b> and <b>Redact all</b> buttons 
+			are also enabled.
+			<li>Confirm that tab order is correct.
+			<li>Close the image file.
+			<li>Confirm that only the <b>Close</b> button is enabled.
+			<li>Close the dialog.
+			<li>Leave <b>ID Shield Office</b> open.
+		</ul>
+		<p>
+
+		<li>Settings persistence
+		<ul>
+			<li>Reopen the <b>Find and redact - Bracketed Text</b> dialog.
+			<li>Confirm that the same checkbox is checked and that the others are 
+			unchecked.
+			<li>Uncheck the one checkbox and check the other two checkboxes.
+			<li>Close and reopen the dialog.
+			<li>Confirm that the appropriate checkboxes are checked.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Bracketed Text</b> dialog.
+			<li>Confirm that the checkboxes are unchecked.
+			<p>
+
+			<li>Open the <b>FindTextTest.tif</b> test image.
+			<li>Confirm that the same checkbox is checked and that the others are 
+			unchecked.
+			<li>Uncheck the one checkbox and check the other two checkboxes.
+			<li>Close and reopen the dialog.
+			<li>Confirm that the appropriate checkboxes are checked.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Bracketed Text</b> dialog.
+			<li>Confirm that the checkboxes are unchecked.
+		</ul>
+		<p>
+
+		<li>Find functionality - Basic
+		<ul>
+			<li>Check all the checkboxes and click the <b>Find</b> button.
+			<li>Confirm that the <b>first</b> bracketed item is selected.
+			<li>Click the <b>Redact</b> button.
+			<li>Confirm that the <b>first</b> bracketed item is redacted and that 
+			the <b>second</b> bracketed item is now selected.
+			<li>Click the <b>Find next</b> button.
+			<li>Confirm that the <b>third</b> bracketed item is selected.
+			<li>Click the <b>Redact all</b> button.
+			<li>Confirm that <b>all</b> bracketed items are now redacted.
+		</ul>
+		<p>
+
+		<li>Results navigation
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Click <b>Bracketed text finder</b> and check all the checkboxes.
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and results grid is correct.
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and information in results grid is correct again.
+			<li>Confirm that all the clues and redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that all the added redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that <b>Find next</b> button is disabled.
+			<li>Click <b>Reset search</b> button.
+			<li>Confirm that status bar and results grid is reset.
+			<li>Delete several redactions.
+			<li>Click <b>Find next</b>.
+			<li>Confirm message on the status bar and results grid is correct.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that message in the status bar is correct.
+			<li>Confirm that <b>Find next</b> button is enabled.
+			<li>Confirm that newly added redactions can be navigated by clicking <b>Find next</b> button.
+			<p>
+			<li>Open <b>QuickOCR.tif</b> image file.
+			<li>Check all the checkboxes and click <b>Find next</b> button.
+			<li>Confirm that <b>No matched</b> dialog appears.		
+		</ul>
+		<p>
+
+		<!-- SCR# 46 -->
+		<li> Redact all - without other buttons clicking
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Check <b>all</b> checkboxes and click the <b>Redact all</b> button.
+			<li>Confirm that no exception is thrown and proper items are redacted
+		</ul>
+	</ul>
+	<p>
+
+	<LI><b>Find and Redact Words / Patterns</b>
+	<ul>
+		<li>Default behavior
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Find words</b> button.
+			<li>Confirm that the <b>Find and redact - Words/patterns</b> 
+			dialog appears.
+			<!-- SCR# 69 -->
+			<li>Confirm that <b>dialog icon</b> is the same as main window.
+			<li>Confirm that a multi-line edit box is provided for 
+			<b>Words/patterns (one per line)</b>.
+			<li><b>[IDSO #92]</b> Confirm that the edit box has initial focus.
+			<li>Confirm that the edit box is empty.
+			<li>Confirm that checkboxes are included for: <b>Match case</b>
+			and <b>Treat as regular expressions</b>.
+			<!-- SCR# 114 -->
+			<li>Confirm that help link label to "treat as regular expressions" checkbox is provided
+			<li>Confirm that the checkboxes are <b>unchecked</b>.
+			<li>Confirm that buttons are provided for <b>Import...</b> and 
+			<b>Export...</b>.
+			<li>Confirm that buttons are provided for <b>Reset search</b>, <b>Find next</b>, 
+			<b>Redact</b>, <b>Redact all</b>, and <b>Close</b>.
+			<li>Confirm that results grid is provided.
+			<li>Confirm that status bar is provided.
+			<li>Confirm that tab order is correct.
+			<li>Confirm that only the <b>Import...</b> and <b>Close</b> buttons 
+			are enabled.
+			<li>Confirm that the <b>Close</b> button closes the dialog.
+		</ul>
+		<p>
+
+		<li>Enable and disable of buttons
+		<ul>
+			<li>Open <b>ID Shield Office</b> without opening an image.
+			<li>Click the <b>Find words</b> button.
+			<li>Open an image file.
+			<li>Confirm that only the <b>Close</b> and <b>Import...</b> buttons are enabled.
+			<li>Add a word or pattern to the edit box.
+			<li>Confirm that the <b>Export...</b>, <b>Find next</b> and <b>Redact 
+			all</b> buttons are also enabled.
+			<li>Confirm that tab order is correct.
+			<li>Close the image file.
+			<li>Confirm that only the <b>Import...</b>, <b>Export...</b> and 
+			<b>Close</b> buttons are enabled.
+			<li>Close the dialog.
+			<li>Leave <b>ID Shield Office</b> open.
+		</ul>
+		<p>
+
+		<li>Settings persistence
+		<ul>
+			<li>Reopen the <b>Find and redact - Words/patterns</b> dialog.
+			<li>Confirm that the same word or pattern is present in the edit box.
+			<li>Modify the checkbox settings.
+			<li>Add additional lines of text to fill up the edit box.
+			<li><b>[IDSO #91]</b> Confirm that a horizontal scroll bar is displayed 
+			when needed.
+			<li><b>[IDSO #91]</b> Confirm that a vertical scroll bar is displayed 
+			when needed.
+			<li>Close and reopen the dialog.
+			<li>Confirm that the edit box contents are retained.
+			<li>Confirm that the checkbox settings are retained.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Words/patterns</b> dialog.
+			<li>Confirm that the edit box is empty.
+		</ul>
+		<p>
+
+		<li>Import / Export functionality
+		<ul>
+			<li>Add several entries to the edit box.
+			<li>Confirm that the entries can be <b>exported</b> to a text file.
+			<li>Confirm that the entries can be <b>exported</b> to a file with 
+			a non-TXT file extension.
+			<li>Confirm that Export... defaults to <b>TXT</b> file extension.
+			<li>Close and reopen <b>ID Shield Office</b>.
+			<li>Reopen the <b>Find and redact - Words/patterns</b> dialog.
+			<li>Confirm that Import... defaults to <b>TXT</b> file extension.
+			<li>Confirm that the previously saved entries can be <b>imported</b> from 
+			the text file.
+			<li>Delete an entry and export the remaining items to the same text file.
+			<li>Confirm that a confirmation dialog is presented before file contents 
+			are overwritten.
+			<li>Confirm that the new contents were saved to the text file.
+			<!-- SCR# 13 -->
+			<li>Delete all entries.
+			<li>Confirm that <b>Export</b> button is disabled.
+			<li>Add an entry to the edit box.
+			<li>Confirm that <b>Export</b> button is enabled now.
+		</ul>
+		<p>
+
+		<li>Find functionality - Basic
+		<ul>
+			<li>Open <b>ID Shield Office</b> and the <b>FindTextTest.tif</b> 
+			test image.
+			<li>Add <b>this</b>, <b>test</b> and <b>111</b> as entries to the <b>Find 
+			and redact - Words/patterns</b> edit box.
+			<li>Click the <b>Find next</b> button and confirm that the word <b>This</b> 
+			is highlighted.
+			<li>Click the <b>Redact</b> button and confirm that the highlight changes 
+			to a redaction and that the word <b>test</b> is highlighted.
+			<li>Click the <b>Redact</b> button again and confirm that the highlight changes 
+			to a redaction and that <b>test</b> within the word <b>testing</b> is 
+			highlighted.
+			<li>Click the <b>Find next</b> button and confirm that the word <b>this</b> 
+			is highlighted.
+			<li>Click the <b>Reset search</b> button and confirm that all highlights are 
+			removed and the redactions are retained.
+			<li>Zoom in on the redacted <b>This</b> text.
+			<li>Click the <b>Find next</b> button and confirm that the redacted word 
+			<b>This</b> is highlighted again and that the window remains zoomed in.
+			<li>Click the <b>Find next</b> button and confirm that the <b>test</b> 
+			redaction is highlighted.
+			<li>Click the <b>Find next</b> button and confirm that <b>test</b> 
+			is highlighted.
+			<li>Click the <b>Find next</b> button and confirm that <b>this</b> 
+			is highlighted.
+			<li>Pan around in the image and confirm that the <b>This</b> redaction 
+			is still redacted.  Also confirm that the <b>test</b> highlight that is 
+			part of <b>testing</b> is no longer highlighted and is NOT redacted.
+			<li>Click the <b>Redact all</b> button and confirm that all the <b>this</b>, 
+			<b>test</b> and <b>111</b> strings are redacted including the item that 
+			had previously not been redacted.
+			<p>
+
+			<li>Close and reopen the <b>FindTextTest.tif</b> test image.
+			<li>Modify the <b>test</b> entry to <b>\btest\b</b>. 
+			<li>Modify the dialog settings to check the <b>Match case</b> and 
+			<b>Treat as regular expression</b> checkboxes.
+			<li>Click the <b>Find next</b> button and confirm that the word <b>test</b> 
+			is the first item highlighted.
+			<li>Click the <b>Redact</b> button and confirm that the highlight changes 
+			to a redaction and that the word <b>test</b> is highlighted.
+			<li>Confirm that <b>test</b> within <b>testing</b> was NOT highlighted or 
+			redacted.
+			<li>Close <b>ID Shield Office</b>.
+		</ul>
+		<p>
+
+		<li>Results navigation
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Click <b>word list finder</b>.
+			<li>Add <b>this</b>, <b>test</b> and <b>111</b> as entries to the <b>Find 
+			and redact - Words/patterns</b> edit box.
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and results grid is correct.
+			<li>Click <b>Find next</b> button.
+			<li>Confirm that message on the status bar and information in results grid is correct again.
+			<li>Confirm that all the clues and redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that all the added redactions can be navigated by using <b>Find next</b> button.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that <b>Find next</b> button is disabled.
+			<li>Click <b>Reset search</b> button.
+			<li>Confirm that status bar and results grid is reset.
+			<li>Delete several redactions.
+			<li>Click <b>Find next</b>.
+			<li>Confirm message on the status bar and results grid is correct.
+			<li>Click <b>Redact all</b> button.
+			<li>Confirm that <b>Redact</b> button is disabled.
+			<li>Confirm that information in results grid is correct.
+			<li>Confirm that message in the status bar is correct.
+			<li>Confirm that <b>Find next</b> button is enabled.
+			<li>Confirm that newly added redactions can be navigated by clicking <b>Find next</b> button.
+			<p>
+			<li>Clear the <b>Find and redact - Words/patterns</b> edit box.
+			<li>Add a nonexistent to the edit box and click <b>Find next</b> button.
+			<li>Confirm that <b>No matched</b> dialog appears.		
+		</ul>
+		<p>
+
+		<!-- SCR# 46 -->
+		<li><b>[IDSD #46]</b> Redact all - without other buttons clicking
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Add <b>test</b>  and <b>111</b> two search words to the textbox and click the <b>Redact all</b> button.
+			<li>Confirm that no exception is thrown and proper items are redacted
+		</ul>
+	</ul>
+	<p>
+
+    <LI><b>Configuration</b>
+	<ul>
+		<li>Type(s) of brackets surrounding text to be redacted
+		<li>Fill type: solid black, solid white
+		<ul>
+			<li>Confirm that default redaction fill color is black
+			<li>Open <b>User preference</b> dialog
+			<li>Change fill color to <b>White</b>
+			<li>Confirm redaction fill color is <b>white</b>
+		</ul>
+		<p>
+
+		<!-- SCR# 267 -->
+		<li><b>[IDSO #267]</b> Default white color not applied
+		<ul>
+			<li>Open ID Shield Office
+			<li>Under Edit | Preferences change the default redaction fill color to white.
+			<li>Close IDSO
+			<li>Open IDSO
+			<li>Confirm that the default redaction fill color is still specified to be white.
+			<li>Make a manual redaction.
+			<li>Confirm that the redaction appears <b>white</b> instead of black.
+			<li>
+		</ul>
+		<!--
+		<li><b>[V2]</b> Specify text output to redaction zone
+		-->
+	</ul>
+	<p>
+
+	<LI><b>Functionality</b>
+	<ul>
+
+		<li>Confirm that user can manually draw a rectangular redaction
+		<li>Confirm that user can manually draw an angular redaction
+		<!-- SCR# 124 -->
+		<li>Confirm that user can resize angular redaction by mouse wheel, or "+" and "-" key while drawing
+		<li>Confirm that a rectangular redaction can be selected,moved, rotated, resized and deleted
+		<li>Confirm that an angular redaction can be selected,moved, rotated, resized and deleted
+		<li>Confirm that multiple redactions can be selected,moved, rotated, resized and deleted
+		<li>Confirm that rectangular redactions can not be moved out of a page
+		<li>Confirm that angular redactions can not be moved out of a page
+		<p>
+
+		<li>Redaction overlapping
+		<ul>
+			<!-- SCR# 51 -->
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Select <b>Edit - redact entire page</b> to redact first page
+			<li>Click <b>Data type finder</b>.
+			<li>Check <b>all</b> the checkboxes and click <b>Redact all</b>
+			<li>Select the redaction in the first page and delete it.
+			<li>Confirm the no additional redactions are added in first page and the linked piece is 
+			added to the second page.
+			<li>Delete all the redactions in the second page.
+			<p>
+
+			<li>Select <b>Edit - redact entire page</b> to redact first page
+			<li>Click <b>Bracketed text finder</b>.
+			<li>Check <b>all</b> the checkboxes and click <b>Redact all</b>
+			<li>Select the redaction in the first page and delete it.
+			<li>Confirm that no additional redactions are added in first page and proper redactions are added to the second page.
+			<li>Delete all the redactions in the second page.
+			<p>
+
+			<li>Select <b>Edit - redact entire page</b> to redact first page
+			<li>Click <b>Word list finder</b>.
+			<li>Add <b>test</b> to the textbox and click <b>Redact all</b>
+			<li>Select the redaction in the first page and delete it
+			<li>Confirm the no additional redactions are added in first page and proper redactions are added to the second page.
+			<li>Delete all the redactions in the second page.		
+			<p>
+
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Click <b>Data type finder</b>.
+			<li>Check <b>all</b> the checkboxes and click <b>Redact all</b> multiple times
+			<li>Confirm the no duplicate redactions are added.
+			<li>Delete one of the redactions
+			<li>Apply <b>Redact all</b> again
+			<li>Confirm that the deleted redaction is added back and no duplications exist for the other redactions.
+			<p>
+
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Click <b>Bracketed text finder</b>.
+			<li>Check <b>all</b> the checkboxes and click <b>Redact all</b> multiple times
+			<li>Confirm that no duplicate redactions are added.
+			<li>Delete one of the redactions
+			<li>Apply <b>Redact all</b> again
+			<li>Confirm that the deleted redaction is added back and no duplications exist for the other redactions.
+			<p>
+
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Click <b>Word list finder</b>.
+			<li>Add <b>test</b> to the textbox and click <b>Redact all</b> multiple times
+			<li>Confirm the no duplicate redactions are added.
+			<li>Delete one of the redactions
+			<li>Apply <b>Redact all</b> again
+			<li>Confirm that the deleted redaction is added back and no duplications exist for the other redactions.
+			<p>
+
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Click <b>Word list finder</b>.
+			<li>Add <b>test</b> and <b>a test document</b> to the textbox and click <b>Find next</b>
+			<li>Confirm that <b>a test document</b> is highlighted by green with a border.
+			<li>Click <b>Redact all</b>
+			<li>Confirm that no duplicate redactions in the <b>a test document</b> redaction.
+		</ul>
+		<p>
+
+		<li>Clues spanning lines
+		<ul>
+			<li>Open <b>NewLineClues.tif</b> image file
+			<li>Show <b>Find and redact - Data types</b> dialog
+			<li>Check <b>all the checkboxes</b> and click <b>Find next</b>
+			<li>Confirm that all the clues are highlighted
+		</ul>
+		<p>
+
+		<!-- SCR# 120 -->
+		<li><b>[IDSD #120]</b> Match spanning pages
+		<ul>
+			<li>Open <b>Brackets.tif</b> image file
+			<li>Show <b>Find and redact - Bracketed text</b> dialog
+			<li>Check <b>all the checkboxes</b> and click <b>Find next</b>
+			<li>Confirm that first piece of match for curly bracket is highlighted by green
+			<li>Click <b>Redact</b> to redact this piece
+			<li>Confirm that the open square bracket in the first page is highlighted now
+			<li>Click <b>Find next</b>
+			<li>Confirm that the second piece of match for curly(whole second page) is now highlighted
+			<li>Click <b>Find next</b>
+			<li>Confirm that the close square bracket in the second page is highlighted
+			<li>Click <b>Redact</b> to redact
+			<li>Confirm that another square brackets on the second page is now highlighted
+			<li>Click <b>Redact</b> to redact
+			<li>Confirm that the third piece of match for curly is now highlighted
+			<li>Click <b>Redact</b> to redact
+			<li>Confirm that the first piece and the third piece is linked correctly
+		</ul>
+
+		<!-- SCR# 52 -->
+		<li><b>[IDSD #52]</b> Highlighting
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Click <b>Bracketed text finder</b>.
+			<li>Check <b>all</b> the checkboxes and click <b>Find next</b>
+			<li>Click <b>Select redactions and other objects</b> toolbar button
+			<li>Confirm that <b>Current highlight</b> can not be selected and removed
+			<li>Click <b>Redact</b> button in the <b>Find and redact - Bracketed text</b> dialog
+			<li>Confirm that <b>Redaction</b> can be selected and removed
+		</ul>	
+
+		<!-- SCR# 75,115,258 -->
+		<li><b>[IDSD #75, 115, 258]</b> Windows Activation / Minimize / Restore
+		<ul>
+			<li>close image file
+			<li>Click <b>Data type finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Data types</b> dialog appears
+			<li>Minimize <b>Find and redact - Data types</b> dialog
+			<li>Click <b>Data type finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Data types</b> dialog is visible
+			<li>Minimize IDSO main window
+			<li>Confirm that <b>Find and redact - Data types</b> dialog is minimized
+			<li>Restore IDSO main window
+			<li>Confirm that <b>Find and redact - Data types</b> dialog is restored
+			<li>Resize <b>Find and redact - Data types</b> dialog
+			<li>Confirm that <b>all controls</b> are resized properly
+			<p>
+
+			<li>Click <b>Bracketed text finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Bracketed text</b> dialog appears
+			<li>Minimize <b>Find and redact - Bracketed text</b> dialog
+			<li>Click <b>Bracketed text finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Bracketed text</b> dialog is visible
+			<li>Minimize IDSO main window
+			<li>Confirm that <b>Find and redact - Bracketed text</b> dialog is minimized
+			<li>Restore IDSO main window
+			<li>Confirm that <b>Find and redact - Bracketed text</b> dialog is restored
+			<li>Resize <b>Find and redact - Bracketed text</b> dialog
+			<li>Confirm that <b>all controls</b> are resized properly
+			<p>
+
+			<li>Click <b>Word list finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Words/Patterns</b> dialog appears
+			<li>Minimize <b>Find and redact - Words/Patterns</b> dialog
+			<li>Click <b>Word list finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Words/Patterns</b> dialog is visible
+			<li>Minimize IDSO main window
+			<li>Confirm that <b>Find and redact - Words/Patterns</b> dialog is minimized
+			<li>Restore IDSO main window
+			<li>Confirm that <b>Find and redact - Words/Patterns</b> dialog is restored
+			<li>Resize <b>Find and redact - Words/Patterns</b> dialog
+			<li>Confirm that <b>all controls</b> are resized properly
+		</ul>
+
+		<li>Dynamic Data type rules
+		<ul>
+			<li>Open <b>C:\Program Files\Extract Systems\IDShieldOffice\Rules\DataTypes</b> folder
+			<li>Chang <b>E-mail addresses</b> folder name to <b>E-mail addresses renamed</b>
+			<li>Start IDSO without opening an image
+			<li>Click <b>Data type finder</b> toolbar button
+			<li>Confirm that <b>E-mail addresses renames</b> checkbox is displayed in the dialog
+			<li>Chang renamed folder back to original name
+			<li>Close IDSO
+			<p>
+
+			<li>Move <b>Social security numbers</b> folder to parent folder <b>DataTypes</b>
+			<li>Start IDSO without opening an image
+			<li>Click <b>Data type finder</b> toolbar button
+			<li>Confirm that <b>Social security number </b> checkbox is not displayed in the dialog
+			<li>Move <b>Social security numbers</b> folder back
+			<li>Close IDSO
+			<p>
+
+			<li>Copy <b>Social security numbers</b> and paste to <b>DataTypes</b> a couple of times.
+			<li>Start IDSO without opening an image
+			<li>Click <b>Data type finder</b> toolbar button
+			<li>Confirm that <b>Find and redact - Data type finder</b> automatically adjusts its size to contain all the checkboxes.
+			<li>Delete all the copies of <b>Social security numbers</b> folder
+		</ul>
+	</ul>
+	<p>
+
+	<LI><b>Others</b>
+	<ul>
+		<li>Pressure Test
+		<ul>
+			<li>Open <b>0350pages.tif (350 pages)</b> image files.
+			<li>Confirm that <b>Data type finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Bracketed text finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Word list finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Bates#</b> works without errors and screen frozen.		
+			<p>
+
+			<li>Open many-page pdf files.
+			<li>Confirm that it won't take too long to open the file.
+			<li>Confirm that <b>Loading document, please wait...</b> displayed on the status bar.
+			<li>Confirm that <b>Data type finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Bracketed text finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Word list finder</b> works without errors and screen frozen.
+			<li>Confirm that <b>Bates#</b> works without errors and screen frozen.
+		</ul>
+		<p>
+
+		<!-- SCR# 210 -->
+		<li><b>[IDSD #210]</b> Clues selection
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Find some clues on both pages.
+			<li>Click <b>Edit - Select All</b> to select all clues.
+			<li>Confirm that clues' selection boxes at first page are painted on the second page.	
+		</ul>
+		<p>
+
+		<!-- SCR# 293 -->
+		<li><b>[IDSD #293]</b> "[]" redaction
+		<ul>
+			<li>Open <b>2004_13815951.tif</b> image file
+			<li>Click <b>Bracketed text finder</b> toolbar button
+			<li>Check all the checkboxes and click <b>Redact all</b> 
+			<li>Confirm that all the "[]" are not redacted
+		</ul>
+		<p>
+
+		<!-- SCR# 314 -->
+		<li><b>[IDSD #314]</b> Redaction movement exception
+		<ul>
+			<li>Open an image in portrait view
+			<li>Draw a redaction toward the top of the image
+			<li>Rotate the image clockwise
+			<li>Click and drag the redaction from the top of the page to the valid location on the bottom of the page
+			<li>Confirm that the redaction can be moved to the new location
+		</ul>
+		<p>
+
+		<li><b>[IDSD #344]</b> Find or Redact uses excess CPU when waiting for OCR results
+		<ul>
+			<li>Open ID Shield Office.
+			<li>Open task manager and go to the processes tab.
+			<li>Sort the processes by name and find the IDShieldOffice.exe.
+			<li>In ID Shield Office, open an image (preferably a multi-page document).
+			<li>Immediately open Find or Redact and start a find operation.
+			<li>Confirm that while the document is still being OCR'd, CPU usage for IDShieldOffice.exe should remain at or near 0%
+		</ul>
+		<p>
+</UL>
+</BODY>
+</HTML>

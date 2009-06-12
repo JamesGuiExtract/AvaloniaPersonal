@@ -1,0 +1,51 @@
+// SubImageHandlers.idl : IDL source for SubImageHandlers.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SubImageHandlers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(A3910261-B6B8-11D6-82F4-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR SubImageHandlers 1.0 Type Library")
+]
+library UCLID_SUBIMAGEHANDLERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\Core\SpotRecognitionIR.tlb");
+	importlib("..\..\..\..\..\IFCore\Code\IFCore.tlb");
+
+	//////////////////////
+	// Interfaces		//
+	//////////////////////
+	[
+		object,
+		uuid(A391026E-B6B8-11D6-82F4-0050DAD4FF55),
+		dual,
+		helpstring("ISRWSubImageHandler Interface"),
+		pointer_default(unique)
+	]
+	interface ISRWSubImageHandler : IDispatch
+	{
+		[id(1), helpstring("method SetInputManager")] HRESULT SetInputManager([in] IInputManager *pInputManager);
+	};
+
+	//////////////////////
+	// CoClasses		//
+	//////////////////////
+	[
+		uuid(A391026F-B6B8-11D6-82F4-0050DAD4FF55),
+		helpstring("SRWSubImageHandler Class")
+	]
+	coclass SRWSubImageHandler
+	{
+		[default] interface ISRWSubImageHandler;
+		interface ISubImageHandler;
+		interface ILicensedComponent;
+	};
+};

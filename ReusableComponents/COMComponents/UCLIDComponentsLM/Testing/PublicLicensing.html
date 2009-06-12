@@ -1,0 +1,126 @@
+<html>
+
+<head>
+<title>Public Licensing Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Public Licensing Testing Checklist<br>
+<IMG src="../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
+
+<ol>
+
+	<!-- *********************************************** -->
+	<li><h2>ExtractTRP2 - Functionality</h2>
+	<ul>
+   		<li>Execute the following test cases from a command window.  Use <b>Task Manager</b> 
+		to verify presence / absence of the application.</li>
+   		<li>Confirm that <b>ExtractTRP2</b> can be started without arguments.</li>
+   		<li><b>[LegacyRCAndUtils #4353]</b> Attempt to start multiple instances.  Confirm that only 
+		one instance is active.</li>
+   		<li>Confirm that <b>ExtractTRP2 /?</b> provides a message box with usage instructions.</li>
+   		<li><b>[LegacyRCAndUtils #4354, #4414]</b> Confirm that <b>ExtractTRP2 /exit</b> closes 
+		the application.</li>
+   		<li>Confirm that unsupported command-line arguments such as <b>ExtractTRP2 /abc</b> 
+		provide a message box with usage instructions.</li>
+		<li><b>[LegacyRCAndUtils #5021]</b> Instance will be left running with /exit flag
+		<ul>
+			<li>With no instance of ExtractTRP2 running, confirm that entering <b>ExtractTRP2 /exit</b>
+			at the command line starts a new instance and immediately closes it.</li>
+		</ul>
+	</ul>
+	</li>
+<p>
+	<!-- *********************************************** -->
+	<li><h2>User Key Generator - Functionality</h2>
+	<ul>
+   		<li><b>Step 1</b>
+		<ul>
+	   		<li>Confirm that the initial caption is <b>User License - Step 1 of 3</b>.</li>
+   			<li>Confirm that the user license key is generated, displayed and non-selectable 
+			when the application starts.</li>
+	   		<li>Confirm that the tab order is appropriate for the Name, Company Name, Phone 
+			Number and Email edit boxes.</li>
+   			<li>Confirm that appropriate strings are presented for <b>Product</b> 
+			and <b>Version</b>.</li>
+   			<li>Confirm that for <b>FLEX Index or ID Shield</b>, both Client and Server are 
+			presented for <b>Type</b>.</li>
+	   		<li>Confirm that the <b>Next</b> button is disabled until all information 
+			is provided.</li>
+		</ul>
+   		<li><b>Step 2</b>
+		<ul>
+	   		<li>Click the <b>Next</b> button.</li>
+	   		<li>Confirm that the caption is <b>User License - Step 2 of 3</b>.</li>
+   			<li>Confirm that <b>Select email system</b> radio buttons are presented 
+			for <b>desktop email</b> and <b>web-based email</b>.</li>
+	   		<li>Confirm that the default is <b>desktop email</b>.</li>
+		</ul>
+   		<li><b>Step 3</b>
+		<ul>
+	   		<li><b>Desktop email</b>
+			<ul>
+		   		<li>Select <b>Desktop email</b> and click Next.
+		   		<li>Confirm that the caption is <b>User License - Step 3 of 3</b>.</li>
+		   		<li>Confirm that a three-item list of instructions is presented.</li>
+		   		<li>Confirm that a <b>here</b> button is provided to automatically 
+				generate a license request email.</li>
+		   		<li>Confirm that a <b>Show manual license request instructions</b> button 
+				is provided.</li>
+<p>
+		   		<li>Click the <b>here</b> button on a system that has email configured. 
+		   		<li>Confirm that the license request email is created.</li>
+		   		<li>Click the <b>here</b> button on a system that does not have 
+				email configured. 
+		   		<li>Confirm that an <b>Internet COnnection Wizard</b> appears to 
+				try and configure email settings.</li>
+<p>
+		   		<li>Click the <b>Show manual license request instructions</b> button.</li>
+		   		<li>Confirm that a six-item list of instructions is presented.</li>
+		   		<li>Confirm that an enabled <b>Click here</b> button is provided to 
+				copy the email body to the clipboard.
+		   		<li>Confirm that the other two <b>Click here</b> buttons are disabled.
+		   		<li>Click the <b>Click here</b> button.
+		   		<li>Confirm that appropriate email text has been copied to the clipboard.
+		   		<li>Confirm that the next <b>Click here</b> button is now enabled.
+		   		<li>Click the second <b>Click here</b> button.
+		   		<li>Confirm that appropriate email subject text has been copied to 
+				the clipboard.
+		   		<li>Confirm that the next <b>Click here</b> button is now enabled.
+		   		<li>Click the third <b>Click here</b> button.
+		   		<li>Confirm that appropriate recipient address text has been copied to 
+				the clipboard.
+		   		<li>Confirm that the <b>Finish</b> button is now enabled.
+			</ul>
+	   		<li><b>Web-based email</b>
+			<ul>
+		   		<li>Select <b>web based email</b> and click Next.
+		   		<li>Confirm that the caption is <b>User License - Step 3 of 3</b>.</li>
+		   		<li>Confirm that a six-item list of instructions is presented.</li>
+		   		<li>Confirm that an enabled <b>Click here</b> button is provided to 
+				copy the email body to the clipboard.
+		   		<li>Confirm that the other two <b>Click here</b> buttons are disabled.
+		   		<li>Click the <b>Click here</b> button.
+		   		<li>Confirm that appropriate email text has been copied to the clipboard.
+		   		<li>Confirm that the next <b>Click here</b> button is now enabled.
+		   		<li>Click the second <b>Click here</b> button.
+		   		<li>Confirm that appropriate email subject text has been copied to 
+				the clipboard.
+		   		<li>Confirm that the next <b>Click here</b> button is now enabled.
+		   		<li>Click the third <b>Click here</b> button.
+		   		<li>Confirm that appropriate recipient address text has been copied to 
+				the clipboard.
+		   		<li>Confirm that the <b>Finish</b> button is now enabled.
+			</ul>
+		</ul>
+	</ul>
+	</li>
+</ol>
+</body>
+</html>

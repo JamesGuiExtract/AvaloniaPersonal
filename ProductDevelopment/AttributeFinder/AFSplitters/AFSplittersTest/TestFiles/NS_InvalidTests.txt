@@ -1,0 +1,218 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Valid and Invalid Entities
+// Purpose: Check Discard of Invalid
+
+<TESTCASE>|Name with Grantor1|Mr. John Smith and Grantor
+Names|Mr. John Smith and Grantor
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Grantor2|Grantor & Mr. John Smith
+Names|Grantor & Mr. John Smith
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Successors1|Mr. John Smith, His Successors
+Names|Mr. John Smith, His Successors
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Successors2|Mr. John Smith, His Successors and Assigns
+Names|Mr. John Smith, His Successors and Assigns
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Invalid1|Mr. John Smith and Of The Place
+Names|Mr. John Smith and Of The Place
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Invalid2|Mr. John Smith and Of My Place
+Names|Mr. John Smith and Of My Place
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Invalid3|Mr. John Smith, Party
+Names|Mr. John Smith, Party
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Trustees|Mr. John Smith and Trustees
+Names|Mr. John Smith and Trustees
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with The Assignees|Mr. John Smith and The Assignees
+Names|Mr. John Smith and The Assignees
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Lower Case|Mr. John Smith and lower case
+Names|Mr. John Smith and lower case
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Page|Mr. John Smith and Page
+Names|Mr. John Smith and Page
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Vendor's Lien|Mr. John Smith and Vendor's Lien
+Names|Mr. John Smith and Vendor's Lien
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Grantor's Address|Mr. John Smith and Grantor's Address
+Names|Mr. John Smith and Grantor's Address
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and ATTY IN FACT FOR MY|Mr. John Smith and ATTORNEY IN FACT FOR MY
+Names|Mr. John Smith and ATTORNEY IN FACT FOR MY
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Agent|Mr. John Smith and Agent
+Names|Mr. John Smith and Agent
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and As Agent|Mr. John Smith and As Agent
+Names|Mr. John Smith and As Agent
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and With Right|Mr. John Smith, With Right
+Names|Mr. John Smith, With Right
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and To|Mr. John Smith, To Record
+Names|Mr. John Smith, To Record
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Of|Mr. John Smith, Estate Of Henry James
+Names|Mr. John Smith, Estate Of Henry James
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and With Rights|Mr. John Smith, With Rights
+Names|Mr. John Smith, With Rights
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name With A Corporation|ACME Explosives Inc., A Corporation
+Names|ACME Explosives Inc., A Corporation
+.Company|ACME Explosives Inc.
+
+<TESTCASE>|Name With Et Al|Mr. John Smith, Et Al
+Names|Mr. John Smith, Et Al
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name With Addendum|Mr. John Smith, Plus Addendum
+Names|Mr. John Smith, Plus Addendum
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name = FEE-CO|FEE-CO
+Names|FEE-CO
+
+// Invalid Company because first word is "Of"
+<TESTCASE>|Name = Leading Of|Of Bank
+Names|Of Bank
+
+// Invalid Company because only word is "Trust"
+<TESTCASE>|Name = Trust|Trust
+Names|Trust
+
+// Valid Company because "Of" is first word after a new line (P16 #2048)
+<TESTCASE>|Name With New Line Of|Bank\r\nOf The West
+Names|Bank\r\nOf The West
+.Company|Bank\r\nOf The West
+
+// Valid Trust because "Trust" is alone after a new line (P16 #2048)
+<TESTCASE>|Name With New Line Trust|Masters\r\nTrust\r\nRealty
+Names|Masters\r\nTrust\r\nRealty
+.Trust|Masters\r\nTrust\r\nRealty
+
+<TESTCASE>|Name With FEE-ST|Mr. John Smith and FEE-ST
+Names|Mr. John Smith and FEE-ST
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with For No Consideration|For No Consideration, Mr. John Smith
+Names|For No Consideration, Mr. John Smith
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name and Beneficiary|Mr. John Smith and Beneficiary
+Names|Mr. John Smith and Beneficiary
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith

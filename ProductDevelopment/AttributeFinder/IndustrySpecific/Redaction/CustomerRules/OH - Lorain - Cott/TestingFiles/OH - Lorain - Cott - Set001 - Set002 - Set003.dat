@@ -1,0 +1,12 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//Set001
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\OH - Lorain\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Set002
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\OH - Lorain\Set002\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Set003
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\OH - Lorain\Set003\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

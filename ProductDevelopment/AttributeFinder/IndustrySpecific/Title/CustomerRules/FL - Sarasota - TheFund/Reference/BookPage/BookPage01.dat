@@ -1,0 +1,14 @@
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*)?SARASOTA(?:\s*County)?
+
+//less strict
+recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?(?:volume/)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\b\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?)?(?!\s*,?\s*public\s*records\s*of(?!\s*Sarasota))
+//above with no word border //recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?(?:volume/)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?)?(?!\s*,?\s*public\s*records\s*of(?!\s*Sarasota))
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?(?:volume/)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?(?!,?\s*public\s*records\s*of\s*(?!Sarasota)\s*County,?\s*Florida)(?:\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*)?SARASOTA(?:\s*County)?)?
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?(?:volume/)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?(?:\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*)?SARASOTA(?:\s*County)?)?
+
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?(?:\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*)?SARASOTA(?:\s*County)?)?
+//like above, but require Sarasota County,
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?(?:volume/)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*SARASOTA|SARASOTA\s*County)
+//backup recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*SARASOTA|SARASOTA\s*County)
+
+//recorded[\s\S]{0,34}in\s*(?:official\s*records?\s*)?Book(?:/reel/liber)?:?\s*\d{3,4},?\s*Page(?:\/Folio)?:?\s*\d{3,4}\s*(?:\(?\s*or\s*doc\s*#\s*\d{7,9}\s*\)?\s*)?,?(?!\s*in\s*the\s*office\s*of\s*the\s*Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*(?:county\s*of\s*)?(?!SARASOTA)(?:\s*County)?)

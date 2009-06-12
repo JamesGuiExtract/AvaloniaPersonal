@@ -1,0 +1,25 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000274700.002.uss
+LocalGrantee10=appoints^?Grantee^120~[as^3~successor^3~trustee
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\SUBSTITUTION OF TRUSTEE\FEB_11_2008013893.tif
+rule08=hereby|give|notice^20~Substitution^3~and^3~Appointment^3~of]^?Grantee^160~[in^3~place^3~and^3~instead
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000009700.002.uss
+//LocalSotGrantee02=undersigned^36~beneficiary^\r\n^3~Beneficiar^7~:^?Grantee^80~\r\n^3~By]:|By :
+LocalSotGrantee02=undersigned^36~beneficiary^\r\n^3~Beneficiar^7~:^?Grantee^80~By:|By :
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000145600.001
+LocalSotGrantee03=NOW^5~THEREFORE^5~said^?Grantee^160~[does hereby|herby^5~substitute
+LocalSotGrantee04=The^?Grantee^48~[an Agency duly^SBA^3~hereby^3~subs
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\SUBSTITUTION OF TRUSTEE\FEB_11_2008013903.tif
+rule10=held|by it|under^16~said^3~Deed^3~of^3~Trust^10~Dated:^10~[2000]|[2001]|[2002]|[2003]|[2004]|[2005]|[2006]|[2007]|[2008]|[2009]^?NomineeFor^80~[as nominee for (mers)|[as nominee for^?Grantee^80~\r\nBy:
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000218800.001.uss
+LocalSotGrantee05=undersigned^3~hereby^3~substitutes^3~himself|itself|herself^Dated^36~0|1|2|3|4|5|6|7|8|9^1~\r\n^?Grantee<^60~\r\nBy:
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000147900.001.uss
+LocalSotGrantee07=undersigned^3~substituted^Dated^36~0|1|2|3|4|5|6|7|8|9^1~\r\n^?NomineeFor<^60~[as^nominee^3~for^?Grantee^80~\r\nBy:|\r\n\r\n
+LocalSotGrantee08=undersigned^3~substituted^Dated^36~0|1|2|3|4|5|6|7|8|9^1~\r\n^?Grantee^180~\r\nBy:|\r\n\r\n
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\QUITCLAIM DEED\20079000232600.002.uss
+LocalSotGrantee01=hereby^3~substitutes^?Grantee^160~[as^3~trustee
+//always keep last
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000221700.002.uss
+LocalSotGrantee06=desires^3~to^3~substitute^?Grantee^160~[as^9~[new Trustee|Trustee
+[PATTERNS_END]

@@ -1,0 +1,240 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Companies with Alias
+// Purpose: Check Division, Proper SubAttributes
+
+// AKA and variations
+<TESTCASE>|Company Name with AKA|Wisconsin National Bank AKA Wisconsin Bank
+Names|Wisconsin National Bank AKA Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|AKA
+
+<TESTCASE>|Company Name with A/K/A|Wisconsin National Bank A/K/A Wisconsin Bank
+Names|Wisconsin National Bank A/K/A Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|AKA
+
+<TESTCASE>|Company Name with Also Known As|Wisconsin National Bank Also Known As Wisconsin Bank
+Names|Wisconsin National Bank Also Known As Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|AKA
+
+<TESTCASE>|Company Name with Currently Known As|Wisconsin Service Teachers Credit Union Currently Known As Wisconsin Credit Union
+Names|Wisconsin Service Teachers Credit Union Currently Known As Wisconsin Credit Union
+.Company|Wisconsin Service Teachers Credit Union
+..CompanyAlias|Wisconsin Credit Union|NKA
+
+// P16 #1311
+<TESTCASE>|Company Name with Currently Known As|Pacific Service Employees\r\nCredit Union currently known as Pacific Service Credit Union
+Names|Pacific Service Employees\r\nCredit Union currently known as Pacific Service Credit Union
+.Company|Pacific Service Employees\r\nCredit Union
+..CompanyAlias|Pacific Service Credit Union|NKA
+
+// FKA and variations
+<TESTCASE>|Company Name with FKA|Wisconsin National Bank FKA Wisconsin Bank
+Names|Wisconsin National Bank FKA Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|FKA
+
+<TESTCASE>|Company Name with F/K/A|Wisconsin National Bank F/K/A Wisconsin Bank
+Names|Wisconsin National Bank F/K/A Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|FKA
+
+<TESTCASE>|Company Name with Formerly Known As|Wisconsin National Bank Formerly Known As Wisconsin Bank
+Names|Wisconsin National Bank Formerly Known As Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|FKA
+
+<TESTCASE>|Company Name with Formerly|Wisconsin National Bank Formerly Wisconsin Bank
+Names|Wisconsin National Bank Formerly Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|FKA
+
+// DBA and variations
+<TESTCASE>|Company Name with DBA|Wisconsin National Bank DBA Wisconsin Bank
+Names|Wisconsin National Bank DBA Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with D/B/A|Wisconsin National Bank D/B/A Wisconsin Bank
+Names|Wisconsin National Bank D/B/A Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with Doing Business As|Wisconsin National Bank Doing Business As Wisconsin Bank
+Names|Wisconsin National Bank Doing Business As Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with D.B.A.|Wisconsin National Bank D.B.A. wisbank.com
+Names|Wisconsin National Bank D.B.A. wisbank.com
+.Company|Wisconsin National Bank
+..CompanyAlias|wisbank.com|DBA
+
+<TESTCASE>|Company Name with OBA|Wisconsin National Bank OBA Wisconsin Bank
+Names|Wisconsin National Bank OBA Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with T/A|Wisconsin National Bank T/A Wisconsin Bank
+Names|Wisconsin National Bank T/A Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with Assigned Over To|Wisconsin National Bank Assigned Over To Wisconsin Bank
+Names|Wisconsin National Bank Assigned Over To Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+<TESTCASE>|Company Name with Now By Chartered Conversion|Wisconsin National Bank Now By Chartered Conversion Wisconsin Bank
+Names|Wisconsin National Bank Now By Chartered Conversion Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|DBA
+
+// SBM and variations
+<TESTCASE>|Company Name with SBM1|Wisconsin National Bank SBM Wisconsin Bank
+Names|Wisconsin National Bank SBM Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with S/B/M/T|Wisconsin National Bank S/B/M/T Wisconsin Bank
+Names|Wisconsin National Bank S/B/M/T Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with SBM2|Wisconsin National Bank successor by merger to Wisconsin Bank
+Names|Wisconsin National Bank successor by merger to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with SBM3|Wisconsin National Bank survivor by merger Wisconsin Bank
+Names|Wisconsin National Bank survivor by merger Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with By Merge To|Wisconsin National Bank by merge to Wisconsin Bank
+Names|Wisconsin National Bank by merge to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with SBM4|Wisconsin National Bank S/B/M To Wisconsin Bank
+Names|Wisconsin National Bank S/B/M To Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with BMW1|Wisconsin National Bank successor by merger with Wisconsin Bank
+Names|Wisconsin National Bank successor by merger with Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with BMW2|Wisconsin National Bank survivor by merger with Wisconsin Bank
+Names|Wisconsin National Bank survivor by merger with Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+<TESTCASE>|Company Name with S/B/M/W|Wisconsin National Bank S/B/M/W Wisconsin Bank
+Names|Wisconsin National Bank S/B/M/W Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SBM
+
+// SII and variations
+<TESTCASE>|Company Name with SII1|Wisconsin National Bank SII Wisconsin Bank
+Names|Wisconsin National Bank SII Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
+<TESTCASE>|Company Name with S/I/I|Wisconsin National Bank S/I/I Wisconsin Bank
+Names|Wisconsin National Bank S/I/I Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
+<TESTCASE>|Company Name with Successor In Interest To|Wisconsin National Bank successor in interest to Wisconsin Bank
+Names|Wisconsin National Bank successor in interest to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
+<TESTCASE>|Company Name with Successor To|Wisconsin National Bank successor to Wisconsin Bank
+Names|Wisconsin National Bank successor to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
+<TESTCASE>|Company Name with As Successor To|Wisconsin National Bank as successor to Wisconsin Bank
+Names|Wisconsin National Bank as successor to Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|SII
+
+// BMW and variations
+<TESTCASE>|Company Name with By Merger With|Wisconsin National Bank by merger with Wisconsin Bank
+Names|Wisconsin National Bank by merger with Wisconsin Bank
+.Company|Wisconsin National Bank
+..CompanyAlias|Wisconsin Bank|BMW
+
+// Related Company variations
+<TESTCASE>|Company Name with A Division Of|Wisconsin National Bank a division of Wisconsin Bank
+Names|Wisconsin National Bank a division of Wisconsin Bank
+.Company|Wisconsin National Bank
+..RelatedCompany|Wisconsin Bank|Division
+
+<TESTCASE>|Company Name with A Branch Of|Wisconsin National Bank a branch of Wisconsin Bank
+Names|Wisconsin National Bank a branch of Wisconsin Bank
+.Company|Wisconsin National Bank
+..RelatedCompany|Wisconsin Bank|Branch
+
+<TESTCASE>|Company Name with A Subdivision Of|Wisconsin National Bank a subdivision of Wisconsin Bank
+Names|Wisconsin National Bank a subdivision of Wisconsin Bank
+.Company|Wisconsin National Bank
+..RelatedCompany|Wisconsin Bank|Subdivision
+
+<TESTCASE>|Company Name with A Branch Of|Wisconsin National Bank a branch of Wisconsin Bank
+Names|Wisconsin National Bank a branch of Wisconsin Bank
+.Company|Wisconsin National Bank
+..RelatedCompany|Wisconsin Bank|Branch
+
+<TESTCASE>|Company Name with A Subsidiary Of|Wisconsin National Bank a subsidiary of Wisconsin Bank
+Names|Wisconsin National Bank a subsidiary of Wisconsin Bank
+.Company|Wisconsin National Bank
+..RelatedCompany|Wisconsin Bank|Subsidiary
+
+// Multiple Alias tests
+<TESTCASE>|Company Name with Three Aliases|First Wisconsin Bank FKA Wisconsin Bank S/B/M/T Wisconsin National Bank
+Names|First Wisconsin Bank FKA Wisconsin Bank S/B/M/T Wisconsin National Bank
+.Company|First Wisconsin Bank
+..CompanyAlias|Wisconsin Bank|FKA
+..CompanyAlias|Wisconsin National Bank|SBM
+
+// Forward Slashes
+<TESTCASE>|Company Name with Digits|20/20 CUSTOM AUDIO VIDEO SYSTEMS
+Names|20/20 CUSTOM AUDIO VIDEO SYSTEMS
+.Company|20/20 CUSTOM AUDIO VIDEO SYSTEMS
+
+<TESTCASE>|Company Name with Assumed Business Name|First American Title Insurance Company of Oregon, an assumed business name of Title Insurance Company of Oregon
+Names|First American Title Insurance Company of Oregon, an assumed business name of Title Insurance Company of Oregon
+.Company|First American Title Insurance Company of Oregon
+..CompanyAlias|Title Insurance Company of Oregon|DBA
+
+// P16 #1350
+<TESTCASE>|Company Name with formerly known as|Citifinancial formerly known as Commercial Credit Corporation
+Names|Citifinancial formerly known as Commercial Credit Corporation
+.Company|Citifinancial
+..CompanyAlias|Commercial Credit Corporation|FKA
+
+// P16 #1711
+<TESTCASE>|Company Name with Division|First Franklin A Division Of National City Bank Of Indiana
+Names|First Franklin A Division Of National City Bank Of Indiana
+.Company|First Franklin
+..RelatedCompany|National City Bank Of Indiana|Division

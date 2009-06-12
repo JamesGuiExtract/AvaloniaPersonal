@@ -1,0 +1,257 @@
+<html>
+
+<HEAD>
+<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Document Preprocessor - Replace Strings<br>
+&nbsp;
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+
+<h2><b>Replace Strings Dialog</b></h2>
+    <ul>
+      <li>Confirm that the &quot;<b>Define the
+        replacement string pair(s)</b>&quot; list box is displayed</li>
+      <li>Confirm that the icon on the right
+        side of &quot;<b>Define the replacement string pair(s)</b>&quot; text can be
+        clicked to display the balloon help</span></li>
+      <li>&quot;<b>To Be Replaced</b>&quot; and &quot;<b>Replacement</b>&quot;
+        appear as columns in the list box</li>
+      <li>&quot;<b>Add</b>&quot; button displays &quot;<b>Enter Replacement String
+        Pair</b>&quot; dialog
+        <h3>Enter Replacement String Dialog</h3>
+        <ul>
+          <li>&quot;<b>Specify string to be replaced</b>&quot; edit box is editable</li>
+          <li>&quot;<b>Specify string to replace</b>&quot; edit box is editable</li>
+		  <ul>
+			<li><b>[FlexIDSCore #3114]</b> Replace Strings Garbling Text</li>
+			  <ul>
+				<li>Open the ruleset located at "I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example.rsd".</li>
+				<li>Run the ruleset on the text in "I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example.txt".</li>
+				<li>Ensure that the resulting attribute text reads: "Dec 04 Oct 15 June 12 Feb 12", and has not
+					been garbled. Wrong output would be "Dec 04 Oct 15 Junc 52 Fec 52".</li>
+			  </ul>
+		  </ul>
+<p>		  
+      <li>&quot;<b>OK</b>&quot; button saves changes and exits dialog</li>
+      <li>Changes made are persistent.</li>
+      <li>&quot;<b>Cancel</b>&quot; button ignores changes and exits dialog</li>
+      <li>&quot;<b>X</b>&quot; button ignores changes and exits dialog<br>
+        <br>
+          </li>
+        </ul>
+      </li>
+      <li>Highlighting an existing replace string list box entry activates
+        &quot;<b>Remove</b>&quot; and &quot;<b>Modify</b>&quot;</li>
+      <li>&quot;<b>Remove</b>&quot; button displays &quot;<b>Confirm Delete</b>&quot;
+        dialog
+        <h3>Behavior of a File Name entry
+        </h3>
+        <ul type="disc">
+          <li>Clear
+            the
+            &quot;<b>Define the replacement string pair(s)</b>&quot; list box and
+            click the 
+            &quot;<b>Add</b>&quot; button to add a file name beginning with
+            &quot;<a href>file://</a> </span>&quot;
+            inside the
+            &quot;<b>Specify string to be replaced</b>&quot; edit
+            box of &quot;<b>Enter Replacement String Pair</b>&quot; dialog
+            <ul type="disc">
+              <li>Confirm
+                the 
+                &quot;<b>Specify string to replace</b>&quot; edit box
+                is disabled&nbsp;
+              <li>Confirm
+                that removing the
+                &quot;file://&quot;
+                 inside the &quot;<b>Specify string to be replaced</b>&quot;
+                edit box will enable the &quot;<b>Specify string to replace</b>&quot;
+                edit box</li>
+              <li>Click the
+                &quot;<b>OK</b>&quot; button and confirm that a message box is displayed to
+                remind you to use a
+                &quot;;&quot; as a separator followed by a
+                delimiter</li>
+            </ul>
+          <li>Add
+            &quot;;&quot; at the end of the file name and a
+            two-character delimiter after
+            &quot;;&quot; and click
+            &quot;<b>OK</b>&quot;
+            <ul type="disc">
+              <li>Confirm
+                that a message box is displayed to remind you that only a single-character
+                delimiter can be used
+              <li>Confirm
+                that Clicking
+                &quot;<b>OK</b>&quot; on the message box will return to
+                the
+                &quot;<b>Enter Replacement String Pair</b>&quot; dialog and
+                the delimiter will be selected for modification</li>
+            </ul>
+          <li>Change
+            the delimiter to one character and click
+            &quot;<b>OK</b>&quot;
+            <ul type="disc">
+              <li>Confirm
+                the file name with the delimiter becomes the first entry inside
+                the list box
+              <li>Confirm
+                the
+                &quot;<b>Add</b>&quot; 
+                button is disabled
+              <li>Confirm
+                the
+                &quot;<b>Save List...</b>&quot; 
+                button is disabled
+                </li>
+              <li>Click
+                &quot;<b>Remove</b>&quot; to delete this file name entry
+                <ul type="disc">
+                  <li>Confirm
+                the
+                &quot;<b>Add</b>&quot;
+                    button is enabled</span></li>
+                  <li>Confirm
+                the
+                &quot;<b>Save
+                    List</b>&quot; button is enabled</li>
+                </ul>
+              </li>
+            </ul>
+          <li>Add
+            several entries to
+            
+            &quot;<b>Define the replacement string pair(s)</b>&quot;
+            list box (do not include a file name entry) and double click one of the
+            entries to bring up the &quot;<b>Enter Replacement String Pair</b>&quot; dialog. Modify the text in the &quot;<b>Specify string to be
+            replaced</b>&quot; edit box to a file name with delimiter (prefixed
+            with &quot;file://&quot;) and click &quot;<b>OK</b>&quot; button
+            <ul type="disc">
+              <li>Confirm
+                that a message box is displayed stating that the
+                file name will be the only entry inside the list box
+                <ul type="disc">
+                  <li>Confirm
+                    that clicking
+                    
+                    &quot;<b>YES</b>&quot; on the message box will clear all
+                    the other entries inside the list box and display the newly
+                    modified file name with delimiter as the first entry in the
+                    list box
+                  <li>Confirm
+                    that clicking &quot;<b>NO</b>&quot; on the message box will do nothing
+                    to the list box</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <h3>Confirm Delete Dialog</h3>
+        <ul>
+   		   <li>&quot;<b>YES</b>&quot; button deletes the replacement string and exits dialog</li>
+        </ul>
+        <ul>
+	      	<li>&quot;<b>NO</b>&quot; button ignores delete request and exits dialog<br>
+              <br>
+          </li>
+        </ul>
+      </li>
+      <li>&quot;<b>Modify</b>&quot; button displays a pre-populated &quot;<b>Enter
+        Replacement String Pair</b>&quot; dialog
+        <ul>
+          <li>Changes made are persistent.</li>
+        </ul>
+      </li>
+      <li>Graphical &quot;<b>UP&quot; </b>arrow button moves the selected item
+        up in the list box</li>
+      <li>Graphical &quot;<b>DOWN&quot; </b>arrow button moves the selected item
+        down in the list box</li>
+      <li>Graphical &quot;<b>UP</b>&quot; and &quot;<b>DOWN</b>&quot; arrow
+        buttons become inactive when reaching top or bottom of the list</li>
+	<br />
+      <li>&quot;<b>Load List</b>&quot; button displays &quot;<b>Open</b>&quot;
+        dialog
+        <h3>Open Dialog</h3>
+        <ul>
+          <li>&quot;<b>Specify the file name:</b>&quot; edit box is editable
+            <ul>
+              <li>Displays an error message when the file specified does not
+                exist</li>
+		<li>Displays an error message when a directory name is entered.</li>
+            </ul>
+          </li>
+          <li>&quot;<b>Specify a single character delimiter:</b>&quot; edit box
+            allows only one character and is editable
+            <ul>
+              <li>Error message displayed if wrong delimiter is defined.</li>
+            </ul>
+          </li>
+          <li>&quot;<b>...</b>&quot; button brings up the standard Windows open
+            file dialog
+            <ul>
+              <li>Selecting a file displays the file name in &quot;<b>Specify
+                the file name:</b>&quot; edit box</li>
+            </ul>
+          </li>
+          <li>List box is populated correctly after loading from a file<br>
+            <br>
+          </li>
+        </ul>
+      </li>
+      <li>&quot;<b>Save List</b>&quot; button displays &quot;<b>Configuration</b>&quot;
+        message box when no replacements are specified</li>
+      <li>&quot;<b>Save List</b>&quot; button displays &quot;<b>Save</b>&quot;
+        dialog
+        <h3>Save Dialog</h3>
+        <ul>
+          <li>&quot;<b>Specify the file name:</b>&quot; edit box is editable
+            <ul>
+              <li>Displays a confirmation message when the file specified&nbsp;
+                already exists</li>
+            </ul>
+          </li>
+          <li>&quot;<b>Specify a single character delimiter:</b>&quot; edit box
+            allows only one character and is editable</li>
+          <li>&quot;<b>...</b>&quot; button brings up the standard Windows open
+            file dialog
+            <ul>
+              <li>Selecting a file displays the file name in &quot;<b>Specify
+                the file name:</b>&quot; edit box</li>
+            </ul>
+          </li>
+          <li>Saved output file is created correctly
+          </li>
+          <li>&quot;<b>OK</b>&quot; button throws exception if no file is
+            defined.<br>
+            <br>
+          </li>
+        </ul>
+      </li>
+      <li>&quot;<b>Strings defined above are treated as Regular Expressions</b>&quot;
+        check box is checkable
+      </li>
+      <li>&quot;<b>Strings in first column are Case Sensitive</b>&quot; check
+        box is checkable
+      </li>
+      <li>&quot;<b>OK</b>&quot; button saves changes and exits dialog</li>
+      <li>Changes made are persistent.</li>
+      <li>&quot;<b>Cancel</b>&quot; button ignores changes and exits dialog</li>
+      <li>&quot;<b>X</b>&quot; button ignores changes and exits dialog<br>
+      </li>
+    </ul>
+
+
+</body>
+
+</html>

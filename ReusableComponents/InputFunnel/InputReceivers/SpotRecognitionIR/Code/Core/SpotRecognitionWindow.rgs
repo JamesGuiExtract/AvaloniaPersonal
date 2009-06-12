@@ -1,0 +1,26 @@
+HKCR
+{
+	SpotRecognitionIR.SpotRecognitionWindow.1 = s 'SpotRecognitionWindow Class'
+	{
+		CLSID = s '{7EAAB2F8-B6C0-431C-9F92-AE1085992DFF}'
+	}
+	SpotRecognitionIR.SpotRecognitionWindow = s 'SpotRecognitionWindow Class'
+	{
+		CLSID = s '{7EAAB2F8-B6C0-431C-9F92-AE1085992DFF}'
+		CurVer = s 'SpotRecognitionIR.SpotRecognitionWindow.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7EAAB2F8-B6C0-431C-9F92-AE1085992DFF} = s 'SpotRecognitionWindow Class'
+		{
+			ProgID = s 'SpotRecognitionIR.SpotRecognitionWindow.1'
+			VersionIndependentProgID = s 'SpotRecognitionIR.SpotRecognitionWindow'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{CF01D58E-0C0B-434F-83D2-ABFA24BA834F}'
+		}
+	}
+}

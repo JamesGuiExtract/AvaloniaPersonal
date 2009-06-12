@@ -1,0 +1,23 @@
+
+// Tests of trimming based on Municipality keywords
+Leading City Of|name is City Of Madison plus more|City Of Madison
+
+Leading City of|name is City of Madison plus more|City of Madison
+
+Leading County Of|name is County Of Dane plus more|County Of Dane
+
+Leading County of|name is County of Dane plus more|County of Dane
+
+Leading State Of|name is State Of California plus more|State Of California
+
+Leading State of|name is State of California plus more|State of California
+
+Leading Commonwealth Of|name is Commonwealth Of Massachusetts plus more|Commonwealth Of Massachusetts
+
+Leading Commonwealth of|name is Commonwealth of Massachusetts plus more|Commonwealth of Massachusetts
+
+XYZ County|name is Los Angeles County plus more|Los Angeles County
+
+XYZ County Plus1|name is Dane County Department Of Corrections plus more|Dane County Department Of Corrections
+
+XYZ County Plus2|name is Los Angeles County DCSS plus more|Los Angeles County DCSS

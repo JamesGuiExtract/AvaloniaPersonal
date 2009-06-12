@@ -1,0 +1,9 @@
+; GenericDisplay.def : Declares the module parameters.
+
+LIBRARY      "UCLIDGENERICDISPLAY2.OCX"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer PRIVATE

@@ -1,0 +1,27 @@
+HKCR
+{
+	ESActMaskPCE.ActMaskTIFPrintCaptureEngine.1 = s 'ActMaskTIFPrintCaptureEngine Class'
+	{
+		CLSID = s '{6CA9DA66-2E74-450C-8840-90745A49B80C}'
+	}
+	ESActMaskPCE.ActMaskTIFPrintCaptureEngine = s 'ActMaskTIFPrintCaptureEngine Class'
+	{
+		CLSID = s '{6CA9DA66-2E74-450C-8840-90745A49B80C}'
+		CurVer = s 'ESActMaskPCE.ActMaskTIFPrintCaptureEngine.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6CA9DA66-2E74-450C-8840-90745A49B80C} = s 'ActMaskTIFPrintCaptureEngine Class'
+		{
+			ProgID = s 'ESActMaskPCE.ActMaskTIFPrintCaptureEngine.1'
+			VersionIndependentProgID = s 'ESActMaskPCE.ActMaskTIFPrintCaptureEngine'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{}'
+		}
+	}
+}

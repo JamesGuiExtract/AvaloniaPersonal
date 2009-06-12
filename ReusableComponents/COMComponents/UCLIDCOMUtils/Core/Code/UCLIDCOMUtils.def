@@ -1,0 +1,9 @@
+; UCLIDCOMUtils.def : Declares the module parameters.
+
+LIBRARY      "UCLIDCOMUtils.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

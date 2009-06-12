@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCountyTester.GrantorGranteeTester.1 = s 'GrantorGranteeTester Class'
+	{
+		CLSID = s '{4A470394-3AF9-48A9-B28B-A907F4D4767E}'
+	}
+	UCLIDCountyTester.GrantorGranteeTester = s 'GrantorGranteeTester Class'
+	{
+		CLSID = s '{4A470394-3AF9-48A9-B28B-A907F4D4767E}'
+		CurVer = s 'UCLIDCountyTester.GrantorGranteeTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4A470394-3AF9-48A9-B28B-A907F4D4767E} = s 'GrantorGranteeTester Class'
+		{
+			ProgID = s 'UCLIDCountyTester.GrantorGranteeTester.1'
+			VersionIndependentProgID = s 'UCLIDCountyTester.GrantorGranteeTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{8A7432FD-FEFC-4C12-84D6-38BAA81CDEBD}'
+		}
+	}
+}

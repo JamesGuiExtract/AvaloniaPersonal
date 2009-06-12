@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.SelectUsingMajority.1 = s 'SelectUsingMajority Class'
+	{
+		CLSID = s '{6175A0B0-8B95-4B5B-8FA3-4745835402DA}'
+	}
+	UCLIDAFOutputHandlers.SelectUsingMajority = s 'SelectUsingMajority Class'
+	{
+		CLSID = s '{6175A0B0-8B95-4B5B-8FA3-4745835402DA}'
+		CurVer = s 'UCLIDAFOutputHandlers.SelectUsingMajority.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6175A0B0-8B95-4B5B-8FA3-4745835402DA} = s 'SelectUsingMajority Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.SelectUsingMajority.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.SelectUsingMajority'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

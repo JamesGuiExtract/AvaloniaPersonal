@@ -1,0 +1,23 @@
+HKCR
+{
+	AFOutputHandlers.RemoveSubAttributesPP.1 = s 'RemoveSubAttributesPP Class'
+	{
+		CLSID = s '{C81AF3A3-1A7C-4794-9858-2F9DCA050AEA}'
+	}
+	AFOutputHandlers.RemoveSubAttributesPP = s 'RemoveSubAttributesPP Class'
+	{
+		CLSID = s '{C81AF3A3-1A7C-4794-9858-2F9DCA050AEA}'
+		CurVer = s 'AFOutputHandlers.RemoveSubAttributesPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C81AF3A3-1A7C-4794-9858-2F9DCA050AEA} = s 'RemoveSubAttributesPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

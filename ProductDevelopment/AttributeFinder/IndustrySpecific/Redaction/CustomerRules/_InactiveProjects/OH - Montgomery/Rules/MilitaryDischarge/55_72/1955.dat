@@ -1,0 +1,6 @@
+[VARS_BEGIN]
+hc_clues=10a. highest|10a highest|15. selective|15 selective|16. date|16 date|17. district|17 district|18. terminal|18 terminal|19. current|19 current|20. prior|20 prior|21. grade,|21 grade|22. place|22 place|23. home|23 home|24. statement|24 statement|25a. specialty|25a specialty|27. wounds|27 wounds|28. service|28 service|29. other|29 other|30d. government|30d government|31a. va|31a va|32. remarks|32 remarks|33. permanent|33 permanent|35a. typed|35a typed|3a. grade,|3a grade|5. place|5 place|7a. race|7a race|9. marital|9 marital
+[VARS_END]
+[PATTERNS_BEGIN]
+rule1=?HC_1955^@hc_clues
+[PATTERNS_END]

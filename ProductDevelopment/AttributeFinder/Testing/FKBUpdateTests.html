@@ -1,0 +1,71 @@
+<HTML>
+
+<HEAD>
+<TITLE>FKB Updates Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>FKB Updates Testing Checklist<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>General Instructions</h2>
+<UL>
+	<li>Run one instance of <b>LogProcessStats</b> to collect information on memory and handle usage.  
+	One instance will collect statistics for all TestHarness instances.  
+	Run the following command string from the folder containing the TCL file.
+<p>
+	<b>LogProcessStats TestHarness 30s .\Statistics /el</b>
+<p>
+	<li>Close the <b>LogProcessStats</b> command window when the last TestHarness instance has finished.
+<p>
+  	<li>For each <b>Test Harness</b> instance:
+	<UL>
+		<li>Review the results and add one or more SCRs to PVCS - P16 if needed.
+		<li>Review the Exception log and add SCRs if needed.  
+		The following error items and some others are benign.
+		<UL>
+			<li>ELI09263 - No Rules Files Found.
+			<li>ELI15464 - Exception from ISubMatches GetItem!
+			<li>ELI15935 - Application trace information.
+		</UL>
+		<li>Update the statistics in the appropriate spreadsheet.
+	</UL>
+<p>
+	<li>Copy the <b>Statistics</b> folder to a YYYY-MM-DD named subfolder under the appropriate FKB 
+	version number under I:\Testing\Product Testing\FKB_Updates.
+	<li>Add a TXT file inside the YYYY-MM-DD subfolder describing which rules and images 
+	were tested for each of the CSV files.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Indexing Projects</h2>
+<UL>
+  	<li>Print a copy of <a href="AnalysisResults.html">FLEX Index - Analysis Results</a> to retrieve 
+	an up-to-date list of active <b>Indexing</b> projects and desired fields.
+  	<li>Select at least <b>three</b> projects for which to check the capture rate, execution time, 
+	memory usage and handle usage.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Redaction Projects</h2>
+<UL>
+  	<li>Print a copy of <a href="AnalysisResults2.html">ID Shield - Analysis Results</a> to retrieve 
+	an up-to-date list of active <b>Redaction</b> projects.
+  	<li>Select at least <b>five</b> projects for which to check the capture rate, execution time, 
+	memory usage and handle usage.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</HTML>

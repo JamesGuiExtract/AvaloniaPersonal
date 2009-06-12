@@ -1,0 +1,280 @@
+// Company Or Person Name Splitter tests
+// This is a subset of the NS_Abc.txt test files from the AFSplittersTest\TestFiles folder
+// Test Type: Company Suffixes and Designators
+Wisconsin Software LLC
+
+Wisconsin Software LLP
+
+Wisconsin Software Incorporated
+
+Wisconsin Software Inc
+
+Wisconsin Software Co
+
+Citibank FSB
+
+First Federal Savings Bank
+
+First Federal Savings Bank of Iowa
+
+Citibank SSB
+
+Wisconsin Software Ltd
+
+Citibank N.A.
+
+Citibank National Association
+
+Citibank F.A.
+
+Citibank Federal Association
+
+Pentagon Federal C.U.
+
+Wisconsin Software Corporation
+
+Wisconsin Software Corp
+
+Wisconsin Software Company
+
+Wisconsin Software Partners
+
+Wisconsin Software Partnership
+
+Wisconsin Software Limited
+
+Citibank Mortgage
+
+Wisconsin Software Properties
+
+Wisconsin Software Association
+
+Fly By Night Bank
+
+Investorsbank
+
+Fly By Night Banking
+
+Fly By Night Credit Union
+
+EquiCredit Service
+
+Fly By Night Financial
+
+Fly By Night Lending
+
+Fly By Night Realty
+
+Fly By Night Home Equity
+
+Fly By Night Investment
+
+Fly By Night Investments
+
+Midland School District
+
+Midland Tax District
+
+Fly By Night Leasing
+
+Fly By Night Rental
+
+Fly By Night Rentals
+
+Borough Of Sewickley
+
+Fly By Night Construction
+
+Fly By Night Development
+
+Fly By Night Redevelopment
+
+Fly By Night Builders
+
+Fly By Night Enterprises
+
+Elmira Baptist Church
+
+Elmira Methodist Church
+
+St. Elmira Catholic Church
+
+Elmira Lutheran Church
+
+Elmira Wedding Church
+
+Elmira University
+
+Elmira Community College
+
+Elmira Graduate Center
+
+Fly By Night Neighborhood Center
+
+Fly By Night Wholesale
+
+Fly By Night Homes
+
+Floyd Patterson Farms
+
+Coastal Counties Escrow
+
+Floyd Patterson Hospital
+
+Floyd Patterson Specialists
+
+Floyd Patterson Farm Bureau
+
+Floyd Patterson Insurance
+
+Borges Landscaping
+
+Nor-Cal Iron Works
+
+RK's Paramount Cameras
+
+Southside Camera
+
+Western Pacific Housing
+
+Allied Property & Casualty
+
+4 SEASONS LANDSCAPE
+
+134-121 JOINT VENTURE
+
+1ST AUTO SALES
+
+7582 SOUTHWEST JOINT VENTURE
+
+Floyd Patterson Engineering
+
+Floyd Patterson And Sons
+
+Floyd Patterson & Sons
+
+ACME Communities
+
+ACME Electric
+
+ACME Automotive
+
+ACME Installations
+
+ACME Materials
+
+ACME Repair
+
+ACME Exchange
+
+ACME Consultants
+
+ACME Education
+
+ACME Manufacturing
+
+Secretary of Veterans Affairs
+
+ACME Apartment Complex
+
+ACME Apartments
+
+Statewide Energy Systems
+
+NW PREFERRED FCU
+
+MERS
+
+Nick's Restaurant
+
+US Recordings
+
+Washington Mutual
+
+Doctors Clinic, PC
+
+Bond Wolfe Architects
+
+Suntrust Mortgage, Inc.
+
+Citigroup Global Markets
+
+ditech.com
+
+C&A/GFSP Joint Venture, a Florida General Partnership
+
+Great Lakes Savings and Loan Association
+
+ACME Explosives Inc., A Corporation
+
+Bank\r\nOf The West
+
+Masters\r\nTrust\r\nRealty
+
+Mortgage Of Housing And Urban Development
+
+// Test Type: Municipalities with various Identifiers
+The City of Madison
+
+County Of Dane
+
+State Of Iowa
+
+Commonwealth Of Virginia
+
+Los Angeles County
+
+Los Angeles County Department of Corrections
+
+Los Angeles County DCSS
+
+// Test Type: Trust and Trustee Entities
+John L. Smith, Trustee of the John Smith Trust
+
+John L. Smith, Trustee of the John Smith Personal Trust
+
+John L. Smith, Trustee of the John Smith Irrevocable Trust
+
+John L. Smith, Trustee of the John Smith Revocable Trust
+
+John L. Smith, Trustee of the John Smith Living Trust
+
+John L. Smith, Trustee of the John Smith Marital Trust
+
+John Smith and Mary Smith, as Trustees of the John and Mary Smith Family Trust
+
+John Smith and Mary Smith, Co-Trustees of the John and Mary Smith Joint Trust
+
+John L. Smith, or his successor, Trustee of the John Smith Trust
+
+Mary Smith, or her successor, Trustee of the Mary Smith Trust
+
+John Smith and Mary Smith, or their successors, Trustees of the John and Mary Smith Family Trust
+
+John Smith and Mary Smith, or their successors, as Co-Trustees of the John and Mary Smith Family Trust
+
+John L. Smith, Trust Manager of the John Smith Trust
+
+John L. Smith, Trustmanager of the John Smith Trust
+
+John Smith and Mary Smith, Co-Trustees under the John and Mary Smith Joint Trust
+
+John Smith and Mary Smith, As Trustees under the John and Mary Smith Joint Trust
+
+John L. Smith Trustee, Trustee of the John Smith Trust
+
+John Smith Trustee and Mary Smith Trustee, Co-Trustees under the John and Mary Smith Joint Trust
+
+Karey J. Nay, Trustee of the Karey J. Nay Amended and Restated Trust
+
+// Test Type: NonTrust Items
+ACME Trust Company
+
+ACME Bank and Trust
+
+ACME Bank & Trust
+
+ACME Trust Bank
+
+Trustee Services, Inc.
+

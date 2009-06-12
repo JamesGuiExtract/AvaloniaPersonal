@@ -1,0 +1,174 @@
+<HTML>
+
+<HEAD>
+<TITLE>ID Shield for Laserfiche Miscellaneous Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+<BODY>
+
+<h1>ID Shield for Laserfiche<br>Miscellaneous Testing Checklist 
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<li><h3>PVCS</h3></li>
+	<ul>
+		<li><b>[Integrations #6]</b> Repository list has empty entry
+		<ul>
+			<li>Delete HKCU\Software\Extract Systems\Laserfiche\Admin Console.
+			<li>Delete HKLM\Software\Extract Systems\Laserfiche\Service.
+			<li>Start the <b>Admin Console</b>.
+			<li>Confirm that an available repository is displayed in the 
+			Repository field.
+			<li>Press the down arrow to expand the repository selection box
+			<li>Confirm that the first entry in the list is a repository name
+			and not a blank entry.
+		</ul>
+<p>
+		<li><b>[Integrations #17]</b> Verification should bring document 
+		window to the front
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Open a document marked <b>Needs verification</b>.
+			<li>Minimize the document.
+			<li>With the document still highlighted in the client, 
+			press the verification button.
+			<li>Confirm that the document is restored and open for 
+			verification.
+		</ul>
+<p>
+		<li><b>[Integrations #23]</b> Annotation exception with 
+		layered attributes
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Add <b>TestImage006.tif</b> from the SCR to the 
+			repository.
+			<li>Process the document.
+			<li>Confirm that the document is processed and verified 
+			without error.
+		</ul>
+<p>
+		<li><b>[Integrations #90]</b> Wait dialog for repository search
+		<ul>
+			<li>Open the <b>ID Shield Admin Console</b>.
+			<li>Confirm that a brief wait message is presented 
+			before the application window appears.
+			<li>Close the <b>Admin Console</b>.
+<p>
+			<li>Open the <b>ID Shield Background Service</b>.
+			<li>Confirm that a brief wait message is presented 
+			before the application window appears.
+			<li>Close the <b>Background Service</b>.
+		</ul>
+<p>
+		<li><b>[Integrations #105]</b> Redactions on multipage document
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Locate a multipage image with <b>Needs Processing</b> 
+			in the repository (i.e. <b>04</b>).
+			<li>Process the document with <b>On-demand redaction</b>.
+			<li>Verify the document.
+			<li>Add a manual redaction on page 2.
+			<li>Confirm that the redactions are saved without error.
+			<li>Open the document and confirm that redactions were 
+			saved properly.
+		</ul>
+<p>
+		<li><b>[Integrations #106]</b> Exceptions during verification 
+		not displayed
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Locate an image with <b>Needs Verification</b> in the 
+			repository.
+			<li>Open two copies of the document.
+			<li>Verify the document.
+			<li>Confirm that an exception is displayed about multiple 
+			instances of the iamge already open.
+		</ul>
+	</ul>
+<p>
+	<li><h3>Other</h3></li>
+	<ul>
+		<li><b>Process a multi-page document</b>
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Add <b>MultipageDocument.tif</b> to the repository 
+			from I:\Common\Testing\Product Testing\Laserfiche.
+			<li>OCR the document.
+			<li>Process the document with <b>On-demand redaction</b>.
+			<li>Verify the document.
+			<li>Confirm that each redaction found beyond the first page 
+			has associated linked text.
+		</ul>
+<p>
+		<li><b>Reprocess a document - no duplicated items</b>
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Process document <b>01</b> with <b>On-demand redaction</b>.
+			<li>Confirm that a highlighted clue and an redacted SSN 
+			item are found when the document is presented for verification.
+			<li>Verify the document.
+<p>
+			<li>Process the document again.  Accept the document for 
+			re-processing.
+			<li>Confirm that a highlighted clue and an redacted SSN 
+			item are found when the document is presented for verification.
+			<li>Right-click and delete each item.
+			<li>Confirm that only one copy of each item is present.
+		</ul>
+<p>
+		<li><b>Exceptions appear in the foreground</b>
+		<ul>
+			<li>Rename the rules file.
+			<li>Rename the AFValueFinders DLL.
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Attempt to process one document with <b>On-demand redaction</b>.
+			<li>Confirm that displayed exception appears on top of 
+			all other windows.
+			<li>Close the <b>Laserfiche Client</b>.
+<p>
+			<li>Correct the name of the rules file.
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Select a document and process it with <b>On-demand 
+			redaction</b>.
+			<li>Confirm that the progress dialog appears and 
+			moves to approximately 40%.
+			<li>Confirm that displayed exception appears on top of 
+			the progress dialog.
+			<li>Close the <b>Laserfiche Client</b>.
+			<li>Correct the name of the AFValueFinders DLL.
+		</ul>
+<p>
+		<li><b>Laserfiche 8 : Meaningful exception when no selected repository</b>
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Select the root LF Repositories item.
+			<li>Click the <b>On-demand redaction</b> button.
+			<li>Confirm that the displayed exception includes 
+			meaningful information suggesting that a repository may 
+			not be selected.
+		</ul>
+<p>
+		<li><b>On-demand redaction from various selections</b>
+		<ul>
+			<li>Open the <b>Laserfiche Client</b>.
+			<li>Select a repository.
+			<li>Begin processing the repository with 
+			<b>On-demand redaction</b>.
+			<li>Stop the processing.
+<p>
+			<li>Select a folder.
+			<li>Begin processing the folder with 
+			<b>On-demand redaction</b>.
+			<li>Stop the processing.
+<p>
+			<li>Select a single document.
+			<li>Process the document with 
+			<b>On-demand redaction</b>.
+		</ul>
+	</ul>
+</ul>
+</BODY>
+</HTML>

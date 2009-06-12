@@ -1,0 +1,177 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.10 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.10 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3136]</b> Copy Move Delete file processor
+	       	<ul>
+	      		<li>Confirm that read-only files can now be optionally moved.
+	      		<li>Confirm that read-only files can now be optionally deleted.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3132]</b> IDShield.ini supports Black or White redactions
+	       	<ul>
+	      		<li>Add <b>RedactionColorInOutputFile=White</b> to the General section.
+	      		<li>Confirm that output redactions are <b>white</b>.
+	      		<li>Modify the INI file to <b>RedactionColorInOutputFile=Black</b>.
+	      		<li>Confirm that output redactions are <b>black</b>.
+	      		<li>Remove the INI file entry for <b>RedactionColorInOutputFile=Black</b>.
+	      		<li>Confirm that output redactions are <b>black</b>.
+<p>
+	      		<li>Add <b>RedactionColorInOutputFile=White</b> to the General section.
+			<li>Create XML output files containing some redactions using the verification process.
+			<li>Exercise <b>RedactFromXml.exe</b> and confirm that output redactions 
+			are <b>white</b>.
+			<li>Run redaction rules via auto-redaction that save redactions as annotations.
+	      		<li>Confirm that output redactions (annotations) are <b>white</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3119]</b> The Highlight tool no longer toggles redaction state 
+		in the verification UI
+	       	<ul>
+	      		<li>Select a highlight in the verification UI.
+	      		<li>Confirm that the redaction state is not toggled.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3115, 3118, 3120, 3121, 3128, 3129]</b> Highlights are moveable and 
+		resizable in the verification UI using the Select Highlights tool.
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> images and rules.
+	      		<li>Test the ability to move and resize highlights found by rules.
+	      		<li>Confirm that modified highlights persist when re-reviewing a saved image.
+	      		<li><b>[LegacyRC #5042]</b> Confirm that the Select Highlights icon is an arrow.
+<p>
+	      		<li>Add both rectangular and angular manual redactions.
+	      		<li>Test the ability to move and resize the manual highlights.
+	      		<li>Confirm that modified highlights persist when re-reviewing a saved image.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3044]</b> PadValue VM accepts only digits
+	       	<ul>
+	      		<li>Confirm that the <b>Required</b> edit box accepts only digit characters.
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3003]</b> Conditional Task property page
+	       	<ul>
+	      		<li>Confirm that the Conditional Task property page inserts new True tasks <b>after</b> 
+			the current selection.
+	      		<li>Confirm that the Conditional Task property page inserts new False tasks <b>after</b> 
+			the current selection.
+	       	</ul>
+		
+<p>
+  	   	<LI><b>[LegacyRC #5052]</b> Exceptions logged with FAMDBAdmin database changes 
+	       	<ul>
+	      		<li>Confirm that <b>Application trace</b> exceptions are logged for the following actions.
+			<ul>
+	      			<li>Database - Clear
+	      			<li>Database - Reset lock
+	      			<li>Database - Change password
+	      			<li>Action - Add
+	      			<li>Action - Remove
+	      			<li>Action - Rename
+	      			<li>Action - Manually set action status
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5048]</b> Lead Tools version 16 
+	       	<ul>
+	      		<li>Check the file properties for <b>Ltkrnu.dll</b>.
+	      		<li>Confirm that the version number is <b>16.0.0.4</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5044, 5045, 5046, 5047]</b> Crystal Reports reporting functionality
+	       	<ul>
+			<li>Confirm that <b>RunReport.exe</b> exists in the CommonComponents folder.
+			<li>Confirm that one or more reports can be run from <b>FAMDBAdmin.exe</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4926]</b> Auto-encryption is on by default in RDT builds
+	       	<ul>
+			<li>Install and license the <b>Rule Development Toolkit</b>.
+			<li>Delete the registry key (if present) at HKCU/Software/Extract 
+			Systems/AttributeFinder/Settings/AutoEncrypt.
+			<li>Start <b>RDTConfig.exe</b>.
+			<li>Confirm that <b>Automatically re-encrypt out-of-date ETF files</b> is checked.
+	       	</ul>
+<p>
+  	   	<LI><b>Miscellaneous</b>
+	       	<ul>
+			<li>From the verification UI, confirm that the image cannot be scrolled during 
+			creation, movement, or resize of a manual redaction.
+<p>
+			<li>Confirm that <b>ImageFormatConverter.exe</b> supports a <b>/retain</b> option 
+			that retains redaction annotations.
+			<li>Confirm that the auto-redaction property page mentions that saving redactions 
+			as annotations only applies to TIF images.
+			<li>Confirm that the verification property page mentions that saving redactions 
+			as annotations only applies to TIF images.
+			<li>Confirm that an <b>Application trace</b> exception is logged when retaining 
+			annotations and the output image is a PDF.
+			<li>Confirm that an <b>Application trace</b> exception is logged when saving 
+			redactions as annotations and the output image is a PDF.
+<p>
+			<li><b>(?)</b> Confirm that <b>UCRSingleDocument.exe</b> is installed with the <b>Rule 
+			Development Toolkit</b>.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

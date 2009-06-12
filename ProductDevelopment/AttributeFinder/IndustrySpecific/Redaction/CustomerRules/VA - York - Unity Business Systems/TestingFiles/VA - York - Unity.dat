@@ -1,0 +1,4 @@
+<SETTING>;QueryForVerification=Clues|HCData|MCData|LCData
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - York - Unity Business Systems\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Unity Business Systems\VA - York\Set001\DayForward;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,7 @@
+[PATTERNS_BEGIN]
+rule01=deed^10~trust^50~executed^5~by]^?Grantor^350~[as^5~trustor
+rule01a=deed^10~trust^50~executed^5~by]^?Grantor^250~trustor^20~recorded
+rule02=trust^5~deed^50~executed^5~by]^?Grantor^350~[as^5~trustor
+rule01a=deed^5~trust^5~executed^?Grantor^350~[as^5~trustor
+rule02a=trust^5~deed^5~executed^?Grantor^350~[as^5~trustor
+[PATTERNS_END]

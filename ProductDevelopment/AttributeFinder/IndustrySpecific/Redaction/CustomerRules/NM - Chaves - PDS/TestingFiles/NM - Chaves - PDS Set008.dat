@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+//<SETTING>;QueryForVerification=HCData|MCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//<SETTING>;QueryForAutomatedRedaction=HCData|MCData
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set008\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+

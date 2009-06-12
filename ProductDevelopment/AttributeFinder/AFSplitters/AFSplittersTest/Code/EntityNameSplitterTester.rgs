@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFSplittersTest.EntityNameSplitterTester.1 = s 'EntityNameSplitterTester Class'
+	{
+		CLSID = s '{2859C188-208D-42B3-B7F3-ADC9DE3A2F44}'
+	}
+	UCLIDAFSplittersTest.EntityNameSplitterTester = s 'EntityNameSplitterTester Class'
+	{
+		CLSID = s '{2859C188-208D-42B3-B7F3-ADC9DE3A2F44}'
+		CurVer = s 'UCLIDAFSplittersTest.EntityNameSplitterTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2859C188-208D-42B3-B7F3-ADC9DE3A2F44} = s 'EntityNameSplitterTester Class'
+		{
+			ProgID = s 'UCLIDAFSplittersTest.EntityNameSplitterTester.1'
+			VersionIndependentProgID = s 'UCLIDAFSplittersTest.EntityNameSplitterTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{36572F9B-248E-47E9-9C57-8569D56EE033}'
+		}
+	}
+}

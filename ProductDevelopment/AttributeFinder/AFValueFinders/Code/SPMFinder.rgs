@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.SPMFinder.1 = s 'SPMFinder Class'
+	{
+		CLSID = s '{AC479A87-7A47-4E46-8B16-F78C5ED0520A}'
+	}
+	UCLIDAFValueFinders.SPMFinder = s 'SPMFinder Class'
+	{
+		CLSID = s '{AC479A87-7A47-4E46-8B16-F78C5ED0520A}'
+		CurVer = s 'UCLIDAFValueFinders.SPMFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AC479A87-7A47-4E46-8B16-F78C5ED0520A} = s 'SPMFinder Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.SPMFinder.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.SPMFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

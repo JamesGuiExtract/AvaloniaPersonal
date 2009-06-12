@@ -1,0 +1,4 @@
+PARED\s*BY(?:\s*and\s*return\s*to)?:?(?:\x20\w+\.?)*(?:\r\n){1,2}(?:.*(?:\r\n){1,2}){0,3}?.*\b(?:bank|first(?!\s*(?:\bave|\bstr))|equity|\w*mortgage|financial|funding|capital|title|people|loans?|law\x20offices?)\b(?!\s*,?\s*coordinator).*\r\n
+//test with above change
+//PARED\s*BY(?:\s*and\s*return\s*to)?:?(?:\x20\w+\.?)*(?:\r\n){1,2}(?:.*(?:\r\n){1,2}){0,3}?.*\b(?:bank|first|equity|\w*mortgage|financial|funding|capital|title|people|loans?|law\x20offices?)\b(?!\s*,?\s*coordinator).*\r\n
+//PARED\s*BY(?:\s*and\s*return\s*to)?:(?:\x20\w+\.?)*(?:\r\n){1,2}(?:.*(?:\r\n){1,2}){0,3}?.*\b(?:bank|first|equity|\w*mortgage|financial|funding|capital|title|people|loans?|law\x20offices?)\b(?!\s*,?\s*coordinator).*\r\n

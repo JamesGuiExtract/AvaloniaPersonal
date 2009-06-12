@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGridGenerator.EventSink.1 = s 'EventSink Class'
+	{
+		CLSID = s '{292D3C25-D848-4F0D-83D7-9731C1EF86E0}'
+	}
+	UCLIDGridGenerator.EventSink = s 'EventSink Class'
+	{
+		CLSID = s '{292D3C25-D848-4F0D-83D7-9731C1EF86E0}'
+		CurVer = s 'UCLIDGridGenerator.EventSink.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {292D3C25-D848-4F0D-83D7-9731C1EF86E0} = s 'EventSink Class'
+		{
+			ProgID = s 'UCLIDGridGenerator.EventSink.1'
+			VersionIndependentProgID = s 'UCLIDGridGenerator.EventSink'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{57355D04-CA9E-4BD8-9350-1F94B6DA0C68}'
+		}
+	}
+}

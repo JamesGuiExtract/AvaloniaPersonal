@@ -1,0 +1,71 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Tests to find Trust and Trustee
+Simple Trust with 1 Trustee|by John L. Smith, Trustee of the John Smith Trust which|John L. Smith, Trustee of the John Smith Trust
+
+Simple Trust with 2 Trustees A|by John Smith and Mary Smith, as Trustees of the John and Mary Smith Family Trust which|John Smith and Mary Smith, as Trustees of the John and Mary Smith Family Trust
+
+Simple Trust with 2 Trustees B|by John Smith and Mary Smith, Co-Trustees of the John and Mary Smith Joint Trust which|John Smith and Mary Smith, Co-Trustees of the John and Mary Smith Joint Trust
+
+Trust with Successor Trustee A|by John L. Smith, or his successor, Trustee of the John Smith Trust which|John L. Smith, or his successor, Trustee of the John Smith Trust
+
+Trust with Successor Trustee B|by Mary Smith, or her successor, Trustee of the Mary Smith Trust which|Mary Smith, or her successor, Trustee of the Mary Smith Trust
+
+Trust with Successor Trustee C|by John Smith and Mary Smith, or their successors, Trustees of the John and Mary Smith Family Trust which|John Smith and Mary Smith, or their successors, Trustees of the John and Mary Smith Family Trust
+
+Trust with Successor Trustee D|by John Smith and Mary Smith, or their successors, Co-Trustees of the John and Mary Smith Joint Trust which|John Smith and Mary Smith, or their successors, Co-Trustees of the John and Mary Smith Joint Trust
+
+Trust with Sole Trustee|by John L. Smith, Sole Trustee of the John Smith Trust which|John L. Smith, Sole Trustee of the John Smith Trust
+
+Trust with Trust Manager 1|by John L. Smith, Trust Manager of the John Smith Trust which|John L. Smith, Trust Manager of the John Smith Trust
+
+Trust with Trust Manager 2|by John L. Smith, Trustmanager of the John Smith Trust which|John L. Smith, Trustmanager of the John Smith Trust
+
+Trustee with Under The Trust A|by John Smith and Mary Smith, Co-Trustees under the John and Mary Smith Joint Trust which|John Smith and Mary Smith, Co-Trustees under the John and Mary Smith Joint Trust
+
+Trustee with Under The Trust B|by John Smith and Mary Smith, Trustees under the John and Mary Smith Irrevocable Trust which|John Smith and Mary Smith, Trustees under the John and Mary Smith Irrevocable Trust
+
+John Smith Trustee Style 1|by John L. Smith Trustee, Trustee of the John Smith Trust which|John L. Smith Trustee, Trustee of the John Smith Trust
+
+John Smith Trustee Style 2|by John Smith Trustee and Mary Smith Trustee, as Trustees of the John Smith and Mary Smith Family Trust which|John Smith Trustee and Mary Smith Trustee, as Trustees of the John Smith and Mary Smith Family Trust
+
+Trust A (Survivors)|by John L. Smith, Trustee of Trust A (Survivors) created under the John Smith Trust which|John L. Smith, Trustee of Trust A created under the John Smith Trust
+
+// Tests of trimming after Trust
+Trim Agreement|by John L. Smith, Trustee of the John Smith Trust Agreement which|John L. Smith, Trustee of the John Smith Trust
+
+Trim DATED|by John L. Smith, Trustee of the John Smith Trust DATED April 1, 2000 which|John L. Smith, Trustee of the John Smith Trust
+
+Trim Dated|by John L. Smith, Trustee of the John Smith Trust Dated April 1, 2000 which|John L. Smith, Trustee of the John Smith Trust
+
+Trim DTD|by John L. Smith, Trustee of the John Smith Trust DTD April 1, 2000 which|John L. Smith, Trustee of the John Smith Trust
+
+Trim UTD|by John L. Smith, Trustee of the John Smith Trust UTD April 1, 2000 which|John L. Smith, Trustee of the John Smith Trust
+
+// Tests of NonTrust items
+Trust Company|by ACME Trust Company which|ACME Trust Company
+
+Bank and Trust|by ACME Bank and Trust which|ACME Bank and Trust
+
+Bank & Trust|by ACME Bank & Trust which|ACME Bank & Trust
+
+Trust Bank|by ACME Trust Bank which|ACME Trust Bank
+
+// K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set001\Images\SUBSTITUTION OF TRUSTEE\20059019676400.tif.uss
+Trustee Services|by Trustee Services, Inc. which|Trustee Services, Inc.

@@ -1,0 +1,29 @@
+<SETTING>;VerificationCondition=HCData|LCData|MCData|Clues
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+<SETTING>;AutomatedCondition=HCData|LCData|MCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;OutputFinalStatsOnly=1
+// output verification result
+//<SETTING>;CreateTestOutputVOAFiles=1   
+// Type of Redactions to be tested
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;TypeToBeTested=DriversLicense
+//<SETTING>;TypeToBeTested=AccountNumber
+//<SETTING>;TypeToBeTested=TaxID
+//<SETTING>;TypeToBeTested=TaxID
+//<SETTING>;OutputAttributeNamesFileLists=1
+//<SETTING>;DocTypesToVerify=Mortgage|Abstract of Judgment|Certificate of Death
+//OutputHybridStats=1
+
+// Master.rsd rule file(PDF Format)
+//<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set003\FlattenedImages;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+// No Duplicate Images(PDF Format) 
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set003\FlattenedImages\ImagesWithoutDuplicates;$DirOf(<SourceDocName>)\..\$FileOf(<SourceDocName>).voa;$DirOf(<SourceDocName>)\..\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+// Master.rsd rule file(TIF Format)
+//<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set003\FlattenedImages\ImagesConverted2tif;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+// No Duplicate Images(TIF Format) 
+//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set003\FlattenedImages\ImagesConverted2tif\ImagesWithoutDuplicates;$DirOf(<SourceDocName>)\..\$FileOf(<SourceDocName>).voa;$DirOf(<SourceDocName>)\..\ExpectedRedactions\$FileOf(<SourceDocName>).voa

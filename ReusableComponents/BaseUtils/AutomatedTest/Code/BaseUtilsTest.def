@@ -1,0 +1,9 @@
+; BaseUtilsTest.def : Declares the module parameters.
+
+LIBRARY      "BaseUtilsTest.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE

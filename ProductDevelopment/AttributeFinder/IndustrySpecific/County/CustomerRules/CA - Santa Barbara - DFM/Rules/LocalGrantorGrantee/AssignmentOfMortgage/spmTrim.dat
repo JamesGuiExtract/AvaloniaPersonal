@@ -1,0 +1,7 @@
+Ç?[\s\S]*?president[\s\S]*?Ç?%
+\bas\s{0,4}trustee\s{0,4}for\b%AS TRUSTEE FOR Ç
+\bNational\s{0,4}Association\s*,?\b%
+\babfc\b[\s\S]*$%
+\([\s\S]*?\)%
+[\s\S]*\bassignment[\s\S]{0,6}security\s{0,4}instrument\b%
+\b(?:whose\s{0,4})?address\s{0,4}is[\s\S]*?\d{5}(?:-\d{4})?%

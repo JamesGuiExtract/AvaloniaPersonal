@@ -1,0 +1,67 @@
+// Started with SUB-BLO LotPart.dat
+
+// DT:0019
+//	UNIT\s\d+,
+
+// DT:0020
+//	APARTMENT\sNO.\s\d+,
+
+// DT:0047
+// 		added \b[a-z]\d+
+
+// K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment Of Mortgage\2999320.tif.uss
+//  added Letter(ed)?
+// Beginning Lot Part
+(
+	\bunit
+	|
+	apartment
+)
+[\(\)s\.]{0,5}
+(
+	\s+number
+	|
+	\s+nos?(\.)?
+	|
+	\s+#
+	|
+	\s+Letter(ed)?
+)?
+
+// Digits or single letter or both
+
+(
+	(
+		[\.\s]*\(?\d+\)?[,\s]?
+		|
+		"?[a-zA-Z]"?(?=\s|,|\.)
+	)
+	|
+	through\s
+	|
+	inclusive\s
+	|
+	thru\s
+	|
+	\bto\s
+	|
+	\band\s
+	|
+	\b[a-z]\d+
+
+// Or Number could be spelled out
+	|
+	\s{0,4}
+		(
+			ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(Y|EEN)?)|(NINE(TY|TEEN)?)|
+			TEN|ELEVEN|TWELVE|THIRTEEN|FIFTEEN|
+			TWENTY|THIRTY|FORTY|FIFTY|
+			HUNDRED|THOUSAND|\band\b|\s?-\s?|&
+// End of spelled out number or number separators
+		)*
+	|
+	[-&,\s]+
+)*
+
+// moved the dash for whatcom-31100124.tif.eav to so spaces on both sides would be picked up
+

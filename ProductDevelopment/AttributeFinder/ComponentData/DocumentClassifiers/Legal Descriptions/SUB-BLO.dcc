@@ -1,0 +1,135 @@
+// ******************************************************************************************
+// 				SUB-BLO.dcc
+// 
+// NOTES:
+// 1) This file can contain 4 sections, ZERO, SURE, PROBABLE and MAYBE
+// 2) ZERO section must be placed ahead of any other sections if some exclusive expressions
+//    that will disqualify the document as such type need to be acknowledged. For instance,
+//    if the input document contains text such as "subordination", this document will be classified
+//    as "Assignment Of Mortgage" at ZERO level.
+// 3) Each section shall start with [<Section Name>_BEGIN] and end with [<Section Name>_END]
+// 4) Each section contains 0 or more criteria, where the criteria is either OR, AND or SIGNLE
+// 5) At least one of the appropriate criteria must be met for the document to be considered
+//    as either a sure, probable, maybe or zero document
+// 6) Each criteria is specified in the following format:
+//    <CRITERIA>_BEGIN,dStartingRange,dEndingRange,bCaseSensitive,nStartPageNum,nEndPageNum
+//    expression1
+//    expression2
+//    ......
+//    <CRITERIA>_END
+// 7) Each expression must use Regular Expression syntex. Refer to JScript or VBScript's 
+//    Regular Expression help file.
+// 8) The AND and OR criteria must have two or more expressions
+// 9) "dStartingRange" and "dEndingRange" indicate the range of input text within which the
+//    search must be done. Their value shall be in between 0 and 1. For example, specifying
+//    0,0.25 indicates that the top quarter of text should be searched for the criteria.
+// 10) Using #import statement to include a file. The syntex is similar to C++ syntex, where
+//     a file name must be enclosed in a pair of quotes. The file name must either be fully
+//     specified, or without specifying the full path. In the latter case, the file name could
+//     be a relative path (e.g. #import "..\..\Abc.dcc") or without any path (e.g. #import "Abc.dcc").
+// 11) Relationship among each SINGLE/OR/AND block within a section is OR relation.
+// 12) Special meaning for start/end page numbers:
+//     startPage = -1 OR > 0; endPage = -1 OR > 0
+//     If startPage == -1, then the endPage field represents the "last X pages".
+//     If endPage == -1, then the search should go from the specified start page to the last page in the document.
+//     If startPage == endPage == -1, then that's an error condition.
+//
+// ******************************************************************************************
+
+
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+// dtc-00076
+
+// I:\users\William_Parr\Public\Images\LegalSplitter Samples\Trimin-WD-000005C7.tif.uss
+// zero if contains the word thence
+
+SINGLE_BEGIN,0,1,false,1,-1
+//condominium|thence|\bunit\b
+condominium|thence
+SINGLE_END
+
+AND_BEGIN,0,1,false,1,-1
+Sections?\s+(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(TY|TEEN)?)|(NINE(TY|TEEN)?)|TEN|ELEVEN|TWELVE|THIRTEEN|FIFETEEN|TWENTY|THIRTY|FORTY|FIFTY|HUNDRED|THOUSAND)?[\s\(]*\d
+T[\.\s]*(OWN)?(SHIP)?\s*(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(TY|TEEN)?)|(NINE(TY|TEEN)?)|TEN|ELEVEN|TWELVE|THIRTEEN|FIFETEEN|TWENTY|THIRTY|FORTY|FIFTY|HUNDRED|THOUSAND)?[\s\(]*\d+[\s\)]*(N\b|S\b|NORTH|SOUTH)
+AND_END
+
+SINGLE_BEGIN, 0,1,false,1,-1
+((CERTIFIED\s+SURVEY\s+MAP)|CSM)
+SINGLE_END
+
+
+// DT:0082
+SINGLE_BEGIN, 0,1,false,1,-1
+lot(s)?\s+within
+SINGLE_END
+
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+
+// I:\users\William_Parr\Public\Images\LegalSplitter Samples\ExiGent-16055487.TIF.uss			
+// 	for (Tract[\s\S{1,20]\d)
+AND_BEGIN,0,1,false,1,-1
+LOT[\s\S]{1,50}\d
+((BLOCK|BLK|CIRCLE)\s)|(Tract[\s\S]{1,20}\d)
+AND_END
+
+// DT:0003
+// 	ADDED PLACE
+
+// DT:0023
+//	ADDED PLAT
+// DT:0012
+//	ADDED PARK
+// DT:0016
+//	ADDED FARM
+
+// DT:0074
+// ADDED Highlands
+
+AND_BEGIN,0,1,false,1,-1
+(LOT|BLOCK|BLK|CIRCLE)[\s\S]{1,50}\d
+(ESTATE|VALLEY|ADDITION|HILLS|DIVISION|RIDGE|HEIGHTS|TERRACE|VIEW|COURT|PARK|Addn|PLACE|PLAT|FARM|HIGHLANDS)
+AND_END
+
+
+// Added for  WAUKESHA-8-19-U1-WD00001167.TIF
+//SINGLE_BEGIN,0,1,false,1,-1
+//LOTs+\d
+//SINGLE_END
+
+//AND_BEGIN,0,1,false,1,-1
+//LOT((\(s\))|(s))?\s+(\(?\d+\)?[a-zA-Z]?|(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(TY|TEEN)?)|(NINE(TY|TEEN)?)|TEN|ELEVEN|TWELVE|THIRTEEN|FIFETEEN|TWENTY|THIRTY|FORTY|FIFTY|HUNDRED|THOUSAND)\s*|\s*-\s*)+
+//PLAT
+//AND_END
+
+
+//EXIGENT-16055487.TIF
+//OR_BEGIN,0,1,false,1,-1
+//LOT[\s\S]+?\d[\s\S]+?(Map|plat)
+//(BLOCK|blk)[\s\S]+?\d[\s\S]+?(Map|plat)
+//OR_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+
+OR_BEGIN,0,1,false,1,-1
+(ESTATE|VALLEY|ADDITION|HILLS|SUB-?DIVISION|RIDGE|HEIGHTS|TERRACE|VIEW|COURT|HIGHLANDS)
+LOT|BLOCK|BLK
+OR_END
+
+[PROBABLE_END]
+

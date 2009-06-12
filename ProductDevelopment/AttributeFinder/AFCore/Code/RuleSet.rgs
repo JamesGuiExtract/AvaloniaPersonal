@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.RuleSet.1 = s 'RuleSet Class'
+	{
+		CLSID = s '{BD457649-B6B8-4B3C-946D-448F3BF5F720}'
+	}
+	UCLIDAFCore.RuleSet = s 'RuleSet Class'
+	{
+		CLSID = s '{BD457649-B6B8-4B3C-946D-448F3BF5F720}'
+		CurVer = s 'UCLIDAFCore.RuleSet.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BD457649-B6B8-4B3C-946D-448F3BF5F720} = s 'RuleSet Class'
+		{
+			ProgID = s 'UCLIDAFCore.RuleSet.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.RuleSet'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

@@ -1,0 +1,51 @@
+<HTML>
+	<HEAD>
+		<TITLE>Advanced Replace String Document Preprocessor</TITLE>
+	<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Advanced Replace String Document Preprocessor</h1>
+		<hr>
+		<h3>Uses</h3>
+		<p>
+			<ul>
+				<li>The Advanced Replace String preprocessor is used to change or remove text from a document before a value finder is run on that text.</li>
+				<li>It is most often used to prevent erroneous redactions.</li>
+				<li>For example, if you were trying to redact social security numbers you would probably write a Regular Expression Rule that would catch all numbers with a format of <b>\d{3}-\d{2}-\d{4}</b>.   However, in Louisiana, state project numbers also have this format. (The top of the document often says something like, "State Project No. 033-03-0034".)  You regular expression rule will also catch the state project number, even though it is not a social security number.  This can be avoided by using an Advanced Replace String preprocessors to remove the all strings with a format of <b>STATE\sPROJECT\sNO\.\s\d{3}-\d{2}-\d{4}</b>.</li>
+			</ul>
+		</p>
+		<hr>
+		<h3>Usage</h3>
+		<p>
+			<ul>
+				<li>To use the Advanced Replace String preprocessor you must specify the text you want to find and the text you want to replace the found text with.
+					<ul>
+						<li>These two items can be either plain text or a regular expression.</li>
+						<li>They can also be made case sensitive.</li>
+						<li>You can remove a certain piece of text by leaving the <b>Replace with:</b> box blank.</li>
+						<li>You can also read these items from .txt files.</li>
+					</ul>
+				</li>
+				<li>You can also choose which occurrences of the specified text you want to replace:
+					<ul>
+						<li>All occurrences</li>
+						<li>The first occurrence</li>
+						<li>The last occurrence</li>
+						<li>A certain occurrence</li>
+					</ul>
+				</li>
+				<p>
+					<li><b>Example:</b>
+						<ul>
+							<li>Open <b>ARS_StateProjectNumber.rsd</b>.  This file finds numbers with a ###-##-#### format.</li>
+							<li>Run this rules file on <b>StateProjectNumber.txt</b>. Note that the state project number is erroneously found.</li>
+							<li>Add an Advanced Replace String preprocessor that removes <b>STATE\sPROJECT\sNO\.\s\d{3}-\d{2}-\d{4}</b>.</li>
+							<li>Run the rules again.  Note that now only the valid social security number is found.</li>
+						</ul>
+					</li>
+				</p>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>

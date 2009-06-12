@@ -1,0 +1,7 @@
+//K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set005\RandomSubset\BF_COC_Civil_9281612.tif
+(?<Name1>
+	#import Names.dat.etf
+)
+\W*
+#import Clues\AMinor.dat.etf
+#import OptionalName.dat.etf

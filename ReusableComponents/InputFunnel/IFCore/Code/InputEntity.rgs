@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.InputEntity.1 = s 'InputEntity Class'
+	{
+		CLSID = s '{775ACCA3-32AC-11D6-8259-0050DAD4FF55}'
+	}
+	UCLIDInputFunnel.InputEntity = s 'InputEntity Class'
+	{
+		CLSID = s '{775ACCA3-32AC-11D6-8259-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFunnel.InputEntity.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {775ACCA3-32AC-11D6-8259-0050DAD4FF55} = s 'InputEntity Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.InputEntity.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.InputEntity'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

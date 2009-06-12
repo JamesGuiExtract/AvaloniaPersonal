@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.TextInput.1 = s 'TextInput Class'
+	{
+		CLSID = s '{775ACCA5-32AC-11D6-8259-0050DAD4FF55}'
+	}
+	UCLIDInputFunnel.TextInput = s 'TextInput Class'
+	{
+		CLSID = s '{775ACCA5-32AC-11D6-8259-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFunnel.TextInput.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {775ACCA5-32AC-11D6-8259-0050DAD4FF55} = s 'TextInput Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.TextInput.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.TextInput'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

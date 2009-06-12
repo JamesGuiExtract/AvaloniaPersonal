@@ -1,0 +1,281 @@
+// All lines beginning with // are ignored as well as all whitespace " \f\n\r\t\v"
+
+// DT:0000
+// 	When Recorded Return To: ... \d{5}
+// DT:0001
+//	Name And Return Address ... \d{5}
+// DT:0002
+//	Return Address: ... \d{5}
+// DT:0003
+//	Mail To: ... \d{5}-\d{4}[^0-9] -dddd in additon to Zip code
+// DT:0004**
+//	Name and Return Address: ... \d{5} optional : on the end
+// DT:0005
+//	Name & Return Address: ... \d{5} and|&
+// DT:0006
+//	After Recording Return To: ... \d{5}-\d{4}[^0-9] 
+// DT:0007
+//	When Recorded Mail To: ... \d{5}
+// DT:0008
+//	Record and Return To: ... \d{5}-\d{4}[^0-9]
+// DT:0009
+//	Return To: ... \d{5}
+// DT:0010
+//	Return To: ... \d{5} Attn: <Name>
+// DT:0011**
+//	Return To: ... \d{5} Attn.: <Name>
+// DT:0012**
+//	Return Recorded Mortgage To: ... \d{5} 
+// DT:0014
+//	Return To ... \d{5} 
+// DT:0015
+//	Name & Return Address ...   \d{5}
+// DT:0016
+//	When Recorded Return To: ... City, ST.  \d{5} 
+//	ADDED an optional "." after state
+// DT:0017**
+//	after recording mail to: ... \d{5}-\d{4}[^0-9]
+// DT:0018
+//	Return To: ... City, State USA \d{5}
+// 	ADDED optional "USA" after state
+// DT:0019
+//	Mail Recorded Satisfaction To: ... \d{5}
+// DT:0020
+//	Name and Return Address ... \d{5} \d{4}[^0-9]
+//	space instead of a dash in zipcode (55555 4444) instead of (55555-4444)
+// DT:0021
+//	Name and Return Address ... City. State \d{5}
+//	period instead of a comma separating the city and state (Madison. WI) instead of(Madison, WI)
+// DT:0022**
+//	Return Document To: ... \d{5}
+// DT:0023**
+//	Record & Return To: ... \d{5}
+
+// DT:0024
+//	After Recording Return To: ... City State \d{5}
+//	A space inbetween city and state instead of a period or comma
+// DT:0025**
+//	After Recorded, Return To: ... \d{5}
+
+// DT:0026
+//	Prepared By & Return To: ... \d{5}
+// DT:0027
+//	Recording Requested By and Return To: ... \d{5}
+// DT:0028
+//	Return To Mortgagee At ... \d{5}
+// DT:0029
+//	Prepared By and When Recorded Return To:  ... \d{5}
+// DT:0030
+//	When Recorded Mail To.  ... \d{5} \d{4}
+// 	A "." instead of a ":" at the end at the end of prefix
+// DT:0031
+//	After Recording Return To  ... \d{5} \d{4}
+// 	A "." instead of a ":" at the end 
+// DT:0032
+//	Recording Requested By / Return To ... \d{5}-\d{4}
+// DT:0033
+//	When Recorded Mail To: ... \d{5}\d{4}
+// 	no seperator in zip code
+
+// DT:0034
+//	When Recorded Return To. ... \d{5}
+// 	period
+// DT:0035
+//	Mail Recorded Satisfaction To. ... \d{5}
+// 	period
+// DT:0036
+//	This Document Was Prepared By 
+//	and When Recorded Mail To: ... \d{5} ATTN: <name>
+// DT:0037
+//	And When Recorded Mail To ... \d{5}
+// DT:0038
+//	And When Recorded Mail To
+//	 (Name, Address, City and State) ... \d{5}
+// DT:0039
+//	Record and Return Address: ... \d{5} Attn: <name>
+// DT:0040
+//	Recorder of Deeds is requested to mail 
+// 	this satisfaction piece to: ... \d{5} Attn: <name>
+// DT:0042
+//	After Recording, Return To: ... \d{5}
+// DT:0043
+//	Prepared By/Return To: ... \d{5}
+// DT:0044
+//	Recorder Please Mail To: ... \d{5}
+// DT:0045
+//	This instrument prepared by and to be returned to: ... \d{5}
+// DT:0046
+//	Return Recorded Instrument To: ... \d{5}
+// DT:0047
+//	Recorder Mail To ... \d{5}
+// DT:0048
+//	Prepared By and Mail To: ... \d{5}
+// DT:0049
+//	Return By Mail To: ... \d{5}
+// DT:0050
+//	Recorded of Deeds is requested to
+//	mail this assignment to: ... \d{5}
+// DT:0051
+//	Please Return This Recorded Document to: ... \d{5}-\d{4}
+// DT:0052
+//	When Recorded Return Original to: ... \d{5}-\d{4}
+// DT:0053
+//	Mail Recorded Document to: ... \d{5}-\d{4}
+// DT:0054
+//	[When Recorded Return To] ... \d{5}-\d{4}
+// DT:0055
+//	Recorder, Please Return To ... \d{5}
+// DT:0056
+//	After Recording Return To ... CITY,ST,\d{5}
+// DT:0058
+//	Record & Return...\d{5}
+// DT:0058
+//	Please Return This Document To: ... \d{5}
+// DT:0060
+//	When Recorded Return To: ... \d{5}\d{4}
+// DT:0061
+//	Please Return To: ... \d{5}
+//    Attention: <name>ENDOFDOCUMENT
+// DT:0062
+//	Please Record And Return To: ... \d{5}-\d{4}ENDOFDOCUMENT
+// DT:0063
+//	After Recording Return To and Prepared By: ... \d{5)
+// DT:0064
+//	When Recorded, Mail Reconveyance To: ... \d{5)
+// DT:0065
+//	Recorder of Deeds is Requested to Mail this Satisfaction to: ... \d{5)
+// DT:0066
+//	Recorder of Deeds is Requested to Mail this Satisfaction to: ... \d{5)
+// DT:0067
+//	Mail this Satisfaction to: ... \d{5)
+// DT:0068
+//	After Recordation this mortgage should be returned to: ... \d{5)
+// DT:0069
+//	After Recording of this document, please return to
+//	address shown below: ... \d{5)
+
+
+// $1 is the PREFIX
+(
+\[?(?::?
+ (?:
+	// The "\|" and "I" at the end is for ocr errors on / no template exists
+	(?:(?:(?:(?:(?:this\s+document\s+was\s+)?prepared)|(?:recording\s+requested))\s+by\s*)?(?:and|&|/|I|\|)\s*)?	
+	(?:(?:
+       (?:when\s+recorded)|
+	 (?:after\s+recording(?:\s+of\s+this\s+document)?)|
+	 (?:after\s+recorded)|
+	 (?:record\s+(?:and|&))|
+	 (?:recorder)
+	),?\s+)?
+	(?:(?:please\s+)?(?:mail|retu(?:rn|m))\s+(?:this\s+)?(?:(?:(?:original\s+)|(?:recorded\s+))?(?:document|instrument|reconveyance)\s+)?(?:by\s+mail\s+)?to)
+	(?:\s+mortgagee\s+at)?
+	(?:\s+address\s+shown\s+below)?
+	(?:\s+and\s+prepared\s+by)?
+ )
+ |
+ (?:(?:(?:name|record)\s+(?:and|&)\s+)?retu(?:rn|m)\s+address)
+ |
+ (?:mail\s+recorded\s+satisfaction\s+to)
+ |
+ (?:recorder\s+of\s+deeds\s+is\s+requested\s+to\s+mail
+  \s+this\s+satisfaction\s+piece\s+to)
+ |
+ (?:
+  (?:recorder\s+of\s+deeds\s+is\s+requested\s+to\s+)?
+  mail\s+this\s+(?:assignment|satisfaction)\s+(?:peice\s+)?to
+ )
+ |
+ (?:this\s+instrument\s+prepared\s+by\s+and\s+to\s+be\s+returned\s+to)
+ |
+ (?:record\s+(?:and|&)\s+return)
+ |
+ (?:after\s+recordation\s+this\s+mortgage\s+should\s+be\s+returned\s+to)
+)\]?
+// The comma, semi-colon, "*" and hyphen are to account for ocr errors
+// they are not in any document template
+(?:\s*[:.,-;*]\s*)?
+(?:\s*\(?:name,?\s*address,?\s*city,?\s+and\s+state\))?
+){1,}
+
+// $2 is the BODY
+(
+// Body of Address
+[\s\S]{1,200}?\b\s*
+)
+
+// $3 is the state
+// State Part of Address
+(
+	ALABAMA|AL|
+	ALASKA|AK|
+	AMERICAN\s+SAMOA|AS|
+	ARIZONA|AZ|
+	ARKANSAS|AR|
+	CALIFORNIA|CA|
+	COLORADO|CO|
+	CONNECTICUT|CT|
+	DELAWARE|DE|
+	DISTRICT\s+OF\s+COLUMBIA|DC|
+	FEDERATED\s+STATES\s+OF\s+MICRONESIA|FM|
+	FLORIDA|FL|
+	GEORGIA|GA|
+	GUAM|GU|
+	HAWAII|HI|
+	IDAHO|ID|
+	ILLINOIS|IL|
+	INDIANA|IN|
+	IOWA|IA|
+	KANSAS|KS|
+	KENTUCKY|KY|
+	LOUISIANA|LA|
+	MAINE|ME|
+	MARSHALL ISLANDS|MH|
+	MARYLAND|MD|
+	MASSACHUSETTS|MA|
+	MICHIGAN|MI|
+	MINNESOTA|MN|
+	MISSISSIPPI|MS|
+	MISSOURI|MO|
+	MONTANA|MT|
+	NEBRASKA|NE|
+	NEVADA|NV|
+	NEW\s+HAMPSHIRE|NH|
+	NEW\s+JERSEY|NJ|
+	NEW\s+MEXICO|NM|
+	NEW\s+YORK|NY|
+	NORTH\s+CAROLINA|NC|
+	NORTH\s+DAKOTA|ND|
+	NORTHERN\s+MARIANA\s+ISLANDS|MP|
+	OHIO|OH|
+	OKLAHOMA|OK|
+	OREGON|OR|
+	PALAU|PW|
+	PENNSYLVANIA|PA|
+	PUERTO\s+RICO|PR|
+	RHODE\s+ISLAND|RI|
+	SOUTH\s+CAROLINA|SC|
+	SOUTH\s+DAKOTA|SD|
+	TENNESSEE|TN|
+	TEXAS|TX|
+	UTAH|UT|
+	VERMONT|VT|
+	VIRGIN\s+ISLANDS|VI|
+	VIRGINIA|VA|
+	WASHINGTON|WA|
+	WEST\s+VIRGINIA|WV|
+	WISCONSIN|WI|
+	WYOMING|WY
+)
+(?:
+(?:\s*\.\s*)?
+(?:\s*U\s*(?:\.\s*)?S\s*(?:\.\s*)?A(?:\.\s*)?)?
+(?:\s*[,._]?\s*)
+)
+// $4 $5 is the ZIP CODE
+//Zip Code
+(\d{5})(?:(?:(?:\s*)|(?:\s*(?:\.|-)\s*))(\d{4})([^0-9]|(?=\r?$)))?
+
+// $6 is the TRAILING ATTN BLOCKS
+// Trailing Attn Blocks
+(\s*att(?:ention|n)?\s*[:.,;\x21]\s*\S[\s\S]*?(?:\n|(?=\r?$)))?

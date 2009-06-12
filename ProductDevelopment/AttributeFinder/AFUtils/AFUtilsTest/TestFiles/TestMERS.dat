@@ -1,0 +1,13 @@
+// **********************************************************************
+// This file contains three columns:
+// First column: input file (.mfa), which simulates the found attributes.
+// 		 .mfa has the same format as .eav
+// Second column: Actual document file in either .txt or .uss file format
+// Third column: Expected attributes file (.eav)
+// All files shall be specified in fully qualified name or as a relative
+// path to this file.
+// **********************************************************************
+
+.\MERS\001589.tif.mfa;.\MERS\001589.tif.uss;.\MERS\001589.tif.eav
+.\MERS\001584.tif.mfa;.\MERS\001584.tif.uss;.\MERS\001584.tif.eav
+.\MERS\001873.tif.mfa;.\MERS\001873.tif.uss;.\MERS\001873.tif.eav

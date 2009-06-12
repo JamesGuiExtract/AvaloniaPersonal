@@ -1,0 +1,663 @@
+// SpatialString.cpp : Implementation of CSpatialString string construction
+#include "stdafx.h"
+#include "SpatialString.h"
+#include "UCLIDRasterAndOCRMgmt.h"
+
+#include <UCLIDException.h>
+#include <cpputil.h>
+#include <COMUtils.h>
+#include <CompressionEngine.h>
+#include <TemporaryFileName.h>
+
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+const string gstrSPATIAL_STRING_FILE_SIGNATURE = "UCLID Spatial String (USS) File";
+const _bstr_t gbstrSPATIAL_STRING_STREAM_NAME("SpatialString");
+
+//-------------------------------------------------------------------------------------------------
+// CSpatialString
+//-------------------------------------------------------------------------------------------------
+CSpatialString::CSpatialString()
+: m_strString(""), 
+  m_eMode(kNonSpatialMode), 
+  m_strSourceDocName("")
+{
+}
+//-------------------------------------------------------------------------------------------------
+CSpatialString::~CSpatialString()
+{
+	try
+	{
+		// Clear the page info map
+		m_ipPageInfoMap = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16539");
+}
+
+//-------------------------------------------------------------------------------------------------
+// ISpatialString - String construction
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateFromLines(IIUnknownVector* pLines)
+{
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		IIUnknownVectorPtr ipLines(pLines);
+		ASSERT_RESOURCE_ALLOCATION("ELI15088", ipLines != NULL);
+
+		// Reset everything
+		reset(true, true);
+
+		// Flags to determine the type of object we are creating
+		bool bOneSpatial = false;
+		bool bAllSpatial = true;
+		bool bAllHybrid = true;
+
+		vector<UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr> vecLines;
+
+		// Have to find the mode before appending the values otherwise append will not
+		// know how to handle the values for each type.
+		long lLineCount = ipLines->Size();
+		vecLines.reserve(lLineCount);
+		for (long i = 0; i < lLineCount; i++)
+		{
+			// Get each line
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = ipLines->At(i);
+			ASSERT_RESOURCE_ALLOCATION( "ELI14777", ipLine != NULL);
+			
+			// Place each line in the vector of lines
+			vecLines.push_back(ipLine);
+
+			// If any single line is non-spatial, then the lines
+			// cannot be all hybrid or all spatial.
+			UCLID_RASTERANDOCRMGMTLib::ESpatialStringMode eSourceMode = ipLine->GetMode();
+
+			if ( eSourceMode == kNonSpatialMode )
+			{
+				bAllHybrid = false;
+				bAllSpatial = false;
+			}
+			// If at least one line is Hybrid or Spatial, then the OneSpatial bool is set.
+			else if( eSourceMode == kHybridMode )
+			{
+				bOneSpatial = true;
+				bAllSpatial = false;
+			}
+
+			else if( eSourceMode == kSpatialMode )
+			{
+				bOneSpatial = true;
+			}
+			else
+			{
+				THROW_LOGIC_ERROR_EXCEPTION("ELI15378");
+			}
+		}//end for
+
+		// Determine which mode this object will be in. If all lines are non-spatial, then
+		// the object will be kNonSpatialMode. If at least 1 line is spatial, the object
+		// will be kHybridMode. If all the lines are spatial, the object will be kSpatialMode.
+		if( bAllSpatial )
+		{
+			m_eMode = kSpatialMode;
+		}
+		// If at least one is spatial OR all were hybrid, mode is hybrid.
+		else if( bOneSpatial || bAllHybrid)
+		{
+			m_eMode = kHybridMode;
+		}
+		// If none of the above are set, all items were non-spatial
+		else
+		{
+			m_eMode = kNonSpatialMode;
+		}		
+
+		// Now this object's insert method can handle each line correctly since it knows
+		// what mode it is in.
+		for (long i = 0; i < lLineCount; i++)
+		{
+			// Get each line
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipLine = vecLines[i];
+			ASSERT_RESOURCE_ALLOCATION( "ELI14804", ipLine != NULL);
+
+			// Append the line to this object
+			append(ipLine);
+			
+			// Don't append a new line after the last line and 
+			if (i < lLineCount-1 )
+			{
+				appendString("\r\n");
+			}
+		}//end for
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI08819");
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::AddRasterZones(IIUnknownVector *pVal, ILongToObjectMap* pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check arguments
+		IIUnknownVectorPtr ipVal(pVal);
+		ASSERT_ARGUMENT("ELI25769", ipVal != NULL);
+
+		// Validate license first
+		validateLicense();
+
+		// Wrap the page info map as a smart pointer (NULL is a valid value for
+		// this argument)
+		ILongToObjectMapPtr ipPageInfoMap(pPageInfoMap);
+
+		// Add the raster zones (note the string will now be hybrid no matter what
+		// its mode was previously)
+		addRasterZones(ipVal, ipPageInfoMap);
+
+		// Update the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14801");
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR bstrText, 
+	BSTR bstrSourceDocName, ILongToObjectMap *pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Validate license first
+		validateLicense();
+
+		UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone(pZone);
+		ASSERT_ARGUMENT("ELI19769", ipZone != NULL);
+		string strText = asString(bstrText);
+		ASSERT_ARGUMENT("ELI19907", !strText.empty());
+		ASSERT_ARGUMENT("ELI20241", pPageInfoMap != NULL);
+
+		// Reset everything
+		reset(true, true);
+
+		// Calculate dimensions needed to generate the letter array
+		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI19908", ipBounds != NULL);
+
+		long nTop, nBottom, nLeft, nRight;
+		ipBounds->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
+		long nRegionWidth = nRight - nLeft;
+		long nRegionHeight = nBottom - nTop;
+		unsigned long nLetterCount = strText.size();
+		float ufCharWidth = (float) nRegionWidth / (float)nLetterCount;
+		float ufLeftBound = (float) nLeft;
+		long nPageNum = ipZone->PageNumber;
+		vector<CPPLetter> vecLetters;
+
+		// Generate letter objects for the ImageRegionText string and populate
+		// them with spatial information that will fill the found image region
+		for (unsigned long i = 0; i < nLetterCount; i++)
+		{
+			unsigned short usLetter = (unsigned short) strText[i];
+
+			vecLetters.push_back(CPPLetter(usLetter,
+				usLetter,
+				usLetter,
+				(unsigned short) nTop,
+				(unsigned short) nBottom,
+				(unsigned short) ufLeftBound,
+				(unsigned short) (ufLeftBound + ufCharWidth),
+				(unsigned char) nPageNum,
+				false, false, true, (unsigned char) ufCharWidth, 100, 0));
+
+			ufLeftBound += ufCharWidth;
+		}
+
+		// set the last character's right bound to the right bound of the region
+		vecLetters[nLetterCount - 1].m_usRight = (unsigned short) nRight;
+
+		processLetters(&vecLetters[0], nLetterCount);
+
+		// set the source doc name
+		m_strSourceDocName = asString(bstrSourceDocName);
+
+		// Set the mode to spatial
+		m_eMode = kSpatialMode;
+
+		// Set the page info map
+		m_ipPageInfoMap = pPageInfoMap;
+
+		// Update the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19768");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateHybridString(IIUnknownVector* pVecRasterZones, BSTR bstrText, 
+		BSTR bstrSourceDocName, ILongToObjectMap *pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Validate license first
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI20253", pPageInfoMap != NULL);
+
+		// Reset everything except m_strSourceDocName
+		reset(false, true);
+
+		// Handle the raster zones parameter
+		IIUnknownVectorPtr ipRZones(pVecRasterZones);
+		ASSERT_RESOURCE_ALLOCATION( "ELI14814", ipRZones != NULL );
+
+		// Put the Raster Zones into this object's raster zone vector if one exists
+		long lSize = ipRZones->Size();
+		if( lSize > 0)
+		{
+			m_vecRasterZones.reserve(lSize);
+
+			// Add each raster zone to the vector of raster zones
+			for (long i=0; i < lSize; i++)
+			{
+				UCLID_RASTERANDOCRMGMTLib::IRasterZonePtr ipZone = ipRZones->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI25770", ipZone != NULL);
+
+				m_vecRasterZones.push_back(ipZone);
+			}
+
+			// Update the mode
+			m_eMode = kHybridMode;
+
+			m_ipPageInfoMap = pPageInfoMap;
+		}
+		// If no raster zones exist, set this object to non spatial mode
+		else
+		{
+			m_eMode = kNonSpatialMode;
+		}
+
+		// Update the string of this object
+		m_strString = asString( bstrText );
+
+		// set the source doc name
+		m_strSourceDocName = asString(bstrSourceDocName);
+
+		// Update the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14813");
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateNonSpatialString(BSTR bstrText, BSTR bstrSourceDocName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Get the text
+		string strText = asString(bstrText);
+
+		// Check license
+		validateLicense();
+
+		// Reset the entire string
+		reset(true, true);
+
+		// Set the string to this text
+		m_strString = strText;
+
+		// Set the source doc name
+		m_strSourceDocName = asString(bstrSourceDocName);
+
+		// Set the mode to non-spatial
+		m_eMode = kNonSpatialMode;
+
+		// Update the dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25665");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::CreateFromLetterArray(long nNumLetters, void* pLetters,
+		BSTR bstrSourceDocName, ILongToObjectMap* pPageInfoMap)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check arguments
+		ASSERT_ARGUMENT("ELI25771", (pLetters != NULL) || (nNumLetters == 0));
+		ASSERT_ARGUMENT("ELI25772", pPageInfoMap != NULL);
+		string strSourceDocName = asString(bstrSourceDocName);
+		ASSERT_ARGUMENT("ELI25773", !strSourceDocName.empty());
+
+		// Check license
+		validateLicense();
+
+		// Reset the spatial string
+		reset(true, true);
+
+		// Copy the source doc name
+		m_strSourceDocName = strSourceDocName;
+
+		// Copy the page info map
+		m_ipPageInfoMap = pPageInfoMap;
+		
+		// compute the string from the letters, and 
+		// downgrade to non-spatial string if necessary.
+		processLetters((CPPLetter*)pLetters, nNumLetters);
+
+		// Update the dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25667")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::ReplaceAndDowngradeToHybrid(BSTR bstrReplacement)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// check if this string is spatial
+		if(m_eMode == kSpatialMode)
+		{
+			// Downgrade the string to a hybrid string
+			downgradeToHybrid();
+		}
+		else if(m_eMode == kNonSpatialMode)
+		{
+			throw UCLIDException("ELI17164", 
+				"Cannot downgrade a non-spatial string to a hybrid string.");
+		}
+		// else the spatial string is already hybrid
+
+		// replace the text of the hybrid string
+		m_strString = asString(bstrReplacement);
+		
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17068");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::ReplaceAndDowngradeToNonSpatial(BSTR bstrReplacement)
+{
+
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Downgrade the string to non-spatial mode
+		downgradeToNonSpatial();
+
+		// Replace the text of the non-spatial string
+		m_strString = asString(bstrReplacement);
+
+		// Update the dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI25774");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::LoadFrom(BSTR strFullFileName, 
+									  VARIANT_BOOL bSetDirtyFlagToTrue, 
+									  BSTR *pstrOriginalSourceDocName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		CSingleLock lg(&m_mutex, TRUE);
+
+		// Default return OriginalSourceDocName path to empty string
+		string strOrigSourceDocName = "";
+
+		// if the user is trying to load from a text file, use the reusable
+		// functions to read the text from the ASCII file
+		string strInputFile = asString(strFullFileName);
+		EFileType eFileType = getFileType(strInputFile);
+		if (eFileType == kTXTFile)
+		{
+			loadFromTXTFile(strInputFile);
+		}
+		else if (eFileType == kUSSFile)
+		{
+			// If we reached here, it's because the file is not a text file
+			// Any file that's not a text file is assumed to be a USS file.
+			// The .uss file may be compressed.
+			// create a temporary file with the uncompressed output
+			TemporaryFileName tmpFile;
+			CompressionEngine::decompressFile(strInputFile, tmpFile.getName());
+
+			// Load this object from the file
+			IPersistStreamPtr ipPersistStream = getThisAsCOMPtr();
+			ASSERT_RESOURCE_ALLOCATION("ELI16919", ipPersistStream != NULL);
+			readObjectFromFile(ipPersistStream, get_bstr_t(tmpFile.getName().c_str()), 
+				gbstrSPATIAL_STRING_STREAM_NAME, false, gstrSPATIAL_STRING_FILE_SIGNATURE);
+
+			////////////////////////////////////////
+			// Check for SourceDocName image, prefer
+			// image in same location as USS file
+			////////////////////////////////////////
+
+			// Get folder for USS file
+			string	strFolder = getDirectoryFromFullPath(strInputFile);
+
+			// Get filename without extension
+			string	strSourceFile = getFileNameWithoutExtension(strInputFile);
+
+			// Check existence of SourceDocName file in present folder
+			string	strNewSource = strFolder + "\\" + strSourceFile;
+			// if the new source file exists, replace the existing source doc name
+			if (isFileOrFolderValid(strNewSource))
+			{
+				// Retain original source doc name
+				strOrigSourceDocName = m_strSourceDocName;
+
+				// the actual source doc name
+				m_strSourceDocName = strNewSource;
+			}
+		}
+		else
+		{
+			UCLIDException ue("ELI06797", "Unknown file type!");
+			ue.addDebugInfo("strInputFile", strInputFile);
+			throw ue;
+		}
+
+		// Original source doc name will be returned to the caller
+		*pstrOriginalSourceDocName = _bstr_t( strOrigSourceDocName.c_str() ).Detach();
+
+		// mark this object as dirty depending upon bSetDirtyFlagToTrue
+		m_bDirty = asCppBool(bSetDirtyFlagToTrue);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06689");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::SaveTo(BSTR strFullFileName, VARIANT_BOOL bCompress,
+									VARIANT_BOOL bClearDirty)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		CSingleLock lg(&m_mutex, TRUE);
+
+		// if the user is trying to save to a text file,
+		// the text associated with this object to the ASCII file
+		string stdstrFullFileName = asString(strFullFileName);
+		EFileType eFileType = getFileType(stdstrFullFileName);
+		if (eFileType == kTXTFile)
+		{
+			// save the text file to the specified output file name
+			// NOTE: saveToTXTFile calls waitForFileAccess internally, no
+			// need to call it here
+			saveToTXTFile(stdstrFullFileName);
+
+			// clear the dirty bit as requested
+			if (bClearDirty == VARIANT_TRUE)
+			{
+				m_bDirty = false;
+			}
+		}
+		else if (eFileType == kUSSFile)
+		{
+			// If we reached here, it's because the file is not a text file
+			// Any file that's not a text file is assumed to be a USS file.
+			// Create a temporary file (which will later be compressed and
+			// saved with the specified file name)
+			TemporaryFileName tmpFile;
+			string strOutputFileName = asCppBool(bCompress) ? 
+				tmpFile.getName() : stdstrFullFileName;
+
+			// Save this object to the file using the UNC path [FlexIDSCore #3519]
+			string strSourceDocName = m_strSourceDocName;
+			try
+			{
+				m_strSourceDocName = ::getUNCPath(strSourceDocName);
+
+				writeObjectToFile(this, _bstr_t(strOutputFileName.c_str()), 
+					gbstrSPATIAL_STRING_STREAM_NAME, asCppBool(bClearDirty), 
+					gstrSPATIAL_STRING_FILE_SIGNATURE);
+			}
+			catch (...)
+			{
+				// Restore the original source doc name
+				m_strSourceDocName = strSourceDocName;
+
+				throw;
+			}
+
+			// Restore the original source doc name
+			m_strSourceDocName = strSourceDocName;
+
+			// Wait until the file is readable
+			waitForStgFileAccess(_bstr_t(strOutputFileName.c_str()));
+
+			// if requested, compress the above created temporary file and 
+			// save as the specified filename
+			if (bCompress == VARIANT_TRUE)
+			{
+				string strOutputFile = asString(strFullFileName);
+
+				// Compress the file (compress file includes a call to waitForFileToBeReadable
+				// no need to include one here)
+				CompressionEngine::compressFile(tmpFile.getName(), strOutputFile);
+			}
+		}
+		else
+		{
+			UCLIDException ue("ELI06798", "Unknown file type!");
+			ue.addDebugInfo("strInputFile", stdstrFullFileName);
+			throw ue;
+		}
+
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06692");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::Clear()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		// reset all member variables
+		reset(true, true);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06618");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::LoadFromMultipleFiles(IVariantVector *pvecFiles, BSTR strSourceDocName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Reset the string (including spatial page info and source doc name)
+		reset(true, true);
+
+		// store the new value of the source-doc-name attribute
+		m_strSourceDocName = asString(strSourceDocName);
+
+		// Wrap the vector in a smart pointer
+		IVariantVectorPtr ipvecFiles = pvecFiles;
+		ASSERT_RESOURCE_ALLOCATION( "ELI09067", ipvecFiles != NULL );
+
+		// Get the number of files and iterate over the vector
+		long nNumFiles = ipvecFiles->Size;
+		for ( long i = 0; i < nNumFiles; i++)
+		{
+			// Create a temporary spatial string to append onto the back of this
+			// object once it has been loaded from the file
+			UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipText(CLSID_SpatialString);
+			ASSERT_RESOURCE_ALLOCATION( "ELI09072", ipText != NULL );
+
+			// Load the file
+			ipText->LoadFrom( _bstr_t(ipvecFiles->GetItem(i)), VARIANT_TRUE );
+			
+			// Set the source document name to the given source name
+			ipText->SourceDocName = strSourceDocName;
+				
+			if( ipText->HasSpatialInfo() )
+			{
+				ipText->UpdatePageNumber( i+1 );
+			}
+
+			// Add Blank line before the new string is added if at least 1 page has been loaded
+			if ( i > 0)
+			{
+				appendString("\r\n\r\n");
+			}
+
+			// Append the new spatial string. This will append any RasterZones that are on the
+			// spatial string from the file.
+			append(ipText);
+		}
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09065");
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRasterAndOCRMgmt.SpatialString.1 = s 'SpatialString Class'
+	{
+		CLSID = s '{91AB60A3-57DA-44F5-BDEF-52ABF522A543}'
+	}
+	UCLIDRasterAndOCRMgmt.SpatialString = s 'SpatialString Class'
+	{
+		CLSID = s '{91AB60A3-57DA-44F5-BDEF-52ABF522A543}'
+		CurVer = s 'UCLIDRasterAndOCRMgmt.SpatialString.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {91AB60A3-57DA-44F5-BDEF-52ABF522A543} = s 'SpatialString Class'
+		{
+			ProgID = s 'UCLIDRasterAndOCRMgmt.SpatialString.1'
+			VersionIndependentProgID = s 'UCLIDRasterAndOCRMgmt.SpatialString'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}'
+		}
+	}
+}

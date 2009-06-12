@@ -1,0 +1,115 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Abstract of Judgment
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Abstract of Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Abstract of Support Judgment
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Support Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Abstract of Support Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Affidavit of Death
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Affidavit of Death;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Affidavit of Death;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Mortgage
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Assignment of Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Assignment of Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Assignment of Rents
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Assignment of Rents;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Assignment of Rents;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Certificate of Delinquency of Personal Property Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Personal Property Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Personal Property Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Financing Statement
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Financing Statement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Financing Statement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Modification of Deed of Trust
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Modification of Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Modification of Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Completion
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Completion;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Default
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Federal Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Federal Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Federal Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Rescission
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Rescission;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Power of Attorney
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Power of Attorney;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Quit Claim Deed (Grant Deed);$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of County Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Release of County Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Release of County Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Federal Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Release of Federal Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Release of Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of State Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Release of State Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Request for Notice of Default
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Request for Copy of Notice of Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Request for Copy of Notice of Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Judgment
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Acknowledgement of Satisfaction of Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Acknowledgement of Satisfaction of Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Reconveyance;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Reconveyance;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Subordination Agreement
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Subordination Agreement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Substitution of Trustee
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Substitution of Trustee;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Substitution of Trustee;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Warranty Deed
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+//unsupported start here
+//Affidavit - Death of Life Tenant
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Affidavit - Death of Life Tenant;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Affidavit - Death of Life Tenant;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Affidavit - Death of Trustee
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Affidavit - Death of Trustee;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Affidavit - Death of Trustee;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Copy of Deed of Trust
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Copy of Deed of Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of State Tax Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of State Tax Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Order After Hearing
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Order After Hearing;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Release of Judgement Lien
+<TESTFOLDER>;..\..\Rules\PIN.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Release of Judgement Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav

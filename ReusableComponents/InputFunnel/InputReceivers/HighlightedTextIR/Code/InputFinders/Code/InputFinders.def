@@ -1,0 +1,9 @@
+; InputFinders.def : Declares the module parameters.
+
+LIBRARY      "InputFinders.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

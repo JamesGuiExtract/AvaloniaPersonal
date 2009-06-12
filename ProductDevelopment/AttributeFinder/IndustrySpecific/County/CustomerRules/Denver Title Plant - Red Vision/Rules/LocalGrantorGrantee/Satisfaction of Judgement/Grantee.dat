@@ -1,0 +1,22 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2005089010.tif.uss
+LocalModotGrantee01=CERTIFICATE OF FULL SATISFACTION OF JUDGMENT^300~Full Satisfaction^10~Debtor(s)^?Grantee^160~Creditor
+
+[PATTERNS_END]

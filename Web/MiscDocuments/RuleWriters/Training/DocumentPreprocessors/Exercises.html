@@ -1,0 +1,40 @@
+<HTML>
+	<HEAD>
+		<TITLE>Preprocessors Exercises</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+
+	<BODY>
+		<h1>Preprocessors Exercises</h1>
+		<hr>
+		<ol>
+			<li>Sometimes the word order in the OCR result of an image is not what it should be. These exercises use a text file that simulates this condition.
+				<p>
+					<ul>
+						<li>Open <b>Pets.rsd</b> in the Rule Set Editor. Run this rule on <b>Pets.txt</b>.</li>
+						<li>Notice that only one of three pet names was found and that the text, <i>". Thank you!</i>, was incorrectly found as the name of a pet.</li>
+						<li>Add an Advanced Replace String preprocessor to remove the first occurrence of <i>Name of Pet</i> so that, when the rule is run, <i>". Thank you!</i> is no longer found as a pet's name.</li>
+						<li>Copy the Advanced Replace String to the clipboard; change the preprocessor to a Select Multiple Document Preprocessors object and paste the Advanced Replace String into it.</li>
+						<li>Add an Advanced Replace String that will make the rule find <i>Spot</i> as a pet's name.</li>
+					</ul>
+				</p>
+			</li>
+			<li>Open the Rule Set Editor and load the file <b>SelectMultiple.rsd</b>.</li>
+				<ul>
+					<p>
+						
+						<li>Load the file <b>SelectMultiple.txt</b> in the Rule Tester and execute the rules.</li>
+						<li>We are looking for "Sensitive #"'s, but it looks like the word "Sensitive" was not OCRed correctly.</li>
+						<li>The rule is looking for any string of nine digits, but this finds too many numbers.</li>
+						<li>Use preprocessors to eliminate the numbers we don't want.
+							<ul>
+								<li>Hint: <b>Advanced replace string</b> can replace insensitive numbers with garbage text.</li>
+								<li>No cheating! Don't edit the Value Finder.</li>
+							</ul>
+						</li>
+					</p>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

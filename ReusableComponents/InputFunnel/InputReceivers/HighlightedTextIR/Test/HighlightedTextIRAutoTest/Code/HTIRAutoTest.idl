@@ -1,0 +1,38 @@
+// HTIRAutoTest.idl : IDL source for HTIRAutoTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (HTIRAutoTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(9322E80E-7CAA-4195-90F2-C3CA7D37063C),
+		dual,
+		helpstring("IHTIRTester Interface"),
+		pointer_default(unique)
+	]
+	interface IHTIRTester : IDispatch
+	{
+	};
+
+[
+	uuid(34C19C20-8C57-40B7-90EC-1058F238F975),
+	version(1.0),
+	helpstring("HTIRAutoTest 1.0 Type Library")
+]
+library HTIRAUTOTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(AA427C4C-49E6-420F-9799-616B2AE7B19E),
+		helpstring("HTIRTester Class")
+	]
+	coclass HTIRTester
+	{
+		[default] interface IHTIRTester;
+	};
+};

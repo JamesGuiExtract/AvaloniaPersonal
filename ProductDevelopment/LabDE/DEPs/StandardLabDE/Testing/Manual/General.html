@@ -1,0 +1,520 @@
+<HTML>
+
+<HEAD>
+<TITLE>Standard LabDE General Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>General Features Testing Checklist<br>
+<IMG src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Config File Support</h3>
+	<ul>
+		<LI>Create or identify at least two distinct DEPs.
+		<ul>
+			<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+			folder so that <b>DataEntryPanelFileName</b> is set to the first DEP.
+			<LI>Confirm that the appropriate DEP is loaded in <b>stand-alone</b> mode.
+			<LI>Confirm that the appropriate DEP is loaded in <b>FAM</b> mode.
+<p>
+			<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+			folder so that <b>DataEntryPanelFileName</b> is set to the second DEP.
+			<LI>Confirm that the appropriate DEP is loaded in <b>stand-alone</b> mode.
+			<LI>Confirm that the appropriate DEP is loaded in <b>FAM</b> mode.
+		</ul>
+<p>
+		<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+		folder so that <b>FileProcessingTaskName</b> is set to a unique 
+		file processing task.
+		<LI>Click on <b>Check for new components</b> in the FAM.
+		<LI>Confirm that the specified file processing task can be selected 
+		in the <b>FAM</b>.
+<p>
+		<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+		folder so that <b>ApplicationTitle</b> is set to a unique string.
+		<LI>Exercise LabDE in <b>stand-alone</b> mode.
+		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> 
+		and the <b>task bar</b>.
+		<LI>Exercise LabDE in <b>FAM</b> mode.
+		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b>.
+	</ul>
+<p>
+	<LI><h3>Window Position</h3>
+	<ul>
+		<li>Stand-alone mode
+		<ul>
+			<li>Exercise LabDE in <b>stand-alone</b> mode.
+			<li>Modify window size and position. 
+			<li>Exit <b>LabDE</b>. 
+			<li>Re-open LabDE in <b>stand-alone</b> mode.
+			<li>Confirm that window size and position are persistent.
+			<li>Modify the scrollbar position in the <b>Image Viewer</b>.
+			<li>Exit <b>LabDE</b>. 
+			<li>Re-open LabDE in <b>stand-alone</b> mode.
+			<li>Confirm that the scrollbar position is persistent.
+		</ul>
+<p>
+		<li>FAM mode
+		<ul>
+			<li>Exercise LabDE in <b>FAM</b> mode.
+			<li>Modify window size and position. 
+			<li>Stop processing. 
+			<li>Re-open LabDE in <b>FAM</b> mode.
+			<li>Confirm that window size and position are persistent.
+			<li>Modify the scrollbar position in the <b>Image Viewer</b>.
+			<li>Stop processing. 
+			<li>Re-open LabDE in <b>FAM</b> mode.
+			<li>Confirm that the scrollbar position is persistent.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Menus and Toolbars</h3>
+	<ul>
+		<li>File menu - Stand-alone mode
+		<ul>
+			<li>Confirm that <b>File - Open</b> allows a file to be be selected 
+			and opened.
+			<li>Confirm that the <b>Open image</b> toolbar button allows a file to 
+			be selected and opened.
+			<li>Confirm that <b>File - Open</b> adds a file to the MRU list.
+			<li>Confirm that a file selected from the MRU list is opened.
+			<li>Confirm that <b>File - Close</b> closes the open file.
+			<li>Confirm that <b>File - Save</b> saves changes to a VOA file when all 
+			data items are valid.
+			<li>Confirm that the <b>Save</b> toolbar button saves changes to a VOA file 
+			when all data items are valid.
+			<li>Confirm that the <b>Save</b> toolbar button does not display a Save dialog.
+			<li>Confirm that <b>File - Print</b> allows a file to be be printed.
+			<li>Confirm that the <b>Print image</b> toolbar button allows a file to 
+			be printed.
+			<li>Confirm that <b>File - Exit</b> closes the open file and exits 
+			the application.
+		</ul>
+<p>
+		<li>File menu - FAM mode
+		<ul>
+			<li>Confirm that <b>File - Stop processing</b> closes the open file and exits 
+			the application.
+		</ul>
+<p>
+		<li>View menu
+		<ul>
+			<li>Open image <b>151.tif</b> from Demo_LabDE.
+			<li>Confirm that the <b>Page number</b> toolbar edit box displays 
+			<b>1 of 2</b>.
+			<li>Confirm that the proper page is displayed if a valid page number 
+			is entered.
+			<li>Confirm that an invalid page number is entered, the entry is ignored 
+			and the page does not change.
+			<li>Confirm that <b>View - Go To Page - Page number</b> displays a 
+			<b>Goto Page</b> dialog.
+			<li>Confirm that the proper page is displayed if a valid page number 
+			is entered.
+			<li>Confirm that an <b>Invalid page number</b> error is displayed if 
+			an invalid page number is entered.
+<p>
+			<li>Open image <b>004.tif</b> from Demo_LabDE.
+			<li>Confirm that <b>View - Go To Item - Next unviewed</b> navigates to 
+			an item that displays in bold, indicating that it has not yet been viewed.
+			<li>Confirm that the <b>Go to next unviewed item</b> toolbar button 
+			navigates to the next unviewed item.
+			<li>Confirm that the <b>F4</b> key navigates to the next unviewed item.
+			<li><b>[DataEntry #197]</b> Confirm that empty cells are skipped.
+			<li>Confirm that <b>View - Go To Item - Next invalid</b> navigates to 
+			an invalid item.
+			<li>Confirm that the <b>Go to next invalid item</b> toolbar button 
+			navigates to the next invalid item.
+			<li>Confirm that the <b>F3</b> key navigates to the next invalid item.
+<p>
+			<li>Select a non-empty cell.
+			<li>Confirm that a tooltip appears.
+			<li>Confirm that <b>View - Temporarily hide tooltips</b> hides the tooltip.
+			<li>Select another non-empty cell.
+			<li>Confirm that a tooltip appears.
+			<li>Confirm that <b>View - Temporarily hide tooltips</b> hides the tooltip.
+			<li>Select the non-empty cell chosen before.
+			<li>Confirm that a tooltip appears.
+			<li>Confirm that <b>Escape</b> hides the tooltip.
+			<li>Type text into the cell.
+			<li>Confirm that the tooltip stays hidden.
+<p>
+			<li>Confirm that <b>View - Highlight all data in image</b> highlights 
+			all the found data.
+			<li>Confirm that the menu item is checked.
+			<li>Confirm that <b>View - Highlight all data in image</b> removes all 
+			the highlights.
+			<li>Confirm that the menu item is unchecked.
+			<li>Confirm that <b>F10</b> highlights all the found data.
+<p>
+			<li>Select a non-empty cell such as <b>GM/DL</b> that has a partially red 
+			highlight indicating poorer OCR.
+			<li>Confirm that <b>View - Accept highlight</b> changes the highlight to green.
+			<li>Confirm that <b>View - Remove highlight</b> removes the highlight and 
+			the tooltip.
+			<li>Select another non-empty cell that has a partially red 
+			highlight indicating poorer OCR.
+			<li>Confirm that <b>Ctrl+T</b> changes the highlight to green.
+			<li>Confirm that <b>Ctrl+D</b> removes the highlight and the tooltip.
+		</ul>
+<p>
+		<li>Tools menu
+		<ul>
+			<li>Confirm that <b>Tools - Zoom window</b> changes the cursor to a Magnifier.
+			<li>Confirm that the Image Viewer zooms to the selected region.
+			<li>Confirm that the cursor and zoom are the same when using the 
+			appropriate toolbar button.
+			<li>Confirm that <b>Tools - Pan</b> changes the cursor to a Hand.
+			<li>Confirm that the Image Viewer pans as expected.
+			<li>Confirm that the cursor and zoom are the same when using the 
+			appropriate toolbar button.
+			<li>Confirm that <b>Tools - Review and select</b> changes the cursor 
+			to an Arrow.
+			<li>Confirm that moving the mouse over some relevant text either displays 
+			a highlight and tooltip or a hint.
+			<li>Confirm that the cursor and zoom are the same when using the 
+			appropriate toolbar button.
+<p>
+			<li>Confirm that <b>Tools - Swipe text in angular zone</b> changes the cursor 
+			to a Yellow Highlighter.
+			<li>Confirm that swiped text appears in the active cell along with 
+			a matching tooltip.
+			<li>Confirm that the cursor and swipe result are the same when using the 
+			appropriate toolbar button.
+			<li>Confirm that the menu item and toolbar button each remain selected after use.
+			<li>Confirm that <b>Tools - Swipe text in rectangular zone</b> changes the cursor 
+			to a Yellow Rectangle.
+			<li>Confirm that swiped text appears in the active cell along with 
+			a matching tooltip.
+			<li>Confirm that the cursor and swipe result are the same when using the 
+			appropriate toolbar button.
+			<li>Confirm that the menu item and toolbar button each remain selected after use.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Shortcuts</h3>
+	<ul>
+		<li>Stand-alone mode
+		<ul>
+			<li>Confirm that <b>Ctrl+O</b> displays the File - Open dialog with no image open.
+			<li>Confirm that <b>Ctrl+O</b> displays the File - Open dialog with an image open.
+			<li>Confirm that <b>Ctrl+F4</b> closes an open image.
+			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
+			may be presented if invalid data is present.
+			<li>Confirm that <b>Ctrl+P</b> does not display the File - Print dialog with 
+			no image open.
+			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog with an image open.
+<p>
+			<li>Confirm that <b>Alt+P</b> sets Fit-To-Page mode with no image open.
+			<li>Confirm that <b>Alt+P</b> sets Fit-To-Page mode with an image open.
+			<li>Confirm that <b>Alt+W</b> sets Fit-To-Width mode with no image open.
+			<li>Confirm that <b>Alt+W</b> sets Fit-To-Width mode with an image open.
+			<li>Confirm that the remaining View menu shortcuts have no effect 
+			with no image open.
+			<li>Confirm that <b>F7</b> zooms in.
+			<li>Confirm that <b>Ctrl+Plus</b> zooms in.
+			<li>Confirm that <b>F8</b> zooms out.
+			<li>Confirm that <b>Ctrl+Minus</b> zooms out.
+			<li>Confirm that <b>Alt+Left</b> zooms previous.
+			<li>Confirm that <b>Alt+Right</b> zooms next.
+			<li>Confirm that <b>Ctrl+Shift+R</b> rotates an open image counterclockwise.
+			<li>Confirm that <b>Ctrl+R</b> rotates an open image clockwise.
+			<li>Confirm that <b>Ctrl+Home</b> navigates to the first page of an open image.
+			<li>Confirm that <b>PgUp</b> navigates to the previous page of an open image.
+			<li>Confirm that <b>PgDown</b> navigates to the next page of an open image.
+			<li>Confirm that <b>Ctrl+End</b> navigates to the last page of an open image.
+			<li>Confirm that <b>F3</b> navigates to the next invalid item.
+			<li>Confirm that <b>F4</b> navigates to the next unviewed item.
+			<li>Confirm that <b>Escape</b> hides the active tooltip.
+			<li>Confirm that <b>F10</b> highlights all found data.
+			<li>Confirm that <b>F10</b> again turns off all highlights.
+			<li>Confirm that <b>Ctrl+T</b> accepts the active highlight by turning any 
+			red background color to green.
+			<li>Confirm that <b>Ctrl+D</b> deletes the active highlight.
+<p>
+			<li>Confirm that <b>Alt+Z</b> activates the Zoom Window tool with an image open.
+			<li>Confirm that <b>Alt+Z</b> does not activate the Zoom Window tool with 
+			no image open.
+			<li>Confirm that <b>Alt+A</b> activates the Pan tool with an image open.
+			<li>Confirm that <b>Alt+A</b> does not activate the Pan tool with 
+			no image open.
+			<li>Confirm that <b>Alt+R</b> activates the Review and Select tool with 
+			an image open.
+			<li>Confirm that <b>Alt+R</b> does not activate the Review and Select tool with 
+			no image open.
+			<li>Confirm that <b>Alt+S</b> activates one of the swiping tools with 
+			an image open.
+			<li>Confirm that another <b>Alt+S</b> activates the other swiping tool with 
+			an image open.
+		</ul>
+<p>
+		<li>FAM mode
+		<ul>
+			<li>Confirm that <b>Ctrl+F4</b> stops processing.
+			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
+			may be presented if invalid data is present.
+			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog.
+<p>
+			<li>Confirm that <b>Alt+P</b> sets Fit-To-Page mode.
+			<li>Confirm that <b>Alt+W</b> sets Fit-To-Width mode.
+			<li>Confirm that <b>F7</b> zooms in.
+			<li>Confirm that <b>Ctrl+Plus</b> zooms in.
+			<li>Confirm that <b>F8</b> zooms out.
+			<li>Confirm that <b>Ctrl+Minus</b> zooms out.
+			<li>Confirm that <b>Alt+Left</b> zooms previous.
+			<li>Confirm that <b>Alt+Right</b> zooms next.
+			<li>Confirm that <b>Ctrl+Shift+R</b> rotates an image counterclockwise.
+			<li>Confirm that <b>Ctrl+R</b> rotates an image clockwise.
+			<li>Confirm that <b>Ctrl+Home</b> navigates to the first page of an image.
+			<li>Confirm that <b>PgUp</b> navigates to the previous page of an image.
+			<li>Confirm that <b>PgDown</b> navigates to the next page of an image.
+			<li>Confirm that <b>Ctrl+End</b> navigates to the last page of an image.
+			<li>Confirm that <b>F3</b> navigates to the next invalid item.
+			<li>Confirm that <b>F4</b> navigates to the next unviewed item.
+			<li>Confirm that <b>Escape</b> hides the active tooltip.
+			<li>Confirm that <b>F10</b> highlights all found data.
+			<li>Confirm that <b>F10</b> again turns off all highlights.
+			<li>Confirm that <b>Ctrl+T</b> accepts the active highlight by turning any 
+			red background color to green.
+			<li>Confirm that <b>Ctrl+D</b> deletes the active highlight.
+<p>
+			<li>Confirm that <b>Alt+Z</b> activates the Zoom Window tool.
+			<li>Confirm that <b>Alt+A</b> activates the Pan tool.
+			<li>Confirm that <b>Alt+R</b> activates the Review and Select tool.
+			<li>Confirm that <b>Alt+S</b> activates one of the swiping tools.
+			<li>Confirm that another <b>Alt+S</b> activates the other swiping tool.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Data Entry in cells</h3>
+	<ul>
+		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<li><b>Result Status</b>
+		<ul>
+			<li>Confirm that text cannot be swiped into the combo box.
+			<li>Confirm that typing <b>O</b> or <b>R</b> into the combo box 
+			changes the setting to <b>Original</b> or <b>Reviewed</b>, respectively.
+		</ul>
+<p>
+		<li><b>Patient Information</b>
+		<ul>
+			<li>Confirm that text can be swiped into the <b>Name</b> edit box.
+			<li>Confirm that text can be typed into the <b>Name</b> edit box.
+			<li>Confirm that a validation icon is displayed if only one word is 
+			provided in the <b>Name</b> edit box.
+			<li>Confirm that text can be swiped into the <b>Medical Record #</b> edit box.
+			<li>Confirm that text can be typed into the <b>Medical Record #</b> edit box.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Medical Record #</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Date of Birth</b> edit box.
+			<li>Confirm that text can be typed into the <b>Date of Birth</b> edit box.
+			<li>Confirm that a validation icon is displayed in the DEP if an invalid date is 
+			provided in the <b>Date of Birth</b> edit box.
+			<li><b>[DataEntry #279]</b> Confirm that a validation icon is displayed 
+			after the image highlight if an invalid date is provided in the 
+			<b>Date of Birth</b> edit box.
+			<li>Confirm that text can be swiped into the <b>Gender</b> combo box.
+			<li>Confirm that text can be typed into the <b>Gender</b> combo box.
+			<li>Confirm that entered text is converted to upper-case if valid.
+			<li>Confirm that a validation icon is displayed if a character other than 
+			<b>F</b>, <b>M</b> or <b>U</b> is provided for the <b>Gender</b> combo box.
+		</ul>
+<p>
+		<li><b>Physicians</b>
+		<ul>
+			<li>Confirm that text can be swiped into the <b>Name</b> cell.
+			<li>Confirm that text can be typed into the <b>Name</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Name</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Type</b> cell.
+			<li>Confirm that text can be typed into the <b>Type</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Type</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Name</b> cell for 
+			the starred row.
+			<li>Confirm that text can be typed into the <b>Name</b> cell for 
+			the starred row.
+			<li>Confirm that entering text into the <b>Name</b> cell for 
+			the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Type</b> cell for 
+			the starred row.
+			<li>Confirm that text can be typed into the <b>Type</b> cell for 
+			the starred row.
+			<li>Confirm that entering text into the <b>Type</b> cell for 
+			the starred row creates a new starred row.
+		</ul>
+<p>
+		<li><b>Laboratory</b>
+		<ul>
+			<li>Confirm that text can be swiped into the <b>Laboratory</b> edit box.
+			<li>Confirm that text can be typed into the <b>Laboratory</b> edit box.
+			<li>Confirm that a validation icon is displayed if the 
+			<b>Laboratory</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Street</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be typed into the <b>Street</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be swiped into the <b>City</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be typed into the <b>City</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be swiped into the <b>State</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be typed into the <b>State</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be swiped into the <b>Zip</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that text can be typed into the <b>Zip</b> cell of the 
+			<b>Address</b> table.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>any or all</b> of the cells are empty.
+			<li>Confirm that text can be swiped into the <b>Phone</b> edit box.
+			<li>Confirm that text can be typed into the <b>Phone</b> edit box.
+			<li>Confirm that a validation icon is displayed if an invalid phone 
+			number is provided in the <b>Phone</b> edit box.
+			<li>Confirm that text can be swiped into the <b>Lab ID</b> edit box.
+			<li>Confirm that text can be typed into the <b>Lab ID</b> edit box.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Lab ID</b> edit box is empty.
+		</ul>
+<p>
+		<li><b>Completed Tests</b>
+		<ul>
+			<li>Confirm that text can be swiped into the <b>Laboratory Test 
+			Results</b> cell.
+			<li>Confirm that text can be typed into the <b>Laboratory Test 
+			Results</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Laboratory Test Results</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Collection Date</b> cell.
+			<li>Confirm that text can be typed into the <b>Collection Date</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Collection Date</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Collection Time</b> cell.
+			<li>Confirm that text can be typed into the <b>Collection Time</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Collection Time</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Laboratory Test Results</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Laboratory Test Results</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Laboratory Test Results</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Collection Date</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Collection Date</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Collection Date</b> cell for 
+			the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Collection Time</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Collection Time</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Collection Time</b> cell for 
+			the starred row creates a new starred row.
+			<li>Confirm that clearing text out of the cells in the <b>Completed 
+			Tests</b> table retains the information in the <b>Selected Test Details</b> 
+			table.
+			<li>Confirm that deleting all rows from the <b>Completed Tests</b> table 
+			removes the information in the <b>Selected Test Details</b> table.
+		</ul>
+<p>
+		<li><b>Selected Test Details</b>
+		<ul>
+			<li>Confirm that text can be swiped into the <b>Result Date</b> edit box.
+			<li><b>[DataEntry #258]</b> Confirm that the swiped highlight is visible.
+			<li>Confirm that text can be typed into the <b>Result Date</b> edit box.
+			<li>Confirm that a validation icon is displayed if an invalid date 
+			is provided in the <b>Result Date</b> edit box.
+			<li>Confirm that a validation icon is not displayed if the 
+			<b>Result Date</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Result Time</b> edit box.
+			<li><b>[DataEntry #258]</b> Confirm that the swiped highlight is visible.
+			<li>Confirm that text can be typed into the <b>Result Time</b> edit box.
+			<li>Confirm that a validation icon is displayed if an invalid time 
+			is provided in the <b>Result Time</b> edit box.
+			<li>Confirm that a validation icon is not displayed if the 
+			<b>Result Time</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Order Code</b> edit box.
+			<li>Confirm that text can be typed into the <b>Order Code</b> edit box.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Order Code</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Order Number</b> edit box.
+			<li>Confirm that text can be typed into the <b>Order Number</b> edit box.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Order Number</b> edit box is empty.
+			<li>Confirm that text can be swiped into the <b>Comment</b> edit box.
+			<li>Confirm that text can be typed into the <b>Comment</b> edit box.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Comment</b> edit box is empty.
+			<li>Confirm that entering lots of text into the <b>Comment</b> edit box 
+			enables the vertical scrollbar.
+<p>
+			<li>Confirm that text can be swiped into the <b>Component Name</b> cell.
+			<li>Confirm that text can be typed into the <b>Component Name</b> cell.
+			<li>Confirm that a validation icon is displayed if the 
+			<b>Component Name</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Value</b> cell.
+			<li>Confirm that text can be typed into the <b>Value</b> cell.
+			<li>Confirm that a validation icon is displayed if the 
+			<b>Value</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Units</b> cell.
+			<li>Confirm that text can be typed into the <b>Units</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Units</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Ref. Range</b> cell.
+			<li>Confirm that text can be typed into the <b>Ref. Range</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Ref. Range</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Flag</b> cell.
+			<li>Confirm that text can be typed into the <b>Flag</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Flag</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Comment</b> cell.
+			<li>Confirm that text can be typed into the <b>Comment</b> cell.
+			<li>Confirm that a validation icon is not displayed even if the 
+			<b>Comment</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Component Name</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Component Name</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Component Name</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Value</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Value</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Value</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Units</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Units</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Units</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Ref. Range</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Ref. Range</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Ref. Range</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Flag</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Flag</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Flag</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Comment</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Comment</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Comment</b> 
+			cell for the starred row creates a new starred row.
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.CategoryManager.1 = s 'CategoryManager Class'
+	{
+		CLSID = s '{AC73C5D4-EB59-42CF-AAF0-9E19A184CF57}'
+	}
+	UCLIDCOMUtils.CategoryManager = s 'CategoryManager Class'
+	{
+		CLSID = s '{AC73C5D4-EB59-42CF-AAF0-9E19A184CF57}'
+		CurVer = s 'UCLIDCOMUtils.CategoryManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AC73C5D4-EB59-42CF-AAF0-9E19A184CF57} = s 'CategoryManager Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.CategoryManager.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.CategoryManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{0AE4AE1A-A4C5-4061-B3F5-525937B0F7AF}'
+		}
+	}
+}

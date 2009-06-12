@@ -1,0 +1,5 @@
+//test1 Set attribute Value to "My Value"
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 Set attribute value to input document name, and type to "My Type"
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav

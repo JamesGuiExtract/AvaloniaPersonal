@@ -1,0 +1,9 @@
+; UCLIDRasterAndOCRMgmt.def : Declares the module parameters.
+
+LIBRARY      "UCLIDRasterAndOCRMgmt.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

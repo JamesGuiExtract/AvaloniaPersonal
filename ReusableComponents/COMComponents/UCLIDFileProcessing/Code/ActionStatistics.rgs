@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.ActionStatistics.1 = s 'ActionStatistics Class'
+	{
+		CLSID = s '{661912F2-1A5F-4B87-8C18-742C0E50C1B1}'
+	}
+	UCLIDFileProcessing.ActionStatistics = s 'ActionStatistics Class'
+	{
+		CLSID = s '{661912F2-1A5F-4B87-8C18-742C0E50C1B1}'
+		CurVer = s 'UCLIDFileProcessing.ActionStatistics.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {661912F2-1A5F-4B87-8C18-742C0E50C1B1} = s 'ActionStatistics Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.ActionStatistics.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.ActionStatistics'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{}'
+		}
+	}
+}

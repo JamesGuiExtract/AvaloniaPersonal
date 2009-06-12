@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.FilterIDShieldDataFileTask.1 = s 'FilterIDShieldDataFileTask Class'
+	{
+		CLSID = s '{85D176EC-411F-4568-965B-CAA7F528EFD6}'
+	}
+	RedactionCustomComponents.FilterIDShieldDataFileTask = s 'FilterIDShieldDataFileTask Class'
+	{
+		CLSID = s '{85D176EC-411F-4568-965B-CAA7F528EFD6}'
+		CurVer = s 'RedactionCustomComponents.FilterIDShieldDataFileTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {85D176EC-411F-4568-965B-CAA7F528EFD6} = s 'FilterIDShieldDataFileTask Class'
+		{
+			ProgID = s 'RedactionCustomComponents.FilterIDShieldDataFileTask.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.FilterIDShieldDataFileTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

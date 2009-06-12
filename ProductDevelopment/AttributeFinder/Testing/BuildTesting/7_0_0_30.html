@@ -1,0 +1,225 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.30 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.30 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+      		<li><b>[FlexIDSCore #2648]</b> Unnecessary exception in VOA Viewer
+		<ul>
+	      		<li>Open a VOA file with two or more spatial attributes.
+			<li>Select a spatial attribute so that it is highlighted in the Image Viewer.
+	      		<li>While the image is open and showing a highlight, delete the image from 
+			the file system.
+			<li>Select another spatial attribute in the VOA Viewer.
+	      		<li>Confirm that the selected attribute is highlighted without error.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3131]</b> Strange behavior with auto-zoom
+		<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules to auto-redact 
+			PDF images at <b>I:\Common\Testing\PVCS_Testing\FlexIDsCore\3131</b>.
+			<li>Configure the redaction task to save redactions as annotations.
+			<li>Confirm that redactions are burned in to the output PDF images.
+			<li>Confirm that an appropriate <b>Application trace</b> exception is logged 
+			for each file.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3376]</b> Image Viewer and Verification
+		<ul>
+	      		<li>Exercise <b>Verification</b> and add 4 large redactions.
+			<li>Try to move each redaction past the left and top edges of the page.
+			<li>Confirm that the displayed redactions do not appear to move completely 
+			past the page bounds.
+			<li>Confirm that redactions moved past the image bounds snap back to 
+			their original locations.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3402]</b> Exemption codes and unredacted items
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add an exemption code to a redacted item.  Toggle the item to unredacted 
+			and save the document.
+			<li>Confirm that an error message is displayed preventing the user from 
+			saving exemption codes to unredacted items.
+			<li>Confirm that applying exemption codes to all items adds the chosen 
+			exemption codes only to redacted items.
+			<li>Confirm that trying to apply exemption codes to an unredacted item 
+			displays a meaningful error.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3403, #3408]</b> Long exemption codes
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add a very long exemption code to a redacted item.
+			<li>Confirm that the exemption code text is displayed only within the 
+			redacted area.  Note that it may not extend from end to end.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3404]</b> Strange behavior with auto-zoom
+		<ul>
+	      		<li>Watch the movie clip attached to the SCR.
+			<li>During verification, select highlights and move them.
+			<li>Confirm that no unusual zoom behavior is seen.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3409]</b> Redactions in rotated images
+		<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules on the images in 
+			<b>I:\Common\Testing\Rotated_Images</b>.
+			<li>Review the redacted images.
+			<li>Confirm that the redaction zones are properly placed.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3410]</b> Threading-related problems with auto-redaction
+		<ul>
+	      		<li>Exercise the FPS file and images attached to the SCR.
+			<li>Confirm that no unexpected or weird exceptions are seen - 
+			especially with <b>Image087_R270.tif</b>.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3413]</b> Auto-encryption of rules files
+		<ul>
+	      		<li>Create an FPS file with an <b>Execute rules</b> task pointing to 
+			an RSD.ETF file.
+			<li>Confirm that the associated <b>RSD file</b> exists.
+	      		<li>Save the FPS file and delete the <b>RSD.ETF</b> file.
+			<li>Confirm that the <b>RDT</b> is licensed.
+			<li>Confirm that the <b>auto-encrypt</b> setting is enabled in 
+			<b>RDTCOnfig</b>.
+			<li>Exercise the <b>FPS file</b>.
+			<li>Confirm that the <b>ETF file</b> is automatically created from 
+			the RSD file.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3416]</b> Redaction zones shifted in verification
+		<ul>
+	      		<li>Verify the attached image and VOA file.
+			<li>Confirm that the redactions on each page are properly aligned 
+			with the text.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3423]</b> Enable / disable exemption codes buttons
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add an exemption code to a redacted item.
+			<li>Confirm that the <b>Exemption code</b> toolbar buttons enable and 
+			disable as appropriate depending on whether or not the selected item 
+			is redacted.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5202, #5203]</b> Image Viewer refresh issues
+	       	<ul>
+	      		<li>Draw an angular highlight.
+	      		<li>Grab a longer-edge grip handle and move it closer to and past the other 
+			long-edge grip handle.
+	      		<li>Confirm that there is no weird 90-degree flip of the redaction zone.  
+			Note that this is still not completely fixed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5232]</b> Last used Exemption codes category
+	       	<ul>
+	      		<li>Verify an image with several redactions.
+	      		<li>Apply an <b>Privacy Act</b> exemption code.
+	      		<li>Confirm that when you start applying an exemption code to another 
+			redaction, the <b>Privacy Act</b> category is selected by default.  
+	      		<li>Apply an <b>Freedom of Information Act</b> exemption code.
+	      		<li>Confirm that when you start applying an exemption code to another 
+			redaction, the <b>Freedom of Information Act</b> category is selected by default.  
+	      		<li>Confirm that modifying each exemption code displays the proper category.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5233]</b> Keyboard shortcuts for Exemption codes dialog
+	       	<ul>
+	      		<li>Confirm that <b>Alt+C</b> is the shortcut for <b>Clear All</b>.
+	      		<li>Confirm that <b>Alt+L</b> is the shortcut for <b>Apply Last</b>.
+	      		<li>Confirm that <b>Alt+A</b> is the shortcut for <b>Additionally associate</b>.
+	      		<li>Confirm that <b>Alt+E</b> is the shortcut for <b>Exemption code categories</b>.
+	      		<li>Confirm that <b>Alt+S</b> is the shortcut for <b>Select exemption codes</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5234]</b> Default focus in Exemption codes dialog
+	       	<ul>
+	      		<li>Verify an image and display the <b>Exemption codes</b> dialog.
+	      		<li>Confirm that initial focus is on the exemption codes list box 
+			so that the user can simply use the arrow keys and space bar to 
+			select exemption codes.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5235]</b> Supplying FAM should stop after DB connection timeout
+	       	<ul>
+	      		<li>Create and run an FPS file for supplying - include listening for 
+			added files.
+	      		<li>Create and run an FPS file for processing.
+	      		<li>Stop the SQL service.
+	      		<li>Add a few files into the listening folder.
+	      		<li>Wait for the processing FAM to timeout after the processing files finish.
+	      		<li>Confirm that the supplying FAM also times out and stops.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5244]</b> Non-default VOA file for verification
+	       	<ul>
+	      		<li>Configure <b>Verification</b> and use a non-default VOA file with a 
+			long filename.
+	      		<li>Confirm that the filename is not cut off too early in the 
+			read-only edit box.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

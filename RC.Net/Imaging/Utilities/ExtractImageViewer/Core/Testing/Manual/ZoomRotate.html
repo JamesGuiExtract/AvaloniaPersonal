@@ -1,0 +1,89 @@
+<HTML>
+
+<HEAD>
+<TITLE>Image Viewer Zoom and Rotation Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+<h1>Image Viewer Zoom and Rotation Testing Checklist
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<h3>Zoom - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Zoom window</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Pan</b> toolbar button.</li>
+        	  	<li>Select <b>Zoom window</b> from the Tools menu.</li>
+        	  	<li>Click and drag the mouse in the Image Viewer.</li>
+        	  	<li>Confirm that a box is drawn describing the zoom area.</li>
+	          	<li>Release the mouse button and confirm that the image 
+			zooms to the selected region.</li>
+	       	</ul>
+<p>
+	       	<li><b>Zoom window</b> - from Toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Pan</b> toolbar button.</li>
+	          	<li>Click the <b>Zoom window</b> toolbar button.</li>
+        	  	<li>Click and drag the mouse in the Image Viewer.</li>
+        	  	<li>Confirm that a box is drawn describing the zoom area.</li>
+	          	<li>Release the mouse button and confirm that the image 
+			zooms to the selected region.</li>
+	       	</ul>
+<p>
+	       	<li><b>[DotNet #31]</b> Zoom sequence is effective
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Fit to page</b> toolbar button.</li>
+        	  	<li>Zoom out one step.</li>
+        	  	<li>Zoom previous.</li>
+        	  	<li>Zoom next.</li>
+	          	<li>Confirm that the entire image is visible in the 
+			Image Viewer and that it remains zoomed out one step.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Rotation - Manual Tests</h3>
+       	<ul>
+	       	<li><b>[DotNet #32]</b> Center point is unchanged after rotation
+       		<ul>
+        	  	<li>Open an image and zoom in so that the center 
+			point of the display is obvious.</li>
+        	  	<li>Rotate the image.</li>
+	          	<li>Confirm that the center point is unchanged after 
+			rotation.</li>
+	       	</ul>
+<p>
+	       	<li><b>[DotNet #35]</b> Angular highlights remain after rotation
+       		<ul>
+        	  	<li>Open an image and zoom in so that the center 
+			point of the display is obvious.</li>
+        	  	<li>Create an angular highlight.</li>
+        	  	<li>Rotate the image.</li>
+	          	<li>Confirm that the highlight was rotated properly.</li>
+	       	</ul>
+<p>
+	       	<li><b>[DotNet #66]</b> Annotated image rotates properly even 
+		if annotations are not licensed
+       		<ul>
+          		<li>Create a license file where annotations are 
+			<b>not</b> licensed.</li>
+	          	<li>Confirm that no other license files are available.</li>
+        	  	<li>Open an image that contains one or more annotations.</li>
+        	  	<li>Confirm that the annotations are not displayed.</li>
+        	  	<li>Rotate the image.</li>
+	          	<li>Confirm that the image rotates properly and that 
+			annotations are still not displayed.</li>
+	       	</ul>
+       	</ul>
+</ul>
+</BODY>
+</HTML>

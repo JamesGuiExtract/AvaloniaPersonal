@@ -1,0 +1,3 @@
+Fed.+(?:Identif.{6,8}|.{1,4}ntificat.{1,4}|.{6,8}ication)(?:.{0,4}|\s*)(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)
+|
+Federal(?=[\s\S]{0,40}quired\s*for\s*all\s*entit)

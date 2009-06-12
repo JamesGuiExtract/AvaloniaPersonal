@@ -1,0 +1,215 @@
+<HTML>
+	<HEAD>
+		<TITLE>Test Harness</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Test Harness</h1>
+		<hr>
+		<h3>Test Harness</h3>
+		<p>
+			<ul>
+				<li>The Test Harness can be used to test rules on large groups of images.</li>
+				<li>The Test Harness works by comparing the data found by the rules to a manually made set of "correct" data.</li>
+				<li>All of the image files that you want to test in the Test Harness must have .uss files.</li>
+				<p>
+					<li>Creating Expected Redaction VOAs
+						<ul>
+							<li>In order to use the Test Harness, you must first create a "correct" set of data.</li>
+							<li>For redaction-related projects, this is done by creating a set of VOA files that contain the co-ordinates of all the information that we want to find.</li>
+							<li>These "Expected Redaction" VOA files will then be compared to the data found by the rules in order to measure how well the rules perform.</li>
+							<li>The Expected Redaction VOA files can be made by using the <b>Verify redactions</b> task in the File Action Manager.</li>
+							<li>A quick note on tags:
+								<ul> 
+									<li>Tags are Extract Systems way of specifying relative file/directory names.</li>
+									<li><b>&ltSourceDocName&gt</b>: the full path of the file being processed.</li>
+									<li><b>$FileOf(</b>x<b>)</b>: the full file name of x.</li>
+									<li><b>$DirOf(</b>x<b>)</b>: the full path of the directory that contains x.</li>
+									<li>Example: If you are processing the file <i>C:\Image001.tif</i>, then <b>$DirOf(&ltSourceDocName&gt)\ExpectedRedactions\$FileOf(&ltSourceDocName&gt).voa</b> will output the Expected Redaction file <i>C:\ExpectedRedactions\Image001.tif.voa</i>.</li>
+								</ul>
+							</li>
+							<li>In order to create the Expected Redaction VOAs, you will need to check the <b>Enable collection of redaction accuracy feedback</b> checkbox.</li>
+							<li>You probably will also want to turn off the <b>Include the original document as part of the feedback data</b> option.</li>
+							<li>After you have finished setting up the <b>Verify redactions</b> task, click the <b>Start processing</b> button to bring up the Verification Window.</li>
+							<li>The goal of verification is to place a single redaction "box" over every piece of sensitive information that you want to find.</li>
+							<li>The coordinates of these redaction boxes will be saved into a .voa file that will be used by the Test Harness later.</li>
+							<li>There are two tools you can use to create a new redaction box:
+								<ul>
+									<li><b>Horizontal Zone Tool</b>: Makes horizontal rectangular boxes</li>
+									<li><b>Any-angle Zone Tool</b>: Makes skewed rectangular boxes</li>
+								</ul>
+							</li>
+							<li>By default the height of the box made by the <b>Any-angle Zone</b> tool is the average height of all of the characters in an image.</li>
+							<li>You can use the "ruler" tool to change the default height of the box made by the <b>Any-angle Zone</b> tool.</li>
+							<li>When you create a redaction box, an entry for the boxes will appear in the list on the left.</li>
+							<li>You will need to choose a type for the redaction box.</li>
+							<li>When you have created all of the needed boxes, you can click the <b>Save redacted image</b> button to save the redaction boxes into a VOA file and move on to the next image.</li>
+							<li>There are several other useful tools on the Verification Window:
+								<ul>
+									<li>The <b>Toggle redaction</b> button</li>
+									<li>The <b>Zoom in</b> and <b>Zoom out</b> buttons</li>
+									<li>The <b>Fit to page</b> and <b>Fit to width</b> buttons</li>
+									<li>The <b>Rotate Left</b> and <b>Rotate Right</b> buttons</li>
+									<li>The <b>Zoom window</b> and <b>Pan</b> buttons</li>
+									<li>The page navigation buttons</li>
+									<li>The document navigation buttons</li>
+								</ul>
+							</li>
+							<p>
+								<li><b>Example:</b>
+									<ul>
+										<li>Create a new database, add an action, and queue up <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b>.</li>
+										<li>Add a <b>Verify redactions</b> task.</li>
+										<li>Create redactions for social security numbers on <b>TestImage001.tif</b> using the <b>Horizontal Zone</b> tool.</li>
+										<li>Save the image and note that the Expected Redaction .voa is created.</li>
+										<li>Create redactions for social security numbers on <b>TestImage002.tif</b> using the <b>Any-angle Zone</b> tool tool.</li>
+										<li>Create redactions for social security numbers on <b>TestImage003.tif</b>.</li>
+									</ul>
+								</li>
+							</p>
+						</ul>
+					</li>
+				</p>
+				<p>
+					<li>Setting up the Test Harness
+						<ul>
+							<li>TCL files
+								<ul>
+									<li>In order to use the Test Harness, we need to create a configuration file that will tell the Test Harness what we want to test.</li>
+									<li>The Test Harness configuration files have a .tcl extension.</li>
+									<li>Each line of a .tcl file points to a .dat file.</li>
+									<li>Each of these .dat files contains the configuration for a single test.</li>
+									<li>The lines in the .tcl file have the following syntax:
+										<ul>
+											<li><b>EXTRACTRedactionTester.IDShieldTester.1;;</b>{ Name of .dat file }</li>
+												<ul>
+													<li>{ Name of .dat file }: The filename of the .dat file that contains the configuration for the test you want to run.</li>
+												</ul>
+										</ul>
+									</li>
+									<li>You can have multiple lines in the .tcl file which allows you to run multiple tests in a row.</li>
+									<li>The Test Harness will run each test in the order that they appear in the .tcl file.</li>
+								</ul>
+							</li>
+							<li>DAT files
+								<ul>
+									<li>Each .dat file contains the setting for a single test.</li>
+									<li>The .dat file consists of a settings section followed by a test configuration section.
+										<ul>
+											<li>Settings
+												<ul>
+													<li>In the settings section, you will need to specify which attributes you want to compute statistics for.</li>
+													<li>For redaction projects, the Test Harness will output two sets of statistics; one for automated redaction and one for redaction with manual verification.</li>
+													<li>"Automated Redaction" means that the documents are redacted automatically without any user intervention.  Basically, the output of the rules is "blindly accepted".</li>
+													<li>When "Redaction with manual verification" is used, the rules are used to select a subset of documents for a human user to check, or "verify".  For statistical purposes, we assume that a human will catch any redactions that are missed by the rules.</li>
+													<li>You will need to specify which attributes you want to use to compute each set of statistics using the following syntax:
+														<ul>
+															<li><b>&ltSETTING&gt</b><b>;QueryForVerification=</b><i>Attribute1</i><b>|</b><i>Attribute2...</i></li>
+															<li><b>&ltSETTING&gt</b><b>;QueryForAutomatedRedaction=</b><i>Attribute1</i><b>|</b><i>Attribute2...</i>
+														</ul>
+													</li>
+												</ul>
+											</li>
+											<li>Test Configuration
+												<ul>
+													<li>The configuration section has one line for each folder of images that you want to include in the test.</li>
+													<li>Each line has the following syntax:
+														<ul>
+															<li><b>&ltTESTFOLDER&gt</b><b>;</b>{ Rules }<b>;</b>{ Image Folder }<b>;</b>{ Previously Made Output }<b>;</b>{ Correct Answers }
+																<ul>
+																	<li>{ Rules }: This is the full path to the .rsd file that you want to test.</li>
+																	<li>{ Image Folder }: This is the full path to a folder that contains the images you want to test.</li>
+																	<li>{ Previously Made Output }: This is an optional, advanced setting.  This is a path using tags that points to a set of previously generated output VOA files.  The Test Harness will compare the output .voa files to the Expected Redactions instead of running the rules.</li>
+																	<li>{ Correct Answers }: This is a path using tags that points to the Expected Redaction .voa files that contain the "correct" data.</li>
+																</ul>
+															</li>
+														</ul>
+													</li>
+												</ul>
+											</li>
+										</ul>
+									</li>
+								</ul>
+							<li><b>Example:</b>
+								<ul>
+									<li>Create a .tcl and a .dat file that will test <b>SSN.rsd</b> on <b>TestImage001.tif</b>, <b>TestImage002.tif</b>, and <b>TestImage003.tif</b>.  Use the Expected Redactions that were created in the last example.</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</p>
+				<p>
+					<li>Test Harness User Interface
+						<ul>
+							<li>The Test Harness displays one "node" for each image in the current test.</li>
+							<li>If the rules correctly found all of the Expected Redactions in the document and did not find any false positives, the node will be green.</li>
+							<li>If the rules missed some data or found a false positive, the node will be red.</li>
+							<li>By default, red nodes are expanded and green nodes are collapsed.</li>
+							<li>If you expand each node, you will see the following items:
+								<ul>
+									<li>The full path of the image being tested.</li>
+									<li>The full path of the image's .uss file.</li>
+									<li>The full path of the Expected Redaction .voa file associated with the image.</li>
+									<li>The full path of the output .voa file associated with the image. (Only if you choose to compare the Expected Redactions to a set of output .voa files.)</li>
+									<li>The full path of the .nte file associated with the image.
+										<ul>
+											<li>The .nte file is just a text file that you can use to jot down notes about the image.</li>
+											<li>A node that has a .nte file will be collapsed by default, even if it is red.</li>
+										</ul>
+									</li>
+									<li>A side by side display of the Expected and Found attributes.</li>
+									<li>The amount of time it took to process the document.</li>
+								</ul>
+							</li>
+							<li>Double clicking on the path of a file in the Test Harness window will open that file in an appropriate application.</li>
+							<p>
+								<li>Summary Statistics
+									<ul>
+										<li>When the test is complete, the overall results of the test will be displayed in the Summary Statistics node.
+										<li>The top section of the Summary Statistics node displays overall totals:
+											<ul>
+												<li><b>Total files processed</b>: The total number of image files that were tested.</li>
+												<li><b>Total Expected Redactions</b>:The total number of sensitive items in all of the images files that were tested.</li>
+												<li><b>Number of files with expected redactions</b>: The total number of image files that contain sensitive data.</li>
+											</ul>
+										<li>The middle section of the Summary Statistics node displays the statistics for automated redaction:
+											<ul>
+												<li><b>Number of over-redaction</b>: The number of redaction boxes that were too large.</li>
+												<li><b>Number of under-redaction</b>: The number of redaction boxes that were too small.</li>
+												<li><b>Number of missed redaction</b>: The number of sensitive data items that were NOT redacted by the rules.</li>
+												<li><b>Number of correct redaction</b>: The number of sensitive data items that were correctly redacted by the rules.</li>
+												<li><b>Number of false positives</b>: The number of "extra" redaction boxes that do not cover any sensitive information.</li>
+											</ul>
+										</li>
+										<li>The bottom section of the Summary Statistics node displays the statistics for redaction with manual verification:
+											<ul>
+												<li><b>Number of files selected for review</b>: The number of files that were selected for a human user to look at.</li>
+												<li><b>Number of expected redactions found in reviewed files</b>: The number of sensitive data items that were contained in the files that were selected for a human user to look at.</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</p>
+						</ul>
+					</li>
+				</p>
+				<p>
+					<li>Test Harness Output Files
+						<ul>
+							<li>In the same directory that contains the .tcl file, the Test Harness will output a directory with many useful file lists.</li>
+							<li>These files lists include:
+								<ul>
+									<li><b>SensitiveFiles_AtLeastOneMissedRedaction.txt</b></li>
+									<li><b>Files_AtLeastOneFalsePositive.txt</b></li>
+									<li><b>SensitiveFiles_NotSelectedForReview.txt</b></li>
+									<li><b>InsensitiveFiles_SelectedForReview.txt</b></li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+				</p>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>

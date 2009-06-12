@@ -1,0 +1,21 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079004167600.003.uss
+AOD_GRANTEE_03=executed^3~by^240~[to]^?Grantee^160~[and]^9~undersigned^24~tenants^subscribed|sworn^80~[by]^?SecondGrantee^60~personally known|known to me
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000060100.003.uss
+AOD_GRANTEE_01=executed^3~by^240~[to]^?Grantee^160~pursuant
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000133100.003.uss 
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000172700.004
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000382100.002.uss
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000517100.003.uss
+AOD_GRANTEE_02=executed^3~by^240~[to]^?Grantee^160~all as joint tenants|[as joint tenants|joint tenants|[as life tenant|life tenant|[as joint ten
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079004108200.004
+AOD_Grantee_05=\r\n\r\n^?Grantee^80~being^12~duly|legal^16~deposes^360~affiant^9~conjunction^12~decedent^3~held
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000685500.003.uss
+AOD_Grantee_06=executed^3~by^160~[to]^?Grantee^160~[as^3~community^3~property
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079004132900.004.uss
+AOD_Grantee_04=same^3~person^5~[as]^?Grantee^160~[who]^9~[named]^16~grantees|grantee
+[PATTERNS_END]

@@ -1,0 +1,41 @@
+
+*************************************************************************************
+************ Input Funnel Core Installation Design Documentation ********************
+*************************************************************************************
+
+(1) Vender App Installation flow diagram :
+	
+		Start...
+		  |
+		  | 
+Run WindowComponentsUpdate (silent) setup.exe <Optional ($FullPath)\VenderAppInstall.exe> -s
+		  |
+		  | 
+if (result == 2)
+{
+   Prompt for rebooting...
+   <Optionally, set Runonce key of "($FullPath)\VenderAppInstall.exe" in Registry>
+   goto end of installation...
+}
+		  |
+		  | 
+Continue installation...
+Welcome screen...
+...
+Prompt for Destination path...
+		  |
+		  | 
+Run InputFunnelCore installation (silent) setup.exe ($FullPath)\destination bin folder -s
+		  |
+		  |
+Continue installation...
+Copy vender app files...
+		  |
+		  |
+		 End
+
+(2) Note:
+result from WCU setup.exe is stored in Registery. 
+0 -- Installation failed
+1 -- Succeed, no reboot is required
+2 -- Succeed, reboot is required

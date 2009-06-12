@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.OutputToXMLPP.1 = s 'OutputToXMLPP Class'
+	{
+		CLSID = s '{8AD94653-C863-4273-AA62-E3F2F6F6028F}'
+	}
+	UCLIDAFOutputHandlers.OutputToXMLPP = s 'OutputToXMLPP Class'
+	{
+		CLSID = s '{8AD94653-C863-4273-AA62-E3F2F6F6028F}'
+		CurVer = s 'UCLIDAFOutputHandlers.OutputToXMLPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8AD94653-C863-4273-AA62-E3F2F6F6028F} = s 'OutputToXMLPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

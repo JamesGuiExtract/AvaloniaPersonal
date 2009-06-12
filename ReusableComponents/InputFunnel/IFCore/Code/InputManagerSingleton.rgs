@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.InputManagerSingleton.1 = s 'InputManagerSingleton Class'
+	{
+		CLSID = s '{D602DE70-C4A1-415E-8942-C86BD7E073E3}'
+	}
+	UCLIDInputFunnel.InputManagerSingleton = s 'InputManagerSingleton Class'
+	{
+		CLSID = s '{D602DE70-C4A1-415E-8942-C86BD7E073E3}'
+		CurVer = s 'UCLIDInputFunnel.InputManagerSingleton.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D602DE70-C4A1-415E-8942-C86BD7E073E3} = s 'InputManagerSingleton Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.InputManagerSingleton.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.InputManagerSingleton'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

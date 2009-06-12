@@ -1,0 +1,224 @@
+//*********************************************************************************
+// SelectPageRegion.dat
+// 	Testcases for testing the Select Page Region Value Finder
+//*********************************************************************************
+
+//*********************************************************************************
+// Test Include with other options
+//*********************************************************************************
+
+// Find first and last page
+<TESTCASE>;FirstandLastPage.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1and3.voa
+
+// Find last 2 pages
+<TESTCASE>;Last2PageTest.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find 1st page
+<TESTCASE>;Page1Test.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Find 2nd and 3rd pages
+<TESTCASE>;Page2and3Test.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find page 2
+<TESTCASE>;Page2Test.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2.voa
+
+// Find page range 2-3
+<TESTCASE>;PageRange2thru3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find pages containing RegExp with out case sensitivity
+<TESTCASE>;PageContainingRegExp.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1and2.voa
+
+// Find pages containing RegExp with case sensitivity
+<TESTCASE>;PageContainingRegExpCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Find pages containing string with out case sensitivity
+<TESTCASE>;PageContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1and2.voa
+
+// Find pages containing string with case sensitivity
+<TESTCASE>;PageContainingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Find Leading pages that contain string without case sensitivity
+<TESTCASE>;LeadingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Find Trailing pages that contain string without case sensitivity
+<TESTCASE>;TrailingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page3.voa
+
+
+//*********************************************************************************
+// Test Include Left or Top Half of various pages
+//*********************************************************************************
+
+// Find left half of pages 1-3
+<TESTCASE>;LeftHalfOfPages1thru3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfAllPages.voa
+
+// Find left half of all pages
+<TESTCASE>;LeftHalfOfAllPages.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfAllPages.voa
+
+// Find top half of page 2
+<TESTCASE>;TopHalfPage2.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPage2.voa
+
+// Find top half of all pages that contain RegExp
+<TESTCASE>;TopHalfOfPagesIncludingRegExp.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPage2.voa
+
+// Left Half Pages Containing Regex
+<TESTCASE>;LeftHalfPagesContainingRegex.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfPagesContainingRegex.voa
+
+// Left Half Pages Containing Regex Case Sensitive
+<TESTCASE>;LeftHalfPagesContainingRegexCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfPagesContainingRegexCS.voa
+
+// Left Half Pages Containing String
+<TESTCASE>;LeftHalfPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfPagesContainingString.voa
+
+// Left Half Pages Containing String Case Sensitive
+<TESTCASE>;LeftHalfPagesContainingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;LeftHalfPagesContainingStringCS.voa
+
+// Top Half Leading Pages Containing String
+<TESTCASE>;TopHalfLeadingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfLeadingPagesContainingString.voa
+
+// Top Half Of Pages1thru3
+<TESTCASE>;TopHalfOfPages1thru3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfOfPages1thru3.voa
+
+// Top Half Pages Containing Regex
+<TESTCASE>;TopHalfPagesContainingRegex.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPagesContainingRegex.voa
+
+// Top Half Pages Containing Regex Case Sensitive
+<TESTCASE>;TopHalfPagesContainingRegexCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPagesContainingRegexCS.voa
+
+// Top Half Pages Containing Regex With Back Reference
+<TESTCASE>;TopHalfPagesContainingRegexWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;TopHalfPagesContainingRegexWithBackReference.voa
+
+// Top Half Pages Containing Regex With Back Reference Case Sensitive
+<TESTCASE>;TopHalfPagesContainingRegexWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;TopHalfPagesContainingRegexWithBackReferenceCS.voa
+
+// Top Half Pages Containing String
+<TESTCASE>;TopHalfPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPagesContainingString.voa
+
+// Top Half Pages Containing String Case Sensitive
+<TESTCASE>;TopHalfPagesContainingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfPagesContainingStringCS.voa
+
+// Top Half Trailing Pages Containing String
+<TESTCASE>;TopHalfTrailingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;TopHalfTrailingPagesContainingString.voa
+
+//*********************************************************************************
+// Test Exclude with other options
+//*********************************************************************************
+
+// Find all pages but the first and last
+<TESTCASE>;ExcludeFirstandLastPage.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2.voa
+
+// Find all pages but the last 2
+<TESTCASE>;ExcludeLast2PageTest.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Find all pages but the first
+<TESTCASE>;ExcludePage1Test.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find all pages that do not contain the reg exp without case sensitivity
+<TESTCASE>;PageExcludingRegExp.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page3.voa
+
+// Find all pages that do not contain the reg exp with case sensitivity
+<TESTCASE>;PageExcludingRegExpCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find all pages that do not contain the string without case sensitivity
+<TESTCASE>;PageExcludingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page3.voa
+
+// Find all pages that do not contain the string with case sensitivity
+<TESTCASE>;PageExcludingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find all trailing pages that do not contain the string
+<TESTCASE>;ExcludeTrailingContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1and2.voa
+
+// Find all leading pages that do not contain the string
+<TESTCASE>;ExcludeLeadingContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page2and3.voa
+
+// Find all except the top half of pages that contain the RegExp (case sensitive)
+<TESTCASE>;ExcludeTopHalfOfPagesWithRegExpCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AllExceptTopHalfPage2.voa
+
+// Exclude Left Half of All Pages
+<TESTCASE>;ExcludeLeftHalfOfAllPages.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfOfAllPages.voa
+
+// Exclude Left Half of Pages1thru3
+<TESTCASE>;ExcludeLeftHalfOfPages1thru3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfOfAllPages.voa
+
+// Exclude Left Half Pages Containing Regex
+<TESTCASE>;ExcludeLeftHalfPagesContainingRegex.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfPagesContainingRegex.voa
+
+// Exclude Left Half Pages Containing Regex Case Sensitive
+<TESTCASE>;ExcludeLeftHalfPagesContainingRegexCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfPagesContainingRegexCS.voa
+
+// Exclude Left Half Pages Containing String
+<TESTCASE>;ExcludeLeftHalfPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfPagesContainingString.voa
+
+// Exclude Left Half Pages Containing String Case Sensitive
+<TESTCASE>;ExcludeLeftHalfPagesContainingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeLeftHalfPagesContainingStringCS.voa
+
+// Exclude Page2and3 Test
+<TESTCASE>;ExcludePage2and3Test.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Exclude Page Range2-3
+<TESTCASE>;ExcludePageRange2-3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;Page1.voa
+
+// Exclude Top Half Leading Pages Containing String
+<TESTCASE>;ExcludeTopHalfLeadingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfLeadingPagesContainingString.voa
+
+// Exclude Top Half Of Pages1thru3
+<TESTCASE>;ExcludeTopHalfOfPages1thru3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfOfPages1thru3.voa
+
+// Exclude Top Half Page3
+<TESTCASE>;ExcludeTopHalfPage3.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfPage3.voa
+
+// Exclude Top Half Pages Containing Regex
+<TESTCASE>;ExcludeTopHalfPagesContainingRegex.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfPagesContainingRegex.voa
+
+// Exclude Top Half Pages Containing Regex Case Sensitive
+<TESTCASE>;ExcludeTopHalfPagesContainingRegexCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfPagesContainingRegexCS.voa
+
+// Exclude Top Half Pages Containing String
+<TESTCASE>;ExcludeTopHalfPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfPagesContainingString.voa
+
+// Exclude Top Half Pages Containing String Case Sensitive
+<TESTCASE>;ExcludeTopHalfPagesContainingStringCS.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfPagesContainingStringCS.voa
+
+// Exclude Top Half Trailing Pages Containing String
+<TESTCASE>;ExcludeTopHalfTrailingPagesContainingString.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;ExcludeTopHalfTrailingPagesContainingString.voa
+
+//*********************************************************************************
+// Test use of Regular Expression with Back Reference - using Image1.tif.uss
+//*********************************************************************************
+
+// Exclude Left Half Pages Containing Regex with Back Reference
+<TESTCASE>;ExcludeLeftHalfPagesContainingRegexWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludeLeftHalfPagesContainingRegexWithBackReference.voa
+
+// Exclude Left Half Pages Containing Regex with Back Reference Case Sensitive
+<TESTCASE>;ExcludeLeftHalfPagesContainingRegexWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludeLeftHalfPagesContainingRegexWithBackReferenceCS.voa
+
+// Exclude Page Containing Reg Exp With Back Reference
+<TESTCASE>;ExcludePageContainingRegExpWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludePageContainingRegExpWithBackReference.voa
+
+// Exclude Page Containing Reg Exp With Back Reference Case Sensitive
+<TESTCASE>;ExcludePageContainingRegExpWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludePageContainingRegExpWithBackReferenceCS.voa
+
+// Exclude Top Half Pages Containing Regex With Back Reference
+<TESTCASE>;ExcludeTopHalfPagesContainingRegexWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludeTopHalfPagesContainingRegexWithBackReference.voa
+
+// Exclude Top Half Pages Containing Regex With Back Reference Case Sensitive
+<TESTCASE>;ExcludeTopHalfPagesContainingRegexWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;ExcludeTopHalfPagesContainingRegexWithBackReferenceCS.voa
+
+// Left Half Pages Containing Regex With Back Reference
+<TESTCASE>;LeftHalfPagesContainingRegexWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;LeftHalfPagesContainingRegexWithBackReference.voa
+
+// Left Half Pages Containing Regex With Back Reference Case Sensitive
+<TESTCASE>;LeftHalfPagesContainingRegexWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;LeftHalfPagesContainingRegexWithBackReferenceCS.voa
+
+// Page Containing Reg Exp With Back Reference
+<TESTCASE>;PageContainingRegExpWithBackReference.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;PageContainingRegExpWithBackReference.voa
+
+// Page Containing Reg Exp With Back Reference Case Sensitive
+<TESTCASE>;PageContainingRegExpWithBackReferenceCS.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;PageContainingRegExpWithBackReferenceCS.voa
+
+//*********************************************************************************
+// Test Rotation
+//*********************************************************************************
+
+// The testcase include rotation angle of 90, 180, 270 degrees.
+// Rotation is excercised in greater detail in the interactive tests
+<TESTCASE>;RotateTest.rsd;Rotated2.tif.uss;;RotateTest.voa

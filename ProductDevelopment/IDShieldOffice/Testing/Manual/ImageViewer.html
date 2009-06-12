@@ -1,0 +1,421 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Image Viewer Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Image Viewer Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<li><b>Tile Navigation</b>
+	<ul>
+		<li>Set <b>Fit-To-Page</b> mode.
+		<li>Open an image with at least 3 pages
+		<li>Confirm that <b>Previous Tile</b> button and menu are disabled.
+		<li>Click <b>Next Tile</b>.
+		<li>Confirm that the <b>Second</b> page is displayed.
+		<li>Confirm that both <b>Previous Tile</b> and <b>Next Tile</b> buttons are enabled.
+		<li>Confirm that both <b>Previous Tile</b> and <b>Next Tile</b> menu are enabled.
+		<li>Move directly to the last page and confirm that <b>Next Tile</b> button and menu are disabled.
+		<li>Click <b>Previous Tile</b>.
+		<li>Confirm that the page <b>prior to the last</b> is displayed.
+		<li>Confirm that both <b>Previous Tile</b> and <b>Next Tile</b> buttons are enabled.
+		<li>Confirm that both <b>Previous Tile</b> and <b>Next Tile</b> menu are enabled.
+	</ul>
+	<p>
+
+	<li><b>Objects Navigation</b>
+	<ul>
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>Fit to page</b> button
+		<li>Draw several angular and rectangular redactions at first page.
+		<li>Confirm that <b>Previous object</b> button and menu are disabled.
+		<li>Confirm that <b>Next object</b> button and menu are disabled.
+		<li>Click <b>Go to next page</b> to go to the second page.
+		<li>Draw several redactions at the second page.
+		<li>Confirm that <b>Previous object</b> button and menu are enabled.
+		<li>Confirm that <b>Next object</b> button and menu are disabled.
+		<li>Click <b>Go to previous page</b> to go to the first page.
+		<li>Confirm that <b>Previous object</b> button and menu are disabled.
+		<li>Confirm that <b>Next object</b> button and menu are enabled.
+		<p>
+
+		<li>Go to the first page.
+		<li>Highlight all the clues and redact all the matched by <b>Data types finder</b>.
+		<li>Confirm that <b>Previous object</b> button and menu are disabled.
+		<li>Confirm that <b>Next object</b> button and menu are enabled.
+		<li>Click <b>Next object</b>.
+		<li>Confirm that the <b>first object</b> on the second page is displayed.
+		<li>Confirm that both <b>Previous object</b> and <b>Next object</b> buttons are enabled.
+		<li>Confirm that both <b>Previous object</b> and <b>Next object</b> menu are enabled.
+		<li>Click <b>Next object</b>.
+		<li>Confirm that the <b>Second object</b> on the second page is displayed.
+
+		<li>Select <b>Last object</b> on the second page
+		<li>Confirm that <b>Previous object</b> button and menu are enabled.
+		<li>Confirm that <b>Next object</b> button and menu are disabled.
+		<li>Click <b>Previous object</b>.
+		<li>Confirm that the object <b>prior to the last</b> is displayed.
+		<li>Confirm that both <b>Previous object</b> and <b>Next object</b> buttons are enabled.
+		<p>
+
+		<li><b>Do not select any redactions</b> on the second page.
+		<li>Confirm that <b>Previous object</b> button and menu are enabled.
+		<li>Confirm that <b>Next object</b> button and menu are disabled.
+		<li>Click <b>Previous object</b>.
+		<li>Confirm that the <b>Last object</b> on the first page is displayed.
+		<li>Confirm that <b>Previous object</b> button and menu are enabled.
+		<li>Confirm that <b>Next object</b> button and menu are enabled.
+		<p>
+
+		<!-- SCR# 264 -->
+		<li>Go to the first page.
+		<li>Select the clue <b>social security number</b>
+		<li>Confirm that next object is <b>redaction</b> right behind the clue
+		<p>
+
+		<!-- SCR# 266 -->
+		<li>Open <b>FindTextTest.tif</b> image file
+		<li>Click <b>Data types finder</b>
+		<li>Check <b>all the checkboxes</b> and click <b>Redact all</b> button
+		<li>Chang several redactions' fillcolor to <b>White</b>
+		<li>Apply Bates number
+		<li>Draw several redactions with <b>White</b> fillcolor
+		<li>Draw several redactions with <b>Black</b> fillcolor
+		<li>Click <b>Select redactions and objects</b> button.
+		<li>Select Bates# object and confirm that it shows a dotted border
+		<li>Select <b>manually drawn white redaction</b> and confirm that it shows a dotted border
+		<li>Select <b>manually drawn black redaction</b> and confirm that it shows a dotted border
+		<li>Select <b>automatically drawn white redaction</b> and confirm that it shows a dotted border
+		<li>Select <b>automatically drawn black redaction</b> and confirm that it shows a dotted border
+		<li>Select <b>one clue</b> and confirm that it shows a dotted border
+		<p>
+
+		<li>Next/previous layer object should change zoom to ensure the whole object is in view 
+		<ul>
+			<li> Open an image.
+			<li> Select the <b>fit-to-width</b> zoom mode and ensure the image extends off the bottom of the page.
+			<li> Select <b>Edit | Redact entire page</b>
+			<li> Press the <b>next layer object</b> button.
+			<li> Confirm that in addition to selecting the redaction, the entire page is not in view and that
+			the fit-to-width mode has been disabled.
+		</ul>
+	</ul>
+	<p>
+
+	<li><b>Zoom Navigation</b>
+	<ul>
+		<li>Set <b>Fit-To-Page</b> mode.
+		<li>Open a multi-page image.
+		<li>Move directly to the last page and confirm that both the 
+		<b>Zoom Previous</b> and <b>Zoom Next</b> buttons and menu are 
+		disabled.
+		<li>Zoom in one step.
+		<li>Confirm that both the <b>Zoom Previous</b> button and menu are 
+		enabled.
+		<li>Zoom previous and confirm that both the <b>Zoom Next</b> button and menu 
+		item are enabled.
+		<li>Click <b>Zoom in</b> toolbar button.
+		<li>Confirm that image is zoomed.
+		<li>Click <b>Zoom out</b> toolbar button.
+		<li>Confirm that image is zoomed.
+	</ul>
+	<p>
+
+	<li><b>Page rotation</b>
+	<ul>
+		<li>Open an image file
+		<li>Click <b>Rotate counterclockwise</b> toolbar button
+		<li>Confirm that image is rotated <b>Counterclockwise</b>
+		<li>Click <b>Rotate clockwise</b> toolbar button
+		<li>Confirm that image is rotated <b>clockwise</b>
+		<p>
+
+		<!-- SCR# 188,190 -->
+		<li><b>[IDSO #188, 190]</b> Image distortion
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Redact one line and apply bates numbers at the first page.
+			<li>Rotate clockwise or counterclockwise 90 degree.
+			<li>Save the image file.
+			<li>Rotate back the image file.
+			<li>Confirm that Bates number and the redaction are in the right position.
+			<p>
+
+			<li>Close and reopen saved image file
+			<li>Rotate the first page 90 degrees.
+			<li>Click Print Preview and then click Close on the Print Preview dialog.
+			<li>Save the image.
+			<li>Confirm that Bates number and the redaction are in the right position.
+		</ul>
+	</ul>
+	<p>
+
+	<li><b>Page navigation</b>
+	<ul>
+		<li>Open an image with at least 3 pages
+		<li>Confirm that <b>First Page</b> and <b>Previous Page</b> buttons are disabled. 
+		<li>Confirm that <b>First Page</b> and <b>Previous Page</b> menu are disabled. 
+		<li>Click <b>Next Page</b> button to move to the second page.
+		<li>Confirm that <b>First Page</b> and <b>Previous Page</b> buttons are now enabled. 
+		<li>Confirm that <b>First Page</b> and <b>Previous Page</b> menu are now enabled. 
+		<li>Click <b>Last Page</b> button to move to the last page.
+		<li>Confirm that <b>Last Page</b> and <b>Last Page</b> buttons are disabled. 
+		<li>Confirm that <b>Next Page</b> and <b>Next Page</b> menu are disabled. 
+		<li>Click <b>Previous Page</b> button to move to the second page.
+		<li>Confirm that <b>Last Page</b> and <b>Last Page</b> buttons are now enabled. 
+		<li>Confirm that <b>Next Page</b> and <b>Next Page</b> menu are now enabled. 
+		<p>
+
+		<li>Click <b>View - Goto Page - Page number...</b>.
+		<li>Confirm <b>Goto Page</b> dialog appears and then input a page number and click OK.
+		<li>Confirm that specified page is now displayed.
+		<li>Click <b>View - Goto Page - Page number...</b>.
+		<li>Confirm <b>Goto Page</b> dialog appears and then input a page number and click cancel.
+		<li>Confirm that not navigated to the specified page.
+		<p>
+
+		<li>Specify a page number in the toolbar textbox and then enter.
+		<li>Confirm that specified page is now displayed.
+	</ul>
+	<p>
+
+	<!--
+	<li><b>Basic Features</b>
+	<ul>
+       	<LI>Zoom in, zoom out
+		<li>Zoom window
+		<li>Fit to page, fit to width
+		<li>Pan
+		<li>Rotate left, rotate right
+		<p>
+		<li>Shortcuts are provided for frequently used commands and tools
+		<li><b>[V2]</b> Can display thumbnails for all pages in 
+		current document
+	</ul>
+	-->
+	<li><b>Toolbars</b>
+	<ul>
+		<li>Allow access to frequently used commands and tools
+		<li>Are movable and dockable at Top, Bottom. Left, or 
+		Right edges of the ID Shield Office window
+		<li>Toolbar positions are persistent across per-user 
+		sessions
+	</ul>
+	<p>
+
+	<li><b>Layers and properties window</b>
+	<ul>	 
+		<li>Confirm that they are movable and dockable at Top, Bottom, Left or Right edges of the IDSO window
+		<!-- SCR# 182 -->
+		<li><b>[IDSO #182]</b> Strange behavior for dockable windows
+		<ul>
+			<li>Have both windows on the same side of the screen.
+			<li>Unpin one of the windows
+			<li>Confirm that you can hover over the <b>Properties</b> tab and unpinned window
+			<li>Confirm that you can hover over the <b>Layers</b> tab and unpinned window
+		</ul>
+		<p>
+
+		<li>Confirm that they can be set to auto hide.
+		<li>Confirm that they can be cascaded, tabbed.
+		<li>Confirm that their positions and sizes are persistent between sessions.
+		<li>Confirm that their status are persistent between sessions.
+		<ul>
+			<li>unpinned
+			<li>pinned
+			<li>closed by menu 
+			<li>closed by click <b>x</b> at the top right of individual pane
+		</ul>
+		<!-- SCR# 255 -->
+		<li>Confirm that checkboxes status in the <b>Layers window</b> is not persistent across sessions.
+		<p>
+
+		<!-- SCR# 187 -->
+		<li>Confirm that following shortcut keys in properties windows are not interpreted as shortcut keys.
+		<ul>
+			<li>A - Pan tool
+			<li>Del - Delete redaction
+			<li>P - Fit to page
+			<li>W - Fit to width
+			<li>Z - Zoom window
+			<li>R - Zoom previous
+			<li>T - Zoom next
+			<li>, - Previous tile
+			<li>. - Next tile
+			<li>H - Redaction(switch between angular and rectangular tool)
+		</ul>
+		<p>
+
+		<li><b>[.NetRCAndUtils #227]</b> Restrict redaction fill color values in property grid.
+		<ul>
+			<li> Open and image in ID Shield Office.
+			<li> Make a manual redaction and select it.
+			<li> Open the properties pane if it is not already open.
+			<li> In <b>Appearance | FillColor</b> ensure that <b>White</b> and <b>Black</b> are the only available options 
+			and that the box's text is not editable.
+		</ul>		
+
+		<li>Objects visibility
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file.
+			<li>Click <b>Bates#</b> button to apply Bates#
+			<li>Switch to rectangular redaction tool and draw a rectangular redaction
+			<li>Click <b>Data type finder</b>
+			<li>Check all the checkboxes and then click <b>Find next</b> in the <b>Data type finder</b> dialog
+			<li>Confirm that <b>Bates number</b> can be showed/hidden according to checking/unchecking the <b>Bates number</b> checkbox in the <b>layers window</b> 
+			<li>Confirm that <b>Clues</b> can be showed/hidden according to checking/unchecking the <b>Clues</b> checkbox in the <b>layers window</b> 
+			<li>Confirm that <b>Redactions</b> can be showed/hidden according to checking/unchecking the <b>Redactions</b> checkbox in the <b>layers window</b> 
+			<li>Click <b>Check All</b> button in the <b>Layers window</b>
+			<li>Confirm that <b>all</b> the checkboxes in the <b>Layers window</b> are checked
+			<li>Confirm that <b>Bates#</b>, <b>Clues</b> and <b>Redactions</b> are visible
+			<li>Click <b>Uncheck All</b> button in the <b>Layers window</b>
+			<li>Confirm that <b>all</b> the checkboxes in the <b>Layers window</b> are unchecked
+			<li>Save and reopen the image file
+			<li>Confirm that <b>Bates#</b>, <b>Clues</b> and <b>Redactions</b> are invisible
+
+			<!-- invisible objects can not be selected -->
+			<li>Make <b>Bates#</b> be visible
+			<li>Click<b>Edit - Select All</b> 
+			<li>Confirm that invisible <b>Clues</b> or <b>Redactions</b> are not be selected.
+			<li>Make <b>Clues</b> be visible and <b>Bates#</b> invisible
+			<li>Click <b>Edit - Select All</b>
+			<li>Confirm that invisible <b>Bates#</b> or <b>Redactions</b> are not be selected.
+			<li>Make <b>Redactions</b> be visible
+			<li>Click <b>Edit - Select All</b>
+			<li>Confirm that invisible <b>Bates#</b> or <b>Clues</b> are not be selected.
+			<p>
+
+			<!-- SCR# 121,290 -->
+			<li>Uncheck <b>Clues</b> checkbox in the layer window
+			<li>Open <b>FindTextTest.tif</b> image file
+			<li>Check <b>all</b> checkboxes in the Data Types finder and click the <b>Find next</b> button.
+			<li>Confirm that <b>first clue</b> is highlighted by green with a border
+			<li>Confirm that <b>the other clues</b> are highlighted by yellow
+			<li>Confirm that <b>Clues</b> checkbox is auto checked in the layer window
+			
+			<!-- SCR# 233 -->
+			<li>Open an image file
+			<li>Uncheck the Bates# number checkbox in the layers window
+			<li>Click save button
+			<li>When prompted, click no to cancel the save
+			<li>Click <b>Bates#</b> to apply bates#
+			<li>Confirm that checkbox is checked in the layers window
+
+			<!-- SCR# 245 -->
+			<li>Prepare an image file with redactions, clues and Bates#.
+			<li>Launch the IDSO without open the image file.
+			<li>Uncheck <b>all the checkboxes</b> in the layers window.
+			<li>Open the image file
+			<li>Confirm that <b>redactions, clues and Bate#</b> are not visible
+			<li>Check <b>all the checkboxes</b> in the layers window.
+			<li>Confirm that <b>redactions, clues and Bate#</b> are visible now
+		</ul>
+	</ul>	
+	<p>
+
+	<li><b>Status Bar</b>
+	<ul>
+		<li>Default
+		<ul>
+			<li>Launch IDSO
+			<li>Confirm that status panes should be a reasonable fixed size
+			<li>Open an image file
+			<li>Confirm that hint for <b>Zoom window</b> is displayed
+			<li>Confirm that current mouse X, Y position is displayed in pixels
+			<li>Confirm that document resolution is displayed
+			<li>Confirm that OCR status is displayed
+			<li>Close the image file
+			<li>Confirm that status bar is cleared.  (Except for an evaluation message if IDSO is not fully licensed).
+		</ul>
+		<p>
+
+		<li>Functionality
+		<ul>
+			<li>Click <b>Select redactions and objects</b> button
+			<li>Confirm that hint for <b>Select redactions and objects</b> is displayed on the status bar.
+			<li>Switch to <b>Rectangular redaction</b> and Click.
+			<li>Confirm that hint for <b>Rectangular redaction</b> is displayed on the status bar.
+			<li>Switch to <b>Angular redaction</b> and Click.
+			<li>Confirm that hint for <b>Angular redaction</b> is displayed on the status bar.
+			<li>Click <b>Zoom window</b> button
+			<li>Confirm that hint for <b>Zoom window</b> is displayed on the status bar.
+			<li>Click <b>Pan</b> button
+			<li>Confirm that hint for <b>Pan</b> is displayed on the status bar.
+			<li>Click <b>Save</b> button
+			<li>Confirm that status bar is reseted to status before saving.
+
+			<li>Modify registry to add following key/value.
+				<br><b>Entry:HKEY_CURRENT_USER\Software\Extract Systems\InputFunnel\InputReceivers\SpotRecIR</b>
+				<br><b>Key/Value:DisplayPercentageEnabled = 1</b>
+			<li>Confirm that current mouse X, Y position is also displayed in percentage
+		</ul>
+	</ul>
+	<p>
+
+	<LI><b>Context Menu</b>
+	<ul>
+		<li>Open <b>FindTextTest.tif</b> image file in local folder.
+		<li>Right Click to display Context menu.
+		<li>Confirm that following menu are provided:
+		<ul>
+			<li>Select redactions and objects,
+			<li>Zoom window,
+			<li>Pan,
+			<li>Zoom previous,
+			<li>Zoom next,
+			<li>Redaction 
+		</ul>
+		<li>Confirm that <b>Zoom previous</b> and <b>Zoom next</b> are disabled.
+		<li>Select <b>Zoom Window</b> context menu to zoom window.
+		<li>Confirm that <b>Zoom previous</b> is enabled and <b>Zoom next</b> is disabled now .
+		<li>Select <b>Zoom previous</b> to return to previous zoom.
+		<li>Confirm that <b>Zoom next</b> is enabled and <b>Zoom previous</b> is disabled now.
+		<li>Confirm that <b>Pan</b> works.
+		<li>Confirm that <b>Redaction</b> works.
+		<li>Close opened document.
+		<li>Confirm that <b>all</b> the context menu are disabled now.
+	</ul>
+	<p>
+
+	<LI><b>PVCS Testing</b>
+	<ul>
+		<li><b>[.NetRCAndUtils #159]</b> ImageViewer - highlights move on non-visible page  
+		<ul>
+			<li> Open a multipage image in the image viewer
+			<li> Draw a few redactions over text such that you will remember where they are located.
+			<li> Go to the next page and draw a few more redactions.
+			<li> Select the "Select redactions".
+			<li> CTRL+A to select all redactions.
+			<li> Go to the first page.
+			<li> Draw a box around all the redactions on the page to select them.
+			<li> Go to page 2.
+			<li> Hit CTRL+A to select all redactions.
+			<li> Move the redactions on page 2 to a valid location (ie. on the image).
+			<li> Confirm the redactions on page 1 are still in their original positions.
+			<li> Confirm the redactions on page 2 are still in their new positions.
+		</ul>
+		<p>
+
+		<li><b>[IDSD #338 - VISTA ONLY]</b> Saved layer objects do not always appear on load
+		<ul>
+			<li> Open Image A with ID Shield and make sure all layers are turned on.
+			<li> Make a manual redaction.
+			<li> Save the document in IDSO format.
+			<li> Open Image B.
+			<li> Make a manual redaction.
+			<li> Save the document in IDSO format.
+			<li> Open Image A from the MRU list.
+			<li> Repeat these steps 3 times, each time opening the other document from the MRU list without closing the other document first.
+			Each time ensure that the redactions make in previous steps appear when the document is opened.
+		</ul>
+		<p>
+	</ul>
+</UL>
+</BODY>
+</HTML>

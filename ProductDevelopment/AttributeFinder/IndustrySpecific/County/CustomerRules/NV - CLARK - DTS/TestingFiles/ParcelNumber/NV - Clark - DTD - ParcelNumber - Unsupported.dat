@@ -1,0 +1,50 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Affidavit
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Affidavit;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Affidavit Termination
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Affidavit Termination;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Annexation
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Annexation;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Breach
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Breach;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Certificate
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Certificate;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Certificate of Location
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Certificate of Location;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Easement
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Easement;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Interest
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Interest;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Miscellaneous
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Miscellaneous;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Order
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Order;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Request Notice
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Request Notice;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Substitution
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Substitution;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Trust Deed & Assignment
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trust Deed & Assignment;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Trustee Deed
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trustee Deed;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//UCC Finance Statement Amendment
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\UCC Finance Statement Amendment;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+
+//Unclassified
+<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Unclassified;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber
+

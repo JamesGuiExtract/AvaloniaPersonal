@@ -1,0 +1,112 @@
+//
+// Packages.dat
+//
+// This file should be located in the same directory as the executable.
+//
+// Contains list of package names and associated component IDs.
+// Format: 
+//   Package name 1,ID1:ID2:ID3:ID4
+//   !Package name 2,ID1:ID3:ID5:ID7
+//   Package name 3,ID6:ID8:$Package name n
+//
+// NOTES: 
+//     - Package names can be nested using $
+//     - ! indicates a package definition that will not be displayed
+//     - Packages are no longer reordered in the dialog
+//     - see also COMLMCore/Code/ComponentLicenseIDs.h
+//
+// NOTE:
+//   Component IDs include a base offset that is modified for each major release
+//          MAJOR BUILD                     OFFSET
+//   FLEX Index & ID Shield 5.0             1000
+//          IcoMap 4.2                      1000
+//   FLEX Index & ID Shield 6.0             2000
+//   ID Shield for Laserfiche 1.0           2000
+//   ID Shield Office 1.0                   2000
+//   FLEX Index & ID Shield 7.0             3000
+//
+// TODO: remove private license for ObjSelectorUI and ObjPropertiesDlg
+// and implemented standard ID based licensing.
+
+// NOTE: the rule tester should check for FlexIDShieldCoreClient
+// during initialization.  Then, before it privately licenses
+// the OCR engine, it should check for OCROnClient license.
+
+
+///////////
+// Core IDs
+///////////
+!ExtractCore,3001
+!InputFunnelCore,3002:3070:$ExtractCore
+!FlexIndexAndIDShieldCore,3003:3076:$RuleWritingCore
+!FlexIndex,3004:$FlexIndexAndIDShieldCore
+!IDShield,3005:$FlexIndexAndIDShieldCore
+!IcoMapCore,3007:$InputFunnelCore
+
+// NOT !IcoMapForArcGIS,3008:$IcoMapCore because IcoMapCore is licensed separately
+!IcoMapForArcGIS,3008
+
+// RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
+!RuleDevelopmentToolkit,3006:$FlexServer:$IDShield:3026:3027:3044:3045:3046:3077:3081
+
+// Laserfiche = IDShieldServer + IDShieldClient + Laserfiche_Integration
+!LaserficheVerification,$IDShield:3044:3045:3101
+!LaserficheDesktop,$IDShield:3044:3045:$LaserficheVerification:3102
+!LaserficheServer,$IDShield:3044:3045:$LaserficheVerification:$LaserficheDesktop:3103
+
+// ID Shield Office = IDShieldOffice + OCROnClient + ExtractCore
+// plus built-in support for AntiAliasing + PDF Read/Write + Annotations
+!IDShieldOffice,$ExtractCore:3022:3049:3070:3073:3076
+
+////////////////////
+// Functionality IDs
+////////////////////
+!OCROnServer,3021
+!OCROnClient,3022
+!FlexShieldServerCore,3025:3047:3048:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
+!FlexServer,3023:$FlexShieldServerCore:$FlexIndex
+!RuleWritingCore,3024:$InputFunnelCore
+// Removed 05/23/08 - WEL
+//!SimpleRules,3024:$InputFunnelCore
+
+
+FLEX Index,0
+-    Client (read voa files),$FlexIndex:$OCROnClient
+-    Server/SDK,$FlexServer
+
+ID Shield,0
+-    Client (Verify redactions only),$IDShield:3045:3047
+-    Server (OCR + run rules + auto-redact),$IDShield:3044:3045:$FlexShieldServerCore
+
+FLEX Index / ID Shield Utilities,0
+-    Create Searchable PDF, 3079
+//-    Disable USB Counters (locked to PC),3072
+-    Disable USB Key Serial Numbers,3071
+-    Handwriting Recognition,3078
+-    Image Cleanup Engine,3077
+-    MICR Finding Engine,3081
+-    PDF Read+Write,3073
+//-    Rotated Images and Image Window Annotation,3076
+
+ID Shield Office 1.0,0
+-    ID Shield Office,$IDShieldOffice
+
+ID Shield for Laserfiche,0
+-    Verification Only,$LaserficheVerification
+-    Desktop Redaction (includes verification),$LaserficheDesktop
+-    Server Redaction (includes desktop redaction),$LaserficheServer
+
+IcoMap for ArcGIS,0
+-    IcoMap 4.2,$IcoMapForArcGIS
+-    IcoMap Tester,$IcoMapCore
+//-    IcoMap Core 4.2 (internal use),$IcoMapCore:$OCROnClient:3070:3073
+-    Grid Generator,3075
+-    Query Feature Tool,3074
+
+Other,0
+-    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:3027:3046:$OCROnClient
+-    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:3026:3046:$OCROnClient
+-    Rule Development Toolkit,$RuleDevelopmentToolkit:3078
+-    Scansoft OEM OCR,3080
+// Removed 05/23/08 - WEL
+//-    Simple Rule Writing,$SimpleRules:3046:$OCROnClient

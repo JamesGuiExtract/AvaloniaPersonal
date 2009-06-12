@@ -1,0 +1,64 @@
+//*********************************************************************************
+// InsertCharsTest.dat
+// 		This file contains testcases for testing the InsertCharacters Value Modifier
+//*********************************************************************************
+
+// Insert the string <INSERTED> at the end of the found string
+<TESTCASE>;InsertChar01.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedEnd.eav
+
+// Insert the string <INSERTED> at the beginning of the found string
+<TESTCASE>;InsertChar02.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedBeginning.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string
+<TESTCASE>;InsertChar03.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size = 34
+<TESTCASE>;InsertChar04.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size = 20
+<TESTCASE>;InsertChar05.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <= 34
+<TESTCASE>;InsertChar06.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <= 20
+<TESTCASE>;InsertChar07.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <= 100
+<TESTCASE>;InsertChar08.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size < 33
+<TESTCASE>;InsertChar09.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size < 34
+<TESTCASE>;InsertChar10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size < 100
+<TESTCASE>;InsertChar11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size >= 34
+<TESTCASE>;InsertChar12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size >= 20
+<TESTCASE>;InsertChar13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size >= 100
+<TESTCASE>;InsertChar14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size > 34
+<TESTCASE>;InsertChar15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size > 20
+<TESTCASE>;InsertChar16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size > 100
+<TESTCASE>;InsertChar17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <> 34
+<TESTCASE>;InsertChar18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Unchanged.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <> 20
+<TESTCASE>;InsertChar19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav
+
+// Insert the string <INSERTED> at positions 9 of the found string with size <> 100
+<TESTCASE>;InsertChar20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;InsertedAtPos9.eav

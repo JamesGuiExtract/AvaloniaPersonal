@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.MERSHandler.1 = s 'MERSHandler Class'
+	{
+		CLSID = s '{A32A3A9F-C818-4154-8F50-4C1D429E1ADE}'
+	}
+	UCLIDAFUtils.MERSHandler = s 'MERSHandler Class'
+	{
+		CLSID = s '{A32A3A9F-C818-4154-8F50-4C1D429E1ADE}'
+		CurVer = s 'UCLIDAFUtils.MERSHandler.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A32A3A9F-C818-4154-8F50-4C1D429E1ADE} = s 'MERSHandler Class'
+		{
+			ProgID = s 'UCLIDAFUtils.MERSHandler.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.MERSHandler'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{AC966E48-1A26-40C7-B61E-AC4C09C9D565}'
+		}
+	}
+}

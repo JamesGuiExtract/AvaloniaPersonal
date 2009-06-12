@@ -1,0 +1,26 @@
+HKCR
+{
+	TestComponents.NumberInputReceiver.1 = s 'NumberInputReceiver Class'
+	{
+		CLSID = s '{FFB72363-35CD-11D6-825C-0050DAD4FF55}'
+	}
+	TestComponents.NumberInputReceiver = s 'NumberInputReceiver Class'
+	{
+		CLSID = s '{FFB72363-35CD-11D6-825C-0050DAD4FF55}'
+		CurVer = s 'TestComponents.NumberInputReceiver.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FFB72363-35CD-11D6-825C-0050DAD4FF55} = s 'NumberInputReceiver Class'
+		{
+			ProgID = s 'TestComponents.NumberInputReceiver.1'
+			VersionIndependentProgID = s 'TestComponents.NumberInputReceiver'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FFB72355-35CD-11D6-825C-0050DAD4FF55}'
+		}
+	}
+}

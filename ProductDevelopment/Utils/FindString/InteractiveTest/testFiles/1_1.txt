@@ -1,0 +1,52 @@
+This is a sample file to be used with testing the FindString utility!
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+
+I hope this sample file has proved to be helpful in testing this utility
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+
+social: 333-22-4444
+Social: 333-22-4444
+SociaL: 333-22-4444
+
+Tax ID: 111-00-5555
+taxID: 111-00-5555
+taxid: 111-00-5555
+

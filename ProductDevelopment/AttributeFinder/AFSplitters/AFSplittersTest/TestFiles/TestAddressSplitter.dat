@@ -1,0 +1,37 @@
+// Basic input file for Address Splitter Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) <FILE> | Path1
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path1  = a fully qualified path to a text file with input and output.
+//             OR a filename for file located in same folder as TestAddressSplitter.dat
+//
+// 2) <TESTCASE> - a test to be executed
+//        next token - label for test case
+//        last token - input string for Address Splitter test
+//      Text - precedes text of main Attribute
+//      .Sub - precedes text of first-level sub-Attribute
+//      ..Of - precedes text of second-level sub-Attribute
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Basic tests: zip, zip+4, leading digits for address, return to, 
+//              mail to, attention, etc.
+<FILE>|AS_BasicTestsEAV.txt
+
+// Properly identify States based on State codes
+<FILE>|AS_StateCodesEAV.txt
+
+// Properly identify States based on State names
+<FILE>|AS_StateNamesEAV.txt
+
+// Properly identify Address lines based on Street types
+<FILE>|AS_StreetTypesEAV.txt
+
+// Single-line Addresses
+<FILE>|AS_SingleLinesEAV.txt
+
+// Trailing Text
+<FILE>|AS_TrailingTestsEAV.txt

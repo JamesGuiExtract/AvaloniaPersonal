@@ -1,0 +1,57 @@
+// TestComponents.idl : IDL source for TestComponents.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (TestComponents.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(FFB72355-35CD-11D6-825C-0050DAD4FF55),
+	version(1.0),
+	helpstring("TestComponents 1.0 Type Library")
+]
+library TESTCOMPONENTSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\Code\IFCore.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDIUnknownVector\Code\UCLIDIUnknownVector.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentCategoryMgmt\Code\UCLIDComponentCategoryMgmt.tlb");
+
+	[
+		object,
+		uuid(FFB72354-35CD-11D6-825C-0050DAD4FF55),
+		dual,
+		helpstring("INumberInputReceiver Interface"),
+		pointer_default(unique)
+	]
+	interface INumberInputReceiver : IDispatch
+	{
+		[id(1), helpstring("method CreateNewInputReceiver")] HRESULT CreateNewInputReceiver([in] IInputReceiver *ipInputReceiver);
+		[id(2), helpstring("method OnInputReceived")] HRESULT OnInputReceived([in] BSTR bstrTextInput);
+		[id(3), helpstring("method OnAboutToDestroy")] HRESULT OnAboutToDestroy();
+	};
+
+	[
+		uuid(FFB72363-35CD-11D6-825C-0050DAD4FF55),
+		helpstring("NumberInputReceiver Class")
+	]
+	coclass NumberInputReceiver
+	{
+		[default] interface INumberInputReceiver;
+		interface IInputReceiver;
+		interface IInputEntityManager;
+		interface ICategorizedComponent;
+	};
+	[
+		uuid(54AF6104-3761-11D6-825E-0050DAD4FF55),
+		helpstring("NumberInputValidator Class")
+	]
+	coclass NumberInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+	};
+};

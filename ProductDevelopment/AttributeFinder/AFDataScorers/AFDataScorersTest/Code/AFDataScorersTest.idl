@@ -1,0 +1,41 @@
+// AFDataScorersTest.idl : IDL source for AFDataScorersTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFDataScorersTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(16609C4A-1074-4410-B493-4FF71223BDF9),
+	version(1.0),
+	helpstring("AFDataScorersTest 1.0 Type Library")
+]
+library UCLID_AFDATASCORERSTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+/*
+	[
+		object,
+		uuid(330F31FD-8562-47A3-A257-A986E454D709),
+		dual,
+		helpstring("IEntityNameDataScorerTester Interface"),
+		pointer_default(unique)
+	]
+	interface IEntityNameDataScorerTester : IDispatch
+	{
+	};
+	
+*/	[
+		uuid(798D0268-A5A0-43B5-BB5B-C663482B28AB),
+		helpstring("EntityNameDataScorerTester Class")
+	]
+	coclass EntityNameDataScorerTester
+	{
+		[default] interface ITestableComponent;
+	};
+};

@@ -1,0 +1,1 @@
+(?:(?:Fed).{0,16}(?:(?:Ident|tificat).{0,12}(?:Nu\w*|mber)|identifi)|F.{0,9}Identificat.*(?:Num|mber))(?!.*(?:\d{2}\-\d{6}.?|\b\d{9}[AB]?\b))

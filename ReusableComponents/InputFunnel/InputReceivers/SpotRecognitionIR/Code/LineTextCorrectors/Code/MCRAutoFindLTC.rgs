@@ -1,0 +1,26 @@
+HKCR
+{
+	LineTextCorrectors.MCRAutoFindLTC.1 = s 'MCRAutoFindLTC Class'
+	{
+		CLSID = s '{6508515E-D155-4E16-91DB-CE8536E0A7A8}'
+	}
+	LineTextCorrectors.MCRAutoFindLTC = s 'MCRAutoFindLTC Class'
+	{
+		CLSID = s '{6508515E-D155-4E16-91DB-CE8536E0A7A8}'
+		CurVer = s 'LineTextCorrectors.MCRAutoFindLTC.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6508515E-D155-4E16-91DB-CE8536E0A7A8} = s 'MCRAutoFindLTC Class'
+		{
+			ProgID = s 'LineTextCorrectors.MCRAutoFindLTC.1'
+			VersionIndependentProgID = s 'LineTextCorrectors.MCRAutoFindLTC'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D7A48C67-215A-4E0B-A6E7-E356423C3254}'
+		}
+	}
+}

@@ -1,0 +1,12 @@
+// *******
+// Imports
+// *******
+
+
+[VARS_BEGIN]
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\TransUnion\Demo\Set001\Images\Maricopa AZ Deed3.pdf.uss
+LocalGrantee01=hereby^3~convey^250~certain^3~property^70~[to]^?Grantee^240~such^3~property^16~described
+[PATTERNS_END]

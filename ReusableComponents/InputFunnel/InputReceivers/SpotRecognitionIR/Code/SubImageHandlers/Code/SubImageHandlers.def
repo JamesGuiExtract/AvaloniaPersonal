@@ -1,0 +1,9 @@
+; SubImageHandlers.def : Declares the module parameters.
+
+LIBRARY      "SubImageHandlers.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

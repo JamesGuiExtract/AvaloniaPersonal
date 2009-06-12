@@ -1,0 +1,57 @@
+// AFUtilsTest.idl : IDL source for AFUtilsTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFUtilsTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(63AB2AE7-7499-4975-96FD-6532DF6FA946),
+	version(1.0),
+	helpstring("UCLID AFUtilsTest 1.0 Type Library")
+]
+library UCLID_AFUTILSTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(E84EDA2F-9485-4512-A793-E44A24DEE41D),
+		helpstring("DocumentClassifierTester Class")
+	]
+	coclass DocumentClassifierTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(70D94119-44A2-447E-99E9-0BA788F990D8),
+		helpstring("EntityFinderTester Class")
+	]
+	coclass EntityFinderTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(BE0DAF0B-0287-4560-9666-FE75669295DF),
+		helpstring("MERSTester Class")
+	]
+	coclass MERSTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(5F0CC11E-739C-4D9C-8AB4-57D729C9FEAD),
+		helpstring("AFUtilityTester Class")
+	]
+	coclass AFUtilityTester
+	{
+		[default] interface ITestableComponent;
+	};
+};

@@ -1,0 +1,12 @@
+//<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues|Oil Gas and Mineral Lease
+//<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData|Clues|Oil Gas and Mineral Lease
+<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+// output verification result
+//<SETTING>;CreateTestOutputVOAFiles=1
+// Type of Redactions to be tested
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;OutputAttributeNamesFileLists=1
+
+// Master.rsd rule file
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Isabella\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

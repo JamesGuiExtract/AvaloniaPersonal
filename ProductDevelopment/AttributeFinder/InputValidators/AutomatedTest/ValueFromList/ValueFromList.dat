@@ -1,0 +1,5 @@
+// Non-case sensitive
+<TESTCASE>;Test1.rsd;Input.txt;;Test1.eav
+
+// Case sensitive
+<TESTCASE>;Test2.rsd;Input.txt;;Test2.eav

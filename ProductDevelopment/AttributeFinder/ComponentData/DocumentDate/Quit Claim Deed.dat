@@ -1,0 +1,31 @@
+// *******
+// Imports
+// *******
+
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QCD\B04286AAB3F.TIF.uss
+QD_DOCDATE_01=\r\nDated^?DocumentDate^35~Signed
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QCD\B04286AAB0U.TIF.uss
+QD_DOCDATE_02=\r\nDated|Date:^?DocumentDate^50~\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QCD\B04288AAA0X.TIF.uss (Bad OCR)
+QD_DOCDATE_03=\r\nOn this^?DocumentDate^50~before me
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QCD\B04288AAA3R.TIF.uss (Bad OCR)
+QD_DOCDATE_04=before me^?DocumentDate^50~by
+
+[PATTERNS_END]
+

@@ -1,0 +1,34 @@
+// *******
+// Imports
+// *******
+// #import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+[VARS_END]
+
+
+[PATTERNS_BEGIN]
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257519.tif.uss
+ALL_PROP_ADDR_03=Parcel ID Number^25~\r\n^?<Address^250~zip code
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257412.tif.uss
+ALL_PROP_ADDR_01=has the address of^?Address^250~zip code
+ALL_PROP_ADDR_01B=has the address of^?Address^250~Property Address
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257379.tif.uss
+ALL_PROP_ADDR_02=property^50~address^50~known as^?Address^250~\r\nGrantor|\r\nREVOLVING
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257538.tif.uss
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257715.tif.uss
+ALL_PROP_ADDR_04=premises|PROPERTY^100~located at^?Address^250~(the "Premises")|THE LEGAL DESCRIPTION
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257592.tif.uss
+ALL_PROP_ADDR_05=property is located in^125~[at]^?Address^350~(city)
+ALL_PROP_ADDR_05B=property is located in^125~[at]^?Address^350~(Address)
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257772.tif.uss
+ALL_PROP_ADDR_06=property located at the address^?Address^250~in the county of
+
+[PATTERNS_END]
+

@@ -1,0 +1,30 @@
+<SETTING>;VerificationCondition=Merged
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=Merged
+<SETTING>;AutomatedCondition=Merged
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+// 0.1% overlap criteria
+<TESTFOLDER>;.\Test01.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test01.voa
+
+// 50% overlap criteria
+<TESTFOLDER>;.\Test02.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test02.voa
+
+// 90% overlap criteria
+<TESTFOLDER>;.\Test03.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test03.voa
+
+// 0% overlap criteria
+<TESTFOLDER>;.\Test04.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test04.voa
+
+// Merge overlapping attributes named "ImageRegion"
+<TESTFOLDER>;.\Test05.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test05.voa
+
+// Merge overlapping attributes of type "LegalDescription"
+<TESTFOLDER>;.\Test06.rsd;.\Images\;;$DirOf(<SourceDocName>)\..\Test06.voa
+
+// FlexIDSCore-3141: Merge areas on skewed document
+<TESTFOLDER>;.\Test14.rsd;.\Images\FlexIDSCore-3141\;;$DirOf(<SourceDocName>)\..\..\Test14.voa
+
+// Test on non-standard skew, orientation and rotation
+<TESTFOLDER>;.\Test15.rsd;.\Images\RotationOrientationSkew\;;$DirOf(<SourceDocName>)\..\..\Test15.voa

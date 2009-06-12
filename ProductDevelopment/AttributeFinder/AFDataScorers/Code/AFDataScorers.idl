@@ -1,0 +1,44 @@
+// AFDataScorers.idl : IDL source for AFDataScorers.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFDataScorers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(F0A8FC59-37EE-4EB5-A9C8-C322F851BC88),
+	version(1.0),
+	helpstring("UCLID AFDataScorers 1.0 Type Library")
+]
+library UCLID_AFDATASCORERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+
+	[
+		object,
+		uuid(0EDBFC88-9CBE-4F4B-9458-55E94E991A50),
+		dual,
+		helpstring("IEntityNameDataScorer Interface"),
+		pointer_default(unique)
+	]
+	interface IEntityNameDataScorer : IDispatch
+	{
+	};
+
+	[
+		uuid(0E9555F7-9F77-41BD-9762-199F07A871E0),
+		helpstring("EntityNameDataScorer Class")
+	]
+	coclass EntityNameDataScorer
+	{
+		[default] interface IDataScorer;
+		interface ILicensedComponent;
+	};
+};

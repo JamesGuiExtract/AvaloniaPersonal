@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.CartographicPointInputValidator.1 = s 'CartographicPointInputValidator Class'
+	{
+		CLSID = s '{90666182-C597-11d6-8301-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.CartographicPointInputValidator = s 'CartographicPointInputValidator Class'
+	{
+		CLSID = s '{90666182-C597-11d6-8301-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.CartographicPointInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {90666182-C597-11d6-8301-0050DAD4FF55} = s 'CartographicPointInputValidator Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.CartographicPointInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.CartographicPointInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

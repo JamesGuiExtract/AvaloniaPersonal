@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.AFDocument.1 = s 'AFDocument Class'
+	{
+		CLSID = s '{BBDE6205-9193-4959-8922-630A9F920ADB}'
+	}
+	UCLIDAFCore.AFDocument = s 'AFDocument Class'
+	{
+		CLSID = s '{BBDE6205-9193-4959-8922-630A9F920ADB}'
+		CurVer = s 'UCLIDAFCore.AFDocument.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BBDE6205-9193-4959-8922-630A9F920ADB} = s 'AFDocument Class'
+		{
+			ProgID = s 'UCLIDAFCore.AFDocument.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.AFDocument'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

@@ -1,0 +1,9 @@
+; HighlightedTextIR.def : Declares the module parameters.
+
+LIBRARY      "HighlightedTextIR.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

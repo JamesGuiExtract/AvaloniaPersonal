@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDArcGISUtils.HTIRCommand.1 = s 'HTIRCommand Class'
+	{
+		CLSID = s '{7F4176E0-9C8F-48C9-B641-760AC20668A0}'
+	}
+	UCLIDArcGISUtils.HTIRCommand = s 'HTIRCommand Class'
+	{
+		CLSID = s '{7F4176E0-9C8F-48C9-B641-760AC20668A0}'
+		CurVer = s 'UCLIDArcGISUtils.HTIRCommand.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7F4176E0-9C8F-48C9-B641-760AC20668A0} = s 'HTIRCommand Class'
+		{
+			ProgID = s 'UCLIDArcGISUtils.HTIRCommand.1'
+			VersionIndependentProgID = s 'UCLIDArcGISUtils.HTIRCommand'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{EC0C8698-B764-429F-8CFF-EB0A540603C6}'
+		}
+	}
+}

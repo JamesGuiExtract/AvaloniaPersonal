@@ -1,0 +1,14 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;TypeToBeTested=MinorChildName
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Lucas - CASNET\Rules\MinorChildName\MinorChildNameMaster.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set001\COC Civil;<SourceDocName>.childName.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Lucas - CASNET\Rules\MinorChildName\MinorChildNameMaster.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set001\COC Criminal;<SourceDocName>.childName.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Lucas - CASNET\Rules\MinorChildName\MinorChildNameMaster.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set001\Images 2008 05 13;<SourceDocName>.childName.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Lucas - CASNET\Rules\MinorChildName\MinorChildNameMaster.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set001\lorien\Digital\774741;<SourceDocName>.childName.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Lucas - CASNET\Rules\MinorChildName\MinorChildNameMaster.rsd;K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set001\lorien\Tighter Overscan;<SourceDocName>.childName.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

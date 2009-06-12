@@ -1,0 +1,266 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Individual tests to guarantee that particular keywords and phrases used as
+// Company Suffixes and Company Designators are found properly
+
+// Company Suffixes
+Company: LLC|UCLID Software, LLC Plus More Text|UCLID Software, LLC
+
+Company: L L C|UCLID Software, L L C Plus More Text|UCLID Software, L L C
+
+Company: L.L C|UCLID Software, L.L C Plus More Text|UCLID Software, L.L C
+
+Company: L .L . C|UCLID Software, L .L . C Plus More Text|UCLID Software, L .L . C
+
+Company: LLP|Habush & Habush, LLP Plus More Text|Habush & Habush, LLP
+
+Company: Incorporated|Acme Explosives, Incorporated With extra text|Acme Explosives, Incorporated
+
+Person: Incorporated Herein|John Smith with incorporated herein with extra text|John Smith
+
+Company: Inc.|Acme Explosives, Inc. With extra text|Acme Explosives, Inc.
+
+Company: Inc&|Acme Explosives, Inc& With extra text|Acme Explosives, Inc
+
+Company: Inc|Acme Explosives, Inc With extra text|Acme Explosives, Inc
+
+Company: Co.|Walt Disney Co. With extra text|Walt Disney Co.
+
+Company: Co&|Walt Disney Co& With extra text|Walt Disney Co
+
+Company: FSB|Madison National Bank, FSB With extra text|Madison National Bank, FSB
+
+Company: F S B|Madison National Bank F S B With extra text|Madison National Bank F S B
+
+Company: F.S.B.|Madison National Bank, F.S.B. With extra text|Madison National Bank, F.S.B.
+
+Company: F.S B.|Madison National Bank, F.S B. With extra text|Madison National Bank, F.S B.
+
+Company: Federal Savings Bank|Citibank Federal Savings Bank With extra|Citibank Federal Savings Bank
+
+Company: SSB|Park Bank, SSB With extra text|Park Bank, SSB
+
+Company: S S B.|Park Bank, S S B. With extra text|Park Bank, S S B.
+
+Company: State Savings Bank|Citibank State Savings Bank With extra|Citibank State Savings Bank
+
+Company: Ltd|Acme Explosives, Ltd With extra text|Acme Explosives, Ltd
+
+Company: N D|Park Bank, N D With extra text|Park Bank, N D
+
+Company: NA|Park Bank, NA With extra text|Park Bank, NA
+
+Company: N.A.|Park Bank, N.A. With extra text|Park Bank, N.A.
+
+Company: National Association|Park Bank, National Association With extra text|Park Bank, National Association
+
+Company: FA|Park Bank, FA With extra text|Park Bank, FA
+
+Company: F.A.|Park Bank, F.A. With extra text|Park Bank, F.A.
+
+Company: Federal Association|Park Bank, Federal Association With extra text|Park Bank, Federal Association
+
+Company: C.U.|Pentagon Federal C.U. With extra text|Pentagon Federal C.U.
+
+Company: FLCA|GreenStone Farm Stuff, FLCA Plus More Text|GreenStone Farm Stuff, FLCA
+
+// Company Designators
+Company: Corporation|Walt Disney Corporation with extra text|Walt Disney Corporation
+
+Company: Corp|Walt Disney Corp plus More Text|Walt Disney Corp
+
+Company: Corp.|Walt Disney Corp. plus More Text|Walt Disney Corp
+
+Company: Company|Walt Disney Company with extra text|Walt Disney Company
+
+Company: Trust|Affiliated Bank and Trust with extra text|Affiliated Bank and Trust
+
+Company: Partnership|Jones and Smith Partnership with extra text|Jones and Smith Partnership
+
+Company: Partners|by Jones and Smith Partners with extra text|Jones and Smith Partners
+
+Company: Limited|by Jones and Smith Limited with extra text|Jones and Smith Limited
+
+Company: Properties|by Jones and Smith Properties with extra text|Jones and Smith Properties
+
+Company: Products|by Jones and Smith Products with extra text|Jones and Smith Products
+
+Company: Mortgage|Fly By Night Mortgage with extra text|Fly By Night Mortgage
+
+Company: Association|Fly By Night Loan Association with extra text|Fly By Night Loan Association
+
+Company: Bank1|Fly By Night Bank with extra text|Fly By Night Bank
+
+Company: Bank2|more InvestorsBank with extra text|InvestorsBank
+
+Company: Credit1|Fly By Night Credit Union with extra text|Fly By Night Credit Union
+
+Company: Credit2|more EquiCredit Service with extra text|EquiCredit Service
+
+Company: Financial|Fly By Night Financial Services with extra text|Fly By Night Financial Services
+
+Company: Lending|Fly By Night Lending with extra text|Fly By Night Lending
+
+Company: Equity|Fly By Night Home Equity with extra text|Fly By Night Home Equity
+
+Company: Realty|by Mickey Mouse Realty with extra text|Mickey Mouse Realty
+
+Company: Title1|by Mickey Mouse Title with extra text|Mickey Mouse Title
+
+Company: Title2|by Milwaukee Title with extra text|Milwaukee Title
+
+Person: Title Vested|by Mickey Mouse title Vested with extra text|Mickey Mouse
+
+Person: Titled|by Mickey Mouse titled Vested with extra text|Mickey Mouse
+
+Company: Investment|by Mickey Mouse Investment & Loan with extra text|Mickey Mouse Investment & Loan
+
+Company: Investments|by Mickey Mouse Investments with extra text|Mickey Mouse Investments
+
+Company: School District|by Arden Hills School District with extra text|Arden Hills School District
+
+Company: District|by Arden Hills Tax district with extra text|Arden Hills Tax district
+
+Company: Borough Of 1|by Borough Of Sewickley with extra text|Borough Of Sewickley
+
+Company: Borough of 2|by Borough of Sewickley with extra text|Borough of Sewickley
+
+Company: Borough of 3|by Borough of sewickley with extra text|Borough
+
+Company: Leasing|by Solomon and Sons Leasing with extra text|Solomon and Sons Leasing
+
+Company: Rental|by R & R Rental with extra text|R & R Rental
+
+Company: Rentals|by R & R Rentals with extra text|R & R Rentals
+
+Company: Construction|by R & R Construction with extra text|R & R Construction
+
+Company: Development|by R & R Development with extra text|R & R Development
+
+Company: Redevelopment|by R & R Redevelopment with extra text|R & R Redevelopment
+
+Company: Builders|by Jones and Smith Builders with extra text|Jones and Smith Builders
+
+Company: Enterprises|by Jones and Smith Enterprises with extra text|Jones and Smith Enterprises
+
+Company: Baptist Church|by Elmira Baptist Church with extra text|Elmira Baptist Church
+
+Company: Lutheran Church|by Elmira Lutheran Church with extra text|Elmira Lutheran Church
+
+Company: Methodist Church|by Elmira Methodist Church with extra text|Elmira Methodist Church
+
+Company: Catholic Church|by St. Elmira Catholic Church with extra text|St. Elmira Catholic Church
+
+Company: Wedding Church|by Elmira Wedding Church with extra text|Elmira Wedding Church
+
+Company: Community College|by Elmira Community College with extra text|Elmira Community College
+
+Company: University|by Elmira University with extra text|Elmira University
+
+Company: Education|by ACME Education with extra text|ACME Education
+
+Company: Graduate Center|by Elmira Graduate Center with extra text|Elmira Graduate Center
+
+Company: Neighborhood|by Jones and Smith Neighborhood Center with extra text|Jones and Smith Neighborhood Center
+
+Company: Wholesale|by R & R Wholesale with extra text|R & R Wholesale
+
+Company: Homes|by R & R Homes with extra text|R & R Homes
+
+Company: Service|by Mickey Mouse Dowsing Service with extra text|Mickey Mouse Dowsing Service
+
+Company: Services|by Mickey Mouse Dowsing Services with extra text|Mickey Mouse Dowsing Services
+
+Company: Collector|by Mickey Mouse Collector Society with extra text|Mickey Mouse Collector Society
+
+Company: Franchise Group|by Mickey Mouse Franchise Group with extra text|Mickey Mouse Franchise Group
+
+Company: Tax Board|by Mickey Mouse Tax Board with extra text|Mickey Mouse Tax Board
+
+Company: Equalization|by Mickey Mouse Equalization with extra text|Mickey Mouse Equalization
+
+Company: Department|by Mickey Mouse Dowsing Department with extra text|Mickey Mouse Dowsing Department
+
+Company: Counties|by Coastal Counties Escrow with extra text|Coastal Counties Escrow
+
+Company: Farms|by Mickey Mouse Farms with extra text|Mickey Mouse Farms
+
+Company: Hospital|by Mickey Mouse Hospital with extra text|Mickey Mouse Hospital
+
+Company: Bureau|by Mickey Mouse Farm Bureau with extra text|Mickey Mouse Farm Bureau
+
+Company: Specialists|by Mickey Mouse Specialists with extra text|Mickey Mouse Specialists
+
+Company: Insurance|by Mickey Mouse Insurance with extra text|Mickey Mouse Insurance
+
+Company: Engineering|by ACME Engineering with extra text|ACME Engineering
+
+Company: And Sons|by Mickey Mouse and Sons with extra text|Mickey Mouse and Sons
+
+Company: & Sons|by Mickey Mouse & Sons with extra text|Mickey Mouse & Sons
+
+Company: Communities|by ACME Communities with extra text|ACME Communities
+
+Company: Electric|by ACME Electric with extra text|ACME Electric
+
+Company: Automotive|by ACME Automotive with extra text|ACME Automotive
+
+Company: Installations|by ACME Installations with extra text|ACME Installations
+
+Company: Materials|by ACME Materials with extra text|ACME Materials
+
+Company: Repair|by ACME Repair with extra text|ACME Repair
+
+Company: Exchange|by ACME Exchange with extra text|ACME Exchange
+
+Company: Consultants|by ACME Consultants with extra text|ACME Consultants
+
+Company: Manufacturing|by ACME Manufacturing with extra text|ACME Manufacturing
+
+Company: Veterans|by Secretary of Veterans Affairs with extra text|Secretary of Veterans Affairs
+
+Company: Apartment|by ACME Apartment Complex with extra text|ACME Apartment Complex
+
+Company: Apartments|by ACME Apartments with extra text|ACME Apartments
+
+Company: Architects|by ACME Architects with extra text|ACME Architects
+
+Company: Global|by Citigroup Global Markets with extra text|Citigroup Global Markets
+
+Company: .COM|by ebay.com with extra text|ebay.com
+
+// The following 2 tests illustrate PVCS P16 2051
+Company: Bank (State Name)| Fifth Third Bank (Eastern Michigan)|Fifth Third Bank Eastern Michigan
+
+Company: Bank (BadState Name)| Fifth Third Bank (Eastern BadState Name)|Fifth Third Bank
+
+Company: Landscaping|by Borges Landscaping with extra text|Borges Landscaping
+
+Company: Iron Works|by Nor-Cal Iron Works with extra text|Nor-Cal Iron Works
+
+Company: Cameras|by RK's Paramount Cameras with extra text|RK's Paramount Cameras
+
+Company: Camera|by Southside Camera with extra text|Southside Camera
+
+Company: Housing|by Western Pacific Housing with extra text|Western Pacific Housing
+
+Company: Casualty|by Allied Property & Casualty with extra text|Allied Property & Casualty
+
+// P13 #4698
+Company: Funding|by LVNV Funding with extra text|LVNV Funding

@@ -1,0 +1,23 @@
+HKCR
+{
+	ESFileSuppliers.FolderFSPP.1 = s 'FolderFSPP Class'
+	{
+		CLSID = s '{0D984170-4F66-4102-B3D2-61EEDBBD3D76}'
+	}
+	ESFileSuppliers.FolderFSPP = s 'FolderFSPP Class'
+	{
+		CLSID = s '{0D984170-4F66-4102-B3D2-61EEDBBD3D76}'
+		CurVer = s 'ESFileSuppliers.FolderFSPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0D984170-4F66-4102-B3D2-61EEDBBD3D76} = s 'FolderFSPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

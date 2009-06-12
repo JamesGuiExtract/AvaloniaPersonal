@@ -1,0 +1,30 @@
+// AFValueFinderTest.idl : IDL source for AFValueFinderTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFValueFinderTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	uuid(23136429-3BFA-4AEB-BC39-ECECE36F4DFF),
+	version(1.0),
+	helpstring("AFValueFinderTest 1.0 Type Library")
+]
+library AFVALUEFINDERTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(8355357D-E6C8-43DE-93F3-7AEE7C51AB8A),
+		helpstring("LegalDescFinderTester Class")
+	]
+	coclass LegalDescFinderTester
+	{
+		[default] interface ITestableComponent;
+	};
+};

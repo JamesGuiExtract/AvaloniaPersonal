@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.FileNamePattern.1 = s 'FileNamePattern Class'
+	{
+		CLSID = s '{421BC3A2-8218-4048-A1A2-1FC7ED64EE5E}'
+	}
+	ESFAMConditions.FileNamePattern = s 'FileNamePattern Class'
+	{
+		CLSID = s '{421BC3A2-8218-4048-A1A2-1FC7ED64EE5E}'
+		CurVer = s 'ESFAMConditions.FileNamePattern.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {421BC3A2-8218-4048-A1A2-1FC7ED64EE5E} = s 'FileNamePattern Class'
+		{
+			ProgID = s 'ESFAMConditions.FileNamePattern.1'
+			VersionIndependentProgID = s 'ESFAMConditions.FileNamePattern'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

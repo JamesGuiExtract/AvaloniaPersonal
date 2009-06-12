@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.AddWatermarkTaskPP.1 = s 'AddWatermarkTaskPP Class'
+	{
+		CLSID = s '{58E38D1D-E67C-48DF-931B-EEA7AD7B96AA}'
+	}
+	FileProcessors.AddWatermarkTaskPP = s 'AddWatermarkTaskPP Class'
+	{
+		CLSID = s '{58E38D1D-E67C-48DF-931B-EEA7AD7B96AA}'
+		CurVer = s 'FileProcessors.AddWatermarkTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {58E38D1D-E67C-48DF-931B-EEA7AD7B96AA} = s 'AddWatermarkTaskPP Class'
+		{
+			ProgID = s 'FileProcessors.AddWatermarkTaskPP.1'
+			VersionIndependentProgID = s 'FileProcessors.AddWatermarkTaskPP'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

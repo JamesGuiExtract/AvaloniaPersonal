@@ -1,0 +1,24 @@
+HKCR
+{
+	SSOCR2.ScansoftOCR2.1 = s 'ScansoftOCR2 Class'
+	{
+		CLSID = s '{AE7DB7D9-6DE4-4F60-9DEE-71CB6CBB1892}'
+	}
+	SSOCR2.ScansoftOCR2 = s 'ScansoftOCR2 Class'
+	{
+		CLSID = s '{AE7DB7D9-6DE4-4F60-9DEE-71CB6CBB1892}'
+		CurVer = s 'SSOCR2.ScansoftOCR2.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AE7DB7D9-6DE4-4F60-9DEE-71CB6CBB1892} = s 'ScansoftOCR2 Class'
+		{
+			ProgID = s 'SSOCR2.ScansoftOCR2.1'
+			VersionIndependentProgID = s 'SSOCR2.ScansoftOCR2'
+			ForceRemove 'Programmable'
+			LocalServer32 = s '%MODULE%'
+			val AppID = s '{752139E2-5977-4AD2-9E26-BE3B9235524C}'
+			'TypeLib' = s '{20ED8F87-8A6C-400B-9C41-A6810ECBA3AE}'
+		}
+	}
+}

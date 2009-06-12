@@ -1,0 +1,496 @@
+RegEx(2): UCLID's regular expression object wrapper around IRegEx object was used to find
+          two matches ($1 and $2) in the input text.
+UCLID:	  UCLID's prototype for pattern matching with UCLID proprietory syntax was used to
+          find matches (instances of ? in the pattern string)
+RegEx(1): UCLID's regular expression object wrapper around IRegEx object was used to find
+          two matches ($1 and $2) at the same time, by replacing the input string with $1|$2,
+          with the idea being that we can seperate the valuesof $1 and $2 later using string
+          tokenizer.
+
+Below, each input text, and the corresponding patterns tried is shown, along with the time
+in milli seconds, for each search.  Each number below was found by executing 100,000 searches
+and the total time per search was calculated.
+
+The UCLID prototype string pattern matching object was just a C++ class, while the regular
+expression based classes were COM objects (which has an additional overhead for method invokation)
+
+******************
+
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+
+executed^*^between^?^Grantee^*^and^?^Grantor
+
+[\s\S]+?executed[\s\S]+?between([\s\S]+?)Grantee[\s\S]+?and([\s\S]+?)Grantor[\s\S]*
+
+RegEx(x2)     UCLID      RegEx(x1)
+0.130         0.100      0.080
+
+*******************
+
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+
+RegEx(x2)     UCLID      RegEx(x1)
+0.330         0.120      0.180
+
+**********************
+
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+The mortgage executed between James C. Smith and Mary D. Smith ("Grantee") and Wisconsin Mortgage Corporation ("Grantor") is now considered fully paid.
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand Seven Hundred Fifty Dollars and no/100 Dolla
+successors and assigns forever, for its and their use and benefit, not however hereby guaranteering anything and
+without recourse to it in any event.
+
+  And said Corporation hereby covenants that there is now owing and unpaid on the said -NOTE-
+and Mortgage, as principal. a sum not less than One Hundred Fifty Thousand S
+
+RegEx(x2)     UCLID      RegEx(x1)
+2.360         0.170      1.210
+
+******************************

@@ -1,0 +1,50 @@
+(
+
+// Finds on Jan|Feb|Mar|Apr|... DD, YYYY at HH:MM (a.m.|p.m.)
+(
+
+// Find "on"
+\bon\s+
+
+// optionally followed by characters for a day name
+[\s\S]{0,15}
+
+// Followed by a month name
+(January|February|March|April|May|June|July|August|September|October|November|December)\s*
+
+// Followed by a two-digit day and four-digit year
+\d{2}\s*[\.,]*\s*\d{4}\s*(,)?\s*
+
+// Followed by "at"
+at\s+
+
+// Followed by HH:MM AM or PM
+\d{1,2}\s*[:;\.,]+\s*\d{2}\s*(a|p)\s*[\.,]*\s*m
+
+)|
+
+// OR
+// Finds at HH:MM (a.m.|p.m.) on Jan|Feb|Mar|Apr|... DD, YYYY
+(
+
+// Find "at"
+\bat\s+
+
+// Followed by HH:MM AM or PM
+\d{1,2}\s*[:;\.,]+\s*\d{2}\s*(a|p)\s*[\.,]*\s*m[\.,]*
+
+// Followed by "on"
+\s+on\s+
+
+// optionally followed by characters for a day name
+[\s\S]{0,15}
+
+// Followed by a month name
+(January|February|March|April|May|June|July|August|September|October|November|December)\s*
+
+// Followed by a two-digit day and four-digit year
+\d{2}\s*[\.,]*\s*\d{4}
+
+)
+
+)

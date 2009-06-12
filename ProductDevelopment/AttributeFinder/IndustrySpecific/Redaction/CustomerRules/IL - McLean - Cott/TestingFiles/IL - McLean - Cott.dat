@@ -1,0 +1,7 @@
+//Adjust as needed
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//<SETTING>;CreateTestOutputVOAFiles=1
+//<SETTING>;TypeToBeTested=SSN
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\IL - McLean\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,9 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData 
+
+<SETTING>;OutputAttributeNamesFileLists=1
+//<SETTING>;TypeToBeTested=
+
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\Utah - Department of Commerce\Set022\Images2\1_2\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\Utah - Department of Commerce\Set022\Images2\2_2\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\Utah - Department of Commerce\Set022\Images2\3_2\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

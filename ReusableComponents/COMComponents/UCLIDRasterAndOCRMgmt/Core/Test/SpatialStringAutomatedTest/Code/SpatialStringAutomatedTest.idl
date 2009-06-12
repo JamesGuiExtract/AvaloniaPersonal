@@ -1,0 +1,29 @@
+// SpatialStringAutomatedTest.idl : IDL source for SpatialStringAutomatedTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SpatialStringAutomatedTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(7B62653C-9EA1-4B23-A71F-23BC1D51094A),
+	version(1.0),
+	helpstring("UCLID SpatialStringAutomatedTest 1.0 Type Library")
+]
+library UCLID_SPATIALSTRINGAUTOMATEDTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(04193AC9-5FD6-4773-9B76-DA462EB455F5),
+		helpstring("TestSpatialString Class")
+	]
+	coclass TestSpatialString
+	{
+		[default] interface ITestableComponent;
+	};
+};

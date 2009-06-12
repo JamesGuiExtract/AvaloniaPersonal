@@ -1,0 +1,27 @@
+// Condition must fail and it does not
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Condition must pass and it does
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// Condition must fail and it does
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// Condition must pass and it does not
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 The RSDFile Condition is set to be true and turns out to be true,
+//"Change Case" is run as the following rule. 
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 The RSDFile Condition is set to be true and turns out to be false,
+//"Change Case" is run as the following rule.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 The RSDFile Condition is set to be false and turns out to be false,
+//"Change Case" is run as the following rule. 
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 The RSDFile Condition is set to be false and turns out to be true,
+//"Change Case" is run as the following rule.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav

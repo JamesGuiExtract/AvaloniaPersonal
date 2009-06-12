@@ -1,0 +1,30 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800017.tif
+rule01=convey^9~warrant^3~to]^?Grantee^240~[all that|[all^24~certain|piece|land
+
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800127.tif
+rule02=conv|nvey^12~warrants|warrant^9~to]^?Grantee^240~party|part^12~second^3~part
+
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800387.tif.uss
+rule07=p^1~rty|rties^3~of^3~the^3~first^3~part^80~[and]^?Grantee^240~p^1~rty|rtie^4~of^3~the^3~[se^together with all|all and singular|the appurtenancess
+
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800188.tif.uss
+rule06=p^1~rty|rties^3~of^3~the^3~first^3~p^1~rt^?Grantee^240~p^1~rty|rties^20~of^3~the^3~second
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800190.tif
+rule08=of the]^6~t]^3~part^?Grantee^240~of the second|the second part
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800389.tif.uss
+rule09=of^3~the^3~first^3~[p^3~t]^?Grantee^240~[of^3~the^3~second^3~[p^3~t]
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800408.tif.uss
+rule10=party^5~of^5~the^12~part^?Grantee^240~party^3~of^3~the^3~second
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800473.tif
+rule11=warrant^3~to]^?Grantee^240~husband^3~and^3~wife
+
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800587.tif
+rule12=p^1~rties|rty^9~first^3~part^?Grantee^240~p^1~rties|rty^12~second|of the se
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800596.tif
+rule13=of^3~the^3~first]^?Grantee^240~[of^3~the^3~second
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800625.tif.uss
+rule14=conv|nvey^9~warrant^3~to]^?Grantee^240~the^3~f^1~llowing^16~descr|scribed|premise
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set003\Images\WD\0096800041.tif
+rule15=convey^6~unto^?Grantee^240~hereinafter^9~grantee
+[PATTERNS_END]

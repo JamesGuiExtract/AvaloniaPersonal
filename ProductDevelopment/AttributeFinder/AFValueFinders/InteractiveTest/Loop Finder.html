@@ -1,0 +1,529 @@
+<html>
+
+<HEAD>
+<TITLE>RuleSet Editor - Loop Value Finder - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Value Finders - Loop Finder<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3><b>Do Loop type</b></h3>
+<ul>
+   	<li>Select the <b>Do</b> radio button in the <b>Loop type</b> group box.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>Do<br>{</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Commands &gt;</b> 
+	button for <b>Executing finding rule</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Commands &gt;</b> 
+	button for <b>Execute pre processor</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>} while this condition is</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains a combo box with <b>True</b> and <b>False</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains an associated read-only edit box and 
+	<b>Commands &gt;</b> button.
+   	<li>Confirm that the <b>Loop options</b> group box contains an edit box for <b>Maximum number 
+	of iterations</b>.
+   	<li>Confirm that the <b>Loop options</b> group box contains a check box for <b>Log exception if 
+	above maximum number of iterations is reached</b>.
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Executing finding rule</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Finding Rule...</b>
+			<li><b>Configure Finding Rule...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Finding Rule...</b>
+          	<li>Confirm that the <b>Select Finding Rule</b> dialog appears.
+          	<li>Select and configure an <b>Attribute Finding Rule</b>.
+		<li>Confirm that both the description text and the component name of the value finder are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Finding Rule...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined value finder settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Execute Preprocessor</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Preprocessor...</b>
+			<li><b>Configure Preprocessor...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
+          	<li>Select and configure a <b>Preprocessor</b>.
+		<li>Confirm that both the description text and the component name of the preprocessor are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>} while this condition is</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Condition...</b>
+			<li><b>Configure Condition...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Condition...</b>
+          	<li>Confirm that the <b>Select Condition</b> dialog appears.
+          	<li>Select and configure a <b>Condition</b>.
+		<li>Confirm that both the description text and the component name of the condition are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Condition...</b>.  This option should be disabled 
+		if no condition has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no condition has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li><b>Object validation</b>
+      	<ul>
+          	<li>Confirm that a <b>Finding Rule</b> must be configured.
+          	<li>Confirm that a <b>Preprocessor</b> must be configured.
+          	<li>Confirm that a <b>Condition</b> must be configured.
+          	<li>Confirm that a <b>Maximum number of iterations</b> must be defined and must be greater 
+		than zero.
+          	<li>Confirm that the <b>Maximum number of iterations</b> edit box accepts only numbers.
+      	</ul>
+</ul>
+<p>
+<h3><b>While Loop type</b></h3>
+<ul>
+   	<li>Select the <b>While</b> radio button in the <b>Loop type</b> group box.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <b>While this condition is</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains a combo box with <b>True</b> and <b>False</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains an associated read-only edit box and 
+	<b>Configure...</b> button.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>{</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Configure...</b> 
+	button for <b>Executing finding rule</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Configure...</b> 
+	button for <b>Execute pre processor</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>}</b>
+   	<li>Confirm that the <b>Loop options</b> group box contains an edit box for <b>Maximum number 
+	of iterations</b>.
+   	<li>Confirm that the <b>Loop options</b> group box contains a check box for <b>Log exception if 
+	above maximum number of iterations is reached</b>.
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>While this condition is</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Condition...</b>
+			<li><b>Configure Condition...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Condition...</b>
+          	<li>Confirm that the <b>Select Condition</b> dialog appears.
+          	<li>Select and configure a <b>Condition</b>.
+		<li>Confirm that both the description text and the component name of the condition are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Condition...</b>.  This option should be disabled 
+		if no condition has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no condition has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Executing finding rule</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Finding rule...</b>
+			<li><b>Configure Finding rule...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Finding rule...</b>
+          	<li>Confirm that the <b>Select Finding rule...</b> dialog appears.
+          	<li>Select and configure an <b>Attribute Finding Rule</b>.
+		<li>Confirm that both the description text and the component name of the value finder are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Finding rule...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined value finder settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Execute pre processor</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Document Preprocessor...</b>
+			<li><b>Configure Document Preprocessor...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
+          	<li>Select and configure a <b>Preprocessor</b>.
+		<li>Confirm that both the description text and the component name of the preprocessor are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li><b>Object validation</b>
+      	<ul>
+          	<li>Confirm that a <b>Condition</b> must be configured.
+          	<li>Confirm that a <b>Finding Rule</b> must be configured.
+          	<li>Confirm that a <b>Preprocessor</b> must be configured.
+          	<li>Confirm that a <b>Maximum number of iterations</b> must be defined and must be greater 
+		than zero.
+          	<li>Confirm that the <b>Maximum number of iterations</b> edit box accepts only numbers.
+      	</ul>
+</ul>
+<p>
+<h3><b>For Loop type</b></h3>
+<ul>
+   	<li>Select the <b>For</b> radio button in the <b>Loop type</b> group box.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>Execute the following 
+	rules in a loop<br>{</b>
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Configure...</b> 
+	button for <b>Executing finding rule</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a read-only edit box and <b>Configure...</b> 
+	button for <b>Execute pre processor</b>.
+   	<li>Confirm that the <b>Loop setup</b> group box contains a label with <br><b>}</b>
+   	<li>Confirm that the <b>Loop options</b> group box contains an edit box for <b>Number 
+	of iterations</b>.
+   	<li>Confirm that the <b>Loop options</b> group box contains a check box for <b>Log exception if 
+	above maximum number of iterations is reached</b>.
+   	<li>Confirm that the <b>Log exception if above maximum number of iterations is reached</b> check box 
+	is <b>unchecked</b> and <b>disabled</b>.
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Executing finding rule</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Attribute finding rule...</b>
+			<li><b>Configure Attribute finding rule...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Finding Rule...</b>
+          	<li>Confirm that the <b>Select Finding Rule</b> dialog appears.
+          	<li>Select and configure a <b>Finding Rule</b>.
+		<li>Confirm that both the description text and the component name of the value finder are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Finding Rule...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined value finder settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no value finder has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li>Click the <b>Commands &gt;</b> button for <b>Execute pre processor</b>
+      	<ul>
+          	<li>Confirm that a drop-down menu appears with
+	      	<ul>
+			<li><b>Select Preprocessor...</b>
+			<li><b>Configure Preprocessor...</b>
+			<li><b>Configure description...</b>
+			<li><b>Cancel</b>
+	      	</ul>
+<p>
+          	<li>Choose <b>Select Preprocessor...</b>
+          	<li>Confirm that the <b>Select Preprocessor</b> dialog appears.
+          	<li>Select and configure a <b>Preprocessor</b>.
+		<li>Confirm that both the description text and the component name of the preprocessor are 
+		displayed in the read-only edit box.
+          	<li>Confirm that the object and settings are persistent after saving an RSD file.
+<p>
+          	<li>Choose <b>Configure Preprocessor...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the appropriate property page appears.
+          	<li>Confirm that the previously defined settings are presented.
+		<li>Confirm that modifications to the description text are persistent.
+		<li>Confirm that modifications to the object settings are persistent.
+<p>
+          	<li>Choose <b>Configure description...</b>.  This option should be disabled 
+		if no preprocessor has been selected.
+          	<li>Confirm that the expected property page appears.
+          	<li>Confirm that the previously defined description is presented.
+		<li>Confirm that modifications are persistent.
+<p>
+          	<li>Choose <b>Cancel</b>
+          	<li>Confirm that the drop-down menu closes.
+		<li>Confirm that the text in the read-only edit box is unchanged.
+<p>
+          	<li>Right-click in the read-only edit box and confirm that a context menu appears
+	      	<ul>
+			<li>Confirm that <b>Cut</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Cut</b> works properly.
+			<li>Confirm that <b>Copy</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Copy</b> works properly.
+			<li>Confirm that <b>Paste</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Paste</b> works properly.
+			<li>Confirm that <b>Delete</b> is enabled and disabled as appropriate.
+			<li>Confirm that <b>Delete</b> works properly.
+			<li>Confirm that <b>Cancel</b> is always enabled.
+			<li>Confirm that <b>Cancel</b> closes the context menu.
+	      	</ul>
+      	</ul></li>
+<p>
+      	<li><b>Object validation</b>
+      	<ul>
+          	<li>Confirm that a <b>Finding Rule</b> must be configured.
+          	<li>Confirm that a <b>Preprocessor</b> must be configured.
+          	<li>Confirm that a <b>Number of iterations</b> must be defined and must be greater 
+		than zero.
+          	<li>Confirm that the <b>Number of iterations</b> edit box accepts only numbers.
+          	<li><b>[FlexIDSCore #3194] </b>Confirm that entering a non-number in
+              	the <b>Number of iterations</b> edit box and selecting <b>OK</b> produces an error 
+		but does not close the configuration menu.
+      	</ul>
+</ul>
+<p>
+<h3><b>Miscellaneous</b></h3>
+<ul>
+      	<li><b>[FlexIDSCore #3195]</b> Loop Finder exceptions</li>
+	<ul>
+      		<li>Exercise the <b>Loop Finder</b> such that an exception is thrown by one of 
+		the components. One possibility is to include an invalid regular expression.</li>
+      		<li>Confirm that descriptive exception information is provided.</li>
+      		<li>Create an RSD file test.rsd with a <b>Loop Finder</b> rule configured such that it 
+		will reach the maximum number of iterations before it stops searching. Make sure that 
+		the option to throw an exception if it reaches the maximum number of iterations is
+      		checked.</li>
+      		<li>Configure another RSD file to find from test.rsd and test it on an image.</li>
+		<li>Confirm that an exception is thrown and that it contains information about the RSD 
+		file containing the loop and the input file that was being processed when the exception 
+		was thrown.</li>
+      	</ul>
+<p>
+	<li><b>[FlexIDSCore #3191]</b> Loop Finder UI should open config on doubleclick</li>
+	<ul>
+		<li>Open a new RuleSet Editor.</li>
+		<li>Create a Loop Finder rule and configure it with a finding rule, preprocessor, 
+		and condition.</li>
+		<li>Confirm that double-clicking on any of the read-only text boxes (<b>Execute rule</b>, 
+		<b>Execute preprocessor</b>, or <b>While this condition is</b>) opens the corresponding 
+		<b>Configure</b> dialog.</li>
+		<li>Confirm that double-clicking on them while holding down the <b>&lt;Ctrl&gt;</b> key 
+		opens the corresponding <b>Select</b> dialog.</li>
+		<li>Confirm that double-clicking on them while holding down the <b>&lt;Alt&gt;</b> key 
+		opens the corresponding <b>Configure description</b> dialog.</li>
+	</ul>		
+</ul>
+</body>
+</html>

@@ -1,0 +1,5 @@
+// Test QueryBased attribute Selectors
+<FILE>;..\QueryBasedAS\QueryBasedASTest.dat
+
+// Test Spatial Content Based attribute Selectors
+<FILE>;..\SpatialContentBasedAS\SpatialContentBasedAS.dat

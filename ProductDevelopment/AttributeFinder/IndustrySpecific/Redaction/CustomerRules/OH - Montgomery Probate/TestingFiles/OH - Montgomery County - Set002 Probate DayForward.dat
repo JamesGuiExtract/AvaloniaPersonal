@@ -1,0 +1,11 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//<SETTING>;TypeToBeTested=BankCCNum
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;TypeToBeTested=TaxID
+//<SETTING>;TypeToBeTested=PIN
+//<SETTING>;TypeToBeTested=StateID
+<SETTING>;TypeToBeTested=Password
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\OH - Montgomery County\Set002\probate\DayForward\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,594 @@
+<HTML>
+
+<HEAD>
+<TITLE>Sanity Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br> Sanity Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+<LI><b>Preparation</b>
+	<ul>	
+		<li>Install <b>ID Shield Office</b>
+		<li>Copy <b>I:\Common\Testing\Product Testing\IDShieldOffice\Images\</b> to local drive.	
+		<li>Copy <b>I:\Common\Engineering\ProductTesting\ManyPage Images</b> to local drive.
+		<li>Generate <b>Full/Evaluation license</b> in local drive.
+	</ul>
+	<p>
+
+<LI><b>Evaluation License</b>
+	<ul>
+		<li> File Operations
+		<ul>
+			<li>Save
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Draw a <b>rectangular redaction</b> and adjust it to <b>overlay</b> the supposed watermark(from top-right to bottom-left).
+				<li><b>Save </b>the image file.
+				<li><b>Open </b>the saved image file. 
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is <b>on the top of redaction</b> on the first page.
+				<p>
+
+				<!-- SCR# 250 -->
+				<li>Open <b>FindTextTest_Rotation.tif</b> image file.
+				<li>Rotate the first page 180 degree counterclockwise.
+				<li>Rotate the second page 90 degree clockwise.
+				<li><b>Save</b> the image file.
+				<li><b>Open </b>the saved image file. 
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is applied to <b>the rotated image</b>.
+			</ul>
+			<p>
+
+			<li>Save As
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file saved above.
+				<li><b>Save as</b> another image file.
+				<li><b>Open </b>the saved image file. 
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is <b>on the top of redaction</b> on the first page.
+				<p>
+
+				<!-- SCR# 250 -->
+				<li>Open <b>FindTextTest_Rotation.tif</b> image file.
+				<li>Rotate the first page 180 degree counterclockwise.
+				<li>Rotate the second page 90 degree clockwise.
+				<li><b>Save as</b> another image file.
+				<li><b>Open </b>the saved image file. 
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is applied to <b>the rotated image</b>.
+			</ul>
+			<p>
+
+			<li>Print Preview/Print
+			<ul>
+				<!-- SCR# 189 -->
+				<li>Open <b>FindTextTest.tif</b> image file saved above.
+				<li>Rotate image 90 degree.
+				<li>Click <b>File - Print Preview</b> menu.
+				<li>Confirm that watermarks on every page are on the center.
+				<li>Confirm that <b>every page</b> is watermarked in preview window.				
+				<li>Confirm that watermark is <b>on the top of redaction</b> on the first page in the preview window.
+				<li>Close the preview window.
+				<p>
+
+				<li>Rotate image 180 degree.
+				<li>Click <b>File - Print Preview</b> menu.
+				<li>Confirm that watermarks on every page are on the center.
+				<li>Close the preview window.
+				<p>
+
+				<li>Rotate image 270 degree.
+				<li>Click <b>File - Print Preview</b> menu.
+				<li>Confirm that watermarks on every page are on the center.
+				<li>Click <b>Print</b> toolbar button in the preview window.
+				<li>Specify <b>ID Shield</b> virtual printer and click <b>Print</b>.
+				<li>Confirm that <b>ID Shield Office has disallowed to print to ID shield printer.Please select another printer</b> message appears.
+				<li>Click <b>OK</b> and return back to <b>Print</b> dialog.
+				<li>Specify <b>a physical printer</b> and click <b>Print</b>.
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is <b>on the top of redaction</b> on the first page.
+				<p>
+
+				<!-- SCR# 250 -->
+				<li>Open <b>FindTextTest_Rotation.tif</b> image file.
+				<li>Rotate the first page 180 degree counterclockwise.
+				<li>Rotate the second page 90 degree clockwise.
+				<li>Click <b>File - Print Preview</b> menu.
+				<li>Confirm that <b>every page</b> is watermarked.
+				<li>Confirm that watermark is applied to <b>the rotated image</b>.
+			</ul>
+			<p>			
+
+			<!-- SCR# 260,262 -->
+			<!-- specification change: can not print to ID Shield printer from IDSO
+			<li>Print to <b>ID Shield</b> Virtual Printer 
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Draw a <b>rectangular redaction</b> and adjust it to <b>overlay</b> the supposed watermark.
+				<li>Click <b>Print image</b> toolbar button.
+				<li>Specify <b>ID Shield</b> virtual printer and uncheck <b>Print to file</b> radio button.
+				<li>Click <b>Print</b> in the <b>Print</b> dialog.
+				<li>Confirm that a new instance of <b>ID Shield Office</b> is launched.
+				<li>Confirm that <b>every page</b> is watermarked in the new instance.
+				<li>Confirm that watermark is <b>on the top of redaction</b> on the first page in the new instance.
+			</ul>
+			-->
+		</ul>
+	</ul>
+	<p>
+
+<LI><b>Full License</b>
+	<ul>
+		<li><b>File Input/Output</b>
+		<ul>
+			<li>Configuration
+			<ul>
+				<li>Launch IDSO and open user preference dialog.
+				<li>Switch to <b>Output files</b> tab
+				<li>Check <b>Use the following expression as default output path for redacted files</b>
+			</ul>
+			<p>
+
+			<li>Open/Save TIFF
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Click <b>Create rectangular redaction</b> button and draw a rectangular redaction.
+				<li>Confirm that the redaction is <b>filled with black</b>.
+				<li>Draw <b>another rectangular redaction</b>.
+				<li>Click <b>Select redactions and Objects</b> and <b>select the drawn redaction</b>.
+				<li>Change <b>FillColor</b> from Black to <b>White</b> in the <b>properties</b> windows.
+				<li>Click <b>Bates#</b> to apply Bates number.
+				<li>Click <b>Data type finder</b> to display the dialog
+				<li>Check <b>all the checkboxes</b> and Click <b>Find next</b> to highlight all the clues.
+				<li>Close the dialog.
+				<li>Navigate to the second page.
+				<li>Click <b>Save</b> toolbar button and accept default settings.
+				<li>Confirm that the <b>FindTextTest.redacted.tif</b> and <b>FindTextTest.tif.idso</b> are output and located in the same local folder.
+				<li>Verify that <b>FindTextTest.redacted.tif</b> includes the <b>specified redactions</b> and that the white redaction has a black border.
+				<!-- SCR# 144 -->
+				<li>Reopen <b>FindTextTest.tif</b> image file in local folder.
+				<li>Confirm that <b>all the redactions</b> is loaded.
+				<li>Confirm that <b>all the clues</b> is loaded.
+				<li>Confirm that <b>Bates#</b> is loaded.
+			</ul>
+			<p>
+
+			<li>Open/Save PDF
+			<ul>
+				<li>Open <b>FindTextTest.pdf</b> image file in local folder.
+				<li>Click <b>Create rectangular redaction</b> button and draw a rectangular redaction filled with <b>black</b>.
+				<li>Draw another rectangular redaction filled with <b>white</b>. 
+				<li>Click <b>Bates#</b> to apply Bates number.
+				<li>Click <b>Data type finder</b> to display the dialog
+				<li>Check <b>all the checkboxes</b> and Click <b>Find next</b> to highlight all the clues.
+				<li>Close the dialog.
+				<li>Click <b>Save</b> toolbar button and save the image as PDF format.
+				<li>Confirm that the <b>FindTextTest.redacted.pdf</b> and <b>FindTextTest.pdf.idso</b> are output and located in the same local folder.
+				<li>Verify that <b>FindTextTest.redacted.pdf</b> includes the <b>specified redactions</b> and that the white redaction has a black border.
+				<!-- SCR# 144 -->
+				<li>Reopen <b>FindTextTest.pdf</b> image file in local folder.
+				<li>Confirm that <b>all the redactions</b> is loaded.
+				<li>Confirm that <b>all the clues</b> is loaded.
+				<li>Confirm that <b>Bates#</b> is loaded.
+			</ul>
+			<p>
+
+			<li>Open TIFF and save as PDF
+			<ul>
+				<li>Open <b>FindTextTest.tif.idso</b> image file saved above.
+				<li>Click <b>File - Save as...</b> menu.
+				<li>Specify save as type as <b>PDF files</b> and file name in the <b>Save Document</b> dialog.
+				<li>Confirm that the saved file is output to <b>specified locations with specified name</b>.
+				<li>Verify that output files include the <b>specified redactions</b>.
+				<li>Verify that output files exclude <b>all the clues</b>.
+				<li>Verify that output files include the <b>Bates#</b>.
+			</ul>
+			<p>
+
+			<li>Open PDF and save as TIFF
+			<ul>
+				<li>Open <b>FindTextTest.pdf.idso</b> image file saved above.
+				<li>Click <b>File - Save as...</b> menu.
+				<li>Specify save as type as <b>TIFF files</b> and file name in the <b>Save Document</b> dialog.
+				<li>Confirm that the saved file is output to <b>specified locations with specified name</b>.
+				<li>Verify that output files include the <b>specified redactions</b>.
+				<li>Verify that output files exclude <b>all the clues</b>.
+				<li>Verify that output files include the <b>Bates#</b>.
+			</ul>
+		</ul>
+		<p>
+
+		<li><b>Print</b>
+		<ul>
+			<li>Print to a Printer
+			<ul>
+				<li>Open previously saved <b>FindTextTest.tif.idso</b> image file in local folder.
+				<li>Uncheck <b>all the checkboxes</b> in the layers window to turn off all objects' visibility.
+				<!-- Page setup test -->
+				<li>Click <b>File -  Page setup</b> menu.
+				<li>Confirm that <b>Page setup</b> dialog appears.
+				<li>Change Paper size to <b>A3</b> and orientation to <b>Landscape</b>.
+				<li>Change left/right/bottom/top margins to 1 inch.
+				<li>Close <b>Page Setup</b> dialog.
+				<!-- Print preview test -->
+				<li>Click <b>File - Print preview</b> menu.
+				<li>Confirm that <b>Paper size</b> and <b>Orientation</b> are correct.
+				<li>Confirm that <b>Zoom</b> works.
+				<li>Confirm that <b>Two pages</b> button works and close print preview dialog.
+				<!-- Print test -->
+				<li>Click <b>Print image</b> button
+				<li>Confirm that <b>Print</b> dialog appears.	
+				<li>Specify <b>ID Shield</b> virtual printer and click <b>Print</b>.
+				<li>Confirm that <b>ID Shield Office has disallowed to print to ID shield printer.Please select another printer</b> message appears.
+				<li>Click <b>OK</b> and return back to <b>Print</b> dialog.
+				<li>Select a physical printer and uncheck the <b>print to file</b> checkbox.
+				<li>Confirm that the printed image includes the <b>specified redactions</b>.
+				<li>Confirm that the printed image includes the <b>Bates number</b>.
+				<li>Confirm that the printed image doesn't include the <b>Clues</b>.
+				<li>Check <b>all the checkboxes</b> in the layers window.
+				<li>Close the image file.
+			</ul>
+		</ul>
+		<p>
+
+		<li> <b>IDSO Internal File</b>
+		<ul>
+			<li>Bates number
+			<ul>
+				<li>Delete <b>*.idso</b> files in local folder.
+				<li>Open <b>FindTextTest.pdf</b> image file in local folder.
+				<li>Click <b>Bates #</b> to apply Bates number.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has no elements.
+				<li>Confirm that <b>CurrentObjects</b> tag has two TextLayerObject.
+				<li>Confirm that <b>Sessions</b> tag only has one session.
+				<li>confirm that <b>SessionInfo</b> in the session tag is right.
+				<li>Confirm that <b>ObjectsAdd</b> has two objects referencing TextLayerObject in the CurrentObjects.
+				<li>Confirm that <b>ObjectsModified</b> has no elements.
+				<li>Confirm that <b>ObjectsDeleted</b> has no elements.
+				
+				<li><b>Save and reopen</b> the image file.
+				<!-- SCR# 200 -->
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>ObjectsModified</b> has no elements in the newer session.
+				<!-- SCR# 200 end-->
+				<li>Change Bates number's position by selecting it and moving to a new position at first page.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has one elements which was older TextLayerObject at the first page.	
+				<li>Confirm that <b>CurrentObjects</b> tag has two TextLayerObject, the newer TextLayerObject at the first page has a bigger revision number.
+				<li>Confirm that <b>a newer Session</b> is added to Sessions tag.
+				<li>Confirm that <b>ObjectsModified</b> in the newer Session referencing the newer TextLayerOjbect at the first page.
+
+				<li><b>Save and reopen</b> the image file.
+				<li><b>Delete Bates number</b>.
+				<li>Confirm that previous two TextLayerOjbect are<b> included in the HistoricalObjects</b>.			
+				<li>Confirm that <b>CurrentObjects</b> has no elements.
+				<li>Confirm that <b>a newer Session</b> is added to Sessions tag.
+				<li>Confirm that <b>ObjectsDeleted</b> in the newer Session referencing the TextLayerOjbect moved into HistoricalObjects.
+				<li>Close image file without saving.
+			</ul>
+			<p>
+
+			<li>Clues
+			<ul>
+				<li>Delete <b>*.idso</b> files in local folder.
+				<li>Open <b>FindTextTest.pdf</b> image file in local folder.
+				<li>Click <b>Data type finder</b> toolbar button.
+				<li>Check <b>Social security number</b> checkbox only.
+				<li>Click <b>Find next</b>, then close the <b>Find and redact - data types</b> dialog.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has no elements.
+				<li>Confirm that <b>CurrentObjects</b> has three <b>Clue</b> objects.
+				<li>Confirm that <b>Sessions</b> only has one <b>session</b>.
+				<li>confirm that <b>SessionInfo</b> in the session is right.
+				<li>Confirm that <b>ObjectsAdd</b> has three objects referencing <b>Clue objects in the CurrentObjects</b>.
+				<li>Confirm that <b>ObjectsModified</b> has no elements.
+				<li>Confirm that <b>ObjectsDeleted</b> has no elements.
+				
+				<li><b>Save and do not apply Bates number</b>.
+				<li><b>reopen</b> the image file.
+				<!-- SCR# 200 -->
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>ObjectsModified</b> has no elements in the newer session.
+				<!-- SCR# 200 end-->
+				<li>Click <b>Data type finder</b> toolbar button.
+				<li>Check <b>E-mail addresses</b> checkbox only.
+				<li>Click <b>Find next</b>, then close the <b>Find and redact - data types</b> dialog.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has no elements.
+				<li>Confirm that <b>CurrentObjects</b> has a new Clue object added.
+				<li>Confirm that <b>a newer Session</b> is added to Sessions.
+				<li>Confirm that <b>ObjectsAdd</b> has one objects referencing the new Clue object in the CurrentObjects.
+				<li>Confirm that <b>ObjectsModified</b> has no elements.
+				<li>Confirm that <b>ObjectsDeleted</b> has no elements.
+				<li>Close image file without saving.
+			</ul>
+			<p>
+
+			<li>Redactions
+			<ul>
+				<li>Delete <b>*.idso</b> files in local folder.
+				<li>Open <b>FindTextTest.pdf</b> image file in local folder.
+				<li>Click <b>Rectangular redaction</b> button to draw a redaction.
+				<li>Click <b>Bracketed text finder</b> button.
+				<li>Check <b>all</b> the checkboxes.
+				<li>Click <b>Find next</b> and <b>redact</b> to redact first match, then close dialog.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has no elements.
+				<li>Confirm that <b>CurrentObjects</b> tag has two Redaction objects.
+				<li>Confirm that <b>Sessions</b> tag only has one session.
+				<li>confirm that <b>SessionInfo</b> in the session tag is right.
+				<li>Confirm that <b>ObjectsAdd</b> has two objects referencing Redaction in the CurrentObjects.
+				<li>Confirm that <b>ObjectsModified</b> has no elements.
+				<li>Confirm that <b>ObjectsDeleted</b> has no elements.
+				
+				<li><b>Save and do not apply Bates number</b>.
+				<li><b>reopen</b> the image file.
+				<!-- SCR# 200 -->
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>ObjectsModified</b> has no elements.
+				<!-- SCR# 200 end-->
+				<li>Change rectangular redaction's FillColor to <b>white</b>.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that <b>HistoricalObjects</b> has one elements which was older rectangular redaction.	
+				<li>Confirm that <b>CurrentObjects</b> tag has two redacted objects, the newer rectangular redaction has a bigger revision number.
+				<li>Confirm that <b>a newer Session</b> is added to Sessions.
+				<li>Confirm that <b>ObjectsModified</b> in the newer Session referencing the newer rectangular redaction.
+
+				<li><b>Save and do not apply Bates number</b>.
+				<li><b>reopen</b> the image file.
+				<li><b>Delete current two redactions</b>.
+				<li>Click <b>File - Properties</b> to view internal XML file.
+				<li>Confirm that previous two redactions are <b>moved into the HistoricalObjects</b>.
+				<li>Confirm that <b>CurrentObjects</b> has no elements.
+				<li>Confirm that <b>a newer Session</b> is added to Sessions tag.
+				<li>Confirm that <b>ObjectsDeleted</b> in the newer Session referencing the two redactions moved into HistoricalObjects.
+				<li>Close image file without saving.
+			</ul>	
+		</ul>
+		<p>
+
+		<LI><b>Find and Redact Data Type</b>
+		<ul>
+			<li>Open <b>DebitCredit.tif</b> image file in local folder.
+			<li>Click <b>Data Type Finder</b> button.
+			<li>Check the <b>Account numbers - Credit and debit card numbers</b> checkbox and click the <b>Find next</b> button.
+			<li>Confirm that the first occurrence <b>1234-1234-1234-1234</b> is highlighted by green with a border.
+			<li>Click the <b>Redact</b> button.
+			<li>Confirm that next occurrence <b>1234 - 1234 - 1234 - 1234</b> is highlighted.
+			<li>Click the <b>Redact</b> button.
+			<li>Confirm that next occurrence <b>1234-123456-12345</b> is highlighted.
+			<li>Click the <b>Redact all</b> button.
+			<li>Confirm that <b>all</b> the proper items behind clues are now redacted.			
+			<li>Close image file without saving.
+			<p>
+			
+			<li>Note: The other data types are tested by automated tests and/or the Redaction Finding Testing checklist.
+		
+		</ul>
+		<p>
+
+		<LI><b>Find and Redact Bracketed Text</b>
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file in local folder.
+			<li>Click <b>Find bracketed text</b> button.
+			<li>Check <b>all the checkboxes</b> and click the <b>Find</b> button.
+			<li>Confirm that the <b>first</b> bracketed item is highlighted by green with a border.
+			<li>Click the <b>Redact</b> button.
+			<li>Confirm that the <b>first</b> bracketed item is redacted and that 
+			the <b>second</b> bracketed item is now selected.
+			<li>Click the <b>Find next</b> button.
+			<li>Confirm that the <b>third</b> bracketed item is selected.
+			<li>Click the <b>Find next</b> button.
+			<li>Confirm that the <b>Fourth</b> bracketed including nested bracketed items is selected correctly.
+			<li>Click the <b>Find next</b> button.
+			<li>Confirm that the <b>Fifth</b> bracketed including nested bracketed items is selected correctly.
+			<li>Click the <b>Redact all</b> button.
+			<li>Confirm that <b>all</b> bracketed items are now redacted.			
+			<li>Close image file without saving.
+		</ul>
+		<p>
+
+		<LI><b>Find and Redact Words / Patterns</b>
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file in local folder.
+			<li>Add <b>this</b>, <b>test</b> and <b>111</b> as entries to the <b>Find 
+			and redact - Words/patterns</b> edit box.
+			<li>Click the <b>Find next</b> button and confirm that the first word <b>This</b> 
+			is highlighted by green with a border.
+			<li>Click the <b>Redact</b> button and confirm that the highlight changes 
+			to a redaction and that the word <b>test</b> is highlighted.
+			<li>Click the <b>Redact</b> button again and confirm that the highlight changes 
+			to a redaction and that <b>test</b> within the word <b>testing</b> is 
+			highlighted.
+			<li>Click the <b>Find next</b> button and confirm that the word <b>this</b> 
+			is highlighted.
+			<li>Click the <b>Reset</b> button and confirm that the redactions are retained.
+			<li>Zoom in on the redacted <b>This</b> text.
+			<li>Click the <b>Find next</b> button and confirm that the redacted word 
+			<b>This</b> is highlighted again and that the window remains zoomed in.
+			<li>Click the <b>Find next</b> button and confirm that the <b>test</b> 
+			redaction is highlighted.
+			<li>Click the <b>Find next</b> button and confirm that <b>test</b> 
+			is highlighted.
+			<li>Click the <b>Find next</b> button and confirm that <b>this</b> 
+			is highlighted.
+			<li>Pan around in the image and confirm that the <b>This</b> redaction 
+			is still redacted.  Also confirm that the <b>test</b> highlight that is 
+			part of <b>testing</b> is no longer highlighted and is NOT redacted.
+			<li>Click the <b>Redact all</b> button and confirm that all the <b>this</b>, 
+			<b>test</b> and <b>111</b> strings are redacted including the item that 
+			had previously not been redacted.
+			<p>
+
+			<li>Close and reopen the <b>FindTextTest.tif</b> test image.
+			<li>Modify the <b>test</b> entry to <b>\btest\b</b> and remove the other entries. 
+			<li>Modify the dialog settings to check the <b>Match case</b> and 
+			<b>Treat as regular expression</b> checkboxes.
+			<li>Click the <b>Find next</b> button and confirm that the word <b>test</b> 
+			is the first item highlighted.
+			<li>Click the <b>Redact</b> button and confirm that the highlight changes 
+			to a redaction and that the word <b>test</b> is highlighted.
+			<li>Confirm that <b>test</b> within <b>testing</b> was NOT highlighted or 
+			redacted.
+			<li>Close image file without saving.
+		</ul>
+		<p>
+
+		<LI><b>Bates Number</b>
+		<ul>
+			<li>Open <b>FindTextTest.tif</b> image file in local folder.
+			<li>Click <b>Bates #</b> button.
+			<li>Confirm that Bates number is added into <b>each</b> page.
+			<li>Confirm that <b>Bates#</b> toolbar button is disabled.
+			<li>Delete Bates number on all pages.
+			<li>Confirm that <b>Bates#</b> toolbar button is enabled.
+			<li>Close image file without saving.
+		</ul>
+		<p>
+
+		<LI><b>Properties Window</b>
+		<ul>
+			<li>Bates Number
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Click <b>Bates #</b> button.
+				<li>Select <b>Bates Number</b> object in the first page.
+				<li>Confirm that value of AnchorAlignment in the properties windows is <b>RightTop</b>.
+				<li>Confirm that value of font in the properties windows is <b>Arial, 30pt, style=Bold</b>.
+				<li>Confirm that value of <b>IsLinked</b> in the properties windows is <b>True</b>.
+				<li>Confirm that value of <b>PageNumber</b> in the properties windows is <b>1</b>.
+				<li>Confirm that value of <b>Text</b> in the properties windows is <b>the same as in the page</b>.
+				<li>Change Bates number's font.
+				<li>Confirm that font of Bates Numbers is <b>changed</b>.
+				<li>Move Bates Number around and confirm that <b>Anchorpoint</b> and <b>Location</b> changes.
+				<p>
+
+				<li>Hover mouse over Bates number and click <b>red arrow along Bates number</b> to navigate to next linked Bates number.
+				<li>Confirm that value of AnchorAlignment in the properties window is <b>RightTop</b>.
+				<li>Confirm that value of font in the properties window is <b>Arial, 30pt, style=Bold</b>.
+				<li>Confirm that value of <b>IsLinked</b> in the properties window is <b>True</b>.
+				<li>Confirm that value of <b>PageNumber</b> in the properties window is <b>2</b>.
+				<li>Confirm that value of <b>Text</b> in the properties window is <b>the same as in the page</b>.
+				<li>Save and reopen image file.
+				<li>Confirm that <b>all the modifications</b> are saved.			
+				<li>Confirm that <b>revision</b> is correct.
+			</ul>
+			<p>
+
+			<li>Clues
+			<ul>
+				<li>Delete <b>*.idso</b> files in local folder.
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Click <b>Data Type Finder</b> button.
+				<li>Check the <b>all the checkboxes</b> and click the <b>Find next</b> button.
+				<li>Close the dialog.
+				<li>Select a clue object.
+				<li>Confirm that value of <b>Comment</b> is correct in the properties window.
+				<li>Confirm that value of <b>IsLinked</b> is correct in the properties window.
+				<li>Confirm that value of <b>Pagenumber</b> is correct in the properties window.
+				<li>Confirm that value of <b>Text</b> is correct in the properties window.
+				<li>Confirm that value of <b>Revision</b> is correct in the properties window.
+			</ul>
+			<p>
+
+			<li>Redactions
+			<ul>
+				<li>Open <b>FindTextTest.tif</b> image file in local folder.
+				<li>Click <b>Bracketed text finder</b> button.
+				<li>Check the <b>all the checkboxes</b> and click the <b>Redact all</b> button.
+				<li>Close the dialog.
+				<li>Select a redaction object.
+				<li>Confirm that value of <b>Comment</b> is correct in the properties window.
+				<li>Confirm that value of <b>IsLinked</b> is correct in the properties window.
+				<li>Confirm that value of <b>Pagenumber</b> is correct in the properties window.
+				<li>Confirm that value of <b>Text</b> is empty in the properties window.
+				<li>Confirm that value of <b>Revision</b> is correct in the properties window.
+				<li>Change FillColor from Black to <b>White</b>.
+				<li>Confirm that redaction color is changed to <b>white</b>.
+
+				<!--Manual redaction -->
+				<li>Draw <b>an angular redaction</b> and <b>a rectangular redaction</b>.
+				<li>Confirm that values of <b>Comment</b> for those two redaction are <b>Manual</b>.
+				<li>Save and reopen image file.
+				<li>Confirm that <b>FillColor</b> property is saved correctly.		
+			</ul>
+		</ul>
+		<p>
+
+		<LI><b>Layers Window</b>
+		<ul>
+			<li>Delete <b>*.idso</b> files in local folder.
+			<li>Open <b>FindTextTest.tif</b> image file in local folder.
+			<li>Click <b>Bates #</b> button.
+			<li>Uncheck <b>Bates numbers</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that the Bates numbers disappear in <b>all</b> pages.
+			<li>Check <b>Bates numbers</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that the Bates numbers appear in <b>all</b> pages.
+			<p>
+
+			<li>Click <b>Data Type Finder</b> button.
+			<li>Check <b>all</b> the checkboxes in the <b>Find and redact - Data types</b> dialog.
+			<li>Click <b>Find next</b> button in the <b>Find and redact - Data types</b> dialog.
+			<li>Close the <b>Find and redact - Data types</b> dialog.
+			<li>Uncheck <b>Clues</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that <b>all</b> the clues disappear.
+			<li>Check <b>Clues</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that <b>all</b> the clues reappear.
+			<p>
+
+			<li>Click <b>Data type finder</b> button.
+			<li>Check <b>all</b> the checkboxes in the <b>Find and redact - Data types</b> dialog.
+			<li>Click <b>Redact all</b> button in the <b>Find and redact - Data types</b> dialog.
+			<li>Close the <b>Find and redact - Data types</b> dialog.
+			<li>Uncheck <b>Redactions</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that <b>all</b> the redactions disappear.
+			<li>Check <b>Redactions</b> checkbox in the <b>Layers</b> window.
+			<li>Confirm that <b>all</b> the redactions reappear.			
+		</ul>
+		<p>
+
+		<LI><b>Image Viewer</b>
+		<ul>
+			<li>Confirm that the <b>tile navigation</b> works after zooming in.
+			<li>Confirm that the <b>objects navigation</b> works after creating some redactions and applying Bates#.
+			<li>Confirm that the <b>page navigation</b> works.
+			<li>Confirm that the <b>zoom in/zoom out/zoom window</b> works.
+			<li>Confirm that the <b>zoom navigation</b> works.
+			<li>Confirm that the <b>rotation clockwise/anti-clockwise</b> works.
+			<li>Confirm that the <b>fit to width/page</b> works.
+			<li>Confirm that the <b>pan</b> works.
+		</ul>
+		<p>
+
+		<LI><b>Help</b>
+		<ul>
+			<li>Click <b>Help - ID Shield Office...</b> menu. 
+			<li>Confirm that <b>ID Shield Office</b> help file is displayed.
+			<li>Click <b>Help - Regular expression help...</b> menu.
+			<li>Confirm that <b>.NET Framework Regular Expressions</b> page is opened in user's favorite web browser.
+			<li>Click <b>Help - About ID Shield Office...</b> menu.
+			<li>Confirm that <b>About ID Shield Office...</b> appears.
+			<li>Confirm that <b>version information</b> is correct.
+			<li>Confirm that <b>www.extractsystems.com</b> link works.
+		</ul>	
+		<p>
+
+		<li>Start menu and Desktop/Launch bar shortcuts
+		<ul>
+			<li>Confirm <b>all the shortcuts in Start menu</b> works properly.
+			<li>Confirm <b>Desktop shortcut</b> works properly.
+			<li>Confirm <b>Launch bar shortcut</b> works properly.
+		</ul>
+	</ul>
+	<p>
+</UL>
+</BODY>
+</HTML>

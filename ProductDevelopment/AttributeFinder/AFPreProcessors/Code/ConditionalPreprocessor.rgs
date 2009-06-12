@@ -1,0 +1,26 @@
+HKCR
+{
+	AFPreProcessors.ConditionalPreprocessor.1 = s 'ConditionalPreprocessor Class'
+	{
+		CLSID = s '{48C52A48-02C5-4C98-9AE2-459861484958}'
+	}
+	AFPreProcessors.ConditionalPreprocessor = s 'ConditionalPreprocessor Class'
+	{
+		CLSID = s '{48C52A48-02C5-4C98-9AE2-459861484958}'
+		CurVer = s 'AFPreProcessors.ConditionalPreprocessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {48C52A48-02C5-4C98-9AE2-459861484958} = s 'ConditionalPreprocessor Class'
+		{
+			ProgID = s 'AFPreProcessors.ConditionalPreprocessor.1'
+			VersionIndependentProgID = s 'AFPreProcessors.ConditionalPreprocessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{6E739155-A988-45D0-8FF9-D2718B7B4126}'
+		}
+	}
+}

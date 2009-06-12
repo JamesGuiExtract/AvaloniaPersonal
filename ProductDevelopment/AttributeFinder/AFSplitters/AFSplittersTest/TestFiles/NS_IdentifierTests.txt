@@ -1,0 +1,137 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Persons with Identifiers
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Name with His Wife1|Mr. John Smith and Mary W. Smith, His Wife
+Names|Mr. John Smith and Mary W. Smith, His Wife
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+.Person|Mary W. Smith
+..First|Mary
+..Last|Smith
+..Middle|W.
+
+<TESTCASE>|Name with Her Husband|Mary W. Smith and Mr. John Smith, Her Husband
+Names|Mary W. Smith and Mr. John Smith, Her Husband
+.Person|Mary W. Smith
+..First|Mary
+..Last|Smith
+..Middle|W.
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with His Wife2|John H. Smith, Jr. and his wife Mary Smith
+Names|John H. Smith, Jr. and his wife Mary Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with Her Spouse|Mary W. Smith and her spouse, John W. Smith
+Names|Mary W. Smith and her spouse, John W. Smith
+.Person|Mary W. Smith
+..First|Mary
+..Last|Smith
+..Middle|W.
+.Person|John W. Smith
+..First|John
+..Last|Smith
+..Middle|W.
+
+<TESTCASE>|Name with Joined By His Wife|John H. Smith, Jr. joined by his wife Mary Smith
+Names|John H. Smith, Jr. joined by his wife Mary Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with And Joined By|John H. Smith, Jr., a married man and joined by Mary Smith, his wife
+Names|John H. Smith, Jr., a married man and joined by Mary Smith, his wife
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with Joined Herein By|John H. Smith, Jr. joined herein by Mary Smith
+Names|John H. Smith, Jr. joined herein by Mary Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with Joined Herein By His Wife|John H. Smith, Jr. joined herein by his wife Mary Smith
+Names|John H. Smith, Jr. joined herein by his wife Mary Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with Joined Herein Pro-Forma By His Spouse|John H. Smith, Jr. joined herein pro-forma by his spouse Mary Smith
+Names|John H. Smith, Jr. joined herein pro-forma by his spouse Mary Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name with JHB Her Spouse|Mary Smith joined herein by her spouse John H. Smith, Jr.
+Names|Mary Smith joined herein by her spouse John H. Smith, Jr.
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Name with JB His/Her Spouse|John Smith joined herein by his/her spouse Mary Smith
+Names|John Smith joined herein by his/her spouse Mary Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith

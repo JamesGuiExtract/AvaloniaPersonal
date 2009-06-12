@@ -1,0 +1,5 @@
+(?:d[\s\S]{0,5}Full N|
+6[\s\S]{0,5}color|
+13[\s\S]{0,5}father|
+14[\s\S]{0,5}mother
+)

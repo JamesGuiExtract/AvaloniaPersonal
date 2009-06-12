@@ -1,0 +1,81 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,ROSTL_SURE_01,false
+		//////////////////////////////////
+		// RELEASE OF TAX LIEN - COUNTY //
+		//////////////////////////////////
+		//RELEASE OF CERTIFICATE OF LIEN
+		01=^Release\s*of\s*Certificate\s*of\s*Lien(?:\r?$)
+
+		/////////////////////////////////
+		// RELEASE OF TAX LIEN - STATE //
+		/////////////////////////////////
+		// RELEASE OF LIEN IMPOSED UNDER CERTIFICATE
+		// RELEASE OF LIEN IMPOSED UNDER A CERTIFICATE
+		02=^RELEASE\s*OF\s*LIEN\s*IMPOSED\s*UNDER\s*A?\s*CERTIFICATE(?:\s*OR\s*NOTICE\s*OF\s*STATE\s*TAX\s*LIEN)?(?:\s*NO[\s\S]{0,15}?)?(?:\r?$)
+
+		03=^(?:NOTICE\s*OF\s*)?RELEASE\s*OF\s*STATE\s*TAX\s*LIEN\s*(?:\r?$)
+		04=^.{0,15}?STATE\s*TAX\s*LIEN\s*RELEASE\s*-?(?:\r?$)
+		05=^RELEASE\s*OF\s*STATE\s*TAX\s*LIEN\s*FILED\s*IN\s*ERROR\s*(?:\r?$)
+		06=^PARTIAL\s*RELEASE\s*OF\s*STATE\s*TAX\s*LIEN(?:\s*ON)?\s*(?:\r?$)
+		
+		// 0001.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\release lien\20059023215300.tif.uss
+		07=^OFFICE\s*OF\s*THE\s*TAX\s*COLLECTOR\s*RELEASE\s*OF\s*LIEN\s*(?:\r?$)
+	OR_END
+
+	// RELEASE OF LIEN & FOLLOWING DESCRIBED CERTIFICATE OF TAX
+	AND_BEGIN,ROSTL_SURE_02,false
+		^RELEASE\s*OF\s*LIEN(?:\r?$)
+		\bFOLLOWING\s*DESCRIBED\s*CERTIFICATE\s*OF\s*TAX\b
+	AND_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.4,1,1
+	OR_BEGIN,ROSTL_PROBABLE_01,TRUE
+		01=\b[\s\S]{0,15}?STATE\s*TAX\s*LIEN\s*RELEASE\b
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.4,1,1
+	OR_BEGIN,ROSTL_PROBABLE_02,FALSE
+		01=^RELEASE\s*OF\s*LIEN\s*OFFICE\s*OF\s*THE\s*TAX\s*COLLECTOR(?:\r?$)
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	AND_BEGIN,ROSTL_MAYBE_01,false
+		01=UNDERSIGNED\s*TAX\s*COLLECTOR
+		02=HEREBY\s*REMISE.?\s*RELEASE\s*AND\s*DISCHARGE
+		03=CERTIFICATE\s*OF\s*LIEN
+	AND_END
+SCOPE_END
+
+[MAYBE_END]

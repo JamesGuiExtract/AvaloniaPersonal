@@ -1,0 +1,427 @@
+<html>
+
+<head>
+<title>Software-Based Licensing Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Software-Based Licensing Testing Checklist<br>
+<IMG src="../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
+
+<ol>
+
+<!-- *********************************************** -->
+<li><h2>Invalid License Files - Software should not run</h2>
+<ul>
+  	<li>Test an expired license file for the package to be tested.</li>
+   	<li>Test a fully licensed LIC file locked to a different PC.</li>
+   	<li>Test a fully licensed LIC file for IcoMap.</li>
+   	<li><b>[LegacyRC #5116]</b> Test a fully licensed LIC file for FLEX Index 6.0.</li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>License Files That Expire - Software should run</h2>
+<ul>
+	<li>Test a license file that expires today.</li>
+   	<li>Test two license files - one that already expired and one that has not yet expired.</li>
+   	<li>Test two license files - one that already expired and one that is fully licensed.</li>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Time Rollback Prevention</h2>
+<h3>Notes</h3>
+<ol>
+	<li>Most test cases require an expiring license file.  Without an expiring 
+	license the time-rollback prevention software is not activated.</li>
+	<li>The first following group of test cases should start with an uncorrupted 
+	license.</li>
+	<li>The second following group of test cases should start with a corrupted 
+	license.</li>
+	<li>A corrupted license can be created by starting a licensed application, 
+	letting it run for a short time, and modifying system time to be a day or two 
+	earlier than actual calendar time.</li>
+	<li>Use the Control Panel to modify the <b>Windows Time</b> service.  Set the 
+	startup type to be <b>Manual</b> and <b>Stop</b> the service.  Without these changes, 
+	rebooting the PC resets the system time from the domain server and makes testing 
+	time rollback much more difficult.</li>
+</ol>
+<p>
+<h3>Tests for Uncorrupted Software</h3>
+<ul>
+	<li>Test a fully licensed LIC file.
+	<ul>
+		<li>Close any running Extract Systems applications including <b>ExtractTRP2.exe</b> 
+		from Task Manager.
+		<li>Create a fully licensed LIC file.</li>
+		<li>Delete or rename any expiring license files on the test machine.</li>
+		<li>Run the software and set system time back.</li> 
+		<li>Confirm that the software continues to run.</li>
+	</ul>
+<p>
+	<li>Test a fully licensed LIC file plus an expired evaluation license.
+	<ul>
+		<li>Create a fully licensed LIC file.</li>
+		<li>Create an evaluation license that has already expired.</li>
+		<li>Run the software and set system time back.</li> 
+		<li>Confirm that the software continues to run.</li>
+		<li>Confirm that the already expired license file has been automatically 
+		renamed with a <b>.EXPIRED</b> or similar extension.</li>
+	</ul>
+<p>
+	<li>Test a fully licensed LIC file plus a non-expired evaluation license.
+	<ul>
+		<li>Create a fully licensed LIC file.</li>
+		<li>Create an evaluation license that has not yet expired.</li>
+		<li>Run the software and set system time back.</li> 
+		<li>Confirm that the software stops running properly (files start to fail) and 
+		displays a license corruption error.</li>
+	</ul>
+<p>
+	<li>Test a single non-expired evaluation license.
+	<ul>
+		<li>Create an evaluation license that has not yet expired.</li>
+		<li>Run the software and set system time back.</li> 
+		<li>Confirm that the software stops running and displays a license 
+		corruption error.</li>
+		<li><b>[LegacyRCAndUtils #4191]</b> Confirm that this test runs as expected.
+	</ul>
+<p>
+	<li>System time before build time <b>is not</b> valid with evaluation license.
+	<ul>
+   		<li>From a fresh machine, set system time back 6 months ( to some date 
+		before the build date ).</li>
+		<li>Install the software.</li>
+		<li>Create an evaluation license file.</li>
+		<li>Run the software.</li>
+		<li>Confirm that the software displays a license corruption error.</li>
+	</ul>
+<p>
+	<li>System time before build time <b>is</b> valid with permanent license.
+	<ul>
+   		<li>From a fresh machine, set system time back 6 months ( to some date 
+		before the build date ).</li>
+		<li>Install the software.</li>
+		<li>Create a permanent license file.</li>
+		<li>Run the software.</li>
+		<li>Confirm that the software executes without error.</li>
+	</ul>
+</ul>
+<p>
+<h3>Tests for Corrupted Software</h3>
+<ul>
+   	<li>A corrupt license stays corrupt - #1.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Reboot the system.</li>
+		<li><b>Do not</b> restore the system time.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>A corrupt license stays corrupt - #2.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Restore the system time.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>A corrupt license stays corrupt - #3.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Reboot the system.</li>
+		<li>Restore the system time.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>An <b>Unlock</b> file can expire.</li>
+	<ul>
+   		<li>Establish a corrupted license.</li>
+		<li>Reboot the system.</li>
+		<li>Create and deploy an <b>Unlock</b> file that has already expired.</li>
+		<li>Confirm that the license remains corrupted and that the software 
+		does not run.</li>
+	</ul>
+<p>
+   	<li>An <b>Unlock</b> file is locked to a PC.</li>
+	<ul>
+   		<li>Establish a corrupted license.</li>
+		<li>Reboot the system.</li>
+		<li>Create and deploy an <b>Unlock</b> file using the license key 
+		from a different PC.</li>
+		<li>Confirm that the license remains corrupted and that the software 
+		does not run.</li>
+	</ul>
+<p>
+   	<li><b>[P13 #4390]</b> An <b>Unlock</b> file can have leading and 
+	trailing whitespace.</li>
+	<ul>
+   		<li>Establish a corrupted license.</li>
+		<li>Reboot the system.</li>
+		<li>Create and deploy an <b>Unlock</b> file.</li>
+		<li>Copy the <b>Unlock</b> file for use in the next test.</li>
+		<li>Manually edit the Unlock file to add leading and trailing whitespace.</li>
+		<li>Confirm that license corruption is gone and the software runs.</li>
+	</ul>
+<p>
+   	<li>An <b>Unlock</b> file can only be used once.</li>
+	<ul>
+   		<li>Establish a corrupted license.</li>
+		<li>Reboot the system.</li>
+		<li>Rename the copied Unlock file from above to 
+		<b>Extract_UnlockLicense.txt</b>.</li>
+		<li>Confirm that the license remains corrupted and that the software 
+		does not run.</li>
+	</ul>
+<p>
+   	<li><b>[P13 #4934]</b> An <b>Unlock</b> file can be used without a system reboot.</li>
+	<ul>
+   		<li>Establish a corrupted license.</li>
+		<li><b>Do not</b> reboot the system.</li>
+		<li>Create and deploy an <b>Unlock</b> file using a new expiration date.</li>
+		<li>Confirm that license corruption is gone and the software runs.</li>
+	</ul>
+<p>
+   	<li>Clearing <b>all</b> special registry and file system entries fixes 
+	license corruption.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Delete the following items.</li>
+		<ul>
+			<li>HKCU\Identities\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}\LTUSWU</li>
+			<li>HKCU\Software\Classes\Code (another item may be present in the 
+			wow6432 node if installed on a 64-bit operating system)
+			<li>HKCU\Software\Classes\State (if present)
+			<li>HKCU\Software\Windows\Count</li>
+<p>
+			<li><b>Note that this file is hidden!</b>  C:\Documents and 
+			Settings\<b>CURRENT_USER</b>\Application 
+			Data\Windows\tlsuuw_DO_NOT_DELETE.dll</li>
+		</ul>
+		<li>Reboot the system.</li>
+		<li>Restore the system time.</li>
+		<li>Confirm that license corruption is gone and the software runs.</li>
+	</ul>
+<p>
+   	<li>Clearing <b>some</b> special registry and file system entries does not fix 
+	license corruption - #1.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Delete the following registry entry.</li>
+		<ul>
+			<li>HKCU\Identities\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}\LTUSWU</li>
+		</ul>
+		<li>Kill <b>ExtractTRP2.exe</b>
+		<li>Restore the system time.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>Clearing <b>some</b> special registry and file system entries does not fix 
+	license corruption - #2.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Close the application.</li>
+		<li>Delete the following hidden file.</li>
+		<ul>
+			<li>C:\Documents and Settings\<b>CURRENT_USER</b>\Application 
+			Data\Windows\tlsuuw_DO_NOT_DELETE.dll</li>
+		</ul>
+		<li>Kill <b>ExtractTRP2.exe</b>
+		<li>Restore the system time.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>Saving and restoring the special registry entry does not fix license corruption.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+		<li>Save the following registry entry in a temporary text file.</li>
+		<ul>
+			<li>HKCU\Identities\{7FEF3749-A8CC-4CD0-9CEB-E6D267FA524E}\LTUSWU</li>
+		</ul>
+		<li>Continue using the application for at least one minute.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Reboot the system.</li>
+		<li>Restore the system time.</li>
+		<li>Overwrite the registry entry with the saved value.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+<p>
+   	<li>Saving and restoring the special file system entry does not fix license corruption.</li>
+	<ul>
+	   	<li>Demonstrate proper application performance with a non-corrupted license.</li>
+		<li>Save a copy of the following hidden file.</li>
+		<ul>
+			<li>C:\Documents and Settings\<b>CURRENT_USER</b>\Application Data\Windows\tlsuuw_DO_NOT_DELETE.dll</li>
+		</ul>
+		<li>Continue using the application for at least one minute.</li>
+	   	<li>Establish a corrupted license by setting system time back.</li>
+		<li>Reboot the system.</li>
+		<li>Restore the system time.</li>
+		<li>Overwrite the hidden file with the saved copy.</li>
+		<li>Restart the application and confirm that the license state is still corrupt.</li>
+	</ul>
+</ul>
+</li> 
+<p> 
+<!-- *********************************************** -->
+<li><h2>[P13 #4878] License Expiration</h2>
+<ul>
+	<li>Confirm that the <b>Windows Time</b> service is disabled.</li>
+   	<li>Create a license file that expires <b>today</b>.</li>
+   	<li>Delete or rename all other license files on the system.</li>
+   	<li>Test <b>OCR document</b> task.
+	<ul>
+	   	<li>Create an FPS file to queue <b>at least 100</b> files and process them 
+		with <b>OCR document</b>.</li>
+   		<li>Set system time ahead to <b>11:57 PM</b>.</li>
+   		<li>Start processing and confirm that some files are successfully queued 
+		and processed.</li>
+   		<li>Confirm that files stop processing before all have finished.</li>
+	</ul>
+	</li>
+   	<li>Test <b>Execute rules</b> task.
+	<ul>
+   		<li>Clear the database, reset system time to the correct value, 
+		and confirm that licensed applications run without license corruption.</li>
+	   	<li>Create an FPS file to queue <b>at least 100</b> files and process them 
+		with <b>Execute rules</b> using the Redaction Demo ruleset.</li>
+   		<li>Set system time ahead to <b>11:57 PM</b>.</li>
+   		<li>Start processing and confirm that some files are successfully queued 
+		and processed.</li>
+   		<li>Confirm that files stop processing before all have finished.</li>
+	</ul>
+	</li>
+</ul>
+</li>
+<p>
+
+<!-- *********************************************** -->
+<li><h2>Miscellaneous</h2>
+<ul>
+  	<li><b>[P13 #4762]</b> Encrypted Component ID
+	<ul>
+	   	<li>Install FLEX Index or ID Shield without creating a license file.
+	   	<li>Confirm that the test machine has a drive mapping to <b>\\fnp\internal</b> 
+		( usually drive I: ).
+	   	<li>Run the File Action Manager from the Start menu.  Confirm that a 
+		licensing error message is displayed.
+	   	<li>Confirm that the Debug information in the displayed exception includes a 
+		non-encrypted <b>Component ID</b> item.
+	   	<li>Disconnect the mapped drive.
+	   	<li>Run the File Action Manager from the Start menu.  Confirm that the Debug 
+		information in the displayed exception includes an encrypted <b>Component ID</b> item.
+	</ul>
+<p>
+	<LI><b>[FlexIDSCore #3062]</b> Rulesets with Internal-use only flag
+		<ul>
+			<li>Using an RDT license, create and test an encrypted RSD file that has the 
+		Internal-use only flag checked.
+			<li>Using a non-RDT license, test the encrypted Internal-use RSD file.
+			<ul>
+			<li>Confirm that the <b>Rule Tester</b> will not exercise the rule set.
+			<li>Confirm that <b>Run Rules</b> will not exercise the rule set.
+			</ul>
+		</ul>
+<p>
+	<LI><b>[FlexIDSCore #3061]</b> Rulesets without a USB counter
+		<ul>
+			<li>Using an RDT license, create and test an encrypted RSD file that has the 
+		Internal-use only flag unchecked and <b>does not</b> require a USB counter.
+			<li>Using a non-RDT license, test the encrypted counter-less RSD file.
+			<ul>
+			<li>Confirm that the <b>Rule Tester</b> will not exercise the rule set.
+			<li>Confirm that <b>Run Rules</b> will not exercise the rule set.
+			</ul>
+		</ul>
+<p>
+	<LI><b>[FlexIDSCore #3059]</b> Simple Rule Writing and USB counters
+		<ul>
+			<li>Using an <b>ID Shield Rule Writing</b> license, create and test an RSD file.
+		<li>Confirm that the rule set will not run without checking the <b>Redaction</b> counter.
+		</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5020]</b> Creation of license files using either JAKE or FNP2
+	       	<ul>
+			<li>Log in to a test machine that is connected to the <b>extract.local</b> domain.
+			<li>Copy the I:\Common\Engineering\Tools\SecureClients\COMLicense_InternalTesting\Current 
+			folder to the test machine.
+			<li>Disconnect the drive mapping to \\fnp2\internal.
+			<li>Disconnect the drive mapping to \\jake\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does not run.
+			<li>Re-connect the drive mapping to \\fnp2\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+			<li>Disconnect the drive mapping to \\fnp2\internal.
+			<li>Re-connect the drive mapping to \\jake\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+	       	</ul>
+   	</LI>
+<p>
+	<LI><b>[LegacyRC #5055]</b> Updated Safenet Drivers
+		<ul>
+			<li>Check <b>Server Status</b> from the USB License Key Manager utility.
+			<li>Confirm that the Sentinel Protection Server Version is <b>7.5.0</b>.
+		</ul>
+
+</ul>
+</li>
+<p>
+<!-- *********************************************** -->
+<li><h2>Developer License Features</h2>
+	<ul>
+		<li>Create a License file which licenses <b>Disable USB Key Serial 
+		Numbers</b> and <b>Rule Development Toolkit</b>.</li>
+		<li>Remove or rename ( to non-LIC extension ) any other license files in 
+		the CommonComponents folder.</li>
+		<li>Open a RuleSet Editor. Add an attribute called <b>ATest</b> using the 
+		default configuration of <b>Extract Line Rule</b> as an attribute finding rule.</li>
+		<li>In the <b>Ruleset Properties</b> dialog, check the <b>RuleSet can only be 
+		executed internally...</b> check box and type <b>500</b> in the <b>Key 
+		Serial #&#8217;s</b> edit box.</li>
+		<li>Open the rule tester, select <b>Text from manual input</b>, and type any 
+		text in the edit box.  Verify that the rule tester will run the rule with no 
+		exceptions.</li>
+<p>
+                <li>Confirm that the checkbox for the <b>"FlexIndex - Indexing"</b> counter is checked.
+		<li>Remove any local USB key and any reference to a networked USB key.</li>              
+		<li>Confirm that no USB key is available with the USB License Key Manager.</li>
+		<li>Verify that the rule tester will <b>NOT</b> run the rule.</li>
+</ul> 
+<br>
+<!-- *********************************************** -->
+<li><h2>Developer License Features - Tested by Wayne Only</h2>
+	<ul>
+		<li>Create a License file which licenses <b>Disable USB Counters (locked to PC)</b> 
+		and <b>Rule Development Toolkit</b>.</li>
+		<li>Remove or rename ( to non-LIC extension ) any other license files in 
+		the CommonComponents folder.</li>
+		<li>Open a RuleSet Editor. Add an attribute called <b>ATest</b> using the 
+		default configuration of <b>Extract Line Rule</b> as an attribute finding rule.</li>
+		<li>In the <b>Ruleset Properties</b> dialog, check the <b>FlexIndex - Indexing</b> 
+		check box and type <b>500</b> in the <b>Key Serial #&#8217;s</b> edit box.</li>
+		<li>Remove any local USB key and any reference to a networked USB key.</li>
+		<li>Confirm that no USB key is available with the USB License Key Manager.</li>
+		<li>Open the rule tester, select <b>Text from manual input</b>, and type any text 
+		in the edit box.  Verify that the rule tester will run the rule with no exceptions.</li>
+</ul> 
+</ol>
+</body>
+</html>

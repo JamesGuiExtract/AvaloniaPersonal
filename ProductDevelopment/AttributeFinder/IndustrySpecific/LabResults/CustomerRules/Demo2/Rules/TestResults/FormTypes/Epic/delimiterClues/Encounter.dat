@@ -1,0 +1,1 @@
+(?x)  ^ Encounter (?=[\W_]*$) (?= [\S\s]* ^ (?:Results|Service\sLocation|Patient\sInformation|Entry\sDate|Component\sResults|Result\sHistory|Lab\sInformation|Lab\sCollection\sInformation|Reviewed\sby\sList) [\W_]*$)

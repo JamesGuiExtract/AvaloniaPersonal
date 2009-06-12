@@ -1,0 +1,361 @@
+<IDShieldOfficeData Version="1">	
+	<!--
+	*******************
+	***** SUMMARY *****
+	*******************
+	The IDSO file contains 4 main sections of data as described below:
+	DocumentInfo: This section contains information about the document as a whole, such as the original
+		source document's full path.
+	HistoricalObjects: This section contains all revisions of any objects that used to exist but no 
+		longer exist because they have either been deleted.  When objects are deleted, they are moved
+		from the CurrentObjects section to the HistoricalObjects section.  When objects are modified,
+		the state of the object (prior to it being modified) is archived to the HistoricalObjects
+		section and the new state of the object (after it was modified) is represented by a newer
+		revision of the object in the CurrentObjects section described below.
+	CurrentObjects: This section contains the current revisions of any object that is still present
+		on the document.  See note in the HistoricalObjects section describing conditions under 
+		which objects can be moved from this section to the HistoricalObjects section.
+	Sessions: This section contains information about each editing session that the original
+		source document has been through.  For each editing session, various fields of information 
+		are collected - such as the starting and ending time of the session, the user who was 
+		logged on during the editing session, and the computer the editing session executed on.
+		Please note that the user opening up a document in ID Shield Office and frequently hitting
+		the save button (while the document is still open) counts only as one session.  A session is 
+		starts when the user opens a file.  A session ends when the user saves an output file 
+		from ID Shield Office.  If the user saves output files from ID Shield Office multiple times 
+		for the same input file before opening a new file (or closing ID Shield Office), the session
+		is considered as ended at the time of the last said save operation.-->
+	<!--The HistoricalObjects section will contain all objects that were persisted to disk at
+		some point but which are no longer present currently on the document, either because
+		the object was deleted or modified in a subsequent session.-->
+	<HistoricalObjects>
+		<!--The object below is in the HistoricalObjects section because it was deleted in
+			session #2.-->
+		<Redaction Id="3" Revision="1">
+			<Page>2</Page>
+			<Zone>
+				<Start>2110,50</Start>
+				<End>2220,50</End>
+				<Height>5</Height>
+			</Zone>
+			<Zone>
+				<Start>80,60</Start>
+				<End>210,60</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>255.255.255</Color>
+			<Comment>Data type rule: Bank account numbers</Comment>
+		</Redaction>
+		<!--The object below is in the HistoricalObjects section because the user moved it
+			as well as changed the redaction fill color in session #2.  A new revision of 
+			this object (revision #2) represents the current state of this object, and 
+			is in the CurrentObjects section.-->
+		<Redaction Id="4" Revision="1">
+			<Page>3</Page>
+			<Zone>
+				<Start>210,210</Start>
+				<End>220,220</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>255.255.255</Color>
+			<Comment>Manual</Comment>
+		</Redaction>
+		<!--The object below is in the HistoricalObjects section because the underlying object
+			was moved in session #4.  A new revision of this object (revision #2) represents the
+			current state of this object, and exists in the CurrentObjects section.-->
+		<TextObject Id="6" Revision="1">
+			<Page>1</Page>
+			<AnchorPosition>1122,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 001</Text>
+			<Tag>BatesNumber</Tag>
+			<NextObjectId>7</NextObjectId>
+		</TextObject>
+		<!--The object below is in the HistoricalObjects section because this object (the middle
+			one of three linked objects) was deleted in session #6.-->
+		<Redaction Id="12" Revision="1">
+			<Page>4</Page>
+			<Zone>
+				<Start>815,415</Start>
+				<End>825,425</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Bracketed text rule: [...]</Comment>
+			<PreviousObjectId>11</PreviousObjectId>
+			<NextObjectId>13</NextObjectId>
+		</Redaction>
+		<!--The following two objects are in the HistoricalObjects section because they were part of
+			a chain of linked objects where the object between them in the chain was deleted, and
+			caused these objects to end up as a new revision (revision #2).-->
+		<Redaction Id="11" Revision="1">
+			<Page>3</Page>
+			<Zone>
+				<Start>815,415</Start>
+				<End>825,425</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Bracketed text rule: [...]</Comment>
+			<NextObjectId>12</NextObjectId>
+		</Redaction>
+		<Redaction Id="13" Revision="1">
+			<Page>5</Page>
+			<Zone>
+				<Start>815,415</Start>
+				<End>825,425</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Bracketed text rule: [...]</Comment>
+			<PreviousObjectId>12</PreviousObjectId>
+		</Redaction>
+	</HistoricalObjects>
+	<!--The CurrentObjects section will contain all objects that are currently in the document.
+		These may include all kinds of layer objects including redactions, clues, Bates numbers,
+		and so on.-->
+	<CurrentObjects>
+		<!--Note the Highlight object with the Clue tag, indicating that this object is a clue.
+			Also note that the comment field indicates which rule object generated this clue.
+			Also note the text value associated with the highlight indicating the actual clue
+			string that was found.-->
+		<Highlight Id="1" Revision="1">
+			<Page>1</Page>
+			<Zone>
+				<Start>30,30</Start>
+				<End>50,50</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>255.255.0</Color>
+			<Comment>Data type rule: Bank account numbers</Comment>
+			<Text>Bank A/C #</Text>
+			<Tag>Clue</Tag>
+		</Highlight>
+		<!--Note that the comment field indicates which rule object generated this redaction.-->
+		<Redaction Id="2" Revision="1">
+			<Page>1</Page>
+			<Zone>
+				<Start>10,10</Start>
+				<End>20,20</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Data type rule: Social security numbers</Comment>
+		</Redaction>
+		<!--Note that the comment field indicates that this redaction was drawn manually.-->
+		<Redaction Id="5" Revision="1">
+			<Page>5</Page>
+			<Zone>
+				<Start>310,310</Start>
+				<End>320,320</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>255.255.255</Color>
+			<Comment>Manual</Comment>
+		</Redaction>
+		<!--The following redaction object was modified (hence Revision = 2).  The previous
+			revision of the object was moved to the HistoricalObjects section.-->
+		<Redaction Id="4" Revision="2">
+			<Page>3</Page>
+			<Zone>
+				<Start>215,215</Start>
+				<End>225,225</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Manual</Comment>
+		</Redaction>
+		<!--The following objects are Bates numbers (as identified from the Tag) that were
+			applied on the document.  One of the Bates numbers (Id = 6) was moved and hence is
+			present here as Revision #2.  The previous revision of that Bates number has been
+			moved to the HistoricalObjects section.  Also note how the Bates number objects
+			are linked via the PreviousObjectId and NextObjectId values.-->
+		<TextObject Id="7" Revision="1">
+			<Page>2</Page>
+			<AnchorPosition>1122,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 002</Text>
+			<Tag>BatesNumber</Tag>
+			<PreviousObjectId>6</PreviousObjectId>
+			<NextObjectId>8</NextObjectId>
+		</TextObject>
+		<TextObject Id="8" Revision="1">
+			<Page>3</Page>
+			<AnchorPosition>1122,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 003</Text>
+			<Tag>BatesNumber</Tag>
+			<PreviousObjectId>7</PreviousObjectId>
+			<NextObjectId>9</NextObjectId>
+		</TextObject>
+		<TextObject Id="9" Revision="1">
+			<Page>4</Page>
+			<AnchorPosition>1122,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 004</Text>
+			<Tag>BatesNumber</Tag>
+			<PreviousObjectId>8</PreviousObjectId>
+			<NextObjectId>10</NextObjectId>
+		</TextObject>
+		<TextObject Id="10" Revision="1">
+			<Page>5</Page>
+			<AnchorPosition>1122,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 005</Text>
+			<Tag>BatesNumber</Tag>
+			<PreviousObjectId>9</PreviousObjectId>
+		</TextObject>
+		<TextObject Id="6" Revision="2">
+			<Page>1</Page>
+			<AnchorPosition>1050,80</AnchorPosition>
+			<ContentAlignment>MiddleLeft</ContentAlignment>
+			<Font>Arial 18pt Bold</Font>
+			<Text>0009298 / 001</Text>
+			<Tag>BatesNumber</Tag>
+			<NextObjectId>7</NextObjectId>
+		</TextObject>
+		<!--The following two objects are linked to each other (see the values for
+			PreviousObjectId and NextObjectId).  These two objects used to be the
+			first and last objects of a 3-object chain which was added in session #5.
+			But the middle object in the chain was deleted in session #6, 
+			causing these two to get modified (and therefore show up as revision #2).
+			Note that the values of PreviousObjectId and NextObjectId reflect that 
+			these are the only two objects left in the chain.-->
+		<Redaction Id="11" Revision="2">
+			<Page>3</Page>
+			<Zone>
+				<Start>815,415</Start>
+				<End>825,425</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Bracketed text rule: [...]</Comment>
+			<NextObjectId>13</NextObjectId>
+		</Redaction>
+		<Redaction Id="13" Revision="2">
+			<Page>5</Page>
+			<Zone>
+				<Start>815,415</Start>
+				<End>825,425</End>
+				<Height>5</Height>
+			</Zone>
+			<Color>0.0.0</Color>
+			<Comment>Bracketed text rule: [...]</Comment>
+			<PreviousObjectId>11</PreviousObjectId>
+		</Redaction>
+	</CurrentObjects>
+	<Sessions>
+		<!--In session #1, the user ran a rule, which produced one clue (Id=1) and a couple
+			redaction objects (Id=2 and Id=3).  The user also added a manual
+			redaction (Id=4).-->
+		<Session Id="1">
+			<SessionInfo>
+				<User>Arvind Ganesan</User>
+				<Computer>Delhi</Computer>
+				<StartTime>09/26/2008 11:15:01.287</StartTime>
+				<EndTime>09/26/2008 11:15:58.731</EndTime>
+			</SessionInfo>
+			<ObjectsAdded>
+				<Object Type="Highlight" Id="1" Revision="1"/>
+				<Object Type="Redaction" Id="2" Revision="1"/>
+				<Object Type="Redaction" Id="3" Revision="1"/>
+				<Object Type="Redaction" Id="4" Revision="1"/>
+			</ObjectsAdded>
+		</Session>
+		<!--In session #2, the user deleted an existing redaction (Id=3).  That caused
+			the associated object to be moved to the HistoricalObjects section.  The
+			user also added a new object (Id=5).  Finally, the user moved one of the
+			redaction objects (Id=4), which caused a new revision (#2) of the object
+			to be created in the CurrentObjects section and also caused the old 
+			revision (#1) of the object to be archived in the HistoricalObjects
+			section.-->
+		<Session Id="2">
+			<SessionInfo>
+				<User>Wayne Lenius</User>
+				<Computer>Engineering004</Computer>
+				<StartTime>09/28/2008 15:23:05.123</StartTime>
+				<EndTime>09/28/2008 15:24:18.377</EndTime>
+			</SessionInfo>
+			<ObjectsAdded>
+				<Object Type="Redaction" Id="5" Revision="1"/>
+			</ObjectsAdded>
+			<ObjectsDeleted>
+				<Object Type="Redaction" Id="3" Revision="1"/>
+			</ObjectsDeleted>
+			<ObjectsModified>
+				<Object Type="Redaction" Id="4" NewRevision="2"/>
+			</ObjectsModified>
+		</Session>
+		<!--In session #3, the user added Bates numbers, causing one object to
+			be added on each of the 5 pages of the document.-->
+		<Session Id="3">
+			<SessionInfo>
+				<User>Arvind Ganesan</User>
+				<Computer>Station112</Computer>
+				<StartTime>09/29/2008 16:51:45.624</StartTime>
+				<EndTime>09/29/2008 16:52:04.951</EndTime>
+			</SessionInfo>
+			<ObjectsAdded>
+				<Object Type="Text" Id="6" Revision="1"/>
+				<Object Type="Text" Id="7" Revision="1"/>
+				<Object Type="Text" Id="8" Revision="1"/>
+				<Object Type="Text" Id="9" Revision="1"/>
+				<Object Type="Text" Id="10" Revision="1"/>
+			</ObjectsAdded>
+		</Session>
+		<!--In session #4, the user slightly adjusted the position of the Bates
+			number (Id=6) on the first page.  This caused the old revision (#1) of the
+			Bates number to be archived to the HistoricalObjects section and a new
+			revision (#2) of the object to be created in the CurrentObjects section.-->
+		<Session Id="4">
+			<SessionInfo>
+				<User>Wayne Lenius</User>
+				<Computer>Engineering004</Computer>
+				<StartTime>09/30/2008 09:51:45.624</StartTime>
+				<EndTime>09/30/2008 09:52:04.951</EndTime>
+			</SessionInfo>
+			<ObjectsModified>
+				<Object Type="Text" Id="6" NewRevision="2"/>
+			</ObjectsModified>
+		</Session>
+		<!--In session #5, the user ran the bracketed text rule and found a match
+			that spanned three pages.  The objects on the three pages are linked 
+			to each other.-->
+		<Session Id="5">
+			<SessionInfo>
+				<User>Wayne Lenius</User>
+				<Computer>Engineering004</Computer>
+				<StartTime>10/02/2008 14:21:45.734</StartTime>
+				<EndTime>10/02/2008 14:22:04.191</EndTime>
+			</SessionInfo>
+			<ObjectsAdded>
+				<Object Type="Redaction" Id="11" Revision="1"/>
+				<Object Type="Redaction" Id="12" Revision="1"/>
+				<Object Type="Redaction" Id="13" Revision="1"/>
+			</ObjectsAdded>
+		</Session>
+		<!--In session #6, the user deleted the middle of 3 linked objects added in 
+			session #5.  While one object was deleted, the other two ended up getting
+			modified (because the prev/next links on them changed).-->
+		<Session Id="6">
+			<SessionInfo>
+				<User>Wayne Lenius</User>
+				<Computer>Engineering004</Computer>
+				<StartTime>10/12/2008 16:51:55.794</StartTime>
+				<EndTime>10/12/2008 16:52:14.847</EndTime>
+			</SessionInfo>
+			<ObjectsDeleted>
+				<Object Type="Redaction" Id="12" Revision="1"/>
+			</ObjectsDeleted>
+			<ObjectsModified>
+				<Object Type="Redaction" Id="11" NewRevision="2"/>
+				<Object Type="Redaction" Id="13" NewRevision="2"/>
+			</ObjectsModified>
+		</Session>
+	</Sessions>
+</IDShieldOfficeData>

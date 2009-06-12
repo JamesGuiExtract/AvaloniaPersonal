@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFPreProcessors.DocPreprocessorSequence.1 = s 'DocPreprocessorSequence Class'
+	{
+		CLSID = s '{3A17A77B-7F74-4A75-9191-C54A0251C967}'
+	}
+	UCLIDAFPreProcessors.DocPreprocessorSequence = s 'DocPreprocessorSequence Class'
+	{
+		CLSID = s '{3A17A77B-7F74-4A75-9191-C54A0251C967}'
+		CurVer = s 'UCLIDAFPreProcessors.DocPreprocessorSequence.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3A17A77B-7F74-4A75-9191-C54A0251C967} = s 'DocPreprocessorSequence Class'
+		{
+			ProgID = s 'UCLIDAFPreProcessors.DocPreprocessorSequence.1'
+			VersionIndependentProgID = s 'UCLIDAFPreProcessors.DocPreprocessorSequence'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{6E739155-A988-45D0-8FF9-D2718B7B4126}'
+		}
+	}
+}

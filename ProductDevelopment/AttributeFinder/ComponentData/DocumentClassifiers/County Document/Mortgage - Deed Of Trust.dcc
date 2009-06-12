@@ -1,0 +1,529 @@
+#import "CommonDT.dcc"
+
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,MTG_ZERO_01,false
+		01=(?:^|[^A-Za-z \t]+)\s*(?:warranty|condominium)\s*deed\s*(?:[^A-Za-z \t]+|(?:\r?$))
+
+		02=(?:satisfaction|release|discharge|assignment)\s*of[\s\S]{1,4}(?:(?:real\s*estate|construction|recorded)\s*)?(?:mortgage|deed\s*of\s*trust|lien)
+
+		03=mortgage[\s\S]{1,5}release[\s\S]{1,5}satisfaction[\s\S]{1,10}discharge
+		04=real\s*estate\s*mortgage[\s\S]{1,5}satisfaction
+		//K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction of Mortgage\2999286.tif.uss
+		05=^RELEASE\s*DEED\s*\([A-Z]{0,15}\)\r\n\r\n
+		06=\r\n\r\nCERTIFICATE\s*OF\s*SATISFACTION\r\n\r\n
+
+		07=Assignment\s*Of\s*(?:Real\s*Estate\s*|CREDITLINE\s*)?(?:Mortgage|Deed\s*Of\s*Trust|Lien)
+
+		08=Mortgage\s*Satisfaction
+
+		09=APPOINTMENT\s*OF\s*SUBSTITUTE\s*TRUSTEE
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\SUB TRUSTEE DEED\00016783.tif.uss
+		10=SUBSTITUTE\s*TRUSTEE'S\s*DEED
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RESCIND ACCELERATION\00016374.tif.uss
+		11=RESCISSION\s*OF\s*ACCELERATION\s*OF\s*LOAN\s*MATURITY
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AMENDMENT\00016531.tif.uss
+		12=^AMENDMENT\s*TO\s*DEED\s*OF\s*TRUST(?:\r?$)
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOMESTD DESIGNAT\00016494.tif.uss
+		13=NONHOMESTEAD\s*AFFIDAVIT
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT\Assignment of Mortgage\00016563.tif.uss
+		14=ASSIGNMENT\s*AND\s*SECURITY\s*AGREEMENT
+
+		15=\bCORPORATE\s*ASSIGNMENT(?:\r?$)
+
+		// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AST\B04288AABT8.TIF.uss
+		16=^ASSIGNMENT\s*TO\s*DEED\s*OF\s*TRUST
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT\Assignment of Rent\00016238.tif.uss
+		17=ASSIGNMENT\s*OF\s*RENT,\s*INCOME,\s*AND\s*RECEIPTS
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Other\00016740.tif.uss
+		18=DEED\s*IN\s*LIEU\s*OF\s*FORECLOSURE
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT\Assignment of Mortgage\00016636.tif.uss
+		19=DEED\s*OF\s*TRUST\s*BEING\s*ASSIGNED(?:\r?$)
+
+		// K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\assignmt\live\\2003133216.tif.uss
+		20=\bASSIGNMENT\s*OF\s*NOTE\b
+
+		// K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003132501.tif.uss
+		21=\bRELEASE\s*OF\s*[\s\S]{0,20}DEED\s*OF\s*TRUST\b
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT\00015947.tif.uss
+		22=ASSIGNMENT\s*AND\s*TRANSFER\s*OF\s*NOTE\s*AND\s*DEED\s*OF\s*TRUST
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017105.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\POWER OF ATTORNY\00012395.tif.uss
+		23=(?:LIMITED|GENERAL)\s*POWER\s*OF\s*ATTORNEY(?:\r?$)
+
+		24=^NOTICE\s*OF\s*DEFAULT(?:\r?$)
+		25=\bNOTICE\s*OF\s*DEFAULT\s*AND\s*ELECTION\s*TO\s*SELL\s*UNDER\s*DEED\s*OF\s*TRUST\b
+		26=\bNOTICE\s*OF\s*DEFAULT\s*AND\s*FORECLOSURE\s*SALE\b
+
+		27=\bNOTICE\s*OF\s*RESCISSION\s*OF\s*(?:NOTICE|DECLARATION)\s*OF\s*DEFAULT\b
+
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement\20049002237000.003.tif.uss
+		28=^(?:REAL\s*ESTATE)?SUBORDINATION\s*(?:AGREEMENT|BY\s*THE\s*GOVERNMENT)?(?:\r?$)
+
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement\20049000722800.006.tif.uss
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement\20049000821600.003.tif.uss
+		// SUBORDINATED AHP DEED OF TRUST
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement\20049003043300.010.tif.uss
+		29=^SUBORDINAT(?:ED|ION\s*OF)(?:\s*AHP)?\s*(?:(?:DEED\s*OF\s*TRUST)|MORTGAGE|AGREEMENT)(?:\r?$)
+
+	OR_END
+
+	OR_BEGIN,MTG_ZERO_02,false
+		01=\b(?:MODIFICATION\s*)?(?:AGREEMENT|AMENDMENT)?\s*TO\s*HOME\s*EQUITY\s*LINE\s*OF\s*CREDIT\s*AGREEMENT\b
+		02=\bMODIFICATION\s*AGREEMENT\s*TO\s*PRIME\s*EQUITY\s*LINE\s*AND\s*DEED\s*OF\s*TRUST\b
+		03=^[\s\S]{0,10}MODIFICATION\s*AGREEMENT(?:\r?$)
+		04=\bMODIFICATION\s*OF\s*(?:A\s*)?(?:(?:PROMISSORY\s*)?NOTE\s*AND\s*)?DEED\s*OF\s*TRUST\b
+		05=\bMODIFICATION\s*(?:TO)?\s*DEED\s*OF\s*TRUST\b
+		06=\bMODIFICATION\s*AGREEMENT\s*TO\s*NOTE\s*(?:/|AND|OR)\s*DEED\s*OF\s*TRUST\b
+		07=\bMODIFICATION\s*AND/OR\s*EXTENSION\s*AGREEMENT\b
+		08=\bMODIFICATION\s*AND\s*SUPPLEMENT\s*TO\s*DEED\s*OF\s*TRUST\b
+		09=\bHOME\s*EQUITY\s*LINE\s*OF\s*CREDIT\s*MODIFICATION\s*OF\s*DEED\s*OF\s*TRUST\b
+		10=\bMORTGAGE\s*MODIFICATION\s*AND\s*SUPPLEMENT\s*AGREEMENT\b
+		11=\bLOAN\s*MODIFICATION\s*AGREEMENT(?:\s*TO\s*THE\s*DEED\s*OF\s*TRUST)?\b
+		12=\bNOTICE\s*OF\s*ADDITIONAL\s*(?:LOAN|ADVANCE)\b
+		13=\bNOTICE\s*OF\s*ADDITIONAL\s*INDEBTEDNESS\s*SECURED\s*BY\s*DEED\s*OF\s*TRUST\b
+		14=\bMEMORANDUM\s*OF\s*(?:MODIFICATION\s*AGREEMENT|AGREEMENT\s*AMENDING\s*DEED\s*OF\s*TRUST)\b
+		15=\bDEED\s*OF\s*TRUST\s*-\s*MODIFICATION\s*AGREEMENT\b
+		16=\bTRUST\s*DEED\s*MODIFICATION\s*AGREEMENT\b
+		17=\bREFORMATION\s*OF\s*PERMANENT\s*DEED\s*OF\s*TRUST\b
+		18=\bHELOC\s*AND\s*MORTGAGE\s*MODIFICATION\b
+		19=\b(?:FIRST|SECOND|THIRD)\s*EXTENSION\s*AND\s*MODIFICATION\s*AGREEMENT\b
+	OR_END
+	AND_BEGIN,MTG_ZERO_03,false
+		said\s*note\s*set\s*out\s*and\s*described\s*in\s*a\s*certain\s*Deed\s*of\s*Trust
+		secured\s*by\s*the\s*lien\s*therein\s*expressed
+	AND_END
+	AND_BEGIN,MTG_ZERO_04,false
+		(?:received\s*full\s*payment\s*and\s*satisfaction\s*of\s*same|Does\s*hereby\s*cancel\s*and\s*discharge\s*said\s*Mortgage)
+		Original\s*Grant(?:ee|or)
+	AND_END
+SCOPE_END
+/*
+	OR_BEGIN,MTG_ZERO_03,false
+		01=assignment\s*of\s*real\s*estate
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT\Assignment of Mortgage\00016563.tif.uss
+		02=ASSIGNMENT\s*OF\s*[\s\S]{0,50}(?:LIENS|SECURITY\s*INSTRUMENTS|mortgage)
+
+		// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AST\B04317AAA1C.TIF.uss
+		03=ASSIGNMENT\s*OF\s*RECORDED\s*DOCUMENTS
+
+		// K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment of Mortgage\3015730.tif.uss
+		04=\bassignor[\s\S]{0,50}assigns\s*to[\s\S]{0,250}the\s*mortgage\s*executed\b
+
+		// K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment of Mortgage\3015533.tif.uss
+		05=\bassigns\s*to[\s\S]{0,250}a\s*certain\s*mortgage\s*executed\b
+
+		// K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set002\Images\ASSIGNMT\2003130563.tif.uss
+		06\bdescribed\s*in\s*a\s*certain\r\n\s*Deed\s*of\s*Trust\s*\r\nexecuted\s*by\b
+
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Corporation Assignment - Deed of Trust\20049000467400.003.tif.uss
+		07=Assignment\s*Of\s*(?:Real\s*Estate\s*)?(?:Mortgage|Deed\s*Of\s*Trust|Lien)
+	OR_END
+
+SCOPE_END
+
+
+SCOPE_BEGIN,0,0.5,1,1
+	//a mortgage document that contains "assignment of rents"
+	// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110348.TIF.uss
+	OR_BEGIN,MTG_ZERO_04,true
+		01=(?:^|(?:\r\n){2,}|[^A-Za-z \r\n\t]+)[ \t]*A(?:ssignment|SSIGNMENT)\s*[Oo][Ff]\s*R(?:ents|ENTS)[ \t]*(?:\r\n)+
+		02=(?:\r\n){2,}[ \t]*A(?:ssignment|SSIGNMENT)\s*[Oo][Ff]\s*R(?:ents|ENTS)(?:\r\n|[\s\S]{0,8}\s{3,})
+		03=^This\s*is\s*a\s*refinance\s*of\s*a\s*mortgage 
+	OR_END
+SCOPE_END
+*/
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,MTG_ZERO_05,false
+		01=^MODIFICATION\s*OF\s*MORTGAGE(?:\r?$)
+		02=^MORTGAGE\s*SPREADER\s*AGREEMENT(?:\r?$)
+		03=^THIS\s*MORTGAGE\s*SPREADING\s*AGREEMENT
+		04=^NOTE\s*AND\s*(?:SECURITY\s*INSTRUMENT|MORTGAGE)\s*MODIFICATION\s*AGREEMENT
+		05=^FULL\s*RECONVEYANCE\W*(?:\r?$)
+
+	OR_END
+	OR_BEGIN,MTG_ZERO_06,true
+		01=^MODIF[lI]ED\.\s*AMENDED\s*AND\s*RESTATED(?:\r?$)
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.5,1,2
+	SINGLE_BEGIN,MTG_ZERO_07,false
+		//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Assignment\200406290000689.tif
+		^.{0,3}Assignment\W*of\W*Deed\W*of\W*Trust(?:\W*or\W*Mortgage)?.{0,3}(?:\r?$)
+	SINGLE_END
+SCOPE_END
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,2
+	OR_BEGIN,MTG_SURE_01,false
+		//Real Estate Mortgage
+		// 0001.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000374.TIF.uss
+		// REAL ESTATE MORTGAGE TO SECURE GUARANTY
+		// 0002.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000534.TIF.uss
+		01=^(?:ALABAMA|ALASKA|ARIZONA|ARKANSAS|CALIFORNIA|COLORADO|CONNECTICUT|DELAWARE|FLORIDA|GEORGIA|HAWAII|IDAHO|ILLINOIS|INDIANA|IOWA|KANSAS|KENTUCKY|LOUISIANA|MAINE|MARYLAND|MASSACHUSETTS|MICHIGAN|MINNESOTA|MISSISSIPPI|MISSOURI|MONTANA|NEBRASKA|NEVADA|NEW\s*HAMPSHIRE|NEW\s*JERSEY|NEW\s*MEXICO|NEW\s*YORK|NORTH\s*CAROLINA|NORTH\s*DAKOTA|OHIO|OKLAHOMA|OREGON|PENNSYLVANIA|RHODE\s*ISLAND|SOUTH\s*CAROLINA|SOUTH\s*DAKOTA|TENNESSEE|TEXAS|UTAH|VERMONT|VIRGINIA|WASHINGTON|WEST\s*VIRGINIA|WISCONSIN|WYOMING)?\s*REAL\s*ESTATE\s*MORTGAGE(?:\s*TO\s*SECURE\s*GUARANTY)?(?:\r?$)
+
+		// 0003.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000577.TIF.uss
+		02=^MORTGAGE[\s\S]{0,8}LINE\s*OF\s*CREDIT(?:\r?$)
+
+		// OPEN-END PURCHASE MONEY MORTGAGE AND SECURITY AGREEMENT
+		// 0010.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00105081.tif.uss 
+		// OPEN-END MORTGAGE AND SECURITY AGREEMENT
+		// 0011.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00105763.tif.uss
+		// OPEN-END MORTGAGE SECURING FUTURE ADVANCES
+		// 0012.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00105774.tif.uss
+		// Open-End Mortgage
+		// 0024.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MTG\B04292AAA7Q.TIF.uss
+		03=^OPEN[\s\S]{0,3}END\s*(?:PURCHASE\s*MONEY\s*)?MORTGAGE(?:\s*(?:AND\s*SECURITY\s*AGREEMENT|SECURING\s*FUTURE\s*ADVANCES))?(?:\r?$)
+
+		// PURCHASE MONEY SECURITY DOCUMENT
+		// 0032.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00015551.tif.uss
+		// 0013.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110831.tif.uss
+		04=^PURCHASE\s*MONEY\s*(?:SECOND\s*MORTGAGE|SECURITY\s*DOCUMENT)(?:\r?$)
+
+		// Mortgage Agreement
+		// 0014.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00111099.tif.uss
+		// Mortgage And Security Agreement
+		// 0015.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00104619.tif.uss
+		// Mortgage, Security Agreement And Financing Statement
+		// 0016.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00106858.tif.uss
+		// DEED OF TRUST AND SECURITY AGREEMENT
+		// 0039.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00006749.tif.uss
+		05=^(?:MORTGAGE|DEED\s*OF\s*TRUST)\s*(?:[\s\S]{1,8}SECURITY\s*)?AGREEMENT(?:\s*AND\s*FINANCING\s*STATEMENT)?(?:\r?$)
+
+		// Construction Mortgage
+		// 0004.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000413.TIF.uss
+		// Consumer Mortgage
+		// 0005.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000799.TIF.uss
+		// Consumer R.E.A.P. Mortgage
+		// 0006.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000802.TIF.uss
+		// Corrective Mortgage
+		// 0017.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00104714.tif.uss
+		// LEASEHOLD MORTGAGE
+		// 0018.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110684.tif.uss
+		// Real Property Mortgage
+		// 0019.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00105656.tif.uss
+		// Secondary Mortgage
+		// 0020.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00105517.tif.uss
+		// Subordinate Mortgage
+		// 0021.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00106851.tif.uss
+		//  Line of Credit Mortgage
+		// HOME EQUITY LINE OF CREDIT MORTGAGE
+		// 0025.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04314AAA56.TIF.uss
+		06=^(?:(?:CONS(?:TRUCTION|UMER[\s\S]{0,15})|RRECTIVE)|LEASEHOLD|(?:HOME\s*EQUITY\s*)?LINE\s*OF\s*CREDIT|REAL\s*PROPERTY|SECONDARY)\s*(?:MORTGAGE|DEED\s*OF\s*TRUST)(?:\r?$)
+
+		// 0049.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed of Trust\20049000011300.002.tif.uss
+		08=^SHORT\s*FORM\s*DEED\s*OF\s*TRUST(?:\r?$)
+
+		// THIS IS A FUTURE ADVANCE MORTGAGE
+		// 0026.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04317AABJ4.TIF.uss
+		// THIS IS A MICHIGAN FUTURE ADVANCES REAL ESTATE MORTGAGE
+		// 0027.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04289AAAGU.TIF.uss
+		09=^(?:THIS\s*IS\s*A\s*(?:MICHIGAN\s*)?)?FUTURE\s*ADVANCES?\s*(?:REAL\s*ESTATE\s*)?MORTGAGE(?:\r?$)
+
+		// REVISED FORM OF MORTGAGE
+		// 0028.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04313AAAWB.TIF.uss
+		10=^REVISED\s*FORM\s*OF\s*MORTGAGE(?:\r?$)
+
+		// SECOND MORTGAGE
+		// 0029.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04314AAAHX.TIF.uss
+		11=^SECOND\s*MORTGAGE(?:\r?$)
+
+		// MORTGAGE FORM
+		// 0030.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04314AAA5H.TIF.uss
+		12=^MORTGAGE\s*FORM(?:\r?$)
+
+		// CLASS 4 LEASEHOLD DEED OF TRUST
+		// 0031.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG\B04315AAAO0.TIF.uss
+		13=^(?:CLASS\s*4\s*)?LEASEHOLD\s*DEED\s*OF\s*TRUST,?(?:\r?$)
+
+		// SECOND LIEN DEED OF TRUST
+		// 0041.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00007936.tif.uss
+		14=^SECOND\s*LIEN\s*DEED\s*OF\s*TRUST(?:\r?$)
+
+		// SUBSTITUTED DEED OF TRUST TO SECURE ASSUMPTION
+		// 0033.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00015258.tif.uss
+		// DEED OF TRUST TO SECURE ASSUMPTION
+		// 0051.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016820.tif.uss
+		15=^(?:SUBSTITUTED\s*)?DEED\s*OF\s*TRUST\s*TO\s*SECURE\s*ASSUMPTION(?:\r?$)
+
+		// HOME EQUITY DEED OF TRUST
+		// 0042.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00006912.tif.uss
+		// TEXAS HOME EQUITY SECURITY INSTRUMENT
+		// 0034.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00016005.tif.uss
+		// 0052.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY\00016298.tif.uss
+		// 0053.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY\00016299.tif.uss
+		// 0054.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY\00016687.tif.uss
+		16=^(?:TEXAS\s*)?HOME\s*EQUITY\s*(?:SECURITY\s*(?:INSTRUMENT|DOCUMENT)|(?:CONVERSION\s*)?(?:SECOND\s*)?DEED\s*OF\s*TRUST)(?:\r?$)
+
+		// DEED OF TRUST SECURED BY HOMESTEAD
+		// 0043.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00007334.tif.uss
+		17=^DEED\s*OF\s*TRUST\s*SECURED\s*BY\s*HOMESTEAD(?:\r?$)
+
+		// DEED OF TRUST...NOTICE OF CONFIDENTIALITY RIGHTS:
+		// 0055.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016323.tif.uss
+		18=^DEED\s*OF\s*TRUST[\s\S]{0,100}NOTICE\s*OF\s*CONFIDENTIALITY\s*RIGHTS\b
+		
+		// NOTICE OF CONFIDENTIALITY RIGHTS...DEED OF TRUST
+		// 0056.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Deed of Trust\00016304.tif.uss
+		19=^NOTICE\s*OF\s*CONFIDENTIALITY\s*RIGHTS[\s\S]{0,500}?DEED\s*OF\s*TRUST\b
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-035079.tif.uss 
+		20=^LINE\s*OF\s*CREDIT\s*TRUST\s*DEED(?:\r?$)
+		
+	OR_END
+
+	OR_BEGIN,MTG_SURE_02,false
+		//////////////////////////////
+		// DOUBLE DOCUMENTS - START //
+		//////////////////////////////
+		// DEED OF TRUST AND REQUEST FOR NOTICE OF DEFAULT
+		// 0050.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed of Trust\20049000048400.007.tif.uss
+		01=^DEED\s*OF\s*TRUST\s*AND\s*REQUEST\s*FOR\s*NOTICE\s*OF\s*DEFAULT(?:\r?$)
+
+		// MORTGAGE AND ASSIGNMENT OF RENTS
+		// 0022.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\Images\MTG\00104652.tif.uss
+		// DEED OF TRUST, ASSIGNMENT OF LEASES AND RENTS
+		// 0057.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016450.tif.uss
+		02=^(?:DEED\s*OF\s*TRUST|MORTGAGE)\s*(?:AND|,)?\s*ASSIGNMENT\s*OF\s*(?:LEASES\s*AND\s*)?RENTS,?(?:\r?$)
+
+		// COMMERCIAL DEED OF TRUST, SECURITY AGREEMENT, ASSIGNMENT OF LEASES AND RENTS, AND FIXTURE FILING
+		// 0058.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016933.tif.uss
+		03=^COMMERCIAL\s*DEED\s*OF\s*TRUST,?\s*SECURITY AGREEMENT,?\s*ASSIGNMENT\s*OF\s*LEASES\s*AND\s*RENTS,?\s*AND\s*FIXTURE\s*FILING(?:\r?$)
+
+		// DEED OF TRUST, SECURITY AGREEMENT, ASSIGNMENT OF PRODUCTION AND FINANCING STATEMENT
+		// 0035.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00014909.tif.uss
+		// DEED OF TRUST, MORTGAGE, SECURITY AGREEMENT, ASSIGNMENT OF PRODUCTION
+		// 0044.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00006801.tif.uss
+		04=^DEED\s*OF\s*TRUST,?\s*(?:MORTGAGE,?\s*)?SECURITY\s*AGREEMENT,?\s*ASSIGNMENT\s*OF\s*PRODUCTION(?:\s*AND\s*FINANCING\s*STATEMENT)?(?:\r?$)
+
+		// EXTENSION OF DEED OF TRUST, MORTGAGE, ASSIGNMENT OF RUNS, SECURITY AGREEMENT, FINANCING STATEMENT AND ASSIGNMENT
+		// 0036.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00015575.tif.uss
+		05=^EXTENSION\s*OF\s*DEED\s*OF\s*TRUST,?\s*MORTGAGE,?\s*ASSIGNMENT\s*OF\s*RUNS,?\s*SECURITY\s*AGREEMENT,?\s*FINANCING\s*STATEMENT\s*AND\s*ASSIGNMENT(?:\r?$)
+
+		// MORTGAGE, DEED OF TRUST, ASSIGNMENT OF LEASES AND RENTS, SECURITY AGREEMENT, FIXTURE FILING AND FINANCING STATEMENT
+		// 0045.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00007792.tif.uss
+		// MULTIFAMILY DEED OF TRUST ASSIGNMENT OF RENTS AND SECURITY AGREEMENT AND FIXTURE FILING
+		// 0062.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DEED OF TRUST\00013066.tif.uss
+		// LEASEHOLD MORTGAGE, DEED OF TRUST, ASSIGNMENT OF LEASES AND RENTS, SECURITY AGREEMENT, FIXTURE FILING AND FINANCING STATEMENT
+		// 0046.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00007790.tif.uss
+		06=^(?:LEASEHOLD\s*)?(?:(?:MORTGAGE,?|MULTIFAMILY)\s*)?DEED\s*OF\s*TRUST,?\s*ASSIGNMENT\s*OF\s*(?:LEASES\s*AND\s*)?RENTS,?\s*SECURITY\s*AGREEMENT,?(?:\s*AND)?\s*FIXTURE\s*FILING(?:\s*AND\s*FINANCING\s*STATEMENT)?(?:\r?$)
+
+		// FIFTH SUPPLEMENT TO DEED OF TRUST, MORTGAGE, LINE OF CREDIT MORTGAGE, ASSIGNMENT, SECURITY AGREEMENT, FIXTURE FILING AND FINANCING STATEMENT
+		// 0037.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00014464.tif.uss
+		07=^FIFTH\s*SUPPLEMENT\s*TO\s*DEED\s*OF\s*TRUST,?\s*MORTGAGE,?\s*LINE\s*OF\s*CREDIT\s*MORTGAGE,?\s*ASSIGNMENT,?\s*SECURITY\s*AGREEMENT,?\s*FIXTURE\s*FILING\s*AND\s*FINANCING\s*STATEMENT(?:\r?$)
+
+		// FIRST AMENDMENT TO DEEDS OF TRUST, MORTGAGES, SECURITY AGREEMENTS. ASSIGNMENTS OF PRODUCTION, AND FINANCING STATEMENTS
+		// 0038.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST\00014568.tif.uss
+		08=^FIRST\s*AMENDMENT\s*TO\s*DEEDS\s*OF\s*TRUST.?\s*MORTGAGES.?\s*SECURITY\s*AGREEMENTS.?\s*ASSIGNMENTS\s*OF\s*PRODUCTION.?\s*AND\s*FINANCING\s*STATEMENTS(?:\r?$)
+
+		// FIFTH RESTATED MORTGAGE, DEED OF TRUST, SECURITY AGREEMENT, FINANCING STATEMENT AND ASSIGNMENT
+		// 0047.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00007185.tif.uss
+		09=^(?:FIFTH\s*RESTATED\s*)?MORTGAGE,?\s*DEED\s*OF\s*TRUST,?\s*SECURITY\s*AGREEMENT,?\s*FINANCING\s*STATEMENT\s*AND\s*ASSIGNMENT(?:\r?$)
+
+		// CONTRACT FOR IMPROVEMENTS WITH DEED OF TRUST AND POWER OF SALE
+		// 0048.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST\00006596.tif.uss
+		10=^CONTRACT\s*FOR\s*IMPROVEMENTS\s*WITH\s*DEED\s*OF\s*TRUST\s*AND\s*POWER\s*OF\s*SALE(?:\r?$)
+
+		// HOMESTEAD LIEN CONTRACT AND DEED OF TRUST
+		// 0063.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DTRUST\2003132608.tif.uss
+		11=^(?:HOMESTEAD\s*LIEN\s*CONTRACT|HOME\s*EQUITY)[\s\S]{0,8}DEED\s*OF\s*TRUST(?:\r?$)
+
+		// REAL ESTATE MORTGAGE, SECURITY AGREEMENT AND FINANCING STATEMENT
+		//0068.tif;k:\common\engineering\sample files\waukesha\set005\images\mortgage bank\00000245.tif.uss
+		12=^REAL\s*ESTATE\s*MORTGAGE,?\s*SECURITY\s*AGREEMENT\s*AND\s*FINANCING\s*STATEMENT(?:\r?$)
+
+		13=^Commercial\s*Real\s*Estate\s*Mortgage\s*and\s*Assignment\s*of\s*Leases\s*and\s*Rents\s*(?:\r?$)
+
+		////////////////////////////
+		// DOUBLE DOCUMENTS - END //
+		////////////////////////////
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.4,1,2
+	OR_BEGIN,MTG_SURE_03,true
+		// Mortgage
+		// 0007.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000360.TIF.uss
+		// 0023.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110348.TIF.uss
+		// Deed Of Trust
+		// 0064.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DTRUST\2003132449.tif.uss
+		//  REAL ESTATE DEED OF TRUST - 
+		// 0059.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Deed of Trust\00016413.tif.uss
+		// MORTGAGE (?:With Future Advance Clause)
+		// 0008.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000409.TIF.uss
+		01=^(?:R(?:eal|EAL)\s*E(?:state|STATE)\s*)?(?:D(?:eed|EED)\s*[Oo][Ff]\s*T(?:rust|RUST)|M(?:ortgage|ORTGAGE))(?:\r?$)
+
+		02=^\d+\s*(?:D(?:eed|EED)\s*[Oo][Ff]\s*T(?:rust|RUST))\s*\d+
+
+		// DEED OF TRUST (?:OCR ZONE of a LOAN NUMBER) \nNOTICE OF CONFIDENTIALITY RIGHTS
+		// 0060.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Deed of Trust\00016546.tif.uss
+		03=^DEED\s*OF\s*TRUST[\s\S]{0,50}(?:(?:NOTICE\s*OF\s*CONFIDENTIALITY\s*RIGHTS)|(?:RECORD\s*IN\s*THE\s*PUBLIC\s*RECORDS))(?:\r?$)
+
+		// PURCHASE MONEY DEED OF TRUST
+		// 0055.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016323.tif.uss
+		04=^PURCHASE MONEY\s*(?:DEED\s*OF\s*TRUST|MORTGAGE)(?:\r?$)
+
+		// SUPPLEMENTAL DEED OF TRUST
+		// 0065.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set002\Images\DTRUST\2003131730.tif.uss
+		05=^SUPPLEMENTAL\s*DEED\s*OF\s*TRUST,?(?:\r?$)
+				  
+		// DEED OF TRUST INCORPORATING BY REFERENCE
+		// 0066.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set002\Images\DTRUST\2003132384.tif.uss
+		06=^DEED\s*OF\s*TRUST\s*INCORPORATING\s*BY\s*REFERENCE(?:\r?$)
+
+		// THIS DEED OF TRUST
+		// 0061.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Deed of Trust\00016311.tif.uss
+		07=^THIS\s*DEED\s*OF\s*TRUST\b
+		
+		08=^.{0,10}DEED\s*OF\s*TRUST.{0,20}(?:\r?$)
+
+		09=^THIS(?:\s*REAL\s*ESTATE\s*)?\s*MORTGAGE\s*[Ii]s\s*made\s*(?:this|between|on\s*the)\b
+
+		10=^THIS\s*IS\s*A\s*MORTGAGE\s*between\b
+
+		11=^T(?:his|HIS)\s*M(?:ortgage|ORTGAGE)\s*\(?.?Security\s*[Ii]nstrument.?\)?\s*[Ii]s\s*given\b
+		
+		12=^Mortgage\s*\(Installment\s*Loan\s*or\s*Line\s*of\s*Credit\)
+
+		13=^(?:REAL\s*Mortgage\s*)?THIS\s*IS\s*A\s*FUTURE\s*ADVANCE\s*MORTGAGE\s*(?:\r?$)
+
+		14=^Equity\s*Line\s*Mortgage\s*(?:\r?$)
+
+		15=^RECORDED\s*IN\s*MORTGAGES\s*(?:\r?$)
+		
+		16=^(?:This\s*)?Continuing\s*Collateral\s*Mortgage,?\s*(?:\r?$)
+
+		17=^RESIDENTIAL\s*MORTGAGE\s*(?:\r?$)
+
+		18=^HOME\s*EQUITY\s*MORTGAGE\s*(?:\r?$)
+
+		19=^HOME\s*LOAN\s*MORTGAGE\s*(?:\r?$)
+
+		20=^THIS\s*MORTGAGE\b
+		
+
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	AND_BEGIN,MTG_SURE_04,false
+		^SECURITY\s*DOCUMENT(?:\r?$)
+		MORTGAGE
+	AND_END
+SCOPE_END
+SCOPE_BEGIN,0,0.25,1,1
+	OR_BEGIN,MTG_SURE_05,true
+		01=^M(?:ortgage|ORTGAGE)\s*D(?:eed|EED)(?:\r?$)
+	OR_END
+SCOPE_END
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,MTG_PROBABLE_01,true
+		//
+		01=(?:(?:CONS(?:TRUCTION|UMER[\s\S]{0,15})|RRECTIVE)|LEASEHOLD|(?:HOME\s*EQUITY\s*)?LINE\s*OF\s*CREDIT|REAL\s*PROPERTY|SECONDARY|SUBORDINATE)\s*(?:MORTGAGE|DEED\s*OF\s*TRUST)
+		
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-028658.tif.uss
+		02=^TRUST\s*DEED\s*TO\s*CONSUMER\s*FINANCE\s*LICENSEE(?:\r?$)
+	OR_END
+	OR_BEGIN,MTG_PROBABLE_02,false
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-011297.tif.uss
+		01=^TRUST\s*DEED(?:\r\n){1,4}\(?LINE\s*OF\s*CREDIT\s*TRUST\s*DEED\)?(?:\r?$)
+
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-028658.tif.uss
+		02=THIS\s*TRUST\s*DEED,?\s*made\s*this
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,MTG_PROBABLE_03,true
+		01=^(?:(?:D(?:eed|EED)\s*?:[Oo][Ff]\s*T(?:rust|RUST))|(?:M(?:ortgage|ORTGAGE)))(?:\r?$)
+
+		// This DEED OF TRUST (herein referred to as the "Deed of Trust")
+		// 0067.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set001\Images\DTRUST\2003133994.tif.uss
+		02=^This\s*DEED\s*OF\s*TRUST\s*\(herein\s*referred\s*to\s*as\s*the\s*"Deed\s*of\s*Trust"\)
+	OR_END
+
+	AND_BEGIN,MTG_PROBABLE_04,false
+		THIS\s*(?:MORTGAGE|DEED\s*OF\s*TRUST)
+		\b(?:MORTGAGOR|GRANTOR|BORROWER)\b
+		\b(?:MORTGAGEE|LENDER)\b
+	AND_END
+	//K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\DEED OF TRUST\2005-0061876.TIF
+	AND_BEGIN,MTG_PROBABLE_05,false
+		^.{0,2}2\.\x20?CONVEYANCE
+		^.{0,2}3\.\x20?MAXIMUM\x20?OBLIGATION\x20?LIMIT
+		^.{0,2}4\.\x20?SECURED\x20?DEBT\x20?AND\x20?FUTURE\x20?ADVANCES
+	AND_END
+SCOPE_END
+SCOPE_BEGIN,0,0.5,1,2
+	SINGLE_BEGIN,MTG_PROBABLE_06,false
+		DEED\W*OF\W*TRUST\W*With\W*Future\W*Advance\W*Clause
+	SINGLE_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+
+SCOPE_BEGIN,0,0.25,1,2 
+	OR_BEGIN,MTG_MAYBE_01,false
+		01=^.{0,50}DEED\s*O\s*F\s*TRUST[\s\S]{0,100}?\r\n\r\n
+	OR_END
+	OR_BEGIN,MTG_MAYBE_02,true
+		01=\bMORTGAGE\b
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,MTG_MAYBE_03,false
+		// 0009.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000355.TIF.uss
+		01=borrower[\s\S]{1,5}\bis\b[\s\S]+?(?:lender[\s\S]{1,5}\bis\b|MERS[\s\S]{1,5}\bis\b|trustee[\s\S]{1,5}\bis\b)
+		02=mortgages?[\s\S]{1,4}(?:(?:grant|assign|convey|bargain)s?[\s\S]{1,8}?){2,}
+		03=(?:(?:grant|assign|convey|bargain)s?[\s\S]{1,8}?){2,}mortgages\b
+		04=\bMortgagor\s*promises\s*to\s*pay\s*to\s*Mortgagee\b
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,MTG_MAYBE_04,false
+		01=^NOTE\s*AND\s*MORTGAGE\s*MODIFICATION\s*
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,3
+	OR_BEGIN,MTG_MAYBE_05,false
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-023300.tif.uss
+		01=^Deed\s*of\s*Trust(?:\r?$)
+		02=THIS\s*DEED\s*OF\s*TRUST\s*IS\s*ALSO\s*INTENDED\s*TO\s*BE\s*A\s*FIXTURE\s*FILING
+	OR_END
+SCOPE_END
+[MAYBE_END]

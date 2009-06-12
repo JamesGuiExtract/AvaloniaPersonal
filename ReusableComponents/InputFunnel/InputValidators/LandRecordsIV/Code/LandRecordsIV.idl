@@ -1,0 +1,190 @@
+// LandRecordsIV.idl : IDL source for LandRecordsIV.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (LandRecordsIV.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D08B8B61-3AA3-11D6-8260-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID LandRecordsIV 1.0 Type Library")
+]
+library UCLID_LANDRECORDSIVLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDDistanceConverter\Code\UCLIDDistanceConverter.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\IFCore\Code\IFCore.tlb");
+
+	// Enums
+	typedef
+	[
+		uuid(01836E80-6E9A-11d6-829F-0050DAD4FF55), 
+		helpstring("UCLID ECartographicDirection Types")
+	]
+	enum ECartographicDirection
+	{
+		kUndefined = 0, 
+		kBearingDirection = 1, 
+		kPolarAngleDirection = 2, 
+		kAzimuthDirection = 3
+	} ECartographicDirection;
+
+	// Interfaces
+	[
+		object,
+		uuid(D08B8B6F-3AA3-11D6-8260-0050DAD4FF55),
+		dual,
+		helpstring("IBearing Interface"),
+		pointer_default(unique)
+	]
+	interface IBearing : IDispatch
+	{
+		[id(1), helpstring("method GetBearingInRadians")] HRESULT GetBearingInRadians([out, retval] double *dValue);
+		[id(2), helpstring("method GetBearingInDegrees")] HRESULT GetBearingInDegrees([out, retval] double *dValue);
+		[id(3), helpstring("method InitBearing")] HRESULT InitBearing([in] BSTR strInput);
+		[id(4), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *bValid);
+	};
+	[
+		object,
+		uuid(D08B8B72-3AA3-11D6-8260-0050DAD4FF55),
+		dual,
+		helpstring("IAngle Interface"),
+		pointer_default(unique)
+	]
+	interface IAngle : IDispatch
+	{
+		[id(1), helpstring("method GetAngleInRadians")] HRESULT GetAngleInRadians([out, retval] double *dValue);
+		[id(2), helpstring("method GetAngleInDegrees")] HRESULT GetAngleInDegrees([out, retval] double *dValue);
+		[id(3), helpstring("method InitAngle")] HRESULT InitAngle([in] BSTR strInput);
+		[id(4), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *bValid);
+	};
+	[
+		object,
+		uuid(D08B8B74-3AA3-11D6-8260-0050DAD4FF55),
+		dual,
+		helpstring("IDistance Interface"),
+		pointer_default(unique)
+	]
+	interface IDistance : IDispatch
+	{
+		[id(1), helpstring("method GetDistanceInUnit")] HRESULT GetDistanceInUnit([in] EDistanceUnitType eOutUnit, [out, retval] double *dValue);
+		[id(2), helpstring("method InitDistance")] HRESULT InitDistance([in] BSTR strInput);
+		[id(3), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *bValid);
+		[propget, id(4), helpstring("property GlobalDefaultDistanceUnit")] HRESULT GlobalDefaultDistanceUnit([out, retval] EDistanceUnitType *pVal);
+		[propput, id(4), helpstring("property GlobalDefaultDistanceUnit")] HRESULT GlobalDefaultDistanceUnit([in] EDistanceUnitType newVal);
+	};
+	[
+		object,
+		uuid(7D249AD5-539F-11D6-8280-0050DAD4FF55),
+		dual,
+		helpstring("IDirection Interface"),
+		pointer_default(unique)
+	]
+	interface IDirection : IDispatch
+	{
+		[id(1), helpstring("method GetDirectionAsPolarAngleInDegrees")] HRESULT GetDirectionAsPolarAngleInDegrees([out, retval] double *pdPolarAngleDegrees);
+		[id(2), helpstring("method GetDirectionAsPolarAngleInRadians")] HRESULT GetDirectionAsPolarAngleInRadians([out, retval] double *pdPolarAngleRadians);
+		[id(3), helpstring("method InitDirection")] HRESULT InitDirection([in] BSTR strInput);
+		[id(4), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *pbValid);
+		[propget, id(5), helpstring("property GlobalDirectionType")] HRESULT GlobalDirectionType([out, retval] ECartographicDirection *pVal);
+		[propput, id(5), helpstring("property GlobalDirectionType")] HRESULT GlobalDirectionType([in] ECartographicDirection newVal);
+	};
+
+
+	// Coclasses
+	[
+		uuid(D08B8B70-3AA3-11D6-8260-0050DAD4FF55),
+		helpstring("Bearing Class")
+	]
+	coclass Bearing
+	{
+		[default] interface IBearing;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D08B8B73-3AA3-11D6-8260-0050DAD4FF55),
+		helpstring("Angle Class")
+	]
+	coclass Angle
+	{
+		[default] interface IAngle;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D08B8B75-3AA3-11D6-8260-0050DAD4FF55),
+		helpstring("Distance Class")
+	]
+	coclass Distance
+	{
+		[default] interface IDistance;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(7D249AD6-539F-11D6-8280-0050DAD4FF55),
+		helpstring("Direction Class")
+	]
+	coclass Direction
+	{
+		[default] interface IDirection;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D08B8B77-3AA3-11D6-8260-0050DAD4FF55),
+		helpstring("BearingInputValidator Class")
+	]
+	coclass BearingInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D08B8B79-3AA3-11D6-8260-0050DAD4FF55),
+		helpstring("AngleInputValidator Class")
+	]
+	coclass AngleInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(5AD193B4-3B4E-11D6-8261-0050DAD4FF55),
+		helpstring("DistanceInputValidator Class")
+	]
+	coclass DistanceInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(7D249AD4-539F-11D6-8280-0050DAD4FF55),
+		helpstring("DirectionInputValidator Class")
+	]
+	coclass DirectionInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(90666182-C597-11d6-8301-0050DAD4FF55),
+		helpstring("CartographicPointInputValidator Class")
+	]
+	coclass CartographicPointInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ITestableComponent;
+	};
+
+};

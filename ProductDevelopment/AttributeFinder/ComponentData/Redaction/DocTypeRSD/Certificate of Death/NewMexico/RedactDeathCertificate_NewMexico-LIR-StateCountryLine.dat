@@ -1,0 +1,8 @@
+STATE\s*OR\s*COUNTRY
+OR\s*COUNTRY.{0,6}BIRTH
+CITIZEN.{0,5}WHAT
+MARRIED.{0,3}NEVER
+NEVER.{0,3}MARRIED
+SURVIVING\s*SPOUSE
+if\s*wife.{0,3}give
+give\s*birth\s*name

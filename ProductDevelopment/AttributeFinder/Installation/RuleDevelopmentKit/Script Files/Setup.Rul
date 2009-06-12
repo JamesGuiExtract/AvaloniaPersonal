@@ -1,0 +1,239 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:    Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                          
+//                                                                            
+//  Comments:     This minimal project is intended for advanced users. 
+//                To create a robust project with step-by-step 
+//				  instructions, use the Project Wizard. 
+//                                                                                                               
+/////////////////////////////////////////////////////////////////////////////
+
+// Include header files /////////////////////////////////////////////////////
+#include "..\..\..\..\Common\InstallScripts\Common.rul"
+
+////////////////////// string defines ////////////////////////////
+    #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
+//////////////////// installation declarations ///////////////////
+
+    // In order to have your InstallScript function executed as a custom
+    // action by the Windows Installer, it must be prototyped as an 
+    // entry-point function.
+
+    // The keyword export identifies MyFunction() as an entry-point function.
+    // The argument it accepts must be a handle to the Installer database.
+    
+      /* export prototype MyFunction(HWND); */  
+
+    // To Do:  Declare global variables, define constants, and prototype user-
+    //         defined and DLL functions here.
+
+
+// ----- DLL function prototypes -----
+
+
+    // your DLL function prototypes
+    prototype detectFlexIndexSDKInstall();
+
+
+// ---- script function prototypes -----
+
+
+    // your script function prototypes
+
+    // your global variables
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   OnFirstUIBefore                                            
+//                                                                           
+//  EVENT:      FirstUIBefore event is sent when installation is run for the first
+//              time on given machine. In the handler installation usually displays
+//              UI allowing end user to specify installation parameters. After this
+//              function returns, ComponentTransferData is called to perform file
+//              transfer.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIBefore()
+    NUMBER nResult, nSetupType, nvSize, nUser;
+    STRING szTitle, szMsg, szQuestion, svName, svCompany, szFile;
+    STRING szLicenseFile;
+    LIST list, listStartCopy;
+    BOOL bCustom;
+begin	
+    // TO DO: if you want to enable background, window title, and caption bar title                                                                   
+    // SetTitle( @PRODUCT_NAME, 24, WHITE );                                        
+    // SetTitle( @PRODUCT_NAME, 0, BACKGROUNDCAPTION ); 	                  
+    // Enable( FULLWINDOWMODE );						   
+    // Enable( BACKGROUND );							  
+    // SetColor(BACKGROUND,RGB (0, 128, 128));					   
+
+    SHELL_OBJECT_FOLDER = @PRODUCT_NAME;	   
+    
+    nSetupType = TYPICAL;	
+
+	// check installed Flex Index SDK
+	detectFlexIndexSDKInstall();
+
+Dlg_SdWelcome:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SdWelcome(szTitle, szMsg);
+    if (nResult = BACK) goto Dlg_SdWelcome;
+	
+    szTitle   = "";
+    svName    = "";
+    svCompany = "";    
+    
+    // Set destination path according to the registry key
+Dlg_SdLicense:
+	nResult = SdLicense2(szTitle, "", "", "License.txt", FALSE);
+	if nResult = BACK goto Dlg_SdWelcome;
+	
+Dlg_SdStartCopy:
+    if (nResult = BACK) then
+    	goto Dlg_SdLicense;
+    endif;
+
+	CloseApps();
+	
+    // setup default status
+    Enable(STATUSEX);
+ 
+    return 0;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnFirstUIAfter
+//
+//  EVENT:      FirstUIAfter event is sent after file transfer, when installation 
+//              is run for the first time on given machine. In this event handler 
+//              installation usually displays UI that will inform end user that
+//              installation has been completed successfully.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szOption1, szOption2, szRegAllCmdLine, szCmd;
+    NUMBER bOpt1, bOpt2;
+begin
+                                                                                                                                  
+    // Register Dlls
+	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
+	szCmd = "cmd";
+	LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+
+    Disable(STATUSEX);
+	
+    bOpt1  = FALSE;
+    bOpt2  = FALSE;
+    szMsg1 = SdLoadString(IFX_SDFINISH_MSG1);
+    SdFinishEx(szTitle, szMsg1, szMsg2, szOption1, szOption2, bOpt1, bOpt2);
+end; 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   detectFlexIndexSDKInstall
+//
+//  EVENT:      Check for installed FlexIndexSDK
+//
+///////////////////////////////////////////////////////////////////////////////
+function detectFlexIndexSDKInstall()
+	STRING strSDKUninstallKey, strIDShieldUninstallKey;
+	NUMBER nSize, nType;
+	STRING strVersion;
+begin
+	CheckOtherExtractProducts();
+	if ( CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, TRUE) ||
+		CheckProductKeyInstalled(@FlexIndexVersion, FLEX_INDEX_PRODUCT_CODE, strVersion, TRUE)||
+		CheckProductKeyInstalled(@LabDEVersion, LABDE_PRODUCT_CODE, strVersion, TRUE)) then
+		return 0;
+	endif;
+	
+	// this means Flex Index SDK is not installed 
+	// on the target machine
+	MessageBox("FLEX Index, ID Shield or LabDE must be installed before this installation can run. Setup will terminate.", SEVERE);
+	abort;
+	
+	return 0;
+end;						
+// --- include script file section ---
+
+//---------------------------------------------------------------------------
+// OnMaintUIBefore
+//
+// The OnMaintUIBefore event is called by the framework when the setup is
+// running in maintenance mode. By default this event displays UI that
+// allows the end user to add or remove features, repair currently
+// installed features or uninstall the application.
+//---------------------------------------------------------------------------
+function OnMaintUIBefore()
+	NUMBER nResult, nType;
+	STRING szTitle, szMsg, svDir, svResult, szCaption;
+begin
+	// TO DO: if you want to enable background, window title, and caption bar title   								
+	// SetTitle( @PRODUCT_NAME, 24, WHITE );					
+	// SetTitle( @PRODUCT_NAME, 0, BACKGROUNDCAPTION );  			
+	// SetColor(BACKGROUND,RGB (0, 128, 128));					
+	// Enable( FULLWINDOWMODE );						
+	// Enable( BACKGROUND );							
+	
+Dlg_Start:
+
+    // Added in Version 9.5 - Support for REMOVEONLY option.
+    if( !REMOVEONLY ) then
+		// In standard mode show maintenance dialog
+		Disable(BACKBUTTON);
+		nType = SdWelcomeMaint(szTitle, szMsg, MODIFY);
+		Enable(BACKBUTTON);
+	else
+        // Hide the initial progress dialog as otherwise the user can
+        // click on it, and hide the MessageBox.
+        Disable( DIALOGCACHE );
+
+        // In RemoveOnly mode, set to remove.
+        nType = REMOVEALL;
+    endif;
+	
+	// Show Uninstall Confirmation Dialog
+    if ( nType = REMOVEALL ) then
+		nResult = MessageBox( SdLoadString( IFX_MAINTUI_MSG ), MB_YESNO );
+		if (nResult != IDYES ) then
+            
+            if( REMOVEONLY ) then
+                // In REMOVEONLY mode, abort the setup.
+                abort;
+            else
+                // In non-REMOVEONLY mode, redisplay the previous dialog.
+			    goto Dlg_Start;
+            endif;
+
+		endif;
+	endif;
+
+	nResult = NEXT;
+
+Dlg_SdFeatureTree:
+	if (nType = MODIFY) then
+		szTitle = "";
+		szMsg = "";
+		nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
+		if (nResult = BACK) goto Dlg_Start;
+	endif;
+ 
+ 	// Close ExtractTRP2
+	CloseApps();
+	
+	switch(nType)
+		case REMOVEALL: FeatureRemoveAll();
+		case REPAIR:    FeatureReinstall();
+	endswitch;
+    
+	// setup default status 
+	SetStatusWindow(0, "");
+	Enable(STATUSEX);
+	StatusUpdate(ON, 100);
+end;

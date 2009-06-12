@@ -1,0 +1,303 @@
+<html>
+
+<head>
+<title>File Action Manager Sanity Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>File Action Manager NEW Sanity Test<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<p>
+*Both ID Shield and FLEX Index should be installed and licensed for this test.
+<ol>
+	<li><h2>ID Shield Testing</h2>
+	<ul>
+		<li><b>File preparation</b>
+		<ul>
+			<li>Navigate to <b>\\fnp2\Internal\Common\Testing\Product Testing\IDShield_Sanity\</b>.
+			<li>Copy images to the test machine.
+			<ul>
+				<li>Create destination folder for Sanity Test images on the test machine.
+				<li>Open command window on test machine and navigate to the <b>IDShield_Sanity</b> 
+				folder provided above.
+				<li>Exercise <b>Copy_SanityTest_Files.bat</b> using the fully-qualified path to the 
+				destination folder as the single argument.
+			</ul>
+			<li>Confirm presence of the following non-empty child folders.
+			<ul>
+				<li><b>Images</b> - images to be copied into the <b>Images2</b> folder 
+				to be supplied via listening for OCR and auto-redaction processing.
+				<li><b>Images1</b> - for a Folder file supplier to use to supply images 
+				for OCR and auto-redaction processing.
+				<li><b>Images2</b> - empty folder to contain files from <b>Images</b> 
+				to be supplied via listening.
+				<li><b>Images3</b> - for a Folder file supplier to use to supply images 
+				for <b>Execute rules</b> and later verification.
+			</ul>
+			<li>Use the <b>File Action Manager Database Administration</b> utility to create a 
+			<b>SANITY_TEST</b> database on the test machine with actions for <b>Compute</b>, 
+			<b>Verify</b> and <b>Auto</b>.
+			<li>Verify the <b>USB License Key Manager</b> is pointed to a USB key with redaction 
+			counts available (usually LISA).
+<p>
+			<li>Use of <b>Redaction Demo</b> rules?
+			<ul>
+				<li>Assess whether or not they are appropriate for use in this testing.
+				<li>If so, confirm that the RedactionDemo folder has been copied to C:\.
+				Modify <b>Auto-Redact.fps</b> so that the Redact images task uses the 
+				RedactionDemo rules.
+<p>
+				<li>If not, confirm that the desired rules have been copied to the test 
+				machine.  Modify <b>Compute.fps</b> so that the Execute rules task uses the 
+				desired rules.
+			</ul>
+		</ul>
+<p>
+		<li><b>Test1 - OCR and Auto-redaction from a Folder file supplier</b>
+		<ul>
+			<li>Open <b>Auto-Redact.fps</b> and start processing.
+			<li>Confirm that a few files complete the <b>OCR</b> and <b>Redact images</b> tasks.
+			<li>Copy the files from the <b>Images</b> folder to the <b>Images2</b> folder.
+			<li>Confirm that files are also being queued from the <b>Images2</b> folder.
+			<li><b>Test2</b> can be started while <b>Test1</b> is executing.
+		</ul>
+<p>
+		<li><b>Test2 - Compute redactions from a Folder file supplier</b>
+		<ul>
+			<li>Open <b>Compute.fps</b> and start processing.
+			<li>Confirm that a few files complete the <b>Execute rules</b> and <b>Conditionally 
+			execute task(s)</b> tasks.
+			<li>Use the <b>File Action Manager Database Administration</b> utility to display 
+			the <b>Summary</b> tab.  Confirm that the various counts are changing.
+			<li><b>Test3</b> can be started while <b>Test2</b> is executing.  Note that <b>Test3</b> 
+			cannot be completed until after Test2 has completed.
+			<li>Confirm via <b>FAMDBAdmin</b> that several files are ready for verification 
+			before starting <b>Test3</b>.
+		</ul>
+<p>
+		<li><b>Test3 - Verify redactions</b>
+		<ul>
+			<li>Open <b>Verify.fps</b> and start processing.
+			<li>Verify a few files and add several manual redactions.
+			<li>Navigate to previously verified documents and add additional manual redactions.
+			<li>Confirm that the latest manual redactions are properly saved. 
+			<li>Finish verifying the sensitive documents and confirm that the verification UI 
+			automatically closes.
+		</ul>
+<p>
+		<li><b>Analysis of ID Shield test results</b>
+		<ul>
+			<li>Confirm that the <b>Summary</b> tab displays the expected counts.
+			<li>Check for errors in the log tabs of the FAM and in the UEX log.
+		</ul>
+	</ul>
+<p>
+	<li><h2>FLEX Index - Flex Data Entry</h2>
+	<ul>
+		<li>Copy the <b>Flex Data Entry</b> folder to the test machine.
+		<li>Exercise the rules and images
+		<ul>
+			<li>Confirm that each image finds appropriate fields.
+			<li>Confirm that no exceptions are thrown during rule execution.
+			<li>Confirm that each field type can be swiped using the <b>angular redaction</b> 
+			tool.
+			<li>Confirm that each field type can be swiped using the <b>rectangular redaction</b> 
+			tool.
+			<li>Confirm that both Return Address and Legal Description types can be swiped via 
+			<b>Recognize text and process</b>.
+		</ul>
+	</ul>
+<p>
+	<li><h2>General Tools</h2>
+	<ul>
+		<li><b>Database Administration</b>
+		<ul>
+			<li>Confirm that <b>Database server name</b> is prepopulated with the previously 
+			selected server.
+			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
+			database name.
+			<li>Confirm that <b>Database server name</b> includes a <b>&lt;Browse...&gt;</b> 
+			choice that populates the combo box with names of all reachable SQL Server machines.
+			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
+			choice that populates the combo box with names of all databases available on the 
+			selected server.
+<p>
+			<li>Confirm that an action can be <b>added</b> to the database.
+			<li>Confirm that an action can be <b>removed</b> from the database.
+			<li>Confirm that an action can be <b>renamed</b> in the database.
+			<li>Confirm that action status can be <b>modified</b>.
+<p>
+			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
+			defined in the selected database.
+			<li>Confirm that the <b>Refresh</b> button updates the current counts.
+<p>
+			<li>Confirm that a file list can be <b>exported</b>.
+			<li>Confirm that the <b>File Action Manager</b> can be started from the Tools 
+			menu and that the active database is preselected.
+			<li>Confirm that each available <b>Report</b> can be generated.
+		</ul>
+<p>
+		<li><b>Help File</b>
+		<ul>
+			<li>Confirm that the <b>ID Shield</b> help file opens without error.
+			<li>Confirm that the <b>ID Shield</b> help file contains the expected contents.
+			<li>Confirm that the <b>FLEX Index</b> help file opens without error.
+			<li>Confirm that the <b>FLEX Index</b> help file contains the expected contents.
+		</ul>
+<p>
+		<li><b>USB License Key Manager</b>
+		<ul>
+			<li>Confirm that connecting to a USB key on a remote machine (i.e. <b>LISA</b>) 
+			populates the appropriate fields.
+			<li>Confirm that connecting to a USB key on the <b>local</b> machine 
+			populates the appropriate fields.
+			<li>Confirm that clicking the <b>Server Status</b> button displays a browser 
+			window with details about the local key.
+		</ul>
+<p>
+		<li><b>User License</b>
+		<ul>
+			<li>Confirm that the <b>User License</b> application when selected from the start menu starts with empty 
+			<b>Name</b>, <b>Company Name</b>, <b>Phone Number</b> and <b>Email</b> fields.
+			<li>Confirm that the <b>User License Key</b> field is populated and read-only.
+			<li>Confirm that one or more of the Extract Systems software products is 
+			available for selection.
+			<li>Confirm that the selected software product includes the appropriate 
+			version number.
+			<li>Confirm that when <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b>, and <b>Email</b> fields and
+			<b>Product</b>, <b>Version</b>, and <b>Type</b> drop-boxes are populated, the<b>
+              &lt;Next&gt;</b> button becomes active.
+          <li>Confirm that selecting the "<b>I use a desktop email application...</b>" radio button and pressing <b>&lt;Next&gt;</b>
+          takes you to step three.
+			<li>Confirm that <b>here</b> displays an email message to 
+			the specified email address.  Note that email setup can be skipped since the email 
+			will not actually be sent.
+			<li>Confirm that <b>&lt;Show manual license request instructions&gt;</b> takes you to the correct page.
+			<li>Confirm that the earlier "<b>I use web based email on this machine</b>" option also takes you to the manual license request
+			instructions.
+			<li>Confirm that the three buttons copy the appropriate information onto the clipboard.
+		</ul>
+	</ul>
+<p>
+	<li><h2>Utility Applications</h2>
+	<ul>
+		<li><b>Miscellaneous Utilities</b>
+		<ul>
+			<li>Convert FAM Database - opens without error.
+			<li>Convert FPS File - opens without error.
+		</ul>
+<p>
+		<li><b>Detect and Report Failure</b>
+		<ul>
+			<li>Confirm that <b>FDRS</b> starts and leaves a green icon in the system tray.
+			<li>Confirm that <b>FDRS</b> displays a context menu.
+			<li>Confirm that <b>Configure - Automatic notifications</b> displays an INI file 
+			with application settings.
+			<li>Confirm that <b>Exit</b> closes the application and removes the icon from the 
+			system tray.
+		</ul>
+<p>
+		<li><b>Image Viewer</b>
+		<ul>
+			<li><b>TIF image</b>
+			<ul>
+				<li>Confirm that an image can be opened and rotated.
+				<li>Confirm that a region of text can be OCR'd.
+				<li>Confirm that a page of text can be OCR'd.
+				<li>Confirm that an angular swipe of text OCRs properly.
+				<li>Confirm that a rectangular swipe of text OCRs properly.
+				<li>Confirm that a highlight can be deleted.
+			</ul>
+<p>
+			<li><b>PDF image</b>
+			<ul>
+				<li>Confirm that an image can be opened and rotated.
+				<li>Confirm that a region of text can be OCR'd.
+				<li>Confirm that a page of text can be OCR'd.
+				<li>Confirm that an angular swipe of text OCRs properly.
+				<li>Confirm that a rectangular swipe of text OCRs properly.
+				<li>Confirm that a highlight can be deleted.
+			</ul>
+		</ul>
+<p>
+		<li><b>Rule Tester</b>
+		<ul>
+			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
+			patch, and FKB update.
+			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> from the 
+			Redaction Demo.
+			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
+			different <b>rsd.etf</b> file from the Redaction Demo.
+			<br>Note: For the exception to be thrown, the RDT cannot be licensed.
+		</ul>
+<p>
+		<li><b>USS Viewer</b>
+		<ul>
+			<li>Confirm that a USS file can be opened.
+			<li>Confirm that <b>File - Properties</b> displays appropriate information.
+			<li>Confirm that <b>Find</b> finds text via regular expression.
+			<li>Confirm that <b>Find</b> finds text that is not a regular expression.
+		</ul>
+<p>
+		<li><b>View Exception Log</b>
+		<ul>
+			<li>Confirm that the <b>UEX Viewer</b> opens the current exception log.
+			<li>Confirm that if older UEX files are present, the file navigation buttons 
+			successfully open other UEX files.
+		</ul>
+<p>
+		<li><b>VOA Viewer</b>
+		<ul>
+			<li>Confirm that an <b>EAV</b> file can be opened.
+			<li>Confirm that a <b>VOA</b> file can be opened.
+			<li>Confirm that changes made to a VOA file can be saved.
+		</ul>
+	</ul>
+<p>
+	<li><h2>Rule Development Toolkit</h2>
+	<ul>
+		<li>Install and license the RDT.
+		<li>Confirm that <b>Automated Tests - Run all tests</b> works.
+<p>
+		<li><b>Miscellaneous Tools</b>
+		<ul>
+			<li>Image Cleanup Settings Editor - opens without error.
+			<li>Index Converter - opens without error.
+			<li>RDT Configuration - opens without error.
+			<li>Test Harness - opens without error.  Note that <b>Unable to 
+			decrypt license file!</b> is a benign error here.
+		</ul>
+<p>
+		<li><b>Rule Set Editor</b>
+		<ul>
+			<li>Confirm that <b>File - Properties</b> allows choice of counters to decrement, 
+			Key Serial #'s, and setting of an Internal Use Only flag.
+			<li>Confirm that <b>Tools - Rule Tester</b> displays the Rule Tester dialog.
+			<li>Confirm that <b>Tools - Execute Test Harnesss</b> displays the Test Harness dialog 
+			and the Test Result Logger window.
+			<li>Confirm that <b>Tools - Check For New Components</b> displays a message box 
+			with numbers found of the following component types.
+			<ul>
+				<li>Value Finders
+				<li>Value Modifiers
+				<li>Input Receivers
+				<li>Input Validators
+				<li>Output Handlers
+				<li>Attribute Splitters
+				<li>Document Preprocessors
+				<li>Data Scorers
+				<li>Conditions
+				<li>Selectors
+			</ul>
+			<li>Confirm that <b>Help - About FLEX Index</b> displays the expected version number, 
+			patch, and FKB update.
+		</ul>
+	</ul>
+</ol>
+
+</body>
+</html>

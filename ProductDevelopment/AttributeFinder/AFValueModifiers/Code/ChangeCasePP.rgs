@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.ChangeCasePP.1 = s 'ChangeCasePP Class'
+	{
+		CLSID = s '{280B434E-2AE7-4CA6-AE22-C94D7A5CEF9E}'
+	}
+	UCLIDAFValueModifiers.ChangeCasePP = s 'ChangeCasePP Class'
+	{
+		CLSID = s '{280B434E-2AE7-4CA6-AE22-C94D7A5CEF9E}'
+		CurVer = s 'UCLIDAFValueModifiers.ChangeCasePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {280B434E-2AE7-4ca6-AE22-C94D7A5CEF9E} = s 'ChangeCasePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -1,0 +1,6 @@
+Kind\s*of\s*Tax
+K.nd\s*.f\s*T.x
+Kind[\s\S]{2,6}Tax
+K.nd[\s\S]{2,6}T.x
+Kind\s*of\s*(?:Ta.?|.?ax)
+K.nd[\s\S]{2,6}(?:Ta.?|.?ax)

@@ -1,0 +1,4 @@
+Test|I, ROBERT H. YOUNG, 1709 Community Lane, Midland, Texas 79701, appoint CAROL R.\r\nYOUNG,1709 Community Lane, Midland, Texas 79701, my agent and attorneyinfact (my Agents) to act\r\nfor me in any lawful way with respect to all of the following powers except for a power I have crossed\r\nout below.
+Test|I ROBERT H YOUNG Community Lane Midlands Texas appoint CAROL R\r\nYOUNG Community Laney Midlands Texas my agent and attorneyinfact my Agent to act\r\nfor me in any lawful way with respect to all of the following powers except for a power I have crossed\r\nout below
+Test|^^ ^^^^^^ ^^ ^^^^^^ 1709 ^^^^^^^^^ ^^^^^ ^^^^^^^^ ^^^^^ 79701^ ^^^^^^^ ^^^^^ 0^ 121\r\n^^^^^^1709 ^^^^^^^^^ ^^^^^ ^^^^^^^^ 1 ^ 79701^ 2113^ ^^^^^ ^^^ 31^0211^^^121^^3^^ (111^ ^^^^^^^) ^0 ^^^\r\n^^^ ^^ ^^ ^^^ ^^^^^^ ^^^ ^^^^ ^^^^^^^ ^0 ^^^ ^^ ^^^ ^^^^^^^^^ ^^^^^^ ^^^^^^ ^^^ ^ ^^^^^ ^ ^^^^ ^^^^^^^\r\n^^^ ^^^^^^
+Test|, . , , , , .\r\n, , , ,\r\n.

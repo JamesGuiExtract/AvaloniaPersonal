@@ -1,0 +1,48 @@
+<HTML>
+	<HEAD>
+		<TITLE>Split Attribute Using Tokens</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Split Attribute Using Tokens</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Split Attribute Using Tokens attribute splitter is used to split an attributes into sub-attributes by using a specified delimiting character.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>To use the Split Attribute Using Tokens attribute splitter, you must first specify which character will be serving as the delimiting character.</li>
+			<li>Next you will have to choose how to name the sub-attributes:
+				<ul>
+					<li>You can have the sub-attributes be named automatically.
+						<ul>
+							<li>All of the sub-attributes will be given the name entered into the <b>Sub-attribute name expression</b> box.</li>
+							<li>%d will be replaced with the token number. (ie. If you enter <i>Field%d</i> into the <b>Sub-attribute name expression</b> box, the first sub-attribute with be named Field1, the second will be Field2, etc.)</li>
+						</ul>
+					</li>
+					<li>You can specify a name for each sub-attribute.
+						<ul>
+							<li>You will need to specify the desired name for each token.</li>
+							<li>%1 indicates the first token, %2 indicates the second token, etc.</li>
+							<li>Name/Token pairs can be added, deleted, and modified by using the <b>Add...</b>, <b>Remove</b>, and <b>Modify...</b> buttons.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<p>
+				<li><b>Example</b>:
+					<ul>
+						<li>Open <b>Names.rsd</b> and run it on <b>Names.txt</b>.  Note that a Replace Strings value modifier has been used to replace all of the spaces in the found data with semicolons.</li>
+						<li>Add a Split Attributes Using Tokens attribute splitter with a semicolon as the delimiting character.</li>
+						<li>Run the rules again and note how the sub-attributes are named.</li>
+						<li>Modify the attribute splitter to name the first token <i>First</i>, the second token <i>Middle</i>, and the third token to <i>Last</i>.</li>
+						<li>Run the rules again and note how the sub-attribute names have changed.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

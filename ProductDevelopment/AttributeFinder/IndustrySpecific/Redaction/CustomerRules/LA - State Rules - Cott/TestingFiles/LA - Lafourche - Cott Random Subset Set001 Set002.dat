@@ -1,0 +1,51 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//ADO
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\ADO;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//BON
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\BON;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//CAN
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\CAN;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//CHR
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\CHR;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//CNO
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\CNO;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//COU
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\COU;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//COV
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\COV;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//DOC
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\DOC;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//MAR
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\MAR;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//MIL
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\MIL;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//MIS
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\MIS;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//MTG
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\MTG;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//OAT
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\OAT;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//RDX
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\RDX;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//UCC
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\UCC;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//WIL
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - Lafourche - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - Lafourche\Random Subset Set001 Set002\Images\WIL;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

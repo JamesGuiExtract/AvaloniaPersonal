@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDSubImageHandlers.SRWSubImageHandler.1 = s 'SRWSubImageHandler Class'
+	{
+		CLSID = s '{A391026F-B6B8-11D6-82F4-0050DAD4FF55}'
+	}
+	UCLIDSubImageHandlers.SRWSubImageHandler = s 'SRWSubImageHandler Class'
+	{
+		CLSID = s '{A391026F-B6B8-11D6-82F4-0050DAD4FF55}'
+		CurVer = s 'UCLIDSubImageHandlers.SRWSubImageHandler.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A391026F-B6B8-11D6-82F4-0050DAD4FF55} = s 'SRWSubImageHandler Class'
+		{
+			ProgID = s 'UCLIDSubImageHandlers.SRWSubImageHandler.1'
+			VersionIndependentProgID = s 'UCLIDSubImageHandlers.SRWSubImageHandler'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{A3910261-B6B8-11D6-82F4-0050DAD4FF55}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.MicrFinder.1 = s 'MicrFinder Class'
+	{
+		CLSID = s '{895D780B-8C6F-46FD-A034-6C2BCF622B39}'
+	}
+	AFValueFinders.MicrFinder = s 'MicrFinder Class'
+	{
+		CLSID = s '{895D780B-8C6F-46FD-A034-6C2BCF622B39}'
+		CurVer = s 'AFValueFinders.MicrFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {895D780B-8C6F-46FD-A034-6C2BCF622B39} = s 'MicrFinder Class'
+		{
+			ProgID = s 'AFValueFinders.MicrFinder.1'
+			VersionIndependentProgID = s 'AFValueFinders.MicrFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

@@ -1,0 +1,9 @@
+^2[,.]{0,2}\s*ADD[\s\S]{3,9}DEBT
+^[\s\S]{0,4}ADDITI[O0]NAL\s*DEBT
+2[\s\S]{0,4}ADDITIONAL\s*DEBTO
+2.?\x20*(A[\s\S]{0,3}|[\s\S]{0,3}DD)[\s\S]{3,9}(NAL|[O0]NA\S{0,3})\s*DEBT
+^[\x20\S]{0,6}DITION[\s\S]{2,5}DEBTO
+^2.?\s*ADDITIONAL\s*\S{0,5}
+(^2.*|AL)\s*DEBT[O0]R'?S\s*EXACT
+(^2|ADDITION).*[o0]ne\s*debt[o0]r\s*nam
+name\s*\w2a\s*[o0]r\s*2b

@@ -1,0 +1,26 @@
+HKCR
+{
+	FeedbackManager.FeedbackMgr.1 = s 'FeedbackMgr Class'
+	{
+		CLSID = s '{70CF4E4F-61A6-4C27-B548-7C0C7B9C5A71}'
+	}
+	FeedbackManager.FeedbackMgr = s 'FeedbackMgr Class'
+	{
+		CLSID = s '{70CF4E4F-61A6-4C27-B548-7C0C7B9C5A71}'
+		CurVer = s 'FeedbackManager.FeedbackMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {70CF4E4F-61A6-4C27-B548-7C0C7B9C5A71} = s 'FeedbackMgr Class'
+		{
+			ProgID = s 'FeedbackManager.FeedbackMgr.1'
+			VersionIndependentProgID = s 'FeedbackManager.FeedbackMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{CB6DDDB9-8603-4FF2-B753-C9FED66ED9CB}'
+		}
+	}
+}

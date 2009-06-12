@@ -1,0 +1,4 @@
+\d{2}\/\d{2}\/\d{4}#Sept. 11th 1997
+Instrument\sNo\.#instr number
+Volume#Vol
+page#

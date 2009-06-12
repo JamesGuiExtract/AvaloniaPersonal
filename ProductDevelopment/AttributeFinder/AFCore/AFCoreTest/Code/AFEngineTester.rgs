@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCoreTest.AFEngineTester.1 = s 'AFEngineTester Class'
+	{
+		CLSID = s '{44DCAC20-5A28-485A-9FD8-CFC82508B404}'
+	}
+	UCLIDAFCoreTest.AFEngineTester = s 'AFEngineTester Class'
+	{
+		CLSID = s '{44DCAC20-5A28-485A-9FD8-CFC82508B404}'
+		CurVer = s 'UCLIDAFCoreTest.AFEngineTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {44DCAC20-5A28-485A-9FD8-CFC82508B404} = s 'AFEngineTester Class'
+		{
+			ProgID = s 'UCLIDAFCoreTest.AFEngineTester.1'
+			VersionIndependentProgID = s 'UCLIDAFCoreTest.AFEngineTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{4FA7B9DE-BF59-475E-980B-D0924BBAF268}'
+		}
+	}
+}

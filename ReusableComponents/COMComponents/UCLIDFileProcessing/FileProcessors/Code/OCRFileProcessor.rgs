@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.OCRFileProcessor.1 = s 'OCRFileProcessor Class'
+	{
+		CLSID = s '{F7A6E3C1-FED5-4271-BE7E-1F5DD2667433}'
+	}
+	FileProcessors.OCRFileProcessor = s 'OCRFileProcessor Class'
+	{
+		CLSID = s '{F7A6E3C1-FED5-4271-BE7E-1F5DD2667433}'
+		CurVer = s 'FileProcessors.OCRFileProcessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F7A6E3C1-FED5-4271-BE7E-1F5DD2667433} = s 'OCRFileProcessor Class'
+		{
+			ProgID = s 'FileProcessors.OCRFileProcessor.1'
+			VersionIndependentProgID = s 'FileProcessors.OCRFileProcessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

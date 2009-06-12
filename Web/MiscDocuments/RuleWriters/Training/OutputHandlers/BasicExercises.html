@@ -1,0 +1,45 @@
+<HTML>
+	<HEAD>
+		<TITLE>Output Handler Exercises</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Output Handler Exercises</h1>
+		<hr>
+		<ol>
+			<li><b>Remove Characters</b>
+				<ul>
+					<p>
+						<li>Open <b>SSN.rsd</b> and run it on <b>TestImage001.tif</b>.</li>
+						<li>Add a Remove Characters output handler that will remove all dashes from the output.</li>
+						<li>Run the rules again.  Notice how the text of attribute the has changed, but the spatial information has not.</li>
+					</p>
+				</ul>
+			</li>
+			<p>
+				<li><b>Output to XML File</b>
+					<ul>
+						<p>
+							<li>Open <b>SSN.rsd</b> and add an <i>Output data to XML file</i> output handler.  Set up the output handler to output Version 1 XML files in a subfolder called "XML".</li>
+							<li>Run the rules on <b>TestImage001.tif</b> to check your set up.</li>
+						</p>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>Output to VOA file</b>
+					<ul>
+						<p>
+							<li>Open <b>SSN.rsd</b> and add an <i>Output data to VOA file</i> output handler that outputs a VOA file to <i>&ltSourceDocName&gt.voa</i>.  Save the file.</li>
+							<li>Create a new database, add a new action, and queue all of the images in RedactionDemo Images folder.</li>
+							<li>Process all of the documents using a Execute Rules task that runs <b>SSN.rsd</b>.  Confirm that .voa files have been created for all of the images.</li>
+							<li>Set all of the documents back to pending and then process them using a Verify Redactions task.  Be sure that the task is set up to create Expected Redaction .voa files.  Redact all of the social security numbers in the documents.</li>
+							<li>Set up a .tcl and .dat files that will test <b>SSN.rsd</b> by comparing the output .voa files for all of the images in the Redaction Demo Image folder with the Expected Redaction .voa files that you just created.</li>
+							<li>Run the test. Delete the output .voa files and run the test again.  Notice that it takes the test longer to run when the output .voa files are not present.  This is because the Test Harness has to run the rules on each document.</li>
+						</p>
+					</ul>
+				</li>
+			</p>
+		</ol>
+	</BODY>
+</HTML>

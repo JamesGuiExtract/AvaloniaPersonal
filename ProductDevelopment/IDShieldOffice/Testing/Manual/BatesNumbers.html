@@ -1,0 +1,327 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Bates Number Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Bates Number Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+    <LI><b>Preferences - Bates number</b>
+	<ul>
+		<li>Open <b>ID Shield Office</b> and select the <b>Edit - Preferences</b> 
+		menu 
+		<li>Select the <b>Bates number</b> tab
+		<li>Confirm that a checkbox is provided for requiring a Bates number before 
+		files can be saved
+		<li>Confirm that the default setting is <b>checked</b>
+		<li>Confirm that the setting is persistent within the same session
+		<li>Confirm that the setting is persistent between sessions
+		<p>
+
+		<li>Confirm that a read-only edit box is provided to display the Bates number 
+		format for the current page
+		<li>Confirm that a <b>Change...</b> button is provided
+		<li>Confirm that the <b>Change...</b> button displays a <b>Change Bates number 
+		format</b> dialog
+		<li>Confirm that the setting is persistent within the same session
+		<li>Confirm that Bates number format is persistent between sessions
+		<p>
+
+		<li>Confirm that a <b>Change...</b> button is provided
+		<li>Confirm that double click disabled <b>Bates number format for current page</b> editbox shows <b>Change Bates number format</b> dialog
+		<li>Confirm that the <b>Change default position and appearance...</b> button 
+		displays a <b>Change Bates number default position and appearance</b> dialog
+		<li>Confirm that the setting is persistent within the same session
+		<li>Confirm that Bates number position is persisted between sessions
+		<p>
+
+		<li><b>[IDSD #61]</b> Confirm that user has an option to create a file as next number file
+	</ul>
+	<p>
+
+	<LI><b>Preferences - Change Bates number format dialog</b>
+	<ul>
+		<li>Open <b>ID Shield Office</b> and select the <b>Edit - Preferences</b> 
+		menu 
+		<li>Select the <b>Bates number</b> tab
+		<li>Click <b>Change...</b> button to display <b>Change Bates number format dialog</b> dialog
+		<li>Confirm that tab order is correct.
+		<!-- SCR# 69 -->
+		<li>Confirm that <b>dialog icon</b> is the same as main window.
+		<li>Confirm that next number defaults to <b>As specified</b>
+		<li>Confirm that next number is formatted as <b>Zero pad to 6 digits</b> by default.
+		<li>Confirm that Bates number format defaults to <b>Use next number for each document and add separator with page number</b>
+		<li>Confirm that page number is formatted as <b>Zero pad to 3 digits</b> by default.
+		<li>Confirm that default page number separator is <b>/</b>
+		<li>Confirm that <b>prefix</b> and <b>suffix</b> is empty by default
+		<li>Confirm that <b>Sample Bates number</b> is according to above setup
+		<!-- SCR# 62 -->
+		<li>Add prefix and suffix, change default zero pad for next number and page number
+		<li>Confirm that <b>Sample Bates number</b> is updated to the new format
+		<li>Click <b>OK</b> 
+		<li>Confirm that the <b>read-only Bates number editbox</b> in the <b>User preferences</b> dialog is updated to above sample Bates number
+	</ul>
+	<p>
+
+	<LI><b>Preferences - Change Bates number default position and appearance dialog</b>
+	<ul>
+		<li>Open <b>ID Shield Office</b> and select the <b>Edit - Preferences</b> 
+		menu 
+		<li>Select the <b>Bates number</b> tab
+		<li>Click <b>Change Bates number default position and appearance ...</b> button to display <b>Change Bates number default position and appearance</b> dialog
+		<li>Confirm that tab order is correct.
+		<!-- SCR# 39 -->
+		<li>Confirm that double click disabled font edit box shows <b>Font</b> dialog.
+		<!-- SCR# 69 -->
+		<li>Confirm that <b>dialog icon</b> is the same as main window.
+		<li>Confirm that font defaults to <b>Arial 30pt;Bold</b>
+		<li>Confirm that the editbox to display font options is <b>read only</b> 
+		<li>Confirm that default anchor positions for Bates number are as following.
+		<br><b>0.50</b> inches from <b>Right</b> of the page
+		<br><b>0.50</b> inches from <b>Top</b> of the page
+		<li>Confirm that default alignment for the anchor is right-top
+		<li>Change all the default values 
+		<li>Click <b>Cancel</b> 
+		<li>Click <b>Change Bates number default position and appearance ...</b> button to display <b>Change Bates number default position and appearance</b> dialog
+		<li>Confirm that all the options are still default values(not changed).
+	</ul>
+	<p>
+
+	<li><b>Configuration</b>
+	<ul>
+		<li>Can specify alphanumeric prefix for the Bates number
+		<li>Can specify alphanumeric suffix for the Bates number
+		<li>Can specify special characters such as #,@,etc. as part of the
+		Bates number prefix or suffix
+		<li>Can specify a zero-padded document number up to 
+		a user-specified number of digits by direct input
+		<li>Can specify a zero-padded document number up to 
+		a user-specified number of digits by a shared file
+		<li>Can specify a zero-padded page number up to 
+		a user-specified number of digits
+		<li>Can specify using next number on each page instead of 
+		a page number
+		<li>Can specify an anchor position relative to the page
+		<li>Can specify font size and style for Bates numbering
+		<li>Can specify one of nine anchor points
+		<p>
+
+		<!-- SCR# 40 -->
+		<li>Open ID Shield Office.
+		<li>Goto Preferences-&gt;Bates number-&gt;Change default position and appearance.
+		<li>Change some settings, remembering their original settings and then Click OK.
+		<li>Click <b>Cancel</b> in the <b>User reference</b> dialog
+		<li>Reopen Preferences-&gt;Bates number-&gt;Change default position and appearance
+		<li>Confirm previous changes are not saved
+		<p>
+
+		<!-- SCR# 60 -->
+		<!-- Bates# partial off page while image file is opening, should get a warning -->
+		<li>Open an image file
+		<li>Goto Preferences-&gt;Bates number-&gt;Change default position and appearance.
+		<li>Change anchor position as following:
+		<ul>
+			<li><b>0.5</b> inches from <b>Right</b> of the page
+			<li><b>0.05</b> inches from <b>Top</b> of the page
+		</ul>
+		<li>Change anchor alignment to <b>Left bottom</b>
+		<li>Click <b>OK</b>
+		<li>Confirm that <b>Apply Bates numbers off page? </b> dialog appears.
+		<li>Click <b>OK</b> in the <b>Apply Bates numbers off page? </b> dialog
+		<li>Click <b>OK</b> in the <b>Change Bates number default position and appearance</b> dialog
+		<li>Click <b>OK</b> in the <b>User Preference</b> dialog
+		<p>
+
+		<!-- Bates# partial off page while no image file is opening, should not get a warning -->
+		<li>Close the image file
+		<li>Goto Preferences-&gt;Bates number-&gt;Change default position and appearance.
+		<li>Confirm anchor position as following:
+		<ul>
+			<li><b>0.5</b> inches from <b>Right</b> of the page
+			<li><b>0.05</b> inches from <b>Top</b> of the page
+		</ul>
+		<li>Change anchor alignment to <b>Left bottom</b>
+		<li>Click <b>OK</b>
+		<li>Confirm that <b>Apply Bates numbers off page? </b> dialog doesn't appear.
+		<li>Click <b>OK</b> in the <b>Change Bates number default position and appearance</b> dialog
+		<li>Click <b>OK</b> in the <b>User Preference</b> dialog
+		<p>
+
+		<li>Open an image file
+		<li>Click <b>Bates#</b>
+		<li>Confirm that <b>Apply Bates numbers off page? </b> dialog appears.
+		<li>Click <b>No</b> in the <b>Apply Bates numbers off page? </b> dialog
+		<li>Confirm that <b>Bates#</b> are not added to the document
+		<li>Click <b>Bates#</b> again
+		<li>Confirm that <b>Apply Bates numbers off page? </b> dialog appears
+		<li>Click <b>Yes</b> in the <b>Apply Bates numbers off page? </b> dialog
+		<li>Confirm that <b>Bates#</b> are added to the document
+		<!-- SCR# 60 End -->
+	</ul>
+	<p>
+
+	<li><b>Functionality</b>
+	<ul>
+		<!-- SCR# 58 -->
+		<li>Launch IDSO and uncheck <b>Bates number</b> in the layers window
+		<li>Open an image file
+		<li>Click <b>Bates#</b> to apply bates number
+		<li>Confirm that <b>Bates number</b> is changed to checked in the layers window
+		<li>Confirm that <b>Bates#</b> added to image file are visible.
+		<p>
+
+		<!-- SCR# 55 -->
+		<li>Confirm that <b>Bates#</b> are added to each page of current document
+		<p>
+
+		<!-- SCR# 56 -->
+		<li>Confirm that <b>Bates#</b> position and offset from page are correct
+		<p>
+
+		<!-- SCR# 57 -->
+		<li>Confirm that <b>Bates#</b> can not be applied completely out of page		
+		<li>Confirm that <b>Bates#</b> toolbar button is disabled after applying
+		<li>Confirm that <b>Tools - Apply Bates number</b> menu is disabled after applying
+		<li>Confirm that Bates number can toggle <b>visible/invisible</b> by <b>check/uncheck the Bates number checkbox</b> at the layers window
+		<li>Can apply a user-defined separator before appending a 
+		page number to the Bates number on the page
+		<li>Can require a Bates number before allowing a document 
+		to be saved
+		<li>Can reposition a Bates number on a page		
+		<li>Can not reposition a Bates number out of a page
+		<li>Confirm that properties windows is refreshed during reposition
+		<li>confirm that properties are correct for Bates number
+		<li>Can change Bates number's font on a page
+		<li>Can calculate next document number correctly after applying Bates number				
+		<li>Confirm that next document number is persistent between sessions
+		<li>Confirm that Bates# properties are persistent between sessions
+
+		<p>		
+		<li>Check <b>Require Bates number before files can be saved</b> in the <b>User preferences</b> dialog
+		<li>Open an image file
+		<li>Draw an redaction
+		<li>Click <b>Save</b>
+		<li>Confirm that <b>ID Shield Office has been configured to require Bates numbers on output documents, but this document does not have Bates numbers on it.  Are you sure you want to continue?</b> prompt dialog appears
+		<li>Click <b>No</b>
+		<li>Confirm that <b>Save</b> dialog doesn't appear(Save is canceled).
+		<li>Click <b>Save</b> again and click <b>Yes</b> when prompt dialog appears.
+		<li>Confirm that <b>Save</b> dialog appears.
+		<li>Save the image file.
+		<li>Confirm that Bates number is not applied on the image file.
+		<p>
+
+		<!-- SCR# 287 -->
+		<li>Click <b>File - Print preview</b>
+		<li>Confirm that <b>ID Shield Office has been configured to require Bates numbers on output documents, but this document does not have Bates numbers on it.  Are you sure you want to continue?</b> prompt dialog appears
+		<li>Click <b>No</b>
+		<li>Confirm that <b>Print preview</b> dialog doesn't appear.
+		<li>Click <b>File - Print preview</b> again and click <b>Yes</b> when prompt dialog appears.
+		<li>Confirm that <b>Print preview</b> dialog appears.
+		<li>Confirm that Bates number is not applied on the image file.
+		<p>
+
+		<li>Click <b>File - Print</b>
+		<li>Confirm that <b>ID Shield Office has been configured to require Bates numbers on output documents, but this document does not have Bates numbers on it.  Are you sure you want to continue?</b> prompt dialog appears
+		<li>Click <b>No</b>
+		<li>Confirm that <b>Print</b> dialog doesn't appear.
+		<li>Click <b>File - Print</b> again and click <b>Yes</b> when prompt dialog appears.
+		<li>Confirm that <b>Print</b> dialog appears.
+		<li>Confirm that Bates number is not printed on the image file.		
+		<p>
+
+		<!-- SCR# 249 -->
+		<li>Draw another redaction to trigger the dirty flag
+		<li>Select <b>File - Close</b> menu 
+		<li>Click <b>Yes</b> on the <b>Save</b> dialog
+		<li>Confirm that <b>ID Shield Office has been configured to require Bates numbers on output documents, but this document does not have Bates numbers on it.  Are you sure you want to continue?</b> prompt dialog appears.
+		<li>Click <b>Yes</b> in the confirmation dialog.
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog to cancel saving.
+		<p>
+
+		<li>Uncheck <b>Require Bates number before files can be saved</b> in the <b>User preferences</b> dialog
+		<li>Open an image file and save it
+		<li>Confirm that no prompt appears to apply a Bates number before saving
+		<p>
+
+		<li>Open an image file
+		<li>Draw an redaction
+		<li>Select <b>File - Close</b> menu 
+		<li>Click <b>Yes</b> on the <b>Save</b> dialog
+		<li>Confirm <b>Apply Bates numbers</b> dialog doesn't appear
+		<li>Click <b>Cancel</b> in the <b>Save</b> dialog to cancel saving.
+		<p>
+
+		<li>Open an image file and apply Bates number
+		<li>Turn off <b>Bates number objects</b> in the Layers window
+		<li>Save and reopen the image file
+		<li>Confirm that <b>Bate#</b> toolbar button is disabled
+		<li>Confirm that <b>Tools - Apply Bates number</b> is disabled
+		<li>Confirm that <b>Bates number</b> is invisible
+		<p>
+
+		<!-- SCR# 81 -->
+		<li>Confirm that deleting a single selected bates# will raise a prompt
+		<li>Confirm that deleting all bates# by selecting them raises an off-page prompt
+	</ul>
+	<p>		
+
+	<li><b>Other</b>
+	<ul>
+		<li>Specify a very long Bates number
+		<ul>
+			<li>Specify a very long prefix.
+			<li>Specify a very long suffix.
+			<li>Confirm that a warning message is displayed when saving settings.
+			<li>Confirm that another warning message is displayed when applying a Bates number 
+			using these settings.
+			<li>Confirm that part of the very long Bates number is displayed.
+		</ul>
+		<li>Can not specify an empty file as a shared file
+		<li>Can not specify a non-existing file as a shared file
+		<li>Can not specify a non-text file as a shared file
+		<li>Can not specify a text file contained an invalid number as a shared file
+		<li>Can not specify a text file contained a number bigger that 9223372036854775807 as a shared file
+		<li>Confirm that next number after 9223372036854775807(max sign int 64) is 1
+		<p>
+
+		<!-- SCR# 66 -->
+		<li>Bates# exclusive lock
+		<ul>
+			<!-- Specify next number -->
+			<li>Open <b>ID Shield Office</b> instance.
+			<li>Press F12 to show user preference dialog
+			<li>Click <b>Change...</b> in Bates number tab to show options.
+			<li>Specify <b>Next number</b> by using specified number
+			<li>specify <b>Bates number format</b> by selecting <b>use next number for every page</b>
+			<li>Close the instance to save options.
+			<li>Open two <b>ID Shield Office</b> instances.
+			<li>Open <b>0350pages.tif</b> in one instance.
+			<li>Open <b>0300pages.tif</b> in the other instance.
+			<li>Click <b>Apply Bates#</b> button at the same time for each instance.
+			<li>Confirm that the two images are numbered correctly.
+			<li>Confirm that next number in both instances are same and correct.
+			<p>
+
+			<!-- Specify shared file -->
+			<li>Open <b>ID Shield Office</b> instance in one machine.
+			<li>Press F12 to show user preference dialog
+			<li>Click <b>Change...</b> in Bates number tab to show options.
+			<li>Specify <b>Next number</b> by using shared file
+			<li>specify <b>Bates number format</b> by selecting <b>use next number for every page</b>
+			<li>Open another <b>ID Shield Office</b> instances in other machines.
+			<li>Specify the same options for Bates# with above instance.
+			<li>Open <b>0350pages.tif</b> in each instance.
+			<li>Click <b>Apply Bates#</b> button at the same time for each instance.
+			<li>Confirm that the two images are numbered correctly.
+			<li>Confirm that next number in each instance are same and correct.
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

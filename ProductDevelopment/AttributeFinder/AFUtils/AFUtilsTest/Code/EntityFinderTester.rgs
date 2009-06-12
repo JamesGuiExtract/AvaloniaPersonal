@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtilsTest.EntityFinderTester.1 = s 'EntityFinderTester Class'
+	{
+		CLSID = s '{70D94119-44A2-447E-99E9-0BA788F990D8}'
+	}
+	UCLIDAFUtilsTest.EntityFinderTester = s 'EntityFinderTester Class'
+	{
+		CLSID = s '{70D94119-44A2-447E-99E9-0BA788F990D8}'
+		CurVer = s 'UCLIDAFUtilsTest.EntityFinderTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {70D94119-44A2-447E-99E9-0BA788F990D8} = s 'EntityFinderTester Class'
+		{
+			ProgID = s 'UCLIDAFUtilsTest.EntityFinderTester.1'
+			VersionIndependentProgID = s 'UCLIDAFUtilsTest.EntityFinderTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63AB2AE7-7499-4975-96FD-6532DF6FA946}'
+		}
+	}
+}

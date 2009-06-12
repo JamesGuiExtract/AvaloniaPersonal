@@ -1,0 +1,5 @@
+<TESTCASE>;Test.rsd;Input1.txt;;Output1.eav
+<TESTCASE>;Test.rsd;Input2.txt;;Output2.eav
+<TESTCASE>;Test.rsd;Input3.txt;;Output3.eav
+<TESTCASE>;Test.rsd;Input4.txt;;Output4.eav
+<TESTCASE>;Test.rsd;Input5.txt;;Output5.voa

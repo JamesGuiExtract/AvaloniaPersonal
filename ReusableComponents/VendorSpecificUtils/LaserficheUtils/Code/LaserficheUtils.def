@@ -1,0 +1,6 @@
+; LaserficheUtils.def : Declares the module parameters for the DLL.
+
+LIBRARY      "ESLaserficheUtils"
+
+EXPORTS
+    ; Explicit exports can go here

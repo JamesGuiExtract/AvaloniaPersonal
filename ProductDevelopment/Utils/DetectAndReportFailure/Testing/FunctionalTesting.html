@@ -1,0 +1,113 @@
+<html>
+
+<head>
+<title>Failure Detection and Reporting Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../reusablecomponents/comcomponents/uclidtestingframework/misc/uclidtesting.css">
+</head>
+
+<body>
+
+<h1>Failure Detection and Reporting Testing Checklist&nbsp;<br>
+<img src="../../../../reusablecomponents/comcomponents/uclidtestingframework/misc/testingchecklistheader.gif">
+</h1>
+<hr>
+
+<ol>
+
+<!-- *********************************************** -->
+<li><h2>Startup and Exit</h2>
+<ul>
+  	<li>Start application and confirm that the application appears in the System Tray with a green icon.
+   	<li>Select Configure - Email Settings from the context menu and confirm that the appropriate settings dialog appears.
+   	<li>Confirm that the email settings are persistent.
+   	<li>Confirm that Exit closes the FDRS application.
+<p>
+   	<li>Start the File Action Manager first and wait at least one minute.  Start the FDRS aplication.  Cause an exception or application crash in the File Action Manager and confirm that the system tray icon turns red.
+   	<li>Double click on the blinking red icon and confirm display of an exception.
+   	<li>Click on the Display button and confirm that a UCLID Exception dialog appears.  Close the UCLID Exception dialog.
+   	<li>Confirm that the dialog disappears on its own in approximately ten seconds.
+</ul>
+<br>
+
+<!-- *********************************************** -->
+<li><h2>Automatic Notification</h2>
+<ul>
+	<li>Select Configure - Automatic Notifications and confirm that the INI file opens.  Set NumRecipients to 1.  Set Recipient1 to the tester's email address.  Set all notifications to 0.
+   	<li>Run the File Action Manager and make a change to prompt saving of settings at Exit.  After confirmation dialog appears, kill the application from Task Manager.  Confirm that an error is displayed (blinking red icon) after one minute with no automatic popup or email.
+   	<li>Right click the icon and select Show Exceptions.  Confirm that the dialog appears.
+   	<li>Select Close in the dialog.  Confirm that the dialog disappears and that the icon turns yellow.
+   	<li>Show the dialog again and select Clear All.  Confirm that the dialog disappears and that the icon turns green.
+<p>
+   	<li>Turn on the popup notification for logged exceptions.  Create a text file and rename it to a TIF.  Run the File Action Manager and attempt to OCR this TIF file.  Confirm that a popup message appears.
+   	<li>Turn off the popup notification for logged exceptions.  Turn on popup notification for application crash.  Repeat the above test killing the File Action Manager from within Task Manager.  Confirm that a popup message appears after 1 minute.
+   	<li>Turn off the popup notification for application crash.  Turn on email notification for application crash.  Repeat the above test killing the File Action Manager from within Task Manager.  Confirm a blinking red icon after 1 minute.
+<p>
+   	<li>Examine the received email message.  Confirm proper sender name.
+   	<li>Confirm proper subject line as: [FDRS] Notification of application crash.
+   	<li>Confirm proper computer name.
+   	<li>Confirm proper application name.
+   	<li>Confirm proper process ID.
+   	<li>Confirm proper start date.
+   	<li>Confirm proper start time.
+   	<li>Confirm proper time of crash detection of new line of message.
+   	<li>Confirm proper email signature.
+<p>
+   	<li>Turn off the application crash notifications.  Turn on popup notification for frequent exceptions.  Run the File Action Manager.  Rename a dummy text file as an RSD file.  Run the Attribute Finder Engine using this fake RSD file against a folder of at least 20 images (per the NumExceptions setting).  Confirm a popup message and a blinking red icon.
+   	<li>Turn off the popup notification for frequent exceptions.  Turn on email notification.  Run the File Action Manager with the same fake RSD file.  Confirm an email message and a blinking red icon.
+<p>
+   	<li>Modify the NumExceptions setting so that a single test of the images folder with the fake RSD file described above will not trigger an ExceptionFrequency notification.  Modify the ExceptionCheckDurationInSeconds setting to 60 seconds.  Run the File Action Manager with the same fake RSD file.  Confirm the blinking red icon.
+   	<li>Confirm the lack of an email message.  Do not clear FDRS exceptions.
+   	<li>Wait two minutes and run the File Action Manager again - confirming the lack of an email message.
+   	<li>Wait at least two minutes while modifying the automatic notifications to send two email messages by:
+		<ol>
+		<li>Setting &quot;<b>NumExceptions</b>&quot; to a number less than the number of images in the folder.</li>
+		<li>Settting &quot;<b>MinSecondsBetweenEmails</b>&quot; to 10 .</li>
+		</ol>
+	</li>
+ 	<li>Run the File Action Manager twice within the 60 second window.  Confirm that two email messages are received.</li>
+</ul>
+<br>
+
+<!-- *********************************************** -->
+<li><h2>Exception Log and Custom Email Messages</h2>
+<ul>
+  	<li>Send the Exception Log:
+		<ul>
+		<li>Confirm that the destination email address is fdrs@extractsystems.com .</li>
+		<li>Change the destination email address to your own email address.</li>
+		<li>Provide some custom text in the message body and send the message.</li> 
+		</ul>
+	</li>
+	<li>Confirm that the message is received at the configured email address:
+		<ul>
+		<li>Confirm that the proper signature is used.</li>
+		<li>Confirm that the custom text is included in the received message.</li>
+		<li>Confirm that the Exception Log is zipped and included as an attachment:
+			<ul>
+			<li>Confirm that the zipped exception log attachment can be saved to the local disk.</li>
+			<li>Confirm that the exception log can be unzipped.</li>
+			<li>Confirm that the unzipped exception log can be viewed in the UEX Viewer.
+			</ul>
+		</li>
+		</ul>
+	</li>
+  	<li>Send a Custom Email:
+		<ul>
+		<li>Confirm that the destination email address is fdrs@extractsystems.com .</li>
+		<li>Change the destination email address to your own email address.</li>
+		<li>Provide some custom text in the message body and send the message.</li> 
+		</ul>
+	</li>	
+	<li>Confirm that the message is received at the configured email address:
+		<ul>
+		<li>Confirm that the proper signature is used.</li>
+		<li>Confirm that the custom text is included in the received message.</li>
+		</ul>
+	</li>
+</li>
+<!-- *********************************************** -->
+</ol>
+
+</body>
+
+</html>

@@ -1,0 +1,3 @@
+^.{0,2}(?:FTB|.?TB|F.?B|FT.?|\b(?:.TB|F.B|FT.)\b).{0,4}(?:.cc..nt|.?ccount|A.?count|Ac.?ount|Acc.?unt|Acco.?nt|Accou.?t|Accoun.?).{0,3}(?:No|N.mb.r|.?umber|N.?mber|Nu.?ber|Num.?er|Numb.?r|Numbe.?|\b(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)\b)
+^(?:(?:F..|.T.|..B).{0,4}|.{0,2}F.{0,3}[TB].{0,3})(?:.cc..nt|.?ccount|A.?count|Ac.?ount|Acc.?unt|Acco.?nt|Accou.?t|Accoun.?).{0,3}(?:No|N.mb.r|.?umber|N.?mber|Nu.?ber|Num.?er|Numb.?r|Numbe.?|\b(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)\b)
+^.{0,2}(?:FTB|.?TB|F.?B|FT.?|\b(?:.TB|F.B|FT.)\b)[\s\S]{3,11}(?:No|N.mb.r|.?umber|N.?mber|Nu.?ber|Num.?er|Numb.?r|Numbe.?|\b(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)\b)

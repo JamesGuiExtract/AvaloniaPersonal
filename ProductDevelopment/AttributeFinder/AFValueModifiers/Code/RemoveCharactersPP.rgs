@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.RemoveCharactersPP.1 = s 'RemoveCharactersPP Class'
+	{
+		CLSID = s '{DDC9C138-8859-4AF6-8FD5-5E37CB5919CE}'
+	}
+	UCLIDAFValueModifiers.RemoveCharactersPP = s 'RemoveCharactersPP Class'
+	{
+		CLSID = s '{DDC9C138-8859-4AF6-8FD5-5E37CB5919CE}'
+		CurVer = s 'UCLIDAFValueModifiers.RemoveCharactersPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DDC9C138-8859-4AF6-8FD5-5E37CB5919CE} = s 'RemoveCharactersPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

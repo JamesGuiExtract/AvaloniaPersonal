@@ -1,0 +1,98 @@
+// UCLIDMCRTextViewer.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (UCLIDMCRTextViewer.tlb) that will become a resource in
+// UCLIDMCRTextViewer.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(8E5F747C-4028-4237-9A1F-0A1F0B5CDE08), version(1.0),
+  helpfile("UCLIDMCRTextViewer.hlp"),
+  helpstring("UCLID MCRTextViewer ActiveX Control module"),
+  control ]
+library UCLIDMCRTEXTVIEWERLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CUCLIDMCRTextViewerCtrl
+
+	[ uuid(68D14862-F691-4413-B6C4-3D17A09C6B11),
+	  helpstring("Dispatch interface for UCLIDMCRTextViewer Control"), hidden ]
+	dispinterface _DUCLIDMCRTextViewer
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CUCLIDMCRTextViewerCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CUCLIDMCRTextViewerCtrl)
+			[id(1)] void open(BSTR strFileName);
+			[id(2)] void save();
+			[id(3)] void saveAs(BSTR strFileName);
+			[id(4)] void clear();
+			[id(5)] void parseText();
+			[id(6)] void enableTextSelection(long ulValue);
+			[id(7)] BSTR getEntityText(long ulTextEntityID);
+			[id(8)] void pasteTextFromClipboard();
+			[id(9)] void copyTextToClipboard();
+			[id(10)] void setTextFontName(BSTR strFontName);
+			[id(11)] BSTR getTextFontName();
+			[id(12)] void setTextSize(long ulTextSize);
+			[id(13)] long getTextSize();
+			[id(14)] void increaseTextSize();
+			[id(15)] void decreaseTextSize();
+			[id(16)] void appendTextFromClipboard();
+			[id(17)] void setText(BSTR strNewText);
+			[id(18)] void appendText(BSTR strNewText);
+			[id(19)] long isModified();
+			[id(20)] void print();
+			[id(21)] BSTR getFileName();
+			[id(22)] void setEntityText(long ulTextEntityID, BSTR strNewText);
+			[id(23)] void setTextHighlightColor(long ulTextEntityID, OLE_COLOR newTextHighlightColor);
+			[id(24)] long isEntityIDValid(long lEntityID);
+			[id(25)] void setInputFinder(IUnknown* pInputFinder);
+			[id(26)] OLE_COLOR getEntityColor(long ulTextEntityID);
+			[id(27)] void setEntityColor(long ulTextEntityID, OLE_COLOR newTextColor);
+			[id(28)] BSTR getText();
+			[id(29)] BSTR getSelectedText();
+			//}}AFX_ODL_METHOD
+	};
+
+	//  Event dispatch interface for CUCLIDMCRTextViewerCtrl
+
+	[ uuid(46B02873-939C-4A2E-884C-135A20D85205),
+	  helpstring("Event interface for UCLIDMCRTextViewer Control") ]
+	dispinterface _DUCLIDMCRTextViewerEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CUCLIDMCRTextViewerCtrl)
+			[id(1)] void TextSelected(long ulTextEntityID);
+			[id(2)] void SelectedText(BSTR strText);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CUCLIDMCRTextViewerCtrl
+
+	[ uuid(7758F110-00D3-4E95-81CE-86C8F483E3B3),
+	  helpstring("UCLIDMCRTextViewer Control"), control ]
+	coclass UCLIDMCRTextViewer
+	{
+		[default] dispinterface _DUCLIDMCRTextViewer;
+		[default, source] dispinterface _DUCLIDMCRTextViewerEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

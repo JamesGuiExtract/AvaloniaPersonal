@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.RedactFileProcessor.1 = s 'RedactFileProcessor Class'
+	{
+		CLSID = s '{20DDA9F8-5337-4711-B6B1-45DF74CD6634}'
+	}
+	RedactionCustomComponents.RedactFileProcessor = s 'RedactFileProcessor Class'
+	{
+		CLSID = s '{20DDA9F8-5337-4711-B6B1-45DF74CD6634}'
+		CurVer = s 'RedactionCustomComponents.RedactFileProcessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {20DDA9F8-5337-4711-B6B1-45DF74CD6634} = s 'RedactFileProcessor Class'
+		{
+			ProgID = s 'RedactionCustomComponents.RedactFileProcessor.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.RedactFileProcessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

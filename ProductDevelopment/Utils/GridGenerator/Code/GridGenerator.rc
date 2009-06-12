@@ -1,0 +1,267 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""GridGenerator.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "GridGenerator Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "GridGenerator"
+            VALUE "LegalCopyright", "Copyright 2004"
+            VALUE "OriginalFilename", "GridGenerator.DLL"
+            VALUE "ProductName", "GridGenerator Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_DRAWGRID            REGISTRY                "DrawGrid.rgs"
+IDR_EVENTSINK           REGISTRY                "EventSink.rgs"
+IDR_QUERYFEATURE        REGISTRY                "QueryFeature.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_BMP_GRID            BITMAP                  ".\\res\\bmp_grid.bmp"
+IDB_BMP_QUERY           BITMAP                  ".\\res\\bmp_query.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_PROMPT DIALOGEX 0, 0, 225, 279
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Create Features"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    EDITTEXT        IDC_EDIT_COUNTY_CODE,135,55,47,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_TOWNSHIP,135,70,47,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_CMB_TOWNSHIP_DIR,135,85,48,38,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_RANGE,135,100,47,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_CMB_RANGE_DIR,135,114,48,36,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_SECTION,135,130,47,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "> 36?",IDC_SECTION_GT36,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,185,132,34,10
+    EDITTEXT        IDC_EDIT_QUARTER_SECTION,135,145,47,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_EDIT_QQ_SECTION,135,161,47,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_EDIT_QQQ_SECTION,135,175,47,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    CONTROL         "",IDC_USE_EXISTING,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,215,8,10
+    DEFPUSHBUTTON   "&Create Features",IDOK,70,260,90,14
+    PUSHBUTTON      "Cancel",IDC_CANCEL,165,260,50,15
+    LTEXT           "County Code........................",IDC_STATIC,40,55,90,8
+    LTEXT           "Township.............................",IDC_STATIC,40,70,90,8
+    LTEXT           "Township Direction.............",IDC_STATIC,40,85,88,8
+    LTEXT           "Range.................................",IDC_STATIC,40,100,88,8
+    LTEXT           "Range Direction...................",IDC_STATIC,40,114,90,8
+    LTEXT           "Section................................",IDC_STATIC,40,130,89,8
+    LTEXT           "Q.........................................",IDC_STATIC,41,145,88,8
+    LTEXT           "QQ......................................",IDC_STATIC,41,162,88,8
+    CONTROL         "",IDC_CHECK_Q,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,145,10,8
+    CONTROL         "",IDC_CHECK_QQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,161,10,8
+    LTEXT           "QQQ....................................",IDC_STATIC,41,177,89,8
+    CONTROL         "",IDC_CHECK_QQQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,175,10,8
+    CONTROL         "",IDC_CHECK_QQQQ,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,190,10,8
+    LTEXT           "QQQQ (Acreage code sheet)",IDC_STATIC,41,190,92,8
+    LTEXT           "Additionally, select at least one of the checkboxes below, indicating which levels of features are to be created.",IDC_STATIC,5,32,215,18
+    LTEXT           "If a feature at a particular level already exists, use its geometry to determine the geometry of the lower level features. The feature attributes will be used to determine if a feature already exists.",IDC_STATIC,40,215,180,35
+    LTEXT           "You have selected a [Section] Feature to subdivide into smaller parts. Please specify attributes for this feature.",IDC_STATIC_SELECT_TEXT,5,5,216,24
+END
+
+IDD_DLG_QUERY_FEATURE DIALOG  0, 0, 158, 223
+STYLE DS_SETFONT | DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Query Feature"
+FONT 8, "MS Sans Serif"
+BEGIN
+    COMBOBOX        IDC_CMB_LAYER,42,6,103,56,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_COUNTY_CODE2,97,24,48,12,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_EDIT_SECTION_NUM,97,41,48,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_EDIT_TOWNSHIP2,97,58,48,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_CMB_TOWNSHIP_DIR2,97,75,48,43,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_RANGE2,97,92,48,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_CMB_RANGE_DIR2,97,109,48,43,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_QUARTER,97,126,48,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_EDIT_QQ,97,143,48,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    EDITTEXT        IDC_EDIT_QQQQ,97,177,48,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    PUSHBUTTON      "&Query",IDC_BTN_QUERY,53,200,50,14
+    LTEXT           "Layer : ",IDC_STATIC,10,8,24,8
+    LTEXT           "County Code :",IDC_STATIC,10,25,46,8
+    LTEXT           "Township :",IDC_STATIC,10,59,36,8
+    LTEXT           "Township Direction :",IDC_STATIC,10,76,66,8
+    LTEXT           "Range :",IDC_STATIC,10,93,26,8
+    LTEXT           "Range Direction :",IDC_STATIC,10,110,56,8
+    LTEXT           "Section Number :",IDC_STATIC,10,42,56,8
+    LTEXT           "Quarter Section :",IDC_STATIC,10,127,54,8
+    LTEXT           "Quarter-Quarter Section :",IDC_STATIC,10,144,80,8
+    LTEXT           "Acreage (Quarter Call) :",IDC_STATIC,10,178,74,8
+    EDITTEXT        IDC_EDIT_QQQ,97,160,48,12,ES_AUTOHSCROLL | ES_NUMBER | WS_DISABLED
+    LTEXT           "Qtr-Qtr-Qtr Section:",IDC_STATIC,9,162,61,8
+END
+
+IDD_QUARTERS_NOT_DRAWN DIALOGEX 0, 0, 284, 105
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Quarters that could not be drawn"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,227,84,50,14
+    EDITTEXT        IDC_EDIT_QUARTERS,7,7,270,75,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_VSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_DLG_PROMPT DLGINIT
+BEGIN
+    IDC_CMB_TOWNSHIP_DIR, 0x403, 6, 0
+0x6f4e, 0x7472, 0x0068, 
+    IDC_CMB_TOWNSHIP_DIR, 0x403, 6, 0
+0x6f53, 0x7475, 0x0068, 
+    IDC_CMB_RANGE_DIR, 0x403, 5, 0
+0x6145, 0x7473, "\000" 
+    IDC_CMB_RANGE_DIR, 0x403, 5, 0
+0x6557, 0x7473, "\000" 
+    0
+END
+
+IDD_DLG_QUERY_FEATURE DLGINIT
+BEGIN
+    IDC_CMB_TOWNSHIP_DIR2, 0x403, 6, 0
+0x6f4e, 0x7472, 0x0068, 
+    IDC_CMB_TOWNSHIP_DIR2, 0x403, 6, 0
+0x6f53, 0x7475, 0x0068, 
+    IDC_CMB_RANGE_DIR2, 0x403, 5, 0
+0x6145, 0x7473, "\000" 
+    IDC_CMB_RANGE_DIR2, 0x403, 5, 0
+0x6557, 0x7473, "\000" 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DLG_QUERY_FEATURE, DIALOG
+    BEGIN
+        RIGHTMARGIN, 157
+    END
+
+    IDD_QUARTERS_NOT_DRAWN, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 277
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 98
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "GridGenerator"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "GridGenerator.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

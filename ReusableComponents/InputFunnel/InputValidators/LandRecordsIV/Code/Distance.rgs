@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.Distance.1 = s 'Distance Class'
+	{
+		CLSID = s '{D08B8B75-3AA3-11D6-8260-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.Distance = s 'Distance Class'
+	{
+		CLSID = s '{D08B8B75-3AA3-11D6-8260-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.Distance.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D08B8B75-3AA3-11D6-8260-0050DAD4FF55} = s 'Distance Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.Distance.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.Distance'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

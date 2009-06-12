@@ -1,0 +1,1 @@
+ParagraphTextCorrectors.LegalDescriptionTextCorrector.1;;

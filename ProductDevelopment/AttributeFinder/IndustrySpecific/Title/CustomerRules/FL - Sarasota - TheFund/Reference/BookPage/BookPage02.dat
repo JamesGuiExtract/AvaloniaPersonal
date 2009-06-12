@@ -1,0 +1,1 @@
+recorded[\s\S]{0,34}in\s*Book(?:/reel/liber)?:?\s*\d{3,4}\s*Page(?:\/Folio)?:?\s*\d{3,4},?\s*(?:as\s*)?Instrument\s*(?:Number|no\.?):?\s*\d{7,9}\s*in\s*the\s*(?:Clerk\s*of\s*the\s*Circuit\s*Court\s*of\s*)?(?:county\s*of\s*)?SARASOTA(?:\s*County)?

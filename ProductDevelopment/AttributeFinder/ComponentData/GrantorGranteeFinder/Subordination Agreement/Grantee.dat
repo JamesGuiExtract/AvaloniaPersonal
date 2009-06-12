@@ -1,0 +1,34 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000016600.002.tif.uss
+SA_GRANTEE_01=between^?Grantee^250~creditor
+
+// <NRS>:K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Subordination Agreement\20049000093100.004.tif.uss
+SA_GRANTEE_02=in favor of^?Grantee>^250~creditor|hereinafter|lender|beneficiary
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000240700.005.tif.uss
+SA_GRANTEE_04=delivered to^?Grantee^250~lender
+
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049001141600.006.tif.uss
+SA_GRANTEE_05=landlord^5~tenant^5~and the^?Grantee^250~lender
+
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000750500.010.tif.uss
+SA_GRANTEE_07=lessee^?Grantee^250~lender
+
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000519600.004.tif.uss
+SA_GRANTEE_06=owner^?Grantee^250~lender
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049002908000.005.tif.uss
+SA_GRANTEE_08=New^5~Senior^5~Lender^10~Name^?Grantee^250~Senior^5~Lender^10~Address
+
+[PATTERNS_END]
+

@@ -1,0 +1,3 @@
+an\s*employee\s*of(?:\r\n){1,2}(.*(?:\b(?:bank|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|equity|mortgage|financial|funding|capital|title|credit|loans|lend(?:er|ing)?)\b|\w,?\s*&\s*\w)(?!\s*,?\s*coordinator).*)\r\n
+//prepared\s*by[\s\S]{1,240}an\s*employee\s*of(?:\r\n){1,2}(.*(?:\b(?:bank|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|equity|mortgage|financial|funding|capital|title|credit|loans|lend(?:er|ing)?)\b|\w,?\s*&\s*\w)(?!\s*,?\s*coordinator).*)\r\n
+

@@ -1,0 +1,25 @@
+HKCR
+{
+	UCLID_AFVALUEFINDERSLib.MicrFinderPP.1 = s 'MicrFinderPP Class'
+	{
+		CLSID = s '{A34E445F-9560-4A78-9B1D-146E18BC2EED}'
+	}
+	UCLID_AFVALUEFINDERSLib.MicrFinderPP = s 'MicrFinderPP Class'
+	{
+		CLSID = s '{A34E445F-9560-4A78-9B1D-146E18BC2EED}'
+		CurVer = s 'UCLID_AFVALUEFINDERSLib.MicrFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A34E445F-9560-4A78-9B1D-146E18BC2EED} = s 'MicrFinderPP Class'
+		{
+			ProgID = s 'UCLID_AFVALUEFINDERSLib.MicrFinderPP.1'
+			VersionIndependentProgID = s 'UCLID_AFVALUEFINDERSLib.MicrFinderPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

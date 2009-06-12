@@ -1,0 +1,85 @@
+/**************************************************************************************************
+ STRING PATTERN SYNTAX (in BNF-like notation):
+
+	<pattern> ::= <pattern_token> [<pattern_delimiter> <pattern_token>]*
+
+	<pattern_token> ::= <match_variable> | <literal_or_list> | <expression_ref> |
+						<include_char_list> | <exclude_char_list>
+
+	<match_variable> ::= <question_char> [left_greedy_spec] <match_variable_name> [right_greedy_spec]
+
+	<question_char> ::= the question character '?'
+
+	<left_greedy_spec> ::= the character '<' to indicate "greedy on the left" or
+						   the character '>' to indicate "non-greedy on the left"
+
+	<match_variable_name> ::= <non_special_char>+
+
+	<right_greedy_spec> ::= the character '<' to indicate "non-greedy on the right" or
+							the character '>' to indicate "greedy on the right"
+
+	<literal_or_list> ::= [max_ignore_chars_constraint] <literal> [<or_char> <literal>]*
+
+    <max_ignore_chars_constraint> ::= <digit_char>+ <tilde_char>
+
+	<digit_char> ::= any of the digit characters 0 through 9
+
+	<tilde_char> ::= the tilde character '~'
+
+	<literal> ::= [<word_boundary_constraint>] <word>+ [<word_boundary_constraint>]
+
+	<word_boundary_constraint> ::= open or close square bracket characters
+
+	<word> ::= <non_special_char>+
+
+	<non_special_char> ::= any character other than '@', '^', '|' or '?'
+
+	<or_char> ::= the pipe character '|'
+
+	<expression_ref> ::= [max_ignore_chars_constraint] <at_char> <expression_name>
+
+	<at_char> ::= the at symbol character '@'
+
+	<expression_name> ::= <non_special_char>+
+
+	<include_char_list> ::= [max_ignore_chars_constraint] <at_char> <plus_char> <expression_name>
+
+	<plus_char> ::= the plus character '+'
+
+	<exclude_char_list> ::= [max_ignore_chars_constraint] <at_char> <minus_char> <expression_name>
+
+	<minus_char> ::= the minus character '-'
+
+	<pattern_delimiter> ::= the carrot character '^'
+	
+ SUMMARY:
+	The pattern string contains tokens seperated by the ^ character.  A token may
+	be a literal "or list", a question mark (to indicate a desired match), or a
+	string in the form @ExprName, @+ExprName, @-ExprName.
+	A literal "or list" is a single literal, or one or more literals seperated by
+	the pipe character.
+	A string literal is a string that is optionally surrounded on either side by 
+	word boundary indicating character.
+	The opening and closing square bracket chars are considered as word boundary
+	characters.  Either the opening or the closing square bracket can be used on
+	either side of a literal (i.e. "[to]" equals "[to[" equals "]to]" equals "]to[")
+
+ NOTES ABOUT EXPRESSIONS:
+	Every expression name is expected to be associated with a value string.
+	@+exprName will search for a character that matches one of the characters in 
+	the value string associated with exprName.  Syntax for the value string 
+	expression in this case is: <expression_value> ::= <non_special_char>+
+	@-exprName will search for a character that matches none of the characters in
+	the value string associated with exprName.  Syntax for the value string 
+	expression in this case is: <expression_value> ::= <non_special_char>+
+	Using @exprName has the effect of processing exprName.ValueString as 
+	a literal_or_list.  This means that the expression value string must adhere
+	to the syntax <expression_value> ::= <literal_or_list>
+
+ NOTES ABOUT 'TreatMultipleWSAsOne' ATTRIBUTE:
+	If this attribute is set to True, then any occurrence of the space character
+	in a literal will match any whitespace character in the input string.  If 
+	this attribute is set to False, then any occurrence of the space character
+	in a literal will exactly match a space character in the input string.
+
+**************************************************************************************************/

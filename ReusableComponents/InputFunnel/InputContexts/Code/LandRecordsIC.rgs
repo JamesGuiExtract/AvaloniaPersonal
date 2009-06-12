@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputContexts.LandRecordsIC.1 = s 'LandRecordsIC Class'
+	{
+		CLSID = s '{482AC22F-CC30-4D90-8120-68C31BDA5114}'
+	}
+	UCLIDInputContexts.LandRecordsIC = s 'LandRecordsIC Class'
+	{
+		CLSID = s '{482AC22F-CC30-4D90-8120-68C31BDA5114}'
+		CurVer = s 'UCLIDInputContexts.LandRecordsIC.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {482AC22F-CC30-4D90-8120-68C31BDA5114} = s 'LandRecordsIC Class'
+		{
+			ProgID = s 'UCLIDInputContexts.LandRecordsIC.1'
+			VersionIndependentProgID = s 'UCLIDInputContexts.LandRecordsIC'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{142427CD-FBC2-4505-9A70-CDDD6C9BBC5E}'
+		}
+	}
+}

@@ -1,0 +1,55 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,DIV_SURE_01,false
+		01=^FINAL\s*JUDGMENT\s*(OF|FOR)\s*DISSOLUTION\s*OF\s*MARRIAGE(?:\r?$)
+		02=^DEFAULT\s*JUDGMENT\s*OF\s*DIVORCE\s*BY\s*WITHDRAWAL(?:\r?$)
+
+
+	OR_END
+SCOPE_END
+
+//SCOPE_BEGIN,0,0.3,1,2
+//	OR_BEGIN,DIV_SURE_02,TRUE
+//		01=^(?:NOTICE\s*OF\s*)?LIS\s*PENDENS\s*(?:\r?$)
+//	OR_END
+//SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,-1
+	OR_BEGIN,DIV_PROBABLE_01,TRUE
+		01=marriage\s*(?:of|between)\s*the\s*parties\s*(?:is|are)\s*irretrievably\s*broken
+		02=marriage\s*between\s*the\s*Plaintiff\s*and\s*the\s*Defendant[\s\S]{0,45}dissolved
+		03=divorce\s*from\s*the\s*bonds\s*of\s*matrimony\s*between\s*the\s*parties 
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

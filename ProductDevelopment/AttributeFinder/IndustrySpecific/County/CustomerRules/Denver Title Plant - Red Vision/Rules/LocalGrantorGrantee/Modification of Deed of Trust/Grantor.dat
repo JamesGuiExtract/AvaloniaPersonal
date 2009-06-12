@@ -1,0 +1,42 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+//Trustor type rules, complex above simple
+LocalModotGrantor01=[by]^9~between^?Grantor^160~hereinafter^12~trustor^240~hereina|inafter^12~Trustee^6~[and]^?SecondGrantor^160~hereinafter^24~lender
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000012200.007
+LocalModotGrantor01=[by]^9~between^?Grantor^160~collectively^36~trustor
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000090300.003
+LocalModotGrantor02=modification^70~between^?Grantor^160~referred^7~below^8~trustor
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079004313200.004.uss
+LocalModotGrantor11=[by]|Between^240~"BENEFICIARY|BENEFICIARY"^5~[and]^?Grantor^240~"Borrower|Borrower(s)"|Borrowers"|Borrower"
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079002357500.007
+LocalModotGrantee04=between^120~Lender"|"Lender^5~[and]^?Grantor^160~individually^60~Borrower"|"Borrower
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000273400.005.uss
+LocalModotGrantee05=modification^60~made^36~between^?Trustee^160~Trustee^7~borrower^6~[and]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000307700.004.uss
+LocalModotGrantee06=between^160~"Lender|Lender"^5~[and]^?Grantor^240~collectively^48~Borrower"|"Borrower
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079002368300.004.uss
+LocalModotGrantee10=executed^3~between^180~"Borrower|Borrower"^?Grantor^240~"Grantor|Grantor"^6~[and]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079001524700.002
+LocalModotGrantee08=MADE^3~THIS^60~[By]^?Grantor^160~[with^3~regard^5~[to]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079001616900.002.uss
+LocalModotGrantor09=modification^3~agreement^80~[by]^160~"Lender|Lender"^6~[and]^?Grantor^240~Borrower"|"Borrower
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079001056900.005.uss
+LocalModotGrantor07=modification^60~[by]|executed^9~between^?Grantor^240~"Borrower|Borrower"
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079001648700.005
+LocalModotGrantor03=modification^70~between^?Grantor^160~borrower^3~and]
+[PATTERNS_END]

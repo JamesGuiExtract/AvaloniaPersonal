@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>Pre-checkin tasks for developers and code-reviewers</title>
+</head>
+
+<h1><center>Pre-checkin tasks for developers and code-reviewers</center></h1>
+<hr>
+<br>
+
+<ol>
+	<li><img src="../CheckDash.JPG">Is the new or modified code/algorithm correct and doing what it should?</li>
+	<li><img src="../CheckDash.JPG">If new design has been implemented, or existing design has been refactored, has that been done in an appropriate way?</li>
+	<li><img src="../CheckDash.JPG">Are the names of classes, variables, and methods appropriate?</li>
+	<li><img src="../CheckDash.JPG">Is code in cpp files adequately documented?</li>
+	<li><img src="../CheckDash.JPG">Are coding conventions being followed?</li>
+	<li><img src="../CheckDash.JPG">Do method or function declarations in header/IDL/ODL files supported with purpose/promise/require comment blocks?</li>
+	<li><img src="../CheckDash.JPG">Is the code in MFC UI handlers (e.g. OnClickedButtonX) wrapped within try/CATCH_AND_DISPLAY_ALL_EXCEPTIONS?</li>
+	<li><img src="../CheckDash.JPG">Is the code within COM method implementations wrapped within try/CATCH_ALL_AND_RETURN_AS_COM_ERROR?</li>
+	<li><img src="../CheckDash.JPG">Is the code in destructors wrapped within CATCH_AND_LOG_ALL_EXCEPTIONS?</li>
+	<li><img src="../CheckDash.JPG">Is all allocated memory being released? Check regular heap allocations to pointers using the new keyword, as well as COM object allocations to smart pointers.</li>
+	<li><img src="../CheckDash.JPG">Are pointers being checked with the ASSER_RESOURCE_ALLOCATION or other mechanism before they are dereferenced?</li>
+	<li><img src="../CheckDash.JPG">Are exceptions coded to contain all possibly useful debug information available in a particular scope of code?</li>
+	<li><img src="../CheckDash.JPG">Is the code thread-safe for a multi-processor/core machine?</li>
+	<li><img src="../CheckDash.JPG">Is the actual visible-to-user-change at the application level working as expected?</li>
+	<li><img src="../CheckDash.JPG">Have boundry conditions been checked?</li>
+	<li><img src="../CheckDash.JPG">Have PVCS records been added and updated as appropriate for any new or modified functionality in the code about to be checked in?</li>
+	<li><img src="../CheckDash.JPG">Has a full build of one or more related products been executed to ensure that code about to be checked in does not prevent compilation of code in other projects?</li>
+</ol>
+
+</html>

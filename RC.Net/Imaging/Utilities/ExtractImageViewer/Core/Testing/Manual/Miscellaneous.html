@@ -1,0 +1,172 @@
+<HTML>
+
+<HEAD>
+<TITLE>Image Viewer Miscellaneous Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+<h1>Image Viewer Miscellaneous Testing Checklist
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<h3>[DotNet #38] Mousewheel Scroll / Zoom - Manual Tests</h3>
+       	<ul>
+       	  	<li>Open an image from the Redaction Demo.</li>
+       	  	<li>Zoom in several steps.</li>
+       	  	<li>Confirm that scrolling the mousewheel up scrolls the 
+		image up.</li>
+       	  	<li>Confirm that scrolling the mousewheel down scrolls the 
+		image down.</li>
+<p>
+       	  	<li>Confirm that scrolling the mousewheel up while pressing 
+		<b>Shift</b> scrolls the image left.</li>
+       	  	<li>Confirm that scrolling the mousewheel down while pressing 
+		<b>Shift</b> scrolls the image right.</li>
+<p>
+       	  	<li>Confirm that scrolling the mousewheel up while pressing 
+		<b>Control</b> zooms the image in.</li>
+       	  	<li>Confirm that scrolling the mousewheel down while pressing 
+		<b>Control</b> zooms the image out.</li>
+<p>
+       	  	<li>Click and drag to begin defining a zoom region.</li>
+          	<li>Scroll the mousewheel while continuing to define the zoom 
+		region.</li>
+          	<li>Confirm that the mousewheel has no effect.</li>
+       	  	<li>Keep the image open for the following tests.</li>
+       	</ul>
+<p>
+	<h3>[DotNet #69] Context Menu - Manual Tests</h3>
+       	<ul>
+       	  	<li>Zoom in several steps.</li>
+          	<li>Right-click to display the context menu.</li>
+       	  	<li>Confirm that <b>Zoom window</b> is available.</li>
+       	  	<li>Select <b>Zoom window</b> and confirm that a zoom region can 
+		be defined and that the Image Viewer properly displays the 
+		new region.</li>
+<p>
+       	  	<li>Confirm that <b>Pan</b> is available.</li>
+       	  	<li>Select <b>Pan</b> and confirm that it works properly.</li>
+<p>
+       	  	<li>Confirm that <b>Zoom previous</b> is available.</li>
+       	  	<li>Select <b>Zoom previous</b> and confirm that it works properly.</li>
+<p>
+       	  	<li>Confirm that <b>Zoom next</b> is available.</li>
+       	  	<li>Select <b>Zoom next</b> and confirm that it works properly.</li>
+<p>
+       	  	<li>Confirm that <b>Highlighter</b> is available.</li>
+       	  	<li>Select <b>Highlighter</b> and confirm that a rectangular 
+		highlight can be created.</li>
+       	  	<li>Select <b>Highlighter</b> and confirm that an angular 
+		highlight can be created.</li>
+       	</ul>
+<p>
+	<h3>Fit Mode - Manual Tests</h3>
+       	<ul>
+	       	<li><b>[DotNet #41]</b> - Works for PDF images
+       		<ul>
+          		<li>Open a PDF image.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Fit to page</b> toolbar button.</li>
+        	  	<li>Confirm that the entire image is now visible.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Shortcuts - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Shortcuts disabled during interactive mouse events</b>
+       		<ul>
+        	  	<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click <b>P</b> as a shortcut to enable Pan mode.</li>
+	          	<li>Click <b>Z</b> as a shortcut to enable Zoom mode.</li>
+        	  	<li>Click and drag to begin defining a zoom region.</li>
+	          	<li>Click <b>P</b> while continuing to define the zoom 
+			region.</li>
+	          	<li>Confirm that the shortcut key has no effect.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Status Bar - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Status text</b>
+       		<ul>
+        	  	<li>Confirm that no status text is provided without an open image.</li>
+        	  	<li>Open an image and confirm that status text is provided 
+			for <b>a user action</b>, <b>image resolution</b> and 
+			<b>mouse position</b>.</li>
+	          	<li>Confirm that status text for user action <b>does not</b> change and 
+			is meaningful when selecting the following toolbar buttons.</li>
+	       		<ul>
+	          		<li>Open image</li>
+	          		<li>Print image</li>
+	          		<li>Zoom in</li>
+	          		<li>Zoom out</li>
+	          		<li>Zoom previous</li>
+	          		<li>Zoom next</li>
+	          		<li>Fit to page</li>
+	          		<li>Fit to width</li>
+	          		<li>Rotate counterclockwise</li>
+	          		<li>Rotate clockwise</li>
+	          		<li>Go to first page</li>
+	          		<li>Go to previous page</li>
+	          		<li>Go to next page</li>
+	          		<li>Go to last page</li>
+	       		</ul>
+	          	<li>Confirm that status text for user action <b>does</b> change and is 
+			meaningful when selecting the following toolbar buttons.</li>
+	       		<ul>
+	          		<li>Zoom window</li>
+	          		<li>Pan</li>
+	          		<li>Angular highlight</li>
+	          		<li>Rectangular highlight</li>
+	          		<li>Select highlight</li>
+	       		</ul>
+<p>
+	          	<li><b>[DotNet #41]</b> Registry setting controls display of 
+			position percentage</li>
+	       		<ul>
+	          		<li>Use <b>RegEdit</b> to modify the following registry entry:
+				HKCU\Software\Extract Systems\InputFunnel\InputReceivers\SpotRecIR\DisplayPercentageEnabled</li>
+	          		<li>With the setting at <b>0</b>, confirm that the 
+				status bar <b>does not</b> provide percentage information.</li>
+	          		<li>With the setting at <b>1</b>, confirm that the 
+				status bar <b>does</b> provide percentage information.</li>
+	       		</ul>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Page Navigation - Manual Tests</h3>
+       	<ul>
+	       	<li><b>*Invalid page number displays error message</b>
+       		<ul>
+        	  	<li>Open a multi-page image from the Redaction Demo.</li>
+	          	<li>Select the <b>View - Goto Page</b> menu item.</li>
+	          	<li>Enter a page number beyond the end of the document.</li>
+	          	<li>Confirm that a meaningful error message is displayed.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Pan Tool - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Tools menu</b>
+       		<ul>
+        	  	<li>Open an image.</li>
+	          	<li>Zoom in several steps so that the image is not completely visible.</li>
+	          	<li>Select the <b>Pan</b> tool from the <b>Tools</b> menu.</li>
+	          	<li>Confirm that click and drag allows the user to pan.</li>
+	       	</ul>
+	       	<li><b>Toolbar</b>
+       		<ul>
+        	  	<li>Open an image.</li>
+	          	<li>Zoom in several steps so that the image is not completely visible.</li>
+	          	<li>Select the <b>Pan</b> tool from the <b>Toolbar</b>.</li>
+	          	<li>Confirm that click and drag allows the user to pan.</li>
+	       	</ul>
+       	</ul>
+</ul>
+</BODY>
+</HTML>

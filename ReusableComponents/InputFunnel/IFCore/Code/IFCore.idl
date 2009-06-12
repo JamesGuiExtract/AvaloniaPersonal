@@ -1,0 +1,386 @@
+// IFCore.idl : IDL source for IFCore.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (IFCore.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+#include "olectl.h"
+
+[
+	uuid(775ACC91-32AC-11D6-8259-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID Input Funnel 1.0 Type Library")
+]
+library UCLID_INPUTFUNNELLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-F O R W A R D    D E C L A R A T I O N S-----------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	// we are forward-declaring the  IInputReceiver interface because the IInputReceiver and 
+	// IREventHandler interfaces use each other.
+	interface IInputReceiver;
+	interface IInputContext;
+
+	////////////////////////////////////////////////////////
+	// Interfaces
+	////////////////////////////////////////////////////////
+	[
+		object,
+		uuid(775ACCA0-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IInputEntityManager Interface"),
+		pointer_default(unique)
+	]
+	interface IInputEntityManager : IDispatch
+	{
+		[id(1), helpstring("method Delete")] HRESULT Delete([in] BSTR strID);
+		[id(2), helpstring("method SetText")] HRESULT SetText([in] BSTR strID, [in] BSTR strText);
+		[id(3), helpstring("method GetText")] HRESULT GetText([in] BSTR strID, [out, retval] BSTR *pstrText);
+		[id(4), helpstring("method CanBeMarkedAsUsed")] HRESULT CanBeMarkedAsUsed([in] BSTR strID, [out, retval] VARIANT_BOOL *pbCanBeMarkedAsUsed);
+		[id(5), helpstring("method MarkAsUsed")] HRESULT MarkAsUsed([in] BSTR strID, [in] VARIANT_BOOL bValue);
+		[id(6), helpstring("method IsMarkedAsUsed")] HRESULT IsMarkedAsUsed([in] BSTR strID, [out, retval] VARIANT_BOOL *pbIsMarkedAsUsed);
+		[id(7), helpstring("method IsFromPersistentSource")] HRESULT IsFromPersistentSource([in] BSTR strID, [out, retval] VARIANT_BOOL *pbIsFromPersistentSource);
+		[id(8), helpstring("method GetPersistentSourceName")] HRESULT GetPersistentSourceName([in] BSTR strID, [out, retval] BSTR *pstrSourceName);
+		[id(9), helpstring("method HasBeenOCRed")] HRESULT HasBeenOCRed([in] BSTR strID, [out, retval] VARIANT_BOOL *pbHasBeenOCRed);
+		[id(10), helpstring("method CanBeDeleted")] HRESULT CanBeDeleted([in] BSTR strID, [out, retval] VARIANT_BOOL *pbCanBeDeleted);
+		[id(11), helpstring("method GetOCRImage")] HRESULT GetOCRImage([in] BSTR strID, [out, retval] BSTR* pstrImageFileName);
+		[id(12), helpstring("method HasIndirectSource")] HRESULT HasIndirectSource([in] BSTR strID, [out, retval] VARIANT_BOOL *pbHasIndirectSource);
+		[id(13), helpstring("method GetIndirectSource")] HRESULT GetIndirectSource([in] BSTR strID, [out, retval] BSTR *pstrIndirectSourceName);
+		[id(15), helpstring("method GetOCRZones")] HRESULT GetOCRZones([in] BSTR strID, [out, retval] IIUnknownVector **pRasterZones);
+	};
+
+	[
+		object,
+		uuid(775ACCA2-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IInputEntity Interface"),
+		pointer_default(unique)
+	]
+	interface IInputEntity : IDispatch
+	{
+		[id(1), helpstring("method Delete")] HRESULT Delete();
+		[id(2), helpstring("method SetText")] HRESULT SetText([in] BSTR strText);
+		[id(3), helpstring("method GetText")] HRESULT GetText([out, retval] BSTR *pstrText);
+		[id(4), helpstring("method CanBeMarkedAsUsed")] HRESULT CanBeMarkedAsUsed([out, retval] VARIANT_BOOL *pbCanBeMarkedAsUsed);
+		[id(5), helpstring("method MarkAsUsed")] HRESULT MarkAsUsed([in] VARIANT_BOOL bValue);
+		[id(6), helpstring("method IsMarkedAsUsed")] HRESULT IsMarkedAsUsed([out, retval] VARIANT_BOOL *pbIsMarkedAsUsed);
+		[id(7), helpstring("method IsFromPersistentSource")] HRESULT IsFromPersistentSource([out, retval] VARIANT_BOOL *pbIsFromPersistentSource);
+		[id(8), helpstring("method GetPersistentSourceName")] HRESULT GetPersistentSourceName([out, retval] BSTR *pstrSourceName);
+		[id(9), helpstring("method HasBeenOCRed")] HRESULT HasBeenOCRed([out, retval] VARIANT_BOOL *pbHasBeenOCRed);
+		[id(10), helpstring("method InitInputEntity")] HRESULT InitInputEntity([in] IInputEntityManager *pEntityManager, [in] BSTR strID);
+		[id(11), helpstring("method CanBeDeleted")] HRESULT CanBeDeleted([out, retval] VARIANT_BOOL *pbCanBeDeleted);
+		[id(12), helpstring("method GetOCRImage")] HRESULT GetOCRImage([out, retval] BSTR *pstrImageFileName);
+		[id(13), helpstring("method HasIndirectSource")] HRESULT HasIndirectSource([out, retval] VARIANT_BOOL *pbHasIndirectSource);
+		[id(14), helpstring("method GetIndirectSource")] HRESULT GetIndirectSource([out, retval] BSTR *pstrIndirectSourceName);
+		[id(16), helpstring("method GetOCRZones")] HRESULT GetOCRZones([out, retval] IIUnknownVector **pRasterZones);
+	};
+
+	[
+		object,
+		uuid(775ACCA4-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("ITextInput Interface"),
+		pointer_default(unique)
+	]
+	interface ITextInput : IDispatch
+	{
+		[id(1), helpstring("method InitTextInput")] HRESULT InitTextInput([in] IInputEntity *pEntity, [in] BSTR strText);
+		[id(2), helpstring("method SetText")] HRESULT SetText([in] BSTR strText);
+		[id(3), helpstring("method GetText")] HRESULT GetText([out, retval] BSTR *pstrText);
+		[id(4), helpstring("method GetValidatedInput")] HRESULT GetValidatedInput([out, retval] IUnknown **pObj);
+		[id(5), helpstring("method SetValidatedInput")] HRESULT SetValidatedInput([in] IUnknown *pObj);
+		[id(6), helpstring("method GetInputEntity")] HRESULT GetInputEntity([out, retval] IInputEntity **pEntity);
+	};
+
+	[
+		object,
+		uuid(775ACCA6-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IIREventHandler Interface"),
+		pointer_default(unique)
+	]
+	interface IIREventHandler : IDispatch
+	{
+		[id(1), helpstring("method NotifyInputReceived")] HRESULT NotifyInputReceived([in] ITextInput *pTextInput);
+		[id(2), helpstring("method NotifyAboutToDestroy")] HRESULT NotifyAboutToDestroy([in] IInputReceiver *pInputReceiver);
+	};
+
+	[
+		object,
+		uuid(775ACCAA-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IInputValidator : IDispatch
+	{
+		[id(1), helpstring("method ValidateInput")] HRESULT ValidateInput([in] ITextInput *pTextInput, [out, retval] VARIANT_BOOL *pbSuccessful);
+		[id(2), helpstring("method GetInputType")] HRESULT GetInputType([out, retval] BSTR *pstrInputType);
+	};
+	
+	[
+		object,
+		uuid(788F91F4-5832-4ce8-937C-2E427224B7DE),
+		dual,
+		helpstring("ITextInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface ITextInputValidator : IDispatch
+	{
+		[propget, id(1), helpstring("property EmptyInputOK")] HRESULT EmptyInputOK([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(1), helpstring("property EmptyInputOK")] HRESULT EmptyInputOK([in] VARIANT_BOOL bVal);
+	};
+	
+	[
+		object,
+		uuid(CDEB3E44-3DF6-404b-A1FD-FEF8DB14F2C7),
+		dual,
+		helpstring("IOCRFilter Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRFilter : IDispatch
+	{
+		[id(1), helpstring("method GetValidChars")] HRESULT GetValidChars([in] BSTR strInputType, [out, retval] BSTR *pstrValidChars);
+	};
+
+	[
+		object,
+		uuid(963C8A62-B21F-4FB3-BB3E-10BE3463BFE2),
+		dual,
+		helpstring("IOCRFilterMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRFilterMgr : IDispatch
+	{
+		[id(1), helpstring("method GetCurrentScheme")] HRESULT GetCurrentScheme([out, retval] BSTR *pstrSchemeName);
+		[id(2), helpstring("method SetCurrentScheme")] HRESULT SetCurrentScheme([in] BSTR strSchemeName);
+		[id(3), helpstring("method ShowFilterSchemesDlg")] HRESULT ShowFilterSchemesDlg();
+		[id(4), helpstring("method ShowFilterSettingsDlg")] HRESULT ShowFilterSettingsDlg();
+	};
+
+	[
+		object,
+		uuid(775ACCA8-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IInputReceiver Interface"),
+		pointer_default(unique)
+	]
+	interface IInputReceiver : IDispatch
+	{
+		[propget, id(1), helpstring("property WindowShown")] HRESULT WindowShown([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(2), helpstring("property InputIsEnabled")] HRESULT InputIsEnabled([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(3), helpstring("property HasWindow")] HRESULT HasWindow([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(4), helpstring("property WindowHandle")] HRESULT WindowHandle([out, retval] long *pVal);
+		[id(5), helpstring("method EnableInput")] HRESULT EnableInput([in] BSTR strInputType, [in] BSTR strPrompt);
+		[id(6), helpstring("method DisableInput")] HRESULT DisableInput();
+		[id(7), helpstring("method SetEventHandler")] HRESULT SetEventHandler([in] IIREventHandler *pEventHandler);
+		[id(8), helpstring("method ShowWindow")] HRESULT ShowWindow([in] VARIANT_BOOL bShow);
+		[propget, id(9), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([out, retval] long *pVal);
+		[propput, id(9), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([in] long newVal);
+		[propget, id(10), helpstring("property UsesOCR")] HRESULT UsesOCR([out, retval] VARIANT_BOOL *pVal);
+		[id(11), helpstring("method SetOCRFilter")] HRESULT SetOCRFilter([in] IOCRFilter *pFilter);
+		[id(12), helpstring("method SetOCREngine")] HRESULT SetOCREngine([in] IOCREngine *pEngine);
+	};
+
+	[
+		uuid(775ACCAE-32AC-11D6-8259-0050DAD4FF55),
+		helpstring("_IInputManagerEvents Interface")
+	]
+	dispinterface _IInputManagerEvents
+	{
+		properties:
+		methods:
+		[id(1), helpstring("method NotifyInputReceived")] HRESULT NotifyInputReceived([in] ITextInput *pTextInput);
+	};
+
+	[
+		object,
+		uuid(775ACCAC-32AC-11D6-8259-0050DAD4FF55),
+		dual,
+		helpstring("IInputManager Interface"),
+		pointer_default(unique)
+	]
+	interface IInputManager : IDispatch
+	{
+		[propget, id(1), helpstring("property WindowsShown")] HRESULT WindowsShown([out, retval] VARIANT_BOOL *pVal);
+		[propget, id(2), helpstring("property InputIsEnabled")] HRESULT InputIsEnabled([out, retval] VARIANT_BOOL *pVal);
+		[id(4), helpstring("method EnableInput1")] HRESULT EnableInput1([in] BSTR strInputValidatorName, [in] BSTR strPrompt, [in] IInputContext* pInputContext);
+		[id(5), helpstring("method EnableInput2")] HRESULT EnableInput2([in] IInputValidator *pInputValidator, [in] BSTR strPrompt, [in] IInputContext* pInputContext);
+		[id(6), helpstring("method DisableInput")] HRESULT DisableInput();
+		[id(7), helpstring("method CreateNewInputReceiver")] HRESULT CreateNewInputReceiver([in] BSTR strInputReceiverName, [out, retval] long *pnIRHandle);
+		[id(8), helpstring("method ConnectInputReceiver")] HRESULT ConnectInputReceiver([in] IInputReceiver *pInputReceiver, [out, retval] long *pnIRHandle);
+		[id(9), helpstring("method DisconnectInputReceiver")] HRESULT DisconnectInputReceiver([in] long nIRHandle);
+		[id(10), helpstring("method GetInputReceiver")] HRESULT GetInputReceiver([in] long nIRHandle, [out, retval] IInputReceiver **pReceiver);
+		[id(11), helpstring("method ShowWindows")] HRESULT ShowWindows([in] VARIANT_BOOL bShow);
+		[id(12), helpstring("method Destroy")] HRESULT Destroy();
+		[propget, id(13), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([out, retval] long *pVal);
+		[propput, id(13), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([in] long newVal);
+		[id(14), helpstring("method ProcessTextInput")] HRESULT ProcessTextInput([in] BSTR strInput);
+		[id(15), helpstring("method GetOCRFilterMgr")] HRESULT GetOCRFilterMgr([out, retval] IOCRFilterMgr **pOCRFilterMgr);
+		[id(16), helpstring("method SetOCREngine")] HRESULT SetOCREngine([in] IOCREngine *pEngine);
+		[id(17), helpstring("method SetInputContext")] HRESULT SetInputContext([in] IInputContext* pInputContext);
+		[id(18), helpstring("method GetInputReceivers")] HRESULT GetInputReceivers([out, retval] IIUnknownVector** pInputReceivers);
+		[id(19), helpstring("method GetHWND")] HRESULT GetHWND([out, retval] long *phWnd);
+	};
+
+	[
+		object,
+		uuid(00801873-60FE-11D6-828D-0050DAD4FF55),
+		dual,
+		helpstring("IInputCorrectionUI Interface"),
+		pointer_default(unique)
+	]
+	interface IInputCorrectionUI : IDispatch
+	{
+		[id(1), helpstring("method PromptForCorrection")] HRESULT PromptForCorrection([in] IInputValidator* pValidator, [in] ITextInput* pTextInput, [out, retval] VARIANT_BOOL *pbSuccess);
+		[propget, id(2), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([out, retval] long *pVal);
+		[propput, id(2), helpstring("property ParentWndHandle")] HRESULT ParentWndHandle([in] long newVal);
+	};
+	[
+		object,
+		uuid(6C2EA83A-AA93-4FE7-BBD1-8CC928A2C183),
+		dual,
+		helpstring("IInputManagerSingleton Interface"),
+		pointer_default(unique)
+	]
+	interface IInputManagerSingleton : IDispatch
+	{
+		[id(1), helpstring("method GetInstance")] HRESULT GetInstance([out, retval] IInputManager **pInputManager);
+		[id(2), helpstring("method DeleteInstance")] HRESULT DeleteInstance();
+	};
+	[
+		object,
+		uuid(AE63592B-604E-4036-A9EE-D61457F5B69B),
+		dual,
+		helpstring("IInputContext Interface"),
+		pointer_default(unique)
+	]
+	interface IInputContext : IDispatch
+	{
+		[id(1), helpstring("method Activate")] HRESULT Activate([in] IInputManager* pInputManager);
+		[id(2), helpstring("method NotifyNewIRConnected")] HRESULT NotifyNewIRConnected([in] IInputReceiver *pNewInputReceiver);
+	};
+	[
+		object,
+		uuid(7117002A-6BA4-4754-9962-69DD3C4EF9A4),
+		dual,
+		helpstring("IIRUIDisabler Interface"),
+		pointer_default(unique)
+	]
+	interface IIRUIDisabler : IDispatch
+	{
+		// PURPOSE:
+		// Whenever SetInputManager is called,
+		// it will go through all input receivers that have window
+		// ui and connected to the input manager, disable
+		// their ui window. Once the object goes out of the scope,
+		// all the input receivers window ui will be enabled.
+		// PARAMETERS:
+		// pInputManager: any input receiver with window interface connected
+		//				  to this input manager will be disabled/enabled.
+		//				  if this parameter is null, the input manager will
+		//				  be obtained through InputManagerSingleton.
+		// OTHERS:
+		// If this method is never called within the life time of IRUIDisabler,
+		// nothing will happen to any of the input receivers.
+		[id(1), helpstring("method SetInputManager")] HRESULT SetInputManager(IInputManager* pInputManager);
+	};
+
+	////////////////////////////////////////////////////////
+	// Coclasses
+	////////////////////////////////////////////////////////
+	[
+		uuid(775ACCA3-32AC-11D6-8259-0050DAD4FF55),
+		helpstring("InputEntity Class")
+	]
+	coclass InputEntity
+	{
+		[default] interface IInputEntity;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(775ACCA5-32AC-11D6-8259-0050DAD4FF55),
+		helpstring("TextInput Class")
+	]
+	coclass TextInput
+	{
+		[default] interface ITextInput;
+		interface ILicensedComponent;
+	};
+
+	//---------------------------------------------------------------------------------------------
+	// NOTE: This CoClass does not accept empty text input as valid by default.
+	// If empty text input is allowed, then the EmptyTextOK property on the
+	// ITextInputValidator interface should be set to VARIANT_TRUE
+	[
+		uuid(775ACCAB-32AC-11D6-8259-0050DAD4FF55),
+		helpstring("TextInputValidator Class")
+	]
+	coclass TextInputValidator
+	{
+		[default] interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ITestableComponent;
+		interface ITextInputValidator;
+	};
+	//---------------------------------------------------------------------------------------------
+
+	[
+		uuid(775ACCAD-32AC-11D6-8259-0050DAD4FF55),
+		helpstring("InputManager Class")
+	]
+	coclass InputManager
+	{
+		[default] interface IInputManager;
+		[default, source] dispinterface _IInputManagerEvents;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(00801874-60FE-11D6-828D-0050DAD4FF55),
+		helpstring("InputCorrectionUI Class")
+	]
+	coclass InputCorrectionUI
+	{
+		[default] interface IInputCorrectionUI;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(E3D22DBC-AB8F-484F-917C-7D880D9FE7BC),
+		helpstring("OCRFilterMgr Class")
+	]
+	coclass OCRFilterMgr
+	{
+		[default] interface IOCRFilterMgr;
+		interface IOCRFilter;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D602DE70-C4A1-415E-8942-C86BD7E073E3),
+		helpstring("InputManagerSingleton Class")
+	]
+	coclass InputManagerSingleton
+	{
+		[default] interface IInputManagerSingleton;
+	};
+	[
+		uuid(0098F184-C600-46FD-B870-16DB5437D22F),
+		helpstring("IRUIDisabler Class")
+	]
+	coclass IRUIDisabler
+	{
+		[default] interface IIRUIDisabler;
+	};
+};

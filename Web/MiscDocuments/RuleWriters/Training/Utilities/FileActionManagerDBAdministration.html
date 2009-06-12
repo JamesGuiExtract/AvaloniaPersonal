@@ -1,0 +1,97 @@
+<HTML>
+	<HEAD>
+		<TITLE>File Action Manager and DB Administration</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>File Action Manager and DB Administration</h1>
+		<hr>
+		<p>
+			<h3>USS files</h3>
+			<ul>
+				<li>Extract Systems software has the capability to store the text extracted by the OCR engine in a .uss file.</li>
+				<li>Storing the extracted text in a .uss file allows multiple rules to be run on the same image without having to go through the lengthy process of OCR each time.</li>
+				<li>If you open an image file in the Rule Tester, the Rule Tester will automatically open the image's corresponding .uss file, if it exists, rather than taking the time to OCR the image.</li>
+				<li>The .uss file stores both the extracted text and spatial information about where text is located on the image.</li>
+				<li>Generally, there is one .uss file per image file, and the name of the .uss file is &ltimage name&gt .uss</li>
+				<li>USS files can be created using the File Action Manager and DB Administration applications.</li>
+			</ul>
+		</p>
+		<hr>
+		<p>
+			<h3>File Action Manager</h3>
+			<ul>
+				<li>The File Action Manager is Extract System's main application.</li>
+				<li>It is used to perform the same task or set of tasks on a large numbers of files
+				<li>For example, the File Action Manager can be used to copy millions and millions of files from one directory to another.</li>
+				<p>
+				<li>The File Action Manger uses a database back-end.</li>
+				<li>The columns of the database, which are called "Actions", represent what task or set of tasks we want to perform on the set of images.</li>
+				<li>The rows of the database represent which files we want to perform the Actions on.</li>
+				<li>The cells of the database contain the status of the file for each Action.</li>
+				<li>The status of the files is always one of the following:
+					<ul>
+						<li><b>Unattempted:</b> We do not want this file to be processed for this Action.</li>
+						<li><b>Pending:</b> The file is waiting to be processed.</li>
+						<li><b>Processing:</b> The file is currently being processed.</li>
+						<li><b>Complete:</b> The file has been processed.</li>
+						<li><b>Failed:</b> The file failed to process for some reason.</li>
+					</ul>
+				</li>
+			</ul>
+			<h3>DB Administration</h3>
+			<p>
+				<ul>
+					<li>DB Administration application is used to create and maintain databases.</li>
+					<li>When you first open the DB Administration you will be asked to select a server machine and a database.</li>
+						<ul>
+							<li>By default, your local machine is selected as the server.</li>
+							<li>If you want to choose another machine on the network to be the server, you can either type the name of the machine into the <b>Database server name</b> box or click on the drop down menu and browse for the desired machine.</li>
+							<li>One you have your server selected, you can choose to either log into an existing database or create a new one.
+								<ul>
+									<li>To create a new database, first select <b>Create new database</b> and then type the name of your new database into the <b>Database Name</b> box.</li>
+									<li>You will be asked to create a password for the new database.</li>
+								</ul>
+							</li>
+							<li>The <b>Database</b> tab shows the server your database is on, the name of the database, and the connection status.</li>
+							<li>The <b>Summary</b> tab shows all the actions in the database and how many files are in each status for that action.</li>
+						</ul>
+					</li>
+					<li>Actions can be added, deleted, or renamed using the <b>Action</b> menu.</li>
+				</ul>
+				<h3>Queuing Files</h3>
+				<ul>
+					<li>Files are added to the database by "queuing" them using the File Action Manager.
+						<ul>
+							<li>You can open the File Action Manger using the <b>Tools</b> menu on the DB Administration.</li>
+							
+						</ul>
+					</li>
+					<li>On the <b>Action</b> tab, select which action you want to work with.</li>
+					<li>To queue files, check the <b>Queue files for this action</b> check box.</li>
+					<li>You can choose which files you want to queue on the <b>Queue Setup</b> tab.</li>
+					<li>There are three different "File Suppliers" that you can use to queue files:
+						<ul>
+							<li><b>Files from folder:</b> Queues all the files in a specific folder.</li>
+							<li><b>Files from static list:</b> Choose individual files to queue or read in a list of files and queue each of them.</li>
+							<li><b>Files from dynamic list:</b> Queue all of the files in a list.</li>
+						</ul>
+					</li>
+					<li>Once you have your file suppliers setup, press the green "play" button to queue your selected files.</li>
+					<li>Note that the summary tab of the Database Administration now has several files that are pending for the action.</li>
+				</ul>
+				<h3>Processing files</h3>
+					<ul>
+						<li>To process files, check the <b>Process files in the queue for this action</b> check box on the <b>Action</b> tab.</li>
+						<li>You can choose which task or tasks you want to perform on the queued files on the <b>Processing Setup</b> tab.</li>
+						<li>To create uss files, you will need to add an <b>OCR document</b> task.</li>
+						<li>After you have added the task, press the green "play" button to process your files.</li>
+						<li>Note that the summary tab of the Database Administration will show how many files are being processed and how many have been completed.</li>
+						<li>Note that the .uss files appear as each document is OCRed!</li>
+					</ul>
+				</li>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>

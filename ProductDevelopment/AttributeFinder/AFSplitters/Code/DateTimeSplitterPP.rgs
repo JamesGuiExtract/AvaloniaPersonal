@@ -1,0 +1,23 @@
+HKCR
+{
+	AFSplitters.DateTimeSplitterPP.1 = s 'DateTimeSplitterPP Class'
+	{
+		CLSID = s '{7EDF8918-6CCA-45B9-BD72-3C3481FA753C}'
+	}
+	AFSplitters.DateTimeSplitterPP = s 'DateTimeSplitterPP Class'
+	{
+		CLSID = s '{7EDF8918-6CCA-45B9-BD72-3C3481FA753C}'
+		CurVer = s 'AFSplitters.DateTimeSplitterPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7EDF8918-6CCA-45B9-BD72-3C3481FA753C} = s 'DateTimeSplitterPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

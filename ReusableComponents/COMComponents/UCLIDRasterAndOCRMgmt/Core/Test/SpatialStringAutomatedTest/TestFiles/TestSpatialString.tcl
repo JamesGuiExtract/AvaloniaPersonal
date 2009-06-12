@@ -1,0 +1,1 @@
+UCLIDSpatialStringAutomatedTest.TestSpatialString.1;;./

@@ -1,0 +1,2 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;..\..\Rules\BuildingNo\BuildingNo.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set012\Images;;K:\Common\Engineering\Sample Files\ByteManagers\Set012\EAV\BuildingNo\$FileNoExtOf(<SourceDocName>).eav

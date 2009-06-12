@@ -1,0 +1,18 @@
+//test1 One line is extracted including line breaks.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 Three lines are extracted including line breaks.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 One line is extracted excluding line breaks.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 Four lines are extracted excluding line breaks using lower to higher line range and individual line.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 Three lines are extracted including line breaks using from higher to lower line range.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//Test6 The third option "Extract each line(excluding line breaks) as a unique
+//value for current attribute" is checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav

@@ -1,0 +1,9 @@
+; RegExprIV.def : Declares the module parameters.
+
+LIBRARY      "RegExprIV.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

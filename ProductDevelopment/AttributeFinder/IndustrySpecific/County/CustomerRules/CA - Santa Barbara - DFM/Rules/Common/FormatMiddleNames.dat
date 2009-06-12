@@ -1,0 +1,6 @@
+//format J. D. or J.D. to J D
+^([A-Z])\.\s?([A-Z])\.$;$1 $2
+//Middle Initial Only
+//([A-Z])[A-Z]+;$1
+
+

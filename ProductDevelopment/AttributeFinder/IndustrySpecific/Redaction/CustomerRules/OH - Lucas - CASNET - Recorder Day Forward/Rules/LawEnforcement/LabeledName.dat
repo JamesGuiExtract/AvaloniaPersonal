@@ -1,0 +1,48 @@
+(?nx)
+(?<=
+  #import Clues.dat.etf
+  
+  ,?
+  \s*
+  (?#: Optional name + 'and')
+  (
+    (?-i:
+      (?#: First Name)
+      (\b[A-Z][A-z]+\s+|\b[A-Z]\.?\s+)?
+      (?#: Middle Name)
+      ((\b[A-Z]([A-z]+\b|(?:[.,]))|\b[A-Z]\.[A-Z]\.)\s+)?
+      (?#: Last Name)
+      (\b([A-Z]')?[A-Z][A-z]{2,100}\b)
+    )
+    \s+and\s+
+  )?
+)
+(?#: Names to be captured)
+(?!
+  #import Clues.dat.etf
+  |mrs
+  |mr
+  |ms
+  |Bureau
+  |Sheriff
+  |Shareif
+)
+(?-i:
+  (
+    (?<FirstName>
+      (\b[A-Z][A-z]+\b|\b[A-Z]\.?)
+    )
+  \s+
+  )?
+  (
+    (?<MiddleName>
+      (\b[A-Z]([A-z]+\b|(?:[.,]))|\b[A-Z]\.[A-Z]\.)
+    )
+  \s
+  )?
+  (
+    (?<LastName>
+      \b([A-Z]')?[A-Z][A-z]{2,100}\b
+    )
+  )
+)

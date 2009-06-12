@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDCountyCustomComponents.GrantorGranteeFinderV2PP.1 = s 'GrantorGranteeFinderV2PP Class'
+	{
+		CLSID = s '{90F99A8B-0856-42EE-9CBF-94D9EDCE0BF3}'
+	}
+	UCLIDCountyCustomComponents.GrantorGranteeFinderV2PP = s 'GrantorGranteeFinderV2PP Class'
+	{
+		CLSID = s '{90F99A8B-0856-42EE-9CBF-94D9EDCE0BF3}'
+		CurVer = s 'UCLIDCountyCustomComponents.GrantorGranteeFinderV2PP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {90F99A8B-0856-42EE-9CBF-94D9EDCE0BF3} = s 'GrantorGranteeFinderV2PP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

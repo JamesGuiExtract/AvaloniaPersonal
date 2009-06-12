@@ -1,0 +1,5 @@
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\RedactionSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set004\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

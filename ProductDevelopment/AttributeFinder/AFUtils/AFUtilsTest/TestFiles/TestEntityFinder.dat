@@ -1,0 +1,43 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// General exercise of Entity Finder Algorithm steps
+<FILE>|EntityFinderBasicTests.dat
+
+// Test Entity Finder Algorithm blank-line trimming
+<FILE>|EntityFinderBlankLineTests.dat
+
+// Test Entity Finder Algorithm Leading Nonsense trimming
+<FILE>|EntityFinderNonsenseTests.dat
+
+// Exercise specific Person Designator Keywords that should be found by patterns
+<FILE>|EntityFinderPersonKeywordTests.dat
+
+// Exercise specific Company Suffix and Company Designator Keywords 
+// that should be found by patterns
+<FILE>|EntityFinderCompanyKeywordTests.dat
+
+// Exercise specific Person Alias and Company Alias Keywords 
+// that should be found by patterns
+<FILE>|EntityFinderAliasTests.dat
+
+// Exercise specific Municipality test cases
+<FILE>|EntityFinderMunicipalityTests.dat
+
+// Exercise specific Trust and Trustee test cases
+<FILE>|EntityFinderTrustTests.dat

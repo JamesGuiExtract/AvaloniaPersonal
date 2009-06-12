@@ -1,0 +1,79 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SOJ_SURE_01,false
+		// SATISFACTION OF JUDGMENT
+		// ACKNOWLEDGEMENT OF SATISFACTION OF JUDGMENT
+		// 0004.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\satisfaction judgement\20059022444600.tif.uss
+		01=^(?:(?:FULL\s*)?ACKNOWLEDGE?MENT\s*OF\s*)?SATISFACTION\s*OF\s*JUDGE?MENT(?:\r?$)
+
+		// RELEASE OF ABSTRACT OF JUDGMENT
+		//
+		// FULL RELEASE OF ABSTRACT OF JUDGMENT
+		// 0001.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set004\Images\RELEASE\2003136137.tif.uss
+		02=^(?:(?:FULL|PARTIAL)\s*)?RELEASE\s*OF\s*ABSTRACT\s*OF\s*JUDGE?MENT(?:\r?$)
+
+		// RELEASE OF JUDGMENT LIEN
+		//
+		// RELEASE OF JUDGMENT
+		// 0002.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set001\Images\RELEASE\2003133885.tif.uss
+		//
+		// SATISFACTION AND RELEASE OF JUDGMENT
+		// 0003.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set002\Images\RELEASE\2003132288.tif.uss
+		03=^.?\s*(?:SATISFACTION\s*AND\s*)?RELEASE\s*OF\s*JUDGE?MENT\s*(?:AND\s*JUDGE?MENT\s*)?(?:LIEN)?(?:\r?$)
+
+		// PARTIAL RELEASE OF JUDGMENT LIEN
+		04=^(?:PARTIAL\s*)?RELEASE\s*OF\s*JUDGE?MENT\s*(?:LIEN)?(?:\r?$)
+
+		// GENERAL RELEASE OF CHILD SUPPORT JUDGMENT LIEN
+		05=^GENERAL\s*RELEASE\s*OF\s*CHILD\s*SUPPORT\s*JUDGE?MENT\s*LIEN(?:\r?$)
+		06=^.{0,3}CERTIFICATE\s*OF\s*FULL\s*SATISFACTION\s*OF\s*JUDGE?MENT.{0,3}(?:\r?$)
+	OR_END
+
+	// RELEASE OF LIEN & RELEASES THE LIEN...JUDGMENT OR ABSTRACT OF JUDGMENT
+	//
+	AND_BEGIN,SOJ_SURE_02,false
+		^RELEASE\s*OF\s*LIEN(?:\r$)
+		\bRELEASES\s*THE\s*LIEN\s*[\s\S]{0,100}JUDGE?MENT\s*OR\s*ABSTRACT\s*OF\s*JUDGE?MENT\b
+	AND_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SOJ_PROBABLE_01,false
+		// SATISFACTION OF JUDGMENT
+		// ACKNOWLEDGEMENT OF SATISFACTION OF JUDGMENT
+		01=\b(?:ACKNOWLEDGE?MENT\s*OF\s*)?SATISFACTION\s*OF\s*JUDGE?MENT\b
+		02=^.{0,3}FULL\s*RELEASE\s*OF\s*LIEN\s*ABSTRACT\s*OF\s*JUDGMENT.{0,3}(?:\r?$)
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+
+[MAYBE_END]

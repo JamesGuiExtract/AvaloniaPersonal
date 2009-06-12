@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.CopyMoveDeleteFileProcessor.1 = s 'CopyMoveDeleteFileProcessor Class'
+	{
+		CLSID = s '{D9451FFE-8588-4C01-88E0-4FC0D157C0A5}'
+	}
+	FileProcessors.CopyMoveDeleteFileProcessor = s 'CopyMoveDeleteFileProcessor Class'
+	{
+		CLSID = s '{D9451FFE-8588-4C01-88E0-4FC0D157C0A5}'
+		CurVer = s 'FileProcessors.CopyMoveDeleteFileProcessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D9451FFE-8588-4C01-88E0-4FC0D157C0A5} = s 'CopyMoveDeleteFileProcessor Class'
+		{
+			ProgID = s 'FileProcessors.CopyMoveDeleteFileProcessor.1'
+			VersionIndependentProgID = s 'FileProcessors.CopyMoveDeleteFileProcessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

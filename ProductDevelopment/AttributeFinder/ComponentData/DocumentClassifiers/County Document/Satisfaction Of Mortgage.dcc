@@ -1,0 +1,513 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,SAT_ZERO_01,false
+		01=AFFIDAVIT\s*OF[\s\S]{0,200}REGARDING\s*HEIRSHIP\s*OF
+		//RELEASE\s*OF\s*HOSPITAL\s*LIEN
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\STATE TAX LIEN\00016416.tif.uss
+		02=^NOTICE\s*OF\s*STATE\s*TAX\s*LIEN\b
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\SUBORD&ATTORN AG\00016935.tif.uss
+		03=SUBORDINATION\W*NON-DISTURBANCE\s*AND\s*ATTORNMENT\s*AGREEMENT
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL STATE TAX LN\00016375.tif.uss
+		04=STATE\s*TAX\s*LIEN\s*RELEASE
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL OF JUDGEMENT\00016856.tif.uss
+		05=RELEASE\s*OF\s*JUDGMENT\s*LIEN
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\PTL RELEASE\00016867.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\PTL RELEASE\00016552.tif.uss
+		06=PARTIAL\s*RELEASE\s*OF\s*ABSTRACT\s*OF\s*JUDGEMENT
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017064.tif.uss
+		07=STATUTORY\s*DURABLE\s*POWER\s*OF\s*ATTORNEY
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\OIL & GAS LEASE\00017045.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\OIL & GAS LEASE\00017046.tif.uss
+		08=^(?:OIL\W*(?:AND\W*)?GAS|OIL\W*GAS\W*(?:AND\W*)?MINERAL)\s*LEASE(?:\r?$)
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\LIEN\00016325.tif.uss
+		09=Notice\s*of\s*Child\s*Support\s*Lien
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AGREEMENT\00016308.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\AGREEMENT\00016468.tif.uss
+		10=(?:RECASTING|MEMORANDUM\s*OF)\s*AGREEMENT
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CC PROBATE\00017093.tif.uss
+		11=ORDER\s*ADMITTING\s*WILL\s*TO\s*PROBATE\s*AND\s*AUTHORIZING\s*LETTERS\s*TESTAMENTARY
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CERTIFIED COPY\00016797.tif.uss
+		12=FINAL\s*DECREE\s*OF\s*DIVORCE
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CONTRACT\00017040.tif.uss
+		13=^.{0,30}LIEN\s*CONTRACT(?:\r?$)
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\CONTRACT\00017050.tif.uss
+		14=Corrected\s*Contract\s*for\s*Deed
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY\00016230.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\HOME EQUITY\00016687.tif.uss
+		15=^HOME\s*EQUITY\s*SECURITY\s*(?:INSTRUMENT|DOCUMENT)(?:\r?$)
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RESCIND ACCELERATION\00016374.tif.uss
+		16=RESCISSION\s*OF\s*ACCELERATION\s*OF\s*LOAN\sMATURITY
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL OF JUDGEMENT\00016469.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\PTL RELEASE\00016552.tif
+		17=RELEASE\s*OF(?:\s*ABSTRACT\s*OF)?\s*JUDGMENT
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED\Other\00016660.tif.uss
+		18=DISTRIBUTION\s*DEED(?:\r?$)
+		//K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\SUB TRUSTEE DEED\00016300.tif.uss
+		19=SUBSTITUTE\s*TRUSTEE'S\s*DEED
+
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WARRANTY DEED\00015300.tif.uss
+		20=\b(?:SPECIAL\s*)?WARRANTY\s*DEED(?:\r?$)
+		21=^.{0,15}(?:SPECIAL\s*)?WARRANTY\s*DEED\s*.{0,30}(?:\r?$)
+
+		// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\WDD\B04313AAAFI.TIF.uss
+		22=\b(?:Convey|Warrant)[\s\S]{0,5}\s*(?:and|or)\s*(?:Warrant|Convey)[\s\S]{0,5}to\b
+
+		// example of "this indenture" made between
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018194.tif.uss
+		// example of "this deed" made between
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017360.tif.uss
+		// example with no space between "this" and "indenture"
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015839.tif.uss
+		// example that contains "T H I S  I N D E N T U R E"
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017686.tif.uss
+		// example that contains "T H I S" and "I N D E N T U R E" on seperate lines
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017179.tif.uss
+		23=\bT\s*h\s*i\s*s\s*(?:D\s*e\s*e\s*d|I\s*n\s*d\s*e\s*n\s*t\s*u\s*r\s*e)[\s\S]{0,40}?Made[\s\S]{1,100}?Between
+
+
+		24=Notice\s*of\s*Default
+
+		25=^RELEASE\s*OF\s*CERTIFICATE\s*OF\s*LIEN(?:\r?$)
+
+		26=\bGENERAL\s*RELEASE\s*OF\s*CHILD\s*SUPPORT\s*JUDGMENT\s*LIEN\b
+
+		27=\bMODIFICATION\s*OF\s*DEED\s*OF\s*TRUST\b
+
+		28=\bNOTICE\s*OF\s*RESCISSION\s*OF\s*NOTICE|DECLARATION\s*OF\s*DEFAULT\b
+
+		29=\bSUBSTITUTION\s*OF\s*TRUSTEE\s*AND(?:\s*DEED\s*OF)?(?:\s*FULL)?\s*RECONVEYANCE\b
+
+		30=^OFFICE\s*OF\s*THE\s*TAX\s*COLLECTOR\s*(?:\r?$)
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-041836.tif.uss
+		31=^APPOINTMENT\s*OF\s*SUCCESSOR\s*TRUSTEE(?:\r?$)
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002646.tif.uss
+		32=^PERSONAL\s*PROPERTY\s*TAX\s*WARRANT(?:\r?$)
+		33=^.{0,3}FULL\s*RELEASE\s*OF\s*LIEN\s*ABSTRACT\s*OF\s*JUDGMENT.{0,3}(?:\r?$)
+	OR_END
+
+	AND_BEGIN,SAT_ZERO_02,false
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\LIEN\00016782.tif.uss
+		release
+		MUNICIPAL\s*UTILITY\s*LIEN
+	AND_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	AND_BEGIN,SAT_ZERO_03,false
+		^RELEASE\s*OF\s*LIEN(?:\r?$)
+		following\s*described\s*certificate\s*of\s*tax
+	AND_END
+
+	SINGLE_BEGIN,SAT_ZERO_04,false
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017085.tif.uss
+		^Limited\s*Power\s*of\s*Attorney(?:\r?$)
+	SINGLE_END
+
+	AND_BEGIN,SAT_ZERO_05,false
+		\bRELEASE\s*OF\s*LIEN\b
+		releases\s*the\s*lien\s*[\s\S]{0,100}judgment\s*or\s*abstract\s*of\s*judgment
+	AND_END
+	AND_BEGIN,SAT_ZERO_06,false
+		Substitution\W*of\W*Trustee
+		substitute\W*a\W*different\W*Trustee 	
+	AND_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,3
+	AND_BEGIN,SAT_ZERO_07,false
+		// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Release of Federal Tax Lien\20049000016400.004.tif.uss
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL FED TAX LIEN\00016760.tif.uss
+		(?:Release\s*of|DISCHARGE\s*OF\s*PROPERTY\s*FROM)\s*Federal\s*Tax
+		Lien
+	AND_END
+SCOPE_END
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,SAT_ZERO_08,false
+		01=^.{0,4}PERSONAL\s*PROPERTY\s*TAX\s*WARRANT(?:\r?$)	
+		02=\(This\s*is\s*a\s*lien\s*demand\s*and\s*not\s*an\s*arrest\s*warrant\.?\)
+		// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016270.tif.uss
+		03=(GENERAL\s*)?POWER\s*OF\s*ATTORNEY(?:\r?$)
+	OR_END
+SCOPE_END
+
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,SAT_SURE_01,false
+		// SATISFACTION OF MORTGAGE
+		// 0001.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000710.TIF.uss
+		// SATISFACTION OF REAL ESTATE MORTGAGE
+		// 0002.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000715.TIF.uss
+		// RELEASE OF MORTGAGE
+		// 0003.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00001001.TIF.uss
+		// DISCHARGE OF MORTGAGE
+		// 0004.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00001043.TIF.uss
+		// RELEASE OF MORTGAGE OR DEED OF TRUST
+		// 0009.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003132501.tif.uss
+		// RELEASE OF DEED OF TRUST
+		// 0010.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003132630.tif.uss
+		// SATISFACTION OF CONSTRUCTION MORTGAGE
+		// 0015.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00107228.tif.uss
+		// Release of a Real Estate Mortgage
+		//
+		// RELEASE OF LIEN
+		// 0011.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003134013.tif.uss
+		// RELEASE OF RECORDED LIEN
+		// 0012.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003133915.tif.uss
+		// DISCHARGE OF MORTGAGE FOR CORPORATION
+		// 0018.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA0F.TIF.uss
+		// Discharge of Mortgage (Michigan)
+		// 0019.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA10.TIF.uss
+		// MICHIGAN DISCHARGE OF MORTGAGE
+		// 0020.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04289AAAU0.TIF.uss
+		// DISCHARGE OF REHABILITATION MORTGAGE
+		// 0027.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIS\B04293AAAA9.TIF.uss
+		// DISCHARGE OF CONTINUING COLLATERAL MORTGAGE
+		// 0021.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04289AAAMA.TIF.uss
+		01=^(?:MICHIGAN\s*)?(?:(?:PARTIAL|FULL)\s*)?(?:SATISFACTION|RELEASE|DISCHARGE:?)\s*OF\s*(?:A\s*)?(?:(?:REAL\s*ESTATE|CONSTRUCTION|RECORDED|REHABILITATION|CONTINUING\s*COLLATERAL)\s*)?(?:MORTGAGES?|DEED\s*OF\s*TRUST|LIENS?)(?:\s*(?:BY\s*A|FOR)\s*CORPORATIONS?)?(?:\s*-?\s*\([\s\S]{0,15}\))?(?:\r?$)
+
+		// DISCHARGE OF MORTGAGE RECONVEYANCE BY LIENHOLDER
+		// 0022.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04292AAATY.TIF.uss
+		02=^DISCHARGE\s*OF\s*MORTGAGE\s*RECONVEYANCE\s*BY\s*LIENHOLDER(?:\r?$)
+
+		// SHORT FORM DISCHARGE OF MORTGAGE/SATISFACTION
+		// 0030.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RELEASE OF LIEN\00014166.tif.uss
+		// SHORT FORM DISCHARGE OF MORTGAGE
+		// 0023.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA25.TIF.uss 
+		// SHORT FORM DISCHARGE OF MORTGAGE FOR CORPORATIONS
+		// 0024.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04289AAAT8.TIF.uss
+		03=^SHORT\s*FORM\s*DISCHARGE\s*OF\s*MORTGAGE(?:/SATISFACTION)?(?:\s*FOR\s*CORPORATIONS?)?(?:\r?$)
+
+		// 0033.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00013063.tif.uss
+		04=^RELEASE\s*&\s*SATISFACTION\s*OF\s*LIEN(?:\r?$)
+
+		// 0031.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RELEASE OF LIEN\00015285.tif.uss
+		05=^LIEN\s*RELI?EASE(?:\r?$)
+
+		// 0016.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110865.tif.uss
+		06=^MORTGAGE\s*(?:FULL\s*)?SATISFACTION(?:\r?$)
+
+		// 0005.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000803.TIF.uss
+		07=^REAL\s*ESTATE\s*MORTGAGE[\s\S]{0,5}SATISFACTION(?:\r?$)
+
+		// 0006.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000796.TIF.uss
+		// Satisfacton - 
+		// 0039.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Lien\00016673.tif.uss
+		08=^CERTIFICATE\s*OF\s*(?:DISCHARGE|SATISFACTI?ON)(?:\r?$)
+
+		// 0007.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000813.TIF.uss
+		09=^MORTGAGE[\s\S]{0,5}RELEASE[\s\S]{0,5}SATISFACTION[\s\S]{0,10}DISCHARGE(?:\r?$)
+
+		// R E L E A S E O F L I E N
+		// 0040.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Lien\00016337.tif.uss
+		10=^(?:LOAN.*?|[\s\S]{0,20}?\d{5}\s*)?R\s*E\s*L\s*E\s*A\s*S\s*E\s*[O0]\s*F\s*L\s*I\s*E\s*N\s*(?:AND\s*ASSIGNMENT\s*OF\s*RENTS\s*|HOMESTEAD\s*PROPERTY\s*)?(?:\r\n|DOC)
+		
+		// RELEASE OF EASEMENT 
+		// 0041.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Lien\00016390.tif.uss
+		// RELEASE OF EASEMENT AND BILL OF SALE
+		// 0034.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00012754.tif.uss
+		11=^RELEASE\s*OF[\s\S]{0,15}EASEMENT(?:\s*AND\s*BILL\s*OF\s*SALE)?(?:\r?$)
+
+		// SATIFACTION PIECE
+		// 0017.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110367.tif.uss
+		12=^SATISFACTION\s*PIECE(?:\r?$)
+
+		// DEED OF RELEASE
+		//0042.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\Release of Lien\00017084.tif.uss
+		13=^DEED\s*OF[\s\S]{0,15}RELEASE(?:\r?$)
+
+		//0044.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction of Mortgage\3015956.tif.uss
+		14=^SATISFACTION\s*OF\s*REAL\s*ESTATE\s*MORTGAGE\s*-\s*BY\s*LENDER(?:\r?$)
+
+		// 0032.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RELEASE OF LIEN\00013844.tif.uss
+		15=^RELEASE\s*OF\s*FIRST\s*AMENDED\s*AND\s*SUPPLEMENTAL\s*MORTGAGE,?(?:\r?$)
+
+		// RELEASE OF COLLATERAL ASSIGNMENT OF NOTE
+		// 0013.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set001\Images\RELEASE\2003132479.tif.uss
+		16=^RELEASE\s*OF\s*COLLATERAL\s*ASSIGNMENT\s*OF\s*NOTE(?:\r?$)
+
+		//0045.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction of Mortgage\2999286.tif.uss
+		17=^RELEASE\s*DEED(?:\s*\(ILLINOIS\))?(?:\r?$)
+
+		// FULL RECONVEYANCE
+		// PARTIAL RECONVEYANCE
+		// DEED OF RECONVEYANCE
+		// CALIFORNIA RECONVEYANCE (not CALIFORNIA RECONVEYANCE COMPANY)
+		// DEED OF FULL RECONVEYANCE
+		// 0048.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Reconveyance\20049000003300.001.tif.uss
+		18=^(?:DEED\s*OF\s*)?(?:FULL|PARTIAL|DEED\s*OF|CALIFORNIA)\s*RECONVEYANCE(?!\s*COMPANY)(?:\r?$)
+
+		// AUTHORITY TO CANCEL
+		// 0049.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS\B04314AAAZ6.TIF.uss
+		19=^AUTHORITY\s*TO\s*CANCEL(?:\r?$)
+
+		// RELEASE OF LIEN AFFIDAVIT
+		// 0014.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set001\Images\RELEASE\2003134208.tif.uss
+		20=^RELEASE\s*OF\s*LIEN\s*AFFIDAVIT(?:\r?$)
+
+		// 0050.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\Multi Page\MORTGAGE DISCHARGE\3901716REQ.tif.uss
+		21=\bsatisfied\s*and\s*discharged\s*in\s*full\W*and\s*it\s*hereby\s*releases\s*the\s*Mortgage\b
+
+		// 0051.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\Multi Page\MORTGAGE DISCHARGE\3912566HOC.tif.uss
+		22=\bexecuted\s*this\s*release\s*and\s*do\s*hereby\s*discharge\s*and\s*release\s*from\s*the\s*lien\s*and\s*operation\s*of\s*the\s*Mortgage\b
+
+		// 0052.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\Multi Page\MORTGAGE DISCHARGE\3919117KEA.tif.uss
+		23=\bthat\s*a\s*certain\s*indenture\s*(?:of\s*)?Mortgage[\s\S]{0,1500}?is\s*fully\s*paid\W*satisfied\s*and\s*discharged\b
+
+		// 0053.tif;K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\Multi Page\MORTGAGE DISCHARGE\3903966GCB.tif.uss
+		24=\band\s*hereby\s*cancels\s*and\s*discharges\s*said\s*mortgage\b
+
+		25=^RELEASE\s*OF\s*LIENS?\s*-\s*TEXAS\s*(?:\r?$)
+
+		26=^RELEASE\s*OF\s*LIEN\s*FOR\s*LOT\s*CLEARING\s*(?:\r?$)
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-003682.tif.uss
+		27=^RELEASE\s*OF\s*(?:TRUST\s*)?DEED\s*(?:\r?$)
+
+		28=^RELEASE\s*OF\s*VENDOR.?S\s*LIEN\s*(?:\r?$)
+
+		29=^RELEASE\s*OF\s*LIEN[\s\S]{0,200}KNOW\s*ALL\s*MEN\s*BY\s*THESE\s*PRESENTS\b
+
+		30=^(?:DISCHARGE|RELEASE|SATISFACTION)\s*AND\s*(?:SATISFACTION|RELEASE|DISCHARGE)\s*OF\s*(?:SECOND\s*)?MORTGAGE\s*(?:\r?$)
+		
+		31=^DISCHARGE\r\n[\s\S]{0,50}that\s*a\s*certain\s*mortgage\b
+
+		32=^SHORT\s*FORM\s*OF\s*DISCHARGE\s*OF\s*(?:\r?$)
+
+		33=^SATISFACTION\s*/\s*DISCHARGE\s*OF\s*MORTGAGE\s*(?:\r?$)
+
+		34=^DISCHARGE\s*OF\s*MORTGAGE\s*-\s*.{0,15}\s*(?:\r?$)
+
+		35=^MORTGAGE\s*DISCHARGE(?:\(?S\)?)?\s*(?:\r?$)
+
+		36=^DISCHARGE\s*OF\s*MORTGAGE\s*LOAN\s*NO\b
+
+		37=^RELEASE\s*OF\s*MORTGAGE\s*LOAN\b
+
+		38=^CERTIFICATION\s*OF\s*DISCHARGE\s*(?:\r?$)
+
+		39=^CERTIFICATE\s*OF\s*SPECIFIC\s*RELEASE\s*OF\s*REAL\s*PROPERTY\s*(?:\r?$)
+
+		40=^CERTIFICATE\s*OF\s*SATISFACTION\s*(?:\r?$)
+
+		41=^DISCHARGE\s*OF\s*L(?:IE|EI)N\s*(?:\r?$)
+
+		42=^MICHIGAN\s*DISCHARGE\s*(?:\r?$)
+
+		43=^DISCHARGE\s*OF\s*MORTGAGE[\s\S]{0,50}\r\nKNOW\s*ALL\s*MEN\s*BY\s*THESE\s*PRESENTS\b
+
+		44=^DISCHARGE\s*OF\s*MORTGAGE(?:\s*BY\s*A)?\s*FOR\s*CORPORATIONS?.?\s*(?:\r?$)
+
+		45=^SATISFACTION\s*OF\s*MORTGAGE\s*BY\s*SEPARATE\s*INSTRUMENT\s*(?:\r?$)
+
+		46=^M\s*O\s*R\s*T\s*G\s*A\s*G\s*E\s*R\s*E\s*L\s*E\s*A\s*S\s*E\s*(?:\r?$)
+
+		47=^RELEASE\s*AND\s*DISCHARGE\s*OF\s*LIEN\s*(?:\r?$)
+
+		48=DISCHARGE\s*OF\s*ASSIGNMENT\s*OF\s*PURCHASER'S\s*INTEREST\s*IN\s*LAND\s*CONTRACT\s*AS\s*SECURITY\s*AND\s*MORTGAGE
+
+		49=^S\s*A\s*T\s*I\s*S\s*F\s*A\s*C\s*T\s*I\s*O\s*N\s*O\s*F\s*M\s*O\s*R\s*T\s*G\s*A\s*G\s*E\s*(?:\r?$)
+		50=does\s*hereby\s*release,\s*satisfy,\s*and\s*discharge\s*said\s*Mortgage\s*in\s*full\s*and\s*does\s*hereby\s*consent\s*that\s*the\s*same\s*be\s*cancelled\s*and\s*discharged\s*of\s*record
+		//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-025451.tif.uss	
+		//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-025451.tif.uss
+		51=^.{0,2}RECONVEYANCE\s*OF\s*TRUST\s*DEED.{0,2}(?:\r?$)
+		// 0057.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06173AA.ADS.TIF.uss
+		52=^.{0,2}DISCHARGE\s*OF\s*COMMERCIAL\s*REAL\s*ESTATE\s*MORTGAGE.{0,2}(?:\r?$)
+
+		// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Satisfaction of Mortgage\Grantor\0147.TIF.uss
+		53=^.{0,2}DISCHARGE\s*OF\s*MODIFICATION\s*AGREEMENT.{0,2}(?:\r?$)
+
+	OR_END
+	AND_BEGIN,SAT_SURE_2,true
+	^KNOW\s*ALL\s*MEN\s*BY\s*THESE\s*PRESENTS\s*THAT.*
+	DOES\s*HEREBY\s*CERTIFY\s*THAT
+	A\s*CERTAIN\s*MORTGAGE\s*DATED
+	IS\s*FULLY\s*PAID\W*SATISFIED\W*AND\s*DISCHARGED
+	AND_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.25,1,1
+	OR_BEGIN,SAT_SURE_3,true
+		// Satisfaction
+		// 0008.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000792.TIF.uss
+		01=^(?:S(?:atisfaction|ATISFACTION)|R(?:elease|ELEASE))(?:\r?$)
+		02=\bD(?:ischarge|ISCHARGE)\s*[Oo][Ff]\s*M(?:ortgage|ORTGAGE)\b
+		03=\bSATISFACTION\s*PIECE\b
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,2
+	OR_BEGIN,SAT_PROBABLE_01,false
+		//0046.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction of Mortgage\2999173.tif.uss
+		01=^.{0,20}(?:SATISFACTION|RELEASE)\s*OF\s*(?:[\s\S]{0,20})?MORTGAGE[\s\S]{0,20}(?:\r?$)
+
+		// R E L E A S E O F L I E N
+		02=\bR\s*E\s*L\s*E\s*A\s*S\s*E\s*O\s*F\s*L\s*I\s*E\s*N(?:\r?$)
+
+		//0025.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04292AAAPK.TIF.uss
+		03=^.{0,20}DISCHARGE\s*OF\s*MORTGAGE(?:/SATISFACTION)?(?:\r?$)
+
+		//
+		04=\b(?:MICHIGAN\s*)?(?:(?:PARTIAL|FULL)\s*)?(?:SATISFACTION|RELEASE|DISCHARGE:?)\s*OF\s*(?:A\s*)?(?:(?:(?:REAL\s*ESTATE)|CONSTRUCTION|RECORDED|REHABILITATION)\s*)?(?:MORTGAGES?|DEED\s*OF\s*TRUST|LIENS?)(?:\s*(?:BY\s*A|FOR)\s*CORPORATIONS?)?(?:\s*-?\s*\([\s\S]{0,15}\))?\b
+
+		//
+		05=\b(?:DEED\s*OF\s*)?(?:FULL|PARTIAL|DEED\s*OF|CALIFORNIA)\s*RECONVEYANCE(?!\s*COMPANY)\b
+
+		// FIILL RECONVEYANCE
+		// 0055.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\reconveyance\20059020119500.tif.uss
+		06=^F(?:U|II)LL\s*RECONVEYANCE\s*(?:\r?$)
+		// 0059.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.ALI.TIF.uss
+		07=^DISCHARGE\s*OF\s*ASSIG.{1,6}OF\s*LEASES\W*RENTS(?:\r?$)
+		// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Satisfaction of Mortgage\Grantor\0111.tif.uss
+		08=^Mortgage\s*Satisfaction\b[^A-Z]*(?:\r?$)
+		// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Satisfaction of Mortgage\Grantor\0119.tif.uss
+		09=^Release\s*of\s*Lease(?:\r?$)
+		10=^SATISFACTION\s*PIECE(?:\r?$)
+		11=^RECONVEYANCE\s*OF\s*TRUST\s*DEED(?:\r?$)
+		
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SAT_PROBABLE_02,false
+		// Indenture Mortgage...is fully paid, satisfied and discharged
+		// 0026.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AABDZ.TIF.uss
+		// Indenture Mortgage...is hereby paid in full and discharged
+		// 0028.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIS\B04292AAA19.TIF.uss
+		01=\bINDENTURE\s*(?:OF\s*)?MORTGAGE[\s\S]{0,700}\r\nIS\s*(?:FULLY|HEREBY)\s*PAID,?\s*(?:IN\s*FULL|SATISFIED)\s*AND\s*DISCHARGED\b
+
+		// This Release of Lien is executed by
+		// 0054.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00006968.tif.uss
+		02=\bTHIS\s*RELEASE\s*OF\s*LIEN\s*IS\s*EXECUTED\s*BY\b
+
+		// forever discharging the lien from said Deed of Trust
+		// 0035.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00011945.tif.uss
+		03=\bFOREVER\s*DISCHARGING\s*THE\s*LIEN\s*FROM\s*SAID\s*DEED\s*OF\s*TRUST\b
+
+		// does hereby release the Deed of Trust lien
+		// 0043.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RELEASE OF LIEN\00016521.tif.uss
+		04=\bDO(?:ES)?\s*HEREBY\s*RELEASE\s*THE\s*(?:(?:DEED\s*OF\s*TRUST|REAL\s*PROPERTY)\s*)LIEN\b
+
+		// releases the Property from all liens securing the Note
+		// 0036.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00011245.tif.uss
+		05=\bRELEASES\s*THE\s*PROPERTY\s*FROM\s*ALL\s*LIENS\s*SECURING\s*THE\s*NOTE\b
+
+		//HEREBY DISCHARGES THE FOLLOWING DESCRIBED MORTGAGE\b
+		//0029.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIS\B04293AAA2F.TIF.uss
+		06=\bHEREBY\s*DISCHARGES\s*THE\s*FOLLOWING\s*DESCRIBED\s*MORTGAGE\b
+
+		//
+		07=the\s*following\s*Mortgage\s*[i1][5s]\s*PAID\b
+		
+		//
+		08=\bcertain\s*mortgage\s*from[\s\S]{0,500}?has\s*been\s*fully\s*paid\s*and\s*satisfied\b
+		09=does\s*hereby\s*acknowledge\s*that\s*the\s*indebtedness\s*set\s*forth\s*in\s*the\s*aforementioned\s*agreement(?:\(s\))?\s*has\s*been\s*satisfied\s*and\s*canceled
+		//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-012295.tif.uss
+		10=WHEREAS,?\s*the\s*indebtedness\s*secured\s*by\s*said\s*Deed\s*of\s*Trust\s*has\s*been\s*paid\s*in\s*full
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-000043.tif
+		11=\bthe\s*obligation\s*secured\s*by\s*said\s*trust\s*deed\s*has\s*been\s*(?:fully\s*)paid\b[\s\S]{1,36}hereby\s*does\b[\s\S]{0,24}(?:grant|sellconvey)
+		//I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Satisfaction of Mortgage\Grantee\0006.tif
+		12=above\W*mentioned\W*Mortgage\W*has\W*been\W*fully\W*paid\W*or\W*otherwise\W*discharged
+	OR_END
+
+	AND_BEGIN,SAT_PROBABLE_03,false
+		// does hereby release and discharge all liens
+		// 0037.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00012255.tif.uss
+		// does hereby acknowledge that it has received full payment and satisfaction
+		// 0038.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00012250.tif.uss
+		(?:MORTGAGE|DEED\s*OF\s*TRUST)
+		\bDOES\s*HEREBY\s*(?:RELEASE\s*AND\s*DISCHARGE\s*ALL\s*LIENS|ACKNOWLEDGE\s*THAT\s*IT\s*HAS\s*RECEIVED\s*FULL\s*PAYMENT\s*AND\s*SATISFACTION)\b
+	AND_END
+	AND_BEGIN,SAT_PROBABLE_04,false
+		HEREBY\s*CERTIFY\s*that\s*the\s*following\s*Mortgage
+		the\s*same\s*be\s*discharged\s*of\s*record
+	AND_END
+SCOPE_END
+SCOPE_BEGIN,0,0.1,1,2
+	SINGLE_BEGIN,SAT_PROBABLE_05,false
+		^DISCHARGE\W*OF\W*MORTGAGE
+	SINGLE_END
+SCOPE_END
+SCOPE_BEGIN,0,1,1,-1
+	AND_BEGIN,SAT_PROBABLE_06,false
+		acknowledges\s*full\s*payment\s*and\s*satisfaction\s*of\s*said[\s\S]{1,12}(?:note|mortgage|deed)
+		directs\s*the\s*Register\s*of\s*Deeds\s*to[\s\S]{1,24}(?:cancel|release|discharge)
+	AND_END
+	AND_BEGIN,SAT_PROBABLE_07,false
+		has\s*been\s*fully\s*satisfied\s*by\s*the\s*payment\s*of\s*the\s*debt\s*secured\s*thereby
+		(?:fully\s*cancelled\s*and\s*discharged\s*and\s*surrenders\s*same\s*as\s*cancelled|directs\s*the\s*Clerk\s*of\s*the\s*said\s*Circuit\s*Court\s*to\s*cancel\s*the\s*same)
+	AND_END
+SCOPE_END
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+// removed due to being too loose and causing false positives - db
+//SCOPE_BEGIN,0,0.3,1,1
+//	OR_BEGIN,SAT_MAYBE_01,true
+//		// 0047.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction of Mortgage\3001476.tif.uss
+//		01=\bSATISFACTION\b
+//
+//		//
+//		02=\bRELEASE\b
+//	OR_END
+//SCOPE_END
+
+SCOPE_BEGIN,0,1,1,2
+	AND_BEGIN,SAT_MAYBE_02,false
+		(?:FULLY\s*PAID|FULL\s*SATISFACTION|CEASE\s*TO\s*BE\s*A\s*LIEN|\bIS\b[\s\S]{1,10}(?:PAID\s*AND\s*HEREBY\s*)?(?:RELEASE|DISCHARGED))
+		MORTGAGE
+	AND_END
+
+	AND_BEGIN,SAT_MAYBE_03,false
+		original\s*(?:mortgagor|grantor|borrower)
+		original\s*(?:mortgagee|grantee)
+	AND_END
+
+	OR_BEGIN,SAT_MAYBE_04,false
+		//
+		01=\b(?:SATISFACTION|RELEASE)\s*OF\s*(?:[\s\S]{0,20})?(?:MORTGAGE|DEED\s*OF\s*TRUST)\b
+
+		//
+		02=[^A-Za-z \t]+\s*SATISFACTION\s*[^A-Za-z \t]+
+
+		//
+		03=\bIN\s*CONSIDERATION\s*OF\s*THE\s*PAYMENT\s*IN\s*FULL[\s\S]{0,100}PROMISORRY\s*NOTE\b
+
+		// 
+		04=\b[Mm]ortgage[\s\S]{0,100}?\s*[1I][5S3]\s*PAID\b
+
+		//
+		05=\band\s*does\s*hereby\s*consent\s*that\s*the\s*same\s*be\s*discharged\s*of\s*record\b
+	
+		// 0056.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\reconveyance\20059019666500.tif.uss
+		06=under\s*said\s*Deed\s*of\s*Trust.?\s*do\(?es\)?\s*hereby\s*reconvey\b
+		
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-004930.tif.uss
+		07=This\s*Release\s*of\s*Trust\s*Deed\s*was\s*acknowledged\s*before\s*me\s*on
+	OR_END
+SCOPE_END
+
+[MAYBE_END]

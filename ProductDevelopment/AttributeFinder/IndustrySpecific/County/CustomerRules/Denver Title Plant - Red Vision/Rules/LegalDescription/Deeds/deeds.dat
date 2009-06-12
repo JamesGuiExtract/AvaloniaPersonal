@@ -1,0 +1,17 @@
+[PATTERNS_BEGIN]
+
+legal1 = real property^300~described as follows:^?Legal1^also|as known
+
+legal6 = real^350~described as follows:^?Legal6^also|as known
+
+legal2 = following described property^:^?Legal2^which^20~address
+
+legal5 = following described property^100~jurisdiction^?Legal5^which^20~address
+
+legal3 = property^300~described^20~:^?Legal3^also|as known
+
+legal4 = following described^100~wit:|wit;^?Legal4^also|as known
+
+legal7 = following described^100~wit:|wit;^?Legal7^a.k.a.|aka
+
+[PATTERNS_END]

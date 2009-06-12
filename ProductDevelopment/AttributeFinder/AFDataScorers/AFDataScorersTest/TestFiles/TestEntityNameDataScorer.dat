@@ -1,0 +1,43 @@
+// Basic input file for Entity Name Data Scorer Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) <FILE> | Path1 
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path1  = a fully qualified path to a text file with input and output.
+//             OR a filename for file located in same folder as TestEntityNameDataScorer.dat
+//
+// 2) <TESTCASE>| Expected score | Attribute Value to score
+//				
+// 3) <ENDSLog>| Path2|GroupOnly
+//		Path2 = a fully qualified path for a ENDSLog file that has the same format as a ENDS
+//				log file. The blank lines in the file separate groups of attributes to 
+//				be scored together
+//		GroupOnly is optional if it is the 3 token value on the <ENDSLog> line the test will only
+//			test the groups. This allows input of a ENDSLog file created from a logging session
+//			to be duplicated exactly if ENDS Logging is enabled in the Test Harness.
+//			if there is no 3 token or it is not = to GroupOnly the test will be done with
+//			both Individual attributes and groups
+//
+//	Format of this file is
+//		Comment lines are ignored
+//		Blank lines separate groups of attributes
+// 		Each none comment and blank line has a score value and a text value separated by |
+//		if the Text value is TotalGroupScore then the score at the beginning of the line is
+// 		the total score for the group of attributes since the last blank line
+//		
+
+<TESTCASE>|20|\r\nJeffrey J. Martino and Kimberley C. Martino, husband and wife\r\n\r\n
+
+// Test an empty string
+<TESTCASE>|0|
+
+// Test a single space
+<TESTCASE>|0| 
+
+
+<ENDSLog>|ENDSLog.dat
+
+
+

@@ -1,0 +1,77 @@
+//test1 All four clues have value.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 clue1 and clue2 have value, "Above clue texts will be treated as regular expression" is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 The setting is the same as test2 except Define the LEFT of the Region and Define the RIGHT of the Region 
+//are set to different values.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 The setting is the same as test2 and 3 except Define the LEFT of the Region and Define the Right of
+//the Region are set to different values.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 The setting is the same as test1 except Define the LEFT of the Region and Define the Right of
+//the Region are set to different values.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 Only cluelist1 has value, "Above clue tests will be treated as regular expression(s)"
+//is checked. All four Region Boundaries are set based on value of ClueList1.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 The setting is the same as test6 except "Characters" is selected in "Words|Characters" that intersect 
+//region boundaries".
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 Only ClueList1 has value. All regional boundaries are set based on ClueList1. 
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 The setting is the same as test8 except "Case Sensitive" checkbox is checked.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 The setting is the same as test8 except ClueList1 value is moved to ClueList2.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 The setting is the same as test10 except "Case Sensitive" checkbox is checked.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 The setting is same as test10 except cluelist2 value is moved to ClueList3.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 The setting is same as test12 except "case Sensitive" checkbox is checked.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 The setting is same as test12 except cluelist3 value is moved to ClueList4.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 The setting is the same as test14 except "case Sensitive" checkbox is checked.
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 All four ClueLists have regular expression values and the "Above clue texts will be treated as
+//regular expressions" checkbox is checked. 
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//test17 Clue List2,3,4 have the same values as test16, clueList1's entry is different from test16
+//and is invalid which will result in no output being generated. 
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 Only ClueList1 has value, "Outside" is selected in "Inside|Outside" the specified boundaries
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
+
+//test19 The main purpose of this test is to test the "Restrict search to the region defined
+//by the results from clue list" check box. It is checked in settings for Clue List2.
+<TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav
+
+//test 20 The setting is the same as test19 except "Restrict search to the region defined
+//by the results from clue list" check box is not checked.
+<TESTCASE>;Test20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test20.eav
+
+//test22 This testcase is to test the Dynamic File List feature. ClueList 1 and 2 both
+//utilize the file:// feature, ClueList3 does not and ClueList4 has no entry. 
+<TESTCASE>;Test22.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test22.eav
+
+//test23 Also to test the Dynamic File List feature, all four Clue Lists have entries, and all the
+//checkboxes are selected checked. The tags in Clue List 3 and Clue List 4 are written
+//as "File://" and "FILE://" to test case insensitivity.
+<TESTCASE>;Test23.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test23.eav

@@ -1,0 +1,20 @@
+// Started with SUB-BLO BlockPart.dat
+
+// DT:0020
+//	BUILDING\s\d+
+
+// Beginning Block Part
+(BUILDING)[\(\)s\.]{0,5}(\s+number|\s+no(\.)?)?\s+
+
+// Digits or single letter or both
+(([\.\s]*\(?\d+\)?)|("?[a-zA-Z]"?(?=\s|,|\.|(?=\r?$)))
+
+// Or Number could be spelled out
+|\s?(ONE|TWO|THREE|(FOUR(TEEN)?)|FIVE|(SIX(TY|TEEN)?)|(SEVEN(TY|TEEN)?)|(EIGHT(Y|EEN)?)|(NINE(TY|TEEN)?)|
+  TEN|ELEVEN|TWELVE|THIRTEEN|FIFTEEN|
+  TWENTY|THIRTY|FORTY|FIFTY|
+  HUNDRED|THOUSAND|\band\b|\s?-\s?
+
+// End of spelled out number or number separators
+)*
+|[,\s])*

@@ -1,0 +1,108 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ReusableComponents\COMComponents\ESMessageUtils\Code\ESMessageUtils.vcproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631} = {08CC1AFB-7B9D-42E5-B823-DC72CDC06631}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ZLibUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\ZLibUtils\Code\ZLibUtils.vcproj", "{A1474E20-9B5F-4DF9-A400-490270BC7999}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LeadUtils", "..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code\LeadUtils.vcproj", "{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DetectAndReportFailure", "DetectAndReportFailure.vcproj", "{A96917AB-80A9-44A7-AC3B-6EA28075CE38}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{A1474E20-9B5F-4DF9-A400-490270BC7999} = {A1474E20-9B5F-4DF9-A400-490270BC7999}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {D026CB45-DFA8-4FD7-AE12-C6F05978187A}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.Build.0 = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.ActiveCfg = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.Build.0 = Release|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Debug|Win32.Build.0 = Debug|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Release|Win32.ActiveCfg = Release|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Release|Win32.Build.0 = Release|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Debug|Win32.Build.0 = Debug|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Release|Win32.ActiveCfg = Release|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Release|Win32.Build.0 = Release|Win32
+		{A1474E20-9B5F-4DF9-A400-490270BC7999}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A1474E20-9B5F-4DF9-A400-490270BC7999}.Debug|Win32.Build.0 = Debug|Win32
+		{A1474E20-9B5F-4DF9-A400-490270BC7999}.Release|Win32.ActiveCfg = Release|Win32
+		{A1474E20-9B5F-4DF9-A400-490270BC7999}.Release|Win32.Build.0 = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.Build.0 = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.ActiveCfg = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.Build.0 = Release|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Debug|Win32.ActiveCfg = Debug|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Debug|Win32.Build.0 = Debug|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Release|Win32.ActiveCfg = Release|Win32
+		{08CC1AFB-7B9D-42E5-B823-DC72CDC06631}.Release|Win32.Build.0 = Release|Win32
+		{A96917AB-80A9-44A7-AC3B-6EA28075CE38}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A96917AB-80A9-44A7-AC3B-6EA28075CE38}.Debug|Win32.Build.0 = Debug|Win32
+		{A96917AB-80A9-44A7-AC3B-6EA28075CE38}.Release|Win32.ActiveCfg = Release|Win32
+		{A96917AB-80A9-44A7-AC3B-6EA28075CE38}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

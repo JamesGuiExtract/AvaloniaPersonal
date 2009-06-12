@@ -1,0 +1,130 @@
+// AFFileProcessors.idl : IDL source for AFFileProcessors.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFFileProcessors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(0D45D3B2-CF74-4000-9549-EC5BD95B6A55),
+	version(1.0),
+	helpstring("AFFileProcessors 1.0 Type Library")
+]
+library UCLID_AFFILEPROCESSORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFILEPROCESSING.tlb");
+
+	//////////////
+	// Enums
+	//////////////
+	typedef 
+	[
+		uuid(891CCDB2-84CD-4011-BEBF-1C9F89C55E75), 
+		helpstring("UCLID OCR Image Pages Type")
+	]
+    enum
+	{
+		kNoOCR = 0,
+		kOCRAllPages = 1,
+        kOCRCertainPages = 2
+    } EOCRPagesType;
+
+	//////////////
+	// Interfaces
+	//////////////
+	[
+		object,
+		uuid(F4C65FD0-4DE5-4E37-81D9-14CB6168C1E3),
+		dual,
+		helpstring("IDetectFirstPageCreateMPI Interface"),
+		pointer_default(unique)
+	]
+	interface IDetectFirstPageCreateMPI : IDispatch
+	{
+		[propget, id(1), helpstring("property RulesFile")] HRESULT RulesFile([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property RulesFile")] HRESULT RulesFile([in] BSTR newVal);
+		[propget, id(2), helpstring("property OutputImageName")] HRESULT OutputImageName([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property OutputImageName")] HRESULT OutputImageName([in] BSTR newVal);
+		[propget, id(3), helpstring("property CreateOutputUSS")] HRESULT CreateOutputUSS([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property CreateOutputUSS")] HRESULT CreateOutputUSS([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property UseUSS")] HRESULT UseUSS([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property UseUSS")] HRESULT UseUSS([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(06557EDF-0C1E-4A5D-8B6C-51E60860FCE7),
+		dual,
+		helpstring("IAFEngineFileProcessor Interface"),
+		pointer_default(unique)
+	]
+	interface IAFEngineFileProcessor : IDispatch
+	{
+		// if input is an image file and its corresponding USS file exists, then read that USS file
+		[propget, id(1), helpstring("property ReadUSSFile")] HRESULT ReadUSSFile([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property ReadUSSFile")] HRESULT ReadUSSFile([in] VARIANT_BOOL newVal);
+		// if input is an image file and its corresponding USS file exists, then create the USS file 
+		// and read from the USS file
+		[propget, id(2), helpstring("property CreateUSSFile")] HRESULT CreateUSSFile([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property CreateUSSFile")] HRESULT CreateUSSFile([in] VARIANT_BOOL newVal);
+		// name of the rule set file name (encrypted or not)
+		[propget, id(3), helpstring("property RuleSetFileName")] HRESULT RuleSetFileName([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property RuleSetFileName")] HRESULT RuleSetFileName([in] BSTR newVal);
+		// OCR all pages or only OCR specific pages
+		[propget, id(4), helpstring("property OCRPagesType")] HRESULT OCRPagesType([out, retval] EOCRPagesType *pVal);
+		[propput, id(4), helpstring("property OCRPagesType")] HRESULT OCRPagesType([in] EOCRPagesType newVal);
+		// If OCRPageRange = kOCRPages, this property specifies certain page numbers in a string
+		[propget, id(5), helpstring("property OCRCertainPages")] HRESULT OCRCertainPages([out, retval] BSTR *strSpecificPages);
+		[propput, id(5), helpstring("property OCRCertainPages")] HRESULT OCRCertainPages([in] BSTR strSpecificPages);
+	};
+
+	[
+		uuid(7009B66A-BF97-4557-A029-FBF178ADAAA5),
+		helpstring("DetectFirstPageCreateMPI Class")
+	]
+	coclass DetectFirstPageCreateMPI
+	{
+		[default] interface IDetectFirstPageCreateMPI;
+		interface IFileProcessingTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(0DF8637C-E581-4EC3-992D-A375E92183E1),
+		helpstring("DetectFirstPageCreateMPIPP Class")
+	]
+	coclass DetectFirstPageCreateMPIPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(0F831302-E48D-4A2C-B636-485612A60262),
+		helpstring("AFEngineFileProcessor Class")
+	]
+	coclass AFEngineFileProcessor
+	{
+		[default] interface IAFEngineFileProcessor;
+		interface IFileProcessingTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(F0B58CEC-401F-42AC-BA0C-F11E3A3ED3F4),
+		helpstring("AFEngineFileProcessorPP Class")
+	]
+	coclass AFEngineFileProcessorPP
+	{
+		interface IUnknown;
+	};
+};

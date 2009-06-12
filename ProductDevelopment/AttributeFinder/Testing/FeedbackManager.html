@@ -1,0 +1,122 @@
+<HTML>
+
+<HEAD>
+<TITLE>Feedback Manager Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Feedback Manager Testing Checklist<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Feedback EXE</h2>
+<UL>
+        <LI>Type <b>Feedback</b> in the Command line window.
+  	<LI>Defaults to showing the Choice dialog (Configuration and Packaging options)
+   	<LI>Command-line option "/c" shows the Configuration dialog
+   	<LI>Command-line option "/p" shows the Packaging dialog
+   	<LI>Other command-line options show the Choice dialog
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>General</h2>
+<UL>
+  	<LI><u>Exclusivity</u>
+	<UL>
+		<LI>If the Feedback Manager is operating as a DLL, confirm that only a single process is able to collect Feedback.
+		<LI>If the Feedback Manager is operating as a Service, confirm that multiple processes on the same PC are able to collect Feedback at the same time.
+	</UL>
+  	<LI><u>Read-Only Files</u>
+	<UL>
+	   	<LI>Make the Feedback.dsn file read-only and confirm that the user is prompted to allow file modification when changing the Feedback folder.
+	   	<LI>With a read-only Feedback.dsn file, confirm that Feedback is not collected if the user disallows file modification.
+   		<LI>Make the Feedback.mdb file read-only and confirm that the user is prompted to allow file modification when changing the Feedback folder.
+	   	<LI>With a read-only Feedback.mdb file, confirm that Feedback is not collected if the user disallows file modification.
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Configuration Dialog</h2>
+<UL>
+	<LI>Confirm that the default Feedback setting is disabled and that no Feedback folder is defined.
+	<LI>Confirm that Feedback cannot be enabled without a defined Feedback folder.
+   	<LI>With Feedback disabled, confirm that Feedback can be cleared.
+   	<LI>With Feedback disabled, confirm that a Feedback folder can be defined.
+   	<LI>Confirm that Feedback state (enabled or disabled) and Feedback folder are persistent.
+   	<LI><u>Skip Count</u>
+	<UL>
+		<LI>Confirm that the number of items to be skipped between collections is persistent.
+		<LI>With a skip count of 2, confirm that the first two attribute findings do not have collected feedback.
+		<LI>Confirm that the number of items already skipped is persistent between collections.  In other words, set skip count to 5 and allow 3 findings to be skipped.  Exit the application (RuleSet Editor or Process Files).  Restart the application and confirm that only the first 2 findings are skipped.
+	</UL>
+   	<LI><u>Turn Off At Count</u>
+	<UL>
+		<LI>Confirm that the count of rule executions before stopping feedback collection is persistent.
+		<LI>With a turn-off count of 3, confirm that only three attribute findings have collected feedback.
+		<LI>With a turn-off count of 3 and a skip count of 2, confirm that only 9 attribute findings are required to accumulate three feedback collections.
+		<LI>Confirm that the turn off count is persistent between collections.  In other words, set the turn-off count to 5 and allow 3 feedback collections.  Exit the application (RuleSet Editor or Process Files).  Restart the application and confirm that feedback is collected only 2 more times.
+	</UL>
+   	<LI><u>Turn Off At Date</u>
+	<UL>
+		<LI>Confirm that the date at which to stop feedback collection is persistent.
+		<LI>With a turn-off date of today, confirm that feedback is not collected.
+		<LI>With a turn-off date of tomorrow, confirm that feedback is collected.
+		<LI>Set turn-off date to tomorrow and change the system date to tomorrow. Confirm that feedback is not collected.
+	</UL>
+	<LI>Confirm that corrected data cannot be saved from the Rule Tester if found data was not collected.
+	<LI>Confirm that corrected data can be saved from the Rule Tester if found data was collected.
+   	<LI><u>Source Document Collection</u>
+	<UL>
+		<LI>Confirm that the source document collection setting is persistent.
+		<LI>Set source document collection to None, confirm that the image file is not copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Rule Execution without Convert To Text, confirm that the image file is copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Rule Execution with Convert To Text, confirm that the USS file is copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Packaging, confirm that the image file is not copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Rule Execution without Convert To Text. Use Manual Input from the Rule Tester and confirm that no source information is copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Rule Execution without Convert To Text. Use OCR Input from Image Window from the Rule Tester and confirm that the image file is copied to the Feedback folder.
+		<LI>Set source document collection to Collect At Rule Execution with Convert To Text. Use OCR Input from Image Window from the Rule Tester and confirm that the USS file is copied to the Feedback folder.
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Packaging Dialog</h2>
+<UL>
+	<LI>Confirm that changing the Feedback folder to a non-empty folder displays a message informing the user that files found in the folder may be deleted after packaging.
+   	<LI><u>Read Database Button</u>
+	<UL>
+	  	<LI>Without any collected Feedback, confirm that clicking the Read Database button displays a message informing the user that no Feedback is available for packaging.
+  		<LI>With Feedback available and no Feedback folder defined, confirm that clicking the Read Database button displays a message informing that no Feedback information is available for packaging.
+  		<LI>With Feedback available and a Feedback folder defined, confirm that clicking the Read Database button updates the dialog with a size estimate for the output file.
+	</UL>
+   	<LI><u>Package Data Button</u>
+	<UL>
+  		<LI>Without any collected Feedback, confirm that clicking the Package Data button displays a message informing the user that no Feedback is available for packaging.
+  		<LI>With Feedback available and no Feedback folder defined, confirm that clicking the Package Data button displays a message informing the user that a Feedback folder must be defined.
+  		<LI>With Feedback available and a Feedback folder defined, clear the Clear Feedback After Packaging checkbox.  Confirm that clicking the Package Data button creates the output file and retains the Feedback files.
+  		<LI>With Feedback available and a Feedback folder defined, set the Clear Feedback After Packaging checkbox.  Confirm that clicking the Package Data button creates the output file and removes all files in the Feedback folder.
+	</UL>
+	<LI>Confirm that the output file contains the Feedback.MDB file.
+	<LI>Confirm that the output file contains the UCLID_FeedbackRunRules.DAT file.
+	<LI>Confirm that the output file contains the expected number of RSD (or ETF) files.
+	<LI>Confirm that the output file contains the ID.found.voa file for each Rule ID.
+	<LI>Confirm that the output file contains the ID.correct.voa file for each Rule ID where Correct data was saved to the Feedback folder.  This can be done from the Rule Tester toolbar for any rule execution where feedback is collected.
+	<LI>Confirm that the output file contains the appropriate ID.tif.uss file for each Rule ID where source documents were converted to text.
+	<LI>Confirm that the output file contains the appropriate ID.tif file for each Rule ID where source documents were not converted to text.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</BODY>
+
+</HTML>

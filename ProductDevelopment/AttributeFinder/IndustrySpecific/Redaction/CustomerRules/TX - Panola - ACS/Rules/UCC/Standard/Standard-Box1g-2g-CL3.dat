@@ -1,0 +1,4 @@
+^.{0,3}\bSTATE\b
+^.{0,3}(MIDD|IDDL|DDLE)[\s\S]{0,6}(NAM|AME)(?!.*SUFFIX)
+[^1lI|t\s][1lI|t2367](?![1lI|tc0on|[A-Z]{3,})[^2\n']{1,9}(ENTITY.?S\s*[O0C]RGAN|[O0C]RGAN\S{3,7}NAL|RGAN.{0,10}|ZATIONAL).{0,4}(ID|#)
+\D[12]\D.{0,3}ORGANIZATIONAL\s*(ID|.{0,3}#)

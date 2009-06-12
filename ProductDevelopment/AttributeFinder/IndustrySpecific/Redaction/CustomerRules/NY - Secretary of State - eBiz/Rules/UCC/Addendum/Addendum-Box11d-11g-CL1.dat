@@ -1,0 +1,14 @@
+11d\.\s*S\.S\.\s*OR\s*TAX
+11d\.\s*TAX[\s\S]{0,9}SSN
+(?:(?:1[1lIt]|[1lIt]1)d.?|^(?:1[1lIt]|[1lIt]1).{0,4})\s*SEE\s*(?:.NST|.{0,5}(?:NSTR|STR.)|.{0,7}(?:TR.CT|UCT..)|.{0,9}(?:R.CT.|CT..N))
+(?:(?:1[1lIt]|[1lIt]1)d.?|^(?:1[1lIt]|[1lIt]1).{0,4})\s*[S5].?[S5].?\s*.R\s*TAX
+^(?:1[1lIt]|[1lIt]1).{5,11}I.?D.?[\s\S]{1,4}SSN\s*.R\s*[FE]{1,2}IN
+(?:(?:1[1lIt]|[1lIt]1)d.?|^(?:1[1lIt]|[1lIt]1).{0,4})\s*TAX\s*[LI]
+(?:(?:1[1lIt]|[1lIt]1)d.?|^(?:1[1lIt]|[1lIt]1).{0,4})\s*(?:TA|.?AX|ID)[\s\S]{3,18}(?:SSN\s*.R|.R\s*[FE]{1,2}IN|SSN[\s\S]{0,5}[FE]{1,2}IN)
+(?:1[1lIt]|[1lIt]1){4,17}SSN\s*.R\s*[FE]{1,2}IN
+TAX\s*[\s\S]{1,9}SSN\s*.R\s*[FE]{1,2}IN
+(?:1[1lIt]|[1lIt]1)[\s\S]{0,6}(?:TAX|ID)[\s\S]{3,9}(?:SSN\s*.R|.R\s*[FE]{1,2}IN)
+(?:1[1lIt]|[1lIt]1)[\s\S]{1,9}TY[PR][EF]\s*[O0]F\s*[O0]R
+(?:1[1lIt]|[1lIt]1)[\s\S]{1,9}JUR.SD.CT.[O0]N\s*[O0]F\s*[O0]RG
+(?:1[1lIt]|[1lIt]1)[\s\S]{1,9}[O0]RGAN.ZAT.[O0]NAL
+^11(?:[dg]|\x20*[dg][.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS))

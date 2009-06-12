@@ -1,0 +1,39 @@
+[VARS_BEGIN]
+
+InFavorOf=to and in favor of|in favor of|to the order of|[to]
+
+GrantsKeyword=[grant]|[grants]|[granted]|[assign]|[assigns]|[assigned]|[transfer]|[transfers]|[transferred]|[sell]|[sells]|[sold]|[bargain]|[bargains]|[bargained]|[convey]|[conveys]|[conveyed]|[deliver]|[delivers]|[delivered]|set over|sets over
+
+UntoKeyword=[unto:|[to:|[unto :|[to :|[unto]|[t0]|[to]
+
+OriginMortgagor=Name of Original Mortgagor|Name of Original Mortgagor ( s )|Original Mortgagor
+
+MadeAndExecuted=made and executed by|executed by|made and executed|made by|executed
+
+Present=present|presence
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+ASMT_Company_01=ASSIGNMENT OF MORTGAGE^100~THIS CERTIFIES THAT^200~hereby assigns all if its rights^100~and interest to^?Company^80~[in that certain mortgage
+ASMT_Company_02=ASSIGNMENT OF MORTGAGE^80~For value received^200~hereby assigns, without recourse, to^?Company^80~[at]
+ASMT_Company_03=Corporation Assignment of Mortgage^200~hereby grants, assigns and transfers to^?Company^200~Assignee
+ASMT_Company_04=ASSIGNMENT OF LEASES AND RENTS AND SECURITY DEPOSITS^200~THIS ASSIGNMENT OF LEASES AND RENTS AND SECURITY DEPOSITS^having the address set forth on the signature page hereof, to^?Company^100~Lender
+ASMT_Company_05=ASSIGNMENT OF MORTGAGE OR DEED OF TRUST^300~successor by merger to^?Company^100~Whose address is
+ASMT_Company_06=ASSIGNMENT OF^80~ALL MEN BY THESE PRESENTS:^40~That^?Company^150~located at
+ASMT_Company_07=SUBORDINATION OF MORTGAGE^500~For itself, its successors and assigns^500~mortgage to]^?Company^200~[its successors
+ASMT_Company_08=SUBORDINATION AGREEMENT^150~(Subordinating Party), and^?Company^100~(New Lender)
+ASMT_Company_09=ASSIGNMENT OF LEASES AND RENTS^100~as Assignor^40~(Borrower)^To^?Company^100~[as Assignee
+ASMT_Company_10=ASSIGNMENT OF SECURITY INSTRUMENT^80~Owner and Holder^250~Assignee:^?Company^80~[its successors and assigns
+
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Random1500Subset\ASMT\0081079.TIF
+ASMT_Company_11=[as]^6~Borrower^6~to^?Company^80~[as Lender^20~ASSIGNMENT OF LEASES, RENTS AND PROFITS
+
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Random1500Subset\ASMT\0082445.TIF
+ASMT_Company_12=assigns^3~and^3~transfers^6~to^?Company^100~with^3~an^3~address^3~of
+
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Random1500Subset\ASMT\0096363.TIF
+ASMT_Company_13=hereby^3~assigns^3~without^3~recourse^3~[to]^?Company^100~[the]^3~mortgage^3~executed^3~by
+
+[PATTERNS_END]

@@ -1,0 +1,85 @@
+//test1 A single clue is defined. "Above defined clue text(s) will be treated as Regular Expressions(s)", 
+//and "Include all strings after the clue text until the end of the input" checkboxes are both checked. 
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 A single clue is defined. "Include all strings after the clue text until the end of the line"
+//checkbox is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 Use the same clue as test2. "Include all strings between the clue text and the 
+//strings specified:", and "Above defined string will be treated as a Regular Expression" checkboxes are checked. 
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 Use the same clue as test2. "Include all strings between the clue text and the
+//string specified:"checkbox is checked. 
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 Use the same clue as test2. "Up to X number of lines after the clue text:"
+//checkbox is checked.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 Use the same clue as test2. "Up to x number of lines after the clue text:",
+//and "Include text after the clue on the line that contains the clue" checkboxes are checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 Use the same clue as test2. "Up to X numbers of words after the clue text:", 
+//and "Space, tab, Carriage Return and New Line characters" checkboxes are checked.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 Everything is the same as test7, the only difference is a different value 
+//is entered for "Number of words:", after "Up to X number of words after the clue text"checkbox.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 Use the same clue as test2. "Up to X number of words after the clue text:",
+//"Other" in "Define character(s) for which to stop further searching", and 
+//"Space,Tab,Carriage Return and New Line Characters" in Define characters to
+//separate each word checkboxes are checked.  
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 Use the same clue as test2. "Up to X number of words after the clue text:"
+//"Carriage Return and New Line Characters" in Define character(s) for which
+//to stop further searching", and "Space, Tab, Carriage Return and New Line characters",
+//in Define character(s) to separate each word, are selected. 
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 Use the same clue as test2. "Up to X number of words after the clue text:",
+//"Other:" in Define character(s) for which to stop further searching, and "Space,
+//Tab, Carriage Return and New Line Characters" in Define character(s) to separate
+//each word: checkboxes are checked. 
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 Use the same clue as test2. "Up to X number of words after the clue text",
+//and "Other:" in Define character(s) to separate each word checkboxes are checked.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 Use the same clue as test2. "Up to X number of words after the clue text",
+//"Space, Tab, Carriage Return and New Line Characters" and "Others:" in
+//Define characters(s) to separate each word: checkboxes are checked.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 Use the same clue as test2. "Include all strings between the clue text and the string 
+//specified:", and "All strings defined in this window are case-sensitive" checkboxes are checked.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 Everything is the same as in test14 except the letters in clue defined are of different
+//cases. 
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 Everything is the same as in test14 except the string specified in 
+//"Include all strings between the clue text and the string specified" is a word whose
+//letters are of different case.
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//test17 Use the same clue as in test2. "Include all strings between the clue text and the
+//string specified", and "All strings defined in this window are case-sensitive" checkboxes 
+//are checked.
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 Everything is the same as test17 except the entry in "Inclue all strings 
+//between the clue text and the string specified" is a letter of different case.  
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
+
+//test19 Use the same clue as test2. "Include all strings between the clue text and 
+//the string specified:", "Above defined string will be treatd as a Regular Expression",
+//and "All strings defined in this window are case-sensitive" checkboxes are checked.
+<TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav

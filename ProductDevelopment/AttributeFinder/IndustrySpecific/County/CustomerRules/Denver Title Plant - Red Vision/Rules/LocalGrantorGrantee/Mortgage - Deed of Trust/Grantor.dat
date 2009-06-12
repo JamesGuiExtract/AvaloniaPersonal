@@ -1,0 +1,22 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075457.tif
+rule01=the^3~grantor]^?Grantor^80~("Borrow|Borrower")^40~the public trustee|("trustee|trustee")
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075463.tif
+rule02=this^3~indenture^3~made^40~between^?Grantor^80~\r\naddress^16~hereinafter
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2003107970.tif
+rule03=indenture^36~between]^?Grantor^240~hereinafter^40~grantor
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2008074526.tif.uss
+rule04=deed^9~of^3~trust]^40~between]^?Grantor^160~[the^5~granter|grantor
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089037.tif.uss
+rule05=this^3~deed^60~between^?Grantor^160~[the^3~granter
+rule06=this^3~deed^60~between^?Grantor^160~[the^3~grantor
+rule07=this^3~deed^60~between^?Grantor^160~granter^3~herein
+rule08=this^3~deed^60~between^?Grantor^160~grantor^3~herein
+rule09=Grantor:^?Grantor^160~Beneficiary:
+rule10=deed|trust|made|on this day|this day of^60~between^?Grantor^80~(Borrower|"Borrower|Borrower)|Borrower"
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2006085093.tif.uss
+rule11=borrower^5~is]^?Grantor^240~borrower^5~is^20~trustor|under|security
+rule12=that^5~whereas]^?Grantor^240~has^5~executed^24~promiss|note|issory
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\9700069328.tif
+rule13=deed|indenture^120~between^?Grantor^240~hereinafter^24~grantor|known as
+[PATTERNS_END]

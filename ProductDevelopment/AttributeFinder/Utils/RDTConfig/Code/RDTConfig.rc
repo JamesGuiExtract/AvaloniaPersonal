@@ -1,0 +1,198 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\RDTConfig.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\RDTConfig.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_RDTCONFIG_DIALOG DIALOGEX 0, 0, 255, 307
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "RDT Configuration"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "OK",IDOK,140,287,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,197,287,50,14
+    DEFPUSHBUTTON   "Apply",IDC_APPLY,83,287,50,14
+    CONTROL         "Automatically re-encrypt out-of-date ETF files",IDC_CHECK_AUTOENCRYPT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,162,12
+    CONTROL         "Load .dcc and .dat files only once per session",IDC_CHECK_LOADONCE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,21,162,12
+    LTEXT           "If you do not check this option, .dcc and .dat files will be loaded every time when a rule tries to use them.",IDC_STATIC,21,34,145,27
+    CONTROL         "Enable logging in the Entity Finder object",IDC_CHECK_EFALOG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,63,162,12
+    CONTROL         "Add document tag with RuleID for rule that captured data when using the Grantor-Grantee Finder",IDC_CHECK_RULEIDTAG,
+                    "Button",BS_AUTOCHECKBOX | BS_MULTILINE | WS_TABSTOP,7,92,183,19
+    LTEXT           "Optional prefix for .dcc and .dat files",IDC_STATIC,7,159,145,10
+    COMBOBOX        IDC_COMBO_PREFIX,7,172,184,60,CBS_DROPDOWN | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Root folder for automated testing files",IDC_STATIC,7,192,145,10
+    COMBOBOX        IDC_COMBO_ROOT,7,205,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Browse...",IDC_BROWSE_ROOT,198,205,50,14
+    LTEXT           "Full path to component data folder",IDC_STATIC,7,225,145,10
+    COMBOBOX        IDC_COMBO_COMPONENT,7,238,184,60,CBS_DROPDOWN | CBS_AUTOHSCROLL | CBS_DISABLENOSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Browse...",IDC_BROWSE_COMPONENT,198,238,50,14
+    PUSHBUTTON      "Restore Defaults",IDC_DEFAULTS,6,287,70,14
+    CONTROL         "Enable Auto Scrolling of the Test Logger windows as test runs",IDC_CHECK_SCROLLLOGGER,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,113,228,12
+    CONTROL         "Enable logging in the Entity Name Data Scorer object",IDC_CHECK_ENDSLOG,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,77,188,12
+    EDITTEXT        IDC_EDIT_DIFF_COMMAND_LINE,6,267,240,12,ES_AUTOHSCROLL
+    LTEXT           "Diff tool command line ( will replace %1 and %2 with files to be compared.)",IDC_STATIC,6,257,234,8
+    CONTROL         "Display X, Y percentages in Image Viewer",IDC_CHECK_SRW_PERCENT,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,127,188,12
+	CONTROL			"Automatically open image in VOA File Viewer", IDC_CHECK_AUTOOPENIMAGE,
+					"Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,141,188,12
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "RDTConfig MFC Application"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "RDTConfig"
+            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "OriginalFilename", "RDTConfig.EXE"
+            VALUE "ProductName", "RDTConfig Application"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_RDTCONFIG_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 248
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 287
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\RDTConfig.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,13 @@
+(?<=
+
+\bbirth\b[\s\S]{0,7}\bof\b[\s\S]{1,30}\bin\b
+
+[\s\S]{0,10}
+
+)
+
+(?<DateOfBirth_Data>
+
+(?:JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)[\s\S]{0,15}\bof\b[\s\S]{0,5}(?:\d{4}|\d{2})
+
+)

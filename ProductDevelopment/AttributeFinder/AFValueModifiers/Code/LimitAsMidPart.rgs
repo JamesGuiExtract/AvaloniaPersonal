@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueModifiers.LimitAsMidPart.1 = s 'LimitAsMidPart Class'
+	{
+		CLSID = s '{40B70336-206D-4810-97AB-87E1D5E9C16E}'
+	}
+	UCLIDAFValueModifiers.LimitAsMidPart = s 'LimitAsMidPart Class'
+	{
+		CLSID = s '{40B70336-206D-4810-97AB-87E1D5E9C16E}'
+		CurVer = s 'UCLIDAFValueModifiers.LimitAsMidPart.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {40B70336-206D-4810-97AB-87E1D5E9C16E} = s 'LimitAsMidPart Class'
+		{
+			ProgID = s 'UCLIDAFValueModifiers.LimitAsMidPart.1'
+			VersionIndependentProgID = s 'UCLIDAFValueModifiers.LimitAsMidPart'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{C5230183-3ACC-4C4F-8D91-745FFB3C018E}'
+		}
+	}
+}

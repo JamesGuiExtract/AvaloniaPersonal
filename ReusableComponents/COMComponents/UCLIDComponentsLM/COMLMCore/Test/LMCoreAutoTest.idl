@@ -1,0 +1,38 @@
+// LMCoreAutoTest.idl : IDL source for LMCoreAutoTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (LMCoreAutoTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(1B078BC7-AEAB-4D93-9D12-BEFDA2B1DA8F),
+		dual,
+		helpstring("ILMDataTester Interface"),
+		pointer_default(unique)
+	]
+	interface ILMDataTester : IDispatch
+	{
+	};
+
+[
+	uuid(E3C303CE-7EFE-4934-85C1-C2BBCF7BD874),
+	version(1.0),
+	helpstring("LMCoreAutoTest 1.0 Type Library")
+]
+library LMCOREAUTOTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(E577290A-0B1A-4F9F-A4F3-001431E9A187),
+		helpstring("LMDataTester Class")
+	]
+	coclass LMDataTester
+	{
+		[default] interface ILMDataTester;
+	};
+};

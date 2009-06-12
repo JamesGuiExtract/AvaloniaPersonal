@@ -1,0 +1,26 @@
+HKCR
+{
+	AFConditions.DocTypeCondition.1 = s 'DocTypeCondition Class'
+	{
+		CLSID = s '{C9A05826-595E-468D-9258-C7199E0F5F0E}'
+	}
+	AFConditions.DocTypeCondition = s 'DocTypeCondition Class'
+	{
+		CLSID = s '{C9A05826-595E-468D-9258-C7199E0F5F0E}'
+		CurVer = s 'AFConditions.DocTypeCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C9A05826-595E-468D-9258-C7199E0F5F0E} = s 'DocTypeCondition Class'
+		{
+			ProgID = s 'AFConditions.DocTypeCondition.1'
+			VersionIndependentProgID = s 'AFConditions.DocTypeCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D3DC98FB-A212-409B-B68C-64D1DC430594}'
+		}
+	}
+}

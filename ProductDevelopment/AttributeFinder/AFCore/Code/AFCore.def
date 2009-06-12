@@ -1,0 +1,9 @@
+; AFCore.def : Declares the module parameters.
+
+LIBRARY      "UCLIDAFCore.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

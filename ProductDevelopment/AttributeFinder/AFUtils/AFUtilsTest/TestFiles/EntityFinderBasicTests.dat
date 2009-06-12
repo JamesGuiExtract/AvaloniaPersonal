@@ -1,0 +1,192 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Tests of trimming based on keywords
+Company with Suffix_1|name is UCLID Software, LLC|UCLID Software, LLC
+
+Company with Suffix_2|is First Federal Savings Bank of Iowa plus more|First Federal Savings Bank of Iowa
+
+Company with Two Suffixes|name is UCLID Software Co., LLC|UCLID Software Co., LLC
+
+Company with Trailing Designator|name is Bahamas National Bank|Bahamas National Bank
+
+Company with Leading Designator_1|Bank Of America and more|Bank Of America
+
+Company with Leading Designator_2|Bank Of America 123 Main St|Bank Of America
+
+Company with Embedded Designator|name is Bahamas National Bank Trust plus more|Bahamas National Bank Trust
+
+Company with Two Designators|name is Bahamas Bank Holding Company plus more|Bahamas Bank Holding Company
+
+Company with Designator Plus And|Park Bank and Loan and more|Park Bank and Loan
+
+Company with Designator Plus &|Park Bank & Loan and more|Park Bank & Loan
+
+Company with Designator Plus Trailing And|Park Bank and|Park Bank
+
+Company with Designator Plus Trailing &|Park Bank &|Park Bank
+
+Person with Designator|John H. Smith, a single person with extra text|John H. Smith, a single person
+
+Two Persons with 1 Designator|John H. Smith and Mary Smith, husband and wife with extra text|John H. Smith and Mary Smith, husband and wife
+
+Two Persons with 2 Designators|John H. Smith, a married man and Mary Smith, his wife with extra text|John H. Smith, a married man and Mary Smith, his wife
+
+Two Persons with 1 Last Name|John and Mary W. Smith with extra text|John and Mary W. Smith
+
+Two Persons with 1 Identifier|John Smith and his wife Mary W. Smith with extra text|John Smith and his wife Mary W. Smith
+
+// FlexIDSCore #1190
+Two Persons with 1 IdentifierB|GEORGE WILLIAM COOMBES III AND KATHRYN ELISE COOMBES, MARRIED TO EACH OTHER with extra text|GEORGE WILLIAM COOMBES III AND KATHRYN ELISE COOMBES, MARRIED TO EACH OTHER
+
+// FlexIDSCore #1175
+Two Persons with 1 IdentifierC|JULIE MAKER, MARRIED TO DANIEL YAKER with extra text|JULIE MAKER, MARRIED TO DANIEL YAKER
+
+Two Persons with Designator & Identifier|Mary Smith, a married woman and her spouse John H. Smith with extra text|Mary Smith, a married woman and her spouse John H. Smith
+
+Two Persons with ET UX|John H. Smith et ux Mary Smith with extra text|John H. Smith et ux Mary Smith
+
+Two Persons with ETUX|John H. Smith etux Mary Smith with extra text|John H. Smith etux Mary Smith
+
+// Trimming based on LC words without Designators
+Company without Designator + LC Text|name is Bahamas Holding plus more|Bahamas Holding
+
+Company without Designator + Punctuation|name is Bahamas Holding: An Offshore Entity plus more|Bahamas Holding
+
+Company without Designator + And|name is Bahamas Finance and Holding plus more|Bahamas Finance and Holding
+
+Company without Designator + &|name is Bahamas Finance & Holding plus more|Bahamas Finance & Holding
+
+Company with Designator + of|name is Park Bank of Iowa plus more|Park Bank of Iowa
+
+Person without Designator + of|name is John Smith of Pittsburgh plus more|John Smith
+
+Person with Designator + of|name is John Smith, single, of Pittsburgh plus more|John Smith, single
+
+Company with Designator + of and|name is Park Bank of and Iowa plus more|Park Bank
+
+Company w/o Designator + Trailing And|name is Bahamas Finance and |Bahamas Finance
+
+Company w/o Designator + Trailing &|name is Bahamas Finance & |Bahamas Finance
+
+Company w/o Designator + Embedded Punctuation|name is Bahamas Hold^ings, An Offshore Entity plus more|Bahamas Hold
+
+Two Persons with And|John H. Smith and Mary Smith with extra text|John H. Smith and Mary Smith
+
+Two Persons with Comma|John H. Smith, Mary Smith with extra text|John H. Smith, Mary Smith
+
+// Trim leading and trailing junk
+Company with Leading Junk|name is .,"Bahamas National Bank|Bahamas National Bank
+
+Company with Trailing Junk_1|name is Bahamas National Bank and Trust[]() plus more|Bahamas National Bank and Trust
+
+Company with Trailing Junk_2|name is Bahamas National Bank and Trust", plus more|Bahamas National Bank and Trust
+
+Company with Trailing Space & Period|name is Bahamas National Bank and Trust . plus more|Bahamas National Bank and Trust
+
+// Entity Trim Phrases
+Trailing PO Box_1|lower case BAHAMAS NATIONAL BANK P.O. Box 1234, plus more|BAHAMAS NATIONAL BANK
+
+Trailing PO Box_2|lower case BAHAMAS NATIONAL BANK P.O. plus more|BAHAMAS NATIONAL BANK
+
+Trailing PO Box_3|lower case BAHAMAS NATIONAL BANK P. O|BAHAMAS NATIONAL BANK
+
+Trailing PO Box_4|lower case BAHAMAS NATIONAL BANK P O. Box plus more|BAHAMAS NATIONAL BANK
+
+Trailing Whose Address|John H. Smith Whose Address Is plus more|John H. Smith
+
+Trailing Residing At|John H. Smith Residing At plus more|John H. Smith
+
+Trailing DOB|John H. Smith (DOB 2/2/82) plus more|John H. Smith
+
+Trailing Organized|lower case BAHAMAS NATIONAL BANK, ORGANIZED IN FLORIDA plus more|BAHAMAS NATIONAL BANK
+
+Company with Trailing Pro Forma|lower case BAHAMAS NATIONAL BANK, Pro Forma|BAHAMAS NATIONAL BANK
+
+Persons with Trailing Pro Forma|lower case John Smith and wife Mary Smith, Pro Forma|John Smith and wife Mary Smith, Pro Forma
+
+Persons with Trailing Grantor's|lower case John Doe and Jane Doe Grantor's plus more|John Doe and Jane Doe
+
+Persons with Trailing Grantee's|lower case John Doe and Jane Doe Grantee's plus more|John Doe and Jane Doe
+
+Persons with Trailing Grantees|lower case John Doe and Jane Doe Grantees plus more|John Doe and Jane Doe
+
+Persons with Trailing Grantors|lower case John Doe and Jane Doe Grantors plus more|John Doe and Jane Doe
+
+Persons with Trailing Grantor|lower case John Doe and Jane Doe Grantor plus more|John Doe and Jane Doe
+
+Persons with Trailing Grantee|lower case John Doe and Jane Doe Grantee plus more|John Doe and Jane Doe
+
+Trailing Payable|lower case BAHAMAS NATIONAL BANK Payable To Xyz plus more|BAHAMAS NATIONAL BANK
+
+Persons with Phrase|John H. Smith residing at 123 and Mary Smith residing at 123, husband and wife with extra text|John H. Smith residing at 123 and Mary Smith residing at 123, husband and wife
+
+Person with Of|John H. Smith of Pittsburgh plus|John H. Smith
+
+Company with Of|First National Bank of Pittsburgh plus|First National Bank of Pittsburgh
+
+// Trim internal parentheses
+Company with Internal Parentheses1|lower case (For Recording) Bahamas National Bank plus more|Bahamas National Bank
+
+Company with Internal Parentheses2|lower case Bahamas National Bank (For Recording) plus more|Bahamas National Bank
+
+Persons with Internal Parentheses1|other John Smith (with) Mary Smith plus more|John Smith
+
+Persons with Internal Parentheses2|other John Smith (AKA) John L Smith plus more|John Smith AKA John L Smith
+
+Persons with Internal Brackets1|other John Smith [with] Mary Smith plus more|John Smith
+
+Persons with Internal Brackets2|other John Smith [AKA] John L Smith plus more|John Smith AKA John L Smith
+
+// Test Company-specific post-processing
+Company with Trailing Space & Char & Period|lower case Bahamas National Bank X. plus more|Bahamas National Bank
+
+Company with Trailing Abbreviation|lower case Bahamas National Bank X.Y.Z. plus more|Bahamas National Bank X.Y.Z
+
+Company with Trailing Suffix|lower case Bahamas National Bank F A. plus more|Bahamas National Bank F A.
+
+Upper Case Substring_1|text. Lender Is Located In Charlottetown. BAHAMAS NATIONAL BANK plus more|BAHAMAS NATIONAL BANK
+
+Upper Case Substring_2|lower case BAHAMAS NATIONAL BANK. Located On St. Croix plus more|BAHAMAS NATIONAL BANK
+
+// Trim trailing periods
+Company with Trailing Suffix|lower case Bahamas National Bank F.S.B. plus more|Bahamas National Bank F.S.B.
+
+Company without Trailing Suffix|lower case Bahamas National Bank. plus more|Bahamas National Bank
+
+// Trim embedded address
+Embedded Address1|John Smith of 123 Main Any WI 53777 and Mary Smith of 123 Main Any WI 53777|John Smith ; and Mary Smith
+
+Embedded Address2|John Smith residing at 123 Main Any WI 53777 and Mary Smith, his wife residing at 123 Main Any WI 53777|John Smith ; and Mary Smith, his wife
+
+Embedded Address3|John Smith whose address is 123 Main Any WI 53777 and Mary Smith, husband and wife, whose address is 123 Main Any WI 53777|John Smith ; and Mary Smith, husband and wife
+
+Embedded Address4|John Smith 123 Main Any WI 53777 and Mary Smith 123 Main Any WI 53777 and Peter Smith|John Smith ; and Mary Smith ; and Peter Smith
+
+Embedded Address5|John Smith and Mary Smith 123 Main Any WI 53777 and Peter Smith|John Smith and Mary Smith ; and Peter Smith
+
+Embedded Address6|John Smith P.O. Box 123 Any WI 53777 and Mary Smith P.O. Box 123 Any WI 53777|John Smith ; and Mary Smith
+
+Embedded Address7|John Smith P.0. Box 123 Any WI 53777 and Mary Smith P.0. Box 123 Any WI 53777|John Smith ; and Mary Smith
+
+Embedded Address8|John Smith and Mary Smith, husband and wife, C/O 123 Main Any WI 53777|John Smith and Mary Smith, husband and wife
+
+// Add missing space
+Missing Space1|by JOHN SMITHand MARY SMITH or something|JOHN SMITH and MARY SMITH
+
+Missing Space2|by JOHN SMITH andMARY SMITH or something|JOHN SMITH and MARY SMITH

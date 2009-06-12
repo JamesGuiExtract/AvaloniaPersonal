@@ -1,0 +1,4 @@
+<SETTING>;QueryForVerification=Manual|HCData|MCData|LCData
+<SETTING>;QueryForAutomatedRedaction=Manual|HCData|MCData|LCData
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\AtPac\CA - Districts\RandomSet002\CA - Stanislaus\nat_review;<SourceDocName>.voa;$DirOf(<SourceDocName>)\..\ExpectedRedactions\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,364 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""SpotRecognitionIR.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "SpotRecognitionIR Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "SpotRecognitionIR"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "SpotRecognitionIR.DLL"
+            VALUE "ProductName", "SpotRecognitionIR Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_SPOTRECOGNITIONWINDOW REGISTRY                "SpotRecognitionWindow.rgs"
+IDR_SRIRUTILS           REGISTRY                "SRIRUtils.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SPOT_RECOGNITION_DLG DIALOGEX 0, 0, 356, 248
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_ACCEPTFILES
+CAPTION "Dialog"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_GENERICDISPLAYCTRL,
+                    "{14981576-9117-11D4-9725-008048FBC96E}",WS_TABSTOP,5,5,320,175
+END
+
+IDD_PolygonDragOperation DIALOG  0, 0, 110, 90
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION
+FONT 8, "MS Sans Serif"
+BEGIN
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SPOT_RECOGNITION_DLG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 349
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 241
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_SPOT_RECOGNITION_DLG DLGINIT
+BEGIN
+    IDC_GENERICDISPLAYCTRL, 0x376, 20, 0
+0x0000, 0x0000, 0x0000, 0x0001, 0x319c, 0x0000, 0x1d5a, 0x0000, 0x0000, 
+0x0000, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Toolbar
+//
+
+IDR_TOOLBAR TOOLBAR  16, 15
+BEGIN
+    BUTTON      IDC_BTN_OpenImage
+    BUTTON      IDC_BTN_Save
+    BUTTON      IDC_BTN_Print
+    SEPARATOR
+    BUTTON      IDC_BTN_ZoomWindow
+    BUTTON      IDC_BTN_ZoomIn
+    BUTTON      IDC_BTN_ZoomOut
+    BUTTON      IDC_BTN_ZoomPrev
+    BUTTON      IDC_BTN_ZoomNext
+    BUTTON      IDC_BTN_FitPage
+    BUTTON      IDC_BTN_FitWidth
+    BUTTON      IDC_BTN_Pan
+    SEPARATOR
+    BUTTON      IDC_BTN_SELECT_ENTITIES
+    BUTTON      IDC_BTN_SelectText
+    BUTTON      IDC_BTN_SetHighlightHeight
+    BUTTON      IDC_BTN_EditZoneText
+    BUTTON      IDC_BTN_DeleteEntities
+    SEPARATOR
+    BUTTON      IDC_BTN_RecognizeTextAndProcess
+    SEPARATOR
+    BUTTON      IDC_BTN_OPENSUBIMAGE
+    SEPARATOR
+    BUTTON      IDC_BTN_RotateLeft
+    BUTTON      IDC_BTN_RotateRight
+    SEPARATOR
+    BUTTON      IDC_BTN_FirstPage
+    BUTTON      IDC_BTN_PreviousPage
+    BUTTON      IDC_BTN_GoToPage
+    BUTTON      IDC_BTN_NextPage
+    BUTTON      IDC_BTN_LastPage
+    SEPARATOR
+    BUTTON      IDB_SWIPE_SELECTION_TOOL
+    BUTTON      IDB_RECT_SELECTION_TOOL
+END
+
+IDR_TOOLBAR_SELECTION TOOLBAR  16, 15
+BEGIN
+    BUTTON      ID_MENU_SWIPE_SELECTION_TOOL
+    BUTTON      ID_MENU_RECT_SELECTION_TOOL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDR_TOOLBAR             BITMAP                  "res\\toolbar1.bmp"
+IDB_SWIPE_SELECTION_TOOL BITMAP                  "res\\SwipeSelection.bmp"
+IDB_RECT_SELECTION_TOOL BITMAP                  "res\\RectSelection.bmp"
+IDR_TOOLBAR_SELECTION   BITMAP                  "res\\SelectionToolbar.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_SPOT_REC_ICON       ICON                    "res\\spot_rec.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_MRU MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "No File",                     ID_MNU_MRU, GRAYED
+    END
+END
+
+IDR_MENU_CONTEXT MENU 
+BEGIN
+    POPUP "Tools"
+    BEGIN
+        MENUITEM "&Zoom Window",                ID_MNU_ZOOMWINDOW
+        MENUITEM "&Pan",                        ID_MNU_PAN
+        MENUITEM SEPARATOR
+        MENUITEM "&Highlighter",                ID_MNU_HIGHLIGHTER
+        MENUITEM SEPARATOR
+        MENUITEM "&Cancel",                     ID_MNU_CANCEL
+    END
+END
+
+IDR_MENU_POLYGON_CONTEXT MENU 
+BEGIN
+    POPUP "Context"
+    BEGIN
+        MENUITEM "&Finish Polygon",             ID_MNU_FINISH_POLYGON
+        MENUITEM "Cancel &Polygon",             ID_MNU_CANCEL_POLYGON
+    END
+END
+
+IDR_MENU_SELECTION_TOOL MENU 
+BEGIN
+    POPUP "Popup"
+    BEGIN
+        MENUITEM "Create any-angle zone",       ID_MENU_SWIPE_SELECTION_TOOL
+        MENUITEM "Create horizontal zone",      ID_MENU_RECT_SELECTION_TOOL
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Cursor
+//
+
+IDC_CUR_ZOOMWINDOW      CURSOR                  "res\\ZoomWindow.cur"
+IDC_CUR_EDITTEXT        CURSOR                  "res\\EditText.Cur"
+IDC_CUR_NOSELECT        CURSOR                  "res\\NoSelectText.cur"
+IDC_CUR_OPENSUBIMAGE    CURSOR                  "res\\OpenSubImgInWindow.cur"
+IDC_CUR_PAN             CURSOR                  "res\\Pan.cur"
+IDC_CUR_RECTEXT_RECT    CURSOR                  "res\\RecognizeTextInWindow.cur"
+IDC_CUR_RECTEXT_POLY    CURSOR                  "res\\RecognizeTextInWindowPoly.cur"
+IDC_CUR_SELECTTEXT      CURSOR                  "res\\SelectText.cur"
+IDC_CUR_TEXTHEIGHT      CURSOR                  "res\\SetTextHeight.cur"
+IDC_CUR_ERASER          CURSOR                  "res\\DeleteText.cur"
+IDC_CUR_SELECTRECTTEXT  CURSOR                  "res\\SelectRectText.cur"
+IDC_CUR_NOSELECTRECT    CURSOR                  "res\\NoSelectRectText.cur"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "SpotRecognitionIR"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_OpenImage       "Open image file"
+    IDC_BTN_Save            "Save highlights in a new image file"
+    IDC_BTN_ZoomWindow      "Zoom window (Z)"
+    IDC_BTN_ZoomOut         "Zoom out (F8)"
+    IDC_BTN_Pan             "Pan (A)"
+    IDC_BTN_SelectText      "Highlight text (H)"
+    IDC_BTN_ZoomIn          "Zoom in (F7)"
+    IDC_BTN_SetHighlightHeight "Set the default highlight height"
+    IDC_BTN_EditZoneText    "Edit highlight text"
+    IDC_BTN_DeleteEntities  "Delete highlights (D)"
+    IDC_BTN_RecognizeTextAndProcess "Recognize text and process"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_FitPage         "Toggle fit to page mode (P)"
+    IDC_BTN_FitWidth        "Toggle fit to width mode (W)"
+    IDC_BTN_SELECT_ENTITIES "Select highlight (Esc)"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_ZoomPrev        "Zoom previous (R)"
+    IDC_BTN_ZoomNext        "Zoom next"
+    IDC_BTN_RotateLeft      "Rotate 90° left"
+    IDC_BTN_RotateRight     "Rotate 90° right"
+    ID_MNU_HIGHLIGHTER      "Set to the Highlighter tool"
+    ID_MNU_PAN              "Set to the Pan tool"
+    ID_MNU_ZOOMWINDOW       "Set to the Zoom Window tool"
+    ID_MNU_CANCEL           "Cancel this context menu"
+    IDC_BTN_OPENSUBIMAGE    "Open portion of the image in another window (I)"
+    IDC_BTN_FirstPage       "Go to the first page (F)"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_PreviousPage    "Go to the previous page (PageUp)"
+    IDC_BTN_NextPage        "Go to the next page (PageDown)"
+    IDC_BTN_LastPage        "Go to the last page (L)"
+    IDC_BTN_GoToPage        "Go to a specific page number"
+    ID_MRU_FILE1            "MRU File 1"
+    ID_MRU_FILE2            "MRU File 2"
+    ID_MRU_FILE3            "MRU File 3"
+    ID_MRU_FILE4            "MRU File 4"
+    ID_MRU_FILE5            "MRU File 5"
+    ID_MRU_FILE6            "MRU File 6"
+    ID_MRU_FILE7            "MRU File 7"
+    ID_MRU_FILE8            "MRU File 8"
+END
+
+STRINGTABLE 
+BEGIN
+    IDC_BTN_Print           "Print document"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "SpotRecognitionIR.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

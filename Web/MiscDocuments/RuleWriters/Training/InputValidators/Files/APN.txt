@@ -1,0 +1,13 @@
+John owns the below properties:
+
+123 Fake Street
+APN: 143-23421-123
+
+34 43rd Street
+APN: unknown
+
+58585 College Avenue
+APN:1234-2340252
+
+72 Main Street
+APN: A-234-XYZ

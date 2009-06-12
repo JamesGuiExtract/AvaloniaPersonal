@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.FindFromRSD.1 = s 'FindFromRSD Class'
+	{
+		CLSID = s '{49C7D808-6593-47F9-8ED7-D2F59F6D7657}'
+	}
+	AFValueFinders.FindFromRSD = s 'FindFromRSD Class'
+	{
+		CLSID = s '{49C7D808-6593-47F9-8ED7-D2F59F6D7657}'
+		CurVer = s 'AFValueFinders.FindFromRSD.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {49C7D808-6593-47F9-8ED7-D2F59F6D7657} = s 'FindFromRSD Class'
+		{
+			ProgID = s 'AFValueFinders.FindFromRSD.1'
+			VersionIndependentProgID = s 'AFValueFinders.FindFromRSD'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

@@ -1,0 +1,35 @@
+FilteringDisabled=0
+
+[Cartographic Point]
+ExactCase=1
+UpperCase=0
+LowerCase=0
+P1
+
+[Common Angle]
+ExactCase=1
+UpperCase=0
+LowerCase=0
+1
+
+[Common Bearing]
+ExactCase=1
+UpperCase=0
+LowerCase=0
+1
+
+[Deg-Min-Sec]
+ExactCase=1
+UpperCase=0
+LowerCase=0
+
+[Distance]
+ExactCase=1
+UpperCase=0
+LowerCase=0
+04
+
+[Start-End Directions]
+ExactCase=1
+UpperCase=0
+LowerCase=0

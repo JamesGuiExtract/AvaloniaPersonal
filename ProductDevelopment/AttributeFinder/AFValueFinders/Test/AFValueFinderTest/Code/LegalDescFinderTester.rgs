@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinderTest.LegalDescFinderTester.1 = s 'LegalDescFinderTester Class'
+	{
+		CLSID = s '{8355357D-E6C8-43DE-93F3-7AEE7C51AB8A}'
+	}
+	UCLIDAFValueFinderTest.LegalDescFinderTester = s 'LegalDescFinderTester Class'
+	{
+		CLSID = s '{8355357D-E6C8-43DE-93F3-7AEE7C51AB8A}'
+		CurVer = s 'UCLIDAFValueFinderTest.LegalDescFinderTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8355357D-E6C8-43DE-93F3-7AEE7C51AB8A} = s 'LegalDescFinderTester Class'
+		{
+			ProgID = s 'UCLIDAFValueFinderTest.LegalDescFinderTester.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinderTest.LegalDescFinderTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{23136429-3BFA-4AEB-BC39-ECECE36F4DFF}'
+		}
+	}
+}

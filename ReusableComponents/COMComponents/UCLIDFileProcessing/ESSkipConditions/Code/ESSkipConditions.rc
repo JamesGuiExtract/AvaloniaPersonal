@@ -1,0 +1,225 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""ESSkipConditions.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems, LLC."
+            VALUE "FileDescription", "ESFAMConditions Module"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "LegalCopyright", "(c) 2009 Extract Systems, LLC.  All rights reserved."
+            VALUE "InternalName", "ESFAMConditions.dll"
+            VALUE "OriginalFilename", "ESFAMConditions.dll"
+            VALUE "ProductName", "ESFAMConditions"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_FILEEXISTENCE       REGISTRY                "FileExistence.rgs"
+IDR_FILEEXISTENCEPP     REGISTRY                "FileExistencePP.rgs"
+IDR_FILENAMEPATTERN     REGISTRY                "FileNamePattern.rgs"
+IDR_FILENAMEPATTERNPP   REGISTRY                "FileNamePatternPP.rgs"
+IDR_GENERICMULTIFAMCONDITION REGISTRY                "GenericMultiSkipCondition.rgs"
+IDR_MULTIFAMCONDITIONAND REGISTRY                "MultiSkipConditionAND.rgs"
+IDR_MULTIFAMCONDITIONOR REGISTRY                "MultiSkipConditionOR.rgs"
+IDR_MULTIFAMCONDITIONEXACTONE REGISTRY                "MultiSkipConditionEXACTONE.rgs"
+IDR_MULTIFAMCONDITIONNONE REGISTRY                "MultiSkipConditionNONE.rgs"
+IDR_TASKCONDITION       REGISTRY                "TaskCondition.rgs"
+IDR_TASKCONDITIONPP     REGISTRY                "TaskConditionPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_FILEEXISTENCEPP DIALOGEX 0, 0, 275, 46
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    LTEXT           "Match if the file",IDC_STATIC,5,6,55,11
+    COMBOBOX        IDC_CMB_DOESEXIST,57,4,47,32,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "exist",IDC_STATIC,107,6,19,11
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,241,24,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,254,24,15,14
+    EDITTEXT        IDC_EDT_FILENAME,5,24,232,14,ES_AUTOHSCROLL
+END
+
+IDD_FILENAMEPATTERNPP DIALOGEX 0, 0, 288, 204
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,271,14,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,259,69,15,14
+    EDITTEXT        IDC_EDT_FAMCONDITION_FILENAME,7,14,260,14,ES_AUTOHSCROLL
+    COMBOBOX        IDC_CMB_CONTAIN,62,34,61,32,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    COMBOBOX        IDC_CMB_DOES,7,34,47,32,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "Read regular expression from file:",IDC_RADIO_FILE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,15,58,124,10
+    EDITTEXT        IDC_EDIT_REG_EXP_FILE,15,69,226,14,ES_AUTOHSCROLL
+    CONTROL         "Specify regular expression:",IDC_RADIO_TEXT,"Button",BS_AUTORADIOBUTTON,15,87,102,10
+    EDITTEXT        IDC_EDIT_PATTERN,15,98,258,82,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    CONTROL         "Case sensitive",IDC_CHK_REG_EXP_CASE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,183,62,10
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG2,246,69,10,14,BS_ICON
+    LTEXT           "Match if the file",IDC_STATIC,7,3,80,11
+    LTEXT           "the following expression",IDC_STATIC,127,35,80,11
+    GROUPBOX        "",IDC_STATIC,7,50,274,147
+END
+
+IDD_TASKCONDITIONPP DIALOGEX 0, 0, 258, 68
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_COMBO_TASK_SELECT,6,23,180,120,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configure...",IDC_BTN_CONFIGURE,192,23,60,13
+    LTEXT           "The condition will be considered met if the following condition completes with no exceptions:",IDC_STATIC,6,3,174,18
+    LTEXT           "The task must be configured",IDC_STATIC_CONFIGURE,6,40,134,11
+    CONTROL         "Log exceptions generated by the selected task",IDC_LOG_EXCEPTIONS,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,6,52,246,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_FILEEXISTENCEPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 39
+    END
+
+    IDD_FILENAMEPATTERNPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 281
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 197
+    END
+
+    IDD_TASKCONDITIONPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 251
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 62
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "ESFAMConditions"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "ESSkipConditions.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

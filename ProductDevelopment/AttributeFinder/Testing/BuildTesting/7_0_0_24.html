@@ -1,0 +1,252 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.25 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.25 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+      		<li><b>[FlexIDSCore #2508]</b> Advanced Replace String and Back References
+		<ul>
+	      		<li>Exercise the <b>RSD file and image</b> attached to the SCR.
+			<li>Confirm that spatial information is retained for 
+			<b>First occurrence</b>.
+			<li>Confirm that spatial information is retained for 
+			<b>Last occurrence</b>.
+			<li>Confirm that spatial information is retained for 
+			<b>Specified occurrence</b>.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3141]</b> Merge attributes and skewed images
+		<ul>
+	      		<li>Exercise the RSD file and images in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3141</b>.
+			<li>Confirm that merging of attributes works properly for the <b>good</b> image.
+			<li>Confirm that merging of attributes works properly for the <b>skewed</b> image.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3372]</b> Line Finder with rotated images
+		<ul>
+	      		<li>Exercise <b>Line Finder</b> automated tests.
+			<li>Confirm that 100% of the tests pass.
+			<li>Confirm that one or more of the automated test cases involve a 
+			rotated image.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3380, #3385]</b> Verification toolbar images & Options
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Confirm that the <b>Previous item</b> toolbar button now has a red border around 
+			the highlight.
+			<li>Confirm that the <b>Next item</b> toolbar button now has a red border around 
+			the highlight.
+			<li>Confirm that the <b>Options</b> dialog now has the text in the Enable ... 
+			combo box lined up with the associated labels.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3393]</b> OUTPUT_FINAL_STATS_ONLY in Automated Rule Tester
+		<ul>
+	      		<li>Exercise the <b>Automated Rule Tester</b>.
+			<li>Confirm that usual nodes and stats are generated without an 
+			<b>OUTPUT_FINAL_STATS_ONLY</b> setting.
+			<li>Confirm that usual nodes and stats are generated with an 
+			<b>OUTPUT_FINAL_STATS_ONLY=0</b> setting.
+			<li>Confirm that usual nodes are not generated and stats are generated with an 
+			<b>OUTPUT_FINAL_STATS_ONLY=1</b> setting.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5146]</b> Auto-close of SSOCR2 error windows
+	       	<ul>
+	      		<li>Start a long-running test like an <b>Endurance Test</b> or <b>Scalability 
+			Test</b> on UltraTester or another 2008 Server test machine.
+	      		<li>Periodically review the exception log looking for <b>ELI25219, Application 
+			trace: Idle process terminated.</b> messages.
+	      		<li>Confirm that the no SSOCR2 error messages are displayed to the user.
+<p>
+	      		<li>Start a long-running test like an <b>Endurance Test</b> or <b>Scalability 
+			Test</b> on DELLQC1 or another Vista test machine.
+	      		<li>Periodically review the exception log looking for <b>ELI25219, Application 
+			trace: Idle process terminated.</b> messages.
+	      		<li>Confirm that the no SSOCR2 error messages are displayed to the user.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5110]</b> Consistent USB Key retries
+	       	<ul>
+	      		<li>Exercise the <b>Error Handling</b> section of the 
+			<b>USB Counters</b> checklist.
+	      		<li>Modify the registry keys for retry timeout and number of retries 
+			as specified in the SCR.
+	      		<li>Confirm that the registry settings are honored.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5161]</b> Report Viewer About box
+	       	<ul>
+	      		<li>Open <b>Report Viewer</b> About box.
+	      		<li>Confirm presence of appropriate version information and the correct icon.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5165]</b> Changing databases while processing
+	       	<ul>
+	      		<li>Open <b>File Action Manager</b> and begin processing.
+	      		<li>Confirm that the <b>Database Server</b> browse button is disabled 
+			while processing and while paused.
+	      		<li>Confirm that the <b>Database Name</b> browse button is disabled 
+			while processing and while paused.
+	      		<li>Confirm that the <b>Connection Status</b> refresh button is disabled 
+			while processing and while paused.
+	      		<li>Confirm that the <b>Connect to last used database</b> button is disabled 
+			while processing and while paused.
+	      		<li>Confirm that each button is enabled again after processing is completed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5173]</b> Encrypt email password in registry
+	       	<ul>
+	      		<li>Use <b>EmailFile /c</b> or <b>DetectAndReportFailure</b> to configure 
+			email settings.
+	      		<li>Require authorization and provide a user name and password.
+	      		<li>Confirm that the password is encrypted in <b>HKLM/Software/Extract 
+			Systems/EmailSettings</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5184]</b> Multiple separators in Image Viewer toolbar
+	       	<ul>
+	      		<li>Verify some images.
+	      		<li>Confirm that several unnecessary toolbar buttons have been removed 
+			(Save, Edit Highlight Text, Recognize Text and Process).
+	      		<li>Confirm that a sequence multiple separators are not visible on the 
+			toolbar.  The screenshot attached to the SCR shows two to the left of 
+			the rotate image buttons.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5189]</b> Cannot clean image
+	       	<ul>
+	      		<li>Run <b>Image Cleanup</b> on the JPEG-compressed TIF image stored 
+			in I:\Common\Testing\PVCS_Testing\LegacyRC\5189.
+	      		<li>Confirm that the cleaned image is saved successfully.
+	      		<li>Confirm that the cleaned image is OCRed successfully.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5195]</b> NumberOfUSBKeyRetries
+	       	<ul>
+	      		<li>Exercise the <b>Error Handling</b> section of the 
+			<b>USB Counters</b> checklist.
+	      		<li>Modify the registry keys for retry timeout and number of retries 
+			as specified in the SCR.
+	      		<li>Confirm that the registry settings are honored.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5198]</b> Prompt for Clear Database
+	       	<ul>
+	      		<li>Open the FAM DB Admin tool.
+	      		<li>Select <b>File - Clear database</b>.
+	      		<li>Confirm that the prompt message properly reflects the option to 
+			retain action names.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5199]</b> Image Viewer zoom with mouse wheel
+	       	<ul>
+	      		<li>Open an image.
+	      		<li>Confirm that using <b>Mousewheel Up</b> zooms in.
+	      		<li>Confirm that using <b>Mousewheel Down</b> zooms out.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5206]</b> Image Format Converter and large PDFs
+	       	<ul>
+	      		<li>Exercise the <b>Image Format Converter - Functionality</b> portion of 
+			the <b>Miscellaneous Utilities</b> checklist.
+	      		<li>Confirm that large PDFs can be converted into TIF images.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5207]</b> USB Key License Manager errors
+	       	<ul>
+	      		<li>Open the <b>USB Key License Manager</b> utility.
+	      		<li>Adjust settings so that the utility will look for a local USB key.
+	      		<li>Close the utility and remove any local key.
+	      		<li>Open the <b>USB Key License Manager</b> utility again.
+	      		<li>Confirm that after a short delay, zeros are displayed for counts.
+	      		<li>Review the exception log and confirm that multiple retry error messages 
+			have not been logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5212]</b> Convert FAM Database utility
+	       	<ul>
+	      		<li>Run the <b>Convert Database</b> utility and select a database server 
+			and database name.
+	      		<li>Confirm that the default name of the output database includes an 
+			appended <b>_7_0</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5216]</b> Email of exception log from FDRS
+	       	<ul>
+	      		<li>Run the <b>Detect and Report Failure</b> utility and configure email settings.
+	      		<li>Confirm that <b>Send Test Email</b> successfully sends an email message. 
+	      		<li>Confirm that <b>Send to Extract Systems - Exception Log</b> successfully 
+			creates an email message with an <b>ExtractException.uex.zip</b> attachment.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5218]</b> Create Multipage Image
+	       	<ul>
+	      		<li>Confirm that the EXE runs with a <b>FLEX Index Server</b> license. 
+	      		<li>Confirm that the EXE runs with an <b>ID Shield Server</b> license. 
+	      		<li>Confirm that the EXE runs with an <b>RDT</b> license. 
+	      		<li>Confirm that the EXE does not run with a <b>FLEX Index Client</b> license. 
+	      		<li>Confirm that the EXE does not run with an <b>ID Shield Client</b> license. 
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

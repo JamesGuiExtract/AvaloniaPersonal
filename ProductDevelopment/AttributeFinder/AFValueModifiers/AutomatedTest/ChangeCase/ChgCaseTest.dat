@@ -1,0 +1,16 @@
+//*********************************************************************************
+// ChgCaseTest.dat
+// 		This file contains testcases for testing the Change Case Value Modifier
+//*********************************************************************************
+
+// Test case for Do not change case option
+<TESTCASE>;ChgCase01.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;ChgCase01.eav
+
+// Test Case for UPPER CASE
+<TESTCASE>;ChgCase02.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;ChgCase02.eav
+
+//Test Case for lower case
+<TESTCASE>;ChgCase03.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;ChgCase03.eav
+
+//Test case for Title Case
+<TESTCASE>;ChgCase04.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;ChgCase04.eav

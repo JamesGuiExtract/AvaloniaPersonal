@@ -1,0 +1,14 @@
+^2d\.\s*S\.S\.\s*OR\s*TAX\s*I\.D\.
+^2d\.\s*TAX[\s\S]{0,9}SSN\s*OR\s*EIN
+^2[d5].?\s*SEE\s*INSTRUCTIONS
+^2d.?\s*[S5].?[S5].?\s*[O0]R\s*TAX\s*[IL].?[DGO].?
+^2d.[\s\S]{3,8}ID[\s\S]{0,4}\s*SSN\s*[O0]R\s*EIN
+^2[d5].?\s*TAX\s*[LI][DGO]
+^2[\x20\S]{5,17}SSN\s*[O0D]R\s*EIN
+^2d[,.]?\s*(TA|.?AX|ID)[\s\S]{3,18}(SSN\s*[O0]R|[O0]R\s*EIN|SSN[\s\S]{0,5}EIN)
+^2d[,.]?[\s\S]{4,17}SSN\s*[O0]R\s*EIN
+^2[\x20\S]{0,6}(TAX|ID)[\s\S]{3,9}(SSN\s*[O0]R|[O0]R\s*EIN)
+^2[\x20\S]{0,5}SEE\s*INSTRUCTIONS
+[^1lI|t]2[\x20\S]{1,9}(TY[PR][EF]\s*[O0]F\s*ENT|TY[PR][EF]\s*([O0]F)?\s*[O0]R)
+[^1lI|t]2[\x20\S]{1,9}(ENTITY.?S\s*STATE|JUR[1Il]SD[\s\S]{7,12}[O0]RG)
+[^1lI|t]2[\x20\S]{1,9}(ENTITY.?S\s*[O0]RGAN|[O0]RGAN\S{3,7}NAL)

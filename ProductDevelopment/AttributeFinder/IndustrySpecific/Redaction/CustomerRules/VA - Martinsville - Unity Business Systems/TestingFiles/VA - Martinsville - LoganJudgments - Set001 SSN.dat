@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//<SETTING>;TypeToBeTested=SSN
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\LoganSystems\VA - Judgments\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsAllDigits\$FileOf(<SourceDocName>).voa

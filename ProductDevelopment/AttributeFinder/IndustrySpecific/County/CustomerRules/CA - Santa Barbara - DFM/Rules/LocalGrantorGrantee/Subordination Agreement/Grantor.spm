@@ -1,0 +1,23 @@
+[PATTERNS_BEGIN]
+rule01=SUBORDINATION^6~AGREEMENT^50~made^50~by and among the^?Grantor01^100~a municipal
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0062695.tif
+rule02=SUBORDINATION^6~AGREEMENT^50~made|entered into^50~by and among^?Grantor02^100~a municipal|Current Lienholder
+rele03=SUBORDINATION^6~AGREEMENT|Deed^50~made and executed among^350~Borrower^?Grantor03^100~(|Lender
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0062294.tif
+//rule04=SUBORDINATION^6~AGREEMENT^50~made^300~favor of|in favor^?Grantor04^100~(|Lender
+rule04=SUBORDINATION^6~AGREEMENT^50~made^300~favor of|in favor|benefit of^?Grantor04^100~(|Lender
+rule05=SUBORDINATION^6~AGREEMENT^300~[on one hand^?Grantor05^100~(hereinafter
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0059626.tif
+rule10=SUBORDINATION^6~AGREEMENT^25~made^75~[by|between^150~owner^25~land^25~described^?Grantor10^200~[a public body|Beneficiary
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0065494.tif
+rule06=Agreement^6~made^25~[by and between^300~) and^?Grantor06^50~whose address
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0064764.tif
+rule07=Agreement^6~made^350~Borrower^?Grantor07^hereinafter|Beneficiary
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0065196.tif
+rule08=Subordination^6~Deed^6~Trust^50~made|executed^25~[by and among^?Grantor08^Lender
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0064039.tif
+rule09=Agreement^6~made^50~Between^?Grantor09^(hereinafter
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Subordination Agreement\2008-0058979.tif
+rule11=SUBORDINATION AGREEMENT^6~Acknowledgment^6~Lease Assignment^6~Estoppel^6~Attornment^6~Non^6~Disturbance Agreement^25~made^50~[by and between^1000~("Lessee")|) and^?Grantor11^("Lender|(
+
+[PATTERNS_END]

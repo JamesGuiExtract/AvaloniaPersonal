@@ -1,0 +1,106 @@
+<HTML>
+
+<HEAD>
+<TITLE>Convert FPS File Utility - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Convert FPS File Utility - Testing Checklist<br>
+<IMG src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: This utility is designed to convert pre-5.0 FPS files to 7.0 standard.</h2>
+
+<ol>
+  	<li><h2>Basic Operation and Error Conditions</h2></li>
+  	<ul>
+    		<li>Confirm that <b>ConvertFPSFile</b> requires a license file.</li>
+<p>
+    		<li>Confirm that an error message is displayed if only an input FPS file is defined.</li>
+    		<li>Confirm that an error message is displayed if only an output FPS file is defined.</li>
+    		<li>Confirm that a warning message is displayed if the output FPS file already exists.</li>
+    		<li>Confirm that a second warning message is displayed if the output FPS file is the same 
+		as the input file.</li>
+    		<li>Confirm that an error message is displayed if the input FPS file is newer than 
+		version 10.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 2 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V2_OCR_Images.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes a <b>Folder</b> file supplier providing TIF 
+		Images from <b>C:\FlexDataEntry\Images</b>.</li>
+    		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+    		<li><b>[LegacyRC #5288]</b> Confirm that the application closes without error.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 5 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V5_Verify_Redactions.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes a <b>Folder</b> file supplier providing TIF 
+		Images from <b>C:\RedactionDemo\Images\4 Mix</b>.</li>
+    		<li>Confirm that the new version includes one <b>Verify Redactions</b> file processor.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 6 FPS Files</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V6_Folder-Skip-USS.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes a <b>Folder</b> file supplier and a 
+		<b>File Existence</b> skip condition.</li>
+    		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+<p>
+    		<li>Confirm that <b>V6_OCR_Images.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes a <b>Folder</b> file supplier and a 
+		<b>File Existence</b> skip condition.</li>
+    		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 7 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V7_test.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes one <b>Static list</b> file supplier.</li>
+    		<li>Confirm that the new version includes one <b>Copy, Move or Delete File</b> 
+		file processor.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 8 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V8_OCR_test.fps</b> converts successfully.</li>
+    		<li>Confirm that 3 message boxes related to the <b>OCR document</b> task are displayed 
+		after opening the converted FPS file.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes two <b>Static list</b> file suppliers one 
+		with both flags set and the other with neither flag set.</li>
+    		<li>Confirm that the new version includes three <b>OCR document</b> file processors.</li>
+  	</ul>
+<br>
+	<li><h2>Convert Version 9 FPS File</h2></li>
+	<ul>
+    		<li>Confirm that <b>V9_OCR_test.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version does not define an <b>Action</b>.</li>
+    		<li>Confirm that the new version includes four <b>Static list</b> file suppliers 
+		each with a different combination of <b>Enabled</b> and <b>Force Processing</b> flags.</li>
+    		<li>Confirm that the new version includes a <b>File Existence</b> skip condition.</li>
+    		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+  	</ul>
+<br>
+  	<li><h2>Convert Version 10 FPS File</h2></li>
+  	<ul>
+    		<li>Confirm that <b>V10_3-files.fps</b> converts successfully.</li>
+    		<li>Confirm that the new version uses ActionName = <b>test</b>.  Note that if <b>test</b> 
+		is not defined in your database, no Action will be selected.</li>
+    		<li>Confirm that the new version includes a <b>Static list</b> file supplier 
+		providing 3 TIF Images.</li>
+    		<li>Confirm that the new version includes one <b>OCR document</b> file processor.</li>
+  	</ul>
+</ol>
+</body>
+</html>

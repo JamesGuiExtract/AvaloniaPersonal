@@ -1,0 +1,642 @@
+//==================================================================================================
+//
+// COPYRIGHT (c) 2008 EXTRACT SYSTEMS, LLC., IN PUBLISHED AND UNPUBLISHED WORKS
+// ALL RIGHTS RESERVED.
+//
+// FILE:	AddWatermarkTask.cpp
+//
+// PURPOSE:	A file processing task that will apply an image as a stamp on another image
+//
+// AUTHORS:	Jeff Shergalis
+//
+//==================================================================================================
+
+#include "stdafx.h"
+#include "FileProcessors.h"
+#include "AddWatermarkTask.h"
+#include "FileProcessorsUtils.h"
+
+#include <UCLIDException.h>
+#include <cpputil.h>
+#include <COMUtils.h>
+#include <ByteStream.h>
+#include <ComponentLicenseIDs.h>
+#include <LicenseMgmt.h>
+#include <PasteImage.h>
+
+//--------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------
+const unsigned long gnCurrentVersion = 1;
+
+// component description
+const string gstrADD_WATERMARK_COMPONENT_DESCRIPTION = "Add watermark";
+
+const string gstrDEFAULT_INPUT_IMAGE_FILENAME = "";
+
+//--------------------------------------------------------------------------------------------------
+// CAddWatermarkTask
+//--------------------------------------------------------------------------------------------------
+CAddWatermarkTask::CAddWatermarkTask() :
+m_strInputImage(gstrDEFAULT_INPUT_IMAGE_FILENAME),
+m_strStampImage(""),
+m_dHorizontalPercentage(-1.0),
+m_dVerticalPercentage(-1.0),
+m_lPageToStamp(1)
+{
+	try
+	{
+	}
+	CATCH_DISPLAY_AND_RETHROW_ALL_EXCEPTIONS("ELI19912");
+}
+//--------------------------------------------------------------------------------------------------
+CAddWatermarkTask::~CAddWatermarkTask()
+{
+	try
+	{
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI19913");
+}
+
+//--------------------------------------------------------------------------------------------------
+// IAddWatermarkTask
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::get_InputImageFile(BSTR *pbstrInputImageFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19914", pbstrInputImageFile != NULL);
+
+		validateLicense();
+
+		*pbstrInputImageFile = _bstr_t(m_strInputImage.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19915");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::put_InputImageFile(BSTR bstrInputImageFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_strInputImage = asString(bstrInputImageFile);
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19916");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::get_StampImageFile(BSTR *pbstrStampImageFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19917", pbstrStampImageFile != NULL);
+
+		validateLicense();
+
+		*pbstrStampImageFile = _bstr_t(m_strStampImage.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19918");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::put_StampImageFile(BSTR bstrStampImageFile)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_strStampImage = asString(bstrStampImageFile);
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19919");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::get_HorizontalPercentage(double *pdHorizPercentage)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19920", pdHorizPercentage != NULL);
+
+		validateLicense();
+
+		*pdHorizPercentage = m_dHorizontalPercentage;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19921");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::put_HorizontalPercentage(double dHorizPercentage)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_dHorizontalPercentage = dHorizPercentage;
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19922");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::get_VerticalPercentage(double *pdVertPercentage)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19923", pdVertPercentage != NULL);
+
+		validateLicense();
+
+		*pdVertPercentage = m_dVerticalPercentage;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19924");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::put_VerticalPercentage(double dVertPercentage)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_dVerticalPercentage = dVertPercentage;
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19925");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::get_PageToStamp(long *plPageToStamp)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19926", plPageToStamp != NULL);
+
+		validateLicense();
+
+		*plPageToStamp = m_lPageToStamp;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19927");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::put_PageToStamp(long lPageToStamp)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_lPageToStamp = lPageToStamp;
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19928");
+
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// ICategorizedComponent
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_GetComponentDescription(BSTR* pstrComponentDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19929", pstrComponentDescription);
+		
+		*pstrComponentDescription = 
+			_bstr_t(gstrADD_WATERMARK_COMPONENT_DESCRIPTION.c_str()).Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19930");
+	
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// ICopyableObject
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_CopyFrom(IUnknown* pObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// validate license first
+		validateLicense();
+
+		// get the AddWatermarkTask object
+		UCLID_FILEPROCESSORSLib::IAddWatermarkTaskPtr ipAddWatermarkTask(pObject);
+		ASSERT_RESOURCE_ALLOCATION("ELI19931", ipAddWatermarkTask != NULL);
+
+		// copy the data from the WatermarkTask object
+		m_strInputImage = asString(ipAddWatermarkTask->InputImageFile);
+		m_strStampImage = asString(ipAddWatermarkTask->StampImageFile);
+		m_dHorizontalPercentage = ipAddWatermarkTask->HorizontalPercentage;
+		m_dVerticalPercentage = ipAddWatermarkTask->VerticalPercentage;
+		m_lPageToStamp = ipAddWatermarkTask->PageToStamp;
+
+		// set the dirty flag
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19932");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_Clone(IUnknown** ppObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// validate license first
+		validateLicense();
+
+		// ensure that the return value pointer is non-NULL
+		ASSERT_ARGUMENT("ELI19933", ppObject != NULL);
+
+		// get the copyable object interface
+		ICopyableObjectPtr ipObjCopy(CLSID_AddWatermarkTask);
+		ASSERT_RESOURCE_ALLOCATION("ELI19934", ipObjCopy != NULL);
+
+		// create a shallow copy
+		IUnknownPtr ipUnknown(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI19935", ipUnknown != NULL);
+		ipObjCopy->CopyFrom(ipUnknown);
+
+		// return the new AddWatermarkTask to the caller
+		*ppObject = ipObjCopy.Detach();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19936");
+
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// IFileProcessingTask
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_Init()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// nothing to do
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19937");
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, 
+		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, 
+		VARIANT_BOOL vbCancelRequested, VARIANT_BOOL *pvbSuccessfulCompletion)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// check for NULL parameters
+		ASSERT_ARGUMENT("ELI19938", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI19939", pTagManager != NULL);
+		ASSERT_ARGUMENT("ELI19940", pvbSuccessfulCompletion != NULL);
+
+		// get the source doc name
+		string strSourceDoc = asString(bstrFileFullName);
+		validateFileOrFolderExistence(strSourceDoc);
+
+		// construct the full path to the input and output images
+		string strInputImage = 
+			CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strInputImage, strSourceDoc);
+		string strOutputImage = strInputImage;
+
+		// construct the full path to the stamp image
+		string strStampImage = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, 
+			m_strStampImage, strSourceDoc);
+
+		// apply the stamp to the image
+		applyStampToImage(strInputImage, strOutputImage, strStampImage, m_dHorizontalPercentage,
+			m_dVerticalPercentage, m_lPageToStamp);
+
+		// completed successfully
+		*pvbSuccessfulCompletion = VARIANT_TRUE;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19941")
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_Cancel()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// nothing to do
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19942");
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_Close()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// nothing to do
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19943");
+	
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// ILicensedComponent
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_IsLicensed(VARIANT_BOOL* pbValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// ensure the return value pointer is non-NULL
+		ASSERT_ARGUMENT("ELI19944", pbValue != NULL);
+
+		try
+		{
+			// check license
+			validateLicense();
+
+			// if no exception was thrown, then pbValue is true
+			*pbValue = VARIANT_TRUE;
+		}
+		catch(...)
+		{
+			*pbValue = VARIANT_FALSE;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19945");
+
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// IMustBeConfiguredObject
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::raw_IsConfigured(VARIANT_BOOL* pbValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// ensure the return value pointer is non-NULL
+		ASSERT_ARGUMENT("ELI19946", pbValue != NULL);
+
+		// AddWatermark is configured if there is an input image, a stamp image
+		// and the horizontal and vertical percentages have been set
+		bool bIsConfigured = (!m_strInputImage.empty()
+								&& !m_strStampImage.empty()
+								&& m_dHorizontalPercentage >= 0.0
+								&& m_dVerticalPercentage >= 0.0);
+
+		*pbValue = asVariantBool(bIsConfigured);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19947");
+
+	return S_OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+// IPersistStream
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::GetClassID(CLSID* pClassID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI19948", pClassID != NULL);
+
+		*pClassID = CLSID_AddWatermarkTask;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19949");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::IsDirty(void)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	return m_bDirty ? S_OK : S_FALSE;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::Load(IStream* pStream)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// check license state
+		validateLicense();
+
+		// clear the options
+		m_strInputImage = gstrDEFAULT_INPUT_IMAGE_FILENAME;
+		m_strStampImage = "";
+		m_dHorizontalPercentage = -1.0;
+		m_dVerticalPercentage = -1.0;
+		m_lPageToStamp = 1;
+		
+		// use a smart pointer for the IStream interface
+		IStreamPtr ipStream(pStream);
+		ASSERT_RESOURCE_ALLOCATION("ELI19950", ipStream != NULL);
+
+		// read the bytestream data from the IStream object
+		long nDataLength = 0;
+		HANDLE_HRESULT(ipStream->Read(&nDataLength, sizeof(nDataLength), NULL), "ELI19951", 
+			"Unable to read object size from stream.", ipStream, IID_IStream);
+		ByteStream data(nDataLength);
+		HANDLE_HRESULT(ipStream->Read(data.getData(), nDataLength, NULL), "ELI19952", 
+			"Unable to read object from stream.", ipStream, IID_IStream);
+
+		// read the data version
+		ByteStreamManipulator dataReader(ByteStreamManipulator::kRead, data);
+		unsigned long nDataVersion = 0;
+		dataReader >> nDataVersion;
+
+		// check if file is a newer version than this object can use
+		if (nDataVersion > gnCurrentVersion)
+		{
+			// throw exception
+			UCLIDException ue("ELI19953", "Unable to load newer AddWatermarkTask.");
+			ue.addDebugInfo("Current Version", gnCurrentVersion);
+			ue.addDebugInfo("Version to Load", nDataVersion);
+			throw ue;
+		}
+
+		// read the settings from the stream
+		dataReader >> m_strInputImage;
+		dataReader >> m_strStampImage;
+		dataReader >> m_dHorizontalPercentage;
+		dataReader >> m_dVerticalPercentage;
+		dataReader >> m_lPageToStamp;
+
+		// clear the dirty flag since a new object was loaded
+		m_bDirty = false;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19954");
+	
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::Save(IStream* pStream, BOOL fClearDirty)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// check license state
+		validateLicense();
+
+		// create a bytestream and stream this object's data into it
+		ByteStream data;
+		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
+		dataWriter << gnCurrentVersion;
+		dataWriter << m_strInputImage;
+		dataWriter << m_strStampImage;
+		dataWriter << m_dHorizontalPercentage;
+		dataWriter << m_dVerticalPercentage;
+		dataWriter << m_lPageToStamp;
+
+		// flush the data to the stream
+		dataWriter.flushToByteStream();
+
+		// use a smart pointer for IStream interface
+		IStreamPtr ipStream(pStream);
+		ASSERT_RESOURCE_ALLOCATION("ELI19955", ipStream != NULL);
+
+		// write the bytestream data into the IStream object
+		long nDataLength = data.getLength();
+		HANDLE_HRESULT(ipStream->Write(&nDataLength, sizeof(nDataLength), NULL), "ELI19956", 
+			"Unable to write object size to stream.", ipStream, IID_IStream);
+		HANDLE_HRESULT(ipStream->Write(data.getData(), nDataLength, NULL), "ELI19957", 
+			"Unable to write object to stream.", ipStream, IID_IStream);
+
+		// clear the flag as specified
+		if(fClearDirty)
+		{
+			m_bDirty = false;
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19958");
+
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::GetSizeMax(ULARGE_INTEGER* pcbSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	return E_NOTIMPL;
+}
+
+//--------------------------------------------------------------------------------------------------
+// ISupportsErrorInfo
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CAddWatermarkTask::InterfaceSupportsErrorInfo(REFIID riid)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		static const IID* arr[] = 
+		{
+			&IID_IAddWatermarkTask,
+			&IID_ICategorizedComponent,
+			&IID_ICopyableObject,
+			&IID_IFileProcessingTask,
+			&IID_ILicensedComponent,
+			&IID_IMustBeConfiguredObject
+		};
+
+		for (int i = 0; i < sizeof(arr) / sizeof(arr[0]); i++)
+		{
+			if (InlineIsEqualGUID(*arr[i],riid))
+			{
+				return S_OK;
+			}
+		}
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19959");
+
+	return S_FALSE;
+}
+
+//--------------------------------------------------------------------------------------------------
+// Private functions
+//--------------------------------------------------------------------------------------------------
+void CAddWatermarkTask::validateLicense()
+{
+	// ensure that add watermark is licensed
+	VALIDATE_LICENSE(gnFILE_ACTION_MANAGER_OBJECTS, "ELI19960", "AddWatermarkTask");
+}
+//--------------------------------------------------------------------------------------------------
+void CAddWatermarkTask::applyStampToImage(const string &strInputImage, const string &strOutputImage, 
+										  const string &strStampImage, double dHorizPercent,
+										  double dVertPercent, long lPageToStamp)
+{
+	pasteImageAtLocation(strInputImage, strOutputImage, strStampImage, dHorizPercent,
+		dVertPercent, lPageToStamp);
+}
+//--------------------------------------------------------------------------------------------------

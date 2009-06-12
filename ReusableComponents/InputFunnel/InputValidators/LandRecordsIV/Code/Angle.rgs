@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.Angle.1 = s 'Angle Class'
+	{
+		CLSID = s '{D08B8B73-3AA3-11D6-8260-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.Angle = s 'Angle Class'
+	{
+		CLSID = s '{D08B8B73-3AA3-11D6-8260-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.Angle.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D08B8B73-3AA3-11D6-8260-0050DAD4FF55} = s 'Angle Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.Angle.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.Angle'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

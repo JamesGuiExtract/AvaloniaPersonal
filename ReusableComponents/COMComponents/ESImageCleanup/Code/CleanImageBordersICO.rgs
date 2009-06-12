@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.CleanImageBordersICO.1 = s 'CleanImageBordersICO Class'
+	{
+		CLSID = s '{010F93BA-B582-4121-A0BF-5F6D501809F3}'
+	}
+	ESImageCleanup.CleanImageBordersICO = s 'CleanImageBordersICO Class'
+	{
+		CLSID = s '{010F93BA-B582-4121-A0BF-5F6D501809F3}'
+		CurVer = s 'ESImageCleanup.CleanImageBordersICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {010F93BA-B582-4121-A0BF-5F6D501809F3} = s 'CleanImageBordersICO Class'
+		{
+			ProgID = s 'ESImageCleanup.CleanImageBordersICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.CleanImageBordersICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

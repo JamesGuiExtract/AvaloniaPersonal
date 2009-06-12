@@ -1,0 +1,27 @@
+Begin
+
+Name:
+Ichba Kikimoto
+Address:
+295 Few dr.
+Holiday, SC 29384
+
+Begin
+
+Name:
+Ammi Kikimoto
+Address:
+245 Water st.
+Holiday, SC 29324
+
+Begin
+
+Name:
+Joe Smith
+Address:
+234 South Park st.
+Jackson, NC 23442
+
+End
+End
+End

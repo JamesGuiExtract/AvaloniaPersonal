@@ -1,0 +1,170 @@
+<HTML>
+	<HEAD>
+		<TITLE>Regular Expression Rule Value Finder</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Regular Expression Rule Value Finder</h1>
+		<hr>
+		<h3>Basic Regular Expression Syntax</h3>
+		<ul>
+			<p>
+				<li>Literals : With the exception of a few special characters, all characters will match their corresponding character in the searched text
+					<ul>
+						<li><b>a</b> will find the text <i>a</i>.</li>
+						<li><b>123Something123</b> will find the text <i>123Something123</i>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>{}</b> : Used to specify a certain number of characters
+					<ul>
+						<li><b>a{2}</b> will find a string of exactly two a's. ( It will find <i>aa</i>, but not <i>a</i> or <i>aaa</i>. )</li>
+						<li><b>BO{3,5}</b> will find a B followed by three, four or five O's.  (It will find <i>BOOO</i>, <i>BOOOO</i>, and <i>BOOOOO</i>, but not <i>BO</i> or <i>BOOOOOOOO</i>. )</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>+</b> : Used to specify "one or more" characters
+					<ul>
+						<li><b>z+</b> will find a string of one or more z's. ( It will find <i>z</i>, <i>zz</i>, <i>zzz</i>, etc. )</li>
+						<li><b>MO+M</b> will find two M's with one or more O's between them. ( It will find <i>MOM</i>, <i>MOOM</i>, <i>MOOOM</i>, etc., but it will not find <i>MM</i>. )</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>*</b> : Used to specify "zero or more" characters
+					<ul>
+						<li><b>AB*</b> will find an A followed by zero or more B's. ( It will find <i>A</i>, <i>AB</i>, <i>ABB</i>, <i>ABBB</i>, etc. )</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>?</b> : Used to specify an optional character
+					<ul>
+						<li><b>JUDGE?MENT</b> will find <i>JUDGEMENT</i> and <i>JUDGMENT</i>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>|</b> : The OR operator
+					<ul>
+						<li><b>Joe|Mark</b> will find the text <i>Joe</i> or the text <i>Mark</i>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>()</b> : Used to group items and show the precedence of operators
+					<ul>
+						<li><b>Nov(ember)?</b></li> will find the text <i>Nov</i> or the text <i>November</i>.</li>
+						<li><b>H(is|er)</b> will find the text <i>His</i> or the text <i>Her</i>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li>If you want to find the above-mentioned characters as literals you must "escape" the character with a <b>\</b>.
+					<ul>
+						<li><b>why\?</b> will find the text <i>why?</i>.</li>
+						<li><b>\(dog\)</b> will find the text <i>(dog)</i>.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<h3>Character Classes</h3>
+		<ul>
+			<p>
+				<li><b>[]</b> : Used to create a "Character Class" that matches any character between the brackets
+					<ul>
+						<li><b>[02468]</b> will find an even, single-digit number. ( It will find <i>2</i>, <i>6</i>, etc. but not <i>7</i>. )</li>
+						<li>A dash is used to represent a range of characters.
+							<ul>
+								<li><b>[A-C]</b> will match <i>A</i>, <i>B</i>, and <i>C</i>, but not <i>D</i> or <i>Q</i>.</li>
+							</ul>
+						</li>
+						<li>A caret is used to indicate NOT. 
+							<ul>
+								<li><b>A[^B-D]A</b> will find <i>A2A</i>, <i>AQA</i>, and <i>AAA</i>, but not <i>ABA</i>, <i>ACA</i>, or <i>ADA</i>.</li>
+							</ul>
+						</li> 
+						<li>Different character ranges can be used within the same square brackets.
+							<ul>
+								<li><b>[0-46-9]</b> will find any single digit number except five.</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>\d</b> : Matches a single digit character
+					<ul>
+						<li><b>\d</b> is the same as <b>[0-9]</b>.</li>
+						<li><b>\d{3}-\d{4}</b> will find any telephone number in a ###-#### format.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>\D</b> : Matches a single non-digit character
+					<ul>
+						<li><b>\D</b> is the same as <b>[^0-9]</b>.</li>
+						<li><b>\d\D\d\D</b> finds four consecutive characters such that the first and third are digits and the second and fourth are not digits ( e.g. 2W6t ).</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>\s</b> : Matches a single white space character
+					<ul>
+							<li>Matches white space characters including space (<b>\x20</b>), carriage return (<b>\r</b>) and line feed (<b>\n</b>).</li>
+							<li>To match white space without matching end of line characters (<b>\r\n</b>) use <b>\x20</b>.</i></li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>\S</b> : non-white space character
+					<ul>
+						<li>Matches any non-white space character.</li>
+						<li><b>\S</b> is the same as <b>[^\s]</b>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>.</b> : matches any character except for <i>\n</i>.</li>
+					<ul>
+						<li><b>A.{5}A</b> will match an A followed by any five characters followed by another A.</li>
+						<li>If you want to match any character including <i>\n</i>, use <b>[\s\S]</b> or <b>[\d\D]</b>.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>\b</b> : Matches a word boundary
+					<ul>
+						<li><b>you\b</b> will match the <i>you</i> in <i>you have</i> but will not match the <i>you</i> in <i>your</i>.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<p>
+		Review handout for additional examples and items.
+		</p>
+		<hr>
+		<p>
+			<h3>Regular Expression Rule</h3>
+			<ul>
+				<li>Regular Expression Rule Value Finder is the most basic Value finder. Just type your regular expression into the box!</li>
+				<li>You can make your expression case sensitive.</li>
+				<li>You can also read your expression in from a file.</li>
+				<p>
+					<li><b>Example</b>
+						<ul>
+							<li>Review <b>TestImage001.tif</b> and note that the image has two social security numbers.</li>
+							<li>Open a new Rule Set Editor and add an attribute named <b>SSN</b>.</li>
+							<li>Add a new <b>Regular Expression Rule</b> and give it an appropriate description.</li>
+							<li>Write a regular expression that will find a social security number in the form ###-##-####.</li>
+							<li>Open the Rule Tester and test the new rule on <b>TestImage001.tif</b>.</li>
+						</ul>
+					</li>
+				</p>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>

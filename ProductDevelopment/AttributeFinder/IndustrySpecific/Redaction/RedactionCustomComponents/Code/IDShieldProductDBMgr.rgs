@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.IDShieldProductDBMgr.1 = s 'IDShieldProductDBMgr Class'
+	{
+		CLSID = s '{ED3295F2-7D53-4CCB-A246-BF3118B10012}'
+	}
+	RedactionCustomComponents.IDShieldProductDBMgr = s 'IDShieldProductDBMgr Class'
+	{
+		CLSID = s '{ED3295F2-7D53-4CCB-A246-BF3118B10012}'
+		CurVer = s 'RedactionCustomComponents.IDShieldProductDBMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {ED3295F2-7D53-4CCB-A246-BF3118B10012} = s 'IDShieldProductDBMgr Class'
+		{
+			ProgID = s 'RedactionCustomComponents.IDShieldProductDBMgr.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.IDShieldProductDBMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

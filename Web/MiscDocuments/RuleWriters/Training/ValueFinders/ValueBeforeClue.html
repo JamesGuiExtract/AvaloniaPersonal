@@ -1,0 +1,64 @@
+<HTML>
+	<HEAD>
+		<title>Value Before Clue Value Finder</title>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Value Before Clue Value Finder</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Value Before Clue value finder is used to find a specified amount of text before a specified clue.</li>
+			<li>Multiple clues can be defined in a single rule.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>Clues can be added, deleted, or modified using the <b>Add</b>, <b>Remove</b>, and <b>Modify</b> buttons.</li>
+			<li>The specified clue can be either plain text or a regular expression.</li>
+			<li>You have to specify how much of the text preceding the clue that you want to capture:
+				<ul>
+					<li>You can capture all of the text between the beginning of input and the clue.</li>
+					<li>You can capture all of the text between an end of line character and the clue.</li>
+					<li>You can capture all of the text between a second clue and your first clue.</li>
+						<ul>
+							<li>The second clue can also be either plain text or a regular expression.</li>
+						</ul>
+					</li>
+					<li>You can capture a certain number of lines before the clue.</li>
+						<ul>
+							<li>You will need to choose the number of lines you want to capture and whether or not you want to include the line that contains the clue.</li>
+						</ul>
+					</li>
+					<li>You can capture a specified number of words before the clue.</li>
+						<ul>
+							<li>You will need to choose the number of words you want to capture.</li>
+							<li>You can optionally stop searching if you find a specified character.</li>
+							<li>You must specify what a word is by defining what characters separate words.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>All of the strings in the Value Before Clue value finder can be made case sensitive.</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<p>
+			<ol>
+				<p>
+					<li>Write a Value Before Clue rule to find all file numbers in </b>FileNumbers2.txt</b>.</li>
+				</p>
+				<p>
+					<li>Open up <b>TestImage001.tif</b>. 
+						<p>
+							<ul>
+								<li>Write a Value Before Clue rule that uses <b>Up to X lines before clue text</b> to find the 3 lines of text preceding "2." and test it using the Rule Tester.</li>
+								<li>Write a Value before clue rule that uses <b>Up to X words before clue text</b> to find the text preceding "1.", below "STIPULATION TO ABATE CURRENT CHILD SUPPORT".</li>
+							</ul>
+						</p>
+					</li>
+				</p>
+			</ol>
+		<p>
+	</body>
+</html>

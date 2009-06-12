@@ -1,0 +1,5 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\NY - Secretary of State - eBiz\Rules\Master.rsd;K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsAll\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,18 @@
+//ASGRNT
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\ASGRNT;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//ASM
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\Images\ASM;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//D
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MTG
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\Images\MTG;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//SAT
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\Images\SAT;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//SHD
+<TESTFOLDER>;GGFinder - PA - Allegheny - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\SHD;;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+

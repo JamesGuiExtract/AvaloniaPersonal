@@ -1,0 +1,459 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Address Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Address Splitter tests
+// Test Type: State codes
+// Note that comment lines should be removed by the RSD file
+
+<TESTCASE>|Alabama|John One and Jane One\r\n123 Main Street\r\nMontgomery, AL  53704
+Address|John One and Jane One\r\n123 Main Street\r\nMontgomery, AL  53704
+.Recipient1|John One and Jane One
+.Address1|123 Main Street
+.City|Montgomery
+.State|AL
+.ZipCode|53704
+
+<TESTCASE>|Alaska|John Two and Jane Two\r\n123 Main Street, \r\nApartment 321\r\nJuneau, AK  98765
+Address|John Two and Jane Two\r\n123 Main Street, \r\nApartment 321\r\nJuneau, AK  98765
+.Recipient1|John Two and Jane Two
+.Address1|123 Main Street
+.Address2|Apartment 321
+.City|Juneau
+.State|AK
+.ZipCode|98765
+
+<TESTCASE>|Arizona|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nPhoenix, AZ 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nPhoenix, AZ 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Phoenix
+.State|AZ
+.ZipCode|80302
+
+<TESTCASE>|Arkansas|John Three and Jane Three\r\n14422 Division Lane \r\nLittle Rock, AR\r\n53705
+Address|John Three and Jane Three\r\n14422 Division Lane \r\nLittle Rock, AR\r\n53705
+.Recipient1|John Three and Jane Three
+.Address1|14422 Division Lane
+.City|Little Rock
+.State|AR
+.ZipCode|53705
+
+<TESTCASE>|California|John Four and Jane Four\r\n14422 Maple Court \r\nSan Francisco, \r\nCA 41234-3322
+Address|John Four and Jane Four\r\n14422 Maple Court \r\nSan Francisco, \r\nCA 41234-3322
+.Recipient1|John Four and Jane Four
+.Address1|14422 Maple Court
+.City|San Francisco
+.State|CA
+.ZipCode|41234-3322
+
+<TESTCASE>|Colorado|Mr. John Five Jr\r\n1234 University Ave, Apt 2B \r\nBoulder, CO 80302
+Address|Mr. John Five Jr\r\n1234 University Ave, Apt 2B \r\nBoulder, CO 80302
+.Recipient1|Mr. John Five Jr
+.Address1|1234 University Ave, Apt 2B
+.City|Boulder
+.State|CO
+.ZipCode|80302
+
+<TESTCASE>|Connecticut|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHartford, CT 10019
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHartford, CT 10019
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Hartford
+.State|CT
+.ZipCode|10019
+
+<TESTCASE>|Delaware|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nDover, DE 10019
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nDover, DE 10019
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Dover
+.State|DE
+.ZipCode|10019
+
+<TESTCASE>|Florida|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nTampa, FL 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nTampa, FL 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Tampa
+.State|FL
+.ZipCode|80302
+
+<TESTCASE>|Georgia|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAtlanta, \r\nGA 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAtlanta, \r\nGA 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Atlanta
+.State|GA
+.ZipCode|80302
+
+<TESTCASE>|Hawaii|John and Jane Doe\r\n1234 University Ave, Apt 2B \r\nHonolulu, HI 99855
+Address|John and Jane Doe\r\n1234 University Ave, Apt 2B \r\nHonolulu, HI 99855
+.Recipient1|John and Jane Doe
+.Address1|1234 University Ave, Apt 2B
+.City|Honolulu
+.State|HI
+.ZipCode|99855
+
+<TESTCASE>|Idaho|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nBoise, ID 88865
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nBoise, ID 88865
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Boise
+.State|ID
+.ZipCode|88865
+
+<TESTCASE>|Illinois|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nChicago, IL 60602
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nChicago, IL 60602
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Chicago
+.State|IL
+.ZipCode|60602
+
+<TESTCASE>|Indiana|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nIndianapolis, IN 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nIndianapolis, IN 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Indianapolis
+.State|IN
+.ZipCode|80302
+
+<TESTCASE>|Iowa|Doctor Benjamin Spock\r\n1234 University Ave, Apt 2B \r\nDes Moines, IA 59991
+Address|Doctor Benjamin Spock\r\n1234 University Ave, Apt 2B \r\nDes Moines, IA 59991
+.Recipient1|Doctor Benjamin Spock
+.Address1|1234 University Ave, Apt 2B
+.City|Des Moines
+.State|IA
+.ZipCode|59991
+
+<TESTCASE>|Kansas|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nKansas City, KS 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nKansas City, KS 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Kansas City
+.State|KS
+.ZipCode|80302
+
+<TESTCASE>|Kentucky|Mrs. Jane Seven\r\n1234 University Ave, Apt 2B \r\nLouisville, KY 80302
+Address|Mrs. Jane Seven\r\n1234 University Ave, Apt 2B \r\nLouisville, KY 80302
+.Recipient1|Mrs. Jane Seven
+.Address1|1234 University Ave, Apt 2B
+.City|Louisville
+.State|KY
+.ZipCode|80302
+
+<TESTCASE>|Louisiana|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNew Orleans, LA 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNew Orleans, LA 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|New Orleans
+.State|LA
+.ZipCode|80302
+
+<TESTCASE>|Maine|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAugusta, ME 01210
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAugusta, ME 01210
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Augusta
+.State|ME
+.ZipCode|01210
+
+<TESTCASE>|Maryland|Wayne Lenius\r\n1234 University Ave, Apt 2B \r\nWaldorf, MD 20602
+Address|Wayne Lenius\r\n1234 University Ave, Apt 2B \r\nWaldorf, MD 20602
+.Recipient1|Wayne Lenius
+.Address1|1234 University Ave, Apt 2B
+.City|Waldorf
+.State|MD
+.ZipCode|20602
+
+<TESTCASE>|Massachusetts|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nBoston, MA 10019
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nBoston, MA 10019
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Boston
+.State|MA
+.ZipCode|10019
+
+<TESTCASE>|Michigan|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nLansing, MI 61123
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nLansing, MI 61123
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Lansing
+.State|MI
+.ZipCode|61123
+
+<TESTCASE>|Minnesota|Wayne Lenius\r\n1234 University Ave, Apt 2B \r\nBrainerd, MN 56401
+Address|Wayne Lenius\r\n1234 University Ave, Apt 2B \r\nBrainerd, MN 56401
+.Recipient1|Wayne Lenius
+.Address1|1234 University Ave, Apt 2B
+.City|Brainerd
+.State|MN
+.ZipCode|56401
+
+<TESTCASE>|Mississippi|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nJackson, MS 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nJackson, MS 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Jackson
+.State|MS
+.ZipCode|80302
+
+<TESTCASE>|Missouri|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nKansas City, MO 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nKansas City, MO 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Kansas City
+.State|MO
+.ZipCode|80302
+
+<TESTCASE>|Montana|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHelena, MT 83456
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHelena, MT 83456
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Helena
+.State|MT
+.ZipCode|83456
+
+<TESTCASE>|Nebraska|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nLincoln, NE 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nLincoln, NE 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Lincoln
+.State|NE
+.ZipCode|80302
+
+<TESTCASE>|New Hampshire|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNashua, NH 03301
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNashua, NH 03301
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Nashua
+.State|NH
+.ZipCode|03301
+
+<TESTCASE>|New Jersey|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nTrenton, NJ 12345
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nTrenton, NJ 12345
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Trenton
+.State|NJ
+.ZipCode|12345
+
+<TESTCASE>|New Mexico|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAlbuquerque, NM 88877
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nAlbuquerque, NM 88877
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Albuquerque
+.State|NM
+.ZipCode|88877
+
+<TESTCASE>|New York|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNew York, NY 10019
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nNew York, NY 10019
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|New York
+.State|NY
+.ZipCode|10019
+
+<TESTCASE>|Nevada|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nCarson City, NV 88877
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nCarson City, NV 88877
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Carson City
+.State|NV
+.ZipCode|88877
+
+<TESTCASE>|North Carolina|John Doe\r\n223 Churchill Hall\r\nNorth Carolina State University\r\nRaleigh, NC 57104
+Address|John Doe\r\n223 Churchill Hall\r\nNorth Carolina State University\r\nRaleigh, NC 57104
+.Recipient1|John Doe
+.Address1|223 Churchill Hall
+.Address2|North Carolina State University
+.City|Raleigh
+.State|NC
+.ZipCode|57104
+
+<TESTCASE>|North Dakota|Wayne Lenius\r\n223 Churchill Hall\r\nNorth Dakota State University\r\nFargo, ND 57104
+Address|Wayne Lenius\r\n223 Churchill Hall\r\nNorth Dakota State University\r\nFargo, ND 57104
+.Recipient1|Wayne Lenius
+.Address1|223 Churchill Hall
+.Address2|North Dakota State University
+.City|Fargo
+.State|ND
+.ZipCode|57104
+
+<TESTCASE>|Ohio|Mrs. Jane Six\r\nRock and Roll Hall of Fame\r\n1234 University Ave, Apt 2B \r\nCleveland, OH 62626
+Address|Mrs. Jane Six\r\nRock and Roll Hall of Fame\r\n1234 University Ave, Apt 2B \r\nCleveland, OH 62626
+.Recipient1|Mrs. Jane Six
+.Recipient2|Rock and Roll Hall of Fame
+.Address1|1234 University Ave, Apt 2B
+.City|Cleveland
+.State|OH
+.ZipCode|62626
+
+<TESTCASE>|Oklahoma|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nOklahoma City, OK 62626
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nOklahoma City, OK 62626
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Oklahoma City
+.State|OK
+.ZipCode|62626
+
+<TESTCASE>|Oregon|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nPortland, OR 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nPortland, OR 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Portland
+.State|OR
+.ZipCode|80302
+
+<TESTCASE>|Pennsylvania|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHarrisburg, PA 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nHarrisburg, PA 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Harrisburg
+.State|PA
+.ZipCode|80302
+
+<TESTCASE>|Rhode Island|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nProvidence, RI 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nProvidence, RI 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Providence
+.State|RI
+.ZipCode|80302
+
+<TESTCASE>|South Carolina|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nColumbia, SC 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nColumbia, SC 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Columbia
+.State|SC
+.ZipCode|80302
+
+<TESTCASE>|South Dakota|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nRapid City, SD 80302
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nRapid City, SD 80302
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Rapid City
+.State|SD
+.ZipCode|80302
+
+<TESTCASE>|Tennessee|Elvis Presley\r\n1234 University Ave, Apt 2B \r\nMemphis, TN 80302
+Address|Elvis Presley\r\n1234 University Ave, Apt 2B \r\nMemphis, TN 80302
+.Recipient1|Elvis Presley
+.Address1|1234 University Ave, Apt 2B
+.City|Memphis
+.State|TN
+.ZipCode|80302
+
+<TESTCASE>|Texas|Home Economics Department\r\nTexas Tech University\r\n1234 University Ave, Apt 2B \r\nLubbock, TX 79411
+Address|Home Economics Department\r\nTexas Tech University\r\n1234 University Ave, Apt 2B \r\nLubbock, TX 79411
+.Recipient1|Home Economics Department
+.Recipient2|Texas Tech University
+.Address1|1234 University Ave, Apt 2B
+.City|Lubbock
+.State|TX
+.ZipCode|79411
+
+<TESTCASE>|Utah|Provo School District\r\n1234 University Ave, Apt 2B \r\nProvo, UT 85678
+Address|Provo School District\r\n1234 University Ave, Apt 2B \r\nProvo, UT 85678
+.Recipient1|Provo School District
+.Address1|1234 University Ave, Apt 2B
+.City|Provo
+.State|UT
+.ZipCode|85678
+
+<TESTCASE>|Vermont|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nSouth Burlington, VT 05402
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nSouth Burlington, VT 05402
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|South Burlington
+.State|VT
+.ZipCode|05402
+
+<TESTCASE>|Virginia|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nRichmond, VA 24680
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nRichmond, VA 24680
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Richmond
+.State|VA
+.ZipCode|24680
+
+<TESTCASE>|Washington|Professor Albert Einstein\r\nDepartment of Physics\r\nWashington State University\r\n1234 University Ave\r\nPullman, WA 90123
+Address|Professor Albert Einstein\r\nDepartment of Physics\r\nWashington State University\r\n1234 University Ave\r\nPullman, WA 90123
+.Recipient1|Professor Albert Einstein
+.Recipient2|Department of Physics
+.Recipient3|Washington State University
+.Address1|1234 University Ave
+.City|Pullman
+.State|WA
+.ZipCode|90123
+
+<TESTCASE>|Washington DC|George W. Bush\r\n1600 Pennsylvania Ave\r\nWashington, DC 20201
+Address|George W. Bush\r\n1600 Pennsylvania Ave\r\nWashington, DC 20201
+.Recipient1|George W. Bush
+.Address1|1600 Pennsylvania Ave
+.City|Washington
+.State|DC
+.ZipCode|20201
+
+<TESTCASE>|West Virginia|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nMorgantown, WV 43210
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nMorgantown, WV 43210
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Morgantown
+.State|WV
+.ZipCode|43210
+
+<TESTCASE>|Wisconsin|UCLID Software, LLC\r\n8383 Greenway Blvd, Suite #500\r\nMiddleton, WI 53562
+Address|UCLID Software, LLC\r\n8383 Greenway Blvd, Suite #500\r\nMiddleton, WI 53562
+.Recipient1|UCLID Software, LLC
+.Address1|8383 Greenway Blvd, Suite #500
+.City|Middleton
+.State|WI
+.ZipCode|53562
+
+<TESTCASE>|Wyoming|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nCheyenne, WY 82233
+Address|Mrs. Jane Six\r\n1234 University Ave, Apt 2B \r\nCheyenne, WY 82233
+.Recipient1|Mrs. Jane Six
+.Address1|1234 University Ave, Apt 2B
+.City|Cheyenne
+.State|WY
+.ZipCode|82233
+
+<TESTCASE>|Guam|John Jones\r\n1234 Beach Road\r\nApartment H-2\r\nAgana, GU 99923-0022
+Address|John Jones\r\n1234 Beach Road\r\nApartment H-2\r\nAgana, GU 99923-0022
+.Recipient1|John Jones
+.Address1|1234 Beach Road
+.Address2|Apartment H-2
+.City|Agana
+.State|GU
+.ZipCode|99923-0022
+
+<TESTCASE>|Puerto Rico|Hard Rock Cafe\r\n123 West Restaurant Row\r\nSan Juan \r\nPR \r\n99877
+Address|Hard Rock Cafe\r\n123 West Restaurant Row\r\nSan Juan \r\nPR \r\n99877
+.Recipient1|Hard Rock Cafe
+.Address1|123 West Restaurant Row
+.City|San Juan
+.State|PR
+.ZipCode|99877
+
+<TESTCASE>|Virgin Islands|Mrs. Jane Six\r\nMarriot Hotel\r\n1234 Beach Lane\r\nCharlotte Amalie, VI 99894
+Address|Mrs. Jane Six\r\nMarriot Hotel\r\n1234 Beach Lane\r\nCharlotte Amalie, VI 99894
+.Recipient1|Mrs. Jane Six
+.Recipient2|Marriot Hotel
+.Address1|1234 Beach Lane
+.City|Charlotte Amalie
+.State|VI
+.ZipCode|99894

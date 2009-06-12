@@ -1,0 +1,61 @@
+# 1) Each non-comment line in the file shall be a command statement to the
+#    CurveCalculationEngine.
+# 2) If the first word of the command statement is "RESET", then
+#    the reset() method shall be invoked on the CurveCalculationEngine.
+# 3) If the first word of the command statement is "SET", then the rest of the line
+#    shall be in the format "VariableName=VariableValue" where the value of the variable
+#    represented by VariableName in the CurveCalculationEngine shall be set to the 
+#    specified VariableValue.  For Variables whose type is boolean, the VariableValue
+#    shall be either 0 or 1.  For variables whose type is an angle or a bearing, the
+#    VariableValue shall be a number that represents the angle or bearing in radians.
+#    For variables of distance type, the VariableValue shall be a number representing
+#    the distance in feet units. For varibles of point type, the VariableValue shall
+#    contain two numbers (the x and y values) seperated by a comma.  Valid values for
+#    VariableName are: ArcConcaveLeft, ArcDeltaGreaterThan180Degrees, ArcDelta,
+#    ArcStartAngle, ArcEndAngle, ArcDegreeOfCurveChordDef, ArcDegreeOfCurveArcDef,
+#    ArcTangentInBearing, ArcTangentOutBearing, ArcChordBearing, ArcRadialInBearing,
+#    ArcRadialOutBearing, ArcRadius, ArcLength, ArcChordLength, ArcExternalDistance,
+#    ArcMiddleOrdinate, ArcTangentDistance, ArcStartingPoint, ArcMidPoint,
+#    ArcEndingPoint, ArcCenter, ArcExternalPoint, and ArcChordMidPoint.  Please refer
+#    to the documentation in ICurveCalculationEngine.h for information on these
+#    parameters, their types, etc.
+# 4) If the first word of the command statement is "TEST", then the rest of the line
+#    shall be in the format "VariableName=ExpectedValue".  The
+#    valid options for VariableName are the same as those mentioned in point 3) above.
+#    The format of the ExpectedValue shall be the same as the format of the VariableValue
+#    field mentioned in point 3) above, and shall be used to test the value of the
+#    specified variable, as reported by the CurveCalculationEngine.  In addition, if the
+#    VariableName is "canCalculateAllParameters", the ExpectedValue shall either be 1 
+#    or 0, and shall be used to test the return value of the canCalculateAllParameters()
+#    method of the CurveCalculationEngine.
+# 5) If the first word of the command statement is "COMMENT", then the entire command
+#    statement is simply written to the output fie.
+
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=East
+SET ArcRadius=1
+SET ArcDelta=1.5707963
+SET ArcConcaveLeft=0
+TEST ArcEndingPoint=1,0
+TEST ArcCenter=0,0
+RESET
+SET ArcStartingPoint=0,1
+SET ArcTangentInBearing=West
+SET ArcRadius=1
+SET ArcDelta=1.5707963
+SET ArcConcaveLeft=1
+TEST ArcEndingPoint=0,-1
+TEST ArcCenter=0,0
+#
+# The following test will fail, because not enough variables are
+# set before get tests are made
+#
+RESET
+SET ArcStartingPoint=0,1
+TEST ArcEndingPoint=4,4
+#
+# The following test will pass, because, as expected, none of the variables
+# are calculatable
+#
+TEST canCalculateAllParameters=0

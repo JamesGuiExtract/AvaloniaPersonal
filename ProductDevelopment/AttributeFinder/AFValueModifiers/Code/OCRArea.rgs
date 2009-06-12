@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueModifiers.OCRArea.1 = s 'OCRArea Class'
+	{
+		CLSID = s '{3CCA1475-FE67-4a14-B7DB-0478A1DABBFB}'
+	}
+	AFValueModifiers.OCRArea = s 'OCRArea Class'
+	{
+		CLSID = s '{3CCA1475-FE67-4a14-B7DB-0478A1DABBFB}'
+		CurVer = s 'AFValueModifiers.OCRArea.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3CCA1475-FE67-4a14-B7DB-0478A1DABBFB} = s 'OCRArea Class'
+		{
+			ProgID = s 'AFValueModifiers.OCRArea.1'
+			VersionIndependentProgID = s 'AFValueModifiers.OCRArea'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{C5230183-3ACC-4C4F-8D91-745FFB3C018E}'
+		}
+	}
+}

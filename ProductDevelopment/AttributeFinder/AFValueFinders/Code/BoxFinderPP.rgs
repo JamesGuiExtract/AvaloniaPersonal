@@ -1,0 +1,25 @@
+HKCR
+{
+	UCLID_AFVALUEFINDERSLib.BoxFinderPP.1 = s 'BoxFinderPP Class'
+	{
+		CLSID = s '{4F485DCB-E548-4C1B-B3D5-D611F318E01C}'
+	}
+	UCLID_AFVALUEFINDERSLib.BoxFinderPP = s 'BoxFinderPP Class'
+	{
+		CLSID = s '{4F485DCB-E548-4C1B-B3D5-D611F318E01C}'
+		CurVer = s 'UCLID_AFVALUEFINDERSLib.BoxFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4F485DCB-E548-4C1B-B3D5-D611F318E01C} = s 'BoxFinderPP Class'
+		{
+			ProgID = s 'UCLID_AFVALUEFINDERSLib.BoxFinderPP.1'
+			VersionIndependentProgID = s 'UCLID_AFVALUEFINDERSLib.BoxFinderPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

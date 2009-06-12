@@ -1,0 +1,44 @@
+// *********************************
+// Format of StringCSISTest.dat
+// *********************************
+//
+// Two line formats are supported:
+// 1) <TESTCASE> |<Operator>|<string1>|<string1 case>|<string2>|<string2 case>|(<find type>|(<count>|)<value1>(|<value2>...)
+//    where:
+//    <Operator>  = operation to be tested ( find, find_first_not_of, find_first_of, find_last_not_of, 
+//								find_last_of, rfind, !=, ==, <, <=, >, >= )
+//
+//	  <string1>   = is the string value of the StringCSIS that is the left side of the operation 
+//				( StringCSIS to be searched or StringCSIS to be compared with )
+//
+//	  <string1 case> = is the case for the string1 object to be set in the StringCSIS instance
+//						true - string is case sensitive
+//						false - string is not case sensitive
+//
+//	  <string2>   = is the string value that is searched for in the find's or the right side compared string
+//
+//	  <string2 case> = is the case for the string2 object to be set in the StringCSIS instance
+//						true - string is case sensitive
+//						false - string is not case sensitive
+//
+//	  <find type> = is there if the <Operator> is not ( !=, ==, <, <=, >, >= ) and is
+//					one of:
+//						C - char
+//						CP - char *
+//						BS - basic_string
+//						CPC - char * with Count - this will be followed by <count>
+//
+//	  <count>   = is the count when the find type is CPC
+//
+//	  <value1>  = 1st value to be found. if the operation is a comparison it will be true or false
+//				  if the operation is a find it will be the first location found ( -1 == npos, for the not found case)
+//				  multiple found positions are will be the other values that are on the line after this value.
+//
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             NOTE: The text file must also satisfy these format requirements
+//
+//
+//-------------------------------------------------------------------------------------------------

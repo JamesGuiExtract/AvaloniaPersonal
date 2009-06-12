@@ -1,0 +1,166 @@
+<HTML>
+
+<HEAD>
+<TITLE>Feedback Manager Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Installation Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>General</h2>
+<UL>
+  	<LI><u>Licensing</u>
+	<UL>
+	  	<LI>Confirm that an SDK license enables each Start menu item from an SDK installation
+  		<LI>Confirm that an RDT license enables each Start menu item from an RDT installation
+	  	<LI>Confirm that an SDK license does not enable the Ruleset Editor 
+  		<LI>Confirm that an RDT license does enable the Ruleset Editor 
+	</UL>
+<p>
+  	<LI><u>Install Options</u>
+	<UL>
+	  	<LI>Confirm that not agreeing with the terms of the license agreement halts the installation with no files copied to the system.
+  		<LI>Confirm that a Custom SDK installation allows installation of the SDK Merge Module.
+  		<LI>Confirm that Merge Modules for FlexIndexSDK, InputFunnel and VOAClient are copied to the \FlexIndex\SDK\Redist folder.
+	  	<LI>Confirm that a Compact SDK installation does not install Tutorials or Help.
+	</UL>
+</UL>
+<br>
+
+
+<!-- *********************************************** -->
+<LI><h2>Windows XP</h2>
+<UL>
+  	<LI><u>Software Development Toolkit (UCLIDFlexIndexSDK or SDK)</u>
+	<UL>
+	  	<LI>Confirm that SDK installs successfully
+	  	<LI>Each Shortcut on Start menu "works"
+	  	<LI>EAV Generator is available from the Start menu
+	  	<LI>Feedback Manager is available from the Start menu
+	  	<LI>File Processing Manager is available from the Start menu
+	  	<LI>FlexIndex Help is available from the Start menu
+	  	<LI>Rule Tester is available from the Start menu
+	  	<LI>Spatial String Viewer is available from the Start menu
+	  	<LI>User License is available from the Start menu
+<p>
+		<LI>Confirm that uninstall of SDK is successful
+	</UL>
+<p>
+  	<LI><u>Rule Development Toolkit (RDT)</u>
+	<UL>
+	  	<LI>Confirm that RDT does not install without SDK installation
+	  	<LI>Confirm that RDT installs successfully after SDK installation
+	  	<LI>Each Shortcut on Start menu "works"
+	  	<LI>EAV Generator is available from the Start menu
+	  	<LI>Feedback Manager is available from the Start menu
+	  	<LI>File Processing Manager is available from the Start menu
+	  	<LI>FlexIndex Help is available from the Start menu
+	  	<LI>Index Converter is available from the Start menu
+	  	<LI>RDT Configuration is available from the Start menu
+	  	<LI>Ruleset Editor is available from the Start menu
+	  	<LI>Rule Tester is available from the Start menu
+	  	<LI>Run Diagnostic Tests is available from the Start menu
+	  	<LI>Spatial String Viewer is available from the Start menu
+	  	<LI>Test Harness is available from the Start menu
+	  	<LI>User License is available from the Start menu
+<p>
+		<LI>Confirm that uninstall of SDK with RDT still installed is prohibited
+		<LI>Confirm that uninstall of RDT is successful
+		<LI>Confirm that uninstall of RDT retains SDK items
+		<LI>Confirm that subsequent uninstall of SDK is successful
+	</UL>
+<p>
+  	<LI><u>VOAClient</u>
+	<UL>
+	  	<LI>Confirm that VOA Client installs successfully by itself
+	  	<LI>Copy the VOATester EXE to the test machine and confirm that a license error message is seen when no license file is present.
+	  	<LI>Confirm that a VOAClient license file removes the above error message.
+	  	<LI><u>VOATester</u>
+		<UL>
+		  	<LI>Confirm appropriate message for VOA file without Attributes
+		  	<LI>Confirm appropriate message for VOA file with Attributes
+		  	<LI>Confirm appropriate message for VOA file with a defined Splitter
+		  	<LI>Confirm appropriate message for VOA file with a defined Validator
+		</UL>
+<p>
+		<LI>Confirm that uninstall of VOA Client is successful
+	</UL>
+</UL>
+<br>
+
+
+<!-- *********************************************** -->
+<LI><h2>Windows 2000</h2>
+<UL>
+  	<LI><u>Software Development Toolkit (UCLIDFlexIndexSDK or SDK)</u>
+	<UL>
+	  	<LI>Confirm that SDK installs successfully
+	  	<LI>Each Shortcut on Start menu "works"
+	  	<LI>EAV Generator is available from the Start menu
+	  	<LI>Feedback Manager is available from the Start menu
+	  	<LI>File Processing Manager is available from the Start menu
+	  	<LI>FlexIndex Help is available from the Start menu
+	  	<LI>Rule Tester is available from the Start menu
+	  	<LI>Spatial String Viewer is available from the Start menu
+	  	<LI>User License is available from the Start menu
+<p>
+		<LI>Confirm that uninstall of SDK is successful
+	</UL>
+<p>
+  	<LI><u>Rule Development Toolkit (RDT)</u>
+	<UL>
+	  	<LI>Confirm that RDT does not install without SDK installation
+	  	<LI>Confirm that RDT installs successfully after SDK installation
+	  	<LI>Each Shortcut on Start menu "works"
+	  	<LI>EAV Generator is available from the Start menu
+	  	<LI>Feedback Manager is available from the Start menu
+	  	<LI>File Processing Manager is available from the Start menu
+	  	<LI>FlexIndex Help is available from the Start menu
+	  	<LI>Index Converter is available from the Start menu
+	  	<LI>RDT Configuration is available from the Start menu
+	  	<LI>Ruleset Editor is available from the Start menu
+	  	<LI>Rule Tester is available from the Start menu
+	  	<LI>Run Diagnostic Tests is available from the Start menu
+	  	<LI>Spatial String Viewer is available from the Start menu
+	  	<LI>Test Harness is available from the Start menu
+	  	<LI>User License is available from the Start menu
+<p>
+		<LI>Confirm that uninstall of SDK with RDT still installed is prohibited
+		<LI>Confirm that uninstall of RDT is successful
+		<LI>Confirm that uninstall of RDT retains SDK items
+		<LI>Confirm that subsequent uninstall of SDK is successful
+	</UL>
+<p>
+  	<LI><u>VOAClient</u>
+	<UL>
+	  	<LI>Confirm that VOA Client installs successfully by itself
+	  	<LI>Copy the VOATester EXE to the test machine and confirm that a license error message is seen when no license file is present.
+	  	<LI>Confirm that a VOAClient license file removes the above error message.
+	  	<LI><u>VOATester</u>
+		<UL>
+		  	<LI>Confirm appropriate message for VOA file without Attributes
+		  	<LI>Confirm appropriate message for VOA file with Attributes
+		  	<LI>Confirm appropriate message for VOA file with a defined Splitter
+		  	<LI>Confirm appropriate message for VOA file with a defined Validator
+		</UL>
+<p>
+		<LI>Confirm that uninstall of VOA Client is successful
+	</UL>
+</UL>
+<br>
+
+
+<!-- *********************************************** -->
+</OL>
+
+</BODY>
+
+</HTML>

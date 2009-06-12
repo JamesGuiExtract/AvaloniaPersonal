@@ -1,0 +1,389 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.0.6 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.0.6 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3171, #3527]</b> Split Region Into Content Areas
+	       	<ul>
+	      		<li>Configure the object.
+	      		<li>Confirm that the edit boxes associated with the <b>Filter results</b> 
+			check boxes are enabled and disabled in tandem with the checked states.
+<p>
+	      		<li>Exercise the image and RSD file in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3527</b>.
+	      		<li>Confirm that the Drivers License highlights appear in the proper position.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3001, #3329, #3503, #3504]</b> Launch Application
+	       	<ul>
+	      		<li>Configure the <b>Launch Application</b> task.
+	      		<li>Confirm that a <b>Parameters</b> edit box is provided.
+			<ul>
+		      		<li>Confirm that the label includes <b>(Any parameter that contains 
+				spaces must be quoted)</b>.
+		      		<li>Confirm that the edit box has an associated <b>Tag Selector</b>.
+		      		<li>Confirm that the edit box has an associated <b>...</b> browse button.
+			</ul>
+<p>
+	      		<li>Browse for a <b>Launch Directory</b>.
+	      		<li>Cancel from the browse operation and confirm that the configuration dialog 
+			remains active.
+<p>
+	      		<li>Browse for an application that does not require any parameters such as 
+			<b>UEXViewer.exe</b>.
+	      		<li>Provide a meaningful <b>Launch Directory</b> 
+			<UL>
+				<LI>Confirm that the launch directory is not surrounded by quotes.
+				<LI>Confirm that the application runs as expected.
+			</UL>
+	      		<li>Modify the <b>Launch Directory</b> to something invalid such as <b>XYZ</b>.
+	      		<li>Confirm that the application <b>does not</b> run but provides meaningful 
+			error information.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3051]</b> Locate Image Region
+	       	<ul>
+	      		<li>Exercise <b>Locate Image Region</b> using opposite page edges as 
+			part of the region boundaries.
+			<ul>
+		      		<li>Left of page containing Clues expanded Right by <i>x</i> 
+				characters, as Right boundary.
+		      		<li>Right of page containing Clues expanded Left by <i>x</i> 
+				characters, as Left boundary.
+		      		<li>Top of page containing Clues expanded Down by <i>x</i> 
+				spatial lines, as Bottom boundary.
+		      		<li>Bottom of page containing Clues expanded Up by <i>x</i> 
+				spatial lines, as Top boundary.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3305]</b> Translating blank types
+	       	<ul>
+	      		<li>Create an RSD file with a <b>Translate values or types</b> output handler.
+	      		<li>Confirm that it can be configured to translate blank types to <b>Test</b>.
+	      		<li>Confirm that the translation works as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3412]</b> Auto-zoom persistence
+	       	<ul>
+	      		<li>Exercise <b>verification</b> and open the Options dialog.
+	      		<li>Set the zoom level to something other than 1, uncheck the auto-zoom option 
+			and save the settings.
+	      		<li>Re-open the Options dialog.
+	      		<li>Confirm that the zoom level <b>did not</b> reset to 1.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3463, #3496]</b> Unstoppable FAM
+	       	<ul>
+	      		<li>Exercise <b>verification</b> for Demo_IDShield.
+	      		<li>Queue the files with <b>Force Processing</b> enabled while 
+			verifying the documents.
+	      		<li>Confirm that at least one document fails because it cannot be 
+			queued while it is being processed.
+	      		<li>Confirm that stopping processing from <b>the FAM</b> works.
+	      		<li>Confirm that stopping processing from <b>Verification</b> works.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3488]</b> Save in Verification
+	       	<ul>
+	      		<li>Confirm that <b>Ctrl+S</b> works to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	      		<li>Confirm that <b>Shift+S</b> does not work to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	      		<li>Confirm that <b>Alt+S</b> does not work to save a document.  Test with 
+			either Data Grid or Image Viewer having focus.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3492, #3497, #3512]</b> VOA Viewer
+	       	<ul>
+	      		<li>Confirm that the <b>Clear Attributes</b> button has been removed.
+	      		<li>Open a VOA file and delete an attribute.
+	      		<li>Confirm that the confirmation dialog is modal.
+<p>
+	      		<li>Move an existing VOA file and its image to a noew folder.
+	      		<li>Open the VOA file.
+	      		<li>Swipe text to create a new attribute in the VOA Viewer.
+	      		<li>Merge one old attribute with the new attribute.
+	      		<li>Confirm that merge works properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3495]</b> Sharing violation during Verification
+	       	<ul>
+	      		<li>Exercise the <b>Verification with annotations</b> memory leak test.
+	      		<li>Review the exception log after the test is completed.
+	      		<li>Confirm that no <b>Sharing violation</b> errors were logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3499]</b> Oversize exception
+	       	<ul>
+	      		<li>Create license file that <b>does not</b> include support for <b>Convert 
+			to searchable PDF</b>.
+	      		<li>Open an auto-redaction FPS file from the 6.0 Redaction Demo or 7.0 
+			Demo IDShield.
+	      		<li>Confirm that an exception is logged about an inability to open 
+			the FPS file.
+	      		<li>Confirm that the exception does not create an unusually large UEX 
+			file and that the UEX Viewer opens the UEX file without difficulty.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3493]</b> VOA Viewer and merging attributes
+	       	<ul>
+	      		<li>Open the <b>VOA Viewer</b> and a VOA file with multiple spatial attributes.
+	      		<li>Select two of the attributes and merge them.
+	      		<li>Confirm that the merged attribute shows only the combined spatial 
+			areas and not a large bounding rectangle.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3515]</b> Rule Tester buttons
+	       	<ul>
+	      		<li>Exercise an RSD file using the <b>MICR Finder</b>.
+	      		<li>Exercise the rule(s).
+	      		<li>Confirm that the Rule Tester toolbar buttons are disabled while 
+			the rules are running. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3517]</b> Retaining annotations and Legislation Guard
+	       	<ul>
+			<li>Copy <b>test.fps</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3517</b>.
+	      		<li>Exercise the FPS file and supply several multipage TIFs.
+	      		<li>Exercise verification and toggle at least one redaction on for each image.
+	      		<li>Confirm that proper output is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3518]</b> Execute rules with no text in image
+	       	<ul>
+	      		<li>Execute rules in the FAM for images without USS files.
+	      		<li>Supply at least one file without recognized text (i.e. 
+			<b>K:\Common\Engineering\Sample Files\CO - SoS\Set005\Images\O_3696988.tif</b>).
+	      		<li>Confirm that the rules process without failing the document. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3519]</b> USS files and UNC path
+	       	<ul>
+	      		<li>Exercise the RSD file attached to the SCR against 
+			<b>K:\Common\Engineering\Sample Files\AtPac\CA - Kern\Set002\Images\19834000236501.001</b>).
+	      		<li>Confirm that the rules work without error.
+<p> 
+	      		<li>Navigate to and open a USS via a mapped drive.
+	      		<li>Confirm that <b>File - Properties</b> shows the navigated path as 
+			Source Document and the UNC path as Original Source Document.
+	      		<li>Navigate to and open a USS via a UNC path.
+	      		<li>Confirm that <b>File - Properties</b> shows the UNC path as both 
+			Source Document and Original Source Document.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3525]</b> Spatial String Searcher and rotated rectangles
+	       	<ul>
+	      		<li>Exercise the RSD file and image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
+	      		<li>Confirm that the rules run without error. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3529]</b> Locate Image Region and invalid settings
+	       	<ul>
+	      		<li>Open an RSD file with a <b>Locate Image Region</b> rule configured 
+			to find a text region.
+	      		<li>Modify the object to return an image region. 
+	      		<li>Click OK and confirm that a validation error is presented. 
+	      		<li>Close the validation error message and <b>Cancel</b> the 
+			configuration changes. 
+	      		<li>Re-open the object property page and confirm that the valid settings 
+			are presented. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4108, #5308]</b> UEX Viewer
+	       	<ul>
+	      		<li>Open the <b>UEX Viewer</b> an a UEX file with other UEX files in 
+			the same folder.
+	      		<li>Navigate to another UEX file using the combo box.
+	      		<li>Confirm that <b>Ctrl+Left Arrow</b> and <b>Ctrl+Right Arrow</b> 
+			work as shortcuts to navigate to other UEX files.
+	      		<li>Navigate to another UEX file using the <b>&lt;</b> and 
+			<b>&gt;</b> buttons.
+	      		<li>Confirm that <b>Ctrl+Left Arrow</b> and <b>Ctrl+Right Arrow</b> 
+			work as shortcuts to navigate to other UEX files.
+<p>
+	      		<li>Confirm that UEX files from <b>ID Shield 6.0</b> can be opened.
+	      		<li>Confirm that UEX files from <b>ID Shield 7.0</b> can be opened.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4353]</b> Multiple copies of ExtracTRP2.exe
+	       	<ul>
+	      		<li>Create a batch file to start multiple simultaneous instances of 
+			<b>ExtractTRP2.exe</b>.
+	      		<li>Confirm with <b>Task Manager</b> that only one instance runs at a time.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5117]</b> Slow PDF queuing
+	       	<ul>
+			<li>Select a folder of PDF images for queuing.
+			<li>Supply the images and confirm that temporary TIF images are not 
+			created during queuing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5249]</b> Filter ID Shield Data File
+	       	<ul>
+	      		<li>Configure the task.
+	      		<li>Check the <b>Other</b> checkbox and add text to the associated edit box.
+	      		<li>Uncheck the checkbox.
+	      		<li>Confirm that the edit box is disabled but the contents are retained.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5250]</b> Tab order for ID Shield dialogs
+	       	<ul>
+	      		<li>Confirm that the <b>Filter ID Shield data file</b> task can be 
+			configured from the keyboard.
+	      		<li>Confirm that the <b>ID Shield data file condition</b> object can be 
+			configured from the keyboard.
+	      		<li>Confirm that the <b>Verify redactions</b> task can be 
+			configured from the keyboard.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5278]</b> Excessive memory use by LogProcessStats
+	       	<ul>
+	      		<li>Open a previously saved FPS file.
+	      		<li>Uncheck all checkboxes on the <b>Action</b> tab.
+	      		<li>Confirm that <b>File - Save</b> and <b>File - Save As</b> 
+			are disabled.
+	      		<li>Confirm that <b>Ctrl+S</b> does not save the FPS file.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5287]</b> ExtractTRP2.exe error on close
+	       	<ul>
+	      		<li>Start <b>ExtractTRP2.exe</b>.
+	      		<li>Close the process from <b>Task Manager</b> and confirm that an 
+			Unexpected exception is not logged.
+	      		<li>Start <b>ExtractTRP2.exe</b> again.
+	      		<li>Run <b>ExtractTRP2.exe /exit</b> from the command line.
+	      		<li>Confirm that <b>ExtractTRP2.exe</b> exits without an exception.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5289, #5290]</b> Improper Paste in FAM
+	       	<ul>
+			<li>Configure a list of multiple conditions.
+			<li>Confirm that a task object <b>cannot</b> be pasted into the list.
+			<li>Confirm that a skip condition <b>cannot</b> be pasted into the list 
+			of tasks on the Processing Setup tab.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5302]</b> Logging FAM Stop time
+	       	<ul>
+	      		<li>Start processing for an FPS file with only <b>Display real-time 
+			status</b> active.
+	      		<li>Stop processing.
+	      		<li>Confirm that both the start time and the stop time are logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5307]</b> Recognizing text in the Image Viewer
+	       	<ul>
+	      		<li>Open an image in the Image Viewer.
+	      		<li>Select a highlight tool.
+	      		<li>Select <b>Recognize text and process to OCR a rectangular area</b>.
+	      		<li>Click on the image after the OCR results appear.
+	      		<li>Click OK in the OCR results.
+	      		<li>Confirm that the OCR results close and that no exception is logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5309]</b> Check for new components
+	       	<ul>
+	      		<li>Exercise <b>Tools - Check for new components</b> from the FAM.
+	      		<li>Confirm that no exception is logged.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5310]</b> Page Summary report
+	       	<ul>
+	      		<li>Exercise an FPS file that is queuing a large number of images.
+	      		<li>Open the <b>FAM DB Admin</b> tool and the Report Viewer while 
+			queuing continues.
+	      		<li>Open the <b>Summary of actions and associated document page counts</b> 
+			report.
+	      		<li>Confirm that the final total matches the totals provided in the table.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5312]</b> Modifying skip conditions
+	       	<ul>
+	      		<li>Exercise an FPS file with a skip condition that is queuing a large 
+			number of images.
+	      		<li>Confirm that the skip condition <b>cannot</b> be modified while 
+			queuing continues.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5313]</b> USS Viewer and empty USS file
+	       	<ul>
+	      		<li>OCR a blank page to create an empty USS file.  Note that it will not 
+			be zero bytes.
+	      		<li>Confirm that <b>File - Properties</b> from the USS Viewer displays 
+			meaningful information.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5316]</b> Locked FAM during Verification
+	       	<ul>
+	      		<li>Exercise <b>Verification</b>.
+	      		<li>Pause the FAM. 
+	      		<li>Confirm that processing can be stopped from the verification UI.
+<p>
+	      		<li>Exercise <b>Verification</b> again.
+	      		<li>Pause the FAM. 
+	      		<li>Confirm that processing can be stopped from the FAM.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

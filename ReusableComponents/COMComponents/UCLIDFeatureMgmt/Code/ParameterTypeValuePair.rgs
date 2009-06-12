@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFeatureMgmt.ParameterTypeValuePair.1 = s 'ParameterTypeValuePair Class'
+	{
+		CLSID = s '{CE733926-BF3D-45E6-B89E-B05B8A70283B}'
+	}
+	UCLIDFeatureMgmt.ParameterTypeValuePair = s 'ParameterTypeValuePair Class'
+	{
+		CLSID = s '{CE733926-BF3D-45E6-B89E-B05B8A70283B}'
+		CurVer = s 'UCLIDFeatureMgmt.ParameterTypeValuePair.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {CE733926-BF3D-45E6-B89E-B05B8A70283B} = s 'ParameterTypeValuePair Class'
+		{
+			ProgID = s 'UCLIDFeatureMgmt.ParameterTypeValuePair.1'
+			VersionIndependentProgID = s 'UCLIDFeatureMgmt.ParameterTypeValuePair'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{691AD683-B1D9-42E1-99B8-3398A794CDB1}'
+		}
+	}
+}

@@ -1,0 +1,147 @@
+// ESFileSuppliers.idl : IDL source for ESFileSuppliers
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ESFileSuppliers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(ABCBED34-5255-4717-A098-B9D9B505DE93),
+	version(1.0),
+	helpstring("ESFileSuppliers 1.0 Type Library")
+]
+
+library EXTRACT_FILESUPPLIERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	importlib("..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\Code\UCLIDFileProcessing.tlb");
+	
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(F1CABB03-1756-4881-BF20-C7CCCAD134FD),
+		dual,
+		nonextensible,
+		helpstring("IStaticFileListFS Interface"),
+		pointer_default(unique)
+	]
+	interface IStaticFileListFS : IDispatch
+	{
+		[propget, id(1), helpstring("property FileList")] HRESULT FileList([out, retval] IVariantVector **pVal);
+		[propput, id(1), helpstring("property FileList")] HRESULT FileList([in] IVariantVector* newVal);
+	};
+	[
+		object,
+		uuid(F81D9A6D-0D04-4268-B558-C00896A81DF7),
+		dual,
+		nonextensible,
+		helpstring("IFolderFS Interface"),
+		pointer_default(unique)
+	]
+	interface IFolderFS : IDispatch
+	{
+		[propget, id(1), helpstring("property FolderName")] HRESULT FolderName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property FolderName")] HRESULT FolderName([in] BSTR newVal);
+		[propget, id(2), helpstring("property FileExtensions")] HRESULT FileExtensions([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property FileExtensions")] HRESULT FileExtensions([in] BSTR newVal);
+		[propget, id(3), helpstring("property RecurseFolders")] HRESULT RecurseFolders([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(3), helpstring("property RecurseFolders")] HRESULT RecurseFolders([in] VARIANT_BOOL bVal);
+		[propget, id(4), helpstring("property AddedFiles")] HRESULT AddedFiles([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(4), helpstring("property AddedFiles")] HRESULT AddedFiles([in] VARIANT_BOOL bVal);
+		[propget, id(5), helpstring("property ModifiedFiles")] HRESULT ModifiedFiles([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(5), helpstring("property ModifiedFiles")] HRESULT ModifiedFiles([in] VARIANT_BOOL bVal);
+		[propget, id(6), helpstring("property TargetOfMoveOrRename")] HRESULT TargetOfMoveOrRename([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(6), helpstring("property TargetOfMoveOrRename")] HRESULT TargetOfMoveOrRename([in] VARIANT_BOOL bVal);
+		[propget, id(7), helpstring("property NoExistingFiles")] HRESULT NoExistingFiles([out, retval] VARIANT_BOOL *pbVal);
+		[propput, id(7), helpstring("property NoExistingFiles")] HRESULT NoExistingFiles([in] VARIANT_BOOL bVal);
+
+	};
+	[
+		object,
+		uuid(029C5C48-FB83-461b-9890-8668766CEDEB),
+		dual,
+		nonextensible,
+		helpstring("IDynamicFileListFS Interface"),
+		pointer_default(unique)
+	]
+	interface IDynamicFileListFS : IDispatch
+	{
+		[propget, id(1), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *strFileName);
+		[propput, id(1), helpstring("property FileName")] HRESULT FileName([in] BSTR strFileName);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(27D4BFD3-4F5B-44ce-B834-ED9FB654D113),
+		helpstring("StaticFileListFS Class")
+	]
+	coclass StaticFileListFS
+	{
+		[default] interface IStaticFileListFS;
+		interface IFileSupplier;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;		
+	};
+	[
+		uuid(948BA86C-E2EB-4199-AAEE-4FE03D89E6F0),
+		helpstring("StaticFileListFSPP Class")
+	]
+	coclass StaticFileListFSPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(D49300B0-78A1-4ACE-B449-EC7D426745C0),
+		helpstring("FolderFS Class")
+	]
+	coclass FolderFS
+	{
+		[default] interface IFolderFS;
+		interface IFileSupplier;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;		
+	};
+	[
+		uuid(0D984170-4F66-4102-B3D2-61EEDBBD3D76),
+		helpstring("FolderFSPP Class")
+	]
+	coclass FolderFSPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(AD2EFC26-A67B-48d7-A069-B0EA5B215E18),
+		helpstring("DynamicFileListFS Class")
+	]
+	coclass DynamicFileListFS
+	{
+		[default] interface IDynamicFileListFS;
+		interface IFileSupplier;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;		
+	};
+	[
+		uuid(576BCB23-B48A-4fea-A33C-1F141AEF108C),
+		helpstring("DynamicFileListFSPP Class")
+	]
+	coclass DynamicFileListFSPP
+	{
+		[default] interface IUnknown;
+	};
+};

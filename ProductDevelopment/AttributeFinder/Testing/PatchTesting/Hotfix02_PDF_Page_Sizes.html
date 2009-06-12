@@ -1,0 +1,76 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 02 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 02 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Old Republic
+   	<LI><b>SCRs:</b> LegacyRCAndUtils #5298
+   	<LI><b>Issue:</b> Chris had locally converted the Old Republic PDF images into TIFs 
+	to allow faster analysis.  Many of the documents included both legal-size and letter-size 
+	pages.  In the converted TIFs, the letter-size pages included a large black area at the 
+	top of the page when displayed in the Image Viewer.  The OCR engine did not see the black 
+	areas so the spatial information for the text did not line up with the displayed image.
+   	<LI><b>Solution:</b> Code was added to Image Format Converter to require rechecking of 
+	page dimensions for each page instead of assuming that all pages had identical dimensions.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Exercise problematic images</b>
+	<ul>
+		<li>Make a local copy of the <b>Old Republic Title\RedactionDemo\Set003</b> 
+		image files.  Use <b>Image Format Converter</b> to convert them from PDF 
+		format to TIF.
+		<li>Open each image file in the Image Viewer.  Confirm that pages of different 
+		size are displayed without black areas.
+		<li>Write basic rules using Extract Lines.  Confirm that spatial information for 
+		OCR'd text is correct for both legal-size and letter-size pages.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Exercise related utilities</b>
+	<ul>
+		<li>TBD.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Sanity Test</b>
+       	<ul>
+  	   	<LI>Operating system: ____________________
+  	   	<LI>Test machine: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+  	   	<LI>Notes: ____________________
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Automated Testing</b>
+       	<ul>
+  	   	<LI>Automated Tests : AFCore.tcl
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Capture Rate Testing</b>
+       	<ul>
+  	   	<LI>Rules delivery date: ____________________
+  	   	<LI>Acceptable capture rate: ____________________
+  	   	<LI>Acceptable ROCE: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,9 @@
+; ArcGISUtils.def : Declares the module parameters.
+
+LIBRARY      "ArcGISUtils.DLL"
+
+EXPORTS
+	DllCanUnloadNow      PRIVATE
+	DllGetClassObject    PRIVATE
+	DllRegisterServer    PRIVATE
+	DllUnregisterServer	 PRIVATE

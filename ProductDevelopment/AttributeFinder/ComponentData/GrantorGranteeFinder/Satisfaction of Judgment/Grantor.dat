@@ -1,0 +1,25 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\acknowledgement of satisfaction of judgment\20049000003700.003.tif.uss
+SOJ_GRANTOR_01=Judgment cr^5~tor]^?Grantor^250~\r\n3.|Full name
+
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\release\20059021675100.tif.uss
+SOJ_GRANTOR_04a=in^3~favor^3~of^3~plaintiff^?Grantor^250~by it^5~agent^250~and against defendant|against defendant
+SOJ_GRANTOR_04=in^3~favor^3~of^3~plaintiff^?Grantor^250~and against defendant|against defendant
+
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\release\20059019894800.tif.uss
+SOJ_GRANTOR_03=claimed by^?Grantor^250~against
+
+SOJ_GRANTOR_05=Judgment creditor^?Grantor^250~hereby release
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\acknowledgement of satisfaction of judgment\20049000948200.003.tif.uss
+SOJ_GRANTOR_02=The undersigned^?Grantor^250~[by]
+[PATTERNS_END]

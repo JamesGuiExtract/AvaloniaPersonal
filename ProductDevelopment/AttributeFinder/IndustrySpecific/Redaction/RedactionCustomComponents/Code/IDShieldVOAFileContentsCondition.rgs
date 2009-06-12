@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.IDShieldVOAFileContentsCondition.1 = s 'IDShieldVOAFileContentsCondition Class'
+	{
+		CLSID = s '{B4105A87-92B7-4CE9-8FAC-BC0026478411}'
+	}
+	RedactionCustomComponents.IDShieldVOAFileContentsCondition = s 'IDShieldVOAFileContentsCondition Class'
+	{
+		CLSID = s '{B4105A87-92B7-4CE9-8FAC-BC0026478411}'
+		CurVer = s 'RedactionCustomComponents.IDShieldVOAFileContentsCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B4105A87-92B7-4CE9-8FAC-BC0026478411} = s 'IDShieldVOAFileContentsCondition Class'
+		{
+			ProgID = s 'RedactionCustomComponents.IDShieldVOAFileContentsCondition.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.IDShieldVOAFileContentsCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

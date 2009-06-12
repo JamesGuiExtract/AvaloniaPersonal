@@ -1,0 +1,106 @@
+<html>
+
+<HEAD>
+<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Value Finders - Block Finder<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+    <h2><b>Block Finder Rule</b></h2>
+    <ul>
+      <li>&quot;<b>Configure</b>&quot; button displays &quot;<b>Configure Block
+        Finder Rule</b>&quot; dialog</li>
+      <li>&quot;<b>Blocks are separated by</b>&quot; radio button works
+        <ul>
+          <li>Related edit and check boxes are activated when radio button is
+            selected</li>
+          <li>&quot;<b>Blocks are separated by</b>&quot; edit box is editable
+          </li>
+          <li>&quot;<b>If no block separator is found, assume that the entire
+            input text is one block</b>&quot; check box is checkable
+          </li>
+		  <li>Verify that the balloon help is working</li>
+        </ul>
+      </li>
+      <li>&quot;<b>Blocks are defined between</b>&quot; radio button works
+        <ul>
+          <li>Related edit and check boxes are activated when radio button is
+            selected</li>
+          <li>&quot;<b>Begin:</b>&quot; edit box is editable</li>
+          <li>&quot;<b>End:</b>&quot; edit box is editable</li>
+          <li>&quot;<b>Pair beginning and ending strings</b>&quot; check box is
+            checkable
+          </li>
+        </ul>
+      </li>
+      <li>&quot;<b>Find all blocks</b>&quot; radio button is selectable</li>
+      <li>&quot;<b>Find blocks containing at least</b>&quot; radio button is
+        selectable
+        <ul>
+		<li>Verify that the balloon help is working</li>
+          <li>Related list box, edit boxes, check boxes, and &quot;<b>Add</b>&quot;
+            button become active when selected</li>
+          <li>&quot;____ <b>of the clue(s) defined below</b>&quot; edit box is
+            editable
+            <ul>
+		<li>Edit box is populated with &quot;<b>1</b>&quot; by default.</li>
+              <li>Input is limited to numbers</li>
+              <li>&quot;<b>Minimum number of clues must be greater than zero</b>&quot;
+                error message is displayed when &quot;0&quot; or nothing is
+                entered</li>
+            </ul>
+          </li>
+          <li>&quot;<b>Add</b>&quot; button displays &quot;<b>Text</b>&quot;
+            dialog
+            <ul>
+              <li>&quot;<b>Specify the text</b>&quot; edit box is editable</li>
+              <li>Changes are persistent</li>
+            </ul>
+          </li>
+          <li>Selecting an existing list box item activates &quot;<b>Remove</b>&quot;
+            and &quot;<b>Modify</b>&quot; buttons</li>
+          <li>&quot;<b>Remove</b>&quot; button displays &quot;<b>Confirm Delete</b>&quot;
+            dialog
+        <h3>Confirm Delete Dialog</h3>
+        <ul>
+   		   <li>&quot;<b>YES</b>&quot; button deletes the item and exits dialog</li>
+        </ul>
+        <ul>
+	      	<li>&quot;<b>NO</b>&quot; button ignores delete request and exits dialog<br>
+              <br>
+          </li>
+        </ul>
+          </li>
+          <li>&quot;<b>Modify</b>&quot; button displays pre-populated &quot;<b>Text</b>&quot;
+            dialog
+            <ul>
+              <li>Changes are persistent</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>&quot;<b>Above clues are defined as Regular Expressions</b>&quot;
+        check box is checkable
+      </li>
+      <li>&quot;<b>Get Blocks only if it contains the maximum number of clues
+        defined above</b>&quot; is checkable
+      </li>
+	  <li>Verify that the balloon help is working</li>
+      <li>&quot;<b>Each word can be part of a word in the input text</b>&quot;
+        check box is checkable
+      </li>
+	  <li>Verify that the balloon help is working</li>
+    </ul>
+
+</body>
+
+</html>

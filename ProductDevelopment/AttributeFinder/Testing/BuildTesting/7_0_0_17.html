@@ -1,0 +1,273 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.17 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.17 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3100]</b> Legal Description Splitter
+	       	<ul>
+	      		<li>Create an RSD file using <b>LOT 16, BLOCK 1, CHERRY LEA SUBDIVISION</b> as 
+			input text.  Include a <b>Legal description splitter</b>.
+			<li>Confirm that output attribute includes a <b>CHERRY LEA SUBDIVISION</b> 
+			Subdivision.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3113, #3348]</b> Unwanted toolbar buttons in Image Viewer
+	       	<ul>
+	      		<li>Exercise redaction verification.
+			<li>Confirm that the <b>Edit Highlight Text</b> toolbar button is no 
+			longer visible.
+			<li>Confirm that the <b>Recognize Text and Process</b> toolbar button is no 
+			longer visible.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3219]</b> Redact From XML
+	       	<ul>
+	      		<li>Exercise <b>RedactFromXML.exe</b> for TestImage001.tif from the Redaction Demo.
+			<li>Version 1, 2, and 3 metadata XML files are attached to the SCR.
+			<li>Confirm that the utility correctly creates a redacted image for each of the 
+			metadata formats.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3224, #3342]</b> Support for multiple Verification sessions in metadata
+	       	<ul>
+	      		<li>Confirm that the Verification property page <b>does not</b> include a setting 
+			to specify desired Metadata version.
+			<li>Confirm that Metadata output contains a <b>&lt;IDShieldVerificationSession&gt;</b>
+			node.
+			<li>Re-verify the image 
+			<ul>
+				<li>Confirm that the original session information is still present in 
+				the metadata output.
+				<li>Confirm that a new session information node is still present.
+			</ul>
+<p>
+	      		<li>Confirm that metadata includes a <b>&lt;RedactionTextAndColorSettings&gt;</b>
+			node.
+	      		<li>Confirm that <b>Exemption Code</b> information is included in the metadata.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3226, #3228, #3229, #3232]</b> Exemption codes
+	       	<ul>
+			<li>Confirm that <b>Apply last exemption code</b> works for verification.
+			<li>Confirm that <b>Apply exemption code to all redactions</b> works for verification.
+			<li>Confirm that a confirmation message is displayed if <b>Apply exemption code 
+			to all redactions</b> is asked to overwrite one or more existing exemption codes.
+<p>
+			<li>Confirm that <b>E</b> works as a shortcut for <b>Apply exemption code</b>.
+			<li>Confirm that <b>Ctrl+E</b> works as a shortcut for <b>Apply exemption code 
+			to all redactions</b>.
+			<li>Confirm that <b>L</b> works as a shortcut for <b>Apply last exemption code</b>.
+<p>
+			<li>Review the XLS file attached to #3228.  Confirm that the <b>Code</b>, 
+			<b>Summary</b>, and <b>Description</b> entries are provided in the user interface.
+			<li>Review the XLS file attached to #3229.  Confirm that the <b>Code</b>, 
+			<b>Summary</b>, and <b>Description</b> entries are provided in the user interface.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3251]</b> Configure selection border color
+	       	<ul>
+	      		<li>Confirm that <b>IDShield.ini</b> contains a setting for 
+			<b>SelectionBorderColor</b>.
+	      		<li>Confirm that highlights have a default border color even if <b>IDShield.ini</b> 
+			does not contain a setting for <b>SelectionBorderColor</b>.
+	      		<li>Confirm that <b>SelectionBorderColor</b> can be modified to 0,0,0 to turn the 
+			border color to black.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3325]</b> Copyright dates in About boxes
+	       	<ul>
+	      		<li>Confirm that the copyright text in the <b>Rule Tester</b> About box is correct.
+	      		<li>Confirm that the copyright text in other <b>About boxes</b> is correct.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3326]</b> MICR Finder and rotated checks
+	       	<ul>
+	      		<li>Confirm that the <b>MICR Finder</b> correctly finds appropriate sub-attributes 
+			from rotated check images.
+	      		<li>Confirm that the <b>Check Finder</b> is available as a rule object. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3330]</b> Configure email settings
+	       	<ul>
+	      		<li>Confirm that <b>Configure email settings</b> is available from the Start 
+			menu under the Utilities sub-menu.
+	      		<li>Confirm that <b>Configure email settings</b> displays the appropriate 
+			settings dialog and that the settings are persistent.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3336]</b> VOA Viewer and sub-attributes
+	       	<ul>
+	      		<li>Open a <b>VOA</b> file that contains sub-attributes.
+	      		<li>Append a character to the name of a sub-attribute.
+	      		<li>Confirm that an <b>Invalid Identifier in Attribute Name/Type!</b> 
+			error is not seen.
+<p>
+	      		<li>Open an <b>EAV</b> file that contains sub-attributes.
+	      		<li>Append a character to the name of a sub-attribute.
+	      		<li>Confirm that an <b>Invalid Identifier in Attribute Name/Type!</b> 
+			error is not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3341]</b> Loop Finder error
+	       	<ul>
+	      		<li>Exercise the RSD file and image attached to the SCR.
+	      		<li>Confirm that a <b>GetLastPageNumber() requires spatial or hybrid mode!</b> 
+			error is not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3342]</b> Merging attributes in VOA Viewer
+	       	<ul>
+	      		<li>Confirm that a <b>Merge Attributes</b> button is available in the VOA Viewer.
+      			<li>Confirm that the button is disabled unless multiple attributes are selected.
+      			<li>Confirm that with multiple attributes selected, the only enabled buttons are: 
+			<b>New Attribute</b>, <b>Delete Attribute</b>, <b>Clear Attributes</b> and 
+			<b>Merge Attributes</b>.  Also confirm that the <b>Name</b>, <b>Value</b> and 
+			<b>Type</b> edit boxes are cleared.
+<p>
+	      		<li>Exercise <b>TestImage001.tif</b> from the Redaction Demo.  Merge two of 
+			the attributes, a clue and the associated social security number.
+			<ul>
+		      		<li>Confirm that the merged <b>Name</b> is <b>Clues_HCData</b>.
+		      		<li>Confirm that the merged <b>Value</b> is the concatenation of the 
+				two text strings.
+		      		<li>Confirm that the merged <b>Type</b> remains <b>SSN</b>.
+		      		<li>Select the merged attribute and confirm that the entire text 
+				is highlighted.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3352]</b> New highlight colors for verification
+	       	<ul>
+	      		<li>Exercise redaction rules on an image or images that contain <b>HCData</b>, 
+			<b>MCData</b>, <b>LCData</b> and <b>Clues</b>.  Also add a manual redaction.
+	      		<li>Step through each item during verification.
+			<ul>
+		      		<li>Confirm that the highlight color for <b>HCData</b> is <b>bright green</b>.
+		      		<li>Confirm that the highlight color for <b>MCData</b> is <b>gold</b>.
+		      		<li>Confirm that the highlight color for <b>LCData</b> is <b>pink</b>.
+		      		<li>Confirm that the highlight color for <b>Clues</b> is <b>medium gray</b>.
+		      		<li>Confirm that the highlight color for <b>Man</b> is <b>dark green</b>.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3356]</b> Image Viewer shortcut in ID Shield
+	       	<ul>
+	      		<li>Confirm that the Start menu shortcut is <b>Image Viewer</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #3716]</b> Output PDF image size
+	       	<ul>
+	      		<li>Redact some TIF images saving the results as PDFs.
+	      		<li>Confirm that the output PDFs are approximately the same size (in bytes) as the 
+			input image.  Smaller file size is also acceptable.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5149]</b> Name of image window
+	       	<ul>
+	      		<li>Confirm that the <b>Spot Recognition Window</b> has been renamed to 
+			<b>Extract Image Viewer</b>.
+	      		<li>Confirm that the <b>Start menu</b> shortcut is labeled properly. 
+	      		<li>Confirm that the <b>window caption</b> is correct. 
+	      		<li>Confirm that <b>tooltips</b> are correct in the <b>Rule Tester</b> and 
+			the <b>VOA Viewer</b> applications.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5162]</b> Folder file supplier crash
+	       	<ul>
+	      		<li>Run <b>Auto-redact.fps</b> from the Redaction Demo.
+	      		<li>Pause processing.
+	      		<li>Click on <b>Pause</b> again to resume processing.
+	      		<li>Confirm that the <b>File Action Manager</b> successfully resumes processing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5163]</b> USB License Key Manager crash
+	       	<ul>
+	      		<li>Open <b>USB License Key Manager</b>.
+	      		<li>Switch from <b>Local machine</b> to <b>Remote machine</b> or vice versa.
+	      		<li>Click the <b>Refresh</b> button.
+	      		<li>Confirm that no errors are seen.
+	      		<li>Restore the original machine setting.
+	      		<li>Click the <b>Refresh</b> button.
+	      		<li>Confirm that no errors are seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5171, #5172, #5175, #5176, #5177, #5182]</b> Report Viewer command-line setting for email
+	       	<ul>
+	      		<li>Exercise functionality of emailing reports via the <b>/mailto</b> 
+			and related command-line options.
+	      		<li>Confirm that providing just a report name works instead of providing 
+			a fully-qualified path.
+	      		<li>Confirm that emails are received.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5179]</b> Convert FAM Database
+	       	<ul>
+	      		<li>Confirm that the label for the target database references version 7.0.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5188]</b> Write-caching error with Add Watermark
+	       	<ul>
+	      		<li>Confirm that the second memory leak test for <b>Add Watermark</b> runs 
+			without write-caching errors.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

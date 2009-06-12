@@ -1,0 +1,1 @@
+(?:parcel|appraiser's|property)[\s\S]{0,3}(?:(identification|id|(i\.?.?d\.?))[\s\S]{0,3})?(?:\(folio\)[\s\S]{0,3})?(?:account[\S\s]{0,3})?(?:Number|no\.?|#):?\s*(?:portion\s*of\s*d\.?\s*p\.?\s*#?\s*)?(\d{4}-\d{2}-\d{4}[\s,]{0,3})+

@@ -1,0 +1,23 @@
+HKCR
+{
+	RedactionCustomComponents.SSNFinderPP.1 = s 'SSNFinderPP Class'
+	{
+		CLSID = s '{209B4D3D-9706-4295-86A1-3E130B2FA0AF}'
+	}
+	RedactionCustomComponents.SSNFinderPP = s 'SSNFinderPP Class'
+	{
+		CLSID = s '{209B4D3D-9706-4295-86A1-3E130B2FA0AF}'
+		CurVer = s 'RedactionCustomComponents.SSNFinderPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {209B4D3D-9706-4295-86A1-3E130B2FA0AF} = s 'SSNFinderPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

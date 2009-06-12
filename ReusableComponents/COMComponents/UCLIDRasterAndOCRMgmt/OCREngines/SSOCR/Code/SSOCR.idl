@@ -1,0 +1,59 @@
+// SSOCR.idl : IDL source for SSOCR.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SSOCR.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(C0F50AC4-62B2-4D15-A26F-404FEC1D58B2),
+	version(1.0),
+	helpstring("UCLID SSOCR 1.0 Type Library")
+]
+library UCLID_SSOCRLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(01604DB3-BD44-4ef6-BD66-4A62CCC73D58), 
+		helpstring("UCLID OCR Page Range Types")
+	]
+    enum
+	{
+		kOCRNothing = 0,
+		kOCRAll = 1,
+        kOCRSpecifiedPages = 2
+    } EOCRPageRangeType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(F478BBED-AB3C-4C7A-822B-B5A0F3A54D3C),
+		helpstring("ScansoftOCR Class")
+	]
+	coclass ScansoftOCR
+	{
+		[default] interface IOCREngine;
+		interface ILicensedComponent;
+		interface IPrivateLicensedComponent;
+	};
+};

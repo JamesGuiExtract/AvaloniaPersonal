@@ -1,0 +1,26 @@
+HKCR
+{
+	SpatialStringSearcherTest.SpatialStringSearcherTester.1 = s 'SpatialStringSearcherTester Class'
+	{
+		CLSID = s '{0A0747A2-5124-4773-A6E4-C76AA478CA12}'
+	}
+	SpatialStringSearcherTest.SpatialStringSearcherTester = s 'SpatialStringSearcherTester Class'
+	{
+		CLSID = s '{0A0747A2-5124-4773-A6E4-C76AA478CA12}'
+		CurVer = s 'SpatialStringSearcherTest.SpatialStringSearcherTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0A0747A2-5124-4773-A6E4-C76AA478CA12} = s 'SpatialStringSearcherTester Class'
+		{
+			ProgID = s 'SpatialStringSearcherTest.SpatialStringSearcherTester.1'
+			VersionIndependentProgID = s 'SpatialStringSearcherTest.SpatialStringSearcherTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{567BE36B-1A97-475E-862E-B521FAF122F3}'
+		}
+	}
+}

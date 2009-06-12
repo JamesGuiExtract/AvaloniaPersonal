@@ -1,0 +1,103 @@
+// HighlightedTextIR.idl : IDL source for HighlightedTextIR.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (HighlightedTextIR.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(940DE945-DA5B-4B16-A11C-125AD3894F1D),
+	version(1.0),
+	helpstring("UCLID HighlightedTextIR 1.0 Type Library")
+]
+library UCLID_HIGHLIGHTEDTEXTIRLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\IFCore\Code\IFCore.tlb");
+	importlib("..\InputFinders\Code\InputFinders.tlb");
+
+	[
+		object,
+		uuid(C0513A76-238A-49b2-95E3-063BE4B11CC9),
+		dual,
+		helpstring("UCLID IHighlightedTextWindow Interface"),
+		pointer_default(unique)
+	]
+	interface IHTIRTextProcessor : IDispatch
+	{
+		[id(1), helpstring("method IsTPEnabled")] HRESULT IsTPEnabled([out, retval] VARIANT_BOOL *pbEnabled);
+		[id(2), helpstring("method GetTPDescription")] HRESULT GetTPDescription([out, retval] BSTR *pstrDescription);
+		[id(3), helpstring("method ProcessText")] HRESULT ProcessText([in] BSTR strText);
+	};
+
+	[
+		object,
+		uuid(EF6198EA-E9ED-477A-A255-A5F1937FA87A),
+		dual,
+		helpstring("UCLID IHighlightedTextWindow Interface"),
+		pointer_default(unique)
+	]
+	interface IHighlightedTextWindow : IDispatch
+	{
+		[id(1), helpstring("method Open")] HRESULT Open([in] BSTR strFilename);
+		[id(2), helpstring("method SaveAs")] HRESULT SaveAs([in] BSTR strFilename);
+		[id(3), helpstring("method Clear")] HRESULT Clear();
+		[id(4), helpstring("method SetText")] HRESULT SetText([in] BSTR strText);
+		[id(5), helpstring("method SetInputFinder")] HRESULT SetInputFinder([in] BSTR strName);
+		[id(6), helpstring("method IsModified")] HRESULT IsModified([out, retval] VARIANT_BOOL *pbIsModified);
+		[id(7), helpstring("method GetFileName")] HRESULT GetFileName([out, retval] BSTR *pstrFileName);
+		[id(8), helpstring("method GetInputFinderName")] HRESULT GetInputFinderName([out, retval] BSTR *pstrName);
+		[id(9), helpstring("method GetText")] HRESULT GetText([out, retval] BSTR *pstrText);
+		[id(10), helpstring("method Save")] HRESULT Save();
+		[id(11), helpstring("method SetIndirectSource")] HRESULT SetIndirectSource(BSTR strIndirectSourceName);
+		[id(12), helpstring("method ShowOpenDialogBox")] HRESULT ShowOpenDialogBox();
+		[id(13), helpstring("method AddInputFinder")] HRESULT AddInputFinder([in] BSTR strInputFinderName, [in] IInputFinder* pInputFinder);
+		[id(14), helpstring("method SetTextProcessors")] HRESULT SetTextProcessors([in] IIUnknownVector *pvecTextProcessors);
+		[id(15), helpstring("method ClearTextProcessors")] HRESULT ClearTextProcessors();
+	};
+	[
+		object,
+		uuid(6ADA4380-2346-47AF-A4E7-B284CB9F4D57),
+		dual,
+		helpstring("IHTIRUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IHTIRUtils : IDispatch
+	{
+		// Whether or not there's only one text window with a file open
+		// Return the file name only if there's exactly one text window with that file open,
+		// return empty string otherwise (eg. multiple text windows open, none text window
+		// open, or one text window open with no file open, etc.)
+		[id(1), helpstring("method IsExactlyOneTextFileOpen")] HRESULT IsExactlyOneTextFileOpen(
+									[in] IInputManager* pInputMgr, 
+									[in, out] VARIANT_BOOL* pbExactOneFileOpen,
+									[in, out] BSTR* pstrCurrentOpenFileName,	// If true, what's the name for the file
+									[in, out] IHighlightedTextWindow **pHTIR);	// If true, what's the text window
+	};
+	[
+		uuid(839523B4-F053-4651-B4EB-4382E46E2226),
+		helpstring("UCLID HighlightedTextWindow Class")
+	]
+	coclass HighlightedTextWindow
+	{
+		[default] interface IHighlightedTextWindow;
+		interface IInputReceiver;
+		interface IInputEntityManager;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+	};
+	[
+		uuid(035A5675-0976-40E0-B232-C35210C1A5EB),
+		helpstring("HTIRUtils Class")
+	]
+	coclass HTIRUtils
+	{
+		[default] interface IHTIRUtils;
+		interface ILicensedComponent;
+	};
+};

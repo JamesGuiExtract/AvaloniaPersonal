@@ -1,0 +1,23 @@
+HKCR
+{
+	AFCore.ConditionalRulePP.1 = s 'ConditionalRulePP Class'
+	{
+		CLSID = s '{D8938C93-36E0-4980-AA6D-0296CFBB2B16}'
+	}
+	AFCore.ConditionalRulePP = s 'ConditionalRulePP Class'
+	{
+		CLSID = s '{D8938C93-36E0-4980-AA6D-0296CFBB2B16}'
+		CurVer = s 'AFCore.ConditionalRulePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D8938C93-36E0-4980-AA6D-0296CFBB2B16} = s 'ConditionalRulePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

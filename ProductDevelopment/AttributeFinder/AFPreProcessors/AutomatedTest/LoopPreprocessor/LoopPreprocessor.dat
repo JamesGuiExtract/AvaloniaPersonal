@@ -1,0 +1,37 @@
+// Tests 1 & 2: Document type condition, multiple preprocessors, Image1
+
+// Test1: While loop
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Test2: Do loop
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test2.eav
+
+// Tests 3 & 4: Finding rule condition, multiple preprocessors
+
+// Test3: While loop, Image1
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// Test4: Do loop, Image2
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test4.eav
+
+// Test5: For loop, Image1. Same as Tests 3 & 4 but no condition
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// Tests 6 & 7: Finding rule condition, multiple preprocessors
+
+// Test6: While loop, Image2
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test6.eav
+
+// Test7: Do loop, Image1
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// Test8: For loop, Image2. Same as Tests 6 & 7 except no condition.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test8.eav
+
+// Tests 9 & 10: RSD file condition, locate image region preprocessor
+
+// Test9: While loop, Image1
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// Test10: Do loop, Image2
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test10.eav

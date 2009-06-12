@@ -1,0 +1,32 @@
+//*********************************************************************************
+// TestTestPreProcessords.dat
+// 		This file contains File test cases that point to the dat files for running individual test
+//		cases for PreProcessors
+//*********************************************************************************
+
+// Test AdvancedReplaceString PreProcessor
+<FILE>;..\AdvancedReplaceString\AdvancedReplaceString.dat
+
+// Test ConditionalPreprocessor PreProcessor
+<FILE>;..\ConditionalPreprocessor\ConditionalPreprocessor.dat
+
+// Test LocateImageRegion PreProcessor
+<FILE>;..\LocateImageRegion\LocateImageRegion.dat
+
+// Test LoopPreprocessor
+<FILE>;..\LoopPreprocessor\LoopPreprocessor.dat
+
+// Test RemoveSpatialInfo PreProcessor
+<FILE>;..\RemoveSpatialInfo\TestRemoveSpatialInfo.dat
+
+// Test ReplaceStrings PreProcessor
+<FILE>;..\ReplaceStrings\ReplaceStrings.dat
+
+// Test SelectPageRegion PreProcessor
+<FILE>;..\SelectPageRegion\TestSelectPageRegion.dat
+
+// TestSelectMultipleDocumentPreprocessors PreProcessor
+<FILE>;..\SelectMultipleDocumentPreprocessors\TestSelectMultipleDocumentPreprocessors.dat
+
+// Test DocumentClassifier PreProcessor
+<FILE>;..\DocumentClassifier\TestDocumentClassifier.dat

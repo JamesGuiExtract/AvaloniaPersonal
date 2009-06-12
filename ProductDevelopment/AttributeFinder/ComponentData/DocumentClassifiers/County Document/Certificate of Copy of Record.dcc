@@ -1,0 +1,51 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,COCOR_SURE_01,false
+		01=^CERTIFICATE\s*OF\s*COPY\s*OF\s*RECORD\s*(?:\r?$)
+		
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,COCOR_SURE_02,TRUE
+
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.4,1,2
+	OR_BEGIN,COCOR_PROBABLE_01,TRUE
+		
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

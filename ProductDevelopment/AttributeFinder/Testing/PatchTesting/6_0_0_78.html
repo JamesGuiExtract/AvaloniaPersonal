@@ -1,0 +1,320 @@
+<HTML>
+
+<HEAD>
+<TITLE>Customer Rule Writing Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield Version 6.0.0.78<br>Customer Rule Writing Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Installation</h3>
+       	<ul>
+  	   	<LI><b>ID Shield Rule Writing</b> - requires previous installation of <b>ID Shield</b>
+	       	<ul>
+	      		<li>Confirm that an error message is displayed during <b>RDT_IDShieldCustomer</b> 					installation if ID Shield was not previously installed.</li>
+	      		<li>Confirm successful RDT_IDShieldCustomer installation after <b>ID Shield</b>
+			installation.</li>
+	       	</ul>
+<p>
+  	   	<LI>TODO: <b>FLEX Index Rule Writing</b> - requires previous installation of 
+		<b>FLEX Index</b>
+	       	<ul>
+	      		<li>Confirm that an error message is displayed during <b>RDT_FLEXIndexCustomer</b> 					installation if FLEX Index was not previously installed.</li>
+	      		<li>Confirm successful RDT_FLEXIndexCustomer installation after <b>FLEX Index</b>
+			installation.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>Start Menu</b>
+	       	<ul>
+	      		<li>Confirm that the following items are displayed on the Customer RDT 
+			start menu.
+		       	<ul>
+		          	<li>Rule Set Editor</li>
+		          	<li>Test Harness</li>
+		       	</ul>
+<p>
+	      		<li>Confirm that the following items are <b>NOT</b> displayed on the Customer 
+			RDT start menu.
+		       	<ul>
+		          	<li>Automated Tests</li>
+		          	<li>FLEX Index UI Help</li>
+		          	<li>FLEX Index SDK Help</li>
+		          	<li>Image Cleanup Settings Editor</li>
+		          	<li>Index Converter</li>
+		          	<li>RDT Config</li>
+		       	</ul>
+<p>
+	      		<li>Confirm that the following items are installed but <b>NOT</b> displayed 
+			on the Customer RDT start menu.
+		       	<ul>
+		          	<li>EncryptFile.exe</li>
+		          	<li>LogProcessStats.exe</li>
+		          	<li>ModifyVOA.exe</li>
+		       	</ul>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Licensing</h3>
+       	<ul>
+  	   	<LI>Create license files.
+	       	<ul>
+	  	   	<LI>Create a <b>full RDT</b> license file.
+  		   	<LI>Create a <b>FLEX Index Rule Writing</b> license file using 
+			<b>Simple Rules</b> passwords.
+  	   		<LI>Create an <b>ID Shield Rule Writing</b> license file using 
+			<b>Simple Rules</b> passwords.
+<p>
+	  	   	<LI>Note that subsequent test cases should have only <b>one</b> 
+			active license file.  The other files should be renamed so that 
+			they are not loaded.
+	       	</ul>
+<p>
+  	   	<LI>RDT rules cannot be viewed.
+	       	<ul>
+	  	   	<LI>With the <b>full RDT</b> license file, create an Indexing RSD file 
+			using a non-simple rule object like <b>Locate Image Region</b>.  Include 
+			use of the <b>Indexing</b> counter.
+	      		<li>Using only the <b>FLEX Index Rule Writing</b> license file, 
+			confirm that the Rule Set Editor displays an error message 
+			and does not open the above RSD file.</li>
+<p>
+	  	   	<LI>With the <b>full RDT</b> license file, create a Redaction RSD file 
+			using a non-simple rule object like <b>Locate Image Region</b>.  Include 
+			use of the <b>Redaction by Pages</b> counter.
+	      		<li>Using only the <b>ID Shield Rule Writing</b> license file, 
+			confirm that the Rule Set Editor displays an error message 
+			and does not open the above RSD file.</li>
+	       	</ul>
+<p>
+  	   	<LI>FLEX Index and ID Shield rules are <b>not</b> compatible.
+	       	<ul>
+	      		<li>With the <b>FLEX Index Rule Writing</b> license file, 
+			create an RSD file using one or more simple rule objects.</li>
+	      		<li>Confirm that the <b>Indexing</b> counter is enabled.</li>
+	      		<li>Using only the <b>ID Shield Rule Writing</b> license file, 
+			confirm that the Rule Set Editor will not open the above RSD file 
+			without error.</li>
+<p>
+	      		<li>With the <b>ID Shield Rule Writing</b> license file, 
+			create an RSD file using one or more simple rule objects.</li>
+	      		<li>Confirm that the <b>Redaction by Pages</b> counter is enabled.</li>
+	      		<li>Using only the <b>FLEX Index Rule Writing</b> license file, 
+			confirm that the Rule Set Editor will not open the above RSD file 
+			without error.</li>
+	       	</ul>
+<p>
+  	   	<LI>Simple Rule Writing compatible with Master rules
+	       	<ul>
+	      		<li>Enable both the <b>FLEX Index Rule Writing</b> license 
+			file with Simple Rules passwords and the <b>FLEX Index Server</b> 
+			license file using Default passwords.</li>
+	      		<li>Confirm that the <b>County.rsd.etf</b> rules from the <b>Flex 
+			Data Entry</b> demo work to process the associated demo images.</li>
+	      		<li>Confirm that the Rule Set Editor will run but will not 
+			provide access to the <b>Grantor-Grantee Finder Ver. 2</b> value 
+			finder.</li>
+<p>
+	      		<li>Confirm that the <b>Master.rsd.etf</b> rules from the <b>Redaction 
+			Demo</b> work to process the associated demo images.</li>
+	      		<li>Confirm that the Rule Set Editor will run but will not 
+			provide access to the <b>Find from RSD</b> value finder.</li>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Rule Objects</h3>
+       	<ul>
+      		<li>Open the Rule Set Editor and <b>Check for New Components</b>.</li>
+      		<li>Confirm that the following rule objects are available.  Items not listed 
+		should <b>not</b> be available.</li>
+<p>
+      		<li><b>Document Preprocessors</b></li>
+	       	<ul>
+	      		<li>Advanced replace string</li>
+	      		<li>Remove spatial information</li>
+	      		<li>Replace strings</li>
+	      		<li>Select multiple document preprocessors</li>
+	       	</ul>
+<p>
+      		<li><b>Value Finders</b></li>
+	       	<ul>
+	      		<li>Create value</li>
+	      		<li>Extract lines</li>
+	      		<li>Regular expression rule</li>
+	      		<li>Value after clue rule</li>
+	      		<li>Value before clue rule</li>
+	      		<li>Value from list</li>
+	       	</ul>
+<p>
+      		<li><b>Value Modifiers</b></li>
+	       	<ul>
+	      		<li>Advanced replace string</li>
+	      		<li>Change case</li>
+	      		<li>Regular expression rule</li>
+	      		<li>Remove characters</li>
+	      		<li>Remove spatial information</li>
+	      		<li>Replace strings</li>
+	      		<li>Translate to closest value in list</li>
+	       	</ul>
+<p>
+      		<li><b>Input Validators</b></li>
+	       	<ul>
+	      		<li>Regular expression rule</li>
+	      		<li>Value from list</li>
+	       	</ul>
+<p>
+      		<li><b>Attribute Splitters</b></li>
+	       	<ul>
+	      		<li>Split attributes using tokens</li>
+	       	</ul>
+<p>
+      		<li><b>Output Handlers</b></li>
+	       	<ul>
+	      		<li>Change case</li>
+	      		<li>Modify attributes</li>
+	      		<li>Move and modify attributes</li>
+	      		<li>Output data to VOA file</li>
+	      		<li>Output data to XML file</li>
+	      		<li>Remove characters</li>
+	      		<li>Remove invalid entries</li>
+	      		<li>Remove spatial information</li>
+	      		<li>Replace strings</li>
+	      		<li>Run object on query</li>
+	      		<li>Select multiple output handlers</li>
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<li><h3>USB Key Requirements</h3></li>
+	<UL>
+  	   	<LI>The following tests should use <b>only</b> the specified license file.  Other license 
+		files should be renamed so that they cannot be loaded.
+<p>
+  	   	<LI><b>Full RDT License</b>
+	       	<ul>
+	      		<li>Confirm that the following USB counter choices are available on the 
+			<b>Properties</b> dialog.</li>
+		       	<ul>
+		      		<li>FLEX Index - Indexing.</li>
+		      		<li>FLEX Index - Pagination.</li>
+		      		<li>ID Shield - Redaction (By Page).</li>
+		      		<li>ID Shield - Redaction (By Document).</li>
+		       	</ul>
+<p>
+	      		<li>Confirm that a rule set can be saved without specifying a USB key.</li>
+	      		<li>Save a simple RSD file using the <b>Indexing</b> counter.</li>
+	      		<li>Save a simple RSD file using the <b>Pagination</b> counter.</li>
+	      		<li>Save a simple RSD file using the <b>Redaction (By Page)</b> counter.</li>
+	      		<li>Save a simple RSD file using the <b>Redaction (By Document)</b> counter.</li>
+<p>
+	      		<li>Save a simple RSD file using the <b>Indexing</b> counter with the 
+			internal use only flag.</li>
+	      		<li>Save a simple RSD file using the <b>Redaction (By Page)</b> counter 
+			with the internal use only flag.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>ID Shield Rule Writing License</b>
+	       	<ul>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Indexing</b> counter RSD file created above.</li>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Pagination</b> counter RSD file created above.</li>
+	      		<li>Confirm that the <b>Redaction (By Page)</b> counter RSD file 
+			created above opens without error and has the appropriate USB 
+			counter checked on the Properties dialog.</li>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Redaction (By Document)</b> counter RSD file created above.</li>
+<p>
+	      		<li>Open the RSD file using the <b>Redaction (By Page)</b> counter 
+			and the internal use only flag.</li>
+	      		<li>Confirm that the RSD file opens without error and has the internal
+			use only flag both checked and disabled.</li>
+	      		<li>Modify the RSD file, save it with a new name and close the Rule Set 
+			Editor.</li>
+			<li>Open the new RSD file and confirm that the modifications were saved and 
+			that the internal use only flag remains both checked and disabled.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>FLEX Index Rule Writing License</b>
+	       	<ul>
+	      		<li>Confirm that the <b>Indexding</b> counter RSD file 
+			created above opens without error and has the appropriate USB 
+			counter checked on the Properties dialog.</li>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Pagination</b> counter RSD file created above.</li>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Redaction (By Page)</b> counter RSD file created above.</li>
+	      		<li>Confirm that an error message is displayed when trying to open 
+			the <b>Redaction (By Document)</b> counter RSD file created above.</li>
+<p>
+	      		<li>Open the RSD file using the <b>Indexing</b> counter 
+			and the internal use only flag.</li>
+	      		<li>Confirm that the RSD file opens without error and has the internal
+			use only flag both checked and disabled.</li>
+	      		<li>Modify the RSD file, save it with a new name and close the Rule Set 
+			Editor.</li>
+			<li>Open the new RSD file and confirm that the modifications were saved and 
+			that the internal use only flag remains both checked and disabled.</li>
+	       	</ul>
+       	</ul>
+    	</LI>
+<p>
+	<li><h3>Test Harness</h3></li>
+	<UL>
+  	   	<LI><b>FLEX Index Rule Writing</b>
+	       	<ul>
+	      		<li>Create a simple TCL file that exercises the automated tests for 
+			<b>Split using tokens</b>.</li>
+	      		<li>Make local modifications to the automated test's <b>RSD</b> files 
+			to include the <b>Indexing</b> counter.</li>
+	      		<li>Confirm that the <b>Test Harness</b> successfully executes the tests.</li>
+	      		<li>Confirm that the <b>Test Harness</b> displays a licensing-related 
+			error message when trying to execute the <b>Redaction Tester</b> tests 
+			developed for the ID Shield Rule Writer training.</li>
+	       	</ul>
+<p>
+  	   	<LI><b>ID Shield Rule Writing</b>
+	       	<ul>
+	      		<li>Confirm that the <b>Test Harness</b> successfully executes the 
+			<b>Redaction Tester</b> tests developed for the ID Shield Rule 
+			Writer training.</li>
+	      		<li>Confirm that the <b>Test Harness</b> displays a licensing-related 
+			error message when trying to execute the <b>Split using tokens</b> tests 
+			created above.</li>
+	       	</ul>
+       	</ul>
+    	</LI>
+<p>
+	<li><h3>Training Materials</h3></li>
+	<UL>
+      		<li>Master CD Contents</li>
+	       	<ul>
+	      		<li>Confirm that the <b>ID Shield</b> folder is included on the 
+			Master CD.</li>
+	      		<li>Confirm that the <b>RDT_IDShieldCustomer</b> folder is included on the 
+			Master CD.</li>
+	      		<li>Confirm that the <b>RedactionDemo</b> folder is included on the 
+			Master CD.</li>
+	      		<li>Confirm that the <b>Training</b> folder is included on the 
+			Master CD.</li>
+	      		<li>Confirm that each <b>RSD</b> file referenced in the training checklists is 
+			included on the Master CD.</li>
+	      		<li>Confirm that each <b>TXT</b> file referenced in the training checklists is 
+			included on the Master CD.</li>
+	       	</ul>
+<p>
+      		<li>Confirm that each <b>RSD</b> file referenced in the training checklists can 
+		be opened successfully with an appropriate <b>Customer Rule Writing</b> license 
+		file.</li>
+      		<li>Confirm that each <b>image</b> file referenced in the training checklists is 
+		included in the RedactionDemo or in an appropriate Files folder on the Master CD.</li>
+       	</ul>
+    	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,5 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Warranty Deed
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\BARGAIN and SALE DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\WARRANTY DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

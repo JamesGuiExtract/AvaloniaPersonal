@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.EntityKeywords.1 = s 'EntityKeywords Class'
+	{
+		CLSID = s '{E18C9BC2-69EA-4D0E-888B-02655278FC07}'
+	}
+	UCLIDAFUtils.EntityKeywords = s 'EntityKeywords Class'
+	{
+		CLSID = s '{E18C9BC2-69EA-4D0E-888B-02655278FC07}'
+		CurVer = s 'UCLIDAFUtils.EntityKeywords.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E18C9BC2-69EA-4D0E-888B-02655278FC07} = s 'EntityKeywords Class'
+		{
+			ProgID = s 'UCLIDAFUtils.EntityKeywords.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.EntityKeywords'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{AC966E48-1A26-40C7-B61E-AC4C09C9D565}'
+		}
+	}
+}

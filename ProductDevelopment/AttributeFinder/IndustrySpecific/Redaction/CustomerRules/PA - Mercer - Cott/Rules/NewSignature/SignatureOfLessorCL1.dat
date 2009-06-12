@@ -1,0 +1,1 @@
+SOCIAL.{0,3}SEC|(?:SOC|OCI|CIA|IAL).{0,9}SEC(?=UR)|(?:SOC|OCI|CIA|IAL).{0,9}(?:S.{0,3}|.{0,2}EC)(?=URITY)

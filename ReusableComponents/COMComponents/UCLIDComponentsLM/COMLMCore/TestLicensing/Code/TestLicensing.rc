@@ -1,0 +1,205 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\TestLicensing.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\TestLicensing.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TESTLICENSING_DIALOG DIALOGEX 0, 0, 300, 215
+STYLE DS_MODALFRAME | WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "UCLID Licensing Test"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON      "Test Write",ID_BTN_TEST_WRITE,176,194,60,14
+    PUSHBUTTON      "Cancel",IDCANCEL,243,194,50,14
+    LTEXT           "User Name:",IDC_STATIC,7,39,97,12
+    LTEXT           "Computer Name:",IDC_STATIC,7,56,97,12
+    LTEXT           "L1 read / write test:",IDC_STATIC,7,73,97,12
+    LTEXT           "L2 read / write test:",IDC_STATIC,7,90,97,12
+    LTEXT           "C1 read / write test:",IDC_STATIC,7,124,97,12
+    LTEXT           "C2 read / write test:",IDC_STATIC,7,158,97,12
+    EDITTEXT        IDC_EDIT_USER,120,39,173,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_COMPUTER,120,56,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_FILE,120,73,173,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_KEY,120,90,173,12,ES_AUTOHSCROLL | ES_READONLY
+    EDITTEXT        IDC_EDIT_COUNT,120,124,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    EDITTEXT        IDC_EDIT_CODE,120,158,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    PUSHBUTTON      "Test Presence",ID_BTN_TEST_PRESENCE,42,194,60,14
+    PUSHBUTTON      "Test Read",ID_BTN_TEST_READ,109,194,60,14
+    LTEXT           "C1 value:",IDC_STATIC,7,107,97,12
+    EDITTEXT        IDC_EDIT_COUNT_VALUE,120,107,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "C2 values found:",IDC_STATIC,7,141,97,12
+    EDITTEXT        IDC_EDIT_COUNT_FOUND,120,141,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    LTEXT           "Summary:",IDC_STATIC,7,175,97,12
+    EDITTEXT        IDC_EDIT_SUMMARY,120,175,173,12,ES_AUTOHSCROLL | 
+                    ES_READONLY
+    GROUPBOX        "Version",IDC_STATIC,120,7,173,25
+    CONTROL         "Version 1",IDC_RADIO_V1,"Button",BS_AUTORADIOBUTTON,161,
+                    17,55,10
+    CONTROL         "Version 2",IDC_RADIO_V2,"Button",BS_AUTORADIOBUTTON,224,
+                    17,55,10
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "TestLicensing MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "TestLicensing\0"
+            VALUE "LegalCopyright", "Copyright (C) 2004\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "TestLicensing.EXE\0"
+            VALUE "ProductName", "TestLicensing Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_TESTLICENSING_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 208
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\TestLicensing.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,144 @@
+// SSOCR2.idl : IDL source for SSOCR2.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SSOCR2.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+[
+	uuid(20ED8F87-8A6C-400B-9C41-A6810ECBA3AE),
+	version(1.0),
+	helpstring("SSOCR2 1.0 Type Library")
+]
+library UCLID_SSOCR2Lib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(6128AFAA-06E9-42dd-A9BA-B6989036EA78),
+		helpstring("PageDecompositionMethod")
+	]
+    enum
+	{
+		kAutoDecomposition = 0,
+        kLegacyDecomposition = 1,
+		kStandardDecomposition = 2
+    } EPageDecompositionMethod;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(527FFCBA-6985-43F7-91A7-F96FAE706D69),
+		dual,
+		helpstring("IScansoftOCRInternals Interface"),
+		pointer_default(unique)
+	]
+	interface IScansoftOCR2 : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Recognizes text in the specified zone of the specified pages of the specified
+		// filename. Returns the spatial string as a BSTR stream containing only the specified
+		// filter characters. Has the capacity to detect handwriting.
+		// PARAMS:  bstrFileName - name of image file to recognize, may be relative or absolute.
+		//          ipPageNumbers - a variant vector containing the 1-based page numbers of the 
+		//            image in which to recognize text.
+		//          pZone - the rectangular area in which to recognize text, defined using a 
+		//            top-left coordinate system prior to the application of any rotation.
+		//          lRotationInDegrees - the rotation to apply to the specified image before 
+		//            recognizing text.
+		//          eFilter - the set of filter options apply. only the set of characters selected
+		//            will be returned in pStream.
+		//          bstrCustomFilterCharacters - the set of characters to recognize. this value is
+		//            ignored if kCustomFilter is disabled in eFilter.
+		//			eTradeOff - The trade off between accuracy and speed:
+		//            (1) kAccurate - Most accurate, but slowest
+		//            (2) kBalanced - Compromise between accuracy and speed
+		//            (3) kFast - Fastest, but least accurate
+		//            (4) kRegistry - Use the trade off setting specified in the registry
+		//          vbDetectHandwriting - detects handwritten text if VARIANT_TRUE, otherwise detects 
+		//            printed text.
+		//          vbReturnUnrecognized -
+		//            (1) VARIANT_TRUE - returns characters which are identified by the OCR engine but
+		//              which the OCR engine is unable to correspond with a character from the filter
+		//              character set. The value of the unrecognized character is defined in OCRConstants.h.
+		//            (2) VARIANT_FALSE - returns only recognized characters.
+		//          vbReturnSpatialInfo - returns a spatial string if VARIANT_TRUE, returns a 
+		//            non-spatial spatial string if VARIANT_FALSE.
+		//          vbUpdateProgressStatus - updates progress status if VARIANT_TRUE, otherwise it
+		//            does not. May be slightly faster if VARIANT_FALSE.
+		//          eDecompMethod - decomposition method to use when locating zones automatically.
+		//            This is only used if pZone != NULL or if vbDetectHandwriting == VARIANT_TRUE.
+		// PROMISE: Returns the text as a spatial string in a BSTR stream.
+		[id(1), helpstring("method RecognizeText")] HRESULT RecognizeText([in] BSTR bstrImageFileName, 
+			[in] IVariantVector* pPageNumbers, [in] ILongRectangle* pZone, [in] long lRotationInDegrees,
+			[in] EFilterCharacters eFilter,	[in] BSTR bstrCustomFilterCharacters, 
+			[in] EOcrTradeOff eTradeOff, [in] VARIANT_BOOL vbDetectHandwriting, 
+			[in] VARIANT_BOOL vbReturnUnrecognized, [in] VARIANT_BOOL vbReturnSpatialInfo, 
+			[in] VARIANT_BOOL vbUpdateProgressStatus, [in] EPageDecompositionMethod eDecompMethod, 
+			[out, retval] BSTR* pStream);
+		//-----------------------------------------------------------------------------------------
+		[id(2), helpstring("method GetPID")] HRESULT GetPID([out, retval] long* pPID);
+		[id(5), helpstring("method SupportsTrainingFiles")] HRESULT SupportsTrainingFiles([out, retval] VARIANT_BOOL *pbValue);
+		[id(6), helpstring("method LoadTrainingFile")] HRESULT LoadTrainingFile([in] BSTR strTrainingFileName);	
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Checks the registry to see whether to perform a third recognition pass.
+		// PROMISE: Calls the ScansoftOCRCfg object to check whether the registry option is set.
+		//          Returns VARIANT_FALSE if the option is turned off, VARIANT_TRUE otherwise.
+		[id(7), helpstring("method WillPerformThirdRecognitionPass")] HRESULT WillPerformThirdRecognitionPass(
+			[out, retval] VARIANT_BOOL *vbWillPerformThirdRecognitionPass);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets specified process ID, percentage complete, page index, and page number to
+		//          match those of the currently executing OCR process.
+		// REQUIRE: All parameters must be non-NULL.
+		// PROMISE: Sets the parameters based on the last results from the RecAPI progress monitor
+		//          callback function.
+		// ARGS:    plProcessID is a number of the current OCR process, corresponding to an element 
+		//            of RecAPI's tagPROCESSID enum.
+		//          plPercentComplete is the percentage the current RecAPI process is complete.
+		//          plPageIndex is the index of the currently OCRing page in an array of the pages
+		//            being OCRed.
+		//          plPageNumber is the page number of currently OCRing page, appropriate for
+		//            display to the user.
+		// EXAMPLE: Say SSOCR2 is processing pages 2, 4, and 7 of a document. If the OCR is halfway
+		//          through the second recognition pass on page 4, GetProgress will set:
+		//          (1) plProcessID = PID_RECOGNITION2
+		//          (2) plPercentComplete = 50
+		//          (3) plPageIndex = 1
+		//          (4) plPageNumber = 4
+		[id(8), helpstring("method GetProgress")] HRESULT GetProgress([out] long* plProcessID, 
+			[out] long* plPercentComplete, [out] long* plPageIndex, [out] long* plPageNumber);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns the default primary decomposition method as it is set in the registry.
+		// PROMISE: Calls the ScansoftOCRCfg object to return the corresponding registry key value.
+		[id(9), helpstring("method GetPrimaryDecompositionMethod")] HRESULT GetPrimaryDecompositionMethod(
+			[out, retval] EPageDecompositionMethod *ePrimaryDecompositionMethod);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(AE7DB7D9-6DE4-4F60-9DEE-71CB6CBB1892),
+		helpstring("ScansoftOCR2 Class")
+	]
+	coclass ScansoftOCR2
+	{
+		[default] interface IScansoftOCR2;
+		interface ILicensedComponent;
+		interface IPrivateLicensedComponent;
+	};
+};

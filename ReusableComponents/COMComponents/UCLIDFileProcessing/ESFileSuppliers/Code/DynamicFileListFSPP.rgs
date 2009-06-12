@@ -1,0 +1,23 @@
+HKCR
+{
+	ESFileSuppliers.DynamicFileListFSPP.1 = s 'DynamicFileListFSPP Class'
+	{
+		CLSID = s '{576BCB23-B48A-4fea-A33C-1F141AEF108C}'
+	}
+	ESFileSuppliers.DynamicFileListFSPP = s 'DynamicFileListFSPP Class'
+	{
+		CLSID = s '{576BCB23-B48A-4fea-A33C-1F141AEF108C}'
+		CurVer = s 'ESFileSuppliers.DynamicFileListFSPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {576BCB23-B48A-4fea-A33C-1F141AEF108C} = s 'DynamicFileListFSPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

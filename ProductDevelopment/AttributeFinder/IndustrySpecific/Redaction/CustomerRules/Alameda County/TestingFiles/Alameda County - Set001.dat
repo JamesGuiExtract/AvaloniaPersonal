@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Notice of State Tax Lien|Notice of Federal Tax Lien|Release of State Tax Lien|Release of Federal Tax Lien|Discharge from Active Duty|Certificate of Death|Affidavit of Death|Abstract of Judgment
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+<SETTING>;CreateTestOutputVOAFiles=1
+<SETTING>;OutputAttributeNamesFileLists=1
+ 
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\Alameda County\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsNat\$FileOf(<SourceDocName>).voa

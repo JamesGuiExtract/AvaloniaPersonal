@@ -1,0 +1,16 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000032100.002.uss
+//SHOULD BE SPATIAL RULE
+NOC_TENANTGRANTOR_01=names addresses^?TenantGrantor^250~work of improvement
+
+[PATTERNS_END]

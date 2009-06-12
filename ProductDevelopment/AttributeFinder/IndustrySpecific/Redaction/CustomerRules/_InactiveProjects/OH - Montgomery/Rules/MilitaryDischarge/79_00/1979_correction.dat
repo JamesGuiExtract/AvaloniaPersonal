@@ -1,0 +1,6 @@
+[VARS_BEGIN]
+hc_clues=4. mailing|4 mailing|5. original|5 original|7. typed|7 typed
+[VARS_END]
+[PATTERNS_BEGIN]
+rule1=?HC_1979_correction^@hc_clues
+[PATTERNS_END]

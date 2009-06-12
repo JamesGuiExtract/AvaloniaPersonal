@@ -1,0 +1,42 @@
+<HTML>
+	<HEAD>
+		<TITLE>Translate Values or Types</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Translate Values or Types Output Handler</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Translate Values or Types output handler is used to change an attribute’s value or type.
+				<ul>
+					<li>For example, you can change an attribute's type from <i>SocialSecurityNumber</i> to <i>SSN</i>.</li>
+					<li>You could change the value of an attribute from <i>0</i> to <i>None</i>.</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>First you must choose weather you want to translate values or types.
+			<li>Next, you must specify what text you want to replace and what you want to replace it with.
+				<ul>
+					<li>You can make multiple translations in a single output handler.</li>
+					<li>The <b>Add</b>, <b>Remove</b>, and <b>Modify</b> buttons can be used to add, delete, and modify translation pairs.</li>
+					<li>The translation pairs can be made case sensitive.</li>
+				</ul>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>Translate.rsd</b> and run it on <b>Translate.txt</b>.
+				<ul>
+					<li>Add a Translate Values or Types output handler to the existing Select Multiple Output Handlers output handler and configure it to change the types <i>DLN</i> and <i>SSN</i> to <i>SensitiveNumber</i>.</li>
+					<li>Run the rules again and notice the difference in output.</li>
+					<li>Add another Translate Values or Types output handler that changes the value <i>$0</i> to <i>No Money Owed</i>.</li>
+					<li>Run the rules again and notice the difference in output.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

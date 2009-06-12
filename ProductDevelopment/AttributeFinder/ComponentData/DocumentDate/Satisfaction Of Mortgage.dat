@@ -1,0 +1,64 @@
+// *******
+// Imports
+// *******
+
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA6Y.TIF.uss
+SM_DOCDATE_07=\r\n\r\nOn^?DocumentDate^50~before me
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA0F.TIF.uss
+SM_DOCDATE_01=\r\n\r\nDated this^?DocumentDate^35~\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA6D.TIF.uss
+SM_DOCDATE_06=\r\n\r\ndated^?DocumentDate^50~recorded
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA0V.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA4D.TIF.uss
+SM_DOCDATE_02=\r\n\r\nExecuted on^?DocumentDate^50~\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA1C.TIF.uss
+SM_DOCDATE_03=signed^30~this^?DocumentDate^35~\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA5V.TIF.uss
+SM_DOCDATE_04=on^2~this| |the^?DocumentDate^40~before me
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS\B04288AAA6D.TIF.uss
+SM_DOCDATE_05=before me this^?DocumentDate^40~[by]|\r\n
+
+SM_DOCDATE_09=executed^as of the^?DocumentDate^50~\r\n\r\n
+
+SM_DOCDATE_10=mortgage this^?DocumentDate^50~legal description
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS\B04314AAAMK.TIF.uss
+SM_DOCDATE_11=IN TESTIMONY WHEREOF^100~this day of^?DocumentDate^\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS\B04317AABFE.TIF.uss
+SM_DOCDATE_15=acknowledged before me^2~this|[on]^?DocumentDate^40~[by]|\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS\B04315AAAMP.TIF.uss
+SM_DOCDATE_12=SATISFIED and DISCHARGED^\r\nDated^?DocumentDate^Mortgage|\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS\B04317AAAVX.TIF.uss
+SM_DOCDATE_13=has been paid in full^5~\r\n\r\nDated^?DocumentDate^40~\r\n\r\n
+
+SM_DOCDATE_16=\r\n\r\nDate:^?DocumentDate^50~\r\n
+
+// K:\Common\Engineering\Sample Files\Trimin\MN - Scott\Set003\Images\SATISFACTION OF MORTGAGE\A731722.tif.uss
+SM_DOCDATE_17=affixed^2~this|[on]^?DocumentDate^40~\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\Trimin\MN - Scott\Set003\Images\SATISFACTION OF MORTGAGE\A731495.tif.uss 
+SM_DOCDATE_18=corporate^2~seal^5~on|this|the^?DocumentDate
+
+[PATTERNS_END]

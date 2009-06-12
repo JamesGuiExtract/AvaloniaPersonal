@@ -1,0 +1,1 @@
+(?:soc|cial)[\s\S]{0,10}(?:secu|urity)(?:[\s\S]{0,15}(?:num|ber))?[\s\S]{0,25}(?:decla|clared)[\s\S]{0,10}[BE]

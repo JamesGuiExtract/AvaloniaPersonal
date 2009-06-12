@@ -1,0 +1,42 @@
+[CharsAlwaysEnabled]
+0123456789.
+
+[InputTypes]
+Distance
+
+[Choices]
+01|Feet|Fet
+02|Foot|Fot
+03|Ft|Ft
+04|' (Apostrophe -- Feet symbol)|'
+05|Inches|Inches
+06|Inch|Inch
+07|In|In
+08|" (Quote -- Inches symbol)|"
+09|Miles|Miles
+10|Mile|Mile
+11|Yards|Yards
+12|Yard|Yard
+13|Yds|Yds
+14|Yd|Yd
+15|Meters|Metrs
+16|Meter|Metr
+17|M|M
+18|Centimeters|Centimrs
+19|Centimeter|Centimr
+20|Cm|Cm
+21|Kilometers|Kilometrs
+22|Kilometer|Kilometr
+23|Km|Km
+24|Chains|Chains
+25|Chain|Chain
+26|Ch|Ch
+27|Rods|Rods
+28|Rod|Rod
+29|Rd|Rd
+30|R|R
+31|. (Period symbol)|.
+32|Links|Links
+33|Link|Link
+34|Lks|Lks
+35|L|L

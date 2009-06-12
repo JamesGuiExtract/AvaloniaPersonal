@@ -1,0 +1,17 @@
+\r\nVOLUNTARY\s*DISMISSAL\r\n
+|
+files\s*this\s*its\s*Notice\s*of\s*Voluntary\s*Dismissal
+|
+\r\n(?:(?:notice|release)\s*of)?\s*lis\s*pendens\r\n
+|
+\r\nnotice\s*of\s*voluntary\s*dismissal\r\n
+|
+\r\norder\s*of\s*summary\s*administration\r\n
+|
+\r\n(?:Petition\s*to\s*Spread\s*Will\s*of\s*Record|PETITION\s*FOR\s*PROBATE\s*OF\s*WILL\s*(?:WITHOUT\s*ADMINISTRATION)?)\r\n
+| 
+\r\nORDER\s*DETERMINING\s*HOMESTEAD\s*STATUS\s*OF\s*REAL\s*PROPERTY\r\n
+| 
+probate\s*division[\s\S]+\r\nletters\s*of\s*administration\r\n
+| 
+probate\s*division[\s\S]+\r\nORDER\s*FOR\s*AUTHORIZATION\s*TO\s*SELL\s*REAL\s*PROPERTY\r\n

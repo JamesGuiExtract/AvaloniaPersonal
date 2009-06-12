@@ -1,0 +1,11 @@
+12-345
+Parcel ID samples
+invalid: 12-34
+1234-
+2345
+
+valid: 1234-2345   abc 2345-3456 bbb1234-34566667 
+1122-3344-
+
+Legal Text
+Commencing at the East Quarter corner of Section 26, Town 8 North, Range 5 East, Town of Arena, said point also being the point of beginning of the following description: thence Westerly along the South line of the Southeast quarter of the Northeast quarter of Section 26, 100 feet; thence North 1112 feet, more or less, to a point in the Southeast quarter of the Northeast quarter of Section 26; thence East 447.92 feet; thence South 6 degrees 18 minutes 07 seconds East, 260.00 feet; thence South 87 degrees 53 minutes 51 seconds West, 231.79 feet; thence South  72 degrees 39 minutes 57 seconds West 151.68 feet to a point in the East line of the Southeast quarter of the Northeast quarter of Section 26; thence South 00 degrees 00 minutes 07 seconds West along the said line 264.23 feet; thence South 61 degrees 08 minutes 11 seconds East 242.67 feet; thence South 0 degrees 56 minutes 27 seconds West, 419.65 feet to the South line of the Southwest quarter of the Northwest quarter of Section 25; thence North 89 degrees 38 minutes 11 seconds West along said line 205.66 feet to the point of beginning.  

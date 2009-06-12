@@ -1,0 +1,61 @@
+// RegExprIV.idl : IDL source for RegExprIV.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (RegExprIV.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(98469F15-E4D9-4050-94B5-D47F3DAD5F46),
+	version(1.0),
+	helpstring("UCLID RegExprIV 1.0 Type Library")
+]
+library UCLID_REGEXPRIVLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\IFCore\Code\IFCore.tlb");
+
+	[
+		object,
+		uuid(1C481BA2-6314-4E18-BB5C-D1C3874B67F2),
+		dual,
+		helpstring("IRegExprInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IRegExprInputValidator : IDispatch
+	{
+		[propget, id(1), helpstring("property Pattern")] HRESULT Pattern([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Pattern")] HRESULT Pattern([in] BSTR newVal);
+		[propget, id(2), helpstring("property IgnoreCase")] HRESULT IgnoreCase([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IgnoreCase")] HRESULT IgnoreCase([in] VARIANT_BOOL newVal);
+		[id(3), helpstring("method SetInputType")] HRESULT SetInputType([in] BSTR strInputTypeName);
+		[id(4), helpstring("method GetInputType")] HRESULT GetInputType([out, retval] BSTR* strInputTypeName);
+	};
+
+	[
+		uuid(85CE6BB7-07AB-47D6-BE8E-13FB5FAB542D),
+		helpstring("RegExprInputValidator Class")
+	]
+	coclass RegExprInputValidator
+	{
+		[default] interface IRegExprInputValidator;
+		interface IInputValidator;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(7CD4803D-1A63-4D6D-B827-7EBF27CFA342),
+		helpstring("RegExprIVPP Class")
+	]
+	coclass RegExprIVPP
+	{
+		interface IUnknown;
+	};
+};

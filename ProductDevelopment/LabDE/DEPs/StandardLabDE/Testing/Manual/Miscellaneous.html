@@ -1,0 +1,177 @@
+<HTML>
+
+<HEAD>
+<TITLE>Standard LabDE Miscellaneous Test Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>Miscellaneous Test Checklist<br>
+<IMG src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Scrolling</h3>
+	<ul>
+		<LI><b>[DataEntry #146]</b> Scrolling and table activation
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Resize the DEP such that the table of test names is not completely 
+			visible.
+			<LI>Select a <b>Component Name</b> cell.
+			<LI>Confirm that the table does not automatically scroll into view.
+		</ul>
+		<LI><b>[DataEntry #200]</b> Scroll to top for new document
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Scroll to the bottom of the DEP.
+			<LI>Select and modify a <b>Flag</b> entry.
+			<LI>Open another document without saving changes. 
+			<LI>Confirm that the DEP automatically scrolls back to the top of the DEP.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Data Entry</h3>
+	<ul>
+		<LI><b>[DataEntry #256]</b> Typing into empty table cell
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Comment</b> cell in one of the the <b>Component</b> rows.
+			<LI>Type some text into the cell.
+			<LI>Confirm that the text is accepted and that <b>Unable to draw image</b> 
+			exceptions are not seen.
+		</ul>
+<p>
+		<LI><b>[DataEntry #257]</b> Navigation after Enter key
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select one of the the <b>Component</b> cells.
+			<LI>Type some text into the cell and then the <b>Enter</b> key.
+			<LI>Confirm that the next selected cell is the first cell in the next row.
+		</ul>
+<p>
+		<LI><b>[DataEntry #267, #275]</b> Home, End, Shift+Space when editing a text box
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Double-click the <b>Patient Information - Name</b> field.
+			<LI>Confirm that the entire contents of the text box are selected for editing.
+			<LI>Type <b>Home</b>.
+			<LI>Confirm that the edit cursor moves to the beginning of the text.
+			<LI>Type <b>End</b>.
+			<LI>Confirm that the edit cursor moves to the end of the text.
+			<LI>Modify the text of the edit box.
+			<LI>Type <b>Shift+Space</b>.
+			<LI>Confirm that a space was added to the edited text without selecting 
+			the entire contents.
+		</ul>
+<p>
+		<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Laboratory Name</b> field.
+			<LI>Carefully swipe <b>Community Memorial</b>.
+			<LI>Confirm that newline characters are replaced by spaces in the swiped text.
+		</ul>
+<p>
+		<LI><b>[DataEntry #274]</b> Tooltips and editing text
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Confirm that the appropriate tooltip is displayed.
+			<LI>Modify the text of the edit box.
+			<LI>Confirm that the tooltip changes with the edits.
+			<LI>Accept the changes and move to another cell.
+			<LI>Confirm that the <b>Name</b> tooltip is removed.
+		</ul>
+<p>
+		<LI><b>[DataEntry #277]</b> Unexpected exception for go to next unviewed
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Result Date</b> for the first Completed Test.
+			<LI>Swipe in a new <b>Result Date</b>.
+			<LI>Type the <b>F10</b> key to ghighlight all attributes.
+			<LI>Select a different <b>Completed Test</b>.
+			<LI>Type <b>Alt+G</b> and select the highlight for the previously 
+			swiped <b>Result Date</b>.
+			<LI>Confirm that the date is accepted and no exception is displayed.
+		</ul>
+<p>
+		<LI><b>[DataEntry #278]</b> Tab loop after swiping
+		<ul>
+			<LI>Open image <b>004.tif</b> from Demo_LabDE.
+			<LI>Select the first <b>Completed Test</b>.
+			<LI>Select the <b>Result Date</b> field.
+			<LI>Swipe a different date from the image.
+			<LI>Click the <b>Tab</b> key to step through elements of the selected test.
+			<LI>Confirm that after viewing all entries in the Completed Test, the 
+			next Completed Test is selected and subsequent Tabs move through its fields.
+		</ul>
+<p>
+		<LI><b>[DataEntry #295]</b> Ctrl+A in a text box
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Type <b>Ctrl+A</b>.
+			<LI>Confirm that the entire contents of the text box are selected.
+		</ul>
+<p>
+		<LI><b>[DataEntry #306]</b> CAPS LOCK ignored
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select a field.
+			<LI>Turn on CAPS LOCK. 
+			<LI>Type some characters.
+			<LI>Confirm that all typed characters are entered in upper case.
+		</ul>
+<p>
+		<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Carbon Dioxide</b> component name field.
+			<LI>Confirm that original OCR confidence includes some red background. 
+			<LI>Reswipe the text.
+			<LI>Confirm that the new text also includes some red characters.
+		</ul>
+<p>
+		<LI><b>[DataEntry #353]</b> Focus jumping to Result Status
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
+			<LI>Confirm that each and every <b>Tab</b> is handled correctly 
+			by advancing to the next appropriate field.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Navigation</h3>
+	<ul>
+		<LI><b>[DataEntry #255]</b> Tab loop after swiping
+		<ul>
+			<LI>Open image <b>004.tif</b> from Demo_LabDE.
+			<LI>Select the <b>HEMATOLOGY</b> test.
+			<LI>Click the <b>Tab</b> key to step through elements of the selected test.
+			<LI>Confirm that after selection of the <b>Comment</b> cell in the 
+			<b>RDW</b> test, Tab advances to the Component Name cell in the empty row.
+		</ul>
+<p>
+		<LI><b>[DataEntry #263]</b> Tab navigation skips tables with no data
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select and delete the entire <b>Physician</b> row.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Click the <b>Tab</b> key to step through different cells.
+			<LI>Confirm that even though no Physicians are available, the empty row 
+			can be selected.
+			<LI>Select and delete every <b>Component</b> row for the Completed Test.
+			<LI>Click the <b>Tab</b> key to step through different cells.
+			<LI>Confirm that even though no Components are available, the empty row 
+			can be selected.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>TBD</h3>
+	<ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

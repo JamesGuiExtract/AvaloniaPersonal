@@ -1,0 +1,54 @@
+<HTML>
+
+<HEAD>
+<TITLE>Convert FAM DB Utility - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Convert FAM DB Utility<br>
+<IMG src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<ol>
+  	<li><h2>Database Setup</h2></li>
+  	<ul>
+    		<li>Get a local copy of <b>ID_Shield.bak</b> from I:\Common\Testing\Product Testing\FLEX_Index\5_0_Database.</li>
+    		<li>Create a 5.0 database named <b>ID_Shield</b> using <b>SQL Server Management 
+		Studio</b>.</li>
+    		<li>Restore the database from the above backup file.  Note that you must select 
+		<b>Overwrite existing database</b> from the Restore options.</li>
+  	</ul>
+<p>
+  	<li><h2>Basic Operation and Error Conditions</h2></li>
+  	<ul>
+    		<li><b>[LegacyRCAndUtils #4901, #5277]</b> Confirm that <b>ConvertFAMDB</b> requires 
+		a license file (else error message displayed at startup).</li>
+    		<li><b>[LegacyRCAndUtils #4798]</b> Confirm that the application uses a non-MFC icon.</li>
+<p>
+    		<li>Confirm that an error message is displayed if only an input Server is defined.</li>
+    		<li>Confirm that an error message is displayed if a non-existent input database 
+		is defined.</li>
+    		<li>Confirm that an error message is displayed if the defined input database is 
+		not from 5.0.</li>
+<p>
+    		<li>Confirm that the output <b>Server</b> defaults to the selected input Server.</li>
+    		<li>Confirm that the output <b>Database</b> defaults to the selected input Database 
+		with an appended <b>_7_0</b>.</li>
+<p>
+    		<li>Confirm that clicking <b>Close</b> exits without converting the database.</li>
+    		<li>Confirm that clicking <b>Start</b> displays a confirmation dialog that 
+		presents a benchmark conversion time for a large database.</li>
+	  	<ul>
+	    		<li>Confirm that clicking <b>No</b> returns to the main window.</li>
+	    		<li>Confirm that clicking <b>Yes</b> converts the database.</li>
+	    		<li>Confirm that a success message is presented after the conversion 
+			has finished.</li>
+	  	</ul>
+  	</ul>
+</ol>
+</body>
+
+</html>

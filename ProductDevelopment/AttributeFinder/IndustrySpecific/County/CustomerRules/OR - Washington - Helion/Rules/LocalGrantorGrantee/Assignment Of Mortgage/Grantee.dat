@@ -1,0 +1,197 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+InFavorOf=to and in favor of|in favor of|to the order of|[to]
+
+GrantsKeyword=[grant]|[grants]|[granted]|[assign]|[assigns]|[assigned]|[transfer]|[transfers]|[transferred]|[sell]|[sells]|[sold]|[bargain]|[bargains]|[bargained]|[convey]|[conveys]|[conveyed]|[deliver]|[delivers]|[delivered]|set over|sets over
+
+UntoKeyword=[unto:|[to:|[unto :|[to :|[unto]|[t0]|[to]
+
+OriginMortgagor=Name of Original Mortgagor|Name of Original Mortgagor ( s )|Original Mortgagor
+
+MadeAndExecuted=made and executed by|executed by|made and executed|made by|executed
+
+Present=present|presence
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110507.tif.uss
+ASM_GRANTEE_01=assignment of mortgage^50~between^\r\nand\r\n^?Grantee^\r\n\r\n^400~mail to
+
+// 0002.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106760.tif.uss
+ASM_GRANTEE_02=paid by^?Grantee^hereinafter^50~Assignee
+
+// 0003.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106810.tif.uss
+ASM_GRANTEE_03=consideration^in hand paid by^?Grantee^@-NonTP
+
+// 0004.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132475.tif.uss
+// 0005.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110523.tif.uss
+ASM_GRANTEE_04=party^10~first part^paid by|received from^?Grantee^party^10~second part
+
+// <FIX>Needs Spatial Rule;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\Images\ASSIGNMT\2003133216.tif.uss
+// 0006.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110390.tif.uss
+ASM_GRANTEE_05=Assignee:^?Grantee^300~\r\n\r\n
+
+// 0007.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00008419.tif.uss
+ASM_GRANTEE_06=Assignee:^?Grantee^250~Assignee's mailing address
+
+// 0008.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016433.tif.uss
+ASM_GRANTEE_07=conveys^100~[unto]|[unt0]|[to]|[t0]^?Grantee^250~its successors|the above described
+
+// 0009.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04289aaakb.tif.uss
+ASM_GRANTEE_17=paid to the assignor by^?Grantee^250~assignee
+
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Random10000Subset\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2007-024336.tif
+ASM_GRANTEE_09a=assigns and transfers to^?TRGrantee^200~as Trustee^180~under that certain
+// 0010.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000244300.001.tif.uss
+ASM_GRANTEE_09=assigns and transfers to^?Grantee^250~under that certain
+
+// 0011.tif;k:\common\engineering\sample files\waukesha\set003\images\assignment of mortgage\002955.tif.uss
+ASM_GRANTEE_10=transfer and set unto^?Grantee^250~party of the second part
+
+// 0012.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04313aaaba.tif.uss
+ASM_GRANTEE_11=transfers unto^250~whose address is^?Grantee^all its rights
+
+// 0013.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000159.tif.uss
+ASM_GRANTEE_12=for value received^hereby assigns to^?Grantee^executed to
+
+// 0014.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000472.tif.uss
+ASM_GRANTEE_13=assignor^10~valuable consideration^assigns to^?Grantee^the mortgage
+
+// 0015.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132715.tif.uss
+ASM_GRANTEE_14=valuable consideration^assigns to^?Grantee^@-NonTP
+
+// 0016.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00008152.tif.uss
+ASM_GRANTEE_15=Assignor desires to assign^50~Documents to^?Grantee^250~hereinafter^20~Assignee
+
+// 0017.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04313aaadl.tif.uss
+ASM_GRANTEE_16=\r\nAssignee^?Grantee^250~\r\nexecuted by
+
+// 
+ASM_GRANTEE_5000=Assignor^100~assigns and transfers to^?TRGrantee^250~as Trustee
+
+// 0018.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04292aaa0t.tif.uss
+ASM_GRANTEE_5020=herein^5~Assignor^150~transfer and convey^5~[unto]^?Grantee^250~a certain^5~Deed of Trust|Mortgage
+
+// 0019.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00006842.tif.uss
+// 0020.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00006841.tif.uss
+// 0049.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059021997100.tif.uss
+ASM_GRANTEE_18=Assignor^500~[to]|[t0]^?Grantee^250~"Assignee"|(assignee)
+
+// 0021.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110359.tif.uss
+ASM_GRANTEE_19=ASSIGNEE^?Grantee^250~does hereby sell^100~Assignee
+
+// 0022.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110613.tif.uss
+ASM_GRANTEE_21=assigned to^?Grantee^250~assignee
+
+// 0023.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106972.tif.uss
+ASM_GRANTEE_22=assignor^paid by^?Grantee^amount|assignee
+
+ASM_GRANTEE_23=paid by^20~assignee^?Grantee^@-NonTP
+
+// 0024.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110438.tif.uss
+ASM_GRANTEE_24=consideration^paid^5~[by]^?Grantee^@GrantsKeyword
+
+ASM_GRANTEE_25a=assigns and transfer^5~[unto]|[unt0]|[to]|[t0]^?Grantee^160~as trustee^160~all beneficial interest|all the rights|all its rights
+// 0025.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000337.tif.uss
+// 0026.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000537.tif.uss
+// 0027.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00108334.tif.uss
+// NOTE: the "consideration" starts this rule so that the words like "TRANSFERS AND ASSIGNS" that may be in the title of the document do not match the first use of the GrantsKeyword
+// 0051.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000536.tif.uss
+// 0028.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110417.tif.uss
+//ASM_GRANTEE_08=consideration|value received^@GrantsKeyword^10~@GrantsKeyword^50~@UntoKeyword^?Grantee^250~@-NonTP
+
+// 0029.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109108.tif.uss
+// 0030.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aaac7.tif.uss
+ASM_GRANTEE_25=assigns and transfer^5~[unto]|[unt0]|[to]|[t0]^?Grantee^all beneficial interest|all the rights|all its rights
+
+// 0031.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04292aaarx.tif.uss
+ASM_GRANTEE_26a=transfer^5~[unto]|[unt0]|[to]|[t0]^?TRGrantee^250~as trustee^60~all beneficial interest|all the rights|all its rights|executed by
+ASM_GRANTEE_26=transfer^5~[unto]|[unt0]|[to]|[t0]^?Grantee^250~all beneficial interest|all the rights|all its rights|executed by
+
+// 0032.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106434.tif.uss
+ASM_GRANTEE_27=transfer and^20~set over|convey^10~[unto|[unt0|[to]|[t0]^?Grantee^250~whose address|a corporation
+
+// 
+ASM_GRANTEE_28a=consideration assigns to^?TRGrantee^as trustee^120~the Mortgage executed by
+ASM_GRANTEE_28=consideration assigns to^?Rantee^the Mortgage executed by
+
+// 0033.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132570.tif.uss
+ASM_GRANTEE_29=due or to become due thereon to^?Grantee^250~Assignee
+
+// 0052.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016487.tif.uss
+ASM_GRANTEE_30=following assignee^5~"Assignee"^?Grantee^300~all of its right^10~title
+
+// 0034.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00008542.tif.uss
+ASM_GRANTEE_31=hereby assigns^40~secured thereby to:^?Grantee^300~Witness my hand
+
+// 0035.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015948.tif.uss
+// 0036.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00013783.tif.uss
+ASM_GRANTEE_32=TRANSFEREE^?Grantee^250~Transferee^4~Mailing Address
+
+// 0037.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015391.tif.uss
+ASM_GRANTEE_33=Holder of the Note and Lien assigns^60~warranty^4~[unto]|[unt0]|[to]|[t0]^?Grantee^350~when the context requires
+
+// <FIX>Doc Classification Issue;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT\00015181.tif.uss
+ASM_GRANTEE_34=assigned and do hereby assign to^?Grantee^300~all of our undivided interest
+
+// 0038.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016354.tif.uss
+ASM_GRANTEE_35=evidenced to^?Grantee^\r\n(ii)
+
+// 0039.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aabm5.tif.uss
+ASM_GRANTEE_36=due thereon to^?Grantee^250~said mortgage is
+
+// 0040.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04293aaaye.tif.uss
+ASM_GRANTEE_37=assigns and transfers to:^400~REGISTER OF DEEDS\r\n^?Grantee^its successors
+
+// 0041.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04314aaaxx.tif.uss
+ASM_GRANTEE_38=in consideration of a loan made to^?Grantee^250~borrower
+
+// 0042.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04317aaa1c.tif.uss
+ASM_GRANTEE_39=assigns^5~as of^50~[to]^?Grantee^250~assignee
+
+// 0043.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000046400.001.tif.uss
+ASM_GRANTEE_40=set over^20~[unto]^?Grantee^250~the Deed of Trust|assignee
+
+// 0053.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000214400.001.tif.uss
+ASM_GRANTEE_41=assigns to^?Grantee^250~all right
+
+// 0044.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00014268.tif.uss
+// 0045.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04293aaajl.tif.uss
+// 0054.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272935.tif.uss
+ASM_GRANTEE_42=@GrantsKeyword^10~@UntoKeyword^?Grantee^300~whose address is|its successors and assigns|the described mortgage
+
+// 0060.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AST\B04288AAA2V.TIF.uss
+// 0046.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000918.tif.uss
+ASM_GRANTEE_20=assignor^5~)^?Grantee^250~assignee^5~)
+//Sample moved above previous
+//ASM_GRANTEE_20A=assignor^5~)^?Grantee^250~(^15~herein^24~assignee^5~)
+
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Random10000Subset\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2007-024317.tif
+ASM_GRANTEE_51=\r\n^3~Grantee:|Grantee;^?TRGrantee^80~as truste
+
+// 0047.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272826.tif.uss
+ASM_GRANTEE_50=@GrantsKeyword^10~@UntoKeyword^10~grantee:^?Grantee^300~all interest
+
+// 0048.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272898.tif.uss
+ASM_GRANTEE_60=,Assignor|, Assignor^250~received from or on behalf of^?Grantee^300~,Assignor|, Assignee
+
+// 0050.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059021207600.tif.uss
+ASM_GRANTEE_70=@GrantsKeyword^50~@UntoKeyword^?Grantee^300~all^50~interest
+
+// 0055.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-008685.tif.uss
+// 0056.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-008687.tif.uss
+// 0057.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-001695.tif.uss
+// 0058.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003890.tif.uss
+ASM_GRANTEE_71=assign|transfer|convey^5~[unto]|[to]^?Grantee^120~herein|hereinafter^5~assignee
+ASM_GRANTEE_72=convey^5~unto^?Grantee^120~herein^6~assignee 
+
+// 0059.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\ASSIGNMENT\B06179AA.AC3.TIF.uss
+ASM_GRANTEE_73=does^5~hereby^36~execute^5~this^120~[to]|[in favor of]^?Grantee^250~assignee
+[PATTERNS_END]

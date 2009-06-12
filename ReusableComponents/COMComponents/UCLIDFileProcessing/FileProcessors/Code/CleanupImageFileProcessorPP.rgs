@@ -1,0 +1,25 @@
+HKCR
+{
+	FileProcessors.CleanupImageFileProcessorPP.1 = s 'CleanupImageFileProcessorPP Class'
+	{
+		CLSID = s '{617F9088-A1FB-4E0F-A085-2EF3CE871849}'
+	}
+	FileProcessors.CleanupImageFileProcesso = s 'CleanupImageFileProcessorPP Class'
+	{
+		CLSID = s '{617F9088-A1FB-4E0F-A085-2EF3CE871849}'
+		CurVer = s 'FileProcessors.CleanupImageFileProcessorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {617F9088-A1FB-4E0F-A085-2EF3CE871849} = s 'CleanupImageFileProcessorPP Class'
+		{
+			ProgID = s 'FileProcessors.CleanupImageFileProcessorPP.1'
+			VersionIndependentProgID = s 'FileProcessors.CleanupImageFileProcessorPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

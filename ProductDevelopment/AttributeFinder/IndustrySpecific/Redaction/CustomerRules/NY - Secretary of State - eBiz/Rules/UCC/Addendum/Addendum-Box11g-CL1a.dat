@@ -1,0 +1,5 @@
+(?:1[1lI|t]|[1lI|t]1)g.?\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
+(?:1[1lI|t]|[1lI|t]1)[\s\S]{0,5}\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
+(?:1[1lI|t]|[1lI|t]1)(?!I?ON)[^2\n']{1,9}(?:(?:.NT.TY.?S\s*.RGAN)|.RGAN\S{3,7}NAL|(?:(?:RGAN.{0,10}|Z.T..N.L).{0,4}(?:ID|#)))
+(?:1[1lIt]|[1lIt]1)[^2]{1,9}.RG.N.Z.T..N.L
+^11(?:g|\x20*g[.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS))

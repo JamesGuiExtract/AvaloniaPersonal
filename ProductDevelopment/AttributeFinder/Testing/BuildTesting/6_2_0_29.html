@@ -1,0 +1,110 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.29 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.29 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3097, #3189]</b> Loop Value Finder
+	       	<ul>
+	      		<li>Confirm that the new value finder is available for use.
+	      		<li>Exercise the <b>Loop Finder</b> checklist.
+	      		<li>Do independent testing of <b>Loop Finder</b> functionality.  Confirm 
+			that results are accumulated through loop iterations.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3098]</b> Loop Preprocessor
+	       	<ul>
+	      		<li>Confirm that the new preprocessor is available for use.
+	      		<li>Exercise the <b>Loop Preprocessor</b> checklist.
+	      		<li>Do independent testing of <b>Loop Preprocessor</b> functionality.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3181]</b> Extract Lines Returning Empty Attribute
+	       	<ul>
+	      		<li>Create an RSD file using a Conditional Value Finder where <b>Extract Lines</b> 
+			is used as the finder.
+	      		<li>Configure <b>Extract Lines</b> to return a specified line that will not be found 
+			in the input.  An example is line 25 from a 10-item list.
+	      		<li>Confirm that no attribute is found and that the conditional finder returns false.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3188]</b> Thread Exits Without Exception
+	       	<ul>
+	      		<li>Re-run one of the memory leak tests that exhibited the problem.
+	      		<li>Continue running other memory leak tests and confirm that this error 
+			is no longer seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4908, #4922]</b> Statistics tab in Vista and 2008 Server
+	       	<ul>
+	      		<li>Configure an FPS file to display the <b>Statistics</b> tab.
+	      		<li>Confirm that each list is completely displayed without scrollbars.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4921]</b> DB Admin Combo Box in Vista
+	       	<ul>
+	      		<li>Start the <b>FAM DB Admin</b> utility on a Vista test machine.
+	      		<li>Select a database server that has many databases defined (i.e. Wood).
+	      		<li>Select the <b>Browse...</b> item for database name.
+	      		<li>Confirm that more than two items are displayed in the dropdown list.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

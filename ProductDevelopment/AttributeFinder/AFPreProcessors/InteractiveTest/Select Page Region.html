@@ -1,0 +1,193 @@
+<html>
+
+<HEAD>
+<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Document Preprocessor - Select Page Region
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2><b>Select Page Region Dialog</b></h2>
+<ul>
+    	<li><b>Region defined as follows</b> combo box works.
+       	<ul>
+          	<li><b>Include</b> exists.</li>
+          	<li><b>Exclude</b> exists.</li>
+      	</ul>
+      	</li>
+      	<li><b>All Pages</b> radio button is selectable.</li>
+      	<li><b>Specific Pages</b> radio button is selectable.
+      	<ul>
+          	<li>Selection activates related edit box.</li>
+          	<li>Exception is thrown if invalid pages are defined.</li>
+      	</ul>
+      	</li>
+<p>
+      	<li><b>_____ Pages that contain</b> radio button is selectable.
+      	<ul>
+          	<li>Selection enables the related combo box.
+            	<ul>
+              		<li><b>All</b> exists.</li>
+              		<li><b>Leading</b> exists.</li>
+              		<li><b>Trailing</b> exists.</li>
+            	</ul>
+          	</li>
+          	<li>Selection enables the related edit box.
+            	<ul>
+              		<li>Edit box is editable.</li>
+            	</ul>
+          	</li>
+          	<li>Selection enables <b>Regular Expression</b> check box.
+            	<ul>
+              		<li><b>Regular Expression</b> check box is checkable.</li>
+            	</ul>
+          	</li>
+          	<li>Selection enables <b>Case Sensitive</b> check box.
+            	<ul>
+              		<li><b>Case Sensitive</b> check box is checkable.</li>
+            	</ul>
+          	</li>
+     	</ul>
+      	</li>
+<p>
+      	<li><b>Restrict page horizontally</b> check box is checkable.
+     	<ul>
+          	<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
+            	<ul>
+              		<li><b>Start at</b> and <b>End at</b> edit
+                	box is editable and allows only numbers as input.
+                	<ul>
+                  		<li>Exception is thrown when value entered is &gt;= 100.</li>
+                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
+                    		value.</li>
+                	</ul>
+              		</li>
+            	</ul>
+          	</li>
+     	</ul>
+      	</li>
+<p>
+      	<li><b>Restrict page vertically</b> check box is checkable.
+      	<ul>
+          	<li>Selection enables <b>Start at</b> and <b>End at</b> edit boxes.
+            	<ul>
+              		<li><b>Start at</b> and <b>End at</b> edit
+                	box is editable and allows only numbers as input.
+                	<ul>
+                  		<li>Exception is thrown when value entered is &gt;= 100.</li>
+                  		<li>Exception is thrown when value is &gt;= <b>End at</b>
+                    		value.</li>
+                	</ul>
+              		</li>
+            	</ul>
+          	</li>
+     	</ul>
+      	</li>
+<p>
+      	<li><b>OCR the included text</b> check box is checkable.
+      	<ul>
+          	<li>Selection enables <b>Rotate _____ degrees</b> edit box.</li>
+          	<li><b>Rotate _____ degrees</b> edit box is editable and allows only 
+		numbers as input.</li>
+          	<li>Exception is thrown when value entered != {0,90,180,270}.</li>
+     	</ul>
+<p>
+      	<li><b>Functional Test For Rotation</b></li>
+      	<ul>
+          	<li>Exercise the following rule sets using the <b>Rule Tester</b> utility.
+          	<li>The <b>RotateTest.rsd</b> file contains 5 attributes that exercise the 
+              	rotation capabilities with an included region.  The rules are tuned for 
+              	the <b>Rotated2.tif</b> image.
+          	<li>Recognize the text via <b>Process Current Page</b>.
+          	<li>Confirm that the <b>Test90</b> attribute finds &quot;This text is rotated 
+              	90 degrees clockwise&quot; and that the correct area is highlighted.
+          	<li>Confirm that the <b>Test270</b> attribute finds &quot;This text is rotated 
+              	270 degrees clockwise&quot; and that the correct area is highlighted.
+          	<li>Confirm that the <b>Test180</b> attribute finds <b>one</b> &quot;UPSIDE DOWN&quot; 
+              	attribute and that the correct area (top center) is highlighted.
+          	<li>Confirm that the <b>Test180b</b> attribute finds <b>one</b> &quot;UPSIDE DOWN&quot; 
+              	attribute and that the correct area (bottom center) is highlighted.
+          	<li>Confirm that the <b>TestAll</b> attribute finds the regular paragraph text 
+              	from the center area of the image plus the incorrectly recognized text from the 
+              	UPSIDE DOWN areas.  Also confirm that the entire center text area is highlighted 
+              	along with small portions of the side text.
+     	</ul>
+<p>
+        <ul>
+          	<li>The <b>RotateTest3.rsd</b> file contains 4 attributes that exercise the 
+              	rotation capabilities with an excluded region.  The rules are tuned for 
+              	the <b>Rotated2.tif</b> image.
+          	<li>Confirm that the <b>Test180</b> attribute finds <b>two</b> &quot;UPSIDE DOWN&quot; 
+              	attributes and that the correct areas (top and bottom center) are highlighted.
+              	There will also be small portions of the side text recognized and highlighted.
+          	<li>Confirm that the <b>Test270</b> attribute finds &quot;This text is rotated 
+              	270 degrees clockwise&quot; and that the correct area is highlighted.  The 90 
+              	degrees text will also be highlighted and badly recognized along with a few 
+              	individual UPSIDE DOWN characters.
+          	<li>Confirm that the <b>Test90</b> attribute finds &quot;This text is rotated 
+              	90 degrees clockwise&quot; and that the correct area is highlighted.  Most of 
+		the 270 degrees text will also be highlighted and badly recognized.
+          	<li>Confirm that the <b>TestAll</b> attribute finds jumbled text such that 
+              	occasional side characters are highlighted along with portions of the top and 
+              	bottom UPSIDE DOWN.
+     	</ul>
+<p>
+      	<ul>
+          	<li>The <b>RotateTest3D.rsd</b> file contains 4 attributes that exercise the 
+              	rotation capabilities where the unwanted region is excluded.  The rules are 
+              	tuned for the <b>Rotated2.tif</b> image.
+          	<li>Confirm that the <b>Test180</b> attribute finds two &quot;UPSIDE DOWN&quot; 
+              	attributes and that the correct areas (top and bottom center) are highlighted.
+              	There will also be small portions of the side text recognized and highlighted.
+          	<li>Confirm that the <b>Test270</b> attribute finds &quot;This text is rotated 
+              	270 degrees clockwise&quot; and that the correct area is highlighted.
+          	<li>Confirm that the <b>Test90</b> attribute finds &quot;This text is rotated 
+              	90 degrees clockwise&quot; and that the correct area is highlighted.
+          	<li>Confirm that the <b>TestAll</b> attribute finds jumbled text such that 
+              	occasional side characters are highlighted along with portions of the top and 
+              	bottom UPSIDE DOWN.
+      	</ul>
+<p>
+      	<ul>
+          	<li>Use the <b>Rotation2.rsd</b> file containing 5 attributes to exercise various 
+              	included region and rotation combinations.  The rules are tuned for the 		<b>K:\Common\Engineering\Sample Files\The_Fund\FL - Hendry\Set001\Images\Multi-Page\M\00693.01927.tif</b> image.
+          	<li>Recognize all pages of text via <b>Process Entire Image</b>.
+          	<li>Selecting the <b>Margin_0</b> attribute in the Rule Tester, confirm that the 
+              	<b>three</b> document stamp items are highlighted properly.
+          	<li>Selecting the <b>Partial_Address_0</b> attribute in the Rule Tester, confirm 
+              	that the highlights are near the <b>P.O. Box 5559 Lake Worth</b> text and that 
+              	with the forced zero-degree rotation, recognition was very poor.
+          	<li>Selecting the <b>Partial_Address_180</b> attribute in the Rule Tester, confirm 
+              	that the highlights are near the <b>P.O. Box 5559 Lake Worth FL 33466-5559</b> 
+              	text and that with the forced 180-degree rotation, recognition was very poor.
+          	<li>Selecting the <b>Partial_Address_270</b> attribute in the Rule Tester, 
+              	confirm that both the highlights and the recognition are appropriate.  This 
+              	is a 270-degree forced rotation that finds <b>two</b> attributes.
+          	<li>Selecting the <b>Partial_Address_90</b> attribute in the Rule Tester, confirm 
+              	that the highlights are near the <b>P.O. Box 5559 Lake Worth FL 33466-5559</b> 
+              	text and that with the forced 90-degree rotation, recognition was poor.
+          	<li>Selecting the <b>Partial_Address_Auto</b> attribute in the Rule Tester, confirm 
+              	that both the highlights and the recognition are appropriate.  This is 
+              	automatic rotation - determined by the OCR engine that finds <b>one</b> attribute.
+          	<li>Selecting the <b>Six_Digits</b> attribute in the Rule Tester, confirm that 
+              	both the highlights and the recognition are appropriate and that an attribute 
+              	is found on page 7.
+      	</ul>
+      	</li>
+<p>
+		<li><b>[FlexIDSCore #3063]</b> Throws exception when no text to operate on.</li>
+	<ul>
+		<li>Open 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\spr.rsd'</li>
+		<li>Run the ruleset on 'I:\Common\Testing\PVCS_Testing\FlexIDSCore\3063\00008879_00001.tif'</li>
+		<li>Ensure that a <b>System error: Unable to allocate necessary resources.</b> exception is not logged.</li>
+	</ul>
+</ul>
+</body>
+</html>

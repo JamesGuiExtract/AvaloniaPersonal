@@ -1,0 +1,125 @@
+// TimeRollbackPreventer (TRP) class
+//
+// Purpose: Protect UCLID's evaluation license against unexpected 
+//          rollback of system time preventing license expiration.
+//
+// Rollback Example: Swipe It user has evaluation license file with 
+//                   expiration date of 01-April-2004.  On March 31, 
+//                   the user changes their system time back to 
+//                   March 31, 2003.  Swipe It tests the current 
+//                   system time against the encrypted expiration 
+//                   date so the user gets an extra year of free 
+//                   software evaluation.
+//
+// Solution: Create a text file and a registry key each in an unexpected 
+//           location that track the system time.  Periodic comparison 
+//           of the system time and the tracked times will provide 
+//           indication of any rollback of the system time.  The expected 
+//           situation is that the tracked times match each other and 
+//           that the system time is later than the tracked times.  Any 
+//           deviation from this state indicates corruption in the UCLID 
+//           licensing.
+//
+// File Location: $(Windows)\system32\spool\prtprocs\w32x86\tlsuuw.dll
+//
+// Registry Key: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\System32\LTUSWU
+//
+// Limitation: The TRP class does not protect against Ghost or any 
+//             other utility that copies and restores both the registry 
+//             and the file system.
+//
+// Implementation: The TRP constructor does four things:
+//                 1. Handle Unlock Code, if present (see Backdoor section)
+//                 2. Check Date & Time Items (file and registry key), 
+//                 3. Update the Date & Time Items with current system time, 
+//                 4. Start a 30-second timer to continue updating the items
+//
+//    Step 1A: Find Unlock file
+//    Step 1B: Get Encrypted string from file
+//    Step 1C: Search registry to find duplicate unlock string since Unlock 
+//             string can only be used once.  Just delete the file and return
+//             if this is a duplicate string
+//    Step 1D: Decrypt string to retrieve:
+//             Computer Name,
+//             Disk Serial Number,
+//             MAC Address,
+//             Expiration Date
+//    Step 1E: Compare Name, Number, Address items against current user computer
+//             since this Unlock file is designed to work with a specific PC
+//    Step 1F: Compare Expiration Date against current system time.  If the Unlock 
+//             file is expired, just delete it and return
+//    Step 1G: Add this encrypted Unlock string to the Registry
+//             and update the count of stored Unlock strings
+//       Registry Keys: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Command Processor\Count
+//                      HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DirectInput\PUBDC\1
+//                      HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DirectInput\PUBDC\2 ...
+//    Step 1H: Update the file and registry items (see Step 3)
+//    Step 1I: Delete the Unlock file
+//
+//    Step 2A: Get Current System Time
+//    Step 2B: Get Encrypted Date-Time from file
+//    Step 2C: Get Encrypted Date-Time from registry
+//    Step 2D: Decrypt Date-Time from file
+//    Step 2E: Decrypt Date-Time from registry
+//    Step 2F: Compare Date-Time items
+//             Both items match AND before system time  --->  Success
+//             Neither item exists  --->  Success
+//             Any other situation  --->  Failure and throw UCLID Exception
+//
+//    Step 3A: Get Current System Time
+//    Step 3B: Encrypt Date-Time for file
+//    Step 3C: Encrypt Date-Time for registry
+//    Step 3D: Store encrypted Date-Time to file
+//    Step 3E: Restore original creation and modification timestamps to file
+//    Step 3F: Store encrypted Date-Time to registry
+//    Step 3G: Throw UCLID Exception if encryption or storage failed
+//
+//    Step 4: Repeat Step 3 after each 30 seconds
+//
+// Backdoor: If something happens to a user's licensing situation to put them in 
+//           a bad state, UCLID needs a mechanism to re-sync the file and registry 
+//           key items.  The mechanism is an Unlock file.  The file will contain 
+//           Computer Name, Disk Serial Number, and MAC Address of the affected 
+//           PC.  This information will be provided to UCLID from the UserLicense 
+//           utility.  The file will also contain an expiration date beyond which 
+//           the Unlock file will not work.  The data in the Unlock file will be 
+//           encrypted.  Allow an Unlock file to only be used once.
+//    File Location: UCLID_UnlockLicense.txt in CommonComponents folder
+//    File Creation: Created from User License string and Evaluation License Date
+//                   as provided to COM License Generator utility
+//
+// Initialization: The UserLicense EXE accepts a "/init" command-line argument
+//                 to create the file and registry key without any UI.  If 
+//                 either item already exists, UserLicense does nothing.  
+//
+//                 If the software was in a good state, it remains in a good state.
+//                 If the software was in a bad state, installation leaves it 
+//                 in a bad state.  The prevents the user from corrupting their 
+//                 license state and then just reinstalling the software to fix it.
+//
+// Test Cases:
+//    1. File & Registry items in sync and before system time  --->  GOOD STATE!
+//    2. File & Registry items BOTH missing
+//       TRP class will automatically create each item  --->  GOOD STATE!
+//    3. File & Registry items in sync and after system time  --->  BAD STATE!
+//       Note: This situation may innocently occur if user's system time changes 
+//             due to a different time zone.  The user can just wait (without 
+//             using UCLID software) until new system time catches up with the 
+//             stored system time.  At that time, everything will be okay and 
+//             software will return to a GOOD STATE!
+//    4. File item present, Registry item missing  --->  BAD STATE!
+//    5. Registry item present, File item missing  --->  BAD STATE!
+//    6. System in Bad State, software finds first Unlock file
+//       TRP class will automaticall re-sync the File and Registry items and 
+//       delete the Unlock file.  Software returns to a GOOD STATE!
+//    7. System in Bad State, software finds a repeat of a previous Unlock file
+//       TRP class will delete the Unlock file but remain in a BAD STATE!
+//    8. System in Bad State, software finds different Unlock file
+//       TRP class will automaticall re-sync the File and Registry items.
+//       Software returns to a GOOD STATE!
+//    9. System in Bad State, software finds expired Unlock file
+//       TRP class will delete the Unlock file but remain in a BAD STATE!
+//
+//    NOTE: Different ELI codes are used to indicate different error conditions 
+//          even though the message text remains the same.  To trace a user 
+//          problem, determine specific ELI code(s) reported in the exception.

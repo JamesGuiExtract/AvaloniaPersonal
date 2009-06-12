@@ -1,0 +1,251 @@
+// Person Name Splitter tests
+// This is a subset of the NS_Abc.txt test files from the AFSplittersTest\TestFiles folder
+// Test Type: Person Designators
+John Smith and Mary Smith, Husband and Wife
+
+John and Mary, Husband and Wife
+
+Mary Smith, a married woman and John H. Smith her husband
+
+Mary Smith, a married woman and John H. Smith her husband
+
+John H Smith and Mary W Smith, A Married Couple
+
+John H Smith and Mary W Smith, Married To Each Other
+
+John H Smith et ux Mary W Smith
+
+John H Smith etux Mary W Smith
+
+John H. Smith, a Married Man and Mary W. Smith, a Married Woman
+
+John H and Mary Smith, Husband and Wife
+
+Prof John Henry Smith II & Dr. Mary Anne Williams-Smith, H / W
+
+John Smith, a Single Man and Henry Jones, a Single Man
+
+Mary Smith, Jane Jones, Single Women
+
+John Smith III & Jane Jones, Joint Tenants
+
+John Smith III Married To Jane Jones
+
+John Smith III & Jane Jones, Joint Debtors
+
+John Smith III & Jane Jones, Not Stated
+
+John Smith IV & Jane Jones as Joint Tenants
+
+John Smith IV & Jane Jones as Tenants in Entirety
+
+John Smith IV & Jane Jones as Tenants by Entireties
+
+John Smith IV & Jane Jones as Tenants by the Entirety
+
+John Smith IV and daughter Jane Jones
+
+John Smith IV & Jane Jones as Joint Tenants with rights of survivorship
+
+John Smith IV & Jane Jones as Joint Tenants w/ rights of survivorship
+
+John Smith IV & Jane Jones as Joint Tenants with full rights of survivorship
+
+John Smith IV & Jane Jones Joint Tenancy with full rights of survivorship
+
+John Smith IV joint with spouse Jane Jones
+
+John Smith IV joint with his spouse Jane Jones
+
+John Smith and Henry Jones, both Single
+
+John H. Smith, Jr. and Mary Smith who are married
+
+John H. Smith, Jr. and Mary Smith married But Separated
+
+John H. Smith, Jr. and Mary Smith husband and wife Community Property
+
+Dr. John H. Smith, Jr. and Mary Smith who are husband and wife
+
+John H. Smith, Jr. and Mary Jones Formerly Husband & Wife
+
+Dr. Mary Jones and John H. Smith Formerly Wife and Husband
+
+Mary Smith and John H. Smith as wife and husband
+
+Mary Smith and John H. Smith, Non Vested Spouse
+
+// Test Type: Person Separators
+John Smith Mary Smith
+
+John Smith, Mary Smith
+
+Mary W. Smith John Smith
+
+Mary Smith John H. Smith
+
+Mary H Smith John H Smith
+
+J J Smith Mary H Smith
+
+John H Smith, Mary Smith
+
+John Smith, Jr Peter Jones, Jr.
+
+John H, Mary Smith
+
+John H. and Mary Smith
+
+Mr John H Smith, Mrs. Mary Smith
+
+Prof John Henry Smith II Dr. Mary Anne Williams-Smith
+
+Mr John H. Smith III, Henry Jones
+
+Mr John H. Smith III Henry Jones
+
+Henry Jones, Mr John H. Smith III
+
+Henry Jones Mr John H. Smith III
+
+Mr John H. Smith II, Mr John H. Smith III
+
+Mr. John H. Smith Sr. Mr John H. Smith Jr.
+
+// Test Type: Persons with Identifiers
+Mr. John Smith and Mary W. Smith, His Wife
+
+Mary W. Smith and Mr. John Smith, Her Husband
+
+John H. Smith, Jr. and his wife Mary Smith
+
+Mary W. Smith and her spouse, John W. Smith
+
+John H. Smith, Jr. joined by his wife Mary Smith
+
+John H. Smith, Jr., a married man and joined by Mary Smith, his wife
+
+John H. Smith, Jr. joined herein by Mary Smith
+
+John H. Smith, Jr. joined herein by his wife Mary Smith
+
+John H. Smith, Jr. joined herein pro-forma by his spouse Mary Smith
+
+Mary Smith joined herein by her spouse John H. Smith, Jr.
+
+John Smith joined herein by his/her spouse Mary Smith
+
+// Test Type: Valid and Invalid Entities
+Mr. John Smith and Grantor
+
+Grantor & Mr. John Smith
+
+Mr. John Smith, His Successors
+
+Mr. John Smith, His Successors and Assigns
+
+Mr. John Smith and Of The Place
+
+Mr. John Smith and Of My Place
+
+Mr. John Smith, Party
+
+Mr. John Smith and Trustees
+
+Mr. John Smith and The Assignees
+
+Mr. John Smith and lower case
+
+Mr. John Smith and Page
+
+Mr. John Smith and Vendor's Lien
+
+Mr. John Smith and Grantor's Address
+
+Mr. John Smith and ATTORNEY IN FACT FOR MY
+
+Mr. John Smith and Agent
+
+Mr. John Smith and As Agent
+
+Mr. John Smith, With Right
+
+Mr. John Smith, To Record
+
+Mr. John Smith, Estate Of Henry James
+
+Mr. John Smith, With Rights
+
+Mr. John Smith, Et Al
+
+Mr. John Smith, Plus Addendum
+
+Mr. John Smith and FEE-ST
+
+For No Consideration, Mr. John Smith
+
+// Invalid
+FEE-CO
+
+Of Bank
+
+Trust
+
+// Test Type: More than Two Persons
+John Smith, Mary Smith, Peter Smith
+
+John Smith; Mary Smith; Peter Smith
+
+John Smith / Mary Smith / Peter Smith
+
+John Smith; Mary Q. Smith and Peter Smith
+
+John Smith & Mary Q. Smith and Peter Smith, Jr.
+
+John Smith & Mary Q. Smith and Peter Smith, Jr. & Mrs. Jane Smith
+
+John Smith, Mary Q. Smith and Peter Smith, Jr., Mrs. Jane Smith
+
+John Smith & Mary Q. Smith / Peter Smith, Jr. / Mrs. Jane Smith
+
+John Smith Mary Smith Peter Smith
+
+John H. Smith Mary W Smith Peter H. Smith
+
+Mr. John H. Smith & Ms. Mary W Smith & Peter H. Smith, Jr.
+
+Bob Eubank
+
+// Test Type: One Entity with Designator or Identifier
+John Smith A Single Man
+
+John Smith, Unmarried
+
+Jane W Smith A Single Person
+
+Fr John Smith, Single
+
+Mrs. Jane W. Smith, a Widow
+
+Dr. John Henry Smith III, A Baron Sole
+
+Mr John Q. Smith, Solely
+
+John Q. Smith who is married
+
+Mrs. Jane W. Smith, a married woman
+
+John Smith, Executor Of The Last Will And Testament
+
+ACME Explosives Limited
+
+Dr Jane Smith, Her Separate Property & Estate
+
+Mr John Q. Smith, His Sole and Separate Property
+
+Dr Jane Smith, Her Sole and Separate Property
+
+Dr Jane Smith, As Her Sole & Separate Property
+
+Mrs Jane Q. Smith, Her Sole Property
+

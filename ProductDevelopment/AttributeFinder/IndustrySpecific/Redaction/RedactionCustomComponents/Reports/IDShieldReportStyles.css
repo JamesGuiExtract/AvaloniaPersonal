@@ -1,0 +1,36 @@
+body
+{
+	background-color:white;
+	color:black;
+	font-family:"Arial";
+	padding-left:0.5em;
+	padding-right:0.5em;
+}
+
+tr.header
+{
+	background-color:#385E0F;
+	font-weight:bold;
+	color:White;
+}
+
+tr.rowColor1
+{
+	/*background-color:#E7FFBA;*/
+	background-color:#DFFFA5;
+}
+
+tr.rowColor2
+{
+	background-color:white;
+}
+
+td.leftOfMergedCell 
+{
+	border-right-style:none;
+}
+
+td.rightOfMergedCell 
+{
+	border-left-style:none;
+}

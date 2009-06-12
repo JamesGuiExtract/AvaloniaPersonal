@@ -1,0 +1,244 @@
+// All lines beginning with // are ignored as well as all whitespace " \f\n\r\t\v"
+
+// DT:0000
+// 	When Recorded Return To: ... \d{5}
+// DT:0001
+//	Name And Return Address ... \d{5}
+// DT:0002
+//	Return Address: ... \d{5}
+
+// DT:0004
+//	Name and Return Address: ... \d{5} optional : on the end
+// DT:0005
+//	Name & Return Address: ... \d{5} and|&
+// DT:0006
+//	After Recording Return To: ... \d{5}-\d{4}[^0-9] 
+// DT:0007
+//	When Recorded Mail To: ... \d{5}
+// DT:0008
+//	Record and Return To: ... \d{5}-\d{4}[^0-9]
+// DT:0009
+//	Return To: ... \d{5}
+
+// DT:0012
+//	Return Recorded Mortgage To: ... \d{5} 
+
+// DT:0014
+//	Return To ... \d{5} 
+// DT:0015
+//	Name & Return Address ...   \d{5}
+
+// DT:0017
+//	after recording mail to: ... \d{5}-\d{4}[^0-9]
+
+// DT:0019
+//	Mail Recorded Satisfaction To: ... \d{5}
+
+// DT:0021
+//	Name and Return Address ... City. State \d{5}
+//	period instead of a comma separating the city and state (Madison. WI) instead of(Madison, WI)
+// DT:0022
+//	Return Document To: ... \d{5}
+// DT:0023
+//	Record & Return To: ... \d{5}
+
+// DT:0025
+//	After Recorded, Return To: ... \d{5}
+// DT:0026
+//	Prepared By & Return To: ... \d{5}
+// DT:0027
+//	Recording Requested By and Return To: ... \d{5}
+// DT:0028
+//	Return To Mortgagee At ... \d{5}
+// DT:0029
+//	Prepared By and When Recorded Return To:  ... \d{5}
+// DT:0030
+//	When Recorded Mail To.  ... \d{5} \d{4}
+// 	A "." instead of a ":" at the end at the end of prefix
+// DT:0031
+//	After Recording Return To  ... \d{5} \d{4}
+// 	A "." instead of a ":" at the end 
+// DT:0032
+//	Recording Requested By / Return To ... \d{5}-\d{4}
+// DT:0033
+//	When Recorded Mail To: ... \d{5}\d{4}
+// 	no seperator in zip code
+// DT:0034
+//	When Recorded Return To. ... \d{5}
+// 	period
+// DT:0035
+//	Mail Recorded Satisfaction To. ... \d{5}
+// 	period
+// DT:0036
+//	This Document Was Prepared By 
+//	and When Recorded Mail To: ... \d{5} ATTN: <name>
+// DT:0037
+//	And When Recorded Mail To ... \d{5}
+// DT:0038
+//	And When Recorded Mail To
+//	 (Name, Address, City and State) ... \d{5}
+// DT:0039
+//	Record and Return Address: ... \d{5} Attn: <name>
+// DT:0040
+//	Recorder of Deeds is requested to mail 
+// 	this satisfaction piece to: ... \d{5} Attn: <name>
+// DT:0042
+//	After Recording, Return To: ... \d{5}
+// DT:0043
+//	Prepared By/Return To: ... \d{5}
+// DT:0044
+//	Recorder Please Mail To: ... \d{5}
+// DT:0045
+//	recorder of deeds is requested to mail this release to: ... \d{5}
+// DT:0046
+//	Return Recorded Instrument To: ... \d{5}
+// DT:0047
+//	Recorder Mail To ... \d{5}
+// DT:0048
+//	Prepared By and Mail To: ... \d{5}
+// DT:0049
+//	Prepared By/Record and Return By Mail To: ... \d{5}
+// DT:0050
+//	Recorded of Deeds is requested to
+//	mail this assignment to: ... \d{5}
+// DT:0051
+//	Please Return This Recorded Document to: ... \d{5}-\d{4}
+// DT:0052
+//	When Recorded Return Original to: ... \d{5}-\d{4}
+// DT:0053
+//	Mail Recorded Document to: ... \d{5}-\d{4}
+// DT:0054
+//	[When Recorded Return To] ... \d{5}-\d{4}
+// DT:0055
+//	Recorder, Please Return To ... \d{5}
+
+// DT:0058
+//	Record & Return...\d{5}
+// DT:0058
+//	Please Return This Document To: ... \d{5}
+// DT:0060
+//	When Recorded Return To: ... \d{5}\d{4}
+
+// DT:0063
+//	After Recording Return To and Prepared By: ... \d{5}
+// DT:0064
+//	When Recorded, Mail Reconveyance To: ... \d{5}
+// DT:0065
+//	Recorder of Deeds is Requested to Mail this Satisfaction to: ... \d{5}
+// DT:0066
+//	Recorder of Deeds is Requested to Mail this Satisfaction to: ... \d{5}
+// DT:0067
+//	Mail this Satisfaction to: ... \d{5}
+// DT:0068
+//	After Recordation this mortgage should be returned to: ... \d{5}
+// DT:0069
+//	After Recording of this document, please return to
+//	address shown below: ... \d{5}
+// DT:0071
+//	After Recording Forward To: ... \d{5}
+// DT:0072
+//	When Recorded Return/Mail To: ... \d{5}
+// DT:0073
+//	And After Recordation, this instrument is to be mailed to: ... \d{5}
+// DT:0074
+//	From(& mail to): ... \d{5}
+// DT:0075
+//	Mail To: Prepared By: ... \d{5}
+// DT:0076
+//	Mail Recorded Deed To ... \d{5}
+// DT:0077
+//	Please Mail This Instrument as Follows ... \d{5}
+// DT:0078
+//	Recording Requested By and when recorded return to and mail Tax Statements To... \d{5}
+// DT:0079
+//	(Mail Document To) ... \d{5}
+// DT:0080
+//	Mail To Address: ... \d{5}
+// DT:0081
+//	Please Mail The recorded deed to: ... \d{5}
+// DT:0082
+//	ReturnRecorded Documents to ... \d{5} 
+//	PLURAL added optional s
+// DT:0083 - NEGATIVE
+//	(Forward To)wnship ... \d{5}
+// DT:0084
+//	Return Address is: ... \d{5}
+// DT:0085
+//	And after recording should be returned to: ... \d{5}
+// DT:0086
+//	upon recording of this document return to: ... \d{5}
+// DT:0088
+//	Return Copy To: ... \d{5}
+// DT:0091
+//	This Supplement Was Prepared by
+//	ans when recorded mail to: ... \d{5}
+// DT:0092
+//	After Recording return to (name, address): ... \d{5}
+// DT:0093
+//	Please return documents with filing information to: ... \d{5}
+// DT:0095
+//	Return this lien when recorded to: ... \d{5}
+// DT:0096
+//	After Filing Return To: ... \d{5}
+// DT:0097
+//	After recording send to: ... \d{5}
+// DT:0098
+//	Return recorded abstract to: ... \d{5}
+
+
+// $1 is the PREFIX
+(
+\[?(?::?
+ (?:
+	// The "\|" and "I" at the end is for ocr errors on / no template exists
+	(?:(?:(?:(?:(?:this\s+(document)\s+was\s+)?prepared)|(?:recording\s+requested))\s+by(\s*,)?\s*)?(?:and|&|/|I|\|)\s*)?	
+	(?:
+       (?:please\s+)?
+       (?:
+        (?:when\s+recorded)|
+	  (?:(?:after|upon)\s+(recording|filing)(?:\s+of\s+this\s+document)?)|
+	  (?:after\s+recorded)|
+	  (?:record\s+(?:and|&))|
+	  (?:recorder(\s+of\s+deeds\s+is\s+requested\s+to)?)
+	 )
+      ,?\s+)?
+	[\(]?
+	 (?:
+	  (?:please\s+)?
+
+	  (?:[nm]ail|retu(?:rn|m)|retmn|forward|send|(?:retu(?:rn|m)/[nm]ail))\s*
+
+	  (?:(?:this|the)\s+)?
+	  (?:(?:original\s+)|(?:recorded\s+))?
+	  (?:(?:abstract|lien|copy|document|instrument|reconveyance|deed|release|mortgage|satisfaction|assignment)s?\s+)?
+	  (?:piece\s+)?
+	  (?:by\s+[nm]ail\s+)?
+	  (?:with\s+filing\s+information\s+)?
+	  (?:when\s+recorded\s+)?
+	  
+	  (?:t[o0]|as\s*follows)
+	 )
+	[\)]?
+	(?:\s+mortgagee\s+at)?
+	(?:\s+address(\s+shown\s+below)?)?
+	(?:\s+and\s+prepared\s+by)?
+	(?:\s+and\s+mail\s+tax\s+statements\s+to)?
+ )
+ |
+ (?:(?:(?:name|record)\s+(?:and|&)\s+)?retu(?:rn|m)\s+address(?:\s+is)?)
+ |
+ (?:record\s+(?:and|&)\s+return)
+ |
+ (?:(?:and)?((after\s+(recordation|recording))|(when\s+recorded)),?\s+(this\s+(mortgage|instrument|supplement)\s+)?(?:should|is\s+to)\s+be\s+(?:returned|mailed)\s+t[o0])
+ |
+ (?:(?:(?:from)\s*)? \( \s*(&|and)?\s+(mail|return)\s+t[o0]\s* \) )
+ 
+
+)\]?
+(\s*[\(\[I]name\s*(and|[,.])\s*(mailing\s*)?address[\)\]I])?
+// The comma, semi-colon, "*" and hyphen are to account for ocr errors
+// they are not in any document template
+(?:\s*[':\.,\-;\s]+\s*)
+
+(?:\s*\(name,?\s*address,?\s*city,?\s+and\s+state\))?
+){1,}

@@ -1,0 +1,15 @@
+//"Create each part as a sub-attribute" checkbox is exercised with coma as the delimiter.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//"Create each part as a sub-attribute" checkbox is further exercised with forward slash as the delimiter.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//"Create following sub-attributes" checkbox is exercised with coma as the delimiter.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//"Create following sub-attributes" checkbox is furthur exercised with semi-colon as delimiter.
+<TESTCASE>;Test4.rsd;Input.txt;;Test4.eav
+
+//"Create each part as a sub-attribute" checkbox is furthur exercised with semi-colon as delimiter
+// and all sub-attributes are named "Item".
+<TESTCASE>;Test5.rsd;Input.txt;;Test5.eav

@@ -1,0 +1,8 @@
+^21\s*[,.]?\s*OPER
+^.{0,6}OPERATOR
+^.{0,15}[1!il|]{1,2}C\s*#\s*&\s*STATE
+^21.{0,15}[1!il|]{2}C\s*#
+21\s*[,.]?\s*OPERATOR
+^25\s*[.,]?\s*ADDRES
+^2.{0,6}DRESS
+25\s*[,.]?\s*ADDRES

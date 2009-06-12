@@ -1,0 +1,127 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Visual C++ generated include file.
+// Used by SpotRecognitionIR.rc
+//
+#define IDS_PROJNAME                    100
+#define IDR_SPOTRECOGNITIONWINDOW       102
+#define IDR_SRIRUTILS                   109
+#define IDD_SPOT_RECOGNITION_DLG        201
+#define IDC_GENERICDISPLAYCTRL          202
+#define IDI_SPOT_REC_ICON               204
+#define IDR_MENU_MRU                    205
+#define IDR_MENU_CONTEXT                208
+#define IDC_CUR_ZOOMWINDOW              211
+#define IDC_CUR_EDITTEXT                212
+#define IDC_CUR_NOSELECT                213
+#define IDC_CUR_OPENSUBIMAGE            214
+#define IDC_CUR_PAN                     215
+#define IDC_CUR_RECTEXT_RECT            216
+#define IDC_CUR_SELECTTEXT              217
+#define IDC_CUR_TEXTHEIGHT              218
+#define IDC_CUR_ERASER                  219
+#define IDC_CUR_RECTEXT_POLY            220
+#define IDR_MENU_POLYGON_CONTEXT        221
+#define IDC_CUR_SELECTRECTTEXT          221
+#define IDD_PolygonDragOperation        222
+#define IDC_CUR_NOSELECTRECT            222
+#define IDR_MENU_SELECTION_TOOL         226
+#define IDB_SWIPE_SELECTION_TOOL        227
+#define IDB_RECT_SELECTION_TOOL         228
+#define IDR_TOOLBAR_SELECTION           229
+#define IDC_BTN_OpenImage               12001
+#define IDC_BTN_Save                    12002
+#define IDC_BTN_ZoomWindow              12003
+#define IDC_BTN_ZoomOut                 12004
+#define IDC_BTN_Pan                     12006
+#define IDC_BTN_SelectText              12007
+#define IDC_BTN_ZoomIn                  12008
+#define IDC_BTN_SetHighlightHeight      12010
+#define IDC_BTN_EditZoneText            12011
+#define IDC_BTN_DeleteEntities          12012
+#define IDC_BTN_RecognizeTextAndProcess 12013
+#define IDR_TOOLBAR                     12028
+#define ID_MNU_MRU                      32768
+#define IDC_BTN_ZoomPrev                32769
+#define IDC_BTN_ZoomNext                32770
+#define IDC_BTN_RotateLeft              32771
+#define IDC_BTN_RotateRight             32772
+#define ID_MNU_HIGHLIGHTER              32773
+#define ID_MNU_PAN                      32774
+#define ID_MNU_ZOOMWINDOW               32775
+#define ID_MNU_CANCEL                   32776
+#define IDC_BTN_OPENSUBIMAGE            32777
+#define IDC_BTN_FirstPage               32783
+#define IDC_BTN_PreviousPage            32784
+#define IDC_BTN_NextPage                32785
+#define IDC_BTN_LastPage                32786
+#define IDC_BTN_GoToPage                32787
+#define ID_MRU_FILE1                    32788
+#define ID_MRU_FILE2                    32789
+#define ID_MRU_FILE3                    32790
+#define ID_MRU_FILE4                    32791
+#define ID_MRU_FILE5                    32792
+#define ID_MRU_FILE6                    32793
+#define ID_MRU_FILE7                    32794
+#define ID_MRU_FILE8                    32795
+#define ID_OCR_ENTIRE_IMAGE_01          32796
+#define ID_OCR_CURRENT_PAGE_01          32797
+#define ID_OCR_RECTANGULAR_AREA_01      32798
+#define ID_OCR_POLYGONAL_AREA_01        32799
+#define ID_OCR_ENTIRE_IMAGE_02          32800
+#define ID_OCR_CURRENT_PAGE_02          32801
+#define ID_OCR_RECTANGULAR_AREA_02      32802
+#define ID_OCR_POLYGONAL_AREA_02        32803
+#define ID_OCR_ENTIRE_IMAGE_03          32804
+#define ID_OCR_CURRENT_PAGE_03          32805
+#define ID_OCR_RECTANGULAR_AREA_03      32806
+#define ID_OCR_POLYGONAL_AREA_03        32807
+#define ID_OCR_ENTIRE_IMAGE_04          32808
+#define ID_OCR_CURRENT_PAGE_04          32809
+#define ID_OCR_RECTANGULAR_AREA_04      32810
+#define ID_OCR_POLYGONAL_AREA_04        32811
+#define ID_OCR_ENTIRE_IMAGE_05          32812
+#define ID_OCR_CURRENT_PAGE_05          32813
+#define ID_OCR_RECTANGULAR_AREA_05      32814
+#define ID_OCR_POLYGONAL_AREA_05        32815
+#define ID_OCR_ENTIRE_IMAGE_06          32816
+#define ID_OCR_CURRENT_PAGE_06          32817
+#define ID_OCR_RECTANGULAR_AREA_06      32818
+#define ID_OCR_POLYGONAL_AREA_06        32819
+#define ID_OCR_ENTIRE_IMAGE_07          32820
+#define ID_OCR_CURRENT_PAGE_07          32821
+#define ID_OCR_RECTANGULAR_AREA_07      32822
+#define ID_OCR_POLYGONAL_AREA_07        32823
+#define ID_OCR_ENTIRE_IMAGE_08          32824
+#define ID_OCR_CURRENT_PAGE_08          32825
+#define ID_OCR_RECTANGULAR_AREA_08      32826
+#define ID_OCR_POLYGONAL_AREA_08        32827
+#define ID_OCR_ENTIRE_IMAGE_09          32828
+#define ID_OCR_CURRENT_PAGE_09          32829
+#define ID_OCR_RECTANGULAR_AREA_09      32830
+#define ID_OCR_POLYGONAL_AREA_09        32831
+#define ID_OCR_ENTIRE_IMAGE_10          32832
+#define ID_OCR_CURRENT_PAGE_10          32833
+#define ID_OCR_RECTANGULAR_AREA_10      32834
+#define ID_OCR_POLYGONAL_AREA_10        32835
+#define ID_MAX_OCR_OPTION               32836
+#define ID_MNU_FINISH_POLYGON           32837
+#define ID_MNU_CANCEL_POLYGON           32838
+#define ID_MENU_SWIPE_SELECTION_TOOL    32841
+#define ID_MENU_RECT_SELECTION_TOOL     32842
+#define ID_SWIPE                        32843
+#define IDC_BTN_Print                   32845
+#define ID_BUTTON32846                  32846
+#define IDC_BTN_FitPage                 32848
+#define IDC_BTN_FitWidth                32849
+#define IDC_BTN_SELECT_ENTITIES         32850
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NEXT_RESOURCE_VALUE        230
+#define _APS_NEXT_COMMAND_VALUE         32851
+#define _APS_NEXT_CONTROL_VALUE         203
+#define _APS_NEXT_SYMED_VALUE           110
+#endif
+#endif

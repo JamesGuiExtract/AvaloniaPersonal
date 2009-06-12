@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.CheckFinder.1 = s 'CheckFinder Class'
+	{
+		CLSID = s '{E4EC6E42-1CEA-4925-A97E-C049A889ED0D}'
+	}
+	AFValueFinders.CheckFinder = s 'CheckFinder Class'
+	{
+		CLSID = s '{E4EC6E42-1CEA-4925-A97E-C049A889ED0D}'
+		CurVer = s 'AFValueFinders.CheckFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E4EC6E42-1CEA-4925-A97E-C049A889ED0D} = s 'CheckFinder Class'
+		{
+			ProgID = s 'AFValueFinders.CheckFinder.1'
+			VersionIndependentProgID = s 'AFValueFinders.CheckFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

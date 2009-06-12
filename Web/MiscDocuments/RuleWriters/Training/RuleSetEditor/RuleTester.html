@@ -1,0 +1,66 @@
+<HTML>
+	<HEAD>
+		<TITLE>The Rule Tester and Finding Attributes</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>The Rule Tester and Finding Attributes</h1>
+		<hr>
+		<p>
+			<h3>Rule Tester Basics</h3>
+			<ul>
+				<li>The Rule Tester is used to quickly test rules on a single document.</li>
+				<li>You can open the Rule Tester from the Rule Set Editor.  It is listed under "Tools".</li>
+				<li>On the <b>General Settings</b> tab, you can choose whether to test all of the attributes in the current .rsd file or just the currently selected attribute.</li>
+				<li>On the <b>Input</b> tab, you can choose which type of input to test your rules on.
+					<ul>
+						<li>If you select <b>Text from manual input</b>, you can type the text you want to test in the edit box.</li>
+						<li>You can select <b>Most recently processed text from file</b> to load text or an image from a file.</li>
+					</ul>
+				</li>
+				<li>Once you have your input selected, you can press the green "play" button on the toolbar to test your rules on the selected input.</li>
+				<p>
+					<li><b>Example:</b>
+						<ul>
+							<li>Load <b>FileNumber_VAC.rsd</b>.</li>
+							<li>These rules have been setup to find a number after the text <i>File Number:</i>.</li>
+							<li>Open the Rule Tester.</li>
+							<li>Select <b>Text from manual input</b> and type <i>File Number: 1234</i> into the edit box.</li>
+							<li>Execute the rules and examine the found data.</li>
+							<li>Note the different parts of the found Attribute:
+								<ul>
+									<li>Name</li>
+									<li>Value</li>
+									<li>Type</li>
+								</ul>
+							</li>
+							<li>Selected <b>Most recently processed text from file</b> and load <b>FileNumbers.txt</b>.</li>
+							<li>Execute the rules and note how multiple attributes are found and displayed.</li>
+						</ul>
+					</li>
+				</p>
+				<li>If you select <b>Most recently processed text from file</b> and then load an image file, the image will automatically be OCRed.</li>
+				<li>The results of the OCR will be displayed in a text box.</li>
+				<li>If you execute rules on an image and then click on the found data, the Rule Tester will bring up a window containing the image with the found data highlighted.</li>
+				<p>
+					<li><b>Example:</b>
+						<ul>
+							<li>Load <b>FileNumber_VAC.rsd</b>.</li>
+							<li>Look at a hard copy of <b>TestImage002.tif</b> and note that it contains a file number.</li>
+							<li>Open the Rule Tester, select <b>Most recently processed text from file</b>, and load <b>TestImage002.tif</b>.</li>
+							<li>Note that the image is automatically OCRed.</li>
+							<li>Execute rules and then click on the found data.</li>
+							<li>Note how the found data is highlighted in the image window that pops up.</li>
+						</ul>
+					</li>
+				</p>
+			</ul>
+			<h3>Other Rule Tester Functionality</h3>
+			<ul>
+				<li><b>Clear output window</b> button: Clears the output window
+				<li><b>Disable spot recognition when pressed</b> button: Toggling this button on will prevent the image window from popping up when you click on found data
+			</ul>
+			<hr>
+		</p>
+	</BODY>
+</HTML>

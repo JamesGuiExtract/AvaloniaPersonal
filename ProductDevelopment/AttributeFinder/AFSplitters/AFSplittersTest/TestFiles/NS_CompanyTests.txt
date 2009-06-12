@@ -1,0 +1,456 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Company Name Splitter tests
+// Test Type: Companies with various Identifiers
+// Purpose: Check Proper SubAttributes
+
+// Company Suffixes
+<TESTCASE>|Company Name with LLC|Wisconsin Software LLC
+Names|Wisconsin Software LLC
+.Company|Wisconsin Software LLC
+
+<TESTCASE>|Company Name with LLP|Wisconsin Software LLP
+Names|Wisconsin Software LLP
+.Company|Wisconsin Software LLP
+
+//<TESTCASE>|Company Name with Ltd Ptnshp1|Wisconsin Software Limited Partnership
+//Names|Wisconsin Software Limited Partnership
+//.Company|Wisconsin Software Limited Partnership
+
+//<TESTCASE>|Company Name with Ltd Ptnshp2|Wisconsin Software Limited Partnership, A WI Limited Partnership
+//Names|Wisconsin Software Limited Partnership
+//.Company|Wisconsin Software Limited Partnership
+
+//<TESTCASE>|Company Name with Ltd Ptnshp3|Wisconsin Software Limited Partnership, A Limited Partnership
+//Names|Wisconsin Software Limited Partnership
+//.Company|Wisconsin Software Limited Partnership
+
+<TESTCASE>|Company Name with Incorporated|Wisconsin Software Incorporated
+Names|Wisconsin Software Incorporated
+.Company|Wisconsin Software Incorporated
+
+<TESTCASE>|Company Name with Inc|Wisconsin Software Inc
+Names|Wisconsin Software Inc
+.Company|Wisconsin Software Inc
+
+<TESTCASE>|Company Name with Co|Wisconsin Software Co
+Names|Wisconsin Software Co
+.Company|Wisconsin Software Co
+
+<TESTCASE>|Company Name with FSB1|Citibank FSB
+Names|Citibank FSB
+.Company|Citibank FSB
+
+<TESTCASE>|Company Name with FSB2|First Federal Savings Bank
+Names|First Federal Savings Bank
+.Company|First Federal Savings Bank
+
+<TESTCASE>|Company Name with FSB3|First Federal Savings Bank of Iowa
+Names|First Federal Savings Bank of Iowa
+.Company|First Federal Savings Bank of Iowa
+
+<TESTCASE>|Company Name with SSB|Citibank SSB
+Names|Citibank SSB
+.Company|Citibank SSB
+
+<TESTCASE>|Company Name with Ltd|Wisconsin Software Ltd
+Names|Wisconsin Software Ltd
+.Company|Wisconsin Software Ltd
+
+<TESTCASE>|Company Name with NA1|Citibank N.A.
+Names|Citibank N.A.
+.Company|Citibank N.A.
+
+<TESTCASE>|Company Name with NA2|Citibank National Association
+Names|Citibank National Association
+.Company|Citibank National Association
+
+<TESTCASE>|Company Name with FA1|Citibank F.A.
+Names|Citibank F.A.
+.Company|Citibank F.A.
+
+<TESTCASE>|Company Name with FA2|Citibank Federal Association
+Names|Citibank Federal Association
+.Company|Citibank Federal Association
+
+<TESTCASE>|Company Name with C.U.|Pentagon Federal C.U.
+Names|Pentagon Federal C.U.
+.Company|Pentagon Federal C.U.
+
+// Company Designators
+<TESTCASE>|Company Name with Corporation|Wisconsin Software Corporation
+Names|Wisconsin Software Corporation
+.Company|Wisconsin Software Corporation
+
+<TESTCASE>|Company Name with Corp|Wisconsin Software Corp
+Names|Wisconsin Software Corp
+.Company|Wisconsin Software Corp
+
+<TESTCASE>|Company Name with Company|Wisconsin Software Company
+Names|Wisconsin Software Company
+.Company|Wisconsin Software Company
+
+<TESTCASE>|Company Name with Partners|Wisconsin Software Partners
+Names|Wisconsin Software Partners
+.Company|Wisconsin Software Partners
+
+<TESTCASE>|Company Name with Partnership|Wisconsin Software Partnership
+Names|Wisconsin Software Partnership
+.Company|Wisconsin Software Partnership
+
+<TESTCASE>|Company Name with Limited|Wisconsin Software Limited
+Names|Wisconsin Software Limited
+.Company|Wisconsin Software Limited
+
+<TESTCASE>|Company Name with Mortgage|Citibank Mortgage
+Names|Citibank Mortgage
+.Company|Citibank Mortgage
+
+<TESTCASE>|Company Name with Properties|Wisconsin Software Properties
+Names|Wisconsin Software Properties
+.Company|Wisconsin Software Properties
+
+<TESTCASE>|Company Name with Association|Wisconsin Software Association
+Names|Wisconsin Software Association
+.Company|Wisconsin Software Association
+
+<TESTCASE>|Company Name with Bank1|Fly By Night Bank
+Names|Fly By Night Bank
+.Company|Fly By Night Bank
+
+<TESTCASE>|Company Name with Bank2|Investorsbank
+Names|Investorsbank
+.Company|Investorsbank
+
+<TESTCASE>|Person Name with Bank|Bob Eubank
+Names|Bob Eubank
+.Person|Bob Eubank
+..First|Bob
+..Last|Eubank
+
+<TESTCASE>|Company Name with Banking|Fly By Night Banking
+Names|Fly By Night Banking
+.Company|Fly By Night Banking
+
+<TESTCASE>|Company Name with Credit1|Fly By Night Credit Union
+Names|Fly By Night Credit Union
+.Company|Fly By Night Credit Union
+
+<TESTCASE>|Company Name with Credit2|EquiCredit Service
+Names|EquiCredit Service
+.Company|EquiCredit Service
+
+<TESTCASE>|Company Name with Financial|Fly By Night Financial
+Names|Fly By Night Financial
+.Company|Fly By Night Financial
+
+<TESTCASE>|Company Name with Lending|Fly By Night Lending
+Names|Fly By Night Lending
+.Company|Fly By Night Lending
+
+<TESTCASE>|Company Name with Realty|Fly By Night Realty
+Names|Fly By Night Realty
+.Company|Fly By Night Realty
+
+<TESTCASE>|Company Name with Equity|Fly By Night Home Equity
+Names|Fly By Night Home Equity
+.Company|Fly By Night Home Equity
+
+<TESTCASE>|Company Name with Investment|Fly By Night Investment
+Names|Fly By Night Investment
+.Company|Fly By Night Investment
+
+<TESTCASE>|Company Name with Investments|Fly By Night Investments
+Names|Fly By Night Investments
+.Company|Fly By Night Investments
+
+<TESTCASE>|Company Name with School District|Midland School District
+Names|Midland School District
+.Company|Midland School District
+
+<TESTCASE>|Company Name with District|Midland Tax District
+Names|Midland Tax District
+.Company|Midland Tax District
+
+<TESTCASE>|Company Name with Leasing|Fly By Night Leasing
+Names|Fly By Night Leasing
+.Company|Fly By Night Leasing
+
+<TESTCASE>|Company Name with Rental|Fly By Night Rental
+Names|Fly By Night Rental
+.Company|Fly By Night Rental
+
+<TESTCASE>|Company Name with Rentals|Fly By Night Rentals
+Names|Fly By Night Rentals
+.Company|Fly By Night Rentals
+
+<TESTCASE>|Company Name with Borough|Borough Of Sewickley
+Names|Borough Of Sewickley
+.Company|Borough Of Sewickley
+
+<TESTCASE>|Company Name with Construction|Fly By Night Construction
+Names|Fly By Night Construction
+.Company|Fly By Night Construction
+
+<TESTCASE>|Company Name with Development|Fly By Night Development
+Names|Fly By Night Development
+.Company|Fly By Night Development
+
+<TESTCASE>|Company Name with Redevelopment|Fly By Night Redevelopment
+Names|Fly By Night Redevelopment
+.Company|Fly By Night Redevelopment
+
+<TESTCASE>|Company Name with Builders|Fly By Night Builders
+Names|Fly By Night Builders
+.Company|Fly By Night Builders
+
+<TESTCASE>|Company Name with Enterprises|Fly By Night Enterprises
+Names|Fly By Night Enterprises
+.Company|Fly By Night Enterprises
+
+<TESTCASE>|Company Name with Baptist Church|Elmira Baptist Church
+Names|Elmira Baptist Church
+.Company|Elmira Baptist Church
+
+<TESTCASE>|Company Name with Methodist Church|Elmira Methodist Church
+Names|Elmira Methodist Church
+.Company|Elmira Methodist Church
+
+<TESTCASE>|Company Name with Catholic Church|St. Elmira Catholic Church
+Names|St. Elmira Catholic Church
+.Company|St. Elmira Catholic Church
+
+<TESTCASE>|Company Name with Lutheran Church|Elmira Lutheran Church
+Names|Elmira Lutheran Church
+.Company|Elmira Lutheran Church
+
+<TESTCASE>|Company Name with Wedding Church|Elmira Wedding Church
+Names|Elmira Wedding Church
+.Company|Elmira Wedding Church
+
+<TESTCASE>|Company Name with University|Elmira University
+Names|Elmira University
+.Company|Elmira University
+
+<TESTCASE>|Company Name with Community College|Elmira Community College
+Names|Elmira Community College
+.Company|Elmira Community College
+
+<TESTCASE>|Company Name with Graduate Center|Elmira Graduate Center
+Names|Elmira Graduate Center
+.Company|Elmira Graduate Center
+
+<TESTCASE>|Company Name with Neighborhood|Fly By Night Neighborhood Center
+Names|Fly By Night Neighborhood Center
+.Company|Fly By Night Neighborhood Center
+
+<TESTCASE>|Company Name with Wholesale|Fly By Night Wholesale
+Names|Fly By Night Wholesale
+.Company|Fly By Night Wholesale
+
+<TESTCASE>|Company Name with Homes|Fly By Night Homes
+Names|Fly By Night Homes
+.Company|Fly By Night Homes
+
+<TESTCASE>|Company Name with Farms|Floyd Patterson Farms
+Names|Floyd Patterson Farms
+.Company|Floyd Patterson Farms
+
+<TESTCASE>|Company Name with Counties|Coastal Counties Escrow
+Names|Coastal Counties Escrow
+.Company|Coastal Counties Escrow
+
+<TESTCASE>|Company Name with Hospital|Floyd Patterson Hospital
+Names|Floyd Patterson Hospital
+.Company|Floyd Patterson Hospital
+
+<TESTCASE>|Company Name with Specialists|Floyd Patterson Specialists
+Names|Floyd Patterson Specialists
+.Company|Floyd Patterson Specialists
+
+<TESTCASE>|Company Name with Bureau|Floyd Patterson Farm Bureau
+Names|Floyd Patterson Farm Bureau
+.Company|Floyd Patterson Farm Bureau
+
+<TESTCASE>|Company Name with Insurance|Floyd Patterson Insurance
+Names|Floyd Patterson Insurance
+.Company|Floyd Patterson Insurance
+
+<TESTCASE>|Company Name with Landscaping|Borges Landscaping
+Names|Borges Landscaping
+.Company|Borges Landscaping
+
+<TESTCASE>|Company Name with Iron Works|Nor-Cal Iron Works
+Names|Nor-Cal Iron Works
+.Company|Nor-Cal Iron Works
+
+<TESTCASE>|Company Name with Cameras|RK's Paramount Cameras
+Names|RK's Paramount Cameras
+.Company|RK's Paramount Cameras
+
+
+<TESTCASE>|Company Name with Camera|Southside Camera
+Names|Southside Camera
+.Company|Southside Camera
+
+<TESTCASE>|Company Name with Housing|Western Pacific Housing
+Names|Western Pacific Housing
+.Company|Western Pacific Housing
+
+<TESTCASE>|Company Name with Casualty|Allied Property & Casualty
+Names|Allied Property & Casualty
+.Company|Allied Property & Casualty
+
+// Companies with Digits
+<TESTCASE>|Company Name with Digits1|4 SEASONS LANDSCAPE
+Names|4 SEASONS LANDSCAPE
+.Company|4 SEASONS LANDSCAPE
+
+<TESTCASE>|Company Name with Digits2|134-121 JOINT VENTURE
+Names|134-121 JOINT VENTURE
+.Company|134-121 JOINT VENTURE
+
+<TESTCASE>|Company Name with Digits3|1ST AUTO SALES
+Names|1ST AUTO SALES
+.Company|1ST AUTO SALES
+
+<TESTCASE>|Company Name with Digits4|7582 SOUTHWEST JOINT VENTURE
+Names|7582 SOUTHWEST JOINT VENTURE
+.Company|7582 SOUTHWEST JOINT VENTURE
+
+// More Company Designators
+<TESTCASE>|Company Name with Engineering|Floyd Patterson Engineering
+Names|Floyd Patterson Engineering
+.Company|Floyd Patterson Engineering
+
+<TESTCASE>|Company Name with And Sons|Floyd Patterson And Sons
+Names|Floyd Patterson And Sons
+.Company|Floyd Patterson And Sons
+
+<TESTCASE>|Company Name with & Sons|Floyd Patterson & Sons
+Names|Floyd Patterson & Sons
+.Company|Floyd Patterson & Sons
+
+<TESTCASE>|Company Name with Communities|ACME Communities
+Names|ACME Communities
+.Company|ACME Communities
+
+<TESTCASE>|Company Name with Electric|ACME Electric
+Names|ACME Electric
+.Company|ACME Electric
+
+<TESTCASE>|Company Name with Automotive|ACME Automotive
+Names|ACME Automotive
+.Company|ACME Automotive
+
+<TESTCASE>|Company Name with Installations|ACME Installations
+Names|ACME Installations
+.Company|ACME Installations
+
+<TESTCASE>|Company Name with Materials|ACME Materials
+Names|ACME Materials
+.Company|ACME Materials
+
+<TESTCASE>|Company Name with Repair|ACME Repair
+Names|ACME Repair
+.Company|ACME Repair
+
+<TESTCASE>|Company Name with Exchange|ACME Exchange
+Names|ACME Exchange
+.Company|ACME Exchange
+
+<TESTCASE>|Company Name with Consultants|ACME Consultants
+Names|ACME Consultants
+.Company|ACME Consultants
+
+<TESTCASE>|Company Name with Education|ACME Education
+Names|ACME Education
+.Company|ACME Education
+
+<TESTCASE>|Company Name with Manufacturing|ACME Manufacturing
+Names|ACME Manufacturing
+.Company|ACME Manufacturing
+
+<TESTCASE>|Company Name with Veterans|Secretary of Veterans Affairs
+Names|Secretary of Veterans Affairs
+.Company|Secretary of Veterans Affairs
+
+<TESTCASE>|Company Name with Apartment|ACME Apartment Complex
+Names|ACME Apartment Complex
+.Company|ACME Apartment Complex
+
+<TESTCASE>|Company Name with Apartments|ACME Apartments
+Names|ACME Apartments
+.Company|ACME Apartments
+
+<TESTCASE>|Company Name with Systems|Statewide Energy Systems
+Names|Statewide Energy Systems
+.Company|Statewide Energy Systems
+
+<TESTCASE>|Company Name with FCU|NW PREFERRED FCU
+Names|NW PREFERRED FCU
+.Company|NW PREFERRED FCU
+
+<TESTCASE>|Company Name with MERS|MERS
+Names|MERS
+.Company|MERS
+
+<TESTCASE>|Company Name with restaurant|Nick's Restaurant
+Names|Nick's Restaurant
+.Company|Nick's Restaurant
+
+<TESTCASE>|Company Name with Recordings|US Recordings
+Names|US Recordings
+.Company|US Recordings
+
+<TESTCASE>|Company Name with Mutual|Washington Mutual
+Names|Washington Mutual
+.Company|Washington Mutual
+
+<TESTCASE>|Company Name with PC|Doctors Clinic, PC
+Names|Doctors Clinic, PC
+.Company|Doctors Clinic, PC
+
+<TESTCASE>|Company Name with Architects|Bond Wolfe Architects
+Names|Bond Wolfe Architects
+.Company|Bond Wolfe Architects
+
+<TESTCASE>|Company Name with Trust|Suntrust Mortgage, Inc.
+Names|Suntrust Mortgage, Inc.
+.Company|Suntrust Mortgage, Inc.
+
+<TESTCASE>|Company Name with Global|Citigroup Global Markets
+Names|Citigroup Global Markets
+.Company|Citigroup Global Markets
+
+<TESTCASE>|Company Name with .COM|ditech.com
+Names|ditech.com
+.Company|ditech.com
+
+// P16 #1352
+<TESTCASE>|Company Name with Joint Venture|C&A/GFSP Joint Venture, a Florida General Partnership
+Names|C&A/GFSP Joint Venture, a Florida General Partnership
+.Company|C&A/GFSP Joint Venture, a Florida General Partnership
+
+// P16 #1642
+<TESTCASE>|Company Name with Savings and Loan|Great Lakes Savings and Loan Association
+Names|Great Lakes Savings and Loan Association
+.Company|Great Lakes Savings and Loan Association
+
+// P13 #4698
+<TESTCASE>|Company Name with Funding|LVNV Funding
+Names|LVNV Funding
+.Company|LVNV Funding

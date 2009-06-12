@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.AttributeFinderEngine.1 = s 'AttributeFinderEngine Class'
+	{
+		CLSID = s '{6C9B5C0F-D0AD-477C-82C1-44E2EDDD7C36}'
+	}
+	UCLIDAFCore.AttributeFinderEngine = s 'AttributeFinderEngine Class'
+	{
+		CLSID = s '{6C9B5C0F-D0AD-477C-82C1-44E2EDDD7C36}'
+		CurVer = s 'UCLIDAFCore.AttributeFinderEngine.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6C9B5C0F-D0AD-477C-82C1-44E2EDDD7C36} = s 'AttributeFinderEngine Class'
+		{
+			ProgID = s 'UCLIDAFCore.AttributeFinderEngine.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.AttributeFinderEngine'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

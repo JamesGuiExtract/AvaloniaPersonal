@@ -1,0 +1,53 @@
+// UCLIDFilters.idl : IDL source for UCLIDFilters.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDFilters.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(F6B618C1-595B-11D6-8286-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID Filters 1.0 Type Library")
+]
+library UCLID_FILTERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDDistanceConverter\Code\UCLIDDistanceConverter.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	// Interfaces
+	[
+		object,
+		uuid(F6B618D0-595B-11D6-8286-0050DAD4FF55),
+		dual,
+		helpstring("IDistanceFilter Interface"),
+		pointer_default(unique)
+	]
+	interface IDistanceFilter : IDispatch
+	{
+		[id(1), helpstring("method SetDefaultUnitType")] HRESULT SetDefaultUnitType([in] EDistanceUnitType eDefaultUnit);
+		[id(2), helpstring("method Evaluate")] HRESULT Evaluate([in] BSTR bstrInput);
+		[id(4), helpstring("method GetDistanceInUnit")] HRESULT GetDistanceInUnit([out] double* pdOutValue, [in] EDistanceUnitType eOutUnit);
+		[id(5), helpstring("method GetOriginalInputString")] HRESULT GetOriginalInputString([out] BSTR* pbstrOrignInput);
+		[id(6), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *pbValid);
+		[id(7), helpstring("method Reset")] HRESULT Reset();
+		[id(8), helpstring("method AsStringInUnit")] HRESULT AsStringInUnit([out] BSTR* pbstrOut, [in] EDistanceUnitType eUnitType);
+	};
+
+	// Coclasses
+	[
+		uuid(F6B618D1-595B-11D6-8286-0050DAD4FF55),
+		helpstring("DistanceFilter Class")
+	]
+	coclass DistanceFilter
+	{
+		[default] interface IDistanceFilter;
+		interface ILicensedComponent;
+		interface ITestableComponent;
+	};
+};

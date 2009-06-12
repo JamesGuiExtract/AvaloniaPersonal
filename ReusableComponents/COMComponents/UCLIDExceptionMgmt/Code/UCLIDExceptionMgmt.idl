@@ -1,0 +1,126 @@
+// UCLIDExceptionMgmt.idl : IDL source for UCLIDExceptionMgmt.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDExceptionMgmt.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+
+[
+	uuid(454F2387-F8A9-4F64-9A5E-7B06784E8751),
+	version(1.0),
+	helpstring("UCLID ExceptionMgmt 1.0 Type Library")
+]
+library UCLID_EXCEPTIONMGMTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		object,
+		uuid(56149D14-107A-41E6-B90B-887202DD8C4B),
+		dual,
+		helpstring("ICOMUCLIDException Interface"),
+		pointer_default(unique)
+	]
+	interface ICOMUCLIDException : IDispatch
+	{
+		//[id(1), helpstring("method AddHistoryRecord")] HRESULT AddHistoryRecord([in] BSTR strELICode, [in] BSTR strText);
+		
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To display the exception using the UCLIDExcepitonDlg and log
+		//				the exception.
+		[id(2), helpstring("method Display")] HRESULT Display();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To Add the debug info with the given key name and value.
+		// ARGS:		strKeyName - Key name to associate with the debug info.
+		//				strStringizedValue - debug info value expressed as a string.
+		[id(3), helpstring("method AddDebugInfo")] HRESULT AddDebugInfo([in] BSTR strKeyName, 
+			[in] BSTR strStringizedValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To set the info for the exception based on the ELICode and Data value
+		// ARGS:		strELICode - ELI code for the exception if the strData value is not a 
+		//							 stringized exception value.
+		//				strData - Description text for the exception or a stringized exception as
+		//						  returned from AasStringizedByteStream.
+		[id(4), helpstring("method CreateFromString")] HRESULT CreateFromString(
+			[in] BSTR strELICode, [in] BSTR strData);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the exception as a string.
+		// ARGS:		pstrData - return value that contains the exception as a string.
+		[id(5), helpstring("method AsStringizedByteStream")] HRESULT AsStringizedByteStream(
+			[out, retval] BSTR *pstrData);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the ELI Code of the exception.
+		// ARGS:		pstrCode - return value that contains the ELI code of the exception.
+		[id(6), helpstring("method GetTopELICode")] HRESULT GetTopELICode(
+			[out, retval] BSTR *pstrCode);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the text description of the exception.
+		// ARGS:		pstrText - return value that contains the text description of the exception.
+		[id(7), helpstring("method GetTopText")] HRESULT GetTopText([out, retval] BSTR *pstrText);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To log the exception in the default log file(uclidexception.uex).
+		[id(8), helpstring("method Log")] HRESULT Log();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To save the stringized exception to the given file.
+		// ARGS:		strFullFileName - name of file to save the exception to.
+		//				bAppend - flag to indicate if the exception should be appended to the 
+		//						  given file.
+		[id(9), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bAppend);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To set the ELI Code, exception text and inner exception for the COM 
+		//				Exception object.
+		// ARGS:		strELICode		- ELI Code to be associated with this exception.				
+		//				strText			- Text description of the exception.
+		//				pInnerException - COM Exception object to used as the Inner Exception 
+		//								  for this exception. This value can be NULL.
+		[id(10), helpstring("method CreateWithInnerException")] HRESULT CreateWithInnerException(
+			[in] BSTR strELICode, [in] BSTR strText, [in] ICOMUCLIDException *pInnerException);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To add a stack trace entry to the exception object.
+		// ARGS:		strStackTrace	- Stack trace entry to be added to the stack trace.
+		[id(11), helpstring("method AddStackTraceEntry")] HRESULT AddStackTraceEntry(
+			[in] BSTR strStackTrace);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To get the stack trace entry with the specified index.
+		// ARGS:		nIndex - Index of the stack trace entry to return.
+		//				pstrStackTrace - string pointer to return the stack trace.
+		[id(12), helpstring("method GetStackTraceEntry")] HRESULT GetStackTraceEntry(
+			[in] long nIndex, [out, retval] BSTR *pstrStackTrace);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the inner exception that is associated with this exception.
+		// ARGS:		ppInnerException - return value that contains the pointer to the 
+		//				inner exception, if there is no inner exception the value will be NULL.
+		[id(13), helpstring("method GetInnerException")] HRESULT GetInnerException(
+			[out, retval] ICOMUCLIDException **ppInnerException);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the number of stack trace entries.
+		// ARGS:		pnIndex - return value for the number of stack trace entries.
+		[id(14), helpstring("method GetStackTraceCount")] HRESULT GetStackTraceCount(
+			[out, retval] long *pnIndex);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To the debug info for the given index.
+		// ARGS:		nIndex - Index of debug info to return.
+		//				pbstrKeyName - returned key name for the debug info.
+		//				pbstrStringizedValue - return stringized value for the debug info.
+		[id(15), helpstring("method GetDebugInfo")] HRESULT GetDebugInfo([in] long nIndex, 
+			[out] BSTR* pbstrKeyName, [out] BSTR* pbstrStringizedValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To return the number of debug info entries.
+		// ARGS:		pnIndex - return value for the number of stack trace entries.
+		[id(16), helpstring("method GetDebugInfoCount")] HRESULT GetDebugInfoCount(
+			[out, retval] long *pnIndex);
+	};
+	[
+		uuid(FC391C54-6F67-436E-B7C5-DA799737752E),
+		helpstring("COMUCLIDException Class")
+	]
+	coclass COMUCLIDException
+	{
+		[default] interface ICOMUCLIDException;
+	};
+};

@@ -1,0 +1,26 @@
+HKCR
+{
+	AFOutputHandlers.RunObjectOnQuery.1 = s 'RunObjectOnQuery Class'
+	{
+		CLSID = s '{95A0317C-402E-4492-B82E-9D8696EF25A0}'
+	}
+	AFOutputHandlers.RunObjectOnQuery = s 'RunObjectOnQuery Class'
+	{
+		CLSID = s '{95A0317C-402E-4492-B82E-9D8696EF25A0}'
+		CurVer = s 'AFOutputHandlers.RunObjectOnQuery.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {95A0317C-402E-4492-B82E-9D8696EF25A0} = s 'RunObjectOnQuery Class'
+		{
+			ProgID = s 'AFOutputHandlers.RunObjectOnQuery.1'
+			VersionIndependentProgID = s 'AFOutputHandlers.RunObjectOnQuery'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

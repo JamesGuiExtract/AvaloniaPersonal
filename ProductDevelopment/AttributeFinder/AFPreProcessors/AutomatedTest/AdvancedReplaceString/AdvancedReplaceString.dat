@@ -1,0 +1,88 @@
+//*********************************************************************************
+// AdvancedReplaceString.dat
+// 		This file contains testcases for testing the AdvancedReplaceString Value Modifier
+//*********************************************************************************
+
+// Finds the Legal Desc in file in file and changes all instances of "th" to "<TH>"
+<TESTCASE>;AdvRplcStr01.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr01.eav
+
+// Finds the Legal Desc in file and changes First instance of "th" to "<TH>"
+<TESTCASE>;AdvRplcStr02.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr02.eav
+
+// Finds the Legal Desc in file and changes Last instance of "th" to "<TH>"
+<TESTCASE>;AdvRplcStr03.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr03.eav
+
+// Finds the Legal Desc in file and changes 2nd instance of "th" to "<TH>"
+<TESTCASE>;AdvRplcStr04.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr04.eav
+
+// Finds the Legal Desc in file and changes All instances of case sensitive "th" to "<TH>"
+<TESTCASE>;AdvRplcStr05.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr05.eav
+
+// Finds the Legal Desc in file and changes First instance of case sensitive "th" to "<TH>"
+<TESTCASE>;AdvRplcStr06.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr06.eav
+
+// Finds the Legal Desc in file and changes Last instance of case sensitive "TH" to "<th>"
+<TESTCASE>;AdvRplcStr07.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr07.eav
+
+// Finds the Legal Desc in file and changes 2nd instance of case sensitive "TH" to "<th>"
+<TESTCASE>;AdvRplcStr08.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr08.eav
+
+// Finds the Legal Desc in file and changes All instances of (-|\s)(th)([\S]+) to $1$2<$3>
+<TESTCASE>;AdvRplcStr09.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr09.eav
+
+// Finds the Legal Desc in file and changes first instance of (-|\s)(th)([\S]+) to $1$2<$3>
+<TESTCASE>;AdvRplcStr10.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr10.eav
+
+// Finds the Legal Desc in file and changes Last instance of (-|\s)(th)([\S]+) to $1$2<$3>
+<TESTCASE>;AdvRplcStr11.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr11.eav
+
+// Finds the Legal Desc in file and changes 2nd instance of (-|\s)(th)([\S]+) to $1$2<$3>
+<TESTCASE>;AdvRplcStr12.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr12.eav
+
+// Finds the Legal Desc in file and changes all  instances of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity
+<TESTCASE>;AdvRplcStr13.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr13.eav
+
+// Finds the Legal Desc in file and changes first instance of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity
+<TESTCASE>;AdvRplcStr14.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr14.eav
+
+// Finds the Legal Desc in file and changes Last instance of (-|\s)(TH)([\S]+) to $1$2<$3> with Case Sensitivity
+<TESTCASE>;AdvRplcStr15.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr15.eav
+
+// Finds the Legal Desc in file and changes 2nd instance of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity
+<TESTCASE>;AdvRplcStr16.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr16.eav
+
+//Testcase17 to 23 are used to test the Dynamic File Feature of Advanced Replace String.
+
+//Finds the Legal Desc in file and changes all occurence of th to <TH>
+<TESTCASE>;AdvRplcStr17.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr17.eav
+
+//Finds the Legal Desc in file and the first occurence of th to <TH>
+<TESTCASE>;AdvRplcStr18.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr18.eav
+
+//Finds the Legal Desc in file and the last occurence of th to <TH>
+<TESTCASE>;AdvRplcStr19.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr19.eav
+
+//Finds the Legal Desc in file and the 3rd occurence of th to <TH>
+<TESTCASE>;AdvRplcStr20.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr20.eav
+
+//"String to find" is a regular expression, "Replace with" utilizes the Dynamic File List feature 
+// Finds the Legal Desc in file and changes all  instances of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity 
+<TESTCASE>;AdvRplcStr21.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr21.eav
+
+//"String to find" is a regular expression, "Replace with" utilizes the Dynamic File List feature  
+// Finds the Legal Desc in file and changes first instance of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity 
+//"String to find" does not use the Dynamic File List feature, "Replace with" does
+<TESTCASE>;AdvRplcStr22.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr22.eav
+
+//"String to find" is a regular expression, "Replace with" utilizes the Dynamic File List feature 
+// Finds the Legal Desc in file and changes last instance of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity 
+//"String to find" utilizes the Dynamic File List feature, "Replace with" does not
+<TESTCASE>;AdvRplcStr23.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr23.eav 
+
+//"String to find" is a regular expression, "Replace with" utilizes the Dynamic File List feature  
+// Finds the Legal Desc in file and changes second instance of (-|\s)(th)([\S]+) to $1$2<$3> with Case Sensitivity 
+//as "File://" and "FILE://" to test case insensitivity.
+<TESTCASE>;AdvRplcStr24.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr24.eav
+
+//Multiple captured subexpression replacements. [FlexIDSCore #3114]
+<TESTCASE>;AdvRplcStr25.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;AdvRplcStr25.eav

@@ -1,0 +1,26 @@
+[PATTERNS_BEGIN]
+rule01=presents^3~that^?Grantor^240~Administrator^100~estate^3~of^?Estate^120~deceased^500~paid^3~to^3~it
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800116.tif.uss
+rule02=by^3~this^3~deed^?Grantor^240~[a married|husband and^100~grantor^120~convey^9~warrant
+rule03=by^3~this^3~deed^?Grantor^240~grantor^120~convey^9~warrant
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800127.tif
+rule04=witnesseth^9~that^?Grantor^240~[part|party^16~first^3~part
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800116.tif.uss
+rule05=by^3~this^3~deed^?Grantor^240~grantor^16~convey|warrant
+rule06=statutory^6~form^100~that^?Grantor^240~co^4~y^3~and^3~warrant
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800294.tif.uss
+rule07=witnesseth^6~that^?Grantor^240~party of the first|of the first part
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800349.tif
+rule08=tween]^?Grantor^240~p^1~rty|rties^80~of^3~the^3~first
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800579.tif.uss
+rule09=tween]^?Grantor^240~p^1~rty|rties^60~the^3~first^3~part
+rule09a=tween]^?Grantor^240~p^1~rty|rties^60~of^3~the^3~first
+rule09a=tween]^?Grantor^240~p^1~rty|rties^9~the^3~first
+
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800618.tif.uss
+rule10=tween^40~january|february|march|april|may|june|july|august|september|october|november|december^?Grantor^240~of the first|the first part
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800625.tif
+rule11=tween]^?Grantor^240~of the first|the first part
+//K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set002\Images\WD\0087800661.tif
+rule12=witnesse|sseth^9~that]^?Grantor^240~[p^1~rties|rty^3~of^3~the^3~first
+[PATTERNS_END]

@@ -1,0 +1,11 @@
+// DT:00298
+//	Added initial expression
+
+// Modified to no longer get the North, south, east, or west as halves
+/*
+(\bnorth\b|\bsouth\b|\beast\b|\bwest\b|(\bnorth|\bsouth)(east\b|west\b)|
+(\bN|\bS)(E\b|W\b))
+*/
+
+((\bnorth|\bsouth)\s*(east\b|west\b)|
+(\bN|\bS)(E\b|W\b))

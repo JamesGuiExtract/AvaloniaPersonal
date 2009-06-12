@@ -1,0 +1,2 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

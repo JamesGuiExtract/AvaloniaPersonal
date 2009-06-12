@@ -1,0 +1,7 @@
+(?:.{0,3}(?!.DDR.SS)ADD(?!R)[\s\S]{3,9}|.{0,4}DDITI[\s\S]{1,7}|.{0,6}ITION[\s\S]{0,4})(?:D.BT|.{0,2}.BT.|.{0,4}(?:BT.R|T.R.?S))
+.{0,3}.DD.T..N.L\s*(?:D.BT|.{0,2}.BT.|.{0,4}(?:BT.R|T.R.?S))
+^2\.?\s*.DD.T..N.L
+^2.*D.BT.R.?S\s*.X.CT
+.*(?!.*21.*|.*11.*)AL\s*D.BT.R.?S\s*.X.CT
+^2[.,].*(?:insert\s*only|only\s*one\s*debtor|do\s*not\s*abbr|combine\s*names)
+^.{50,80}(?:[o0]ne\s*d.bt.r.*2[ab]|name\s*.?(?:2a\s*.r\s*2|2.\s*.r\s*2b))

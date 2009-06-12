@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.OCRAreaPP.1 = s 'OCRAreaPP Class'
+	{
+		CLSID = s '{1C197EB9-C0AA-4fe3-940D-4D13058236F9}'
+	}
+	UCLIDAFValueModifiers.OCRAreaPP = s 'OCRAreaPP Class'
+	{
+		CLSID = s '{1C197EB9-C0AA-4fe3-940D-4D13058236F9}'
+		CurVer = s 'UCLIDAFValueModifiers.OCRAreaPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {1C197EB9-C0AA-4fe3-940D-4D13058236F9} = s 'OCRAreaPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

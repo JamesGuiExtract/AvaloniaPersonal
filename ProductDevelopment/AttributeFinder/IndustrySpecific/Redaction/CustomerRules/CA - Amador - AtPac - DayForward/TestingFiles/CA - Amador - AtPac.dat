@@ -1,0 +1,20 @@
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Old Stats
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;DocTypesToVerify=Affidavit of Death|Certificate of Death
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
+
+//Hybrid Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=only any
+//<SETTING>;AutomatedCondition=HCData
+//<SETTING>;OutputHybridStats=1
+
+<SETTING>;OutputFinalStatsOnly=1
+
+// Master.rsd rule file
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Amador\Set002\RandomSubset;$DirOf(<SourceDocName>)\$FileOf(<SourceDocName>).voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

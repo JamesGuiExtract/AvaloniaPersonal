@@ -1,0 +1,282 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Two Persons without Designators or Identifiers
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Plain Names|John Smith Mary Smith
+Names|John Smith Mary Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Plain Names With Comma|John Smith, Mary Smith
+Names|John Smith, Mary Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Two Person Names and One Ignored Company Name|John Smith\r\nMary Smith\r\nMinuteman Press Of Santa Clara
+Names|John Smith\r\nMary Smith\r\nMinuteman Press Of Santa Clara
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with First Initial|Mary W. Smith John Smith
+Names|Mary W. Smith John Smith
+.Person|Mary W. Smith
+..First|Mary
+..Last|Smith
+..Middle|W.
+.Person|John Smith
+..First|John
+..Last|Smith
+
+<TESTCASE>|Names with Second Initial|Mary Smith John H. Smith
+Names|Mary Smith John H. Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Names with Duplicate Initial|Mary H Smith John H Smith
+Names|Mary H Smith John H Smith
+.Person|Mary H Smith
+..First|Mary
+..Last|Smith
+..Middle|H
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+
+<TESTCASE>|Different Last Names with Initials|Mary H Smith John M. Jones
+Names|Mary H Smith John M. Jones
+.Person|Mary H Smith
+..First|Mary
+..Last|Smith
+..Middle|H
+.Person|John M. Jones
+..First|John
+..Last|Jones
+..Middle|M.
+
+<TESTCASE>|Names with Only Initials|J J Smith Mary H Smith
+Names|J J Smith Mary H Smith
+.Person|J J Smith
+..First|J
+..Last|Smith
+..Middle|J
+.Person|Mary H Smith
+..First|Mary
+..Last|Smith
+..Middle|H
+
+<TESTCASE>|Names with Initial and Comma|John H Smith, Mary Smith
+Names|John H Smith, Mary Smith
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with Suffix|John Smith, Jr Peter Jones, Jr.
+Names|John Smith, Jr Peter Jones, Jr.
+.Person|John Smith, Jr
+..Suffix|Jr
+..First|John
+..Last|Smith
+.Person|Peter Jones, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Jones
+
+<TESTCASE>|Name without Last Name|John H, Mary Smith
+Names|John H, Mary Smith
+.Person|John H Smith
+..First|John
+..Middle|H
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Name without Last Name 2|John H. and Mary Smith
+Names|John H. and Mary Smith
+.Person|John H. Smith
+..First|John
+..Middle|H.
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Names with Titles|Mr John H Smith, Mrs. Mary Smith
+Names|Mr John H Smith, Mrs. Mary Smith
+.Person|Mr John H Smith
+..Title|Mr
+..First|John
+..Last|Smith
+..Middle|H
+.Person|Mrs. Mary Smith
+..Title|Mrs.
+..First|Mary
+..Last|Smith
+
+<TESTCASE>|Two Big Names|Prof John Henry Smith II Dr. Mary Anne Williams-Smith
+Names|Prof John Henry Smith II Dr. Mary Anne Williams-Smith
+.Person|Prof John Henry Smith II
+..Title|Prof
+..Suffix|II
+..First|John
+..Last|Smith
+..Middle|Henry
+.Person|Dr. Mary Anne Williams-Smith
+..Title|Dr.
+..First|Mary
+..Last|Williams-Smith
+..Middle|Anne
+
+<TESTCASE>|Long and Short with Comma|Mr John H. Smith III, Henry Jones
+Names|Mr John H. Smith III, Henry Jones
+.Person|Mr John H. Smith III
+..Title|Mr
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+
+<TESTCASE>|Long and Short without Comma|Mr John H. Smith III Henry Jones
+Names|Mr John H. Smith III Henry Jones
+.Person|Mr John H. Smith III
+..Title|Mr
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+
+<TESTCASE>|Short and Long with Comma|Henry Jones, Mr John H. Smith III
+Names|Henry Jones, Mr John H. Smith III
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+.Person|Mr John H. Smith III
+..Title|Mr
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Short and Long without Comma|Henry Jones Mr John H. Smith III
+Names|Henry Jones Mr John H. Smith III
+.Person|Henry Jones
+..First|Henry
+..Last|Jones
+.Person|Mr John H. Smith III
+..Title|Mr
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Two Long with Comma|Mr John H. Smith II, Mr John H. Smith III
+Names|Mr John H. Smith II, Mr John H. Smith III
+.Person|Mr John H. Smith II
+..Title|Mr
+..Suffix|II
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mr John H. Smith III
+..Title|Mr
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Two Long without Comma|Mr. John H. Smith Sr. Mr John H. Smith Jr.
+Names|Mr. John H. Smith Sr. Mr John H. Smith Jr.
+.Person|Mr. John H. Smith Sr.
+..Title|Mr.
+..Suffix|Sr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mr John H. Smith Jr.
+..Title|Mr
+..Suffix|Jr.
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Last Name First1|John, Mary
+Names|John, Mary
+.Person|John, Mary
+..Last|John
+..First|Mary
+
+<TESTCASE>|Last Name First2|Van Buren, John L
+Names|Van Buren, John L
+.Person|Van Buren, John L
+..First|John
+..Last|Van Buren
+..Middle|L
+
+<TESTCASE>|Last Name First3|Van Buren, John Lab Rat
+Names|Van Buren, John Lab Rat
+.Person|Van Buren, John Lab Rat
+..First|John
+..Last|Van Buren
+..Middle|Lab Rat
+
+<TESTCASE>|Last Name First4|Smith, John L and Smith, Mary Q
+Names|Smith, John L and Smith, Mary Q
+.Person|Smith, John L
+..First|John
+..Last|Smith
+..Middle|L
+.Person|Smith, Mary Q
+..First|Mary
+..Last|Smith
+..Middle|Q
+
+<TESTCASE>|Last Name First5|Smith, John L Jr
+Names|Smith, John L Jr
+.Person|Smith, John L Jr
+..Suffix|Jr
+..First|John
+..Last|Smith
+..Middle|L

@@ -1,0 +1,104 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,ROL-O_SURE_01,false,Release of Utility Lien
+		// 
+		01=^RELEASE\s*OF\s*(?:MUNICIPAL\s*)?UTILITY\s*LIEN\s*(?:\r?$)
+		02=\bhas\s*heretofore\s*recorded\s*a\s*municipal\s*utility\s*lien\s*against\s*the\s*below\s*described\s*property[\s\S]{0,200}fully\s*releases\b
+	OR_END
+
+	OR_BEGIN,ROL-O_SURE_03,false,Release of Child Support Lien
+		// 
+		01=^RELEASE\s*OF\s*CHILD\s*SUPPORT\s*LIEN\s*(?:\r?$)
+	OR_END
+
+	OR_BEGIN,ROL-O_SURE_04,false,Release of Construction Lien
+		// 
+		01=^RELEASE\s*(?:&|AND)\s*DISCHARGE\s*OF\s*CONSTRUCTION\s*LIEN\s*(?:\r?$)
+	OR_END
+
+	OR_BEGIN,ROL-O_SURE_05,false
+		01=^RELEASE\s*OF\s*PAVING\s*LIEN\s*(?:\r?$)
+		02=^PARTIAL\s*RELEASE\s*OF\s*LIEN\s*ON\s*TIMBER\s*(?:\r?$)
+		03=^(?:RELEASE|DISCHARGE)\s*OF\s*CLAIM\s*OF\s*LIEN\s*(?:\r?$)
+		04=^DISCHARGE\s*OF\s*JUDGMENT\s*LIEN(?:\r?$)
+		// 0003.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06178AA.AAE.TIF.uss
+		05=^(?:RELEASE|DISCHARGE)\s*OF\s*ASSESSMENT\s*LIEN(?:\r?$)
+		// 0002.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06173AA.ACE.TIF.uss
+		06=^DISCHARGE\s*AND\s*RELEASE\s*OF\s*AFFIDAVIT\s*AND\s*NOTICE\s*OF\s*CONDOMINIUM\s*LIEN\s*PURSUANT
+		// 0005.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06173AA.ACM.TIF.uss	
+		// 0006.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06173AA.ACN.TIF.uss
+		//0007.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06173AA.ACX.TIF.uss
+		//0008.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06177AA.FSW.TIF.uss
+		07=^(?:RELEASE|DISCHARGE)\s*OF\s*(?:LEVY|CLAIM\s*OF\s*LIEN)(?:\s*[IO]N\s*REAL\s*ESTATE)?(?:\r?$)
+
+	OR_END 
+	
+	OR_BEGIN,ROL-O_SURE_06,false
+		01=^RELEASE\s*OF\s*OIL\s*AND\s*GAS\s*LEASE\s*(?:\r?$)
+	OR_END
+
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	AND_BEGIN,ROL-O_PROBABLE_01,false
+	// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00008301.tif.uss
+	^RELEASE\b.{0,5}\bLIEN(?:\r?$)
+	hereby\s*release\s*it.?s\s*Deed\s*of\s*Trust\s*Lien
+	AND_END
+	AND_BEGIN,ROL-O_PROBABLE_02,false
+	//K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00007535.tif
+	secured\s*by\s*the\s*aforesaid\s*liens?
+	hereby\s*releases\s*and\s*discharges
+	all\s*liens\s*held\s*by\s*the\s*undersigned	
+	AND_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.5,1,2
+	OR_BEGIN,ROL-O_PROBABLE_03,false
+	//K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00008696.tif
+	01=^RELEASE\s*OF\s*HOMEQUITY\s*LOAN(?:\r?$)
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,2
+	OR_BEGIN,ROL-O_MAYBE_01,false
+	// K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00008301.tif.uss
+	02=^RELEASE\b.{0,5}LIEN(?:\r?$)
+	OR_END
+
+SCOPE_END
+
+[MAYBE_END]

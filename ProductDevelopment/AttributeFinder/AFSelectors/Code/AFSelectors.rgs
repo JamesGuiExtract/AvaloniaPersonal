@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'AFSelectors'
+		'AFSelectors.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

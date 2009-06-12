@@ -1,0 +1,2 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestOther.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTGR;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).Other.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\Other\$FileNoExtOf(<SourceDocName>).eav

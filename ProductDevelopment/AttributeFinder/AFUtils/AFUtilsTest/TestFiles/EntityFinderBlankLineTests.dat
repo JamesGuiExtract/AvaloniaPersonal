@@ -1,0 +1,78 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Trimming based on blank line inside text string
+Company with Double CR|Park Bank \r\n\r\n and Depository|Park Bank
+
+Persons with Double CR1|John Smith \r\n\r\n and Mary Smith and more|John Smith \r\n\r\n and Mary Smith
+
+Persons with Double CR2|John Smith \r\n\r\n and Mary Jones|John Smith
+
+Persons with Double CR3|John Smith \r\n\r\n and Mary Jones, husband and wife and more|John Smith \r\n\r\n and Mary Jones, husband and wife
+
+// FlexIDSCore #2959
+Persons with Double CR4|JOHN SMITH \r\n\r\n and MARY JONES|JOHN SMITH \r\n\r\n and MARY JONES
+
+// FlexIDSCore #2959
+Person with Double CR and AKA|CLAYBORN M HOLMES )\r\n\r\n AKA; CHARLES M. HOLMES )|CLAYBORN M HOLMES \r\n\r\n AKA; CHARLES M. HOLMES
+
+// FlexIDSCore #1187
+Persons with Double CR4|JEFFREY HURLEY and Anna Hurley, JOINT TENANCY WITH FULL RIGHTS OF \r\n\r\nSURVIVORSHIP and more|JEFFREY HURLEY and Anna Hurley, JOINT TENANCY WITH FULL RIGHTS OF \r\n\r\nSURVIVORSHIP
+
+// FlexIDSCore #1160
+Persons with Double CR5|RICHARD DANIELS An Unmarried Man and JENIFER WEST AN Unmarried Woman, \r\n\r\n AS JOINT TENANTS and more|RICHARD DANIELS An Unmarried Man and JENIFER WEST AN Unmarried Woman, \r\n\r\n AS JOINT TENANTS
+
+Company with NonAlpha1|123.:^ \r\n\r\n Park Bank \r\n\r\n and Depository|Park Bank
+
+Company with NonAlpha2|Park Bank \r\n\r\n $123400|Park Bank
+
+Company with Date1|Day of May, 2004 \r\n\r\n Park Bank \r\n\r\n and Depository|Park Bank
+
+Company with Date2|Park Bank \r\n\r\n May 23, 2004|Park Bank
+
+Persons with ShortLine1|I \r\n\r\n John Smith, single|John Smith, single
+
+Persons with ShortLine2|John Smith \r\n\r\n and Mary Smith \r\n\r\n I|John Smith \r\n\r\n and Mary Smith
+
+Company with ShortLine1|I \r\n\r\n Park Bank|Park Bank
+
+Company with ShortLine2|Park Bank \r\n\r\n I|Park Bank
+
+Persons with Date1|Day of May, 2004 \r\n\r\n John Smith, single|John Smith, single
+
+Persons with Date2|John Smith \r\n\r\n and Mary Smith \r\n\r\n May 23, 2004|John Smith \r\n\r\n and Mary Smith
+
+Persons with Date3|John Smith \r\n\r\n May 23, 2004|John Smith
+
+Persons with Date4|Day of May, 2004 \r\n\r\n John Smith, single \r\n\r\n Peter Smith, single|John Smith, single \r\n\r\n Peter Smith, single
+
+Company with Case1|PARK BANK \r\n\r\n and Depository|PARK BANK
+
+Company with Case2|Pennsylvania \r\n\r\n PARK BANK|PARK BANK
+
+Persons with Case1|JOHN SMITH \r\n\r\n and Title Case|JOHN SMITH
+
+Persons with Case2|Title Case and \r\n\r\n JOHN SMITH|JOHN SMITH
+
+Persons with Case3|Title Case and \r\n\r\n JOHN SMITH \r\n\r\n MARY SMITH|JOHN SMITH \r\n\r\n MARY SMITH
+
+Persons with Case4|JOHN SMITH \r\n\r\n MARY SMITH \r\n\r\n Title Case|JOHN SMITH \r\n\r\n MARY SMITH
+
+Persons with Word Match|John Smith \r\n\r\n Mary Smith \r\n\r\n Pennsylvania|John Smith \r\n\r\n Mary Smith
+
+Persons with Word Match & Addresses|John Smith \r\n\r\n 123 Main St\r\nAnytown, WI 53711\r\n\r\nMary Smith \r\n\r\n 123 Main St\r\nAnytown, WI 53711\r\n\r\nPennsylvania|John Smith ; Mary Smith

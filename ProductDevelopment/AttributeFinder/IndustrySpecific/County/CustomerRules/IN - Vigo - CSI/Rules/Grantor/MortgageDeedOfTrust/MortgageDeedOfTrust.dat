@@ -1,0 +1,5 @@
+[PATTERNS_BEGIN]
+
+GRANTOR_01=MORTGAGOR:^?Grantor^80~Husband and Wife
+
+[PATTERNS_END]

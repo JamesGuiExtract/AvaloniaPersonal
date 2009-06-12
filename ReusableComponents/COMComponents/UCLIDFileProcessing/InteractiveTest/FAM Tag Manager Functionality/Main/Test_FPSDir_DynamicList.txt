@@ -1,0 +1,4 @@
+D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM Tag Manager Functionality\Main\FPSDir01.TIF
+D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM Tag Manager Functionality\Main\Sub\FPSSubDir01.TIF
+D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM Tag Manager Functionality\FPSParentDir01.tif
+D:\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM Tag Manager Functionality\Sibling\FPSSiblingDir01.tif

@@ -1,0 +1,339 @@
+// ******************************************************************************************
+// 	Warranty Deed.dcc
+//  For syntax details please see:
+//		\ComponentData\DocumentClassifiers\County Document\CommonDT.dcc
+// ******************************************************************************************
+
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,WD_ZERO_01,false
+		// if "quit claim deed" is on its own line, then the document is not a warranty deed
+		// K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017765.tif.uss
+		//is an example of a warranty deed that contains the words "quit claim deed"
+		// embedded in a paragraph of text. 
+		//K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00016626.tif.uss
+		//also contains "quit claim deed" in paragraph text
+		01=^QUIT-?\s*CLAIM\s*DEED(?:\r?$)
+
+		02=\bTHIS\s*QUIT-?\s*CLAIM\s*DEED\b
+
+		//K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018324.tif.uss
+		03=\bquit-?\s*claim\(?s?\)?\s*(?:un)?to\b
+		04=\bEXHIBIT\s*A\s*TO\s*WARRANTY\s*DEED\b
+		05=^\s*REVOLVING\s*CREDIT\s*DEED\s*OF\s*TRUST\s*(?:\r?$)
+		
+		// Because of their similarity in wording, Sheriff's Deeds will often classify
+		// as Warranty Deeds.
+		//K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED SHERIFF CLK-JUD\B06174AA.AGP.TIF
+		06=^SHERIFF.?S\s*DEED\s*ON\s*MORTGAGE\s*(?:SALE|FORECLOSURE)
+	OR_END
+SCOPE_END 
+
+SCOPE_BEGIN,0,0.1,1,1
+	SINGLE_BEGIN,WD_ZERO_03,false
+		//K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN\00012260.tif.uss 
+		^Release\s*of\s*L(?:ie|ei)ns?(?:\r?$)
+	SINGLE_END
+SCOPE_END 
+SCOPE_BEGIN,0,0.5,1,2
+	OR_BEGIN,WD_ZERO_04,false
+	//I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Quit Claim Deed\Grantor\0005.tif.uss
+	01=^DEED\s*OF\s*CONVEYANCE[\s\S]{0,5}\(Quit\s*Claim\s*Deed\)
+	02=^.{0,3}Collateral\s*Assignment\s*of
+	OR_END
+SCOPE_END 
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,WD_SURE_01,false
+		// WARRANTY DEED
+		// 0001.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DEED\2003133416.tif.uss
+		// General warranty Deed
+		// 0002.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DEED\2003132633.tif.uss
+		// GENERAL WARRANTY DEED WITH VENDOR'S LIEN
+		// 0003.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DEED\2003133420.tif.uss
+		// SPECIAL WARRANTY DEED
+		// 0004.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DEED\2003133404.tif.uss
+		// CORPORATE WARRANTY DEED
+		// 0005.tif;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\DEED\2003134124.tif.uss
+		// CONDOMINIUM DEED
+		// 0014.tif;K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\002940.tif.uss
+		// FIDUCIARY DEED
+		// MINERAL WARRANTY DEED
+		// 0016.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WARRANTY DEED\00015098.tif.uss
+		// OWELTY DEED
+		// 0006.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set002\Images\DEED\2003131634.tif.uss
+		// GENERAL WARRANTY DEED - GIFT
+		// 0007.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set006\Images\DEED\2003141439.tif.uss
+		//
+		01=^(?:(?:SUBSTITUTED)?(?:SPECIAL|CASH|MINERAL|GENERAL|ASSUMPTION|CORPORATE|CORRECTION)\s*)?(?:WARRANTY|CONDOMINIUM|FIDUCIARY|OWELTY)\s*DEED\s*(?:-\s*[\s\S]{1,15})?(?:\s*(?:OF|-)\s*GIFT)?(?:\r?$)
+
+		// DEED WITH VENDOR'S LIEN
+		//
+		// GENERAL WARRANTY DEED WITH VENDORS LIEN
+		// 0017.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\WARRANTY DEED\00016348.tif.uss
+		02=^(?:(?:GENERAL|SPECIAL)\s*)?(?:WARRANTY\s*)?DEED[\s\S]{0,15}WITH\s*VENDOR[\s\S]{0,5}LIEN(?:(?:-\s*)?[\s\S]{1,15})?
+
+		//
+		03=^WARRANTY\s*DEED\s*IN\s*LIEU\s*OF\s*FORECLOSURE\s*(?:\r?$)
+
+		// Deed under Order of Sale in Tax Suits
+		// 0008.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set003\Images\DEED\2003134416.tif.uss
+		04=^DEED\s*UNDER\s*ORDER\s*OF\s*SALE\s*IN\s*TAX\s*SUITS(?:\r?$)
+
+		// GRANT DEED
+		// 0021.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed\20049000000400.002.tif.uss
+		// INDIVIDUAL GRANT DEED
+		// 0022.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed\20049000001300.001.tif.uss
+		// CORPORATION GRANT DEED
+		// 0023.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed\20049000118700.003.tif.uss
+		05=^(?:(?:CORPORATION|INDIVIDUAL|CALIFORNIA)\s*)?GRANT\s*DEED(?:\r?$)
+
+		// INTERSPOUSAL TRANSFER DEED
+		// 0024.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed\20049000090300.002.tif.uss
+		// INTERSPOUSAL TRANSFER GRANT DEED
+		// 0025.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed\20049000001000.002.tif.uss
+		06=^(?:INTERSPOUSAL|TRUST)\s*TRANSFER\s*(?:GRANT\s*)?DEED(?:\r?$)
+
+		// SUBSTITUTE TRUSTEE'S DEED
+		// 0009.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set006\Images\DEED\2003142079.tif.uss
+		// SUBSTITUTE TRUSTEE'S FORECLOSURE DEED
+		// 0010.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set003\Images\DEED\2003134572.tif.uss
+		07=^SUBSTITUTE\s*TRUSTEE.?S\s*(?:FORECLOSURE\s*)?DEED(?:\r?$)
+
+		// EXECUTOR'S MINERAL AND ROYALTY DEED
+		// 0011.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set003\Images\DEED\2003134820.tif.uss
+		// TRUSTEE'S MINERAL AND ROYALTY DEED
+		// 0012.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set003\Images\DEED\2003134816.tif.uss
+		// MINERAL AND ROYALTY DEED TO TRUSTEE
+		// 0013.tif;K:\Common\Engineering\Sample Files\Fort Bend Central Appraisal District - TX\Set004\Images\DEED\2003135879.tif.uss
+		08=^(?:(?:TRUSTEE|EXECUTOR).?S\s*)?MINERAL\s*AND\s*ROYALTY\s*DEED(?:\s*TO\s*TRUSTEE)?(?:\r?$)
+
+		09=^NOTICE\s*OF\s*CONFIDENTIALITY\s*RIGHTS[\s\S]{0,500}WARRANTY\s*DEED\b
+		
+		10=\bWARRANTY\s*DEED[\s\S]{0,300}\r\nNOTICE\s*OF\s*CONFIDENTIALITY\s*RIGHTS\b
+
+		11=^LIMITED\s*SPECIAL\s*WARRANTY\s*DISTRIBUTION\s*DEED\s*(?:\r?$)
+		
+		// RJB 060103
+		// 0026.tif;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set002\Images\Multi-Page\D\2005272589.tif.uss
+		12=^PERSONAL\s*REPRESENTATIVE.?S\s*DEED\s*(?:\r?$)
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\BARGAIN and SALE DEED\2005-025026.tif.uss
+		13=^(?:STATUTORY\s*)?BARGAIN\s*AND\s*SALE\s*DEED(?:\r?$)
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\BARGAIN and SALE DEED\2005-026902.tif.uss
+		14=^BARGAIN\s*AND\s*SALE\s*DEED\s*\-?\s*STATUTORY\s*\-?\s*FORM(?:\r?$)
+
+
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.6,1,2
+	OR_BEGIN,WD_SURE_02,false
+//		0054.tif;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Deed\200406290001062.tif.uss
+		01=^Grant[^\w\r\n]*Bargain[^\w\r\n]*(?:and[^\w\r\n]*)?Sale[^\w\r\n]*Deed\r\n
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,WD_PROBABLE_01,true
+		// 0015.tif;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Warranty Deed\00000353.TIF.uss
+		01=^.{0,20}(?:W(?:arranty|ARRANTY)|C(?:ondominium|ONDOMINIUM)|G(?:RANT|rant))\s*D(?:eed|EED).{0,20}(?:\r?$)
+
+		// DEED
+		// 0027.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018158.tif.uss
+		// 0028.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015617.tif.uss
+		02=^DEED(?:\r?$)
+
+		03=^Hereby\s*GRANTS\s*to
+		//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\BARGAIN and SALE DEED\2007-025285.tif.uss
+		04=^.{0,5}(?:STATUTORY\s*)?BARGAIN\s*AND\s*SALE\s*DEED|(?:STATUTORY\s*)?BARGAIN\s*AND\s*SALE\s*DEED.{0,5}(?:\r?$)
+		
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,WD_PROBABLE_02,false
+		// example where pattern exists, but requires more chars between "made" and "between"
+		// 0029.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015954.tif.uss
+		// NOTE: "300" was not used in the sure level rule because of the risk of more matches in
+		// non-mortgage documents
+		// "made" not OCR'ed - so left it optional
+		// 0030.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015796.tif.uss
+		// example that contains "T H I S  I N D E N T U R E"
+		// 0031.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017686.tif.uss
+		// example that contains "T H I S" and "I N D E N T U R E" on seperate lines
+		// 0032.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017179.tif.uss
+		// example that does not contain "this", but rest of the pattern is the same.
+		// 0033.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015857.tif.uss
+		01=\bT\s*h\s*i\s*s\s*(?:D\s*e\s*e\s*d(?!\s*OF\s*TRUST)|I\s*n\s*d\s*e\s*n\s*t\s*u\s*r\s*e)[\s\S]{0,40}?(?:Made)?[\s\S]{1,300}?(?:Between|by)
+
+		//0034.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018913.tif.uss
+		02=^GENERAL[\s\S]{0,2}?DEED(?:\r?$)
+
+		// example where this "deed" or "indenture" did not get OCR'ed properly but the words following
+		// 0035.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018202.tif.uss
+		// 	may have sufficient clues that this is a warranty deed
+		// example where the dollar amount is just $1 - so there's only 1 digit after the $
+		// 0036.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017413.tif.uss
+		// example that has a lot (about 370 chars) of chars
+		// 0037.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017949.tif.uss
+		// 	in between  "between" and "witnesseth"
+		03=\bMADE[\s\S]{1,50}?BETWEEN[\s\S]{20,400}?WITNESSETH[\s\S]{20,200}?\$[0-9\.,]{1,}
+		
+		// CORPORATION GRANT .EED
+		// 0054.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\grant deed\20059023088300.tif.uss
+		04=^(?:(?:CORPORATION|INDIVIDUAL|CALIFORNIA)\s*)?GRANT\s*.EED(?:\r?$)
+	OR_END
+
+	OR_BEGIN,WD_PROBABLE_03,TRUE
+		// 0018.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\WARRANTY DEED\00016233.tif.uss
+		// 
+		// SPECIAL WARRANTY DEED
+		// 0019.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WARRANTY DEED\00006687.tif.uss
+		01=\b(?:(?:SPECIAL|GENERAL)\s*)?WARRANTY\s*DEED(?:\s*WITH\s*VENDORS\s* LIEN)?\b
+	OR_END
+
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,WD_PROBABLE_04,false
+		// "THIS INDENTURE" - DOCUMENTS (FANCY FONTS BAD OCR)
+		// 0038.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00015575.tif.uss
+		01=\bGrantors[\s\S]{0,50}Natural\s*Love\s*and\s*Affection\s*paid\s*to[\s\S]{0,50}grant\W*bargain\W*sell\s*and\s*convey\b
+
+		// 0039.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00015643.tif.uss
+		// 0040.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018443.tif.uss
+		02=\bThat\s*the\s*said\s*Grantor\s*in\s*consideration\s*of[\s\S]{0,350}paid\s*to\s*the\s*Grantors?\s*by\s*the\s*Grantees?\W*receipt\s*of\s*which\s*is\s*hereby\s*acknowledged\W*does\s*grant\W*bargain\W*sell\s*and\s*convey\s*to\s*the\s*said\s*Grantees?\b
+
+		// 0041.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00015651.tif.uss
+		// 0042.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018726.tif.uss
+		// 0043.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018346.tif.uss
+		03=\bthe\s*(?:said\s*)?Grantor\(?s?\)?\s*(?:\W*on\s*behalf\s*of\sthemselves\W*their\s*heirs\W*successors\s*and\s*assigns\s*)?do\(?(?:es)?\)?\s*hereby\s*(?:grant\W*)?(?:bargain\W*)?(?:sell\W*)?and\s*convey\s*to\s*(?:the\s*)?(?:said\s*)?Grantee\(?s?\)?\b
+
+		//0045.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00015703.tif.uss
+		04=\bdoes\s*grant\W*bargain\W*sell\s*and\s*convey\s*unto[\s\S]{0,50}heirs\s*and\s*assigns\b
+
+		// 0046.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00017908.tif.uss
+		// 0047.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018839.tif.uss
+		// 0048.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00015803.tif.uss
+		05=(?:(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantor.?\)?[\s\S]{0,20}?)|(?:(?:party\s*)?of\s*the\s*(?:one|first)\s*part,?(?:\s*and,?)?)[\s\S]{0,20}?){2}[\s\S]{0,250}?(?:(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantees?.?\)?[\s\S]{0,20}?)|(?:(?:parties\s*)?of\s*the\s*(?:other|second)\s*part.?)[\s\S]{0,20}?){2}
+
+		// 0049.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00017260.tif.uss
+		06=^THIS\s*INDENTURE\r\n[\s\S]{0,250}?\r\n(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantor.?\)?)[\s\S]{0,250}?(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantees?.?\)?)
+
+		// 0050.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00017267.tif.uss
+		07=^MADE[\s\S]{0,50}BETWEEN[\s\S]{0,250}\r\n(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantor.?\)?[\s\S]{0,250}?)(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantees?.?\)?)
+
+		//
+		08=\bMade\b[\s\S]{0,100}?\bBetween\b[\s\S]{10,200}?\bfirst\s+part[\s\S]{10,500}?\bsecond\s+part
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,WD_PROBABLE_06,true
+
+		02=\bWARRANTY\s*DEED\b
+	OR_END
+SCOPE_END
+[PROBABLE_END]
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,WD_MAYBE_01,true
+		01=\bGRANT\s*DEED\b
+		// 0044.tif;K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set002\Images\D\00018108.tif.uss
+		02=do\s*grant[\s\S]{1,48}\band\s*convey\s*to\s*the\s*Grantee\s*the\s*following\s*described\s*property
+		//THIS INDENTURE
+		//INDENTURE
+		//THIS DEED
+		//DEED
+		03=^(?:(?:T(?:HIS|his)|SPECIAL|CASH|GENERAL|CORPORATE|WARRANTY|CONDOMINIUM|FIDUCIARY)\s*)?[\s\S]{0,20}(?:DEED|INDENTURE)(?:\r?$)
+
+		// 0055.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\grant deed\20059021155100.tif.uss
+		04=^hereby\s*GRANT\(S\)\s*to\b
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,WD_MAYBE_02,false
+		// 0052.tif;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\WDD\B04293AAABD.TIF.uss
+		01=convey(?:s|[(]s[)])?\s*(?:and|or)\s*warrant(?:s|[(]s[)])?([(])?\s*
+
+		//
+		02=warrant(?:s|[(]s[)])?([(])?\s*(?:and|or)\s*convey(?:s|[(]s[)])?\s*
+
+		//
+		03=(?:(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantor.?\)?[\s\S]{0,20}?)|(?:(?:party\s*)?of\s*the\s*(?:one|first)\s*part,?(?:\s*and,?)?)[\s\S]{0,20}?){1,2}[\s\S]{0,250}?(?:(?:\(?hereinafter\s*called\s*(?:the\s*)?.?Grantees?.?\)?[\s\S]{0,20}?)|(?:(?:parties\s*)?of\s*the\s*(?:other|second)\s*part.?)[\s\S]{0,20}?){1,2}
+
+		// similar to above used pattern, except that there's 700+ chars
+		// 0051.tif;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00016936.tif.uss
+		// between "between" and witnesseth
+		04=\b(?:Made|Executed)[\s\S]{1,100}?Between[\s\S]{20,800}?Witnesseth[\s\S]{20,200}?\$[0-9\.,]{1,}
+
+		//
+		05=\bwarrants\s*to\b
+	OR_END
+
+	AND_BEGIN,WD_MAYBE_03,false
+		// 0053.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\wdd\b04288aabpv.tif.uss
+		\bDEED\b
+		Grantor\s*warrants\s*and\s*will\s*defend\s*the\s*title 
+	AND_END
+
+	AND_BEGIN,WD_MAYBE_04,false
+		^THIS\s*INDENTURE(?:\r?$)
+		WARRANT
+	AND_END
+
+	AND_BEGIN,WD_MAYBE_05,false
+		Grant
+		Sell
+		Convey
+		Warrant
+	AND_END
+	
+	AND_BEGIN,WD_MAYBE_06,false
+		FOR\s*A\s*VALUABLE\s*CONSIDERATION
+		HEREBY\s*GRANT\(?S\)?\s*TO\b
+		THE\s*FOLLOWING\s*\S*\s*PROPERTY
+	AND_END
+SCOPE_END
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,WD_MAYBE_07,false
+		//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Deed\200406290002803.tif.uss
+		01=\bGrant[^\w\r\n]*Bargain[^\w\r\n]*Sale[^\w\r\n]*Deed\b
+
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.6,1,2
+	OR_BEGIN,WD_MAYBE_08,false
+
+		//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Deed\200406290001539.tif
+		//actually a ficuciary deed, but Warranty Deed Grantor-Grantee rules work
+		02=^.{0,2}DEED\W*OF\W*EXECUTOR.{0,2}(?:\r?$)
+	OR_END
+SCOPE_END
+[MAYBE_END] 

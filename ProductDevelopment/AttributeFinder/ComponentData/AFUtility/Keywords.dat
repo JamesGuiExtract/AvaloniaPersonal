@@ -1,0 +1,682 @@
+// DAT file to define collections of regular expressions
+// used to locate and extract Entity-related words and phrases
+//
+// Syntax:
+//
+
+/////////////////
+// ALIAS SUBITEMS
+/////////////////
+// Examples: "Formerly", "F/K/A"
+<PersonAliasFKA>
+\bF(\s*((/|\.)\s*)?)?K(\s*((/|\.)\s*)?)?A\b(\s*\.)?
+\bformerly\s+known?\s+as\b
+\bformerly\b
+\b(was\s+the\s+same\s+person\s+as)\b
+
+
+// Examples: "Also Known As", "A/K/A"
+<PersonAliasAKA>
+\bA(\s*((/|\.)\s*)?)?K(\s*((/|\.)\s*)?)?A\b(\s*\.)?
+(?:\(\s*)?\balso\s+know(n)?\s+(of\s+record\s+)?as\b
+\b(is\s+the\s+same\s+person\s+as)\b
+\bWATA\b
+\berroneously\s+spelled\b
+\bbeing\s+one\s+and\s+the\s+same\s+person\s+as\b
+\bwho\s+(acquired|(also\s+)?took)\s+title\s+as\b
+
+
+// Examples: "Now Known As", "N/K/A"
+<PersonAliasNKA>
+\bN(\s*((/|\.)\s*)?)?K(\s*((/|\.)\s*)?)?A\b(\s*\.)?
+\bK(\s*(/\s*)?)?N(\s*(/\s*)?)?A\b(\s*\.)?
+\b(now|currently)\s+known\s+as\b
+\bknown\s+now\s+as\b
+
+
+// Examples: "Doing Business As", "D/B/A", "OBA"
+<CompanyAliasDBA>
+\bD(\s*(/\s*)?)?B(\s*(/\s*)?)?A\b(\s*\.)?
+\bD(\s*\.)B(\s*\.)A\b(\s*\.)?
+\b(doing\s+business\s+as)\b 
+\b(assigned\s+over\s+to)\b
+\b(now\s+by\s+chartered\s+conversion)\b
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-002551.tif.uss
+\b(?:an\s+)?assumed\s+business\s+name\s+of\b
+//\bT(\s*(/\s*)?)?A\b(\s*\.)? 
+\bT\s*(?:\.|/|\s)\s*A\b(\s*\.)?
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AFV.TIF.uss
+\bOBA\b
+
+
+// Examples: "Successor By Merger", "S/B/M"
+<CompanyAliasSBM>
+\b((survivor|successor)\s+by\s+merger\s+(to|with))\b
+\b((survivor|successor)\s+by\s+merger)\b
+\bS(\s*(/\s*)?)?B(\s*(/\s*)?)?M(\s*(/\s*)?)?W\b(\s*\.)?
+\bS(\s*(/\s*)?)?B(\s*(/\s*)?)?M(\s*(/\s*)?)?T\b(\s*\.)?
+\bS(\s*(/\s*)?)?B(\s*(/\s*)?)?M\b(\s*\.)?(\s+To)?
+\b(by\s+merge(r)?(\s+to)?)\b
+
+
+// Examples: "Successor In Interest", "S/I/I"
+<CompanyAliasSII>
+\b(successor\s+in\s+interest(\s+to)?)\b
+\b(successor\s+to)\b
+\bS(\s*(/\s*)?)?I(\s*(/\s*)?)?I\b(\s*\.)?
+\b(as\s+successor(\s+to)?)\b
+
+
+// Examples: "By Merger With", "B/M/W"
+<CompanyAliasBMW>
+\b(by\s+merge(r)?(\s+with)?)\b
+
+
+
+// Examples: "A Division Of"
+<RelatedCompanyDivision>
+\b(a\s+)?(division|div)\s+of\b
+
+
+// Examples: "A Subdivision Of"
+<RelatedCompanySubdivision>
+\b(a\s+)?subdivision\s+of\b
+
+
+// Examples: "A Subsidiary Of"
+<RelatedCompanySubsidiary>
+\b(a\s+)?subsidiary\s+of\b
+
+
+// Examples: "A Branch Of"
+<RelatedCompanyBranch>
+\b(a\s+)?branch\s+of\b
+
+
+//////////////
+// ALIAS ITEMS
+//////////////
+// Examples: A/K/A, NKA, FKA
+<PersonAlias>
+#PersonAliasFKA
+#PersonAliasAKA
+#PersonAliasNKA
+
+
+// Examples: A/K/A, NKA, FKA, DBA, BMW
+<CompanyAlias>
+#PersonAliasFKA
+#PersonAliasAKA
+#PersonAliasNKA
+#CompanyAliasDBA
+#CompanyAliasSBM
+#CompanyAliasSII
+#CompanyAliasBMW
+
+// Examples: "A Division Of", "A Branch Of"
+<RelatedCompany>
+#RelatedCompanyDivision
+#RelatedCompanySubdivision
+#RelatedCompanySubsidiary
+#RelatedCompanyBranch
+
+
+/////////////
+// MAIN ITEMS
+/////////////
+// Examples: "Mr", "Doctor"
+<PersonTitles>
+\bMr\b(\.)?
+\bMrs\b(\.)?
+\bDr\b(\.)?
+\bFr\b(\.)?
+\bProf\b(\.)?
+\bMiss\b
+\bMs\b(\.)?
+
+
+// Examples: "Jr", "Senior", "IV"
+<PersonSuffixes>
+\bJr\b(\.)?
+\bSr\b(\.)?
+\bII\b(\.)?
+\bIII\b(\.)?
+\bIV\b(\.)?
+\bM\.?\x20?D\b\.?
+
+
+// Examples: "Husband and Wife", "An Individual"
+<PersonDesignators>
+// "a single person" and variations
+\b((as|an)\s+)?individual(s|ly)?\b
+\b((a(n|s)?|both|who\s+(is|are))\s+)?(single|unmarried|widow(er)?|(baron|feme)\s+sole)(\s+(person(s)?|individual|man|woman|men|women))?\b
+
+// "Non Vested Spouse"
+\b(non\s+vested\s+spouse)\b
+
+// "married" and variations
+\ba\s+married\s+(couple|man|woman)\b
+\b(who\s+are\s+)?married(\s+to\s+each\s+other)?\b
+\bmarried\s+To\b
+\bmarried\s+but\s+separated\b
+
+// "husband and wife", "H & W", "H / W" and variations
+\b((as|formerly|who\s+are)\s+)?husband[\s\S]{0,8}(his\s+)?wife\b
+\b(H\s*(&|/)\s*W)\b
+\bH\s+W\s*(?:\r?$)
+\bhusband\s*and\s*w\s*i\s*f\s*e\b
+
+// "wife and husband" and variations
+\b((as|formerly|who\s+are)\s+)?wife[\s\S]{0,8}(her\s+)?husband\b
+
+// "her son", "his daughter" and variations
+\b(his|her|their)\s+(son|daughter|wife|husband)\b
+
+// "deceased" and variations
+\b((now\s+)?deceased)\b
+
+// "Executor" and "Executrix"
+\bExecut(or|rix)\b
+
+// "Administrator" and "Administratrix"
+\b(Co-)?Administrat(or(s)?|rix)\b
+
+// "joint tenancy" and variations
+\b(as\s+)?joint\s+tenan(ts|cy)\s+(with|w/)(\s+full)?\s+rights\s+of\s+survivorship\b
+\b((as\s+)?joint\s+(tenancy|tenants|debtors))\b
+\b((as\s+)?JTWROS)\b
+
+// "Joint With Spouse" and variations
+\bjoint\s+with(\s+(his|her|their))?\s+spouse\b
+
+// "joint" and variations
+\b((as\s+)?joint(?!\s+(Trust|Venture)))\b
+
+// "community property" and variations
+\b((as\s+)?community\s+property)\b
+
+// "siblings" and variations
+\b((a(s)?\s+)?sibling(s)?)\b
+
+// "tenants in common" and variations
+\b((as\s+)?tenants\s+in\s+common)\b
+
+// "tenants by entireties" and variations
+\b((as\s+)?tenants\s+by\s+entireties)\b
+\b((as\s+)?tenants\s+(?:in|by\s+the)\s+entirety)\b
+
+// "Signing To"
+\b(signing\s+to)\b
+
+// "Not Stated"
+\b(not\s+stated)\b
+
+// "As His Sole and Separate Property" and variations
+\b((as\s+)?(his|her)\s+sole(\s+[\s\S]{1,6}\s+separate)?\s+property)\b
+
+// "As Their Separate Property and Estate" and variations
+\b((as\s+)?(his|her|their)\s+separate\s+property\s+[\s\S]{1,6}\s+estate)\b
+
+// Trustee items
+\b((or\s+(his|her|their)\s+successor[\S]{0,3}\s+)?(as\s+)?(Successor\s+)?(Co-)?Trustee(s(,)?)?\s+(?:of|under)(\s+the)?)\b
+\b((as\s+)?Trust\s*manager\s+of(\s+the)?)\b
+\b((Co-)?Trustee(s(,)?)?\s+of\s+Trust\s+[\s\S]{5,50}\s+under\s+the)\b
+\b(sole\s+trustee\s+(or\s+(his|her)\s+successor[\S\s]{0,15}\s+)?(?:of|under)(\s+the)?)\b
+
+// Examples: "Corporation", "Mortgage"
+<CompanyDesignators>
+\bCorporation\b
+\bCorp\b(.)?
+
+\bCompany\b
+\bLimited\b
+\bPartners(hip)?\b
+\bTrust\b
+
+// These industry-specific strings are for banks and mortgage companies
+\S{3,}Bank\b
+\bBank(ing)?\b
+\bMortgage\b
+\bSavings\b
+// "Title" but 
+//   NOT "Title Vested"
+//   NOT "Title As"
+//\b(?!Acquired\s+Title)|Title(?!\s+Vested)\b
+\bTitle(?!\s+(Vested|As))\b
+
+Credit\b(?!\s+Agreement)
+Financ(e|ial|ing)\b
+\bLending\b
+\bAssoc(iat(es|ion))?\b
+\bEquity\b
+\b(Fannie\s+Mae)\b
+
+\b((a\s+)?joint\s+venture)\b
+\b(Resident|Industr|Commerc)ial\b
+\bAmerica(n|'s)?\b
+
+\bInvestment(s)?\b
+\bWholesale\b
+\bRealty\b
+\bLeasing\b
+\bRental(s)?\b
+// k:\common\engineering\sample files\acs\pa - allegheny\set002\images\shd\00018329.tif.uss
+\bVeterans\b
+
+\b(School\s+)?District\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000599000.003.tif.uss
+\b(Public\s+)?School\b
+\bCommunity\s+College\b
+\bGraduate\s+Center\b
+\bCollege\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001354100.001.tif.uss
+\bUniversity\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001197600.001.tif.uss
+\bEducation\b
+
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000102800.002.tif.uss
+\b(Methodist|Catholic|Baptist|Lutheran|Wedding)\s+Church\b
+
+//\bWedding\s+Chapel\b
+\bBorough\b
+\bAgency\b
+\bPro(pertie|duct)s\b
+\bConstruction\b
+\b(Re)?Development\b
+\bBuilders\b
+\bEnterprises\b
+\bNeighborhood\b
+\bHomes\b
+\bServices?\b
+\bGroup\b
+\bAdministration\b
+\bCollector\b
+\bFranchise\b
+\bEquilization\b
+\bDepartment\b
+\bBoard\b
+\bCounties\b
+\bOpenings\b
+\bFarms\b
+\bHospital\b
+\bSpecialists\b
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Mortgage - Deed of Trust\Grantor\0113.tif.uss
+\bSystems?\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Acknowledgement of Satisfaction of Judgment\20049000006900.003.tif.uss
+\bBureau\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Acknowledgement of Satisfaction of Judgment\20049000113800.003.tif.uss
+\bInsurance\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001549300.002.tif.uss
+\bSons\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049000266800.001.tif.uss
+\bEngineering\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001482900.002.tif.uss
+\bCommunities\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001191200.002.tif.uss
+\bElectric\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049000426700.002.tif.uss
+//\bSales\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001466600.002.tif.uss
+//\bEstates\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000066500.003.tif.uss
+\bAutomotive\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000080400.001.tif.uss
+\bInstallations\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000679500.003.tif.uss
+\bMaterials\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000538400.001.tif.uss
+\bRepair\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000153000.003.tif.uss
+\bExchange\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000282800.002.tif.uss
+\bConsultants\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Federal Tax Lien\20049000301300.001.tif.uss
+\bManufacturing\b
+// k:\common\engineering\sample files\acs\tx - midland\set004\images\release of lien\00013660.tif.uss
+\bApartment(s)?\b
+// K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\00000001.tif.uss
+\bCommission\b
+//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\DOC\2005257950.tif.uss
+\bcenter\b
+//K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set001\Images\DEED OF TRUST-MORTGAGE\20059019606500.tif.uss
+\bFirst\b
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-031380.tif.uss
+\bGlobal\b
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set002\Images\ASMT\0097514.TIF.uss
+\bFunding\b
+
+// words indicating businesses performing services
+\bCleaners\b
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002841.tif.uss
+\bSolutions\b
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002753.tif.uss
+\bAvionics\b
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002752.tif.uss
+\bTechnologies\b
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-005719.tif.uss
+\bMERS\b
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002755.tif.uss
+\brestaurant\b
+\bpreferred\b
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set003\Images\2006_100228.tif.uss
+\bRecordings\b 
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set003\Images\2006_100227.tif.uss
+\bMutual\b
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06180AA.CR3.TIF.uss
+\barchitects?\b
+// Company names with dot com
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-001080.tif
+\b\w+\.com\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079000228500.001
+\bLandscaping\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079001378600.001
+\bIron\s+Works\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079002124000.001
+\bCameras?\b
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\NOTICE OF COMPLETION\20079000259600.002
+\bHousing\b
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\ABSTRACT OF JUDGMENT\20079000024600.003
+\bCasualty\b
+
+// Examples: "Inc.", "LLC"
+<CompanySuffixes>
+\bL(\s*(\.\s*)?)?L(\s*(\.\s*)?)?(C|P)\b(\s*\.)?
+\bL(\s*(\.\s*)?)?(C|P)\b(\s*\.)?
+
+\bIncorporated(?!\s+herein)\b
+\bInc\b(\.)?
+
+\bLtd\b(\.)?
+\bCo\b(\.)?(?!-)
+
+\b(F|S)(\s*(\.\s*)?)?S(\s*(\.\s*)?)?B\b(\s*\.)?
+\b(Federal|State)\s+Savings\s+Bank(?!\s+Of)\b
+
+\b(N|F)(\s*(\.\s*)?)?(A|D)\b(\s*\.)?
+\b(Federal|National)\s+Association([\s\S]{1,3}N(\s*(\.\s*)?)?D\b(\s*\.)?)?
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files\OR - Washington - AtPac\Delivery Test Files\Indexing\Images\PC_StName.pdf.uss
+\bP(\s*(\.\s*)?)?C\b(\s*\.)?
+
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-024691.tif.uss
+(?:\bF(\s*(\.\s*)?)?)?C(\s*(\.\s*)?)?U\b(\s*\.)?
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\ASSIGNMENT\B06178AA.E6O.TIF.uss
+\bFLCA\b
+
+
+
+// Examples: "as assigned to", "its successor"
+<CompanyAssignors>
+\bas\s+assigned\s+to\b
+\bits\s+successor\b
+
+
+// Examples: "P.O. Box", "Organized"
+<EntityTrimTrailingPhrases>
+\bP(\.)?\s*(?:O|0)(\.)?\s+
+\bP(\.)?\s*(?:O|0)(\.)?(\s+Box)?(?=\r?$)
+\bP(\.)?\s*(?:O|0)(\.)?\s+Box\b
+\bGrant(?:or|ee)(?:\W*s)?\b
+\bwhose\s+address\b
+\bresiding\s+at\b
+
+\bDOB\b
+\bOrganized\b
+\bDescribed\b
+\bPro\s*(-)?\s*Forma\b
+\ba\s+joint\s+venture\b
+
+\bA\s+[\s\S]{0,15}Corporation\b
+\b(City|County|State|Commonwealth)\s+of\b
+
+\bunder\s+trust\b
+// k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00012944.tif.uss
+\bPayable\b
+\bherein\b
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Satisfaction of Mortgage\Grantee\0071.tif.uss
+\bIn\s*Favor\s*of\b
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Satisfaction of Mortgage\Grantor\0150.tif.uss
+\bDated:?\b
+
+// Examples: "spouse", "daughter"
+<PersonTrimIdentifiers>
+\bjoined\s+([\s\S]{2,30}\s+)?by\b(\s+((his/her|his|her)\s+)?(husband|wife|spouse))?
+\b((his/her|his|her)\s+)?(husband|wife|spouse)\b
+\bdaughter\b
+\bsolely\b
+\bby\s+(his|her)\s+agent\b
+\bas\s+sole\s+owner\b
+[']?\btitle\s+vested\s+as\b
+\bmarried\s+to\b
+\bwaiving\s+(?:his|her|dower)\s+rights\b(\s+only)?
+
+// Examples: "Highway", "Lane", "Street"
+<StreetNames>
+\bAvenue\b
+\bBoulevard\b
+\bCircle\b
+\bCourt\b
+\bCrescent\b
+\bDrive\b
+\bHighway\b
+\bLane\b
+\bPlace\b
+\bRoad\b
+\bSquare\b
+\bStreet\b
+
+
+// Examples: "Ave", "Cir"
+<StreetAbbreviations>
+\bAve\b(\.)?
+\bBlvd\b(\.)?
+\bCir\b(\.)?
+\bCres\b(\.)?
+\bCt\b(\.)?
+\bDr\b(\.)?
+\bHwy\b(\.)?
+\bLn\b(\.)?
+\bPl\b(\.)?
+\bRd\b(\.)?
+\bSq\b(\.)?
+\bSt\b(\.)?
+
+
+// Examples: "Apartment", "Suite"
+<BuildingNames>
+\bApartment\b
+\bSuite\b
+
+
+// Examples: "Apt", "Ste"
+<BuildingAbbreviations>
+\bApt\b(\.)?
+\bSte\b(\.)?
+
+
+// Examples: "Attention", "Mail To"
+<DirectionIndicators>
+\bAttention\b(:)?
+\bAttn\b(\.|:)?
+\bMail\s+To\b(:)?
+\bReturn\s+To\b(:)?
+
+
+// Examples: "Two", "Hundred"
+<NumberWords>
+\b(Zero|One|Two|Three|Four|Five|Six|Seven|Eight|Nine)\b
+\b(Ten|Twenty|Thirty|Forty|Fifty|Sixty|Seventy|Eighty|Ninety)\b
+\b(Hundred|Thousand)\b
+
+
+// Examples: "January", "Jun"
+<MonthWords>
+\b(January|February|March|April|May|June|July|August|September|October|November|December)\b
+\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Sept|Oct|Nov|Dec)\b(\.)?
+
+
+// Examples: "whose address is", "C/O"
+<AddressIndicators>
+\bwhose(\s+mailing)?\s+address(\s+is)?\b
+\b(residing|located)\s+at\b
+\bP(\.)?\s*(?:O|0)(\.)?\s+
+\bP(\.)?\s*(?:O|0)(\.)?\s+Box\b
+\bC\s*/\s*(?:O|0)\s+
+
+
+// Examples: 
+<InvalidEntities>
+\bGRANTOR\b
+\bGRANTOR'S\s+ADDRESS\b
+\bHIS\s+SUCCESSORS\b
+\bASSIGNS\b
+\bPARTY\b
+\b(THE\s+)?ASSIGNEE(S)?\b
+\bJOINED\s*HEREIN\b
+\bINTEREST\b
+\b((AS|COLLATERAL)\s+)?AGENT\b
+\bPAGE\b
+\bATTORNEY\s+IN\s+FACT\s+FOR\s+MY\b
+\bWITH\s+RIGHT(S)?\b
+\bVENDOR'S\s+LIEN\b
+^OF\b
+\bET\s+AL\b
+\bADDENDUM\b
+\bFEE-(?:CO|ST)\b
+\bName\b
+\bOriginal\b
+\bHIS\s*WI(?:P|F)E\b
+\bREEL\b
+^TRUST(?=\r?$)
+\b(DECLARATION|DEED)\s+OF\s+TRUST\b
+\bDATED[\s\S]+\d+
+\bCONSIDERATION\b
+\bBENEFICIARY\b
+
+// Examples: A Texas Corporation, A Federal Savings Bank
+^[\s\S]{0,5}\bA\s+[\s\S]{0,15}CORPORATION\b
+//\bA\s+[\s\S]{0,15}FEDERAL\s+SAVINGS\s+BANK\b
+
+
+// NOTE: Only one string is expected for this Keyword
+//       because it is retrieved using GetKeywordPattern 
+//       and used via ipParser->StringMatchesPattern()
+<LastNamePrefixes>
+Le|La|Mc|Mac|Von|Van(der)?|O'|St(\.)?|(?:(?:D|d)e(?:\s*(?:L|l|n)a?)?)
+
+// Examples: "Living Trust", "Family Trust 1996", "John Jones Trust of 1995"
+<TrustIndicators>
+(?:(?:Revocable\s+)|(?:Revocable\s+)?(?:Living|Family)\s+|\bamended\s+and\s+restated\s+)?\bTrust\b(?!("|\s+under))\b((\s+of)?\s+\d{4})?
+
+
+// Examples: "Dated ...", "DTD", "Under Trust Agreement Dated ..."
+<TrustDates>
+\bDated\b
+\b(U|D)TD\b
+\bUnder\s+Trust\s+\Agreement\s+Dated\b
+
+
+// Examples: "Living", "Family", "1996", "Trust", "Revocable", etc.
+// These words are treated as non-last name words
+<TrustFlags>
+\b(Ir)?Revocable\b
+\bLiving\b
+\bFamily\b
+\bTrust\b
+\bOf\b
+\bUnder\b
+\bJoint\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Assignment of Deed of Trust\20049000248200.001.tif.uss
+\bMarital\b
+// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Assignment of Deed of Trust\20049000169600.001.tif.uss
+\bPersonal\b
+\bSurviving\b
+\bSpouse(?:')(?:s)\b
+[12]\d{3}
+//K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED\B06172AA.AHH.TIF.uss
+\bamended\b
+
+
+// Examples: "Bank and Trust", "Deed of Trust"
+<NonTrust>
+\bBank\s*(and|&)?\s*Trust\b
+\bDeed\s+of\s+Trust\b
+\bTrust\s*Bank\b
+\bTrust\s+Company\b
+
+
+// Examples: "Of", "The", "To"
+<InvalidPersons>
+\bOF\b
+\bTHE\b
+\bTO\b
+\bAND\b
+
+
+// Examples: "City Of", "State Of", "County Of", "Abc Def County"
+<MunicipalityIndicators>
+\b(City|County|State|Commonwealth)\s+of\b
+\b[\S]+\s+County(?!\s+of)\b
+
+
+// List of all the states (no abbreviations)
+<StateList>
+ALABAMA
+ALASKA
+AMERICAN\s+SAMOA
+ARIZONA
+ARKANSAS
+CALIFORNIA
+COLORADO
+CONNECTICUT
+DELAWARE
+DISTRICT\s+OF\s+COLUMBIA
+FEDERATED\s+STATES\s+OF\s+MICRONESIA
+FLORIDA
+GEORGIA
+GUAM
+HAWAII
+IDAHO
+ILLINOIS
+INDIANA
+IOWA
+KANSAS
+KENTUCKY
+LOUISIANA
+MAINE
+MARSHALL ISLANDS
+MARYLAND
+MASSACHUSETTS
+MICHIGAN
+MINNESOTA
+MISSISSIPPI
+MISSOURI
+MONTANA
+NEBRASKA
+NEVADA
+NEW\s+HAMPSHIRE
+NEW\s+JERSEY
+NEW\s+MEXICO
+NEW\s+YORK
+NORTH\s+CAROLINA
+NORTH\s+DAKOTA
+NORTHERN\s+MARIANA\s+ISLANDS
+OHIO
+OKLAHOMA
+OREGON
+PALAU
+PENNSYLVANIA
+PUERTO\s+RICO
+RHODE\s+ISLAND
+SOUTH\s+CAROLINA
+SOUTH\s+DAKOTA
+TENNESSEE
+TEXAS
+UTAH
+VERMONT
+VIRGIN\s+ISLANDS
+VIRGINIA
+WASHINGTON
+WEST\s+VIRGINIA
+WISCONSIN
+WYOMING

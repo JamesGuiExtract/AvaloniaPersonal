@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.DirectionInputValidator.1 = s 'DirectionInputValidator Class'
+	{
+		CLSID = s '{7D249AD4-539F-11D6-8280-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.DirectionInputValidator = s 'DirectionInputValidator Class'
+	{
+		CLSID = s '{7D249AD4-539F-11D6-8280-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.DirectionInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7D249AD4-539F-11D6-8280-0050DAD4FF55} = s 'DirectionInputValidator Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.DirectionInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.DirectionInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

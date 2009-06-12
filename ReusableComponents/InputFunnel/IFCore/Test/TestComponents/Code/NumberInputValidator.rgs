@@ -1,0 +1,26 @@
+HKCR
+{
+	TestComponents.NumberInputValidator.1 = s 'NumberInputValidator Class'
+	{
+		CLSID = s '{54AF6104-3761-11D6-825E-0050DAD4FF55}'
+	}
+	TestComponents.NumberInputValidator = s 'NumberInputValidator Class'
+	{
+		CLSID = s '{54AF6104-3761-11D6-825E-0050DAD4FF55}'
+		CurVer = s 'TestComponents.NumberInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {54AF6104-3761-11D6-825E-0050DAD4FF55} = s 'NumberInputValidator Class'
+		{
+			ProgID = s 'TestComponents.NumberInputValidator.1'
+			VersionIndependentProgID = s 'TestComponents.NumberInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FFB72355-35CD-11D6-825C-0050DAD4FF55}'
+		}
+	}
+}

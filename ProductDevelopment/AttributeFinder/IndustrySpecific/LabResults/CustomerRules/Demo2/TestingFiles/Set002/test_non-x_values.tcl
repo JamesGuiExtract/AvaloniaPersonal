@@ -1,0 +1,1 @@
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;test_with_non-crossed_out_values.dat

@@ -1,0 +1,289 @@
+// Last Rule Id Added: MB_GRANTEE_49
+////////////////////////////////////////////////////////////////////////////////////
+// Mortgage Deed of Trust - Grantee
+/////////////////////////////////////////////////////////////////////////////////////
+
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+BorrowerIs=) "borrower" is|"borrower" is|borrower" is|borrower'' is|borrower' is|"borrower is|) "borrower|) Borrower .
+LenderIs=) "lender" is|"lender" is|lender" is|lender'' is|lender' is|"lender is|) "lender|) Lender .
+GrantorKeyword=" Grantor|" Mortgagor|" Borrower|` Borrower|' Borrower|( Borrower|" Mortgago|"owner|as the mortgagor|as mortgagor|"mortgagor
+GranteeKeyword=" Mortgagee|" Lender|' Lender|" Beneficiary|as the mortgagee|as mortgagee|ender)
+MortgagorKeyword=Mortgagor :|Grantor :|Borrower :|Borrower ( s ) :|Mortgagor ( s ) :
+MortgageeKeyword=Mortgagee :|Lender :|Lender .|Beneficiary :
+UntoKeyword=[unto :|[to :|[unto]|[to]
+Numbers=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+
+// 0077.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-6140.tif.uss
+MB_GRANTEE_999=C^5~Lender^?Grantee^250~called^15~Lender
+
+// 0001.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110831.tif.uss
+MB_GRANTEE_01=the " mortgagee^20~[by]^?Grantee^200~" mortgagor
+
+// 0002.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110940.tif.uss
+MB_GRANTEE_02=and^3~the^3~mortgagee^?Grantee^250~[a^3~corporation^3~organized
+
+// 0003.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set002\images\dtrust\2003131336.tif.uss
+MB_GRANTEE_03=MERS^15~[is]^?Grantee^150~as a nominee|nominee for
+MB_GRANTEE_03a=(E)^5~RS^15~[is]^?Grantee^150~as a nominee|nominee for
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed of Trust\20049000044300.017.tif
+MB_GRANTEE_04a=\r\n^3~(C)^3~Le^20~is]^?Grantee^300~lender is a|is a separate corporation
+// 0004.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110347.tif.uss
+// 0005.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110349.tif.uss
+// 0006.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000671.tif.uss
+MB_GRANTEE_04=security^3~instrument.^10~\r\n(C)^3~"^20~" is^?Grantee^300~lender is a|is a separate corporation
+
+// 0007.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109129.tif.uss
+MB_GRANTEE_05=name^3~of^3~lender :^?Grantee^250~lender's^3~address
+
+// 0008.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109141.tif.uss
+MB_GRANTEE_06=in^3~this^3~mortgage^350~" we^40~means^?Grantee^250~" borrower
+
+// 0009.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016826.tif.uss
+MB_GRANTEE_07="me]|[me"^3~means^250~"You]|[You"^5~means^?Grantee^200~the^3~Lender
+
+// 0010.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed of trust\20049000001200.007.tif.uss
+MB_GRANTEE_08=the^3~beneficiary^?Grantee^300~@GranteeKeyword
+
+// 0011.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110348.tif.uss
+MB_GRANTEE_35=the^3~mortgagee^?Grantee^300~existing^3~under^9~laws
+
+// 0094.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-035297.tif.uss
+MB_GRANTEE_64=for^3~the^3~benefit^3~of^?Grantee^180~hereinafter^3~referred^24~Beneficiary
+
+// 0012.tif;k:\common\engineering\sample files\waukesha\set003\images\mortgage bank\000166.tif.uss
+// 0013.tif;k:\common\engineering\sample files\waukesha\set003\images\mortgage bank\001875.tif.uss
+// 0014.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110627.tif.uss
+// 0015.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110730.tif.uss
+// 0016.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110457.tif.uss
+MB_GRANTEE_09=between|among^400~@GrantorKeyword^50~and the mortgagee|and mortgagee^?Grantee^300~@GranteeKeyword
+MB_GRANTEE_10=between|among^400~@GrantorKeyword^100~[and]^?Grantee^300~@GranteeKeyword
+
+// 0017.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00108255.tif.uss
+// 0018.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\mtg\b04288aaada.tif.uss
+MB_GRANTEE_11=This^5~mortgage|security instrument|deed of trust^5~is^3~given^3~to^?Grantee^300~@GranteeKeyword
+
+// 0019.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\mtg\b04286aab2z.tif.uss
+MB_GRANTEE_12=This^30~mortgage^8~given^3~to^?Grantee^300~successors^3~or^3~assignees
+
+// 0020.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\001093044.tif.uss
+// 0021.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109657.tif.uss
+// 0022.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\m\2005257765.tif.uss
+MB_GRANTEE_17=this^3~mortgage^160~@GrantorKeyword^250~the mortgagee is|the "mortgagee" is|the Mortgagee ( Lender )^?Grantee^250~@-NonTP
+//MB_GRANTEE_17=this\s*mortgage^@GrantorKeyword^the\s*mortgagee\s*is|the\s*"mortgagee"\s*is|the\s*Mortgagee\s*(\s*Lender\s*)^?Grantee^@-NonTP
+
+// 0023.tif;k:\common\engineering\sample files\waukesha\set005\images\mortgage bank\00000245.tif.uss
+// 0024.tif;k:\common\engineering\sample files\waukesha\set005\images\mortgage bank\00000362.tif.uss
+// 0025.tif;k:\common\engineering\sample files\trimin\set001\images\mortgage bank\1938453.tif.uss
+// 0026.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109163.tif.uss
+// 0027.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110563.tif.uss
+// 0028.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110841.tif.uss
+MB_GRANTEE_13=this^30~mortgage^500~@GrantorKeyword^250~the Mortgagee is|Security instrument is given to|in favor of|[to]^?Grantee^500~@GranteeKeyword
+
+// 0029.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109565.tif.uss
+MB_GRANTEE_14=this^3~mortgage^3~made^100~mortgagors^10~[to]^?Grantee^250~mortgagee^9~witnesseth
+
+// 0030.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\mtg\b04286aab12.tif.uss
+MB_GRANTEE_15=between^50~mortgagor^300~@GrantorKeyword^50~[and]^30~Mortgagee^?Grantee^300~@GranteeKeyword
+
+// 0031.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110684.tif.uss
+MB_GRANTEE_16=this^30~mortgage]^100~made^50~between^150~mortgagor^10~[and]^?Grantee^250~mortgagee
+
+// 0032.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016480.tif.uss
+// 0033.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016450.tif.uss
+MB_GRANTEE_18=made^50~[by]|among|between^300~" Mortgagor|" Trustor|" Grantor^300~for the benefit of^?Grantee^500~" Mortgagee|" Beneficiary|" Lender
+
+// 0078.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00017029.tif.uss
+MB_GRANTEE_19=" Mortgagor|" Trustor|" Grantor^600~for^9~benefit^3~of^?Grantee^350~" Mortgagee|" Beneficiary|" Lender
+
+// 0034.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003132973.tif.uss
+// 0035.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003133645.tif.uss
+MB_GRANTEE_20=herein " borrower|" borrower|' borrower^300~the beneficiary is|the beneficiary^?Grantee^300~herein " lender|herein ' Lender|" lender|' lender
+
+// 0036.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016775.tif.uss
+// 0037.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\deed of trust\00006709.tif.uss
+MB_GRANTEE_21=is^3~made^250~@GrantorKeyword^500~[and the beneficiary|[and]^?Grantee^500~@GranteeKeyword
+
+// 0038.tif;k:\common\engineering\sample files\trimin\set001\images\mortgage bank\000006eb.tif.uss
+MB_GRANTEE_22=" Mortgage]^30~is^3~made^@GrantorKeyword^250~[and]^?Grantee^250~@GranteeKeyword
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Deed of Trust\20049000012800.021.tif
+//accommodate messed up zoning
+MB_GRANTEE_23a=Borrower^3~is^3~the^3~trustor^3~under^3~this^3~Security^3~Instrument^?Grantee^250~Lender "|" Lender^5~is
+// 0039.tif;k:\common\engineering\sample files\waukesha\set003\images\mortgage bank\001723.tif.uss
+// 0040.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000097.tif.uss
+// 0041.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000229.tif.uss
+// 0042.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003132741.tif.uss
+// 0043.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110473.tif.uss
+MB_GRANTEE_23=security instrument|Definitions^1000~@LenderIs^?Grantee^300~lender is|Lender ' s address|called " lender|" note|" property
+
+// 0044.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000276.tif.uss
+MB_GRANTEE_24=know all|presents that^250~mortgagors^100~hereby^3~mortgage^3~to^?Grantee^250~mortgagee
+
+// 0079.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016239.tif.uss
+MB_GRANTEE_25=) " Grantor " :^150~) " Lender " :^?Grantee^250~(^5~" Promissory
+
+// 0045.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016768.tif.uss
+MB_GRANTEE_26=\r\nLender^?Grantee^150~lender^9~mailing address
+
+// 0046.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003132685.tif.uss
+MB_GRANTEE_27=Beneficiary :|Beneficiary|Lender :^?Grantee^150~Beneficiary's mailing address|mailing address
+
+// 0080.tif;k:\common\engineering\sample files\waukesha\set003\images\mortgage bank\002068.tif.uss
+// 0047.tif;k:\common\engineering\sample files\waukesha\set003\images\mortgage bank\002083.tif.uss
+// 0048.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110664.tif.uss
+MB_GRANTEE_28=@MortgageeKeyword^?Grantee^350~principal amount :|mortgage amount|conveyance|address :|Background|For good and valuable consideration
+
+// 0049.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000534.tif.uss
+// 0081.tif;k:\common\engineering\sample files\waukesha\set008\images\mortgage bank\2998643.tif.uss
+// 0050.tif;k:\common\engineering\sample files\waukesha\set008\images\mortgage bank\2999340.tif.uss
+MB_GRANTEE_29=mortgages and warrants|and warrants|mortgage (s|mortgages^5~[to^?Grantee^250~Lender|in consideration of|" Mortgagee|Mortgagee
+
+// 0051.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000011.tif.uss
+// 0052.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000343.tif.uss
+// 0053.tif;k:\common\engineering\sample files\waukesha\set005\images\mortgage bank\00000268.tif.uss
+MB_GRANTEE_30=whether one or more^30~Mortgages^9~Conveys^20~[to]^?Grantee^250~@GranteeKeyword
+
+// 0054.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000078.tif.uss
+MB_GRANTEE_31=in^3~consideration^3~of^9~agreement^3~of^?Grantee^250~to^3~advance^3~funds
+
+// 0102.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-001128.tif.uss
+// 0055.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003132659.tif.uss
+MB_GRANTEE_32=this deed of trust^dated^[among]^@GrantorKeyword^?Grantee^250~@GranteeKeyword
+
+// 0056.tif;k:\common\engineering\sample files\waukesha\set005\images\mortgage bank\00000066.tif.uss
+MB_GRANTEE_33=hereby mortgage to^?Grantee^250~hereinafter referred^@GranteeKeyword
+
+// 0057.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110764.tif.uss
+// 0058.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00110506.tif.uss
+// 0059.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00109087.tif.uss
+// 0082.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\deed of trust\00007185.tif.uss
+MB_GRANTEE_34=@GrantorKeyword^200~[and]|in favor of^?Grantee^500~a public corporation|the " Bank|which is organized
+
+MB_GRANTEE_36=rehabilitation mortgage\r\n\r\nfrom:^\r\n\r\nto:^?Grantee^250~@Numbers
+
+MB_GRANTEE_37=hereinafter referred to as^30~"we"|"us"^?Grantee^250~with an address at
+
+// 0060.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00105699.tif.uss
+MB_GRANTEE_38=mortgage^50~between^150~\r\nand\r\n^?Grantee^150~mortgagee
+
+// 0061.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\mtg\00105103.tif.uss
+MB_GRANTEE_39=mortgage]^50~from^250~mortgagor^?Grantee^250~mortgagee
+
+// 0062.tif;k:\common\engineering\sample files\waukesha\set004\images\mortgage bank\00000323.tif.uss
+MB_GRANTEE_40=conveys and warrants to^?Grantee^250~"credit union"
+
+// 0101.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-005719.tif.uss
+MB_GRANTEE_69=and the beneficiary^?Grantee^160~solely^8~nominee
+
+// 0063.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016749.tif.uss
+MB_GRANTEE_41=the beneficiary is|the beneficiary^?Grantee^600~Lender|"Bank"
+
+// 0064.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed of trust\20049000058700.010.tif.uss
+MB_GRANTEE_42=Trustor^?Grantee^250~"Lender" and sometimes as "Beneficiary"
+
+// 0065.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed of trust\20049000038500.002.tif.uss
+MB_GRANTEE_43=Lender^?Grantee^250~CONVEYANCE
+
+// 0098.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-032086.tif.uss
+MB_GRANTEE_66=Lender"):^?Grantee^60~@-NonTP
+
+// 0100.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-024691.tif.uss
+MB_GRANTEE_68=Grantee(s):|Grantee:^?Grantee^60~\r\n
+
+// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-001069.tif.uss
+
+// 0066.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed of trust\20049000018000.007.tif.uss
+MB_GRANTEE_44=Trustee^?Grantee^250~Beneficiary
+
+// 0067.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set003\images\dtrust\2003134465.tif.uss
+MB_GRANTEE_45=lender^?Grantee^400~lender's mailing address
+
+// 0068.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\dtrust\2003133679.tif.uss
+MB_GRANTEE_46=Deed of Trust|Mortgage^300~" Grantor^?Grantee^250~whose address^150~beneficiary
+
+// 0069.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set002\images\dtrust\2003131270.tif.uss
+MB_GRANTEE_47=owner^5~[and]^?Grantee^250~whose address^150~lender
+
+// 0070.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016255.tif.uss
+// 0071.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016273.tif.uss
+// 0072.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016278.tif.uss
+MB_GRANTEE_48=executed by^100~payable to the order of|order of^?Grantee^200~" Beneficiary|" Noteholder|as therein provided
+
+// 0073.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\deed of trust\00016593.tif.uss
+MB_GRANTEE_49=hereinafter^50~funds advanced by^?Grantee^250~" Bank|( which|( "
+
+// 0083.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-6441.tif.uss
+MB_GRANTEE_50=the mortgagor^?Grantee^250~the mortgagee
+
+// 0084.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-6464.tif.uss
+MB_GRANTEE_51=THIS MORTGAGE^100~\r\nBETWEEN^250~\r\nand\r\n^?Grantee^250~the mortgagee
+
+// 0085.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-0755.tif.uss
+MB_GRANTEE_52=THIS MORTGAGE^200~BETWEEN^350~\r\nand^?Grantee^250~\r\nWITNESSETH
+
+// 0086.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-0694.tif.uss
+MB_GRANTEE_53=the Borrower^5~Mortgagor^5~[and]^?Grantee^250~the Lender
+
+// 0087.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-2931.tif.uss
+MB_GRANTEE_54=mortgage^100~made by^250~[to]^?Grantee^250~to secure a loan
+
+// 0088.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-1866.tif.uss
+MB_GRANTEE_55=\r\nMortgagee^?Grantee^250~\r\nThe Mortgagor promises
+
+// 0089.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-6154.tif.uss
+MB_GRANTEE_56=\r\nMortgagee^?Grantee^250~\r\nAddress
+
+// 0090.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-1690.tif.uss
+MB_GRANTEE_57=given on^50~[by]^250~\r\nto]^?Grantee^250~[to secure
+
+// 0091.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-2097.tif.uss
+MB_GRANTEE_58=Mortgagee (Lender):^?Grantee^250~\r\nThis Real Property Mortgage
+
+// 0092.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\mtg\00007-1170.tif.uss
+MB_GRANTEE_59=Mortgagee^15~You^?Grantee^250~\r\n1|\r\nI.^10~mortgage to you
+
+// 0093.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set003\images\multipage\2005258351.tif.uss
+MB_GRANTEE_60=herein^5~Borrower^5~[and]^5~mortgagee^?Grantee^250~herein^5~Lender
+
+// 0075.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\deed of trust-mortgage\20059023752900.tif.uss
+MB_GRANTEE_61=Lender^3~[is]^?Grantee^250~Lender is a
+
+// 0076.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\deed of trust-mortgage\20059023593900.tif.uss
+MB_GRANTEE_62=means^250~trustor^250~means^?Grantee^250~beneficiary
+
+// 0095.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-001502.tif.uss
+MB_GRANTEE_63=between^?Grantee^120~mortgagee^5~and^250~mortgagor
+
+// 0096.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-035079.tif.uss
+MB_GRANTEE_64=Mortgagor^160~mortgage|warrant^5~[to]|[unto]^?Grantee^160~Mortgagee
+
+// 0097.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-000290.tif.uss
+MB_GRANTEE_65=Grantor^160~Trustee^160~Lender:^?Grantee^160~Conveyance:
+
+// 0098.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-033445.tif.uss
+MB_GRANTEE_67=beneficiary is^?Grantee^60~@-NonTP
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06172AA.AE0.TIF.uss
+MB_GRANTEE_71=[hereby]^3~[certif^5~that^24~mortgage^3~from^?Grantee^250~[to]^350~[paid]|[satisfied]
+// sample moved to MB_GRANTEE_32
+MB_GRANTEE_70=Grantor^?Grantee<^240~referred^5~below^24~lender
+[PATTERNS_END]

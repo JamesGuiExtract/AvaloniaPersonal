@@ -1,0 +1,9 @@
+; UCLIDFileProcessing.def : Declares the module parameters.
+
+LIBRARY      "UCLIDFileProcessing.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

@@ -1,0 +1,9 @@
+; VBScriptUtils.def : Declares the module parameters.
+
+LIBRARY      "VBScriptUtils.DLL"
+
+EXPORTS
+	DllCanUnloadNow		PRIVATE
+	DllGetClassObject	PRIVATE
+	DllRegisterServer	PRIVATE
+	DllUnregisterServer	PRIVATE

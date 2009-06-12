@@ -1,0 +1,16 @@
+(?:
+(?:
+(?:m.tt.r|.?atter|m.?tter|ma.?ter|mat.?er|matt.?r|matte.?|\b(?:mat.{2,4}|.{1,2}atte.{1,2}|.{2,4}ter)\b)
+\W*(?:of|\bo.\b|\b.f\b)\W*[:;]
+|
+(?-i:T.TL.|.?ITLE|T.?TLE|TI.?LE|TIT.?E|TITL.?|\b(?:.ITLE|T.TLE|TI.LE|TIT.E|TITL.)\b)
+)
+\W*
+|
+^IN[^\r\n\w]*RE[^\r\n\w]*
+)
+(?<Name1>
+#import Names.dat.etf
+)
+\W*
+#import OptionalName.dat.etf

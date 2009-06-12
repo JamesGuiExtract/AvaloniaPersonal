@@ -1,0 +1,20 @@
+// Exercise automated tests for the Date input validator
+<FILE>;..\Date\Date.dat
+
+// Exercise automated tests for the Double input validator
+<FILE>;..\Double\Double.dat
+
+// Exercise automated tests for the Float input validator
+<FILE>;..\Float\Float.dat
+
+// Exercise automated tests for the Long Integer input validator
+<FILE>;..\Long\Long.dat
+
+// Exercise automated tests for the Regular Expression input validator
+<FILE>;..\RegularExpression\RegularExpression.dat
+
+// Exercise automated tests for the Short Integer input validator
+<FILE>;..\Short\Short.dat
+
+// Exercise automated tests for the Value From List input validator
+<FILE>;..\ValueFromList\ValueFromList.dat

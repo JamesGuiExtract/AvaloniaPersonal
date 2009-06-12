@@ -1,0 +1,213 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""ESFileSuppliers.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "CompanyName", "Extract Systems"
+            VALUE "FileDescription", "File Supplier Module"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "ESFileSuppliers.dll"
+            VALUE "LegalCopyright", "(c) 2009 Extract Systems.  All rights reserved."
+            VALUE "OriginalFilename", "ESFileSuppliers.dll"
+            VALUE "ProductName", "ESFileSupplier"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_STATICFILELISTFS    REGISTRY                "StaticFileListFS.rgs"
+IDR_STATICFILELISTFSPP  REGISTRY                "StaticFileListFSPP.rgs"
+IDR_FOLDERFS            REGISTRY                "FolderFS.rgs"
+IDR_FOLDERFSPP          REGISTRY                "FolderFSPP.rgs"
+IDR_DYNAMICFILELISTFS   REGISTRY                "DynamicFileListFS.rgs"
+IDR_DYNAMICFILELISTFSPP REGISTRY                "DynamicFileListFSPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_STATICFILELISTFSPP DIALOGEX 0, 0, 374, 314
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Add...",IDC_BTN_ADD,312,6,54,15
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE,312,26,54,15
+    PUSHBUTTON      "Clear",IDC_BTN_CLEAR,312,46,54,15
+    PUSHBUTTON      "Load List...",IDC_BTN_LOAD_LIST,312,65,54,15
+    CONTROL         "",IDC_FILE_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,6,6,300,300
+END
+
+IDD_FOLDERFSPP DIALOGEX 0, 0, 328, 153
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Specify folder from which to supply files",IDC_STATIC,5,5,128,8
+    COMBOBOX        IDC_CMB_FOLDER,5,17,246,50,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_FOLDER_DOC_TAG,256,17,11,14,BS_ICON
+    PUSHBUTTON      "Browse...",IDC_BTN_BROWSE,274,17,50,14
+    COMBOBOX        IDC_CMB_FILE_EXTENSION,5,46,246,64,CBS_DROPDOWN | CBS_AUTOHSCROLL | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "File extension specification",IDC_STATIC,5,35,91,8
+    CONTROL         "Recursively supply files from any sub-folders",IDC_CHK_RECURSIVE,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,68,159,10
+    CONTROL         "Continuously supply any files that are",IDC_CHK_CONTINUOUS,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,82,137,10
+    CONTROL         "Added",IDC_CHK_ADDED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,96,37,10
+    CONTROL         "Modified",IDC_CHK_MODIFIED,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,110,43,10
+    CONTROL         "Target files for a rename/move operation",IDC_CHK_TARGET_FOR_RENAME_OR_MOVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,27,124,148,10
+    CONTROL         "Do not supply existing files",IDC_CHK_NO_EXISTING,
+                    "Button",BS_AUTOCHECKBOX | WS_GROUP | WS_TABSTOP,5,138,101,10
+END
+
+IDD_DYNAMICFILELISTFSPP DIALOGEX 0, 0, 275, 43
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,241,21,10,14,BS_ICON
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,254,21,15,14
+    EDITTEXT        IDC_EDT_FILENAME,5,21,232,14,ES_AUTOHSCROLL
+    LTEXT           "Dynamic list file name:",IDC_STATIC,7,7,79,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_STATICFILELISTFSPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 367
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 307
+    END
+
+    IDD_DYNAMICFILELISTFSPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 268
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 36
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "ESFileSuppliers"
+    IDS_TITLESTATICFILELISTFSPP "Title"
+    IDS_HELPFILESTATICFILELISTFSPP "Help File Name"
+    IDS_DOCSTRINGSTATICFILELISTFSPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "ESFileSuppliers.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

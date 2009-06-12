@@ -1,0 +1,75 @@
+<HTML>
+
+<HEAD>
+<TITLE>Image Viewer Open Files Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+<h1>Image Viewer Open Files Testing Checklist
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<h3>Manual Tests</h3>
+       	<ul>
+	       	<li><b>[DotNet #63]</b> Confirm that drag-and-drop of an image into 
+		the Image Viewer successfully opens the image.</li>
+	       	<li><b>[DotNet #45]</b> Confirm that a wait cursor is displayed while 
+		the Image Viewer opens an image.</li>
+	       	<li><b>[DotNet #64]</b> Confirm that specifying an image name on the 
+		command line successfully opens the image.</li>
+	       	<li>Confirm that clicking the left side of the <b>Open Image</b> 
+		toolbar button displays the <b>Open Image File</b> dialog.</li>
+	       	<li>Confirm that clicking the right side of the <b>Open Image</b> 
+		toolbar button displays a drop-down list of recently opened files.</li>
+<p>
+	       	<li><b>[DotNet #49]</b> Large image file and MRU list behavior
+       		<ul>
+          		<li>Open <B>K:\Common\Engineering\Sample 
+			Files\TWG\Set001\moi%20sample[2].pdf</B>.</li>
+        	  	<li>Close the Image Viewer.</li>
+          		<li>Open a new instance of the Image Viewer and confirm that 
+			the previous file is present in the MRU list.</li>
+        	  	<li>Open a different image - perhaps one from the 
+			Redaction Demo.</li>
+	          	<li>Use the MRU list to open the first file.</li>
+        	  	<li>Confirm that the image opens and that the 
+			MRU list menu closes.</li>
+	       	</ul>
+<p>
+   	    	<li><b>[DotNet #109]</b> Display previous image on Open failure
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Open a different image from the Redaction Demo.</li>
+        	  	<li>Temporarily rename the first image.</li>
+          		<li>Use the MRU list and attempt to open the first file.</li>
+	          	<li>Confirm that a useful error message is displayed and 
+			that the second image remains open.</li>
+	       	</ul>
+<p>
+   	    	<li>MRU list from File menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Confirm that the new image has been added to the <b>Recent 
+			files</b> menu under the File menu.</li>
+        	  	<li>Open a different image.</li>
+          		<li>Use the <b>Recent files</b> menu to open the first file.</li>
+	          	<li>Confirm that the image opens.</li>
+	       	</ul>
+<p>
+   	    	<li>MRU list from <b>Open image</b> toolbar button
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Confirm that the new image has been added to the <b>MRU list</b> 
+			drop-down menu.</li>
+        	  	<li>Open a different image.</li>
+          		<li>Use the <b>MRU list</b> drop-down menu to open the first file.</li>
+	          	<li>Confirm that the image opens.</li>
+	       	</ul>
+       	</ul>
+</ul>
+</BODY>
+</HTML>

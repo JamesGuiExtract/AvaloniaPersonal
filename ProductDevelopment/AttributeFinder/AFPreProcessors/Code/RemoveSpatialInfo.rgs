@@ -1,0 +1,26 @@
+HKCR
+{
+	AFPreProcessors.RemoveSpatialInfo.1 = s 'RemoveSpatialInfo Class'
+	{
+		CLSID = s '{B8C69AE6-2999-4F37-9F1E-6C029DECB587}'
+	}
+	AFPreProcessors.RemoveSpatialInfo = s 'RemoveSpatialInfo Class'
+	{
+		CLSID = s '{B8C69AE6-2999-4F37-9F1E-6C029DECB587}'
+		CurVer = s 'AFPreProcessors.RemoveSpatialInfo.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B8C69AE6-2999-4F37-9F1E-6C029DECB587} = s 'RemoveSpatialInfo Class'
+		{
+			ProgID = s 'AFPreProcessors.RemoveSpatialInfo.1'
+			VersionIndependentProgID = s 'AFPreProcessors.RemoveSpatialInfo'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{6E739155-A988-45D0-8FF9-D2718B7B4126}'
+		}
+	}
+}

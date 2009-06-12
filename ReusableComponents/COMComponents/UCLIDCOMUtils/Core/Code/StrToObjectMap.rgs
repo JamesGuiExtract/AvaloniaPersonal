@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.StrToObjectMap.1 = s 'StrToObjectMap Class'
+	{
+		CLSID = s '{5E5DDC3D-7928-4155-8501-4C16DCCCDB91}'
+	}
+	UCLIDCOMUtils.StrToObjectMap = s 'StrToObjectMap Class'
+	{
+		CLSID = s '{5E5DDC3D-7928-4155-8501-4C16DCCCDB91}'
+		CurVer = s 'UCLIDCOMUtils.StrToObjectMap.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5E5DDC3D-7928-4155-8501-4C16DCCCDB91} = s 'StrToObjectMap Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.StrToObjectMap.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.StrToObjectMap'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

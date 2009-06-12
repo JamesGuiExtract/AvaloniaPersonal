@@ -1,0 +1,31 @@
+// LineTextEvaluators.idl : IDL source for LineTextEvaluators.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (LineTextEvaluators.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(5A276411-1C00-4E67-8063-B5F5E8D13739),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR LineTextEvaluators 1.0 Type Library")
+]
+library UCLID_LINETEXTEVALUATORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\Core\SpotRecognitionIR.tlb");
+	importlib("..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(28E0AC0C-5DD4-4EDD-93E6-C9675785DD8B),
+		helpstring("MCRLineTextEvaluator Class")
+	]
+	coclass MCRLineTextEvaluator
+	{
+		[default] interface ILineTextEvaluator;
+		interface ILicensedComponent;
+	};
+};

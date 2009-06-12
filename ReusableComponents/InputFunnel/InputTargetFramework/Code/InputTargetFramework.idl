@@ -1,0 +1,65 @@
+// InputTargetFramework.idl : IDL source for InputTargetFramework.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (InputTargetFramework.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(9B58A9D5-9CDD-4ADA-82BD-E6A1E784E79B),
+	version(1.0),
+	helpstring("UCLID InputTargetFramework 1.0 Type Library")
+]
+library UCLID_INPUTTARGETFRAMEWORKLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(75C41434-1869-4AEF-AF97-2AC592C8AEA0),
+		dual,
+		helpstring("IInputTarget Interface"),
+		pointer_default(unique)
+	]
+	interface IInputTarget : IDispatch
+	{
+		[id(1), helpstring("method Activate")] HRESULT Activate();
+		[id(2), helpstring("method Deactivate")] HRESULT Deactivate();
+		[id(3), helpstring("method IsVisible")] HRESULT IsVisible([out, retval] VARIANT_BOOL *pbValue);
+		[id(4), helpstring("method SetApplicationHook")] HRESULT SetApplicationHook([in] IUnknown *pHook);
+	};
+
+	[
+		object,
+		uuid(9E07E5F6-88C6-43DE-9F9F-17837B380C4D),
+		dual,
+		helpstring("IInputTargetManager Interface"),
+		pointer_default(unique)
+	]
+	interface IInputTargetManager : IDispatch
+	{
+		[id(1), helpstring("method AddInputTarget")] HRESULT AddInputTarget([in] IInputTarget *pInputTarget);
+		[id(2), helpstring("method NotifyInputTargetWindowActivated")] HRESULT NotifyInputTargetWindowActivated([in] IInputTarget *pInputTarget);
+		[id(3), helpstring("method NotifyInputTargetWindowClosed")] HRESULT NotifyInputTargetWindowClosed([in] IInputTarget *pInputTarget);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(58B184A2-B24C-4651-86CA-C7AA9F498586),
+		helpstring("InputTargetManager Class")
+	]
+	coclass InputTargetManager
+	{
+		[default] interface IInputTargetManager;
+		interface ILicensedComponent;
+	};
+};

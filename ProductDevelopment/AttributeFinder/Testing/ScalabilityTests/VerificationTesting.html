@@ -1,0 +1,126 @@
+<html>
+
+<head>
+<title>File Action Manager Verification Testing</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Large-Scale Verification Testing<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2>NOTE: Test notes should be archived under I:\Common\Testing\Product Testing\FLEX_Index_60\VerificationTests</h2>
+<ol>
+<li><h2>Server Preparation</h2>
+	<ul>
+		<li>Select a <b>server</b> test machine ( i.e. SuperTester or UltraTester ).
+		<li>Copy suitable image files for redaction from K: to the local machine.  The 
+		<b>Endurance Test</b> checklist can provide example image folders.
+		<li>Confirm that <b>SQL Server</b> is installed on the server.  Either the Standard edition 
+		or the Express edition of SQL 2005 or SQL 2008 are acceptable.
+		<li>Create a <b>V:</b> drive mapped to the root folder containing the local 
+		images for redaction.
+	</ul>
+<p>
+<li><h2>Database Preparation</h2>
+	<ul>
+		<li>Use <b>FAM DB Admin</b> to create a local 
+		LargeVerificationTest database.  The server name should be <b>(local)</b>.
+		<li>Log in and add actions: <b>Compute</b> and <b>Verify</b> to the database.
+	</ul>
+<p>
+<li><h2>File Preparation</h2>
+	<ul>
+		<li>Create a <b>Compute.fps</b> file with a file supplier to supply the images 
+		from <b>drive V:</b>.  
+		<li>Include an <b>Execute rules</b> task using an up-to-date set of 
+		redaction rules.
+		<li>Include a <b>Conditionally execute task(s)</b> task using the ID Shield data 
+		file contents condition object.
+		<li>Execute a <b>Set file-action status</b> task if the condition is <b>True</b> 
+		to set the <b>Verify</b> action to <b>Pending</b>. 
+<p>
+		<li>Note that for an average verification rate of 10 seconds per document, 10 
+		verifiers require 1800 sensitive documents in order to exercise the verification 
+		task for 30 minutes.
+		<li>Exercise  <b>Compute.fps</b> long enough to accumulate an adequate number 
+		of sensitive documents.
+<p>
+		<li>Create <b>Verify.fps</b> stored on drive V:.
+		<li>Use default settings for verification and enable collection of redaction 
+		accuracy feedback.
+	</ul>
+<p>
+<li><h2>Test Execution - Physical Machines</h2>
+	<ul>
+		<li>Each test machine to be used in the verification test should be configured:
+		<ul>
+			<li>Install the chosen build of <b>ID Shield</b>.
+			<li>Add a license file for <b>ID Shield Client</b>.
+			<li>Add a drive mapping for <b>V:</b>.
+		</ul>
+<p>
+		<li>Open <b>Verify.fps</b> from drive V:.
+		<li><b>Start processing</b> to confirm that images and VOA files can be read.
+		<li><b>Stop processing</b> without saving any redacted images until all of the 
+		testers are ready.
+<p>
+		<li><b>Start processing</b> and make suitable corrections as needed to the 
+		redacted images.
+		<li><b>Stop processing</b> at the end of the testing time or when the sensitive 
+		images have all been verified.
+	</ul>
+<p>
+<li><h2>Test Execution - Virtual Machines</h2>
+	<ul>
+		<li>A virtual machine to be used in the verification test should be configured:
+		<ul>
+			<li>From a clean operating system <b>VHD</b> file template.
+			<li>Apply the required <b>Windows Updates</b>.
+			<li>Install the chosen build of <b>ID Shield</b>.
+			<li>Add a license file for <b>ID Shield Client</b>.
+			<li>The virtual machine <b>does not</b> need to be added to the domain <b>at this point</b>.
+		</ul>
+<p>
+		<li>Open <b>Verify.fps</b> from drive V:.
+		<li><b>Start processing</b> to confirm that images and VOA files can be read.
+		<li><b>Stop processing</b> without saving any redacted images.
+<p>
+		<li>Each tester should:
+		<ul>
+			<li>Receive a copy of the configured <b>VHD file</b>.
+			<li>Create a new virtual machine ( and .vmc file ) from the Virtual PC console 
+			and use the new VHD file.
+			<li>Modify the computer name of the new virtual machine to avoid IP address
+			conflicts.
+			<li>After modifying the computer name the virtual machine <b>needs to be added</b> to the <b>extract.local</b> domain.
+			<li><b>Restart</b> the virtual machine and log in with your domain user account.
+			<li>Add a drive mapping for <b>V:</b>.
+			<li>Open <b>Verify.fps</b> from drive V:.
+			<li><b>Start processing</b> to confirm that images and VOA files can be read.
+			<li><b>Stop processing</b> without saving any redacted images until all of the 
+			testers are ready.
+		</ul>
+<p>
+		<li><b>Start processing</b> and make suitable corrections as needed to the 
+		redacted images.
+		<li><b>Stop processing</b> at the end of the testing time or when the sensitive 
+		images have all been verified.
+	</ul>
+<p>
+<li><h2>Test Review and Data Analysis</h2>
+	<ul>
+		<li>The following items should be reviewed after each test execution exercise.
+		<ul>
+			<li>Confirm that no unexpected errors were seen by any tester.
+			<li>Confirm that the expected number of redacted images are present.
+			<li>Run the ID Shield Report and confirm that rational numbers are 
+			present for the verification exercise.
+		</ul>
+	</ul>
+</ol>
+
+</body>
+</html>

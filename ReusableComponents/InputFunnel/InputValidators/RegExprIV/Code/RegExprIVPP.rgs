@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDRegExprIV.RegExprIVPP.1 = s 'RegExprIVPP Class'
+	{
+		CLSID = s '{7CD4803D-1A63-4D6D-B827-7EBF27CFA342}'
+	}
+	UCLIDRegExprIV.RegExprIVPP = s 'RegExprIVPP Class'
+	{
+		CLSID = s '{7CD4803D-1A63-4D6D-B827-7EBF27CFA342}'
+		CurVer = s 'UCLIDRegExprIV.RegExprIVPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7CD4803D-1A63-4D6D-B827-7EBF27CFA342} = s 'RegExprIVPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

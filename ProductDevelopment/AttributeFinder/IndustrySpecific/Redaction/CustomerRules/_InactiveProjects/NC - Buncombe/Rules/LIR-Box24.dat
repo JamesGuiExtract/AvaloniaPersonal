@@ -1,0 +1,5 @@
+^24\s*[,.]?\s*EMPLOY
+^.{0,6}EMPLOYER
+^.{0,15}/SCHOOL
+^.{0,11}(OYER/SCH|YER/SCHO)
+24\s*[,.]?\s*EMPLOYER

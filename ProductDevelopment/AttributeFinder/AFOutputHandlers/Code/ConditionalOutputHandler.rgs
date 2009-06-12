@@ -1,0 +1,26 @@
+HKCR
+{
+	AFOutputHandlers.ConditionalOutputHandler.1 = s 'ConditionalOutputHandler Class'
+	{
+		CLSID = s '{654A637A-6922-4EBA-A8B7-675396570015}'
+	}
+	AFOutputHandlers.ConditionalOutputHandler = s 'ConditionalOutputHandler Class'
+	{
+		CLSID = s '{654A637A-6922-4EBA-A8B7-675396570015}'
+		CurVer = s 'AFOutputHandlers.ConditionalOutputHandler.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {654A637A-6922-4EBA-A8B7-675396570015} = s 'ConditionalOutputHandler Class'
+		{
+			ProgID = s 'AFOutputHandlers.ConditionalOutputHandler.1'
+			VersionIndependentProgID = s 'AFOutputHandlers.ConditionalOutputHandler'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

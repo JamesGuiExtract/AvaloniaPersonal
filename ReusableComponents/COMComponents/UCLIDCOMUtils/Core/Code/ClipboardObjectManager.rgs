@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.ClipboardObjectManager.1 = s 'ClipboardObjectManager Class'
+	{
+		CLSID = s '{A611A231-CE63-41BF-A2EE-B43B5CA23235}'
+	}
+	UCLIDCOMUtils.ClipboardObjectManager = s 'ClipboardObjectManager Class'
+	{
+		CLSID = s '{A611A231-CE63-41BF-A2EE-B43B5CA23235}'
+		CurVer = s 'UCLIDCOMUtils.ClipboardObjectManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A611A231-CE63-41BF-A2EE-B43B5CA23235} = s 'ClipboardObjectManager Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.ClipboardObjectManager.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.ClipboardObjectManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

@@ -1,0 +1,20 @@
+Name of the tool = AdjustImageResolution.exe
+Project type = Use MFC Dialog box application template instead of console app
+Number required arguments = 3 
+	- arg1 = input image filename; 
+	- arg2 = desired X resolution;
+	- arg3 = desired Y resolution;
+Number optional arguments = 2 (either both present or neither present) 
+	- arg4 = -Hn (maximum image height in inches where adjustment is not needed)
+		-H0 indicates that image height is not constrained
+	- arg5 = -Wn (maximum image width in inches where adjustment is not needed)
+		-W0 indicates that image width is not constrained
+Source code location in VSS = ProductDevelopment/Utils/AdjustImageResolution/Code
+ 
+Other specs:
+(a) The EXE shall check # of params.  If # params <> 3 AND <> 5, an error message shall be displayed along with proper usage instructions.
+(b) The EXE will accept single-page images.
+(c) The EXE will accept multi-page images.
+(d) The EXE will replace the original image with the adjusted image.
+(e) If any exceptions are raised they shall be displayed.
+(f) The EXE shall be licensed.

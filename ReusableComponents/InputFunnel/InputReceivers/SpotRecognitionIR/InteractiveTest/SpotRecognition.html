@@ -1,0 +1,307 @@
+<html>
+
+<head>
+<title>Image Viewer Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Image Viewer Testing Checklist<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>NOTE: Additional test cases can be found in the IcoMapESRI/Testing/ITC folder.</h2>
+
+<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
+<hr>
+
+<ol>
+
+<!-- *********************************************** -->
+<li><h2>Miscellaneous</h2>
+<ul>
+   	<li><b>[FlexIDSCore #2930]</b> /l option.  
+	<ul>
+		<li>Open an image file with the Image Viewer.
+		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command 
+		window where <b>&lt;second_image&gt;</b> is a different image file.
+		<li>Confirm that the new image is opened in the existing image window.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3665]</b> /e option in usage.  
+	<ul>
+		<li>Run <b>ImageViewer.exe /?</b> from a command window.
+		<li>Confirm that the usage statement includes a <b>/e</b> option to specify 
+		a script file.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3688]</b> Display page percentage in status bar.  
+	<ul>
+		<li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
+                    HKEY_CURRENT_USER/Software/Extract Systems/InputFunnel/InputReceivers/SpotRecIR.</li> 
+		<li>Open an image file in the Image Viewer and confirm that the rightmost 
+                    two panes in the status bar display <b>X : <i>nn</i></b> and <b>Y : <i>nn</i></b> 
+                    where <i>nn</i> is a numeric value that changes as the mouse moves.</li> 
+		<li><b>[LegacyRC #4590]</b> Close the Image Viewer and confirm that the 
+		application closes without a significant delay.</li>
+		<li>Using <b>RDTConfig</b>, check the <b>Display image window percentages</b> checkbox.</li>
+		<li>Open an image file and confirm that the rightmost 
+                    two panes in the status bar display <b>X : <i>nn</i>, <i>pp</i>%</b> and 
+                    <b>Y : <i>nn</i>, <i>pp</i>%</b> where <i>nn</i> 
+                    and <i>pp</i> are numeric values that change as the mouse moves.</li> 
+		<li>Close the Image Viewer.</li>
+		<li>Using <b>RDTConfig</b>, uncheck the <b>Display image window percentages</b> checkbox.</li>
+		<li>Open an image file and confirm that percentages are no longer displayed 
+                    in the status bar.</li>
+	</ul>
+<p>
+   	<li><b>[LegacyRC #4073]</b> Use shortcut key <b>H</b> to toggle highlighting mode.
+	<ul>
+		<li>Open an image file in the Image Viewer, zoom in to a portion of the 
+                    image, and select <b>Pan</b> mode.</li> 
+		<li>Type an <b>H</b> and confirm that the current highlighting tool is now active with 
+                    the appropriate cursor.</li> 
+		<li>Type another <b>H</b> and confirm that the highlighting tool toggles and the 
+                    cursor also changes.</li> 
+	</ul>
+<p>
+	<li><b>[LegacyRC #4475, #4477]</b> Highlights offset for images with small deskew angle.</li>   
+	<ul>
+		<li>Open <b>PoBox.rsd</b> and start the Rule Tester utility.</li> 
+		<li>Open <b>SlightDeskew.tif</b> in the Rule Tester.</li> 
+		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
+		<li>Review the two found attributes and confirm that the highlights are 
+		    properly aligned with the text.</li> 
+	</ul>
+<p>
+	<li><b>[LegacyRC #4478]</b> Highlights off image page throw an exception.</li>   
+	<ul>
+		<li>Open <b>OffPage.rsd</b> and start the Rule Tester utility.</li> 
+		<li>Open <b>Off_Page.tif</b>  in the Rule Tester.</li> 
+		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
+		<li>Review the found attributes and confirm that each highlight is displayed
+		    without error.</li> 
+	</ul>
+<p>
+	<li><b>[LegacyRC #4480]</b> Incorrect deskew stored for small deskew angles.</li>   
+	<ul>
+		<li>Open <b>Patricia.rsd</b> and start the Rule Tester utility.</li> 
+		<li>Open <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\Document Classification\County Document\Affidavit of Death\0002.tif</b> and recognize all of the text in the image.</li> 
+		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
+		<li>Review the found attributes and confirm that the highlights are 
+		    properly aligned with the text.</li> 
+	</ul>
+<p>
+   	<li><b>*[FlexIDSCore #2994]</b> Right-to-left highlighting
+	<ul>
+		<li>Open an image file with the Image Viewer.
+		<li>Use the rectangular highlight tool to highlight some text swiping from 
+		left-to-right.  Confirm that the OCR result is reasonable.
+		<li>Use the rectangular highlight tool to highlight some text swiping from 
+		right-to-left.  Confirm that the OCR result is reasonable.
+		<li>Use the angular highlight tool to highlight some text swiping from 
+		left-to-right.  Confirm that the OCR result is reasonable.
+		<li>Use the angular highlight tool to highlight some text swiping from 
+		right-to-left.  Confirm that the OCR result is reasonable.
+	</ul>
+<p>
+	<li><b>[LegacyRC #4621, #4627]</b> Image Viewer does not properly handle corrupt images.
+	<ul>
+		<li>Save <b>(#4621) B03307AABMB.TIF (Image A)</b> and <b>(#4627) 00002.tif (Image B)</b> locally.
+		<li>Right-click on <b>Image A</b> and <b>Open With Image Viewer</b>.
+		<li>Verify that Image Viewer <b>displays</b> an exception showing that 
+		    it failed to load the file.
+		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
+		<li>Repeat the above steps for <b>Image B</b>.
+<p>
+		<li>Open Image Viewer.
+		<li>Open <b>Image A</b>.
+		<li>Verify that Image Viewer <b>displays</b> an exception showing that
+		    it failed to load the file.
+		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
+		<li>Repeat the above steps for <b>Image B</b>.
+<p>
+		<li>Open Image Viewer.
+		<li>Open a known <b>non-corrupt</b> image.
+		<li>Open <b>Image A</b>.
+		<li>Verify that Image Viewer <b>displays</b> an exception showing that
+		    it failed to load the file.
+		<li>Verify that Image Viewer will allow you to open a non-corrupt image.
+		<li>Repeat the above steps for <b>Image B</b>.
+	</ul>
+<p>
+	<li><b>[LegacyRC #4726]</b> OCR Rectangular Area.</li>   
+	<ul>
+		<li>Open an image in the Image Viewer.</li> 
+		<li>Zoom out so that a gray area is visible both below and to the right of the image.</li> 
+		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
+		bottom of the page is successful. Note: alternatively, confirm that it
+          is not possible to select a region that runs off the page.</li> 
+		<li>Confirm that OCRing a rectangular region that includes text and runs off the 
+		right side of the page is successful. Note: alternatively, confirm that
+          it is not possible to select a region that runs off the page.</li> 
+	</ul>
+<p>
+	<li><b>[LegacyRC #4416]</b> Open image from USS.</li>   
+	<ul>
+		<li>From the File - Open dialog within Image Viewer, select a USS file 
+		where the corresponding image file is also present in the folder.</li> 
+		<li>Confirm that the image opens successfully.</li> 
+	</ul>
+<p>
+   	<li><b>[LegacyRC #4859]</b> Problem with toolbar display.  
+	<ul>
+		<li>Open an image in <b>Image Viewer</b>.
+		<li>Lock the workstation via <b>Ctrl+Alt+Del</b>.
+		<li>Log back in to the workstation.
+		<li>Confirm that the toolbar remains completely visible above the client area.
+	</ul>
+<p>
+	<li><b>[LegacyRC #4935]</b> Up / Down scrollbar buttons do not work.</li>   
+	<ul>
+		<li>Open an image and zoom in so that the vertical scrollbar is active.</li> 
+		<li>Scroll partway down the image.</li> 
+		<li>Confirm that the <b>Up arrow</b> in the scrollbar scrolls the 
+		image upward.</li> 
+		<li>Confirm that the <b>Down arrow</b> in the scrollbar scrolls the 
+		image downward.</li> 
+	</ul>
+<p>
+	<li><b>*[LegacyRC #5032]</b> Ignore shortcut keys during click + drag</li>   
+	<ul>
+		<li>Open a multi-page image.</li> 
+		<li>Select one of the highlight tools.</li> 
+		<li>Click and hold the mouse button while dragging the mouse in order to 
+		create a highlight.</li> 
+		<li>Press <b>[PageDown]</b> before releasing the mouse button.</li> 
+		<li>Confirm that <b>[PageDown]</b> is ignored and the swipe can continue.
+<p> 
+		<li>Select the angular highlight tool.</li> 
+		<li>Click and hold the mouse button while dragging the mouse in order to 
+		create another highlight.</li> 
+		<li>Press <b>+</b> or <b>-</b> several times before releasing the mouse button to 
+		change the height of the highlight.</li> 
+		<li>Confirm that the height changes during the swipe.
+	</ul>
+<p>
+	<li><b>[FlexIDSCore #3037]</b> OCR of first page of image does not appear in .uss file</li>
+	<ul>
+		<li>Open this image: K:\Common\Engineering\Sample Files\OH - Montgomery 
+County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.TIF</li>
+		<li>OCR entire document.</li>
+		<li>Confirm that the results of the OCR include the first page of the image.</li>
+	</ul>
+<p>
+	<li><b>[LegacyRCAndUtils #5149]</b> Change Image Viewer title
+	<ul>
+		<li>Confirm that the name of the utility is "Extract Image Viewer."
+	</ul>
+</ul>
+</li>
+<br />
+
+<li><h2>Image Display in Image Viewer</h2>
+<ul>
+   	<li><b>[LegacyRC #3897]</b> Version 1.5 PDFs
+	<ul>
+		<li>Confirm that Image Viewer can open each image in the following folder.  I:\Common\Testing\PVCS_Testing\LegacyRC\3897
+	</ul>
+   	<li><b>[FlexIDSCore #2693]</b> Searchable PDFs
+	<ul>
+		<li>Confirm that Image Viewer can open and display each image in the following folder.  I:\Common\Testing\PVCS_Testing\FlexIDSCore\2693
+	</ul>
+	<li><b>[LegacyRCAndUtils #5102]</b> Unable to open PDF - Unable to initialize PDF engine</li>
+	<ul>
+		<li>Modify the <b>GS_LIB</b>.</li>
+		<li>Confirm that the <b>Image Viewer</b> can still open PDF images.</li>
+		<li>Restore the original setting for the <b>GS_LIB</b> environment variable.</li>
+	</ul>
+	<li><b>[LegacyRCAndUtils #4777]</b> SRW does not open a particular image.
+	<ul>
+		<li>Open the image attached to SCR #4745 in the Image Viewer.
+		<li>Confirm that the image opens correctly.
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Manual Rotation Testing</h2>
+<ul>
+   	<li><b>Instructions</b>
+	<ul>
+		<li>Use the Rule Tester and Spot Recognition Window with <b>ExtractLines.rsd</b>.</li> 
+		<li>Use <b>RotationTesting.xls</b> to track performance of OCR and Highlights.</li> 
+		<li>The RSD and XLS files can be found in 
+                    <b>./AttributeFinder/Testing/RotationTesting</b>.</li> 
+		<li>The image files can be found in <b>I:/Common/Testing/Rotated_Images</b>.</li> 
+<p>
+		<li>For <b>OCR Page</b> and <b>Highlights</b></li> 
+		<ul>
+			<li>SRW - Send Text to Rule Tester window (Process Current Page)</li>
+			<li>RT - Execute Rules</li>
+			<li>RT - Select several output lines and confirm that for Good OCR, 
+                            the highlights match the expected and recognized text.  For BAD OCR, 
+                            the highlights should match "lines" of mis-recognized text.</li>
+		</ul>
+<p>
+		<li>For <b>OCR Region</b> and <b>Highlights</b></li> 
+		<ul>
+			<li>SRW - Send Text to Rule Tester window (Process Current Page)</li>
+			<li>SRW - Select a rectangular region.  Do not always use the same 
+                            region when testing different variations of the same source image.</li>
+			<li>RT - Execute Rules</li>
+			<li>RT - Select several output lines and confirm that for Good OCR, 
+                            the highlights match the expected and recognized text.  For BAD OCR, 
+                            the highlights should match "lines" of mis-recognized text.</li>
+		</ul>
+	</ul>
+<p>
+   	<li><b>[LegacyRC #4446]</b> Rotated images are not highlighted correctly.  
+	<ul>
+		<li>Exercise <b>Image23</b> and its <b>_Rxxx</b> and <b>_VPx</b> variations.</li> 
+		<li>Confirm that the <b>good</b> and <b>BAD</b> cell entries for the 
+                    Image23 tab are correct.</li> 
+<p>
+		<li>Exercise <b>Image087</b> and its <b>_Rxxx</b> and <b>_VPx</b> variations.</li> 
+		<li>Confirm that the <b>good</b> and <b>BAD</b> cell entries for the 
+                    Image087 tab are correct.</li> 
+<p>
+		<li>Exercise <b>Image152</b> and its <b>_Rxxx</b> and <b>_VPx</b> variations.</li> 
+		<li>Confirm that the <b>good</b> and <b>BAD</b> cell entries for the 
+                    Image152 tab are correct.</li> 
+<p>
+		<li>Exercise <b>Image960</b> and its <b>_Rxxx</b> and <b>_VPx</b> variations.</li> 
+		<li>Confirm that the <b>good</b> and <b>BAD</b> cell entries for the 
+                    Image960 tab are correct.</li> 
+	</ul>
+</ul>
+</li>
+<br />
+
+<!-- *********************************************** -->
+<li><h2>Automated Rotation Testing</h2>
+<ul>
+	<li>Use the <b>File Action Manager</b> to exercise automated redaction with the 
+            RedactionDemo RSD file.</li>   
+        <li>Configure the <b>Redaction</b> task to create an output image for each input image.</li> 
+	<li>Make a local copy of the image files from <b>I:/Common/Testing/Rotated_Images</b>.</li> 
+	<li>Confirm that each image processes without error.</li> 
+	<li>Confirm that each image has an associated VOA file.</li> 
+<p>
+	<li>Note that the reflected images will not have any redactions because the OCR results
+            will not identify any sensitive regions.</li> 
+	<li>Review each output image using the <b>Windows Fax Viewer</b> and confirm that 
+            the images are displayed properly and that the redactions are positioned correctly.</li> 
+	<li>Review each output image using the <b>Image Viewer</b> and confirm that 
+            the images are displayed properly and that the redactions are positioned correctly.</li> 
+</ul>
+</li>
+<br />
+</ol>
+
+</body>
+
+</html>

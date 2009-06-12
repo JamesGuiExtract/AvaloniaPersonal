@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFinders.RegExprFinder.1 = s 'RegExprFinder Class'
+	{
+		CLSID = s '{445C234E-81D1-48EB-A98C-08A3A8066D6E}'
+	}
+	UCLIDInputFinders.RegExprFinder = s 'RegExprFinder Class'
+	{
+		CLSID = s '{445C234E-81D1-48EB-A98C-08A3A8066D6E}'
+		CurVer = s 'UCLIDInputFinders.RegExprFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {445C234E-81D1-48EB-A98C-08A3A8066D6E} = s 'RegExprFinder Class'
+		{
+			ProgID = s 'UCLIDInputFinders.RegExprFinder.1'
+			VersionIndependentProgID = s 'UCLIDInputFinders.RegExprFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D76C8853-4347-11D6-826C-0050DAD4FF55}'
+		}
+	}
+}

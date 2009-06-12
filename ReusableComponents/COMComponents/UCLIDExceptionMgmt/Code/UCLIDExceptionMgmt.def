@@ -1,0 +1,9 @@
+; UCLIDExceptionMgmt.def : Declares the module parameters.
+
+LIBRARY      "UCLIDExceptionMgmt.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

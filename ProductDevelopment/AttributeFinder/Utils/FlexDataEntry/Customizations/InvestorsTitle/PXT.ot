@@ -1,0 +1,49 @@
+// Seller Names
+SLR1NAM1=$TrimAndConsolidateWS(<Grid1[1][First]> <Grid1[1][Middle]> <Grid1[1][Last]> <Grid1[1][Suffix]>)
+SLR1NAM2=$TrimAndConsolidateWS(<Grid1[2][First]> <Grid1[2][Middle]> <Grid1[2][Last]> <Grid1[2][Suffix]>)
+
+// Buyer names
+BYR1NAM1=$TrimAndConsolidateWS(<Grid2[1][First]> <Grid2[1][Middle]> <Grid2[1][Last]> <Grid2[1][Suffix]>)
+BYR1NAM2=$TrimAndConsolidateWS(<Grid2[2][First]> <Grid2[2][Middle]> <Grid2[2][Last]> <Grid2[2][Suffix]>)
+
+// Sale Price, Lender Name, Loan Amount, Loan Number
+SALEPRIC=<Grid3[SalePrice]>
+LENNAM1=<Grid3[LenderName]>
+LOANAMT=<Grid3[LoanAmount]>
+LOANNUMB=<Grid3[LoanNumber]>
+
+// Property Address
+PROPSTRE=<Grid4[Street]>
+PROPCITY=<Grid4[City]>
+STATELET=<Grid4[State]>
+PROPZIP=<Grid4[ZipCode]>
+
+// Full Legal Description
+PROPDES=<Grid5>
+
+// Components of One Legal Description: County, Lot, Block, Subdivision
+// Section, Phase and Acreage components are blank
+COUNTY=<Grid6[1][County]>
+LOTUNIT=<Grid6[1][Lot]>
+BLKBLDF=<Grid6[1][Block]>
+SUBDIVN=<Grid6[1][Subdivision]>
+SECTION=<Grid6[1][Section]>
+PHASE=<Grid6[1][Phase]>
+ACREAGE=<Grid6[1][Acreage]>
+
+// Tax Map ID, Plat Book, Plat Page, Property Use
+TAXMAPID=<Grid7[TaxParcelID]>
+PLATRWBK=<Grid7[PlatBook]>
+PLATRWPG=<Grid7[PlatPage]>
+PROPUSE=<Grid7[PropertyUse]>
+
+// Loan Officer, Mortgage Book, Mortgage Do, Buyer Attorney Code, Buyer Attorney Name
+LOANOFCR=<Grid8[LoanOfficer]>
+MTDTRWBK=<Grid8[MTDTRWBK]>
+MTDTRWDO=<Grid8[MTDTRWDO]>
+BYRATCOD=<Grid8[AttorneyCode]>
+BYRATNAM=<Grid8[AttorneyName]>
+
+// Effective Date, Effective Time
+CTTODATE=<Grid9[EffectiveDate]>
+CTTOTIM=<Grid9[EffectiveTime]>

@@ -1,0 +1,263 @@
+
+		////////////////////////////////////////////////////
+		// Step 1A: Trim leading non-alphanumeric characters
+		//
+		// Example  Input: ....-, John Smith and Mary Smith
+		// Example Output: John Smith and Mary Smith
+		////////////////////////////////////////////////////
+
+		////////////////////////////////////////
+		// Step 1B: Trim leading lower-case words
+		//          Digits count as upper-case 
+		//
+		// Example  Input: in ABC Company
+		// Example Output: ABC Company
+		////////////////////////////////////////
+
+		//////////////////////////////////////////
+		// Step 1C: Trim leading digits-only words
+		//
+		// Example  Input: 100 State Street
+		// Example Output: State Street
+		//
+		// Example  Input: 21st Century Mortgage
+		// Example Output: 21st Century Mortgage
+		//////////////////////////////////////////
+
+		///////////////////////////////////////////
+		// NOTE: Attempt each one of Steps 2, 3, 4 
+		//       until the success flag is set.
+		//       If one of Steps 2 - 4 does not set
+		//       the success flag, then execute 
+		//       Step 5.
+		///////////////////////////////////////////
+
+		//////////////////////////////////////////
+		// Step 2A: Locate last Person Designator,
+		//          save substring + original
+		//          set Person Success flag
+		//
+		// Example    Input: J Smith, single and M Jones, single plus text
+		// Substring Output: J Smith, single and M Jones, single
+		//////////////////////////////////////////
+
+		/////////////////////////////////////////////////////////////
+		// Step 2B: Search remainder of original string for 
+		//          last Person Identifier.
+		//          If found only Identifier, (A)
+		//             set initial trim position for Step 5B
+		//          Else If found only Designator, (B)
+		//             just retain substring
+		//          Else If Designator + Identifier, (C)
+		//             retain initial trim position for Step 5B
+		//          Else found neither Designator nor Identifier, (D)
+		//             do nothing to original string
+		//
+		// Example (A) Input: J Smith and M Smith, his wife plus text
+		// Trim Pos   Output: J Smith and M Smith, his wife
+		//
+		// Example (B) Input: J Smith and M Smith, married plus more
+		// Substring  Output: J Smith and M Smith, married
+		//
+		// Example (C) Input: J Smith, married and M Smith, his wife plus text
+		// Trim Pos   Output: J Smith, married and M Smith, his wife
+		//
+		// Example (D) Input: ABC Bank and Trust plus more
+		// Substring  Output: ABC Bank and Trust plus more
+		/////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////
+		// Step 2C: Locate first person suffix,
+		//          set Person Suffix flag
+		//
+		// Purpose: Do not trim trailing periods in Step 7
+		//          if a suffix is found
+		//////////////////////////////////////////////////
+
+		///////////////////////////////////////////////////////
+		// Step 3: Locate first company suffix,
+		//         trim succeeding text,
+		//         set Company Suffix flag
+		//         set Company Found flag
+		//
+		// Example  Input: Acme Mortgage Incorporated Plus More
+		// Example Output: Acme Mortgage Incorporated
+		///////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////
+		// Step 4: If NOT Company Found, Locate first company designator
+		//         and Locate first following lower-case word.
+		//         Trim the lower-case word and subsequent words.
+		//         Set Company Found flag.
+		//
+		//         Exception: "and" and "&" are accepted unless 
+		//            at end of string or immediately followed by 
+		//            another lower-case word.
+		//
+		//         Exception: Do not trim after the first word
+		//
+		// Example  Input: Acme Mortgage Company and More plus text
+		// Example Output: Acme Mortgage Company and More
+		//
+		// Example  Input: Acme Mortgage Company and
+		// Example Output: Acme Mortgage Company
+		//
+		// Example  Input: Acme Mortgage Company and more
+		// Example Output: Acme Mortgage Company
+		//
+		// Example  Input: Acme Credit Union plus more
+		// Example Output: Acme Credit Union
+		//
+		// Example  Input: Bank of America plus more
+		// Example Output: Bank of America
+		////////////////////////////////////////////////////////////////
+
+		/////////////////////////////////////////////////////////
+		// Step 4B: Special handling if TRUST found.
+		//          Locate "Trust Dated" and trim after "Trust"
+		//
+		// Example  Input: John Smith Trust Dated January 1, 1999
+		// Example Output: John Smith Trust
+		/////////////////////////////////////////////////////////
+
+		///////////////////////////////////////////////////////////////////
+		// Step 5: Locate double carriage-return (one blank line).
+		//         Trim before the double carriage-return.
+		//
+		// NOTE: Code that trims here only if neither Person Designator nor
+		//       Company Suffix found has been commented out because 
+		//       analysis indicated poorer results.
+		//
+		// Example  Input: ACME SAVINGS\n\nBorrower is
+		// Example Output: ACME SAVINGS
+		///////////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////////////
+		// Step 6: Locate and trim first lower-case word or punctuation.
+		//         Enter here only if neither Person Designator nor Company 
+		//         item found.  Also enter here if just a Person Trim 
+		//         Identifier was found.
+		//
+		//         Exceptions: "and", "&"
+		//         Punctuation = { : ; ( ) " }
+		//
+		// Example  Input: John Smith Associates (Sons of Liberty)
+		// Example Output: John Smith Associates
+		//
+		// Example  Input: John Smith and Mary Smith plus more
+		// Example Output: John Smith and Mary Smith
+		//
+		// Example  Input: John Smith & Mary Smith plus more
+		// Example Output: John Smith & Mary Smith
+		//
+		// Example  Input: John Smith and Mary Smith and Peter Smith plus more
+		// Example Output: John Smith and Mary Smith and Peter Smith
+		//////////////////////////////////////////////////////////////////////
+
+		///////////////////////////////////////////////////////////
+		// Step 7A: General Trimming
+		//          Leading: period, comma, slash, double quote
+		//          Trailing: Leading + brackets, parenthesis
+		//
+		// Example  Input: ..,"John Smith Associates []
+		// Example Output: John Smith Associates
+		///////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////////////
+		// Step 7B: General Trimming
+		//          Trim trailing space + period
+		//          If Person NOT found, trim leading and trailing
+		//             Entity Trim Phrases
+		//
+		// Example  Input: John Smith Associates .
+		// Example Output: John Smith Associates
+		//
+		// Example  Input: John Smith Associates P. O. Box 123
+		// Example Output: John Smith Associates
+		//
+		// Example  Input: John Smith Associates A Division of Acme Industries
+		// Example Output: John Smith Associates
+		//////////////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////
+		// Step 7C: Do company-specific post-processing
+		//       1: Trim leading/trailing spaces & punctuation
+		//       2: Search for trailing " X." where X is any char
+		//          and remove them if found outside of Company Suffix
+		//       3: Quit checking if string is entirely upper case
+		//       4: Search from right-to-left for periods
+		//       5: If period is not part of an abbreviated word,
+		//         then evaluate each substring
+		//       6: IF one substring is all upper-case AND 
+		//         the other is not, then retain the upper-case
+		//         substring
+		//   NOTE: A word is considered to be an abbreviation 
+		//         if it contains only upper-case letters or 
+		//         periods or commas
+		//
+		// Example  Input: John Smith Associates P.
+		// Example Output: John Smith Associates
+		//
+		// Example  Input: ACME CO. LENDING
+		// Example Output: ACME CO. LENDING
+		//
+		// Example  Input: ACME CO. Lender
+		// Example Output: ACME CO.
+		//
+		// Example  Input: Firstar Bank U.S.A., NA
+		// Example Output: Firstar Bank U.S.A., NA
+		//////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////////
+		// Step 7D: Do company-specific comma handling
+		//          Trim contained comma if no suffix found
+		//
+		// Example  Input: Firstar Bank U.S.A., NA
+		// Example Output: Firstar Bank U.S.A., NA
+		//
+		// Example  Input: Firstar Bank U.S.A., North America
+		// Example Output: Firstar Bank U.S.A.
+		//////////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////
+		// TODO:
+		// Add to Step 7: Check words for a sequence of N or more
+		//                upper-case words.  If a sequence of this
+		//                length is found, trim the words not 
+		//                contained in the sequence.
+		//       Example: "Mortgage. MY OWN EQUITY COMPANY Dated"
+		//                becomes
+		//                "MY OWN EQUITY COMPANY"
+		//////////////////////////////////////////////////////////
+
+		//////////////////////////////////////////////////////////
+		// Step 8: Convert local string back to ISpatialString
+		//         Search original Spatial String for substring
+		//         that matches current local string.
+		//
+		// Purpose: Subsequent modifications remove characters 
+		//          from within the string and spatial information
+		//          would be permanently lost.
+		//////////////////////////////////////////////////////////
+
+		////////////////////////////////////////////////////////////////
+		// Step 9A: Trim leading and trailing spaces and punctuation
+		//       1: Replace newline and tab characters with spaces
+		//       2: Trim leading and trailing whitespace
+		//       3: Consolidate any multiple whitespace, periods, commas
+		//       4: Trim any leading and trailing punctuation
+		//
+		//   NOTES:
+		//       1: Trailing periods are NOT trimmed if string is 
+		//          a company (i.e. "L.L.C." != "L.L.C")
+		//       2: Trailing periods are NOT trimmed if string contains
+		//          a person suffix (i.e. "J Smith Jr." != "J Smith Jr")
+		////////////////////////////////////////////////////////////////
+
+		/////////////////////////////////////////////////////
+		// Step 9B: Update ISpatialString with trimmed string
+		/////////////////////////////////////////////////////
+
+		///////////////////////////////////////
+		// Step 10: Log EFA results, if desired
+		///////////////////////////////////////

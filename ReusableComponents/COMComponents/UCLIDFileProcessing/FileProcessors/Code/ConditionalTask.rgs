@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.ConditionalTask.1 = s 'ConditionalTask Class'
+	{
+		CLSID = s '{FBC1072B-446C-4F59-B67B-A843A0936BB1}'
+	}
+	FileProcessors.ConditionalTask = s 'ConditionalTask Class'
+	{
+		CLSID = s '{FBC1072B-446C-4F59-B67B-A843A0936BB1}'
+		CurVer = s 'FileProcessors.ConditionalTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FBC1072B-446C-4F59-B67B-A843A0936BB1} = s 'ConditionalTask Class'
+		{
+			ProgID = s 'FileProcessors.ConditionalTask.1'
+			VersionIndependentProgID = s 'FileProcessors.ConditionalTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

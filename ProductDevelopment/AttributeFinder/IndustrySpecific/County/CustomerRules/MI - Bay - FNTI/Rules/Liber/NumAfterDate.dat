@@ -1,0 +1,1 @@
+(January|February|March|April|May|June|July|August|September|November|December)\s{0,3}\d{1,2}(\,|\.)?\s{0,3}\d{4}[\s\S]{0,10}\d{3}

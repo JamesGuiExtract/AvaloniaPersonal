@@ -1,0 +1,31 @@
+// BaseUtilsTest.idl : IDL source for BaseUtilsTest
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (BaseUtilsTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(DB50B100-AA5B-4897-9CAE-88161153F0A9),
+	version(1.0),
+	helpstring("BaseUtilsTest 1.0 Type Library")
+]
+
+library BaseUtilsTestLib
+{
+	importlib("stdole2.tlb");
+	importlib("..\..\..\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+	importlib("..\..\..\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(E072747D-9C0B-4781-8C73-FB83CFD41087),
+		helpstring("StringCSISTester Class")
+	]
+	coclass StringCSISTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

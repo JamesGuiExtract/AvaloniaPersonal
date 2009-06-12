@@ -1,0 +1,26 @@
+HKCR
+{
+	AFFileProcessors.AFEngineFileProcessor.1 = s 'AFEngineFileProcessor Class'
+	{
+		CLSID = s '{0F831302-E48D-4A2C-B636-485612A60262}'
+	}
+	AFFileProcessors.AFEngineFileProcessor = s 'AFEngineFileProcessor Class'
+	{
+		CLSID = s '{0F831302-E48D-4A2C-B636-485612A60262}'
+		CurVer = s 'AFFileProcessors.AFEngineFileProcessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0F831302-E48D-4A2C-B636-485612A60262} = s 'AFEngineFileProcessor Class'
+		{
+			ProgID = s 'AFFileProcessors.AFEngineFileProcessor.1'
+			VersionIndependentProgID = s 'AFFileProcessors.AFEngineFileProcessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{0D45D3B2-CF74-4000-9549-EC5BD95B6A55}'
+		}
+	}
+}

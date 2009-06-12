@@ -1,0 +1,20 @@
+// 00001.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set002\Images\04752161.tif
+// ###-##-####
+// 00002.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set002\Images\019700157.tif
+// ### ## ####
+// 00003.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set002\Images\019700744.tif
+// ###.##-####.
+// 00005.tif;K:\Common\Engineering\Sample Files\FACC\FL - Manatee\Set001\Images\CRIF\01708308.TIF
+// ###--##-####
+// 00006.tif;K:\Common\Engineering\Sample Files\Rapides Parish - LA\Set001\2109032.tif
+// ###-##.####
+// 00007.tif;K:\Common\Engineering\Sample Files\Rapides Parish - LA\Set001\2214523.tif
+// ###-##--####
+// 00017.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set001\00003156\e\031562360.tif
+// ###-##-####A
+// 00018.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set001\00004752\a\047520097.tif
+// ###-##.-####
+// 00153.tif;\\supertester\Manatee\03062413\00418376.tif
+// ###'##-####
+// 00221.tif;K:\Common\Engineering\Sample Files\Cott\IN - Johnson\Set004\Images\93\000000158875.tif
+(?:\D|^|\b)\d{3}\x20*[-.,\x20='"*_]-?\x20*\d{2}\x20*[-.,\x20='"*_]-?\x20*\d{4}(?!\x20*-\x20*\d)(?:\D|$|\b)

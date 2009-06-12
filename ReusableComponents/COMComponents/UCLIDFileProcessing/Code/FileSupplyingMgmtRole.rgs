@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.FileSupplyingMgmtRole.1 = s 'FileSupplyingMgmtRole Class'
+	{
+		CLSID = s '{CE2131AD-2D7A-4D17-B4B3-54E9237638B0}'
+	}
+	UCLIDFileProcessing.FileSupplyingMgmtRole = s 'FileSupplyingMgmtRole Class'
+	{
+		CLSID = s '{CE2131AD-2D7A-4D17-B4B3-54E9237638B0}'
+		CurVer = s 'UCLIDFileProcessing.FileSupplyingMgmtRole.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {CE2131AD-2D7A-4D17-B4B3-54E9237638B0} = s 'FileSupplyingMgmtRole Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.FileSupplyingMgmtRole.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.FileSupplyingMgmtRole'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

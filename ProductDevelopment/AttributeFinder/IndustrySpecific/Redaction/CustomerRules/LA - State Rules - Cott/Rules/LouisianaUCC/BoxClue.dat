@@ -1,0 +1,1 @@
+(?:^[\s\S]{0,6}SS[\s\S]{0,5}OR)|(?:OR[\s\S]{0,7}(?:EMPL|LOYER|FEDE|DERAL)[\s\S]{0,10}(?:ID|TAX))|[\s\S]{10}(?:EMPL|LOYER)[\s\S]{0,7}[ID].{0,7}[N0O]

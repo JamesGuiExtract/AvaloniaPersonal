@@ -1,0 +1,5 @@
+//Find company name(s)
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test1.eav
+
+//Find person names(s)
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test2.eav

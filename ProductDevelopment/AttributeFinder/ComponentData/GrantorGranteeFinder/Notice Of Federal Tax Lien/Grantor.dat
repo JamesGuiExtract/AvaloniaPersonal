@@ -1,0 +1,18 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of federal tax lien\20049002729900.001.tif.uss
+NFTL_GRANTOR_01=Name^5~of^5~Defendant^?Grantor^250~SSN|Residence
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of federal tax lien\20049000142900.001.tif.uss
+NFTL_GRANTOR_02=Name^5~of^5~Taxpayer^?Grantor^250~\r\nresidence|\r\nimportant release
+
+[PATTERNS_END]

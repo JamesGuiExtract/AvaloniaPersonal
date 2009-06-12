@@ -1,0 +1,29 @@
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+Granted=Granted|Conveyed|Sold
+GrantKeywords=[Grant]|[grants]|[Bargain]|[bargains]|[Sell]|[sells]|[C onvey]|[conveys]
+PresentThat=presents: that|presents, that|presents that|presents:|presents
+GrantorWords=Grantor|Grantor(s)|Grantors|"Grantor"|"Grantor(s)"|"Grantors"|Seller|Seller(s)|Sellers|"Seller"|"Seller(s)"|"Sellers"
+GranteeWords=Grantee|Grantee(s)|Grantees|"Grantee"|"Grantee(s)"|"Grantees"|Buyer|Buyer(s)|Buyers|"Buyer"|"Buyer(s)"|"Buyers"
+
+// plural-only versions of above definitions
+GrantorsWords=Grantor(s)|Grantors|"Grantor(s)"|"Grantors"|Seller(s)|Sellers|"Seller(s)"|"Sellers"
+GranteesWords=Grantee(s)|Grantees|"Grantee(s)"|"Grantees"|Buyer(s)|Buyers|"Buyer(s)"|"Buyers"
+Numbers=0|1|2|3|4|5|6|7|8|9
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+WD_GranteeX1=following^3~property^3~[to]^?Grantee^160~[and]^10~successor^12~assigns
+WD_GRANTEEX3=convey|grant|bargain|sell^4~[to]^?Grantee^180~[the]|that^16~property|real estate
+WD_GranteeX2=convey to]^?Grantee^120~hereinafter
+WD_GranteeX4=[GRANTOR]^400~GRANTEE:|\r\nGRANTEE\r\n^?Grantee^240~for^4~valuable
+[PATTERNS_END]
+
+
+

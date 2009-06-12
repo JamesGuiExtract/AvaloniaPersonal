@@ -1,0 +1,56 @@
+//test1 "/" is defined as the delimiter. A random string is entered for
+//"Result expression defined:".
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 "/" as delimiter. "%1" is entered for "Result expression defined:".
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 Same delimiter. "%1%3" is entered for "Result expression defined:".
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 Same Delimiter. "%1-%3" is entered for "Result expression defined:".
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 Same delimiter. "%1-%3" is entered for "Result expression defined".
+//"-" is entered for "If range(s) of tokens is(are) defined,....".
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 Same Delimiter. "%1\-%3" is entered for "Result expression defined:"
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 Same Delimiter. "\%%1\\%3\%\\" is entered for "Result expression defined:"
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 Same Delimiter. "%1-%3" is entered for "Result expression defined:",
+//"-" is entered for "If range(s) of tokens is(are)defined, what text do you wish..."
+//"> 2" is entered for "Use this modifier if number of token found is".
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 Everything is the same as test8 except "> 3" is entered for
+//"Use this modifier if number of tokern found is". There are only 3 tokens.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 Everything is the same as test8 except "= 3" is entered for
+//"Use this modifier if number of token found is".
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 Everything is the same as test8 except "= 2" is entered for
+//"Use this modifier if number of token found is".
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 Everything is the same as test8 except ">= 1" is entered for
+//"Use this modifier if number of token found is".
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 Everything is the same as test8 except ">= 3" is entered for
+//"Use this modifier if number of token found is".
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 Everything is the same as test8 except ">= 4" is entered for
+//"Use this modifier if number of token found is". There are only 3 tokens.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 Everything is the same as test8 except "= 0" i entered for
+//"Use this modifier if number of token found is". 
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+

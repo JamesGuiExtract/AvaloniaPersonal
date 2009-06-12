@@ -1,0 +1,7 @@
+AbstractMeasurement.cpp
+Angle.cpp
+Bearing.cpp
+Distance.cpp
+Filters.cpp
+StdAfx.cpp
+UnknownMeasurement.cpp

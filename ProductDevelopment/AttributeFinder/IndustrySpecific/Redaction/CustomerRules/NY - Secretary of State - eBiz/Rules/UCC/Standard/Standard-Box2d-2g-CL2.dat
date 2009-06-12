@@ -1,0 +1,12 @@
+^3.?\s*(?:SEC[\s\S]{3,7}PART|\S{2,4}RED\s*\S{0,3}RTY)
+[O0]NE.*(?:SEC[\s\S]{3,7}PART|\S{2,4}RED\s*\S{0,3}RTY)
+(?:^.{0,4}\s*|[O0]NE.*)S.C.R.D\s*P.RTY.?S
+[O0]NE.*S\s*E\s*C\s*U\s*R\s*E\s*D\s*P\s*A\s*R\s*T\s*Y[\s\S]{0,300}?[\sa-z]3[\sa-z]
+^3.{0,2}\s*SECURED
+[O0]NE.*SECURED.*3[ab]
+name\s*.?3a\s*.r\s*3b
+^(?!.*2\d).*T.TAL\s*ASS.GNE
+SS.GN.R.{0,5}(?:ASS|.{1,2}SS.G|.{1,4}SIGNEE)
+(?:ASS.{1,5}|SS.G.{1,3}|SIGNOR).{0,5}SS.GNEE
+ASS.GN.R\s*S.P
+^3.?\s*(?:SEC|.{0,3}ECUR|.{0,5}URED)[\s\S]{0,10}(?:PAR|ART|RTY)

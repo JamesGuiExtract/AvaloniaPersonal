@@ -1,0 +1,4 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - Rockingham Non-Judgments - ACS\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\VA - Rockingham\Set001\RandomSubset\Non-Judgments;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

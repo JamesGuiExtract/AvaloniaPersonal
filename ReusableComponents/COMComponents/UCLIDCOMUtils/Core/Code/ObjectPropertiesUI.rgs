@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.ObjectPropertiesUI.1 = s 'ObjectPropertiesUI Class'
+	{
+		CLSID = s '{E00B3EAE-264B-451C-82DF-1704196AB53A}'
+	}
+	UCLIDCOMUtils.ObjectPropertiesUI = s 'ObjectPropertiesUI Class'
+	{
+		CLSID = s '{E00B3EAE-264B-451C-82DF-1704196AB53A}'
+		CurVer = s 'UCLIDCOMUtils.ObjectPropertiesUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E00B3EAE-264B-451C-82DF-1704196AB53A} = s 'ObjectPropertiesUI Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.ObjectPropertiesUI.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.ObjectPropertiesUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

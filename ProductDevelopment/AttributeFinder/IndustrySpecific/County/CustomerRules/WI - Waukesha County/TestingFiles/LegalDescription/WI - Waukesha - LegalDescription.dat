@@ -1,0 +1,15 @@
+//Assignment of Mortgage
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Assignment Of Mortgage;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Mortgage - Other;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Mortgage Bank;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Deed - Quit Claim;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav
+
+//Warranty Deed
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Warranty Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).lgl.voa;K:\Common\Engineering\Sample Files\Waukesha\Set008\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav

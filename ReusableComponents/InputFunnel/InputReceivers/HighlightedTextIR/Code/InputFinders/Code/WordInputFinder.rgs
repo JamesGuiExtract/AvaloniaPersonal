@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFinders.WordInputFinder.1 = s 'WordInputFinder Class'
+	{
+		CLSID = s '{D76C8863-4347-11D6-826C-0050DAD4FF55}'
+	}
+	UCLIDInputFinders.WordInputFinder = s 'WordInputFinder Class'
+	{
+		CLSID = s '{D76C8863-4347-11D6-826C-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFinders.WordInputFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D76C8863-4347-11D6-826C-0050DAD4FF55} = s 'WordInputFinder Class'
+		{
+			ProgID = s 'UCLIDInputFinders.WordInputFinder.1'
+			VersionIndependentProgID = s 'UCLIDInputFinders.WordInputFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D76C8853-4347-11D6-826C-0050DAD4FF55}'
+		}
+	}
+}

@@ -1,0 +1,57 @@
+(?imnx) (?# Case insensitive, multiline, explicit capture, ignore pattern whitespace)
+
+(?#
+#------------------------------------------------
+# Make sure that the clue is not for a parcel
+# tax ID number.
+#------------------------------------------------
+)
+
+(?<!p(roperty|arcel).{0,4})
+
+(?#
+#------------------------------------------------
+# Various forms of "Tax Identification Number"
+#------------------------------------------------
+)
+
+(?<TaxID_Clues>
+  
+	(?#
+	#------------------------------------------------
+	# "Tax", "Taxpayer", or "Employer"...
+	#------------------------------------------------
+	)
+	
+	(?:federal[\s\S]{0,2})?(?:(?:\bta)?x(?:payer)?\b|employer)
+	
+	(?#
+	#------------------------------------------------
+	# ...followed by some form of "ID" or 
+	# identification...
+	#------------------------------------------------
+	)
+	
+	\D{0,4}(?:i\s?[,.]?\s?d\s?[,.]?|ident[\s\S]{0,11}|[\s\S]{1,6}ification)
+
+	(?#
+	#------------------------------------------------
+	# ...followed by some form of "Number", "No", a 
+	# pound sign, or a colon...
+	#------------------------------------------------
+	)
+	
+	[\s\S]{0,7}?(?:NUM(?:BER)?|N[O0]\b|\#|[:;])
+	 
+)
+
+|(?# Or...)
+
+(?#
+#------------------------------------------------
+# Various forms of "TIN", "EIN", and "FEIN"
+# This expression is CASE SENSITIVE!
+#------------------------------------------------
+)
+
+(?<TaxID_Clues>\b(?-i:(?:[TE]|F\s?[,.]?\s?E)\s?[,.]?\s?[Iil1]\s?[,.]?\s?(?:N\b|\#)))

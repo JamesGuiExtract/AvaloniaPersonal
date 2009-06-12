@@ -1,0 +1,23 @@
+HKCR
+{
+	AFValueFinders.CreateValuePP.1 = s 'CreateValuePP Class'
+	{
+		CLSID = s '{3706BD69-EACF-455D-9DBA-2E54907897A2}'
+	}
+	AFValueFinders.CreateValuePP = s 'CreateValuePP Class'
+	{
+		CLSID = s '{3706BD69-EACF-455D-9DBA-2E54907897A2}'
+		CurVer = s 'AFValueFinders.CreateValuePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3706BD69-EACF-455D-9DBA-2E54907897A2} = s 'CreateValuePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

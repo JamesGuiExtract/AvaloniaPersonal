@@ -1,0 +1,115 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,OAGL_SURE_01,false
+	
+		//---------------------------------------------------------------
+		// "Oil, Gas, and Mineral Lease"
+		//  0001.tif K:\Common\Engineering\Sample Files\LMI\Set003\Images\393209.tif
+		//---------------------------------------------------------------
+		01=^OIL.{0,2}\s*GAS.{0,2}\s*AND\s*MINERAL\s*LEASE\s*(?:\r?$)
+		
+		
+		02=^PAID\s*UP\s*OIL\s*AND\s*GAS\s*LEASE\s*(?:\r?$)
+		
+		//---------------------------------------------------------------
+		// "Oil, Gas and Mineral Lease - Paid-Up"
+		// 0009.tif K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set004\Images\OIL & GAS LEASE\1981-A717962.tif
+		//---------------------------------------------------------------
+		03=^Oil\W*Gas\W*and\W*Mineral\W*Lease\W*Paid\W*Up\W*(?:\r?$)
+		
+		//---------------------------------------------------------------
+		// "Oil & Gas Lease"
+		// 0008.tif K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set006\Additional Samples\Images\389629.bin
+		//---------------------------------------------------------------
+		04=^OIL\W*(?:AND\W*)?GAS\W*LEASE\W*(?:\r?$)
+		
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,OAGL_SURE_02,true
+		01=\bOIL.{0,2}\s*GAS.{0,2}\s*AND\s*MINERAL\s*LEASE\b
+		02=\bPAID\s*UP\s*OIL\s*AND\s*GAS\s*LEASE\b
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,.2,1,2
+
+	OR_BEGIN,OAGL_PROB_01,false
+		
+		// 0006.tif K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set004\Images\OIL & GAS LEASE\1981-A718227.tif
+		// 0007.tif K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set006\Additional Samples\Images\387827.bin
+		01=OIL\W*(?:AND\W*)?GAS\W*LEASE
+		
+		//0010.tif K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set004\Images\OIL & GAS LEASE\1981-A717963.tif
+		02=\bOIL.{0,2}\s*GAS.{0,2}\s*AND\s*MINERAL\s*LEASE\b
+		
+	OR_END
+
+SCOPE_END
+
+[PROBABLE_END]
+
+// ******************************************************************
+// Maybe Block
+//    This maybe block checks for phrases that are commonly found in the second
+//    and third pages of an Oil and Gas Lease. The existance of one of these
+//    phrases is a good indicator that the document is of this type.
+// ******************************************************************
+
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,2,3
+	OR_BEGIN,OilAndGasMaybe01,false
+		phrase1=injection[\s\S]{0,5}of[\s\S]{0,5}water[\s\S]{0,5}brine
+		phrase2=drilling[\s\S]{0,5}testing[\s\S]{0,5}completing[\s\S]{0,5}reworking[\s\S]{0,5}recompleting[\s\S]{0,5}deepening
+		phrase3=payable[\s\S]{0,25}only[\s\S]{0,15}such[\s\S]{0,5}gas[\s\S]{0,15}liquids
+		
+		// 0002.tif K:\Common\Engineering\Sample Files\LMI\Set003\Images\393231.tif
+		phrase4=oil[\s\S]{0,15}sulphur[\s\S]{0,25}mineral
+		
+		phrase5=oil[\s\S]{0,5}gas[\s\S]{0,25}water[\s\S]{0,5}from[\s\S]{0,5}said
+		phrase6=drilling[\s\S]{0,10}reworking[\s\S]{0,25}(?:well|operations)
+		
+		//0005.tif K:\Common\Engineering\Sample Files\LMI\Set003\Images\393235.tif
+		phrase7=square[\s\S]{0,5}centered[\s\S]{0,15}well[\s\S]{0,25}shape
+		
+		phrase8=drilling[\s\S]{0,5}maximum[\s\S]{0,5}allowable[\s\S]{0,5}unit
+		
+		// 0003.tif K:\Common\Engineering\Sample Files\LMI\Set003\Images\393233.tif
+		phrase9=interest[\s\S]{0,5}in[\s\S]{0,5}oil
+		
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,1,1,-1
+	SINGLE_BEGIN,OilAndGasMaybe02,false
+	
+		// 0004.tif K:\Common\Engineering\Sample Files\LMI\Set003\Images\393234.tif
+		01=Gas\W*and\W*Mineral\W*Lease
+		
+	SINGLE_END
+SCOPE_END
+
+[MAYBE_END]

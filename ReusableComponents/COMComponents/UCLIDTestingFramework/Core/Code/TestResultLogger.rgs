@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDTestingFrameworkCore.TestResultLogger.1 = s 'TestResultLogger Class'
+	{
+		CLSID = s '{EB5D8E34-7A38-4C4D-A37E-DEFDC6611CE9}'
+	}
+	UCLIDTestingFrameworkCore.TestResultLogger = s 'TestResultLogger Class'
+	{
+		CLSID = s '{EB5D8E34-7A38-4C4D-A37E-DEFDC6611CE9}'
+		CurVer = s 'UCLIDTestingFrameworkCore.TestResultLogger.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {EB5D8E34-7A38-4C4D-A37E-DEFDC6611CE9} = s 'TestResultLogger Class'
+		{
+			ProgID = s 'UCLIDTestingFrameworkCore.TestResultLogger.1'
+			VersionIndependentProgID = s 'UCLIDTestingFrameworkCore.TestResultLogger'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{71EDAB5F-25C7-48BC-9AAE-F837C9ED7547}'
+		}
+	}
+}

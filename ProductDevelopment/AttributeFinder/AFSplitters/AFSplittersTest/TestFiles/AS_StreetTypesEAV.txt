@@ -1,0 +1,211 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Address Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Address Splitter tests
+// Test Type: Street types
+// Note that comment lines should be removed by the RSD file
+
+<TESTCASE>|Avenue|John One and Jane One\r\n123 Main Avenue\r\nMontgomery, AL  53704
+Address|John One and Jane One\r\n123 Main Avenue\r\nMontgomery, AL  53704
+.Recipient1|John One and Jane One
+.Address1|123 Main Avenue
+.City|Montgomery
+.State|AL
+.ZipCode|53704
+
+<TESTCASE>|Ave|John Two and Jane Two\r\n123 Main Ave.,\r\nApartment 321\r\nJuneau, AK  98765
+Address|John Two and Jane Two\r\n123 Main Ave.,\r\nApartment 321\r\nJuneau, AK  98765
+.Recipient1|John Two and Jane Two
+.Address1|123 Main Ave.
+.Address2|Apartment 321
+.City|Juneau
+.State|AK
+.ZipCode|98765
+
+<TESTCASE>|Boulevard|Mrs. Jane Six\r\nUniversity Boulevard\r\nPhoenix, AZ 80302
+Address|Mrs. Jane Six\r\nUniversity Boulevard\r\nPhoenix, AZ 80302
+.Recipient1|Mrs. Jane Six
+.Address1|University Boulevard
+.City|Phoenix
+.State|AZ
+.ZipCode|80302
+
+<TESTCASE>|Blvd|John Three and Jane Three\r\nDivision Blvd\r\nLittle Rock, AR\r\n53705
+Address|John Three and Jane Three\r\nDivision Blvd\r\nLittle Rock, AR\r\n53705
+.Recipient1|John Three and Jane Three
+.Address1|Division Blvd
+.City|Little Rock
+.State|AR
+.ZipCode|53705
+
+<TESTCASE>|Circle|John Four and Jane Four\r\nMaple Circle\r\nSan Francisco, \r\nCA 41234-3322
+Address|John Four and Jane Four\r\nMaple Circle\r\nSan Francisco, \r\nCA 41234-3322
+.Recipient1|John Four and Jane Four
+.Address1|Maple Circle
+.City|San Francisco
+.State|CA
+.ZipCode|41234-3322
+
+<TESTCASE>|Cir|Mr. John Five Jr\r\nUniversity Cir\r\nBoulder, CO 80302
+Address|Mr. John Five Jr\r\nUniversity Cir\r\nBoulder, CO 80302
+.Recipient1|Mr. John Five Jr
+.Address1|University Cir
+.City|Boulder
+.State|CO
+.ZipCode|80302
+
+<TESTCASE>|Crescent|Mrs. Jane Six\r\nUniversity Crescent\r\nHartford, CT 10019
+Address|Mrs. Jane Six\r\nUniversity Crescent\r\nHartford, CT 10019
+.Recipient1|Mrs. Jane Six
+.Address1|University Crescent
+.City|Hartford
+.State|CT
+.ZipCode|10019
+
+<TESTCASE>|Cres|Mrs. Jane Six\r\nUniversity Cres.,\r\nDover, DE 10019
+Address|Mrs. Jane Six\r\nUniversity Cres.,\r\nDover, DE 10019
+.Recipient1|Mrs. Jane Six
+.Address1|University Cres.
+.City|Dover
+.State|DE
+.ZipCode|10019
+
+<TESTCASE>|Court|Mrs. Jane Six\r\nUniversity Court\r\nTampa, FL 80302
+Address|Mrs. Jane Six\r\nUniversity Court\r\nTampa, FL 80302
+.Recipient1|Mrs. Jane Six
+.Address1|University Court
+.City|Tampa
+.State|FL
+.ZipCode|80302
+
+<TESTCASE>|Ct|Mrs. Jane Six\r\nUniversity Ct\r\nAtlanta, \r\nGA 80302
+Address|Mrs. Jane Six\r\nUniversity Ct\r\nAtlanta, \r\nGA 80302
+.Recipient1|Mrs. Jane Six
+.Address1|University Ct
+.City|Atlanta
+.State|GA
+.ZipCode|80302
+
+<TESTCASE>|Drive|John and Jane Doe\r\n123 University Drive\r\nHonolulu, HI 99855
+Address|John and Jane Doe\r\n123 University Drive\r\nHonolulu, HI 99855
+.Recipient1|John and Jane Doe
+.Address1|123 University Drive
+.City|Honolulu
+.State|HI
+.ZipCode|99855
+
+<TESTCASE>|Dr|Mrs. Jane Six\r\n123 University Dr\r\nBoise, ID 88865
+Address|Mrs. Jane Six\r\n123 University Dr\r\nBoise, ID 88865
+.Recipient1|Mrs. Jane Six
+.Address1|123 University Dr
+.City|Boise
+.State|ID
+.ZipCode|88865
+
+<TESTCASE>|Highway|Mrs. Jane Six\r\nWest Beltline Highway\r\nChicago, IL 60602
+Address|Mrs. Jane Six\r\nWest Beltline Highway\r\nChicago, IL 60602
+.Recipient1|Mrs. Jane Six
+.Address1|West Beltline Highway
+.City|Chicago
+.State|IL
+.ZipCode|60602
+
+<TESTCASE>|Hwy|Mrs. Jane Six\r\nWest Beltline Hwy\r\nIndianapolis, IN 80302
+Address|Mrs. Jane Six\r\nWest Beltline Hwy\r\nIndianapolis, IN 80302
+.Recipient1|Mrs. Jane Six
+.Address1|West Beltline Hwy
+.City|Indianapolis
+.State|IN
+.ZipCode|80302
+
+<TESTCASE>|Lane|Doctor Benjamin Spock\r\nEast University Lane\r\nDes Moines, IA 59991
+Address|Doctor Benjamin Spock\r\nEast University Lane\r\nDes Moines, IA 59991
+.Recipient1|Doctor Benjamin Spock
+.Address1|East University Lane
+.City|Des Moines
+.State|IA
+.ZipCode|59991
+
+<TESTCASE>|Ln|Mrs. Jane Six\r\nNorth University Ln\r\nKansas City, KS 80302
+Address|Mrs. Jane Six\r\nNorth University Ln\r\nKansas City, KS 80302
+.Recipient1|Mrs. Jane Six
+.Address1|North University Ln
+.City|Kansas City
+.State|KS
+.ZipCode|80302
+
+<TESTCASE>|Place|Mrs. Jane Seven\r\nUniversity Place\r\nLouisville, KY 80302
+Address|Mrs. Jane Seven\r\nUniversity Place\r\nLouisville, KY 80302
+.Recipient1|Mrs. Jane Seven
+.Address1|University Place
+.City|Louisville
+.State|KY
+.ZipCode|80302
+
+<TESTCASE>|Pl|Mrs. Jane Six\r\nUniversity Pl.\r\nNew Orleans, LA 80302
+Address|Mrs. Jane Six\r\nUniversity Pl.\r\nNew Orleans, LA 80302
+.Recipient1|Mrs. Jane Six
+.Address1|University Pl.
+.City|New Orleans
+.State|LA
+.ZipCode|80302
+
+<TESTCASE>|Road|Mrs. Jane Six\r\nUniversity Road\r\nAugusta, ME 01210
+Address|Mrs. Jane Six\r\nUniversity Road\r\nAugusta, ME 01210
+.Recipient1|Mrs. Jane Six
+.Address1|University Road
+.City|Augusta
+.State|ME
+.ZipCode|01210
+
+<TESTCASE>|Rd|Wayne Lenius\r\nUniversity Rd\r\nWaldorf, MD 20602
+Address|Wayne Lenius\r\nUniversity Rd\r\nWaldorf, MD 20602
+.Recipient1|Wayne Lenius
+.Address1|University Rd
+.City|Waldorf
+.State|MD
+.ZipCode|20602
+
+<TESTCASE>|Square|Mrs. Jane Six\r\nWest University Square\r\nBoston, MA 10019
+Address|Mrs. Jane Six\r\nWest University Square\r\nBoston, MA 10019
+.Recipient1|Mrs. Jane Six
+.Address1|West University Square
+.City|Boston
+.State|MA
+.ZipCode|10019
+
+<TESTCASE>|Sq|Mrs. Jane Six\r\nWest University Sq.\r\nLansing, MI 61123
+Address|Mrs. Jane Six\r\nWest University Sq.\r\nLansing, MI 61123
+.Recipient1|Mrs. Jane Six
+.Address1|West University Sq.
+.City|Lansing
+.State|MI
+.ZipCode|61123
+
+<TESTCASE>|Street|Wayne Lenius\r\nUniversity Street\r\nBrainerd, MN 56401
+Address|Wayne Lenius\r\nUniversity Street\r\nBrainerd, MN 56401
+.Recipient1|Wayne Lenius
+.Address1|University Street
+.City|Brainerd
+.State|MN
+.ZipCode|56401
+
+<TESTCASE>|St|Mrs. Jane Six\r\nUniversity St.\r\nJackson, MS 80302
+Address|Mrs. Jane Six\r\nUniversity St.\r\nJackson, MS 80302
+.Recipient1|Mrs. Jane Six
+.Address1|University St.
+.City|Jackson
+.State|MS
+.ZipCode|80302

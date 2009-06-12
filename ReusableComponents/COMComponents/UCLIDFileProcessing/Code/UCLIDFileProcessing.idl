@@ -1,0 +1,1025 @@
+// UCLIDFileProcessing.idl : IDL source for UCLIDFileProcessing.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDFileProcessing.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(5FBC9199-D162-4F14-BAD9-090F6AB576C5),
+	version(1.0),
+	helpstring("UCLID FileProcessing 1.0 Type Library")
+]
+library UCLID_FILEPROCESSINGLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("c:\Program Files\Common Files\System\ADO\msado27.tlb");
+
+	/////////////////////////
+	// forward declarations
+	/////////////////////////
+	interface IFileSupplierTarget;
+	interface IFileProcessingDB;
+	interface IFileSupplierData;
+	interface IFileSupplyingMgmtRole;	
+	interface IFileProcessingMgmtRole;
+	interface IFAMTagManager;
+	interface IRoleNotifyFAM;
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef
+		[
+			uuid(E5280058-AFE9-41a3-8A4A-5CF92957441E), 
+			helpstring("UCLID EScopeType")
+		]
+	enum EScopeType
+	{
+		kNoScope = 0,
+		kFolderScope = 1,
+		kIndividualFilesScope = 2
+	}EScopeType;
+
+	typedef
+		[
+			uuid(D9A40A2C-0EBC-4f38-BB77-435621F17618), 
+			helpstring("UCLID EFilterPatternType")
+		]
+	enum EFilterPatternType
+	{
+		kNoFilter = 0,
+		kFilterWithRegExp = 1
+	}EFilterPatternType;
+
+	typedef
+		[
+			uuid(2398267B-C2AC-4681-BB61-9675EB3154C4), 
+			helpstring("UCLID EFilterType")
+		]
+	enum EFilterType
+	{
+		kContain = 0,
+		kDoesNotContain = 1
+
+	}EFilterType;
+
+	typedef
+		[
+			uuid(666CDCA3-BDB0-4005-87AF-070FAFEB1CAC), 
+			helpstring("Extract EActionStatus")
+		]
+	enum EActionStatus
+	{
+		kActionUnattempted = 0,
+		kActionPending = 1,
+		kActionProcessing = 2,
+		kActionCompleted = 3,
+		kActionFailed = 4
+	}EActionStatus;
+
+	typedef
+		[
+			uuid(4AE21420-B07C-4447-87FE-AEAA3E5B4843), 
+			helpstring("Extract EFileSupplierStatus")
+		]
+	enum EFileSupplierStatus
+	{
+		kInactiveStatus = 0,
+		kActiveStatus = 1,
+		kPausedStatus = 2,
+		kStoppedStatus = 3,
+		kDoneStatus = 4
+	}EFileSupplierStatus;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(FE7DED54-C988-43f4-A80B-60DA54F5904B),
+		dual,
+		helpstring("IFileProcessingTask Interface"),
+		pointer_default(unique)
+	]
+	// IFileProcessingTask Note:
+	// Multiple instances may be created in different threads and acted upon at the time
+	// If the task cannot be run multithreaded, the task is required to control processing 
+	// via mutexs as necessary to make it thread-safe. Currently there is only one case
+	// where this is an issue: the RedactionVerificationUI.
+	interface IFileProcessingTask : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To alert the file processor that processing is about to start so it can 
+		//				perform any necessary initialization.
+		// NOTE:		This may be called multiple times on the same object because the same coClass
+		//				may be being used in multiple threads.  This will happen per processing session
+		//				not per file.
+		//				See note about IFileProcessingTask multithreading above
+		[id(11), helpstring("method Init")] HRESULT Init();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To process the file strFileFullName and output a vector of files either generated
+		//				or the file being processed. 
+		// REQUIRED:	Must handle value of strFileFullName with a value of "" as an indication that
+		//				there are no more files to process. If the implementation requires data to be
+		//				cleared that data should be reset and any generated output files should be 
+		//				placed on the pFiles vector returned. If strFileFullName = "" then the pFiles 
+		//				vector returned MUST contain any files to output with an empty string "" as the last entry in the vector.
+		//				IF the strFileFullName was not "" an empty string "" should not be returned in the
+		//				pFiles vector.
+		// ARGUMENTS:	bstrFileFullName - The file to be processed
+		//				bSuccessfulCompletion - If VARIANT_TRUE, file should be set to Completed, if VARIANT_FALSE, 
+		//					file should revert to Pending. VARIANT_FALSE indicates user cancellation
+		//				pFAMTM - A FAMTagManager object for expandin filename tags/methods
+		//				pDB - The database being operated upon
+		//				pProgressStatus - A caller may pass in a progress status object 
+		//					if the caller is interested in the progress information.  If the caller
+		//					passes in a progress status object to this method, and if the CoClass 
+		//					implementing this interface is capable of providing progress information,
+		//					the CoClass will update the provided progress status object with
+		//					progress information.  No CoClass is required to provide progress
+		//					status information.  Those that do provide progress status information are
+		//					free to update the progres status information at random times, or at 
+		//					a particular frequency of the CoClass's choice.  A CoClass capable
+		//					of providing progress information is also free to create one or more 
+		//					sub-levels of progress information.
+		//				bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  Similar to
+		//					the Cancel method (below), it is not required that the FileProcessingTask
+		//					act upon this request. However, if the task needs to honor cancellation
+		//					requests, it should respond to a value of VARIANT_TRUE by not starting processing
+		//					and immediately returning VARIANT_FALSE			
+		// NOTE:		See note about IFileProcessingTask multithreading above
+		[id(12), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrFileFullName, 
+			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB *pDB, 
+			[in] IProgressStatus *pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
+			[out, retval] VARIANT_BOOL *pbSuccessfulCompletion);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To allow the FileProcessingManager to request that this processor stop processing its current file
+		//			if it is able
+		// PROMISE: The FileProcessingManager makes this request to ask the Processor to stop at its earliest 
+		//			convenience.  Nothing is required of the FileProcessor when this method is called.
+		// NOTE:	This method will be called from a different thread than the one that called process file
+		[id(13), helpstring("method Cancel")] HRESULT Cancel();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:		To notify a file processor that the processing has been completed.
+		//				(allowing the file processor to perform any cleanup it may wish to do)
+		// NOTE:		This may be called multiple times on the same object because the same coClass
+		//				may be being used in multiple threads. This will happen per processing session
+		//				not per file
+		[id(14), helpstring("method Close")] HRESULT Close();
+	};
+
+	[
+		object,
+		uuid(28C8AA7B-5DFE-402E-891B-22B61C650F42),
+		dual,
+		helpstring("IFileProcessingManager Interface"),
+		pointer_default(unique)
+	]
+	interface IFileProcessingManager : IDispatch
+	{
+		[id(9), helpstring("method ShowUI")] HRESULT ShowUI([in] VARIANT_BOOL bRunOnInit, [in] VARIANT_BOOL bCloseOnComplete, 
+			VARIANT_BOOL bForceClose, int iNumDocsToExecute, void * pFRM);
+		[id(10), helpstring("method StartProcessing")] HRESULT StartProcessing();
+		[id(11), helpstring("method StopProcessing")] HRESULT StopProcessing();
+		[id(17), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, [in] VARIANT_BOOL bSetDirtyFlagToTrue);
+		[id(18), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, [in] VARIANT_BOOL bClearDirty);
+		[propget, id(19), helpstring("property FPSFileName")] HRESULT FPSFileName([out, retval] BSTR *pVal);
+		[propput, id(19), helpstring("property FPSFileName")] HRESULT FPSFileName([in] BSTR newVal);
+		[propget, id(24), helpstring("property MaxStoredRecords")] HRESULT MaxStoredRecords([out, retval] long *pVal);
+		[propput, id(24), helpstring("property MaxStoredRecords")] HRESULT MaxStoredRecords([in] long newVal);
+		[propget, id(25), helpstring("property RestrictNumStoredRecords")] HRESULT RestrictNumStoredRecords([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(25), helpstring("property RestrictNumStoredRecords")] HRESULT RestrictNumStoredRecords([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To pause the threads that are currently processing files
+		//			The pause will not take effect immediately.  Any files that have already 
+		//			started processing will continue to be processed until processing is
+		//			complete for that file.
+		// NOTES:	To resume processing, invoke the StartProcessing method.
+		[id(27), helpstring("method PauseProcessing")] HRESULT PauseProcessing();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return boolean flags indicating whether processing has started
+		// PROMISE:	To return VARIANT_TRUE if processing was started with the StartProcessing()
+		//			method, and if StopProcessing() has not yet been called since the last
+		//			call to StartProcessing().
+		// NOTES:	The return value of this method has no relevance to whether processing
+		//			is currently paused.
+		[propget, id(28), helpstring("property ProcessingStarted")] HRESULT ProcessingStarted([out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To return boolean flags indicating whether processing is currently paused
+		// REQUIRE: ProcessingHasStarted() must return VARIANT_TRUE before this function can
+		//			be called.
+		// PROMISE:	To return VARIANT_TRUE if processing is in a paused state
+		[propget, id(29), helpstring("property ProcessingPaused")] HRESULT ProcessingPaused([out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To load the IndividualFileList from a file
+		[id(31), helpstring("method LoadFilesFromFile")] HRESULT LoadFilesFromFile([in] BSTR bstrFileName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the name of the Action to process
+		[propget, id(34), helpstring("property ActionName")] HRESULT ActionName([out, retval] BSTR *pVal);
+		[propput, id(34), helpstring("property ActionName")] HRESULT ActionName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the ID of the Action to process
+		//[propget, id(35), helpstring("property ActionID")] HRESULT ActionID([out, retval] long *pVal);
+		//[propput, id(35), helpstring("property ActionID")] HRESULT ActionID([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set/return the status of the Display check box in action tab,
+		//			indicating whether the statistics tab is displayed or not
+		[propget, id(38), helpstring("property DisplayOfStatisticsEnabled")] HRESULT DisplayOfStatisticsEnabled([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(38), helpstring("property DisplayOfStatisticsEnabled")] HRESULT DisplayOfStatisticsEnabled([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To restore the FileProcessingManager to its default state, where there is no
+		//			data (e.g. file suppliers, file processors, action, etc) associated with it.
+		// PROMISE:	This method will clear out all member variables and set the object's state to
+		//			that of a brand new instance of the FileProcessingManager
+		[id(39), helpstring("method Clear")] HRESULT Clear();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return com exception if it can not be saved or run
+		[id(40), helpstring("method ValidateStatus")] HRESULT ValidateStatus(void);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(41), helpstring("property FileSupplyingMgmtRole")] HRESULT FileSupplyingMgmtRole([out, retval] IFileSupplyingMgmtRole* *pVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(42), helpstring("property FileProcessingMgmtRole")] HRESULT FileProcessingMgmtRole([out, retval] IFileProcessingMgmtRole* *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the Action ID associated with the specified Action Name.
+		// REQUIRE: Registry must contain a valid connection string 
+		// PROMISE: To return the associated Action ID or 0 if not found
+		[id(43), helpstring("method GetActionIDFromName")] HRESULT GetActionIDFromName([in] BSTR bstrActionName, 
+			[out, retval] long *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set and get the name of the Database configuration file in the FAMDB object
+		//[propput, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([in] BSTR newVal);		
+		//[propget, id(44), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR *pVal);		
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set and get the database server name
+		[propput, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR newVal);		
+		[propget, id(45), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR *pVal);		
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set and get the database name
+		[propput, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);		
+		[propget, id(46), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR *pVal);		
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(959FDDBF-6566-4545-AB16-CA4B06BC4721),
+		dual,
+		helpstring("IFileSupplier Interface"),
+		pointer_default(unique)
+	]
+	interface IFileSupplier : IDispatch
+	{
+		[id(1), helpstring("method Start")] HRESULT Start([in] IFileSupplierTarget *pTarget, [in] IFAMTagManager *pFAMTM);
+		[id(2), helpstring("method Stop")] HRESULT Stop();
+		[id(3), helpstring("method Pause")] HRESULT Pause();
+		[id(4), helpstring("method Resume")] HRESULT Resume();
+	};
+
+	[
+		object,
+		uuid(DE49D7B3-FA8D-45a1-A753-93B558B37E5F),
+		dual,
+		helpstring("IFileSupplierTarget Interface"),
+		pointer_default(unique)
+	]
+	interface IFileSupplierTarget : IDispatch
+	{
+		[id(1), helpstring("method NotifyFileAdded")] HRESULT NotifyFileAdded([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
+		[id(2), helpstring("method NotifyFileRemoved")] HRESULT NotifyFileRemoved([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
+		[id(3), helpstring("method NotifyFileRenamed")] HRESULT NotifyFileRenamed([in] BSTR bstrOldFile, [in] BSTR bstrNewFile, 
+			[in] IFileSupplier *pSupplier);
+		[id(4), helpstring("method NotifyFolderDeleted")] HRESULT NotifyFolderDeleted([in] BSTR bstrFolder, [in] IFileSupplier *pSupplier);
+		[id(5), helpstring("method NotifyFolderRenamed")] HRESULT NotifyFolderRenamed([in] BSTR bstrOldFolder, [in] BSTR bstrNewFolder, 
+			[in] IFileSupplier *pSupplier);
+		[id(6), helpstring("method NotifyFileModified")] HRESULT NotifyFileModified([in] BSTR bstrFile, [in] IFileSupplier *pSupplier);
+		[id(7), helpstring("method NotifyFileSupplyingDone")] HRESULT NotifyFileSupplyingDone( [in] IFileSupplier *pSupplier);
+		[id(8), helpstring("method NotifyFileSupplyingFailed")] HRESULT NotifyFileSupplyingFailed( [in] IFileSupplier *pSupplier, [in] BSTR strError);
+	};
+
+	[
+		object,
+		uuid(D1BD7E04-EE36-472c-873B-9EE9AFB83F4D),
+		dual,
+		helpstring("IFAMCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMCondition : IDispatch
+	{
+		[id(1), helpstring("method FileMatchesFAMCondition")] HRESULT FileMatchesFAMCondition([in] BSTR bstrFile, [in] IFileProcessingDB *pFPDB, 
+			[in] BSTR bstrAction, [in] IFAMTagManager *pFAMTagManager, [out, retval] VARIANT_BOOL* pRetVal);
+	};
+
+	[
+		object,
+		uuid(625BB300-D5AC-476D-8DC8-893DCE2C0143),
+		dual,
+		nonextensible,
+		helpstring("IActionStatistics Interface"),
+		pointer_default(unique)
+	]
+	interface IActionStatistics : IDispatch{
+		[propget, id(1), helpstring("property NumDocuments")] HRESULT NumDocuments([out, retval] long *pVal);
+		[propput, id(1), helpstring("property NumDocuments")] HRESULT NumDocuments([in] long newVal);
+		[propget, id(2), helpstring("property NumDocumentsComplete")] HRESULT NumDocumentsComplete([out, retval] long *pVal);
+		[propput, id(2), helpstring("property NumDocumentsComplete")] HRESULT NumDocumentsComplete([in] long newVal);
+		[propget, id(3), helpstring("property NumDocumentsFailed")] HRESULT NumDocumentsFailed([out, retval] long *pVal);
+		[propput, id(3), helpstring("property NumDocumentsFailed")] HRESULT NumDocumentsFailed([in] long newVal);
+		[propget, id(4), helpstring("property NumPages")] HRESULT NumPages([out, retval] long *pVal);
+		[propput, id(4), helpstring("property NumPages")] HRESULT NumPages([in] long newVal);
+		[propget, id(5), helpstring("property NumPagesComplete")] HRESULT NumPagesComplete([out, retval] long *pVal);
+		[propput, id(5), helpstring("property NumPagesComplete")] HRESULT NumPagesComplete([in] long newVal);
+		[propget, id(6), helpstring("property NumPagesFailed")] HRESULT NumPagesFailed([out, retval] long *pVal);
+		[propput, id(6), helpstring("property NumPagesFailed")] HRESULT NumPagesFailed([in] long newVal);
+		[propget, id(7), helpstring("property NumBytes")] HRESULT NumBytes([out, retval] LONGLONG *pVal);
+		[propput, id(7), helpstring("property NumBytes")] HRESULT NumBytes([in] LONGLONG newVal);
+		[propget, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([out, retval] LONGLONG *pVal);
+		[propput, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([in] LONGLONG newVal);
+		[propget, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([out, retval] LONGLONG *pVal);
+		[propput, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([in] LONGLONG newVal);
+	};
+
+	[
+		object,
+		uuid(5971B2FF-7604-4BC9-AD94-30320D33EA06),
+		dual,
+		nonextensible,
+		helpstring("IFileRecord Interface"),
+		pointer_default(unique)
+	]
+	interface IFileRecord : IDispatch{
+		[propget, id(1), helpstring("property FileID")] HRESULT FileID([out, retval] LONG* pVal);
+		[propput, id(1), helpstring("property FileID")] HRESULT FileID([in] LONG newVal);
+		[propget, id(2), helpstring("property Name")] HRESULT Name([out, retval] BSTR* pVal);
+		[propput, id(2), helpstring("property Name")] HRESULT Name([in] BSTR newVal);
+		[propget, id(3), helpstring("property FileSize")] HRESULT FileSize([out, retval] LONGLONG* pVal);
+		[propput, id(3), helpstring("property FileSize")] HRESULT FileSize([in] LONGLONG newVal);
+		[propget, id(4), helpstring("property Pages")] HRESULT Pages([out, retval] LONG* pVal);
+		[propput, id(4), helpstring("property Pages")] HRESULT Pages([in] LONG newVal);
+	};
+
+	[
+		object,
+		uuid(27E77AFF-2D7D-4D3E-A415-9D6AAB78A257),
+		dual,
+		nonextensible,
+		helpstring("IFileProcessingDB Interface"),
+		pointer_default(unique)
+	]
+	interface IFileProcessingDB : IDispatch
+	{
+		// TODO: discuss "multiple file" versions of the methods below
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to actions
+		// -----------------------------------------------------------------------------------------------
+		// REQUIRE:	strAction must not contain any spaces, and must match the regex [a-zA-Z_][a-zA-Z0-9_]*
+		//			strAction must be a new action (i.e. one that is not already defined in the database)
+		// PROMISE:	To update the FPMFile table with a new column with the name "ASC_{strAction}" and to
+		//			add a new record in the Action table. The ID of the newly defined action in the 
+		//			Action table will be returned.
+		// NOTE:	The addition of the new record to the Action table and the addition of the column to
+		//			the FPMFile table should be done within a transaction so that both operations pass or
+		//			fail.
+		[id(1), helpstring("method DefineNewAction")] HRESULT DefineNewAction([in] BSTR strAction,
+			[out, retval] long *pnID);
+		// -----------------------------------------------------------------------------------------------
+		// REQUIRE:	strAction must be a current existing action.
+		// PROMISE:	To delete the record associated with strAction from the Action table, and to delete
+		//			the "ASC_{strAction}" column from the FPMFile table.  Also, all records that reference 
+		//			strAction in other tables will be deleted.
+		// NOTE:	All the above database operations shall be executed within a transaction.
+		[id(2), helpstring("method DeleteAction")] HRESULT DeleteAction([in] BSTR strAction);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE:	To return a StringToLong map of all actions and their corresponding IDs in the 
+		//			database.
+		[id(3), helpstring("method GetActions")] HRESULT GetActions(
+			[out,retval] IStrToStrMap * *pmapActionNameToID);
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to adding/removing files
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To add the file to the database.
+		//			if the bForceStatusChange flag is VARIANT_FALSE
+		//				if file is not in the datbase or current status is kActionUnattempted will be added 
+		//				the file will be added and the status will be set to the eNewStatus value
+		//				otherwise the status will be unchanged
+		//			if the bForceStatusChange flag is VARINT_TRUE
+		//				The file will be added to the database if it is not in the database
+		//				and the current status of the file is not kActionProcessing the status of the file
+		//				will be changed to eNewStatus
+		// 
+		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, 
+			[in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
+			[in] EActionStatus eNewStatus, [out] VARIANT_BOOL* pbAlreadyExists, [out] EActionStatus *pPrevStatus, 
+			[out, retval] IFileRecord* *ppFileRecord);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE:	Remove the file by setting the given actions's status to "U" if the current state is "P"
+		//			Also a record will always be added to the QueueEvent table
+		//			if the action state of the file changed the FileActionStateTransition will have a record added
+		[id(5), helpstring("method RemoveFile")] HRESULT RemoveFile([in] BSTR strFile, [in] BSTR strAction);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE:	Removes (sets the Action Status to "U") all files in FPMFile that are in the given folder
+		//			Also a record will always be added to the QueueEvent table for each file
+		//			if the action state of the file changed the FileActionStateTransition will have a record added
+		[id(15), helpstring("method RemoveFolder")] HRESULT RemoveFolder([in] BSTR strFolder, [in] BSTR strAction);
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to setting / getting file status
+		// -----------------------------------------------------------------------------------------------
+		[id(6), helpstring("method NotifyFileProcessed")] HRESULT NotifyFileProcessed([in] long nFileID, 
+			[in] BSTR strAction);
+		[id(7), helpstring("method NotifyFileFailed")] HRESULT NotifyFileFailed([in] long nFileID, 
+			[in] BSTR strAction, [in] BSTR strException);
+		[id(8), helpstring("method SetFileStatusToPending")] HRESULT SetFileStatusToPending([in] long nFileID, 
+			[in] BSTR strAction);
+		[id(9), helpstring("method SetFileStatusToUnattempted")] HRESULT SetFileStatusToUnattempted([in] long nFileID, 
+			[in] BSTR strAction);
+		[id(10), helpstring("method GetFileStatus")] HRESULT GetFileStatus([in] long nFileID, [in] BSTR strAction,
+			[out, retval] EActionStatus *pStatus);
+
+		// PROMISE: To find all of the records that have the status of eFromStatus in the nFromActionID action and change
+		//			the status of the nToActionID action to eToStatus and update the FileActionStateTransistion table.
+		[id(11), helpstring("method SearchAndModifyFileStatus")] HRESULT SearchAndModifyFileStatus([in] long nFromActionID, 
+			[in] EActionStatus eFromStatus, [in] long  nToActionID, [in] EActionStatus eToStatus, [out, retval] long *pnNumRecordsModified);
+
+		[id(12), helpstring("method SetStatusForAllFiles")] HRESULT SetStatusForAllFiles([in] BSTR strAction, 
+			[in] EActionStatus eStatus);
+
+		// -----------------------------------------------------------------------------------------------
+		// REQUIRE:	straction is a valid action defined in the Action table
+		//			nID is a valid file ID defined in the FPMFile table
+		// PROMISE: If pOldStatus != NULL, then the old status associated with the file will be returned.
+		// NOTE:	If pOldStatus != NULL, then two database operations will need to performed (as opposed to
+		//			just one) in order to return the previous status
+		[id(13), helpstring("method SetStatusForFile")] HRESULT SetStatusForFile([in] long nID, [in] BSTR strAction, 
+			[in] EActionStatus eStatus, [out] EActionStatus *poldStatus);
+
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods to determine the next files to process
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE:	To return up to nMaxFiles records where the specified action has a status of 'P'
+		//			For all records returned, the status for the action will be set to 'R' before this
+		//			method call returns.
+		[id(14), helpstring("method GetFilesToProcess")] HRESULT GetFilesToProcess([in] BSTR strAction, 
+			[in] long nMaxFiles, [out, retval] IIUnknownVector* *pvecFileRecords);
+
+		// -----------------------------------------------------------------------------------------------
+		// Properties to set for opening the database
+		// -----------------------------------------------------------------------------------------------
+		//[propget, id(16), helpstring("property ConnectionString")] HRESULT ConnectionString([out, retval] BSTR *pVal);
+		//[propput, id(16), helpstring("property ConnectionString")] HRESULT ConnectionString([in] BSTR newVal);
+		//[propget, id(17), helpstring("property UserName")] HRESULT UserName([out, retval] BSTR *pVal);
+		//[propput, id(17), helpstring("property UserName")] HRESULT UserName([in] BSTR newVal);
+		//[propget, id(18), helpstring("property DBPassword")] HRESULT DBPassword([out, retval] BSTR *pVal);
+		//[propput, id(18), helpstring("property DBPassword")] HRESULT DBPassword([in] BSTR newVal);
+
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To return a IActionStistics pointer that contains the current stats for the given action
+		[id(19), helpstring("method GetStats")] HRESULT GetStats([in] long nActionID, [out, retval] IActionStatistics* *pStats);
+
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To Clear the database
+		[id(20), helpstring("method Clear")] HRESULT Clear();
+
+		// PROMISE: To copy the status of the files for the fromAction to the toAction
+		[id(21), helpstring("method CopyActionStatusFromAction")] HRESULT CopyActionStatusFromAction([in] long nFromAction, [in] long nToAction );
+
+		// PROMISE: To Rename an action
+		[id(22), helpstring("method RenameAction")] HRESULT RenameAction([in] long nActionID, [in] BSTR strNewActionName );
+
+		// PROMISE: To output all of the FileName values found by the query strQuery to a file named strOutputFileName
+		//			and return the number of records that were exported
+		[id(23), helpstring("method ExportFileList")] HRESULT ExportFileList([in] BSTR strQuery, [in] BSTR strOutputFileName,
+			[out,retval] long *pnNumRecordsOutput);
+
+		// PROMISE: To clear any existing DB lock - clears all records in the LockTable
+		[id(24), helpstring("method ResetDBLock")] HRESULT ResetDBLock(void);
+
+		// PROMISE: To return the ActionID for the given action name, if the action name does not exist an exception will be thrown
+		[id(25), helpstring("method GetActionID")] HRESULT GetActionID([in] BSTR bstrActionName, [out, retval]long* pnActionID );
+
+		// PROMISE: To close any existing open connection and reopen with the current settings  
+		//			DatebaseServer and DatabaseName 
+		[id(26), helpstring("method ResetDBConnection")] HRESULT ResetDBConnection(void);
+
+		// PROMISE: To send all database connection status and access status update events
+		//			to the window represented by the handle nHandle
+		[id(27), helpstring("method SetNotificationUIWndHandle")] HRESULT SetNotificationUIWndHandle(long nHandle);
+
+		// PROMISE: To prompt the user for a Username and password if the admin password is in the DB Login table
+		//			and compare the encrypted Username + password combination to the saved password.
+		//			if no password is in the Login table will display password dialog to get the new admin password
+		//			and will encrypt the Username + password and save in the database
+		[id(28), helpstring("method ShowAdminLogin")] HRESULT ShowAdminLogin([out] VARIANT_BOOL* pbLoginCancelled, 
+			[out,retval] VARIANT_BOOL* pbLoginValid);
+
+		// PROMISE: To return the DBSchemaVersion from the DBInfoTable
+		[propget, id(29), helpstring("property DBSchemaVersion")] HRESULT DBSchemaVersion([out, retval] LONG* pVal);
+
+		// PROMISE: To prompt the user for a new admin password.  The encrypted Username + password 
+		//			will be saved in the database.
+		[id(30), helpstring("method ChangeAdminLogin")] HRESULT ChangeAdminLogin([out] VARIANT_BOOL* pbLoginCancelled, 
+			[out,retval] VARIANT_BOOL* pbLoginValid);
+
+		// PROMISE: To get and put the database configuration filename
+		//			DBConfigFileName property is name of the configuration file to use to obtain the database connection information
+		//[propget, id(31), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([out, retval] BSTR* pVal);
+		//[propput, id(31), helpstring("property DBConfigFileName")] HRESULT DBConfigFileName([in] BSTR newVal);
+
+		// PROMISE: To get the current database connection status string
+		[id(32), helpstring("method GetCurrentConnectionStatus")] HRESULT GetCurrentConnectionStatus([out, retval] BSTR* pVal);
+
+		[propget, id(33), helpstring("property DatabaseServer")] HRESULT DatabaseServer([out, retval] BSTR* pVal);
+		[propput, id(33), helpstring("property DatabaseServer")] HRESULT DatabaseServer([in] BSTR newVal);
+
+		[propget, id(34), helpstring("property DatabaseName")] HRESULT DatabaseName([out, retval] BSTR* pVal);
+		[propput, id(34), helpstring("property DatabaseName")] HRESULT DatabaseName([in] BSTR newVal);
+		
+		// PROMISE: To create a new database in the currently set DatabaseServer withthe name bstrNewDBName
+		// REQUIRES: DatabaseServer property must be set to a valid database server.
+		[id(35), helpstring("method CreateNewDB")] HRESULT CreateNewDB([in] BSTR bstrNewDBName);
+
+		// PROMISE: To set the DatabaseServer and DatabaseName to the last used values in the running process
+		[id(36), helpstring("method ConnectLastUsedDBThisProcess ")] HRESULT ConnectLastUsedDBThisProcess();
+
+		// PROMISE: To store a setting in the DBInfo table of the database. 
+		// NOTE:	This is to be used by the product specific database managers to store there settings in the
+		//			DBInfo table.
+		[id(37), helpstring("method SetDBInfoSetting")] HRESULT SetDBInfoSetting([in] BSTR bstrSettingName, [in] BSTR bstrSettingValue );
+
+		// PROMISE: To return the value for the setting name from the DBInfo table
+		[id(38), helpstring("method GetDBInfoSetting")] HRESULT GetDBInfoSetting([in] BSTR bstrSettingName, [out, retval] BSTR* pbstrSettingValue );
+
+		// PROMISE: To lock the database 
+		// NOTE:	This method locks the mutex, adds lock record to the database and sends 
+		//			notification messages to the UI window if it has been set
+		[id(39), helpstring("method LockDB")] HRESULT LockDB();
+
+		// PROMISE: To unlock the database
+		// NOTE:	This method unlocks the mutex, removes lock record from the database and sends 
+		//			notification messages to the UI window if it has been set
+		[id(40), helpstring("method UnlockDB")] HRESULT UnlockDB();
+		
+		// PROMISE: To return a recordset opened with the results of the query in bstrQuery
+		[id(41), helpstring("method GetResultsForQuery")] HRESULT GetResultsForQuery([in] BSTR bstrQuery, 
+			[out,retval] _Recordset** ppVal);
+
+		// PROMISE: To take an EActionStatus and return the corresponding string
+		[id(42), helpstring("method AsStatusString")] HRESULT AsStatusString(
+			[in] EActionStatus eaStatus, [out, retval] BSTR* bstrStatusString);
+
+		// PROMISE: To take an ActionStatus string and return the corresponding
+		//			EActionStatus enum
+		[id(43), helpstring("method AsEActionStatus")] HRESULT AsEActionStatus(
+			[in] BSTR bstrStatusString, [out, retval] EActionStatus* peaStatus);
+
+		// PURPOSE: To get the file ID for a specified file name from the database.
+		// if the action name does not exist an exception will be thrown.
+		[id(44), helpstring("method GetFileIDFromName")] HRESULT GetFileID(
+			[in] BSTR bstrFileName, [out, retval] long *pVal);
+	};
+
+	[
+		object,
+		uuid(18A41FE5-1D07-4af1-91F1-809988312CFE),
+		dual,
+		helpstring("IProductSpecificDBMgr Interface"),
+		pointer_default(unique)
+	]
+	interface IProductSpecificDBMgr : IDispatch
+	{
+		// PROMISE: To create the required tables and relationships for the product that is 
+		//			implementing this interface.  
+		[id(1), helpstring("method AddProductSpecificSchema")] HRESULT AddProductSpecificSchema([in] IFileProcessingDB *pDB);
+
+		// PROMISE: To remove any relationships and tables that were added in a call to AddProductSpecificSchema
+		[id(2), helpstring("method RemoveProductSpecificSchema")] HRESULT RemoveProductSpecificSchema([in] IFileProcessingDB *pDB);
+	};
+
+	[
+		object,
+		uuid(1377A637-5EA4-45F9-9827-AAD1E6FC55F7),
+		dual,
+		nonextensible,
+		helpstring("IFileSupplierData Interface"),
+		pointer_default(unique)
+	]
+	interface IFileSupplierData : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return IObjectWithDescription object that contains
+		//			- IFileSupplier
+		//			- Description
+		//			- Enabled flag
+		//			to provide files to be processed by the defined tasks
+		[propget, id(1), helpstring("property FileSupplier")] HRESULT FileSupplier([out, retval] IObjectWithDescription* *pValue);
+		[propput, id(1), helpstring("property FileSupplier")] HRESULT FileSupplier([in] IObjectWithDescription* newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return boolean flag indicating that processing of the files should be 
+		//			forced
+		[propget, id(2), helpstring("property ForceProcessing")] HRESULT ForceProcessing([out, retval] VARIANT_BOOL *pbValue);
+		[propput, id(2), helpstring("property ForceProcessing")] HRESULT ForceProcessing([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return enumeration indicating the processing state of the File Supplier
+		//			{ Inactive, Active, Paused, Stopped, Done }
+		[propget, id(3), helpstring("property FileSupplierStatus")] HRESULT FileSupplierStatus(
+			[out, retval] EFileSupplierStatus *pVal);
+		[propput, id(3), helpstring("property FileSupplierStatus")] HRESULT FileSupplierStatus(
+			[in] EFileSupplierStatus newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(2E5B30DD-670D-4D00-8AAF-6B521DCA39D8),
+		dual,
+		nonextensible,
+		helpstring("IFileActionMgmtRole Interface"),
+		pointer_default(unique)
+	]
+	interface IFileActionMgmtRole : IDispatch{
+		//-----------------------------------------------------------------------------------------
+		// NOTE:	All the methods below (with the exception of Clear) require that the action 
+		//			management role be enabled, and all data needed by the action management role
+		//			has been specified.  If these two conditions are not met, an exception will
+		//			be raised.
+		//-----------------------------------------------------------------------------------------
+		[id(1), helpstring("method Start")] HRESULT Start([in] IFileProcessingDB *pDB, [in] BSTR bstrAction, 
+			[in] long hWndOfUI, [in] IFAMTagManager *pTagManager, IRoleNotifyFAM *pRoleNotifyFAM );
+		[id(2), helpstring("method Stop")] HRESULT Stop(void);
+		[id(3), helpstring("method Pause")] HRESULT Pause(void);
+		[id(4), helpstring("method Resume")] HRESULT Resume(void);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To enable/disable the particular action mgmt role in the file action manager
+		//			The state of this property is directly correlated with the state of the
+		//			corresponding checkbox on the action tab in the UI
+		[propget, id(5), helpstring("property Enabled")] HRESULT Enabled([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(5), helpstring("property Enabled")] HRESULT Enabled([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To reset the data members of the action mgmt role and restore it to a clean,
+		//			non-dirty state
+		[id(6), helpstring("method Clear")] HRESULT Clear(void);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return com exception if it can not be saved or run
+		[id(7), helpstring("method ValidateStatus")] HRESULT ValidateStatus(void);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(DD34F02C-251E-4CAF-B519-91A91FBD79CB),
+		dual,
+		nonextensible,
+		helpstring("IFileSupplyingMgmtRole Interface"),
+		pointer_default(unique)
+	]
+	interface IFileSupplyingMgmtRole : IDispatch{
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the collection of IFileSupplier items as contained in FileSupplierData
+		//			- IFileSupplierData
+		//			  * IObjectWithDescription
+		//			    + IFileSupplier object
+		//			    + Description
+		//			    + Enabled flag
+		//			  * Force Processing flag
+		//			  * File Supplier Status enumeration
+		[propget, id(1), helpstring("property FileSuppliers")] HRESULT FileSuppliers([out, retval] IIUnknownVector* *pVal);
+		[propput, id(1), helpstring("property FileSuppliers")] HRESULT FileSuppliers([in] IIUnknownVector * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return IFAMCondition object that determines whether SourceDocName should
+		//			be processed by the defined tasks
+		[propget, id(2), helpstring("property FAMCondition")] HRESULT FAMCondition([out, retval] IObjectWithDescription* *pVal);
+		[propput, id(2), helpstring("property FAMCondition")] HRESULT FAMCondition([in] IObjectWithDescription * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the state of the dirty flag.
+		// NOTE:	This method is required here because at this time the FileSupplyingMgmtRole object
+		//			does not know how to read itself out of the FPS file stream.  Since the stream
+		//			is read from/written to at the outer scope, the outer scope needs to be able to
+		//			set the state of the dirty flag.
+		[id(3), helpstring("method SetDirty")] HRESULT SetDirty(VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(F3F26D6F-716B-41ae-BF30-9A3BA5F92F93),
+		dual,
+		nonextensible,
+		helpstring("IFileProcessingMgmtRole Interface"),
+		pointer_default(unique)
+	]
+	interface IFileProcessingMgmtRole : IDispatch{
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the collection of IFileProcessingTask items 
+		[propget, id(1), helpstring("property FileProcessors")] HRESULT FileProcessors([out, retval] IIUnknownVector* *pVal);
+		[propput, id(1), helpstring("property FileProcessors")] HRESULT FileProcessors([in] IIUnknownVector* newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the number of threads
+		[propget, id(2), helpstring("property NumThreads")] HRESULT NumThreads([out, retval] long *pVal);
+		[propput, id(2), helpstring("property NumThreads")] HRESULT NumThreads([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the state of the dirty flag.
+		// NOTE:	This method is required here because at this time the FileProcessingMgmtRole object
+		//			does not know how to read itself out of the FPS file stream.  Since the stream
+		//			is read from/written to at the outer scope, the outer scope needs to be able to
+		//			set the state of the dirty flag.
+		[id(3), helpstring("method SetDirty")] HRESULT SetDirty(VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[id(4), helpstring("method SetRecordMgr")] HRESULT SetRecordMgr(void *pRecordMgr);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(5), helpstring("property OkToStopWhenQueueIsEmpty")] HRESULT OkToStopWhenQueueIsEmpty([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property OkToStopWhenQueueIsEmpty")] HRESULT OkToStopWhenQueueIsEmpty([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(6), helpstring("property KeepProcessingAsAdded")] HRESULT KeepProcessingAsAdded([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(6), helpstring("property KeepProcessingAsAdded")] HRESULT KeepProcessingAsAdded([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return True if exception information should be appended to a user-specified 
+		//			log file if one of the regular tasks ( see FileProcessingTasks ) fails.
+		[propget, id(7), helpstring("property LogErrorDetails")] HRESULT LogErrorDetails([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property LogErrorDetails")] HRESULT LogErrorDetails([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the name of a user-specified log file to which exception information 
+		//			will be appended if one of the regular tasks ( see FileProcessingTasks ) fails.
+		//			Standard document tags ( <SourceDocName>, etc. ) are supported.
+		[propget, id(8), helpstring("property ErrorLogName")] HRESULT ErrorLogName([out, retval] BSTR *pVal);
+		[propput, id(8), helpstring("property ErrorLogName")] HRESULT ErrorLogName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return True if a separate task should be executed if one of the regular tasks 
+		//			( see FileProcessingTasks ) fails.  The setting is stored in the Enabled field 
+		//			associated with the ErrorTask ObjectWithDescription.
+		[propget, id(9), helpstring("property ExecuteErrorTask")] HRESULT ExecuteErrorTask([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property ExecuteErrorTask")] HRESULT ExecuteErrorTask([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return IFileProcessingTask object that will be executed if one of the tasks 
+		//			( see FileProcessingTasks ) fails.
+		[propget, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([out, retval] IObjectWithDescription* *pVal);
+		[propput, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([in] IObjectWithDescription * newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(A6A1C6CE-C0A1-4cbb-811A-FD92CD525731),
+		dual,
+		nonextensible,
+		helpstring("IRoleNotifyFAM Interface"),
+		pointer_default(unique)
+	]
+	interface IRoleNotifyFAM : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To be used to notify the FileActionManager that the Processing is complete
+		[id(1), helpstring("method NotifyProcessingCompleted")] HRESULT NotifyProcessingCompleted(void);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To be used to notify the FileActionManager that the Supplying is complete
+		[id(2), helpstring("method NotifySupplyingCompleted")] HRESULT NotifySupplyingCompleted(void);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To be used to notify the FileActionManager that the Processing is cancelling
+		[id(3), helpstring("method NotifyProcessingCancelling")] HRESULT NotifyProcessingCancelling();
+	};
+
+	[
+		object,
+		uuid(EE7703EA-F880-45ef-842C-11A6B82DB3EF),
+		dual,
+		nonextensible,
+		helpstring("IFAMTagManager Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMTagManager : IDispatch
+	{
+		// FPS file full name
+		[propget, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([out, retval] BSTR *strFPSFileDir);
+		[propput, id(1), helpstring("property FPSFileDir")] HRESULT FPSFileDir([in] BSTR strFPSFileDir);
+		// PROMISE: To return a string that is equivalent in content to strInput
+		// bstrSourceName is the source doc name used in expand <SourceDocName>, it should be passed in as a parameter because
+		// different thread will have different source doc name [P13: 3901]
+		[id(2), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR bstrInput, [in] BSTR bstrSourceName, [out, retval] BSTR *pbstrOutput);
+		// PROMISE: To return a string that is equivalent in content to strInput
+		// PURPOSE: To return a list of all the tags built-in to AttributeFinder (i.e. FPSFileDir...)
+		// REQUIRE: NONE
+		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
+		[id(3), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the tags specified by the user in their INI file
+		// REQUIRE: NONE
+		// PROMISE: If there are tags in the .ini file an empty vector (not NULL) will be returned
+		[id(4), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the available AttributeFinderTags
+		// REQUIRE: NONE
+		// PROMISE: This will be a combined list of all the tags in GetBuiltInTags + the tags in 
+		//			GetBuiltINIFileTags
+		[id(5), helpstring("method GetAllTags")] HRESULT GetAllTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return VARIANT_TRUE if there are any invalid or incomplete
+		//			tags in strInput, and to return VARIANT_FALSE otherwise.
+		// NOTE:	For the sake of this method, a tag name is valid if it is one of
+		//			the predefined tags (like <FPSFileDir> etc), or if there is
+		//			a key in the INI file in the [ExpandableTags]
+		//			section with a non-empty value.
+		[id(6), helpstring("method StringContainsInvalidTags")] HRESULT StringContainsInvalidTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: strInput must contain no tags, or 1 or more well specified
+		//			tags.  Poorly specified tags in strInput (such as non-matching
+		//			'<' and '>', etc) will cause an exception to be thrown.
+		// PROMISE: To return VARIANT_TRUE if there are any tags in the
+		//			strInput, regardless of whether they are valid tag names
+		[id(7), helpstring("method StringContainsTags")] HRESULT StringContainsTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+
+	};
+
+	[
+		object,
+		uuid(5F1B8A0D-CA2B-4eb0-9892-5C9D71F81547),
+		dual,
+		nonextensible,
+		helpstring("IFAMDBUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IFAMDBUtils : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To be used to notify the FileActionManager that the Processing is complete
+		[id(1), helpstring("method PromptForActionSelection")] HRESULT PromptForActionSelection(
+			[in]IFileProcessingDB* pDB, [in] BSTR strTitle, [in] BSTR strPrompt, 
+			[out, retval] BSTR *pActionName);
+	};
+	[
+		object,
+		uuid(1CCBF08F-43B2-4E55-8010-311360670704),
+		dual,
+		nonextensible,
+		helpstring("IFileProcessingTaskExecutor Interface"),
+		pointer_default(unique)
+	]
+	// There are two ways in which FileProcessingTask can be used:
+	// 1) To process a single file with a set of processing tasks, call InitProcessClose
+	// 2) To process multiple files with a set of processing tasks:
+	//		- Call Init
+	//		- Call ProcessFile for each file to be processed
+	//		- Call Close
+	interface IFileProcessingTaskExecutor : IDispatch
+	{
+		// PROMISE: To accept a given file processing task list, database ptr and tag manager
+		//			to use to process files. To subsequently call Init on each of the
+		//			file processing tasks
+		// ARGS:	pFileProcessingTasks- A Object with Description list of file processing tasks
+		//			pDB- The database being acted upon
+		//			pFAMTagManager- The tag manager to use when required
+		// REQUIRED: Nothing.
+		[id(1), helpstring("method Init")] HRESULT Init([in] IIUnknownVector *pFileProcessingTasks, 
+			[in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To process the given file
+		// ARGS:	bstrSourceDocName- The file to act upon
+		//			pProgressStatus- The ProgressStatus object to update
+		//			pbSuccessfulCompletion- VARIANT_TRUE if successful; VARIANT_FALSE is indicative of cancellation since
+		//				an error should fire an exception
+		//			bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  IFileProcessingTaskExecutor
+		//				doesn't act upon this flag, but passes it on to the tasks it executes
+		// REQUIRED: Init must have been called prior to calling ProcessFile.
+		[id(2), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrSourceDocName, 
+			[in] IProgressStatus *pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
+			[out, retval] VARIANT_BOOL *pbSuccessfulCompletion);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To process the given file with one call (separate calls to Init and Close not required)
+		// ARGS:	bstrSourceDocName- The file to act upon
+		//			pFileProcessingTasks- A Object with Description list of file processing tasks
+		//			pDB- The database being acted upon
+		//			pFAMTagManager- The tag manager to use when required
+		//			pProgressStatus- The ProgressStatus object to update (can be NULL)
+		//			bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  IFileProcessingTaskExecutor
+		//				doesn't act upon this flag, but passes it on to the tasks it executes
+		//			pbSuccessfulCompletion- VARIANT_TRUE if successful; VARIANT_FALSE is indicative of cancellation since
+		//				an error should fire an exception
+		// REQUIRED: Nothing.
+		[id(3), helpstring("method InitProcessClose")] HRESULT InitProcessClose(
+			[in] BSTR bstrSourceDocName, [in] IIUnknownVector *pFileProcessingTasks, 
+			[in] IFileProcessingDB *pDB, [in] IFAMTagManager *pFAMTagManager, 
+			[in] IProgressStatus *pProgressStatus, [in] VARIANT_BOOL bCancelRequested, 
+			[out, retval] VARIANT_BOOL *pbSuccessfulCompletion);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To call cancel on the currently running task.
+		//			Notifies the currently executing task (if there is one) the the user has requested for 
+		//			processing to stop. It is not required that the active task necessarily abort processing, however.  
+		//			Currently the only FileProcessingTask that acts on this request is the RedactionVerificationUI
+		// REQUIRED: Nothing. If there is no current task, this call will have no effect
+		[id(4), helpstring("method Cancel")] HRESULT Cancel();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To close all file processing tasks
+		//			However, the FileProcessingTaskExecutor does maintain the task list until destruction
+		//			or the next call to Init or ProcessOneFile
+		// REQUIRED: Init must have been called prior to calling ProcessFile.
+		[id(5), helpstring("method Close")] HRESULT Close();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a IFileProcessingTask pointer to the currently running task.
+		//			If no task is currently running, NULL is returned
+		// REQUIRED: Nothing. (If the executor has not been initialized GetCurrentTask will return NULL)
+		[id(6), helpstring("method GetCurrentTask")] HRESULT GetCurrentTask([out, retval] IFileProcessingTask **ppCurrentTask);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To indicate whether the task executor is currently initialized
+		[propget, id(8), helpstring("property IsInitialized")] HRESULT IsInitialized([out, retval] VARIANT_BOOL *pVal);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(FD701438-4C6B-4D6F-B423-1A7AB2D905E0),
+		helpstring("FileProcessingManager Class")
+	]
+	coclass FileProcessingManager
+	{
+		[default] interface IFileProcessingManager;
+		interface IRoleNotifyFAM;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(93BEB646-2148-49D9-956C-4FB267D4BD0C),
+		helpstring("FileProcessingDB Class")
+	]
+	coclass FileProcessingDB
+	{
+		[default] interface IFileProcessingDB;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(73C81634-FCDE-4DD8-8ACB-B0C899F38063),
+		helpstring("FileSupplierData Class")
+	]
+	coclass FileSupplierData
+	{
+		[default] interface IFileSupplierData;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(661912F2-1A5F-4B87-8C18-742C0E50C1B1),
+		helpstring("ActionStatistics Class")
+	]
+	coclass ActionStatistics
+	{
+		[default] interface IActionStatistics;
+	};
+	[
+		uuid(CE2131AD-2D7A-4D17-B4B3-54E9237638B0),
+		helpstring("QueueSupplyingRole Class")
+	]
+	coclass FileSupplyingMgmtRole
+	{
+		[default] interface IFileSupplyingMgmtRole;
+		interface IFileActionMgmtRole;
+	};
+	[
+		uuid(A5870735-FE5D-438a-8632-4F1F59E8C33F),
+		helpstring("ProcessingRole Class")
+	]
+	coclass FileProcessingMgmtRole
+	{
+		[default] interface IFileProcessingMgmtRole;
+		interface IFileActionMgmtRole;
+	};
+	[
+		uuid(180CE276-B05E-4557-A6AB-3B5FE29587F5),
+		helpstring("FileRecord Class")
+	]
+	coclass FileRecord
+	{
+		[default] interface IFileRecord;
+	};
+	[
+		uuid(F6E7D96F-5592-4e13-9E1C-5A16FB07D2E3),
+		helpstring("FAMTagManager Class")
+	]
+	coclass FAMTagManager
+	{
+		[default] interface IFAMTagManager;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(A7BD9DDF-04BC-46f3-9965-26E9AEF06091),
+		helpstring("FAMDBUtils Class")
+	]
+	coclass FAMDBUtils
+	{
+		[default] interface IFAMDBUtils;
+	};
+	[
+		uuid(818A243C-F765-4A43-BF47-A792AAE7261F),
+		helpstring("FileProcessingTaskExecutor Class")
+	]
+	coclass FileProcessingTaskExecutor
+	{
+		[default] interface IFileProcessingTaskExecutor;
+		interface ILicensedComponent;
+	};
+};

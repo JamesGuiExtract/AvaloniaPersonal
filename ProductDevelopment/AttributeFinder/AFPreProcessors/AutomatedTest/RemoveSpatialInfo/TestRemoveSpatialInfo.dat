@@ -1,0 +1,7 @@
+//*********************************************************************************
+// TestRemoveSpatialInfo.dat
+// 		This file contains test cases to test RemoveSpatialInfo PreProcessor
+//*********************************************************************************
+
+// Removes spatial information
+<TESTCASE>;RemoveSpatialInfo.rsd;..\..\..\AFCore\AutomatedTest\images\image2.tif.uss;;StringWithoutSpatialInfo.voa

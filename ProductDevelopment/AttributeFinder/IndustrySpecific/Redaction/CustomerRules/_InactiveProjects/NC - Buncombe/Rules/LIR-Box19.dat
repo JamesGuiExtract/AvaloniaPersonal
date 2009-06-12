@@ -1,0 +1,8 @@
+^19\s*[,.]?\s*SCARS
+^.{0,6}SCARS.{0,4}MARKS
+^.{0,15}MARKS.{0,4}TATT
+^19.{0,20}TATTOO
+^19\s[,.]?\s*COMPLEX
+^.{0,6}PLEXION
+^.{0,15}XION
+19\s*[,.]?\s*SCARS\s*/\s*MARKS

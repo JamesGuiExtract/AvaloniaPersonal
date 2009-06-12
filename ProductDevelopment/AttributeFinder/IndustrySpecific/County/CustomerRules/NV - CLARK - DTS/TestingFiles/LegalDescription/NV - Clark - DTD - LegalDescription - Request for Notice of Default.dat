@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Request for Notice of Default
+<TESTFOLDER>;..\..\Rules\LegalDescription.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trust Deed-Request Notice;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\LegalDescription

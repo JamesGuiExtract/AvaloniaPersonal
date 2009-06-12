@@ -1,0 +1,362 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: One or Two Persons with Alias
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Name with AKA|John Henry Smith AKA John H. Smith
+Names|John Henry Smith AKA John H. Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John H. Smith|AKA
+...First|John
+...Last|Smith
+...Middle|H.
+
+// FlexIDSCore #2959
+<TESTCASE>|Name with AKA and Semicolon|CLAYBORN M HOLMES AKA; CHARLES M. HOLMES
+Names|CLAYBORN M HOLMES AKA; CHARLES M. HOLMES
+.Person|CLAYBORN M HOLMES
+..First|CLAYBORN
+..Last|HOLMES
+..Middle|M
+..PersonAlias|CHARLES M. HOLMES|AKA
+...First|CHARLES
+...Last|HOLMES
+...Middle|M.
+
+<TESTCASE>|Name with A/K/A|John Henry Smith A/K/A John H. Smith
+Names|John Henry Smith A/K/A John H. Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John H. Smith|AKA
+...First|John
+...Last|Smith
+...Middle|H.
+
+<TESTCASE>|Name with FKA|Mr. John Henry Smith FKA John Smith
+Names|Mr. John Henry Smith FKA John Smith
+.Person|Mr. John Henry Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John Smith|FKA
+...First|John
+...Last|Smith
+
+<TESTCASE>|Name with F/K/A|Jane W. Smith F/K/A Jane Williams
+Names|Jane W. Smith F/K/A Jane Williams
+.Person|Jane W. Smith
+..First|Jane
+..Last|Smith
+..Middle|W.
+..PersonAlias|Jane Williams|FKA
+...First|Jane
+...Last|Williams
+
+<TESTCASE>|Name with Formerly Known As|Mr. John Henry Smith formerly known as John Smith
+Names|Mr. John Henry Smith formerly known as John Smith
+.Person|Mr. John Henry Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John Smith|FKA
+...First|John
+...Last|Smith
+
+<TESTCASE>|Name with Also Known As|Mr. John Henry Smith II also known as John Smith, Jr
+Names|Mr. John Henry Smith II also known as John Smith, Jr
+.Person|Mr. John Henry Smith II
+..Title|Mr.
+..Suffix|II
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John Smith, Jr|AKA
+...Suffix|Jr
+...First|John
+...Last|Smith
+
+<TESTCASE>|Name with Also Know As|Mr. John Henry Smith II also know as John Smith, Jr
+Names|Mr. John Henry Smith II also know as John Smith, Jr
+.Person|Mr. John Henry Smith II
+..Title|Mr.
+..Suffix|II
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John Smith, Jr|AKA
+...Suffix|Jr
+...First|John
+...Last|Smith
+
+<TESTCASE>|Name with Now Known As|Jane Williams now known as Jane W. Smith
+Names|Jane Williams now known as Jane W. Smith
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+<TESTCASE>|Name with Formerly|Jane W. Smith formerly Jane Williams
+Names|Jane W. Smith formerly Jane Williams
+.Person|Jane W. Smith
+..First|Jane
+..Last|Smith
+..Middle|W.
+..PersonAlias|Jane Williams|FKA
+...First|Jane
+...Last|Williams
+
+<TESTCASE>|Name with Was...|Jane W. Smith was the same person as Jane Williams
+Names|Jane W. Smith was the same person as Jane Williams
+.Person|Jane W. Smith
+..First|Jane
+..Last|Smith
+..Middle|W.
+..PersonAlias|Jane Williams|FKA
+...First|Jane
+...Last|Williams
+
+<TESTCASE>|Name with Is...|Jane W. Smith is the same person as Jane Williams
+Names|Jane W. Smith is the same person as Jane Williams
+.Person|Jane W. Smith
+..First|Jane
+..Last|Smith
+..Middle|W.
+..PersonAlias|Jane Williams|AKA
+...First|Jane
+...Last|Williams
+
+<TESTCASE>|Name with WATA|John Henry Smith WATA John H. Smith
+Names|John Henry Smith WATA John H. Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John H. Smith|AKA
+...First|John
+...Last|Smith
+...Middle|H.
+
+<TESTCASE>|Name with Erroneously Spelled|John Henry Smith erroneously spelled Jon Henry Smith
+Names|John Henry Smith erroneously spelled Jon Henry Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|Jon Henry Smith|AKA
+...First|Jon
+...Last|Smith
+...Middle|Henry
+
+<TESTCASE>|Name with Being One And The Same Person As|John Henry Smith Being one and the same person as Jon Henry Smith
+Names|John Henry Smith Being one and the same person as Jon Henry Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|Jon Henry Smith|AKA
+...First|Jon
+...Last|Smith
+...Middle|Henry
+
+<TESTCASE>|Name with Acquired Title As|John Henry Smith who Acquired Title as Jon Henry Smith
+Names|John Henry Smith who Acquired Title as Jon Henry Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|Jon Henry Smith|AKA
+...First|Jon
+...Last|Smith
+...Middle|Henry
+
+<TESTCASE>|Name with Also Took Title As|John Henry Smith who Also took Title as Jon Henry Smith
+Names|John Henry Smith who Also took Title as Jon Henry Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|Jon Henry Smith|AKA
+...First|Jon
+...Last|Smith
+...Middle|Henry
+
+<TESTCASE>|Name with currently known As|John Henry Smith currently known as Jon Henry Smith
+Names|John Henry Smith currently known as Jon Henry Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|Jon Henry Smith|NKA
+...First|Jon
+...Last|Smith
+...Middle|Henry
+
+<TESTCASE>|Name with Two Aliases|Jane W. Smith formerly Jane Williams also known as Jane F. Williams
+Names|Jane W. Smith formerly Jane Williams also known as Jane F. Williams
+.Person|Jane W. Smith
+..First|Jane
+..Last|Smith
+..Middle|W.
+..PersonAlias|Jane Williams|FKA
+...First|Jane
+...Last|Williams
+..PersonAlias|Jane F. Williams|AKA
+...First|Jane
+...Last|Williams
+...Middle|F.
+
+<TESTCASE>|Two Names each with Alias|John Henry Smith AKA John H. Smith and Jane Williams now known as Jane W. Smith
+Names|John Henry Smith AKA John H. Smith and Jane Williams now known as Jane W. Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+..PersonAlias|John H. Smith|AKA
+...First|John
+...Last|Smith
+...Middle|H.
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+<TESTCASE>|Two Names second with Alias|John Henry Smith and Jane Williams now known as Jane W. Smith
+Names|John Henry Smith and Jane Williams now known as Jane W. Smith
+.Person|John Henry Smith
+..First|John
+..Last|Smith
+..Middle|Henry
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+// P16 #2049
+<TESTCASE>|Two Names first with Alias1|LUZ E SALAZAR AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+Names|LUZ E SALAZAR AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+.Person|LUZ E SALAZAR
+..First|LUZ
+..Last|SALAZAR
+..Middle|E
+..PersonAlias|LUZ ESPERANZA SALAZAR|AKA
+...First|LUZ
+...Last|SALAZAR
+...Middle|ESPERANZA
+.Person|FERNANDO OTERO
+..First|FERNANDO
+..Last|OTERO
+
+// P16 #2049
+<TESTCASE>|Two Names first with Alias2|LUZ E SALAZAR, AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+Names|LUZ E SALAZAR, AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+.Person|LUZ E SALAZAR
+..First|LUZ
+..Last|SALAZAR
+..Middle|E
+..PersonAlias|LUZ ESPERANZA SALAZAR|AKA
+...First|LUZ
+...Last|SALAZAR
+...Middle|ESPERANZA
+.Person|FERNANDO OTERO
+..First|FERNANDO
+..Last|OTERO
+
+<TESTCASE>|Names, Comma, Alias1|John Smith and Jane Williams, now known as, Jane W. Smith
+Names|John Smith and Jane Williams, now known as, Jane W. Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+<TESTCASE>|Names, Comma, Alias2|John Smith and Jane Williams, now known as Jane W. Smith
+Names|John Smith and Jane Williams, now known as Jane W. Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+<TESTCASE>|Names, Comma, Alias3|John Smith and Jane Williams now known as, Jane W. Smith
+Names|John Smith and Jane Williams now known as, Jane W. Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Jane Williams
+..First|Jane
+..Last|Williams
+..PersonAlias|Jane W. Smith|NKA
+...First|Jane
+...Last|Smith
+...Middle|W.
+
+<TESTCASE>|AKA in parenthesis1|Alejandro Reyes (also known as Alejandro Reyes Dolores)
+Names|Alejandro Reyes (also known as Alejandro Reyes Dolores)
+.Person|Alejandro Reyes
+..First|Alejandro
+..Last|Reyes
+..PersonAlias|Alejandro Reyes Dolores|AKA
+...First|Alejandro
+...Last|Dolores
+...Middle|Reyes
+
+// P16 #2927
+<TESTCASE>|Name with AKA and N/K/A|Elizabeth A. Hagberg AKA N/K/A Elizabeth A. Kennedy
+Names|Elizabeth A. Hagberg AKA N/K/A Elizabeth A. Kennedy
+.Person|Elizabeth A. Hagberg
+..First|Elizabeth
+..Last|Hagberg
+..Middle|A.
+..PersonAlias|Elizabeth A. Kennedy|NKA
+...First|Elizabeth
+...Last|Kennedy
+...Middle|A.
+
+// FlexIDSCore #1186
+<TESTCASE>|Name with DBA|John W Smith D.B.A. Smith Trucking
+Names|John W Smith D.B.A. Smith Trucking
+.Person|John W Smith
+..First|John
+..Last|Smith
+..Middle|W
+..CompanyAlias|Smith Trucking|DBA

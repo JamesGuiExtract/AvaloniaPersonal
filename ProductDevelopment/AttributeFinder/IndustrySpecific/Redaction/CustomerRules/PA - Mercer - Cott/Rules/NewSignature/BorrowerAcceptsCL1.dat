@@ -1,0 +1,1 @@
+(?:Social(?=[\s\S]{0,80}(?:Sec|ty\b|urit|Numb|umbe|mber))|cial(?=(?:.{0,3}Secu|.{0,10}Number))|.+(?=(?:Security.{0,3}Num|.{0,3}mber)))

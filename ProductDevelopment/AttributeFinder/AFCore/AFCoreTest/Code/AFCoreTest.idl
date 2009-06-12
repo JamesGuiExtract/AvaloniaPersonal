@@ -1,0 +1,44 @@
+// AFCoreTest.idl : IDL source for AFCoreTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFCoreTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(4FA7B9DE-BF59-475E-980B-D0924BBAF268),
+	version(1.0),
+	helpstring("UCLID AFCoreTest 1.0 Type Library")
+]
+library UCLID_AFCORETESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+	importlib("..\..\Code\AFCore.tlb");
+
+	[
+		uuid(A47D3A42-BCBC-4927-A52E-7B0C427E71F3),
+		helpstring("AutomatedRuleSetTester Class")
+	]
+	coclass AutomatedRuleSetTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+// William Parr
+// Removed 9/7/2004
+//		interface IOutputHandler;
+	};
+	[
+		uuid(44DCAC20-5A28-485A-9FD8-CFC82508B404),
+		helpstring("AFEngineTester Class")
+	]
+	coclass AFEngineTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

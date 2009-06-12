@@ -1,0 +1,23 @@
+HKCR
+{
+	ESFAMConditions.FileExistencePP.1 = s 'FileExistencePP Class'
+	{
+		CLSID = s '{657EB1F4-9890-45e1-A68F-EEEC8E12037D}'
+	}
+	FileProcessors.FileExistencePP = s 'FileExistencePP Class'
+	{
+		CLSID = s '{657EB1F4-9890-45e1-A68F-EEEC8E12037D}'
+		CurVer = s 'ESFAMConditions.FileExistencePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {657EB1F4-9890-45e1-A68F-EEEC8E12037D} = s 'FileExistencePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

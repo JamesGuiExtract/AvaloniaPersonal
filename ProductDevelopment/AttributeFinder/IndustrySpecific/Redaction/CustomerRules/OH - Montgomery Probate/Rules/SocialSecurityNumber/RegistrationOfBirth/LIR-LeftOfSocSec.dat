@@ -1,0 +1,6 @@
+Social\s*Sec
+Soc.{2,10}(?:secu|ecur|curi|urit|rity)
+Social.{4,13}\bNo
+Date\s*of\s*Birth
+Maiden\s*Name
+(?:Age|Birthplace)\s*of\s*Mother

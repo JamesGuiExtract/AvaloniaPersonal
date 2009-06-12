@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDDistanceConverter.DistanceConverter.1 = s 'DistanceConverter Class'
+	{
+		CLSID = s '{D2D97FFE-314D-11D6-8257-0050DAD4FF55}'
+	}
+	UCLIDDistanceConverter.DistanceConverter = s 'DistanceConverter Class'
+	{
+		CLSID = s '{D2D97FFE-314D-11D6-8257-0050DAD4FF55}'
+		CurVer = s 'UCLIDDistanceConverter.DistanceConverter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D2D97FFE-314D-11D6-8257-0050DAD4FF55} = s 'DistanceConverter Class'
+		{
+			ProgID = s 'UCLIDDistanceConverter.DistanceConverter.1'
+			VersionIndependentProgID = s 'UCLIDDistanceConverter.DistanceConverter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D2D97FF1-314D-11D6-8257-0050DAD4FF55}'
+		}
+	}
+}

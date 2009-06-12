@@ -1,0 +1,64 @@
+//test1 Paul to be replaced by STEVE.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 Paul to be replaced by STEVE with "Strings in First Column are case Sensitive" is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 PAUL to be replaced by STEVE with "Strings in first column are case Sensitive" is checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 Peacock to be replaced by Johnson.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 This testcase has two entries. 
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 This testcase has three entries.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 This testcase has three entries with "Strings in first column are case Sensitive" is checked.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 Two entries with both "Strings defined above are treated as Regular Expressions" and
+//"Strings in first column are case sensitive" are checked.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 Three entries with both "Regular Expression" and "Case Sensitive" checked.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 The entries are the same as test9 except "Case Sensitive" is not checked.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 Two entries with "Regular Expressions" checkbox checked. 
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 Two entries with "Regular Expressions" checked. 
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 Two entries.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 Two entries with "Regular expressions" checked.
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//Test15 to 18 are to test the Dynamic File List feature of ReplaceStrings.
+
+//Test15 Dynamic File List is utilized. The file contains three entries with coma as 
+//the delimiter. 
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 Dynamic File List is utilized with % as the delimiter."Regular Expression" is checked  
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//test17 Dynamic file list with : as the delimiter. "Case Sensitive" is checked.
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 Dynamic file List with # as the delimiter. Both "Regular Expression" and 
+//"Case Sensitive" are checked.
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
+
+//test19 Dynamic file lists with "file://" as "File://" and "FILE://" to test case insensitivity
+<TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav
+
+//test20 Multiple captured subexpression replacements. [FlexIDSCore #3114]
+<TESTCASE>;Test20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test20.eav

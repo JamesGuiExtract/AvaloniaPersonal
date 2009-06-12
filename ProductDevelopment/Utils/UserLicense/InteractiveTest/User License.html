@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>UserLicense Utility - Testing Checklist</title>
+    <link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+<body>
+    <h1>
+        UserLicense Utility - Testing Checklist<br>
+        <img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+    </h1>
+    <hr>
+
+	<ul>
+		<li>Confirm that the title bar says "User Key Generator"</li>
+		<li>Confirm that the following edit boxes exist and are editable
+		<ul>
+			<li>Name</li>
+			<li>Company Name</li>
+			<li>Phone Number</li>
+			<li>Email</li>
+			<li>Registration Key</li>
+		</ul>
+		</li>
+		<li>Confirm that the &quot;Generate license key&quot; button enables the &quot;Copy Info to Clipboard&quot; button and inserts a license key into &quot;User License Key&quot; text box.<li>
+		<li>Confirm that the &quot;User License Key&quot; edit box is read only</li>
+		<li>Confirm that clicking the &quot;Copy Info to Clipboard&quot; button while any of each of the following editboxes are empty will throw an exception
+			<ul>
+				<li>Name</li>
+				<li>Company Name</li>
+				<li>Phone Number</li>
+				<li>Email</li>
+			</ul>
+		</li>
+		<li>Confirm that clicking the &quot;Copy Info to Clipboard&quot; button while any of each of the following editboxes contain blank spaces will throw an exception
+			<ul>
+				<li>Name</li>
+				<li>Company Name</li>
+				<li>Phone Number</li>
+				<li>Email</li>
+			</ul>
+		</li>
+		<li>Confirm that copying data allows it to be pasted into the COMLicense generator located at I:\Common\Engineering\Tools\SecureClients\COMLicense_InternalTesting	 via the &quot;Paste User String&quot; button. </li>
+		<li>Confirm that the copied data can be pasted into a notepad document and has a readable format and meaningful labels for everything except the license key.</li>
+	</ul>
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+HKCR
+{
+	FileProcessors.ConvertToPDFTaskPP.1 = s 'ConvertToPDFTaskPP Class'
+	{
+		CLSID = s '{7718F938-AEA0-4a84-A14B-0998F05D71D2}'
+	}
+	FileProcessors.ConvertToPDFTaskPP = s 'ConvertToPDFTaskPP Class'
+	{
+		CLSID = s '{7718F938-AEA0-4a84-A14B-0998F05D71D2}'
+		CurVer = s 'FileProcessors.ConvertToPDFTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7718F938-AEA0-4a84-A14B-0998F05D71D2} = s 'ConvertToPDFTaskPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	ESMessageUtils.EmailSettings.1 = s 'EmailSettings Class'
+	{
+		CLSID = s '{1B7F6C45-B51B-4F44-BDD9-8DEB635BA305}'
+	}
+	ESMessageUtils.EmailSettings = s 'EmailSettings Class'
+	{
+		CLSID = s '{1B7F6C45-B51B-4F44-BDD9-8DEB635BA305}'
+		CurVer = s 'ESMessageUtils.EmailSettings.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {1B7F6C45-B51B-4F44-BDD9-8DEB635BA305} = s 'EmailSettings Class'
+		{
+			ProgID = s 'ESMessageUtils.EmailSettings.1'
+			VersionIndependentProgID = s 'ESMessageUtils.EmailSettings'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{036AC2B6-6B38-4EB2-B42E-657891B3833F}'
+		}
+	}
+}

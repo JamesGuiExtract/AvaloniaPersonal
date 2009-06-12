@@ -1,0 +1,176 @@
+<HTML>
+
+<HEAD>
+<TITLE>Pre-Code Freeze Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>FLEX Index / ID Shield Pre-Code Freeze Testing<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Purpose</h2>
+<UL>
+  	<li>Confirm proper project settings in the code baseline.</li>
+  	<li>Basic testing of core features to find problems before it is too late to 
+	fix them.</li>
+  	<li>Performance testing of new features and enhancements to confirm 
+	expected behavior.</li>
+  	<li>Review current state of documentation to confirm that contents reflect 
+	the expected behavior of the new release.</li>
+  	<li>Preparation of updates to various demo applications to appropriately highlight
+	new features and enhancements.</li>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Engineering Project Settings - All Projects</h2>
+<UL>
+  	<li>Confirm that Optimizations are set to <b>Disabled (/Od)</b> via C/C++ - Optimization.
+  	<li>Confirm that C++ Exceptions are set to <b>Yes With SEH Exceptions (/EHa)</b> via 
+	C/C++ - Code Generation.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Core Features - Exercise Testing Checklists</h2>
+<UL>
+  	<li><b>FAM Sanity Tests</b> - run on each supported operating system
+  	<li><b>Running FAM As A Service</b> - run on each supported operating system
+<p>
+  	<li><b>Endurance Testing</b> - FLEX Index.
+  	<li><b>Endurance Testing</b> - ID Shield.
+<p>
+  	<li><b>Large-Scale Verification Testing</b> - stress testing with multiple users.
+  	<li><b>PDF Stability Testing</b> - basic endurance testing.
+  	<li><b>Software Licensing</b> - time rollback prevention and license corruption.
+  	<li><b>USB Counters</b> - stress testing and robust error recovery.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Performance Testing</h2>
+<UL>
+  	<li><b>New Rule Objects</b>
+	<UL>
+	  	<li>Create comprehensive set of automated tests.
+	  	<li>Create Memory Leak test(s).
+	  	<li>Exercise basic functionality with large set of images.
+	</UL>
+<p>
+  	<li><b>New Task Objects</b>
+	<UL>
+	  	<li>Create comprehensive set of automated tests.
+	  	<li>Create Memory Leak test(s).
+	  	<li>Exercise basic functionality with large set of images.
+	</UL>
+<p>
+  	<li><b>Core Feature / Enhancement : Lead Tools version 16</b>
+	<UL>
+	  	<li>Confirm proper functionality with new version.
+	  	<li>Confirm that the <b>NAG DLL message</b> is not seen.
+<p>
+	  	<li>Exercise <b>ImageFormatConverter</b> - through existing checklist
+	  	<li>Exercise <b>Automatic redaction</b> in the Redaction Demo with both TIFs and 
+		converted PDFs - pending existing checklist.
+	  	<li>Exercise <b>Compute redactions</b> in the Redaction Demo with both TIFs and 
+		converted PDFs - pending existing checklist.
+	  	<li>Exercise <b>Verify redactions</b> in the Redaction Demo with both TIFs and 
+		converted PDFs.  Check the redacted images for correctness - pending existing checklist.
+	  	<li>Exercise the <b>Add Watermark</b> file processor for both TIFs and PDFs - 
+		through existing checklist.
+	  	<li>Exercise <b>Adjust Image Resolution</b> for TIFs in the Redaction Demo - 
+		through existing checklist.
+	  	<li>Exercise <b>Adjust Image Resolution</b> for PDFs - pending existing checklist.
+	  	<li>Exercise adding highlights in the <b>Image Viewer</b> for TIFs and 
+		PDFs - pending existing checklist.
+	  	<li>Exercise recognizing text via region and page in the <b>Image Viewer</b> 
+		for TIFs and PDFs - pending existing checklist.
+	  	<li>Open several different image types in the <b>Image Viewer</b> - pending 
+		existing checklist.
+	  	<li>Open various rotated images in the <b>Image Viewer</b> - through 
+		existing checklist.
+	</UL>
+<p>
+  	<li><b>Core Feature / Enhancement : Nuance OCR engine version 16</b>
+	<UL>
+	  	<li>Confirm proper functionality with new version.
+<p>
+      		<li><b>[FlexIDSCore #3037]</b>
+		<ul>
+			<li>Confirm that the image specified in the SCR OCRs text on 
+			<b>page 1</b> when OCR'ing the entire document.
+		</ul>
+      		<li><b>[LegacyRC #3552]</b> Convlist.txt
+		<ul>
+			<li>Confirm that <b>CONVLIST.TXT</b> is no longer required to be 
+			in the CommonComponents folder.
+		</ul>
+      		<li><b>[LegacyRC #4304]</b> OCR region ignores area on image
+		<ul>
+			<li>Confirm that the two <b>Social Security Number</b> items specified in 
+			the SCR are OCR'd properly.
+		</ul>
+      		<li><b>[LegacyRC #4727]</b> OCR tiled TIF image
+		<ul>
+			<li>Confirm that the attached <b>tiled TIF</b> image OCR's properly.
+		</ul>
+      		<li><b>[LegacyRC #4787]</b> OCR adds extra spaces
+		<ul>
+			<li>Confirm that <b>PHILLIP J JANUS</b> is OCR'd correctly without extra 
+			spaces in the specified image file.
+		</ul>
+      		<li><b>[LegacyRC #4868]</b> OCR adds leading spaces
+		<ul>
+			<li>Confirm that OCR'ing the specified PDF image <b>does not</b> create 
+			lines with leading spaces.
+		</ul>
+      		<li><b>[LegacyRC #4917]</b> OCR confuses image orientation
+		<ul>
+			<li>Confirm that OCR'ing the specified image yields the majority of the 
+			document text right side up.
+			<li>Note that the page footer contains upside down text.
+		</ul>
+      		<li><b>[LegacyRC #5060]</b> OCR failures due to image decomposition errors
+		<ul>
+			<li>Confirm that each image in <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5060</b> 
+			OCRs without error.
+		</ul>
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Documentation Review</h2>
+<UL>
+  	<li>Review <b>FlexIndex.chm</b> checking accuracy and completeness.
+  	<li>Review <b>IDShield.chm</b> checking accuracy and completeness.
+<p>
+  	<li>Review <b>FlexInstall.chm</b> checking completeness of installation instructions.
+  	<li>Review <b>IDShieldinstall.chm</b> checking completeness of installation instructions.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Demo Applications</h2>
+<UL>
+  	<li>Prepare list of enhancements and new features relevant to an <b>ID Shield</b> 
+	demonstration.
+  	<li>Begin process of locating suitable sample documents for <b>ID Shield</b>.
+<p>
+  	<li>Prepare list of enhancements and new features relevant to a <b>FLEX Index</b> 
+	demonstration.
+  	<li>Begin process of locating suitable sample documents for <b>FLEX Index</b>.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</HTML>

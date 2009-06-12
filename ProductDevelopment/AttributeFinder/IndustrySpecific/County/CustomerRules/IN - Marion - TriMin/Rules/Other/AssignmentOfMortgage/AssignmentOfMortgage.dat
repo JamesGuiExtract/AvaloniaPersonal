@@ -1,0 +1,8 @@
+[PATTERNS_BEGIN]
+rule01=Borrower^3~Grantor^3~Mortgagor^9~stor:^?OriginalGrantor^250~Lender^3~Benefic
+rule02=mortgagor^3~trustor^?OriginalGrantor^80~Mortgagee^3~benefic
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\ASMT\0081606.TIF
+rule03=[as^5~follows^9~mortgagor^?OriginalGrantor^120~\r\n^3~mortgagee
+//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\ASMT\0081847.TIF
+rule04=indenture^40~made^3~by]^?OriginalGrantor^240~[to^3~it^3~securing
+[PATTERNS_END]

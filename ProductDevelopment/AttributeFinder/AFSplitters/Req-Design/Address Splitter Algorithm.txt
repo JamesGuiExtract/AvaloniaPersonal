@@ -1,0 +1,144 @@
+// Algorithm for Address Splitting
+// updated: 04/19/04
+
+/////////////////////////////////////////////
+// Step 1: Retrieve City, State, and Zip COde
+//         from end of input text
+/////////////////////////////////////////////
+
+	///////////////////////////////////////
+	// Step 1A: Parse input text into lines
+	///////////////////////////////////////
+
+	//////////////////////////////////////////////////////
+	// Step 1B: Use regular expression to locate Zip Code
+	//          - Retrieve appropriate Spatial String
+	//          - Add sub-attribute to end of collection
+	//          - Trim zip code from end of input text
+	//          - Trim trailing whitespace from input text
+	//
+	// Example: "Kansas City, MO  62626" becomes
+	//          "Kansas City, MO"
+	//////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////
+	// Step 1C: Use regular expression to locate State
+	//          - Locate state name, if present
+	//          - Locate state code, if present
+	//          - Use latest of name or code
+	//            (i.e. MO instead of Kansas in example below)
+	//          - Add sub-attribute to beginning of collection
+	//          - Trim state from end of input text
+	//          - Trim trailing commas and spaces from input text
+	//
+	// Example: "Kansas City, MO" becomes
+	//          "Kansas City"
+	/////////////////////////////////////////////////////////////
+
+	/////////////////////////////////////////////////////////////
+	// Step 1D1: If comma or semicolon delimiter is found
+	//          - Use last token as City name
+	//          - Add sub-attribute to beginning of collection
+	//          - Trim city from end of input text
+	//          - Trim trailing commas and spaces from input text
+	//
+	// Example: "Apartment 4, Kansas City" becomes
+	//          "Apartment 4"
+	/////////////////////////////////////////////////////////////
+
+	///////////////////////////////////////////////////////////////
+	// Step 1D2: Else no comma or semicolon delimiter found
+	//          - Parse input text into words
+	//          - If one or two words found --> this is the City
+	//            * Add sub-attribute to beginning of collection
+	//            * Trim city from end of input text
+	//            * Trim trailing commas and spaces from input text
+	//          - Else three or more words found
+	//            * Evaluate words from end to beginning looking
+	//              for an address indicator
+	//              + Word containing digits is NOT part of City name
+	//              + Word that is Street Name (Highway, Road, Street)
+	//                is NOT part of City name
+	//              + Word that is Street Abbreviation may be part 
+	//                of City name (St, but not Rd, Hwy, Pl)
+	//              + If "St" is found, check the previous word
+	//            * Add sub-attribute to beginning of collection
+	//            * Trim city from end of input text
+	//            * Trim trailing commas and spaces from input text
+	//
+	// Examples: "Apartment 4 Kansas City" becomes "Apartment 4"
+	//           "12 Main Street Madison" becomes "12 Main Street"
+	//           "12 Main St Madison" becomes "12 Main St"
+	//           "12 Main Ave St Paul" becomes "12 Main Ave"
+	//           "12 Main St St Paul" becomes "12 Main St"
+	///////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////
+// Step 2: Retrieve Name and Address lines
+//         from end of remaining input text
+///////////////////////////////////////////
+
+	///////////////////////////////////////////
+	// Step 2A: Parse remaining text into lines
+	///////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////
+	// Step 2B: Two or more lines 
+	//          - Evaluate each line as Recipient or Address
+	//          - Add RecipientN sub-attributes to beginning
+	//            of collection
+	//          - Add AddressN sub-attributes to beginning
+	//            of collection but AFTER all Recipient items
+	//////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////
+	// Step 2B1: Evaluate line as Recipient
+	//          - Compute and return Recipient score
+	//            * Increment score if text contains Person
+	//              Title OR Person Suffix
+	//            * Increment score if text contains Company
+	//              Suffix OR Company Designator
+	//            * Increment score if text contains a 
+	//              Direction Indicator
+	//              (i.e. "Return To", "Attention", etc.)
+	//
+	// Examples: "Mr. John Smith III" scores 1
+	//           "John Smith, Incorporated" scores 1
+	//           "Attn: First National Bank" scores 2
+	//////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////
+	// Step 2B2: Evaluate line as Address
+	//          - Compute and return Address score
+	//            * Increment score if first word contains 
+	//              digits
+	//            * Increment score if text contains P O Box
+	//            * Increment score if text contains a Street 
+	//              Name OR Street Abbreviation
+	//              (i.e. "Road", "St", "Avenue", etc.)
+	//            * Increment score if text contains a Building 
+	//              Subdivision Name OR Abbreviation
+	//              (i.e. "Apartment", "Suite", "Apt", "Ste")
+	//
+	// Examples: "8383 Greenway" scores 1
+	//           "P. O. Box 45137" scores 1
+	//           "St Louis Missouri" scores 1
+	//           "Suite #500" scores 1
+	//           "8383 Greenway Blvd Ste #500" scores 3
+	//////////////////////////////////////////////////////////
+
+	//////////////////////////////////////////////////////////
+	// Step 2C: Only one line
+	//          - Divide the line into Recipient and Address
+	//          - Parse input text into words and evaluate
+	//            from end to beginning
+	//          - Word with digits starts the Address portion
+	//          - Add Recipient1 sub-attribute to beginning
+	//            of collection
+	//          - Add Address1 sub-attribute as second
+	//            sub-attribute
+	//
+	// Example: "John Smith 123 Excelsior Ave" becomes 
+	//              "John Smith" AND "123 Excelsior Ave"
+	//////////////////////////////////////////////////////////
+

@@ -1,0 +1,1 @@
+(?:Checking|savings|\bA[^\w\s]C\b).{0,3}\b\d*[A-Z]{0,3}(?:[^\d\r\n\$]{0,2}\d+)+

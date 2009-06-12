@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# flatten annoying testing file directory structures like so:
+# mv -v ./FIN/1998-001417/00001.Tif ./FIN/1998-001417_00001.Tif
+# for the above example, run the "FIN" directory 
+
+if [ "$1" = "2" ];then
+
+	for x in `find . -type f -name *.*`;
+		do mv -v $x `echo $x | sed -e 's/\\/\\([^\\/]*\\)\\/\\([^\\/]*\\)$/_\\1_\\2/'`;
+	done
+
+else
+	for x in `find . -type f -name *.*`;
+		do mv -v $x `echo $x | sed -e 's/\\/\\([^\\/]*\\)$/_\\1/'`;
+	done
+fi

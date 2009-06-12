@@ -1,0 +1,29 @@
+// TestFilters.idl : IDL source for TestFilters.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (TestFilters.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(5DAD75F1-429B-11D6-826B-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID TestFilters 1.0 Type Library")
+]
+library UCLID_TESTFILTERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(5DAD75FF-429B-11D6-826B-0050DAD4FF55),
+		helpstring("TestAbstractMeasurement Class")
+	]
+	coclass TestAbstractMeasurement
+	{
+		[default] interface ITestableComponent;
+	};
+};

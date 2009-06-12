@@ -1,0 +1,2 @@
+(\b[ao]\W*subdivisi?on(?!\s*and)[\s\S]{0,40}\b(?:part\W*of\b|\bof\W*the\b))[\s\S]{0,80}(?:\b[NS][EW]1?\b|1\/4\b|Quarter|section|commencing|following\s*described\s*tract)[\s\S]*;$1
+(subdivisi?on\s*of)\b[\s\S]{0,40}(?:\b[NS][EW]1?\b|1\/4\b|Quarter|section|commencing|following\s*described\s*tract)[\s\S]*;$1

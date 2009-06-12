@@ -1,0 +1,145 @@
+
+
+
+
+
+// First run 8 tests, each testing 1 permutation of the settings
+// Use the same bounds for each test
+<SET>;BOUNDS= 250, 430, 1000, 910;
+
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+
+<SET>;BOUNDARY_DATA_TYPE=CHAR;
+//TEST 1 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_1.txt;
+//TEST 2 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_2.txt;
+
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+//TEST 3 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_3.txt;
+//TEST 4 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_4.txt;
+
+<SET>;EXCLUDE_DATA_ON_BOUNDARY;
+
+<SET>;BOUNDARY_DATA_TYPE=CHAR;
+//TEST 5 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_5.txt;
+//TEST 6 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_6.txt;
+
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+//TEST 7 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_7.txt;
+//TEST 8 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_8.txt;
+
+
+// Test a region that is actually a point
+<SET>;BOUNDS= 255, 790, 255, 790;
+<SET>;BOUNDARY_DATA_TYPE=CHAR;
+
+<SET>;EXCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 9 ///////////////////////////////////////////
+// Should be empty
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;Empty.txt;
+
+//TEST 10 ///////////////////////////////////////////
+// Should be the entire document
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_all.txt;
+
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 11 ///////////////////////////////////////////
+// Should be just a W(itnesseth)
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_11.txt;
+
+//TEST 12 ///////////////////////////////////////////
+// Should be the entire document except a W(itnesseth)
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_12.txt;
+
+
+// Test Negative boundaries (which mean edge of page)
+<SET>;BOUNDS= -1, -10000, -53, -1;
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+<SET>;EXCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 13 ///////////////////////////////////////////
+// Should be the entire document
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_13.txt;
+//TEST 14 ///////////////////////////////////////////
+// Should be Empty
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;Empty.txt;
+
+// test a rectangle that is completely off the page
+<SET>;BOUNDS= 5000, 5000, 8000, 8000;
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 15 ///////////////////////////////////////////
+// Should be empty
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;Empty.txt;
+
+//TEST 16 ///////////////////////////////////////////
+// Should be the entire document
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_all.txt;
+
+
+//Test a rectangle that is really a line
+<SET>;BOUNDS= 100, 790, 1800, 790;
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+<SET>;GET_DATA_IN_REGION
+
+//TEST 17 ///////////////////////////////////////////
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_17.txt;
+
+//TEST 18 ///////////////////////////////////////////
+<SET>;EXCLUDE_DATA_ON_BOUNDARY;
+<TESTCASE>;./1938481.tif.uss;1;Empty.txt;
+
+// Test a rectangle that is much larger than the page
+<SET>;BOUNDS= 0, 0, 10000, 10000;
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 19 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./1938481.tif.uss;1;1938481_out_19.txt;
+
+//TEST 20 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./1938481.tif.uss;1;Empty.txt;
+
+
+// Test an empty uss file
+<SET>;BOUNDS= -1, -1, -1, -1;
+<SET>;BOUNDARY_DATA_TYPE=WORD;
+<SET>;INCLUDE_DATA_ON_BOUNDARY;
+
+//TEST 21 ///////////////////////////////////////////
+<SET>;GET_DATA_IN_REGION
+<TESTCASE>;./Empty.uss;1;Empty.txt;
+
+//TEST 22 ///////////////////////////////////////////
+<SET>;GET_DATA_OUTOF_REGION
+<TESTCASE>;./Empty.uss;1;Empty.txt;
+

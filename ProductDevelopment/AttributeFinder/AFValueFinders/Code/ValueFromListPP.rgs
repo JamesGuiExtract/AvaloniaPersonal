@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueFinders.ValueFromListPP.1 = s 'ValueFromListPP Class'
+	{
+		CLSID = s '{F729FDBE-7BE8-448A-99C4-DAD61AE57BA7}'
+	}
+	UCLIDAFValueFinders.ValueFromListPP = s 'ValueFromListPP Class'
+	{
+		CLSID = s '{F729FDBE-7BE8-448A-99C4-DAD61AE57BA7}'
+		CurVer = s 'UCLIDAFValueFinders.ValueFromListPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F729FDBE-7BE8-448A-99C4-DAD61AE57BA7} = s 'ValueFromListPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -1,0 +1,31 @@
+// CountyTester.idl : IDL source for CountyTester.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (CountyTester.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(8A7432FD-FEFC-4C12-84D6-38BAA81CDEBD),
+	version(1.0),
+	helpstring("UCLID CountyTester 1.0 Type Library")
+]
+library UCLID_COUNTYTESTERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(4A470394-3AF9-48A9-B28B-A907F4D4767E),
+		helpstring("GrantorGranteeTester Class")
+	]
+	coclass GrantorGranteeTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

@@ -1,0 +1,27 @@
+HKCR
+{
+	AFSelectors.SpatialContentBasedAS.1 = s 'SpatialContentBasedAS Class'
+	{
+		CLSID = s '{52532A8A-C84F-400E-A2E4-299C9B93238E}'
+	}
+	AFSelectors.SpatialContentBasedAS = s 'SpatialContentBasedAS Class'
+	{
+		CLSID = s '{52532A8A-C84F-400E-A2E4-299C9B93238E}'
+		CurVer = s 'AFSelectors.SpatialContentBasedAS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {52532A8A-C84F-400E-A2E4-299C9B93238E} = s 'SpatialContentBasedAS Class'
+		{
+			ProgID = s 'AFSelectors.SpatialContentBasedAS.1'
+			VersionIndependentProgID = s 'AFSelectors.SpatialContentBasedAS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

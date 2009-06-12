@@ -1,0 +1,2 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set003\Images\AFF;<SourceDocName>.voa;K:\Common\Engineering\Sample Files\FNTI\CA - Bay\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav

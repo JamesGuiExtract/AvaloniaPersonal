@@ -1,0 +1,262 @@
+// UCLIDGenericDisplay.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (GenericDisplay.tlb) that will become a resource in
+// GenericDisplay.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(14981573-9117-11D4-9725-008048FBC96E), version(1.0),
+  helpfile("UCLIDGenericDisplay.hlp"),
+  helpstring("UCLIDGenericDisplay ActiveX Control module"),
+  control ]
+library UCLIDGENERICDISPLAYLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	typedef
+	[
+		uuid(5F96BB2E-A856-41ca-9116-D3D0457707B3), 
+		helpstring("Rubberband Types")
+	]
+	enum
+	{
+		kNoRubberbandType = 0,
+		kLineRubberband=1,
+		kRectRubberband=2,
+		kPolygonRubberband=3
+	}ERubberbandType;
+
+	typedef
+	[
+		uuid(21C8F65F-D13B-417a-94CF-64813E21C477), 
+		helpstring("Zone Creation Types")
+	]
+	enum
+	{
+		kNoZoneType = 0,
+		kAnyAngleZone=1,
+		kRectZone=2
+	}EZoneEntityCreationType;
+	//  Primary dispatch interface for CGenericDisplayCtrl
+
+	typedef
+	[
+		uuid(A76B7069-E178-4432-9DC5-6A21AB02AF08),
+		helpstring("Auto Fitting Mode")
+	]
+	enum
+	{
+		kNever,
+		kOnCtrlDown,
+		kAlways
+	}EFittingMode;
+
+	[ uuid(14981574-9117-11D4-9725-008048FBC96E),
+	  helpstring("Dispatch interface for UCLIDGenericDisplay Control"), hidden ]
+	dispinterface _DUCLIDGenericDisplay
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CGenericDisplayCtrl)
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CGenericDisplayCtrl)
+			[id(1)] void setDefaultUnits(BSTR zDefaultUnits);
+			[id(2)] void zoomPush();
+			[id(3)] void zoomPop();
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: Zoom the image to fit to the page of the window
+			// REQUIRE: Image must have been loaded
+			// PROMISE: The image will fit to the page of the window
+			[id(4)] void zoomExtents();
+			[id(5)] void zoomCenter(double dCenterX, double dCenterY);
+			[id(6)] void zoomWindow(double dBottomLeftX, double dBottomLeftY, double dTopRightX, double dTopRightY, long* pnFitStatus);
+			[id(7)] void setImage(BSTR zImageFileName);
+			[id(8)] void setScaleFactor(double dScaleFactor);
+			[id(9)] double getScaleFactor();
+			[id(10)] void setStatusBarText(BSTR zStatusBarText);
+			[id(11)] void setRubberbandingParameters(ERubberbandType eRubberbandType, double dStartPointX, double dStartPointY);
+			[id(12)] void enableRubberbanding(BOOL bValue);
+			[id(13)] void deleteEntity(long ulEntityID);
+			[id(14)] void clear();
+			[id(15)] BSTR getEntityAttributes(long ulEntityID);
+			[id(16)] void modifyEntityAttribute(long ulEntityID, BSTR zAttributeName, BSTR zNewValue);
+			[id(17)] void addEntityAttribute(long ulEntityID, BSTR zAttributeName, BSTR zValue);
+			[id(18)] void deleteEntityAttribute(long ulEntityID, BSTR zAttributeName);
+			[id(19)] OLE_COLOR getEntityColor(long ulEntityID);
+			[id(20)] void setEntityColor(long ulEntityID, OLE_COLOR newColor);
+			[id(21)] BSTR getEntityType(long ulEntityID);
+			[id(22)] void moveEntityBy(long ulEntityID, double dX, double dY);
+			[id(23)] long getEntityNearestTo(double dX, double dY, double* rDistance);
+			[id(24)] void selectEntity(long ulEntityID, BOOL bSelect);
+			[id(25)] void selectAllEntities(BOOL bSelect);
+			[id(26)] BSTR getSelectedEntities();
+			[id(27)] void setEntityText(long ulTextEntityID, BSTR zNewText);
+			[id(28)] BSTR queryEntities(BSTR zQuery);
+			[id(29)] BSTR getEntityText(long ulTextEntityID);
+			[id(30)] void getCurrentViewExtents(double* rdBottomLeftX, double* rdBottomLeftY, double* rdTopRightX, double* rdTopRightY);
+			[id(31)] void getEntityExtents(long ulEntityID, double* rdBottomLeftX, double* rdBottomLeftY, double* rdTopRightX, double* rdTopRightY);
+			[id(32)] BSTR getDefaultUnits();
+			[id(33)] BSTR getImageName();
+			[id(34)] BSTR getStatusBarText();
+			[id(35)] BOOL isRubberbandingEnabled();
+			[id(36)] BOOL getRubberbandingParameters(ERubberbandType* eRubberbandType, double* dStartPointX, double* dStartPointY);
+			[id(37)] void convertWorldToImagePixelCoords(double dWorldX, double dWorldY, long* rulImagePixelPosX, long* rulImagePixelPosY, long nPageNum);
+			[id(38)] void convertImagePixelToWorldCoords(long ulImagePixelPosX, long ulImagePixelPosY, double* rdWorldX, double* rdWorldY, long nPageNum);
+			[id(39)] void getImageExtents(double* dWidth, double* dHeight);
+			[id(40)] void setZoomFactor(double dZoomFactor);
+			[id(41)] double getZoomFactor();
+			[id(42)] void zoomIn(long* pnFitStatus);
+			[id(43)] void zoomOut(long* pnFitStatus);
+			[id(44)] void enableEntitySelection(BOOL bEnable);
+			[id(45)] BOOL isEntitySelectionEnabled();
+			[id(46)] void enableZoneEntityCreation(BOOL bEnable);
+			[id(47)] BOOL isZoneEntityCreationEnabled();
+			[id(48)] void getZoneEntityParameters(long nZoneEntityID, long* rulStartPosX, long* rulStartPosY, long* rulEndPosX, long* rulEndPosY, long* rulTotalZoneHeight);
+			[id(49)] void setMinZoneWidth(long ulMinZoneWidth);
+			[id(50)] long getMinZoneWidth();
+			[id(51)] void setZoneHighlightHeight(long ulNewHeight);
+			[id(52)] long getZoneHighlightHeight();
+			[id(53)] void setZoneHighlightColor(OLE_COLOR newColor);
+			[id(54)] OLE_COLOR getZoneHighlightColor();
+			[id(55)] void convertWorldToClientWindowPixelCoords(double dWorldX, double dWorldY, long* rulClientWndPosX, long* rulClientWndPosY, long nPageNum);
+			[id(56)] void convertClientWindowPixelToWorldCoords(long ulClientWndPosX, long ulClientWndPosY, double* rdWorldX, double* rdWorldY, long nPageNum);
+			[id(57)] void zoomInAroundPoint(double dX, double dY);
+			[id(58)] void zoomOutAroundPoint(double dX, double dY);
+			[id(59)] void setXYTrackingOption(long iTrackingOption);
+			[id(60)] boolean documentIsModified();
+			[id(61)] long getCurrentPageNumber();
+			[id(62)] void setCurrentPageNumber(long ulPageNumber);
+			[id(63)] long getTotalPages();
+			[id(64)] BSTR getEntityAttributeValue(long ulEntityID, BSTR zAttributeName);
+			[id(65)] BSTR getEntityInfo(long nEntityID);
+			[id(66)] long addCurveEntity(double dCenterX, double dCenterY, double dRadius, double dStartAngle, double dEndAngle, long nPageNum);
+			[id(67)] long addLineEntity(double dStartPointX, double dStartPointY, double dEndPointX, double dEndPointY, long nPageNum);
+			[id(68)] long addSpecializedCircleEntity(double dCenterX, double dCenterY, long nPercentRadius, long nPageNum);
+			[id(69)] long addTextEntity(double dInsertionPointX, double dInsertionPointY, BSTR zText, short ucAlignment, double dRotationInDegrees, double dHeight, BSTR zFontName, long nPageNum);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: To add a zone entity to the display
+			// NOTES:	If bFill == TRUE, then zone will be filled with the entity
+			//			color.
+			//			If bBorderVisible == TRUE, then the zone will be outlined 
+			//			with a border of color borderColor.
+			[id(70)] long addZoneEntity(long ulStartPosX, long ulStartPosY, long ulEndPosX, long ulEndPosY, long ulTotalZoneHeight, long nPageNum, BOOL bFill, BOOL bBorderVisible, OLE_COLOR borderColor);
+			//--------------------------------------------------------------------------------------
+			[id(71)] double getBaseRotation(long nPageNum);
+			[id(72)] void setBaseRotation(long nPageNum, double dBaseRotation);
+			[id(73)] void setDocumentModified(BOOL bModified);
+			[id(74)] void setCursorHandle(OLE_HANDLE* hCursor);
+			[id(75)] void extractZoneEntityImage(long nZoneEntityID, BSTR strFileName);
+			[id(76)] void extractZoneImage(long nX1, long nY1, long nX2, long nY2, long nHeight, long nPageNum, BSTR strFileName);
+			[id(77)] void getCurrentPageSize(long *pWidth, long *pHeight);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: Methods to read/write the zone border related settings of zone entities
+			[id(78)] BOOL isZoneBorderVisible(long ulZoneEntityID);
+			[id(79)] void showZoneBorder(long ulZoneEntityID, BOOL bShow);
+			[id(80)] OLE_COLOR getZoneBorderColor(long ulZoneEntityID);
+			[id(81)] void setZoneBorderColor(long ulZoneEntityID, OLE_COLOR newColor);
+			[id(82)] BOOL isZoneFilled(long ulZoneEntityID);
+			[id(83)] void setZoneFilled(long ulZoneEntityID, BOOL bFilled);
+			//--------------------------------------------------------------------------------------
+			[id(84)] void setZoneEntityCreationType(EZoneEntityCreationType eType);
+			[id(85)] EZoneEntityCreationType getZoneEntityCreationType();
+			[id(86)] void setZoom(double dZoom);
+			[id(87)] double getZoom();
+			//--------------------------------------------------------------------------------------
+			// By default, zones which have borders use the PS_SOLID style
+			// Other styles can be specified for the zone border.  If the style is
+			// not PS_SOLID, then PS_GEOMETRIC is automatically OR'ed with the 
+			// provided style before drawing.
+			[id(88)] long getZoneBorderStyle(long ulZoneEntityID);
+			[id(89)] void setZoneBorderStyle(long ulZoneEntityID, long nStyle);
+			//--------------------------------------------------------------------------------------
+			// A zone that has a border can either have a "normal border" or a 
+			// "special border".  A special border is one that is equivalent to the 
+			// normal border, but additionally has 4 lines protruding from the four
+			// corners to bring emphasis to the particular zone (to indicate selection
+			// for example)
+			// Below is ASCII graphics representing normal and special borders
+			//
+			//				Normal border           Special border
+			//
+			//               .---------.             \---------/
+			//               |         |             |         |
+			//               .---------.             /---------\
+			// 
+			// 
+			[id(90)] BOOL isZoneBorderSpecial(long ulZoneEntityID);
+			[id(91)] void setZoneBorderSpecial(long ulZoneEntityID, BOOL bSpecial);
+			//--------------------------------------------------------------------------------------
+			[id(92)] long getEntityPage(long ulZoneEntityID);
+			//--------------------------------------------------------------------------------------
+			// PURPOSE: Zoom the image to fit to the width of the window
+			// REQUIRE: Image must have been loaded
+			// PROMISE: The image will fit to the width of the window
+			[id(93)] void ZoomFitToWidth();
+			// PURPOSE: Set the display percentage flag
+			// REQUIRE: Image must have been loaded
+			// PROMISE: the current X, Y coordinates percentage will be displayed on statusbar
+			// if bValue is TRUE;
+			[id(94)] void enableDisplayPercentage(BOOL bValue);
+			[id(95)] BOOL isZoneEntityAdjustmentEnabled();
+			[id(96)] void enableZoneEntityAdjustment(BOOL bEnable);
+			[id(97)] void setFittingMode(EFittingMode eFittingMode);
+			[id(98)] EFittingMode getFittingMode();
+			//-------------------------------------------------------------------------------------
+			// PURPOSE: Gets/sets the color of the border that is drawn around zone entities to
+			//          indicate selection.
+			[id(99)] void setSelectionColor(long lColor);
+			[id(100)] long getSelectionColor();
+
+			//}}AFX_ODL_METHOD
+
+			[id(DISPID_ABOUTBOX)] void AboutBox();
+	};
+
+	//  Event dispatch interface for CGenericDisplayCtrl
+
+	[ uuid(14981575-9117-11D4-9725-008048FBC96E),
+	  helpstring("Event interface for UCLIDGenericDisplay Control") ]
+	dispinterface _DUCLIDGenericDisplayEvents
+	{
+		properties:
+			//  Event interface has no properties
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CGenericDisplayCtrl)
+			[id(DISPID_CLICK)] void Click();
+			[id(DISPID_DBLCLICK)] void DblClick();
+			[id(DISPID_KEYDOWN)] void KeyDown(short* KeyCode, short Shift);
+			[id(DISPID_KEYUP)] void KeyUp(short* KeyCode, short Shift);
+			[id(DISPID_KEYPRESS)] void KeyPress(short* KeyAscii);
+			[id(DISPID_MOUSEMOVE)] void MouseMove(short Button, short Shift, OLE_XPOS_PIXELS x, OLE_YPOS_PIXELS y);
+			[id(DISPID_MOUSEDOWN)] void MouseDown(short Button, short Shift, OLE_XPOS_PIXELS x, OLE_YPOS_PIXELS y);
+			[id(DISPID_MOUSEUP)] void MouseUp(short Button, short Shift, OLE_XPOS_PIXELS x, OLE_YPOS_PIXELS y);
+			[id(1)] void EntitySelected(long ulEntityID);
+			[id(3)] void MouseWheel(long wParam, long lParam);
+			[id(4)] void ZoneEntityMoved(long ulEntityID);
+			[id(5)] void ZoneEntitiesCreated(IUnknown* pZoneIDs);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CGenericDisplayCtrl
+
+	[ uuid(14981576-9117-11D4-9725-008048FBC96E),
+	  helpstring("UCLIDGenericDisplay Control"), control ]
+	coclass UCLIDGenericDisplay
+	{
+		[default] dispinterface _DUCLIDGenericDisplay;
+		[default, source] dispinterface _DUCLIDGenericDisplayEvents;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

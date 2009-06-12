@@ -1,0 +1,44 @@
+//A "true" condition and "The document type must match" are tested for Doctype condition
+//with a single document type selected at "probable" level. 
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test1.eav
+
+//A "true" condition and "The document type must match" are tested for Doctype condition
+//with multiple document types selected at "maybe" level.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test2.eav
+
+//A "true" condition and "The document type must not match" are tested for Doctype condition
+//with multiple document types selected at "maybe" level.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test3.eav
+
+//A "false" condition and "The document type must match" are tested for Doctype condition with multiple document types selected
+//at "sure" level.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test4.eav
+
+//A "false" condition and "The document type must not match" are tested for Doctype condition with
+//multiple document types selected at "sure" level.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test5.eav
+
+//A "true" condition that is evaluated to be true is tested for RSDFile condition.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test6.eav
+
+//A "true" condition that is evaluated to be false is tested for RSDFile condition.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test7.eav
+
+//A "false" condition that is evaluated to be false is tested for RSDFile condition.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test8.eav
+
+//A "false" condition that is evaluated to be true is tested for RSDFile condition. 
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test9.eav
+
+//A "true" condition and "The document type must not match" are tested for Doctype condition
+//with a single document type at the "probable" level.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test10.eav
+
+//A "false" condition and "The document type must match" are tested for Doctype condition with multiple document types selected
+//at "sure" level.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test11.eav
+
+//A "false" condition and "The document type must not match" are tested for Doctype condition with multiple document types selected
+//at "sure" level.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\images\image1.tif.uss;;Test12.eav
+ 

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFCore.AttributeFindInfo.1 = s 'AttributeFindInfo Class'
+	{
+		CLSID = s '{17C3100D-3464-4EC4-A18E-198DDA0E618E}'
+	}
+	UCLIDAFCore.AttributeFindInfo = s 'AttributeFindInfo Class'
+	{
+		CLSID = s '{17C3100D-3464-4EC4-A18E-198DDA0E618E}'
+		CurVer = s 'UCLIDAFCore.AttributeFindInfo.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {17C3100D-3464-4EC4-A18E-198DDA0E618E} = s 'AttributeFindInfo Class'
+		{
+			ProgID = s 'UCLIDAFCore.AttributeFindInfo.1'
+			VersionIndependentProgID = s 'UCLIDAFCore.AttributeFindInfo'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

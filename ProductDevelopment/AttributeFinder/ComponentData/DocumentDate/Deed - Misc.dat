@@ -1,0 +1,20 @@
+// *******
+// Imports
+// *******
+
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED\B06172AA.AKW.TIF.uss
+DEED_DOCDATE_01=this^3~deed^8~made^3~this^?DocumentDate^50~between
+[PATTERNS_END]
+

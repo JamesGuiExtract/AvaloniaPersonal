@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.FAMDBUtils.1 = s 'FAMDBUtils Class'
+	{
+		CLSID = s '{A7BD9DDF-04BC-46f3-9965-26E9AEF06091}'
+	}
+	UCLIDFileProcessing.FAMDBUtils = s 'FAMDBUtils Class'
+	{
+		CLSID = s '{A7BD9DDF-04BC-46f3-9965-26E9AEF06091}'
+		CurVer = s 'UCLIDFileProcessing.FAMDBUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A7BD9DDF-04BC-46f3-9965-26E9AEF06091} = s 'FAMDBUtils Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.FAMDBUtils.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.FAMDBUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

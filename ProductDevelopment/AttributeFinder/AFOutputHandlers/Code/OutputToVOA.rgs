@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.OutputToVOA.1 = s 'OutputToVOA Class'
+	{
+		CLSID = s '{56E2060E-164C-4E9D-BE70-3889404E49A7}'
+	}
+	UCLIDAFOutputHandlers.OutputToVOA = s 'OutputToVOA Class'
+	{
+		CLSID = s '{56E2060E-164C-4E9D-BE70-3889404E49A7}'
+		CurVer = s 'UCLIDAFOutputHandlers.OutputToVOA.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {56E2060E-164C-4E9D-BE70-3889404E49A7} = s 'OutputToVOA Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.OutputToVOA.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.OutputToVOA'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

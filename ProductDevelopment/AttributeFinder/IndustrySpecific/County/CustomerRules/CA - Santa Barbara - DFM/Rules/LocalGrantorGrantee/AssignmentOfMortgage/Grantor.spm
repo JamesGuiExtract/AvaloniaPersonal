@@ -1,0 +1,57 @@
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0064138.tif.uss
+rule00=In witness whereof this instrument is executed^?Grantor^100~AS NOMINEE FOR^?Grantor2^100~FSB ITS SUCCESSORS
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0064431.tif
+rule01=FOR GOOD AND VALUABLE CONSIDERATION^6~the^4~receipt^4~and^4~sufficiency^4~of^4~which^4~is^4~hereby^6~acknowledged^?Grantor^100~as successor-in-interest to^?Grantor2^100~whose address is
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065409.tif
+rule02=FOR VALUABLE CONSIDERATION^?Grantor^150~existing under the laws
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0055162.tif
+//same as rule02
+//rule03=FOR VALUABLE CONSIDERATION^?Grantor^150~existing under the laws
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0059468.tif
+rule04=Mortgage Pass-Through Certificates^4~Series^80~[BY]^?Grantor^150~SERVICING ATTORNEY IN FACT
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0056696.tif
+rule05=For Value Received^?Grantor^150~A CALIFORNIA CORPORATION
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0061580.tif
+rule06=AS ATTORNEY IN FACT FOR^?Grantor^150~[On]
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0058994.tif
+rule07=This ASSIGNMENT OF DEED OF TRUST is made and entered into^30~day of^80~from^?Grantor^180~whose address^180~assigns, as nominee for^?Grantor2^180~its successors and assigns
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0060056.tif
+rule08=who is the Assistant Secretary of^?Grantor^180~AS NOMINEE FOR^?Grantor2^180~DBA^?Grantor3^180~who proved to me on the basis of satisfactory evidence to be the person
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065506.tif
+rule09=Beneficiary:^?Grantor^180~ACTING SOLELY AS^6~NOMINEE FOR^?Grantor2^180~Document Date
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065501.tif
+rule10=AGREEMENT AND FIXTURE FILING^?Grantor^180~a California corporation
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065097.tif.uss
+rule11="ASSIGNOR"|ASSIGNOR:^?Grantor^100~[a Oregon|[a Delaware|[a California|[a Wisconsin
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #4\ATDE-Atty in Fact\2009-0008312.tif
+rule17=good^6~valuable^6~consideration^25~sufficiency^25~hereby^6~acknowledged^6~undersigned^100~AS^4~ATTORNEY^2~IN^2~FACT^2~FOR^?Grantor^100~WHOSE ADDRESS
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0055460.tif
+rule13=good^6~valuable^6~consideration^25~sufficiency^25~hereby^6~acknowledged^6~undersigned^?Grantor13^(assignor
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065555.tif
+rule14=good^6~valuable^6~consideration^25~sufficiency^50~hereby^6~acknowledged^?Grantor14^[does^25~present
+
+rule15=for^6~value^6~received^?Grantor15^hereby^25~grant|assign|transfer
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065500.tif
+rule16=Assignment^6~Security^6~Instrument^?Grantor^a Utah
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0064722.tif.uss
+rule12=personally appeared^?Grantor^100~who proved to me on the basis of satisfactory evidence to be the
+
+[PATTERNS_END]

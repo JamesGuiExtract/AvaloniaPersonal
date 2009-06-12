@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMLM.UCLIDComponentLM.1 = s 'UCLIDComponentLM Class'
+	{
+		CLSID = s '{E129D8F2-E327-4FC1-8CBC-977FA876EFC2}'
+	}
+	UCLIDCOMLM.UCLIDComponentLM = s 'UCLIDComponentLM Class'
+	{
+		CLSID = s '{E129D8F2-E327-4FC1-8CBC-977FA876EFC2}'
+		CurVer = s 'UCLIDCOMLM.UCLIDComponentLM.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E129D8F2-E327-4FC1-8CBC-977FA876EFC2} = s 'UCLIDComponentLM Class'
+		{
+			ProgID = s 'UCLIDCOMLM.UCLIDComponentLM.1'
+			VersionIndependentProgID = s 'UCLIDCOMLM.UCLIDComponentLM'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}'
+		}
+	}
+}

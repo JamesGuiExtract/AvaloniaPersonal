@@ -1,0 +1,50 @@
+<HTML>
+	<HEAD>
+		<TITLE>Long Integer and Short Integer Input Validators</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Long Integer and Short Integer Input Validators</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Long Integer and Short Integer input validators are used in conjunction with the Remove Invalid Entries output handler to remove invalid integer numbers from the output of the rules.</li>
+			<li>The Short Integer input validator will mark any string that is not a well-formed integer as invalid.</li>
+			<li>The Long Integer input validator is similar to the Short Integer input validator; however, it has more configuration options.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>The Short Integer input validator has no configuration options.</li>
+			<li>The Long Integer input validator has the following configuration options:</li>
+				<ul>
+					<li>You have the option of setting a minimum number.</li>
+						<ul>
+							<li>Numbers less than the minimum number will be flagged as "invalid".</li>
+							<li>You can choose whether or not the minimum number itself is valid.</li>
+						</ul>
+					</li>
+					<li>You also have the option of setting a maximum number.</li>
+						<ul>
+							<li>Numbers greater than the maximum number will be flagged as "invalid".</li>
+							<li>You can choose whether or not the maximum number itself is valid.</li>
+						</ul>
+					</li>
+					<li>You can choose to make zero an invalid number.</li>
+					<li>You can choose to make negative numbers invalid.</li>
+				</ul>
+			</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open <b>Numbers.rsd</b> and run it on <b>Numbers.txt</b>.
+				<ul>
+					<li>Add a Short Integer input validator and a Remove Invalid Entries output handler to the rules.</li>
+					<li>Run the rules again and notice the difference in output.</li>
+				</ul>
+			</li>
+			<li>Add a Long Integer input validator to <b>Numbers.rsd</b> that will remove all invalid integers and all negative numbers.  Test the rules on <b>Numbers.txt</b>.</li>
+		</ol>
+	</BODY>
+</HTML>

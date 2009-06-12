@@ -1,0 +1,332 @@
+// UCLIDImageUtils.idl : IDL source for UCLIDImageUtils.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDImageUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D46831E6-669C-423F-8209-D6A7A80C2ADD),
+	version(1.0),
+	helpstring("UCLID ImageUtils 1.0 Type Library")
+]
+
+library UCLID_IMAGEUTILSLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(2EC731E6-8041-4441-B3E5-FD28C42EF92B),
+		dual,
+		nonextensible,
+		helpstring("IImageStats Interface"),
+		pointer_default(unique)
+	]
+	interface IImageStats : IDispatch
+	{
+		[propget, id(1), helpstring("property FGPixelsInRow")] HRESULT FGPixelsInRow([out, retval] IVariantVector ** pVal);
+		[propput, id(1), helpstring("property FGPixelsInRow")] HRESULT FGPixelsInRow([in] IVariantVector * newVal);
+		[propget, id(2), helpstring("property FGColor")] HRESULT FGColor([out, retval] COLORREF* pVal);
+		[propput, id(2), helpstring("property FGColor")] HRESULT FGColor([in] COLORREF newVal);
+		[propget, id(3), helpstring("property Width")] HRESULT Width([out, retval] long* pVal);
+		[propput, id(3), helpstring("property Width")] HRESULT Width([in] long newVal);
+		[propget, id(4), helpstring("property Height")] HRESULT Height([out, retval] long* pVal);
+		[propput, id(4), helpstring("property Height")] HRESULT Height([in] long newVal);
+	};
+
+	[
+		object,
+		uuid(753E5E3E-4852-42C2-8CCF-134084696ABA),
+		dual,
+		helpstring("IImageUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IImageUtils : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		[id(1), helpstring("method CreateMultiPageImage")] HRESULT CreateMultiPageImage([in] IVariantVector *pvecSinglePageImages, [in] BSTR strOutputImageFileName);
+		//-----------------------------------------------------------------------------------------
+		[id(2), helpstring("method IsMultiPageImage")] HRESULT IsMultiPageImage([in] BSTR strImageFileName, [out, retval] VARIANT_BOOL *pResult );
+		//-----------------------------------------------------------------------------------------
+		// Interprets the string of specified page numbers and returns a vector of page numbers for the current image.
+		// strImageFileName - the image file name
+		// strSpecificPages - a string containing specified page numbers. Valid format: single page (eg. 2, 5),
+		// a range of pages (eg. 3-9), last X number of pages (eg. -3). They are seperated by comma(,).
+		[id(6), helpstring("method GetImagePageNumbers")] HRESULT GetImagePageNumbers([in] BSTR strImageFileName, 
+			[in] BSTR strSpecificPages, [out, retval] IVariantVector **pvecPageNumbers);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	This method checks the given ImageStats struct and returns True if there are nConsecutiveLines of
+		//			with the percent of foreground pixels falls between nMinPercent and nMaxPercent
+		[id(7), helpstring("method IsTextInZone")] HRESULT IsTextInZone( [in] IImageStats *pImageStats, 
+			[in] long nConsecutiveRows, [in] long nMinPercent, [in] long nMaxPercent, 
+			[out, retval] VARIANT_BOOL *pResult);
+		//-----------------------------------------------------------------------------------------
+		[id(8), helpstring("method GetImageStats")] HRESULT GetImageStats([in] BSTR strImage, 
+			[in] IRasterZone * pRaster, [out,retval] IImageStats ** ppImageStats);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	This method applies the redaction areas specified by pZones in strImage and 
+		//          saves the result as annotations in strOutputImage.
+		// REQUIRE: Annotations must be licensed if vbRetainAnnotations or vbApplyAsAnnotations 
+		//          are VARIANT_TRUE.
+		// PARAMS:  strImage - The full path to the input (unredacted) image.
+		//          strOutputImage - The full path to output (redacted) image.
+		//          pZones - An IIUnknownVector of RasterZones where the redactions will be drawn.
+		//          lFillColor - The RGB fill color for all redactions.
+		//          lBorderColor - The RGB border color for all redactions.
+		//          strText - The text to print on all redactions.
+		//          lTextColor - The color of the text to print on all redactions.
+		//          vbRetainAnnotations - VARIANT_TRUE if annotations existing in strImage should 
+		//          be retained; VARIANT_FALSE if they should be discarded.
+		//          vbApplyAsAnnotations - VARIANT_TRUE if redactions should be drawn as tiff 
+		//          annotations; VARIANT_FALSE if redactions should be drawn directly to image.
+		/*[id(10), helpstring("method RedactImageArea")] HRESULT RedactImageArea(
+			[in] BSTR strImage, [in] BSTR strOutputImage, [in] IIUnknownVector *pZones,
+			[in] long lFillColor, [in] long lBorderColor, [in] BSTR strText, 
+			[in] long lTextColor, [in] VARIANT_BOOL vbRetainAnnotations, 
+			[in] VARIANT_BOOL vbApplyAsAnnotations);*/
+	};
+
+	[
+		object,
+		uuid(2F361275-389F-4596-A4A0-139CC0CB63E5),
+		dual,
+		nonextensible,
+		helpstring("IImageLineUtility Interface"),
+		pointer_default(unique)
+	]
+	interface IImageLineUtility : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Will provide IIUnknownVectors of ILongRectangles representing the lines found
+		//			on the specified page of the specified image.  
+		// ARGS:	bstrImageFileName- The filename of the document to be searched
+		//			nPageNum- The page number of the specified document to search
+		//			dRotation- The number of degrees (clockwise) to rotate the image prior to
+		//				searching for lines.
+		//			ppHorzLineRects - If supplied (non-NULL), following the call it will 
+		//				point to an IUnknownVectorPtr of ILongRectanglePtrs representing horizontal lines
+		//				on the page.
+		//			ppVertLineRects - If supplied (non-NULL), following the call it will 
+		//				point to an IUnknownVectorPtr of ILongRectanglePtrs representing horizontal lines
+		//				on the page.
+		[id(1), helpstring("method FindLines")] HRESULT FindLines([in] BSTR bstrImageFileName, 
+			[in] long nPageNum, [in] double dRotation, [in, out] IIUnknownVector **ppHorzLineRects, 
+			[in, out] IIUnknownVector **ppVertLineRects);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Will return an IIUnknownVector of ILongRectangles representing line image areas
+		//			formed by lines grouped according to this interface's properties
+		// ARGS:	bstrImageFileName- The filename of the document to be searched
+		//			nPageNum- The page number of the specified document to search
+		//			dRotation- The number of degrees (clockwise) to rotate the image prior to
+		//				searching for line regions. 
+		//			bHorizontal- VARIANT_TRUE to search for horizontal lines. VARIANT_FALSE to search
+		//				for vertical lines.  VARIANT_FALSE is currently unsupported.
+		//			ppSubLineRects- Can be NULL.  If specified, it is used to receive the lines
+		//				that make up each image area in the form of an IIUnknownVector of IIUnknownVectors
+		//				each of which containing ILongRectangles.  Each outside vector corresponds to the 
+		//				ILongRectangle at the same index index in the return value (ppGroupRects) except
+		//				the last vector which is a collection of all lines in the document whether they
+		//				belong to line areas or not
+		///			ppGroupRects- An IIUnknownVector to receive the resulting vector of ILongRectangles
+		[id(2), helpstring("method FindLineRegions")] HRESULT FindLineRegions([in] BSTR bstrImageFileName, 
+			[in] long nPageNum, [in] double dRotation, [in] VARIANT_BOOL bHorizontal, 
+			[in, out] IIUnknownVector **ppSubLineRects, [out, retval] IIUnknownVector **ppGroupRects);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To find a box made up of any of the provided lines that contains the specified
+		//			area of the page.
+		// ARGS:	pRect- ILongRectangle that should be substantially enclosed in any resulting box
+		//			pHorzLineRects- An IUnknownVector of ILongRectangles representing the horizontal
+		//				lines on the page.
+		//			pVertLineRects- An IUnknownVector of ILongRectangles representing the vertical
+		//				lines on the page.
+		//			nRequiredMatchingBoundaries- The number of boundaries of pRect that must line
+		//				up with the boundaries of any resulting box.
+		//			pbIncompleteResult- VARIANT_FALSE indicates the algorithm did not fully complete
+		//				processing.  While the results may still be useful, they also may not
+		//				be as accurate as they otherwise would.
+		// RETURNS: ppBoxRect- An ILongRectangle representing the bounds of a qualifying box
+		[id(30), helpstring("method FindBoxContainingRect")] HRESULT FindBoxContainingRect(
+			[in] ILongRectangle *pRect, [in] IIUnknownVector *pHorzLineRects, 
+			[in] IIUnknownVector *pVertLineRects, [in] long nRequiredMatchingBoundaries,
+			[out] VARIANT_BOOL *pbIncompleteResult, [out, retval] ILongRectangle **ppBoxRect);
+		//-----------------------------------------------------------------------------------------
+		// The minimum line length to search for, specified in thousandths of an inch. This is a member of 
+		// LeadTools' LINEREMOVE structure
+		[propget, id(3), helpstring("property LineLengthMin")] HRESULT LineLengthMin([out, retval] long* pVal);
+		[propput, id(3), helpstring("property LineLengthMin")] HRESULT LineLengthMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum line thickness to search for, specified in thousandths of an inch. This is a member of 
+		// LeadTools' LINEREMOVE structure.  In general, specifying a bigger thickeness tends
+		// to allow lines at greater slopes to be detected.
+		[propget, id(4), helpstring("property LineThicknessMax")] HRESULT LineThicknessMax([out, retval] long* pVal);
+		[propput, id(4), helpstring("property LineThicknessMax")] HRESULT LineThicknessMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum allowable gap in a line to be found via LeadTool's API.  Specified in thousandths
+		// of an inch.  This is a member of LeadTools' LINEREMOVE structure
+		[propget, id(5), helpstring("property LineGapMax")] HRESULT LineGapMax([out, retval] long* pVal);
+		[propput, id(5), helpstring("property LineGapMax")] HRESULT LineGapMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum allowable variance in line width of a line to be found via LeadTool's API.  
+		// Specified in thousandths of an inch.  This is a member of LeadTools' LINEREMOVE structure.
+		[propget, id(6), helpstring("property LineVarianceMax")] HRESULT LineVarianceMax([out, retval] long* pVal);
+		[propput, id(6), helpstring("property LineVarianceMax")] HRESULT LineVarianceMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The line thickness that qualifies a particular slice of a line as a wall. Specified in thousandths
+		// of an inch.  This is a member of LeadTools' LINEREMOVE structure.
+		[propget, id(7), helpstring("property LineWall")] HRESULT LineWall([out, retval] long* pVal);
+		[propput, id(7), helpstring("property LineWall")] HRESULT LineWall([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum percentage of a line to be found via LeadTools' API that qualifies as a wall.
+		// This is a member of LeadTools' LINEREMOVE structure
+		[propget, id(8), helpstring("property LineWallPercentMax")] HRESULT LineWallPercentMax([out, retval] long* pVal);
+		[propput, id(8), helpstring("property LineWallPercentMax")] HRESULT LineWallPercentMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Line gaps up to this length will be bridged given they are sufficiently aligned (adjustable via
+		// the LineVarianceMax parameter)
+		[propget, id(9), helpstring("property LineBridgeGap")] HRESULT LineBridgeGap([out, retval] long* pVal);
+		[propput, id(9), helpstring("property LineBridgeGap")] HRESULT LineBridgeGap([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// If VARIANT_TRUE, post-processing will be performed following the LeadTool's call to find lines
+		// in an attempt to extend lines that were not completely included in result of the initial call.
+		[propget, id(10), helpstring("property ExtendLineFragments")] HRESULT ExtendLineFragments([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(10), helpstring("property ExtendLineFragments")] HRESULT ExtendLineFragments([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// For ExtendLinesFragments: The width (in pixels) of the area to scan for line extensions
+		// This is intended to be a odd number (1,3,5...) so that the scan area extends equa-distance
+		// on either side the center of the line that is being tracked
+		[propget, id(11), helpstring("property ExtensionScanWidth")] HRESULT ExtensionScanWidth([out, retval] long* pVal);
+		[propput, id(11), helpstring("property ExtensionScanWidth")] HRESULT ExtensionScanWidth([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// For ExtendLinesFragments: When white pixels are found, the scan will begin jumping ahead
+		// at greater distances goverened by this setting.  Can be 0 - 100.  If zero, the scan will
+		// continue to look one pixel at a time even when white pixels are found.  If 100, for each
+		// consecutive white pixel found, the scan will skip ahead an additional pixel.  For example,
+		// a scan may search x pos 1000, 1001, 1003, 1006, 1010, 1015.  Once a black pixel is found, 
+		// it will immediately revert to scanning ahead one pixel at a time.
+		[propget, id(12), helpstring("property ExtensionTelescoping")] HRESULT ExtensionTelescoping([out, retval] long* pVal);
+		[propput, id(12), helpstring("property ExtensionTelescoping")] HRESULT ExtensionTelescoping([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// For ExtendLinesFragments: The number of white pixels that can be found before the scan
+		// is aborted.  This count is "paused" every time a black pixel is found and reset every 
+		// time the ConsecutiveMinimum is reached
+		[propget, id(13), helpstring("property ExtensionGapAllowance")] HRESULT ExtensionGapAllowance([out, retval] long* pVal);
+		[propput, id(13), helpstring("property ExtensionGapAllowance")] HRESULT ExtensionGapAllowance([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// For ExtendLinesFragments: The number of consecutive black pixels that must eventually be
+		// found to qualify a line for extension.
+		[propget, id(14), helpstring("property ExtensionConsecutiveMin")] HRESULT ExtensionConsecutiveMin([out, retval] long* pVal);
+		[propput, id(14), helpstring("property ExtensionConsecutiveMin")] HRESULT ExtensionConsecutiveMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Minimum number of lines per column
+		[propget, id(15), helpstring("property RowCountMin")] HRESULT RowCountMin([out, retval] long* pVal);
+		[propput, id(15), helpstring("property RowCountMin")] HRESULT RowCountMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Maximum number of lines per column (accepts -1 for unspecified)
+		[propget, id(16), helpstring("property RowCountMax")] HRESULT RowCountMax([out, retval] long* pVal);
+		[propput, id(16), helpstring("property RowCountMax")] HRESULT RowCountMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Minimum number of columns per area (accepts -1 for unspecified)
+		[propget, id(17), helpstring("property ColumnCountMin")] HRESULT ColumnCountMin([out, retval] long* pVal);
+		[propput, id(17), helpstring("property ColumnCountMin")] HRESULT ColumnCountMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Maximum number of columns per area (accepts -1 for unspecified)
+		[propget, id(18), helpstring("property ColumnCountMax")] HRESULT ColumnCountMax([out, retval] long* pVal);
+		[propput, id(18), helpstring("property ColumnCountMax")] HRESULT ColumnCountMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The minimun required width of a column in pixels (accepts -1 for unspecified)
+		[propget, id(19), helpstring("property ColumnWidthMin")] HRESULT ColumnWidthMin([out, retval] long* pVal);
+		[propput, id(19), helpstring("property ColumnWidthMin")] HRESULT ColumnWidthMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum allowed width of a column in pixels (accepts -1 for unspecified)
+		[propget, id(20), helpstring("property ColumnWidthMax")] HRESULT ColumnWidthMax([out, retval] long* pVal);
+		[propput, id(20), helpstring("property ColumnWidthMax")] HRESULT ColumnWidthMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The overall required width of an area in pixels (accepts -1 for unspecified)
+		[propget, id(21), helpstring("property OverallWidthMin")] HRESULT OverallWidthMin([out, retval] long* pVal);
+		[propput, id(21), helpstring("property OverallWidthMin")] HRESULT OverallWidthMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The overall allowed width of an area in pixels (accepts -1 for unspecified)
+		[propget, id(22), helpstring("property OverallWidthMax")] HRESULT OverallWidthMax([out, retval] long* pVal);
+		[propput, id(22), helpstring("property OverallWidthMax")] HRESULT OverallWidthMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The minimum required spacing between lines in pixels (accepts -1 for unspecified)
+		[propget, id(23), helpstring("property LineSpacingMin")] HRESULT LineSpacingMin([out, retval] long* pVal);
+		[propput, id(23), helpstring("property LineSpacingMin")] HRESULT LineSpacingMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum allowed spacing between lines in pixels (accepts -1 for unspecified)
+		[propget, id(24), helpstring("property LineSpacingMax")] HRESULT LineSpacingMax([out, retval] long* pVal);
+		[propput, id(24), helpstring("property LineSpacingMax")] HRESULT LineSpacingMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The maximum allowed spacing between columns in pixels (accepts -1 for unspecified)
+		// Based on the area between the columns, not the overall column width
+		[propget, id(25), helpstring("property ColumnSpacingMax")] HRESULT ColumnSpacingMax([out, retval] long* pVal);
+		[propput, id(25), helpstring("property ColumnSpacingMax")] HRESULT ColumnSpacingMax([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The percentage of overlap (overlap / combined width) that must exist
+		// to be considered for grouping (0 - 100)
+		[propget, id(26), helpstring("property AlignmentScoreMin")] HRESULT AlignmentScoreMin([out, retval] long* pVal);
+		[propput, id(26), helpstring("property AlignmentScoreMin")] HRESULT AlignmentScoreMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The percentage of overlap (overlap / combined width) that must exist
+		// to overcome a spacing score of < m_nSpacingScoreExact (0 - 100)
+		[propget, id(27), helpstring("property AlignmentScoreExact")] HRESULT AlignmentScoreExact([out, retval] long* pVal);
+		[propput, id(27), helpstring("property AlignmentScoreExact")] HRESULT AlignmentScoreExact([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The similarity in line spacing (new spacing / existing spacing) that 
+		// must exist to be considered for grouping (0 - 100)
+		[propget, id(28), helpstring("property SpacingScoreMin")] HRESULT SpacingScoreMin([out, retval] long* pVal);
+		[propput, id(28), helpstring("property SpacingScoreMin")] HRESULT SpacingScoreMin([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// The similarity in line spacing (new spacing / existing spacing) that 
+		// must exist to overcome an alignment score of < m_nAlignmentScoreExact. (0 - 100)
+		[propget, id(29), helpstring("property SpacingScoreExact")] HRESULT SpacingScoreExact([out, retval] long* pVal);
+		[propput, id(29), helpstring("property SpacingScoreExact")] HRESULT SpacingScoreExact([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(330D1482-9C38-4524-9841-9ADFD604594A),
+		helpstring("ImageUtils Class")
+	]
+	coclass ImageUtils
+	{
+		[default] interface IImageUtils;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(E2938FFB-4DD0-486D-B88E-ADAD410E989F),
+		helpstring("ImageStats Class")
+	]
+	coclass ImageStats
+	{
+		[default] interface IImageStats;
+	};
+
+	[
+		uuid(4EC2DEEC-E38A-4D61-9D85-A8A0ED0DCE41),
+		helpstring("ImageLineUtility Class")
+	]
+	coclass ImageLineUtility
+	{
+		[default] interface IImageLineUtility;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+};

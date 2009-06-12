@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.LimitAsMidPartPP.1 = s 'LimitAsMidPartPP Class'
+	{
+		CLSID = s '{8EA0358C-FF01-4D36-B3C5-71205C426EEA}'
+	}
+	UCLIDAFValueModifiers.LimitAsMidPartPP = s 'LimitAsMidPartPP Class'
+	{
+		CLSID = s '{8EA0358C-FF01-4D36-B3C5-71205C426EEA}'
+		CurVer = s 'UCLIDAFValueModifiers.LimitAsMidPartPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8EA0358C-FF01-4D36-B3C5-71205C426EEA} = s 'LimitAsMidPartPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

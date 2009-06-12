@@ -1,0 +1,23 @@
+(?x) 
+
+(?#
+#--------------------------------------------
+# Various forms of "savings number", 
+# "checking number", "savings account number",
+# and "checking account number"
+#--------------------------------------------
+)
+	
+(?:\bSA?V(?:INGS?)?|CHECKI|CKING|\bCKG?)(?:[\s\S]{0,11}?(?:ACC|COUNT|ACCT))?[\s\S]{0,9}(?:NUM(?:BER)?|\bN[0O]|\#)
+
+|(?# Or...)
+	
+
+(?#
+#--------------------------------------------
+# Various forms of "bank number" and
+# "bank account number"
+#--------------------------------------------
+)
+
+BANK(?:[\s\S]{0,5}?(?:ACC|COUNT|ACCT))?[\s\S]{0,9}(?:NUM(?:BER)?|\bN[0O]|\#)

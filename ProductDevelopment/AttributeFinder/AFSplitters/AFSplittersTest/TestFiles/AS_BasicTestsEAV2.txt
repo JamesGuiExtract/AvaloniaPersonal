@@ -1,0 +1,143 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Address Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Address Splitter tests
+// Test Type: Basic test cases
+// Note that comment lines should be removed by the RSD file
+
+<TESTCASE>|No info lines|John One and Jane One\r\n123 Main Street\r\nMadison, WI  53704
+Address|John One and Jane One\r\n123 Main Street\r\nMadison, WI  53704
+.Address1|John One and Jane One
+.Address2|123 Main Street
+.City|Madison
+.State|WI
+.ZipCode|53704
+
+<TESTCASE>|Two-line address|John Two and Jane Two\r\n123 Main Street, \r\nApartment 321\r\nMadison, wi  53704
+Address|John Two and Jane Two\r\n123 Main Street, \r\nApartment 321\r\nMadison, wi  53704
+.Address1|John Two and Jane Two
+.Address2|123 Main Street
+.Address3|Apartment 321
+.City|Madison
+.State|WI
+.ZipCode|53704
+
+<TESTCASE>|Zip on single line|John Three and Jane Three\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705
+Address|John Three and Jane Three\r\n14422 Division Lane \r\nMadison, Wisconsin\r\n53705
+.Address1|John Three and Jane Three
+.Address2|14422 Division Lane
+.City|Madison
+.State|Wisconsin
+.ZipCode|53705
+
+<TESTCASE>|Two word state|John Four and Jane Four\r\n14422 Maple Court \r\nMorgantown, \r\nWest Virginia 41234-3322
+Address|John Four and Jane Four\r\n14422 Maple Court \r\nMorgantown, \r\nWest Virginia 41234-3322
+.Address1|John Four and Jane Four
+.Address2|14422 Maple Court
+.City|Morgantown
+.State|West Virginia
+.ZipCode|41234-3322
+
+<TESTCASE>|Three word city|Mr. John Five Jr\r\n1234 University Ave, Apt 2B \r\nEast Grand Forks, MN 56711-1234
+Address|Mr. John Five Jr\r\n1234 University Ave, Apt 2B \r\nEast Grand Forks, MN 56711-1234
+.Address1|Mr. John Five Jr
+.Address2|1234 University Ave, Apt 2B
+.City|East Grand Forks
+.State|MN
+.ZipCode|56711-1234
+
+<TESTCASE>|Just leading digits for address line|Howard Hughes\r\nW123 N456 Jamison\r\nHollywood, California  91122
+Address|Howard Hughes\r\nW123 N456 Jamison\r\nHollywood, California  91122
+.Address1|Howard Hughes
+.Address2|W123 N456 Jamison
+.City|Hollywood
+.State|California
+.ZipCode|91122
+
+<TESTCASE>|Just street type|Mickey Mouse\r\nWalt Disney Street\r\nHollywood, California  91122
+Address|Mickey Mouse\r\nWalt Disney Street\r\nHollywood, California  91122
+.Address1|Mickey Mouse
+.Address2|Walt Disney Street
+.City|Hollywood
+.State|California
+.ZipCode|91122
+
+<TESTCASE>|Just Post Office Box|Gerald Ford\r\nP O Box 22\r\nLansing, Michigan  62211
+Address|Gerald Ford\r\nP O Box 22\r\nLansing, Michigan  62211
+.Address1|Gerald Ford
+.Address2|P O Box 22
+.City|Lansing
+.State|Michigan
+.ZipCode|62211
+
+<TESTCASE>|Check for Attention|UCLID Software\r\nAttention: Human Resources\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+Address|UCLID Software\r\nAttention: Human Resources\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+.Address1|UCLID Software
+.Address2|Attention: Human Resources
+.Address3|8383 Greenway Blvd, #500
+.City|Middleton
+.State|WI
+.ZipCode|53562
+
+<TESTCASE>|Check for Attn|UCLID Software\r\nAttn Human Resources\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+Address|UCLID Software\r\nAttn Human Resources\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+.Address1|UCLID Software
+.Address2|Attn Human Resources
+.Address3|8383 Greenway Blvd, #500
+.City|Middleton
+.State|WI
+.ZipCode|53562
+
+<TESTCASE>|Check for Return To|Return To:\r\nHuman Resources\r\nUCLID Software\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+Address|Return To:\r\nHuman Resources\r\nUCLID Software\r\n8383 Greenway Blvd, #500\r\nMiddleton, WI  53562
+.Address1|Return To:
+.Address2|Human Resources
+.Address3|UCLID Software
+.Address4|8383 Greenway Blvd, #500
+.City|Middleton
+.State|WI
+.ZipCode|53562
+
+<TESTCASE>|Directional Street Names|W180 N7950 Town Hall Road\r\nMenomonee Falls, WI 53705
+Address|W180 N7950 Town Hall Road\r\nMenomonee Falls, WI 53705
+.Address1|W180 N7950 Town Hall Road
+.City|Menomonee Falls
+.State|WI
+.ZipCode|53705
+
+<TESTCASE>|Directional Street Names with Recipient|Mau-Mau Pigritia\r\nW180 N7950 Town Hall Road\r\nMenomonee Falls, WI 53705
+Address|Mau-Mau Pigritia\r\nW180 N7950 Town Hall Road\r\nMenomonee Falls, WI 53705
+.Address1|Mau-Mau Pigritia
+.Address2|W180 N7950 Town Hall Road
+.City|Menomonee Falls
+.State|WI
+.ZipCode|53705
+
+<TESTCASE>|Ordinal Street Name|201 W. 1st Street\r\nMonkeyville, HI 12345
+Address|201 W. 1st Street\r\nMonkeyville, HI 12345
+.Address1|201 W. 1st Street
+.City|Monkeyville
+.State|HI
+.ZipCode|12345
+
+<TESTCASE>|Ordinal Street Name with Recipient|D.K.\r\n201 W. 1st Street\r\nMonkeyville, HI 12345
+Address|D.K.\r\n201 W. 1st Street\r\nMonkeyville, HI 12345
+.Address1|D.K.
+.Address2|201 W. 1st Street
+.City|Monkeyville
+.State|HI
+.ZipCode|12345
+
+

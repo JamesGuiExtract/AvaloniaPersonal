@@ -1,0 +1,37 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116501.tif.uss
+LocalGrantee01=QUEST FOR RELEASE OF DEED OF TRUST AND RELEASE^10~Original Grantor^3~Borrower)^?Grantee^160~[A^10~Married^10~Man
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2001089055.tif.uss
+LocalGrantee02=DEED OF TRUST RELEASE^100~Trust^50~fully satisfied^50~Grantor^?Grantee^160~Mortgagee
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2005089018.tif.uss
+LocalGrantee03=The undersigned claimant^?Grantee^160~[the]^3~present owner^3~[of]^10~property
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116493.tif.uss
+LocalGrantee04=FOR RELEASE OF DEED OF TRUST AND RELEASE^200~Grantor^?Grantee^160~ORIG^15~[BENEFICIARY]|[Bene]|[Rene]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\9600074931.tif.uss
+LocalGrantee05=RELEASE OF^6~DEED OF TRUST^80~NATIONAL BANK OF ARVADA^200~BORROWER ADDRESS OF REAL PROPERTY^?Grantee^160~ADDRESS
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\9600074972.tif.uss
+LocalGrantee06=RELEASE OF DEED OF TRUST^10~THIS DEED OF TRUST^200~between^?Grantee^160~Grantor
+
+[PATTERNS_END]

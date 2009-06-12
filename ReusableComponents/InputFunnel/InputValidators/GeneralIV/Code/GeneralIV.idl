@@ -1,0 +1,172 @@
+// GeneralIV.idl : IDL source for GeneralIV.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (GeneralIV.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(203E8934-0C8B-4607-B2F5-84A9167B1107),
+	version(1.0),
+	helpstring("UCLID GeneralIV 1.0 Type Library")
+]
+library UCLID_GENERALIVLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	////////////////////////////////////////////////////////
+	// Interfaces
+	////////////////////////////////////////////////////////
+	[
+		object,
+		uuid(73A6FF75-9AF0-40BB-8EA2-8CFEE12755D0),
+		dual,
+		helpstring("IIntegerInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IIntegerInputValidator : IDispatch
+	{
+		[propget, id(1), helpstring("property Min")] HRESULT Min([out, retval] long *pVal);
+		[propput, id(1), helpstring("property Min")] HRESULT Min([in] long newVal);
+		[propget, id(2), helpstring("property Max")] HRESULT Max([out, retval] long *pVal);
+		[propput, id(2), helpstring("property Max")] HRESULT Max([in] long newVal);
+		[propget, id(3), helpstring("property HasMin")] HRESULT HasMin([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property HasMin")] HRESULT HasMin([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property HasMax")] HRESULT HasMax([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property HasMax")] HRESULT HasMax([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property ZeroAllowed")] HRESULT ZeroAllowed([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property ZeroAllowed")] HRESULT ZeroAllowed([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property NegativeAllowed")] HRESULT NegativeAllowed([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property NegativeAllowed")] HRESULT NegativeAllowed([in] VARIANT_BOOL newVal);
+		[propget, id(7), helpstring("property IncludeMinInRange")] HRESULT IncludeMinInRange([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property IncludeMinInRange")] HRESULT IncludeMinInRange([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property IncludeMaxInRange")] HRESULT IncludeMaxInRange([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property IncludeMaxInRange")] HRESULT IncludeMaxInRange([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(C2C14E8E-4AF7-433C-BF74-EEA61FBCA188),
+		dual,
+		helpstring("IDoubleInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IDoubleInputValidator : IDispatch
+	{
+		[propget, id(1), helpstring("property Min")] HRESULT Min([out, retval] double *pVal);
+		[propput, id(1), helpstring("property Min")] HRESULT Min([in] double newVal);
+		[propget, id(2), helpstring("property Max")] HRESULT Max([out, retval] double *pVal);
+		[propput, id(2), helpstring("property Max")] HRESULT Max([in] double newVal);
+		[propget, id(3), helpstring("property HasMin")] HRESULT HasMin([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property HasMin")] HRESULT HasMin([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property HasMax")] HRESULT HasMax([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property HasMax")] HRESULT HasMax([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property ZeroAllowed")] HRESULT ZeroAllowed([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property ZeroAllowed")] HRESULT ZeroAllowed([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property NegativeAllowed")] HRESULT NegativeAllowed([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property NegativeAllowed")] HRESULT NegativeAllowed([in] VARIANT_BOOL newVal);
+		[propget, id(7), helpstring("property IncludeMinInRange")] HRESULT IncludeMinInRange([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property IncludeMinInRange")] HRESULT IncludeMinInRange([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property IncludeMaxInRange")] HRESULT IncludeMaxInRange([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property IncludeMaxInRange")] HRESULT IncludeMaxInRange([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(B11B3E41-55D3-40D1-A498-C4A14C84C2DC),
+		dual,
+		helpstring("IFloatInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IFloatInputValidator : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(7CF028E0-4001-4857-B779-880CEAABA7AB),
+		dual,
+		helpstring("IShortInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IShortInputValidator : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(C06E8E0F-B839-4516-8B87-4992FE2009B9),
+		dual,
+		helpstring("IDateInputValidator Interface"),
+		pointer_default(unique)
+	]
+	interface IDateInputValidator : IDispatch
+	{
+	};
+
+	////////////////////////////////////////////////////////
+	// Coclasses
+	////////////////////////////////////////////////////////
+	[
+		uuid(DA063302-E6BA-43E6-8084-8E3821ECBB69),
+		helpstring("IntegerInputValidator Class")
+	]
+	coclass IntegerInputValidator
+	{
+		[default] interface IIntegerInputValidator;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D3D998BC-FDF7-4089-842E-C7CDC0A75F8D),
+		helpstring("DoubleInputValidator Class")
+	]
+	coclass DoubleInputValidator
+	{
+		[default] interface IDoubleInputValidator;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(EA1FE48D-1720-4B85-9994-BAB67CB0E0B5),
+		helpstring("FloatInputValidator Class")
+	]
+	coclass FloatInputValidator
+	{
+		[default] interface IFloatInputValidator;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(B11F7F49-4D38-4FBF-8B02-D1F00E2205F5),
+		helpstring("ShortInputValidator Class")
+	]
+	coclass ShortInputValidator
+	{
+		[default] interface IShortInputValidator;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(EAE4A620-2D07-40AD-AD19-9613998C0DE7),
+		helpstring("DateInputValidator Class")
+	]
+	coclass DateInputValidator
+	{
+		[default] interface IDateInputValidator;
+	};
+
+	[
+		uuid(B014E3D7-FF70-4702-ABAA-2209A05ACCC9),
+		helpstring("IntegerInputValidatorPP Class")
+	]
+	coclass IntegerInputValidatorPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(E51A1671-06B2-485D-A073-4CD04D99912C),
+		helpstring("DoubleInputValidatorPP Class")
+	]
+	coclass DoubleInputValidatorPP
+	{
+		interface IUnknown;
+	};
+};

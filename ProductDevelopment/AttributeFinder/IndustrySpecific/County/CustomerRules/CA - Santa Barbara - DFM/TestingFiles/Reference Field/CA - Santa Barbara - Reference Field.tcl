@@ -1,0 +1,1 @@
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;CA - Santa Barbara - Reference Field.dat

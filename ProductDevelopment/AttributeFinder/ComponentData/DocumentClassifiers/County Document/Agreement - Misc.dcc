@@ -1,0 +1,84 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,AGR_ZERO_01,false
+		01=\bREAL\s*ESTATE\s*MORTGAGE.?\s*SECURITY\s*AGREEMENT\s*AND\s*FINANCING\s*STATEMENT\b
+	OR_END
+SCOPE_END
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,AGR_ZERO_02,false
+		01=^MODIFICATION\s*OF\s*MORTGAGE\s*AND\s*SUBSTITUTION\s*OF\s*COLLATERAL(?:\r?$)
+		02=^Mortgage\s*agreement(?:\r?$)
+	OR_END
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,AGR_SURE_01,false
+		01=^RIGHT\s*OF\s*WAY\s*AGREEMENT\s*(?:\r?$)
+		02=^RENEWAL\s*AND\s*EXTENSION\s*AGREEMENT\s*(?:\r?$)
+		03=^REINSTATEMENT\s*AGREEMENT\s*(?:\r?$)
+		04=^TRUST\s*AGREEMENT\s*(?:\r?$)
+		05=^MEMORANDUM\s*OF\s*ACCOMMODATION\s*AGREEMENT\s*(?:\r?$)
+		06=^MEMORANDUM\s*GIVING\s*NOTICE\s*OF\s*CRUDE\s*OIL\s*OPTION\s*AGREEMENT\s*(?:\r?$)
+		07=^ADDITIONAL\s*PIPELINE\s*AGREEMENT\s*(?:\r?$)
+		08=^MORTGAGEE'?S\s*AGREEMENT\s*(?:\r?$)
+		09=^MORTGAGE\s*EXTENSION\s*AGREEMENT\s*(?:\r?$)
+		10=^REAMORTIZATION\s*AGREEMENT\s*(?:\r?$)
+		12=^FARMLAND\s*DEVELOPMENT\s*RIGHTS\s*AGREEMENT\s*(?:\r?$)
+		13=^SUBORDINATION\s*AND\s*ATTORNMENT\s*AGREEMENT\s*(?:\r?$)
+		14=^SUBROGATION\s*AGREEMENT\s*(?:\r?$)
+		15=^PRIVATE\s*ROAD\s*MAINTENANCE\s*AND\s*REGULATION\s*AGREEMENT\s*(?:\r?$)
+		16=^Interest\s*Rate\s*Adjustment\s*Agreement\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,AGR_SURE_02,TRUE
+		01=AGREEMENT\s*TO\s*RESCIND
+		02=Agreement\s*Not\s*To\s*Sell\s*or\s*Encumber\s*Real\s*Property
+		03=FARMLAND\s*DEVELOPMENT\s*RIGHTS\s*AGREEMENT
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.25,1,1
+	OR_BEGIN,AGR_SURE_03,TRUE
+		01=^AGREEMENT\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.4,1,2
+	OR_BEGIN,AGR_PROBABLE_01,TRUE
+		
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

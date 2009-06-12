@@ -1,0 +1,23 @@
+HKCR
+{
+	ESFileSuppliers.StaticFileListFSPP.1 = s 'StaticFileListFSPP Class'
+	{
+		CLSID = s '{948BA86C-E2EB-4199-AAEE-4FE03D89E6F0}'
+	}
+	ESFileSuppliers.StaticFileListFSPP = s 'StaticFileListFSPP Class'
+	{
+		CLSID = s '{948BA86C-E2EB-4199-AAEE-4FE03D89E6F0}'
+		CurVer = s 'ESFileSuppliers.StaticFileListFSPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {948BA86C-E2EB-4199-AAEE-4FE03D89E6F0} = s 'StaticFileListFSPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

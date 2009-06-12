@@ -1,0 +1,25 @@
+//*********************************************************************************
+// ExtractOrRemoveRightMostTest.dat
+// 		This file contains testcases for testing the ExtractOrRemoveRightMost Value Modifier
+//*********************************************************************************
+
+// Extract the Right 10 chars
+<TESTCASE>;RightMost01.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;RightMost01.eav
+
+// Remove the Right 10 chars
+<TESTCASE>;RightMost02.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;RightMost02.eav
+
+// Test to make sure that if the limit is > than the amount of text found nothing will be Extracted
+<TESTCASE>;RightMost03.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;None.eav
+
+// Test to make sure that if the limit is > than the amount of text found nothing will be Removed
+<TESTCASE>;RightMost04.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;All.eav
+
+// Test to make sure that if the limit is > than the amount of text found and if Accecpt if total...specified above is checked
+// all will be Extracted
+<TESTCASE>;RightMost05.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;All.eav
+
+// Test to make sure that if the limit is > than the amount of text found and if Accecpt if total...specified above is checked
+// all will be Removed
+<TESTCASE>;RightMost06.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;None.eav
+

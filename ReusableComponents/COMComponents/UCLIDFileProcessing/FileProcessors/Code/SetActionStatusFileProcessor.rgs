@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.SetActionStatusFileProcessor.1 = s 'SetActionStatusFileProcessor Class'
+	{
+		CLSID = s '{C6AF1E5C-B2F5-49D9-9684-6F46663BE76E}'
+	}
+	FileProcessors.SetActionStatusFileProcessor = s 'SetActionStatusFileProcessor Class'
+	{
+		CLSID = s '{C6AF1E5C-B2F5-49D9-9684-6F46663BE76E}'
+		CurVer = s 'FileProcessors.SetActionStatusFileProcessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C6AF1E5C-B2F5-49D9-9684-6F46663BE76E} = s 'SetActionStatusFileProcessor Class'
+		{
+			ProgID = s 'FileProcessors.SetActionStatusFileProcessor.1'
+			VersionIndependentProgID = s 'FileProcessors.SetActionStatusFileProcessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

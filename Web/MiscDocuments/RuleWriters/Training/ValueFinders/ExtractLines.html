@@ -1,0 +1,43 @@
+<HTML>
+	<HEAD>
+		<TITLE>Extract Lines Value Finder</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Extract Lines Value Finder</h1>
+		<hr>	
+		<h3>Usage</h3>
+		<ul>
+			<li>The Extract Lines value finder is used to extract the contents of specified lines in a document.</li>
+		</ul>
+		<hr>	
+		<h3>Usage</h3>
+		<ul>
+			<li>If you select the <b>Extract specific line(s) including line breaks:</b> option, the value finder will return a single multi-line attribute which contains the specified lines with the new line (\n) and carriage return (\r) characters included.</li>
+
+			<li>If you select the <b>Extract specific line(s) excluding line breaks:</b> option, the value finder will return a single multi-line attribute which contains the specified lines with the new line (\n) and carriage return (\r) characters removed.</li>
+			<li>You can specify as a single line ("3"), a comma separated lists  of lines ("3,5"), or a hyphenated range of lines ("3-5").
+				<ul>
+					<li>Ranges entered in descending order ("5-3") will be output in reverse order.</li>
+					<li>Blank lines <i>do</i> count.</li>
+				</ul>
+			</li>
+			<li>If you select the <b>Extract each line (excluding line breaks) as a unique value for current attribute</b> option, the value finder will return every line in the document as a separate attribute without new line and carriage return characters.</li>
+
+		</ul>
+		<hr>
+		<p>
+		<h3>Exercises</h3>
+		<ol>
+			<li>Open the <b>Rule Set Editor</b>, add a new attribute, and add an Extract Lines value finder that is configured to find lines 2, 4, and 6 with line breaks.
+				<ul>
+					<li>Run this rule on <b>ExtractLines.txt</b>.  Note that we get nothing but new lines.  This is because lines 2, 4, and 6 are blank!</li>
+					<li>Change the value finder so that it extracts lines 1, 3, and 5.  Run the rules again and examine the found data.</li>
+					<li>Change the value finder so that it extract lines 1-5 without line breaks. Run the rules again.  Note that all five lines are output as one attribute with no line break characters.</li>
+					<li>Try extracting lines 19-13 with line breaks and note that the order is reversed.</li>
+					<li>Change the value finder to <b>Extract each line</b> and run the rules. Note that each line is now output as a separate attribute.  Also note that <b>Extract each line</b> ignores blank lines, because they only contain new line characters.</li>
+				</ul>
+			</li>
+		</ol>
+	</BODY>
+</HTML>

@@ -1,0 +1,414 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MTG;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+//Warranty Deed
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\WDD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\WDD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\WDD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).cr.voa;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+/*
+	//unsupported start here
+	//AAB
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AAB;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AAB;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AAB;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AAG
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AAG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AAG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AAL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AAL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AAS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AAS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ADL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ADL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AER
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AER;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AER;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AFD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AFD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AFD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AFD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AFF
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AFF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AFF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AFF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AGR
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AGR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AGR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AIN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AMA
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AMA;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AMD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AMD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AMD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AMG
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//AML
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AML;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AML;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ANL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\ANL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\ANL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ANL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//API
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\API;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//APT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\APT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\APT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ARE
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\ARE;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\ARE;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ARE;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ASF
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ASF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ASL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\ASL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\ASL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ASL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ATL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\ATL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\ATL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ATL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CIN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\CIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\CIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CLN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\CLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\CLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CMD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CMD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CONSENT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CONSENT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CONTRACT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\CONTRACT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CRD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CRD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CST
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\CST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\CST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//CTR
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\CTR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\CTR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\CTR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DAG
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DAG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DAL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DAL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DAL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DAR
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DAR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DAR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DAR;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DAS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DAS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DAS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DAS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DAT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DAT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DAT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DAT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DCI
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DCI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DCI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DCI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DED
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DES
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DES;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DIV
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DJM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DJM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DJM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DLN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DLP
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DLP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DLP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DLP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DLS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DLS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DLV
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DLV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DMI
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DMI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DMI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DMI;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DML
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DML;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DML;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DML;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DMO
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DMO;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DMT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DMT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DTH
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DTH;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DTH;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DTH;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//DUS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DUS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DUS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//EST
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\EST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\EST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\EST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//FST
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\FST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\FST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\FST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//JGM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\JGM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\JGM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//JLN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\JLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\JLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\JLN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LAC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LAC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LCT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\LCT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\LCT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LCT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LDC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\LDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LET
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\LET;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LET;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LEV
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LEV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LIN
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\LIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\LIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LIN;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//LSP
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\LSP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\LSP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\LSP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MIS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MIT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MIT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MIT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MIT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MLC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MLS
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MLS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MMG
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MMG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//MSD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MSD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MSD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//NCM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\NCM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\NCM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\NCM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//NOT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\NOT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//ORD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\ORD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\ORD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\ORD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PAT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\PAT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PAT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PDF
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\PDF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\PDF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PDF;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PDM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\PDM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\PDM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PDM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PLC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PLT
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\PLT;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PRD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\PRD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PRD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//PTD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\PTD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//QCD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QCD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\QCD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\QCD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//QDC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\QDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\QDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//QDP
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\QDP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\QDP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//RED
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\RED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\RED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\RED;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//REL
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\REL;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//RES
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\RES;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//RST
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\RST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\RST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//SBA
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\SBA;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//SBM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\SBM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\SBM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\SBM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//SDD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\SDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssociatedReference\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\SDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\SDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//SLC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\SLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\SLC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//SRV
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\SRV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\SRV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\SRV;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//TRD
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\TRD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//TRM
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\TRM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\TRM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\TRM;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//UST
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\UST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\UST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//WDC
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\WDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\WDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\WDC;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+	//WDP
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\WDP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\WDP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+	<TESTFOLDER>;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\WDP;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\AssocLiberAndPage\$FileNoExtOf(<SourceDocName>).eav
+
+
+*/

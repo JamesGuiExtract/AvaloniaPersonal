@@ -1,0 +1,110 @@
+<html>
+
+<HEAD>
+<TITLE>RuleSet Editor - File Menu - File Menu Items - Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Input Validator Controls<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>Select Input Validator</h2>
+<ul>
+     <li>Displays description and type of input validator correctly</li>
+	 <li>Checkbox is present
+	 <ul>
+		<li>Checkbox is disabled when no input validator is selected</li>
+		<li>Checkbox is checkable when an input validator is selected</li>
+		<li>Checkbox setting is persistent</li>
+	 </ul>
+	 </li>
+      <li><b>[P16 #966]</b> Double-click on defined input validator displays configuration dialog.
+      <li><b>[P16 #966]</b> Ctrl + Double-click on defined input validator displays the <b>Select 
+	Input Validator</b> dialog.
+      <li><b>[P16 #966]</b> Alt + Double-click on defined input validator displays the <b>Configure 
+	description</b> dialog.
+	<li>Right click displays context menu
+        <h3>Context Menu Options</h3>
+        <ol>
+          <li>&quot;<b>Cut</b>&quot; exists
+            <ol>
+              <li>Items can be successfully cut to the clipboard</li>
+              <li>Click on &quot;<b>Cut</b>&quot; loads confirm delete dialog.</li>
+			  <li>Checkbox disables when cut takes place</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Copy</b>&quot; exists
+            <ol>
+              <li>Items can be successfully copied to the clipboard</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Paste</b>&quot; exists
+            <ol>
+              <li>Items can be successfully pasted from clipboard</li>
+			  <li>Paste enables checkbox</li>
+			  <li>Checkbox retains state that the copied/cut input validator had</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Delete</b>&quot; exists
+            <ol>
+              <li>Item is deleted successfully.</li>
+              <li>Click on &quot;<b>Delete</b>&quot; loads confirm delete
+                dialog.</li>
+			  <li>Checkbox disables when input validator is deleted</li>
+            </ol>
+          </li>
+          <li>&quot;<b>Cancel</b>&quot; exists
+            <ol>
+              <li>Exits context menu successfully.</li>
+            </ol>
+          </li>
+        </ol>
+      </li>
+  <li>&quot;<b>Select</b>&quot; button displays &quot;<b>Select Input Validator
+    Dialog</b>&quot;</li>
+</ul>
+<blockquote>
+  <h3>Select Input Validator Dialog</h3>
+  <ul>
+    <li>&quot;<b>Input Validator</b><b> Description</b>&quot; edit box is
+      editable
+    <li>&quot;<b>Select </b><b>Input Validator</b>&quot; combo box is selectable
+      <ul>
+        <li>&quot;<b>&lt;None&gt;</b>&quot; is listed
+        <li>&quot;<b>Date</b>&quot; is listed
+        <li>&quot;<b>Double</b>&quot; is listed
+        <li>&quot;<b>Float</b>&quot; is listed
+        <li>&quot;<b>Long </b><b>Integer</b>&quot; is listed
+        <li>&quot;<b>Regular Expression</b>&quot; is listed
+        <li>&quot;<b>Short Integer</b>&quot; is listed
+        <li>&quot;<b>Value From List</b>&quot; is listed<br>
+          <br>
+        </li>
+      </ul>
+    <li>&quot;<b>&lt;None&gt;</b>&quot; clears the existing validator and description</li>
+    <li>&quot;<b>Configure</b>&quot; button displays appropriate Input Validator
+      dialog
+    <li>&quot;<b>Configure</b>&quot; button is only active when Input Validator
+      has a dialog
+    <li>&quot;<b>OK</b>&quot; button saves changes and exits dialog
+    <li>&quot;<b>Cancel</b>&quot; button ignores changes and exits dialog
+    <li>&quot;<b>X</b>&quot; button ignores changes and exits dialog</li>
+  </ul>
+</blockquote>
+<ul>
+  <li>&quot;<b>Use the following </b><b>Input Validator</b>&quot; edit box is
+    not editable
+  <li>&quot;<b>Use the following </b><b>Input Validator</b>&quot; edit box
+    displays selected Input Validator and corresponding description</li>
+</ul>
+
+</body>
+
+</html>

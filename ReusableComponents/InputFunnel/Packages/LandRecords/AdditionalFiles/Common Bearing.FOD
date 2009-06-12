@@ -1,0 +1,24 @@
+[CharsAlwaysEnabled]
+0123456789
+
+[InputTypes]
+Bearing
+Direction
+
+[Choices]
+
+1|N 45°22'14" E|NSEW°'"
+2|N 45d22'14" E|NSEWd'"
+3|N 45-22-14 E|NSEW-
+4|N 45d22m14s E|NSEWdms
+5|N. 45°22'14" E.|NSEW°'".
+6|N. 45d22'14" E.|NSEWd'".
+7|N. 45-22-14 E.|NSEW-.
+8|N. 45d22m14s E.|NSEWdms.
+9|North 45°22'14" East|NorthSuWesEa°'"
+10|North 45d22'14" East|NorthSuWesEad'"
+11|North 45-22-14 East|NorthSuWesEa-
+12|North 45d22m14s East|NorthSuWesEadms
+13|North 45deg22min14sec East|NorthSuWesEadgminc
+14|North 45degrees22minutes14seconds East|NorthSuWesEdgarminc
+

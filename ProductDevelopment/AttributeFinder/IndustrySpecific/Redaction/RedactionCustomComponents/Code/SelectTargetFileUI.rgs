@@ -1,0 +1,26 @@
+HKCR
+{
+	RedactionCustomComponents.SelectTargetFileUI.1 = s 'SelectTargetFileUI Class'
+	{
+		CLSID = s '{02AEEE32-789A-4975-A625-7C9544C8316F}'
+	}
+	RedactionCustomComponents.SelectTargetFileUI = s 'SelectTargetFileUI Class'
+	{
+		CLSID = s '{02AEEE32-789A-4975-A625-7C9544C8316F}'
+		CurVer = s 'RedactionCustomComponents.SelectTargetFileUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {02AEEE32-789A-4975-A625-7C9544C8316F} = s 'SelectTargetFileUI Class'
+		{
+			ProgID = s 'RedactionCustomComponents.SelectTargetFileUI.1'
+			VersionIndependentProgID = s 'RedactionCustomComponents.SelectTargetFileUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{18CF5BEC-2929-43DD-86E0-7D50F152663A}'
+		}
+	}
+}

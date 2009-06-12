@@ -1,0 +1,451 @@
+<html xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 9">
+<meta name=Originator content="Microsoft Word 9">
+<link rel=File-List href="./FeedbackCollectionSpecs_files/filelist.xml">
+<!--[if gte mso 9]><xml>
+ <o:DocumentProperties>
+  <o:Author>arvind ganesan</o:Author>
+  <o:LastAuthor>arvind ganesan</o:LastAuthor>
+  <o:Revision>2</o:Revision>
+  <o:TotalTime>1</o:TotalTime>
+  <o:Created>2004-06-21T20:29:00Z</o:Created>
+  <o:LastSaved>2004-06-21T20:30:00Z</o:LastSaved>
+  <o:Pages>2</o:Pages>
+  <o:Words>1002</o:Words>
+  <o:Characters>5717</o:Characters>
+  <o:Company>UCLID</o:Company>
+  <o:Lines>47</o:Lines>
+  <o:Paragraphs>11</o:Paragraphs>
+  <o:CharactersWithSpaces>7020</o:CharactersWithSpaces>
+  <o:Version>9.6926</o:Version>
+ </o:DocumentProperties>
+</xml><![endif]-->
+<style>
+<!--
+ /* Font Definitions */
+@font-face
+	{font-family:Verdana;
+	panose-1:2 11 6 4 3 5 4 4 2 4;
+	mso-font-charset:0;
+	mso-generic-font-family:swiss;
+	mso-font-pitch:variable;
+	mso-font-signature:536871559 0 0 0 415 0;}
+ /* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{mso-style-parent:"";
+	margin:0in;
+	margin-bottom:.0001pt;
+	mso-pagination:widow-orphan;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	mso-fareast-font-family:"Times New Roman";}
+a:link, span.MsoHyperlink
+	{color:blue;
+	text-decoration:underline;
+	text-underline:single;}
+a:visited, span.MsoHyperlinkFollowed
+	{color:purple;
+	text-decoration:underline;
+	text-underline:single;}
+@page Section1
+	{size:8.5in 11.0in;
+	margin:1.0in 1.25in 1.0in 1.25in;
+	mso-header-margin:.5in;
+	mso-footer-margin:.5in;
+	mso-paper-source:0;}
+div.Section1
+	{page:Section1;}
+ /* List Definitions */
+@list l0
+	{mso-list-id:56099339;
+	mso-list-type:hybrid;
+	mso-list-template-ids:593682572 -425568692 165301148 -276633484 1631902658 662741438 1896395648 -1105163794 -397260738 -538646112;}
+@list l1
+	{mso-list-id:390540751;
+	mso-list-type:hybrid;
+	mso-list-template-ids:654494252 -1318708184 -1369118552 534946310 1163585634 -2091599862 245245992 -559394234 -1374368902 -1828267770;}
+@list l2
+	{mso-list-id:972640371;
+	mso-list-type:hybrid;
+	mso-list-template-ids:36478566 1602928836 -1188130856 -27858412 -1871663260 777306520 -2074711122 1460467472 -1140313236 425244198;}
+@list l3
+	{mso-list-id:1393000236;
+	mso-list-type:hybrid;
+	mso-list-template-ids:-3739988 -863107218 2095748574 -489767042 -227525682 -970663056 -399966448 -1513344858 -1339905422 1536322816;}
+ol
+	{margin-bottom:0in;}
+ul
+	{margin-bottom:0in;}
+-->
+</style>
+</head>
+
+<body lang=EN-US link=blue vlink=purple style='tab-interval:.5in'>
+
+<div class=Section1>
+
+<p class=MsoNormal><strong><u><span style='font-size:10.0pt;font-family:Verdana'>Goals
+of the &quot;Feedback collection&quot; feature:</span></u></strong><o:p></o:p></p>
+
+<ol start=1 type=1>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l3 level1 lfo1;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>To know actual capture rate at&nbsp;client site from
+     Time1 to Time2.</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l3 level1 lfo1;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Be able to diagnose why certain data was not
+     captured, and&nbsp;be able to improve our product so that the data can be
+     captured in the future.</span><o:p></o:p></li>
+</ol>
+
+<p class=MsoNormal><strong><u><span style='font-size:10.0pt;font-family:Verdana'>High
+Level Requirements:</span></u></strong><o:p></o:p></p>
+
+<ol start=1 type=1>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>The user shall be able to specify options for
+     feedback collection via a UI.</span> <o:p></o:p></li>
+ <ol start=1 type=1>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Whether feedback collection
+      is on or off </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Option to turn off feedback
+      collection when data has been collected for X documents</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Option to turn off feedback
+      collection on a certain date</span>&nbsp; <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Folder to store feedback
+      data</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Three&nbsp;options for:</span>
+      <o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Don't collect source
+       documents</span> <o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Collect
+       source-document&nbsp;at packaging time</span> <o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Collect source-document at
+       rule-execution time</span><o:p></o:p></li>
+  </ol>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>A checkbox to convert source
+      document to text if source document collection is enabled</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Option to specify
+      AttributeNames for which feedback data should be collected.</span><o:p></o:p></li>
+ </ol>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Packaging feedback data and sending to UCLID </span><o:p></o:p></li>
+ <ol start=1 type=1>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The user shall be able to
+      package the feedback data into one file which they can mail or FTP to
+      UCLID. </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>After packaging the feedback
+      data, the user shall be able to decide whether the feedback data should
+      be &quot;cleared&quot;. </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The packaging utility shall
+      optionally allow the user to select source documents to be packaged along
+      with the rest of the feedback data.</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>While packaging the feedback
+      data, the utility shall maintain an error log of all errors encountered
+      and the error log file shall be added to the&nbsp;package as well.</span>
+      <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The packaging utility shall
+      record an entry in the error log if it encounters any rule-execution-records
+      for which the corresponding .rsd file has a newer modify timestamp than
+      the time of execution of the ruleset.</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The packaging utility shall
+      package all files such that they can be unpacked with the exact
+      timestamps that they had at the time of packaging.</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The packaging utility shall
+      create and package two files called &quot;RunRules.dat&quot; and
+      &quot;CompareResults.dat&quot; which can readily be used by UCLID's
+      automated ruleset testing component for testing and report generation
+      purposes.</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+      style='font-size:10.0pt;font-family:Verdana'> The packaging utility shall
+      also package a copy of any rulesets (rsd files) referenced in the
+      feedback collection data being packaged.</span> <o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+      style='font-size:10.0pt;font-family:Verdana'> All packaged files shall
+      retain their last-modify-date file attribute when unpacked.</span><o:p></o:p></li>
+ </ol>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Each execution of the RuleSet shall have its feedback
+     data tagged with a unique ID specific to that execution. </span><o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>The following information shall be collected as part
+     of the feedback data for each execution of the RuleSet: </span><o:p></o:p></li>
+ <ol start=1 type=1>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>One of the following
+      containing Information about the source document: </span><o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Name of an image </span><o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Name of an USS file and
+       name of the image associated with the USS file </span><o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Name of a text file </span><o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Text in the form of string
+       passed in to IAttributeFinderEngine</span><o:p></o:p></li>
+  </ol>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>The filename of the RuleSet
+      that was executed </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Information about the data
+      that FlexIndex was able to capture at the field at the time that the
+      RuleSet was executed </span><o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>IIUnknownVector&lt;IAttribute&gt;</span><o:p></o:p></li>
+  </ol>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Optional information about
+      the actual data (i.e. &quot;correct data&quot;) that the end-user
+      application stored into the database after the user has had a chance to
+      edit + verify the data that FlexIndex presented to them </span><o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>IIUnknownVector&lt;IAttribute&gt;
+       </span><o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>This piece of the data is
+       optional because it requires integration work with the end-user
+       application, which may not always be done.&nbsp; Some of the other
+       colleced feedback&nbsp;data is not as valuable if this piece of
+       information doesn't exist.</span><o:p></o:p></li>
+  </ol>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Start date and time of the
+      execution </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Duration of execution in
+      wall-clock time elapsed. </span><o:p></o:p></li>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Details of any
+      exception&nbsp;that was thrown to the application.&nbsp; The exception
+      shall be stored in a file called {ID}.uex in the feedback data collection
+      folder where {ID} is the rule execution ID.</span><o:p></o:p></li>
+ </ol>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>TODO: UCLIDException.uex...</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l0 level1 lfo2;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Utilities shall be developed that allow UCLID
+     developers to: </span><o:p></o:p></li>
+ <ol start=1 type=1>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Unpack the feedback data
+      received from the client to: </span><o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Allow reproduction
+       of&nbsp;the execution results seen by the client. </span><o:p></o:p></li>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Allow developers to debug
+       and improve rules</span><o:p></o:p></li>
+  </ol>
+  <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+      auto;mso-list:l0 level2 lfo2;tab-stops:list 1.0in'><span
+      style='font-size:10.0pt;font-family:Verdana'>Allow developers to generate
+      reports from the unpacked feedback data (NOTE: in the beginning we may
+      not want to give the report generation utility to our customers, but on
+      the long run we may so that they can generate the reports on their own) </span><o:p></o:p></li>
+  <ol start=1 type=1>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Reports about capture rates</span>
+       <o:p></o:p></li>
+   <ol start=1 type=1>
+    <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+        auto;mso-list:l0 level4 lfo2;tab-stops:list 2.0in'><span
+        style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+        style='font-size:10.0pt;font-family:Verdana'> Percentages for each
+        attribute and sub-attribute</span><o:p></o:p></li>
+   </ol>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana'>Reports about throughput</span>
+       <o:p></o:p></li>
+   <ol start=1 type=1>
+    <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+        auto;mso-list:l0 level4 lfo2;tab-stops:list 2.0in'><span
+        style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+        style='font-size:10.0pt;font-family:Verdana'> Avg time for execution
+        of&nbsp;a ruleset</span> <o:p></o:p></li>
+    <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+        auto;mso-list:l0 level4 lfo2;tab-stops:list 2.0in'><span
+        style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+        style='font-size:10.0pt;font-family:Verdana'> Avg time to OCR a
+        document and avg time to OCR a page</span><o:p></o:p></li>
+   </ol>
+   <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+       auto;mso-list:l0 level3 lfo2;tab-stops:list 1.5in'><span
+       style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+       style='font-size:10.0pt;font-family:Verdana'> Reports about approximate
+       keystroke reduction</span> <o:p></o:p></li>
+   <ol start=1 type=1>
+    <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:
+        auto;mso-list:l0 level4 lfo2;tab-stops:list 2.0in'><span
+        style='font-size:10.0pt;font-family:Verdana;color:red'>[New]</span><span
+        style='font-size:10.0pt;font-family:Verdana'> Options to generate
+        report based on single data-entry or double-blind entry</span><o:p></o:p></li>
+   </ol>
+  </ol>
+ </ol>
+</ol>
+
+<p class=MsoNormal><strong><u><span style='font-size:10.0pt;font-family:Verdana'>Other
+technical notes:</span></u></strong><o:p></o:p></p>
+
+<ol start=1 type=1>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Create&nbsp;a &quot;Clear Attribute Value&quot;
+     Output Handler, which allows clearing out of attribute values for one or
+     more named attribute's, where the attribute name can contain sub-attribute
+     names like &quot;Grantor-Grantee.Person&quot;</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Create an X-path like query tool that allows us to
+     query the engine's result with a string like </span><a
+     href="mailto:Grantor-Grantee@Type=Grantee/Person"><span style='font-size:
+     10.0pt;font-family:Verdana;color:black'>Grantor-Grantee@Type=Grantee/Person</span></a><span
+     style='font-size:10.0pt;font-family:Verdana'>&nbsp;and returns back an
+     IIUnknownVector&lt;IAttribute&gt; with matching tree nodes and sub-nodes
+     if available.</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Update all current splitter objects with an
+     additional method which will take the values of the split parts, and
+     return an IAttribute with subattributes containing the specified values
+     for the various split parts.&nbsp;&nbsp;Example of such a method is
+     CreatePersonAttribute(strTitle, strFirst, strMiddle, strLast, strSuffix,
+     bAutoBuildParent).&nbsp; The bAutoBuildParent argument is available only
+     in those splitter objects where the parent value can be computed based
+     upon the values of the sub-attributes.</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Add &lt;CompareResults&gt; tag to syntax of automated
+     ruleset tester component which will allow direct comparision of a
+     found-attributes .voa&nbsp;file to an expected-attributes .voa file
+     without having to run any rules.&nbsp; Syntax for line is &quot;&lt;CompareResults&gt;;FoundAttributesVOA;ExpectedAttributesVOA&quot;</span>
+     <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>Add &lt;CompareResultsFolder&gt; tag to syntax of
+     automated ruleset tester component - similar functionality as above, but
+     at a folder level.&nbsp; The algorithm will find &quot;*.correct.voa&quot;
+     and compare those voa files to corresponding &quot;.found.voa&quot;
+     files.&nbsp; Syntax for line is
+     &quot;&lt;CompareResultsFolder&gt;;folder_name&quot;</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>The AttributeFinderEngine shall be enhanced so that
+     it always creates a &lt;RuleExecutionID&gt; tag in the AFDocument whenever
+     any type of rule execution is invoked.</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana;color:red'>[New]</span><span style='font-size:10.0pt;
+     font-family:Verdana'> Add
+     IAFUtility.GetAttributesFromAutoFile(strFileName) which returns an
+     IIUnknownVector&lt;IAttribute&gt; and can read attributes from either .voa
+     or .eav files</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l1 level1 lfo3;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana;color:red'>[New]</span><span style='font-size:10.0pt;
+     font-family:Verdana'> Update automated test components to use
+     IAFUtility.GetAttributesFromAutoFile() so that they will also support .voa
+     files.</span><o:p></o:p></li>
+</ol>
+
+<p class=MsoNormal><strong><u><span style='font-size:10.0pt;font-family:Verdana'>Ideas
+to implement in the future:</span></u></strong><o:p></o:p></p>
+
+<ol start=1 type=1>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l2 level1 lfo4;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana'>UCLID writes a utility to automatically package
+     feedback data and send to UCLID via FTP, showing progress bar, allowing
+     partial uploads which can be resumed later, prompting for ftp username and
+     password, etc.</span> <o:p></o:p></li>
+ <li class=MsoNormal style='mso-margin-top-alt:auto;mso-margin-bottom-alt:auto;
+     mso-list:l2 level1 lfo4;tab-stops:list .5in'><span style='font-size:10.0pt;
+     font-family:Verdana;color:red'>[New]</span><span style='font-size:10.0pt;
+     font-family:Verdana'> Convert EAV files to VOA files on the network and
+     eliminate support for EAV files.</span><o:p></o:p></li>
+</ol>
+
+<p class=MsoNormal><![if !supportEmptyParas]>&nbsp;<![endif]><o:p></o:p></p>
+
+</div>
+
+</body>
+
+</html>

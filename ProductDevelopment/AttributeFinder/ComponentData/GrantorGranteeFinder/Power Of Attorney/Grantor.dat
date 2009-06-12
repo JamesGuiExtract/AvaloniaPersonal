@@ -1,0 +1,104 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016676.tif.uss
+// 0019.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016944.tif.uss
+// 0002.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007022.tif.uss
+POA_GRANTOR_0=Principal:^?Grantor^200~Agent:|Agents/Addresses:|Address of principal
+
+// 0003.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00006643.tif.uss
+POA_GRANTOR_0b=[We]^10~[The]^10~[Undersigned]^?Grantor^200~husband and wife^400~appoint|designate
+
+//0026.tif;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney\200406300005114.tif.uss
+POA_GRANTOR_20=presents^3~that^?Grantor^120~herein^12~called^5~grantor
+
+//0027.tif;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney\200406300003616.tif.uss
+POA_GRANTOR_1d=[I]|[1]|[We]^?Grantor^150~social^3~security^3~num^150~[appoint]|[designate]
+// 0004.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016236.tif.uss
+// 0020.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016320.tif.uss
+// 0005.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00017026.tif.uss
+// 
+POA_GRANTOR_1a=[I]|[1]|[We]^?Grantor^300~[appoint]|[designate]
+// 0021.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007400.tif.uss
+POA_GRANTOR_1b=[I]|[1]|[We]^?Grantor^60~whose^20~address is^300~[appoint]|[designate]
+
+POA_GRANTOR_1c=[I]^?Grantor^250~as principal]
+
+// 0007.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016270.tif.uss
+POA_GRANTOR_2=[I]|[1]^100~[am]^100~mother|father|conservator^100~[of]^?Grantor^300~[I]^20~[appoint]|[designate]
+
+// 0022.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016502.tif.uss
+// 0023.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00017105.tif.uss
+// 0024.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007178.tif.uss
+POA_GRANTOR_3=[That]^?Grantor^100~[a]^20~corporation|limited partnership|limited liability company^300~appoint|[designate]
+
+// 0010.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00006874.tif.uss
+POA_GRANTOR_6a=[on]^15~day of^100~personally appeared^100~[of]^?Grantor^personally known
+
+//
+POA_GRANTOR_6b=[This]^20~power of attorney^100~by^?Grantor^200~appoint|designate
+
+// 0025.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00006998.tif.uss
+POA_GRANTOR_7=[That]^?Grantor^200~[have]|[has]^100~appoint|designate
+
+// 0016.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\power of attorney\20059021284900.tif.uss
+POA_GRANTOR_7A=[That]|[That:]^?Grantor^200~hereinafter^100~principal
+
+// 0011.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007500.tif.uss
+POA_GRANTOR_8=Grantor:^?Grantor^200~Grantee:
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000052800.004.uss
+POA_GRANTOR_10=executed by^?Grantor^250~[on]
+
+// 0013.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000066700.007.uss
+POA_GRANTOR_11=\r\n\r\n^?Grantor^250~the principal^100~hereby appoints
+
+// 0014.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000191400.001.uss
+POA_GRANTOR_12=By this Power of Attorney^?Grantor^250~Name^10~of person
+
+// 0015.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000015900.003.uss
+POA_GRANTOR_13=\r\nI]^?Grantor^250~Social Security Number
+
+// 0017.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\power of attorney\20059019777900.tif.uss
+POA_GRANTOR_14=KNOW^30~BY THESE PRESENT^5~\r\n^?Grantor^250~hereinafter^25~principal
+
+// 0018.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\power of attorney\20059020105000.tif.uss
+POA_GRANTOR_15=TO WHOM IT MAY CONCERN^5~\r\n^?Grantor^250~principal
+
+//0028.tif;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney\200406290001299.tif
+POA_GRANTOR_16=presents^5~that^?Grantor^180~hereby^36~make|constitute|appoint
+POA_GRANTOR_17=The^3~undersigned^?Grantor^180~hereby^36~make|constitute|appoint
+POA_GRANTOR_18=presents^5~that^?Grantor^100~the^3~undersigned
+
+//0029.tif;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney\200406300007515.tif.uss
+POA_GRANTOR_19=the^3~undersigned^?Grantor^120~hereinafter^3~called
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000090900.030.uss
+POA_GRANTOR_1e=\r\n,^?Grantor^180~as principal
+
+// 0008.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00017085.tif.uss
+POA_GRANTOR_4=\n^?>Grantor^100~[hereby]^50~[appoint^200~[agent]|attorney
+
+POA_GRANTOR_9=\n^?>Grantor^100~hereby^5~appoint|designate^200~agent|attorney
+
+// 0009.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00006623.tif.uss
+POA_GRANTOR_5a=[The]^10~undersigned^100~personally appeared^?Grantor^\n^[The]^10~undersigned^100~personally appeared^?Grantor2^\n
+
+//
+POA_GRANTOR_5b=[The]^10~undersigned^100~personally appeared^?Grantor^\n
+
+[PATTERNS_END]

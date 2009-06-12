@@ -1,0 +1,1378 @@
+// UCLIDRasterAndOCRMgmt.idl : IDL source for UCLIDRasterAndOCRMgmt.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDRasterAndOCRMgmt.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D73F62A5-9E9F-4A65-9690-491AF2F77FAA),
+	version(1.0),
+	helpstring("UCLID RasterAndOCRMgmt 1.0 Type Library")
+]
+library UCLID_RASTERANDOCRMGMTLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+
+	/////////////////////////
+	// forward declarations
+	/////////////////////////
+	interface ISpatialPageInfo;
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(0EA8AB84-803E-4b0b-AE53-7773A87AB50E), 
+		helpstring("UCLID Spatial String Feature Types")
+	]
+    enum
+	{
+		kNoEntity = 0,
+        kCharacter = 1,
+        kWord = 2,
+		kLine = 3
+    } ESpatialEntity;
+	
+	typedef 
+	[
+		uuid(32AE947D-84AB-4bbc-900C-06AD0BC52182), 
+		helpstring("UCLID Page Orientation Types")
+	]
+	enum 
+	{
+		kRotNone,
+		kRotRight,
+		kRotDown,
+		kRotLeft,
+		kRotFlipped,
+		kRotFlippedRight,
+		kRotFlippedDown,
+		kRotFlippedLeft
+	} EOrientation;
+
+	typedef 
+	[
+		uuid(16C03D15-7B56-4b68-A6A4-BE9F7D2E3DEB), 
+		helpstring("Extract Spatial String Modes")
+	]
+	enum 
+	{
+		kNonSpatialMode, // default
+		kSpatialMode,
+		kHybridMode
+	} ESpatialStringMode;
+
+	typedef
+	[
+		uuid(63854D8E-BAEA-454a-A0E1-C0DAB96E32E8),
+		helpstring("FilterCharacters")
+	]
+	enum
+	{
+		kNoFilter=0,
+		kAlphaFilter=1,
+		kNumeralFilter=2,
+		kPeriodFilter=4,
+		kHyphenFilter=8,
+		kUnderscoreFilter=16,
+		kCommaFilter=32,
+		kForwardSlashFilter=64,
+		kCustomFilter=128,
+		kSizeFilter=256			// number of possible combinations of filter options
+	} EFilterCharacters;
+
+	typedef
+	[
+		uuid(A2D84638-CECB-4f1b-9EED-A50DEA47ACD5),
+		helpstring("OcrTradeOff")
+	]
+	enum
+	{
+		kAccurate,
+		kBalanced,
+		kFast,
+		kRegistry
+	} EOcrTradeOff;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(595379A5-D550-499A-9309-1A6F29E115F0),
+		dual,
+		helpstring("IRasterZone Interface"),
+		pointer_default(unique)
+	]
+	interface IRasterZone : IDispatch
+	{
+		[propget, id(1), helpstring("property StartX")] HRESULT StartX([out, retval] long *pVal);
+		[propput, id(1), helpstring("property StartX")] HRESULT StartX([in] long newVal);
+		[propget, id(2), helpstring("property StartY")] HRESULT StartY([out, retval] long *pVal);
+		[propput, id(2), helpstring("property StartY")] HRESULT StartY([in] long newVal);
+		[propget, id(3), helpstring("property EndX")] HRESULT EndX([out, retval] long *pVal);
+		[propput, id(3), helpstring("property EndX")] HRESULT EndX([in] long newVal);
+		[propget, id(4), helpstring("property EndY")] HRESULT EndY([out, retval] long *pVal);
+		[propput, id(4), helpstring("property EndY")] HRESULT EndY([in] long newVal);
+		[propget, id(5), helpstring("property Height")] HRESULT Height([out, retval] long *pVal);
+		[propput, id(5), helpstring("property Height")] HRESULT Height([in] long newVal);
+		[propget, id(6), helpstring("property PageNumber")] HRESULT PageNumber([out, retval] long *pVal);
+		[propput, id(6), helpstring("property PageNumber")] HRESULT PageNumber([in] long newVal);
+		[id(7), helpstring("method CopyDataTo")] HRESULT CopyDataTo([in] IRasterZone *pRasterZone);
+		[id(8), helpstring("method Clear")] HRESULT Clear();
+		[id(9), helpstring("method Equals")] HRESULT Equals([in] IRasterZone *pRasterZone, [out, retval] VARIANT_BOOL *pbValue);
+		[id(10), helpstring("method RotateBy")] HRESULT RotateBy([in] double dAngleInDegrees);
+		[id(11), helpstring("method GetData")] HRESULT GetData([in] long *pStartX, [in] long *pStartY, [in] long *pEndX, [in] long *pEndY, [in] long *pHeight, [in] long *pPageNum);
+		[id(12), helpstring("method CreateFromLongRectangle")] HRESULT CreateFromLongRectangle([in] ILongRectangle *pRectangle, [in] long nPageNum);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the smallest non-rotated rectangle that can envelope the this raster 
+		//          zone object. Will fit raster zones within page if PageInfoMap is provided.
+		// NOTE:	If pPageInfoMap == NULL, the returned object may exceed page boundaries.
+		[id(13), helpstring("method GetRectangularBounds")] HRESULT GetRectangularBounds(
+			[in] ILongToObjectMap *pPageInfoMap, [out, retval] ILongRectangle* *pRectangle);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return an IIUnknownVector of IDoublePoint where the points are the corners of the 
+		//			RasterZone's oriented rectangle
+		//			The Points will be ordered in the vector such that conecting the first point to 
+		//			the second and so on will create the outline of the raster zone ( a polygon )
+		[id(14), helpstring("method GetBoundaryPoints")] HRESULT GetBoundaryPoints([out, retval] IIUnknownVector** pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the area of this raster zone
+		[propget, id(15), helpstring("property Area")] HRESULT Area([out, retval] long *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the intersection area of the two raster zone
+		[id(16), helpstring("method GetAreaOverlappingWith")] HRESULT GetAreaOverlappingWith(
+			[in] IRasterZone *pRasterZone, [out, retval] double *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the smallest non-rotated rectangle that can envelop all raster zones
+		//			specified in the Vector of raster zones.  Will fit the rectangle within the
+		//			page bounds specified in the SpatialPageInfo object if provided.
+		// NOTE:	If pPageInfo == NULL the returned object may exceed page boundaries.
+		//			This method is basically a static method.  It will not operate on the
+		//			underlying IRasterZone object.  It merely computes a bounding rectangle for
+		//			the provided vector of RasterZones.
+		// REQUIRE:	pZones is an IUnknownVector of IRasterZone objects.
+		//			pZones are all raster zones from the same page
+		[id(17), helpstring("method GetBoundsFromMultipleRasterZones")]
+			HRESULT GetBoundsFromMultipleRasterZones([in] IIUnknownVector* pZones,
+				[in] ISpatialPageInfo* pPageInfo, [out, retval] ILongRectangle** ppRectangle);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To build a new raster-zone based on the provided data (same as setting each
+		//			value through the properties but allows you to do it in a single call)
+		[id(18), helpstring("method CreateFromData")] HRESULT CreateFromData([in] long lStartX,
+			[in] long lStartY, [in] long lEndX, [in] long lEndY, [in] long lHeight, [in] long lPageNum);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(948665AE-298C-4CB1-B580-5B7FA3AB46B2),
+		dual,
+		helpstring("ILineTextImageCleaner Interface"),
+		pointer_default(unique)
+	]
+	interface ILineTextImageCleaner : IDispatch
+	{
+		[id(1), helpstring("method CleanupImage")] HRESULT CleanupImage([in] BSTR strInputImageFileName, [in] BSTR strOutputImageFileName, [in] IRasterZone *pCleanZone);
+		[id(2), helpstring("method CleanupImage2")] HRESULT CleanupImage2([in] BSTR strInputImageFileName, [in] BSTR strOutputImageFileName, [in] IRasterZone *pCleanZone);
+	};
+
+	[
+		object,
+		uuid(0D0D2F15-3646-4788-8E6B-15C157C4CE6F),
+		dual,
+		helpstring("ILetter Interface"),
+		pointer_default(unique)
+	]
+	interface ILetter : IDispatch
+	{
+		[propget, id(1), helpstring("property Left")] HRESULT Left([out, retval] long *pVal);
+		[propput, id(1), helpstring("property Left")] HRESULT Left([in] long newVal);
+		[propget, id(2), helpstring("property Top")] HRESULT Top([out, retval] long *pVal);
+		[propput, id(2), helpstring("property Top")] HRESULT Top([in] long newVal);
+		[propget, id(3), helpstring("property Right")] HRESULT Right([out, retval] long *pVal);
+		[propput, id(3), helpstring("property Right")] HRESULT Right([in] long newVal);
+		[propget, id(4), helpstring("property Bottom")] HRESULT Bottom([out, retval] long *pVal);
+		[propput, id(4), helpstring("property Bottom")] HRESULT Bottom([in] long newVal);
+		[propget, id(6), helpstring("property Guess1")] HRESULT Guess1([out, retval] long *pVal);
+		[propput, id(6), helpstring("property Guess1")] HRESULT Guess1([in] long newVal);
+		[propget, id(7), helpstring("property Guess2")] HRESULT Guess2([out, retval] long *pVal);
+		[propput, id(7), helpstring("property Guess2")] HRESULT Guess2([in] long newVal);
+		[propget, id(8), helpstring("property Guess3")] HRESULT Guess3([out, retval] long *pVal);
+		[propput, id(8), helpstring("property Guess3")] HRESULT Guess3([in] long newVal);
+		[propget, id(11), helpstring("property IsEndOfParagraph")] HRESULT IsEndOfParagraph([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property IsEndOfParagraph")] HRESULT IsEndOfParagraph([in] VARIANT_BOOL newVal);
+		[propget, id(12), helpstring("property IsEndOfZone")] HRESULT IsEndOfZone([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(12), helpstring("property IsEndOfZone")] HRESULT IsEndOfZone([in] VARIANT_BOOL newVal);
+		[propget, id(13), helpstring("property IsSpatialChar")] HRESULT IsSpatialChar([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(13), helpstring("property IsSpatialChar")] HRESULT IsSpatialChar([in] VARIANT_BOOL newVal);
+		[propget, id(15), helpstring("property PageNumber")] HRESULT PageNumber([out, retval] long *pVal);
+		[propput, id(15), helpstring("property PageNumber")] HRESULT PageNumber([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Calling this method has the same effect as setting
+		//			IsSpatialChar = VARIANT_FALSE and Guess1 = nGuess1
+		//-----------------------------------------------------------------------------------------
+		[id(16), helpstring("method SetAsNonSpatialChar")] HRESULT SetAsNonSpatialChar([in] long nGuess1);
+		//-----------------------------------------------------------------------------------------
+		// Change this character to lower case. Currently the character is stored
+		// in Guess1.
+		[id(17), helpstring("method ToLowerCase")] HRESULT ToLowerCase();
+		//-----------------------------------------------------------------------------------------
+		// Change this character to upper case. Currently the character is stored
+		// in Guess1.
+		[id(18), helpstring("method ToUpperCase")] HRESULT ToUpperCase();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To offset the spatial bounds of this letter by the 
+		//			specified amount.  If this letter object is not spatial
+		//			then this method call has no effect (i.e. is ignored).
+		[id(19), helpstring("method Offset")] HRESULT Offset([in] long nX, [in] long nY);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the font size of this letter (in Points).  If there is no associated font size 0 
+		//			will be returned
+		[propget, id(20), helpstring("property FontSize")] HRESULT FontSize([out, retval] long *pVal);
+		[propput, id(20), helpstring("property FontSize")] HRESULT FontSize([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the character confidence for this letter.  If there is no associated confidence 0 
+		//			will be returned
+		[propget, id(21), helpstring("property CharConfidence")] HRESULT CharConfidence([out, retval] long *pVal);
+		[propput, id(21), helpstring("property CharConfidence")] HRESULT CharConfidence([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(22), helpstring("property IsItalic")] HRESULT IsItalic([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(22), helpstring("property IsItalic")] HRESULT IsItalic([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(23), helpstring("property IsBold")] HRESULT IsBold([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(23), helpstring("property IsBold")] HRESULT IsBold([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(24), helpstring("property IsSansSerif")] HRESULT IsSansSerif([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(24), helpstring("property IsSansSerif")] HRESULT IsSansSerif([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(25), helpstring("property IsSerif")] HRESULT IsSerif([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(25), helpstring("property IsSerif")] HRESULT IsSerif([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(26), helpstring("property IsProportional")] HRESULT IsProportional([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(26), helpstring("property IsProportional")] HRESULT IsProportional([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(27), helpstring("property IsUnderline")] HRESULT IsUnderline([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(27), helpstring("property IsUnderline")] HRESULT IsUnderline([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(28), helpstring("property IsSuperScript")] HRESULT IsSuperScript([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(28), helpstring("property IsSuperScript")] HRESULT IsSuperScript([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(29), helpstring("property IsSubScript")] HRESULT IsSubScript([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(29), helpstring("property IsSubScript")] HRESULT IsSubScript([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To create an ILetter object from a CPPLetter object (rather than setting
+		//			each property individually)
+		[id(30), helpstring("method CreateFromCppLetter")] HRESULT CreateFromCppLetter([in] void* pCppLetter);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a CPPLetter object from the ILetter object (rather than getting
+		//			each property individually)
+		[id(31), helpstring("method GetCppLetter")] HRESULT GetCppLetter([in, out] void* pCppLetter);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(A86B4F70-7A8A-4A69-99CA-450D832A69F6),
+		dual,
+		helpstring("ISpatialPageInfo Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatialPageInfo : IDispatch
+	{
+		[propget, id(1), helpstring("property Deskew")] HRESULT Deskew([out, retval] double *pVal);
+		[propput, id(1), helpstring("property Deskew")] HRESULT Deskew([in] double newVal);
+
+		[propget, id(2), helpstring("property Orientation")] HRESULT Orientation([out, retval] EOrientation *pVal);
+		[propput, id(2), helpstring("property Orientation")] HRESULT Orientation([in] EOrientation newVal);
+
+		[propget, id(3), helpstring("property Width")] HRESULT Width([out, retval] long *pVal);
+		[propput, id(3), helpstring("property Width")] HRESULT Width([in] long newVal);
+
+		[propget, id(4), helpstring("property Height")] HRESULT Height([out, retval] long *pVal);
+		[propput, id(4), helpstring("property Height")] HRESULT Height([in] long newVal);
+
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set all the page info in a single call
+		[id(5), helpstring("method SetPageInfo")] HRESULT SetPageInfo(
+			[in] long lWidth, [in] long lHeight, [in] EOrientation eOrientation, [in] double dDeskew);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get both the width and height of the page in a single call
+		[id(6), helpstring("method GetWidthAndHeight")] HRESULT GetWidthAndHeight(
+			[in] long *pWidth, [in] long *pHeight);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get all page info (width, height, orientation, and deskew) in a single call
+		[id(7), helpstring("method GetPageInfo")] HRESULT GetPageInfo(
+			[in] long* plWidth, [in] long* plHeight, [in] EOrientation* peOrientation,
+			[in] double* pdDeskew);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check if this spatial page info is equal to a specified spatial page info.
+		//			Equal means all values are the same (width, height, orientation and deskew)
+		[id(8), helpstring("method Equal")] HRESULT Equal([in] ISpatialPageInfo* pPageInfo,
+			[out, retval] VARIANT_BOOL* pEqual);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(AFDCB4FB-2AC7-46F7-B85C-FE42184ED686),
+		dual,
+		helpstring("ISpatialString Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatialString : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// EXPECTATIONS OF ANY CLASS THAT IMPLEMENTS THIS INTERFACE:
+		//
+		// A spatial string always starts out being in the non-spatial mode (with an empty 
+		// string as the value).  At some point the spatial string object is filled with either
+		// raw text (causes this object to be in the non-spatial mode), a letter-array (usually
+		// causes this object to be in the spatial mode, but that depends on the letters), or some
+		// raw text and some raster zones (which causes this object to be in the hybrid mode).
+		//
+		// In the hybrid mode, this object will contain raw text and some raster zones, but the 
+		// raster zones are artificially "connected" to the raw text.  When this object is in the
+		// hybrid mode, there is no letter array that "parallels" the spatial information returned
+		// by GetRasterZones().
+		//
+		// Unless it is stated otherwise explicitly, it should be understood that calling a 
+		// method on this object will not change the mode of this object.
+		//
+		// When the string is in spatial mode, the length of the returned String will always
+		// equal the length of the returned Letters property and when any one of these 
+		// properties is updated programmatically by a user of this object, the other property is
+		// automatically updated as appropriate.
+		//
+		// When the Letters property is updated, a corresponding string is computed
+		// from the Guess1 attribute of the individual ILetter objects.  The computed
+		// string is then used to update the value of the String property.
+		//
+		// While working with this interface, it is important to understand that the
+		// Letters property stores individual ILetter objects, each of which may
+		// be spatial or non-spatial.  The HasSpatialInfo() method on this interface will
+		// return true as long as at least one of the ILetter objects stored in 
+		// Letters is spatial or there is at least one RasterZone in the RasterZone vector.
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To retrieve the string value associated with this object.
+		[propget, id(1), helpstring("property String")] HRESULT String([out, retval] BSTR *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Look for the first match out of a vector of strings.
+		// REQUIRE: pList is a VariantVector of BSTR's. No parameters may be NULL.
+		// PARAMS:  pList - contains one or more BSTRs to search for
+		//          bCaseSensitive - whether matches should be case sensitive (VARIANT_TRUE) or 
+		//              case insensitive (VARIANT_FALSE).
+		//          bPrioritizedVector - whether pList should be treated as a prioritized vector.
+		//          (1) VARIANT_TRUE - strings in pList are searched sequentially. Return the first
+		//                  string in pList that matches.
+		//          (2) VARIANT_FALSE - search for all strings in pList. Return the string in pList
+		//                  that occurs at the earliest plStart. If two strings have same start index,
+		//                  return the index of the string with the highest end index.
+		//          lStartSearchPos - 0-based index, specifies the start search position in the string
+		//          plStart - 0-based start index of found string, or -1 if no string was found
+		//          plEnd - 0-based ending index of found string, or -1 if no string was found
+		// PROMISE: To return start and end position of the match in the string if a match is found.
+		//			If no match is found -1 will be returned for both the start and end positions.
+		//			If bPrioritizedVector, pList will be treated as a prioritized vector, with
+		//          the first string having the highest priority and last string having the lowest
+		//          priority. A prioritized vector will return the highest priority matching string.
+		//          An unprioritized vector returns the earliest occuring matching string.
+		// NOTE:    If it is only important to find whether a matching string in a vector of strings 
+		//          exists (and not the start and end index of that string), you may use 
+		//          spatial string's ContainsStringInVector method.
+		[id(3), helpstring("method FindFirstItemInVector")] HRESULT FindFirstItemInVector(
+			[in] IVariantVector* pList, [in] VARIANT_BOOL bCaseSensitive, [in] VARIANT_BOOL bPrioritizedVector, 
+			[in] long lStartSearchPos, [in, out] long * plStart, [in, out] long * plEnd);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: This performs the same function as FindFirstItemInVector, except each BSTR in
+		//          pList is treated as a regular expression. See the description above of 
+		//          FindFirstItemInVector for more information.
+		//			pRegExprParser will be used to conduct the search for regular expressions
+		[id(4), helpstring("method FindFirstItemInRegExpVector")] HRESULT FindFirstItemInRegExpVector(
+			[in] IVariantVector* pList, [in] VARIANT_BOOL bCaseSensitive, [in] VARIANT_BOOL bPrioritizedVector,
+			[in] long lStartSearchPos, [in] IRegularExprParser *pRegExprParser, 
+			[in, out] long * plStart, [in, out] long * plEnd);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get access to an individual character in the string
+		// REQUIRE:	nIndex >= 0 && nIndex < Size
+		// PROMISE: To return the character at position nIndex
+		[id(6), helpstring("method GetChar")] HRESULT GetChar([in] long nIndex, 
+			[out, retval] long *pChar);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the size of the string represented by this object.
+		// NOTE:	The returned value will be the same as the size of the returned
+		//			String attribute.
+		[propget, id(7), helpstring("property Size")] HRESULT Size([out, retval] long *pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get access to an individual letter object in the string
+		// REQUIRE: GetMode() == kSpatialMode
+		//			nIndex >= 0 && nIndex < Size
+		//			The return ILetter object must not be modified by caller, and 
+		//			must be used in "read only" mode.
+		// PROMISE: To return the ILetter object at position nIndex
+		[id(8), helpstring("method GetOCRImageLetter")]
+			HRESULT GetOCRImageLetter([in] long nIndex, [out, retval] ILetter **pLetter);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		//			IsMultiPage == VARIANT_FALSE
+		// PROMISE: To return an ILongRectangle containing the bounds of the spatial string
+		// PURPOSE: Will return the smallest possible top, left, bottom, right bounding box that covers 
+		//			all the raster zones or letters vector entries completely.
+		[id(9), helpstring("method GetOriginalImageBounds")]
+			HRESULT GetOriginalImageBounds([out, retval] ILongRectangle **pBounds);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return an IUnknownVector of ISpatialString each string representing one word
+		[id(10), helpstring("method GetWords")] HRESULT GetWords([out, retval] IIUnknownVector **pvecWords);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return an IUnknownVector of ISpatialString each string representing one line
+		[id(11), helpstring("method GetLines")] HRESULT GetLines([out, retval] IIUnknownVector **pvecLines);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: To return an IUnknownVector of ISpatialString each string representing one paragraph
+		[id(12), helpstring("method GetParagraphs")] HRESULT GetParagraphs([out, retval] IIUnknownVector **pvecParagraphs);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Insert another SpatialString inside of this one
+		// REQUIRE: nPos >= 0 and (nPos < Size || nPos == 0)
+		//
+		// TODO:
+		//			If this string and pString are both strings that are spatial, then the page number 
+		//			associated with all the letters of pString must "fit" within the letters (if any)
+		//			that will surround the inserted string after the insert operation. This is to prevent
+		//			insertion of a page5 string in the middle of page2.
+		//
+		// PROMISE: pString will be inserted into this object at the nPos position.
+		//			This object's mode will be changed according to the current mode of this object
+		//			and the mode of pString, according to the table below:
+		//			This object			pString				Resulting This object
+		//			-----------------	-----------------	---------------------
+		//			Spatial				Spatial				Spatial
+		//			Spatial				NonSpatial			Spatial
+		//			Spatial|Hybrid		Spatial|Hybrid		Hybrid
+		//			Hybrid				NonSpatial			Hybrid
+		//			NonSpatial			Spatial				Spatial
+		//			NonSpatial			Hybrid				Hybrid
+		//			NonSpatial			NonSpatial			NonSpatial
+		[id(14), helpstring("method Insert")] HRESULT Insert([in] long nPos, [in] ISpatialString *pString);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Append another SpatialString at the end of this one
+		// PROMISE: pString will be appended to the end of this object.
+		//			This object's mode will be changed in the same way that it would for Insert.
+		[id(15), helpstring("method Append")] HRESULT Append([in] ISpatialString *pString);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Retrieve text from nStart to nEnd, inclusive
+		// REQUIRE: nStart and nEnd must be valid indexes.  A value of -1 for nEnd
+		//			indicates "get from nStart until end of string"
+		// PROMISE:	To retrieve the substring of this object starting at nStart and ending at nEnd.
+		//			If GetMode() == kNonSpatialMode, the returned string will also be non-spatial
+		//			If GetMode() == kSpatialMode, the returned string will either be non-spatial or
+		//			spatial depending upon the spatialness of the letters associated with the 
+		//			returned substring. This mode will also have the correct spatial page info associated
+		//			with it if the letters have relevant spatial page info.
+		//			If GetMode() == kHybridMode, the returned string will also be in the Hybrid mode
+		//			and will have the same raster zones associated with it as this object.
+		[id(16), helpstring("method GetSubString")] HRESULT GetSubString([in] long nStart, [in] long nEnd, 
+			[out, retval] ISpatialString **pSubString);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: nStart and nEnd must be valid indexes.  A value of -1 for nEnd
+		//			indicates "remove from nStart until end of string"
+		// PROMISE:	To remove the characters in this object from position nStart to nEnd.
+		//			If GetMode() == kNonSpatialMode, this object will continue to remain in
+		//			non-spatial mode.
+		//			If GetMode() == kSpatialMode, this object will be in spatial mode if the  
+		//			resultant string has any spatial letters, or a hybrid string if the resultant 
+		//			string contains no spatial letters.
+		//			If GetMode() == kHybridMode, this object will continue to be in hybrid mode
+		//			and will continue to retain all the raster zones previously associated with it.
+		[id(17), helpstring("method Remove")] HRESULT Remove([in] long nStart, [in] long nEnd);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Replace all instances of strToFind with strReplacement
+		// ARGS:	lOccurrence - The 1-based occurrence to replace.
+		//          (A) If lOccurrence is negative, replaces that occurrence from the end of the 
+		//              found occurrences. For example, -1 replaces the last occurrence.
+		//          (B) If lOccurence is 0, replaces all occurrences.
+		//          (C) If lOccurence is positive, replaces that occurrence from the front of the 
+		//              found occurrences. For example, 2 replaces the second occurrence.
+		//          pRegExpr - If NULL, strToFind and strReplacement are in normal string format;
+		//					   If not NULL, strToFind and strReplacement are treated as regular expressions
+		// PROMISE:	If GetMode() == kSpatialMode, and strToFind and strReplacement have the same length
+		//			this object will continue to remain spatial and the found characters in the
+		//			letter array will just be replaced with the replacement characters.
+		//			If GetMode() == kSpatialMode and strToFind and strReplacement are of different
+		//			lengths, the search/replace is done on the text and letters and the 
+		//			following 3 outcomes are possible:
+		//			1. strInput.length() == strReplacement.length() -> Resulting string is kSpatialMode. The
+		//					letters in m_strString are overwritten and nothing else happens.
+		//			2. strInput.length() < strReplacement.length() ->Resulting string is kSpatialMode. The
+		//					extra letters in strReplacement are added as nonspatial letters.
+		//			3. strInput.length() > strReplacement.length() -> Resulting string is kHybridMode since there
+		//					is no way to know which letters to replace.
+		[id(18), helpstring("method Replace")] HRESULT Replace([in] BSTR strToFind, 
+			[in] BSTR strReplacement, [in] VARIANT_BOOL bCaseSensitive, [in] long lOccurrence, 
+			[in] IRegularExprParser *pRegExpr);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Replace consecutive appearances of any character in strChars
+		//			with the first instance of such appearance in the sequence.
+		// PROMISE:	If GetMode() == kSpatialMode, the new mode of this object will either be spatial
+		//			or non-spatial, depending upon the letters are that left over after the 
+		//			consolidate operation.
+		// Example: If this string is "AbcdAbcd is something.", 
+		//			strChars = Abcd, then this string will be consolidated
+		//			to "A is something"
+		[id(19), helpstring("method ConsolidateChars")] HRESULT ConsolidateChars([in] BSTR strChars, 
+			[in] VARIANT_BOOL bCaseSensitive);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To trim off leading and/or trailing characters that 
+		//			match any character in strTrimLeadingChars and
+		//			strTrimTrailingChars respectively
+		// PROMISE:	If GetMode() == kSpatialMode, the new mode of this object will either be spatial
+		//			or non-spatial, depending upon the letters are that left over after the 
+		//			trim operation.
+		// NOTE:	The find algorithm used in this method is case-sensitive.
+		[id(20), helpstring("method Trim")] HRESULT Trim([in] BSTR strTrimLeadingChars,
+			[in] BSTR strTrimTrailingChars);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the index of the first instance of nChar in the string
+		//			where the search is began at nStartPos. If no match is found, 
+		//			-1 will be returned.
+		// NOTE:	The find algorithm used in this method is case-sensitive.
+		[id(21), helpstring("method FindFirstInstanceOfChar")] HRESULT FindFirstInstanceOfChar([in] long nChar,
+			[in] long nStartPos, [out, retval] long *pMatchPos);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a collection of ISpatialStrings that were originally
+		//          delimited by the specified string. If no delimiter is found, 
+		//			the entire ISpatialString will be returned in the collection.
+		//			If GetMode() == kSpatialMode, each of the returned token spatial strings' mode
+		//			will depend upon the spatialness of the corresponding letter objects.
+		//			If GetMode() == kHybridMode, the tokens that are hybrid will contain all the 
+		//			raster zones associated with this object.
+		[id(23), helpstring("method Tokenize")] HRESULT Tokenize([in] BSTR strDelimiter, 
+			[out, retval] IIUnknownVector **pvecItems);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Spatial mode will not change. A string such as "Steve works at Extract Systems." 
+		//			will become "steve works at extract systems."
+		//			If GetMode() == kSpatialMode, the letter array will be updated appropriately.
+		//			Spatialness will not be affected.
+		[id(24), helpstring("method ToLowerCase")] HRESULT ToLowerCase();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Spatial mode will not change. A string such as "The car is red." will become 
+		//			"THE CAR IS RED."
+		//			If GetMode() == kSpatialMode, the letter array will be updated appropriately.
+		//			Spatialness will not be affected.
+		[id(25), helpstring("method ToUpperCase")] HRESULT ToUpperCase();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Spatial mode will not change. The first letter of each word in the string will
+		//			be capitalized. "ThiS is sOme RanDom tExt."  will become "This Is Some Random Text."
+		//			If GetMode() == kSpatialMode, the letter array will be updated appropriately.
+		//			Spatialness will not be affected.
+		[id(26), helpstring("method ToTitleCase")] HRESULT ToTitleCase();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	Delete all its contents, and reset this object to a non-spatial string
+		//			with an empty string value, no associated raster zones, and no 
+		//			associated source document name.
+		[id(27), helpstring("method Clear")] HRESULT Clear();
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	GetMode() != kNonSpatialMode
+		// PROMISE: If GetMode() == kSpatialMode this will offset the spatial letter objects 
+		//			contained in this ISpatialString object by the specified amount.
+		//			If GetMode() == kHybridMode this will offset the raster zone objects 
+		//			associated with this ISpatialString object by the specified amount.
+		[id(28), helpstring("method Offset")] HRESULT Offset([in] long nX, [in] long nY);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	strFullFileName must either have a .txt or .uss file extension.
+		// PROMISE: If bSetDirtyFlagToTrue == VARIANT_TRUE, the internal dirty flag
+		//			is set to True.  If bSetDirtyFlagToTrue == VARIANT_FALSE, then
+		//			the default behavior of the dirty flag being set to false
+		//			takes effect.
+		//			If the extension of strFullFileName is .txt then the input
+		//			file is assumed to contain plain text (without spatial information).
+		//			If the extension is .uss, then the input file is expected to 
+		//			contain complete spatial information required to restore
+		//			this object back to its saved state.
+		[id(29), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bSetDirtyFlagToTrue, [out, retval] BSTR *pstrOriginalSourceDocName);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	strFullFileName must either have a .txt or .uss file extension.
+		// PROMISE: If bClearDirty  == VARIANT_TRUE, the internal dirty flag's
+		//			value is set to false.  If bClearDirty == VARIANT_FALSE
+		//			then the internal dirty flag's value is unchanged.
+		//			If the extension of strFullFileName is .txt then the output
+		//			will be written to the specified file as plain text (without any
+		//			spatial information).  If the extension is .uss, then the output
+		//			will be a binary file with complete spatial information to restore
+		//			this object back to its current state.
+		//			The bCompress flag is ignored if .txt is the extension of
+		//			strFullFileName.
+		//			If bCompress == VARIANT_TRUE, then the .USS file will be compressed.
+		[id(30), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName, 
+			[in] VARIANT_BOOL bCompress, [in] VARIANT_BOOL bClearDirty);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	To append strTextToAppend to this object by creating a new non-spatial ISpatialString
+		//			object and append it to this object using the Append interface method of ISpatialString.
+		[id(31), helpstring("method AppendString")] HRESULT AppendString([in] BSTR strTextToAppend);
+		//-----------------------------------------------------------------------------------------
+		// By default Spatial strings are not associated with source documents.
+		// However, optionally they can be.  The creator or modifier of a spatial
+		// string object decides if and what to populate this attribute with.
+		[propget, id(32), helpstring("property SourceDocName")] HRESULT SourceDocName([out, retval] BSTR *pVal);
+		[propput, id(32), helpstring("property SourceDocName")] HRESULT SourceDocName([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the character in the string
+		// REQUIRE:	nIndex >= 0 && nIndex < Size
+		//			nChar >0 && nChar <=255
+		// PROMISE: To update the character at position nIndex the String attribute.
+		//			if GetMode() == kSpatialMode, then the Guess1 attribute of
+		//			the letter object at position nIndex is also updated.
+		[id(33), helpstring("method SetChar")] HRESULT SetChar([in] long nIndex, 
+			[in] long nChar);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Replace consecutive appearances of strConsolidateString
+		//			with the first instance of such appearance in the sequence.
+		// PROMISE: If GetMode() == kSpatialMode, the new mode of this object will either be spatial
+		//			or non-spatial, depending upon the letters are that left over after the 
+		//			consolidate operation.
+		//			If GetMode() == kHybridMode, the raster zones will not be affected and the
+		//			object will remain in hybrid mode.
+		// Example: If this string is "AbcdAbcd is something.", 
+		//			strConsolidateString = Abcd, then this string will be consolidated
+		//			to "Abcd is something"
+		[id(37), helpstring("method ConsolidateString")] HRESULT ConsolidateString(
+			[in] BSTR strConsolidateString, [in] VARIANT_BOOL bCaseSensitive);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	HasSpatialInfo() == VARIANT_TRUE;
+		// PURPOSE: To update the PageNumber attribute of all associated letter objects / RasterZones
+		//			to nPageNumber.
+		//			If there is only one spatial page info object associated with this string, its 
+		//			page number will be set to nPageNumber. If there are multiple spatial page info
+		//			objects associated with this string, then all spatial page info objects whose page
+		//			number is not nPageNumber shall be removed from this object.
+		[id(38), helpstring("method UpdatePageNumber")] HRESULT UpdatePageNumber(
+			[in] long nPageNumber);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() != kNonSpatialMode
+		//			nStartPageNum = -1 or > 0, nEndPageNum = -1 or > 0
+		//			If nStartPageNum == -1, then the nEndPageNum field represents the "last X pages".
+		//			If nEndPageNum == -1, then the search should go from the specified start page to 
+		//			the last page in the document.
+		//			If nStartPageNum == nEndPageNum == -1, then that's an error condition.
+		// PROMISE: Return a spatial string taking letters/ raster zones from specified range of pages 
+		//			of current spatial string.
+		//
+		// NOTE:	This method always gives the absolute pages, i.e. it gives the pages according to the
+		//			letters position from the original image. For instance, if nStartPageNum = 1,
+		//			nEndPageNum = 2, and the first page of the original image is actually removed already,
+		//			the return spatial string will only contain the letters from the page 2 of the original image.
+		[id(39), helpstring("method GetSpecifiedPages")] HRESULT GetSpecifiedPages([in] long nStartPageNum, 
+			[in] long nEndPageNum, [out, retval] ISpatialString** ppResultString);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() != kNonSpatialMode
+		// PROMISE: Return a collection of spatial strings. Each spatial string has spatial data from only
+		//			one page.
+		[id(40), helpstring("method GetPages")] HRESULT GetPages([out, retval] IIUnknownVector **pvecPages);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Return an approximation of the Line Height(in pixels) of a spatial string
+		//			The Line Height is the Height of the text plus the line spacing
+		//			If the string is on multiple line the average height of those lines
+		//			is returned
+		[id(41), helpstring("method GetAverageLineHeight")] HRESULT GetAverageLineHeight([out, retval] long *lpHeight);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Return a good approximation of the Width (in pixels) of an average character
+		//			Where the width is the size of the character plus the space 
+		//			before the next character.  If there are multiple characters the average
+		//			width is returned
+		[id(42), helpstring("method GetAverageCharWidth")] HRESULT GetAverageCharWidth([out, retval] long* lpWidth);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() != kNonSpatialMode
+		// PROMISE: Returns physical location of pages of the current spatial string. This method 
+		//			may or may not have the same result as GetSpecifiedPages. For instance, if
+		//			current spatial string is directly obtained from original image and no page
+		//			has been removed from or added to this spatial string, then by using 
+		//			GetSpecifiedPages() has the same effect as using GetRelativePages().
+		//			If GetMode() != kSpatialMode the whole string is returned.
+		// NOTE :	This method always returns the relative pages by their physical location in
+		//			the current spatial string, not by their original record of page numbers.
+		[id(43), helpstring("method GetRelativePages")] HRESULT GetRelativePages([in] long nStartPageNum, 
+			[in] long nEndPageNum, [out, retval] ISpatialString** ppResultString);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Returns an IIUnknownVector of the lines in the spatial string after 
+		//			"Splitting" the lines to make sure there are no large white space gaps in 
+		//			the lines
+		[id(45), helpstring("method GetSplitLines")] HRESULT GetSplitLines([in] long nMaxSpace, 
+			[out, retval] IIUnknownVector** ppResultVector);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE:	Builds the string from a vector of lines inserting a \r\n between each line.
+		//			If all the lines have GetMode() == kSpatialMode, then this object will be
+		//			spatial.
+		//			If all the lines have GetMode() == kNonSpatialMode, then this object will be
+		//			non-spatial.
+		//			If all the lines have GetMode() == kHybridMode, then this object will also be in
+		//			hybrid mode.
+		//			If all the lines do not have the same mode, and if at least one line has a mode
+		//			other than non-spatial, then this object will be in hybrid mode.
+		[id(46), helpstring("method CreateFromLines")]
+			HRESULT CreateFromLines([in] IIUnknownVector* pLines);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Returns a vector of spatial strings each one of which is a block of justified text
+		//			from the source strings.  Only blocks with nMinLines or more lines are returned.
+		//			The returned blocks will either be in spatial mode or non-spatial mode depending
+		//			upon the letters that make up those blocks.
+		[id(47), helpstring("method GetJustifiedBlocks")] HRESULT GetJustifiedBlocks([in] long nMinLines, 
+			[out, retval] IIUnknownVector** ppResultVector);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Returns a vector of spatial strings each one of which is a block of text 
+		//			from the source strings. Only blocks with nMinLines or more lines are returned.
+		//			The returned blocks will either be in spatial mode or non-spatial mode depending
+		//			upon the letters that make up those blocks.
+		[id(48), helpstring("method GetBlocks")] HRESULT GetBlocks([in] long nMinLines, [out, retval] IIUnknownVector** ppResultVector);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PURPOSE:	Returns the index of the first spatial letter after and including nStartPos
+		//			It also optionally returns the letter itself
+		[id(50), helpstring("method GetNextOCRImageSpatialLetter")]
+			HRESULT GetNextOCRImageSpatialLetter([in] long nStartPos, 
+				[in, out] ILetter** pLetter, [out, retval] long* pIndex);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	Returns the index of the first non spatial letter after and including nStartPos
+		//			It also optionally returns the letter itself
+		[id(51), helpstring("method GetNextNonSpatialLetter")] HRESULT GetNextNonSpatialLetter([in] long nStartPos, 
+			[in, out] ILetter** pLetter, [out, retval] long* pIndex);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: None
+		// PURPOSE:	Returns VARIANT_TRUE if the letter at nIndex is the last letter in a word
+		[id(52), helpstring("method GetIsEndOfWord")] HRESULT GetIsEndOfWord([in] long nIndex, [out, retval] VARIANT_BOOL* pbIsEnd);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: None
+		// PURPOSE:	Returns VARIANT_TRUE if the letter at nIndex is the last letter in a line
+		[id(53), helpstring("method GetIsEndOfLine")] HRESULT GetIsEndOfLine([in] long nIndex, [out, retval] VARIANT_BOOL* pbIsEnd);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	Nothing
+		// PURPOSE: Load the files in the pvecFiles argument into the spatial string 
+		//			If the files are txt files each will be appended one after the other and the 
+		//			resulting spatial string will be non spatial
+		//			If the files are uss files each will be appended one after.  If the object loaded
+		//			from a particular USS file is spatial, then the page number of all letters in that
+		//			SpatialString will be set to the 1-based index of the USS file in pvecFiles.
+		//			This object's mode at the end of this method call could be kNonSpatialMode, 
+		//			kSpatialMode, or kHybridMode, depending upon whether the USS files contained
+		//			spatial strings, non-spatial strings, or hybrid strings.
+		//			If all the USS files contained non-spatial strings, then this object will be in
+		//			non-spatial mode.
+		//			If all the USS files contained spatial strings, then this object will be in
+		//			spatial mode.
+		//			If all the USS files contained hybrid strings, then this object will be in
+		//			hybrid mode.
+		//			If all the USS files did not contain strings in the same mode, and at least one
+		//			of the USS files contained a string that was hybrid, then this object will
+		//			be in hybrid mode.
+		[id(54), helpstring("method LoadFromMultipleFiles")] HRESULT LoadFromMultipleFiles([in] IVariantVector *pvecFiles, 
+			[in] BSTR strSourceDocName);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PURPOSE: Return the SpatialPageInfo associated with the specified page number
+ 		[id(55), helpstring("method GetPageInfo")] HRESULT GetPageInfo([in] long nPageNum, [out, retval] ISpatialPageInfo** ppPageInfo);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PURPOSE: Sets the SpatialPageInfo associated with the specified page number
+		[id(56), helpstring("method SetPageInfo")] HRESULT SetPageInfo([in] long nPageNum, [in] ISpatialPageInfo* pPageInfo);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PROMISE: Returns a pointer to the spatialpageinfo Long to object map.
+		[propget, id(57), helpstring("property SpatialPageInfos")] HRESULT SpatialPageInfos([out, retval] ILongToObjectMap **pVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PURPOSE: Returns a vector of IRasterZones that represent the spatial string.
+		//			If GetMode() == kSpatialMode, raster zones are computed and returned for each line of this
+		//			spatial string.
+		//			If GetMode() == kHybridMode, a *COPY* of all raster zones artificially associated
+		//			with this spatial string will be returned.
+		[id(58), helpstring("method GetOriginalImageRasterZones")]
+			HRESULT GetOriginalImageRasterZones([out, retval] IIUnknownVector** ppRasterZones);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		// PURPOSE: Returns true if this string exists on more than one page.
+		//			If GetMode() == kSpatialMode, VARIANT_TRUE is returned if and only if all letter
+		//			objects are not on the same page.
+		//			If GetMode() == kHybridMode, VARIANT_TRUE is returned if and only if all spatial 
+		//			zones artificially associated with this string are not on the same page.
+		[id(59), helpstring("method IsMultiPage")] HRESULT IsMultiPage([out, retval] VARIANT_BOOL *pbRet);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns the page number of the first page on the string
+		// REQUIRE: HasSpatialInfo() == VARIANT_TRUE
+		// NOTE:	If IsMultiPage == VARIANT_FALSE the page returned contains the entire string
+		[id(60), helpstring("method GetFirstPageNumber")] HRESULT GetFirstPageNumber([out, retval] long *pRet);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Returns the page number of the last page on the string
+		// REQUIRE: HasSpatialInfo() == VARIANT_TRUE
+		// NOTE:	If IsMultiPage == VARIANT_FALSE the page returned contains the entire string
+		//			And it will be the same as GetFirstPageNumber
+		[id(61), helpstring("method GetLastPageNumber")] HRESULT GetLastPageNumber([out, retval] long *pRet);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the index of the first instance of strSearchString in the string
+		//			where the search is begun at nStartPos. If no match is found, 
+		//			-1 will be returned.  The search is case-sensitive.
+		[id(62), helpstring("method FindFirstInstanceOfString")] HRESULT FindFirstInstanceOfString(
+			[in] BSTR strSearchString, [in] long nStartPos, [out, retval] long *pMatchPos);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: pNumLetters will return with the number of letters in the buffer returned in 
+		//			ppLetters.
+		//			*ppLetters will be a pointer to a memory block containing nNumLetters letters
+		//			The block of memory will be structured with nNumLetters sequential blocks structured
+		//			as follows. Numbers are bits:
+		//			16 - Guess1			- the ASCII character code for the letter
+		//			16 - Guess2			- a second possible code
+		//			16 - Guess3			- a third possible code
+		//			16 - Top			- The top of the letter 
+		//			16 - Left			- The left of the letter 
+		//			16 - Right			- The right of the letter 
+		//			16 - Bottom			- The bottom of the letter 
+		//			08 - PageNum		- The page on which this letter occurs
+		//			08 - EndOfParagraph - Non-Zero if the letter is the last in a paragraph
+		//			08 - EndOfZone		- Non-Zero if the letter is the last in a zone
+		//			08 - IsSpatial		- Non-Zero if the letter is spatial i.e. has a meaningful
+		//								  Top, Bottom, Left, Right and page number
+		//			The total size of the buffer will be nNumLetters * 18Bytes 
+		//
+		//			In general, the caller should not make any modifications to the
+		//			returned Letters buffer, and should use the returned vector in
+		//			"read-only" mode.  The buffer returned is a pointer to the memory
+		//			used inside the spatial string. Only a copy of this buffer may be 
+		//			modified.
+		[id(63), helpstring("method GetOCRImageLetterArray")]
+			HRESULT GetOCRImageLetterArray([in, out] long* pnNumLetters,
+				[in, out] void** ppLetters);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: Nothing
+		// NOTE:	letters points to a buffer of length nNumLetters * 18Bytes that is in the 
+		//			format desribed above
+		// PROMISE: Subsequent calls to GetMode() will return kSpatialMode as long as at least
+		//			one of the letter objects in newVal have IsSpatialChar == VARIANT_TRUE.
+		//			The buffer of letters represented by letters in general should no 
+		//			longer be modified.  If any of the letters or the letters vector
+		//			is modified, then the Letters attribute must be "Set" again.
+		//			The internal value of the String attribute will be updated based 
+		//			upon the Guess1 attribute of the individual letter blocks in 
+		//			letters. This object will automatically be "downgraded" to a 
+		//			non-spatial string if there are no spatial letters in letters.
+		//			The SourceDocName property will be reset to "".
+		[id(64), helpstring("method CreateFromLetterArray")] HRESULT CreateFromLetterArray(
+			[in] long nNumLetters, [in] void* pletters, [in] BSTR bstrSourceDocName,
+			[in] ILongToObjectMap* pPageInfoMap);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		// PROMISE: Will return all characters whose font size falls in(or out of) the specified range.
+		//			If bInclude == VARIANT_TRUE all characters inside the range (inclusive) will be 
+		//			returned, otherwise all characters outside the range will be returned.
+		//			Non-Spatial characters will be included based on the nearest preceeding spatial
+		//			character. Thus given the string "AAABBB" where all 'A's are spatial and all 'B's 
+		//			are not, the B's will be included if and only if the A's are.
+		//			Note: A value of -1 for min(or max) means no min(or max) size.
+		[id(65), helpstring("method SelectWithFontSize")] HRESULT SelectWithFontSize(
+			[in] VARIANT_BOOL bInclude, [in] long nMinFontSize, [in] long nMaxFontSize, 
+			[out, retval] ISpatialString** ppResultString);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: None
+		// PROMISE: Will return the confidence of the lowest confidence character in the string, the 
+		//			confidence of the highest character in the string and the mean confidence of all
+		//			the characters in the string.
+		//			Note: these calculations ignore the confidences of Non-Spatial characters which
+		//			are always 100.
+		//			Note: Hybrid strings are always 100% confidence as well.
+		//			Note: NULL can passed in for any/all of the three parameters e.g. pnMinConfidence
+		//			can be null if the minimum confidence is not needed
+		[id(66), helpstring("method GetCharConfidence")] HRESULT GetCharConfidence(
+			[in, out] long* pnMinConfidence, [in, out] long* pnMaxConfidence, [in, out] long* pnAvgConfidence);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	None
+		// PROMISE: Will return a LongToLongMap mapping, for each font size found on the document, 
+		//			the font size (in points) to the number of characters in the string with that
+		//			font size.
+		// 
+		// TODO:
+		//			A font size of zero should mean "no font size information was available".
+		//			For non-spatial and hybrid strings, there will only be one entry in the returned map
+		//			where the key to that entry is zero, and the value is the length of the current 
+		//			string.
+		[id(67), helpstring("method GetFontSizeDistribution")] HRESULT GetFontSizeDistribution(
+			[out, retval] ILongToLongMap** ppMap);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: None
+		// PURPOSE: To return information about the font in the string
+		// PROMISE: Will return VARIANT_TRUE in pbItalic if at least nMinPercentage of the characters
+		//			in the spatial string are Italic characters.  The same is true for each of the other
+		//			font characteristics i.e. bold, underline ...
+		//			Note: NULL can passed in for any/all of the info parameters e.g. pbSansSerif
+		//			can be NULL if you dont care whether the font is SansSerif
+		//
+		// TODO:
+		//			Also, for non-spatial strings, VARIANT_FALSE should be returned for all of the
+		//			out variables below whose pointers are not NULL.
+		[id(68), helpstring("method GetFontInfo")] HRESULT GetFontInfo(
+			[in] long nMinPercentage, [in, out] VARIANT_BOOL* pbItalic, [in, out] VARIANT_BOOL* pbBold,
+			[in, out] VARIANT_BOOL* pbSansSerif, [in, out] VARIANT_BOOL* pbSerif, [in, out] VARIANT_BOOL* pbProportional,
+			[in, out] VARIANT_BOOL* pbUnderline, [in, out] VARIANT_BOOL* pbSuperScript, [in, out] VARIANT_BOOL* pbSubScript);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode() == kSpatialMode
+		//			pSS != NULL
+		//			pSS.GetMode() == kSpatialMode
+		// PROMISE: This method will return true iff this string is on a previous page to pSS or 
+		//			this string is above pSS or this string is to the left of pSS.  The concepts above/below
+		//			and left right are handled in a fuzzy fashion
+		[id(69), helpstring("method IsSpatiallyLessThan")] HRESULT IsSpatiallyLessThan(
+			[in] ISpatialString* pSS,
+			[out, retval] VARIANT_BOOL* pbRetVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	Nothing
+		// PROMISE:	To return the current mode of the spatial string.
+		[id(70), helpstring("method GetMode")] HRESULT GetMode([out, retval] ESpatialStringMode *pVal);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	None
+		// PROMISE:	To downgrade this object to non-spatial mode such that subsequent calls to
+		//			retrieve the String value return the current value of the String.
+		//			All spatial information will be lost - so subsequent calls to HasSpatialInfo() will
+		//			return VARIANT_FALSE.
+		[id(71), helpstring("method DowngradeToNonSpatialMode")] HRESULT DowngradeToNonSpatialMode();
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE:	GetMode() == kSpatialMode
+		// PROMISE:	To downgrade this object to a hybrid mode.  The current text value and 
+		//			raster zones associated with this object will be remembered as the String value
+		//			and raster zones of this object in its new hybrid mode.  All association to 
+		//			letter objects will be lost.
+		[id(72), helpstring("method DowngradeToHybridMode")] HRESULT DowngradeToHybridMode();
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Add a collection of raster zones to the vector of raster zones for this object.
+		// NOTE:	Regardless of the strings current mode after
+		// 			this call the string will be in hybrid mode.
+		[id(73), helpstring("method AddRasterZones")] HRESULT AddRasterZones(
+			[in] IIUnknownVector *pVal, [in] ILongToObjectMap *pPageInfoMap);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE:	To determine if there are any raster zones associated with this object
+		// PROMISE:	To return VARIANT_TRUE if there is at least one raster zone
+		//			associated with this object.  A raster zone may be associated with this object
+		//			because this object is in SpatialMode or because it is in HybridMode
+		[id(74), helpstring("method HasSpatialInfo")] HRESULT HasSpatialInfo([out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: None
+		// PROMISE: Build a spatial string object in kHybridMode from 1 or more Raster Zones and 
+		//			the string they are	associated with. All previous spatial information will be lost.
+		[id(76), helpstring("method CreateHybridString")] HRESULT CreateHybridString(
+			[in] IIUnknownVector *pVecRasterZones, [in] BSTR bstrText, 
+			[in] BSTR bstrSourceDocName, [in] ILongToObjectMap *pPageInfoMap);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Returns VARIANT_TRUE if this spatial string contains an empty string. Returns
+		//          VARIANT_FALSE otherwise.
+		[id(78), helpstring("method IsEmpty")] HRESULT IsEmpty([out, retval] VARIANT_BOOL *pvbIsEmpty);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To check if this spatial string contains any of the strings contained in the
+		//          specified vector. Strings may optional be set to be case sensitive or treated
+		//          as regular expressions.
+		// REQUIRE: All elements of pVecBSTRs must be variants that contain BSTRs. 
+		//          All parameters must be non-NULL. 
+		// PROMISE: Returns VARIANT_TRUE if this spatial string contains at least one of the 
+		//          strings contained in pVecBSTRs, VARIANT_FALSE otherwise. If vbCaseSensitive
+		//          is VARIANT_TRUE matches must be case sensitive. If vbAreRegExps is VARIANT_TRUE, 
+		//          the strings in pVecBSTRS will be treated as regular expressions, otherwise they 
+		//          will be treated as literal strings.
+		//			The search for the strings in pVecBSTRs will use the Parser passed in 
+		//			pRegExprParser.
+		[id(79), helpstring("method ContainsStringInVector")] HRESULT ContainsStringInVector(
+			[in] IVariantVector* pVecBSTRs, [in] VARIANT_BOOL vbCaseSensitive, 
+			[in] VARIANT_BOOL vbAreRegExps, [in] IRegularExprParser *pRegExprParser, 
+			[out, retval] VARIANT_BOOL *pvbContainsString);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Replaces the entire spatial string with bstrReplacement string and retains the 
+		//          spatial string's original spatial information in the form of raster zones.
+		// REQUIRE: This spatial string cannot be non-spatial.
+		// PROMISE: If this spatial string is spatial, uses the spatial information from its letter
+		//          vector to generate raster zones and downgrades itself to hybrid. If this
+		//          spatial string is hybrid, its raster zones are not changed. The spatial 
+		//          string's internal text will be set to bstrReplacement.
+		// NOTE:    This method preserves spatial information from the collection of all of its 
+		//          letters, but does not preserve spatial information for individual letters. If
+		//          information for individual letters is needed, use the Replace method instead.
+		//          If no spatial information is needed at all, set the String property.
+		[id(80), helpstring("method ReplaceAndDowngradeToHybrid")] HRESULT 
+			ReplaceAndDowngradeToHybrid([in] BSTR bstrReplacement);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return the index of the first instance of strSearchString in the string
+		//			where the search is begun at nStartPos. If no match is found, 
+		//			-1 will be returned.  The search is case-insensitive.
+		[id(81), helpstring("method FindFirstInstanceOfStringCIS")] HRESULT FindFirstInstanceOfStringCIS(
+			[in] BSTR strSearchString, [in] long nStartPos, [out, retval] long *pMatchPos);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Build a spatial string object in kSpatialMode from a provided raster zone and 
+		//			string. The resulting string will completely fill the zone provided with each
+		//			character of the string being assigned the height of the zone and being evenly
+		//			distributed width-wise across the zone.
+		// REQUIRE: bstrText is not empty
+		[id(82), helpstring("method CreatePseudoSpatialString")] HRESULT CreatePseudoSpatialString(
+			[in] IRasterZone *pZone, [in] BSTR bstrText, [in] BSTR bstrSourceDocName, 
+			[in] ILongToObjectMap *pPageInfoMap);
+		//-----------------------------------------------------------------------------------------
+		// Added as per [p13 #4942] - 03/28/2008 - JDS
+		// PROMISE: To build and return a map of word count distributions where the
+		//			keys are the word length and the value is the count of words
+		//			of that length.  If plTotalWords != NULL then plTotalWords
+		//			will contain the total count of words found.
+		[id(83), helpstring("method GetWordLengthDist")] HRESULT GetWordLengthDist(
+			[out] long* plTotalWords, [out, retval] ILongToLongMap** ppWordLengthMap);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode == kSpatialMode
+		// PURPOSE: Returns a vector of IRasterZones that represent the spatial string where the
+		//			raster zones will be divided between letters on opposite sides of a specified
+		//			OCR confidence boundary.
+		// PARAMS:  ipVecOCRConfidenceBoundaries- Specifies the OCR Confidence boundaries used to
+		//			divide raster zones. Must be a number in the range 1 - 100 and must be specified
+		//			in ascending order.  A character with an OCR confidence matching a boundary value
+		//			will be considered to be on the same side of the boundary with as those with 
+		//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
+		//			confidence values 0 - 90 and 91 - 100.
+		//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
+		//			confidence each raster zone is associated with as the index of the next higher
+		//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
+		//			90 are specified, and a string contains 5 chars with confidences of 0, 69, 70,
+		//			71 and 90, three zones will be returned with first 2 chars in the first zone,
+		//			the third and fourth char in the second zone, and the last char in the third
+		//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
+		[id(84), helpstring("method GetOriginalImageRasterZonesGroupedByConfidence")] 
+			HRESULT GetOriginalImageRasterZonesGroupedByConfidence(
+				[in] IVariantVector* pVecOCRConfidenceBoundaries,
+				[out] IVariantVector** ppZoneOCRConfidenceTiers, 
+				[out, retval] IIUnknownVector** ppRasterZones);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To create a non-spatial string with the specified text and specified
+		//			source doc name.
+		[id(85), helpstring("method CreateNonSpatialString")]
+			HRESULT CreateNonSpatialString([in] BSTR bstrText, [in] BSTR bstrSourceDocName);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To replace the underlying string value and downgrade the string to non-spatial.
+		// NOTE:	All raster zones and letter vectors associated with this spatial string
+		//			will be cleared and all future calls to HasSpatialInfo() will return
+		//			VARIANT_FALSE.
+		[id(86), helpstring("method ReplaceAndDowngradeToNonSpatial")]
+			HRESULT ReplaceAndDowngradeToNonSpatial([in] BSTR bstrText);
+		//-----------------------------------------------------------------------------------------
+		[id(87), helpstring("method GetOCRImageRasterZones")]
+			HRESULT GetOCRImageRasterZones([out, retval] IIUnknownVector** ppRasterZones);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: GetMode == kSpatialMode
+		// PURPOSE: Returns a vector of IRasterZones that represent the spatial string where the
+		//			raster zones will be divided between letters on opposite sides of a specified
+		//			OCR confidence boundary.
+		// PARAMS:  ipVecOCRConfidenceBoundaries- Specifies the OCR Confidence boundaries used to
+		//			divide raster zones. Must be a number in the range 1 - 100 and must be specified
+		//			in ascending order.  A character with an OCR confidence matching a boundary value
+		//			will be considered to be on the same side of the boundary with as those with 
+		//			lower confidence levels. (ie. A boundary of 90 will group characters with OCR
+		//			confidence values 0 - 90 and 91 - 100.
+		//			ipZoneOCRConfidenceTiers- Returns a vector that specifies which level of OCR
+		//			confidence each raster zone is associated with as the index of the next higher
+		//			boundary in pVecOCRConfidenceBoundaries. For example, if a boundaries of 70 and
+		//			90 are specified, and a string contains 5 chars with confidences of 0, 69, 70,
+		//			71 and 90, three zones will be returned with first 2 chars in the first zone,
+		//			the third and fourth char in the second zone, and the last char in the third
+		//			zone.  ppZoneOCRConfidenceLevels will have 3 entries: 0, 1 and 2.
+		[id(88), helpstring("method GetOCRImageRasterZonesGroupedByConfidence")] 
+			HRESULT GetOCRImageRasterZonesGroupedByConfidence(
+				[in] IVariantVector* pVecOCRConfidenceBoundaries,
+				[out] IVariantVector** ppZoneOCRConfidenceTiers, 
+				[out, retval] IIUnknownVector** ppRasterZones);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: HasSpatialInfo == VARIANT_TRUE
+		//			IsMultiPage == VARIANT_FALSE
+		// PROMISE: To return an ILongRectangle containing the bounds of the spatial string
+		// PURPOSE: Will return the smallest possible top, left, bottom, right bounding box that covers 
+		//			all the raster zones or letters vector entries completely.
+		[id(89), helpstring("method GetOCRImageBounds")]
+			HRESULT GetOCRImageBounds([out, retval] ILongRectangle** ppBounds);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(A9112609-84AD-422d-A8BA-B7D364FE4F7D),
+		dual,
+		helpstring("IOCREngine Interface"),
+		pointer_default(unique)
+	]
+	interface IOCREngine : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Recognizes text on the specified image page. Returns result as a spatial string.
+		// PARAMS:  (1) strImageFileName - path to the image file on which to recognize text.
+		//			(2) lStartPage - the first 1-based page number to OCR.
+		//          (3) lEndPage - the last 1-based page number to OCR, or -1 to use the last page.
+		//			All pages from lStartPage to lEndPage inclusive will be OCRed.
+		//          (4) eFilter - a bitmask corresponding to sets of characters to recognize. Only
+		//          enabled character sets will be returned. The following values may be bitwise
+		//          ORed together to produce acceptable eFilter values:
+		//            (a) kNoFilter - No filter is enabled. So all basic latin characters are
+		//            returned. This value is disabled if ORed with any other filter option.
+		//            (b) kAlphaFilter - Only alphabetic characters (a-z && A-Z).
+		//            (c) kNumeralFilter - Only digit characters (0-9).
+		//            (d) kPeriodFilter - Only the period character (.).
+		//            (e) kHyphenFilter - Only the hyphen character (-).
+		//            (f) kUnderscoreFilter - Only the underscore character (_).
+		//            (g) kCommaFilter - Only the comma character (,).
+		//            (h) kForwardSlashFilter - Only the forward slash character (/).
+		//            (i) kCustomFilter - Only the set of characters in bstrCustomFilterCharacters.
+		//			(5) bstrCustomFilterCharacters the set of characters for the OCR engine to 
+		//          recognize. This value is ignored if kCustomFilter is not enabled in eFilter.
+		//          (6) eTradeOff - The trade off between accuracy and speed:
+		//            (a) kAccurate - Most accurate, but slowest
+		//            (b) kBalanced - Compromise between accuracy and speed
+		//            (c) kFast - Fastest, but least accurate
+		//            (d) kRegistry - Use the trade off setting specified in the registry
+		//          (7) bReturnSpatialInfo whether to return spatial information about the recognized
+		//          characters.
+		//            (a) bReturnSpatialInfo == VARIANT_TRUE, pstrText will be spatial.
+		//            (b) bReturnSpatialInfo == VARIANT_FALSE, pstrText will be non-spatial.
+		//          (8) pProgressStatus is an optional progress status object.
+		//            (a) pProgressStatus == NULL, no progress status updates will be available.
+		//            (b) pProgressStatus != NULL, it will be updated with the current status of the progress.
+		[id(1), helpstring("method RecognizeTextInImage")] HRESULT RecognizeTextInImage(
+									[in] BSTR strImageFileName, 
+									[in] long lStartPage, 
+									[in] long lEndPage, 
+									[in] EFilterCharacters eFilter,	
+									[in] BSTR bstrCustomFilterCharacters, 
+									[in] EOcrTradeOff eTradeOff,
+									[in] VARIANT_BOOL bReturnSpatialInfo, 
+									[in] IProgressStatus* pProgressStatus,
+									[out, retval] ISpatialString **pstrText);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Recognize specified pages of the image and store the text in a SpatialString.
+		//			pProgressStatus will be updated with the current status of the progress.
+		// REQUIRE: strPageNumbers must not be empty.
+		// ARG:		strPageNumbers - a string containing specified page numbers. Valid 
+		//			format: single page (eg. 2, 5), a range of pages (eg. 3-9), last X number 
+		//			of pages (eg. -3). They are seperated by comma(,).
+		//			pProgressStatus - a pointer to a valid ProgressStatus object or NULL. If it is
+		//          set to NULL, no progress updates will be available, otherwise it will be updated.
+		[id(2), helpstring("method RecognizeTextInImage2")] HRESULT RecognizeTextInImage2(
+									[in] BSTR strImageFileName, 
+									[in] BSTR strPageNumbers, 
+									[in] VARIANT_BOOL bReturnSpatialInfo, 
+									[in] IProgressStatus* pProgressStatus,
+									[out, retval] ISpatialString **pstrText);
+		//-----------------------------------------------------------------------------------------
+		[id(5), helpstring("method SupportsTrainingFiles")] HRESULT SupportsTrainingFiles([out, retval] VARIANT_BOOL *pbValue);
+		[id(6), helpstring("method LoadTrainingFile")] HRESULT LoadTrainingFile([in] BSTR strTrainingFileName);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Recognizes the text in the specified zone on a specified page of an image.
+		//			A specified rotation angle can be applied to the zone.  The text will be 
+		//			returned as a SpatialString, with or without spatial information.  Progress 
+		//			updates are supported if desired.
+		// REQUIRE: strPageNumbers must not be empty.
+		// ARG:		strImageFileName - name of image file
+		//			lStartPage - the first 1-based page number to OCR
+		//          lEndPage - the last 1-based page number to OCR, or -1 to OCR to the last page.
+		//              All pages from lStartPage to lEndPage inclusive will be OCRed.
+		//			pZone - the RasterZone object specifying the area of the page to be 
+		//				recognized or NULL if the entire page is to be recognized
+		//			nRotationInDegrees - the rotation angle to be applied to the zone
+		//				where:	  0 - automatic determination of rotation angle
+		//						 90 - rotate the zone 90 degrees clockwise
+		//						180 - rotate the zone 180 degrees clockwise
+		//						270 - rotate the zone 270 degrees clockwise
+		//						360 - do not rotate the zone
+		//          eFilter - the enabled sets of characters to recognize, see RecognizeTextInImage 
+		//              for an explanation of acceptable values.
+		//          bstrCustomFilterCharacters - a set of characters to recognize. This value is 
+		//              ignored if kCustomFilter is disabled in eFilter.
+		//          bDetectHandwriting - true if handwritten text should be recognized, false if
+		//              printed text should be recognized.
+		//          bReturnUnrecognized - true if all characters should be returned, false if 
+		//              unrecognized characters (ie. characters that were detected but could not 
+		//              be identified) should be excluded.
+		//			bReturnSpatialInfo - VARIANT_TRUE if spatial information should be 
+		//				included in the returned SpatialString
+		//			pProgressStatus - a pointer to a valid ProgressStatus object or NULL. If NULL, 
+		//				no progress updates will be available, otherwise it will be updated.
+		[id(7), helpstring("method RecognizeTextInImageZone")] HRESULT RecognizeTextInImageZone(
+									[in] BSTR strImageFileName, 
+									[in] long lStartPage, 
+									[in] long lEndPage, 
+									[in] ILongRectangle* pZone,
+									[in] long nRotationInDegrees, 
+									[in] EFilterCharacters eFilter,	
+									[in] BSTR bstrCustomFilterCharacters, 
+									[in] VARIANT_BOOL bDetectHandwriting,
+									[in] VARIANT_BOOL bReturnUnrecognized,
+									[in] VARIANT_BOOL bReturnSpatialInfo, 
+									[in] IProgressStatus* pProgressStatus, 
+									[out, retval] ISpatialString **pstrText);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Will kill the OCR engine and prevent it from immediately respawning
+		//			to continue OCR on the current document.
+		[id(8), helpstring("method WhackOCREngine")] HRESULT WhackOCREngine();
+	};
+
+	[
+		object,
+		uuid(3FF1A1E6-A8DE-42FD-8937-52B03B502DF8),
+		dual,
+		helpstring("IOCRUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IOCRUtils : IDispatch
+	{
+		// If strRootDirOrFile is a directory name, then this method will find 
+		// all image files under it (and all image files in sub directories 
+		// if bRecursive == VARIANT_TRUE), and process them using pEngine.
+		// If strRootDirOrFile is a filename, then this method will process
+		// only that filename, assuming that the filename is that of an image.
+		// Each image file will be processed up to nMaxNumOfPages as specified.
+		// nMaxNumOfPages -- a positive number to indicate the max number of pages to be
+		//					 processed. If it's -1, it means that the entire image shall
+		//					 be processed.
+		// bCreateUSSFile: if this is VARIANT_TRUE, the spatial string will be
+		//					 written to a UCLID Spatial String (USS) file.  
+		//					 Otherwise, the OCR output will be written to a
+		//					 text file (with no spatial information)
+		// bCompressUSSFile: if this is VARIANT_TRUE, and 
+		//					 bCreateUSSFile == VARIANT_TRUE, then the created
+		//					 .uss file is compressed.  If bCreateUSSFile == VARIANT_FALSE
+		//					 then this argument is ignored
+		// bSkipCreation: if this is VARIANT_TRUE, and the exact output file already exists, 
+		//					 it will not be overwritten.  Note that if 
+		//					 bCreateUSSFile == VARIANT_TRUE and only the TXT file exists, 
+		//					 the USS file will be created.
+		// pProgressStatus: if this is non-NULL, it will be updated continuously to the current 
+		//                  progress status. If it is NULL, no progress status updates will be available.
+		[id(1), helpstring("method BatchOCR")] HRESULT BatchOCR([in] BSTR strRootDirOrFile,
+			[in] IOCREngine *pEngine, [in] VARIANT_BOOL bRecursive, 
+			[in] long nMaxNumOfPages, [in] VARIANT_BOOL bCreateUSSFile,
+			[in] VARIANT_BOOL bCompressUSSFile, [in] VARIANT_BOOL bSkipCreation, 
+			[in] IProgressStatus* pProgressStatus);
+		// This methods internally calls the method with same name on IOCREngine
+		[id(3), helpstring("method RecognizeTextInImageFile")] HRESULT RecognizeTextInImageFile(
+			[in] BSTR strImageFileName, [in] long lNumPages, 
+			[in] IOCREngine* pOCREngine, [in] IProgressStatus* pProgressStatus, 
+			[out, retval] ISpatialString **pstrText);
+	};
+
+	[
+		object,
+		uuid(2C2B9CD4-9F13-4BC6-83DF-377C4B01E787),
+		dual,
+		helpstring("ISpatialStringSearcher Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatialStringSearcher : IDispatch
+	{
+		[id(1), helpstring("method InitSpatialStringSearcher")] HRESULT InitSpatialStringSearcher(
+			[in] ISpatialString* pSpatialString);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE : Return a spatial string that contains all and only the data inside the
+		// specified rectangle.  If a boundary is negative the edge of the document is used
+		[id(2), helpstring("method GetDataInRegion")] HRESULT GetDataInRegion(
+			[in] ILongRectangle *ipRect, 
+			[in] VARIANT_BOOL bRotateRectanglePerOCR, 
+			[out, retval] ISpatialString** ipReturnString);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE : Return a spatial string that contains all the data except the data inside the 
+		// specified rectangle.  If a boundary is negative the edge of the document is used
+		[id(3), helpstring("method GetDataOutOfRegion")] HRESULT GetDataOutOfRegion([in] ILongRectangle* ipRect, [out, retval] ISpatialString** ipReturnString);
+		[id(4), helpstring("method SetIncludeDataOnBoundary")] HRESULT SetIncludeDataOnBoundary([in] VARIANT_BOOL bInclude);
+		[id(5), helpstring("method SetBoundaryResolution")] HRESULT SetBoundaryResolution([in] ESpatialEntity eResolution);
+		
+	};
+	[
+		object,
+		uuid(1605ED5D-C80B-4AC6-85AF-01535E9A4C09),
+		dual,
+		helpstring("ISpatiallyCompareStrings Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatiallyCompareStrings : IDispatch
+	{
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(FA4D38F5-A212-43E6-ACEA-234D6468214A),
+		helpstring("RasterZone Class")
+	]
+	coclass RasterZone
+	{
+		[default] interface IRasterZone;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D2164333-6191-4317-BA5F-982FBEEA2C17),
+		helpstring("Letter Class")
+	]
+	coclass Letter
+	{
+		[default] interface ILetter;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(91AB60A3-57DA-44F5-BDEF-52ABF522A543),
+		helpstring("SpatialString Class")
+	]
+	coclass SpatialString
+	{
+		[default] interface ISpatialString;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		// NOTE: The implementation of IComparableObject::IsEqualTo() only tests
+		//       the string information, not the source document or the spatial
+		//       information.
+		interface IComparableObject;
+	};
+	[
+		uuid(5F0EF9A8-5F4C-4256-B50F-FF16C953CD34),
+		helpstring("OCRUtils Class")
+	]
+	coclass OCRUtils
+	{
+		[default] interface IOCRUtils;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(7A239107-FDD6-40F1-8978-C3CB6ED939B7),
+		helpstring("SpatialStringSearcher Class")
+	]
+	coclass SpatialStringSearcher
+	{
+		[default] interface ISpatialStringSearcher;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(A47D5752-12AD-42A6-987F-598DC1B3514E),
+		helpstring("SpatialPageInfo Class")
+	]
+	coclass SpatialPageInfo
+	{
+		[default] interface ISpatialPageInfo;
+		interface ICopyableObject;
+	};
+	[
+		uuid(10967FD8-81AB-41A6-AAD5-C470DD5CB78C),
+		helpstring("SpatiallyCompareStrings Class")
+	]
+	coclass SpatiallyCompareStrings
+	{
+		[default] interface ISpatiallyCompareStrings;
+		interface ISortCompare;
+		interface ILicensedComponent;
+	};
+};

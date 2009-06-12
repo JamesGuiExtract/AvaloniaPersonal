@@ -1,0 +1,19 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001167600.002.tif.uss
+NOC_TRANSFEROR_01=transferor^10~of the undersigned^10~[are]|[is]^10~name^10~address^5~\r\n^?Transferor^250~complete where
+
+[PATTERNS_END]
+
+
+
+

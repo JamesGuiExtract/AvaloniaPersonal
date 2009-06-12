@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.StringTokenizerModifierPP.1 = s 'StringTokenizerModifierPP Class'
+	{
+		CLSID = s '{7AEEDAAB-689B-4198-B93A-9009D9E9E536}'
+	}
+	UCLIDAFValueModifiers.StringTokenizerModifierPP = s 'StringTokenizerModifierPP Class'
+	{
+		CLSID = s '{7AEEDAAB-689B-4198-B93A-9009D9E9E536}'
+		CurVer = s 'UCLIDAFValueModifiers.StringTokenizerModifierPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7AEEDAAB-689B-4198-B93A-9009D9E9E536} = s 'StringTokenizerModifierPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

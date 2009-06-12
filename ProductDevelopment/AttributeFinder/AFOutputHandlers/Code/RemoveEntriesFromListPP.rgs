@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.RemoveEntriesFromListPP.1 = s 'RemoveEntriesFromListPP Class'
+	{
+		CLSID = s '{56072B13-FED3-4B31-9BAD-70B5940FD92A}'
+	}
+	UCLIDAFOutputHandlers.RemoveEntriesFromListPP = s 'RemoveEntriesFromListPP Class'
+	{
+		CLSID = s '{56072B13-FED3-4B31-9BAD-70B5940FD92A}'
+		CurVer = s 'UCLIDAFOutputHandlers.RemoveEntriesFromListPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {56072B13-FED3-4B31-9BAD-70B5940FD92A} = s 'RemoveEntriesFromListPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

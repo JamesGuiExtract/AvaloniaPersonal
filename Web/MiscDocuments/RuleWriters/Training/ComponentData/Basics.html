@@ -1,0 +1,36 @@
+<HTML>
+	<HEAD>
+		<TITLE>ComponentData and FKBUpdates</TITLE>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>ComponentData and FKBUpdates</h1>
+		<hr>
+		<h3>ComponentData</h3>
+		<ul>
+			<li>ComponentData is collection of reusable rules.</li>
+			<li>Over the years, rule writers have taken individual rules that were useful on multiple projects and added them to ComponentData.</li>
+			<li>By using ComponentData, rule writers do not have to write the same rules over and over again.</li>
+				<ul>
+					<li>For example, we know that numbers with the format <b>###-##-####</b> will always be social security numbers.  As such, ComponentData contains a Regular Expression rule that contains the regular expression <b>\d{3}-\d{2}-\d{4}</b>.</li>
+					<li>By using ComponentData, we do not have to write this same rule for every single project in which we want to redact social security numbers.</li>
+				</ul>	
+			</li>
+			<li>An encrypted version of the ComponentData rules are installed as part of every ID Shield and FLEX Index installation.</li>
+			<li>The unencrypted rules are stored in SourceSafe under <b>$\Engineering\ProductDevelopment\AttributeFinder\ComponentData</b>.</li>
+			<li>ComponentData is sometimes called the "National Rules Set" by the sales and services departments.</li>
+		</ul>
+		<hr>
+		<h3>FKBUpdates</h3>
+		<ul>
+			<li>We continuously make updates and improvements to the ComponentData rules.</li>
+			<li>Every so often, we package these updates and improvements into what is known as an "FKBUpdate".</li>
+			<li>Every FKBUpdate includes an installation file that can be used to overwrite the existing ComponentData rules on a machine with the new, improved ComponentData rules.</li>
+			<li>An e-mail will be sent out whenever a new FKBUpdate is available.</li>
+			<li>Unless otherwise instructed, when working on a customer project, you should always use the most current FKBUpdate.</li>
+			<li>The most current FKBUpdate is always stored at <b>I:\Common\Engineering\ProductReleases\FlexIndex\External\FKBUpdate</b>.</li>
+			<li>You can check which FKBUpdate you currently have installed on your machine by opening the Rule Tester and clicking the <b>About Rule Tester...</b> button.</li>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

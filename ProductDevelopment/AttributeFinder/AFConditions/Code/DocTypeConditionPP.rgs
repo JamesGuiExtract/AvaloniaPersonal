@@ -1,0 +1,23 @@
+HKCR
+{
+	AFConditions.DocTypeConditionPP.1 = s 'DocTypeConditionPP Class'
+	{
+		CLSID = s '{5C88FB66-FDB7-44B2-9AE1-843CBA62C463}'
+	}
+	AFConditions.DocTypeConditionPP = s 'DocTypeConditionPP Class'
+	{
+		CLSID = s '{5C88FB66-FDB7-44B2-9AE1-843CBA62C463}'
+		CurVer = s 'AFConditions.DocTypeConditionPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5C88FB66-FDB7-44B2-9AE1-843CBA62C463} = s 'DocTypeConditionPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

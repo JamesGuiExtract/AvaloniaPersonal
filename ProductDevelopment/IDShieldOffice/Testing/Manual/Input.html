@@ -1,0 +1,335 @@
+<HTML>
+
+<HEAD>
+<TITLE>IDSO Input Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Input Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+NOTE: Files can be found at <b>I:\Common\Testing\Product Testing\IDShieldOffice\Images</b> unless otherwise specified.
+<hr>
+<UL>
+	<li><b>Opening and closing files plus MRU list</b></li>
+	<ul>
+		<li>Use the <b>File - Open</b> menu to open an image file.
+		<li>Confirm that the file opens and that the image is the 
+		<b>first</b> item in the drop-down MRU list attached to the <b>Open Image</b> 
+		toolbar button.
+		<li>Confirm that titlebar caption is <b>"ID Shield Office - full path filename"</b> 
+		<li>Close the file from the <b>File</b> menu.
+		<li>Confirm that <b>no prompt to save changes</b> is displayed.
+		<li>Confirm that titlebar resets to <b>"ID Shield Office"</b>.
+		<li>Confirm that the <b>status bar</b> is completely reset.
+<p>
+		<li>Open a <b>different</b> image.
+		<li>Confirm that the new image is the <b>first</b> item in the drop-down 
+		MRU list attached to the <b>Open Image</b> toolbar button.
+		<li>Draw <b>a redaction</b> on the image.
+		<li>Close the file from the <b>File</b> menu.
+		<li>Confirm that a <b>prompt to save changes</b> is displayed.  Close the file without 
+		saving changes.
+		<li>Select the second file from the <b>MRU list</b>.
+		<li>Confirm that the selected file opens.
+<p>
+		<!-- SCR# 2 -->
+		<!-- Open image with annotation -->
+		<li>Open <b>AnnotationTypes.tif</b>.
+		<li>Confirm that the file opens and displays annotations.	
+		<!-- open unsupported file -->	
+<p>
+		<li>Select <b>File->Open</b> to display <b>Open image file</b> dialog.
+		<li>Specify <b>files of type</b> as <b>All files(*.*)</b>.
+		<li>Select <b>Test.rtf</b> and click <b>Open</b>.
+		<li>Confirm that <b>Could not open Test.rtf</b> dialog appears.
+		<li>Click <b>Cancel</b> in the dialog.
+		<li>Confirm that <b>Nothing</b> is opened.
+		<li>Confirm that specified file above is <b>not</b> in the MRU list.
+<p>
+		<li><b>File->Open</b> to display <b>Open image file</b> dialog.
+		<li>Specify <b>files of type</b> as <b>All files(*.*)</b>.
+		<li>Select <b>Test.rtf</b> file and click <b>Open</b>.
+		<li>Confirm that <b>Could not open Test.rtf</b> dialog appears.
+		<li>Click <b>See help...</b> in the dialog.
+		<li>Confirm that the <b>Launching ID Shield Office from other applications</b> page is 
+		displayed in the Help file.
+		<li>Confirm that specified file above is <b>not in the MRU list</b>.
+<p>
+		<!-- SCR# 157 -->
+		<!-- open not existing file -->
+		<li>Copy <b>FindTextTest.tif</b> to <b>FindTextTest_copy.tif</b>
+12:28 PM 11/7/2008		<li>Open <b>FindTextTest_copy.tif</b> image file.
+		<li>Close the image file
+		<li>Delete <b>FindTextTest_copy.tif</b> from local folder
+		<li>Try to open <b>FindTextTest_copy.tif</b> from MRU list
+		<li>Confirm that <b>Error</b> dialog appears
+		<li>Confirm that <b>Error message is intuitive</b>
+		<!-- open same file in multiple instances -->	
+		<p>
+
+		<li>Confirm that <b>an intuitive message</b> is displayed while trying to open same file in multiple instances		
+		<!-- open same network file in multiple machines -->	
+		<li>Confirm that <b>an intuitive message</b> is displayed while trying to open same file in multiple machines
+	</ul>
+	<p>
+
+	<li><b>Supported File Formats from Local</b></li>
+	<br>Preparation: Copy the <b>VariousFormats</b> subfolder to a <b>local folder</b>.
+	<ul>
+		<li>Single-page TIF
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>TIFF files (*.tif)</b> from <b>files of type</b> dropdown list
+			<li>Confirm that <b>only tif files</b> are listed in the dialog.
+			<li>Click <b>Cancel</b> in the <b>Open Image File</b> dialog.
+			<li>Confirm that <b>No image file</b> is opened.
+			<li>Click <b>Open</b> toolbar button again and select <b>TiffTest_CCITT3.tif</b> file.
+			<li>Confirm that correct file is opened.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that font is displayed <b>anti-aliased</b>.
+			<li>Confirm that page navigation toolbar buttons and menu are <b>disabled</b>.
+			<li>Confirm that page navigation text box is <b>enabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+<p>
+		<li>Multi-page TIF
+		<ul>
+			<li>Click <b>Open</b> toolbar button again and select <b>0050pages.tif</b> file.
+			<li>Confirm that correct file is opened.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that <b>previous page</b> and <b>First page</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that <b>previous tile</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> or <b>OCR progress percentage</b> appears on 
+			the status bar.
+		</ul>
+<p>
+		<li>Single-page text-only PDF
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>PDF files (*.pdf)</b> from <b>files of type</b> dropdown list.
+			<li>Confirm that <b>only pdf files</b> are listed in the dialog.
+			<li>Select <b>SinglePageTextOnly.pdf</b> file and Click <b>Open</b>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that page navigation toolbar buttons and menu are <b>disabled</b>.
+			<li>Confirm that page navigation text box is <b>enabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+<p>
+		<li>Multi-page text-only PDF
+		<ul>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that <b>previous page</b> and <b>First page</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that <b>previous tile</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+<p>
+		<li>Single-page image-only PDF
+		<ul>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that page navigation toolbar buttons and menu are <b>disabled</b>.
+			<li>Confirm that page navigation text box is <b>enabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+<p>
+		<li>Multi-page image-only PDF
+		<ul>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that <b>previous page</b> and <b>First page</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that <b>previous tile</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+		<p>
+
+		<li>Single-page PDF with text and images
+		<ul>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that page navigation toolbar buttons and menu are <b>disabled</b>.
+			<li>Confirm that page navigation text box is <b>enabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+		<p>
+
+		<li>Multi-page PDF with text and images
+		<ul>
+			<li>Confirm that correct file is opened without error message.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that <b>previous page</b> and <b>First page</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that <b>previous tile</b> toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+		<p>
+
+		<li>Single-page JPG
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>JPG files(*.jpg)</b> from <b>files of type</b> dropdown list.
+			<li>Confirm that <b>only jpg files</b> are listed in the dialog.
+			<li>Select <b>JpgTest_RGB.jpg</b> file and Click <b>Open</b>.
+			<li>Confirm that correct file is opened.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that the image is <b>not</b> anti-aliased.
+			<li>Confirm that page navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+		<p>
+
+		<li>Single-page GIF
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>GIF files(*.gif)</b> from <b>files of type</b> dropdown list.
+			<li>Confirm that <b>only gif files</b> are listed in the dialog.
+			<li>Select <b>SinglePageImageAndText.gif</b> file and Click <b>Open</b>.
+			<li>Confirm that correct file is opened.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that page navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+		<p>
+
+		<li>Single-page BMP
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>BMP files(*.bmp)</b> from <b>files of type</b> dropdown list.
+			<li>Confirm that <b>only bmp files</b> are listed in the dialog.
+			<li>Select <b>BitmapTest1.bmp</b> file and Click <b>Open</b>
+			<li>Confirm that correct file is opened.
+			<li>Set initial zoom mode to <b>fit to page</b>.
+			<li>Confirm that page navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that tile navigation toolbar and menu are <b>disabled</b>.
+			<li>Confirm that resolution is <b>displayed</b> on the status bar.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+		</ul>
+	</ul>
+<p>
+	<li><b>Supported File Formats from Network</b></li>
+	<ul>
+		<li>Open a few images as above but from network folder.
+	</ul>
+<p>
+	<li><b>[IDSD #373] Supported PDF File Formats</b></li>
+	<ul>
+		<li>Open each image from I:\Common\Testing\Product Testing\IDShieldOffice\Images\PDF_Versions.
+	</ul>
+<p>
+	<li><b>Print Output From Other Applications - as available, confirm proper behavior</b></li>
+	<ul>
+		<li>Microsoft Word
+		<li>Microsoft Excel
+		<li>Microsoft Outlook
+		<li>Microsoft Powerpoint
+		<p>
+
+		<li>Word Perfect
+		<li>Open Office
+		<p>
+
+		<li>Internet Explorer
+		<li>Firefox
+		<li>Microsoft Outlook Express
+		<li>Microsoft Paint
+		<p>
+
+		<li>Confirmation
+		<ul>
+			<li>Close all IDSO instances
+			<li>For each application above, open a suitable document and print to <b>ID Shield</b> printer.
+			<li>Confirm that a new <b>ID Shield Office</b> instance starts with an image of the file.
+			<li>Confirm that <b>no new entry</b> is added to MRU list.
+			<!-- SCR# 273 -->
+			<li>Confirm that resolution displayed on the status bar is <b>300 x 300</b>.
+			<p>
+
+			<!-- SCR# 278 -->
+			<li>Keep <b>at least one empty ID Shield Office</b> instance.
+			<li>For each application above, open a suitable document and print to <b>ID Shield</b> printer.
+			<li>Confirm that a new <b>ID Shield Office</b> instance starts with an image of the file.
+			<li>Confirm that <b>no new entry</b> is added to MRU list.
+		</ul>
+	</ul>
+	<p>
+
+	<li><b>Other</b></li>
+	<ul>
+		<li>Open an Extract Systems internal <b>.idso</b> file
+		<!-- SCR# 147,197 -->
+		<ul>
+			<li>Click <b>Open</b> toolbar button.
+			<li>Confirm that <b>Open Image File</b> dialog appears.
+			<li>Select <b>IDSO files(*.idso)</b> from <b>files of type</b> dropdown list.
+			<li>Confirm that <b>only IDSO files</b> are listed in the dialog.
+			<li>Select <b>an IDSO</b> file and Click <b>Open</b>.
+			<li>Confirm that correct file is opened.
+			<li>Confirm that initial zoom mode is <b>fit to page</b>.
+			<li>Confirm that resolution is <b>displayed</b>.
+			<li>Confirm that green <b>OCR complete!</b> appears on the status bar.
+			<li>Confirm that <b>full path filename</b> is added to MRU list.
+		</ul>			
+		<p>
+
+		<!-- SCR# 209 -->
+		<li>Open bad annotation TIF file
+		<ul>
+			<li>Open <b>BadAnnotation_PVCS#209.tif</b> image file
+			<li>Confirm that <b>Error loading annotations</b> message appears.
+			<li>Click <b>OK</b> in the <b>Error</b> dialog and the image file can be opened.
+			<li>Click <b>Save</b> to save the image file as TIF format.
+			<li>Confirm that the image can be saved.
+			<li>Confirm that the saved tif image file can be opened without error message.
+		</ul>
+<p>
+		<li>Rename or move original <b>.tif</b> file
+		<li>Confirm that error occurs while trying to open the <b>.idso</b> file
+		<p>
+
+		<li><b>[IDSD #276]</b> Page Navigation Text Box
+		<ul>
+			<li>Open an image file and confirm that the Page Navigation Text Box displays 
+			<b>1 of <i>N</i></b>.
+			<li>Close the image file.
+			<li>Confirm that the Page Navigation Text Box is cleared.
+		</ul>
+<p>
+		<li><b>[IDSD #264]</b> MRU file missing and with different case
+		<ul>
+			<li>Open and close an image file (i.e. C:\Test.tif).
+			<li>Rename or delete the image file.
+			<li>From the command line, open the image file with different casing (i.e. C:\TEST.TIF).
+			<li>Confirm that the the bad file is removed from the MRU list.
+		</ul>
+		<p>
+		<li>Confirm that no error occurs with around 200~300 pages printed to <b>ID Shield</b> printer.
+		<li>Confirm that no error occurs when closing Office Application while printing to <b>ID Shield</b> printer.
+	</ul>
+</UL>
+</BODY>
+</HTML>

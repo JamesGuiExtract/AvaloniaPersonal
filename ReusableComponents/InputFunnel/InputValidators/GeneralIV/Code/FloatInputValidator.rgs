@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGeneralIV.FloatInputValidator.1 = s 'FloatInputValidator Class'
+	{
+		CLSID = s '{EA1FE48D-1720-4B85-9994-BAB67CB0E0B5}'
+	}
+	UCLIDGeneralIV.FloatInputValidator = s 'FloatInputValidator Class'
+	{
+		CLSID = s '{EA1FE48D-1720-4B85-9994-BAB67CB0E0B5}'
+		CurVer = s 'UCLIDGeneralIV.FloatInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {EA1FE48D-1720-4B85-9994-BAB67CB0E0B5} = s 'FloatInputValidator Class'
+		{
+			ProgID = s 'UCLIDGeneralIV.FloatInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDGeneralIV.FloatInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{203E8934-0C8B-4607-B2F5-84A9167B1107}'
+		}
+	}
+}

@@ -1,0 +1,5 @@
+<ExtractReportParameterData Version="1">
+	<ReportParameters>
+		<TextParameter Name="DocumentName" Default="" />
+	</ReportParameters>
+</ExtractReportParameterData>

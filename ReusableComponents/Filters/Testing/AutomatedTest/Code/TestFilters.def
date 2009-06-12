@@ -1,0 +1,9 @@
+; TestFilters.def : Declares the module parameters.
+
+LIBRARY      "TestFilters.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

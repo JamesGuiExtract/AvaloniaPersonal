@@ -1,0 +1,26 @@
+HKCR
+{
+	SpotRecIRAutoTest.SpotRecIRTester.1 = s 'SpotRecIRTester Class'
+	{
+		CLSID = s '{99281A63-3DFA-4DA4-9B6D-587141D7A770}'
+	}
+	SpotRecIRAutoTest.SpotRecIRTester = s 'SpotRecIRTester Class'
+	{
+		CLSID = s '{99281A63-3DFA-4DA4-9B6D-587141D7A770}'
+		CurVer = s 'SpotRecIRAutoTest.SpotRecIRTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {99281A63-3DFA-4DA4-9B6D-587141D7A770} = s 'SpotRecIRTester Class'
+		{
+			ProgID = s 'SpotRecIRAutoTest.SpotRecIRTester.1'
+			VersionIndependentProgID = s 'SpotRecIRAutoTest.SpotRecIRTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{88C6C489-CCA7-4303-BAEA-56E392AB7CF3}'
+		}
+	}
+}

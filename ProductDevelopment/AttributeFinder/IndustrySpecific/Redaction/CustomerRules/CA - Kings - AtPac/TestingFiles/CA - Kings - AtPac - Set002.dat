@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues|Certificate of Death|Affidavit of Death|Release of Federal Tax Lien|Notice of Federal Tax Lien|Notice of State Tax Lien
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;OutputAttributeNamesFileLists=1
+
+//Set002
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\AtPac\CA - Kings\Set002\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

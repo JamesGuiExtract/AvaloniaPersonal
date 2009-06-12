@@ -1,0 +1,239 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0.0.7 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0.0.7 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3009]</b> Doc Type persists when reviewing verification results
+	       	<ul>
+	      		<li>Exercise redaction verification and confirm that document type information 
+			is displayed.
+	      		<li>Review recent previous redacted images from within the verification UI.
+			<li>Confirm that document type information is displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3212]</b> Verification supports display of previously redacted image
+	       	<ul>
+	      		<li>Create several different VOA files for specified image files ( use the 
+			Filter ID Shield data file task ).
+			<li>Redact &lt;SourceDocName&gt; for one data type.
+			<li>Create an FPS file to re-redact &lt;SourceDocName&gt; for a different 
+			data type.  Configure the task to use the output image from the initial 
+			redaction test.
+			<li>Confirm that the initial output image is properly displayed in the 
+			Verification UI.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3214]</b> Verification task supports use of specified VOA file
+	       	<ul>
+	      		<li>Create several different VOA files for specified image files ( use the 
+			Filter ID Shield data file task ).
+			<li>Confirm that configuring the Verification task to use something other 
+			than the default &lt;SourceDocName&gt;.voa works as properly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3217]</b> Redaction supports addition of redaction text
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> images for automated redaction.
+			<li>Configure the task to add text to the redactions, testing at least each 
+			of the following items (note that some pieces may not be implemented yet).
+		       	<ul>
+		      		<li>Pre-defined text from the combo box
+		      		<li>Pre-defined text plus Type from the combo box
+		      		<li>Custom redaction text
+		      		<li>Custom redaction text plus Type
+		      		<li>White text by selecting <b>Black</b> fill color
+		      		<li>Black text by selecting <b>White</b> fill color
+		      		<li>Non-default font name
+		      		<li>Non-default font size
+		       	</ul>
+<p>
+	      		<li>Exercise the <b>Redaction Demo</b> images for verification.
+			<li>Configure the task to add text to the redactions, testing at least each 
+			of the following items (note that some pieces may not be implemented yet).
+		       	<ul>
+		      		<li>Pre-defined text from the combo box
+		      		<li>Pre-defined text plus Type from the combo box
+		      		<li>Custom redaction text
+		      		<li>Custom redaction text plus Type
+		      		<li>White text by selecting <b>Black</b> fill color
+		      		<li>Black text by selecting <b>White</b> fill color
+		      		<li>Non-default font name
+		      		<li>Non-default font size
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3234]</b> Auto redaction uses previous output image for input
+	       	<ul>
+	      		<li>Exercise images for automated redaction.  Apply only a particular 
+			subset of the redactions (example: SSN but TaxID).
+	      		<li>Confirm that only the specified redactions were applied.
+	      		<li>Process the images again applying additional redactions and <b>retaining 
+			previously existing redactions in the output file</b>.
+	      		<li>Confirm that both sets of specified redactions are now present in 
+			the output file.
+<p>
+	      		<li>Start over with the test images.
+	      		<li>Exercise images for automated redaction.  Apply only a particular 
+			subset of the redactions (example: SSN but TaxID).
+	      		<li>Confirm that only the specified redactions were applied.
+	      		<li>Process the images again applying additional redactions with <b>output 
+			only redactions from this session</b>.
+	      		<li>Confirm that only the second set of specified redactions is now present in 
+			the output file.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3235]</b> Auto Redaction task UI changes
+	       	<ul>
+	      		<li>Confirm that the <b>Rules to execute</b> group box has changed to <b>Data 
+			categories to redact</b>.
+	      		<li>Confirm that the usual HC, MC, LC checkboxes have moved to be side-by-side.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3239]</b> Offset redaction in Verification UI
+	       	<ul>
+	      		<li>Exercise the steps in the SCR following the directions in the 
+			<b>Investigation note</b>.
+	      		<li>Confirm that the problem is fixed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3242]</b> OCRing USS Files
+	       	<ul>
+	      		<li>Create an FPS file to supply and process <b>USS</b> files for OCR.
+	      		<li>Confirm that a usefule error message is presented and that the 
+			FAM does not crash.
+	      		<li>Repeat the exercise since the SCR reports that the crash does not occur every time.
+	      		<li>Repeat the exercise since the SCR reports that the crash does not occur every time.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3248]</b> Text cut off in Verification property page
+	       	<ul>
+	      		<li>Confirm that the text for the <b>Create metadata output only for documents that 
+			contain redactions</b> radio button in the <b>Metadata output</b> group box is 
+			completely visible.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3272]</b> Filter ID Shield Data File task
+	       	<ul>
+	      		<li>Exercise the <b>Filter ID Shield Data File</b> portion of the 
+			<b>ID Shield objects</b> testing checklist.
+	      		<li>Manually test the functionality of the new task.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3278]</b> Redaction property page error message
+	       	<ul>
+	      		<li>Setup an auto-redaction task with the output image configured as 
+			<b>&lt;SourceDocName&gt;</b>.
+	      		<li>Confirm that the validation error message that appears has a 
+			meaningful caption.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5113]</b> Rescaling preview image in Report Viewer
+	       	<ul>
+	      		<li>Open the Report Viewer and select a report.
+	      		<li>Resize the window and confirm that the preview image resizes smoothly.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5114]</b> Report Viewer persists size and position
+	       	<ul>
+	      		<li>Open the Report Viewer and select a report.
+	      		<li>Confirm that window size is persisted across sessions.
+	      		<li>Confirm that window position is persisted across sessions.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5119, #5127, #5133]</b> Archive Restore task
+	       	<ul>
+	      		<li>Exercise the functionality of this task.
+	      		<li>Confirm that archived files are stored in zero-padded folders.
+	      		<li>Confirm that files can be restored to a folder that does not 
+			initially exist.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5131]</b> Share violation errors
+	       	<ul>
+	      		<li>Exercise <b>Stability Test 3E</b>.
+	      		<li>Confirm that <b>Unable to create file storage object</b> errors are not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5134]</b> Share violation errors
+	       	<ul>
+	      		<li>Exercise <b>OCR Document Memory Leak Test 2</b>.
+	      		<li>Confirm that <b>Share violation</b> errors are not seen.
+<p>
+	      		<li>Exercise <b>OCR Document Memory Leak Test 3</b>.
+	      		<li>Confirm that <b>Share violation</b> errors are not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5135, FlexIDSCore #3275]</b> Drag and Drop FPS file to FAM
+	       	<ul>
+	      		<li>Confirm that one FPS file can be dropped onto an open FAM instance.
+	      		<li>Confirm that a meaningful error message is displayed if multiple FPS files are 
+			dropped onto an open FAM instance.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5136]</b> SSOCR2 Error Messages auto-closed on Vista
+	       	<ul>
+	      		<li>Exercise a relatively lengthy test on a <b>Vista</b> machine 
+			that requires images to be OCR'd.
+	      		<li>Confirm that <b>SSOCR2 Module</b> error dialogs are not seen.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

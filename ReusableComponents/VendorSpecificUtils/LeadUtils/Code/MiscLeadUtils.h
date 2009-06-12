@@ -1,0 +1,341 @@
+
+#pragma once
+
+#include "LeadUtils.h"
+
+#include <TemporaryFileName.h>
+#include <UCLIDException.h>
+#include <l_bitmap.h>		// LeadTools Imaging library
+
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+//--------------------------------------------------------------------------------------------------
+// Constants
+//--------------------------------------------------------------------------------------------------
+// constant for the number of retries on saving a page before failing
+const int gnNUMBER_ATTEMPTS_BEFORE_FAIL = 3;
+
+// constant for the length of time to sleep before retrying a page save operation
+// (currently only used in the getNumberOfPagesInImage method
+const int gnSLEEP_BETWEEN_RETRY_MS = 200;
+
+// number of times to retry saving an output image if the page count is wrong (P16 #2593)
+const int gnOUTPUT_IMAGE_RETRIES = 3;
+
+//--------------------------------------------------------------------------------------------------
+// Structs
+//--------------------------------------------------------------------------------------------------
+// Structure that defines a raster zone on a page with a specified line color and border color
+struct PageRasterZone
+{
+	// Initialize struct to empty data
+	PageRasterZone()
+		: m_nStartX(0),
+          m_nStartY(0),
+          m_nEndX(0),
+          m_nEndY(0),
+          m_nHeight(0),
+          m_nPage(1),
+          m_strText(""),
+          m_crFillColor(0),
+          m_crBorderColor(0),
+          m_crTextColor(0),
+          m_iPointSize(0)
+	{
+		memset(&m_font, 0, sizeof(LOGFONT));
+	}
+	
+	long m_nStartX; 
+	long m_nStartY; 
+	long m_nEndX; 
+	long m_nEndY; 
+	long m_nHeight; 
+	long m_nPage;
+	string m_strText;
+	LOGFONT m_font;
+	int m_iPointSize;
+	COLORREF m_crFillColor;
+	COLORREF m_crBorderColor;
+	COLORREF m_crTextColor;
+};
+
+//------------------------------------------------------------------------------------------------
+// Class used to maintain a collection of Brushes that can be reused
+class BrushCollection
+{
+public:
+	// Initializes an empty brush collection
+	BrushCollection() {}
+	
+	// Release all of the brush objects
+	~BrushCollection()
+	{
+		try
+		{
+			for(map<COLORREF, HBRUSH>::iterator it = m_mapColorToBrush.begin();
+				it != m_mapColorToBrush.end(); it++)
+			{
+				DeleteObject(it->second);
+			}
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI23574");
+	}
+
+	// Gets a specific color brush from the collection (creating it if necessary)
+	HBRUSH getColoredBrush(COLORREF color)
+	{
+		// Find the color in the map
+		map<COLORREF, HBRUSH>::iterator it = m_mapColorToBrush.find(color);
+
+		// Get the brush from the map if it was found, otherwise create a new brush,
+		// add it to the map and then return the new brush
+		HBRUSH hBrush = NULL;
+		if (it == m_mapColorToBrush.end())
+		{
+			hBrush = CreateSolidBrush(color);
+			m_mapColorToBrush[color] = hBrush;
+		}
+		else
+		{
+			hBrush = it->second;
+		}
+
+		return hBrush;
+	}
+
+private:
+	map<COLORREF, HBRUSH> m_mapColorToBrush;
+};
+
+//------------------------------------------------------------------------------------------------
+// Class used to maintain a collection of pens that can be reused
+class PenCollection
+{
+public:
+	// Initializes an empty pen collection
+	PenCollection() {}
+
+	// Release all of the allocated pen objects
+	~PenCollection()
+	{
+		try
+		{
+			for(map<COLORREF, HPEN>::iterator it = m_mapColorToPen.begin();
+				it != m_mapColorToPen.end(); it++)
+			{
+				DeleteObject(it->second);
+			}
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI23575");
+	}
+
+	// Gets a specific color brush from the collection (creating it if necessary)
+	HPEN getColoredPen(COLORREF color)
+	{
+		// Find the color in the map
+		map<COLORREF, HPEN>::iterator it = m_mapColorToPen.find(color);
+
+		// Get the pen from the map if it was found, otherwise create a new brush,
+		// add it to the map and then return the new brush
+		HPEN hPen = NULL;
+		if (it == m_mapColorToPen.end())
+		{
+			hPen = CreatePen(PS_SOLID, 2, color);
+			m_mapColorToPen[color] = hPen;
+		}
+		else
+		{
+			hPen = it->second;
+		}
+
+		return hPen;
+	}
+
+private:
+	map<COLORREF, HPEN> m_mapColorToPen;
+};
+
+//-------------------------------------------------------------------------------------------------
+// Class used to protect loading PDF files in 
+// Multi-threading environment.[P13: 4313]
+class LEADUTILS_API LeadToolsPDFLoadLocker
+{
+public:
+	LeadToolsPDFLoadLocker(const string& strFileName);
+	LeadToolsPDFLoadLocker(const bool bProgrammaticallyForceLock);
+	~LeadToolsPDFLoadLocker();
+
+private:
+	// Synchronization members
+	static CMutex ms_mutex;
+	CSingleLock *m_pLock;
+
+	// Registry setting members
+	static bool	ms_bRegistryValueRead;
+	static bool	ms_bSerializeLeadToolsCalls;
+};
+
+//------------------------------------------------------------------------------------------------
+// PURPOSE: Retrieves a user friendly description of the specified Leadtools error code.
+LEADUTILS_API string getErrorCodeDescription(int iErrorCode);
+//------------------------------------------------------------------------------------------------
+// PURPOSE: To throw an UCLIDException if iErrorCode is not SUCCESS.
+LEADUTILS_API void throwExceptionIfNotSuccess(int iErrorCode, 
+	const string& strELICode, const string& strErrorDescription,
+	const string& strFileName = "");
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To fill (i.e. redact) an area of the image with the specified color.
+LEADUTILS_API void fillImageArea(const string& strImageFileName, 
+								 const string& strOutputImageName,
+								 long nLeft, long nTop, long nRight, long nBottom, 
+								 long nPage, const COLORREF color, bool bRetainAnnotations, 
+								 bool bApplyAsAnnotations);
+//-------------------------------------------------------------------------------------------------
+LEADUTILS_API void fillImageArea(const string& strImageFileName,
+								 const string& strOuputImageName,
+								 long nLeft, long nTop, long nRight, long nBottom,
+								 long nPage, const COLORREF crFillColor,
+								 const COLORREF crBorderColor,
+								 const string& strText,
+								 const COLORREF crTextColor,
+								 bool bRetainAnnotations, 
+								 bool bApplyAsAnnotations);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To fill (i.e. redact) all areas of the image specified in specified in vecZones,
+//			with the color and text specified within each zone
+// ARGS:	vecFillAreas contains multiple FillAreaStruct elements to fill
+LEADUTILS_API void fillImageArea(const string& strImageFileName, 
+								 const string& strOutputImageName,
+								 const vector<PageRasterZone> &vecZones, 
+								 bool bRetainAnnotations, 
+								 bool bApplyAsAnnotations);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To take a vector of image file names and combine them into a multipage file with
+//			the name of strOutputFileName
+LEADUTILS_API void createMultiPageImage(vector<string> vecImageFiles, 
+										string strOutputFileName,
+										bool bOverwriteExistingFile);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To take an image file name and return the number of pages in the image
+LEADUTILS_API int getNumberOfPagesInImage( const string& strImageFileName );
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To fill the riXResolution and riYResolution variables with the X and Y resolution
+//			of the specified image [p13 #4809]
+LEADUTILS_API void getImageXAndYResolution(const string& strImageFileName, int& riXResolution,
+										   int& riYResolution);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To fill the riHeight and riWidth variables with the height and width
+//			of the specified one-based page of an image in pixels [p13 #4809]
+LEADUTILS_API void getImagePixelHeightAndWidth(const string& strImageFileName, int& riHeight, 
+											   int& riWidth, int nPageNum=1);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the handle of a bitmap for the given page in the file
+// the bitmap will have to be free'd by caller
+LEADUTILS_API void loadImagePage(const string strImageFileName, unsigned long ulPage, 
+								 BITMAPHANDLE &rBitmap);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the color of the designated pixel
+LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To unlock PDF Read/Write capabilities and to set the default open Resolution,
+//          if and only if PDF Read/Write support is licensed.
+// ARGUMENTS:	nDisplayDepth - this is the display depth to open PDF images. if anti aliasing is
+//					required this should be set to 1. some PDFs are saved with gray scale and 
+//					have there own anti aliasing.
+//				iOpenXRes - this is the X resolution to open the PDF images
+//				iOpenYRes - this it the Y resolution to open the PDF Images
+LEADUTILS_API void initPDFSupport(int nDisplayDepth = 24, int iOpenXRes = 300, int iOpenYRes = 300);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Returns ViewPerspective field from the FILEINFO structure.
+//			1 = TOP_LEFT
+//			2 = TOP_RIGHT
+//			3 = BOTTOM_RIGHT
+//			4 = BOTTOM_LEFT
+//			5 = LEFT_TOP
+//			6 = RIGHT_TOP or TOP_LEFT90 ( rotated 90 degrees clockwise )
+//			7 = RIGHT_BOTTOM
+//			8 = LEFT_BOTTOM or TOP_LEFT270 ( rotated 270 degrees clockwise )
+// NOTE:	nPageNum is a 1-based page number.
+LEADUTILS_API int getImageViewPerspective(const string strImageFileName, int nPageNum);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To unlock the LeadTools Document Toolkit if Annotation support is licensed.
+LEADUTILS_API void unlockDocumentSupport();
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Returns true if all L_xxx() calls to LeadTools functions will be serialized via 
+//			CMutex
+LEADUTILS_API bool isLeadToolsSerialized();
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To convert a TIF image into a PDF image.  This function does not return 
+//			until the conversion is complete.  If the TIF was from TemporaryFileName, auto-deletion 
+//			when the variable goes out of scope is acceptable.
+//			If bRetainAnnotations is true then any redaction type annotations in the tif will
+//			be burned into the PDF [FIDSC #3131 - JDS - 12/17/2008].
+LEADUTILS_API void convertTIFToPDF(const string& strTIF, const string& strPDF,
+								   bool bRetainAnnotations = false);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To convert a PDF image into a TIF image.  This function does not return 
+//			until the conversion is complete.
+LEADUTILS_API void convertPDFToTIF(const string& strPDF, const string& strTIF);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To calculate the 4 corner points of the raster zone given in rZone
+//			aPoints[0] = point above start point
+//			aPoints[1] = point above end point
+//			aPoints[2] = point below end point
+//			aPoints[3] = point below start point
+LEADUTILS_API void pageZoneToPoints(const PageRasterZone &rZone, POINT &p1, POINT &p2, POINT &p3, 
+									POINT &p4);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Returns true if the Leadtools file format number corresponds to a tiff tag.
+LEADUTILS_API bool isTiff(int iFormat);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: Returns true if the specified file page has an annotations tag, false otherwise.
+LEADUTILS_API bool hasAnnotations(string strFilename, LOADFILEOPTION &lfo, int iFileFormat);
+LEADUTILS_API bool hasAnnotations(string strFilename, int iPageNumber);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the compression factor for a particular file format based on the
+//			value in the registry.
+LEADUTILS_API int getCompressionFactor(const string& strFormat);
+LEADUTILS_API int getCompressionFactor(int nFormat);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To initialize a LeadTools sized struct.
+// ARGS:	The value to which the Flags parameter should be initialized
+// Coded with the structures we currently use in mind:
+// FILEINFO, LOADFILEOPTION, SAVEFILEOPTION, FILEPDFOPTIONS
+// [Note: FILEPDFOPTIONS does not contain member Flag, so incoming arg is unused]
+// Should work with any LeadTools struct that needs zero initialization
+// keeping an eye open for any additional parameters that require initialization
+// or that don't contain uStructSize (in which case a runtime exception will be thrown)
+template <typename T>
+T GetLeadToolsSizedStruct(unsigned int Flags)
+{
+	// Create the struct and zero the memory
+	T result;
+	memset( &result, 0, sizeof( T ) );
+
+	// Ensure uStructSize variable exists, then initialize it.
+	__if_exists ( T::uStructSize )
+	{
+		result.uStructSize = sizeof( T );
+	}
+
+	__if_not_exists ( T::uStructSize )
+	{
+		UCLIDException ue("ELI17336", "GetLeadToolsSizedStruct called on unsupported type");
+		ue.addDebugInfo("Missing member","uStructSize");
+		throw ue;
+	}
+
+	// Ensure Flags variable exists, then initialize it.
+	__if_exists ( T::Flags )
+	{
+		result.Flags = Flags;
+	}
+	// Note: FILEPDFOPTIONS does not contain member flag; don't throw exception
+
+	return result;
+}
+//------------------------------------------------------------------------------------------------

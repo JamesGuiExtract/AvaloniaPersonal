@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDHighlightWindow.HighlightWindow.1 = s 'HighlightWindow Class'
+	{
+		CLSID = s '{86455185-E70C-4953-B655-A479C59DE28B}'
+	}
+	UCLIDHighlightWindow.HighlightWindow = s 'HighlightWindow Class'
+	{
+		CLSID = s '{86455185-E70C-4953-B655-A479C59DE28B}'
+		CurVer = s 'UCLIDHighlightWindow.HighlightWindow.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {86455185-E70C-4953-B655-A479C59DE28B} = s 'HighlightWindow Class'
+		{
+			ProgID = s 'UCLIDHighlightWindow.HighlightWindow.1'
+			VersionIndependentProgID = s 'UCLIDHighlightWindow.HighlightWindow'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{47E3C6A5-3E04-4A82-9EE1-999870E29467}'
+		}
+	}
+}

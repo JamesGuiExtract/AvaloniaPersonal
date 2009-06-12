@@ -1,0 +1,120 @@
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060237.tif.uss
+SOT_GRANTOR_01m=The undersigned^48~mortgage elec|tgage electr|tronic registr|c registration sys|[MERS]^160~Beneficiary(ies)|as the owner^mortgage elec|tgage electr|tronic registr|c registration sys|[MERS]^36~nominee for^?MGrantor^120~\r\n\r\n
+SOT_GRANTOR_01=The undersigned^?Grantor^250~Beneficiary(ies)|as the owner
+
+// 0002.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062805.tif.uss
+SOT_GRANTOR_02=\r\n\r\n^?Grantor^250~the undersigned beneficiary
+
+// 0003.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0063602.tif.uss
+SOT_GRANTOR_03=[as]^5~Trustee^5~[and]^?Grantor^250~as Authorized Beneficiary
+
+// 0004.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062413.tif.uss
+// 0023.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\substitution of trustee\20059022361200.tif.uss
+SOT_GRANTOR_04=BENEFICIARY:^?Grantor^250~DEED^15~DATED
+
+// 0005.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0063499.tif.uss
+//SOT_GRANTOR_05=the undersigned^?Grantor^250~is^5~the^5~present^5~Beneficiary
+
+// 0006.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060409.tif.uss
+SOT_GRANTOR_06=Trustee and^?Grantor^250~(Beneficiary)
+
+// 0036.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-001281.tif.uss
+SOT_GRANTOR_31=WHEREAS^?Grantor^160~[is]^36~holder^7~note
+
+// 0007.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060264.tif.uss
+SOT_GRANTOR_07=said Deed of Trust^5~\r\n\r\n^?Grantor^200~[on]^100~State of
+
+// 0024.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020246600.tif.uss
+SOT_GRANTOR_07A=said Deed of Trust^5~\r\n\r\n^?Grantor^300~[SIGNOR]^300~State of
+
+// 0008.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000009800.002.tif.uss
+SOT_GRANTOR_08=said Deed of Trust^5~\r\n\r\n^10~Dated^?Grantor^150~[by]^100~Attest
+SOT_GRANTOR_09=said Deed of Trust^5~\r\n\r\n^10~Dated^?Grantor^150~\r\n\r\n^100~Attest
+
+// 0009.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000033000.001.tif.uss
+// 0010.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000033600.001.tif.uss
+SOT_GRANTOR_10=said Deed of Trust^5~\r\n\r\n^5~[on]^20~\r\n^?Grantor^300~State of
+
+// 0011.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000014500.003.tif.uss
+SOT_GRANTOR_11=Loan No]^50~\r\n\r\n^?Grantor^220~State of
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000001700.001.tif.uss
+SOT_GRANTOR_12=Original Trustee^5~and^?Grantor^200~original Beneficiary^500~undersigned Beneficiary
+
+// 0013.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060468.tif.uss
+SOT_GRANTOR_13=TRUSTEE^10~[for]^?Grantor^250~AS BENEFICIARY 
+
+// 0014.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0063421.tif.uss
+SOT_GRANTOR_14=\r\nBeneficiary:^?Grantor^250~[BY]|\r\nState of
+
+// 0015.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060846.tif.uss
+SOT_GRANTOR_15=Now therefore^?Grantor^250~beneficiary
+
+// 0029.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000568.tif.uss
+SOT_GRANTOR_28=undersigned^reconvey^36~[to the parties^80~under said Deed of Trust^8~\r\nDated:^16~\r\n^?Grantor^80~\r\nBY]
+
+// 0025.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020089900.tif.uss
+// 0016.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060757.tif.uss
+SOT_GRANTOR_16=the undersigned^?Grantor^250~[as]|being^15~Beneficiary
+
+// 0017.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062727.tif.uss
+SOT_GRANTOR_17=[him]^5~[her]^5~thereunder^5~\r\n\r\n^?Grantor^250~\r\n\r\nBy]
+
+// 0018.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060867.tif.uss
+SOT_GRANTOR_18a=Whereas, the undersigned^300~hereby reconvey^300~held^9~trustee^36~\r\nDated:^?TRGrantor^250~\r\nBy]
+SOT_GRANTOR_18=Whereas, the undersigned^300~hereby reconvey^300~\r\nDated:^?Grantor^250~\r\nBy]
+
+// 0019.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060410.tif.uss
+SOT_GRANTOR_19=Original Beneficiary:^?Grantor^250~Date of Deed of Trust|\r\nDated
+
+// 0020.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060413.tif.uss
+SOT_GRANTOR_20=Trustee for^?Grantor^250~Beneficiary
+
+// 0021.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060294.tif.uss
+SOT_GRANTOR_21=Trustee, and^?Grantor^250~the Beneficiary
+
+// 0030.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-035575.tif.uss
+SOT_GRANTOR_29=estate^24~Successor^3~Trustee^?Grantor^120~[as^3~Successor^3~Trustee^3~under^80~Deed^160~hereby|grant|bargain|sell|reconvey
+
+// 0026.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020269000.tif.uss
+// 0022.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062679.tif.uss
+SOT_GRANTOR_22=\r\nBeneficiary^?Grantor^250~\r\nBy|\r\nState of
+
+// 0027.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020086100.tif.uss
+SOT_GRANTOR_23=Original Beneficiary^?Grantor^300~Dated^500~undersigned hereby substitutes
+
+// 0028.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059023354000.tif.uss
+SOT_GRANTOR_24=WHEREAS^?Grantor^250~the undersigned^10~present Beneficiary
+
+// 0031.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000179.tif.uss
+SOT_GRANTOR_25=the present beneficiary^64~caused these presents to be executed^64~on the dates below written^?Grantor^120~By^64~[as Trustee
+SOT_GRANTOR_40=hereby substitutes^160~as trustee^180~and^3~directs^9~[said]^?Grantor^160~to reconvey
+// 0032.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000363.tif
+SOT_GRANTOR_26=undersigned hereby substitutes^240~[as trustee under said Deed of Trust and^?Grantor^80~does hereby reconvey
+// 0033.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000176.tif.uss
+SOT_GRANTOR_27=original Trustee, and^?Grantor^was the original Beneficiary under that certain Deed of Trust^300~WHEREAS^8~undersigned as present Beneficiary
+
+// 0034.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000563.tif.uss
+SOT_GRANTOR_28=under^4~igned^3~hereby^3~substitutes^reconvey^36~parties^64~Deed^16~Dated^16~\r\n^?Grantor^120~[By:
+
+// 0035.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-001353.tif.uss
+SOT_GRANTOR_30=appeared^240~President|vice pres|officer^6~[of]^?Grantor<^240~respectively^120~execute^36~instrument
+
+[PATTERNS_END]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

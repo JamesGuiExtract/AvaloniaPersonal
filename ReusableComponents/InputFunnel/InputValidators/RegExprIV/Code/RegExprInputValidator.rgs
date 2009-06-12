@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRegExprIV.RegExprInputValidator.1 = s 'RegExprInputValidator Class'
+	{
+		CLSID = s '{85CE6BB7-07AB-47D6-BE8E-13FB5FAB542D}'
+	}
+	UCLIDRegExprIV.RegExprInputValidator = s 'RegExprInputValidator Class'
+	{
+		CLSID = s '{85CE6BB7-07AB-47D6-BE8E-13FB5FAB542D}'
+		CurVer = s 'UCLIDRegExprIV.RegExprInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {85CE6BB7-07AB-47D6-BE8E-13FB5FAB542D} = s 'RegExprInputValidator Class'
+		{
+			ProgID = s 'UCLIDRegExprIV.RegExprInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDRegExprIV.RegExprInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{98469F15-E4D9-4050-94B5-D47F3DAD5F46}'
+		}
+	}
+}

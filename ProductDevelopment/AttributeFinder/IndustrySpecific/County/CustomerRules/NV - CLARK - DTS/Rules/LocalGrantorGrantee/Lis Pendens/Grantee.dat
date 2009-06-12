@@ -1,0 +1,12 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN] 
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//LP_Plaintiff01=DISTRICT^3~COURT^16~COUNTY^5~NEVADA^?Grantee^160~Plaintiff|Plaintiffs
+LP_Plaintiff01=NEVADA^?Grantee^160~Plaintiff|Plaintiffs
+[PATTERNS_END] 

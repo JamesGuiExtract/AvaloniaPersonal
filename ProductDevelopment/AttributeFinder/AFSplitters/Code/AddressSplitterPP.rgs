@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFSplitters.AddressSplitterPP.1 = s 'AddressSplitterPP Class'
+	{
+		CLSID = s '{A95FB103-86BF-47CF-9CD6-3E9FCD211B30}'
+	}
+	UCLIDAFSplitters.AddressSplitterPP = s 'AddressSplitterPP Class'
+	{
+		CLSID = s '{A95FB103-86BF-47CF-9CD6-3E9FCD211B30}'
+		CurVer = s 'UCLIDAFSplitters.AddressSplitterPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A95FB103-86BF-47CF-9CD6-3E9FCD211B30} = s 'AddressSplitterPP Class'
+		{
+			ProgID = s 'UCLIDAFSplitters.AddressSplitterPP.1'
+			VersionIndependentProgID = s 'UCLIDAFSplitters.AddressSplitterPP'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{9C61A6A5-6789-4648-9777-5405D6C517DF}'
+		}
+	}
+}

@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>Locate Image Region Preprocessor</TITLE>
+<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css"></link>
+</HEAD>
+<BODY>
+<h1>Locate Image Region Preprocessor</h1>
+<hr></hr>
+	<h3>Uses</h3>
+	<ul>
+		<li>Can be used to filter the pages or portions of pages that are passed to the rule based on clues.</li>
+	</ul>
+
+<hr></hr>
+	<h3>Usage</h3>
+	<ul>
+		<li>In the Select Document Preprocessor dropdown menu in the <b>RuleSet Editor</b>:</li>
+		<ul>
+			<li>Select <b>Locate image region</b> and click <b>Configure...</b>.</li>
+		</ul>
+		<li>There are three sections of options in the <b>Configure Locate image region</b> window: <i>Top</i>, <i>Left</i>, and <i>Right</i>.</li>
+		<ul>
+			<li>The <i>Top</i> section contains general options. From left to right, they:</li>
+			<ul>
+				<li>Toggle between finding <b>Text</b> or an <b>Image Region</b>. For an <b>Image Region</b>, you must assign text to it in the field provided.</li>
+				<li>Toggle the region definition as <b>Inside</b> or <b>Outside</b> the boundaries.</li>
+				<li><b>Include</b> or <b>Exclude</b> <b>Characters</b> or <b>Words</b> that intersect the region boundaries.</li>
+				<li>Find the region on <b>All</b> pages or only the <b>First</b> page.</li>
+			</ul>
+			<li>The <i>Left</i> section of the window contains options to configure the <b>Clue(s)</b>.</li>
+			<ul>
+				<li>Use the radio buttons to configure up to four lists of clues.</li>
+				<li>Click <b>Add...</b> to add clues to the list.</li>
+				<li>Click <b>Remove</b> to delete a clue.</li>
+				<li>Click <b>Modify...</b> or double click a clue to edit it.</li>
+				<li>Use the <b>Load List...</b> and <b>Save List</b> buttons to load clues from or save clues to a list. The list is a newline delimited text file.</li>
+				<li>Use the checkboxes below the clue list to toggle the clues as <b>Case sensitive</b>, <b>regular expression(s)</b>, or to only find clues in the 
+					region defined by the previous clue list (Clue Lists 2-4 only).</li>
+			</ul>
+			<li>The <i>Right</i> section of the window configures the <b>Region Boundaries</b>.</li>
+			<ul>
+				<li>Use the dropdown menus and numerical fields to define the <b>TOP</b>, <b>BOTTOM</b>, <b>LEFT</b>, and <b>RIGHT</b> boundaries of the region.</li>
+				<li>Toggle between either the <b>Top</b>/<b>Bottom</b> or <b>Left</b>/<b>Right</b> end of the <b>Page Containing Clues</b> or one of the <b>Clue Lists</b>.</li>
+				<li>Expand the region <b>Up</b>/<b>Down</b> or <b>Left</b>/<b>Right</b> by a specified number of <b>Spatial lines (1/10 line precision)</b>/<b>Characters 
+					(integer amounts only)</b>.</li>
+			</ul>
+		</ul>
+	</ul>
+
+<hr></hr>
+	<h3>Exercises</h3>
+	<ol>
+		<li>Open the <b>RuleSet Editor</b>, load ".\Files\TestImageSSN.rsd", open the <b>Rule Tester</b>
+			, load ".\Files\TestImage004.tif", and execute the rules.</li>
+		<li>Note the location of the two SSN's on the first page. Perhaps we could avoid having to scan every page 
+			of this document.</li>
+		<li>Configure a <b>Locate image region</b> preprocessor to search only the text in the portion of the page 
+			that contains SSN's (hint: Section headings make good clues).</li>
+	</ol>
+
+</BODY>
+</HTML>

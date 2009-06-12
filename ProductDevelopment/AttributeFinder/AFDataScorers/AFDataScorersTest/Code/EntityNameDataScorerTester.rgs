@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFDataScorersTest.EntityNameDataScorerTester.1 = s 'EntityNameDataScorerTester Class'
+	{
+		CLSID = s '{798D0268-A5A0-43B5-BB5B-C663482B28AB}'
+	}
+	UCLIDAFDataScorersTest.EntityNameDataScorerTester = s 'EntityNameDataScorerTester Class'
+	{
+		CLSID = s '{798D0268-A5A0-43B5-BB5B-C663482B28AB}'
+		CurVer = s 'UCLIDAFDataScorersTest.EntityNameDataScorerTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {798D0268-A5A0-43B5-BB5B-C663482B28AB} = s 'EntityNameDataScorerTester Class'
+		{
+			ProgID = s 'UCLIDAFDataScorersTest.EntityNameDataScorerTester.1'
+			VersionIndependentProgID = s 'UCLIDAFDataScorersTest.EntityNameDataScorerTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{16609C4A-1074-4410-B493-4FF71223BDF9}'
+		}
+	}
+}

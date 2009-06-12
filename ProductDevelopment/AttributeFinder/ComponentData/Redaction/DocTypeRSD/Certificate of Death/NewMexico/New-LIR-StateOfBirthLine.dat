@@ -1,0 +1,8 @@
+6b.{0,3}state\s*of\s*birth
+6c.{0,3}country\s*of\s*birth
+7.{0,3}was\s*decendent\s*ever
+8[a-f].{0,3}residence
+residence\s*street
+street\s*and\s*number
+number\s*or\s*location
+u.?s.?\s*armed

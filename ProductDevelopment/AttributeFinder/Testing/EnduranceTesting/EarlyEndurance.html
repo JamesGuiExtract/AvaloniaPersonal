@@ -1,0 +1,257 @@
+<html>
+
+<head>
+<title>File Action Manager Early Endurance Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>Pre-Code Freeze Endurance Tests (Test ID 6C)<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2>NOTE: Test results should be archived under I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests</h2>
+<ol>
+<li><h2>Purpose</h2>
+<ul>
+	<li>Exercise both <b>FLEX Index</b> and <b>ID Shield</b> for an extended period of time as the 
+	development process approaches code freeze.
+	<li>Use a collection of individual test machines such that each test runs for one week 
+	and uses the most recent internal build.
+</ul>
+<p>
+<li><h2>Machine Preparation</h2>
+	<ul>
+		<li>Select <b>3</b> test machines.  Various operating systems should be exercised 
+		for these collected tests.  Confirm that the chosen operating system is 
+		appropriate for this test.
+		<li>Install and license <b>FLEX Index</b> on one machine (A) and <b>ID Shield</b> on the other 
+		two (B and C).  Note that Disable USB Key Serial Numbers is required to exercise customer rulesets.
+		<li>Use the <b>USB License Key Manager</b> utility to confirm that a network 
+		USB key is configured and available.  The usual location is on <b>LISA</b>.
+		<li>Create a local <b>Statistics</b> folder on each machine for collection of 
+		process statistics.
+		<li>Create a local folder on each machine for the ruleset to be exercised and select 
+		the corresponding images.  Note: The images need to match the ruleset.
+		<ul>
+			<li>For Redaction: <b>Utah - Department of Commerce</b> is the suggested ruleset.
+			<li>For Indexing: <b>MN - Scott - Trimin</b> is the suggested ruleset.
+			<li>Extract the selected rules from the most recent <b>Deliveries</b> folder.  
+			The basic path is <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer 
+			Specific Files\</b>.
+		</ul>
+<p>
+		<li><b>Image Files</b>: 
+		<ul>
+			<li>For a test using the <b>Utah Department of Commerce</b> redaction rules 
+			and images there are over 1 million images currently stored on <b>\\HPQC2\F</b>.
+			<p>
+			<li>If using a different set of rules and images, create two local folders 
+			(<b>Images</b> and <b>Images2</b>) for images to be processed.  Copies of 
+			folders can also be used to increase the number of images to be processed.  
+			<li>Copy images from K: to appropriate subfolders of <b>Images</b> 
+			before processing starts.  This provides images for immediate supplying 
+			and processing.
+			<li>Copy images from K: to appropriate subfolders of <b>Images2</b> 
+			after processing starts to exercise listening for new files.  
+		</ul>
+	</ul>
+<p>
+<!--
+		<li><b>Good examples for Indexing</b>: 
+		<ul>
+			<li>CA - ContraCosta - AtPac : Set001 ( 5000 TIFs )
+			<li>CA - Fresno - AtPac : Set003 ( 4315 TIFs )
+			<li>CA - Fresno - AtPac : Set005 ( 2889 TIFs as .00x )
+			<li>MN - Scott - Trimin : Set003 ( 3000 TIFs )
+			<li>MI - Oakland - ACS : Set003 ( 5742 TIFs )
+			<li>WI - Waukesha : Set008 ( 13909 TIFs )
+		</ul>
+<p>
+		<li><b>Good examples for Redaction</b>: 
+		<ul>
+			<li>LA - Assumption - Cott : Set001/Images ( 50628 TIFs )
+			<li>MI - Macomb - ACS : Set012 ( 10692 TIFs )
+			<li>MI - Macomb - ACS : Set014 ( 15033 TIFs )
+			<li>NV - Clark County : Set001/Images ( 25740 TIFs )
+			<li>VA - Caroline - Logan : Set001 ( 10237 TIFs )
+			<li>VA - Carroll - Logan : Set001 ( 10780 TIFs )
+			<li>VA - Charlottesville - Logan : Set001 ( 10434 TIFs )
+			<li>VA - Chesapeake - Logan : Set001 ( 10337 TIFs )
+			<li>VA - Fluvanna - Logan : Set001 ( 9947 TIFs )
+			<li>VA - New Kent - Logan : Set001 ( 9816 TIFs )
+			<li>VA - Surry - Logan : Set001 ( 8813 TIFs )
+		</ul>
+	</ul>
+<p>
+-->
+<li><h2>Database Preparation</h2>
+<ul>
+	<li><b>ID Shield</b> 
+	<ul>
+		<li>Use the <b>FAM DB Admin</b> utility to log onto or create the 
+		Endurance_Test database on HPQC2.  
+		<li>The server name should be <b>HPQC2</b>.
+		<li>The password should be "a". 
+		<li>Add <b>Test_A</b> and <b>Test_B</b> (one for each of the two test machines)
+		actions to the database if they do not already exist.
+	</ul>
+<p>
+	<li><b>FLEX Index</b> 
+	<ul>
+		<li>Use the <b>FAM DB Admin</b> utility to create an 
+		Endurance_Test database on the test machine.
+		<li>The password should be "a". 
+		<li>Add a <b>Test</b> action to the database if it does not already exist.
+	</ul>
+</ul>
+<p>
+<li><h2>File Preparation</h2>
+	<ul>
+		<li>Create a <b>Queue.fps</b> file with two Folder file suppliers.  
+		    The file suppliers should be configured as follows: 
+		<ul>
+			<li>One File Supplier should be configured to recursively supply <b>*.tif</b> 
+			files from an Images folder that contains subfolders with preloaded images.
+			<li>One File Supplier should be configured to recursively supply <b>*.tif</b> 
+			files from an empty Images2 folder.  
+			Configure the file supplier to <b>Continuously supply files that are added</b>. 
+			Subfolders will later be copied into this folder to exercise listening.
+		</ul>
+<p>
+		<li>Create a <b>Process.fps</b> file with one task.  
+		<ul>
+			<li>For an Indexing test, create an FPS file with one 
+			<b>Execute Rules</b> task for processing.  
+			<li>For a Redaction test, create an FPS file with a <b>Redact images 
+			(no verification)</b> task for processing.
+			<li>The Continuous Processing option on the Processing Setup page should be 
+			set to <b>Keep processing files as they are added to the queue</b>.  
+		</ul>
+	</ul>
+<p>
+<li><h2>Schedule Reports</h2>
+<ul>
+		<li>Confirm that the machine with the Endurance_Test database has the desired 
+		<b>FLEX Index</b> or <b>ID Shield</b> build.
+		<li>Confirm that <b>C:\Program Files\Extract Systems\CommonComponents\</b> (if the 
+		machine has a 64-bit OS, instead put <b>C:\Program Files (x86)\Extract Systems\CommonComponents\</b>) 
+		is in the database machine's system path. 
+		<li>Confirm that email settings are correctly configured on the database machine.
+		<ul>
+			<li>Open a command window and type emailFile /c to open the <b>Email Settings</b> dialog.
+			<li>SMTP should be set to 192.168.44.1.
+			<li>Enter your desired Sender Display Name and your email address.
+		</ul>
+		<li>Get <b>reports.bat</b> from Source Safe and copy it to a local location on the 
+		database machine.
+		<li>Edit the bat file, inserting the correct server and the email address(es) where 
+		the reports will be sent.  Note: More than one email address can be inserted, 
+		separated by semicolons.
+		<li>Use <b>Windows Task Scheduler</b> to run reports.bat at least once a day.
+		<li>After the <b>Windows Scheduled Task</b> has been configured, confirm that the scheduled 
+		task, bat file, and Report Viewer are working correctly by doing a test run of the task.
+</ul>
+<p>
+
+<li><h2>Test Execution</h2>
+<ul>
+	<li><b>Each test</b>
+	<ul>
+		<li>Open a command prompt and begin the collection of process statistics with the 
+		following command string where &quot;Statistics&quot; is the folder created in Step 4 of Machine Preparation.	
+		<li><b>LogProcessStats.exe ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe 5m &quot;Statistics&quot;</b>
+		<li>Open both the Queueing and the Processing FPS files.
+		<li>Start Processing for the <b>Queue.fps</b> file.
+		<li>Start Processing for the <b>Process.fps</b> file.
+	</ul>
+<p>
+	<li><b>Test A - FLEX Index</b>
+	<ul>
+		<li>Start processing with the current internal build on <b>Day 1</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 8</b>.
+		<li>Start processing on <b>Day 8</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 15</b>.
+		<li>Start processing on <b>Day 15</b>.
+		<li>Processing will continue for one week.
+	</ul>
+<p>
+	<li><b>Test B - ID Shield</b>
+	<ul>
+		<li>Start processing with the current internal build on <b>Day 3</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 10</b>.
+		<li>Start processing on <b>Day 10</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 17</b>.
+		<li>Start processing on <b>Day 17</b>.
+		<li>Processing will continue for one week.
+	</ul>
+<p>
+	<li><b>Test C - ID Shield</b>
+	<ul>
+		<li>Start processing with the current internal build on <b>Day 5</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 12</b>.
+		<li>Start processing on <b>Day 12</b>.
+		<li>Processing will continue for one week.
+		<li>Install the newest internal build on <b>Day 19</b>.
+		<li>Start processing on <b>Day 19</b>.
+		<li>Processing will continue for one week.
+	</ul>
+</ul>
+<p>
+<li><h2>Test Review and Data Analysis</h2>
+	<ul>
+		<li>The following items should be periodically reviewed during processing.
+		<ul>
+			<li>Processing failures listed on the <b>Processing Log</b> page.
+			<li>Memory usage via <b>Task Manager</b>.
+			<li>Use xcopy to copy a set of images into a subfolder under <b>Images2</b>.
+			This will exercise the file supplier that is listening for new files.
+		</ul>
+<p>
+		<li>The following items should be checked when processing finishes or is stopped.
+		<ul>
+			<li>Collection of process statistics should be stopped via <b>Ctrl+C</b> in 
+			the appropriate command window.
+			<li>Open the process statistics spreadsheet <b>ImportData.xls</b>.  
+			Import using <b>Ctrl+Shift+I</b> the following CSV files from the Statistics folder.
+			<ul>
+				<li>cpu.csv
+				<li>ProcessFiles.NNN.csv where NNN is the process ID.  
+				Import the larger of the two files.
+			</ul>
+			<li>Save the spreadsheet with a meaningful name to include <b>_6C</b> 
+			as the test number.
+		</ul>
+	</ul>
+<p>
+<li><h2>Saving Test Results</h2>
+	<ul>
+		<li>Data will be stored in subfolders under 
+		I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests.
+		<li>Subfolders exist for:
+		<ul>
+			<li>Test_6A ( see other checklist )
+			<li>Test_6B ( see other checklist )
+			<li>Test_6C
+		</ul>
+		<li>The <b>Stats</b> folder should be copied to a <b>YYYY-MM-DD</b> 
+		named subfolder under the associated test subfolder.
+		<li>One or more Exception logs can be stored in a <b>UEX_Logs</b> subfolder.
+		This is useful if any unexpected errors are noticed during review. 
+		<li>SQL Server Management Studio can be used to backup the Endurance_Test 
+		database files to a <b>Database</b> subfolder.
+		<li>An example path for a particular test is: <br>
+<b>I:\Common\Testing\Product Testing\FLEX_Index_80\EnduranceTests\Test_6C\2007-10-30</b>.
+		<li>Copy and update a <b>TestDetails.txt</b> file in the YYYY-MM-DD folder.
+		This file will contain a summary of the test environment and results.
+	</ul>
+</ol>
+
+</body>
+</html>

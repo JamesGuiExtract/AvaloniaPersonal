@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.DeleteLinesAndRepairICO.1 = s 'DeleteLinesAndRepairICO Class'
+	{
+		CLSID = s '{C9C97F01-A846-4EC4-8267-CA88C668AA8E}'
+	}
+	ESImageCleanup.DeleteLinesAndRepairICO = s 'DeleteLinesAndRepairICO Class'
+	{
+		CLSID = s '{C9C97F01-A846-4EC4-8267-CA88C668AA8E}'
+		CurVer = s 'ESImageCleanup.DeleteLinesAndRepairICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C9C97F01-A846-4EC4-8267-CA88C668AA8E} = s 'DeleteLinesAndRepairICO Class'
+		{
+			ProgID = s 'ESImageCleanup.DeleteLinesAndRepairICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.DeleteLinesAndRepairICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

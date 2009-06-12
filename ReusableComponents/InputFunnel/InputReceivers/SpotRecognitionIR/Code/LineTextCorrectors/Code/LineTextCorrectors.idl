@@ -1,0 +1,40 @@
+// LineTextCorrectors.idl : IDL source for LineTextCorrectors.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (LineTextCorrectors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D7A48C67-215A-4E0B-A6E7-E356423C3254),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR LineTextCorrectors 1.0 Type Library")
+]
+library UCLID_LINETEXTCORRECTORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\Core\SpotRecognitionIR.tlb");
+	importlib("..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(A67AAA84-2642-448D-AE4D-28BF0DB80BE2),
+		helpstring("MCRTextCorrector Class")
+	]
+	coclass MCRTextCorrector
+	{
+		[default] interface ILineTextCorrector;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(6508515E-D155-4E16-91DB-CE8536E0A7A8),
+		helpstring("MCRAutoFindLTC Class")
+	]
+	coclass MCRAutoFindLTC
+	{
+		[default] interface ILineTextCorrector;
+		interface ILicensedComponent;
+	};
+};

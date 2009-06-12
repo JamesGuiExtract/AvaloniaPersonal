@@ -1,0 +1,80 @@
+// TestObjsWithPropPages.idl : IDL source for TestObjsWithPropPages.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (TestObjsWithPropPages.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(D448B476-4652-4F01-A73D-00062B1CB55B),
+		dual,
+		helpstring("IObjA Interface"),
+		pointer_default(unique)
+	]
+	interface IObjA : IDispatch
+	{
+		[propget, id(1), helpstring("property RegExpr")] HRESULT RegExpr([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property RegExpr")] HRESULT RegExpr([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(C3C1D655-8FBF-4EB9-BDAF-3537E7C76419),
+		dual,
+		helpstring("IObjB Interface"),
+		pointer_default(unique)
+	]
+	interface IObjB : IDispatch
+	{
+		[propget, id(1), helpstring("property StartPos")] HRESULT StartPos([out, retval] long *pVal);
+		[propput, id(1), helpstring("property StartPos")] HRESULT StartPos([in] long newVal);
+		[propget, id(2), helpstring("property EndPos")] HRESULT EndPos([out, retval] long *pVal);
+		[propput, id(2), helpstring("property EndPos")] HRESULT EndPos([in] long newVal);
+	};
+
+[
+	uuid(B42DD683-BE90-43F0-823B-E7DB366E34D5),
+	version(1.0),
+	helpstring("TestObjsWithPropPages 1.0 Type Library")
+]
+library TESTOBJSWITHPROPPAGESLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(E9C89975-D281-4A05-9D4C-6D189565E839),
+		helpstring("ObjA Class")
+	]
+	coclass ObjA
+	{
+		[default] interface IObjA;
+	};
+
+	[
+		uuid(D4CE3564-B10C-4CD1-963F-F0F28676F4BF),
+		helpstring("ObjAPropPage Class")
+	]
+	coclass ObjAPropPage
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(1709A600-92F8-4232-8544-E472BE015B2D),
+		helpstring("ObjB Class")
+	]
+	coclass ObjB
+	{
+		[default] interface IObjB;
+	};
+
+	[
+		uuid(78378D3E-AAED-49B0-9E13-4C711917D129),
+		helpstring("ObjBPropPage Class")
+	]
+	coclass ObjBPropPage
+	{
+		interface IUnknown;
+	};
+};

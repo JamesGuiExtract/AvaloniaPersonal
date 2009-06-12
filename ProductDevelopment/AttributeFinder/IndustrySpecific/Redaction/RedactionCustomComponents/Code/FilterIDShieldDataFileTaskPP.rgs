@@ -1,0 +1,23 @@
+HKCR
+{
+	RedactionCustomComponents.FilterIDShieldDataFileTaskPP.1 = s 'FilterIDShieldDataFileTaskPP Class'
+	{
+		CLSID = s '{A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A}'
+	}
+	RedactionCustomComponents.FilterIDShieldDataFileTaskPP = s 'FilterIDShieldDataFileTaskPP Class'
+	{
+		CLSID = s '{A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A}'
+		CurVer = s 'RedactionCustomComponents.FilterIDShieldDataFileTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A68A4C80-CCDA-429A-B1E0-FF4E2FCC775A} = s 'FilterIDShieldDataFileTaskPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

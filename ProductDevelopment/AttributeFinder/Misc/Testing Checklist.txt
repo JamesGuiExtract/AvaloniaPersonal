@@ -1,0 +1,346 @@
+Rule Set Editor and Attribute Finder Interactive Tests
+
+*** File Menu (proper functionality)
+File - New
+File - Open
+   - Opens RSD and RSD.ETF Files
+   - RSD.ETF FILES are not editable or viewable
+File - Import
+File - Export
+File - Save
+File - Save As
+File - Exit
+
+*** Tools Menu (proper functionality)
+Tools - Open Rule Tester
+   - Works on RSD and RSD.ETF Files
+Tools - Check For New Components
+
+*** Help Menu
+Help - Attribute Finder Help
+Help - About Attribute Finder
+   - check for correct version number
+
+*** Editor Dialog
+Select Document Preprocessor
+   - brings up appropriate dialog
+   - information is persistent
+   - does not change preprocessor without confirmation
+
+Attributes Combo Box
+Add Attribute
+   - brings up appropriate dialog
+   - does not allow blank name
+Delete Attribute
+   - removes Attribute after confirmation
+   - does not remove Attribute without confirmation
+   - check enable/disable state
+Rename Attribute
+   - brings up appropriate dialog
+   - Shows new Attribute name
+   - does not rename Attribute without confirmation
+   - check enable/disable state
+
+Attribute Rules List Box
+Insert Attribute Rule
+   - brings up appropriate dialog
+   - information is persistent
+Delete Attribute Rule
+   - removes Attribute Rule after confirmation
+   - does not remove Attribute Rule without confirmation
+   - check enable/disable state
+Modify Attribute Rule
+   - brings up appropriate dialog
+   - information is persistent
+   - check enable/disable state
+Move Up Attribute Rule
+   - moves Attribute Rule up
+   - check enable/disable state
+Move Down Attribute Rule
+   - moves Attribute Rule down
+   - check enable/disable state
+Stop searching after first value found Checkbox
+
+Select Input Validator
+   - brings up appropriate dialog
+   - information is persistent
+   - does not change validator without confirmation
+
+Select Attribute Splitter
+   - brings up appropriate dialog
+   - information is persistent
+   - does not change splitter without confirmation
+
+Select Output Handler
+   - brings up appropriate dialog
+   - information is persistent
+   - does not change handler without confirmation
+
+Context menu(Right Click) items work properly inside application
+(Copy, Paste...)
+   - Document Preprocessor
+   - Attribute with associated rules
+   - Attribute Rule with associated VM Rules
+   - Input Validator
+   - Attribute Splitter
+   - Output Handler
+Context menu(Right Click) items work properly between applications
+(Copy, Paste...)
+   - Document Preprocessor
+   - Attribute with associated rules
+   - Attribute Rule with associated VM Rules
+   - Input Validator
+   - Attribute Splitter
+   - Output Handler
+
+*** Select Document Preprocessor Dialog
+Ensure Description Edit Box is working
+Ensure Document Preprocessor Combo Box
+Configure Document Preprocessor
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+
+*** Select Input Validator Dialog
+Ensure Description Edit Box is working
+Ensure Input Validator Combo Box is working
+
+Configure Input Validator
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+
+*** Select Attribute Splitter Dialog
+Ensure Description Edit Box is working
+Ensure Attribute Splitter Combo Box is working
+Configure Attribute Splitter
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+
+*** Select OutputHandler Dialog
+Ensure Description Edit Box is working
+Ensure OutputHandler Combo Box is working
+Configure OutputHandler
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+
+*** Insert/Modify Attribute Rule Dialog
+Select Document Preprocessor
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+Description Edit Box
+   - information is persistent
+Value Finder Combo Box
+   - information is persistent
+Configure Value Finder
+   - brings up appropriate dialog
+   - information is persistent
+   - information is saved only on confirmation
+Apply Value Modifying Rules Checkbox
+   - information is persistent
+Value Modifying Rules List Box
+   - display stays current with associated changes
+Insert/Modify Value Modifying Rule
+   - brings up appropriate dialog
+   - information is persistent
+   - check enable/disable state
+Remove Value Modifying Rule
+   - removes VM Rule after confirmation
+   - does not remove VM Rule without confirmation
+   - check enable/disable state
+Move Up Value Modifying Rule
+   - moves VM Rule down
+   - check enable/disable state
+Move Down Value Modifying Rule
+   - moves VM Rule down
+   - check enable/disable state
+
+*** For each of the following components make sure that they can 
+be copied and pasted successfully
+
+*** Document Preprocessors Property Pages(proper behavior + persistence)
+Document Classifier
+SelectPageRegion
+Select Multiple Document Preprocessors
+
+*** Value Finder Property Pages (proper behavior + persistence)
+Block Finder
+Extract Line
+Locate Image Region
+Regular Expression
+String Pattern Matcher Finder
+Value After Clue
+Value Before Clue
+Value From List
+
+*** Other Value Finders (proper behavior)
+Legal Description
+Grantor-Grantee
+Return Address
+
+*** Value Modifier Property Pages (proper behavior + persistence)
+Advanced Replace String
+Change Case
+Extract or Remove Leftmost Characters
+Extract or Remove Middle Characters
+Extract or Remove Rightmost Characters
+Insert Characters
+Regular Expression
+Remove Characters
+Replace Strings
+String Tokenizer
+Translate to Closest Value in List
+Translate Values
+
+*** Other Value Modifier (proper behavior)
+Find Company or Person(s)
+MERS Modifier
+
+*** Input Validator Property Pages (proper behavior + persistence)
+Double
+Long Integer
+Regular Expression
+Value From List
+
+*** Other Input Validators (proper behavior)
+Date
+Float
+Short Integer
+
+*** Attribute Splitter Property Pages (proper behavior + persistence)
+RSD Splitter
+Token Splitters
+
+*** Other Attribute Splitters(proper behavior)
+Split an Address
+Split a legal description
+Split the name of a company or person
+Split the name of a company
+
+*** Output Handler Property Pages (proper behavior + persistence)
+Output Data to XML File
+Remove Entries From List
+Select Multiple Output Handlers
+
+*** Other Output Handlers (proper behavior)
+Eliminate Duplicates
+Remove Invalid Entries
+Select Only Unique Values
+Select Using Majority
+Select With UI
+
+*** Rule Tester Dialog
+Settings Persistence
+   - testing scope
+   - input type
+   - input text
+   - window size and position
+   - grid height (position of splitter control)
+Toolbar
+   - Spot Recognition Window
+   - Highlighted Text Window
+     * Open TXT files
+     * Open DOC files
+   - Clear Entries
+   - Execute Rules
+Input
+   - Edit box is editable for Manual input 
+   - Edit box is editable for .TXT input 
+   - Edit box is editable for .DOC input 
+   - Edit box is read-only for Image Window input 
+   - Edit box is read-only for .USS file input 
+Output Handlers
+   - Ignore checkbox
+   - proper behavior when used and configured
+Grid
+   - supports multiple line output in row
+   - selection will highlight in Spot Recognition Window
+   - Clear deselects SRIR highlights
+   - scrollbar appearance and functionality
+   - in-place editing allowed only in Value column
+General
+   - graceful window resizing for each tab
+   - proper results for single attribute scope
+   - proper results for all attributes scope
+   - window has minimum size
+
+*** Spatial Information Retained by Objects
+    Select grid items in Tester Dialog with results found from image data
+   - Block Finder VF Rule
+   - Extract Line VF Rule
+   - Grantor-Grantee Finder VF Rule
+   - Legal Description Finder VF Rule
+   - Locate Image Region VF Rule
+   - Regular Expression VF Rule
+   - Return Address VF Rule
+   - String Pattern Matcher VF Rule
+   - Value After Clue VF Rule
+   - Value Before Clue VF Rule
+   - Value From List VF Rule
+   - Advanced Replace String VM Rule
+   - Change Case VM Rule
+   - Extract or Remove Leftmost Characters VM Rule
+   - Extract or Remove Middle Characters VM Rule
+   - Extract or Remove Rightmost Characters VM Rule
+   - Find Company or Person(s) VM Rule
+   - Insert Characters VM Rule
+   - Locate Image Region VM Rule
+   - MERS Modifier VM Rule
+   - Regular Expression VM Rule
+   - Remove Characters VM Rule
+   - Replace Strings VM Rule
+   - String Tokenizer VM Rule
+   - Translate to Closest Value in List VM Rule
+   - Translate Values VM Rule
+   - Advance Replace String Preprocessor
+   - Document Classifier Preprocessor
+   - Locate Image Region Preprocessor
+   - Replace Strings Preprocessor
+   - Select Multiple Document Preprocessor
+   - Select Page Region Preprocessor
+
+*** BatchOCR Utility
+Test with Single File to .TXT output
+Test with Single File to compressed .USS output
+Test with Single File to uncompressed .USS output
+Test with Single File using limit page number functionality
+Test with Folder to .TXT output
+Test with Folder to compressed .USS output
+Test with Folder to uncompressed .USS output
+Test with Folder to .TXT output skipping existing files
+Test with Folder to .USS output skipping existing files
+Test with Folder to any output using the recursive functionality.
+Test with Folder using limit page number function
+
+
+*** Spatial String Viewer Utility
+File - Open
+File - Close
+File - Properties
+   - Shows Source Document information
+   - Shows lack of Source Document information for "demo3.tif.uss"
+File - Exit
+Help - About Viewer
+Persistence of window size and position
+
+*** Double Click for File Open
+RSD File opens in Rule Set Editor
+RSD.ETF opens in Rule Set Editor
+USS File opens in Spatial String Viewer
+USS Uncompressed File opens in Spatial String Viewer
+
+*** Drag and Drop File for File Open
+RSD File into Rule Set Editor
+RSD.ETF File into Rule Set Editor
+
+TXT File into Rule Set Editor and Rule Tester
+USS File into Rule Set Edtior and Rule Tester
+USS Uncompressed File into Rule Set Edtior and Rule Tester
+DOC File into Rule Set Editor and Rule Tester
+
+TXT File into Spatial String Viewer
+USS File into Spatial String Viewer
+USS Uncompressed File into Spatial String Viewer

@@ -1,0 +1,23 @@
+HKCR
+{
+	AFValueFinders.FindFromRSDPP.1 = s 'FindFromRSDPP Class'
+	{
+		CLSID = s '{FE693CC6-5B09-4582-8EDD-59C7E77F749C}'
+	}
+	AFValueFinders.FindFromRSDPP = s 'FindFromRSDPP Class'
+	{
+		CLSID = s '{FE693CC6-5B09-4582-8EDD-59C7E77F749C}'
+		CurVer = s 'AFValueFinders.FindFromRSDPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FE693CC6-5B09-4582-8EDD-59C7E77F749C} = s 'FindFromRSDPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

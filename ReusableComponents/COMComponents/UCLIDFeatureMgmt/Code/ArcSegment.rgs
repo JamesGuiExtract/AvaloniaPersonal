@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFeatureMgmt.ArcSegment.1 = s 'ArcSegment Class'
+	{
+		CLSID = s '{57A19981-9CF0-4E05-A710-954FCD86E06D}'
+	}
+	UCLIDFeatureMgmt.ArcSegment = s 'ArcSegment Class'
+	{
+		CLSID = s '{57A19981-9CF0-4E05-A710-954FCD86E06D}'
+		CurVer = s 'UCLIDFeatureMgmt.ArcSegment.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {57A19981-9CF0-4E05-A710-954FCD86E06D} = s 'ArcSegment Class'
+		{
+			ProgID = s 'UCLIDFeatureMgmt.ArcSegment.1'
+			VersionIndependentProgID = s 'UCLIDFeatureMgmt.ArcSegment'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{691AD683-B1D9-42E1-99B8-3398A794CDB1}'
+		}
+	}
+}

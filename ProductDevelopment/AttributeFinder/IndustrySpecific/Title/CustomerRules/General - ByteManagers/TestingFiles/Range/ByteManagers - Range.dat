@@ -1,0 +1,3 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;..\..\Rules\Range\Range.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set012\Images;;K:\Common\Engineering\Sample Files\ByteManagers\Set012\EAV\Range\$FileNoExtOf(<SourceDocName>).eav
+

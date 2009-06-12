@@ -1,0 +1,4 @@
+// DT:00298
+//	Added initial expression
+
+\(?\d+\)?\s*(E\b|W\b|EAST|WEST|N\b|S\b|North|South)

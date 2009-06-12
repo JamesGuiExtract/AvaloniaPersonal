@@ -1,0 +1,1 @@
+SpatialStringSearcherTest.SpatialStringSearcherTester.1;;TestSpatialStringSearcher.dat

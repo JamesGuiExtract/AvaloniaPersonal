@@ -1,0 +1,26 @@
+HKCR
+{
+	LineTextCorrectors.MCRTextCorrector.1 = s 'MCRTextCorrector Class'
+	{
+		CLSID = s '{A67AAA84-2642-448D-AE4D-28BF0DB80BE2}'
+	}
+	LineTextCorrectors.MCRTextCorrector = s 'MCRTextCorrector Class'
+	{
+		CLSID = s '{A67AAA84-2642-448D-AE4D-28BF0DB80BE2}'
+		CurVer = s 'LineTextCorrectors.MCRTextCorrector.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A67AAA84-2642-448D-AE4D-28BF0DB80BE2} = s 'MCRTextCorrector Class'
+		{
+			ProgID = s 'LineTextCorrectors.MCRTextCorrector.1'
+			VersionIndependentProgID = s 'LineTextCorrectors.MCRTextCorrector'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D7A48C67-215A-4E0B-A6E7-E356423C3254}'
+		}
+	}
+}

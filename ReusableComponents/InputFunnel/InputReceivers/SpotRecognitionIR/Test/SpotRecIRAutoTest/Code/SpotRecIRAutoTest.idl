@@ -1,0 +1,38 @@
+// SpotRecIRAutoTest.idl : IDL source for SpotRecIRAutoTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SpotRecIRAutoTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+	[
+		object,
+		uuid(90218DAD-2651-426C-B8D3-2729700A4F0E),
+		dual,
+		helpstring("ISpotRecIRTester Interface"),
+		pointer_default(unique)
+	]
+	interface ISpotRecIRTester : IDispatch
+	{
+	};
+
+[
+	uuid(88C6C489-CCA7-4303-BAEA-56E392AB7CF3),
+	version(1.0),
+	helpstring("SpotRecIRAutoTest 1.0 Type Library")
+]
+library SPOTRECIRAUTOTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	[
+		uuid(99281A63-3DFA-4DA4-9B6D-587141D7A770),
+		helpstring("SpotRecIRTester Class")
+	]
+	coclass SpotRecIRTester
+	{
+		[default] interface ISpotRecIRTester;
+	};
+};

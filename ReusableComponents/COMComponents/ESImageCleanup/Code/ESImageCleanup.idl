@@ -1,0 +1,351 @@
+// ESImageCleanup.idl : IDL source for ESImageCleanup
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ESImageCleanup.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(937F7C5D-181C-401D-ACF1-B996AF0A4B49),
+	version(1.0),
+	helpstring("ESImageCleanup 1.0 Type Library")
+]
+library ESImageCleanupLib
+{
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef
+	[
+		uuid(7F819C25-BDD4-425f-BF45-0F418C488803),
+		helpstring("Extract Image Cleanup Page Range Types")
+	]
+	enum
+	{
+		kCleanAll = 0,
+		kCleanFirst = 1,
+		kCleanLast = 2,
+		kCleanSpecified = 3
+	} EICPageRangeType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+	// IImageCleanupSettings
+	[
+		object,
+		uuid(33643252-B973-49D6-8EC6-9FA45EAF039E),
+		helpstring("IImageCleanupSettings Interface"),
+		pointer_default(unique)
+	]
+	interface IImageCleanupSettings : IUnknown{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To load the image cleanup settings from the specified file name
+		[id(1), helpstring("method LoadFrom")] HRESULT LoadFrom([in] BSTR strFullFileName,
+			[in] VARIANT_BOOL bSetDirtyFlagToTrue);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To save the image cleanup settings to the specified file name
+		[id(2), helpstring("method SaveTo")] HRESULT SaveTo([in] BSTR strFullFileName,
+			[in] VARIANT_BOOL bClearDirtyFlag);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To reset the image cleanup settings (clear the vector and reset dirty flag)
+		[id(3), helpstring("method Clear")] HRESULT Clear();
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To specify whether the image cleanup settings that are currently loaded where
+		//			encrypted
+		[propget, id(4), helpstring("property IsEncrypted")] HRESULT IsEncrypted(
+			[out, retval] VARIANT_BOOL* pVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get and set the vector of image cleanup settings
+		[propget, id(5), helpstring("property ImageCleanupOperations")] HRESULT
+			ImageCleanupOperations([out, retval] IIUnknownVector** pVal);
+		[propput, id(5), helpstring("property ImageCleanupOperations")] HRESULT
+			ImageCleanupOperations([in] IIUnknownVector* pNewVal); 
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get and set the string representing the specific pages to be cleaned
+		[propget, id(6), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages(
+			[out, retval] BSTR* pstrSpecifiedPages);
+		[propput, id(6), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages(
+			[in] BSTR strSpecifiedPages);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get and set the range type of pages that should be cleaned
+		[propget, id(7), helpstring("property ICPageRangeType")] HRESULT ICPageRangeType(
+			[out, retval] EICPageRangeType* pVal);
+		[propput, id(7), helpstring("property ICPageRangeType")] HRESULT ICPageRangeType(
+			[in] EICPageRangeType newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	// IImageCleanupEngine
+	[
+		object,
+		uuid(BB07FDE8-34E0-4243-B480-24DB0EDFF465),
+		helpstring("IImageCleanupEngine Interface"),
+		pointer_default(unique)
+	]
+	interface IImageCleanupEngine : IUnknown{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To perform the list of image cleanup operations on the input image file and
+		//			save as a new output image
+		// NOTE:	This method is not thread safe
+		[id(1), helpstring("method CleanupImageInternalUseOnly - Not Thread Safe")] HRESULT 
+			CleanupImageInternalUseOnly(BSTR bstrInputFile, BSTR bstrOutputFile, 
+			IImageCleanupSettings* pImageCleanupSettings);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To perform the list of image cleanup operations on the input image file and
+		//			save as a new output image
+		// NOTE:	This method is thread safe
+		[id(2), helpstring("method CleanupImage - Thread Safe")] HRESULT CleanupImage(
+			BSTR bstrInputFile, BSTR bstrOutputFile, BSTR bstrImageCleanupSettingsFile);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	// IImageCleanupOperation
+	[
+		object,
+		uuid(B97BE111-D4E5-4A35-9F01-D4BF797877D2),
+		helpstring("IImageCleanupOperation Interface"),
+		pointer_default(unique)
+	]
+	interface IImageCleanupOperation : IUnknown{
+		[helpstring("method Perform")] HRESULT Perform([in,out] void* pciRepair);
+	};
+
+	// IRemoveHalftonesICO
+	[
+		object,
+		uuid(6ABFE0B9-A3F3-4615-9792-CA8AD33FFA3D),
+		helpstring("IRemoveHalftonesICO Interface"),
+		pointer_default(unique)
+	]
+	interface IRemoveHalftonesICO : IUnknown{
+	};
+
+	// IDespeckleICO
+	[
+		object,
+		uuid(43529881-ADC2-4A2C-874C-C2718D3B12BA),
+		helpstring("IDespeckleICO Interface"),
+		pointer_default(unique)
+	]
+	interface IDespeckleICO : IUnknown{
+		//-----------------------------------------------------------------------------------------
+		// NoiseSize is the maximum size of noise to remove in pixels
+		[propget, id(1), helpstring("property NoiseSize")] HRESULT 
+			NoiseSize([out, retval] long* plSize);
+		[propput, id(1), helpstring("property NoiseSize")] HRESULT NoiseSize([in] long lSize);
+	};
+
+	// IDeleteLinesAndRepairICO
+	[
+		object,
+		uuid(E7418680-36C4-4410-9803-518D7650CB72),
+		helpstring("IDeleteLinesAndRepairICO Interface"),
+		pointer_default(unique)
+	]
+	interface IDeleteLinesAndRepairICO : IUnknown{
+		//-----------------------------------------------------------------------------------------
+		// LineLength is the minimum number of pixels that make up a line to remove
+		[propget, id(1), helpstring("property LineLength")] HRESULT
+			LineLength([out, retval] long* plLineLength);
+		[propput, id(1), helpstring("property LineLength")] HRESULT 
+			LineLength([in] long lLineLength);
+		//-----------------------------------------------------------------------------------------
+		// LineGap is maximum gap (in pixels) that can occur in a line to remove
+		[propget, id(2), helpstring("property LineGap")] HRESULT
+			LineGap([out, retval] long* plLineGap);
+		[propput, id(2), helpstring("property LineGap")] HRESULT
+			LineGap([in] long lLineGap);
+		//-----------------------------------------------------------------------------------------
+		// LineDirection is the direction of lines to delete
+		[propget, id(3), helpstring("property LineDirection")] HRESULT
+			LineDirection([out, retval] unsigned long* pulLineDirection);
+		[propput, id(3), helpstring("property LineDirection")] HRESULT 
+			LineDirection([in] unsigned long ulLineDirection);
+	};
+
+	// ICleanImageBordersICO
+	[
+		object,
+		uuid(770B7343-11CA-4A02-86B2-84AC9D3B22F2),
+		helpstring("ICleanImageBordersICO Interface"),
+		pointer_default(unique)
+	]
+	interface ICleanImageBordersICO : IUnknown{
+	};
+
+	// ISmoothCharactersICO
+	[
+		object,
+		uuid(86FED9E8-6088-4A48-B90B-CDAE1F7FBC27),
+		helpstring("ISmoothCharactersICO Interface"),
+		pointer_default(unique)
+	]
+	interface ISmoothCharactersICO : IUnknown{
+		//-----------------------------------------------------------------------------------------
+		// SmoothType is the type of character smoothing that should be done (either lighten edges 
+		// or darken edges)
+		[propget, id(1), helpstring("property SmoothType")] HRESULT 
+			SmoothType([out, retval] long* plSmoothType);
+		[propput, id(1), helpstring("property SmoothType")] HRESULT SmoothType([in] long lSmoothType);
+	};
+
+	// IFillStripesICO
+	[
+		object,
+		uuid(6C132E48-4D7F-495c-9C82-F587DC0CF268),
+		helpstring("IFillStripesICO Interface"),
+		pointer_default(unique)
+	]
+	interface IFillStripesICO : IUnknown{
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	// ImageCleanupSettings CoClass
+	[
+		uuid(00978A6E-1CDD-4E13-BF37-3B7AB86645BB),
+		helpstring("ImageCleanupSettings Class")
+	]
+	coclass ImageCleanupSettings
+	{
+		[default] interface IImageCleanupSettings;
+	};
+
+	// ImageCleanupEngine CoClass
+	[
+		uuid(95144E9F-1168-459B-88B0-4A5E7A75AF40),
+		helpstring("ImageCleanupEngine Class")
+	]
+	coclass ImageCleanupEngine
+	{
+		[default] interface IImageCleanupEngine;
+	};
+
+	// ImageCleanupOperation CoClass
+	[
+		uuid(667E5609-85DE-4D15-A574-0E3543810054),
+		helpstring("ImageCleanupOperation Class")
+	]
+	coclass ImageCleanupOperation
+	{
+		[default] interface IImageCleanupOperation;
+	};
+
+	// RemoveHalftonesICO CoClass
+	[
+		uuid(CDEA8B94-E0A9-444A-B389-894BC7475989),
+		helpstring("RemoveHalftonesICO Class")
+	]
+	coclass RemoveHalftonesICO
+	{
+		[default] interface IRemoveHalftonesICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+
+	// DespeckleICO CoClass along with its property page
+	[
+		uuid(3893279D-C24E-4350-B05C-1C1DF265673D),
+		helpstring("DespeckleICO Class")
+	]
+	coclass DespeckleICO
+	{
+		[default] interface IDespeckleICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(8C0D6A39-3DD4-41C4-88D9-FAAA8925605E),
+		helpstring("DespeckleICOPP Class")
+	]
+	coclass DespeckleICOPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// DeleteLinesAndRepairICO CoClass along with its property page
+	[
+		uuid(C9C97F01-A846-4EC4-8267-CA88C668AA8E),
+		helpstring("DeleteLinesAndRepairICO Class")
+	]
+	coclass DeleteLinesAndRepairICO
+	{
+		[default] interface IDeleteLinesAndRepairICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(3E8D7122-A8C8-4C04-8395-F0C91D201007),
+		helpstring("DeleteLinesAndRepairICOPP Class")
+	]
+	coclass DeleteLinesAndRepairICOPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// CleanImageBordersICO CoClass
+	[
+		uuid(010F93BA-B582-4121-A0BF-5F6D501809F3),
+		helpstring("CleanImageBordersICO Class")
+	]
+	coclass CleanImageBordersICO
+	{
+		[default] interface ICleanImageBordersICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+
+	//SmoothCharactersICO CoClass along with its property page
+	[
+		uuid(2F020D66-D26E-49BC-98D0-EF88A14DC986),
+		helpstring("SmoothCharactersICO Class")
+	]
+	coclass SmoothCharactersICO
+	{
+		[default] interface ISmoothCharactersICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(4181DD38-6BA6-42AA-B0D2-0F502D9CEEF0),
+		helpstring("SmoothCharactersICOPP Class")
+	]
+	coclass SmoothCharactersICOPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// FillStripesICO CoClass
+	[
+		uuid(7D2A008A-7E90-44de-A02E-9DCF04951D49),
+		helpstring("FillStripesICO Class")
+	]
+	coclass FillStripesICO
+	{
+		[default] interface IFillStripesICO;
+		interface IImageCleanupOperation;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+};

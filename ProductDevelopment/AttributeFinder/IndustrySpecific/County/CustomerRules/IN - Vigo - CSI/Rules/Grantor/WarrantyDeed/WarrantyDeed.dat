@@ -1,0 +1,270 @@
+
+[VARS_BEGIN]
+
+Granted=Granted|Conveyed|Sold
+GrantKeywords=[Grant]|[grants]|[Bargain]|[bargains]|[Sell]|[sells]|[C onvey]|[conveys]
+PresentThat=presents: that|presents, that|presents that|presents:|presents
+GrantorWords=Grantor|Grantor(s)|Grantors|"Grantor"|"Grantor(s)"|"Grantors"|Seller|Seller(s)|Sellers|"Seller"|"Seller(s)"|"Sellers"
+GranteeWords=Grantee|Grantee(s)|Grantees|"Grantee"|"Grantee(s)"|"Grantees"|Buyer|Buyer(s)|Buyers|"Buyer"|"Buyer(s)"|"Buyers"
+DocTitle=\r\nWarranty Deed - Individual Form\r\n|\r\nWarranty Deed - Statutory Form\r\n|\r\nWarranty Deed\r\n
+// plural-only versions of above definitions
+GrantorsWords=Grantor(s)|Grantors|"Grantor(s)"|"Grantors"|Seller(s)|Sellers|"Seller(s)"|"Sellers"
+GranteesWords=Grantee(s)|Grantees|"Grantee(s)"|"Grantees"|Buyer(s)|Buyers|"Buyer(s)"|"Buyers"
+Numbers=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000373283.TIF
+WD_Grantor000=WARRANTY^3~DEED^10~The [Grantor]|[Grantors]^?Grantor^80~[of^30~County
+
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000373428.TIF
+WD_Grantor001=made by^?Grantor^80~BORROWER(S)
+
+WD_Grantor002=WARRANTY DEED^80~THIS^3~INDENTURE^3~[WITNESSETH]|[WITNESETH]^3~that^?Grantor^80~CONVEYS^3~AND^3~WARRANTS
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000376484.TIF
+WD_Grantor003=WARRANTY DEED^80~THIS^3~INDENTURE^3~[WITNESSETH]|[WITNESETH]^?Grantor^80~[of^30~County^40~CONVEYS^3~AND^3~WARRANTS
+
+WD_Grantor004=WARRANTY DEED^80~THIS^3~INDENTURE^3~[WITNESSETH]|[WITNESETH]^3~that^?Grantor^80~Attorney^40~Power of Attorney
+
+WD_Grantor005=[WITNESSETH]|[WITNESETH]^3~that^?Grantor^80~[adult]|[husband and wife]|[JOINT TENANTS]^4~[of^30~County
+
+WD_Grantor006=WARRANTY DEED^80~[WITNESSETH]|[WITNESETH]^3~that^?Grantor^80~[of^30~County
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000375920.TIF
+WD_Grantor007=WARRANTY^3~DEED^10~The Grantors^?Grantor^80~[adult]|[husband and wife]|[JOINT TENANTS]^80~[of^30~County
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000375401.TIF
+WD_Grantor008=WARRANTY DEED^80~The^3~Grantors^?Grantor^80~as^3~Joint^3~Tenants^3~With^5~Rights^3~of^3~Survivorship
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000373120.TIF
+WD_Grantor009=THIS INDENTURE WITNESSETH^3~that^?Grantor^40~as^3~Sheriff^3~of^3~Vigo^40~Grantor
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000375912.TIF
+WD_Grantor010=THIS^3~INDENTURE^3~WITNESSETH^3~that^?Grantor^100~[of Vigo]|[County]^80~for^3~and^10~consideration^20~sum
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000373316.TIF
+WD_Grantor011=THIS^3~INDENTURE^3~WITNESSETH^3~that^?Grantor^150~[a]|[an]^20~[company]|[corporation]^100~GRANTOR
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000373404.TIF
+WD_Grantor012=THIS^3~INDENTURE^3~WITNESSETH^5~that^?Grantor^150~[a]|[an]^40~[company]|[corporation]^40~conveys
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000374341.TIF
+WD_Grantor013=THIS^3~INDENTURE^3~WITNESSETH^3~that^?Grantor^150~[a]|[an]^4~[company]|[corporation]|[national banking institution]^200~CONVEYS^3~BARGAINS^3~AND^3~SELLS
+
+WD_Grantor014=WARRANTY DEED^80~THIS^3~INDENTURE^3~WITNESSETH^3~that^?Grantor^80~of^30~county^40~for^3~and^3~in^3~consideration^3~of
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000374735.TIF
+WD_Grantor015=THIS INDENTURE WITNESSETH^4~that^?Grantor^40~[an]|[a]^3~[unmarried]|[married]|[unremarried]^3~[adult]|[person]|[widower]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377753.TIF
+WD_Grantor016=THIS INDENTURE WITNESSETH^4~that^?Grantor^40~[an]|[a]^3~[unmarried]|[married]|[unremarried]^3~[adult]|[person]|[widower]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000376118.TIF
+WD_Grantor017=THIS^3~INDENTURE^3~WITNESSETH^3~that^?Grantor^200~[of Vigo]|[County]^80~Convey^4~AND^5~Warrant
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000374394.TIF
+WD_Grantor018=THIS^3~INDENTURE^3~WITNESSETH^4~that^?Grantor^150~Grantor^20~[a]|[an]^80~[company]|[corporation]^100~CONVEYS^3~AND WARRANTS
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000374968.TIF
+WD_Grantor019=GUARDIAN'S DEED^40~THIS INDENTURE WITNE^3~SETH^3~that^?Grantor^150~which guardianship^200~[WARRANTS]|[CONVEYS]|[GRANTS]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000375620.TIF
+WD_Grantor020=PERSONAL REPRESENTATIVE'S DEED^40~THIS INDENTURE WITNE^3~SETH^?Grantor^150~deceased
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000376451.TIF
+WD_Grantor021=SPECIAL^3~WARRANTY^3~DEED^80~This^3~Deed^10~from^?Grantor^150~[a]|[an]^80~[company]|[corporation]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377085.TIF
+WD_Grantor022=WARRANTY^3~DEED^40~THIS^40~[WITNE^6~ETH^20~TOR]^?Grantor^40~[of^40~county
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377753.TIF
+WD_Grantor023=WARRANTY^3~DEED^40~THIS^40~[WITNE^6~ETH^20~THAT^?Grantor^40~[of^40~county
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377138.TIF
+WD_Grantor024=WARRANTY^3~DEED^40~THIS^3~INDENTURE^3~WITNESSETH^5~THAT^?Grantor^80~pursuant^3~to
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377214.TIF
+WD_Grantor025=WARRANTY^3~DEED^40~THIS^3~INDENTURE^3~WITNESSETH^5~THAT^?Grantor^80~hereinafter^4~referred^20~Grantor
+
+
+WD_GRANTOR_01=made^between^?Grantor^hereinafter^grantor
+
+WD_GRANTOR_101=warranty deed^10~grantor:^?Grantor^250~grantee:
+
+WD_GRANTOR_02=made^between^?Grantor^grantor^grantee^witnesseth
+
+WD_GRANTOR_03=made^100~between|[by]^?<Grantor^400~grantor|parties of the first part|party of the first part
+
+WD_GRANTOR_04=made^between^?Grantor^250~who's address is
+
+WD_GRANTOR_04=made^between^?Grantor^[and]^witnesseth
+
+WD_GRANTOR_05=made between^?Grantor^grantor
+
+WD_GRANTOR_105=deed^250~this^250~[by]^?Grantor^250~grantor^250~[to]^250~grantee
+
+WD_GRANTOR_06=know all^presents^undersigned grantor^acknowledged^?Grantor^grantor^hereby grant
+
+WD_GRANTOR_07=know all|known all^100~\r\nthat i,|\r\nthat we,^?Grantor^450~grantor|acting herein by|for and in consideration
+
+WD_GRANTOR_08=know all^presents^50~\r\nthat, i,|\r\nthat i,|\r\ni,|\r\nwe,|\r\n1,^?Grantor^250~grantor|for the consideration|in consideration
+
+WD_GRANTOR_64=PRESENTS that^?Grantor^240~hereinafter called grantor
+
+WD_GRANTOR_09=know all|known all^100~[that]^?Grantor^450~grantor|acting herein by|for and in consideration|whose address|convey
+
+WD_GRANTOR_10=grantor^2~s^2~:^?Grantor^Grantor^2~s^5~Mailing Address
+
+WD_GRANTOR_11=know all^presents^50~\r\nTHAT THE UNDERSIGNED^?Grantor^250~grantor
+
+WD_GRANTOR_12=KNOW ALL^PRESENTS^On this^50~that^?Grantor^250~grantor
+
+WD_GRANTOR_13=know all^presents^25~\r\n\r\n^?Grantor^250~grantor
+
+WD_GRANTOR_14=know all^50~presents^100~[grantor]|[grantors]^?Grantor^250~in consideration
+
+WD_GRANTOR_15=this deed is from^?Grantor^300~grantor
+
+WD_GRANTOR_16=\r\n\r\n^?Grantor^250~[as grantor|("Grantor")^5~conveys and warrants to|whose address
+
+WD_GRANTOR_17=between Grantor^20~Grantee^100~acknowledged^?Grantor^grantor
+
+WD_GRANTOR_18=hereby^5~acknowledged^?Grantor^250~grantor|granted|hereby grants
+
+WD_GRANTOR_19=WARRANTY DEED^5~dated^40~[by]^?Grantor^250~Grantor
+
+WD_GRANTOR_46=VALUABLE CONSIDERATION^100~acknowledged^20~GRANTOR^?Grantor^800~\r\nhereby GRANT|GRANT
+
+WD_GRANTOR_20=\r\nthat^?Grantor^350~grantor|duly organized and existing|whose address
+
+WD_GRANTOR_21=on this, the^10~day of^20~that^?Grantor^\r\n\r\n^50~herein^20~grantor
+
+WD_GRANTOR_106a=by^5~and^5~between^16~warranty^3~deed^9~made^3~on^36~\r\n\r\n^?Grantor^250~who^9~address^120~hereinafter^12~grantor
+
+WD_GRANTOR_106=by^5~and^5~between^16~warranty^3~deed^9~made^3~on^36~\r\n\r\n^?Grantor^350~hereinafter^12~grantor
+
+WD_GRANTOR_22=[by]^5~and^5~between^?Grantor^350~grantor
+
+WD_GRANTOR_23=valuable consideration^?Grantor^250~as Grantor
+
+WD_GRANTOR_24=[the]^3~[grantor]|[grantors]^?Grantor^250~whose address|convey
+
+WD_GRANTOR_25=@DocTitle^16~\r\n\r\ngrantor^?Grantor^250~convey
+
+WD_GRANTOR_89a=@DocTitle^5~individual grantor^?Grantor^250~grantor^12~convey^24~[to]
+
+WD_GRANTOR_89=@DocTitle^?Grantor^250~grantor^12~convey^24~[to]
+
+WD_GRANTOR_26=[I]|[WE]^6~grantor^?Grantor^250~[conveys]|[convey]
+
+WD_GRANTOR_27=the^3~grantor^?Grantor^250~whose^50~address
+
+WD_GRANTOR_28=all^50~presents^10~that^?Grantor^300~convey|whose|[the]^50~address
+
+WD_GRANTOR_29=presents^5~that^?Grantor^250~whose^50~address
+
+WD_GRANTOR_30=all^50~presents:^?Grantor^250~whose^50~address
+
+WD_GRANTOR_31=warranty deed^?Grantor^300~convey and warrant to
+
+WD_GRANTOR_32=warranty deed^25~this indenture^25~[of]^?Grantor^GRANTOR^consideration
+
+WD_GRANTOR_33=[\r\nTHAT|[\r\nTH AT]^?Grantor^250~GRANTOR^consideration
+
+WD_GRANTOR_34=WARRANTY DEED dated^30~[by]^?Grantor^250~grantor
+
+WD_GRANTOR_35=Warranty Deed^50~dated^?Grantor^did warrant
+
+WD_GRANTOR_36=this instrument\r\n\r\n^deed\r\n\r\n^from^?Grantor^250~grantor
+
+WD_GRANTOR_37=\r\n\r\nattorney^\r\n\r\ndeed from^?Grantor^250~[to]^250~premises
+
+WD_GRANTOR_38=between^?Grantor^250~grantor^250~[and]^250~grantee
+
+WD_GRANTOR_39=assumption of^250~liability^500~valuable consideration^?Grantor^250~as Grantor
+
+WD_GRANTOR_65=STATUTORY BARGAIN AND SALE DEED\r\n^?Grantor^160~grantor, conveys to
+
+WD_GRANTOR_66=STATUTORY WARRANTY DEED\r\n^?Grantor^160~grantor, conveys to 
+
+WD_GRANTOR_67=STATUTORY BARGAIN AND SALE DEED (Individual)|STATUTORY BARGAIN AND SALE DEED (Corporation)^?Grantor^80~\r\nconveys to
+
+WD_GRANTOR_90=STATUTORY^5~FORM^10~INDIVIDUAL or CORPORATION^80~COUNTY^24~TRANSFER TAX^40~PAID DATE^?Grantor^160~grantor, convey
+
+WD_GRANTOR_70=WARRANTY DEED -^5~STATUTORY FORM (INDIVIDUAL or CORPORATION)^?Grantor^120~\r\nGrantor, conveys
+
+WD_GRANTOR_71=WARRANTY DEED - STATUTORY FORM^?Grantor^120~, Grantor, conveys 
+
+WD_GRANTOR_68=WARRANTY DEED\r\n|\r\n\r\n^?Grantor^180~(Grantor)|, Grantor|^4~hereby conveys |conveys ^160~Grantee
+
+WD_GRANTOR_88=@DocTitle^?Grantor^160~[convey]|[conveys]
+
+WD_GRANTOR_40=warranty^3~deed\r\n^?Grantor^300~GRANTOR^consideration
+
+WD_GRANTOR_41=all^50~presents^10~that^?Grantor^350~convey^25~warrant^5~to
+
+WD_GRANTOR_42=Grantor^5~(whether^16~more)^?Grantor^250~Grantor
+
+WD_GRANTOR_43=WARRANTY DEED^150~\r\n\r\n^50~That^?Grantor^250~convey^10~warrant
+
+WD_GRANTOR_44=[The]^5~foregoing^5~instrument^40~before^5~[me]^100~president^?Grantor^250~behalf^5~[of]
+
+WD_GRANTOR_45=[For]^21~consideration^40~[we]^?Grantor^250~hereby bargain
+
+WD_GRANTOR_47=VALUABLE^3~CONSIDERATION^100~acknowledge]|acknowledged^?Grantor^800~\r\nhereby GRANT|GRANT
+
+WD_GRANTOR_47b=VALUABLE^3~CONSIDERATION^100~hereby^?Grantor^800~\r\nhereby GRANT|GRANT
+
+WD_GRANTOR_48=grantor(s)^?Grantor^500~\r\nhereby grant
+
+WD_GRANTOR_49=FOR^120~CONSIDERATION^?Grantor^250~HEREBY^50~GRANT
+
+WD_GRANTOR_50=WITHOUT^5~CONSIDERATION^?Grantor^250~hereby^5~grants^5~[to]
+
+WD_GRANTOR_51=GRANT DEED^10~\r\n\r\n^?Grantor^250~hereby^5~grant
+
+WD_GRANTOR_52=grantor:^?Grantor^grantor's mailing|grantee:
+
+WD_GRANTOR_53=indenture^110~between|[by]^?Grantor^grantor|parties of the first part|party of the first part^650~second^5~part
+
+WD_GRANTOR_54=between|[by]^?Grantor^grantor|parties of the first part|party of the first part^[and]^650~second^5~part
+
+WD_GRANTOR_55=[for]^3~[no]^3~consideration^?Grantor^300~grant^20~[to]
+
+WD_GRANTOR_56=[for^5~valuable^5~consideration^70~acknowledged^?Grantor^[do]^5~hereby^5~remise
+
+WD_GRANTOR_57=CONSIDERATION^?Grantor^250~HEREBY GRANT|hereby forever grant to
+
+WD_GRANTOR_58=\r\ngrantors:|\r\ngrantor^?Grantor^300~\r\nhereby^5~grant^5~[to]
+
+WD_GRANTOR_59=\r\n\r\n^?Grantor^300~do hereby grant to
+
+WD_GRANTOR_60=indenture|deed^4~made^100~be^5~n^?Grantor^grantor|parties of the first part|party of the first part^[and]^witnesseth
+
+WD_GRANTOR_61=indenture^5~made^120~be^4~en^?Grantor^450~the first part^450~[the second part
+
+WD_GRANTOR_62=deed^45~between^?Grantor^250~the^5~city^5~[and]
+
+WD_GRANTOR_63=hereby^5~acknowledged^?Grantor^250~hereby^15~[to]
+
+WD_GRANTOR_85=THIS DEED OF TRUST is given^24~by^?Grantor^160~Borrower^250~Lender|Trustee
+
+WD_GRANTOR_86=\r\n\r\n^?Grantor^190~GRANTORS|GRANTOR^6~[convey^4~[to]
+
+WD_GRANTOR_87=\r\n\r\n^?Grantor^190~[convey|[conveys^4~[to]
+
+WD_GRANTOR_91=[\r\n^?Grantor^150~grantor^5~,
+
+WD_Grantor_92=\r\n\r\n^?Grantor^100~\r\n^10~conveys and warrants to
+
+
+[PATTERNS_END]
+
+
+
+

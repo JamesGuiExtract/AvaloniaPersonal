@@ -1,0 +1,46 @@
+// Tests 1 & 2: Finding rule condition, locate image region finder, advanced replace string preprocessor
+
+// Test1: While loop, Image1
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// Test2: Do loop, Image2
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test2.eav
+
+// Test3: For loop, Image1. Same as Tests 1 & 2 but no condition
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// Tests 4 & 5: Finding rule condition, locate image region finder, locate image region preprocessor
+
+// Test4: While loop, Image2
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test4.eav
+
+// Test5: Do loop, Image1
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// Test6: For loop, Image2. Same as Tests 4 & 5 but no condition
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test6.eav
+
+// Tests 7 & 8: Finding rule condition, find from rsd file finder, locate image region preprocessor
+
+// Test7: While loop, Image1
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// Test8: Do loop, Image2
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test8.eav
+
+// Test9: For loop, Image1. Same as Tests 7 & 8 but no condition
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+// Tests 10 & 11: Advanced replace string rule specific preprocessor, rsd file condition, regular expression finder, multiple preprocessors
+
+// Test10: While loop, Image2
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test10.eav
+
+// Test11: Do loop, Image1
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+// Test12: For loop, Image2. Same as Tests 10 & 11 but no condition
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image2.tif.uss;;Test12.eav
+
+// Test13: For loop, Image1. Same as Test12 but with single advanced replace string loop preprocessor (Finds value for each iteration)
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav

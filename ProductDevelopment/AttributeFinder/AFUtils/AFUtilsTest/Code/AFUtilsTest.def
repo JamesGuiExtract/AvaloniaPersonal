@@ -1,0 +1,9 @@
+; AFUtilsTest.def : Declares the module parameters.
+
+LIBRARY      "AFUtilsTest.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

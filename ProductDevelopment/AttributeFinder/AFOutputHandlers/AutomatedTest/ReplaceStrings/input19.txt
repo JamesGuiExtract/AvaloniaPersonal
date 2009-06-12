@@ -1,0 +1,2 @@
+\bRecorded\b;Of Record
+Sept(?!ember)\.?;September

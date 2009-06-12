@@ -1,0 +1,46 @@
+//k:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set003\RandomSubset\1985_01_198503010355819.tif
+//k:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set003\RandomSubset\2000_03_200001030000364.tif
+(?:
+	(?:
+	  (?:b.rn|\b(?:.orn|b.rn|bo.n|bor.)\b)[\s\S]{0,10}
+	|
+	  (?:.?ssue|i.?sue|is.?ue|iss.?e|issu.?|
+		\b(?:.ssue|i.sue|is.ue|iss.e|issu.)\b)
+	)
+	[\s\S]{0,10}
+	(?:m.rr..g.|.?arriage|m.?rriage|ma.?riage|mar.?iage|marr.?age|marri.?ge|
+		marria.?e|marriag.?|\b(?:marr.{3,5}|.{1,3}rria.{1,3}|.{3,5}iage)\b)
+	[\s\S]{0,10}:\s*
+	(?<Name1>
+		#import Names.dat.etf
+	)
+	(?:
+		[\s\S]{0,20}?
+		and\W*
+		(?<Name2>
+			#import Names2.dat.etf
+		)
+	)?
+|
+	(?:
+	  (?:b.rn|\b(?:.orn|b.rn|bo.n|bor.)\b)[\s\S]{0,10}
+	|
+	  (?:.?ssue|i.?sue|is.?ue|iss.?e|issu.?|
+		\b(?:.ssue|i.sue|is.ue|iss.e|issu.)\b)
+	)
+	[\s\S]{0,10}
+	(?:m.rr..g.|.?arriage|m.?rriage|ma.?riage|mar.?iage|marr.?age|marri.?ge|
+		marria.?e|marriag.?|\b(?:marr.{3,5}|.{1,3}rria.{1,3}|.{3,5}iage)\b)
+	[\s\S]{0,10}:\s*
+	(?<Name1>
+		#import Names.dat.etf
+	)?
+	(?:
+		[\s\S]{0,20}?
+		and\W*
+		(?<Name2>
+			#import Names2.dat.etf
+		)
+	)?
+)
+#import OptionalNames.dat.etf

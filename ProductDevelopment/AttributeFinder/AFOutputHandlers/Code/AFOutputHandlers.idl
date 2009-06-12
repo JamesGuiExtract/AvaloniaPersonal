@@ -1,0 +1,599 @@
+// AFOutputHandlers.idl : IDL source for AFOutputHandlers.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFOutputHandlers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(F8F1F33C-B4CE-4171-8855-7DE5AEC361B8),
+	version(1.0),
+	helpstring("UCLID AFOutputHandlers 1.0 Type Library")
+]
+library UCLID_AFOUTPUTHANDLERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(B3D4414C-29EF-44b9-9C38-A6E83DBE6C15), 
+		helpstring("UCLID Overwrite Attribute Name Options")
+	]
+    enum
+	{
+		kDoNotOverwrite = 0,
+        kOverwriteWithRootOrParentName = 1,
+        kOverwriteWithSpecifiedName = 2
+    } EOverwriteAttributeName;
+
+	// Options for moving attribute to a certain level, i.e. either 
+	// the top-most (the root) level, or the parent of current attribute level.
+	typedef 
+	[
+		uuid(DA7F62F4-BC4A-41e0-BE89-FAEC50853091), 
+		helpstring("UCLID Move Attribute Options")
+	]
+    enum
+	{
+		kNoMove = 0,
+        kMoveToRoot = 1,		// simply move this attribute to top-most level
+        kMoveToParent = 2		// move this attribute to parent level
+    } EMoveAttributeLevel;
+
+	// Options for XML output format
+	typedef 
+	[
+		uuid(31114BB5-CEED-4d36-9DDA-291B0ED75EA0), 
+		helpstring("UCLID XML Output Format Options")
+	]
+    enum
+	{
+		kXMLOriginal = 0,		// Use original format with sub-attributes
+        kXMLSchema = 1			// Use schema-compliant format
+    } EXMLOutputFormat;
+
+	// Options for the selected the value of a merged field
+	typedef 
+	[
+		uuid(36499B68-A7E7-4706-BEF6-D60DB86CDC91), 
+		helpstring("UCLID Field Merge Mode")
+	]
+    enum
+	{
+		kSpecifyField,
+        kCombineField,
+		kPreserveField
+    } EFieldMergeMode;
+
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(12FED744-A5FC-443A-BF83-A13FF8B4826E),
+		dual,
+		helpstring("IRemoveEntriesFromList Interface"),
+		pointer_default(unique)
+	]
+	interface IRemoveEntriesFromList : IDispatch
+	{
+		[propget, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property EntryList")] HRESULT EntryList([out, retval] IVariantVector* *pVal);
+		[propput, id(2), helpstring("property EntryList")] HRESULT EntryList([in] IVariantVector* newVal);
+		[id(3), helpstring("method LoadEntriesFromFile")] HRESULT LoadEntriesFromFile([in] BSTR strFileFullName);
+		[id(4), helpstring("method SaveEntriesToFile")] HRESULT SaveEntriesToFile([in] BSTR strFileFullName);
+	};
+	[
+		object,
+		uuid(439B90FB-EF52-411c-9415-CEEB80B6EA78),
+		dual,
+		helpstring("IKeepAttributesInMemory Interface"),
+		pointer_default(unique)
+	]
+	interface IKeepAttributesInMemory : IDispatch
+	{
+		[id(1), helpstring("method GetAttributes")] HRESULT GetAttributes([out, retval] IIUnknownVector* *pvecAttributes);
+	};
+	[
+		object,
+		uuid(A330584B-720E-4905-98F9-3194AEAEA7C9),
+		dual,
+		helpstring("IOutputToXML Interface"),
+		pointer_default(unique)
+	]
+	interface IOutputToXML : IDispatch
+	{
+		[propget, id(1), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
+		[propget, id(2), helpstring("property Format")] HRESULT Format([out, retval] EXMLOutputFormat *pVal);
+		[propput, id(2), helpstring("property Format")] HRESULT Format([in] EXMLOutputFormat newVal);
+		[propget, id(3), helpstring("property NamedAttributes")] HRESULT NamedAttributes([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property NamedAttributes")] HRESULT NamedAttributes([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property UseSchemaName")] HRESULT UseSchemaName([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property UseSchemaName")] HRESULT UseSchemaName([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property SchemaName")] HRESULT SchemaName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property SchemaName")] HRESULT SchemaName([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(E402E0D9-790A-4BD6-ABB3-E7EC1717A221),
+		dual,
+		helpstring("IModifyAttributeValueOH Interface"),
+		pointer_default(unique)
+	]
+	interface IModifyAttributeValueOH : IDispatch
+	{
+		[propget, id(1), helpstring("property AttributeName")] HRESULT AttributeName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property AttributeName")] HRESULT AttributeName([in] BSTR newVal);
+		[propget, id(2), helpstring("property AttributeValue")] HRESULT AttributeValue([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property AttributeValue")] HRESULT AttributeValue([in] BSTR newVal);
+		[propget, id(3), helpstring("property AttributeType")] HRESULT AttributeType([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property AttributeType")] HRESULT AttributeType([in] BSTR newVal);
+		[propget, id(4), helpstring("property SetAttributeValue")] HRESULT SetAttributeValue([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property SetAttributeValue")] HRESULT SetAttributeValue([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property SetAttributeType")] HRESULT SetAttributeType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property SetAttributeType")] HRESULT SetAttributeType([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property SetAttributeName")] HRESULT SetAttributeName([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property SetAttributeName")] HRESULT SetAttributeName([in] VARIANT_BOOL newVal);
+		[propget, id(7), helpstring("property AttributeQuery")] HRESULT AttributeQuery([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property AttributeQuery")] HRESULT AttributeQuery([in] BSTR newVal);
+		[propget, id(8), helpstring("property CreateSubAttribute")] HRESULT CreateSubAttribute([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property CreateSubAttribute")] HRESULT CreateSubAttribute([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(CF805A5C-FFFE-469B-AD56-227EB293DC65),
+		dual,
+		helpstring("IOutputToVOA Interface"),
+		pointer_default(unique)
+	]
+	interface IOutputToVOA : IDispatch
+	{
+		[propget, id(1), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(8E2268F3-D7FF-4618-A86D-A2A79C1D67F0),
+		dual,
+		helpstring("IMoveAndModifyAttributes Interface"),
+		pointer_default(unique)
+	]
+	interface IMoveAndModifyAttributes : IDispatch
+	{
+		[propget, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([in] BSTR newVal);
+		[propget, id(2), helpstring("property OverwriteAttributeName")] HRESULT OverwriteAttributeName([out, retval] EOverwriteAttributeName *pVal);
+		[propput, id(2), helpstring("property OverwriteAttributeName")] HRESULT OverwriteAttributeName([in] EOverwriteAttributeName newVal);
+		[propget, id(3), helpstring("property SpecifiedAttributeName")] HRESULT SpecifiedAttributeName([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property SpecifiedAttributeName")] HRESULT SpecifiedAttributeName([in] BSTR newVal);
+		[propget, id(4), helpstring("property RetainAttributeType")] HRESULT RetainAttributeType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property RetainAttributeType")] HRESULT RetainAttributeType([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property AddRootOrParentAttributeType")] HRESULT AddRootOrParentAttributeType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property AddRootOrParentAttributeType")] HRESULT AddRootOrParentAttributeType([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property AddSpecifiedAttributeType")] HRESULT AddSpecifiedAttributeType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property AddSpecifiedAttributeType")] HRESULT AddSpecifiedAttributeType([in] VARIANT_BOOL newVal);
+		[propget, id(7), helpstring("property SpecifiedAttributeType")] HRESULT SpecifiedAttributeType([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property SpecifiedAttributeType")] HRESULT SpecifiedAttributeType([in] BSTR newVal);
+		[propget, id(8), helpstring("property DeleteRootOrParentIfAllChildrenMoved")] HRESULT DeleteRootOrParentIfAllChildrenMoved([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property DeleteRootOrParentIfAllChildrenMoved")] HRESULT DeleteRootOrParentIfAllChildrenMoved([in] VARIANT_BOOL newVal);
+		[propget, id(9), helpstring("property AddAttributeNameToType")] HRESULT AddAttributeNameToType([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property AddAttributeNameToType")] HRESULT AddAttributeNameToType([in] VARIANT_BOOL newVal);
+		[propget, id(10), helpstring("property MoveAttributeLevel")] HRESULT MoveAttributeLevel([out, retval] EMoveAttributeLevel* pVal);
+		[propput, id(10), helpstring("property MoveAttributeLevel")] HRESULT MoveAttributeLevel([in] EMoveAttributeLevel newVal);
+	};
+	[
+		object,
+		uuid(9E628911-8E80-41CD-8CAC-479AF7A883B8),
+		dual,
+		helpstring("IRemoveSubAttributes Interface"),
+		pointer_default(unique)
+	]
+	interface IRemoveSubAttributes : IDispatch
+	{
+		//[propget, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([out, retval] BSTR *pVal);
+		//[propput, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([in] BSTR newVal);
+		[propget, id(2), helpstring("property DataScorer")] HRESULT DataScorer([out, retval] IObjectWithDescription** pVal);
+		[propput, id(2), helpstring("property DataScorer")] HRESULT DataScorer([in] IObjectWithDescription* newVal);
+		[propget, id(3), helpstring("property ScoreCondition")] HRESULT ScoreCondition([out, retval] EConditionalOp* pVal);
+		[propput, id(3), helpstring("property ScoreCondition")] HRESULT ScoreCondition([in] EConditionalOp newVal);
+		[propget, id(4), helpstring("property ScoreToCompare")] HRESULT ScoreToCompare([out, retval] long* pVal);
+		[propput, id(4), helpstring("property ScoreToCompare")] HRESULT ScoreToCompare([in] long newVal);
+		[propget, id(5), helpstring("property ConditionalRemove")] HRESULT ConditionalRemove([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(5), helpstring("property ConditionalRemove")] HRESULT ConditionalRemove([in] VARIANT_BOOL newVal);
+
+		[propget, id(6), helpstring("property AttributeSelector")] HRESULT AttributeSelector([out, retval] IAttributeSelector ** pVal);
+		[propput, id(6), helpstring("property AttributeSelector")] HRESULT AttributeSelector([in] IAttributeSelector * newVal);
+	};
+	[
+		object,
+		uuid(EDBA04C8-70BB-46A9-A475-8CEF813D5949),
+		dual,
+		helpstring("IReformatPersonNames Interface"),
+		pointer_default(unique)
+	]
+	interface IReformatPersonNames : IDispatch
+	{
+		[propget, id(1), helpstring("property PersonAttributeQuery")] HRESULT PersonAttributeQuery([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property PersonAttributeQuery")] HRESULT PersonAttributeQuery([in] BSTR newVal);
+		[propget, id(2), helpstring("property ReformatPersonSubAttributes")] HRESULT ReformatPersonSubAttributes([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property ReformatPersonSubAttributes")] HRESULT ReformatPersonSubAttributes([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property FormatString")] HRESULT FormatString([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property FormatString")] HRESULT FormatString([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(1C2A9712-A6BA-44BA-A840-BE9F64161470),
+		dual,
+		helpstring("IRunObjectOnQuery Interface"),
+		pointer_default(unique)
+	]
+	interface IRunObjectOnQuery : IDispatch
+	{
+		[propget, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([in] BSTR newVal);
+
+
+		[id(2), helpstring("method GetObjectAndIID")] HRESULT GetObjectAndIID([in, out] IID *pIID, [out, retval] ICategorizedComponent **pObject);
+		[id(3), helpstring("method SetObjectAndIID")] HRESULT SetObjectAndIID([in] IID newIID, [in] ICategorizedComponent* newObject);
+
+	};
+
+	[
+		object,
+		uuid(96D9DAEC-3F0C-43AD-8FAF-B9A20E2A02CE),
+		dual,
+		nonextensible,
+		helpstring("IMergeAttributes Interface"),
+		pointer_default(unique)
+	]
+	interface IMergeAttributes : IDispatch
+	{
+		// A query to define the domain of attributes which may be merged with one another
+		[propget, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property AttributeQuery")] HRESULT AttributeQuery([in] BSTR newVal);
+
+		// The percentage of mutual overlap two attributes must have to qualify to be merged.
+		[propget, id(2), helpstring("property OverlapPercent")] HRESULT OverlapPercent([out, retval] double *pVal);
+		[propput, id(2), helpstring("property OverlapPercent")] HRESULT OverlapPercent([in] double newVal);
+
+		// Specifies the method that should be used to determine the name of the merged attribute.
+		[propget, id(3), helpstring("property NameMergeMode")] HRESULT NameMergeMode([out, retval] EFieldMergeMode *pVal);
+		[propput, id(3), helpstring("property NameMergeMode")] HRESULT NameMergeMode([in] EFieldMergeMode newVal);
+
+		// Specifies the method that should be used to determine the type of the merged attribute.
+		[propget, id(4), helpstring("property TypeMergeMode")] HRESULT TypeMergeMode([out, retval] EFieldMergeMode *pVal);
+		[propput, id(4), helpstring("property TypeMergeMode")] HRESULT TypeMergeMode([in] EFieldMergeMode newVal);
+
+		// If NameMergeMode == kSpecifyField, merged attributes will be assigned this value.
+		[propget, id(5), helpstring("property SpecifiedName")] HRESULT SpecifiedName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property SpecifiedName")] HRESULT SpecifiedName([in] BSTR newVal);
+
+		// If TypeMergeMode == kSpecifyField, merged attributes will be assigned this value.
+		[propget, id(6), helpstring("property SpecifiedType")] HRESULT SpecifiedType([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property SpecifiedType")] HRESULT SpecifiedType([in] BSTR newVal);
+
+		// The text of merged attributes will be assigned this value.
+		[propget, id(7), helpstring("property SpecifiedValue")] HRESULT SpecifiedValue([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property SpecifiedValue")] HRESULT SpecifiedValue([in] BSTR newVal);
+
+		// If NameMergeMode == kPreserveField, this specifies the priority in which names should be preserved.
+		[propget, id(8), helpstring("property NameMergePriority")] HRESULT NameMergePriority([out, retval] IVariantVector **ppVal);
+		[propput, id(8), helpstring("property NameMergePriority")] HRESULT NameMergePriority([in] IVariantVector *pNewVal);
+
+		// If VARIANT_TRUE, the original attributes be added as as sub-attributes to the merged value.
+		[propget, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([in] VARIANT_BOOL newVal);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O - C L A S S E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(DB2C8D87-BB95-42CF-9835-D836631C0018),
+		helpstring("EliminateDuplicates Class")
+	]
+	coclass EliminateDuplicates
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(44F537CC-145D-461A-A915-AB69AB1C443F),
+		helpstring("RemoveInvalidEntries Class")
+	]
+	coclass RemoveInvalidEntries
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(D070B0B5-C084-4C55-8995-0B1809A12033),
+		helpstring("SelectOnlyUniqueValues Class")
+	]
+	coclass SelectOnlyUniqueValues
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(6175A0B0-8B95-4B5B-8FA3-4745835402DA),
+		helpstring("SelectUsingMajority Class")
+	]
+	coclass SelectUsingMajority
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(0BAA6156-1BA0-460E-8223-ED15648AB611),
+		helpstring("SelectWithUI Class")
+	]
+	coclass SelectWithUI
+	{
+		[default] interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(99292FCC-8475-4680-9B43-41B56F40CE75),
+		helpstring("OutputHandlerSequence Class")
+	]
+	coclass OutputHandlerSequence
+	{
+		[default] interface IOutputHandler;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IMultipleObjectHolder;
+	};
+	[
+		uuid(539FD287-862F-4502-A593-17AFE2E435D9),
+		helpstring("RemoveEntriesFromList Class")
+	]
+	coclass RemoveEntriesFromList
+	{
+		[default] interface IRemoveEntriesFromList;
+		interface IOutputHandler;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(1564A1AE-972C-49FD-B1D0-AD62D41B365B),
+		helpstring("KeepAttributesInMemory Class")
+	]
+	coclass KeepAttributesInMemory
+	{
+		[default] interface IOutputHandler;
+		interface IKeepAttributesInMemory;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(56072B13-FED3-4B31-9BAD-70B5940FD92A),
+		helpstring("RemoveEntriesFromListPP Class")
+	]
+	coclass RemoveEntriesFromListPP
+	{
+		[default] interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D81818F8-1E9B-44CB-9EC3-600B6F0DB5B5),
+		helpstring("OutputToXML Class")
+	]
+	coclass OutputToXML
+	{
+		[default] interface IOutputToXML;
+		interface ILicensedComponent;
+		interface IOutputHandler;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(8AD94653-C863-4273-AA62-E3F2F6F6028F),
+		helpstring("OutputToXMLPP Class")
+	]
+	coclass OutputToXMLPP
+	{
+		[default] interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(6CBA66FF-03E8-402D-9F31-90D6D2711283),
+		helpstring("ModifyAttributeValueOH Class")
+	]
+	coclass ModifyAttributeValueOH
+	{
+		[default] interface IModifyAttributeValueOH;
+		interface ILicensedComponent;
+		interface IOutputHandler;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(DCD6FB26-FD55-4012-B2CB-357B0F2F9615),
+		helpstring("ModifyAttributeValuePP Class")
+	]
+	coclass ModifyAttributeValuePP
+	{
+		[default] interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(56E2060E-164C-4E9D-BE70-3889404E49A7),
+		helpstring("OutputToVOA Class")
+	]
+	coclass OutputToVOA
+	{
+		[default] interface IOutputToVOA;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(5F3B51E1-7D0F-4C9E-B65F-EB6F5D8E6D47),
+		helpstring("OutputToVOAPP Class")
+	]
+	coclass OutputToVOAPP
+	{
+		interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(B5076085-4B2C-49FF-95EE-E8CD578FE351),
+		helpstring("MoveAndModifyAttributes Class")
+	]
+	coclass MoveAndModifyAttributes
+	{
+		[default] interface IMoveAndModifyAttributes;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(A781F68D-49D0-40A9-A95D-54DB4785212C),
+		helpstring("MoveAndModifyAttributesPP Class")
+	]
+	coclass MoveAndModifyAttributesPP
+	{
+		interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(BF6DAEE8-10E6-4F39-BF64-CC718FBB7953),
+		helpstring("RemoveSubAttributes Class")
+	]
+	coclass RemoveSubAttributes
+	{
+		[default] interface IRemoveSubAttributes;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(C81AF3A3-1A7C-4794-9858-2F9DCA050AEA),
+		helpstring("RemoveSubAttributesPP Class")
+	]
+	coclass RemoveSubAttributesPP
+	{
+		interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(72899723-E74D-4ABC-A2F7-4916B4A8FCB2),
+		helpstring("ReformatPersonNames Class")
+	]
+	coclass ReformatPersonNames
+	{
+		[default] interface IReformatPersonNames;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(427B8630-7D2F-4A00-92AC-C1780FA87DDD),
+		helpstring("ReformatPersonNamesPP Class")
+	]
+	coclass ReformatPersonNamesPP
+	{
+		interface IUnknown;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(95A0317C-402E-4492-B82E-9D8696EF25A0),
+		helpstring("RunObjectOnQuery Class")
+	]
+	coclass RunObjectOnQuery
+	{
+		[default] interface IRunObjectOnQuery;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(3462D859-1EE4-4D15-B9D5-D0381BCE7C80),
+		helpstring("RunObjectOnQueryPP Class")
+	]
+	coclass RunObjectOnQueryPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(654A637A-6922-4EBA-A8B7-675396570015),
+		helpstring("ConditionalOutputHander Class")
+	]
+	coclass ConditionalOutputHandler
+	{
+		[default] interface IConditionalRule;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(54A6E268-9B45-4F2F-BFC7-483D9351FEFA),
+		helpstring("MergeAttributes Class")
+	]
+	coclass MergeAttributes
+	{
+		[default] interface IMergeAttributes;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(AC58048C-907B-49E5-BA3A-BE7B038F3D25),
+		helpstring("MergeAttributesPP Class")
+	]
+	coclass MergeAttributesPP
+	{
+		[default] interface IUnknown;
+	};
+};

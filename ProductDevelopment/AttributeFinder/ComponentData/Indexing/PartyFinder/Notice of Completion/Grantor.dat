@@ -1,0 +1,58 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000348200.003.tif.uss
+NOC_GRANTOR_11=The^?Grantor^250~is^5~the^5~owner
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000238700.002.tif.uss
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000242100.001.tif.uss
+// 0015.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000568700.002.tif.uss
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000878200.001.tif.uss
+NOC_GRANTOR_03=owner of said property is|owner is^?Grantor^250~the full address|the address|address|that on the|that the title
+
+//
+NOC_GRANTOR_04=the owner^?Grantor^250~awarded a contract
+
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000032100.002.uss
+NOC_GRANTOR_01=undersigned is^?Grantor^250~the full address|address
+
+//
+NOC_GRANTOR_02=\r\n\r\n^?Grantor^250~hereby gives notice that
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001191300.002.tif.uss
+// 0007.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000089700.001.tif.uss
+NOC_GRANTOR_05=\r\nThe|\r\n1. The^?Grantor^250~owners in fee|is owner
+
+// 0008.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001514000.002.tif.uss
+NOC_GRANTOR_06=agent for owner^?Grantor^250~owner
+
+// 0009.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001342700.001.tif.uss
+NOC_GRANTOR_07=contract^20~awarded by the^?Grantor^250~[to]^250~contractor
+
+// 0010.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000701600.001.tif.uss
+NOC_GRANTOR_08=NOTICE IS HEREBY GIVEN that the^?Grantor^250~awarded to 
+
+// 0011.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000380600.002.tif.uss
+NOC_GRANTOR_09=owned by the following^?Grantor^250~if more than one owner
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000568900.002.tif.uss
+NOC_GRANTOR_12=is^5~owned^5~by^5~the^?Grantor^250~the full name
+
+// 0013.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\notice of completion\20059020919400.tif.uss
+NOC_GRANTOR_13=NOTICE IS HEREBY GIVEN by^?Grantor^250~[that]
+
+// 0014.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\notice of completion\20059023085600.tif.uss
+NOC_GRANTOR_14=name of the owner^100~[is]^?Grantor^250~the name
+
+
+[PATTERNS_END]
+
+

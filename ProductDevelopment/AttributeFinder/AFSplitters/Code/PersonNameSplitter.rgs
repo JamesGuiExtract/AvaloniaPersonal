@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFSplitters.PersonNameSplitter.1 = s 'PersonNameSplitter Class'
+	{
+		CLSID = s '{18D56BF1-5530-470B-9368-621BC27FAC67}'
+	}
+	UCLIDAFSplitters.PersonNameSplitter = s 'PersonNameSplitter Class'
+	{
+		CLSID = s '{18D56BF1-5530-470B-9368-621BC27FAC67}'
+		CurVer = s 'UCLIDAFSplitters.PersonNameSplitter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {18D56BF1-5530-470B-9368-621BC27FAC67} = s 'PersonNameSplitter Class'
+		{
+			ProgID = s 'UCLIDAFSplitters.PersonNameSplitter.1'
+			VersionIndependentProgID = s 'UCLIDAFSplitters.PersonNameSplitter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{9C61A6A5-6789-4648-9777-5405D6C517DF}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFileProcessing.FileProcessingManager.1 = s 'FileProcessingManager Class'
+	{
+		CLSID = s '{FD701438-4C6B-4D6F-B423-1A7AB2D905E0}'
+	}
+	UCLIDFileProcessing.FileProcessingManager = s 'FileProcessingManager Class'
+	{
+		CLSID = s '{FD701438-4C6B-4D6F-B423-1A7AB2D905E0}'
+		CurVer = s 'UCLIDFileProcessing.FileProcessingManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FD701438-4C6B-4D6F-B423-1A7AB2D905E0} = s 'FileProcessingManager Class'
+		{
+			ProgID = s 'UCLIDFileProcessing.FileProcessingManager.1'
+			VersionIndependentProgID = s 'UCLIDFileProcessing.FileProcessingManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5FBC9199-D162-4F14-BAD9-090F6AB576C5}'
+		}
+	}
+}

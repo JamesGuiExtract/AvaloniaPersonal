@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDLandRecordsIV.Direction.1 = s 'Direction Class'
+	{
+		CLSID = s '{7D249AD6-539F-11D6-8280-0050DAD4FF55}'
+	}
+	UCLIDLandRecordsIV.Direction = s 'Direction Class'
+	{
+		CLSID = s '{7D249AD6-539F-11D6-8280-0050DAD4FF55}'
+		CurVer = s 'UCLIDLandRecordsIV.Direction.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7D249AD6-539F-11D6-8280-0050DAD4FF55} = s 'Direction Class'
+		{
+			ProgID = s 'UCLIDLandRecordsIV.Direction.1'
+			VersionIndependentProgID = s 'UCLIDLandRecordsIV.Direction'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D08B8B61-3AA3-11D6-8260-0050DAD4FF55}'
+		}
+	}
+}

@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Notice of Default
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

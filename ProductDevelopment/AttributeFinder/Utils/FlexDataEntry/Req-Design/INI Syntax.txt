@@ -1,0 +1,47 @@
+The General section shall contain an RSDFile entry that shall define the collection of attribute rules desired for display.  If a path is not provided, the RSD file shall be located in the BIN folder containing the INI file.
+
+Each grid to be displayed in the FlexDataEntry window shall have its own section in the INI file.
+Each grid section shall be numbered from 1 to N where N is the number of grids to be displayed.
+Each grid section shall contain the following required entries:
+	Label
+	Height
+	Query
+	Type
+	Swipe
+	Rubberband
+Each grid section may shall contain zero or more of the following optional entries:
+	RowHeaderWidth
+	Columns
+	DefaultColumn
+	DynamicInputRSD
+
+The Label entry shall define a text string to be displayed above the top left corner of the grid.
+The Height entry shall define the height of the grid as measured in rows.  The actual number of rows displayed in the grid shall be dependent on the number of Attributes found.
+
+The Query entry shall define an X-Path query string to be applied to the collected Attributes found by RSDFile.
+
+The Type entry shall be "A", "B", "C", or "D".
+
+Grid Type A shall provide row headers and column headers.  Grid Type A shall display one Attribute per row with the Name as the Row header.  Each sub-attribute shall be evaluated such that: (1) if the Name matches a column heading, the Value shall be displayed in that column; (2) if the Name does not match a column heading, the Value will not be displayed.  If the Attribute does not have any sub-attributes the Attribute Value shall be displayed in the DefaultColumn column.  If no sub-attribute matches a column heading the Attribute Value shall be displayed in the DefaultColumn column.
+
+Grid Type B shall provide row headers but not column headers.  Grid Type B shall display one sub-attribute per row with the Name as the row header and the Value in column 1.
+
+Grid Type C shall provide row headers but not column headers.  Grid Type C shall display one Attribute per row with the Name as the row header and the Value in column 1.
+
+Grid Type D shall provide neither row headers nor column headers.  Grid Type D shall display the Value of the first collected Attribute - after application of the appropriate Query - in the single-row grid.
+
+The Swipe entry shall be 1 for true or 0 for false.  Text selected via zone highlighting shall be considered a Swipe.
+
+The Rubberband entry shall be 1 for true or 0 for false.  Text selected via paragraph recognition shall be considered a Rubberband.
+
+If the Grid Type does not require a provided optional entry, the value shall be ignored.
+
+The RowHeaderWidth entry shall define the width of the header column as a percentage of the width of the FelxDataEntry window. A RowHeaderWidth entry is required for Grid Types A, B and C.
+
+The Columns entry shall define the labels and widths of the column headers.  The format shall be Label1:Width1,Label2:Width2,Label3:Width3,...  The width values shall be a percentage of the width of the FlexDataEntry window.  A Columns entry is required for Grid Type A.
+
+The DefaultColumn entry shall define the label of the column to hold attribute text when either no sub-attributes are available or none of the sub-attribute names match a column label.  A DefaultColumn entry is required for Grid Type A.
+
+Consider column labels of First, Middle, Last as expected for sub-attributes of a Person Attribute.  If a Company Attribute is to be displayed, the entire text will be displayed in the DefaultColumn column.  The Company text will be thus displayed even if a CompanyAlias sub-attribute is present.
+
+The DynamicInputRSD entry shall define the filename and optional path of an RSD file used to extract Attributes from  dynamic text input.  Text selected via Swipe or Rubberband shall be considered dynamic text input.  A DynamicInputRSD entry is required for any grid with either Swipe = 1 or Rubberband = 1.

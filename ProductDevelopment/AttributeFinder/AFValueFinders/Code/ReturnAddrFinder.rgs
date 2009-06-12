@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.ReturnAddrFinder.1 = s 'ReturnAddrFinder Class'
+	{
+		CLSID = s '{8D774DD6-7026-4FE1-9517-B448FDFB76BF}'
+	}
+	UCLIDAFValueFinders.ReturnAddrFinder = s 'ReturnAddrFinder Class'
+	{
+		CLSID = s '{8D774DD6-7026-4FE1-9517-B448FDFB76BF}'
+		CurVer = s 'UCLIDAFValueFinders.ReturnAddrFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8D774DD6-7026-4FE1-9517-B448FDFB76BF} = s 'ReturnAddrFinder Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.ReturnAddrFinder.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.ReturnAddrFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

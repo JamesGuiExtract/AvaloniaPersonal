@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.ConvertToPDFTask.1 = s 'ConvertToPDFTask Class'
+	{
+		CLSID = s '{23251295-C946-403e-BDBB-E7F797FD32C1}'
+	}
+	FileProcessors.ConvertToPDFTask = s 'ConvertToPDFTask Class'
+	{
+		CLSID = s '{23251295-C946-403e-BDBB-E7F797FD32C1}'
+		CurVer = s 'FileProcessors.ConvertToPDFTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {23251295-C946-403e-BDBB-E7F797FD32C1} = s 'ConvertToPDFTask Class'
+		{
+			ProgID = s 'FileProcessors.ConvertToPDFTask.1'
+			VersionIndependentProgID = s 'FileProcessors.ConvertToPDFTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

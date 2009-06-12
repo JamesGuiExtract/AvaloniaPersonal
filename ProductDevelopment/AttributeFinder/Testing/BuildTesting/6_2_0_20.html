@@ -1,0 +1,188 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.20 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.20 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3151]</b> Cannot Install Software If Not Administrator
+	       	<ul>
+	      		<li>Confirm that the installation process exits gracefully if the 
+			logged in user is not a member of the Administrators group.
+	       	</ul>
+<p>
+		<li><b>[FlexIDSCore #3162]</b> Black and White Redactions Via Verification
+	       	<ul>
+	      		<li>Add <b>RedactionColorInOutputFile=White</b> to the General section of 
+			<b>IDShield.ini</b>.
+	      		<li>Confirm that output redactions are <b>white</b>.
+	      		<li>Modify the INI file to <b>RedactionColorInOutputFile=Black</b>.
+	      		<li>Confirm that output redactions are <b>black</b>.
+	      		<li>Remove the INI file entry for <b>RedactionColorInOutputFile=Black</b>.
+	      		<li>Confirm that output redactions are <b>black</b>.
+<p>
+	      		<li>Add <b>RedactionColorInOutputFile=White</b> to the General section.
+			<li>Verify the images and confirm that metadata XML files are created.
+			<li>Exercise <b>RedactFromXml.exe</b> and confirm that output redactions 
+			are <b>white</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5048]</b> Lead Tools version 16 
+	       	<ul>
+	      		<li>Confirm that the opening an image in the Spot Recognition Window <b>does not</b> 
+			display the NAG DLL.
+	      		<li>Confirm that rotated view perspectives display without errors. 
+	      		<li>Confirm that PDF images display without errors. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5063, #5064, #5067]</b> Various Reporting Changes
+	       	<ul>
+	      		<li>Exercise the following items for each installed report as noted below.
+			<ul>
+	      			<li>Confirm that the report conforms to the <b>Report Design Standards</b> 
+				section of the <b>7.0 Reporting Features Specification</b>.
+	      			<li>Confirm that an XML file associated with the report is present in the 
+				reports folder.  Note that <b>DateRange</b> values should be the enumeration 
+				such as <b>LastWeek</b>.
+	      			<li>Confirm that a thumbnail image of the selected report is provided.
+	      			<li>Confirm that a PDF output file can be auto-generated using command-line 
+				parameters.
+	      			<li>Confirm that the <b>/ow</b> command-line parameter allows the PDF output 
+				file to be overwritten.
+	      			<li>Confirm that not using the <b>/ow</b> command-line parameter raises an 
+				exception if the output PDF file already exists.
+	      			<li>Confirm that the <b>/prompt</b> command-line parameter forces display of 
+				a parameters prompt if the report requires parameters.
+			</ul>
+<p>
+	      		<li>Installed reports
+			<ul>
+	      			<li>File Action Manager Action List Report
+	      			<li>File Action Manager Computer List Report
+	      			<li>File Action Manager File Summary Report
+	      			<li>File Action Manager Machines Used For Processing Report
+	      			<li>File Action Manager Page Summary Report
+	      			<li>File Action Manager User List Report
+			</ul>
+<p>
+	      		<li>Confirm that the caption on the main UI has <b>Report Viewer</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5062]</b> Block Fitting
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules and images and begin verification.
+	      		<li>Use the rectangle tool to highlight a line of text while holding down the 
+			<b>Shift</b> key.
+	      		<li>Confirm that one attribute is created that contains the highlighted text.
+	      		<li>Confirm that the highlight automatically shrunk to fit the pixels within 
+			the rectangular area.
+	      		<li>Confirm that the highlighted region retains its rectangular shape.
+<p>
+	      		<li>Use the angle tool to highlight a line of text while holding down the 
+			<b>Shift</b> key.
+	      		<li>Confirm that one attribute is created that contains the highlighted text.
+	      		<li>Confirm that the highlight automatically shrunk to fit the pixels within 
+			the rectangular area.
+	      		<li>Confirm that the highlighted region retains its angle.
+<p>
+	      		<li>Confirm that Block Fitting also works within the <b>Spot Recognition Window</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5065, #5066, #5073]</b> Line Fitting
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules and images and begin verification.
+	      		<li>Use the rectangle tool to highlight multiple lines of text while holding down the 
+			<b>Ctrl</b> key.
+	      		<li>Confirm that one attribute is created that contains individual lines of 
+			highlighted text.
+	      		<li>Confirm that each highlighted line automatically shrunk to fit the pixels within 
+			the rectangular area.
+	      		<li>Confirm that the highlighted region retains its rectangular shape.
+<p>
+	      		<li>Confirm that the same functionality is seen with a multi-line <b>angled</b> 
+			highlight.
+<p>
+	      		<li>Confirm that line fitting within the <b>Spot Recognition Window</b> 
+			produces only one dialog with OCR results.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3148]</b> Grouping Attributes From Line Fitting in Verification UI
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules and images and begin verification.
+	      		<li>Highlight multiple lines of text while holding down the <b>Ctrl</b> key.
+	      		<li>Confirm that one attribute is created that contains the collected highlights.
+	      		<li>Confirm that clicking on one highlight will select the entire group.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for VOA Viewer and Flex Data Entry
+	       	<ul>
+	      		<li>Confirm that highlighting multi-line text while holding the <b>Ctrl</b> 
+			key does not create a multi-zone attribute in the VOA Viewer application.
+	      		<li>Confirm that highlighting multi-line text while holding the <b>Ctrl</b> 
+			key does not create a multi-zone attribute in the Flex Data Entry application.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5051]</b> Automatic Reconnection To Database After Network Problem
+	       	<ul>
+	      		<li>Exercise the <b>Database Connectivity</b> checklist.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using both VBScript and .NET Regular Expression Parsers 
+	via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

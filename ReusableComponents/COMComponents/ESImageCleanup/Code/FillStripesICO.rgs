@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.FillStripesICO.1 = s 'FillStripesICO Class'
+	{
+		CLSID = s '{7D2A008A-7E90-44de-A02E-9DCF04951D49}'
+	}
+	ESImageCleanup.FillStripesICO = s 'FillStripesICO Class'
+	{
+		CLSID = s '{7D2A008A-7E90-44de-A02E-9DCF04951D49}'
+		CurVer = s 'ESImageCleanup.FillStripesICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7D2A008A-7E90-44de-A02E-9DCF04951D49} = s 'FillStripesICO Class'
+		{
+			ProgID = s 'ESImageCleanup.FillStripesICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.FillStripesICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

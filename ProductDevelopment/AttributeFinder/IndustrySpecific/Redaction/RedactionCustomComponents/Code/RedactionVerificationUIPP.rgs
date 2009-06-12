@@ -1,0 +1,23 @@
+HKCR
+{
+	RedactionCustomComponents.RedactionVerificationUIPP.1 = s 'RedactionVerificationUIPP Class'
+	{
+		CLSID = s '{80596F69-4889-480D-B142-DD2FF780B57E}'
+	}
+	RedactionCustomComponents.RedactionVerificationUIPP = s 'RedactionVerificationUIPP Class'
+	{
+		CLSID = s '{80596F69-4889-480D-B142-DD2FF780B57E}'
+		CurVer = s 'RedactionCustomComponents.RedactionVerificationUIPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {80596F69-4889-480D-B142-DD2FF780B57E} = s 'RedactionVerificationUIPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -1,0 +1,1 @@
+(?:Y.u|Yo.)\s{0,4}(?:.ust|m.st|mu.t|mus.)\s{0,4}(?:.nter|e.ter|en.er|ent.r|ente)(?=[\s\S]{0,16}(?:.our|y.ur|yo.r|you.)\s{0,4}(?:SSN.{2,4}|.{1,2}SN\(?s.{1,2}|.{2,4}\(?s\)?)\s{0,4}(?:.bove|a.ove|ab.ve|abo.e|abov.))

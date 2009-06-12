@@ -1,0 +1,242 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\OCRFilteringBase.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "OCRFilteringBase DLL"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "OCRFilteringBase"
+            VALUE "LegalCopyright", "Copyright (C) 2009"
+            VALUE "OriginalFilename", "OCRFilteringBase.DLL"
+            VALUE "ProductName", "OCRFilteringBase Dynamic Link Library"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_Settings DIALOGEX 0, 0, 408, 244
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "OCR Filter Settings"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "&Disable current OCR filtering",IDC_CHK_EnableFiltering,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,7,7,111,10
+    LTEXT           "Input Categories:",IDC_STATIC,7,26,64,10
+    PUSHBUTTON      "",IDC_BTN_AddInputCategories,81,25,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDC_BTN_RemoveInputCategories,93,25,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    LISTBOX         IDC_LIST_InputCategories,7,39,98,177,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    LTEXT           "Choices:",IDC_STATIC,125,43,66,8
+    PUSHBUTTON      "",IDC_BTN_AddChoice,257,42,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDC_BTN_RemoveChoice,269,42,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    LISTBOX         IDC_LIST_Choices,124,55,157,131,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | LBS_WANTKEYBOARDINPUT | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP
+    CONTROL         "E&xact Case",IDC_CHK_Exact,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,298,56,52,10
+    CONTROL         "&Upper Case",IDC_CHK_AllUpper,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,298,67,53,10
+    CONTROL         "Lo&wer Case",IDC_CHK_AllLower,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,298,77,53,10
+    EDITTEXT        IDC_EDIT_CharsAlwaysOn,291,106,100,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "",IDC_BTN_AddAffectedInputType,367,124,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    PUSHBUTTON      "",IDC_BTN_RemoveAffectedInputType,379,124,12,11,BS_ICON,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+    LISTBOX         IDC_LIST_AffectedInputTypes,291,138,100,48,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "C&lear All Choice Selections",IDC_BTN_ClearChoices,124,193,91,14
+    PUSHBUTTON      "&New",IDC_BTN_New,7,223,50,14
+    PUSHBUTTON      "&Open...",IDC_BTN_Open,64,223,50,14
+    PUSHBUTTON      "&Save",IDC_BTN_Save,121,223,50,14
+    PUSHBUTTON      "Save &As...",IDC_BTN_SaveAs,178,223,50,14
+    PUSHBUTTON      "&Close",IDC_BTN_Close,351,223,50,14
+    GROUPBOX        "",IDC_STATIC,114,35,287,181
+    GROUPBOX        "Case Sensitivities",IDC_STATIC,291,44,99,46
+    LTEXT           "Characters Always Turned On:",IDC_STATIC,292,96,99,8
+    LTEXT           "Affected Input Types:",IDC_STATIC,292,126,70,8
+END
+
+IDD_DLG_FilterSchemesDlg DIALOGEX 0, 0, 156, 119
+STYLE DS_SETFONT | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU | WS_THICKFRAME
+EXSTYLE WS_EX_OVERLAPPEDWINDOW
+CAPTION "OCR Filter Schemes"
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_CMB_SchemeName,0,0,143,56,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "",IDC_BTN_OpenSettingsDlg,144,0,12,12,BS_ICON,WS_EX_STATICEDGE
+    EDITTEXT        IDC_EDIT_EnabledStrings,0,13,156,106,ES_MULTILINE | ES_READONLY | WS_VSCROLL,WS_EX_TRANSPARENT | WS_EX_STATICEDGE
+END
+
+IDD_DLG_ChoiceEdit DIALOG  0, 0, 240, 69
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Sub String Choice"
+FONT 8, "MS Sans Serif"
+BEGIN
+    EDITTEXT        IDC_EDIT_Description,68,6,165,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_Chars,68,27,165,14,ES_AUTOHSCROLL
+    DEFPUSHBUTTON   "OK",IDOK,126,48,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,183,48,50,14
+    LTEXT           "Description:",IDC_STATIC,7,8,38,8
+    LTEXT           "Actual Characters: (Leave empty if same as above)",IDC_STATIC,7,28,58,27
+END
+
+IDD_DLG_OpenSave DIALOGEX 0, 0, 214, 156
+STYLE DS_SETFONT | DS_MODALFRAME | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Open"
+FONT 8, "MS Sans Serif", 0, 0, 0x0
+BEGIN
+    DEFPUSHBUTTON   "Open",IDOK,99,137,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,158,137,50,14
+    LISTBOX         IDC_LIST_Files,6,31,202,76,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_FileName,43,114,165,14,ES_AUTOHSCROLL
+    LTEXT           "File Name:",IDC_STATIC,7,116,36,8
+    LTEXT           "File(s) in:",IDC_STATIC,6,5,28,8
+    EDITTEXT        IDC_STATIC_Directory,6,17,201,11,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DLG_Settings, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 401
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 237
+    END
+
+    IDD_DLG_ChoiceEdit, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 233
+        TOPMARGIN, 6
+        BOTTOMMARGIN, 62
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_MENU           ICON                    "icon_men.ico"
+IDI_ICON_Add            ICON                    "icon_add.ico"
+IDI_ICON_Remove         ICON                    "icon_rem.ico"
+IDI_ICON_SchemeDlg      ICON                    "icon1.ico"
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\OCRFilteringBase.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

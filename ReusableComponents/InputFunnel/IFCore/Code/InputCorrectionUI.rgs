@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.InputCorrectionUI.1 = s 'InputCorrectionUI Class'
+	{
+		CLSID = s '{00801874-60FE-11D6-828D-0050DAD4FF55}'
+	}
+	UCLIDInputFunnel.InputCorrectionUI = s 'InputCorrectionUI Class'
+	{
+		CLSID = s '{00801874-60FE-11D6-828D-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFunnel.InputCorrectionUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {00801874-60FE-11D6-828D-0050DAD4FF55} = s 'InputCorrectionUI Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.InputCorrectionUI.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.InputCorrectionUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

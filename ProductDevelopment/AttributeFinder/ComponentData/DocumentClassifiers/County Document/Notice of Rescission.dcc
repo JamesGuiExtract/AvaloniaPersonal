@@ -1,0 +1,62 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,NOR_SURE_01,false
+		// NOTICE OF RESCISSION
+		// 0001.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Rescission\20049000270800.001.uss
+		// NOTICE OF RESCISSION OF NOTICE OF DEFAULT
+		// NOTICE OF RESCISSION OF DECLARATION OF DEFAULT
+		// 0002.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Rescission\20049000038300.001.uss
+		01=^NOTICE\s*OF\s*RESCISSION(?:\s*OF\s*(?:DECLARATION|NOTICE)\s*OF\s*DEFAULT)?(?:\r?$)
+		
+		// Rescission of Notice of Default And Election To Sell
+		// 0004.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\rescission notice default\20059019694700.tif.uss
+		02=^RESCISSION\s*OF\s*NOTICE(?:\s*OF\s*DEFAULT\s*AND\s*ELECTION\s*TO\s*SELL)?(?:\r?$)
+
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,NOR_PROBABLE_01,false
+		// NOTICE OF RESCISSION OF NOTICE OF DEFAULT
+		// 0003.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Notice of Rescission\20049000118300.001.uss
+		01=^.{0,20}NOTICE\s*OF\s*RESCISSION\s*OF\s*NOTICE\s*OF\s*DEFAULT.{0,20}(?:\r?$)
+	OR_END
+
+	AND_BEGIN,NOR_PROBABLE_02,false
+		// 0005.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\rescission notice default\20059019654000.tif.uss
+		01=Notice\s*is\s*hereby\s*given
+		02=does\s*hereby\s*rescind.?\s*cancel\s*and\s*withdraw
+	AND_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+
+[MAYBE_END]

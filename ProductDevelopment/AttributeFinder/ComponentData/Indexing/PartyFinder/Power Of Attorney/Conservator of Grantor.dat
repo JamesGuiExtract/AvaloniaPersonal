@@ -1,0 +1,24 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// I...am...mother|managing conservator of....I do hereby appoint...
+// 0001.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016270.tif.uss
+POA_CONSERVATOR_OF_GRANTOR_1=[I]^?ConservatorOfGrantor^100~[am]^100~mother|father|conservator^100~[of]^300~[I]^20~[hereby]|[appoint]
+
+[PATTERNS_END]
+
+

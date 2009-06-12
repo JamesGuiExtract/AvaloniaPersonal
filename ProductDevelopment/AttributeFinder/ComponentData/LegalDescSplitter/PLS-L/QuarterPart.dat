@@ -1,0 +1,4 @@
+// DT:00298
+//	Added initial expression
+
+[\s\S]+?(?=Section)

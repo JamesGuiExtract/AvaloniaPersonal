@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFileSuppliers.StaticFileListFS.1 = s 'StaticFileListFS Class'
+	{
+		CLSID = s '{27D4BFD3-4F5B-44ce-B834-ED9FB654D113}'
+	}
+	ESFileSuppliers.StaticFileListFS = s 'StaticFileListFS Class'
+	{
+		CLSID = s '{27D4BFD3-4F5B-44ce-B834-ED9FB654D113}'
+		CurVer = s 'ESFileSuppliers.StaticFileListFS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {27D4BFD3-4F5B-44ce-B834-ED9FB654D113} = s 'StaticFileListFS Class'
+		{
+			ProgID = s 'ESFileSuppliers.StaticFileListFS.1'
+			VersionIndependentProgID = s 'ESFileSuppliers.StaticFileListFS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{ABCBED34-5255-4717-A098-B9D9B505DE93}'
+		}
+	}
+}

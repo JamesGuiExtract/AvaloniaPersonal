@@ -1,0 +1,87 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,AOJ_ZERO_01,false
+		//
+		01=\b(?:ACKNOWLEDGE?MENT\s*OF\s*)?SATISFACTION\s*OF\s*JUDGE?MENT\b
+		//
+		02=\bRELEASE\s*OF\s*ABSTRACT\s*OF\s*JUDGE?MENT\b
+		03=\bCOUNTY\s*CLERK\s*[\s\S]{0,250}AS\s*ABSTRACT\s*OF\s*JUDGMENT\s*(?:\r?$)
+	OR_END
+
+
+	AND_BEGIN,AOJ_ZERO_02,false
+		//
+		\bRELEASE\s*OF\s*LIEN\b
+		\bRELEASES\s*THE\s*LIEN\s*[\s\S]{0,100}JUDGE?MENT\s*OR\s*ABSTRACT\s*OF\s*JUDGE?MENT\b
+	AND_END
+	SINGLE_BEGIN,AOJ_ZERO_03,false
+		^.{0,3}FULL\s*RELEASE\s*OF\s*LIEN\s*ABSTRACT\s*OF\s*JUDGMENT.{0,3}(?:\r?$)
+	SINGLE_END
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,AOJ_SURE_01,false
+		//ABSTRACT OF JUDGEMENT
+		//0001.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000027500.002.tif.uss
+		01=^.?\s*ABSTRACT\s*OF\s*JUDGE?MENT.?\s*(?:\r?$)
+
+		//TRANSCRIPT OF JUDGEMENT
+		//0003.tif;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\RandomSubsetOfSet001\Transcript Of Judgements\0010666-0001.tif.uss
+		02=^.?\s*TRANSCRIPT\s*OF\s*JUDGE?MENT.?\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,AOJ_PROBABLE_01,true
+		// ABSTRACT OF JUDGEMENT
+		01=\bABSTRACT\s*OF\s*JUDGE?MENT\b
+		02=\bTRANSCRIPT\s*OF\s*JUDGE?MENT\b
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,AOJ_MAYBE_01,true
+		//ABSTRACT OF JUDGEMENT
+		01=\bABSTRACT\s*OF\s*JUDGE?MENT\b
+
+		// 0002.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000456800.002.tif.uss
+		02=\bapplies for an abstract of judgment and represents the following\b
+
+		//TRANSCRIPT OF JUDGEMENT
+		03=\bTRANSCRIPT\s*OF\s*JUDGE?MENT\b
+
+		04=foregoing[\s\S]{0,12}true\s*transcript[\s\S]{0,12}judgment[\s\S]{0,6}said\s*Court
+	OR_END
+SCOPE_END
+
+[MAYBE_END]

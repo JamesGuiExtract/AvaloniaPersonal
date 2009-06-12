@@ -1,0 +1,353 @@
+<HTML>
+
+<HEAD>
+<TITLE>Image Viewer Highlighting Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+<h1>Image Viewer Highlighting Testing Checklist
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<h3>Angled Highlights - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Highlight Height</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			begin creating an angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>+</b> key on the keyboard.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>+</b> key on the number pad.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+<p>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>-</b> key on the keyboard.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>-</b> key on the number pad.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+<p>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, scroll 
+			the <b>mouse wheel</b> up.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+<p>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, scroll 
+			the <b>mouse wheel</b> down.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+	       	</ul>
+<p>
+	       	<li><b>Highlight Height</b> - from Tools menu
+       		<ul>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			begin creating an angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>+</b> key on the keyboard.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>+</b> key on the number pad.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+<p>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>-</b> key on the keyboard.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+        	  	<li>While continuing to hold down the mouse button, click 
+			the <b>-</b> key on the number pad.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+<p>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, scroll 
+			the <b>mouse wheel</b> up.</li>
+        	  	<li>Confirm that the highlight height increases.</li>
+<p>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			begin creating another angular highlight.</li>
+        	  	<li>While continuing to hold down the mouse button, scroll 
+			the <b>mouse wheel</b> down.</li>
+        	  	<li>Confirm that the highlight height decreases.</li>
+        	  	<li><b>[DotNet #82]</b> Confirm that the highlight height 
+			does not decrease to zero.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Rectangular Highlights - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Creation</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create a rectangular highlight.</li>
+	       	</ul>
+<p>
+	       	<li><b>Creation</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			create a rectangular highlight.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>*Delete Highlights - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Functionality</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Create several highlights.</li>
+	          	<li>Click the <b>Delete Highlights</b> toolbar button.</li>
+        	  	<li>Confirm that specified highlights can be deleted.</li>
+	       	</ul>
+	       	<li><b>Functionality</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Create several highlights.</li>
+	          	<li>Click the <b>Tools - Delete Highlights</b> menu item.</li>
+        	  	<li>Confirm that specified highlights can be deleted.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Highlight Selection - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Shift + Selection</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create several highlights.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select a highlight.</li>
+        	  	<li><b>[DotNet #79]</b> Confirm that the selected highlight 
+			has a dashed line border.</li>
+        	  	<li>Press the <b>Shift</b> key and click one or more 
+			additional highlights.</li>
+        	  	<li>Confirm that each highlight remains selected with 
+			gripper corners.</li>
+	       	</ul>
+<p>
+	       	<li><b>Control + Selection</b> - from toolbar
+       		<ul>
+          		<li>Deselect all of the previous highlights.</li>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select one highlight.</li>
+        	  	<li>Press the <b>Control</b> key and click one or more 
+			additional highlights.</li>
+        	  	<li>Confirm that each highlight remains selected with 
+			gripper corners.</li>
+        	  	<li>Continue pressing the <b>Control</b> key and click 
+			one of the already selected highlights.</li>
+        	  	<li>Confirm that the highlight is deselected.</li>
+	       	</ul>
+<p>
+	       	<li><b>Shift + Selection</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create several highlights.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select a highlight.</li>
+        	  	<li>Press the <b>Shift</b> key and click one or more 
+			additional highlights.</li>
+        	  	<li>Confirm that each highlight remains selected with 
+			gripper corners.</li>
+	       	</ul>
+<p>
+	       	<li><b>Control + Selection</b> - from Tools menu
+       		<ul>
+          		<li>Deselect all of the previous highlights.</li>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select one highlight.</li>
+        	  	<li><b>[DotNet #83]</b> Press the <b>Control</b> key and 
+			click one or more additional highlights.</li>
+        	  	<li>Confirm that each highlight remains selected with 
+			gripper corners.</li>
+        	  	<li>Continue pressing the <b>Control</b> key and click 
+			one of the already selected highlights.</li>
+        	  	<li>Confirm that the highlight is deselected.</li>
+<p>
+        	  	<li>Draw an angled highlight and select it.</li>
+        	  	<li><b>[DotNet #84]</b> Put the mouse cursor over one of the grip 
+			handles and press the <b>Control</b> key without moving the mouse.</li>
+        	  	<li>Confirm that the mouse cursor changes to the cross cursor 
+			indicating that the angle can be changed.</li>
+	       	</ul>
+<p>
+	       	<li><b>Click and Drag</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create several highlights.</li>
+	          	<li>Activate highlight selection by clicking <b>Tools - Select highlight</b>.</li>
+        	  	<li>Confirm that clicking and dragging the mouse across several 
+			highlights works to select those highlights.</li>
+<p>
+        	  	<li>Press the <b>Shift</b> key and then click and drag across 
+			different highlights.</li>
+        	  	<li>Confirm that the new highlights are added to the existing selection.</li>
+	       	</ul>
+<p>
+	       	<li><b>Click and Drag</b> - from Toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create several highlights.</li>
+	          	<li>Activate highlight selection by clicking the <b>Select layer 
+			object</b> toolbar button.</li>
+        	  	<li>Confirm that clicking and dragging the mouse across several 
+			highlights works to select those highlights.</li>
+<p>
+        	  	<li>Press the <b>Shift</b> key and then click and drag across 
+			different highlights.</li>
+        	  	<li>Confirm that the new highlights are added to the existing selection.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>Moving Highlights - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Selection</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Highlighter</b> toolbar button and 
+			create several highlights - both angular and rectangular.</li>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select a highlight.</li>
+        	  	<li>Confirm that the highlight can be dragged to a new 
+			location.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that clicking and dragging each of the four 
+			gripper buttons on the highlight allow the highlight to 
+			be resized.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that <b>Control + click</b> and dragging each 
+			of the four gripper buttons on the highlight allow the 
+			highlight angle to be changed.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select a rectangular highlight.</li>
+        	  	<li>Confirm that clicking and dragging each of the eight 
+			gripper buttons on the highlight allow the highlight to 
+			be resized.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select a rectangular highlight.</li>
+        	  	<li><b>[DotNet #82]</b> Confirm that clicking and dragging 
+			one of the side gripper buttons on the highlight allow the 
+			highlight to be resized but not to have a zero width.</li>
+        	  	<li><b>[DotNet #100]</b> Confirm that a right-click during 
+			a highlight resize operation has no effect.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select a rectangular highlight.</li>
+        	  	<li>Confirm that the highlight cannot be dragged completely 
+			out of the image area.</li>
+        	  	<li><b>[DotNet #100]</b> Confirm that a right-click during 
+			a highlight move operation has no effect.</li>
+        	  	<li><b>[DotNet #99]</b> Confirm that trying to move the 
+			highlight completely out of the image area results in the 
+			highlight retaining its original location.</li>
+        	  	<li><b>[DotNet #85]</b> Confirm that the highlight cannot 
+			be resized completely out of the image area.</li>
+<p>
+	          	<li>Click the <b>Select highlight</b> toolbar button and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that the highlight angle cannot be changed to 
+			completely move the highlight out of the image area.</li>
+          		<li>Close the Image Viewer.</li>
+	       	</ul>
+<P>
+	       	<li><b>Selection</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+	          	<li>Click the <b>Tools - Highlighter</b> menu item and 
+			create several highlights - both angular and rectangular.</li>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select a highlight.</li>
+        	  	<li>Confirm that the highlight can be dragged to a new 
+			location.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that clicking and dragging each of the four 
+			gripper buttons on the highlight allow the highlight to 
+			be resized.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that <b>Control + click</b> and dragging each 
+			of the four gripper buttons on the highlight allow the 
+			highlight angle to be changed.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select a rectangular highlight.</li>
+        	  	<li>Confirm that clicking and dragging each of the eight 
+			gripper buttons on the highlight allow the highlight to 
+			be resized.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select a rectangular highlight.</li>
+        	  	<li><b>[DotNet #82]</b> Confirm that clicking and dragging 
+			one of the side gripper buttons on the highlight allow the 
+			highlight to be resized but not to have a zero width.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select a rectangular highlight.</li>
+        	  	<li>Confirm that the highlight cannot be dragged completely 
+			out of the image area.</li>
+        	  	<li><b>[DotNet #85]</b> Confirm that the highlight cannot 
+			be resized completely out of the image area.</li>
+<p>
+	          	<li>Click the <b>Tools - Select highlight</b> menu item and 
+			select an angular highlight.</li>
+        	  	<li>Confirm that the highlight angle cannot be changed to 
+			completely move the highlight out of the image area.</li>
+	       	</ul>
+       	</ul>
+<p>
+	<h3>*Set Highlight Height - Manual Tests</h3>
+       	<ul>
+	       	<li><b>Functionality</b> - from toolbar
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Set Highlight Height</b> toolbar button and 
+			set the default highlight height.</li>
+        	  	<li>Confirm that the Image Viewer reverts to the previously 
+			used cursor tool after setting highlight height.</li>
+        	  	<li>Confirm that a new angular highlight has the new height.</li>
+	       	</ul>
+<p>
+	       	<li><b>Functionality</b> - from Tools menu
+       		<ul>
+          		<li>Open an image from the Redaction Demo.</li>
+        	  	<li>Zoom in several steps.</li>
+	          	<li>Click the <b>Tools - Set Highlight Height</b> menu item and 
+			set the default highlight height.</li>
+        	  	<li>Confirm that the Image Viewer reverts to the previously 
+			used cursor tool after setting highlight height.</li>
+        	  	<li>Confirm that a new angular highlight has the new height.</li>
+	       	</ul>
+       	</ul>
+</ul>
+</BODY>
+</HTML>

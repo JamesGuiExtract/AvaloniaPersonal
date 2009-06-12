@@ -1,0 +1,25 @@
+HKCR
+{
+	AFConditions.FindingRuleConditionPP.1 = s 'FindingRuleConditionPP Class'
+	{
+		CLSID = s '{CF3F89FE-9503-4E0B-9B14-9D101F064C87}'
+	}
+	AFConditions.FindingRuleConditionPP = s 'FindingRuleConditionPP Class'
+	{
+		CLSID = s '{CF3F89FE-9503-4E0B-9B14-9D101F064C87}'
+		CurVer = s 'UCLID_AFCONDITIONSLib.FindingRuleConditionPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {CF3F89FE-9503-4E0B-9B14-9D101F064C87} = s 'FindingRuleConditionPP Class'
+		{
+			ProgID = s 'UCLID_AFCONDITIONSLib.FindingRuleConditionPP.1'
+			VersionIndependentProgID = s 'UCLID_AFCONDITIONSLib.FindingRuleConditionPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D3DC98FB-A212-409B-B68C-64D1DC430594}'
+		}
+	}
+}

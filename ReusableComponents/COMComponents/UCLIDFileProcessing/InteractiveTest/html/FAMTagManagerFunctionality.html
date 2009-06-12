@@ -1,0 +1,141 @@
+<html>
+<head>
+<link type="text/css" rel="stylesheet" href="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+<h1>
+File Action Manager - FAM Tag Manager Functionality<br>
+<IMG src="../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<ul>
+	<li>Recursively get the folder "FAM Tag Manager Functionality" from SourceSafe. It is located at:<br>
+	<i>$\Engineering\ReusableComponents\COMComponents\UCLIDFileProcessing\InteractiveTest\FAM Tag Manager Functionality</i><br>
+<p>
+	<li>&ltFPSFileDir&gt Functionality</li>
+	<ul>
+		<li>Open a blank File Action Manager
+		<ul>
+			<li>Select any action, and then check the "Queue files for this action" checkbox.
+			<li>On the Queue setup tab, click the "Add..." button.  Select "Files from folder" 
+			from the "Select File Supplier" list, and then click the "Configure" button.
+			<li>Use the tag selector or manually enter "&ltFPSFileDir&gt" into the "Specify 
+			folder from which to supply files" edit box.
+			<li>Click "OK" to exit the "Configure Files from folder" dialog, and then click 
+			"OK" again to exit the "Select File Supplier dialog.
+			<li> Run the file supplier by pressing the “Start processing” button on the toolbar.
+			<li> Confirm that an error message appears that says, "There is no FPS File Name 
+			available to expand the &ltFPSFileDir&gt tag!"and the File Action Manager stops smoothly.
+		</ul>
+		<li>Clear the current database, and add an action called "FPSdir".</li>
+		<ul>
+			<li>Open the file named Queue_In_FPS_Dir.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of 
+			the Queue log and confirm that FPSDir01.tif and FPSDir02.tif were both added 
+			to the queue.</li>
+		</ul>
+		<li>Add an action called "SubDir" to the database</li>
+		<ul>
+			<li>Open the file named Queue_In_Sub_Dir.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of the 
+			Queue log and confirm that FPSSubDir01.tif and FPSSubDir02.tif were both added 
+			to the queue.</li>
+		</ul>
+		<li>Add an action called "Parent" to the database</li>
+		<ul>
+			<li>Open the file named Queue_In_Parent_Dir.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of the 
+			Queue log and confirm that FPSParentDir01.tif and FPSParentDir02.tif were both 
+			added to the queue.</li>
+		</ul>
+		<li>Add an action called "Sibling" to the database</li>
+		<ul>
+			<li>Open the file named Queue_In_Sibling_Dir.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of the 
+			Queue log and confirm that FPSSiblingDir01.tif and FPSSiblingDir02.tif were both 
+			added to the queue.</li>
+		</ul>
+	</ul>
+<p>
+	<li><u>File Suppliers</u></li>
+	<ul>
+		<li>Files from dynamic list
+		<ul>
+			<li>Add an action called "Dynamic" to the Database</li>
+			<li>Open the file named Test_FPSDir_DynamicList.fps and run it. This FPS file is 
+			located in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of 
+			the Queue log and confirm that FPSDir01.tif, FPSSubDir01.tif, FPSParentDir01.tif, 
+			and FPSSiblingDir01.tif were all added to the queue.</li>
+		</ul>
+	</ul>
+<p>
+	<li><u>File Processors</u></li>
+	<ul>
+		<li>Copy, Move, or Delete File</li>
+		<ul>
+			<li>Add an action called "Copy" to the database</li>
+			<li>Open the file named Test_Copy.fps and run it. This FPS file is located in 
+			<i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look in <i>FAM Tag Manager Functionality\Main\Sub</i> and confirm that two files, 
+			named FPSDir01COPY.TIF and FPSDir02COPY.TIF have been created.</li>
+		</ul>
+<p>
+		<li>Redact Images (no verification)</li>
+		<ul>
+			<li>Add an action called "Redact" to the database</li>
+			<li>Open the file named Test_AutoRedact.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look in <i>FAM Tag Manager Functionality</i> and confirm that a directory 
+			name "Redacted" has been created and that it contains files FPSParentDir01_redacted.tif 
+			and FPSParentDir02_redacted.tif.</li>
+		</ul>
+<p>
+		<li>Verify Redactions</li>
+		<ul>
+			<li>Add an action called "Verify" to the database</li>
+			<li>Open the file named Test_Verify.fps and run it. This FPS file is located in 
+			<i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Place a manual redaction and save every image that comes up in the ID 
+			Shield window.  <li>Look in <i>FAM Tag Manager Functionality\Main\Sub</i>
+			<ul>
+				<li>Confirm that a directory name "Redacted" has been created and that 
+				it contains files FPSDir01COPY_redacted.TIF, FPSDir02COPY_redacted.TIF, 							FPSSubDir01_redacted.TIF, and FPSSubDir02_redacted.TIF.</li>
+				<li>Confirm that a directory name "MetaData" has been created and that 
+				it contains files FPSDir01COPY_metadata.xml, FPSDir02COPY_metadata.xml, 							FPSSubDir01_metadata.xml, and FPSSubDir02_metadata.xml.</li>
+				<li>Confirm that a directory name "ExpectedVOA" exists and that it contains 
+				files FPSDir01COPY.TIF.voa, FPSDir02COPY.TIF.voa, FPSSubDir01.TIF.voa, and 							FPSSubDir02.TIF.voa.</li>
+			</ul>
+		</ul>
+	</ul>
+<p>
+	<li><u>Skip Conditions</u></li>
+	<ul>
+		<li>Skip based on file existance
+		<ul>
+			<li>Add an action called "SkipExist" to the database.</li>
+			<li>Open the file named Test_SkipExistance.fps and run it. This FPS file is 
+			located in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of 
+			the Queue Log and confirm that only FPSParentDir02.tif was added to the queue.</li>
+		</ul>
+<p>
+		<li>Skip based on file name pattern
+		<ul>
+			<li>Add an action called "SkipName" to the database.</li>
+			<li>Open the file named Test_SkipName.fps and run it. This FPS file is located 
+			in <i>FAM Tag Manager Functionality\Main</i></li>
+			<li>Look at the "Files added or updated in the queue recently" display area of 
+			the Queue Log and confirm that FPSDir01COPY.TIF and FPSDir02COPY.tif was added 
+			to the queue.</li>
+		</ul>
+	</ul>
+</ul>
+</body>
+</html>
+  

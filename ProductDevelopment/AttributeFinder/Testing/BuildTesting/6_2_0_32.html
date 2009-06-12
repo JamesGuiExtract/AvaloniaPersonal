@@ -1,0 +1,128 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.32 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.32 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3093, #3193]</b> Order of attributes
+	       	<ul>
+	      		<li>Exercise the TCL file attached to SCR #3093.
+	      		<li><b>Note that this enhancement may be removed later and replaced by something 
+			better tuned to Lab Records testing</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4726]</b> OCR Rectangular Area
+	       	<ul>
+	      		<li>Exercise the attached <b>slightdeskew.tif</b> image.
+	      		<li>Confirm that OCR works properly for each situation described in the SCR.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4900]</b> FAM DB Admin - Export File List
+	       	<ul>
+	      		<li>Start the application.
+	      		<li>Confirm that the active database contains images and actions.
+	      		<li>Export a file list.
+	      		<li>Confirm that providing a relative path for the output file <b>is not</b> accepted.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5099]</b> Stop FAM Processing with only Statistics Tab
+	       	<ul>
+	      		<li>Create an FPS file with only a <b>Statistics</b tab.
+	      		<li>Start processing.
+	      		<li>Confirm that the <b>Stop processing</b> button works.
+	      		<li>Start processing again.
+	      		<li>Confirm that the <b>Process - Stop processing</b> menu item works.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5102]</b> Unable to open PDF images
+	       	<ul>
+	      		<li>Modify the <b>GS_LIB</b environment variable.
+	      		<li>Confirm that the <b>Spot Recognition Window</b> can still open PDF images.
+	      		<li>Restore the original setting for the <b>GS_LIB</b> environment variable.
+	       	</ul>
+<p>
+  	   	<LI><b>OCR Engine - Version 16</b>
+	       	<ul>
+	      		<li>Exercise the <b>Nuance OCR engine version 16</b> section of the 
+			<b>Pre-Code Freeze</b> testing checklist.
+	       	</ul>
+<p>
+  	   	<LI><b>General FAM Testing</b> - Exercise each of the following standard checklists
+	       	<ul>
+	      		<li>Exercise each of the following standard checklists.
+	      		<li>Pay special attention to fundamental UI behavior or problems that may be 
+			related to the updated OCR engine.
+<p>
+	  		<li><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/FileActionManager.html">User Interface</a></li>
+	  		<li><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/Utils/FAMDBAdmin/InteractiveTest/FAMDBAdmin.html">FAM DB Admin</a></li>
+			<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/ProcessFilesTasks.html">File Processing Tabs and File Processors</a></LI>
+			<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/ESFileSuppliers/InteractiveTest/FileSuppliers.html">Queueing Tabs and File Suppliers</a></LI>
+			<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/ESSkipConditions/InteractiveTest/html/SkipConditions.html">FAM Conditions</a></LI>
+			<LI><a href="../../../../ReusableComponents/COMComponents/UCLIDFileProcessing/InteractiveTest/html/FAMTagManagerFunctionality.html">FAM Tag Manager Functionality</a></LI>
+	       	</ul>
+<p>
+  	   	<LI><b>Miscellaneous</b>
+	       	<ul>
+	      		<li><b>[FlexIDSCore #3114]</b> Replace Strings (automated tests)
+	      		<li><b>[FlexIDSCore #3188]</b> Thread exited without exception
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,63 @@
+<HTML>
+	<HEAD>
+		<title>Value After Clue Value Finder</title>
+		<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Value After Clue Value Finder</h1>
+		<hr>
+		<h3>Value After Clue Value Finder</h3>
+		<ul>
+			<li>The Value After Clue value finder looks for a specified clue and then captures a string of text that follows that clue.</li>
+			<li>Multiple clues can be defined in a single rule.</li>
+			<li>Clues can be added, deleted, or modified using the <b>Add</b>, <b>Remove</b>, and <b>Modify</b> buttons.</li>
+			<li>The specified clue can be either plain text or a regular expression.</li>
+			<li>You have to specify how much of the text following the clue that you want to capture:
+				<ul>
+					<li>You can capture all of the text between the clue and the end of input.</li>
+					<li>You can capture all of the text between the clue and next end of line character.</li>
+					<li>You can capture all of the text between the clue and a second clue.</li>
+						<ul>
+							<li>The second clue can also be either plain text or a regular expression.</li>
+						</ul>
+					</li>
+					<li>You can capture a certain number of lines after the clue.</li>
+						<ul>
+							<li>You will need to choose the number of lines you want to capture and whether or not you want to include the line that contains the clue.</li>
+						</ul>
+					</li>
+					<li>You can capture a specified number of words after the clue.</li>
+						<ul>
+							<li>You will need to choose the number of words you want to capture.</li>
+							<li>You can optionally stop searching if you find a specified character.</li>
+							<li>You must specify what a word is by defining what characters separate words.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>All of the strings in the Value After Clue value finder can be made case sensitive.</li>
+		</ul>
+		<p>
+			<hr>
+			<h3>Example:</h3>
+			<ul>
+				<li>Open <b>FileNumber_VAC.rsd</b>.  </li>
+				<li>Click the <b>Configure</b> button to edit the rule.</li>
+				<li>Notice the text <i>File Number</i> appears in the <b>Define the clue text(s)</b> box.</li>
+				<li>Test the rule on <b>FileNumbers.txt</b> using the Rule Tester and observe the output.</li>
+				<li>Check the <b>Above defined clue text(s) will be treated as Regular Expression(s)</b> checkbox and change the clue to <i>File\sNumber</i>.  Test the rule.  The output should be the same as when the plain text clue was tested.</li>
+				<li>Select <b>Include all strings after the clue text until the end of the input</b>.  Look at the output from the Rule Tester.  Notice that for every occurrence of the clue, the rules find a string containing all text after each occurrence of the clue to the end of the file.</li>  
+				<li>Select <b>Include all strings after the clue until the end of the line</b>. Look at the output from the Rule Tester. Notice that for every occurrence of the clue, the rules find a string containing all the text after the clue to the end of the line.</li>
+				<li>Add the regular expression clue <i>File\s\S*\s</i>. Test this new clue.  Note that this example should find all file numbers.</li>
+				<li>Delete the additional clue.  Re-enter the <i>File\sNumber</i> clue if it is no longer present.  Enter the same clue again as a second clue by clicking on the radio button in front of the <b>Include all strings between the clue text and the string specified</b> text box then type the second specified clue, <i>File\sNumber</i> in the box. Test the rule with the Rule Tester.  Notice that this finds file numbers with some trailing return carriage and new line characters.</li>
+				<li>Select <b>Up to X number of lines after the clue text</b> and then enter the number 2 as the number of lines to be found. Run the rule in the Rule Tester and observe the output.</li>
+				<li>Select <b>Include text after the clue on the line that contains the clue</b> and run the rules in the Rule Tester.  Notice the difference in the output.</li>
+				<li>Select <b>Up to X number of words after the text</b> and then enter a number of lines to be found.  Run the rule in the Rule Tester and observe the output.</li>
+				<li>Select <b>Define characters(s) for which to stop further searching</b>,  define some characters, and run the rule to observe the differences in output.</li>
+				<li>Select <b>Define character(s) to separate each word</b> and select a few different characters.  Run the rule in the Rule Tester and observe the differences in output.</li>
+				<li>Check the <b>All strings defined in this window are case-sensitive</b> check box, change the clue to "file/snumber", and test the rule. Now un-check the case-sensitive box and re-test.  Observe the difference in output.</li>
+			</ul>
+		</p>
+		<hr>
+	</body>
+</html>

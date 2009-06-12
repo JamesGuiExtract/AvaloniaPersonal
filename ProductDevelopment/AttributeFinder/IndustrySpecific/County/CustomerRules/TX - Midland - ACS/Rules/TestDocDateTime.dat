@@ -1,0 +1,15 @@
+// NOTE: When you want to run the doc-date-time test on the midland docs, do the following:
+// 1. Copy the Master.rsd as DocDateTime-Master.rsd in the current folder.
+// 2. Open DocDateTime-Master.rsd and delete all attributes except for DocInfo
+// 3. Edit the output handlers for DocDateTime-Master.rsd and ensure that .voa files are not generated.
+// 4. Run the automated ruleset tester and point the master file for that automated test
+//    to this file.
+// 
+// The above steps ensure that we're not duplicating the rules in two files and that only the master
+// version is stored in source-safe.  At some point, we will build the ability for our automated test
+// to run rules for only certain attributes in a RSD file.
+
+<TESTFOLDER>;DocDateTime-Master.rsd;K:\Common\Engineering\Sample Files\ACS\10-26-2004-Midland-TX\Images;K:\Common\Engineering\Sample Files\ACS\10-26-2004-Midland-TX\EAV\DateTime
+<TESTFOLDER>;DocDateTime-Master.rsd;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040401_20040531\Images;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040401_20040531\EAV\DateTime
+<TESTFOLDER>;DocDateTime-Master.rsd;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040601_20040630\Images;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040601_20040630\EAV\DateTime
+<TESTFOLDER>;DocDateTime-Master.rsd;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040701_20040731\Images;K:\Common\Engineering\Sample Files\ACS\11-11-2004-Midland-TX\TXMIDLAND_20040701_20040731\EAV\DateTime

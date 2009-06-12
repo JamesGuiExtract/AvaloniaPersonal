@@ -1,0 +1,36 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000040100.003
+LocalPrGrantor01=WITNESS^3~WHEREOF^?Grantor^120~[as]^3~trustee
+LocalPrGrantor02=WITNESS^3~WHEREOF^?Grantor^120~[trustee
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079007323100.003.uss
+//LocalPrGrantor08=[is borrower^?Grantor^80~[is Trustee^5~[and]^?SecondGrantor^80~[is lender
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079006381400.002.uss
+//LocalPrGrantor09=WHEREAS^?Grantor^120~[was^10~original^3~Trustor^160~original^3~Trustee^5~and]^?SecondGrantor^120~[the^3~Beneficiary
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000382600.001
+LocalPrGrantor03=reconveyance^5~\r\n\r\n^?Grantor^80~trustee^3~under^9~deed^16~executed^3~by
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000556900.002
+LocalPrGrantor04=reconveyance^5~\r\n\r\n^?Grantor^80~duly^16~trustee^3~under^9~deed^16~executed^3~by
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079006245100.003.uss
+LocalPrGrantor10=said^3~deed^9~trust^3~[and]^?Grantor^120~[as]^3~trustee^5~does^3~hereby
+LocalPrGrantor11=provisions^9~said^3~deed^9~trust^?Grantor^240~[as]^3~trustee^5~does^3~hereby
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000435400.003
+LocalPrGrantor04=said^3~deed^9~trust^3~[and]^?Grantor^120~[as]^9~substitut^7~trustee
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079000624500.002.uss
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079008022300.004.uss
+LocalPrGrantor05=RECONVEYANCE^5~\r\n\r\n^?Grantor^80~[as successors^6~interest^3~to
+LocalPrGrantor06=as^3~trustee^3~for]^?Grantor^60~Benifci^9~dated
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079006437400.001.uss
+LocalPrGrantor08=\r\n\r\n^?Grantor^120~[as^3~Successor^3~of]^120~Substituted^3~Trustee^5~under^9~deed
+
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\PARTIAL RECONVEYANCE\20079007502200.001.uss
+//this is risky, try not using
+//LocalPrGrantor07=\r\n\r\n^?Grantor^48~\r\n\r\nBy]
+[PATTERNS_END]

@@ -1,0 +1,12 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Substitution of Trustee\2008-0055266.tif
+rule01=whereas^?Grantee^250~is/are|[is]|[are]^12~present^5~owner^40~primissory|[note]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Substitution of Trustee\2008-0055482.tif
+rule2=THEREFORE^12~undersigned^5~desires^10~substitute^?Grantee^250~[as^5~Trustee^5~under
+rule3=substitute^?Grantee^250~[as^5~trustee
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Substitution of Trustee\2008-0056078.tif
+rule4=does^5~hereby^5~substitute^?Grantee^150~\r\n\r\n^100~was the original|original trustee
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Substitution of Trustee\2008-0056396.tif
+
+rule5=hereby^5~substitutes]|substitute]^?Grantee^250~[as^5^servicing^5~agent^250~[as^5~Trustee^5~under
+[PATTERNS_END]

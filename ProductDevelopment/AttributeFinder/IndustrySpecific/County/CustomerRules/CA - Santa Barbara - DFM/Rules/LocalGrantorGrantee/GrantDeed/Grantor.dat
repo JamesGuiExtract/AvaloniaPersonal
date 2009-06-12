@@ -1,0 +1,8 @@
+[PATTERNS_BEGIN]
+rule02=hereby^5~acknowledged^?Trustee^250~[as^5~indenture^5~trustee^5~for]^?Grantor^250~who^5~acquired^5~title^5~as^250~hereby^5~grant
+rule03=hereby^5~acknowledged^?Trustee^250~[as^5~indenture^5~trustee^5~for]^?Grantor^250~hereby^5~grant
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\GrantDeed\2009-0000824.tif
+rule04=hereby^5~acknowledged^?Grantor^350~as^5~to^8~undivided^30~interest, and]|interest and]|interest]^?Grantor2^350~hereby^5~grant
+rule01=hereby^5~acknowledged^?Grantor^250~hereby^5~grant
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\GrantDeed\2009-0000655.tif
+[PATTERNS_END]

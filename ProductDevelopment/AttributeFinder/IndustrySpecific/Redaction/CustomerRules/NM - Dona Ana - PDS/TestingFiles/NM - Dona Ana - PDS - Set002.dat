@@ -1,0 +1,27 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+
+//DD214s
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\DD214;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Death Certificates
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Death Certificates;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Federal Tax Liens
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Federal Tax Liens;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Hospital Liens
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Hospital Liens;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Mortagages
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Mortgage;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Powers of Attorney
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Power of Attorney;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Transcript Of Judgements
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Transcript Of Judgements;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
+
+//Wills
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\PDS\NM - Dona Ana\Set002\Images\Will;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

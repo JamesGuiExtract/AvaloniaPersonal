@@ -1,0 +1,11 @@
+(
+
+// "BOARD ADJOURNS or BOARD ADJOURNED"
+(\bBOARD\s+ADJOURN(S|ED))|
+
+// OR
+
+// ADJOURNS:
+(\bADJOURNS\s*:)
+
+)

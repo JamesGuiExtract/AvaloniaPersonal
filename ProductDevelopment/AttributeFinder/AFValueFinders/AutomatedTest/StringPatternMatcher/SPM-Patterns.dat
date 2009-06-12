@@ -1,0 +1,10 @@
+[PATTERNS_BEGIN]
+#ifdef PICK_ADDRESS
+TEST_RULE_1=Property^5~address:^?Attr^200~In^5~witness
+#endif
+#ifdef PICK_COMPANY
+TEST_RULE_3=For^5~value^5~received,^?Names^75~of^5~the^5~beneficial
+#else
+TEST_RULE_2=Original^5~Borrower.|Borrower:^?Names^75~\r\n
+#endif
+[PATTERNS_END]

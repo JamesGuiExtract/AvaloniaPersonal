@@ -1,0 +1,31 @@
+// Standard MM/DD/YYYY and MM/DD/YY
+11/21/2007
+11/21/07
+
+// dd-mmm-yyyy
+04-Nov-2007
+3-mar-2007
+
+// Month Day, Year
+January 27, 2006
+February 14, 1999
+March 5, 1945
+April 22, 1967
+May 24, 1987
+June 1, 2012
+July 4, 1976
+August 8, 1956
+September 30, 2100
+October 9, 1977
+November 22, 2007
+December 25, 1923
+
+// Special cases - valid
+02/29/2000
+02/28/2001
+
+// Special cases - invalid
+04/31/2007
+February 29, 2007
+December 32, 2005
+13/13/2004

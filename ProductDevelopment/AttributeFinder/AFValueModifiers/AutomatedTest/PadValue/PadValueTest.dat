@@ -1,0 +1,11 @@
+//*********************************************************************************
+// PadValueTest.dat
+// 		This file contains testcases for testing the Pad Value Value Modifier
+//*********************************************************************************
+
+// Test Pad Left ( the found data has numbers of size 1 to > 4 digits)
+<TESTCASE>;PadValue01.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;PadValue01.eav
+
+// Test Pad Right ( the found data has numbers of size 1 to > 4 digits)
+<TESTCASE>;PadValue02.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;PadValue02.eav
+

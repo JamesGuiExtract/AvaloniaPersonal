@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.ObjectSelectorUI.1 = s 'ObjectSelectorUI Class'
+	{
+		CLSID = s '{786ABD38-3B24-482D-9393-847FA7B34401}'
+	}
+	UCLIDCOMUtils.ObjectSelectorUI = s 'ObjectSelectorUI Class'
+	{
+		CLSID = s '{786ABD38-3B24-482D-9393-847FA7B34401}'
+		CurVer = s 'UCLIDCOMUtils.ObjectSelectorUI.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {786ABD38-3B24-482D-9393-847FA7B34401} = s 'ObjectSelectorUI Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.ObjectSelectorUI.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.ObjectSelectorUI'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

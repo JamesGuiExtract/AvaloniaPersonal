@@ -1,0 +1,24 @@
+//ASSIGNMENT
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED OF TRUST
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE OF LIEN
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\RELEASE OF LIEN;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//WARRANTY DEED
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - TX - Midland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+

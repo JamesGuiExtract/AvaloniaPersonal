@@ -1,0 +1,7 @@
+Test1,Opening text files,opening.html
+Test2,Opening non-ASCII text files,opening_non-ascii.html
+Test3,Copy, paste, append,copy_paste_append.html
+Test4,Expected errors with read-only files,read-only.html
+Test5,Printing,printing.html
+Test6,Miscellaneous,Miscellaneous.html
+

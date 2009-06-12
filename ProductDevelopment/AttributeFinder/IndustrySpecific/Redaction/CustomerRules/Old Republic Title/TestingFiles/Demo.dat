@@ -1,0 +1,19 @@
+<SETTING>;VerificationCondition=HCData|LCData|MCData|Clues
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+<SETTING>;AutomatedCondition=HCData|LCData|MCData
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;OutputFinalStatsOnly=1
+// output verification result
+//<SETTING>;CreateTestOutputVOAFiles=1   
+// Type of Redactions to be tested
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;TypeToBeTested=DriversLicense
+//<SETTING>;TypeToBeTested=AccountNumber
+//<SETTING>;TypeToBeTested=TaxID
+//<SETTING>;OutputAttributeNamesFileLists=1
+//<SETTING>;DocTypesToVerify=Mortgage|Abstract of Judgment|Certificate of Death
+//OutputHybridStats=1
+
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsWithTaxIDandBankCCNum\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Old Republic Title\RedactionDemo\Set002\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsWithTaxIDandBankCCNum\$FileOf(<SourceDocName>).voa

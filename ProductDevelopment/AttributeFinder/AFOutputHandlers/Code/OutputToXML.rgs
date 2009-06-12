@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.OutputToXML.1 = s 'OutputToXML Class'
+	{
+		CLSID = s '{D81818F8-1E9B-44CB-9EC3-600B6F0DB5B5}'
+	}
+	UCLIDAFOutputHandlers.OutputToXML = s 'OutputToXML Class'
+	{
+		CLSID = s '{D81818F8-1E9B-44CB-9EC3-600B6F0DB5B5}'
+		CurVer = s 'UCLIDAFOutputHandlers.OutputToXML.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D81818F8-1E9B-44CB-9EC3-600B6F0DB5B5} = s 'OutputToXML Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.OutputToXML.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.OutputToXML'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

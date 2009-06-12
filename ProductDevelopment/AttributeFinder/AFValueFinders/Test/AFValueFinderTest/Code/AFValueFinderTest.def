@@ -1,0 +1,9 @@
+; AFValueFinderTest.def : Declares the module parameters.
+
+LIBRARY      "AFValueFinderTest.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

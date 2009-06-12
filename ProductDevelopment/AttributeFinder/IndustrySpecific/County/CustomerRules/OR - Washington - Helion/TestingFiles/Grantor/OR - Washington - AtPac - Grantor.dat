@@ -1,0 +1,15 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED;;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN;;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN;;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+
+//Warranty Deed
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\BARGAIN and SALE DEED;;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
+

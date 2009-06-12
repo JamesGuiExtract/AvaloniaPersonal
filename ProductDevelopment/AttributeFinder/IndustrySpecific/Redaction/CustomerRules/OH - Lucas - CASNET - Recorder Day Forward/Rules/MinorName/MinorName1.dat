@@ -1,0 +1,29 @@
+//K:\Common\Engineering\Sample Files\CASNET\OH - Lucas\Set005\RandomSubset\BF_COC_Civil_10485909.tif
+(?:
+#import Clues\MinorChild.dat.etf
+[\s\S]{0,10}?
+	(?<Name1>
+		#import Names.dat.etf
+	)
+	(?:
+		[\s\S]{0,30}?
+		and\W*
+		(?<Name2>
+			#import Names2.dat.etf
+		)
+	)?
+|
+#import Clues\MinorChild.dat.etf
+[\s\S]{0,10}?
+	(?<Name1>
+		#import Names.dat.etf
+	)?
+	(?:
+		[\s\S]{0,30}?
+		and\W*
+		(?<Name2>
+			#import Names2.dat.etf
+		)
+	)
+)
+#import OptionalNames.dat.etf

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtilsTest.MERSTester.1 = s 'MERSTester Class'
+	{
+		CLSID = s '{BE0DAF0B-0287-4560-9666-FE75669295DF}'
+	}
+	UCLIDAFUtilsTest.MERSTester = s 'MERSTester Class'
+	{
+		CLSID = s '{BE0DAF0B-0287-4560-9666-FE75669295DF}'
+		CurVer = s 'UCLIDAFUtilsTest.MERSTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {BE0DAF0B-0287-4560-9666-FE75669295DF} = s 'MERSTester Class'
+		{
+			ProgID = s 'UCLIDAFUtilsTest.MERSTester.1'
+			VersionIndependentProgID = s 'UCLIDAFUtilsTest.MERSTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{63AB2AE7-7499-4975-96FD-6532DF6FA946}'
+		}
+	}
+}

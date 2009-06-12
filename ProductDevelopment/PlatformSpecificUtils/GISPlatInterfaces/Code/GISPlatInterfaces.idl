@@ -1,0 +1,106 @@
+// GISPlatInterfaces.idl : IDL source for GISPlatInterfaces.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (GISPlatInterfaces.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(9E50E7D7-7F66-4051-A296-EEB1662CC15B),
+	version(1.0),
+	helpstring("UCLID GISPlatInterfaces 1.0 Type Library")
+]
+library UCLID_GISPLATINTERFACESLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFeatureMgmt\Code\UCLIDFeatureMgmt.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDDistanceConverter\Code\UCLIDDistanceConverter.tlb");
+
+	/////////////////////////////////
+	// Interfaces
+	//////////////////////////////////
+	[
+		object,
+		uuid(A3480AEC-125F-4143-A1DA-1FCC4D6B4587),
+		dual,
+		helpstring("IDisplayAdapter Interface"),
+		pointer_default(unique)
+	]
+	interface IDisplayAdapter : IDispatch
+	{
+		[helpstring("method AddLineSegment")] HRESULT AddLineSegment([in] ILineSegment *ipLineSegment, [out,retval] BSTR* segmentID);
+		[helpstring("method AddCurveSegment")] HRESULT AddCurveSegment([in] IArcSegment *ipArcSegment, [out,retval] BSTR* segmentID);
+		[helpstring("method FinishCurrentSketch")] HRESULT FinishCurrentSketch([out,retval] BSTR* featureID);
+		[helpstring("method DeleteCurrentSketch")] HRESULT DeleteCurrentSketch();
+		[helpstring("method FinishCurrentPart")] HRESULT FinishCurrentPart();
+		// removes last segment from the sketch
+		[helpstring("method EraseLastSegment")] HRESULT EraseLastSegment();
+		[propget, helpstring("property SupportsPartCreation")] HRESULT SupportsPartCreation([out, retval] VARIANT_BOOL *pVal);
+		[propget, helpstring("property SupportsSketchCreation")] HRESULT SupportsSketchCreation([out, retval] VARIANT_BOOL *pVal);
+		// selects whatever is the default tool, for instance, the 
+		// edit tool or select tool from ArcMap
+		[helpstring("method SelectDefaultTool")] HRESULT SelectDefaultTool();
+		[helpstring("method GetLastPoint")] HRESULT GetLastPoint([in, out] double* dX, [in, out] double* dY, [out, retval] VARIANT_BOOL *pVal);
+		// clear all
+		[helpstring("method Reset")] HRESULT Reset(void);
+		[helpstring("method SelectFeatures")] HRESULT SelectFeatures([in] BSTR strCommonSourceDoc);
+		// what's the current unit for distance in the map
+		[helpstring("method GetCurrentDistanceUnit")] HRESULT GetCurrentDistanceUnit([out, retval] EDistanceUnitType *eCurrentUnitType);
+		[helpstring("method SetFeatureGeometry")] HRESULT SetFeatureGeometry([in] BSTR strFeatureID, [in] IUCLDFeature *ipIFeature); 
+		[helpstring("method GetFeatureGeometry")] HRESULT GetFeatureGeometry([in] BSTR strFeatureID, [out, retval] IUCLDFeature **ipIFeature);
+		[helpstring("method SetStartPointForNextPart")] HRESULT SetStartPointForNextPart([in] double dX, [in] double dY);
+		// strToolName - the tool name, for instance, "IcoMap"
+		[helpstring("method SelectTool")] HRESULT SelectTool(BSTR strToolName);
+		[helpstring("method GetLastSegmentTanOutAsPolarAngleInRadians")] HRESULT GetLastSegmentTanOutAsPolarAngleInRadians([in, out] double *pdTangentOutAngle, [out, retval] VARIANT_BOOL *pbSucceeded);
+		// Undo the top most operation if any on the operation stack
+		[helpstring("method Undo")] HRESULT Undo();
+		// Redo the undid operation if any
+		[helpstring("method Redo")] HRESULT Redo();
+		// what's the current feature class type
+		[helpstring("method GetFeatureType")] HRESULT GetFeatureType([out, retval] long *peFeatureType);
+		// willl flash the specific segment for some amount of time
+		// nPartIndex - 0-based number for indexing part number
+		// nSegmentIndex - 0-based number for indexing segment number within the part
+		[helpstring("method FlashSegment")] HRESULT FlashSegment([in] long nPartIndex, [in] long nSegmentIndex);
+		// Updates all segments staring from the specified segment
+		// nPartIndex - 0-based number for indexing part number
+		// nStartSegmentIndex - 0-based number for indexing segment number within the part. From this
+		//						segment on, all segments need to be updated
+		// pUpdatedSegmentsForThisPart: vector of ISegment. It contains all updated segments for this part.
+		//								It shall not be NULL.
+		// Note: This method can be used to remove or insert segment(s) when there's a need
+		//		 for updating all rest of the segments
+		[helpstring("method UpdateSegments")] HRESULT UpdateSegments(
+													[in] long nPartIndex, 
+													[in] long nStartSegmentIndex, 
+													[in] IIUnknownVector* pUpdatedSegmentsForThisPart);
+	};
+	[
+		object,
+		uuid(7D1D8C29-28EC-4A00-87C1-EA5CF8D8DB15),
+		dual,
+		helpstring("IAttributeManager Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeManager : IDispatch
+	{
+		[helpstring("method SetSketchSourceDocuments")] HRESULT SetSketchSourceDocuments([in] BSTR strFeatureID, [in] IVariantVector *pColSrcDocStrings);
+		[helpstring("method GetSketchSourceDocuments")] HRESULT GetSketchSourceDocuments([in] BSTR strFeatureID, [out, retval] IVariantVector **ppColSrcDocStrings);
+		[helpstring("method SetSegmentSourceDocuments")] HRESULT SetSegmentSourceDocuments([in] BSTR strSegmentID, [in] IVariantVector *pColSrcDocStrings);
+		[helpstring("method GetSegmentSourceDocuments")] HRESULT GetSegmentSourceDocuments([in] BSTR strSegmentID, [out, retval] IVariantVector **ppColSrcDocStrings);
+		// Store the feature info in a specified field from the database table.
+		// strStoreFieldName - the specified field, which stores the entire feature information
+		[helpstring("method SetFeatureAttribute")] HRESULT SetFeatureAttribute([in] BSTR strFeatureID, [in] BSTR strStoreFieldName, [in] IUCLDFeature *ipIFeature);
+		// Retrieve the feature info stored in a specified field from the database table
+		// strStoreFieldName - the specified field, which stores the entire feature information
+		[helpstring("method GetFeatureAttribute")] HRESULT GetFeatureAttribute([in] BSTR strFeatureID, [in] BSTR strStoreFieldName, [out, retval] IUCLDFeature **ipIFeature);
+		// Whether or not the current table is able to store UCLID feature in the database table.
+		// strStoreFieldName - the specified field, which stores the entire feature information
+		[helpstring("method CanStoreAttributes")] HRESULT CanStoreAttributes([in] BSTR strFeatureID, [in] BSTR strStoreFieldName, [out, retval] VARIANT_BOOL *pbValue);
+	};
+};

@@ -1,0 +1,47 @@
+// ESActMaskPCE.idl : IDL source for ESActMaskPCE
+//
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(7094D76D-0E9F-44B6-BFF2-9E323EC2D24D),
+	version(1.0),
+	helpstring("ESActMaskPCE 1.0 Type Library")
+]
+library ESActMaskPCELib
+{
+	importlib("stdole2.tlb");
+	importlib("..\..\Core\Code\ESPrintCaptureCore.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+	// IActMaskTIFPrintCaptureEngine
+	[
+		object,
+		uuid(B67062F1-944F-4732-B57B-D20217ABECEB),
+		dual,
+		nonextensible,
+		helpstring("IActMaskTIFPrintCaptureEngine Interface"),
+		pointer_default(unique)
+	]
+	interface IActMaskTIFPrintCaptureEngine : IDispatch{
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+	// ActMaskTIFPrintCaptureEngine
+	[
+		uuid(6CA9DA66-2E74-450C-8840-90745A49B80C),
+		helpstring("ActMaskTIFPrintCaptureEngine Class")
+	]
+	coclass ActMaskTIFPrintCaptureEngine
+	{
+		[default] interface IActMaskTIFPrintCaptureEngine;
+		interface IPrintCaptureEngine;
+	};
+};

@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.BoxFinder.1 = s 'BoxFinder Class'
+	{
+		CLSID = s '{8F181D4E-DF97-4813-8708-17EF2587BD28}'
+	}
+	AFValueFinders.BoxFinder = s 'BoxFinder Class'
+	{
+		CLSID = s '{8F181D4E-DF97-4813-8708-17EF2587BD28}'
+		CurVer = s 'AFValueFinders.BoxFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8F181D4E-DF97-4813-8708-17EF2587BD28} = s 'BoxFinder Class'
+		{
+			ProgID = s 'AFValueFinders.BoxFinder.1'
+			VersionIndependentProgID = s 'AFValueFinders.BoxFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

@@ -1,0 +1,451 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFOutputHandlers.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFOutputHandlers Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFOutputHandlers"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFOutputHandlers.DLL"
+            VALUE "ProductName", "AFOutputHandlers Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_ELIMINATEDUPLICATES REGISTRY                "EliminateDuplicates.rgs"
+IDR_REMOVEINVALIDENTRIES REGISTRY                "RemoveInvalidEntries.rgs"
+IDR_SELECTONLYUNIQUEVALUES REGISTRY                "SelectOnlyUniqueValues.rgs"
+IDR_SELECTUSINGMAJORITY REGISTRY                "SelectUsingMajority.rgs"
+IDR_SELECTWITHUI        REGISTRY                "SelectWithUI.rgs"
+IDR_OUTPUTHANDLERSEQUENCE REGISTRY                "OutputHandlerSequence.rgs"
+IDR_REMOVEENTRIESFROMLIST REGISTRY                "RemoveEntriesFromList.rgs"
+IDR_KEEPATTRIBUTESINMEMORY REGISTRY                "KeepAttributesInMemory.rgs"
+IDR_REMOVEENTRIESFROMLISTPP REGISTRY                "RemoveEntriesFromListPP.rgs"
+IDR_OUTPUTTOXML         REGISTRY                "OutputToXML.rgs"
+IDR_OUTPUTTOXMLPP       REGISTRY                "OutputToXMLPP.rgs"
+IDR_MODIFYATTRIBUTEVALUEOH REGISTRY                "ModifyAttributeValueOH.rgs"
+IDR_MODIFYATTRIBUTEVALUEPP REGISTRY                "ModifyAttributeValuePP.rgs"
+IDR_OUTPUTTOVOA         REGISTRY                "OutputToVOA.rgs"
+IDR_OUTPUTTOVOAPP       REGISTRY                "OutputToVOAPP.rgs"
+IDR_MOVEANDMODIFYATTRIBUTES REGISTRY                "MoveAndModifyAttributes.rgs"
+IDR_MOVEANDMODIFYATTRIBUTESPP REGISTRY                "MoveAndModifyAttributesPP.rgs"
+IDR_REMOVESUBATTRIBUTES REGISTRY                "RemoveSubAttributes.rgs"
+IDR_REMOVESUBATTRIBUTESPP REGISTRY                "RemoveSubAttributesPP.rgs"
+IDR_REFORMATPERSONNAMES REGISTRY                "ReformatPersonNames.rgs"
+IDR_REFORMATPERSONNAMESPP REGISTRY                "ReformatPersonNamesPP.rgs"
+IDR_RUNOBJECTONQUERY    REGISTRY                "RunObjectOnQuery.rgs"
+IDR_RUNOBJECTONQUERYPP  REGISTRY                "RunObjectOnQueryPP.rgs"
+IDR_CONDITIONALOUTPUTHANDLER REGISTRY                "ConditionalOutputHandler.rgs"
+IDR_MERGEATTRIBUTES     REGISTRY                "MergeAttributes.rgs"
+IDR_MERGEATTRIBUTESPP   REGISTRY                "MergeAttributesPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_DLG_SelectWithUI DIALOG  0, 0, 330, 193
+STYLE DS_SETFONT | WS_POPUP | WS_CAPTION | WS_THICKFRAME
+CAPTION "Select Attributes"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,216,172,50,14
+    PUSHBUTTON      "Cancel",IDCANCEL,273,172,50,14
+    CONTROL         "Custom1",IDC_GRID,"GXWND",WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,7,7,316,159
+    PUSHBUTTON      "Select &All",IDC_SELECT_ALL,7,172,50,14
+    PUSHBUTTON      "C&lear All",IDC_CLEAR_ALL,64,172,50,14
+    PUSHBUTTON      "Select &Valid",IDC_SELECT_VALID,121,172,50,14
+    CONTROL         "",IDC_PICTURE,"Static",SS_BLACKFRAME,187,174,14,12
+END
+
+IDD_REMOVEENTRIESFROMLISTPP DIALOGEX 0, 0, 247, 185
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Please provide a list of values you wish to be removed from the result :",IDC_STATIC,9,7,175,17
+    CONTROL         "List1",IDC_LIST_ENTRIES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_SORTASCENDING | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER | WS_TABSTOP,8,27,175,134
+    CONTROL         "Above defined text is Case-Sensitive",IDC_CHK_CASE_SENSITIVE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,9,168,131,10
+    PUSHBUTTON      "&Add...",IDC_BTN_ADD,190,28,50,14
+    PUSHBUTTON      "&Remove",IDC_BTN_REMOVE,190,48,50,14
+    PUSHBUTTON      "&Modify...",IDC_BTN_MODIFY,190,68,50,14
+    PUSHBUTTON      "&Load...",IDC_BTN_LOAD,190,127,50,14
+    PUSHBUTTON      "&Save...",IDC_BTN_SAVE,190,146,50,14
+END
+
+IDD_OUTPUTTOXMLPP DIALOGEX 0, 0, 272, 145
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Specify XML Output File",IDC_STATIC,5,5,80,10
+    EDITTEXT        IDC_EDIT_FILENAME,5,15,225,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,250,15,15,14
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,235,15,10,14,BS_ICON
+    GROUPBOX        "XML Format",IDC_STATIC,5,36,259,100
+    CONTROL         "Version 1 format with <SubAttributes>",IDC_RADIO_ORIGINAL,
+                    "Button",BS_AUTORADIOBUTTON,15,49,128,11
+    CONTROL         "Version 2 format with <SpatialLine>",IDC_RADIO_SCHEMA,
+                    "Button",BS_AUTORADIOBUTTON,15,66,124,11
+    CONTROL         "Formatted with attribute names",IDC_CHECK_NAMES,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,82,111,11
+    EDITTEXT        IDC_EDIT_SAMPLE,150,50,105,78,ES_AUTOHSCROLL | ES_READONLY
+    CONTROL         "Include schema name in output",IDC_CHECK_SCHEMA,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,28,98,111,11
+    EDITTEXT        IDC_EDIT_SCHEMANAME,40,114,102,14,ES_AUTOHSCROLL
+END
+
+IDD_MODIFYATTRIBUTEVALUE DIALOGEX 0, 0, 254, 201
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Enter Query to select Attributes",IDC_STATIC,7,7,132,10
+    EDITTEXT        IDC_EDIT_ATTRIBUTEQUERY,7,17,240,30,ES_MULTILINE | ES_AUTOHSCROLL
+    CONTROL         "Modify each selected attribute",IDC_RADIO_MODIFY_SELECTED,
+                    "Button",BS_AUTORADIOBUTTON,5,55,195,10
+    CONTROL         "Create a new sub-attribute for each selected attribute",IDC_RADIO_CREATE_SUB_ATTRIBUTE,
+                    "Button",BS_AUTORADIOBUTTON,5,70,195,10
+    CONTROL         "Set Name to:",IDC_CHECK_UPDATENAME,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,90,93,12
+    EDITTEXT        IDC_EDIT_ATTRIBUTENAMECHANGE,17,106,228,12,ES_AUTOHSCROLL
+    CONTROL         "Set Value to:",IDC_CHECK_UPDATEVALUE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,124,93,12
+    EDITTEXT        IDC_EDIT_ATTRIBUTEVALUE,17,140,228,12,ES_AUTOHSCROLL
+    CONTROL         "Set Type to:",IDC_CHECK_UPDATETYPE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,158,93,12
+    EDITTEXT        IDC_EDIT_ATTRIBUTETYPE,17,174,228,12,ES_AUTOHSCROLL
+END
+
+IDD_OUTPUTTOVOAPP DIALOGEX 0, 0, 271, 37
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Specify VOA Output File",IDC_STATIC,5,5,80,10
+    EDITTEXT        IDC_EDIT_FILENAME,5,15,225,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BTN_BROWSE_FILE,250,15,15,14
+    PUSHBUTTON      "SelectDocTag",IDC_BTN_SELECT_DOC_TAG,235,15,10,14,BS_ICON
+END
+
+IDD_MOVEANDMODIFYATTRIBUTESPP DIALOGEX 0, 0, 184, 283
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Query the attribute(s) to be moved:",IDC_STATIC,6,1,138,10
+    EDITTEXT        IDC_EDIT_QUERY,10,12,165,49,ES_MULTILINE | WS_VSCROLL
+    LTEXT           "Move the above queried attribute(s):",IDC_STATIC,6,68,115,8
+    CONTROL         "To top most level",IDC_RADIO_MOVE_TO_ROOT,"Button",BS_AUTORADIOBUTTON | WS_GROUP,15,82,70,10
+    CONTROL         "Up one level",IDC_RADIO_MOVE_TO_PARENT,"Button",BS_AUTORADIOBUTTON,15,92,56,10
+    LTEXT           "After moving,",IDC_STATIC,6,111,165,10
+    LTEXT           "Specify the name of the attribute:",IDC_STATIC,6,120,165,10
+    CONTROL         "Leave the name unchanged",IDC_RADIO_DO_NOT_CHANGE_NAME,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,15,136,105,10
+    CONTROL         "Use the root ancestor's name",IDC_RADIO_ROOT_NAME,
+                    "Button",BS_AUTORADIOBUTTON,15,147,150,10
+    CONTROL         "Use This:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON,15,158,45,10
+    EDITTEXT        IDC_EDIT_SPECIFY_NAME,60,157,105,12,ES_AUTOHSCROLL
+    CONTROL         "Retain the attribute's type",IDC_RADIO_RETAIN_TYPE,
+                    "Button",BS_AUTORADIOBUTTON | WS_GROUP,16,197,105,10
+    CONTROL         "Empty the attribute's type",IDC_RADIO_EMPTY_TYPE,"Button",BS_AUTORADIOBUTTON,16,208,105,10
+    CONTROL         "Add the root ancestor's type",IDC_CHECK_ADD_ROOT_TYPE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,219,110,10
+    CONTROL         "Add the attribute's name as a type",IDC_CHECK_ADD_NAME_TO_TYPE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,231,127,10
+    CONTROL         "Add this:",IDC_CHECK_ADD_SPECIFIED_TYPE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,16,243,40,10
+    EDITTEXT        IDC_EDIT_SPECIFY_TYPE,61,242,105,12,ES_AUTOHSCROLL
+    CONTROL         "If, after the above operations, the root ancestor has no children, delete it",IDC_CHECK_DELETE_ROOT,
+                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,6,264,168,17
+    LTEXT           "Specify the type of the attribute:",IDC_STATIC,6,180,165,10
+    GROUPBOX        "",IDC_STATIC,11,189,164,69
+    GROUPBOX        "",IDC_STATIC,11,129,164,44
+    GROUPBOX        "",IDC_STATIC,11,75,164,30
+END
+
+IDD_REMOVESUBATTRIBUTESPP DIALOGEX 0, 0, 235, 95
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    CONTROL         "Remove an attribute only if the score given by",IDC_CHECK_REMOVE_IF_SCORE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,5,37,165,10
+    EDITTEXT        IDC_EDIT_DATA_SCORER_NAME,10,52,125,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_TABSTOP
+    PUSHBUTTON      "Choose Data Scorer",IDC_BUTTON_CHOOSE_DATA_SCORER,10,67,125,15
+    COMBOBOX        IDC_COMBO_CONDITION,145,52,30,70,CBS_DROPDOWN | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_SCORE,185,52,35,12,ES_AUTOHSCROLL | ES_NUMBER
+    COMBOBOX        IDC_COMBO_ATTRIBUTE_SELECTOR,5,16,169,74,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    LTEXT           "Select Atribute Selector",IDC_STATIC,5,5,75,10
+    PUSHBUTTON      "Configure",IDC_BUTTON_CONFIGURE_SELECTOR,177,16,50,14
+END
+
+IDD_REFORMATPERSONNAMESPP DIALOGEX 0, 0, 211, 126
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Query to select person name attributes:",IDC_STATIC,5,5,135,8
+    EDITTEXT        IDC_EDIT_QUERY_PERSON_ATTRIBUTES,5,15,200,45,ES_MULTILINE | ES_AUTOVSCROLL
+    CONTROL         "Recursively reformat all subattributes that contain person names",IDC_CHK_REFORMAT_SUB_NAMES,
+                    "Button",BS_AUTOCHECKBOX | BS_TOP | BS_MULTILINE | WS_TABSTOP,5,65,200,20
+    LTEXT           "Reformatted name pattern:",IDC_STATIC,5,90,95,10
+    EDITTEXT        IDC_EDIT_NAME_FORMAT,5,100,180,15,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_NAME_FORMAT_INFO,190,100,20,20,SS_NOTIFY
+END
+
+IDD_RUNOBJECTONQUERYPP DIALOGEX 0, 0, 241, 171
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    LTEXT           "Select Attributes:",IDC_STATIC,5,5,130,10
+    EDITTEXT        IDC_EDIT_QUERY,5,15,225,65,ES_MULTILINE | ES_AUTOHSCROLL | WS_VSCROLL
+    LTEXT           "Select a type of object:",IDC_STATIC,5,85,135,10
+    COMBOBOX        IDC_CMB_OBJECT_TYPE,5,95,225,65,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    GROUPBOX        "",IDC_STATIC,5,110,225,55
+    LTEXT           "Select an object to run on the selected attributes:",IDC_STATIC,10,120,195,10
+    COMBOBOX        IDC_CMB_OBJECT,10,130,160,80,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Configure",IDC_BTN_CONFIGURE,175,130,50,12
+    LTEXT           "The object must be configured",IDC_TXT_MUST_CONFIGURE,10,150,120,10
+END
+
+IDD_MERGEATTRIBUTESPP DIALOGEX 0, 0, 256, 300
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_EDIT_QUERY,12,26,231,30,ES_MULTILINE | ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_OVERLAP_PERCENT,162,60,18,14,ES_AUTOHSCROLL
+    CONTROL         "Use:",IDC_RADIO_SPECIFY_NAME,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,95,26,10
+    CONTROL         "Preserve attribute name in this order of preference",IDC_RADIO_PRESERVE_NAME,
+                    "Button",BS_AUTORADIOBUTTON,12,112,170,10
+    EDITTEXT        IDC_EDIT_NAME,40,94,155,14,ES_AUTOHSCROLL
+    CONTROL         "",IDC_LIST_NAMES,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | LVS_NOSORTHEADER | WS_BORDER,24,125,171,72
+    PUSHBUTTON      "Add...",IDC_BTN_ADD_NAME,201,125,42,14
+    PUSHBUTTON      "Remove",IDC_BTN_REMOVE_NAME,201,143,42,14
+    PUSHBUTTON      "Modify...",IDC_BTN_MODIFY_NAME,201,161,42,14
+    PUSHBUTTON      "",IDC_BTN_NAME_UP,201,179,18,18,BS_ICON
+    PUSHBUTTON      "",IDC_BTN_NAME_DOWN,225,179,18,18,BS_ICON
+    CONTROL         "Use:",IDC_RADIO_SPECIFY_TYPE,"Button",BS_AUTORADIOBUTTON | WS_GROUP,12,263,26,10
+    CONTROL         "Combine the types (Type1+Type2)",IDC_RADIO_COMBINE_TYPES,
+                    "Button",BS_AUTORADIOBUTTON,12,279,216,10
+    EDITTEXT        IDC_EDIT_TYPE,40,262,155,14,ES_AUTOHSCROLL
+    LTEXT           "Set the text of merged attribute to:",IDC_STATIC,12,220,108,8
+    EDITTEXT        IDC_EDIT_VALUE,120,218,123,14,ES_AUTOHSCROLL
+    CONTROL         "Preserve the original attributes as sub-attributes to the merged attribute",IDC_CHECK_SUBATTRIBUTES,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,234,235,10
+    GROUPBOX        "Merge criteria",IDC_STATIC,6,2,244,78
+    LTEXT           "Merge attributes matching this query",IDC_STATIC,12,14,120,8
+    LTEXT           "when they mutually overlap spatially by at least",IDC_STATIC,12,62,149,8
+    LTEXT           "percent.",IDC_STATIC,183,62,27,8
+    GROUPBOX        "Name of merged attribute",IDC_STATIC,6,83,244,121
+    GROUPBOX        "Type of merged attribute",IDC_STATIC,6,251,244,43
+    GROUPBOX        "Value of merged attribute",IDC_STATIC,6,207,244,41
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_DLG_SelectWithUI, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 323
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 186
+    END
+
+    IDD_REMOVEENTRIESFROMLISTPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 184
+    END
+
+    IDD_OUTPUTTOXMLPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 144
+    END
+
+    IDD_MODIFYATTRIBUTEVALUE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 247
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 194
+    END
+
+    IDD_MOVEANDMODIFYATTRIBUTESPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 282
+    END
+
+    IDD_REMOVESUBATTRIBUTESPP, DIALOG
+    BEGIN
+        RIGHTMARGIN, 229
+    END
+
+    IDD_RUNOBJECTONQUERYPP, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 110
+    END
+
+    IDD_MERGEATTRIBUTESPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 251
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 293
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_SELECT_DOC_TAG ICON                    "res\\SelectDocTagArrow.ico"
+IDI_ICON_UP             ICON                    "..\\..\\AFCore\\Code\\res\\icon_up.ico"
+IDI_ICON_INFO           ICON                    "iconinfo.ico"
+IDI_ICON_DOWN           ICON                    "..\\..\\AFCore\\Code\\res\\icon_down.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFOutputHandlers"
+    IDS_TITLERemoveEntriesFromListPP "RemoveEntriesFromListPP"
+    IDS_HELPFILERemoveEntriesFromListPP "RemoveEntriesFromListPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_DOCSTRINGRemoveEntriesFromListPP "RemoveEntriesFromListPP"
+    IDS_TITLEOutputToXMLPP  "&Title"
+    IDS_HELPFILEOutputToXMLPP "Help File Name"
+    IDS_DOCSTRINGOutputToXMLPP "Your Help String"
+    IDS_TITLEModifyAttributeValuePP "ModifyAttributeValuePP"
+    IDS_HELPFILEModifyAttributeValuePP "ModifyAttributeValuePP"
+    IDS_DOCSTRINGModifyAttributeValuePP "ModifyAttributeValuePP"
+    IDS_TITLEOutputToVOAPP  "Output to VOA"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEMoveAndModifyAttributesPP "Title"
+    IDS_HELPFILEMoveAndModifyAttributesPP "Help File Name"
+    IDS_DOCSTRINGMoveAndModifyAttributesPP "Your Help String"
+    IDS_TITLERemoveSubAttributesPP "RemoveSubAttributes"
+    IDS_HELPFILERemoveSubAttributesPP "RemoveSubAttributes"
+    IDS_DOCSTRINGRemoveSubAttributesPP "RemoveSubAttributes"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLEReformatPersonNamesPP "ReformatPersonNames"
+    IDS_HELPFILEReformatPersonNamesPP "ReformatPersonNames"
+    IDS_DOCSTRINGReformatPersonNamesPP "ReformatPersonNames"
+    IDS_TITLERunObjectOnQueryPP "&Title"
+    IDS_HELPFILERunObjectOnQueryPP "Help File Name"
+    IDS_DOCSTRINGRunObjectOnQueryPP "Your Help String"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFOutputHandlers.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

@@ -1,0 +1,3 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;..\..\Rules\TownshipDist\TownshipDist.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set012\Images;;K:\Common\Engineering\Sample Files\ByteManagers\Set012\EAV\TownshipDist\$FileNoExtOf(<SourceDocName>).eav
+

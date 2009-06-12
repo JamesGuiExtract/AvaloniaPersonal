@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGeneralIV.DoubleInputValidator.1 = s 'DoubleInputValidator Class'
+	{
+		CLSID = s '{D3D998BC-FDF7-4089-842E-C7CDC0A75F8D}'
+	}
+	UCLIDGeneralIV.DoubleInputValidator = s 'DoubleInputValidator Class'
+	{
+		CLSID = s '{D3D998BC-FDF7-4089-842E-C7CDC0A75F8D}'
+		CurVer = s 'UCLIDGeneralIV.DoubleInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D3D998BC-FDF7-4089-842E-C7CDC0A75F8D} = s 'DoubleInputValidator Class'
+		{
+			ProgID = s 'UCLIDGeneralIV.DoubleInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDGeneralIV.DoubleInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{203E8934-0C8B-4607-B2F5-84A9167B1107}'
+		}
+	}
+}

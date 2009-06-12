@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.LocateImageRegion.1 = s 'LocateImageRegion Class'
+	{
+		CLSID = s '{E3B9A8BF-1FB6-414D-B65D-3EB1058BEAC5}'
+	}
+	UCLIDAFValueFinders.LocateImageRegion = s 'LocateImageRegion Class'
+	{
+		CLSID = s '{E3B9A8BF-1FB6-414D-B65D-3EB1058BEAC5}'
+		CurVer = s 'UCLIDAFValueFinders.LocateImageRegion.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E3B9A8BF-1FB6-414D-B65D-3EB1058BEAC5} = s 'LocateImageRegion Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.LocateImageRegion.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.LocateImageRegion'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

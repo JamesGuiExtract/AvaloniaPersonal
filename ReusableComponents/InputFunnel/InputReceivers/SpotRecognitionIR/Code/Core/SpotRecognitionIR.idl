@@ -1,0 +1,352 @@
+// SpotRecognitionIR.idl : IDL source for SpotRecognitionIR.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SpotRecognitionIR.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(CF01D58E-0C0B-434F-83D2-ABFA24BA834F),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR 1.0 Type Library")
+]
+library UCLID_SPOTRECOGNITIONIRLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\IFCore\Code\IFCore.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef
+	[
+		uuid(E5280058-AFE9-41a3-8A4A-5CF92957441E), 
+		helpstring("UCLID EScopeType")
+	]
+	enum
+	{
+		kBtnOpenImage =					0,
+		kBtnSave =						1,
+		kBtnZoomWindow =				2,
+		kBtnZoomIn =					3,
+		kBtnZoomOut =					4,
+		kBtnZoomPrevious =				5,
+		kBtnZoomNext =					6,
+		// Removed per P13 #3937 - WEL 11/21/06
+//		kBtnZoomExtents =				7,
+		kBtnPan =						8,
+		kBtnSelectText =				9,
+		kBtnSetHighlightHeight =		10,
+		kBtnEditZoneText =				11,
+		kBtnDeleteEntities =			12,
+		kBtnPTH =						13,
+		kBtnOpenSubImgInWindow =		14,
+		kBtnRotateCounterClockwise =	15,
+		kBtnRotateClockwise =			16,
+		kBtnFirstPage =					17,
+		kBtnLastPage =					18,
+		kBtnPrevPage =					19,
+		kBtnNextPage =					20,
+		kEditPageNum =					21,
+		kBtnPrint =						22,
+		kBtnFitPage =					23,
+		kBtnFitWidth =					24,
+		kBtnSelectHighlight =			25,
+	}ESRIRToolbarCtrl;
+	
+	typedef
+	[
+		uuid(18194AF7-0DD8-45c7-94DF-2E4EEF9EBA2E), 
+		helpstring("Extract FitToType")
+	]
+	enum
+	{
+		kFitToWidth =					0,
+		kFitToPage =					1,
+		kFitToNothing =					2,
+	}ESRIRFitToStatus;
+
+	//----------------------------------------------------------------------------------------------
+	//-F O R W A R D    D E C L A R A T I O N S ----------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	interface ISpotRecognitionWindow;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(1560E271-6DED-47B6-9BF6-A03CAF0DCC5F),
+		dual,
+		helpstring("ILineTextEvaluator Interface"),
+		pointer_default(unique)
+	]
+	interface ILineTextEvaluator : IDispatch
+	{
+		[id(1), helpstring("method GetTextScore")] HRESULT GetTextScore([in] BSTR strLineText, [in] BSTR strInputType, [out, retval] long *plScore);
+	};
+
+	[
+		object,
+		uuid(84079C38-6049-4A1A-8ED5-A7127FEB1BE0),
+		dual,
+		helpstring("ILineTextCorrector Interface"),
+		pointer_default(unique)
+	]
+	interface ILineTextCorrector : IDispatch
+	{
+		[id(1), helpstring("method CorrectText")] HRESULT CorrectText([in] BSTR strInputText, [in] BSTR strInputType, [out, retval] BSTR *pstrOutputText);
+	};
+
+	[
+		object,
+		uuid(31504786-2A8E-413C-BF2C-4304C27B5520),
+		dual,
+		helpstring("IParagraphTextCorrector Interface"),
+		pointer_default(unique)
+	]
+	interface IParagraphTextCorrector : IDispatch
+	{
+		[id(1), helpstring("method CorrectText")] HRESULT CorrectText([in] ISpatialString *pTextToCorrect);
+	};
+
+	[
+		object,
+		uuid(48B55D60-236E-4230-B6A0-152B369BAB91),
+		dual,
+		helpstring("IParagraphTextHandler Interface"),
+		pointer_default(unique)
+	]
+	interface IParagraphTextHandler : IDispatch
+	{
+		[id(1), helpstring("method NotifyParagraphTextRecognized")] HRESULT NotifyParagraphTextRecognized([in] ISpotRecognitionWindow *pSourceSRWindow, [in] ISpatialString *pText);
+		[id(2), helpstring("method GetPTHDescription")] HRESULT GetPTHDescription([out, retval] BSTR *pstrDescription);
+		[id(3), helpstring("method IsPTHEnabled")] HRESULT IsPTHEnabled([out, retval] VARIANT_BOOL *pbEnabled);
+	};
+
+	[
+		object,
+		uuid(B3C2F4F4-4B9B-419e-BA50-4B2B27CED0BF),
+		dual,
+		helpstring("ISRWEventHandler Interface"),
+		pointer_default(unique)
+	]
+	interface ISRWEventHandler : IDispatch
+	{
+		[id(1), helpstring("method AboutToRecognizeParagraphText")] HRESULT AboutToRecognizeParagraphText();
+		[id(2), helpstring("method AboutToRecognizeLineText")] HRESULT AboutToRecognizeLineText();
+		// This method is called to notify the Event handler that a key was pressed
+		// PARAM: shiftState - whether or not shift, ctrl, alt are pressed
+		//		  1 - shift, 2 - ctrl, 4 - alt
+		[id(3), helpstring("method NotifyKeyPressed")] HRESULT NotifyKeyPressed([in] long nKeyCode, [in] short shiftState);
+		[id(4), helpstring("method NotifyCurrentPageChanged")] HRESULT NotifyCurrentPageChanged();
+		[id(5), helpstring("method NotifyEntitySelected")] HRESULT NotifyEntitySelected([in] long nZoneID);
+		[id(7), helpstring("method NotifyFileOpened")] HRESULT NotifyFileOpened([in] BSTR bstrFileFullPath);
+		[id(8), helpstring("method NotifyOpenToolbarButtonPressed")] HRESULT NotifyOpenToolbarButtonPressed([out, retval] VARIANT_BOOL *pbContinueWithOpen);
+		[id(9), helpstring("method NotifyZoneEntityMoved")] HRESULT NotifyZoneEntityMoved([in] long nZoneID);
+		[id(10), helpstring("method NotifyZoneEntitiesCreated")] HRESULT NotifyZoneEntitiesCreated([in] IVariantVector *pZoneIDs);
+	};
+
+	[
+		object,
+		uuid(BD94B093-B6A1-11D6-82F4-0050DAD4FF55),
+		dual,
+		helpstring("ISubImageHandler Interface"),
+		pointer_default(unique)
+	]
+	interface ISubImageHandler : IDispatch
+	{
+		[id(1), helpstring("method NotifySubImageCreated")] HRESULT NotifySubImageCreated(
+			[in] ISpotRecognitionWindow *pSourceSRWindow, [in] IRasterZone* pSubImageZone, 
+			[in] double dRotationAngle);
+	};
+
+	[
+		object,
+		uuid(1532F73C-E278-4481-A1AC-B71930241A7B),
+		dual,
+		helpstring("ISpotRecognitionWindow Interface"),
+		pointer_default(unique)
+	]
+	interface ISpotRecognitionWindow : IDispatch
+	{
+		[id(1), helpstring("method OpenImageFile")] HRESULT OpenImageFile([in] BSTR strImageFileFullPath);
+		[id(2), helpstring("method OpenGDDFile")] HRESULT OpenGDDFile([in] BSTR strGDDFileFullPath);
+		[id(3), helpstring("method SaveAs")] HRESULT SaveAs([in] BSTR strFileFullPath);
+		[id(4), helpstring("method Clear")] HRESULT Clear();
+		[id(5), helpstring("method IsModified")] HRESULT IsModified([out, retval] VARIANT_BOOL *pbIsModified);
+		[id(6), helpstring("method GetCurrentPageNumber")] HRESULT GetCurrentPageNumber([out, retval] long *plPageNum);
+		[id(7), helpstring("method SetCurrentPageNumber")] HRESULT SetCurrentPageNumber([in] long lPageNumber);
+		[id(8), helpstring("method GetTotalPages")] HRESULT GetTotalPages([out, retval] long *plTotalPages);
+		[id(9), helpstring("method GetImageFileName")] HRESULT GetImageFileName([out, retval] BSTR *pstrImageFileName);
+		[id(10), helpstring("method GetGDDFileName")] HRESULT GetGDDFileName([out, retval] BSTR *pstrGDDFileName);
+		[id(11), helpstring("method Save")] HRESULT Save();
+		[id(12), helpstring("method SetLineTextCorrector")] HRESULT SetLineTextCorrector([in] ILineTextCorrector *pLineTextCorrector);
+		[id(13), helpstring("method SetLineTextEvaluator")] HRESULT SetLineTextEvaluator([in] ILineTextEvaluator *pLineTextEvaluator);
+		[id(14), helpstring("method SetParagraphTextCorrector")] HRESULT SetParagraphTextCorrector([in] IParagraphTextCorrector *pParagraphTextCorrector);
+		[id(15), helpstring("method SetParagraphTextHandlers")] HRESULT SetParagraphTextHandlers([in] IIUnknownVector *pHandlers);
+		[id(16), helpstring("method SetSRWEventHandler")] HRESULT SetSRWEventHandler([in] ISRWEventHandler *pHandler);
+		[propget, id(17), helpstring("property AlwaysAllowHighlighting")] HRESULT AlwaysAllowHighlighting([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(17), helpstring("property AlwaysAllowHighlighting")] HRESULT AlwaysAllowHighlighting([in] VARIANT_BOOL newVal);
+		[id(18), helpstring("method ShowOpenDialogBox")] HRESULT ShowOpenDialogBox();
+		[id(19), helpstring("method OpenImagePortion")] HRESULT OpenImagePortion([in] BSTR strOriginalImageFileName, 
+			[in] IRasterZone* pImagePortionInfo, [in] double dRotationAngle);
+		[id(20), helpstring("method SetSubImageHandler")] HRESULT SetSubImageHandler([in] ISubImageHandler *pSubImageHandler, [in] BSTR strToolbarBtnTooltip, [in] BSTR strTrainingFile);
+		[id(21), helpstring("method GetLineTextCorrector")] HRESULT GetLineTextCorrector([out, retval] ILineTextCorrector **ppLineTextCorrector);
+		[id(22), helpstring("method GetLineTextEvaluator")] HRESULT GetLineTextEvaluator([out, retval] ILineTextEvaluator **ppLineTextEvaluator);
+		[id(23), helpstring("method GetParagraphTextCorrector")] HRESULT GetParagraphTextCorrector([out, retval] IParagraphTextCorrector **ppParagraphTextCorrector);
+		[id(24), helpstring("method GetParagraphTextHandlers")] HRESULT GetParagraphTextHandlers([out, retval] IIUnknownVector **ppHandlers);
+		[id(25), helpstring("method GetSRWEventHandler")] HRESULT GetSRWEventHandler([out, retval] ISRWEventHandler **ppHandler);
+		[id(26), helpstring("method GetSubImageHandler")] HRESULT GetSubImageHandler([in, out] ISubImageHandler **ppSubImageHandler, [in, out] BSTR *pstrToolbarBtnTooltip, [in, out] BSTR *pstrTrainingFile);
+		[id(27), helpstring("method IsImagePortionOpened")] HRESULT IsImagePortionOpened([out, retval] VARIANT_BOOL *pbValue);
+		[id(28), helpstring("method GetImagePortion")] HRESULT GetImagePortion([out, retval] IRasterZone **pImagePortion);
+		[id(29), helpstring("method ClearParagraphTextHandlers")] HRESULT ClearParagraphTextHandlers();
+		[id(30), helpstring("method OCRCurrentPage")] HRESULT OCRCurrentPage([out, retval] ISpatialString** ppSpatialString);
+		[id(31), helpstring("method CreateZoneEntity")] HRESULT CreateZoneEntity([in] IRasterZone *pZone, [in] long nColor, [out, retval] long *pID);
+		[id(32), helpstring("method DeleteZoneEntity")] HRESULT DeleteZoneEntity([in] long nID);
+		[id(33), helpstring("method ZoomAroundZoneEntity")] HRESULT ZoomAroundZoneEntity([in] long nID);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: For a temporary highlight to be displayed, pText->HasSpatialInfo()
+		//			must equal VARIANT_TRUE and pText->IsOnMultiplePages() must
+		//			equal VARIANT_FALSE.  If these conditions are not met, then
+		//			this method just returns without doing anything.
+		// PROMISE: If a temporary highlight already exists in this window, it will 
+		//			be deleted before the new temporary highlight is created.
+		//			This class will ensure that there is at most one temporary
+		//			highlight in this window at any time.
+		[id(34), helpstring("method CreateTemporaryHighlight")] HRESULT CreateTemporaryHighlight(
+			[in] ISpatialString *pText);
+		//-----------------------------------------------------------------------------------------
+		[id(35), helpstring("method DeleteTemporaryHighlight")] HRESULT DeleteTemporaryHighlight();
+		//-----------------------------------------------------------------------------------------
+		[id(36), helpstring("method GetGenericDisplayOCX")] HRESULT GetGenericDisplayOCX([out, retval] IDispatch **pOCX);
+		//-----------------------------------------------------------------------------------------
+		// This method can be called to notify the SpotRec window of an key pressed while another window has 
+		// focus.  The effect is that the keystroke will be processed as the SpotRecWindow had had the focus.
+		[id(37), helpstring("method NotifyKeyPressed")] HRESULT NotifyKeyPressed([in] long nKeyCode);
+		//-----------------------------------------------------------------------------------------
+		[id(38), helpstring("method ShowToolbarCtrl")] HRESULT ShowToolbarCtrl([in] ESRIRToolbarCtrl eCtrl, [in] VARIANT_BOOL bShow);
+		//-----------------------------------------------------------------------------------------
+		[id(39), helpstring("method ShowTitleBar")] HRESULT ShowTitleBar([in] VARIANT_BOOL bShow);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: to zoom in to a specified width around a point on the image.
+		// REQUIRE: Both the point and width are specified in image coordinates
+		// PROMISE: If the width is greater than the image, the full width of the image will be 
+		//			displayed but no more than that i.e. this method will not zoom more than the 
+		//			full width of the image.
+		[id(40), helpstring("method ZoomPointWidth")] HRESULT ZoomPointWidth([in] long nX, [in] long nY, [in] long nWidth);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To enable/disable the automatic OCR that currently occurs within the 
+		//			when a swipe is made in the window
+		// REQUIRE: NONE
+		// PROMISE: If this method is called with false, no OCR will be performed by the SpotRecognition window
+		[id(41), helpstring("method EnableAutoOCR")] HRESULT EnableAutoOCR([in] VARIANT_BOOL bEnable);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return the postion of the SpotRecognitionWindow in screen coordinates
+		// REQUIRE: ppVal != NULL
+		// PROMISE: NONE
+		[propget, id(42), helpstring("property WindowPos")] HRESULT WindowPos([out, retval] ILongRectangle **ppVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the postion of the SpotRecognitionWindow in screen coordinates
+		// REQUIRE: pNewVal != NULL
+		// PROMISE: NONE
+		[propput, id(42), helpstring("property WindowPos")] HRESULT WindowPos([in] ILongRectangle *pNewVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To load settings for the image viewer from a file
+		// REQUIRE: strFileName must be a valid file
+		// PROMISE: NONE
+		[id(43), helpstring("property LoadOptionsFromFile")] HRESULT LoadOptionsFromFile([in] BSTR bstrFileName);
+		// PURPOSE: To set the current tool in spot recognition window
+		[id(44), helpstring("method SetCurrentTool")] HRESULT SetCurrentTool([in] ESRIRToolbarCtrl eCtrl);
+		// PURPOSE: To return VARIANT_FALSE if OCR_ON_CLIENT is not licensed
+		[id(45), helpstring("method IsOCRLicensed")] HRESULT IsOCRLicensed([out, retval] VARIANT_BOOL *pbLicensed);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Gets the current tool in spot recognition window
+		[id(46), helpstring("method GetCurrentTool")] HRESULT GetCurrentTool([out, retval] ESRIRToolbarCtrl *peCtrl);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Enables the ability to move and resize highlights. Disabled by default.
+		[propget, id(47), helpstring("property HighlightsAdjustableEnabled")] HRESULT 
+			HighlightsAdjustableEnabled([out, retval] VARIANT_BOOL *pvbEnable);
+		[propput, id(47), helpstring("property HighlightsAdjustableEnabled")] HRESULT
+			HighlightsAdjustableEnabled([in] VARIANT_BOOL vbEnable);
+		[propget, id(48), helpstring("property FittingMode")] HRESULT FittingMode(
+			[out, retval] long* peFittingMode);
+		[propput, id(48), helpstring("property FittingMode")] HRESULT FittingMode(
+			[in] long eFittingMode);
+	};
+
+	[
+		object,
+		uuid(2579B418-A6D0-4F50-A777-BF7961037358),
+		dual,
+		helpstring("ISRIRUtils Interface"),
+		pointer_default(unique)
+	]
+	interface ISRIRUtils : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// Returns the spot recognition window with the specified image opened in the window
+		// Require: If bAutoCreate == VARIANT_FALSE, and there's no image window open,
+		//			then it will return ppSRIR = NULL
+		// NOTE:	If strImageFileName is actually a GDD file name, the returned
+		//			SRIR will be one which contains the image referred to by
+		//			the GDD file (even if the actual image is open via another 
+		//			GDD file).  This is to enforce that the same image cannot
+		//			be open multiple times.
+		//			If strImageFileName is "" and a spot recognition window is opened
+		//			with "" will return the the opened window.  If it is not open
+		//			and bAutoCreate == VARIANT_TRUE then an SRW will be opened without
+		//			an image and return it, otherwise will return ppSRIR = NULL
+		[id(1), helpstring("method GetSRIRWithImage")] HRESULT GetSRIRWithImage(
+							[in] BSTR strImageFileName, 
+							[in] IInputManager* pInputManager, 
+							[in] VARIANT_BOOL bAutoCreate, 
+							[out, retval] ISpotRecognitionWindow** ppSRIR);
+		//-----------------------------------------------------------------------------------------
+		// Whether or not there's only one image window with an image open
+		// Return image file name only if there's exactly one image window with that image open,
+		// return empty string otherwise (eg. multiple image windows open, none image window
+		// open, or one image window open with no image file, etc.)
+		[id(2), helpstring("method IsExactlyOneImageOpen")] HRESULT IsExactlyOneImageOpen(
+							[in] IInputManager* pInputMgr, 
+							[in, out] VARIANT_BOOL* pbExactOneFileOpen,
+							[in, out] BSTR* pstrCurrentOpenFileName,	// If true, what's the name for the file
+							[in, out] ISpotRecognitionWindow **ppSRIR);	// If true, what's the image window);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(7EAAB2F8-B6C0-431C-9F92-AE1085992DFF),
+		helpstring("SpotRecognitionWindow Class")
+	]
+	coclass SpotRecognitionWindow
+	{
+		[default] interface ISpotRecognitionWindow;
+		interface IInputReceiver;
+		interface IInputEntityManager;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(B4720DFA-4FE5-4CEC-A577-D3268D936552),
+		helpstring("SRIRUtils Class")
+	]
+	coclass SRIRUtils
+	{
+		[default] interface ISRIRUtils;
+		interface ILicensedComponent;
+	};
+};

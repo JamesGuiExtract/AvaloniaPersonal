@@ -1,0 +1,14 @@
+//Assignment of Mortgage
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\ASSIGNMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Lien - Misc
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav

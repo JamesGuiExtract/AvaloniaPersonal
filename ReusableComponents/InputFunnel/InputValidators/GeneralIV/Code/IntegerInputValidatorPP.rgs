@@ -1,0 +1,23 @@
+HKCR
+{
+	GeneralIV.IntegerInputValidatorPP.1 = s 'IntegerInputValidatorPP Class'
+	{
+		CLSID = s '{B014E3D7-FF70-4702-ABAA-2209A05ACCC9}'
+	}
+	GeneralIV.IntegerInputValidatorPP = s 'IntegerInputValidatorPP Class'
+	{
+		CLSID = s '{B014E3D7-FF70-4702-ABAA-2209A05ACCC9}'
+		CurVer = s 'GeneralIV.IntegerInputValidatorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B014E3D7-FF70-4702-ABAA-2209A05ACCC9} = s 'IntegerInputValidatorPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

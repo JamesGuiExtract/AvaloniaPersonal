@@ -1,0 +1,26 @@
+HKCR
+{
+	AFSelectorsLib.SpatialContentBasedASP.1 = s 'SpatialContentBasedASPP Class'
+	{
+		CLSID = s '{B42259D1-9EB1-4152-B1C5-FE2A334A6214}'
+	}
+	AFSelectorsLib.SpatialContentBasedASPP = s 'SpatialContentBasedASPP Class'
+	{
+		CLSID = s '{B42259D1-9EB1-4152-B1C5-FE2A334A6214}'
+		CurVer = s 'AFSelectorsLib.SpatialContentBasedASP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B42259D1-9EB1-4152-B1C5-FE2A334A6214} = s 'SpatialContentBasedASPP Class'
+		{
+			ProgID = s 'AFSelectorsLib.SpatialContentBasedASP.1'
+			VersionIndependentProgID = s 'AFSelectorsLib.SpatialContentBasedASPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{B2548FD4-6D38-4849-828E-FE0660B45935}'
+		}
+	}
+}

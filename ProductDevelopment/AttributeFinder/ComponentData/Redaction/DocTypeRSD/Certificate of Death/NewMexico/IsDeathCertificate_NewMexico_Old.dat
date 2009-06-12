@@ -1,0 +1,32 @@
+\b
+(?:
+	2[.,]?\s*USUAL
+	|
+	3[.,]?\s*NAME\s*OF
+	|
+	4[.,]?\s*DATE\s*OF\s*DEATH	
+	|
+	5[.,]?\s*SEX
+	|
+	6[.,]?\s*COLOR
+	|
+	7[.,]?\s*MARRIED
+	|
+	8[.,]?\s*DATE\s*OF\s*BIRTH
+	|
+	9[.,]?\s*AGE
+	|
+	10a[.,]?\s*USUAL\s*OCCU
+	|
+	11[.,]?\s*BIRTHPLACE
+	|
+	12[.,]?\s*CITIZEN\s*OF
+	|
+	13[.,]?\s*FATHER'?S\s*NAME
+	|
+	14a[.,]?\s*MOTHER'?S\s*MAI
+	|
+	15[.,]?\s*WAS\s*DECEASED
+	|
+	16[.,]?\s*SOCIAL
+)

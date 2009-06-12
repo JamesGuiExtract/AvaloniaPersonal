@@ -1,0 +1,2 @@
+(DATE[\s\S]{0,6}BIRTH|CITENSHIP|UNITED STATES)
+(Number[\s\S]{0,5}Depend|living\s*with\s*you|Who\s*are\s*they)

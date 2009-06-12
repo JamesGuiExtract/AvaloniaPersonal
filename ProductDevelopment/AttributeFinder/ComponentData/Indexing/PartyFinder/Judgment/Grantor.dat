@@ -1,0 +1,42 @@
+//--------------------------------------
+// Judgment - Grantor
+//--------------------------------------
+
+// *******
+// Imports
+// *******
+
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+
+[VARS_BEGIN]
+
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\jdg\2005257690.tif.uss
+JMT_GRANTOR_01=Case NO^45~\r\n^?Grantor^250~PLAINTIFF^120~\r\nvs.|\r\nV.|\r\nVS^250~\r\nDefendant
+
+// 0003.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\fj\2005272425.tif.uss
+JMT_GRANTOR_03=County Court^50~\r\n^?Grantor^250~PLAINTIFF^120~\r\nvs.|\r\nV.|\r\nVS^250~\r\nDefendant
+
+// 0002.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\fj\2005272413.tif.uss
+JMT_GRANTOR_02=Receipt^20~\r\n^?Grantor^250~PLAINTIFF^120~\r\nvs.|\r\nV.|\r\nVS^250~\r\nDefendant
+
+// 0004.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\fj\2005272404.tif.uss
+JMT_GRANTOR_04=Receipt^20~\r\n^?Grantor^250~vs.|V.|PLAINTIFF|CASE NO
+
+// 0005.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\fj\2005272971.tif.uss
+JMT_GRANTOR_05=In and For^20~County^50~\r\n^?Grantor^250~\r\n\r\nvs.|\r\nV.^20~PLAINTIFF^250~\r\nCASE NO
+
+[PATTERNS_END]
+

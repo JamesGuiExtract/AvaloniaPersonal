@@ -1,0 +1,30 @@
+(?:
+//[li]oan (number)?
+  (?:\bloa[nm]|loa[nm]\b|\b[li]o\S[nm]\b|\b[li][^j\s]a[nm]\b|\b[li]oa[^fd\s]\b)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))?
+//not followed by too many garbage chars
+  (?!(?:.*[^\w\s.,-]){10})
+//not followed by 3 words of 3+ or 2 words of 5+ letters (both with 2+ letter words interspersed)
+  (?!(\s+[^\d\s]{3,}(?:\s+[^\d\s]{2,})?){3}|(\s+[^\d\s]{5,}(?:\s+[^\d\s]{2,})?){2})
+//not followed by money
+  (?!.*\$(?=.*(?:[.,]|\.00))(?:.?\d){4})
+//must have 2 digits on line, close together
+  (?=.*?\d.{0,5}\d)
+|
+//loan (number)?
+  (?:\bloan|loan\b|\blo\Sn\b|\bl[^j\s]an\b|\bloa[^fd\s]\b)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))?
+//not followed by too many garbage chars
+  (?!(?:.*[^\w\s.,-]){10})
+//not followed by 3 words of 3+ or 2 words of 5+ letters (both with 2+ letter words interspersed)
+  (?!(\s+[^\d\s]{3,}(?:\s+[^\d\s]{2,})?){3}|(\s+[^\d\s]{5,}(?:\s+[^\d\s]{2,})?){2})
+//not followed by money
+  (?!.*\$(?=.*(?:[.,]|\.00))(?:.?\d){4})
+//must have 2 digits withn 45 chars that are close together
+  (?=[\s\S]{0,45}?\d[\s\S]{0,10}?\d)
+|
+//loan number
+  (?:\b[li]oa[nm]|[li]oa[nm]\b|\b[li]o\S[nm]\b|\b[li][^j\s]a[nm]\b|\bloa[^fd\s]\b)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))
+//not followed by 3 words of 3+ or 2 words of 5+ letters (both with 2+ letter words interspersed)
+  (?!(\s+[^\d\s]{3,}(?:\s+[^\d\s]{2,})?){3}|(\s+[^\d\s]{5,}(?:\s+[^\d\s]{2,})?){2})
+//not followed by money
+  (?!.*\$(?=.*(?:[.,]|\.00))(?:.?\d){4})
+)

@@ -1,0 +1,249 @@
+<html>
+
+<head>
+<title>TIF Stability Tests</title>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>TIF Stability Tests (Test ID 3)<br>
+<img src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<ol>
+<li><h2>Goals</h2>
+	<ul>
+		<li>Exercise supplying and processing of TIF images with 
+		various combinations of machines, FAM instances, and supplying 
+		of existing and/or added files.
+		<li>Test various operating systems.
+		<li>Test FLEX Index and ID Shield using various rule and image sets.
+	</ul>
+<p>
+<li><h2>Database Preparation</h2>
+	<ul>
+		<li>Use SQL Server Management Studio to create a database.  The recommended 
+                    name is <b>Stability_3A</b> or <b>Stability_3C</b> or <b>Stability_3E</b>.
+		<li>Use the <b>DB Admin</b> utility to clear the database.
+		<li>Add the action <b>Test</b>.
+		<li>For the multiple PC tests ( 3C and 3E ), the Windows Firewall settings 
+		on the machine hosting the database must be updated to add <b>sqlservr.exe</b> 
+		and <b>sqlbrowser.exe</b> to the Exceptions list.
+	</ul>
+<p>
+<li><h2>Test 3A - One FAM, One PC, Existing Files</h2>
+	<ul>
+		<li>Create a <b>Test_3A</b> folder that will contain subfolders for
+		<b>Rules</b>, <b>Images</b>, and <b>Statistics</b>.
+		<li>Select a FLEX Index or ID Shield ruleset.  
+		Copy the desired rules to a local <b>Rules</b> folder under <b>Test_3A</b>.
+		<li>Select one or more folders of images for processing.
+		<li>Copy the folder(s) of images to a local <b>Images</b> folder 
+		under <b>Test_3A</b>.  Note that a single file supplier will be 
+		queueing these images.
+<p>
+		<li>Create an FPS file for both queueing and processing.
+		<li>Configure a <b>Folder file supplier</b> to supply existing *.tif images.  
+		Browse to the <b>Images</b> folder.  Remember to supply recursively if 
+		the TIFs are in one or more subfolders.
+		<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
+		to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+		<li>If processing for <b>ID Shield</b>, configure a 
+		<b>Redact images (no verification)</b> task 
+		to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+		Redact HCData and MCData items.
+<p>
+		<li>Begin collection of process statistics.  Use the following command from a 
+		command window open in the <b>Test_3A</b> folder.
+<p>
+		<b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
+        1m .\Statistics\Test_3A /el</b>
+<p>
+		<li>Start processing with the FPS file.
+		<li>Test 3A is expected to continue processing for at least 48 hours.
+	</ul>
+<p>
+<li><h2>Test 3C - One PC with FS FAM and FP FAM, Second PC with FP FAM</h2>
+	<ul>
+		<li>For each PC, create a <b>Test_3C</b> folder.  On the first PC, create 
+		subfolders for <b>Rules</b>, <b>Images</b>, and <b>Statistics</b>.  On the 
+		second PC, create subfolders for <b>Rules</b> and <b>Statistics</b>.
+		<li>Drive mapping
+		<ul>
+			<li>Map the <b>Test_3C</b> folder to drive Q: on the first PC.
+			<li>On the second PC, map drive Q: to the <b>Test_3C</b> 
+			folder on the first PC.
+			<li>This allows files to be supplied as <b>Q:\Images\123.tif</b> and 
+			processing of files to work from either machine.
+		</ul>
+		<li>Select a FLEX Index or ID Shield ruleset.  On both PCs, 
+		copy the desired rules to the local <b>Rules</b> folder under <b>Test_3C</b>.
+		<li>Select one or more folders of images for processing.
+		<li>Copy the folder(s) of images to the local <b>Images</b> folder 
+		under <b>Test_3C</b>. To ensure that the test runs long enough, a few
+          hundred thousand images are needed, so it is likely that you will need
+          to make several copies of the image folder(s). Note that a single file supplier on the first PC 
+		will be queueing these images.
+<p>
+		<li>On the first PC:
+		<ul>
+			<li>Create an FPS file for both queueing and processing.
+			<li>Configure a <b>Folder file supplier</b> to supply existing *.tif images.  
+			Browse to the <b>Images</b> folder.  Remember to supply recursively if 
+			the TIFs are in one or more subfolders.
+<p>
+			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, configure a 
+			<b>Redact images (no verification)</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			Redact HCData and MCData items.
+		</ul>
+<p>
+		<li>On the second PC:
+		<ul>
+			<li>Use the DB Admin utility to select the <b>Stability_3C</b> 
+			database on the first PC.
+			<li>Create an FPS file for processing.
+			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, configure a 
+			<b>Redact images (no verification)</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			Redact HCData and MCData items.
+		</ul>
+<p>
+		<li>Begin collection of process statistics on both PCs.  Use the following command 
+		from a command window open in the <b>StabilityTest</b> folder.
+<p>
+		<b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
+        1m .\Statistics\Test_3C_1 /el</b>
+<p>
+        &nbsp;or
+<p>
+        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
+        1m .\Statistics\Test_3C_2 /el</b>
+<p>
+		where Test_3C_1 is for the first PC and Test_3C_2 is for the second PC
+<p>
+		<li>Start processing with the FPS files.
+		<li>Test 3C is expected to continue processing for at least 24 hours.
+	</ul>
+<p>
+<li><h2>Test 3E - One PC with One FAM, Second PC with One FAM</h2>
+	<ul>
+		<li>For each PC, create a <b>Test_3E</b> folder.  On the first PC, create 
+		subfolders for <b>Rules</b>, <b>Images</b>, <b>Images</b>, and <b>Statistics</b>.  
+		On the second PC, create subfolders for <b>Rules</b> and <b>Statistics</b>.
+		Files in the <b>Images</b> folder will be supplied by the first PC.
+		Files in the <b>Images2</b> folder will be supplied by the second PC.
+		<li>Drive mapping
+		<ul>
+			<li>Map the <b>Test_3E</b> folder to drive Q: on the first PC.
+			<li>On the second PC, map drive Q: to the <b>Test_3E</b> 
+			folder on the first PC.
+			<li>This allows files to be supplied as <b>Q:\Images\123.tif</b> and 
+			processing of files to work from either machine.
+		</ul>
+		<li>Select a FLEX Index or ID Shield ruleset.  On both PCs, 
+		copy the desired rules to the local <b>Rules</b> folder under <b>Test_3E</b>.
+		<li>Select one or more folders of images for processing.
+		<li>Copy the folder(s) of images to the <b>Images</b> AND the <b>Images2</b> 
+		folders under <b>Test_3E</b> on the first PC. To ensure that the test
+          will run long enough, a few hundred thousand images are needed, so it
+          is likely that you will need to make several copies of the image
+          folder(s). Note that the images copied into the <b>Images2</b> folder
+          now will not be processed.
+		<li>Select one or more additional folders of images for supplying via listening.
+<p>
+		<li>On the first PC:
+		<ul>
+			<li>Create an FPS file for both queueing and processing.
+			<li>Configure a <b>Folder file supplier</b> to supply existing *.tif images.  
+			Browse to the <b>Images</b> folder on the mapped drive.  
+			Configure the file supplier to also 
+			supply files that are added.  Remember to supply recursively if 
+			the TIFs are in one or more subfolders.
+			<li>Add a Skip Condition to not supply files that 
+			include <b>&quot;_redacted&quot;</b>.
+<p>
+			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, configure a 
+			<b>Redact images (no verification)</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			Redact HCData and MCData items.
+		</ul>
+<p>
+		<li>On the second PC:
+		<ul>
+			<li>Use the DB Admin utility to select the <b>Stability_3E</b> 
+			database on the first PC.
+<p>
+			<li>Create an FPS file for both queueing and processing.
+			<li>Configure a <b>Folder file supplier</b> to supply *.tif images.  
+			Browse to the <b>Images2</b> folder on the mapped drive.  
+			Configure the file supplier to supply files that are added but not to 
+			supply existing files.  Remember to supply recursively if 
+			the TIFs are in one or more subfolders.
+			<li>Add a Skip Condition to not supply files that 
+			include <b>&quot;_redacted&quot;</b>.
+<p>
+			<li>If processing for <b>FLEX Index</b>, configure an <b>Execute Rules</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			<li>If processing for <b>ID Shield</b>, configure a 
+			<b>Redact images (no verification)</b> task 
+			to use the Master RSD file previously copied to the <b>Rules</b> folder.  
+			Redact HCData and MCData items.
+		</ul>
+<p>
+		<li>Begin collection of process statistics on both PCs.  Use the following command 
+		from a command window open in the <b>Test_3E</b> folder.
+<p>
+        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe 1m
+        .\Statistics\Test_3E_1 /el</b>
+<p>
+        or
+<p>
+        <b>LogProcessStats ProcessFiles.exe,SSOCR2.exe,XOCR32b.exe,AdjustImageResolution.exe,CleanupImage.exe,ESConvertToPDF.exe,ESConvertUSSToTxt.exe,ImageFormatConverter.exe,RedactFromXml.exe,RunRules.exe,SQLServerInfo.exe
+        1m .\Statistics\Test_3E_2 /el</b> <br>
+		where Test_3E_1 is for the first PC and Test_3E_2 is for the second PC
+<p>
+		<li>Start processing with the FPS files.
+		<li>Copy some images into the <b>Images</b> folder on the mapped drive.  
+		This will trigger the listening for the file supplier on the first PC.
+		<li>Copy some images into the <b>Images2</b> folder on the mapped drive.  
+		This will trigger the listening for the file supplier on the second PC.
+		<li>Test 3E is expected to continue processing for at least 24 hours.
+	</ul>
+<p>
+<li><h2>Test Review and Data Analysis</h2>
+	<ul>
+		<li>The following items should be periodically reviewed during processing.
+		<ul>
+			<li>Processing failures listed on the <b>Processing Log</b> page.
+			<li>Memory usage via <b>Task Manager</b>.
+			<li>For Test_3E, use xcopy to copy a set of images into a subfolder under <b>Images2</b>.
+			This will exercise the file supplier that is listening for new files.
+		</ul>
+<p>
+		<li>The following items should be checked when processing finishes or is stopped.
+		<ul>
+			<li>Collection of process statistics should be stopped via <b>Ctrl+C</b> in 
+			the appropriate command window.
+			<li>Open the process statistics spreadsheet <b>ImportData.xls</b>.  
+			Import using <b>Ctrl+Shift+I</b> the following CSV files from the Statistics folder.
+			<ul>
+				<li>cpu.csv
+				<li>ProcessFiles.NNN.csv where NNN is the process ID.  
+				Import the larger of the two files.
+			</ul>
+			<li>Save the spreadsheet with a meaningful name to include <b>_3A</b> or <b>_3C</b> 
+			or <b>_3E</b> as the test number.
+		</ul>
+	</ul>
+</ol>
+
+</body>
+</html>

@@ -1,0 +1,1 @@
+(?:\bAVE\b|\bAVENUE\b|\bBLVD\b|\bBOULEVARD\b|\bCI\b|\bCIR\b|\bCIRCLE\b|\bCOURT\b|\bCT\b|\bDR\b|\bDRIVE\b|\bHWY\b|\bLANE\b|\bLN\b|\bPARKWAY\b|\bPLACE\b|\bPL\b|\bRD\b|\bROAD\b|\bST\b|ST[.]|\bSTREET\b|\bTPKE\b|\bTURNPIKE\b|\bWAY\b|\bWO\b|\bWOODS\b|\bWY\b)

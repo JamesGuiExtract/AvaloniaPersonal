@@ -1,0 +1,115 @@
+<HTML>
+
+<HEAD>
+<TITLE>Rule Tester Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>Rule Tester Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+
+<ol>
+
+<!-- *********************************************** -->
+<li><h2>Toolbar</h2>
+<ul>
+	<li>Confirm that <b>Open New Image Viewer</b> button runs the <b>Spot 
+	Recognition Window</b> application.
+<!--
+   	<LI>Confirm that <b>Open New Highlighted Text Window</b> button runs <b>Highlighted 
+	Text Window</b> application.
+	<UL>
+		<LI>Opens <b>*.TXT</b> files.
+		<LI>Opens <b>*.DOC</b> files, with Microsoft Word installed.
+	</UL>
+-->
+   	<li>Confirm that <b>Clear output window</b> button clears results in the output pane.
+	<li>Confirm that <b>Execute rules</b> button executes rule file on the selected input and
+	displays results in the output pane.
+	<li>Confirm that <b>Save attributes to VOA file</b> button is inactive by default.
+    	<li>Confirm that <b>Save attributes to VOA file</b> button becomes active when results 
+	are displayed in the output pane.
+      	<ul>
+        	<li><b>Save attributes to VOA file</b> button displays the Windows Save As dialog.
+      	</ul>
+	<li>Confirm that <b>Save attributes to Feedback</b> button is inactive by default.
+</ul>
+<p>
+<li><h2>General Settings Tab</h2>
+<ul>
+    	<li>Confirm that this tab is visible only when run from <b>Ruleset Editor</b> application.
+    	<li>Confirm that <b>All Attributes</b> radio button is selectable.
+    	<li>Confirm that <b>Current Attribute</b> radio button is disabled if no attribute is defined.
+    	<li>Confirm that <b>Current Attribute</b> radio button is selectable.
+       	<li>Confirm that current selected attribute name appears in parentheses next to button text.
+</ul>
+<p>
+<li><h2>Ruleset Tab</h2>
+<ul>
+    	<li>Confirm that this tab is visible only when the <b>Rule Tester</b> application is 
+	run directly.
+    	<li>Confirm that the <b>Ruleset</b> edit box is editable.
+    	<li>Confirm that the <b>...</b> button displays the standard Windows <b>Open</b> dialog.
+       	<li>Confirm that the selected file is displayed in the <b>Ruleset</b> edit box.
+</ul>
+<p>
+<li><h2>Input Tab</h2>
+<ul>
+	<li>Confirm that the <b>Input</b> combo box is selectable.
+       	<li>Confirm that <b>Most recently OCR'd text from image window</b> is listed.
+	<ul>
+        	<li>Confirm that the main edit box is editable.
+	</ul>
+<p>
+<!--
+	<li>Confirm that <b>Most recently OCR'd text from text window</b> is listed.
+<p>
+-->
+	<li>Confirm that <b>Most recently processed text from file</b> is listed.
+      	<ul>
+            	<li>Confirm that selection of this option displays a <b>Filename:</b> edit box 
+		and a <b>...</b> button.
+            	<li>Confirm that the <b>...</b> button displays the standard Windows <b>Open</b> 
+		dialog.
+              	<ul>
+                	<li>Confirm that the selected file is displayed in the <b>Filename:</b>
+                  	edit box.
+                	<li>Confirm that file selection displays file contents in the main edit box.
+                	<li>Confirm that the main edit box becomes read-only.
+              	</ul>
+      	</ul>
+<p>
+        <li>Confirm that <b>Text from manual input</b> is listed.
+	<ul>
+            	<li>Confirm that the main edit box is editable.</li>
+	</ul>
+</ul>
+<p>
+<LI><h2>Found Attributes</h2>
+<UL>
+	<li>Confirm that <b>Name</b> column tree control displays sub-attributes.
+   	<li>Confirm that selection of an attribute will open the corresponding image and 
+	highlight text in the <b>Image Viewer</b>.
+    	<li>Confirm that double-click on an attribute displays the <b>Edit Attribute</b> 
+	dialog.
+      	<ul>
+        	<li>Confirm that the <b>Name</b> edit box is editable.
+	        <li>Confirm that the <b>Value</b> edit box is editable.
+        	<li>Confirm that the <b>Type</b> edit box is editable.
+	        <li>Confirm that changes made are displayed in the <b>Found Attributes</b>.
+        	<li>Confirm that the <b>OK</b> button saves changes and exits dialog.
+	        <li>Confirm that the <b>Cancel</b> button ignores changes and exits dialog.
+        	<li>Confirm that the <b>X</b> button ignores changes and exits dialog.
+      	</ul>
+</UL>
+</LI>
+</OL>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,2 @@
+^Legal\b
+As\s*described\s*in\s*said\s*deed\s*of\s*trust

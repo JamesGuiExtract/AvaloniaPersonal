@@ -1,0 +1,72 @@
+// UCLIDDistanceConverter.idl : IDL source for UCLIDDistanceConverter.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDDistanceConverter.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(D2D97FF1-314D-11D6-8257-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID DistanceConverter 1.0 Type Library")
+]
+library UCLID_DISTANCECONVERTERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	// Enums
+    typedef 
+	[
+		uuid(3D37AFB0-314D-11d6-8257-0050DAD4FF55), 
+		helpstring("UCLID Distance Converter")
+	]
+    enum 
+	{
+        kUnknownUnit = 0,
+        kFeet = 1,
+        kInches = 2,
+		kMiles = 3,
+		kYards = 4,
+		kChains = 5,
+		kRods = 6,
+		kLinks = 7,
+		kMeters = 8,
+		kCentimeters = 9,
+		kKilometers = 10
+
+    } EDistanceUnitType;
+
+	// Interfaces
+	[
+		object,
+		uuid(D2D97FFD-314D-11D6-8257-0050DAD4FF55),
+		dual,
+		helpstring("IDistanceConverter Interface"),
+		pointer_default(unique)
+	]
+	interface IDistanceConverter : IDispatch
+	{
+		[id(1), helpstring("method ConvertDistanceInUnit")] 
+		HRESULT ConvertDistanceInUnit([in] double dInValue, 
+									  [in] EDistanceUnitType eInUnit, 
+									  [in] EDistanceUnitType eOutUnit, 
+									  [out, retval] double* dOutValue);
+	};
+
+	// Coclasses
+	[
+		uuid(D2D97FFE-314D-11D6-8257-0050DAD4FF55),
+		helpstring("DistanceConverter Class")
+	]
+	coclass DistanceConverter
+	{
+		[default] interface IDistanceConverter;
+		interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

@@ -1,0 +1,18 @@
+n351424e    **pass**  
+
+north 35 deg 12 min 34 s west    **pass**  
+
+n3514'24w    **pass**  
+
+n351424    * FAIL (invalid)*
+         Alternate  "N35D14'24"E "
+         Alternate  "N35D14'24"W "
+
+nw    * FAIL (invalid)*
+         Alternate  "**** NO ALTERNATE STRING ! "
+
+east    **pass**  
+
+South45D 16m 49sW    **pass**  
+
+

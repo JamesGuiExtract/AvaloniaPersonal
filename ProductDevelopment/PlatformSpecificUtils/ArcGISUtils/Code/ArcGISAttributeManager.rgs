@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDArcGISUtils.ArcGISAttributeManager.1 = s 'ArcGISAttributeManager Class'
+	{
+		CLSID = s '{AE2C2F1A-25E5-40EC-806E-9ECCAD5C6788}'
+	}
+	UCLIDArcGISUtils.ArcGISAttributeManager = s 'ArcGISAttributeManager Class'
+	{
+		CLSID = s '{AE2C2F1A-25E5-40EC-806E-9ECCAD5C6788}'
+		CurVer = s 'UCLIDArcGISUtils.ArcGISAttributeManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {AE2C2F1A-25E5-40EC-806E-9ECCAD5C6788} = s 'ArcGISAttributeManager Class'
+		{
+			ProgID = s 'UCLIDArcGISUtils.ArcGISAttributeManager.1'
+			VersionIndependentProgID = s 'UCLIDArcGISUtils.ArcGISAttributeManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{EC0C8698-B764-429F-8CFF-EB0A540603C6}'
+		}
+	}
+}

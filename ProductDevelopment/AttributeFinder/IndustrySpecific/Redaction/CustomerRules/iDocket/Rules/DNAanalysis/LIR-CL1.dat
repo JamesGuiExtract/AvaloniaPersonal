@@ -1,0 +1,3 @@
+(bone|bon|one|\bb.n.|\b.o.e).{0,6}(m.?rr.?w|mar|rrow)(?!.*(or\b|stem|cell|s..m(\s*c|.*ll)))
+.{3,6}m.rr.w(?!.*(or\b|stem|cell|s..m(\s*c|.*ll)))
+\bbone\s*m(?!.*(or\b|stem|cell|s..m(\s*c|.*ll)))

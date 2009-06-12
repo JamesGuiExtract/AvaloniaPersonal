@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDTestingFrameworkCore.InteractiveTestExecuter.1 = s 'InteractiveTestExecuter Class'
+	{
+		CLSID = s '{0761EEBE-DEEB-40B4-BB4E-EEE6AE041CC7}'
+	}
+	UCLIDTestingFrameworkCore.InteractiveTestExecuter = s 'InteractiveTestExecuter Class'
+	{
+		CLSID = s '{0761EEBE-DEEB-40B4-BB4E-EEE6AE041CC7}'
+		CurVer = s 'UCLIDTestingFrameworkCore.InteractiveTestExecuter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0761EEBE-DEEB-40B4-BB4E-EEE6AE041CC7} = s 'InteractiveTestExecuter Class'
+		{
+			ProgID = s 'UCLIDTestingFrameworkCore.InteractiveTestExecuter.1'
+			VersionIndependentProgID = s 'UCLIDTestingFrameworkCore.InteractiveTestExecuter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{71EDAB5F-25C7-48BC-9AAE-F837C9ED7547}'
+		}
+	}
+}

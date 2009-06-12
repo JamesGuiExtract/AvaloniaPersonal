@@ -1,0 +1,49 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// ....signed this day of
+// 0001.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016409.tif.uss
+// ....acknowledged this day of
+// 0002.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016236.tif.uss
+POA_BACKUP_GRANTEE_1=[I]^20~[name]^20~[the]^20~[following]^100~[as]^20~[successor]^:^?BackupGrantee^1000~[signed]|[acknowledged]^50~[this]^50~day of
+
+// I name the following to that agent...
+// 0003.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007242.tif.uss
+// 0004.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\power of attorny\00007413.tif.uss
+POA_BACKUP_GRANTEE_1b=[I]^20~[name]^20~[the]^20~[following]^50~act^30~successive^50~[to]^agent:^?BackupGrantee^1000~[signed]|[acknowledged]^50~day of
+
+// 0005.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00017026.tif.uss
+POA_BACKUP_GRANTEE_2=Substitute|Successor^20~Agent^[appoint]|[designate]^?BackupGrantee^@-NonTP
+
+// Successor agent:....address:
+// 0006.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\power of attorny\00016676.tif.uss
+POA_BACKUP_GRANTEE_3=Substitute|Successor^2~Agent:^?BackupGrantee^100~Address:
+
+// 0007.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000203200.007.uss
+POA_BACKUP_GRANTEE_04=I appoint^?BackupGrantee^250~first alternate^200~I appoint^?BackupGrantee2^250~second alternate
+
+// 0008.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\power of attorney\20049000066700.007.uss
+POA_BACKUP_GRANTEE_05=original agents^100~unwilling or unable^50~to serve^?BackupGrantee^250~shall instead
+
+// 0009.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\power of attorney\20059020361000.tif.uss
+POA_BACKUP_GRANTEE_06=[if]^15~fails to qualify or ceases^15~[act]^50~I hereby^[appoint]^?BackupGrantee1^250~[and]^?BackupGrantee2^250~[as]^50~co-attorneys-in-fact
+
+[PATTERNS_END]
+
+
+
+

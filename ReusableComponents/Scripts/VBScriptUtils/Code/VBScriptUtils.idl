@@ -1,0 +1,37 @@
+// VBScriptUtils.idl : IDL source for VBScriptUtils
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (VBScriptUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	object,
+	uuid(9839CDEA-4475-4D7D-9DEA-BCAFBD8ECA1C),
+	dual,
+	nonextensible,
+	helpstring("IImageData Interface"),
+	pointer_default(unique)
+]
+interface IImageData : IDispatch{
+	[id(1), helpstring("method GetImagePageCount")] HRESULT GetImagePageCount([in] BSTR bstrImageName, [out][retval] LONG *pnNumPages);
+};
+[
+	uuid(7318A7D4-817E-4D52-ACE6-3245C350BACF),
+	version(1.0),
+	helpstring("VBScriptUtils 1.0 Type Library")
+]
+library VBScriptUtilsLib
+{
+	importlib("stdole2.tlb");
+	[
+		uuid(543249E3-59C3-4379-AF33-008DDB5A0E2A),
+		helpstring("ImageData Class")
+	]
+	coclass ImageData
+	{
+		[default] interface IImageData;
+	};
+};

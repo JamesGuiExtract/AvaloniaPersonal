@@ -1,0 +1,23 @@
+HKCR
+{
+	GeneralIV.DoubleInputValidatorPP.1 = s 'DoubleInputValidatorPP Class'
+	{
+		CLSID = s '{E51A1671-06B2-485D-A073-4CD04D99912C}'
+	}
+	GeneralIV.DoubleInputValidatorPP = s 'DoubleInputValidatorPP Class'
+	{
+		CLSID = s '{E51A1671-06B2-485D-A073-4CD04D99912C}'
+		CurVer = s 'GeneralIV.DoubleInputValidatorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E51A1671-06B2-485D-A073-4CD04D99912C} = s 'DoubleInputValidatorPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

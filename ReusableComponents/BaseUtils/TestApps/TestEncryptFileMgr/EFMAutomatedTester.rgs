@@ -1,0 +1,26 @@
+HKCR
+{
+	TestEncryptFileMgr.EFMAutomatedTester.1 = s 'EFMAutomatedTester Class'
+	{
+		CLSID = s '{EFD596C4-CFA1-450B-B63B-2EF059212FEC}'
+	}
+	TestEncryptFileMgr.EFMAutomatedTester = s 'EFMAutomatedTester Class'
+	{
+		CLSID = s '{EFD596C4-CFA1-450B-B63B-2EF059212FEC}'
+		CurVer = s 'TestEncryptFileMgr.EFMAutomatedTester.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {EFD596C4-CFA1-450B-B63B-2EF059212FEC} = s 'EFMAutomatedTester Class'
+		{
+			ProgID = s 'TestEncryptFileMgr.EFMAutomatedTester.1'
+			VersionIndependentProgID = s 'TestEncryptFileMgr.EFMAutomatedTester'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{B5462DA5-ACF5-44AC-AAD8-7A629189C353}'
+		}
+	}
+}

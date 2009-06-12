@@ -1,0 +1,26 @@
+HKCR
+{
+	ParagraphTextHandlers.HighlightedTextWindowPTH.1 = s 'HighlightedTextWindowPTH Class'
+	{
+		CLSID = s '{4F0FBD42-A8B7-4DF1-BF1A-0165930ADD11}'
+	}
+	ParagraphTextHandlers.HighlightedTextWindowPTH = s 'HighlightedTextWindowPTH Class'
+	{
+		CLSID = s '{4F0FBD42-A8B7-4DF1-BF1A-0165930ADD11}'
+		CurVer = s 'ParagraphTextHandlers.HighlightedTextWindowPTH.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4F0FBD42-A8B7-4DF1-BF1A-0165930ADD11} = s 'HighlightedTextWindowPTH Class'
+		{
+			ProgID = s 'ParagraphTextHandlers.HighlightedTextWindowPTH.1'
+			VersionIndependentProgID = s 'ParagraphTextHandlers.HighlightedTextWindowPTH'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{7F2B40B7-4A96-49E5-A184-3AAAE4D938B4}'
+		}
+	}
+}

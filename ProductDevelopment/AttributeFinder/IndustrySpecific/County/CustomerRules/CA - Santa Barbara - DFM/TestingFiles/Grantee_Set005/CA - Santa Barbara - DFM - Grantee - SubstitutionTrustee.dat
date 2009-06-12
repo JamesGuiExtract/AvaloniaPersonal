@@ -1,0 +1,2 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\SubstitutionTrustee;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).Grantee.voa;K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

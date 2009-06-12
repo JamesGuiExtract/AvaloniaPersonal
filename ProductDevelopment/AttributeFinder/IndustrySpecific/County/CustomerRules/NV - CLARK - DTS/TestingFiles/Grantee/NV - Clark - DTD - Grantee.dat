@@ -1,0 +1,49 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Assignment of Mortgage
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Assignment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Financing Statement
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\UCC Finance Statement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Homestead Designation
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Homestead;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Judgment
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Lien - Misc
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Mechanic Lien;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Lis Pendens
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Lis Pendens;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trust Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Completion
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Notice;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Default
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Notice of Federal Tax Lien
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\IRS Lien Notice;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Power of Attorney
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Request for Notice of Default
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Trust Deed-Request Notice;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Subordination Agreement
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Agreement;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//Substitution of Trustee
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Reconveyance;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Substitution-Reconveyance;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+

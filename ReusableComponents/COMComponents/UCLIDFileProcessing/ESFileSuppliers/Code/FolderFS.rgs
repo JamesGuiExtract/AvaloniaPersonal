@@ -1,0 +1,27 @@
+HKCR
+{
+	ESFileSuppliers.FolderFS.1 = s 'FolderFS Class'
+	{
+		CLSID = s '{D49300B0-78A1-4ACE-B449-EC7D426745C0}'
+	}
+	ESFileSuppliers.FolderFS = s 'FolderFS Class'
+	{
+		CLSID = s '{D49300B0-78A1-4ACE-B449-EC7D426745C0}'
+		CurVer = s 'ESFileSuppliers.FolderFS.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D49300B0-78A1-4ACE-B449-EC7D426745C0} = s 'FolderFS Class'
+		{
+			ProgID = s 'ESFileSuppliers.FolderFS.1'
+			VersionIndependentProgID = s 'ESFileSuppliers.FolderFS'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{}'
+		}
+	}
+}

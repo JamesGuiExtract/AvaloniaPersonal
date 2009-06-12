@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.DoublePoint.1 = s 'DoublePoint Class'
+	{
+		CLSID = s '{31229082-2278-4371-B1FB-E7654AA27E95}'
+	}
+	UCLIDCOMUtils.DoublePoint = s 'DoublePoint Class'
+	{
+		CLSID = s '{31229082-2278-4371-B1FB-E7654AA27E95}'
+		CurVer = s 'UCLIDCOMUtils.DoublePoint.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {31229082-2278-4371-B1FB-E7654AA27E95} = s 'DoublePoint Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.DoublePoint.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.DoublePoint'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

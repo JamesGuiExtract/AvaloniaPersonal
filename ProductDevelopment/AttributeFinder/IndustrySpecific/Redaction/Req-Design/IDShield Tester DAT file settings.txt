@@ -1,0 +1,26 @@
+Settings definition format -
+<SETTING>;[Setting]=[value]
+
+QueryForVerification:
+| delimited list of names to verify for (HCData, MCData)
+
+QueryForAutomatedRedaction:
+| delimited list of names to verify for (HCData, MCData)
+
+CreateTestOutputVOAFiles:
+Allowable settings are 1 or 0.  If set to 1 then the IDShield tester
+will output a file named <SourceDocName>.testouput.voa for each
+source document which contains a list of all attributes that 
+and a prepended name describing if it was correct, missed,
+under redacted, over redacted, and false positives.
+
+OutputAttributeNamesFileLists:
+Allowable settings are 1 or 0.  If set to 1 then the IDShield tester
+will output the following list files:
+FilesWithHCData.txt
+FilesWithMCData.txt
+FilesWithLCData.txt
+FilesWithClues.txt
+
+TypeToBeTested:
+A string to filter attributes by (i.e. SSN)

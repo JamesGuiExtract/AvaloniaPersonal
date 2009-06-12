@@ -1,0 +1,160 @@
+#import "CommonDT.dcc"
+
+// ********************************************
+// Zero Block
+// ********************************************
+[ZERO_BEGIN]
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,POA_ZERO_01,false
+		01=^PERSONAL\s*REPRESENTATIVE.?S\s*DEED\s*(?:\r?$)
+		02=^.{0,35}NOTARY\s*(?:PUBLIC)?\s*BOND(?:\r?$)
+		03=^.{0,35}BOND\s*OF\s*NOTARY\s*PUBLIC\s*(?:\r?$)
+		//I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\CountyWithNewOCR\Images\GrantorGrantee\Satisfaction of Mortgage\Grantee\0047.tif
+		04=^Satisfaction\s*piece\s*made\s*this
+	OR_END
+	AND_BEGIN,POA_ZERO_02,false
+		Satisfaction\s*of\s*Mortgage
+		(?:above\W*mentioned\W*mortgage|mortgage\W*has\W*been\W*fully\W*paid)	
+	AND_END
+SCOPE_END
+[ZERO_END]
+
+
+// ********************************************
+// Sure Block
+// ********************************************
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,POA_SURE_01,false
+		// Limited Power of Attorney
+		// 0001.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016320.tif.uss
+		//
+		// Power of Attorney
+		// 0002.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016270.tif.uss
+		//
+		// Statutory Durable Power of Attorney
+		// 0003.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016409.tif.uss
+		//
+		// General Power of Attorney
+		// 0004.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016590.tif.uss
+		//
+		// Durable Power of Attorney
+		// 0005.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016945.tif.uss
+		//
+		// General Durable Power of Attorney
+		// 0006.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017026.tif.uss
+		//
+		// The reason for using [a-z]{2} instead of "Of"
+		// 0007.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016256.tif.uss
+		//
+		// Statutory OCRED with a space before the Y
+		// 0008.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016619.tif.uss
+		//
+		// Reason for replacing \s+ with \s* inbetween words
+		// 0009.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00016737.tif.uss
+		//
+		// No \r\n before clue
+		// 0010.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017042.tif.uss
+		//
+		// SPECIAL STATUTORY DURABLE POWER OF ATTORNEY
+		// 0012.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00007751.tif.uss
+		//
+		// Special durable power of attorney
+		// 0013.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00006587.tif.uss
+		//
+		// OCR'ed correctly, except for lots of unnecessary spaces in between words
+		// 0014.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00008402.tif.uss
+		//
+		// Durable General power of attorney
+		// 0015.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00008711.tif.uss
+		// 
+		// Of -> (R) or (C)
+		// 0016.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00009669.tif.uss
+		//
+		// Specific Power of Attorney
+		// 0018.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\POWER OF ATTORNY\00014356.tif.uss
+		//
+		// STATUTORY SHORT FORM POWER OF ATTORNEY
+		// 0020.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Power of Attorney\20049000203200.007.uss
+		// 
+		01=^(?:(?:Limited|Specific|(?:(?:(?:Special\s*)?Statutor\s*y|General|Special)\s*)?(?:Limited|Durable|(?:\s*SHORT\s*FORM)?)|(?:Durable\s*)?General)\s*)?Power\s*\S{2}\s*Attorney(?:\r?$)
+
+		// POWER OF ATTORNEY - SPECIAL
+		// 0021.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Power of Attorney\20049000120800.002.uss
+		// POWER OF ATTORNEY GENERAL
+		// 0022.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set004\Images\Power of Attorney\20049000191400.001.uss
+		02=^POWER\s*OF\s*ATTORNEY\s*.?\s*(?:GENERAL|SPECIAL)(?:\r?$)
+
+		// STATUTORY DURABLE POWER OF ATTORNEY
+		03=^\s*S\s*T\s*A\s*T\s*U\s*T\s*O\s*R\s*Y\s*D\s*U\s*R\s*A\s*B\s*L\s*E\s*P\s*O\s*W\s*E\s*R\s*O\s*F\s*A\s*T\s*T\s*O\s*R\s*N\s*E\s*Y\s*(?:\r?$)
+
+		04=^POWER\s*OF\s*ATTORNEY\s*PURCHASING\s*(?:\r?$)
+
+		05=^POWER\s*OF\s*ATTORNEY\s*FOR\s*SELLER\s*(?:\r?$)
+	OR_END
+// 0025.tif;k:\common\engineering\sample files\acs\mi - macomb\set012\set12a\images\b00124aalsw.tif.uss
+	AND_BEGIN,POA_SURE_02,false
+		^Power\s*of\s*A.{1,3}orney(?:\r?$)
+		(?:empower|granting\s*to)\s*our\s*said\s*Attorney[-\s]in[-\s]Fact
+	AND_END
+SCOPE_END
+
+[SURE_END]
+
+// ********************************************
+// Probable Block
+// ********************************************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,POA_PROBABLE_01,false
+		// usage of "appoints" vs "appoint" in the following two files
+		// 0011.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\POWER OF ATTORNY\00017085.tif.uss
+		// 0019.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\POWER OF ATTORNY\00013994.tif.uss
+		01=hereby[\s\S]{1,100}appoint[\s\S]{1,300}?as[\s\S]{1,100}?attorney(?:\s+|-)in(?:\s+|-)fact
+		//K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Power of Attorney\157.bin
+		02=hereby[\s\S]{1,70}delegate[\s\S]{1,90}power[\s\S]{1,10}attorney
+	OR_END
+	OR_BEGIN,POA_PROBABLE_02,true
+		//K:\Common\Engineering\Sample Files\PDS\NM - Chaves\Set005\Images\Power of Attorney\157.bin
+		01=^.{0,5}POWER\s*OF\s*ATTORNEY\s*.{1,50}(?:\r?$)
+		02=^POWER\s*OF\s*A.{1,3}ORNEY(?:\r?$)
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.5,1,2
+	SINGLE_BEGIN,POA_PROBABLE_03,false
+		//(?:Special)? Power of Attorney, broken by non-word chars
+		//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Power of Attorney\200406300004795.tif.uss
+		^.{0,3}(?:S\W*P\W*E\W*C\W*I\W*A\W*L\W*)?P\W*O\W*W\W*E\W*R\W*O\W*F\W*A\W*T\W*T\W*O\W*R\W*N\W*E\W*Y.{0,3}(?:\r?$)
+	SINGLE_END
+SCOPE_END
+[PROBABLE_END]
+
+// ********************************************
+// Maybe Block
+// ********************************************
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,POA_MAYBE_01,false
+		// 0017.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\POWER OF ATTORNY\00007500.tif.uss
+		01=This[\s\S]{1,50}?Power\W*Of\W*Attorney
+	OR_END
+
+	AND_BEGIN,POA_MAYBE_02,false
+		// 0024.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\power of attorney\20059023231300.tif.uss
+		01=hereby\W*makeW*constitute\W*and\W*appoint
+		02=true\W*and\W*lawful\W*Attorney
+	AND_END
+	
+SCOPE_END
+	SINGLE_BEGIN,POA_MAYBE_03,false
+		(?:empower|granting\W*to)\W*our\W*said\W*Attorney\W*in\W*Fact
+	SINGLE_END
+	
+SCOPE_END
+
+[MAYBE_END]
+

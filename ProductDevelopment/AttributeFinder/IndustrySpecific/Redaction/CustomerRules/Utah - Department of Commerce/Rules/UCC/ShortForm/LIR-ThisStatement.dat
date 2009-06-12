@@ -1,0 +1,10 @@
+^([^\d\r\n]{0,2}4\D{0,2})?This.{0,2}statement.{0,2}refers
+original.{0,2}Financing.{0,2}Statement.{0,2}(?:bearing|No)
+Financing.{0,2}Statement.{0,2}(?:bearing.{0,2}File.{0,2})?No
+following.{0,2}types.{0,2}\W?o[fr].{0,2}items\W?.{0,2}o[fr]
+collateral.{0,2}now.{0,2}owned[\s\S]{1,6}hereafter.{0,2}acquired
+statement.{0,2}covers.{0,2}the.{0,2}following
+covers.{0,2}the.{0,2}following.{0,2}types.{0,2}o[rf].{0,2}items
+collateral[\s\S]{0,3}including.{0,2}proceeds.{0,2}and.{0,2}products
+types.{0,2}\W?.{0,2}o[rf].{0,2}items\W?.{0,2}o[fr].{0,2}(?:property|collateral)
+This.{0,2}financing.{0,2}statement.{0,2}covers

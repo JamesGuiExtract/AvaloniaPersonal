@@ -1,0 +1,183 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.24 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.24 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3063]</b> Select Page Region Value Finder
+	       	<ul>
+	      		<li>Exercise the <b>RSD file</b> attached to the SCR.
+	      		<li>Confirm that the specified exception is not thrown.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4879, #4880]</b> Error when clicking on empty entries 
+	       	<ul>
+	      		<li>Exercise the <b>Redaction Demo</b> rules and images and begin computing redactions.
+	      		<li>Double-click on an empty entry in the Processing Log page - failed files grid.  
+			Confirm that <b>no</b> exception is thrown.
+	      		<li>Double-click on an empty entry in the Queue Log page - failed files grid.  
+			Confirm that <b>no</b> exception is thrown.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4925]</b> Verification with empty VOA file 
+	       	<ul>
+	      		<li>Prepare a Verification FPS file.
+	      		<li>Confirm that <b>Include all pages in redaction review</b> is unchecked.
+	      		<li>Verify redactions on an image <b>without a VOA file</b> or with an empty VOA file.
+	      		<li>Confirm that the first page in the Summary grid is <b>green</b>.
+	      		<li>Click <b>TAB</b> and confirm that the proper number of pages reviewed is 
+			noted in the user prompt.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5009]</b> Adjust Image Resolution on each page 
+	       	<ul>
+	      		<li>Examine the image attached to the SCR.
+	      		<li>Confirm that image resolution is <b>300x300</b> on the first pages.
+	      		<li>Confirm that image resolution is <b>96x96</b> on the last page.
+	      		<li>Use Adjust Image Resolution to set the resolution to <b>300x300</b>.
+	      		<li>Confirm that <b>each</b> page now has the expected resolution.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5035, #5075]</b> Mousewheel effects on Spot Recognition Window 
+	       	<ul>
+	      		<li>Open an image in the <b>Spot Recognition Window</b>.
+	      		<li>Draw several highlights and scroll the mousewheel.
+	      		<li>Confirm that the highlights remain visible as appropriate.
+	      		<li>Confirm that the image scrolls vertically.
+<p>
+	      		<li>Begin drawing an angular redaction and then scroll the mousewheel.
+	      		<li>Confirm that the in-progress angular redaction grows and shrinks according to 
+			the mousewheel movement.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5051]</b> Automatic Reconnection To Database After Network Problem
+	       	<ul>
+	      		<li>Exercise the <b>Database Connectivity</b> checklist.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5063, #5064, #5067, #5081, #5082, #5084]</b> Various Reporting Changes
+	       	<ul>
+	      		<li>Exercise the following items for each installed report as noted below.
+			<ul>
+	      			<li>Confirm that the report conforms to the <b>Report Design Standards</b> 
+				section of the <b>7.0 Reporting Features Specification</b>.
+	      			<li>Confirm that an XML file associated with the report is present in the 
+				reports folder.  Note that <b>DateRange</b> values should be the enumeration 
+				such as <b>LastWeek</b>.
+	      			<li>Confirm that a thumbnail image of the selected report is provided.
+	      			<li>Confirm that a PDF output file can be auto-generated using command-line 
+				parameters.
+	      			<li>Confirm that the <b>/ow</b> command-line parameter allows the PDF output 
+				file to be overwritten.
+	      			<li>Confirm that not using the <b>/ow</b> command-line parameter raises an 
+				exception if the output PDF file already exists.
+	      			<li>Confirm that the <b>/prompt</b> command-line parameter forces display of 
+				a parameters prompt if the report requires parameters.
+			</ul>
+<p>
+	      		<li>Installed reports
+			<ul>
+	      			<li>File Action Manager Action List Report
+	      			<li>File Action Manager Computer List Report
+	      			<li>File Action Manager File Summary Report
+	      			<li>File Action Manager Machines Used For Processing Report
+	      			<li>File Action Manager Page Summary Report
+	      			<li>File Action Manager User List Report
+			</ul>
+<p>
+	      		<li>Confirm that the caption on the main UI has <b>Report Viewer</b>.
+	      		<li>Rename a thumbnail image file for one of the installed reports.  Confirm that 
+			no exception is thrown when selecting this report.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5071]</b> Disable Auto-Fitting for Flex Data Entry
+	       	<ul>
+	      		<li>Confirm that highlighting multi-line text while holding the <b>Ctrl</b> 
+			key does not create a multi-zone attribute in the Flex Data Entry application.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5090]</b> Various issues with write-caching - <b>exercised by Jeff</b>
+	       	<ul>
+	      		<li>Locate a collection of several thousand sample images on <b>FNP2</b>.
+	      		<li>Create an FPS file to <b>queue</b> the images.
+	      		<li>Create an FPS file to <b>process</b> the images.  Include an <b>Execute rules</b> 
+			task and a <b>Conditionally evaluate VOA file</b> task.  If file is sensitive, set 
+			<b>Verify</b> action to Pending.  If file is not sensitive, set <b>Export</b> action 
+			to Pending.
+	      		<li>Create an FPS file to <b>Export</b> the images.  Several <b>Delete</b> tasks 
+			remove the image file, the USS file, the VOA file, and the XML file.
+	      		<li>Confirm that <b>no</b> file access exceptions are seen in the UEX logs.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5091]</b> FAM DB Admin - spaces in database name
+	       	<ul>
+	      		<li>Connect to a database with one or more spaces in the database name.
+	      		<li>Confirm that connection is possible.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5094]</b> .NET regular expression parser
+	       	<ul>
+	      		<li>Check the <b>HKCU/Software/Extract Systems/ReusableComponent/UCLIDCOMUtils/MiscUtils</b> 
+			registry key.
+	      		<li>Confirm that the <b>Default</b> entry is <b>ESRegExParser.DotNetRegExParser.1</b>.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing - using just .NET Regular Expression Parser via registry settings</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

@@ -1,0 +1,52 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GridGenerator", "GridGenerator.vcproj", "{4565383B-BBD2-4796-A424-3A4EC1549D9E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{EBE90516-603A-4562-8B47-51234CBB9903} = {EBE90516-603A-4562-8B47-51234CBB9903}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\ReusableComponents\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TopoUtils", "..\..\..\..\ReusableComponents\Geometry\TopoUtils\Code\TopoUtils.vcproj", "{EBE90516-603A-4562-8B47-51234CBB9903}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4565383B-BBD2-4796-A424-3A4EC1549D9E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4565383B-BBD2-4796-A424-3A4EC1549D9E}.Debug|Win32.Build.0 = Debug|Win32
+		{4565383B-BBD2-4796-A424-3A4EC1549D9E}.Release|Win32.ActiveCfg = Release|Win32
+		{4565383B-BBD2-4796-A424-3A4EC1549D9E}.Release|Win32.Build.0 = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.Build.0 = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.ActiveCfg = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.Build.0 = Release|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Debug|Win32.Build.0 = Debug|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Release|Win32.ActiveCfg = Release|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Release|Win32.Build.0 = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.Build.0 = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.ActiveCfg = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.Build.0 = Release|Win32
+		{EBE90516-603A-4562-8B47-51234CBB9903}.Debug|Win32.ActiveCfg = Debug|Win32
+		{EBE90516-603A-4562-8B47-51234CBB9903}.Debug|Win32.Build.0 = Debug|Win32
+		{EBE90516-603A-4562-8B47-51234CBB9903}.Release|Win32.ActiveCfg = Release|Win32
+		{EBE90516-603A-4562-8B47-51234CBB9903}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,5 @@
+\bDiner,\x20?(.*)%$1 DINER
+\b(Mortgage?|MTG),\x20?(.*)%$2 $1
+\bMinistries,\x20?(.*)%$1 MINISTRIES
+Video,\x20?(.*)%$1 VIDEO
+\bLOMPOC,\s(ALTERATIONS?)\b%$1 LOMPOC

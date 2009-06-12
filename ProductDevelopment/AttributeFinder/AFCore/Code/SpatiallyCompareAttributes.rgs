@@ -1,0 +1,26 @@
+HKCR
+{
+	AFCore.SpatiallyCompareAttributes.1 = s 'SpatiallyCompareAttributes Class'
+	{
+		CLSID = s '{794FB907-9D86-4466-A9A7-DE245C2EA0B6}'
+	}
+	AFCore.SpatiallyCompareAttributes = s 'SpatiallyCompareAttributes Class'
+	{
+		CLSID = s '{794FB907-9D86-4466-A9A7-DE245C2EA0B6}'
+		CurVer = s 'AFCore.SpatiallyCompareAttributes.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {794FB907-9D86-4466-A9A7-DE245C2EA0B6} = s 'SpatiallyCompareAttributes Class'
+		{
+			ProgID = s 'AFCore.SpatiallyCompareAttributes.1'
+			VersionIndependentProgID = s 'AFCore.SpatiallyCompareAttributes'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{69D40760-8162-4822-85D6-C10B02044E9D}'
+		}
+	}
+}

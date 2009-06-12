@@ -1,0 +1,234 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Individual Persons
+// Purpose: Check Titles, Suffixes, First, Last, Middle
+
+<TESTCASE>|Plain Name|John Smith
+Names|John Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Mr.|Mr. John Smith
+Names|Mr. John Smith
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Initial|John H Smith
+Names|John H Smith
+.Person|John H Smith
+..First|John
+..Last|Smith
+..Middle|H
+
+<TESTCASE>|Name with Initial.|John H. Smith
+Names|John H. Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Name with , Jr.|John Smith, Jr.
+Names|John Smith, Jr.
+.Person|John Smith, Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Jr.|John Smith Jr.
+Names|John Smith Jr.
+.Person|John Smith Jr.
+..Suffix|Jr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Initial & Jr|John H Smith Jr
+Names|John H Smith Jr
+.Person|John H Smith Jr
+..Suffix|Jr
+..First|John
+..Last|Smith
+..Middle|H
+
+<TESTCASE>|Name with III|John H. Smith, III
+Names|John H. Smith, III
+.Person|John H. Smith, III
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Name with Title & Suffix|Mr. John H. Smith, III
+Names|Mr. John H. Smith, III
+.Person|Mr. John H. Smith, III
+..Title|Mr.
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Name with Sr|John Smith Sr
+Names|John Smith Sr
+.Person|John Smith Sr
+..Suffix|Sr
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with First Initial & IV|J. Harvey Smith IV
+Names|J. Harvey Smith IV
+.Person|J. Harvey Smith IV
+..Suffix|IV
+..First|J.
+..Last|Smith
+..Middle|Harvey
+
+<TESTCASE>|Name with Hyphen|Mary W. Smith-Jones
+Names|Mary W. Smith-Jones
+.Person|Mary W. Smith-Jones
+..First|Mary
+..Last|Smith-Jones
+..Middle|W.
+
+<TESTCASE>|Name with Mrs.|Mrs. Mary Jones
+Names|Mrs. Mary Jones
+.Person|Mrs. Mary Jones
+..Title|Mrs.
+..First|Mary
+..Last|Jones
+
+<TESTCASE>|Name with Dr.|Dr. Mary W. Jones
+Names|Dr. Mary W. Jones
+.Person|Dr. Mary W. Jones
+..Title|Dr.
+..First|Mary
+..Last|Jones
+..Middle|W.
+
+<TESTCASE>|Name with Prof|Prof Mary Jones
+Names|Prof Mary Jones
+.Person|Prof Mary Jones
+..Title|Prof
+..First|Mary
+..Last|Jones
+
+<TESTCASE>|Name with Miss|Miss Mary Jones
+Names|Miss Mary Jones
+.Person|Miss Mary Jones
+..Title|Miss
+..First|Mary
+..Last|Jones
+
+<TESTCASE>|Name with Fr.|Fr. William Henry Harrison
+Names|Fr. William Henry Harrison
+.Person|Fr. William Henry Harrison
+..Title|Fr.
+..First|William
+..Last|Harrison
+..Middle|Henry
+
+<TESTCASE>|Name with Compound Last Name1|Mary W. Van Buren
+Names|Mary W. Van Buren
+.Person|Mary W. Van Buren
+..First|Mary
+..Last|Van Buren
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name2|Mary W. Mc Donald
+Names|Mary W. Mc Donald
+.Person|Mary W. Mc Donald
+..First|Mary
+..Last|Mc Donald
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name3|Mary W. St Clair
+Names|Mary W. St Clair
+.Person|Mary W. St Clair
+..First|Mary
+..Last|St Clair
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name4|Mary W. McDonald
+Names|Mary W. McDonald
+.Person|Mary W. McDonald
+..First|Mary
+..Last|McDonald
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name5|Mary W. St. Clair
+Names|Mary W. St. Clair
+.Person|Mary W. St. Clair
+..First|Mary
+..Last|St. Clair
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name6|Mary W. Vander Wolk
+Names|Mary W. Vander Wolk
+.Person|Mary W. Vander Wolk
+..First|Mary
+..Last|Vander Wolk
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name7|Mary W. Von Buren
+Names|Mary W. Von Buren
+.Person|Mary W. Von Buren
+..First|Mary
+..Last|Von Buren
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name8|Mary W. Mac Donald
+Names|Mary W. Mac Donald
+.Person|Mary W. Mac Donald
+..First|Mary
+..Last|Mac Donald
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name9|Mary W. De Rosa
+Names|Mary W. De Rosa
+.Person|Mary W. De Rosa
+..First|Mary
+..Last|De Rosa
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name10|Mary W. Den Rosa
+Names|Mary W. Den Rosa
+.Person|Mary W. Den Rosa
+..First|Mary
+..Last|Den Rosa
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name11|Mary W. Le Rosa
+Names|Mary W. Le Rosa
+.Person|Mary W. Le Rosa
+..First|Mary
+..Last|Le Rosa
+..Middle|W.
+
+<TESTCASE>|Name with Compound Last Name12|Mary W. La Rosa
+Names|Mary W. La Rosa
+.Person|Mary W. La Rosa
+..First|Mary
+..Last|La Rosa
+..Middle|W.
+
+<TESTCASE>|Korean Name|Do Yoon Kim
+Names|Do Yoon Kim
+.Person|Do Yoon Kim
+..First|Do
+..Last|Kim
+..Middle|Yoon

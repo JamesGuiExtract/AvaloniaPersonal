@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.LongToLongMap.1 = s 'LongToLongMap Class'
+	{
+		CLSID = s '{E23C61A0-9780-4F41-9D21-A0E4A3EE9927}'
+	}
+	UCLIDCOMUtils.LongToLongMap = s 'LongToLongMap Class'
+	{
+		CLSID = s '{E23C61A0-9780-4F41-9D21-A0E4A3EE9927}'
+		CurVer = s 'UCLIDCOMUtils.LongToLongMap.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E23C61A0-9780-4F41-9D21-A0E4A3EE9927} = s 'LongToLongMap Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.LongToLongMap.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.LongToLongMap'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

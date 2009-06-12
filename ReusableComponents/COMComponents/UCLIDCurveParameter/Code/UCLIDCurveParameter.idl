@@ -1,0 +1,59 @@
+// UCLIDCurveParameter.idl : IDL source for UCLIDCurveParameter.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDCurveParameter.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(9F2B3833-F121-49C0-A687-D8241EBAA90B),
+	version(1.0),
+	helpstring("UCLID CurveParameter 1.0 Type Library")
+]
+library UCLID_CURVEPARAMETERLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+	typedef
+	[
+		uuid(F05CAF8F-BA28-49d3-B952-0163D964F599), 
+		helpstring("UCLID ECurveParameter Enum")
+	]
+	enum ECurveParameterType
+	{
+		// input is deflection angle
+		kLineDeflectionAngle = -4,
+		// input is internal angle
+		kLineInternalAngle = -3,
+		kLineBearing = -2,
+		kLineDistance = -1,
+		kInvalidParameterType = 0,
+		kArcConcaveLeft = 1,
+		kArcDeltaGreaterThan180Degrees = 2,
+		kArcDelta = 3,
+		kArcStartAngle = 4,
+		kArcEndAngle = 5,
+		kArcDegreeOfCurveChordDef = 6,
+		kArcDegreeOfCurveArcDef = 7,
+		kArcTangentInBearing = 8,
+		kArcTangentOutBearing = 9,
+		kArcChordBearing = 10,
+		kArcRadialInBearing = 11,
+		kArcRadialOutBearing = 12,
+		kArcRadius = 13,
+		kArcLength = 14,
+		kArcChordLength = 15,
+		kArcExternalDistance = 16,
+		kArcMiddleOrdinate = 17,
+		kArcTangentDistance = 18,
+		kArcStartingPoint = 19,
+		kArcMidPoint = 20,
+		kArcEndingPoint = 21,
+		kArcCenter = 22,
+		kArcExternalPoint = 23,
+		kArcChordMidPoint = 24
+	} ECurveParameterType;
+};

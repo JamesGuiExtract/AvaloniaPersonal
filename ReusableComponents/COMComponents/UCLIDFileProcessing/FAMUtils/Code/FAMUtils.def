@@ -1,0 +1,6 @@
+; FAMUtils.def : Declares the module parameters for the DLL.
+
+LIBRARY      "FAMUtils"
+
+EXPORTS
+    ; Explicit exports can go here

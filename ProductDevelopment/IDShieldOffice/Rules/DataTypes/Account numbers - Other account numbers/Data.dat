@@ -1,0 +1,61 @@
+(?imnsx)
+
+(?#
+#------------------------------------------------
+# Do NOT find account number clues that are part
+# of a Savings, Checking, Bank, or Credit Card
+# account number clue.
+#------------------------------------------------
+)
+
+(?<!
+
+	(?#
+	#--------------------------------------------
+	# Various forms of "Savings", "Checking", and
+	# "Bank"
+	#--------------------------------------------
+	)
+	
+	(?:\bSA?V(?:INGS?)?|CHECKI|CKING|\bCKG?|BANK)[\s\S]{0,11}
+	
+	|(?# OR...)
+	
+	(?#
+	#--------------------------------------------
+	# Various credit card number clues
+	#--------------------------------------------
+	)
+	
+	(?:CARD|\bVISA\b|AMERICAN\s?EXPRESS|DISCOVER|CREDIT|CHARGE|DEBIT)[\s\S]{0,12}
+	
+)
+
+(?:
+
+	(?#
+	#--------------------------------------------
+	# Various forms of "Account Number"
+	#--------------------------------------------
+	)
+	
+	(?:\bACC|COUNT\b|ACCT|\bA\s?[\\\/]\s?C\b)[\s\S]{0,9}(?:NUM(?:BER)?|\bN[0O]|\#)
+	
+)
+
+(?#
+#------------------------------------------------
+# ...within ten characters of...
+#------------------------------------------------
+)
+
+\D{0,10}
+
+(?#
+#------------------------------------------------
+# ...something that looks like an account number.
+# Capture the account number!
+#------------------------------------------------
+)
+
+(?<Account_Data>\d([A-Z]?[\d\x20-]{1,2}){1,10}\d)

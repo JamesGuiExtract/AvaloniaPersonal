@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.EliminateDuplicates.1 = s 'EliminateDuplicates Class'
+	{
+		CLSID = s '{DB2C8D87-BB95-42CF-9835-D836631C0018}'
+	}
+	UCLIDAFOutputHandlers.EliminateDuplicates = s 'EliminateDuplicates Class'
+	{
+		CLSID = s '{DB2C8D87-BB95-42CF-9835-D836631C0018}'
+		CurVer = s 'UCLIDAFOutputHandlers.EliminateDuplicates.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {DB2C8D87-BB95-42CF-9835-D836631C0018} = s 'EliminateDuplicates Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.EliminateDuplicates.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.EliminateDuplicates'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

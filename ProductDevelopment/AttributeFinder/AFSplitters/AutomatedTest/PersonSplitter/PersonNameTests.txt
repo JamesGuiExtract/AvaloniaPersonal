@@ -1,0 +1,84 @@
+// Person Name Splitter tests
+// Test Type: Individual Persons
+John Smith
+
+Mr. John Smith
+
+John H Smith
+
+John H. Smith
+
+John Smith, Jr.
+
+John Smith Jr.
+
+John H Smith Jr
+
+John H. Smith, III
+
+Mr. John H. Smith, III
+
+John Smith Sr
+
+J. Harvey Smith IV
+
+Mary W. Smith-Jones
+
+Mrs. Mary Jones
+
+Dr. Mary W. Jones
+
+Prof Mary Jones
+
+Miss Mary Jones
+
+Fr. William Henry Harrison
+
+Mary W. Van Buren
+
+Mary W. Mc Donald
+
+Mary W. St Clair
+
+Mary W. McDonald
+
+Mary W. St. Clair
+
+Mary W. Vander Wolk
+
+Mary W. Von Buren
+
+Mary W. Mac Donald
+
+Mary W. De Rosa
+
+Mary W. Den Rosa
+
+Mary W. Le Rosa
+
+Mary W. La Rosa
+
+Do Yoon Kim
+
+John Van Buren
+
+John W. Van Buren
+
+Mr. John Van Buren
+
+Mr. John W. Van Buren
+
+Mr. John Van Buren, Jr.
+
+Mr. John MiddleA MiddleB Van Buren, Jr.
+
+John, Mary
+
+Van Buren, John L
+
+Van Buren, John Lab Rat
+
+Smith, John L and Smith, Mary Q
+
+Smith, John L Jr
+

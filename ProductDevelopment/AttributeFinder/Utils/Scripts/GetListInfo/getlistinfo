@@ -1,0 +1,29 @@
+#!/bin/sh
+# run from the directory with the file lists you wish to search
+# with the test result XML as the first argument e.g.,
+#
+# getlistinfo EXTRACTRedactionTester.IDShieldTester.1\ -\ 09-06-2007\ -\ 16.39.32.xml
+
+while read -r x; do
+	x="${x%%
+}";
+	# don't print xml tag lines or uss|voa|nte's
+	if [[  $x != \<* && $x != *uss && $x != *voa && $x != *dat ]];
+		then echo $x;
+	fi
+
+	# add a blank line after SUCCESS|FAILURE
+	if [[ $x = SUCCESS || $x = FAILURE ]];
+		then echo "";
+	fi
+
+	# echo contents of nte files if file exists
+	if [[ $x == *nte && -e "$x" ]];
+		then cat "$x";
+	fi
+
+	# check for filenames in all text files
+	if [[ $x == K:* ]]; 
+		then grep -Fl "$x" *.txt;
+	fi;
+done < $1 > ${1%%xml}dat

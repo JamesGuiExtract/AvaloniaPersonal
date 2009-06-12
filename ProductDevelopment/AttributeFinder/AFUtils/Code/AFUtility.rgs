@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFUtils.AFUtility.1 = s 'AFUtility Class'
+	{
+		CLSID = s '{39125F86-1A5F-4389-A456-FB4DC4FDFCEE}'
+	}
+	UCLIDAFUtils.AFUtility = s 'AFUtility Class'
+	{
+		CLSID = s '{39125F86-1A5F-4389-A456-FB4DC4FDFCEE}'
+		CurVer = s 'UCLIDAFUtils.AFUtility.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {39125F86-1A5F-4389-A456-FB4DC4FDFCEE} = s 'AFUtility Class'
+		{
+			ProgID = s 'UCLIDAFUtils.AFUtility.1'
+			VersionIndependentProgID = s 'UCLIDAFUtils.AFUtility'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{AC966E48-1A26-40C7-B61E-AC4C09C9D565}'
+		}
+	}
+}

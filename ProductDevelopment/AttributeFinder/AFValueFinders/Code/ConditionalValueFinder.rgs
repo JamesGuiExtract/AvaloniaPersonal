@@ -1,0 +1,26 @@
+HKCR
+{
+	AFValueFinders.ConditionalValueFinder.1 = s 'ConditionalValueFinder Class'
+	{
+		CLSID = s '{2ADCF61C-813B-488E-91A6-0D746B38BEE2}'
+	}
+	AFValueFinders.ConditionalValueFinder = s 'ConditionalValueFinder Class'
+	{
+		CLSID = s '{2ADCF61C-813B-488E-91A6-0D746B38BEE2}'
+		CurVer = s 'AFValueFinders.ConditionalValueFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2ADCF61C-813B-488E-91A6-0D746B38BEE2} = s 'ConditionalValueFinder Class'
+		{
+			ProgID = s 'AFValueFinders.ConditionalValueFinder.1'
+			VersionIndependentProgID = s 'AFValueFinders.ConditionalValueFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

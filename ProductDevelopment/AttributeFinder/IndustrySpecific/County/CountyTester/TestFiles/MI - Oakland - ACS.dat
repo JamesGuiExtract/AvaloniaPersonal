@@ -1,0 +1,20 @@
+//AST
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//DIS
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\DIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\DIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\DIS;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MTG
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\MTG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\MTG;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+
+//WDD
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\WDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\WDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;GGFinder - MI - Oakland - ACS.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\WDD;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+

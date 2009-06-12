@@ -1,0 +1,26 @@
+HKCR
+{
+	ParagraphTextCorrectors.LegalDescriptionTextCorrector.1 = s 'LegalDescriptionTextCorrector Class'
+	{
+		CLSID = s '{6F0C8A6C-B704-46A7-9624-D21ADA6414AE}'
+	}
+	ParagraphTextCorrectors.LegalDescriptionTextCorrector = s 'LegalDescriptionTextCorrector Class'
+	{
+		CLSID = s '{6F0C8A6C-B704-46A7-9624-D21ADA6414AE}'
+		CurVer = s 'ParagraphTextCorrectors.LegalDescriptionTextCorrector.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {6F0C8A6C-B704-46A7-9624-D21ADA6414AE} = s 'LegalDescriptionTextCorrector Class'
+		{
+			ProgID = s 'ParagraphTextCorrectors.LegalDescriptionTextCorrector.1'
+			VersionIndependentProgID = s 'ParagraphTextCorrectors.LegalDescriptionTextCorrector'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA7C4DC6-E679-461A-BE65-25B50DD25597}'
+		}
+	}
+}

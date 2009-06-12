@@ -1,0 +1,4 @@
+Driver[\s\S]{1,5}License
+^Driver
+Date\s*of\s*Birth
+applicant.{0,5}typed

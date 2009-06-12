@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.SmoothCharactersICO.1 = s 'SmoothCharactersICO Class'
+	{
+		CLSID = s '{2F020D66-D26E-49BC-98D0-EF88A14DC986}'
+	}
+	ESImageCleanup.SmoothCharactersICO = s 'SmoothCharactersICO Class'
+	{
+		CLSID = s '{2F020D66-D26E-49BC-98D0-EF88A14DC986}'
+		CurVer = s 'ESImageCleanup.SmoothCharactersICO.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2F020D66-D26E-49BC-98D0-EF88A14DC986} = s 'SmoothCharactersICO Class'
+		{
+			ProgID = s 'ESImageCleanup.SmoothCharactersICO.1'
+			VersionIndependentProgID = s 'ESImageCleanup.SmoothCharactersICO'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

@@ -1,0 +1,232 @@
+//Microsoft Developer Studio generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE DISCARDABLE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "#ifdef _WIN32\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#endif //_WIN32\r\n"
+    "#include ""res\\IndexConverter.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""         // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON    DISCARDABLE     "res\\IndexConverter.ico"
+IDI_ICON_INFO           ICON    DISCARDABLE     "..\\..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\res\\icon_info.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_INDEXCONVERTER_DIALOG DIALOGEX 0, 0, 336, 324
+STYLE DS_MODALFRAME | WS_MINIMIZEBOX | WS_POPUP | WS_VISIBLE | WS_CAPTION | 
+    WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "Index File Converter"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Index File",IDC_STATIC,11,9,35,10
+    EDITTEXT        IDC_EDIT_INDEX,76,7,200,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_INDEX,282,7,13,12
+    LTEXT           "Delimiter",IDC_STATIC,11,28,42,10
+    EDITTEXT        IDC_EDIT_DELIMITER,76,26,32,12,ES_AUTOHSCROLL
+    LTEXT           "EAV Path and File",IDC_STATIC,11,46,58,10
+    EDITTEXT        IDC_EDIT_EAV,76,44,200,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "...",IDC_BUTTON_EAV,282,44,13,12
+    EDITTEXT        IDC_EDIT_FROM,114,257,161,12,ES_AUTOHSCROLL
+    CONTROL         "Move file(s) with name:",IDC_CHECK_MOVE,"Button",
+                    BS_AUTOCHECKBOX | WS_TABSTOP,23,257,84,10
+    RTEXT           "to folder:",IDC_STATIC,79,276,28,10
+    EDITTEXT        IDC_EDIT_TO,114,274,161,12,ES_AUTOHSCROLL
+    LTEXT           "Attribute Name",IDC_STATIC,11,64,58,10
+    EDITTEXT        IDC_EDIT_NAME,76,63,200,12,ES_AUTOHSCROLL
+    LTEXT           "Attribute Value",IDC_STATIC,11,83,58,10
+    EDITTEXT        IDC_EDIT_VALUE,76,82,200,12,ES_AUTOHSCROLL
+    CONTROL         "Consolidate and trim whitespace",IDC_CHECK_CONSOLIDATE,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,76,98,122,10
+    EDITTEXT        IDC_EDIT_TYPE,76,115,200,12,ES_AUTOHSCROLL
+    LTEXT           "Type Translation Table :",IDC_STATIC,23,131,83,10
+    CONTROL         "List1",IDC_LIST_TRANSLATE,"SysListView32",LVS_REPORT | 
+                    LVS_SHOWSELALWAYS | WS_BORDER | WS_TABSTOP,23,143,253,56
+    PUSHBUTTON      "&Add...",IDC_BUTTON_ADD,282,153,44,12
+    PUSHBUTTON      "&Modify...",IDC_BUTTON_MODIFY,282,187,44,12
+    PUSHBUTTON      "&Delete",IDC_BUTTON_DELETE,282,170,44,12
+    PUSHBUTTON      "Process &One",IDC_BUTTON_PROCESS,10,305,71,13
+    PUSHBUTTON      "&Process All",IDC_BUTTON_CONTINUE,92,305,71,13
+    PUSHBUTTON      "...",IDC_BUTTON_FROM,281,257,13,12
+    PUSHBUTTON      "...",IDC_BUTTON_TO,281,274,13,12
+    LTEXT           "Attribute Type",IDC_STATIC,11,117,58,10
+    ICON            IDI_ICON_INFO,IDC_INFO_EAV,300,46,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    ICON            IDI_ICON_INFO,IDC_INFO_FROM_FILE,299,258,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    ICON            IDI_ICON_INFO,IDC_INFO_TO_FOLDER,299,278,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    ICON            IDI_ICON_INFO,IDC_INFO_ATTR_VALUE,283,84,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    ICON            IDI_ICON_INFO,IDC_INFO_ATTR_TYPE,283,117,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    PUSHBUTTON      "&Close",IDC_BUTTON_CLOSE,250,305,71,13
+    GROUPBOX        "Move Files",IDC_STATIC,10,230,315,65
+    CONTROL         "Move files only (i.e. use this utility for moving files only.)",
+                    IDC_CHECK_ONLY_MOVE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,23,243,187,10
+    PUSHBUTTON      "Re&set",IDC_BUTTON_RESET,173,305,71,13
+    EDITTEXT        IDC_EDIT_CONDITION_LHS,115,210,55,12,ES_AUTOHSCROLL
+    COMBOBOX        IDC_COMBO_CONDITION_OP,175,210,40,45,CBS_DROPDOWNLIST | 
+                    WS_VSCROLL | WS_TABSTOP
+    EDITTEXT        IDC_EDIT_CONDITION_RHS,220,210,55,12,ES_AUTOHSCROLL
+    ICON            IDI_ICON_INFO,IDC_INFO_CONDITION,285,210,20,20,SS_NOTIFY | 
+                    SS_REALSIZEIMAGE | WS_TABSTOP
+    CONTROL         "Write above attribute only if",
+                    IDC_CHECK_WRITE_CONDITION,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,10,210,100,10
+    LTEXT           "String Qualifiers",IDC_STATIC,140,28,60,10
+    EDITTEXT        IDC_EDIT_BEGIN_STRING_QUALIFIER,205,25,32,12,
+                    ES_AUTOHSCROLL
+    EDITTEXT        IDC_EDIT_END_STRING_QUALIFIER,245,25,32,12,
+                    ES_AUTOHSCROLL
+END
+
+
+#ifndef _MAC
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "CompanyName", "\0"
+            VALUE "FileDescription", "IndexConverter MFC Application\0"
+            VALUE "FileVersion", "1, 0, 0, 1\0"
+            VALUE "InternalName", "IndexConverter\0"
+            VALUE "LegalCopyright", "Copyright (C) 2009\0"
+            VALUE "LegalTrademarks", "\0"
+            VALUE "OriginalFilename", "IndexConverter.EXE\0"
+            VALUE "ProductName", "IndexConverter Application\0"
+            VALUE "ProductVersion", "1, 0, 0, 1\0"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+#endif    // !_MAC
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO DISCARDABLE 
+BEGIN
+    IDD_INDEXCONVERTER_DIALOG, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 323
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#endif //_WIN32
+#include "res\IndexConverter.rc2"  // non-Microsoft Visual C++ edited resources
+#include "afxres.rc"         // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

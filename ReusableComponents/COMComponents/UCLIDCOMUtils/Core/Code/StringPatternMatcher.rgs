@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.StringPatternMatcher.1 = s 'StringPatternMatcher Class'
+	{
+		CLSID = s '{8CD557BC-C36B-42C8-88D4-971A3F1E52EC}'
+	}
+	UCLIDCOMUtils.StringPatternMatcher = s 'StringPatternMatcher Class'
+	{
+		CLSID = s '{8CD557BC-C36B-42C8-88D4-971A3F1E52EC}'
+		CurVer = s 'UCLIDCOMUtils.StringPatternMatcher.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8CD557BC-C36B-42C8-88D4-971A3F1E52EC} = s 'StringPatternMatcher Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.StringPatternMatcher.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.StringPatternMatcher'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

@@ -1,0 +1,80 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MOD\9700069354.tif.uss
+LocalGrantee01=between^100~Mortgagor^5~[and]^?Grantee01^160~[a]^80~corporation^150~as agent
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MOD\2007084498.tif.uss
+LocalGrantee02=[and]^?Grantee02^160~AS TRUSTEE^20~FIRST^3~SUPPLEMENT^3~TO^3~AMENDED^3~AND^3~RESTATED^10~MORTGAGE^3~AND^3~INDENTURE^3~[OF]^3~TRUST
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075457.tif
+LocalGrantee03 = secure Borrower^30~note^20~[to]^?Grantee03^(the "lender
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075462.tif
+LocalGrantee04 = bargains|sells|transfers|grants|conveys|assigns^100~[to trustee^50~[for]^?Grantee04^("lender
+LocalGrantee05 = bargains|sells|transfers|grants|conveys|assigns^100~[in trust^4~[for]^?Grantee05^("lender
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075463.tif
+LocalGrantee06 = public trustee^50~and the beneficiary^?Grantee06^[a corporation organized
+LocalGrantee07 = public trustee^50~and the beneficiary^?Grantee07^under the laws]^12~united states
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089039.tif
+LocalGrantee12 = ("borrower|borrower")^100~beneficiary^?Grantee12^which^6~organized|existing
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2003107994.tif ocr'd out of order
+LocalGrantee15 = beneficiary^100~("borrower|borrower")^?Grantee15^which^6~organized|existing
+
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2000075466.tif
+LocalGrantee08 = Agreement^6~made^100~between^50~) and]^?Grantee08^Refinancer
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089006.tif
+LocalGrantee09 = beneficiary^100~acting|nominee^40~lender^300~telephone number^100~MERS|NIERS^?Grantee09^("lender|lender")
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2002098966.tif
+LocalGrantee10 = DEFINITIONS|words used in multiple sections|defined below^"Lender" is]^?Grantee10^200~Lender is
+//|words used in multiple sections
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089037.tif
+LocalGrantee11 = promissory note|hereinafter referred^250~payable^12~order of^?Grantee11^the beneficiary|beneficiary
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089041.tif
+LocalGrantee13 = payable^12~order of^?Grantee13^hereinafter referred^12~beneficiary
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2001089046.tif
+LocalGrantee14 = beneficiary is^?Grantee14^[a corporation^20~organized|exist
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2003107999.tif out of order text
+//too much trouble
+//LocalGrantee16 = herein "trustee^12~beneficiary^?Grantee16^organized|existing^25~law
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2005088984.tif
+LocalGrantee17 = herein "trustee^12~beneficiary^?Grantee16^[a corporation^25~organized|existing^25~law
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2005089008.tif
+LocalGrantee18 = witnesseth|whereas^100~executed^6~promissory note^250~payable^12~order of]^?Grantee18^successors|assigns|address
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2007084492.tif
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2008074510.tif
+LocalGrantee19 = deed^6~trust^6~made^50~between^100~("borrower"|(borrower)^250~benefit of^?Grantee19^("lender")|(lender)
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\2008074533.tif
+LocalGrantee20 = deed^6~trust^6~made^50~[by]|between^100~borrower^250~benefit of^?Grantee20^lender
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\MTG\8800273158.tif
+LocalGrantee21 = grantor^6~executed^25~promissory note^50~payable^25~[of^?Grantee21^hereinafter|referred|beneficiary
+
+[PATTERNS_END]

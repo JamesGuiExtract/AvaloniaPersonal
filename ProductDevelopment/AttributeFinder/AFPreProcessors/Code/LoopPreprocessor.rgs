@@ -1,0 +1,26 @@
+HKCR
+{
+	AFPreProcessors.LoopPreprocessor.1 = s 'LoopPreprocessor Class'
+	{
+		CLSID = s '{E5F3CDEC-A737-41db-9696-523559762A17}'
+	}
+	AFPreProcessors.LoopPreprocessor = s 'LoopPreprocessor Class'
+	{
+		CLSID = s '{E5F3CDEC-A737-41db-9696-523559762A17}'
+		CurVer = s 'AFPreProcessors.LoopPreprocessor.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E5F3CDEC-A737-41db-9696-523559762A17} = s 'LoopPreprocessor Class'
+		{
+			ProgID = s 'AFPreProcessors.LoopPreprocessor.1'
+			VersionIndependentProgID = s 'AFPreProcessors.LoopPreprocessor'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{6E739155-A988-45D0-8FF9-D2718B7B4126}'
+		}
+	}
+}

@@ -1,0 +1,23 @@
+(?:
+//(saving|checking) account (number)?
+  (?:s.v.ng|ch.ck.ng.{0,5})(?:\baccn?t|acc..nt)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))?
+//not followed by 3 words of 3+ or 2 words of 5+ letters (both with 2+ letter words interspersed)
+  (?!(\s+[^\d\s]{3,}(?:\s+[^\d\s]{2,})?){3}|(\s+[^\d\s]{5,}(?:\s+[^\d\s]{2,})?){2})
+//not on same line as section symbol thing
+  (?!.*(?:§|s.ct..n))
+//must have 2 digits within 100 chars that are close together
+  (?=[\s\S]{0,100}?\d[\s\S]{0,10}?\d)
+|
+// (saving|checking)? account number
+  (?:s.v.ng|ch.ck.ng.{0,5})?(?:\baccn?t|acc..nt)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))
+|
+//account or acct with 2 digits on line close together
+  \bacc(?:..nt|t)(?=.*?\d.{0,5}\d)
+//not on same line as section symbol thing
+  (?!.*(?:§|s.ct..n))
+|
+//account at beginning of line
+^.{0,2}(?:\baccn?t|acc..nt)(?:[\s\S]{0,5}(?:n.[mn]b.r|nu[mn]|\bnu[a-z]*|..[mn]ber|nu..er|n.m..r|n..b.r|\bn....r\b|n[0o](?![a-z])|#))?
+//must have 2 digits within 60 chars that are close together
+  (?=[\s\S]{0,60}?\d[\s\S]{0,10}?\d)
+)

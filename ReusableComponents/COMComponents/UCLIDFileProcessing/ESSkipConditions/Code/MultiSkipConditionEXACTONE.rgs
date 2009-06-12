@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.MultiFAMConditionEXACTONE.1 = s 'MultiFAMConditionEXACTONE Class'
+	{
+		CLSID = s '{26AFEBC0-4FBB-45c8-9913-B352E4F65C93}'
+	}
+	ESFAMConditions.MultiFAMConditionEXACTONE = s 'MultiFAMConditionEXACTONE Class'
+	{
+		CLSID = s '{26AFEBC0-4FBB-45c8-9913-B352E4F65C93}'
+		CurVer = s 'ESFAMConditions.MultiFAMConditionEXACTONE.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {26AFEBC0-4FBB-45c8-9913-B352E4F65C93} = s 'MultiFAMConditionEXACTONE Class'
+		{
+			ProgID = s 'ESFAMConditions.MultiFAMConditionEXACTONE.1'
+			VersionIndependentProgID = s 'ESFAMConditions.MultiFAMConditionEXACTONE'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

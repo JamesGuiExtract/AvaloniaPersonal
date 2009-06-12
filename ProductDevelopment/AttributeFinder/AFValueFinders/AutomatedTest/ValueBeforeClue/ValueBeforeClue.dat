@@ -1,0 +1,99 @@
+//test1 A single clue is defined. "Includ all strings from the beginning of the 
+//input text until the clue text" checkbox is checked.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 A single clue is defined. "Above defined clue text(s) will be treated
+//as Regular Expression(s)", and "Include all strings from the beginning of 
+//the input text until the clue text" checkboxes are checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 Use the same clue as in test2. "Include all strings from the beginning
+// of the line containing the clue text to the clue text" checkbox is checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 A single clue is defined. "Above defined clue text(s) will be treated 
+//as Regular Expression(s)", and "Include all strings from the beginning of the 
+//line containing the clue text to the clue text." checkboxes are checked.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 A single clue is defined. "Include all strings between the string specified
+// and the clue text" checkbox is checked.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//test6 A single clue is defined. "Above defined clue test(s) will be treated as
+//Regular Expression(s), "Includ all stings between the string specified and the 
+//clue text", and "Above defined string will be treated as a Regular Expression"
+//checkboxes are checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 Use the same clue as in test6. The only difference is The string defined 
+//in "Include all strings between the string specified and the clue text:"
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 Use the same clue as test6. "Up to X number of lines before the clue text:"
+//is selected.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 Everything is the same as in test8 except "Include text before the clue
+//on the line that contains the clue" is also checked.  
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 Everything is the same as in test9 except the value for "Number of lines"
+//is different.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 Everything is the same as in test10 except "Include text before the clue
+//on the line that contains the clue" checkbox is not checked.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 A single clue is defined. "Above defined clue text(s) will be treated as
+//Regular Expression(s)" is checked, and "Up to X number of words before the clue text"
+//is selected. "Space, Tab, carriage Return and New Line characters" in 
+//Define punctuation to separate each word: is checked. 
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 Everything is the same as in test12, the only difference is the value for
+//"Number of words. 
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+
+//test14 A single clue is defined. "Up to number of words before the clue text" 
+//is selected. "Carriage Return and New Line characters", and "Space, Tab, carriage Return"
+//are checked.  
+<TESTCASE>;Test14.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test14.eav
+
+//test15 Everything is the same as in test14 except "Other" checkbox in 
+//Define characters for which to stop further searching  is also checked.
+<TESTCASE>;Test15.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test15.eav
+
+//test16 Use the same clue as in test15. "Up to X number of the words before the clue text:"
+//is selected. "Space, Tab, carriage" and "Other" in "Define punctuation to separate each
+//word" are also checked.
+<TESTCASE>;Test16.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test16.eav
+
+//test17 A single clue is defined. "Up to X number of words before the clue text"
+//is selected. "Space, Tab, Carriage Return and New Line characters" in Define
+//punctuation to separate each word:" is also checked.
+<TESTCASE>;Test17.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test17.eav
+
+//test18 Use the same clue as test17. "Up to X number of words before the clue text:"
+//is selected. "Space, Tab, Carriage Return.." in "Define punctuation to separate each word:"
+//is checked.
+<TESTCASE>;Test18.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test18.eav
+
+//test19 Use the same clue as test18. "Include all strings between the string specified
+//and the clue text:" is selected. "Above Defined string will be treated as a Regular Expression"
+//is checked.
+<TESTCASE>;Test19.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test19.eav
+
+//test20 The content of the clue is the same as test19, but of different case. The settings of
+//the checkboxes are the same except "All strings defined in this window are case-sensitive"
+//is checked.
+<TESTCASE>;Test20.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test20.eav
+
+//test21 A single clue is defined. "Include all strings between the string specified and clue
+//test:" is selected. "All strings defined in this window are case-sensitive" is checked. 
+<TESTCASE>;Test21.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test21.eav
+
+//test22 Everything is same as test21 except the entry for "Inclue all strings between the string
+//specified and clue text:" is of different case.
+<TESTCASE>;Test22.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test22.eav

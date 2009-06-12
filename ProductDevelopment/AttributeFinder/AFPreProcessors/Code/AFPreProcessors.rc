@@ -1,0 +1,260 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "1 TYPELIB ""AFPreProcessors.tlb""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x2L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904B0"
+        BEGIN
+            VALUE "FileDescription", "AFPreProcessors Module"
+            VALUE "FileVersion", "1, 0, 0, 1"
+            VALUE "InternalName", "AFPreProcessors"
+            VALUE "LegalCopyright", "Copyright 2009"
+            VALUE "OriginalFilename", "AFPreProcessors.DLL"
+            VALUE "ProductName", "AFPreProcessors Module"
+            VALUE "ProductVersion", "1, 0, 0, 1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// REGISTRY
+//
+
+IDR_SELECTPAGEREGION    REGISTRY                "SelectPageRegion.rgs"
+IDR_SELECTPAGEREGIONPP  REGISTRY                "SelectPageRegionPP.rgs"
+IDR_DOCPREPROCESSORSEQUENCE REGISTRY                "DocPreprocessorSequence.rgs"
+IDR_REMOVESPATIALINFO   REGISTRY                "RemoveSpatialInfo.rgs"
+IDR_CONDITIONALPREPROCESSOR REGISTRY                "ConditionalPreprocessor.rgs"
+IDR_LOOPPREPROCESSOR    REGISTRY                "LoopPreprocessor.rgs"
+IDR_LOOPPREPROCESSORPP  REGISTRY                "LoopPreprocessorPP.rgs"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_SELECTPAGEREGIONPP DIALOGEX 0, 0, 186, 310
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    COMBOBOX        IDC_CMB_INCLUDE_EXCLUDE,5,4,48,40,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "All pages",IDC_RADIO_ALL_PAGES,"Button",BS_AUTORADIOBUTTON | WS_GROUP,13,41,45,10
+    CONTROL         "Specific page(s) ",IDC_RADIO_SPECIFIC_PAGE,"Button",BS_AUTORADIOBUTTON,13,55,68,10
+    EDITTEXT        IDC_EDIT_SPECIFIC_PAGE,81,53,69,12,ES_AUTOHSCROLL
+    CONTROL         "",IDC_RADIO_REGEXP_PAGE,"Button",BS_AUTORADIOBUTTON,13,69,12,10
+    EDITTEXT        IDC_EDIT_REGEXP_PAGE,25,85,140,55,ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_VSCROLL | WS_HSCROLL
+    CONTROL         "Regular Expression",IDC_CHECK_REGEXP,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,144,77,10
+    CONTROL         "Case Sensitive",IDC_CHECK_CASE_SENSITIVE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,25,155,63,10
+    CONTROL         "Restrict page horizontally",IDC_CHECK_RESTRICT_HORIZON,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,181,95,10
+    LTEXT           "Start at",IDC_STATIC,27,196,24,8
+    EDITTEXT        IDC_EDIT_START_HORIZON,59,194,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "End at",IDC_STATIC,27,209,22,8
+    EDITTEXT        IDC_EDIT_END_HORIZON,59,207,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    CONTROL         "Restrict page vertically",IDC_CHECK_RESTRICT_VERTICAL,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,224,87,10
+    LTEXT           "Start at",IDC_STATIC,27,239,24,8
+    EDITTEXT        IDC_EDIT_START_VERTICAL,59,237,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "End at",IDC_STATIC,27,252,22,8
+    EDITTEXT        IDC_EDIT_END_VERTICAL,59,250,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "region defined as follow:",IDC_STATIC,58,6,77,8
+    LTEXT           "1) Select page(s)",IDC_STATIC,5,28,54,8
+    LTEXT           "2) On each page in scope",IDC_STATIC,5,168,83,8
+    LTEXT           "%",IDC_STATIC,93,196,8,8
+    LTEXT           "%",IDC_STATIC,93,209,8,8
+    LTEXT           "%",IDC_STATIC,93,239,8,8
+    LTEXT           "%",IDC_STATIC,93,252,8,8
+    ICON            IDI_ICON_INFO,IDC_HELP_SPECIFIC_PAGE,159,54,21,20,SS_NOTIFY
+    LTEXT           "pages that contain:",IDC_STATIC,95,70,65,8
+    COMBOBOX        IDC_CMB_REGEXP_PAGES,25,69,65,40,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "OCR the included text",IDC_CHECK_OCR,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,279,85,10
+    LTEXT           "Rotate image",IDC_STATIC,27,295,43,8
+    EDITTEXT        IDC_EDIT_ROTATION,74,293,29,12,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "3) For each selected region",IDC_STATIC,5,266,93,8
+    LTEXT           "degrees clockwise",IDC_STATIC,108,295,60,8
+END
+
+IDD_LOOPPREPROCESSORRPP DIALOGEX 0, 0, 290, 218
+STYLE DS_SETFONT | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Sans Serif", 0, 0, 0x1
+BEGIN
+    GROUPBOX        "Loop Type",IDC_LOOP_TYPE,6,6,276,48,WS_GROUP
+    CONTROL         "Do",IDC_RADIO_DO,"Button",BS_AUTORADIOBUTTON,12,18,25,10
+    CONTROL         "While",IDC_RADIO_WHILE,"Button",BS_AUTORADIOBUTTON,12,30,34,10
+    CONTROL         "For",IDC_RADIO_FOR,"Button",BS_AUTORADIOBUTTON,12,42,26,10
+    GROUPBOX        "Loop setup",IDC_STATIC_LOOP_SETUP,6,64,276,98
+    LTEXT           "Do",IDC_STATIC_BEGIN_LOOP_TEXT,12,76,72,8
+    LTEXT           "{",IDC_STATIC_BEGIN_LOOP_BRACE,12,88,8,8
+    LTEXT           "Execute Preprocessor",IDC_STATIC_PRE_PROCESSOR,23,97,70,8
+    CONTROL         "",IDC_EDIT_PREPROCESSOR,"Static",SS_LEFTNOWORDWRAP | SS_NOTIFY | WS_GROUP,24,108,198,12,WS_EX_STATICEDGE
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIGURE_PREPROCESSOR,228,108,48,13
+    LTEXT           "} while this condition is",IDC_STATIC_END_LOOP_TEXT,12,131,72,8
+    COMBOBOX        IDC_COMBO_CONDITION_VALUE,90,127,42,36,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_EDIT_CONDITION,"Static",SS_LEFTNOWORDWRAP | SS_NOTIFY | WS_GROUP,24,144,198,12,WS_EX_STATICEDGE
+    PUSHBUTTON      "Commands >",IDC_BUTTON_CONFIGURE_CONDITION,228,144,48,13
+    LTEXT           "Maximum number of iterations:",IDC_STATIC_ITERATION_TEXT,12,181,96,8
+    EDITTEXT        IDC_EDIT_ITERATIONS,114,179,48,12,ES_AUTOHSCROLL
+    GROUPBOX        "Loop options",IDC_STATIC,6,168,276,42
+    CONTROL         "Log exceptions if above maximum number of iterations is reached",IDC_CHECK_LOG_EXCEPTION,
+                    "Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,195,220,10
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_SELECTPAGEREGIONPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 5
+        RIGHTMARGIN, 181
+        TOPMARGIN, 4
+        BOTTOMMARGIN, 305
+    END
+
+    IDD_LOOPPREPROCESSORRPP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 283
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 211
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_ICON_INFO           ICON                    "..\\..\\..\\..\\ReusableComponents\\BaseUtils\\Code\\res\\icon_info.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_LOOPPREPROCESSORRPP DLGINIT
+BEGIN
+    IDC_COMBO_CONDITION_VALUE, 0x403, 5, 0
+0x7254, 0x6575, "\000" 
+    IDC_COMBO_CONDITION_VALUE, 0x403, 6, 0
+0x6146, 0x736c, 0x0065, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_PROJNAME            "AFPreProcessors"
+    IDS_TITLESelectPageRegionPP "SelectPageRegionPP"
+    IDS_HELPFILESelectPageRegionPP "SelectPageRegionPP"
+    IDS_DOCSTRINGSelectPageRegionPP "SelectPageRegionPP"
+END
+
+STRINGTABLE 
+BEGIN
+    IDS_TITLELoopPreProcessorPP "LoopPreProcessornPP"
+    IDS_HELPFILELoopPreProcessorPP "LoopPreProcessorPP"
+    IDS_DOCSTRINGLoopPreProcessorPP "LoopPreProcessorPP"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+1 TYPELIB "AFPreProcessors.tlb"
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

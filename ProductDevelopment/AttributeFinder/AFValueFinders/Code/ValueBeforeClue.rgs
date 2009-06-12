@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.ValueBeforeClue.1 = s 'ValueBeforeClue Class'
+	{
+		CLSID = s '{69F2031E-B5C7-4905-A0C8-53FD5B52E369}'
+	}
+	UCLIDAFValueFinders.ValueBeforeClue = s 'ValueBeforeClue Class'
+	{
+		CLSID = s '{69F2031E-B5C7-4905-A0C8-53FD5B52E369}'
+		CurVer = s 'UCLIDAFValueFinders.ValueBeforeClue.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {69F2031E-B5C7-4905-A0C8-53FD5B52E369} = s 'ValueBeforeClue Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.ValueBeforeClue.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.ValueBeforeClue'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

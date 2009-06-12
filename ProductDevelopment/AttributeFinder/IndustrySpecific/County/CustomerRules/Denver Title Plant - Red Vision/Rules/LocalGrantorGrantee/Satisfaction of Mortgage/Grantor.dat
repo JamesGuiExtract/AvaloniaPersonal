@@ -1,0 +1,33 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116478.tif
+rule01=Federal^3~Securities^3~Exchange^3~Act^3~of^3~1934]^?Grantor^250~Current^6~Owner^30~Evidence|Debt
+rule02=deed^9~trust^20~fully^3~satisfied]^?Grantor^160~Current^3~Owner^9~Holder^24~Indebtedness|Secured
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2006085118.tif
+//rule04=entities^3~described^3~in]^12~38|39|102^16~[CRS]|[C.R.S]^?Grantor^90~Name^9~address^9~Current^3~Owner^9~Holder^24~Indebtedness|Secured
+rule03=entities^3~described^3~in]^12~38|39|102^16~[CRS]|[C.R.S]^?Grantor^90~Current^3~Owner^9~Holder
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116498.tif.uss
+rule05=have been^16~satisfied^?Grantor^160~Current^3~Owner^9~Holder^24~Indebtedness|Secured
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116515.tif 
+rule10=authorized^3~signor^3~[of]^?Grantor^160~[who^3~is^3~personally
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116516.tif
+rule11=vice^3~president^3~of]^?Grantor^80~[who is personally|personally known|known to me
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2004116524.tif
+rule12=vice^3~president^3~of]^?Grantor^80~[as^3~attorney^9~fact
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2006085139.tif.uss
+rule13=trust^3~have^3~been^3~fully^3~satisfied^?Grantor^120~Current^3~Owner^9~Holder
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2007084525.tif.uss
+rule14=undersigned^60~executed|sealed|acknowledged|delivered|instrument^60~year^5~first^5~above^5~written^?Grantor^120~[as^3~Servicer^3~for^3~the^3~following^3~Lenders
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2007084528.tif 
+rule13=by^3~deed^3~of^3~trust^1~(Lender|Lender)^?Grantor^120~name^3~and^3~title^9~agent
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\2005089019.tif.uss
+rule18=foregoing^60~request|release|acknowl|knowledged^100~as^9~Manager^6~[of]^?Grantor^80~witness^5~my^5~hand
+rule15=Current^3~benefic^3~y]^?Grantor^160~[by]^60~title|state of|[ss]
+rule20=conditions|trust^20~have|been^20~fully^3~satisfied^?Grantor^160~Current^6~Beneficiary^6~Lender
+rule21=has|have^5~been^5~fully^5~satisfied^3~\r\n\r\n^?Grantor^160~\r\n\r\nBy]
+rule22=been^5~fully^5~satisfied^3~\r\n\r\n^?Grantor^160~know^3~[al
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\9200060228.tif.uss
+rule23=been^5~fully^5~satisfied^3~\r\n^?Grantor^160~current^80~owner|holder|deed|lender|trust
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\9200060661.tif
+rule24=president|secretary^80~respectively^3~of]^?Grantor^160~witness^3~my^3~hand
+rule25=Please execute^120~been fully satisfied\r\n\r\n^?Grantor^120~\r\nC^60~owner|holder|debt|secured|deed|trust
+[PATTERNS_END]

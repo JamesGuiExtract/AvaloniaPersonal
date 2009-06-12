@@ -1,0 +1,29 @@
+// SpatialStringSearcherTest.idl : IDL source for SpatialStringSearcherTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (SpatialStringSearcherTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(567BE36B-1A97-475E-862E-B521FAF122F3),
+	version(1.0),
+	helpstring("SpatialStringSearcherTest 1.0 Type Library")
+]
+library SPATIALSTRINGSEARCHERTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(0A0747A2-5124-4773-A6E4-C76AA478CA12),
+		helpstring("SpatialStringSearcherTester Class")
+	]
+	coclass SpatialStringSearcherTester
+	{
+		[default] interface ITestableComponent;
+	};
+};

@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		{72A08E20-591B-4399-8D00-A253554DFE8E} = s 'FeedbackManager'
+		'FeedbackManager.EXE'
+		{
+			val AppID = s {72A08E20-591B-4399-8D00-A253554DFE8E}
+		}
+	}
+}

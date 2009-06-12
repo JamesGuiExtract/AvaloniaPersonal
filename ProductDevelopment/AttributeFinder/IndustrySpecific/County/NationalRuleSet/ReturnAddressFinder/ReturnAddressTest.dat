@@ -1,0 +1,310 @@
+// Last used template ID: 0095
+
+//*************
+// PREFIX
+//*************
+
+<SETTING>;CASESENSITIVE=FALSE
+
+// DT:0000/CA
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\00004A5F.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00004A5F.tif.eav
+
+// DT:0001/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\000005AD.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000005AD.tif.eav
+
+// DT:0002/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\000005C2.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000005C2.tif.eav
+
+// DT:0003/OH
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\000006D2.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000006D2.tif.eav
+
+// DT:0004/OH
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\00000411.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000411_t.tif.eav
+
+// DT:0005/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000871.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000871_t.TIF.eav
+
+// DT:0006/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\00000430.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000430.tif.eav
+
+// DT:0007/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000798.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000798.TIF.eav
+
+// DT:0008/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\1938513.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\1938513.tif.eav
+
+// DT:0009/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Assignment of Mortgage\V_1_D_25_id0.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\V_1_D_25_id0.tif.eav
+
+// DT:0010/IL
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Deed of Trust\Deed of Trust012.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\Deed of Trust012.tif.eav
+
+// DT:0011/CO
+<TESTCASE>;ReturnAddressTestFile_00011.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00109315.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109315_t.tif.eav
+
+// DT:0012/WI
+<TESTCASE>;ReturnAddressTestFile_00012.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Mortgage Bank\000006D7.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000006D7_t.tif.eav
+
+// DT:0013/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Mortgage Bank\0000050A.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\0000050A.tif.eav
+
+// DT:0014/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000901.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000901.TIF.eav
+
+// DT:0015/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Mortgage Bank\1938507.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\1938507.tif.eav
+
+// DT:0016/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Mortgage Bank\1938555.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\1938555.tif.eav
+
+// DT:0017/TX
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Satisfaction of Mortgage\000006B7.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000006B7_t.tif.eav
+
+// DT:0018/MN
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Satisfaction of Mortgage\00000640.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000640.tif.eav
+
+// DT:0019/MN
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Satisfaction of Mortgage\00000707.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000707_t.tif.eav
+
+// DT:0020/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Satisfaction of Mortgage\1938433.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\1938433.tif.eav
+
+// DT:0021/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Warranty Deed\000005B6.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\000005B6.tif.eav
+
+// DT:0022/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Warranty Deed\00000474.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000474.tif.eav
+
+// DT:0023/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Trimin\Set001\Images\Warranty Deed\00000589.tif.uss;;K:\Common\Engineering\Sample files\Trimin\Set001\EAV\ReturnAddress\00000589_t.tif.eav
+
+// DT:0024/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000360.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000360.TIF.eav
+
+// DT:0025/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage Bank\001578.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set003\EAV\ReturnAddress\001578.tif.eav
+
+// DT:0026/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000395.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000395.TIF.eav
+
+// DT:0027/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000918.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000918.TIF.eav
+
+// DT:0028/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000413.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000413.TIF.eav
+
+// DT:0029/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000096.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000096_t.TIF.eav
+
+// DT:0030/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000629.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000629.TIF.eav
+
+// DT:0031/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000642.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000642.TIF.eav
+
+// DT:0032/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000914.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000914.TIF.eav
+
+// DT:0033/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00000921.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000921.TIF.eav
+
+// DT:0034/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00001028.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00001028.TIF.eav
+
+// DT:0035/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Satisfaction of Mortgage\00001034.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00001034_t.TIF.eav
+
+// DT:0036/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000041.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000041.TIF.eav
+
+// DT:0037/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000578.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000578.TIF.eav
+
+// DT:0038/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Assignment of Mortgage\00000597.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000597.TIF.eav
+
+// DT:0039/WI
+<TESTCASE>;ReturnAddressTestFile.rsd;K:\Common\Engineering\Sample files\Waukesha\Set004\Images\Mortgage Bank\00000356.tif.uss;;K:\Common\Engineering\Sample files\Waukesha\Set004\EAV\ReturnAddress\00000356.TIF.eav
+
+// DT:0040/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00111149.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00111149.tif.eav
+
+// DT:0041/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00111067.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00111067.tif.eav
+
+// DT:0042/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110800.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110800.tif.eav
+
+// DT:0043/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110960.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110960.tif.eav
+
+// DT:0044/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\QCD (D)\00018175.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018175_t.tif.eav
+
+// DT:0045/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\REL\00108557.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00108557.tif.eav
+
+// DT:0046/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\QCD (D)\00018523.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018523_t.tif.eav
+
+// DT:0047/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110437.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110437.tif.eav
+
+// DT:0048/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\REL\00110498.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110498.tif.eav
+
+// DT:0049/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SUB\00105175.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00105175.tif.eav
+
+// DT:0050/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00109644.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109644.tif.eav
+
+// DT:0051/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00108634.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00108634.tif.eav
+
+// DT:0052/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00109041.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109041.tif.eav
+
+// DT:0053/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00107722.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00107722.tif.eav
+
+// DT:0054/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00106970.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00106970_t.tif.eav
+
+// DT:0055/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110719.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110719.tif.eav
+
+// DT:0056/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00109312.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109312.tif.eav
+
+// DT:0057/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00109823.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109823.tif.eav
+
+// DT:0058/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00109855.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109855.tif.eav
+
+// DT:0059/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00110231.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110231.tif.eav
+
+// DT:0060/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00104130.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00104130.tif.eav
+
+// DT:0061/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00104259.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00104259.tif.eav
+
+// DT:0062/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00109465.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109465.tif.eav
+
+// DT:0063/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110816.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110816.tif.eav
+
+// DT:0064/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110252.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110252.tif.eav
+
+// DT:0065/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110295.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110295.tif.eav
+
+// DT:0066/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110220.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110220.tif.eav
+
+// DT:0067/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00108165.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00108165.tif.eav
+
+// DT:0068/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00107989.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00107989_t.tif.eav
+
+// DT:0069/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00110642.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00110642.tif.eav
+
+// DT:0070/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00104815.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00104815.tif.eav
+
+// DT:0071/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00105148.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00105148.tif.eav
+
+// DT:0072/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00104137.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00104137.tif.eav
+
+// DT:0073/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00106505.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00106505_t.tif.eav
+
+// DT:0074/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00107176.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00107176.tif.eav
+
+// DT:0075/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018420.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018420.tif.eav
+
+// DT:0076/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015696.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00015696.tif.eav
+
+// DT:0077/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00015663.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00015663.tif.eav
+
+// DT:0078/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\QCD (D)\00018667.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018667.tif.eav
+
+// DT:0079/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018437.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018437.tif.eav
+
+// DT:0080/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018428.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018428.tif.eav
+
+// DT:0081/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017748.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00017748.tif.eav
+
+// DT:0082/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00017913.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00017913.tif.eav
+
+// DT:0083/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\Images\D\00018182.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set002\EAV\ReturnAddress\00018182.tif.eav
+
+// DT:0084/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\SAT\00108545.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00108545_t.tif.eav
+
+// DT:0085/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00106858.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00106858.tif.eav
+
+// DT:0086/PA
+<TESTCASE>;ReturnAddressACS.rsd;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\MTG\00109258.tif.uss;;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\EAV\ReturnAddress\00109258.tif.eav
+
+// DT:0087/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\FINANC STMT\00016954.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016954_t.tif.eav
+
+// DT:0088/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\FINANC STMT\00016583.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016583.tif.eav
+
+// DT:0089/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\FINANC STMT\00016985.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016985_t.tif.eav
+
+// DT:0090/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT ORIG\Assignment of Rent\00016594.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016594.tif.eav
+
+// DT:0091/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00016787.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016787.tif.eav
+
+// DT:0092/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT ORIG\Assignment of Rent\00016561.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016561.tif.eav
+
+// DT:0093/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST\00017029.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00017029.tif.eav
+
+// DT:0094/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REL STATE TAX LN\00016375.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016375.tif.eav
+
+// DT:0095/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\STATE TAX LIEN\00016376.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016376_t.tif.eav
+
+// DT:0096/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\REVOC POWER ATTY\00016874.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016874.tif.eav
+
+// DT:0097/PA
+<TESTCASE>;ReturnAddressTestFile_00097.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RATIFICATION\00016446.tif.uss;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\ReturnAddress\00016446.tif.eav
+
+// DT:0098/PA
+<TESTCASE>;ReturnAddressACS_Midland.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ABSTRACT JUDGEMT\00008016.tif.uss;;K:\Common\Engineering\Sample Files\ACS\Set002\EAV\ReturnAddress\00008016.tif.eav
+
+
+
+
+
+

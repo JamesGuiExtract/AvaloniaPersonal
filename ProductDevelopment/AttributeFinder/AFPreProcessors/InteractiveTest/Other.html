@@ -1,0 +1,180 @@
+<html>
+
+<HEAD>
+<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Document Preprocessor - Other<br>
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<ol>
+  	<li><h2><b>Document Classifier dialog</b></h2>
+    	<ul>
+      		<li><b>Select Industry Specific Category name</b> combo box works.
+        	<ul>
+          		<li><b>County Document</b> is listed.</li>
+          		<li><b>Legal Descriptions</b> is listed.</li>
+        	</ul>
+      		</li>
+      		<li><b>OK</b> button saves changes and exits dialog.</li>
+      		<li>Changes made are persistent.</li>
+      		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+      		<li><b>X</b> button ignores changes and exits dialog.</li>
+    	</ul>
+  	</li>
+<p>
+  	<li><h2><b>Remove Spatial Info dialog</b></h2>
+    	<ul>
+      		<li><b>Configure</b> button is disabled.</li>
+    	</ul>
+  	</li>
+<p>
+  	<li><h2>Conditional Preprocess dialog</h2>
+    	<ul>
+      		<li><b>If the following condition is</b> combo box is selectable.
+        	<ul>
+          		<li><b>true</b> is listed.</li>
+          		<li><b>false</b> is listed.</li>
+        	</ul>
+      		</li>
+		<li>Condition object must be configured.</li>
+		<li>Rule object must be configured.</li>
+      		<li>Combo box below <b>If the following condition is</b> is selectable.
+        	<ul>
+          		<li><b>DocType Condition</b> is listed.
+            		<ul>
+              			<li><b>Configure</b> button opens <b>Configure Doc Type 
+				Condition</b> dialog.</li>
+            		</ul>
+            		<h3>Configure Doc Type Condition Dialog</h3>
+            		<ul>
+              			<li><b>The document type must</b> combo box is selectable.
+                		<ul>
+          				<li><b>Match</b> is listed.</li>
+          				<li><b>Not Match</b> is listed.</li>
+                		</ul>
+              			</li>
+      				<li><b>Select</b> button displays <b>Select Document 
+				Types</b> dialog.
+        			<ul>
+          				<li><b>Document Category</b> combo box is disabled.
+			         	<li>County Document is the default category.</li>
+			  		<li><b>County Document</b> contains the following 
+					at the top:
+					<ul>
+						<li>Any Unique</li>
+						<li>Unclassified</li>
+					</ul>
+			  		</li>
+            			</ul>
+          			</li>
+          			<li><b>Select one or more of the following types</b> list 
+            			box lists all document classification types.
+            			<ul>
+              				<li><b>Left Click</b> on an unselected item selects it.</li>
+              				<li><b>Left Click</b> on a selected item unselects it.</li>
+	      				<li><b>OK</b> button saves changes and exits dialog.</li>
+	      				<li>Changes made are persistent.</li>
+	      				<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+	      				<li><b>X</b> button ignores changes and exits dialog.</li>
+	      				<li>Right Click has no effect.</li>
+				</ul>
+          			</li>
+      				<li><b>Clear</b> button clears the main list box.</li>
+      				<li><b>The probability must be at least at the</b> combo box
+        			is selectable.
+        			<ul>
+          				<li><b>maybe</b> is listed.</li>
+          				<li><b>probable</b> is listed.</li>
+          				<li><b>sure</b> is listed.</li>
+        			</ul>
+              			</li>
+      				<li><b>OK</b> button saves changes and exits dialog.</li>
+      				<li>Changes made are persistent.</li>
+      				<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+      				<li><b>X</b> button ignores changes and exits dialog.</li>
+            		</ul>
+          		</li>
+<p>
+          		<li><b>Finding Rule Condition</b> is listed.
+            		<ul>
+              			<li><b>Configure</b> button opens <b>Configure
+                		finding rule</b> dialog.</li>
+            		</ul>
+            		<h3><b>Configure Finding Rule</b> dialog</h3>
+            		<ul>
+              			<li><b>... the following rule...</b> combo box is editable.</li>
+              			<li>Combo box contents include <b>Address finder</b>, <b>Block 
+				finder</b>, <b>Create value</b> and other Attribute Finding 
+				Rule objects.</li>
+              			<li>The enabled state of the <b>Configure</b> button depends 
+				on whether or not the selected Finding Rule requires 
+				configuration.</li>
+              			<li>A static text item <b>The rule must be configured</b> is 
+				displayed below the combo box if the selected Finding Rule 
+				has not been configured.</li>
+              			<li><b>OK</b> button saves changes and exits dialog.</li>
+              			<li>Changes made are persistent.</li>
+              			<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+              			<li><b>X</b> button ignores changes and exits dialog.</li>
+            		</ul>
+          		</li>
+<p>
+          		<li><b>RSDFile Condition</b> is listed.
+            		<ul>
+              			<li><b>Configure</b> button opens <b>Configure
+                		RSDFile Condition</b> dialog.</li>
+            		</ul>
+            		<h3><b>Configure RSDFile Condition</b> dialog</h3>
+            		<ul>
+              			<li><b>RSDFile</b> edit box is editable.</li>
+              			<li><b>...</b> button displays standard Windows <b>Open</b>
+                		file dialog.
+				<ul>
+					<li>File selection populates the edit box.</li>
+				</ul> 
+				</li>
+              			<li><b>Specified RSD file does not exist</b> exception
+                		is thrown when the RSD file entered is invalid.</li>
+              			<li><b>OK</b> button saves changes and exits dialog.</li>
+              			<li>Changes made are persistent.</li>
+              			<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+              			<li><b>X</b> button ignores changes and exits dialog.</li>
+            		</ul>
+          		</li>
+        	</ul>
+      		</li>
+<p>
+      		<li><b>Then run the following rule</b> combo box is selectable.
+        	<ul>
+       			<li>Combo box contents include <b>Advanced replace string</b>, 
+			<b>Document classifier</b>, <b>Locate image region</b> and other 
+			Document Preprocessor objects.</li>
+          		<li><b>Configure</b> button opens the corresponding 
+			configuration dialog.</li>
+        	</ul>
+      		</li>
+<p>
+		<li><b>[FlexIDSCore #3134]</b> Conditional Task property page
+	       	<ul>
+	      		<li>Confirm that the Conditional Task property page supports Cut, Copy and Paste 
+			via context menu in the True list.
+	      		<li>Confirm that the Conditional Task property page supports Cut, Copy and Paste 
+			via context menu in the False list.
+	       	</ul>			
+<p>
+      		<li><b>OK</b> button saves changes and exits dialog.</li>
+      		<li>Changes made are persistent.</li>
+      		<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+      		<li><b>X</b> button ignores changes and exits dialog.</li>
+		</ul>
+</ol>
+</body>
+</html>

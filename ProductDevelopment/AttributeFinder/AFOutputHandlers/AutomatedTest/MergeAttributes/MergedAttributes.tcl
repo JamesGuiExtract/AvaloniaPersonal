@@ -1,0 +1,2 @@
+EXTRACTRedactionTester.IDShieldTester.1;;IDShieldTester.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;AFCoreTester.dat

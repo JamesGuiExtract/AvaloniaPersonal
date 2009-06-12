@@ -1,0 +1,1 @@
+(?:this\s*(?:mortgage|instrument|document)(?:\s*was)?\s*)?PREPARED\s*BY(?:\s*or\s*under\s*the\s*supervision\s*of)?:(?:\r\n){1,2}(?!recor(?:d|p))(?:Law\s*office\s*of(?:\r\n){1,2})?(?:\w+[,\x20\.]{0,3})+\r\n

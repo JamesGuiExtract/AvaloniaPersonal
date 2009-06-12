@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDArcGISUtils.ArcMapToolbar.1 = s 'ArcMapToolbar Class'
+	{
+		CLSID = s '{11FC1424-005E-11D6-821B-0050DAD4FF55}'
+	}
+	UCLIDArcGISUtils.ArcMapToolbar = s 'ArcMapToolbar Class'
+	{
+		CLSID = s '{11FC1424-005E-11D6-821B-0050DAD4FF55}'
+		CurVer = s 'UCLIDArcGISUtils.ArcMapToolbar.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {11FC1424-005E-11D6-821B-0050DAD4FF55} = s 'ArcMapToolbar Class'
+		{
+			ProgID = s 'UCLIDArcGISUtils.ArcMapToolbar.1'
+			VersionIndependentProgID = s 'UCLIDArcGISUtils.ArcMapToolbar'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{EC0C8698-B764-429F-8CFF-EB0A540603C6}'
+		}
+	}
+}

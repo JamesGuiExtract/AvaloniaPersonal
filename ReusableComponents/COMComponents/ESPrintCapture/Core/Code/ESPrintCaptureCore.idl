@@ -1,0 +1,55 @@
+// ESPrintCaptureCore.idl : IDL source for ESPrintCaptureCore
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ESPrintCaptureCore.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(C5B684F8-C1C7-4A95-BCE7-93F6448F738F),
+	version(1.0),
+	helpstring("ESPrintCaptureCore 1.0 Type Library")
+]
+library ESPrintCaptureCoreLib
+{
+	importlib("stdole2.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+	// IPrintCaptureEngine
+	[
+		object,
+		uuid(4B36677E-C814-4C3A-B188-3294778ABB83),
+		dual,
+		nonextensible,
+		helpstring("IPrintCaptureEngine Interface"),
+		pointer_default(unique)
+	]
+	interface IPrintCaptureEngine : IDispatch{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Installs the virtual printer driver and sets strHandlerApp
+		//			to handle the output from the printer driver
+		[id(1), helpstring("method Install")] HRESULT Install([in] BSTR strHandlerApp);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Uninstalls the virtual printer driver that was installed previously
+		[id(2), helpstring("method Uninstall")] HRESULT Uninstall();
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+
+	// PrintCaptureEngine CoClass
+	[
+		uuid(320B9979-ED14-4293-AAC3-B66705628F57),
+		helpstring("PrintCaptureEngine Class")
+	]
+	coclass PrintCaptureEngine
+	{
+		[default] interface IPrintCaptureEngine;
+	};
+};

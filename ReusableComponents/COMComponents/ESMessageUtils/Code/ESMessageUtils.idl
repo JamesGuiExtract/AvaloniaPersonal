@@ -1,0 +1,89 @@
+// ESMessageUtils.idl : IDL source for ESMessageUtils.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ESMessageUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(036AC2B6-6B38-4EB2-B42E-657891B3833F),
+	version(1.0),
+	helpstring("ESMessageUtils 1.0 Type Library")
+]
+library ESMESSAGEUTILSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+
+	[
+		object,
+		uuid(9CC38317-0DC4-4384-A97F-A54B5E4A3F76),
+		dual,
+		helpstring("IEmailSettings Interface"),
+		pointer_default(unique)
+	]
+	interface IEmailSettings : IDispatch
+	{
+		[propget, id(1), helpstring("property SMTPServer")] HRESULT SMTPServer([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property SMTPServer")] HRESULT SMTPServer([in] BSTR newVal);
+		[propget, id(2), helpstring("property SMTPPort")] HRESULT SMTPPort([out, retval] LONG *pVal);
+		[propput, id(2), helpstring("property SMTPPort")] HRESULT SMTPPort([in] LONG newVal);
+		[propget, id(3), helpstring("property SMTPUserName")] HRESULT SMTPUserName([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property SMTPUserName")] HRESULT SMTPUserName([in] BSTR newVal);
+		[propget, id(4), helpstring("property SMTPPassword")] HRESULT SMTPPassword([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property SMTPPassword")] HRESULT SMTPPassword([in] BSTR newVal);
+		[propget, id(5), helpstring("property SenderName")] HRESULT SenderName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property SenderName")] HRESULT SenderName([in] BSTR newVal);
+		[propget, id(6), helpstring("property SenderEmailAddr")] HRESULT SenderEmailAddr([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property SenderEmailAddr")] HRESULT SenderEmailAddr([in] BSTR newVal);
+		[propget, id(7), helpstring("property EmailSignature")] HRESULT EmailSignature([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property EmailSignature")] HRESULT EmailSignature([in] BSTR newVal);
+		[propget, id(8), helpstring("property SMTPTimeout")] HRESULT SMTPTimeout([out, retval] LONG *pVal);
+		[propput, id(8), helpstring("property SMTPTimeout")] HRESULT SMTPTimeout([in] LONG newVal);
+	};
+	[
+		object,
+		uuid(718F3272-D73A-42E4-858D-0F8D99A3ADDC),
+		dual,
+		helpstring("IESMessage Interface"),
+		pointer_default(unique)
+	]
+	interface IESMessage : IDispatch
+	{
+		[id(1), helpstring("method Send")] HRESULT Send();
+		[propput, id(2), helpstring("property EmailSettings")] HRESULT EmailSettings([in] IEmailSettings * newVal);
+		[propget, id(3), helpstring("property Subject")] HRESULT Subject([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property Subject")] HRESULT Subject([in] BSTR newVal);
+		[propget, id(4), helpstring("property BodyText")] HRESULT BodyText([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property BodyText")] HRESULT BodyText([in] BSTR newVal);
+		[propget, id(5), helpstring("property FileAttachments")] HRESULT FileAttachments([out, retval] IVariantVector * *pVal);
+		[propput, id(5), helpstring("property FileAttachments")] HRESULT FileAttachments([in] IVariantVector * newVal);
+		[propget, id(6), helpstring("property Recipients")] HRESULT Recipients([out, retval] IVariantVector * *pVal);
+		[propput, id(6), helpstring("property Recipients")] HRESULT Recipients([in] IVariantVector * newVal);
+		[propget, id(7), helpstring("property Sender")] HRESULT Sender([out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property Sender")] HRESULT Sender([in] BSTR newVal);
+		[id(8), helpstring("method Clear")] HRESULT Clear();
+	};
+
+	[
+		uuid(1B7F6C45-B51B-4F44-BDD9-8DEB635BA305),
+		helpstring("EmailSettings Class")
+	]
+	coclass EmailSettings
+	{
+		[default] interface IEmailSettings;
+		//interface IObjectUserInterface;
+		//interface IObjectSettings;
+	};
+	[
+		uuid(8641F9B2-A2A3-4BA4-9B9A-F57F326D55F5),
+		helpstring("ESMessage Class")
+	]
+	coclass ESMessage
+	{
+		[default] interface IESMessage;
+	};
+};

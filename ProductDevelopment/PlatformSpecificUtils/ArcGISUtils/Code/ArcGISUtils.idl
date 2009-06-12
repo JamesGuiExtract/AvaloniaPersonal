@@ -1,0 +1,85 @@
+// ArcGISUtils.idl : IDL source for ArcGISUtils.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ArcGISUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(EC0C8698-B764-429F-8CFF-EB0A540603C6),
+	version(1.0),
+	helpstring("UCLID ArcGISUtils 1.0 Type Library")
+]
+library UCLID_ARCGISUTILSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystem.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystemUI.olb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\GISPlatInterfaces\Code\GISPlatInterfaces.tlb");
+
+
+	// Interfaces
+	[
+		object,
+		uuid(948409B3-BBFF-4B91-AA51-81C017692394),
+		dual,
+		helpstring("IArcGISDependentComponent Interface"),
+		pointer_default(unique)
+	]
+	interface IArcGISDependentComponent : IDispatch
+	{
+		[helpstring("method SetApplicationHook")] HRESULT SetApplicationHook([in] IDispatch *pApp);
+	};
+
+	// Coclasses
+	[
+		uuid(11FC1424-005E-11D6-821B-0050DAD4FF55),
+		helpstring("ArcMapToolbar Class")
+	]
+	coclass ArcMapToolbar
+	{
+		[default] interface IToolBarDef;
+	};
+	[
+		uuid(7F4176E0-9C8F-48C9-B641-760AC20668A0),
+		helpstring("HTIRCommand Class")
+	]
+	coclass HTIRCommand
+	{
+		[default] interface ICommand;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(B210E15F-A9CD-40E2-AAE5-790DFBEBE876),
+		helpstring("SRIRCommand Class")
+	]
+	coclass SRIRCommand
+	{
+		[default] interface ICommand;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(33624806-C0A2-412F-9FEE-9F1BA347E2E9),
+		helpstring("ArcGISDisplayAdapter Class")
+	]
+	coclass ArcGISDisplayAdapter
+	{
+		[default] interface IDisplayAdapter;
+		interface IArcGISDependentComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(AE2C2F1A-25E5-40EC-806E-9ECCAD5C6788),
+		helpstring("ArcGISAttributeManager Class")
+	]
+	coclass ArcGISAttributeManager
+	{
+		[default] interface IAttributeManager;
+		interface IArcGISDependentComponent;
+		interface ILicensedComponent;
+	};
+};

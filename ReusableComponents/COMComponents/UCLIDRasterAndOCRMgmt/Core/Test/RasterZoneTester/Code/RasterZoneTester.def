@@ -1,0 +1,9 @@
+; RasterZoneTester.def : Declares the module parameters.
+
+LIBRARY      "RasterZoneTester.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

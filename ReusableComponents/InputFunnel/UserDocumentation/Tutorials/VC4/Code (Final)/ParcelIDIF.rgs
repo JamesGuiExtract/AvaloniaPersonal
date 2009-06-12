@@ -1,0 +1,26 @@
+HKCR
+{
+	ParcelIDFinder.ParcelIDIF.1 = s 'ParcelIDIF Class'
+	{
+		CLSID = s '{7E28D7C6-9F4E-4CB7-806B-D0002F2AD220}'
+	}
+	ParcelIDFinder.ParcelIDIF = s 'ParcelIDIF Class'
+	{
+		CLSID = s '{7E28D7C6-9F4E-4CB7-806B-D0002F2AD220}'
+		CurVer = s 'ParcelIDFinder.ParcelIDIF.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {7E28D7C6-9F4E-4CB7-806B-D0002F2AD220} = s 'ParcelIDIF Class'
+		{
+			ProgID = s 'ParcelIDFinder.ParcelIDIF.1'
+			VersionIndependentProgID = s 'ParcelIDFinder.ParcelIDIF'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{C750BDF7-45E3-46E2-81B3-C923354F6AFE}'
+		}
+	}
+}

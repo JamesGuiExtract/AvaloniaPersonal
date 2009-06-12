@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;..\..\Rules\Grantee\Grantee.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

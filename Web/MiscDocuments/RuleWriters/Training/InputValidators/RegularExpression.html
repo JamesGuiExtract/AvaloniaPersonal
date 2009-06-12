@@ -1,0 +1,41 @@
+<HTML>
+	<HEAD>
+		<TITLE>Regular Expression Input Validator</TITLE>
+	<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Regular Expression Input Validator</h1>
+		<hr>
+		<h3>Uses</h3>
+		<p>
+			<ul>
+				<li>The Regular Expression input validator is used in conjunction with the Remove Invalid Entries output handler to remove invalid data from the output of the rules.</li>
+				<li>Any data that is not matched by the specified regular expression is marked as "invalid".</li>
+			</ul>
+		</p>
+		<hr>
+		<h3>Usage</h3>
+		<p>
+			<ul>
+				<li>To use the Regular Expression Input Validator, you first need to put some "placeholder" text in the <b>Please specify the input type</b> box.</li>
+				<li>You then need to write a regular expression that defines what data is "valid".
+					<ul>
+						<li>The regular expression can be made case sensitive.</li>
+					</ul>
+				</li>
+				<p>
+					<li><b>Example:</b>
+						<ul>
+							<li>Open <b>APN.rsd</b> and run in on <b>APN.txt</b>.</li>
+							<li>Add a Regular Expression input validator and define valid data as any string of numbers and dashes. (The regular expression <b>[\d-]*</b> will work.)</li>
+							<li>Run the rules again.  Note that the output did not change.  This is because we forgot to add a Remove Invalid Entries output handler.  The data is being flagged as invalid, but it is not being removed!</li>
+							<li>Add a Remove Invalid Entries output handler to the rules.  Run the rules again and notice the difference in output.</li>
+						</ul>
+					</li>
+				</p>
+			</ul>
+		</p>
+		<hr>
+	</BODY>
+</HTML>
+

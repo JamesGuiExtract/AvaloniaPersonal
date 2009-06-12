@@ -1,0 +1,11 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+[VARS_END]
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\RELEASE OF LIEN\20079000014800.001
+LocalRolGrantor01=[lien]^3~claimed^3~by]^?Grantor^120~against
+[PATTERNS_END]

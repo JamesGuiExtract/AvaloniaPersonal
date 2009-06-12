@@ -1,0 +1,9 @@
+^(?:[1lIt]|Ad.?)2.[\s\S]{0,4}.DD.T..N
+^.{0,5}(?:[1lIt]|Ad.?)2[\s\S]{0,6}.DD.T..N.L
+^12[\s\S]{0,4}.DD.T..N.L
+^12.*(?:SEC[\s\S]{3,7}PART|\S{2,4}RED\s*\S{0,3}RTY)
+^.{0,5}.DD.T..N.L\s*s.c.r.d
+^.{0,9}(?:ADDI.{2,9}|.{0,5}DITIO.{0,5}|.{0,7}ITIO.{0,4}|.{2,9}ITION.{0,4}|.{2,11}IONAL)\s*(?:SEC|.{0,3}ECUR|.{0,5}URED)
+^.{15,45}ASS.GN.R\s*S.P
+^.{25,55}\bS/P\WS\s*NAME
+^.{60,90}[o0]ne\s*n.me.*12[ab]

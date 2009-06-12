@@ -1,0 +1,36 @@
+1) Get lastest version of $Engineering\ProductDevelopment\Common on your computer
+
+2) Open a command prompt to Engineering\ProductDevelopment\Common folder
+
+3) Type "UpdateAllLabels.bat" and enter
+
+4) Follow the EXACT instructions given by the batch (Usually if it pauses, it means there's 
+   something you need to do before proceeding.)
+
+5) When it is asking whether you wish to label a certain project with a given label number, 
+   you can either answer 'Y' or 'N'. If you enter 'Y', remember to update LastestComponentVersions.mak. 
+   If you choose 'N', you'll need to label that project manually.
+
+6) Once UpdateAllLabels is done, go to the Build machine
+
+7) If there're build logs under E:\temp, rename and move them to their respective folders. For instance, if 
+   there's AttributeFinder.log file, look up E:\Engineering\ProductDevelopment\Common\LatestComponentVersions.mak,
+   put the correct version number (eg. 1.0.0.40) at the beginning of the "AttributeFinder.log" file name.
+   (eg. 1.0.0.40 AttributeFinder.log).
+   Then move the file to I:\Common\Engineering\ProductDevelopment\AttributeFinder\Archive\BuildLogs.
+
+8) Open a command prompt to E:\ drive. One easy way to do it is to right click on the E:\ drive, and select 
+   "Command Prompt Here".
+
+9) Type 
+   - "BuildAll" to build FlexIndex, IcoMapForArcGIS, SwipeItForArcGIS and InputFunnelSDK
+   - "BuildAF" to build FlexIndex only
+   - "BuildESRI" to build IcoMapForArcGIS
+   - "BuildIFSDK" to build InputFunnelSDK
+   - "BuildSwipeIt" to build SwipeItForArcGIS
+Note: These batch files are for building latest versions only. If you wish to build some earlier version
+      of the product, you need to call individual batch file from each product's build folder, and give 
+      a specific label number as the argument. 
+      For instance, to build version 1.0.0.20 of FlexIndex, open a command prompt to 
+      AttributeFinder\Build folder and type :
+      AttributeFinderSDK.bat "AttributeFinder Ver. 1.0.0.20"

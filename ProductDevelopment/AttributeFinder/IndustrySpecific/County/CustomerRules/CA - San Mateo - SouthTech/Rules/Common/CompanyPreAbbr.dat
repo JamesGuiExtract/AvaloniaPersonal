@@ -1,0 +1,11 @@
+(Bank\W*of\W*America)\W*N\W*A\W*$;$1
+([\s\S]+)\bF\W*A\W*$;$1
+\W+N\W*A\W*$;
+\bRECONTRUST\b;RECON TRUST
+\bL\W*L\W*C\w*$;LLC
+\bL\W*P\W*$;LP
+\bF\W*S\W*B\W*$;FSB
+^LOAN\W*\d+INVR\s*NO\s*\d+\s*;
+^Loan[\W\d]+;
+^Registered\s*holders\s*of\s*;
+^U\W*S\b;US

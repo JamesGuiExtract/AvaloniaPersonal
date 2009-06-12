@@ -1,0 +1,10 @@
+\W*an\W*addition(?:\W*to)?[\s\S]*;
+(?:\W*an\W*)addition\W*to[\s\S]*;
+\bAddition\b(?!\W*$);
+\bPhase\b;PH
+PH\s*(?:ONE|1)\b;PH I
+(\w+)\s*\-\s*(\w+);$1 $2
+PH\s*(?:TWO|2)\b;PH II
+PH\s*(?:THREE|3)\b;PH III
+PH\s*(?:FOUR|4)\b;PH IV
+PH\s*(?:FIVE|5)\b;PH V

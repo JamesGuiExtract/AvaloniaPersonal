@@ -1,0 +1,9 @@
+; AFConditions.def : Declares the module parameters.
+
+LIBRARY      "UCLIDAFConditions.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

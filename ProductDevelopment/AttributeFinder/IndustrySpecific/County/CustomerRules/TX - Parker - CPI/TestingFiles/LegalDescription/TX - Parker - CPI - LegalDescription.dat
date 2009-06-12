@@ -1,0 +1,2 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestLegalDescription.rsd;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\Images;;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\EAV\LegalDescription\$FileNoExtOf(<SourceDocName>).eav

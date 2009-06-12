@@ -1,0 +1,27 @@
+[PATTERNS_BEGIN]
+
+rule01=Ord Phys:^?Order^50~\r\n
+rule02=Fam^2~Phys:^?Family^50~\r\n
+rule03=REG DR:^?Regular^50~DOB|\r\n
+rule04=OTHR DR:^?Other^50~\r\n
+//rule04a=OTHR DR:^30~\r\n^?Other^50~\r\n
+rule05=PCP:^?Primary^50~\r\n
+rule06=ADDTL PHYS^?Additional^50~\r\n
+rule07=ATTENDING^50~\r\nSECOND^3~:^?Additional^50~\r\n
+rule08=\r\nDR:^?Primary^20~\r\n
+rule09=ORD:^?Order^20~ATT:|ADM
+rule09a=ORD!^?Order^20~ATT:|ADM
+rule10=\r\nADMITTING:^?Admitting^50~\r\n
+rule11=\r\nFAMILY^3~:^?Family^50~\r\n
+rule12=\r\nPractitioner:^?Primary^50~Patient
+rule13=\r\nOther Practitioner:^?Other^50~Primary
+rule14=\r\nORD^20~ ATT:^?Other^50~SEC:
+rule15=\r\nDR:^?Primary^50~)
+rule16=\r\nSUBM DR:^?Order^30~\r\n
+rule16a=\r\nSURM DR:^?Order^30~\r\n
+
+rule17=[Ord Dr:^?Doc^Oth|0th^2~Dr
+rule18=Results^3~faxed^3~to^6~Doctor|DR.^?Doc^[at]|[on]
+rule19=Attention:|Attn:^3~Dr^?Doc^100~also
+
+[PATTERNS_END]

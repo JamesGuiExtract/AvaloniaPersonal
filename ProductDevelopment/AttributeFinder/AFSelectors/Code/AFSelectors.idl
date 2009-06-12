@@ -1,0 +1,249 @@
+// AFSelectors.idl : IDL source for AFSelectors
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFSelectors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(B2548FD4-6D38-4849-828E-FE0660B45935),
+	version(1.0),
+	helpstring("AFSelectors 1.0 Type Library")
+]
+library UCLID_AFSELECTORSLib
+{
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//////////////////
+	// Enums
+	//////////////////
+
+	typedef
+	[
+		uuid(CF1DF0E6-F2C9-4a80-B34B-C9A8623706CF), 
+		helpstring("AFSelectors Boundary")
+	]
+	enum EBorder
+	{
+		kNoBorder,
+		kTop, 
+		kBottom, 
+		kLeft, 
+		kRight
+	}EBorder;
+
+	typedef
+	[	
+		uuid(223DAC58-6EEA-4ef0-B940-DBBF559D9DF5), 
+		helpstring("AFSelectors Border Expand Direction")
+	]
+	enum EBorderExpandDirection
+	{
+		kNoDirection,
+		kExpandUp, 
+		kExpandDown, 
+		kExpandLeft, 
+		kExpandRight
+	} EBorderExpandDirection;
+
+	typedef
+	[
+		uuid(4BB1B962-57FE-42a3-8E95-8AA1B5D36DD8), 
+		helpstring("AFSelectors Border Relation")
+	]
+	enum EBorderRelation
+	{
+		kReferenceAttibute,
+		kPage
+	}EBorderRelation;
+
+	typedef
+	[
+		uuid(A4E3D532-6309-403d-B10B-0A4560A65CBB), 
+		helpstring("AFSelectors Units")
+	]
+	enum EUnits
+	{
+		kLines,
+		kCharacters,
+		kInches,
+		kPixels
+	}EUnits;
+
+	//////////////////
+	// Interfaces
+	//////////////////
+
+	[
+		object,
+		uuid(DF345CDE-1F84-447E-9E16-9809A562133A),
+		dual,
+		nonextensible,
+		helpstring("IQueryBasedAS Interface"),
+		pointer_default(unique)
+	]
+	interface IQueryBasedAS : IDispatch
+	{
+		[propget, id(1), helpstring("property QueryText")] HRESULT QueryText([out, retval] BSTR* pVal);
+		[propput, id(1), helpstring("property QueryText")] HRESULT QueryText([in] BSTR newVal);
+	};
+
+	[
+		object,
+		uuid(A035B1E3-7524-4D15-89C0-2445637FC2B0),
+		dual,
+		nonextensible,
+		helpstring("ISpatialContentBasedAS Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatialContentBasedAS : IDispatch
+	{
+		[propget, id(1), helpstring("property ConsecutiveRows")] HRESULT ConsecutiveRows([out, retval] long* pVal);
+		[propput, id(1), helpstring("property ConsecutiveRows")] HRESULT ConsecutiveRows([in] long newVal);
+		[propget, id(2), helpstring("property MinPercent")] HRESULT MinPercent([out, retval] long* pVal);
+		[propput, id(2), helpstring("property MinPercent")] HRESULT MinPercent([in] long newVal);
+		[propget, id(3), helpstring("property MaxPercent")] HRESULT MaxPercent([out, retval] long* pVal);
+		[propput, id(3), helpstring("property MaxPercent")] HRESULT MaxPercent([in] long newVal);
+		[propget, id(4), helpstring("property Contains")] HRESULT Contains([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(4), helpstring("property Contains")] HRESULT Contains([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property IncludeNonSpatial")] HRESULT IncludeNonSpatial([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(5), helpstring("property IncludeNonSpatial")] HRESULT IncludeNonSpatial([in] VARIANT_BOOL newVal);
+	};
+
+	[
+		object,
+		uuid(8A8FC6A5-54F1-4B24-94B3-938EE957EB03),
+		dual,
+		nonextensible,
+		helpstring("ISpatialProximityAS Interface"),
+		pointer_default(unique)
+	]
+	interface ISpatialProximityAS : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Query that any selected attributes must match
+		[propget, id(1), helpstring("property TargetQuery")] HRESULT TargetQuery([out, retval] BSTR* pVal);
+		[propput, id(1), helpstring("property TargetQuery")] HRESULT TargetQuery([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Query that any attributes must match that will be tested for spatial proximity 
+		//			to target candidates .
+		[propget, id(2), helpstring("property ReferenceQuery")] HRESULT ReferenceQuery([out, retval] BSTR* pVal);
+		[propput, id(2), helpstring("property ReferenceQuery")] HRESULT ReferenceQuery([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If VARIANT_TRUE, attributes must entirely contain or be contained in the 
+		//			described spatial region in order to be selected.  If VARIANT_FALSE,
+		//			selected attributes need only overlap with the described spatial region.
+		[propget, id(3), helpstring("property RequireCompleteInclusion")] HRESULT RequireCompleteInclusion([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(3), helpstring("property RequireCompleteInclusion")] HRESULT RequireCompleteInclusion([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: VARIANT_TRUE, comparisons will be made separately to each line of a reference
+		//			attribute.  If VARIANT_FALSE, the overall area of the attribute will be used
+		//			for comparison, except where divided by page boundaries.
+		[propget, id(4), helpstring("property CompareLinesSeparately")] HRESULT CompareLinesSeparately([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(4), helpstring("property CompareLinesSeparately")] HRESULT CompareLinesSeparately([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set/get the one of the borders defining the region to search for selectable 
+		//			attributes.
+		// PARAMS:  (1) eRegionBorder - The side of the region being defined/retrieved
+		//              (top, bottom, left, or right).
+		//          (2) eRelation - The area that the boundary is dependent on. Either one of the
+		//              clue lists or the page itself.
+		//          (3) eRelationBorder - The side of the clue or page that the boundary is 
+		//				dependent on.
+		//          (4) eExpandDirection - The direction to expand the defined boundary
+		//              (up, down, left, or right).
+		//          (5) dExpandNumber - The number of units to expand the border.
+		//			(6) eUnits - The units to use when interpreting dExpandNumber.
+		[id(5), helpstring("method SetRegionBorder")] HRESULT SetRegionBorder(
+			[in] EBorder eRegionBorder, 
+			[in] EBorderRelation eRelation, 
+			[in] EBorder eRelationBorder, 
+			[in] EBorderExpandDirection eExpandDirection, 
+			[in] double dExpandNumber, 
+			[in] EUnits eUnits);
+		[id(6), helpstring("method GetRegionBorder")] HRESULT GetRegionBorder(
+			[in] EBorder eRegionBorder, 
+			[in, out] EBorderRelation *peRelation,  
+			[in, out] EBorder *peRelationBorder, 
+			[in, out] EBorderExpandDirection *peExpandDirection, 
+			[in, out] double *pdExpandNumber, 
+			[in, out] EUnits *peUnits);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If VARIANT_TRUE, sub-attributes will be added to existing attributes to show
+		// regions that will be searched for overlapping attributes (no attributes will be selected)
+		[propget, id(7), helpstring("property IncludeDebugAttributes")] HRESULT IncludeDebugAttributes([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(7), helpstring("property IncludeDebugAttributes")] HRESULT IncludeDebugAttributes([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: If VARIANT_TRUE, selected attributes will need to contain the described spatial 
+		//			region.  If VARIANT_FALSE, selected attributes will need to be contained in the 
+		//			described spatial region.
+		[propget, id(8), helpstring("property TargetsMustContainReferences")] HRESULT TargetsMustContainReferences([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(8), helpstring("property TargetsMustContainReferences")] HRESULT TargetsMustContainReferences([in] VARIANT_BOOL newVal);
+	};
+
+	//////////////////
+	// CoClasses
+	//////////////////
+
+	[
+		uuid(66653897-FFAA-4030-BCB1-9C6BE70B4E99),
+		helpstring("QueryBasedAS Class")
+	]
+	coclass QueryBasedAS
+	{
+		[default] interface IQueryBasedAS;
+	};
+
+	[
+		uuid(52532A8A-C84F-400E-A2E4-299C9B93238E),
+		helpstring("SpatialContentBasedAS Class")
+	]
+	coclass SpatialContentBasedAS
+	{
+		[default] interface ISpatialContentBasedAS;
+	};
+
+	[
+		uuid(5CDBE4BF-96A5-4E6B-8838-2B3E2B6DF394),
+		helpstring("QueryBasedASPP Class")
+	]
+	coclass QueryBasedASPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(B42259D1-9EB1-4152-B1C5-FE2A334A6214),
+		helpstring("SpatialContentBasedASPP Class")
+	]
+	coclass SpatialContentBasedASPP
+	{
+		[default] interface IUnknown;
+	};
+
+	[
+		uuid(21BBC3EB-61AE-48B8-87FC-C129A30178CF),
+		helpstring("SpatialProximityAS Class")
+	]
+	coclass SpatialProximityAS
+	{
+		[default] interface ISpatialProximityAS;
+		interface IAttributeSelector;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(ECBBA2EA-2EE9-43F2-9375-0AE950F55D1A),
+		helpstring("SpatialProximityASPP Class")
+	]
+	coclass SpatialProximityASPP
+	{
+		[default] interface IUnknown;
+	};
+};

@@ -1,0 +1,25 @@
+HKCR
+{
+	UCLID_FILEPROCESSORSLib.SetActionStatusFileProcessorPP.1 = s 'SetActionStatusFileProcessorPP Class'
+	{
+		CLSID = s '{C7628327-D222-4D2C-A0A2-589EA57FD35A}'
+	}
+	UCLID_FILEPROCESSORSLib.SetActionStatusFileProcessorPP = s 'SetActionStatusFileProcessorPP Class'
+	{
+		CLSID = s '{C7628327-D222-4D2C-A0A2-589EA57FD35A}'
+		CurVer = s 'UCLID_FILEPROCESSORSLib.SetActionStatusFileProcessorPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C7628327-D222-4D2C-A0A2-589EA57FD35A} = s 'SetActionStatusFileProcessorPP Class'
+		{
+			ProgID = s 'UCLID_FILEPROCESSORSLib.SetActionStatusFileProcessorPP.1'
+			VersionIndependentProgID = s 'UCLID_FILEPROCESSORSLib.SetActionStatusFileProcessorPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

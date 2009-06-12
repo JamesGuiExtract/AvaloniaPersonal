@@ -1,0 +1,23 @@
+//*********************************************************************************
+// ExtractOrRemoveMiddle.dat
+// 		This file contains testcases for testing the ExtractOrRemoveMiddle Value Modifier
+//*********************************************************************************
+
+// Extract the chars 10 thru 14
+<TESTCASE>;Middle01.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Middle01.eav
+
+// Remove the chars 10 thru 14
+<TESTCASE>;Middle02.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Middle02.eav
+
+// Test to make sure that if the ending position is > than the amount of text found nothing will be Extracted
+<TESTCASE>;Middle03.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;None.eav
+
+// Test to make sure that if the ending position is  > than the amount of text found then everything from starting pos to end of value is extracted
+<TESTCASE>;Middle04.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Middle04.eav
+
+// Test to make sure that if the ending position is > than the amount of text found nothing will be Removed
+<TESTCASE>;Middle05.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;All.eav
+
+// Test to make sure that if the ending position is  > than the amount of text found then everything from starting pos to end of value is removed
+<TESTCASE>;Middle06.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Middle06.eav
+

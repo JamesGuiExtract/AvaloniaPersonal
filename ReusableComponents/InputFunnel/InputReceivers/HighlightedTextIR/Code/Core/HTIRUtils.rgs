@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLID_HighlightedTextIR.HTIRUtils.1 = s 'HTIRUtils Class'
+	{
+		CLSID = s '{035A5675-0976-40E0-B232-C35210C1A5EB}'
+	}
+	UCLID_HighlightedTextIR.HTIRUtils = s 'HTIRUtils Class'
+	{
+		CLSID = s '{035A5675-0976-40E0-B232-C35210C1A5EB}'
+		CurVer = s 'UCLID_HighlightedTextIR.HTIRUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {035A5675-0976-40E0-B232-C35210C1A5EB} = s 'HTIRUtils Class'
+		{
+			ProgID = s 'UCLID_HighlightedTextIR.HTIRUtils.1'
+			VersionIndependentProgID = s 'UCLID_HighlightedTextIR.HTIRUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{940DE945-DA5B-4B16-A11C-125AD3894F1D}'
+		}
+	}
+}

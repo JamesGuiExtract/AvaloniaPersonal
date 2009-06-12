@@ -1,0 +1,180 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person or Company Name Splitter tests
+// Test Type: One Entity with Designator or Identifier
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Plain Name|John Smith A Single Man
+Names|John Smith A Single Man
+.Person|John Smith
+..First|John
+..Last|Smith
+
+<TESTCASE>|Plain Name with Comma|John Smith, Unmarried
+Names|John Smith, Unmarried
+.Person|John Smith
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Initial|Jane W Smith A Single Person
+Names|Jane W Smith A Single Person
+.Person|Jane W Smith
+..First|Jane
+..Last|Smith
+..Middle|W
+
+<TESTCASE>|Name with Title|Fr John Smith, Single
+Names|Fr John Smith, Single
+.Person|Fr John Smith
+..Title|Fr
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Title & Initial|Mrs. Jane W. Smith, a Widow
+Names|Mrs. Jane W. Smith, a Widow
+.Person|Mrs. Jane W. Smith
+..Title|Mrs.
+..First|Jane
+..Last|Smith
+..Middle|W.
+
+<TESTCASE>|Name with Everything|Dr. John Henry Smith III, A Baron Sole
+Names|Dr. John Henry Smith III, A Baron Sole
+.Person|Dr. John Henry Smith III
+..Title|Dr.
+..Suffix|III
+..First|John
+..Last|Smith
+..Middle|Henry
+
+<TESTCASE>|Name with Solely|Mr John Q. Smith, Solely
+Names|Mr John Q. Smith, Solely
+.Person|Mr John Q. Smith
+..Title|Mr
+..First|John
+..Last|Smith
+..Middle|Q.
+
+<TESTCASE>|Name with Who Is|John Q. Smith who is married
+Names|John Q. Smith who is married
+.Person|John Q. Smith
+..First|John
+..Last|Smith
+..Middle|Q.
+
+<TESTCASE>|Name with Married Woman|Mrs. Jane W. Smith, a married woman
+Names|Mrs. Jane W. Smith, a married woman
+.Person|Mrs. Jane W. Smith
+..Title|Mrs.
+..First|Jane
+..Last|Smith
+..Middle|W.
+
+<TESTCASE>|Name with Prefix1|John Van Buren
+Names|John Van Buren
+.Person|John Van Buren
+..First|John
+..Last|Van Buren
+
+<TESTCASE>|Name with Prefix2|John W. Van Buren
+Names|John W. Van Buren
+.Person|John W. Van Buren
+..First|John
+..Last|Van Buren
+..Middle|W.
+
+<TESTCASE>|Name with Prefix3|Mr. John Van Buren
+Names|Mr. John Van Buren
+.Person|Mr. John Van Buren
+..Title|Mr.
+..First|John
+..Last|Van Buren
+
+<TESTCASE>|Name with Prefix4|Mr. John W. Van Buren
+Names|Mr. John W. Van Buren
+.Person|Mr. John W. Van Buren
+..Title|Mr.
+..First|John
+..Last|Van Buren
+..Middle|W.
+
+<TESTCASE>|Name with Prefix5|Mr. John Van Buren, Jr.
+Names|Mr. John Van Buren, Jr.
+.Person|Mr. John Van Buren, Jr.
+..Title|Mr.
+..Suffix|Jr.
+..First|John
+..Last|Van Buren
+
+<TESTCASE>|Name with Prefix6|Mr. John MiddleA MiddleB Van Buren, Jr.
+Names|Mr. John MiddleA MiddleB Van Buren, Jr.
+.Person|Mr. John MiddleA MiddleB Van Buren, Jr.
+..Title|Mr.
+..Suffix|Jr.
+..First|John
+..Last|Van Buren
+..Middle|MiddleA MiddleB
+
+<TESTCASE>|Name with And1|Mortgage Of Housing And Urban Development
+Names|Mortgage Of Housing And Urban Development
+.Company|Mortgage Of Housing And Urban Development
+
+<TESTCASE>|Name with And2|John Smith, Executor Of The Last Will And Testament
+Names|John Smith, Executor Of The Last Will And Testament
+.Person|John Smith
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Limited|ACME Explosives Limited
+Names|ACME Explosives Limited
+.Company|ACME Explosives Limited
+
+<TESTCASE>|Name with Separate Property & Estate|Dr Jane Smith, Her Separate Property & Estate
+Names|Dr Jane Smith, Her Separate Property & Estate
+.Person|Dr Jane Smith
+..Title|Dr
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Name with Sole And Separate1|Mr John Q. Smith, His Sole and Separate Property
+Names|Mr John Q. Smith, His Sole and Separate Property
+.Person|Mr John Q. Smith
+..Title|Mr
+..First|John
+..Last|Smith
+..Middle|Q.
+
+<TESTCASE>|Name with Sole and Separate2|Dr Jane Smith, Her Sole and Separate Property
+Names|Dr Jane Smith, Her Sole and Separate Property
+.Person|Dr Jane Smith
+..Title|Dr
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Name with Sole and Separate3|Dr Jane Smith, As Her Sole & Separate Property
+Names|Dr Jane Smith, As Her Sole & Separate Property
+.Person|Dr Jane Smith
+..Title|Dr
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Name with Sole Property|Mrs Jane Q. Smith, Her Sole Property
+Names|Mrs Jane Q. Smith, Her Sole Property
+.Person|Mrs Jane Q. Smith
+..Title|Mrs
+..First|Jane
+..Last|Smith
+..Middle|Q.

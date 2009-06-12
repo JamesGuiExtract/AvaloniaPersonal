@@ -1,0 +1,9 @@
+; AFDataScorers.def : Declares the module parameters.
+
+LIBRARY      "UCLIDAFDataScorers.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

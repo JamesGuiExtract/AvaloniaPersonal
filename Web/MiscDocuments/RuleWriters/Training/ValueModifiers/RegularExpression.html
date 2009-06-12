@@ -1,0 +1,37 @@
+<HTML>
+	<HEAD>
+		<TITLE>Regular Expression Rule Value Modifier</TITLE>
+	<link type="text/css" rel="stylesheet" href="../UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>Regular Expression Rule Value Modifier</h1>
+		<hr>
+		<h3>Uses</h3>
+		<ul>
+			<li>The Regular Expression Rule value modifier applies a regular expression to the text returned by the Value Finder.</li>
+			<li>It can be used to par down, format, or validate the found value.</li>
+		</ul>
+		<hr>
+		<h3>Usage</h3>
+		<ul>
+			<li>The Regular Expression Rule value modifier functions exactly like the Regular Expression Rule value finder.
+				<ul>
+					<li>Simply type your regular expression into the edit box.</li>
+					<li>You can make your regular expression case sensitive.</li>
+					<li>You can also read your regular expression in from a text file.</li>
+				</ul>
+			</li>
+			<p>
+				<li><b>Example</b>:
+					<ul>
+						<li>Open <b>PhoneNumber_Regex.rsd</b>.  This .rsd file has a rule that looks for the text after "Phone Number:".</li>
+						<li>Open the Rule Tester and run this rule on <b>PhoneNumbers.txt</b> and look at the output.</li>
+						<li>Create a new a Regular Expression Rule value modifier and add the regular expression <i>\d{3}-\d{4}</i>.</li>
+						<li>Run the rules again and note the difference in the output.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+	</BODY>
+</HTML>

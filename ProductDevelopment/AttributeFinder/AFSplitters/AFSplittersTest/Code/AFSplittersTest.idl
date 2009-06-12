@@ -1,0 +1,40 @@
+// AFSplittersTest.idl : IDL source for AFSplittersTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFSplittersTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(36572F9B-248E-47E9-9C57-8569D56EE033),
+	version(1.0),
+	helpstring("UCLID AFSplittersTest 1.0 Type Library")
+]
+library UCLID_AFSPLITTERSTESTLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(2859C188-208D-42B3-B7F3-ADC9DE3A2F44),
+		helpstring("EntityNameSplitterTester Class")
+	]
+	coclass EntityNameSplitterTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(ADF687CB-EF62-4AC2-8B68-469EDBEC51EF),
+		helpstring("AddressSplitterTester Class")
+	]
+	coclass AddressSplitterTester
+	{
+		[default] interface ITestableComponent;
+		interface ILicensedComponent;
+	};
+};

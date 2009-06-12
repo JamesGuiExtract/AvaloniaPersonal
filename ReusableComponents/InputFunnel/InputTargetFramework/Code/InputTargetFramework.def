@@ -1,0 +1,9 @@
+; InputTargetFramework.def : Declares the module parameters.
+
+LIBRARY      "InputTargetFramework.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

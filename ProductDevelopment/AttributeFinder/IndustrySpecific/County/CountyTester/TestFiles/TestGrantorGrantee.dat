@@ -1,0 +1,38 @@
+//*********************************************************************************
+// This file can have x number lines of test cases.
+// Each line must have a leading tag to indicate the use of the line.
+// Tags: 
+// <FILE> -- followed by a .dat file that has similiar structure as current file.
+//	     Example: <FILE>;TestValueFindingRules.dat
+// Note: xxx.dat must either be a fully qualified file name or just a file name
+// without any directory info (or relative path). In later case, the file must be 
+// located in the same directory as the master .dat file (which is TTestGrantorGrantee.dat).
+//
+// <TESTCASE> -- followed by an RSD file name, an input text file and an .eav file.
+//
+// <TESTFOLDER> -- followed by an RSD file name, a folder name containing input text files 
+//		   and their associated .eav files
+//
+//*********************************************************************************
+
+//		*****************************
+//		*   TESTER RESULTS FILES    *
+//		*****************************
+//<FILE>;C:\Program Files\UCLID Software\CommonComponents\TesterResults\TesterResults.dat
+//<FILE>;..\..\..\..\..\..\..\..\Binaries\Release\TesterResults\TesterResults.dat
+//<FILE>;..\..\..\..\..\..\..\..\Binaries\Debug\TesterResults\TesterResults.dat
+
+//		***************************************************************
+// 		*        NATIONAL RULESET TESTER - ALL DOCUMENT TYPES         *
+//		***************************************************************
+<FILE>;..\..\NationalRuleSet\GrantorGranteeFinder\National Ruleset.dat
+
+//		***************************************************************
+// 		*       COMPLETE COUNTY DATA SETS - ALL DOCUMENT TYPES        *
+//		***************************************************************
+//<FILE>;WI - Waukesha - Initial.dat
+//<FILE>;TX - Fort Bend - CAD.dat
+//<FILE>;PA - Allegheny - ACS.dat
+//<FILE>;TX - Midland - ACS.dat
+//<FILE>;MI - Oakland - ACS.dat
+//<FILE>;CA - Fresno - AtPac.dat

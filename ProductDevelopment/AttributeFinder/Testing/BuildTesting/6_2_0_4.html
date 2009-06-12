@@ -1,0 +1,151 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 6.2.0.4 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 6.2.0.4 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3073]</b> Running rule set causes FAM to crash
+	       	<ul>
+	      		<li>Prepare a test database
+	      		<li>Modify the associated Crash.fps
+	      		<li>Cue the associated MTG image
+	      		<li>Exercise the associated RSD file
+	      		<li>Confirm that the FAM <b>does not</b> crash.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3065]</b> Remove RDT Help file
+	       	<ul>
+	      		<li>Confirm that an RDT Help file <b>is not</b> installed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3062]</b> Rulesets with Internal-use only flag
+	       	<ul>
+	      		<li>Using an RDT license, create and test an encrypted RSD file that has the 
+			Internal-use only flag checked.
+	      		<li>Using a non-RDT license, test the encrypted Internal-use RSD file.
+		       	<ul>
+				<li>Confirm that the <b>Rule Tester</b> will not exercise the rule set.
+				<li>Confirm that <b>Run Rules</b> will not exercise the rule set.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3061]</b> Rulesets without a USB counter
+	       	<ul>
+	      		<li>Using an RDT license, create and test an encrypted RSD file that has the 
+			Internal-use only flag unchecked and <b>does not</b> require a USB counter.
+	      		<li>Using a non-RDT license, test the encrypted counter-less RSD file.
+		       	<ul>
+				<li>Confirm that the <b>Rule Tester</b> will not exercise the rule set.
+				<li>Confirm that <b>Run Rules</b> will not exercise the rule set.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3059]</b> Simple Rule Writing and USB counters
+	       	<ul>
+	      		<li>Using an <b>ID Shield Rule Writing</b> license, create and test an RSD file.
+			<li>Confirm that the rule set will not run without checking the <b>Redaction</b> counter.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3046]</b> Retaining existing annotations
+	       	<ul>
+	      		<li>Confirm that auto-redaction successfully retains existing annotations.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5029]</b> Max Files Per SSOCR2 instance registry item 
+	       	<ul>
+	      		<li>Check the <b>HKLM/Software/ReusableComponents/COMComponents/UCLIDRasterAndOCRMgmt/OCREngines/SSOCR/MaxFilesPerInstance</b> 
+			registry key.
+		       	<ul>
+				<li>Confirm that the key <b>is not</b> present on a clean system.
+				<li>Confirm that the key <b>is</b> present after ID Shield installation.
+				<li>Confirm that the key <b>is not</b> present after ID Shield is uninstalled.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5028]</b> Location of UEX file
+	       	<ul>
+			<li>Confirm that the file <b>is not</b> present at Program Files\Extract Systems\LogFiles\Misc 
+			on a clean system.
+			<li>Confirm that the file <b>is not</b> present at Documents and Settings\All 
+			Users\Application Data\Extract Systems\LogFiles\Misc on a clean system.
+			<li>Install ID Shield and create a database.
+			<li>Confirm that the file <b>is</b> present at Documents and Settings\All 
+			Users\Application Data\Extract Systems\LogFiles\Misc.
+			<li>Confirm that the <b>View Exception Log</b> item in the Start menu displays the 
+			exception log.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5020]</b> Creation of license files using either JAKE or FNP2
+	       	<ul>
+			<li>Log in to a test machine that is connected to the <b>extract.local</b> domain.
+			<li>Copy the I:\Common\Engineering\Tools\SecureClients\COMLicense_InternalTesting\Current 
+			folder to the test machine.
+			<li>Disconnect the drive mapping to \\fnp2\internal.
+			<li>Disconnect the drive mapping to \\jake\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does not run.
+			<li>Re-connect the drive mapping to \\fnp2\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+			<li>Disconnect the drive mapping to \\fnp2\internal.
+			<li>Re-connect the drive mapping to \\jake\internal.
+			<li>Confirm that <b>COMLicenseGenerator.exe</b> does run.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>

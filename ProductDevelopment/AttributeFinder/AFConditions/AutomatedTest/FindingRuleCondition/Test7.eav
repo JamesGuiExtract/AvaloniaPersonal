@@ -1,0 +1,13 @@
+Test|Fifth Third Bank|Grantee
+.Company|Fifth Third Bank
+Test|Home Equity of America, Inc.|Grantor
+.Company|Home Equity of America, Inc.
+Test|JOHN E. SCHARDT AND JUDY H. SCHARDT|OriginalGrantor
+.Person|JOHN E. SCHARDT
+..First|JOHN
+..Last|SCHARDT
+..Middle|E.
+.Person|JUDY H. SCHARDT
+..First|JUDY
+..Last|SCHARDT
+..Middle|H.

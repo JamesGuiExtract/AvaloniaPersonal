@@ -1,0 +1,7 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\2000075484.tif
+rule01=this^60~assignment|rents|dated^60~between^?Grantor^160~referred^9~[to]|below^40~grantor
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\ASG\2005089009.tif
+rule02=whereas^?Grantor^120~[has]|[have]^16~[made]|executed
+
+[PATTERNS_END]

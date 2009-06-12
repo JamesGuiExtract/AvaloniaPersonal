@@ -1,0 +1,19 @@
+<SETTING>;VerificationCondition=Test
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=Test
+<SETTING>;AutomatedCondition=Test
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+// Find SSN and retain spatial information
+<TESTFOLDER>;.\SSNFinder1.rsd;.\;$DirOf(<SourceDocName>)\ActualVOA\SSNFinder1.voa;$DirOf(<SourceDocName>)\ExpectedVOA\SSNFinder1.voa
+
+// Find SSN and discard spatial information
+<TESTFOLDER>;.\SSNFinder2.rsd;.\;$DirOf(<SourceDocName>)\ActualVOA\SSNFinder2.voa;$DirOf(<SourceDocName>)\ExpectedVOA\SSNFinder2.voa
+
+// Don't find SSN and retain original
+<TESTFOLDER>;.\SSNFinder3.rsd;.\;$DirOf(<SourceDocName>)\ActualVOA\SSNFinder3.voa;$DirOf(<SourceDocName>)\ExpectedVOA\SSNFinder3.voa
+
+// Don't find SSN and discard attribute
+<TESTFOLDER>;.\SSNFinder4.rsd;.\;$DirOf(<SourceDocName>)\ActualVOA\SSNFinder4.voa;$DirOf(<SourceDocName>)\ExpectedVOA\SSNFinder4.voa
+

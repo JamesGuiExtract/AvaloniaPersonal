@@ -1,0 +1,286 @@
+// Street type test cases for address splitting
+// Note that comment lines should be removed
+
+// Avenue
+John One and Jane One
+123 Main Avenue
+Montgomery, AL  53704
+
+// Ave
+John Two and Jane Two
+123 Main Ave.,
+Apartment 321
+Juneau, AK  98765
+
+// Boulevard
+Mrs. Jane Six
+University Boulevard
+Phoenix, AZ 80302
+
+// Blvd
+John Three and Jane Three
+Division Blvd
+Little Rock, AR
+53705
+
+// Circle
+John Four and Jane Four
+Maple Circle
+San Francisco, 
+CA 41234-3322
+
+// Cir
+Mr. John Five Jr
+University Cir
+Boulder, CO 80302
+
+// Crescent
+Mrs. Jane Six
+University Crescent
+Hartford, CT 10019
+
+// Cres
+Mrs. Jane Six
+University Cres.,
+Dover, DE 10019
+
+// Court
+Mrs. Jane Six
+University Court
+Tampa, FL 80302
+
+// Ct
+Mrs. Jane Six
+University Ct
+Atlanta, 
+GA 80302
+
+// Drive
+John and Jane Doe
+123 University Drive
+Honolulu, HI 99855
+
+// Dr
+Mrs. Jane Six
+123 University Dr
+Boise, ID 88865
+
+// Highway
+Mrs. Jane Six
+West Beltline Highway
+Chicago, IL 60602
+
+// Hwy
+Mrs. Jane Six
+West Beltline Hwy
+Indianapolis, IN 80302
+
+// Lane
+Doctor Benjamin Spock
+East University Lane
+Des Moines, IA 59991
+
+// Ln
+Mrs. Jane Six
+North University Ln
+Kansas City, KS 80302
+
+// Place
+Mrs. Jane Seven
+University Place
+Louisville, KY 80302
+
+// Pl
+Mrs. Jane Six
+University Pl.
+New Orleans, LA 80302
+
+// Road
+Mrs. Jane Six
+University Road
+Augusta, ME 01210
+
+// Rd
+Wayne Lenius
+University Rd
+Waldorf, MD 20602
+
+// Square
+Mrs. Jane Six
+West University Square
+Boston, MA 10019
+
+// Sq
+Mrs. Jane Six
+West University Sq.
+Lansing, MI 61123
+
+// Street
+Wayne Lenius
+University Street
+Brainerd, MN 56401
+
+// St
+Mrs. Jane Six
+University St.
+Jackson, MS 80302
+
+// Missouri
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Kansas City, MO 80302
+
+// Montana
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Helena, MT 83456
+
+// Nebraska
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Lincoln, NE 80302
+
+// New Hampshire
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Nashua, NH 03301
+
+// New Jersey
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Trenton, NJ 12345
+
+// New Mexico
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Albuquerque, NM 88877
+
+// New York
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+New York, NY 10019
+
+// Nevada
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Carson City, NV 88877
+
+// North Carolina
+John Doe
+223 Churchill Hall
+North Carolina State University
+Raleigh, NC 57104
+
+// North Dakota
+Wayne Lenius
+223 Churchill Hall
+North Dakota State University
+Fargo, ND 57104
+
+// Ohio
+Mrs. Jane Six
+Rock and Roll Hall of Fame
+1234 University Ave, Apt 2B 
+Cleveland, OH 62626
+
+// Oklahoma
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Oklahoma City, OK 62626
+
+// Oregon
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Portland, OR 80302
+
+// Pennsylvania
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Harrisburg, PA 80302
+
+// Rhode Island
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Providence, RI 80302
+
+// South Carolina
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Columbia, SC 80302
+
+// South Dakota
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Rapid City, SD 80302
+
+// Tennessee
+Elvis Presley
+1234 University Ave, Apt 2B 
+Memphis, TN 80302
+
+// Texas
+Home Economics Department
+Texas Tech University
+1234 University Ave, Apt 2B 
+Lubbock, TX 79411
+
+// Utah
+Provo School District
+1234 University Ave, Apt 2B 
+Provo, UT 85678
+
+// Vermont
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+South Burlington, VT 05402
+
+// Virginia
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Richmond, VA 24680
+
+// Washington
+Professor Albert Einstein
+Department of Physics
+Washington State University
+1234 University Ave
+Pullman, WA 90123
+
+// Washington DC
+George W. Bush
+1600 Pensylvania Ave
+Washington, DC 20201
+
+// West Virginia
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Morgantown, WV 43210
+
+// Wisconsin
+UCLID Software, LLC
+8383 Greenway Blvd, Suite #500
+Middleton, WI 53562
+
+// Wyoming
+Mrs. Jane Six
+1234 University Ave, Apt 2B 
+Cheyenne, WY 82233
+
+// Guam
+John Jones
+1234 Beach Road
+Apartment H-2
+Agana, GU 99923-0022
+
+// Puerto Rico
+Hard Rock Cafe
+123 West Restaurant Row
+San Juan 
+PR 
+99877
+
+// Virgin Islands
+Mrs. Jane Six
+Marriot Hotel
+1234 Beach Lane
+Charlotte Amalie, VI 99894

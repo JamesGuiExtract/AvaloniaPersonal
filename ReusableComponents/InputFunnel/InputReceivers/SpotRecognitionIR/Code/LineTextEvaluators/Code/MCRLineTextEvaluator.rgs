@@ -1,0 +1,26 @@
+HKCR
+{
+	LineTextEvaluators.MCRLineTextEvaluator.1 = s 'MCRLineTextEvaluator Class'
+	{
+		CLSID = s '{28E0AC0C-5DD4-4EDD-93E6-C9675785DD8B}'
+	}
+	LineTextEvaluators.MCRLineTextEvaluator = s 'MCRLineTextEvaluator Class'
+	{
+		CLSID = s '{28E0AC0C-5DD4-4EDD-93E6-C9675785DD8B}'
+		CurVer = s 'LineTextEvaluators.MCRLineTextEvaluator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {28E0AC0C-5DD4-4EDD-93E6-C9675785DD8B} = s 'MCRLineTextEvaluator Class'
+		{
+			ProgID = s 'LineTextEvaluators.MCRLineTextEvaluator.1'
+			VersionIndependentProgID = s 'LineTextEvaluators.MCRLineTextEvaluator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5A276411-1C00-4E67-8063-B5F5E8D13739}'
+		}
+	}
+}

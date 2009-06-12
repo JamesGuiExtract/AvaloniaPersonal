@@ -1,0 +1,306 @@
+(?#
+#================================================
+# RULE 01: This rule combines a lot of common 
+#	       wordings in Mortgage documents.
+#
+# NRS Examples:
+#
+# 001.tif: MORTGAGE...MADE...BETWEEN...<MORTGAGOR>...HEREIN BORROWER
+#================================================
+)
+
+(?:
+
+	(?#
+	#--------------------------------------------
+	# "MORTGAGE"
+	#--------------------------------------------
+	)
+	
+	(?:MORTGAGE)[\s\S]{0,150}?
+	
+	(?#
+	#--------------------------------------------
+	# ... followed by "MADE", "EXECUTED", 
+	# "GIVEN", "ENTERED", or "IS" ...
+	#--------------------------------------------
+	)
+	
+	(?:\bMAD|ADE\b|EXEC|CUTED|GIVE|IVEN|ENTERED|\bis\b)[\s\S]{0,40}?
+	
+	(?#
+	#--------------------------------------------
+	# ... followed by "BY" or "BETWEEN" ...
+	#--------------------------------------------
+	)
+	(?:BY\b|\bBY|BETW|TWEEN)
+	
+	(?#
+	#--------------------------------------------
+	# Grab the Grantor, which can be up to 150
+	# characters long
+	#--------------------------------------------
+	)
+		
+	(?<MORTGAGOR>[\s\S]{5,150})
+	
+	(?#
+	#--------------------------------------------
+	# The Grantor will end with one of these
+	# common phrases...
+	#--------------------------------------------
+	)
+	
+	(?:
+	
+		(?#
+		#----------------------------------------
+		# "HEREIN" or "THE" followed by 
+		# "BORROWER", "MORTGAGOR", "TRUSTOR", or
+		# "GRANTOR"
+		#----------------------------------------
+		)
+	
+		(?:HERE|ERIN|CALL|LLED|\bTHE\b)[\s\S]{0,13}	(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR)
+		
+		|(?# OR...)
+		
+		(?#
+		#----------------------------------------
+		# A open paren, single quote, or double 
+		# quote followed by "BORROWER", 
+		# "MORTGAGOR", "TRUSTOR", or "GRANTOR"
+		#----------------------------------------
+		)
+		
+		[('"][\s\S]{0,10}(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR)
+		
+		|(?# OR...)
+		
+		(?#
+		#----------------------------------------
+		# "RESIDING AT"
+		#----------------------------------------
+		)
+		
+		(?:RESID|SIDING)[\s\S]{0,9}[AT]
+		
+		|(?# OR...)
+		
+		(?#
+		#----------------------------------------
+		# "WHOSE ADDRESS"
+		#----------------------------------------
+		)
+		
+		(?:WHOS|HOSE)[\s\S]{0,9}(?:ADDR|DRESS)
+	)
+)
+
+|(?# OR...)
+
+(?#
+#================================================
+# RULE 02: This rule covers another common 
+# wording in which the phrase 
+# "GRANTOR/TRUSTOR/MORTGAGOR/BORROWER IS/ARE" 
+# appears.
+#
+# NRS Examples:
+# 0017.tif: TRUST...MADE...GRANTOR IS...<GRANTOR>...THIS
+# 0018.tif: MORTGAGE...MADE...MORTGAGOR IS...<GRANTOR>...WORD
+# 0019.tif: TRUST...MADE...GRANTOR IS...<GRANTOR>...BORROWER
+# 0020.tif: TRUST...MADE...TRUSTOR IS...<GRANTOR>...BORROWER
+# 0021.tif: MORTGAGE...IS...MORTGAGOR REFERRED IS...<GRANTOR>...<DIGITS>
+# 0022.tif: MORTGAGE...GIVEN...MORTGAGOR IS...<GRANTOR>...BORROWER
+# 0023.tif: MORTGAGE...MADE...MORTGAGOR IS...<GRANTOR>...BORROWER
+# 0024.tif: MORTGAGE...GIVEN...MORTGAGOR IS...<GRANTOR>...WHOSE
+# 0025.tif: MORTGAGE...GIVEN...MORTGAGOR ARE...<GRANTOR>...WHOSE
+#================================================
+)
+(?:
+
+	(?#
+	#--------------------------------------------
+	# "MORTGAGE" or "DEED OF TRUST" ...
+	#--------------------------------------------
+	)
+
+	(?:TRUS|RUST)[\s\S]{0,150}?
+	
+	(?#
+	#--------------------------------------------
+	# ...followed by "MADE", "EXECUTED, "GIVEN",
+	# "ENTERED", or "IS"...
+	#--------------------------------------------
+	)
+	
+	(?:\bMAD|ADE\b|EXEC|CUTED|GIVE|IVEN|ENTERED|\bis\b)[\s\S]{0,40}?
+	
+	(?#
+	#--------------------------------------------
+	# ...followed by "BORROWER", "MORTGAGOR",
+	# "TRUSTOR", or "GRANTOR"...
+	#--------------------------------------------
+	)
+
+	(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR)[\s\S]{0,10}
+	
+	(?#
+	#--------------------------------------------
+	# ...optionally followed by "REFERRED" ...
+	#--------------------------------------------
+	)
+	
+	(?:REFER[\s\S]{0,25})?
+	
+	(?#
+	#--------------------------------------------
+	# ...followed by "IS" or "ARE"
+	#--------------------------------------------
+	)
+	
+	(?:\bIS\b|\bARE\b)
+	
+	(?#
+	#--------------------------------------------
+	# Grab the Grantor, which can be up to 150
+	# characters long
+	#--------------------------------------------
+	)
+	
+	(?<GRANTOR>[\s\S]{5,150}?)
+	
+	(?#
+	#--------------------------------------------
+	# The grantor ends when we hit two digits in
+	# a row, or the words "WHOSE", "BORROWER",
+	# "WORD" or "THIS"
+	#--------------------------------------------
+	)
+	(\d{2,}|WHOS|HOSE|BORRO|ROWER|WORD|\bTHIS\b)
+
+)
+
+|(?# OR...)
+
+(?#
+#================================================
+# RULE 03: A less common phrasing that contains
+# the word "AMOUNG"
+# 
+# NRS Examples:
+# 0026.tif: TRUST...MADE...AMOUNG...<GRANTOR>...BORROWER
+# 0027.tif: TRUST...DATED...AMOUNG...<GRANTOR>...WHOSE ADDRESS
+#================================================
+)
+
+(?:
+
+	(?#
+	#--------------------------------------------
+	# "MORTGAGE"...
+	#--------------------------------------------
+	)
+
+	(?:MORTG|TGAGE)[\s\S]{0,50}?
+	
+	(?#
+	#--------------------------------------------
+	# ...followed by "DATED" or "MADE" ...
+	#--------------------------------------------
+	)
+	
+	(?:DATE|MADE)[\s\S]{0,30}
+	
+	(?#
+	#--------------------------------------------
+	# ...followed by "AMOUNG".
+	#--------------------------------------------
+	)
+
+	(?:\bAMON|MONG\b)
+	
+	(?#
+	#--------------------------------------------
+	# Grab the grantor.  Sometime there are two
+	# grantors separated by the clue "whose
+	# address".  The optional expression in the
+	# middle assured that we grab both grantors.
+	#--------------------------------------------
+	)
+
+	(?<GRANTOR>[\s\S]{5,150}?
+	
+		(
+		
+			[\s\S]{0,25}(?:WHOS|HOSE)[\s\S]{0,100}AND[\s\S]{5,125}?
+			
+		)?
+	
+	)
+	
+	(?#
+	#--------------------------------------------
+	# The grantor will end with one of the 
+	# following phrases:
+	#--------------------------------------------
+	)
+	
+	(?:
+		(?#
+		#----------------------------------------
+		# "WHOSE ADDRESS"
+		#----------------------------------------
+		)
+		(?:WHOS|HOSE)[\s\S]{0,9}(?:ADDR|DRESS)
+		
+		|(?# OR...)
+		
+		(?#
+		#----------------------------------------
+		# "HEREIN" or "CALLED" or "THE" followed
+		# by "BORROWOR", "MORTGAGOR", "TRUSTOR",
+		# or "GRANTOR"
+		#----------------------------------------
+		)
+		
+		(?:HERE|ERIN|CALL|LLED|\bTHE\b)[\s\S]{0,13}(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR)
+		
+		|(?# OR...)
+		
+		(?#
+		#----------------------------------------
+		# An open paren, single quote, or double
+		# quote, followed by "BORROWER", 
+		# "MORTGAGOR", "TRUSTOR",or "GRANTOR"
+		#----------------------------------------
+		)
+		
+		[('"][\s\S]{0,10}(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR)
+		
+	)
+)
+
+|(?# OR...)
+
+(?#
+#================================================
+# RULE 04: Find "BORROWER", "MORTGAGOR", 
+# "TRUSTOR", or "GRANTOR" followed by a colon, 
+# the near the beginning of a line.  Grab any 
+# grantor that is on that same line.
+#
+# NRS Examples:
+#
+# MORTGAGOR: 0028.tif
+# GRANTOR: 0029.tif
+#================================================
+)
+
+(?:
+	^[^('"]{0,6}(?:BORRO|ROWER|TRUSTO|STOR|GRANTO|ANTOR).{0,5}[;:]
+	
+	(?<GRANTOR>.{5,125}?)$
+)
+

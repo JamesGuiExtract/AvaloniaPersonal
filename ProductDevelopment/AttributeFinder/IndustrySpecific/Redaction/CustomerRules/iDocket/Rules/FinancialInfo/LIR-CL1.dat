@@ -1,0 +1,1 @@
+^.{0,5}(soc|cia|ial)[\s\S]{0,10}(secu|ecur|curi|urit|rity)([\s\S]{0,6}(#|No))?

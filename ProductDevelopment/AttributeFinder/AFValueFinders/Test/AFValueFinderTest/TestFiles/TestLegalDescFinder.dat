@@ -1,0 +1,91 @@
+// This file will contain all image files that are going to be recognized.
+// Output text will be sent to LegalDescriptionFinder to find legal
+// description text within the file.
+
+// Following image files contain legal info
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\000172.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001585.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001597.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001611.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001645.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001672.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001688.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001874.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\001962.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Satisfaction of Mortgage\002027.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Assignment of Mortgage\002323.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Assignment of Mortgage\002752.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Assignment of Mortgage\002956.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Assignment of Mortgage\003362.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\000315.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\002941.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\003021.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\004396.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\007683.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\007848.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\007877.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Warranty Deed\008090.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000166.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001578.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001589a.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001724.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001875.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001970.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002068.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002083.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002142.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002272.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001596.tif
+
+// Following image files contain no legal info
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000167.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000168.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000169.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000170.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\000171.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001579.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001580.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001588.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001589.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001590.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001591.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001592.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001593.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001594.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001595.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001723.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001725.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001726.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001727.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001728.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001729.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001730.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001731.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001732.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001733.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001734.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001876.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001877.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001878.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001963.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001964.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001965.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001966.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001967.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001968.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\001969.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002069.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002070.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002071.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002084.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002085.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002086.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002140.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002264.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002265.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002266.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002267.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002268.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002269.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002270.tif
+K:\Common\Engineering\Sample files\Waukesha\Set003\Images\Mortgage bank\002271.tif

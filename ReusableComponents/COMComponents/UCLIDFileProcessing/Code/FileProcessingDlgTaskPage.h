@@ -1,0 +1,200 @@
+
+#pragma once
+
+// FileProcessingDlgTaskPage.h : header file
+
+#include <vector>
+#include <string>
+#include "afxwin.h"
+#include <ImageButtonWithStyle.h>
+
+/////////////////////////////////////////////////////////////////////////////
+// FileProcessingDlgTaskPage dialog
+
+class FileProcessingDlgTaskPage : public CPropertyPage
+{
+	DECLARE_DYNCREATE(FileProcessingDlgTaskPage)
+
+// Construction
+public:
+	FileProcessingDlgTaskPage();
+	~FileProcessingDlgTaskPage();
+
+// Methods
+
+	void setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr);
+
+	// When enabled is set to false this page cannot be accessed
+	void setEnabled(bool bEnabled);
+
+	// Retrieve current count from UI
+	int getNumThreads();
+
+	// Clear and refresh any UI elements
+	void refresh();
+
+	// This method is used to reset the m_bInitialized to false
+	// when the user hide the tab so that when this tab reappears,
+	// it will skip the first call to OnSize()
+	void ResetInitialized();
+
+// Override
+	// called when the page is to be activated
+	BOOL OnSetActive();
+
+// Dialog Data
+	//{{AFX_DATA(FileProcessingDlgTaskPage)
+	enum { IDD = IDD_DLG_TASK_PROP };
+	CButton	m_btnAdd;
+	CButton	m_btnModify;
+	CButton	m_btnRemove;
+	CImageButtonWithStyle m_btnUp;
+	CImageButtonWithStyle m_btnDown;
+	CButton m_btnMaxThreads;
+	CButton m_btnNumThreads;
+	CEdit m_editThreads;
+	CSpinButtonCtrl m_SpinThreads;
+	CListCtrl	m_fileProcessorList;
+	CButton m_btnKeepProcessingWithEmptyQueue;
+	CButton m_btnStopProcessingWithEmptyQueue;
+	CButton	m_btnLogErrorDetails;
+	BOOL	m_bLogErrorDetails;
+	CEdit m_editErrorLog;
+	CString	m_zErrorLog;
+	CImageButtonWithStyle	m_btnErrorSelectTag;
+	CButton	m_btnBrowseErrorLog;
+	CButton	m_btnExecuteErrorTask;
+	BOOL	m_bExecuteErrorTask;
+	CString	m_zErrorTaskDescription;
+	CButton	m_btnSelectErrorTask;
+	//}}AFX_DATA
+
+// Overrides
+	// ClassWizard generate virtual function overrides
+	//{{AFX_VIRTUAL(FileProcessingDlgTaskPage)
+	protected:
+	virtual BOOL PreTranslateMessage(MSG* pMsg);
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+	//}}AFX_VIRTUAL
+
+// Implementation
+protected:
+	// Generated message map functions
+	//{{AFX_MSG(FileProcessingDlgTaskPage)
+	virtual BOOL OnInitDialog();
+	afx_msg void OnBtnAdd();
+	afx_msg void OnBtnRemove();
+	afx_msg void OnBtnModify();
+	afx_msg void OnBtnDown();
+	afx_msg void OnBtnUp();
+	afx_msg void OnSelchangeListFileProcessors();
+	afx_msg void OnDblclkListFileProcessors();
+	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnBtnMaxThread();
+	afx_msg void OnBtnNumThread();
+	afx_msg void OnBtnKeepProcessingWithEmptyQueue();
+	afx_msg void OnBtnStopProcessingWithEmptyQueue();
+	afx_msg void OnDeltaposSpinThreads(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMDblclkListFp(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnNMRclickListFp(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnContextCut();
+	afx_msg void OnContextCopy();
+	afx_msg void OnContextPaste();
+	afx_msg void OnContextDelete();
+	afx_msg void OnLvnItemchangedListFp(NMHDR *pNMHDR, LRESULT *pResult);
+	afx_msg void OnEnChangeEditThreads();
+	afx_msg void OnCheckLogErrorDetails();
+	afx_msg void OnEnChangeEditErrorLog();
+	afx_msg void OnBtnErrorSelectDocTag();
+	afx_msg void OnBtnBrowseErrorLog();
+	afx_msg void OnCheckExecuteErrorTask();
+	afx_msg void OnBtnAddErrorTask();
+	afx_msg void OnStnDblClkEditExecuteTask();
+	//}}AFX_MSG
+	
+	DECLARE_MESSAGE_MAP()
+
+private:
+	////////////
+	// Methods
+	////////////
+	// to show SelectObjectWithDescription dialog for picking 
+	// an file processor with unique description
+	bool selectFileProcessor(IObjectWithDescriptionPtr ipObjWithDesc);
+	
+	//This is mainly called when loading a file. Other adds are done
+	// via the onBtnAdd function.
+	void addFileProcessor(IObjectWithDescriptionPtr ipObj);
+
+	// Enable/disable various buttons based upon which items are selected
+	void	setButtonStates();
+
+	// clear all the selections from the listbox
+	void	clearListSelection();
+
+	// Uses SetItemData to mark selected tasks for later deletion
+	void	markSelectedTasks(); 
+
+	// Deletes tasks that have been marked for deletion via SetItemData
+	void	deleteMarkedTasks();	
+
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: sets rectWindow to the position and dimensions of the dialog item
+	//          with the specified resource ID.
+	// REQUIRE: uiDlgItemResourceID must be a unique resource ID corresponding to a dialog item.
+	//          rectWindow must be non-NULL.
+	// PROMISE: sets rectWindow to the window rect of the dialog item with the specified ID.
+	void getDlgItemWindowRect(UINT uiDlgItemResourceID, RECT &rectWindow);
+
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: replaces the file processor in the list box at iIndex with ipNewFP.
+	// REQUIRE: iIndex is the index of the file processor to replace in the file processor list box.
+	//          ipNewFP is a non-NULL ObjectWithDescription.
+	// PROMISE: replaces the old file processor at iIndex with ipNewFP.
+	//          retains the checkbox state.
+	//          refreshes the dialog.
+	void	replaceFileProcessorAt(int iIndex, IObjectWithDescriptionPtr ipNewFP);
+
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: returns a valid clipboard manager.
+	// PROMISE: if m_ipClipboardMgr is NULL, creates a new clipboard manager
+	//          and points m_ipClipboardMgr to it. returns m_ipClipboardMgr.
+	IMiscUtilsPtr getMiscUtils();
+
+	// get the file processing mgmt role for brief use
+	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr getFPMgmtRole();
+
+	// get the file processor data vector for brief use
+	IIUnknownVectorPtr getFileProcessorsData();
+
+	// Update UI, menu and toolbar items
+	void updateUI();
+
+	/////////////
+	// Variables
+	/////////////
+
+	//Clipboard manager for the RC context menu
+	IClipboardObjectManagerPtr m_ipClipboardMgr;
+	
+	// Pointer to File Processing Manager class
+	// not a smart pointer to avoid destruction issues
+	UCLID_FILEPROCESSINGLib::IFileProcessingManager*	m_pFPM;
+
+	// object for handling plug in object selection and configuration
+	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Used to hold the start and end of the current selection in the Error Log edit box
+	DWORD m_dwSel;
+
+	// true if this tab should be accessible
+	bool m_bEnabled;
+
+	// This variable is initialized to false so that the first call of OnSize()
+	// before OnInitDialog() will be skipped, then it will be set to true inside 
+	// OnInitDialog()
+	bool m_bInitialized;
+};
+
+//{{AFX_INSERT_LOCATION}}
+// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

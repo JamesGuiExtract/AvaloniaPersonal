@@ -1,0 +1,8 @@
+<FILE>;..\..\..\AFConditions\AutomatedTest\All\AFConditions.dat
+<FILE>;..\..\..\AFPreProcessors\AutomatedTest\All\TestPreProcessors.dat
+<FILE>;..\..\..\AFOutputHandlers\AutomatedTest\All\AFOutputHandlers.dat
+<FILE>;..\..\..\AFValueFinders\AutomatedTest\All\AFValueFinders.dat
+<FILE>;..\..\..\AFValueModifiers\AutomatedTest\All\AFValueModifiers.dat
+<FILE>;..\..\..\AFUtils\AutomatedTest\All\AFUtils.dat
+<FILE>;..\..\..\AFSplitters\AutomatedTest\All\TestAFSplitters.dat
+<FILE>;..\..\..\InputValidators\AutomatedTest\All\InputValidators.dat

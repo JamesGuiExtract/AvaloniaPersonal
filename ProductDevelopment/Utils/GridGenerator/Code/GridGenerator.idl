@@ -1,0 +1,85 @@
+// GridGenerator.idl : IDL source for GridGenerator.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (GridGenerator.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(57355D04-CA9E-4BD8-9350-1F94B6DA0C68),
+	version(1.0),
+	helpstring("UCLD GridGenerator 1.0 Type Library")
+]
+library UCLID_GRIDGENERATORLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystem.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriSystemUI.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriFramework.olb");
+	importlib("..\..\..\..\ReusableComponents\APIs\ArcGIS\Bin\esriEditor.olb");
+
+	// Interfaces
+	[
+		object,
+		uuid(B82D9B0A-D3A5-4962-8B83-4DE92A8AE37B),
+		dual,
+		helpstring("IDrawGrid Interface"),
+		pointer_default(unique)
+	]
+	interface IDrawGrid : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(28EFC411-84C1-4E7C-86A7-FE7F26E87416),
+		dual,
+		helpstring("IEventSink Interface"),
+		pointer_default(unique)
+	]
+	interface IEventSink : IDispatch
+	{
+		[helpstring("method SetApplicationHook")] HRESULT SetApplicationHook([in] IApplication *pApp);
+	};
+	[
+		object,
+		uuid(8816784D-76F8-47F3-BD37-F76F73FAAB84),
+		dual,
+		helpstring("IQueryFeature Interface"),
+		pointer_default(unique)
+	]
+	interface IQueryFeature : IDispatch
+	{
+	};
+
+	// Coclasses
+	[
+		uuid(BB0B97FC-3F45-4D66-9E62-9EB2786115CF),
+		helpstring("DrawGrid Class")
+	]
+	coclass DrawGrid
+	{
+		[default] interface IDrawGrid;
+		interface ITool;
+		interface ICommand;
+	};
+	[
+		uuid(292D3C25-D848-4F0D-83D7-9731C1EF86E0),
+		helpstring("EventSink Class")
+	]
+	coclass EventSink
+	{
+		[default] interface IEventSink;
+	};
+	[
+		uuid(B24D8A92-CB6B-4BCE-931A-F1CC3A417FF6),
+		helpstring("QueryFeature Class")
+	]
+	coclass QueryFeature
+	{
+		[default] interface IQueryFeature;
+		interface ICommand;
+	};
+};

@@ -1,0 +1,19 @@
+// Represents document titles alone on own line, perhaps separated by blank lines
+// Text will be considered case sensitive
+
+(
+
+// ACCOUNTING items
+(^ANNUAL\x20+ACCOUNTING$)|
+(NNUAL\x20+ACCOUNTING$)|
+(NNUAL\x20+ACCOUNTS$)|
+(^UAL\x20+ACCOU[\s\S]{2,5}$)|
+(NNUALACCOUNTING$)|
+(A[\s\S]{1,4}UAL\x20*ACCOUNTING$)|
+//(AM"lUAL\x20*ACCOUNTING$)|
+
+// NOTICE OF HEARING items
+(^(RE-)?NOTICE\x20+OF\x20+HEARING$)|
+(^AMENDED\x20+NOTICE\x20+OF\x20+HEARING$)|
+(^THIRD\x20+NOTICE\x20+OF\x20+SPECIAL\x20+SET\x20+HEARING$)
+)

@@ -1,0 +1,7 @@
+<SETTING>;QueryForVerification=MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData
+
+//<SETTING>;CreateTestOutputVOAFiles=1
+//<SETTING>;OutputAttributeNamesFileLists=1 
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set005\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

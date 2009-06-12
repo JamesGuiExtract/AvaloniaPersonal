@@ -1,0 +1,29 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0003.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000029200.003.tif.uss
+AOJ_GRANTEE_03=in favor of^?Grantee^250~and against
+
+// 0004.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000612200.002.tif.uss
+AOJ_GRANTEE_04=Plaintiff^?Grantee^250~Case Number|Defendant
+
+// 0001.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000027900.001.tif.uss
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\abstract judgment\20059019653400.tif.uss
+AOJ_GRANTEE_01=judgment creditor (name and address)^?Grantee^250~judgment debtor
+
+// 0002.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000565300.003.tif.uss
+AOJ_GRANTEE_02=judgment creditor (name):^?Grantee^250~judgement debtor|whose address
+
+
+
+
+[PATTERNS_END]
+

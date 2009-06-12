@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.OCRFilterMgr.1 = s 'OCRFilterMgr Class'
+	{
+		CLSID = s '{E3D22DBC-AB8F-484F-917C-7D880D9FE7BC}'
+	}
+	UCLIDInputFunnel.OCRFilterMgr = s 'OCRFilterMgr Class'
+	{
+		CLSID = s '{E3D22DBC-AB8F-484F-917C-7D880D9FE7BC}'
+		CurVer = s 'UCLIDInputFunnel.OCRFilterMgr.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E3D22DBC-AB8F-484F-917C-7D880D9FE7BC} = s 'OCRFilterMgr Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.OCRFilterMgr.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.OCRFilterMgr'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

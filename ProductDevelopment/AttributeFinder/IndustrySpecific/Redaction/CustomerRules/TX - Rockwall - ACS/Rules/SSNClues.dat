@@ -1,0 +1,51 @@
+(?:
+
+// 00008.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage010.tif
+
+// "Social Security"
+\bsocial\s*security
+
+// followed by one word of between 2 and 10 chars
+// followed optionally by "is" or "are"
+\s*\S{2,10}[\x20.:]*(?:is|are)?
+
+// followed eventually by a digit or end of line
+(?=[\s\S]{1,70}(?:\d|$))|
+
+// OR
+
+// 00014.tif;K:\Common\Engineering\Sample Files\Orange County - FL\Set002\Images\019700325.tif
+
+// "Social" or "SO"+xxxx + "SE"
+(?:\bsocial\s*se\S+|\bso[ce][\s\S]{1,9}?\bse[ce]\S{0,6}|so\S{1,5}\s+(?:se\S{1,4}ity|sec\S{2,5}y))
+
+// space for "SECURITY" or "CURITY" or similar
+//[\D]{1,15}
+
+// 00101.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage039.tif
+
+// followed by "#" or "No" or one word starting with N
+// followed optionally by "is" or "are"
+\s*(?:[^a-zA-Z0-9\s]+|N\S{1,8})[\x20.:]*(?:is|are)?
+
+// followed eventually by a digit
+(?=[\s\S]{1,70}?(?:\d|$))|
+
+// OR
+
+// 00009.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage012.tif
+// 00010.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage018.tif
+// 00011.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage020.tif
+// 00012.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage023.tif
+// 00013.tif;K:\Common\Engineering\Sample Files\FACC\Set001\Images\TestImage024.tif
+
+// variations on SSN
+(?:
+	\bS\s*\.\s*S\s*\.\s*(?:N(?:o|umber|\b)|\x20|.{0,5}?[:=#])[\x20.:]*|
+	\bSS(?:A?NO?\b|[#=])[\x20.:#]*
+)
+
+// followed eventually by a digit
+(?=[\s\S]{1,50}?(?:\d|$))
+
+)

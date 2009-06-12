@@ -1,0 +1,51 @@
+// UCLIDTestingFrameworkCore.idl : IDL source for UCLIDTestingFrameworkCore.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDTestingFrameworkCore.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(71EDAB5F-25C7-48BC-9AAE-F837C9ED7547),
+	version(1.0),
+	helpstring("UCLID Testing Framework Core Objects 1.0 Type Library")
+]
+library UCLID_TESTINGFRAMEWORKCORELib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\..\ReusableComponents\COMComponents\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	[
+		uuid(F4C12BE0-1528-48AC-ACEF-5055D9BD6ED2),
+		helpstring("TestHarness Class")
+	]
+	coclass TestHarness
+	{
+		[default] interface ITestHarness;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(EB5D8E34-7A38-4C4D-A37E-DEFDC6611CE9),
+		helpstring("TestResultLogger Class")
+	]
+	coclass TestResultLogger
+	{
+		[default] interface ITestResultLogger;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(0761EEBE-DEEB-40B4-BB4E-EEE6AE041CC7),
+		helpstring("InteractiveTestExecuter Class")
+	]
+	coclass InteractiveTestExecuter
+	{
+		[default] interface IInteractiveTestExecuter;
+		interface ILicensedComponent;
+	};
+};

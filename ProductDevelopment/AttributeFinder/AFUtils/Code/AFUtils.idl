@@ -1,0 +1,616 @@
+// AFUtils.idl : IDL source for AFUtils.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFUtils.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(AC966E48-1A26-40C7-B61E-AC4C09C9D565),
+	version(1.0),
+	helpstring("UCLID AFUtils 1.0 Type Library")
+]
+library UCLID_AFUTILSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//////////////
+	// Enums
+	//////////////
+	typedef
+	[
+		uuid(6C474450-6EF8-45d9-AA35-F5FFD5EE1F2C), 
+		helpstring("UCLID EDocumentConfidenceLevel")
+	]
+	enum
+	{
+		kZeroLevel = 0,
+		kMaybeLevel = 1,
+		kProbableLevel = 2,
+		kSureLevel = 3
+	}EDocumentConfidenceLevel;
+
+	typedef
+	[
+		uuid(A2DB19E3-77CF-4b39-A597-64B232D1F58C), 
+		helpstring("UCLID EAliasType")
+	]
+	enum EAliasType
+	{
+		// Alias string not found
+		kAliasNone = 0,
+		// AKA, FKA, etc.
+		kAliasPerson,
+		// DBA, SBM, etc
+		kAliasCompany,
+		// Division, Subsidiary
+		kAliasRelated
+	} EAliasType;
+
+	typedef
+	[
+		uuid(7905D071-ABA3-4e8b-94CF-9887EED9C866), 
+		helpstring("UCLID EPersonAliasType")
+	]
+	enum EPersonAliasType
+	{
+		// All Person Alias items
+		kPersonAliasAll = 0,
+		// Also Known As
+		kPersonAliasAKA,
+		// Now Known As
+		kPersonAliasNKA,
+		// Formerly Known As
+		kPersonAliasFKA
+	} EPersonAliasType;
+
+	typedef
+	[
+		uuid(6FE1DAA5-19D6-4775-8E15-5F81FFCEA07D), 
+		helpstring("UCLID ECompanyAliasType")
+	]
+	enum ECompanyAliasType
+	{
+		// All Company Alias items
+		kCompanyAliasAll = 0,
+		// Also Known As
+		kCompanyAliasAKA,
+		// Formerly Known As
+		kCompanyAliasFKA,
+		// Now Known As
+		kCompanyAliasNKA,
+		// Doing Business As
+		kCompanyAliasDBA,
+		// Successor By Merger
+		kCompanyAliasSBM,
+		// Successor In Interest
+		kCompanyAliasSII,
+		// By Merger With
+		kCompanyAliasBMW
+	} ECompanyAliasType;
+
+	typedef
+	[
+		uuid(70774724-2999-4287-B357-38DBA8BAF907), 
+		helpstring("UCLID ERelatedCompanyType")
+	]
+	enum ERelatedCompanyType
+	{
+		// All Related Company items
+		kRelatedCompanyAll = 0,
+		// A Division Of
+		kRelatedCompanyDivision,
+		// A Subdivision Of
+		kRelatedCompanySubdivision,
+		// A Division Of
+		kRelatedCompanyBranch,
+		// A Subsidiary Of
+		kRelatedCompanySubsidiary
+	} ERelatedCompanyType;
+
+	// Interfaces
+	[
+		object,
+		uuid(BEEF0E26-ABB5-433c-B6BA-D3C9C02D88B5),
+		dual,
+		helpstring("IDocumentType Interface"),
+		pointer_default(unique)
+	]
+	interface IDocumentType : IDispatch
+	{
+		[id(1), helpstring("method GetDocumentConfidenceLevel")] HRESULT GetDocumentConfidenceLevel([in] ISpatialString* pInputText, [out, retval] EDocumentConfidenceLevel *pLevel);
+	}
+	[
+		object,
+		uuid(43ED36AD-94A7-4de6-B896-F2568E2E62DD),
+		dual,
+		helpstring("IDocumentClassifier Interface"),
+		pointer_default(unique)
+	]
+	interface IDocumentClassifier : IDispatch
+	{
+		// The industry specific categroy name, ex. County Document, Medical Document, etc
+		[propget, id(1), helpstring("property IndustryCategoryName")] HRESULT IndustryCategoryName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property IndustryCategoryName")] HRESULT IndustryCategoryName([in] BSTR newVal);
+	}
+	[
+		object,
+		uuid(EA8DF549-FC5F-4655-AAAB-07B2EFD6DD45),
+		dual,
+		helpstring("IAttributeExtractor Interface"),
+		pointer_default(unique)
+	]
+	interface IAttributeExtractor : IDispatch
+	{
+		// ppAttributes -- vector of IAttribute
+		[id(1), helpstring("method FindAttributes")] HRESULT FindAttributes([in] ISpatialString* pText, [out, retval] IIUnknownVector** ppAttributes);
+	}
+	[
+		object,
+		uuid(A6CBB01A-6C66-432C-929B-7A358E3E9850),
+		dual,
+		helpstring("IEntityFinder Interface"),
+		pointer_default(unique)
+	]
+	interface IEntityFinder : IDispatch
+	{
+		// find entity from pText and update pText with found value
+		[id(1), helpstring("method FindEntities")] HRESULT FindEntities([in] ISpatialString* pText);
+		// get text of each attribute from the vector, and find entity from
+		// the text and update the text with found value
+		[id(2), helpstring("method FindEntitiesInAttributes")] HRESULT FindEntitiesInAttributes([in] IIUnknownVector* pAttributes);
+	};
+	[
+		object,
+		uuid(8FE3D300-CBA5-473A-AB36-2F50CF23F3A0),
+		dual,
+		helpstring("IMERSHandler Interface"),
+		pointer_default(unique)
+	]
+	interface IMERSHandler : IDispatch
+	{
+		// pVecEntities -- vector of IAttribute
+		[id(1), helpstring("method ModifyEntities")] HRESULT ModifyEntities([in] IIUnknownVector* pVecAttributes, [in] IAFDocument* pOriginalText, [out, retval] VARIANT_BOOL *pbFound);
+	};
+	[
+		object,
+		uuid(E2259233-68DA-497A-98B0-6AB9933843B4),
+		dual,
+		helpstring("IEntityKeywords Interface"),
+		pointer_default(unique)
+	]
+	interface IEntityKeywords : IDispatch
+	{
+		// examples: Mr., Mrs, Doctor
+		[propget, id(1), helpstring("property PersonTitles")] HRESULT PersonTitles([out, retval] IVariantVector * *pVal);
+		// examples: Junior, Jr, III
+		[propget, id(2), helpstring("property PersonSuffixes")] HRESULT PersonSuffixes([out, retval] IVariantVector * *pVal);
+		[propget, id(3), helpstring("property PersonDesignators")] HRESULT PersonDesignators([out, retval] IVariantVector * *pVal);
+		[propget, id(4), helpstring("property CompanySuffixes")] HRESULT CompanySuffixes([out, retval] IVariantVector * *pVal);
+		[propget, id(5), helpstring("property CompanyDesignators")] HRESULT CompanyDesignators([out, retval] IVariantVector * *pVal);
+		[propget, id(6), helpstring("property CompanyAssignors")] HRESULT CompanyAssignors([out, retval] IVariantVector * *pVal);
+		// examples: a/k/a, F/K/A, FKA
+		[propget, id(7), helpstring("property PersonAlias")] HRESULT PersonAlias([in] EPersonAliasType eType, [out, retval] IVariantVector * *pVal);
+		[propget, id(8), helpstring("property EntityTrimTrailingPhrases")] HRESULT EntityTrimTrailingPhrases([out, retval] IVariantVector * *pVal);
+		[propget, id(9), helpstring("property PersonTrimIdentifiers")] HRESULT PersonTrimIdentifiers([out, retval] IVariantVector * *pVal);
+		// examples: Avenue, Road, Street
+		[propget, id(10), helpstring("property StreetNames")] HRESULT StreetNames([out, retval] IVariantVector * *pVal);
+		// examples: Ave, Rd, St
+		[propget, id(11), helpstring("property StreetAbbreviations")] HRESULT StreetAbbreviations([out, retval] IVariantVector * *pVal);
+		// examples: Apartment, Suite
+		[propget, id(12), helpstring("property BuildingNames")] HRESULT BuildingNames([out, retval] IVariantVector * *pVal);
+		// examples: Apt, Ste
+		[propget, id(13), helpstring("property BuildingAbbreviations")] HRESULT BuildingAbbreviations([out, retval] IVariantVector * *pVal);
+		// examples: Attention, Attn:, Mail To, Return To
+		[propget, id(14), helpstring("property DirectionIndicators")] HRESULT DirectionIndicators([out, retval] IVariantVector * *pVal);
+		// examples: d/b/a, DBA
+		[propget, id(15), helpstring("property CompanyAlias")] HRESULT CompanyAlias([in] ECompanyAliasType eType, [out, retval] IVariantVector * *pVal);
+		// examples: Five, two, Forty, Hundred, Thousand
+		[propget, id(16), helpstring("property NumberWords")] HRESULT NumberWords([out, retval] IVariantVector * *pVal);
+		// examples: January, February, Mar, Apr
+		[propget, id(17), helpstring("property MonthWords")] HRESULT MonthWords([out, retval] IVariantVector * *pVal);
+		// examples: Whose Address Is, Residing At
+		[propget, id(18), helpstring("property AddressIndicators")] HRESULT AddressIndicators([out, retval] IVariantVector * *pVal);
+		// provide label for Type field for Person Alias
+		[id(19), helpstring("method GetPersonAliasLabel")] HRESULT GetPersonAliasLabel([in] EPersonAliasType eType, [out, retval] BSTR *pVal);
+		// provide label for Type field for Company Alias
+		[id(20), helpstring("method GetCompanyAliasLabel")] HRESULT GetCompanyAliasLabel([in] ECompanyAliasType eType, [out, retval] BSTR *pVal);
+		// provide label for Type field for Related Company
+		[id(21), helpstring("method GetRelatedCompanyLabel")] HRESULT GetRelatedCompanyLabel([in] ERelatedCompanyType eType, [out, retval] BSTR *pVal);
+		// examples: d/b/a, DBA
+		[propget, id(22), helpstring("property RelatedCompany")] HRESULT RelatedCompany([in] ERelatedCompanyType eType, [out, retval] IVariantVector * *pVal);
+		[propget, id(23), helpstring("property KeywordCollection")] HRESULT KeywordCollection([in] BSTR strKeyword, [out, retval] IVariantVector * *pVal);
+		[propget, id(24), helpstring("property KeywordPattern")] HRESULT KeywordPattern([in] BSTR strKeyword, [out, retval] BSTR* pstrPattern);
+	};
+	[
+		object,
+		uuid(5BFF1C6F-616A-4B84-B4AA-44B747E96020),
+		dual,
+		helpstring("IDocumentSorter Interface"),
+		pointer_default(unique)
+	]
+	interface IDocumentSorter : IDispatch
+	{
+		// Classifies all documents in the strInputFolder and move them to specific
+		// sub folders (which has the same name as the actual document types) of 
+		// the strOutputFolder.
+		// strInputFolder -- The folder that has all documents waiting to be sorted
+		// strOutputFolder -- The folder that will have several subfolders. Each subfolder
+		//					  will contain one specific type of document. One of the sub
+		//					  folder will be the "Unclassifed" folder for any uncertain
+		//					  types of files.
+		// strDocIndustryName -- The document industry category name, such as 
+		//						  UCLID County Documents, etc.
+		// bOCRImages -- Whether or not OCR all images in the specified input folder
+		[id(1), helpstring("method SortDocuments")] HRESULT SortDocuments([in] BSTR strInputFolder, [in] BSTR strOutputFolder, [in] BSTR strDocIndustryName, [in] VARIANT_BOOL bOCRImages);
+	};
+	[
+		object,
+		uuid(C6DF2C06-65D1-4E9A-86C7-20EF098AC93E),
+		dual,
+		helpstring("IAFUtility Interface"),
+		pointer_default(unique)
+	]
+	interface IAFUtility : IDispatch
+	{
+		// Read each attribute from pVecAttributes and find its attribute name.
+		// And create a map of attribute name to its attribute(s)
+		// Require: The objects in the pVecAttributes must be of type IAttribute
+		[id(1), helpstring("method GetNameToAttributesMap")] HRESULT GetNameToAttributesMap([in] IIUnknownVector* pVecAttributes, [out, retval] IStrToObjectMap** ppMapNameToAttributes);
+
+		// Located where ComponentData folder, which is always parallel to the Bin
+		// directory if it is Release version, and always under AttributeFinder in source
+		// tree if it is Debug version.
+		[id(2), helpstring("method GetComponentDataFolder")] HRESULT GetComponentDataFolder([out, retval] BSTR* pstrComponentDataFolder);
+
+		// Evaluates the Prefix registry key and the specified file.  If Prefix exists AND the 
+		// associated prefixed file exists, the prefixed file is returned.  Otherwise, the 
+		// default non-prefixed file is returned.
+		[id(4), helpstring("method GetPrefixedFileName")] HRESULT GetPrefixedFileName([in] BSTR strNonPrefixFullPath, [out, retval] BSTR* pstrFileToRead);
+
+		[id(5), helpstring("method GetLoadFilePerSession")] HRESULT GetLoadFilePerSession([out, retval] VARIANT_BOOL *pbSetting);
+
+		// Sets or clears the AutoEncrypt registry entry
+		[id(6), helpstring("method SetAutoEncrypt")] HRESULT SetAutoEncrypt([in] VARIANT_BOOL bAutoEncryptOn);
+		// Reads in the EAV file and convert each line into an attribute and store it in the vector
+		[id(7), helpstring("method GenerateAttributesFromEAVFile")] HRESULT GenerateAttributesFromEAVFile([in] BSTR strEAVFileName, [out, retval] IIUnknownVector** ppAttributes);
+		// Iterate through the vector of attributes, each attribute has its own line, and a pipe (|) character
+		// will be placed in between name and value, value and type (if any)
+		[id(8), helpstring("method GetAttributesAsString")] HRESULT GetAttributesAsString([in] IIUnknownVector *pAttributes, [out, retval] BSTR *pAttributesInString);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return a string that is equivalent in content to strInput
+		// except that all instances of "<RSDFILEDIR>" (case-sensitive) in
+		// strInput will be replaced with the directory name of the 
+		// RSD file associated with the current thread and all 
+		// instances of <DOCTYPE> will be replaced by the doc-type 
+		// associated with pDoc.  If there is no RSD file associated 
+		// with the current thread and the <RSDFILEDIR> tag exists in 
+		// strInput, or if pDoc as no document type associated with it and
+		// strInput contains the <DOCTYPE> tag, then an
+		// exception will be thrown.  If no instances of any of the
+		// tags are found in strInput, the will equal the input.
+		// NOTE: The values of tags that are defined in the INI file are cached
+		// internally so that they are only read once-per-process.
+		[id(9), helpstring("method ExpandTags")] HRESULT ExpandTags([in] BSTR strInput, [in] IAFDocument *pDoc, [out, retval] BSTR *pstrOutput);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return VARIANT_TRUE if there are any invalid or incomplete
+		//			tags in strInput, and to return VARIANT_FALSE otherwise.
+		// NOTE:	For the sake of this method, a tag name is valid if it is one of
+		//			the predefined tags (like <RSDFileDir> etc), or if there is
+		//			a key in the UCLIDAFCore.INI file in the [ExpandableTags]
+		//			section with a non-empty value.
+		[id(10), helpstring("method StringContainsInvalidTags")] HRESULT StringContainsInvalidTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// REQUIRE: strInput must contain no tags, or 1 or more well specified
+		//			tags.  Poorly specified tags in strInput (such as non-matching
+		//			'<' and '>', etc) will cause an exception to be thrown.
+		// PROMISE: To return VARIANT_TRUE if there are any tags in the
+		//			strInput, regardless of whether they are valid tag names
+		[id(11), helpstring("method StringContainsTags")] HRESULT StringContainsTags([in] BSTR strInput, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// Reads in the EAV file and convert each line into an attribute and store it in the vector
+		[id(12), helpstring("method GetAttributesFromFile")] HRESULT GetAttributesFromFile([in] BSTR strFileName, [out, retval] IIUnknownVector** ppAttributes);
+		//-----------------------------------------------------------------------------------------
+		// Queries attributes using XPATH like syntax
+		// REQUIRE: The syntax for strQuery must adhere to the query syntax
+		//		mentioned below.
+		// PROMISE: To return via ppAttributes the subset of attributes in 
+		//			pvecAttributes which match the query given by strQuery.
+		//			If bRemoveMatches == VARIANT_TRUE, then the matched attributes
+		//			will be removed from pvecAttributes
+		//
+		// QUERY SYNTAX:
+		//		<query> ::= <query-part>[<nonselect-query>]
+		//		<nonselect-query> ::= <open-bracket><query-part><close-bracket>
+		//		<query-part> ::= [<slash>] <query-pattern> [<slash> <query-pattern>]* 
+		//		<slash> ::= the slash character '/'
+		//		<query-pattern> ::= <attribute-name> [<atchar> <attribute-type>]
+		//		<attribute-name> ::= name of the attribute being queried for, This must be a valid attribute mame
+		//					attribute names are case sensitive
+		//		<atchar> ::= the at character '@'
+		//		<attribute-type> ::= the type of the attribute that MUST be matched
+		//					attribute-type can be an empty string to allow querying
+		//					of attributes with no defined attribute-type.  Attribute types are
+		//					case sensitive
+		//		<open-bracket> ::= the character '{'
+		//		<close-bracket> ::= the character '}'
+		//
+		// EXAMPLES:
+		//		To search for all attributes whose name is "GrantorGrantee" and
+		//		whose type is "grantor", strQuery should be:
+		//		"GrantorGrantee@grantor"S
+		//
+		//		To search for all attributes whose name is "First" and which have
+		//		a parent attribute named "Person" which has a parent attribute named
+		//		"GrantorGrantee" with the type "Grantee", strQuery should be:
+		//		"GrantorGrantee@Grantee/Person/First"
+		//		
+		//		To search for all attributes whose name is "Company" and 
+		//		which have parent-attribute with the name "GrantorGrantee" and
+		//		type of the parent attribute can be anything, strQuery should be:
+		//		"GrantorGrantee/Company"
+		//		
+		//		To search for all attributes whose name is "Company" and 
+		//		which have parent-attribute with the name "Employer" and
+		//		type of the parent attribute must be empty, strQuery should be:
+		//		"Employer@/Company"
+		//		
+		//		To search for all attributes whose name is "TaxId" strQuery 
+		//		should be "TaxId"
+		//		
+		//		non-select queries can be added to a query to further specify requirements an
+		//		attribute must meet to be selected
+		//		For exmaple to select all Company attrs whose parent is a Grantor attribute and 
+		//		have a sub-attribute called CompanyAlias with a type FKA the following query could 
+		//		be used:
+		//		"Grantor/Company{CompanyAlias@FKA}
+		//		
+		[id(13), helpstring("method QueryAttributes")] HRESULT QueryAttributes(
+			[in] IIUnknownVector *pvecAttributes, [in] BSTR strQuery,
+			[in] VARIANT_BOOL bRemoveMatches,
+			[out, retval] IIUnknownVector** ppAttributes);
+		//-----------------------------------------------------------------------------------------
+		// Applies the specified AttributeModifier to the specified Attributes
+		// The appropriate sub-attributes are also modified if bRecursive == VARIANT_TRUE
+		[id(14), helpstring("method ApplyAttributeModifier")] HRESULT ApplyAttributeModifier(
+			[in] IIUnknownVector *pvecAttributes, [in] IAFDocument *pDoc, 
+			[in] IAttributeModifyingRule *pVM, [in] VARIANT_BOOL bRecursive);
+		//-----------------------------------------------------------------------------------------
+		// returns the parent of pAttribute as it is found in the vector of attribute trees pvecAttributes
+		[id(15), helpstring("method GetAttributeParent")] HRESULT GetAttributeParent(
+			[in] IIUnknownVector *pvecAttributes, [in] IAttribute *pAttribute, 
+			[out, retval] IAttribute** pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// returns the top most parent (root) of pAttribute as it is found in the vector of attribute 
+		// trees pvecAttributes 
+		[id(16), helpstring("method GetAttributeRoot")] HRESULT GetAttributeRoot(
+			[in] IIUnknownVector *pvecAttributes, [in] IAttribute *pAttribute, 
+			[out, retval] IAttribute** pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// removes the specified attribute from wherever it exists in tbe vector of trees
+		[id(17), helpstring("method RemoveAttribute")] HRESULT RemoveAttribute(
+			[in] IIUnknownVector *pvecAttributes, [in] IAttribute *pAttribute);
+		//-----------------------------------------------------------------------------------------
+		// evaluates a query string and returns the minimum depth of an attribute that can be returned
+		[id(18), helpstring("method GetMinQueryDepth")] HRESULT GetMinQueryDepth([in] BSTR bstrQuery, [out, retval] long* pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// evaluates a query string and returns the minimum depth of an attribute that can be returned
+		[id(19), helpstring("method GetMaxQueryDepth")] HRESULT GetMaxQueryDepth([in] BSTR bstrQuery, [out, retval] long* pRetVal);
+		//-----------------------------------------------------------------------------------------
+		// removes the attributes in pvecRemove from wherever they exist in the trees of pvecAttributes 
+		[id(20), helpstring("method RemoveAttributes")] HRESULT RemoveAttributes(
+			[in] IIUnknownVector *pvecAttributes, [in] IIUnknownVector *pvecRemove);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To expand a format string into a spatial string based on an attribute
+		//			and its sub attributes
+		// REQUIRE:	pAttribute != NULL
+		//			bstrFormat must be a valid Format String as defined by the format syntax
+		// FORMAT SYNTAX:
+		//			A format string is made up of TEXT, VARIABLES, and SCOPES
+		//		TEXT:
+		//			Any text that you want to appear as is in the final string
+		//		VARIABLES
+		//			The beginning and end of a variable in a format string is denoted 
+		//			by a % i.e. "The var is %VAR% "
+		//			The syntax of a variable is [<numchars>]<field>|[<xpath>[<dot><field>]]
+		//			<numchars> - is an integer that denotes the maximum number of characters to use
+		//			from the variable (optional)
+		//			<field> - is either the string "Value" or "Type"
+		//			<xpath> - is an xpath query 
+		//			<dot> - is the '.' character
+		//			If an xpath query is specified with out a ".Value" or ".Type" then ".Value"
+		//			is assumed
+		//			If no xpath query is defined then "Value" or "Type" must be specified
+		//		SCOPE:
+		//			A scope is opened with '<' and closed with '>'
+		//			The text inside a scope will be added to the format string only if
+		//			All variables inside the scope can be expanded
+		//	EXAMPLES:
+		//		Attribute:
+		//			GrantorGrantee|John Smith AKA John Jones|Grantor
+		//			.Person|John Smith
+		//			..First|John
+		//			..Last|Smith
+		//			.PersonAlias|John Jones|AKA
+		//			..First|John
+		//			..Last|Jones
+		//
+		//		FormatString:
+		//			On:
+		//			"<For %Person%, > %PersonAlias.Value% is an %PersonAlias.Type%"
+		//			The expanded string would be:
+		//			"For John Smith, John Jones is an AKA"
+		//			On:
+		//			"<First Name: %Person/First.Value%>< Middle Name: %Person/Middle.Value% >"
+		//			The expanded string would be:
+		//			"First Name: John"
+		//			- notice "Middle Name:  " was not used because  %Person/Middle% does not exist
+		[id(21), helpstring("method ExpandFormatString")] HRESULT ExpandFormatString(
+			[in] IAttribute *pAttribute, 
+			[in] BSTR bstrFormat,
+			[out, retval] ISpatialString** pRetVal);
+		//-----------------------------------------------------------------------------------------
+		[id(22), helpstring("method IsValidQuery")] HRESULT IsValidQuery( [in] BSTR bstrQuery,
+			[out, retval] VARIANT_BOOL* pRetVal);
+		//-----------------------------------------------------------------------------------------
+		[id(23), helpstring("method SortAttributesSpatially")] HRESULT SortAttributesSpatially( [in, out] IIUnknownVector* pAttributes);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the tags built-in to AttributeFinder (i.e. RSDFileDir...)
+		// REQUIRE: NONE
+		// PROMISE: If there are no built-in tags an empty vector (not NULL) will be returned
+		[id(24), helpstring("method GetBuiltInTags")] HRESULT GetBuiltInTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the tags specified by the user in their UCLIDAFCore.ini file
+		// REQUIRE: NONE
+		// PROMISE: If there are tags in the .ini file an empty vector (not NULL) will be returned
+		[id(25), helpstring("method GetINIFileTags")] HRESULT GetINIFileTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the available AttributeFinderTags
+		// REQUIRE: NONE
+		// PROMISE: This will be a combined list of all the tags in GetBuiltInTags + the tags in 
+		//			GetBuiltINIFileTags
+		[id(26), helpstring("method GetAllTags")] HRESULT GetAllTags( [out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// Takes a delimited string and converts each token into an attribute and then stores it in the vector
+		[id(27), helpstring("method GetAttributesFromDelimitedString")] HRESULT
+			GetAttributesFromDelimitedString([in] BSTR bstrFileName, [in] BSTR bstrDelimiter,
+			[out, retval] IIUnknownVector** ppAttributes);
+		//-----------------------------------------------------------------------------------------
+		// Returns true if RSD files should be cached by rule objects; false if RSD files should 
+		// not be cached.
+		[propget, id(28), helpstring("method ShouldCacheRSD")] HRESULT ShouldCacheRSD(
+			[out, retval] VARIANT_BOOL *pvbCacheRSD);
+		//-----------------------------------------------------------------------------------------
+		// Expands both the document tags and text functions.
+		[id(29), helpstring("method ExpandTagsAndFunctions")] HRESULT ExpandTagsAndFunctions(
+			[in] BSTR bstrInput, [in] IAFDocument *pDoc, [out, retval] BSTR *pbstrOutput);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(07C238E0-AF7F-4C8C-8E60-2F35339A7E26),
+		dual,
+		helpstring("IDocumentClassificationUtils Interface"),
+		pointer_default(unique)
+	]
+	interface IDocumentClassificationUtils : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the industries with available document classifiers
+		// REQUIRE: NONE
+		// PROMISE: If there are no industries an empty vector (not NULL) will be returned
+		[id(1), helpstring("method GetDocumentIndustries")] HRESULT GetDocumentIndustries(
+			[out, retval] IVariantVector** ppIndustries);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of all the special document types 
+		//          (i.e. AnyUnique, MultiplyClassified, Unclassified)
+		// REQUIRE: NONE
+		// PROMISE: No special delimiting characters will be added (i.e. <> or [])
+		[id(2), helpstring("method GetSpecialDocTypeTags")] HRESULT GetSpecialDocTypeTags(
+			[out, retval] IVariantVector** ppTags);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a list of document types associated with the specified industry
+		// REQUIRE: NONE
+		// PROMISE: If there are no doc types an empty vector (not NULL) will be returned
+		[id(3), helpstring("method GetDocumentTypes")] HRESULT GetDocumentTypes([in] BSTR bstrIndustry, 
+			[out, retval] IVariantVector** ppTypes);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To return a subset of document types associated with the specified industry
+		// REQUIRE: if pbstrIndustry points to an empty string, then bAllowIndustryModification
+		//			is ignored, and the user will be able to select the document industry (and
+		//			the first alphabetically sorted document industry will be selected by default)
+		//			if pbstrIndustry points to a non-empty string, then the string must exactly
+		//			match one of the industries returned by GetDocumentIndustries() and 
+		//			will be shown as the default industry.
+		//			if pbstrIndustry points to a non-empty string, then bAllowIndustryModification
+		//			dictates whether the industry selection drop down list is enabled.
+		// PROMISE: If there are no doc types an empty vector (not NULL) will be returned.  
+		//			pbstrIndustry will always provide the selected industry.
+		[id(4), helpstring("method GetDocTypeSelection")] HRESULT GetDocTypeSelection(
+			[in, out] BSTR *pbstrIndustry, [in] VARIANT_BOOL bAllowIndustryModification,
+			[in] VARIANT_BOOL bAllowMultipleSelection, [in] VARIANT_BOOL bAllowSpecialTags, 
+			[out, retval] IVariantVector** ppTypes);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	// Coclasses
+	[
+		uuid(E1F4636A-34C8-4C66-9B3F-D0EB3CA54C2F),
+		helpstring("EntityFinder Class")
+	]
+	coclass EntityFinder
+	{
+		[default] interface IEntityFinder;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(F8325D2F-23ED-4748-AA8B-7BD643663887),
+		helpstring("DocumentClassifier Class")
+	]
+	coclass DocumentClassifier
+	{
+		[default] interface IDocumentClassifier;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IDocumentClassificationUtils;
+	};
+	[
+		uuid(A32A3A9F-C818-4154-8F50-4C1D429E1ADE),
+		helpstring("MERSHandler Class")
+	]
+	coclass MERSHandler
+	{
+		[default] interface IMERSHandler;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(E18C9BC2-69EA-4D0E-888B-02655278FC07),
+		helpstring("EntityKeywords Class")
+	]
+	coclass EntityKeywords
+	{
+		[default] interface IEntityKeywords;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(C7C2E208-F02E-4826-860C-52D1A3BDB313),
+		helpstring("DocumentSorter Class")
+	]
+	coclass DocumentSorter
+	{
+		[default] interface IDocumentSorter;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(39125F86-1A5F-4389-A456-FB4DC4FDFCEE),
+		helpstring("AFUtility Class")
+	]
+	coclass AFUtility
+	{
+		[default] interface IAFUtility;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(8A10E46E-4E1A-40F6-ABDB-D5761AEBA669),
+		helpstring("DocumentClassifierPP Class")
+	]
+	coclass DocumentClassifierPP
+	{
+		interface IUnknown;
+	};
+};

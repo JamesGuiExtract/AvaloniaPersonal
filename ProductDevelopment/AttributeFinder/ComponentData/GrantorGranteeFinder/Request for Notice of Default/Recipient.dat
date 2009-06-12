@@ -1,0 +1,37 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\request for copy of notice of default\20049000239100.001.tif.uss
+RFNOD_RECIPIENT_03=be^5~mailed^5~to^10~name^?Recipient^250~address
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\request for copy of notice of default\20049000153700.003.tif.uss
+RFNOD_RECIPIENT_01=be^5~mailed^5~to^?Recipient^250~\r\nat|whose address|attention|attn|a copy of|as counsel for|RE:
+
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\request for copy of notice of default\20049001584100.002.tif.uss
+RFNOD_RECIPIENT_02=please mail such notices to^?Recipient^250~\r\nnotice
+
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\request for copy of notice of default\20049000416700.002.tif.uss
+RFNOD_RECIPIENT_04a=mail^5~notices^5~to^120~\r\n\r\n^?Recipient^80~\r\n\r\nNOTICE: A copy of any notice of default^45~sent only to the address
+RFNOD_RECIPIENT_04=mail^5~notices^5~to^?Recipient^250~notice
+
+
+
+// 
+RFNOD_RECIPIENT_05=be^5~mailed^5~to:\r\n^?Recipient^250~\r\n
+
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\request notice\20059022658200.tif.uss
+RFNOD_RECIPIENT_06=be^5~mailed^5~to^?Recipient^250~\r\nRE:
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\request notice\20059023019500.tif.uss
+RFNOD_RECIPIENT_07=Address for Notice:^?Recipient^250~\r\n\r\n
+
+[PATTERNS_END]
+

@@ -1,0 +1,47 @@
+//test1 "New line" and "Remove all characters as specified" checkboxes are checked.
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+//test2 "Space", "New line" and "Remove all characters as specified" checkboxes are checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+//test3 "New line", "Others" and "Remove all characters as specified" are checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+//test4 "Space", "New line", "Others", "All characters specified are Case Sensitive",
+//and "Remove all characters as specified" are selected.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 The entry and settings are exactly the same as test4 except the entry for
+//"Others" is of a different case.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+//tes6 "Tab", and "Remove all characters as specified" are checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+//test7 "New line", "All characters specified are Case Sensitive", and
+//"Trim off all leading characters as specified" in "Select following" are checked.
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+//test8 "New line", "All characters specified are Case Sensitive", 
+//"Trim off all leading characters as specified", and "Trim off all
+//trailing characters as specified" in "Select following:" are checked.
+<TESTCASE>;Test8.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test8.eav
+
+//test9 "New line", "All characters specified are Case Sensitive",
+//"Consolidate multiple consecutive characters into one", and
+//"Trim off all trailing characters as specified" in "Select following:" are checked.
+<TESTCASE>;Test9.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test9.eav
+
+//test10 "New line", "Others", and "Consolidate multiple consecutive characters into one"
+//are selected.
+<TESTCASE>;Test10.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test10.eav
+
+//test11 "New line", "Others", and all three selections of "Select following:" are selected.
+<TESTCASE>;Test11.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test11.eav
+
+//test12 "New line", "Others", and all three selections of "Select following:" are selected.
+<TESTCASE>;Test12.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test12.eav
+
+//test13 "New line", "Others", and "Remove all characters as specified" are selected.
+<TESTCASE>;Test13.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test13.eav
+

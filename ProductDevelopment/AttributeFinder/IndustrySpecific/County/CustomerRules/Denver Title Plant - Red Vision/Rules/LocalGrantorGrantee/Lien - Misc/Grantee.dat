@@ -1,0 +1,29 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+Numbers=0|1|2|3|4|5|6|7|8|9
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+LocalRolGrantee01=Debtor(s):^?Grantee^120~Creditor(s):
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\2001089036.tif.uss
+LocalRolGrantee02=Borrower^5~promises^3~[to]^3~[pay]^?Grantee^120~Lender
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\2004116477.tif.uss
+LocalRolGrantee03=That^3~the]^3~name^3~[and]^3~mailing^3~address^3~[of]^3~[the]^3~person^3~claiming^3~[the]^3~lien^3~[is]^?Grantee^120~[a]^3~subcontractor
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\2005088974.tif.uss
+LocalRolGrantee04=TO WHOM IT MAY CONCERN^?Grantee^120~a Colorado nonprofit corporation^80~wishing to avail itself
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\8800272033.tif.uss
+LocalRolGrantee04=MODERNIZATION LOAN & LIEN NOTE^200~BORROWER^300~LENDER:^?Grantee^120~DISCLOSURES REQUIRED BY FEDERAL LAW
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\8800275122.tif.uss
+LocalRolGrantee04=given^3~[to]^3~secure^3~to]^?Grantee^120~[the]^3~payment^3~[of]^3~[the]^3~[sum]
+
+[PATTERNS_END]

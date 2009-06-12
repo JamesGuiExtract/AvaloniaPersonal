@@ -1,0 +1,49 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000089700.001.uss
+NOC_CONTRACTOR_01=name of contractor^?Contractor^250~address of
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000032100.002.uss
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001560500.001.tif.uss
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001514000.002.tif.uss
+// 0013.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001470700.002.tif.uss
+// 0014.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000568700.002.tif.uss
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000348200.003.tif.uss
+NOC_CONTRACTOR_02=contractor|developer^50~was|[is]^?Contractor^250~addresses|if no contractor|if notice covers|no contractor|the property on|the street address|that the name|the work of 
+
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000098000.001.uss
+NOC_CONTRACTOR_03=the contractor^50~was^?Contractor^250~that the name|no contractor|\r\ninitials
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000231900.001.uss
+NOC_CONTRACTOR_04=names of the contractor^50~was^?Contractor^250~if no contractor
+
+// 0007.tif;k:\common\engineering\sample files\atpac\ca - fresno\set004\images\notice of completion\20049000109900.001.uss
+NOC_CONTRACTOR_06=awarded a contract to^?Contractor^250~for doing the
+
+// 0008.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000701600.001.tif.uss
+NOC_CONTRACTOR_11=awarded to^?Contractor^250~notice to proceed
+
+// 0009.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049001342700.001.tif.uss
+NOC_CONTRACTOR_07=contract^20~awarded by the^250~[to]^?Contractor^250~the contractor
+
+//
+NOC_CONTRACTOR_08=contracts for said work^100~are as follows^?Contractor^[by]|state of
+
+// 0010.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000374400.001.tif.uss
+NOC_CONTRACTOR_09=name of the contractor^100~was^?Contractor^250~date of contract|The property on
+
+// 0011.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\notice of completion\20049000607900.001.tif.uss
+NOC_CONTRACTOR_10=developer who completed said work was^?Contractor^250~and that the name of
+
+
+[PATTERNS_END]
+

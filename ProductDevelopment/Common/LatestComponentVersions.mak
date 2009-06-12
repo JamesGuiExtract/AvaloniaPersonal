@@ -1,0 +1,11 @@
+IcoMapESRIVersion=IcoMapESRI Ver. 4.2.4.11
+IcoMapCoreVersion=IcoMapCore Ver. 4.2.4.11
+ReusableComponentsVersion=RC Ver. 7.1.0.11
+PDUtilsVersion=PDUtils Ver. 3.4.0.11
+PlatformSpecificUtilsVersion=PlatSpecUtils Ver. 2.7.0.11
+RCDotNetVersion=RC.Net Ver. 1.3.0.11
+LaserficheVersion=Integration LF Ver. 1.3.0.11
+FlexIndexVersion=FlexIndex Ver. 7.1.0.11
+IDShieldOfficeVersion=IDShield Office Ver. 1.3.0.11
+LabDEVersion=LabDE Ver. 1.0.1.11
+FKBVersion=FKB Ver. 9.1+

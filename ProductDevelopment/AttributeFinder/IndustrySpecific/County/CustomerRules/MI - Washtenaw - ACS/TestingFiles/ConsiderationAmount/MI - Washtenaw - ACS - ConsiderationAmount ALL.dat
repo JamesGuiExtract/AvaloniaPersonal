@@ -1,0 +1,99 @@
+//Assignment of Mortgage
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\ASSIGNMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Lien - Misc
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//AFFIDAVIT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AFFIDAVIT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//AGREEMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AGREEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//AMENDMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AMENDMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//CERTIFICATE
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\CERTIFICATE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//CORNER - LAND
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\CORNER - LAND;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//COURT - PROBATE
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\COURT - PROBATE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//COURT DOCUMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\COURT DOCUMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED - MASTER
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED - MASTER;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED SHERIFF CLK-JUD
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED SHERIFF CLK-JUD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//EASEMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\EASEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//FED TAX LIEN RELEASE
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FED TAX LIEN RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//FEDERAL TAX LIEN
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FEDERAL TAX LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING AMEND
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING AMEND;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING TERM
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING TERM;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//GOVERNMENT DOCUMENTS
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\GOVERNMENT DOCUMENTS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//JUDGMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\JUDGMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//LAND CONTRACT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LAND CONTRACT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//MICH UNEMP LIEN DIS
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICH UNEMP LIEN DIS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//MICHIGAN TAX LIEN
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICHIGAN TAX LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//MICHIGAN TX LN REL
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICHIGAN TX LN REL;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//MISCELLANEOUS
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MISCELLANEOUS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//MODIFICATION
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MODIFICATION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\NOTICE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE-COMMENCEMENT
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\NOTICE-COMMENCEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE - PARTIAL
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE - PARTIAL;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//SURVEY
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\SURVEY;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+
+//TRUST
+<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\TRUST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).amount.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
+

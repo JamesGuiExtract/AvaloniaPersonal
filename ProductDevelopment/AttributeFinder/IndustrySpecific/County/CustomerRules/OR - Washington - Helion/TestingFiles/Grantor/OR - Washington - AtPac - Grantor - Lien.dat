@@ -1,0 +1,4 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE-LIEN,JUDGMT,WRIT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

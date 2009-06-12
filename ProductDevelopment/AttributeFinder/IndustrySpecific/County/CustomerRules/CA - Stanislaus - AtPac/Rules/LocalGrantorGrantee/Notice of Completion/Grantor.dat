@@ -1,0 +1,13 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\NOTICE OF COMPLETION\20079000140400.005.uss
+LocalNocGrantor01=That^?Grantor^80~awarded^48~contract^3~to]^?Contractor^80~[for]^5~work
+[PATTERNS_END]

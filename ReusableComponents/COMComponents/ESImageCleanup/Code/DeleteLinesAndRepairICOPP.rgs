@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.DeleteLinesAndRepairICOPP.1 = s 'DeleteLinesAndRepairICOPP Class'
+	{
+		CLSID = s '{3E8D7122-A8C8-4C04-8395-F0C91D201007}'
+	}
+	ESImageCleanup.DeleteLinesAndRepairICOPP = s 'DeleteLinesAndRepairICOPP Class'
+	{
+		CLSID = s '{3E8D7122-A8C8-4C04-8395-F0C91D201007}'
+		CurVer = s 'ESImageCleanup.DeleteLinesAndRepairICOPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {3E8D7122-A8C8-4C04-8395-F0C91D201007} = s 'DeleteLinesAndRepairICOPP Class'
+		{
+			ProgID = s 'ESImageCleanup.DeleteLinesAndRepairICOPP.1'
+			VersionIndependentProgID = s 'ESImageCleanup.DeleteLinesAndRepairICOPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRasterZoneTester.TestIntersection.1 = s 'TestIntersection Class'
+	{
+		CLSID = s '{FE4098EC-D232-4271-95EC-873CA7091E4B}'
+	}
+	UCLIDRasterZoneTester.TestIntersection = s 'TestIntersection Class'
+	{
+		CLSID = s '{FE4098EC-D232-4271-95EC-873CA7091E4B}'
+		CurVer = s 'UCLIDRasterZoneTester.TestIntersection.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FE4098EC-D232-4271-95EC-873CA7091E4B} = s 'TestIntersection Class'
+		{
+			ProgID = s 'UCLIDRasterZoneTester.TestIntersection.1'
+			VersionIndependentProgID = s 'UCLIDRasterZoneTester.TestIntersection'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{B449B45E-363E-4457-8E32-717A3A1AA1F0}'
+		}
+	}
+}

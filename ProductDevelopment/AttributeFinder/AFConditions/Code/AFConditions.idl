@@ -1,0 +1,165 @@
+// AFConditions.idl : IDL source for AFConditions.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFConditions.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+//import "..\..\AFUtils\Code\AFUtils.idl";
+[
+	uuid(D3DC98FB-A212-409B-B68C-64D1DC430594),
+	version(1.0),
+	helpstring("AFConditions 1.0 Type Library")
+]
+library UCLID_AFCONDITIONSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+	importlib("..\..\AFUtils\Code\AFUtils.tlb");
+
+	[
+		object,
+		uuid(7C5DCE82-9A31-4955-9B19-195C732F3509),
+		dual,
+		helpstring("IDocTypeCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IDocTypeCondition : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To get the list (VariantVector of BSTR's) of Document Types that this condition 
+		//			will allow(or not allow)
+		[propget, id(1), helpstring("property Types")] HRESULT Types([out, retval] IVariantVector **ppVec);
+		// PROMISE: To set the list (VariantVector of BSTR's) of Document Types that this condition 
+		//			will allow(or not allow)
+		[propput, id(1), helpstring("property Types")] HRESULT Types([in] IVariantVector *pVec);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: To return whether the list of types on this condition are doc types that are 
+		//			allowed by the condition or not allowed by the condition
+		[propget, id(2), helpstring("property AllowTypes")] HRESULT AllowTypes([out, retval] VARIANT_BOOL* pVal);
+		// PROMISE: To specify that the list of types on this condition are doc types that should be
+		//			allowed by the condition or not allowed by the condition
+		[propput, id(2), helpstring("property AllowTypes")] HRESULT AllowTypes([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: A document will only be considered of a type if its confidence is at least the 
+		//			of this property
+		[propget, id(3), helpstring("property MinConfidence")] HRESULT MinConfidence([out, retval] EDocumentConfidenceLevel* pVal);
+		[propput, id(3), helpstring("property MinConfidence")] HRESULT MinConfidence([in] EDocumentConfidenceLevel newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Defines the category or industry for which to evaluate document type
+		[propget, id(4), helpstring("property Category")] HRESULT Category([out, retval] BSTR *pRetVal);
+		// REQUIRE: the length of pNewVal > 0
+		[propput, id(4), helpstring("property Category")] HRESULT Category([in] BSTR pNewVal);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(DA3CB3F4-233B-4383-BEB2-22B3E17EB48B),
+		dual,
+		helpstring("IRSDFileCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IRSDFileCondition : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If the .rsd file returned by this function finds at least one attribute on the document
+		//			that this condition is evaluating this condition will pass
+		[propget, id(1), helpstring("property RSDFileName")] HRESULT RSDFileName([out, retval] BSTR *pRetVal);
+		// REQUIRE: the length of pNewVal > 0
+		// PROMISE: If the .rsd file set by this function finds at least one attribute on the document
+		//			that this condition is evaluating this condition will pass
+		[propput, id(1), helpstring("property RSDFileName")] HRESULT RSDFileName([in] BSTR pNewVal);
+	};
+
+	[
+		object,
+		uuid(3D62D6BC-72D5-4E16-9EE3-45B15D459EF7),
+		dual,
+		nonextensible,
+		helpstring("IFindingRuleCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IFindingRuleCondition : IDispatch
+	{
+		// PROMISE: Specifies the currently configured attribute finding rule to be used to evaluate
+		//			the condition
+		[propget, id(1), helpstring("property AFRule")] HRESULT AFRule([out, retval] IAttributeFindingRule **ppRetVal);
+		[propput, id(1), helpstring("property AFRule")] HRESULT AFRule([in] IAttributeFindingRule *pNewVal);
+	};
+
+	////////////
+	// CoClasses
+	////////////
+	[
+		uuid(C9A05826-595E-468D-9258-C7199E0F5F0E),
+		helpstring("DocTypeCondition Class")
+	]
+	coclass DocTypeCondition
+	{
+		[default] interface IDocTypeCondition;
+		interface IAFCondition;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(5C88FB66-FDB7-44B2-9AE1-843CBA62C463),
+		helpstring("DocTypeConditionPP Class")
+	]
+	coclass DocTypeConditionPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(FCAD538E-C1B3-48F4-AC24-3DB8FD96384A),
+		helpstring("RSDFileCondition Class")
+	]
+	coclass RSDFileCondition
+	{
+		[default] interface IRSDFileCondition;
+		interface IAFCondition;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(BD0F7A85-B524-467A-B2E2-034F104777B7),
+		helpstring("RSDFileConditionPP Class")
+	]
+	coclass RSDFileConditionPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(F4263789-4139-45D6-8A73-7600A47E5149),
+		helpstring("FindingRuleCondition Class")
+	]
+	coclass FindingRuleCondition
+	{
+		[default] interface IFindingRuleCondition;
+		interface IAFCondition;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(CF3F89FE-9503-4E0B-9B14-9D101F064C87),
+		helpstring("FindingRuleConditionPP Class")
+	]
+	coclass FindingRuleConditionPP
+	{
+		[default] interface IUnknown;
+	};
+};

@@ -1,0 +1,3 @@
+John Doe owes $300.  His social security sumber is 312-00-1231 and his driver's license number is H1231313.
+
+Jane Smith owes $0.  Her social security sumber is 555-03-1231 and her driver's license number is H1226453.

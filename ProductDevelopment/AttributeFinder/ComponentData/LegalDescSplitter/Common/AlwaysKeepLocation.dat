@@ -1,0 +1,16 @@
+// DT:0028
+//	Added initial Expression
+
+/*
+Section[\s\S]+?\d+
+
+[\s\S]*?
+
+(T(own)?[\s\S]*?\d+[\s\S]*?((s(outh)?)|(n(orth)?)))
+
+[\s\S]*?
+
+(R(ange)?[\S\s]*?\d+[\s\S]*?((E(ast)?|W(est)?)))
+*/
+
+^also\s+(?!excl)

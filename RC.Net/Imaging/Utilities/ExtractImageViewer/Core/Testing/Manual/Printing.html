@@ -1,0 +1,96 @@
+<HTML>
+
+<HEAD>
+<TITLE>Image Viewer Printing Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+<h1>Image Viewer Printing Testing Checklist
+<IMG src="../../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+
+<hr>
+
+<ul>
+	<h3>Basic Printing - Manual Tests</h3>
+       	<ul>
+       	  	<li>Open a multipage image - <b>TestImage004.tif</b> from the 
+		Redaction Demo.</li>
+       	  	<li>Confirm that the current page can be printed.</li>
+       	  	<li><b>[DotNet #58]</b> Confirm that printing occurs 
+		the first time that <b>Ok</b> is clicked.</li>
+       	  	<li>Confirm that a range of pages can be printed.</li>
+       	  	<li>Confirm that the entire image can be printed.</li>
+<p>
+       	  	<li>Begin a print operation but <b>Cancel</b> before 
+		printing starts.</li>
+       	  	<li>Confirm that printing does not occur.</li>
+       	  	<li>Keep the image open for the following tests.</li>
+       	</ul>
+<p>
+	<h3>Printing Highlights - Manual Tests</h3>
+       	<ul>
+       	  	<li>Create several highlights on the image.</li>
+          	<li><b>[DotNet #56]</b> Confirm that the highlights are printed 
+		as black redactions.</li>
+       	  	<li>Rotate the image.</li>
+       	  	<li>Print the rotated image and confirm that the printed 
+		image is also rotated.</li>
+       	  	<li>Confirm that the highlights are also printed with 
+		appropriate rotation applied.</li>
+       	  	<li>Close the image.</li>
+       	</ul>
+<p>
+	<h3>Printing Annotations - Manual Tests</h3>
+       	<ul>
+       	  	<li>Open an image that contains annotations - <b>FourPagesWithAnnoA.tif</b>
+		from I:\Common\Testing\Annotation_Images.</li>
+       	  	<li>Print the image.</li>
+          	<li>Confirm that the annotations are printed.</li>
+       	  	<li>Rotate the image.</li>
+       	  	<li>Print the rotated image and confirm that the printed 
+		annotations are also rotated.</li>
+       	  	<li>Close the image.</li>
+       	</ul>
+<p>
+	<h3>Printing Rotated View Perspectives - Basic</h3>
+       	<ul>
+       	  	<li>Open an image with an unusual view perspective -
+		<b>Image23_VP3.tif</b>
+		from I:\Common\Testing\Rotated_Images.</li>
+       	  	<li>Print the image.</li>
+          	<li>Confirm that the image is printed with the displayed 
+		view perspective.</li>
+       	  	<li>Close the image.</li>
+       	</ul>
+<p>
+	<h3>Printing Rotated View Perspectives - Special License</h3>
+       	<ul>
+       	  	<li>Create a special license file with
+		<b>RotatedImages_And_Annotation_Feature</b> not licensed.  
+		This will require a temporary modification removing ID <b>2076</b> 
+		from the <b>FlexIndexAndIDShieldCore</b> package.</li>
+       	  	<li>Open an image from the Redaction Demo.</li>
+       	  	<li>Rotate the image.</li>
+       	  	<li>Print the image.</li>
+          	<li>Confirm that the image is printed with the displayed rotation.</li>
+<p>
+       	  	<li>Create several highlights on the image.</li>
+       	  	<li>Print the image.</li>
+       	  	<li>Confirm that the highlights are also printed with 
+		appropriate rotation applied.</li>
+       	  	<li>Close the image.</li>
+<p>
+       	  	<li>Open an image that contains annotations - <b>FourPagesWithAnnoA.tif</b>
+		from I:\Common\Testing\Annotation_Images.</li>
+       	  	<li>Rotate the image.</li>
+       	  	<li>Print the rotated image and confirm that the printed 
+		annotations are also rotated.</li>
+       	  	<li>Close the image.</li>
+       	  	<li>Delete the special license file and confirm that any 
+		modifications to network DAT files are corrected.</li>
+       	</ul>
+</ul>
+</BODY>
+</HTML>

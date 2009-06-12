@@ -1,0 +1,333 @@
+<HTML>
+
+<HEAD>
+<TITLE>Standard LabDE Highlights Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>Highlighting Features Testing Checklist<br>
+<IMG src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Highlights - General</h3>
+	<ul>
+		<LI><b>Highlights on skewed images</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that <b>Patient Info</b> 
+			and <b>Test Results</b> are slightly skewed.
+			<LI>Zoom in to various fields and confirm that the associated highlights 
+			match the image skew.
+			<LI>Confirm that the hint <b>does not</b> follow the skew.
+<p>
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Zoom in to the <b>eGFR Interpretive Guidelines:</b> section of the text. 
+			<LI>Select the <b>Date of Birth</b> field.
+			<LI>Confirm that the view changes such that the highlight and tooltip are visible.
+			<LI>Change to <b>page 2</b>.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Confirm that the view changes back to <b>page 1</b> such that the highlight 
+			and tooltip are visible.
+<p>
+			<LI>Select the <b>Potassium</b> cell.
+			<LI>Confirm that the highlight and tooltip are visible.
+			<LI>Zoom in to the <b>eGFR Interpretive Guidelines:</b> section of the text. 
+			Make sure that the width of the display covers only that text.
+			<LI>Select the whole row for <b>Chloride</b>.
+			<LI>Confirm that the view and zoom level changes such that the highlights and 
+			hint are visible.
+			<LI>Confirm that tooltips <b>are not</b> visible.
+		</ul>
+<p>
+		<LI><b>Highlights and OCR confidence</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Street</b> cell in the <b>Laboratory - Address</b> table.
+			<LI>Confirm that in the <b>N7950</b> text that the <b>9</b> and the <b>0</b> 
+			have a red background indicating lower OCR confidence.
+			<LI>Swipe <b>N7950 Town Hall</b> to replace the Street Address.
+			<LI>Confirm that the text OCRs correctly.
+			<LI>Confirm that now only the <b>0</b> has a red background indicating 
+			lower OCR confidence.
+			<LI>Manually edit the <b>Street</b> cell such that <b>N7950</b> becomes <b>N7960</b>.
+			<ul>
+				<LI>Confirm that the tooltip changes to <b>N7960 Town Hall</b>.
+				<LI>Confirm that the highlight is now completely <b>green</b>.
+			</ul>
+			<LI>Re-swipe <b>N7950 Town Hall</b> to replace the Street Address.
+			<LI>Confirm that the text OCRs correctly.
+			<LI>Confirm that the <b>0</b> again has a red background indicating 
+			lower OCR confidence.
+		</ul>
+<p>
+		<LI><b>Highlights across pages</b>
+		<ul>
+			<LI>Open image <b>352.tif</b> from Demo_LabDE.
+			<LI>Select the first <b>COMP METABOLIC PNL</b> row.
+			<LI>Confirm that the entire set of highlights and hints is visible on 
+			<b>page 1</b>.
+			<LI>Select the second <b>COMP METABOLIC PNL</b> row.
+			<LI>Confirm that the document stays on <b>page 1</b> and that just the 
+			<b>COMP METABOLIC PNL</b> text is highlighted.
+			<LI>Change to <b>page 2</b>.
+			<LI>Confirm that the entire set of highlights and hints is visible on 
+			<b>page 2</b>.
+		</ul>
+<p>
+		<LI><b>Highlights and hints on tables</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Laboratory Address</b> table.
+			<LI>Confirm that selecting each individual row of the address table provides the 
+			appropriate highlight and hint.
+			<LI>Confirm that selecting multiple rows of the address table in various 
+			combinations provides the appropriate highlights but without any hints.
+<p>
+			<LI>Select one of the <b>Basic Metabolic Panel</b> cells in the 
+			<b>Completed Tests</b> table.
+			<LI>Confirm that the <b>Basic Metabolic Panel</b> text is highlighted 
+			and that a hint is also displayed.
+			<LI>Select an entire <b>Basic Metabolic Panel</b> row in the 
+			<b>Completed Tests</b> table.
+			<ul>
+				<LI>Confirm that all of the test results for the <b>Panel</b> are 
+				highlighted and that no hint is displayed.
+				<LI>Confirm that both <b>Red</b> and <b>Green</b> highlights are 
+				visible for individual characters.
+				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
+				provided for <b>Flag</b> items under the <b>OUT OF RANGE</b> column.
+			</ul>
+			<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that a <b>direct</b> hint is provided under the 
+			<b>OUT OF RANGE</b> column.
+			<LI>Select one of the empty <b>Comment</b> cells in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that an <b>indirect</b> hint is provided with dotted line boxes 
+			around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
+			<b>UNITS</b> and <b>REFERENCE RANGE</b> columns.
+<p>
+			<LI>Select the entire <b>Potassium</b> row from the test details in the first 
+			<b>Basic Metabolic Panel</b>.
+			<LI>Right-click and select <b>Copy row(s)</b>.
+			<LI>Select the second <b>Basic Metabolic Panel</b>.
+			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+			<ul>
+				<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
+				Details</b> table.
+				<LI>Confirm that selecting individual cells displays proper highlights 
+				and tooltips. 
+				<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
+				proper highlights and no tooltips. 
+			</ul>
+			<LI>Select <b>multiple</b> rows from the test details in the first 
+			<b>Basic Metabolic Panel</b>.
+			<LI>Right-click and select <b>Copy row(s)</b>.
+			<LI>Select the second <b>Basic Metabolic Panel</b>.
+			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+			<ul>
+				<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
+				Details</b> table.
+				<LI>Confirm that selecting individual cells displays proper highlights 
+				and tooltips. 
+				<LI>Confirm that selecting the entire rows displays 
+				proper highlights and no tooltips. 
+			</ul>
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Show All Highlights</h3>
+	<ul>
+		<LI><b>Persistence</b>
+		<ul>
+			<LI>Open an image.
+			<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+			<LI>Close the image and open another image.
+			<LI>Confirm that <b>Show all highlights</b> remains <b>off</b>.
+			<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+			<LI>Close the image and open another image.
+			<LI>Confirm that <b>Show all highlights</b> remains <b>on</b>.
+		</ul>
+		<LI><b>Functionality</b>
+		<ul>
+			<LI>Open an image.
+			<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+			<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			<LI>Select an item from <b>Patient Information</b>.
+			<ul>
+				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+				<LI>Confirm that the appropriate selected information 
+				remains highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+				<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			</ul>
+			<LI>Select an item from <b>Physicians</b>.
+			<ul>
+				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+				<LI>Confirm that the appropriate selected information 
+				remains highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+				<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			</ul>
+			<LI>Select an item from <b>Laboratory</b>.
+			<ul>
+				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+				<LI>Confirm that the appropriate selected information 
+				remains highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+				<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			</ul>
+			<LI>Select an item from <b>Completed Tests</b>.
+			<ul>
+				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+				<LI>Confirm that the appropriate selected information 
+				remains highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+				<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			</ul>
+			<LI>Select an item from <b>Selected Test Details</b>.
+			<ul>
+				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
+				<LI>Confirm that the appropriate selected information 
+				remains highlighted.
+				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
+				<LI>Confirm that <b>all</b> found data and hints are highlighted.
+			</ul>
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Tooltips - General</h3>
+	<ul>
+		<LI><b>Tooltips and swipes</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Swipe different text and confirm that the new text is entered 
+			in the field.
+			<LI>Confirm that the tooltip moves to directly above the swiped text 
+			and now reflects the OCR result from the swipe.
+			<LI>Swipe the original text.
+			<LI>Confirm that the recognized text is entered in the field.
+			<LI>Confirm that the tooltip is displayed above the swipe.
+<p>
+			<li><b>[DataEntry #332]</b> Tooltips from angled swipes not positioned correctly
+			<ul>
+				<LI>Open image <b>221.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Patient Information - Name</b> field.
+				<LI>Zoom in to the <b>Pathologists</b> area of the document.
+				<LI>Use the <b>Angular Swipe</b> tool to swipe multiple lines of names.  
+				Swipe the text at a distinct angle.
+				<LI>Confirm that the resulting tooltip is displayed with the same angle 
+				as the recognized lines of text.
+			</ul>
+		</ul>
+<p>
+		<LI><b>Tooltips and manual updates</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Manually edit the text in the field.
+			<LI>Confirm that the tooltip changes properly with each character change.  
+			<li><b>[DataEntry #330]</b> Also confirm that the orientation of the tooltip 
+			does not changes as text is typed.
+			<LI>Confirm that whitespace is trimmed from each end of the tooltip as 
+			the text is updated.
+<p>
+			<LI>Click the <b>Highlight all data in image</b> button.
+			<LI>Use <b>Tab</b> to navigate through the data fields.
+			<LI>Confirm that tooltips <b>are</b> visible for found data.
+			<LI>Confirm that tooltips <b>are not</b> visible for data that was not found.
+		</ul>
+<p>
+		<LI><b>Tooltips and selection</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Click the <b>Select object</b> toolbar button.
+			<LI>Select the entire <b>Potassium</b> row.
+			<LI>Hover the mouse over the <b>Units</b> value.
+			<LI>Confirm that a tooltip is displayed.
+			<LI>Click on the highlighted <b>Units</b> value.
+			<LI>Confirm that selection changes from the entire row to just the 
+			<b>Units</b> cell.
+			<LI>Confirm that the tooltip is still displayed above the highlight.
+<p>
+			<LI><b>[DataEntry #342]</b> Tooltips for the whole row
+			<ul>
+				<LI>Select the entire <b>Potassium</b> row.
+				<LI>Confirm that tooltips are displayed for each entry 
+				in the row.
+				<LI>Select a single cell.
+				<LI>Confirm a single tooltip is now displayed.
+			</ul>
+		</ul>
+<p>
+		<LI><b>Tooltips on rotated images</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Note the position of the black mark located approximately 40% of the way 
+			down the page on the right side.
+			<LI>Rotate the image.
+			<LI>Confirm that tooltips are always displayed right-side up.
+			<LI>Select a field suitable for general text input.
+			<LI>Swipe the previously located black mark.  An upper-case <b>I</b> is 
+			expected.
+			<LI>Confirm that the recognized text is entered in the selected field.
+			<LI>Confirm that the tooltip is displayed above the swipe.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Rectangular Highlight Tool</h3>
+	<ul>
+		<LI>Open a document in stand-alone mode.
+		<LI>Use the rectangular highlight tool to swipe multiple words where the highlight 
+		includes fragments of text on other lines.
+		<LI>Confirm that the highlight collapses to just the text that was OCR'd from 
+		the highlighted region.
+<p>
+		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<LI>Rotate the image and confirm that the existing highlights rotate properly.
+		<LI>Swipe some text in the rotated image.  Confirm that the text is recognized 
+		and highlighted properly and that it appears in the DEP.
+	</ul>
+<p>
+	<LI><h3>Angular Highlight Tool</h3>
+	<ul>
+		<LI>Open a document in stand-alone mode.
+		<LI>Use the angular highlight tool to swipe text at a significant angle.
+		<LI>Confirm that the highlight collapses to just the text that was OCR'd from 
+		the highlighted region.
+		<LI>Confirm that the angle of the highlight is maintained.
+<p>
+		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<LI>Rotate the image and confirm that the existing highlights rotate properly.
+		<LI>Swipe some text in the rotated image.  Confirm that the text is recognized 
+		and highlighted properly and that it appears in the DEP.
+	</ul>
+<p>
+	<LI><h3>Miscellaneous</h3>
+	<ul>
+		<LI><b>[DataEntry #352]</b> Swiping on upside down image
+		<ul>
+			<LI>Open the TIF image in <b>I:\Common\Testing\PVCS_Testing\DataEntry\352</b>.
+			<LI>Select the <b>Patient Name</b> field.
+			<li>Go to page 3 and use the <b>Create angular highlight</b> tool to 
+			swipe (at a slight angle) text in the upper left-hand corner of the image.
+			<li>Confirm that the tooltip is always drawn at an appropriate angle.
+			<li>Repeat this exercise several times.  The <b>352</b> folder noted above 
+			includes a screenshot of an inappropriate tooltip.
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

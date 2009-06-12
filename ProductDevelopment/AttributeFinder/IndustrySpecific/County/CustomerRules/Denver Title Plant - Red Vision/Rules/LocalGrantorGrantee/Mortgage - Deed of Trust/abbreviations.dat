@@ -1,0 +1,13 @@
+//\bmortgage\b%MTG minority
+\bindustri.{1,3}?\b%IND
+\bcorporation%CORP
+\bcompany%CO
+//\bNATIONAL\s{0,4}ASSOCIATION\b%NA
+//\bNATIONAL\b%NAT minority
+//\bASSOCIATION\b%ASSOC superceded
+//\bCOLORADO\b%COLO minority
+//\bFINANCIAL\b%FINCL minority
+\bINCORPORATED\b%INC
+\bEMPLOYEES\b%EMPL
+//\bCREDIT\b%CR minority
+(\bBENEFICIAL\x20MORTGAGE\x20CO)\x20OF\x20COLORADO\b%$1

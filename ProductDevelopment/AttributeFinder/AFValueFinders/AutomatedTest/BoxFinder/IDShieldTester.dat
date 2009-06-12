@@ -1,0 +1,121 @@
+<SETTING>;VerificationCondition=Test
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;QueryForAutomatedRedaction=Test
+<SETTING>;AutomatedCondition=Test
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;CreateTestOutputVOAFiles=0
+
+// ucc-dump-56486: UCC Financing statement in normal and 90 degree left rotation
+// ucc-dump-56514: 4 page UCC Financing statment with boxes on first 2 pages
+// TestImage026: Military discharge oriented in all 4 directions
+// TestImage033: Federal Tax Lien in normal and 90 degree right rotation
+// 2497-0082: Death certificate, black borders
+// 00136AAESI: Death certificate without borders, 3 pages all the same
+// SkewedImages: 6 images with significant skew
+
+// Clue to right, spatial region
+// Tests: [P16:2752], [P16:2761]: The second box the first page had been a problem
+<TESTFOLDER>;.\Test0.rsd;.\AutomatedTestFiles\ucc-dump-56486\;$DirOf(<SourceDocName>)\..\ActualVOA\Test0.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test0.voa
+
+// Case-sensitive, RegExpr, clue to right, spatial region without clue
+// Tests: [P16:2750], [P16:2752]
+<TESTFOLDER>;.\Test1.rsd;.\AutomatedTestFiles\ucc-dump-56486\;$DirOf(<SourceDocName>)\..\ActualVOA\Test1.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test1.voa
+
+// RegExpr, same-box, text with clue
+// Tests: [P16:2757]
+<TESTFOLDER>;.\Test2.rsd;.\AutomatedTestFiles\ucc-dump-56514\;$DirOf(<SourceDocName>)\..\ActualVOA\Test2.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test2.voa
+
+// RegExpr, case-sensitive, same-box, text without clue
+// Tests: [P16:2756]
+<TESTFOLDER>;.\Test3.rsd;.\AutomatedTestFiles\ucc-dump-56514\;$DirOf(<SourceDocName>)\..\ActualVOA\Test3.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test3.voa
+
+// Clue to left, multiple clues, spatial region, min width 5
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test4.rsd;.\AutomatedTestFiles\ucc-dump-56486\;$DirOf(<SourceDocName>)\..\ActualVOA\Test4.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test4.voa
+
+// Clue to left, multiple clues, spatial region without clue, max width 5
+// Tests: [P16:2750], [P16:2752]
+<TESTFOLDER>;.\Test5.rsd;.\AutomatedTestFiles\ucc-dump-56486\;$DirOf(<SourceDocName>)\..\ActualVOA\Test5.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test5.voa
+
+// NOTE: Tests 6-9 are failing to find the top "07" box with the image rotated to the right and test 6 and 7 appear to be detecting a false positive box with "07".  These don't appear to be logical failures with the Box Finder.
+
+// Clue to bottom left, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test6.rsd;.\AutomatedTestFiles\TestImage026\;$DirOf(<SourceDocName>)\..\ActualVOA\Test6.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test6.voa
+
+// Clue to top left, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test7.rsd;.\AutomatedTestFiles\TestImage026\;$DirOf(<SourceDocName>)\..\ActualVOA\Test7.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test7.voa
+
+// Clue to top right, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test8.rsd;.\AutomatedTestFiles\TestImage026\;$DirOf(<SourceDocName>)\..\ActualVOA\Test8.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test8.voa
+
+// Clue to bottom right, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test9.rsd;.\AutomatedTestFiles\TestImage026\;$DirOf(<SourceDocName>)\..\ActualVOA\Test9.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test9.voa
+
+// Clue to top, min height 10, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test10.rsd;.\AutomatedTestFiles\TestImage033\;$DirOf(<SourceDocName>)\..\ActualVOA\Test10.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test10.voa
+
+// NOTE: Tests 11 is failing to find a box that shoudl be detected in the rotated right image.  It doesn't appear to be a logical failure with the Box Finder.
+
+// Clue to top, max height 10, spatial region
+// Tests: [P16:2752]
+<TESTFOLDER>;.\Test11.rsd;.\AutomatedTestFiles\TestImage033\;$DirOf(<SourceDocName>)\..\ActualVOA\Test11.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test11.voa
+
+// Clue to bottom, text without clue
+<TESTFOLDER>;.\Test12.rsd;.\AutomatedTestFiles\2497-0082\;$DirOf(<SourceDocName>)\..\ActualVOA\Test12.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test12.voa
+
+// Clue to bottom, case-sensitive, text with clue
+<TESTFOLDER>;.\Test13.rsd;.\AutomatedTestFiles\2497-0082\;$DirOf(<SourceDocName>)\..\ActualVOA\Test13.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test13.voa
+
+// First from prioritized, clues from file, first page only, spatial region
+// Tests [P16:2764], [P16:2830], [P16:2759]: This is a box that had been a problem
+<TESTFOLDER>;.\Test14.rsd;.\AutomatedTestFiles\B00136AAESI\;$DirOf(<SourceDocName>)\..\ActualVOA\Test14.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test14.voa
+
+// First from prioritized, last 2 pages only, spatial region
+// Tests [P16:2830]
+<TESTFOLDER>;.\Test15.rsd;.\AutomatedTestFiles\B00136AAESI\;$DirOf(<SourceDocName>)\..\ActualVOA\Test15.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test15.voa
+
+// All clues inc clues from file, 1st & 3rd pages only, spatial region without clue
+// Tests: [P16:2750], [P16:2764]
+<TESTFOLDER>;.\Test16.rsd;.\AutomatedTestFiles\B00136AAESI\;$DirOf(<SourceDocName>)\..\ActualVOA\Test16.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test16.voa
+
+// Finds boxes with "social" or "station".  Tested against a set of images with significant skew.
+// Tests: [P16:2883]
+<TESTFOLDER>;.\Test17.rsd;.\AutomatedTestFiles\SkewedImages\;$DirOf(<SourceDocName>)\..\ActualVOA\Test17.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test17.voa
+
+// Finds boxes with "social", "SSN" or "Tax\s+ID".  Tested against a 8-bit color bmp with BottomLeft view
+// orientation and jagged line edges.
+// Test: [P16:3041], [P16:3018], [P16:2884]
+<TESTFOLDER>;.\Test18.rsd;.\AutomatedTestFiles\bmp\;$DirOf(<SourceDocName>)\..\ActualVOA\Test18.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test18.voa
+
+// Finds boxes with "social", "SSN" or "Tax\s+ID".  Tested against a 24-bit color jpg with some thick lines
+// bordering the boxes to be found.
+// Tests: [P16:3018], [P16:2884]
+<TESTFOLDER>;.\Test19.rsd;.\AutomatedTestFiles\jpg\;$DirOf(<SourceDocName>)\..\ActualVOA\Test19.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test19.voa
+
+// Finds boxes with "social", "SSN" or "Tax\s+ID".  Tested against a 8-bit color gif with jagged edges
+// Tests: [P16:3018], [P16:2884]
+<TESTFOLDER>;.\Test20.rsd;.\AutomatedTestFiles\gif\;$DirOf(<SourceDocName>)\..\ActualVOA\Test20.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test20.voa
+
+// Finds boxes with "social", "SSN" or "Tax\s+ID".  Limits search to the first page via Select Page Region
+// (box finder rule still includes all pages). Tested against a multipage pdf file
+// Tests: [P16:3040], [P16:3005]
+<TESTFOLDER>;.\Test21.rsd;.\AutomatedTestFiles\pdf\;$DirOf(<SourceDocName>)\..\ActualVOA\Test21.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test21.voa
+
+// Finds box containing any text in a particular image region via select page region. Tested a multi-page
+// tif with skewed images
+// Tests: [P16:3004], [P16:3005]
+<TESTFOLDER>;.\Test22.rsd;.\AutomatedTestFiles\SkewedImages\;$DirOf(<SourceDocName>)\..\ActualVOA\Test22.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test22.voa
+
+// Finds boxes with "social", "SSN" or "Tax\s+ID".  Limits search to pages 13, 17-19 via Select Page Region
+// (box finder rule still includes all pages). Tested against a multipage tif file with page 18 missing
+// Tests: [P16:3005]
+<TESTFOLDER>;.\Test23.rsd;.\AutomatedTestFiles\MissingPage\;$DirOf(<SourceDocName>)\..\ActualVOA\Test23.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test23.voa
+
+// Searches for a box from a document whose pages have all been excluded via an Select Page Region preprocessor
+// Tests: [FlexIDSCore:3069]
+<TESTFOLDER>;.\Test24.rsd;.\AutomatedTestFiles\00010\;$DirOf(<SourceDocName>)\..\ActualVOA\Test24.voa;$DirOf(<SourceDocName>)\..\ExpectedVOA\Test24.voa

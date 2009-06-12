@@ -1,0 +1,1 @@
+^[^\d\r\n]{0,2}3\W*(?:N.m..{2,7}(?:addr|.ddr.s)|Name\W*and|.{2,7}and\W*(?:addr|.ddr.s)|.{10,25}of\W*(?:secu|s.c.r)|.{25,38}p.rty)

@@ -1,0 +1,23 @@
+HKCR
+{
+	TestObjsWithPropPages.ObjAPropPage.1 = s 'ObjAPropPage Class'
+	{
+		CLSID = s '{D4CE3564-B10C-4CD1-963F-F0F28676F4BF}'
+	}
+	TestObjsWithPropPages.ObjAPropPage = s 'ObjAPropPage Class'
+	{
+		CLSID = s '{D4CE3564-B10C-4CD1-963F-F0F28676F4BF}'
+		CurVer = s 'TestObjsWithPropPages.ObjAPropPage.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {D4CE3564-B10C-4CD1-963F-F0F28676F4BF} = s 'ObjAPropPage Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

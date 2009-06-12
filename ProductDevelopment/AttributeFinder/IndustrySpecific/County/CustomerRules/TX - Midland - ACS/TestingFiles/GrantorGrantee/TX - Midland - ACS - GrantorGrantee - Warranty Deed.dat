@@ -1,0 +1,7 @@
+<SETTING>;EAV_MUST_EXIST=TRUE
+
+//Warranty Deed
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\WARRANTY DEED;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav

@@ -1,0 +1,7 @@
+//Adjust as needed
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+<SETTING>;CreateTestOutputVOAFiles=1
+<SETTING>;TypeToBeTested=SSN
+//Top 80 Percent: 
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - Yolo\Set001\Random3333;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

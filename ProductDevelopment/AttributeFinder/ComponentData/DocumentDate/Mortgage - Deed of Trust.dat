@@ -1,0 +1,63 @@
+// *******
+// Imports
+// *******
+
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB3K.TIF.uss
+MB_DOCDATE_04=[it]^3~[is]^3~[dated]^3~[as]^3~[of]^?DocumentDate^50~[and]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABWO.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06172AA.AG8.TIF.uss
+MB_DOCDATE_05=[the]^3~[date]^3~[of]^50~[is]^?DocumentDate<^50~[and]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB00.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB0C.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB1V.TIF.uss
+// "his" was added to this rule because of docs like K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set008\Images\70619.tif.uss
+MB_DOCDATE_01=this|his]^40~which^3~[is^3~dated^?DocumentDate^50~together|will
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABX7.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABY6.TIF.uss
+MB_DOCDATE_06=This|his]^25~dated^?DocumentDate^50~[is]|[made]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB12.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABX8.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABY1.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04288AAA2M.TIF.uss
+MB_DOCDATE_02=made|dated^5~this|thus|[as of]^?DocumentDate^50~between|[by]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB15.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AAB2Z.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04288AAA3E.TIF.uss
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04288AAAAR.TIF.uss ?
+MB_DOCDATE_03=[is]^5~given|made^5~[on]^?DocumentDate^50~[the]|[by]|\r\n
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\MTG\B04286AABWW.TIF.uss
+MB_DOCDATE_100=dated^?DocumentDate^50~and any|between
+
+
+MB_DOCDATE_08=[this^3~mortgage^8~made^3~this]^?DocumentDate^50~between|mortgagor
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06172AA.AFR.TIF.uss
+MB_DOCDATE_07=[this]^3~[mortgage]^8~[made]^?DocumentDate^50~between|mortgagor
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06172AA.AJ8.TIF.uss
+MB_DOCDATE_09=[note]^5~[means]^24~[note]^40~[dated]^?DocumentDate^50~[the]^3~[note]
+
+// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06172AA.AKF.TIF.uss
+MB_DOCDATE_19=dated^?DocumentDate^50~[in]^8~amount^3~[of]
+[PATTERNS_END]
+
+

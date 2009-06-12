@@ -1,0 +1,45 @@
+// *******
+// Imports
+// *******
+//#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+//[VARS_BEGIN]
+
+//[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\9800080974.tif.uss
+LocalGrantee01=KNOW ALL MEN BY THESE PRESENTS^200~hereby^3~sell^3~[and]^3~Quit Claim^3~[to]^?Grantee^160~whose^3~legal^3~address
+
+LocalGrantee02=THIS DEED^10~Made^80~between^100~[a]^80~[corporation]|[company]^100~granto^10~[and]^?Grantee^160~whose^3~legal^3~address
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\8800273160.tif.uss
+LocalGrantee03=THIS DEED^10~Made^80~bet^200~[of^10~[City]|[County]^100~gra^2~o^10~d]^?Grantee^160~[whose legal address]|[IN JOINT TENANCY]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\9100048327.tif.uss
+LocalGrantee04=THIS DEED^10~Made^80~between^200~[of]^15~first^3~part^10~[and]^?Grantee^160~whose^3~legal^3~address
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\2001089021.tif.uss
+LocalGrantee05=THIS DEED^10~Made^80~bet^200~[of^10~[City]|[County]^100~gra^2~o^10~d]^?Grantee^160~and State of
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\9800080948.tif.uss
+LocalGrantee06=THIS DEED^80~between^200~[of^10~[City]|[County]^100~gra^20~an^?Grantee^160~whos^4~legal^3~address
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\9100048002.tif.uss
+LocalGrantee06=QUIT CLAIM DEED^200~Made this^200~grantor^10~[and]^?Grantee^160~whose^4~legal^3~address^3~[is]
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\D\9100047232.tif.uss
+LocalGrantee07=QUIT CLAIM DEED^200~Made^200~between^200~of^3~the^5~County^3~[of]^80~[and]^?Grantee^160~whos^4~leg^10~add
+
+//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL\9000047872.tif.uss
+LocalGrantee08=KNow ALL^80~That^4~Whereas^?Grantee^160~of City & County of Denver
+
+[PATTERNS_END]

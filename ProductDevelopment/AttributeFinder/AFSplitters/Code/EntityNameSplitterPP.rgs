@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFSplitters.EntityNameSplitterPP.1 = s 'EntityNameSplitterPP Class'
+	{
+		CLSID = s '{CCAF65D5-5584-45CD-B264-38687AA3A2A0}'
+	}
+	UCLIDAFSplitters.EntityNameSplitterPP = s 'EntityNameSplitterPP Class'
+	{
+		CLSID = s '{CCAF65D5-5584-45CD-B264-38687AA3A2A0}'
+		CurVer = s 'UCLIDAFSplitters.EntityNameSplitterPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {CCAF65D5-5584-45CD-B264-38687AA3A2A0} = s 'EntityNameSplitterPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

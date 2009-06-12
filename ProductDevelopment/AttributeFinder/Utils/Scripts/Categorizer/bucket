@@ -1,0 +1,34 @@
+dir="$2";
+int="0";
+if [ ! -e Categorized ]; then mkdir Categorized; fi
+if [ "$dir" = "" ]; then dir="`date +%Y-%m-%d_%k.%M`"; fi
+#echo $dir;
+if [  -e Categorized/~"$dir" ]; then
+	rm -fv Categorized/~"$dir"/*; 	
+else 	 mkdir Categorized/~"$dir";
+fi
+
+
+for y in `cat "$1"| sed -e 's/ /?/g'`; do 
+	y=`echo $y|sed -e 's/?/ /g'|sed 's/.$//'`; 
+	int=$[++int];
+	echo -n $int":  ";
+	found_string=`grep -F "$y" FilesWithKnownDocType.txt`;
+	if [ "$found_string" = "" ]; then
+		echo "no match found!";
+		echo -n "$y">>Categorized/~"$dir"/Unclassified.txt;		
+		echo -e '\r'>>Categorized/~"$dir"/Unclassified.txt;
+	else
+		doc_type=`echo ${found_string##*:  }|sed 's/.$//'`; 
+		echo "found match:  $doc_type"'.';
+		echo -n "$y">>Categorized/~"$dir"/"$doc_type".txt;		
+		echo -e '\r'>>Categorized/~"$dir"/"$doc_type".txt;
+
+	fi
+done
+
+if [ -e Categorized/"$dir" ]; then
+	rm -fv Categorized/"$dir"/*;
+	rmdir Categorized/"$dir";
+fi
+mv -f Categorized/~"$dir" Categorized/"$dir";

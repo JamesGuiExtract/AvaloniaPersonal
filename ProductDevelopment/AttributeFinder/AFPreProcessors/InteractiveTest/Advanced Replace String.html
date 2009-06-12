@@ -1,0 +1,95 @@
+<html>
+
+<HEAD>
+<TITLE>FlexIndex Menu Items Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style>
+<!--
+-->
+</style>
+</HEAD>
+
+<body>
+<h1>Ruleset Editor - Document Preprocessor - Advanced Replace String
+	<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2><b>Advanced Replace String Dialog</b></h2>
+<ul>
+    	<li><b>String to find</b> edit box is editable.</li>
+      	<li><b>Replace with</b> edit box is editable.</li>
+		  <ul>
+			<li><b>[FlexIDSCore #3114]</b> Adv. Replace Strings Garbling Text</li>
+			  <ul>
+				<li>Open the ruleset located at "I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example_adv.rsd".</li>
+				<li>Run the ruleset on the text in "I:\Common\Testing\PVCS_Testing\LegacyRC\3114\example.txt".</li>
+				<li>Ensure that the resulting attribute text reads: "Dec 04 Oct 15 June 12 Feb 12", and has not
+					been garbled. Wrong output would be "Dec 04 Oct 15 Junc 52 Fec 52".</li>
+			  </ul>
+		  </ul>
+<p>		  
+      	<li>Confirm the icon on the right side of <b>String to find</b> text
+     	can be clicked to display the balloon help.</li>
+      	<li>Confirm the icon on the right side of <b>Replace with</b> text
+        can be clicked to display the balloon help.</li>
+      	<li>Confirm the drop down menu on the right side of <b>String to find</b> edit 
+      	box displays a list of tags and utility functions.</li>
+     	<ul>
+          	<li>Put the cursor at any position inside <b>String to find</b> edit 
+		box and select one of the tags, it will be inserted at this position.</li>
+          	<li>Select all characters inside <b>String to find</b> edit box and 
+            	select one of the tags; it will replace all characters inside the edit box.</li>
+     	</ul>
+      	<li>Confirm the drop down menu on the right side of <b>Replace with</b> edit box 
+	displays a list of tags and utility functions.</li>
+      	<ul>
+          	<li>Put the cursor at any position inside <b> Replace with</b> edit box and 
+		select one of the tags, it will be inserted at this position.</li> 
+          	<li>Select all characters inside <b>Replace with</b> edit box and select 
+		one of the tags; it will replace all characters inside the edit box.</li>
+     	</ul>
+      	<li>Confirm the browse button on the rightmost side of <b>String to find</b> edit 
+	box displays an open file dialog.</li>
+     	<ul>
+		<li>Select one file and click <b>OK</b> to close the dialog, confirm the file 
+		name and its full path is displayed in the <b>String to find</b> edit box, with 
+		file:// added to the beginning of the file name.</li>
+        </ul>
+      	<li>Confirm the browse button on the rightmost side of <b>Replace with</b> edit box 
+	displays an open file dialog.</li>
+     	<ul>
+        	<li>Select one file and click <b>OK</b> to close the dialog, confirm the file 
+		name and its full path will be displayed in the <b>Replace with</b> edit box, 
+		with file:// added to the beginning of the file name.</li>
+      	</ul>
+      	</li>
+      	<li><b>All occurrences</b> radio button is exclusively selectable.</li>
+      	<li><b>First occurrence</b> radio button is exclusively selectable.</li>
+      	<li><b>Last occurrence</b> radio button is exclusively selectable.</li>
+      	<li><b>Specified occurrence</b> radio button is exclusively selectable.
+       	<ul>
+          	<li>Selecting <b>Specified occurrence</b> radio button allows editing in the 
+		corresponding edit box.</li>
+          	<li>Deselecting <b>Specified occurrence</b> radio button grays out the 
+		corresponding edit box.</li>
+          	<li>Corresponding edit box accepts only digits as input.</li>
+          	<li>Corresponding edit box removes leading 0's if input is similar to
+            	<b>0001</b> and ends up as <b>1</b>.  Note that the change occurs on OK.</li>
+      	</ul>
+      	</li>
+      	<li><b>Case sensitive</b> check box is checkable.</li>
+      	<li><b>Above specified strings are treated as Regular Expression</b> check box is checkable.</li>
+      	<li><b>OK</b> button saves changes and exits dialog.
+      	<ul>
+          	<li><b>OK</b> button throws exception when <b>String
+            	to find</b> has not been specified.</li>
+          	<li><b>OK</b> button throws exception when <b>Specified
+            	occurrence</b> is selected and edit box is empty or contains <b>0</b>.</li>
+     	</ul>
+      	</li>
+      	<li><b>Cancel</b> button ignores changes and exits dialog.</li>
+      	<li><b>X</b> button ignores changes and exits dialog.</li>
+</ul>
+</body>
+</html>

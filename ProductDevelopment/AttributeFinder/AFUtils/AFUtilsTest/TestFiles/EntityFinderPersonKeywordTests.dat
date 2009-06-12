@@ -1,0 +1,155 @@
+// Basic input file for Entity Finder Tester
+//
+// FORMAT:
+// Two line formats are supported:
+// 1) Label | Input | Output
+//    where:
+//    Label  = a number or text string used to identify the test case
+//    Input  = the string used as input to the Entity Finder
+//    Output = the string expected as output from the Entity Finder
+// 2) <FILE> | Path
+//    where:
+//    <FILE> = a keyword indicating that the next argument is a filename
+//    Path   = a fully qualified path to a text file used as input.
+//             OR a filename for file located in same folder as TestEntityFinder.dat
+//             NOTE: The text file must also satisfy these format requirements
+//
+//////////////////////////////////////////////////////////////////////////////
+
+// Individual tests to guarantee that particular keywords and phrases used as
+// Person Designators are found properly
+
+Person: A Married Man|John H. Smith, A Married Man with extra text|John H. Smith, A Married Man
+
+Person: A Married Woman|Mary W. Smith, A Married Woman with extra text|Mary W. Smith, A Married Woman
+
+Person: An Unmarried Man|Peter Smith, An Unmarried Man with extra text|Peter Smith, An Unmarried Man
+
+Person: Unmarried|Peter Smith, Unmarried with extra text|Peter Smith, Unmarried
+
+Person: Married 1|Peter Smith, married with extra text|Peter Smith, married
+
+Person: Married 2|Peter Smith, married But Separated with extra text|Peter Smith, married But Separated
+
+Person: A Single Individual|Jane Jones, a single individual with extra text|Jane Jones, a single individual
+
+Person: Individually|Jane Jones, individually with extra text|Jane Jones, individually
+
+Person: Individuals|John H. Smith and Mary W. Smith and Peter Smith, individuals with extra text|John H. Smith and Mary W. Smith and Peter Smith, individuals
+
+Person: A Widow|Jane Jones, a widow with extra text|Jane Jones, a widow
+
+Person: Administrator|John L. Jones, Administrator of the Jane Jones Estate with extra text|John L. Jones, Administrator
+
+Person: Administratrix|Jane Jones, Administratrix of the John Jones Estate with extra text|Jane Jones, Administratrix
+
+Person: A Widower|John Jones, widower with extra text|John Jones, widower
+
+Person: A Baron Sole|John H. Smith, a Baron Sole with extra text|John H. Smith, a Baron Sole
+
+Person: A Feme Sole|John H. Smith, a Feme Sole with extra text|John H. Smith, a Feme Sole
+
+Person: A Single Person|Peter Smith, a Single Person and Jane Jones, a single person with extra text|Peter Smith, a Single Person and Jane Jones, a single person
+
+Person: Married To|Peter Smith, married to Jane Jones with extra text|Peter Smith, married to Jane Jones
+
+Person: Both Single|Peter Smith and Jane Jones, Both Single with extra text|Peter Smith and Jane Jones, Both Single
+
+Person: Formerly Husband and Wife|Peter Smith and Jane Jones, Formerly Husband and Wife with extra text|Peter Smith and Jane Jones, Formerly Husband and Wife
+
+Person: As Husband and Wife|John H. Smith and Mary W. Smith, As Husband and Wife with extra text|John H. Smith and Mary W. Smith, As Husband and Wife
+
+Person: Husband and Wife|John H. Smith and Mary W. Smith, Husband and Wife with extra text|John H. Smith and Mary W. Smith, Husband and Wife
+
+Person: Non Vested Spouse|John H. Smith and Mary W. Smith, Non Vested Spouse with extra text|John H. Smith and Mary W. Smith, Non Vested Spouse
+
+Person: H W Community Property|John H. Smith and Mary W. Smith, Husband and Wife Community Property with extra text|John H. Smith and Mary W. Smith, Husband and Wife Community Property
+
+Person: Husband & Wife|John H. Smith and Mary W. Smith, Husband & Wife with extra text|John H. Smith and Mary W. Smith, Husband & Wife
+
+Person: H / W|John H. Smith and Mary W. Smith, H / W with extra text|John H. Smith and Mary W. Smith, H / W
+
+Person: Wife and Husband|Mary H. Smith and John W. Smith, Wife and Husband with extra text|Mary H. Smith and John W. Smith, Wife and Husband
+
+Person: His Wife|John H. Smith, A Married Man and Mary W. Smith, His Wife with extra text|John H. Smith, A Married Man and Mary W. Smith, His Wife
+
+Person: Her Husband|Mary H. Smith, a married woman and John W. Smith, her Husband with extra text|Mary H. Smith, a married woman and John W. Smith, her Husband
+
+Person: Her Spouse|Mary H. Smith, a married woman and John W. Smith, her spouse with extra text|Mary H. Smith, a married woman and John W. Smith, her spouse
+
+Person: Joint Tenants1|Peter Smith and Jane Jones, Joint Tenants with extra text|Peter Smith and Jane Jones, Joint Tenants
+
+Person: Joint Tenants2|Peter Smith and Jane Jones, Joint Tenants with rights of survivorship with extra text|Peter Smith and Jane Jones, Joint Tenants with rights of survivorship
+
+Person: Joint Tenants3|Peter Smith and Jane Jones, As Joint Tenants with rights of survivorship with extra text|Peter Smith and Jane Jones, As Joint Tenants with rights of survivorship
+
+Person: Joint Tenants4|Peter Smith and Jane Jones, As Joint Tenants with Full rights of survivorship with extra text|Peter Smith and Jane Jones, As Joint Tenants with Full rights of survivorship
+
+Person: Joint Tenants5|Peter Smith and Jane Jones, As Joint Tenants w/ rights of survivorship with extra text|Peter Smith and Jane Jones, As Joint Tenants w/ rights of survivorship
+
+Person: Joint Tenancy|Peter Smith and Jane Jones, Joint Tenancy with Full rights of survivorship with extra text|Peter Smith and Jane Jones, Joint Tenancy with Full rights of survivorship
+
+Person: Joint Debtors|Peter Smith and Jane Jones, Joint Debtors with extra text|Peter Smith and Jane Jones, Joint Debtors
+
+Person: Not Stated|Peter Smith and Jane Jones, Not Stated with extra text|Peter Smith and Jane Jones, Not Stated
+
+Person: Tenants In Entirety|Peter Smith and Jane Jones, Tenants In Entirety with extra text|Peter Smith and Jane Jones, Tenants In Entirety
+
+Person: His Sole & Separate Property|Peter Smith, as His Sole & Separate Property with extra text|Peter Smith, as His Sole & Separate Property
+
+// FlexIDSCore #1091
+Person: Her Sole & Separate Property|Jane Smith, as Her Sole & Separate Property with extra text|Jane Smith, as Her Sole & Separate Property
+
+Person: Separate Property and Estate|Peter Smith and Jane Jones, as Their Separate Property and Estate with extra text|Peter Smith and Jane Jones, as Their Separate Property and Estate
+
+Person: Tenants By Entireties|Peter Smith and Jane Jones, Tenants By Entireties with extra text|Peter Smith and Jane Jones, Tenants By Entireties
+
+Person: Tenants By the Entirety|Peter Smith and Jane Jones, Tenants By the Entirety with extra text|Peter Smith and Jane Jones, Tenants By the Entirety
+
+Person: Executor|John H. Smith, Executor of Estate with extra text|John H. Smith, Executor
+
+Person: Executrix|Mrs. Mary Smith, Executrix of Estate with extra text|Mrs. Mary Smith, Executrix
+
+Person: Deceased|John H. Smith and Mary Smith, Deceased with extra text|John H. Smith and Mary Smith, Deceased
+
+Person: Joint With Spouse|Peter Smith, joint with spouse Jane Jones with extra text|Peter Smith, joint with spouse Jane Jones
+
+// FlexIDSCore #996
+Person: As Joint Debtors|Peter Smith and Jane Jones As Joint Debtors with extra text|Peter Smith and Jane Jones As Joint Debtors
+
+Person: Joint With His Spouse|Peter Smith, joint with his spouse Jane Jones with extra text|Peter Smith, joint with his spouse Jane Jones
+
+Person: Joint With Their Spouse|Peter Smith, joint with their spouse Jane Jones with extra text|Peter Smith, joint with their spouse Jane Jones
+
+Person: Joint With Her Spouse|Jane Smith, joint with her spouse Peter Jones with extra text|Jane Smith, joint with her spouse Peter Jones
+
+Person: Daughter|Peter Smith and daughter Jane Jones with extra text|Peter Smith and daughter Jane Jones
+
+Person: Daughter2|Peter Smith, \r\nand daughter Jane Jones with extra text|Peter Smith, \r\nand daughter Jane Jones
+
+Person: Husband and Wife with OCR error|Peter Smith and Jane Smith, husband and wi fe with extra text|Peter Smith and Jane Smith, husband and wi fe
+
+// Person Trim Identifiers
+Person: PTI_1|John Smith and wife, Mary Smith plus more|John Smith and wife, Mary Smith
+Person: PTI_2|Mary Smith and husband, John Smith plus more|Mary Smith and husband, John Smith
+Person: PTI_3|John Smith and/his spouse, Mary Smith plus more|John Smith and/his spouse, Mary Smith
+Person: PTI_4|Mary Smith and/her spouse, John Smith plus more|Mary Smith and/her spouse, John Smith
+Person: PTI_5|John Smith husband, Mary Smith wife plus more|John Smith husband, Mary Smith wife
+Person: PTI_6|John Smith, Solely plus more|John Smith, Solely
+Person: PTI_7|John Smith joined by his spouse, Mary Smith plus more|John Smith joined by his spouse, Mary Smith
+Person: PTI_8|Mary Smith joined by her husband, John Smith plus more|Mary Smith joined by her husband, John Smith
+Person: PTI_9|John Smith joined herein by his wife, Mary Smith plus more|John Smith joined herein by his wife, Mary Smith
+Person: PTI_10|John Smith joined herein by his/her spouse, Mary Smith plus more|John Smith joined herein by his/her spouse, Mary Smith
+Person: PTI_11|John Smith joined herein pro-forma by his spouse, Mary Smith plus more|John Smith joined herein pro-forma by his spouse, Mary Smith
+Person: PTI_12|John Smith, a married man and joined by Mary Smith, his wife plus more|John Smith, a married man and joined by Mary Smith, his wife
+Person: PTI_13|John Smith, joined herein by Mary Smith plus more|John Smith, joined herein by Mary Smith
+Person: PTI_14|John Smith and Mary Smith Proforma plus more|John Smith and Mary Smith
+Person: PTI_15|John Smith and Mary Smith Pro-Forma plus more|John Smith and Mary Smith
+Person: PTI_16|John Smith and Mary Smith Herein plus more|John Smith and Mary Smith
+Person: PTI_17|John Smith joined herein pro forma by his wife, Mary Smith plus more|John Smith joined herein pro forma by his wife, Mary Smith
+
+Company: PTI_1|ACME Lending, A Corporation Organized Under the laws of Iowa|ACME Lending
+Company: PTI_2|ACME Lending, State of Iowa|ACME Lending
+Company: PTI_3|ACME Lending, City of Milwaukee|ACME Lending
+Company: PTI_4|ACME Lending, County of Iowa|ACME Lending
+Company: PTI_5|ACME Lending, Commonwealth of Massachusetts|ACME Lending

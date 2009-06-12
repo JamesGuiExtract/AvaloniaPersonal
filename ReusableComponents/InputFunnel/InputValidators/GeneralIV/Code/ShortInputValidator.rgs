@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDGeneralIV.ShortInputValidator.1 = s 'ShortInputValidator Class'
+	{
+		CLSID = s '{B11F7F49-4D38-4FBF-8B02-D1F00E2205F5}'
+	}
+	UCLIDGeneralIV.ShortInputValidator = s 'ShortInputValidator Class'
+	{
+		CLSID = s '{B11F7F49-4D38-4FBF-8B02-D1F00E2205F5}'
+		CurVer = s 'UCLIDGeneralIV.ShortInputValidator.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B11F7F49-4D38-4FBF-8B02-D1F00E2205F5} = s 'ShortInputValidator Class'
+		{
+			ProgID = s 'UCLIDGeneralIV.ShortInputValidator.1'
+			VersionIndependentProgID = s 'UCLIDGeneralIV.ShortInputValidator'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{203E8934-0C8B-4607-B2F5-84A9167B1107}'
+		}
+	}
+}

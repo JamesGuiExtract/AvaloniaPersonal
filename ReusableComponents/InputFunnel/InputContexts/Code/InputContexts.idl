@@ -1,0 +1,31 @@
+// InputContexts.idl : IDL source for InputContexts.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (InputContexts.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(142427CD-FBC2-4505-9A70-CDDD6C9BBC5E),
+	version(1.0),
+	helpstring("UCLID InputContexts 1.0 Type Library")
+]
+library UCLID_InputContextsLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\IFCore\Code\IFCore.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(482AC22F-CC30-4D90-8120-68C31BDA5114),
+		helpstring("LandRecordsIC Class")
+	]
+	coclass LandRecordsIC
+	{
+		[default] interface IInputContext;
+		interface ILicensedComponent;
+	};
+};

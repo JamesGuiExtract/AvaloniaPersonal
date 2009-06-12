@@ -1,0 +1,8 @@
+//  Microsoft C and Visual C++ 6.x, -si4 -sp4, Microsoft's Foundation Class library, Standard Template Library (STL), Windows 32-bit, Windows NT, Scott Meyers (Effective C++), 
+//  Standard lint options
+
+au-sm.lnt
+co-msc60.lnt
+lib-mfc.lnt lib-stl.lnt lib-w32.lnt lib-wnt.lnt
+options.lnt  -si4 -sp4 -i..\..\BaseUtils\Code;..\..\Utils\Code;..\..\OmniORB\inc;..\..\OmniORB\inc\OmniORB2 -DNDEBUG;WIN32;_WINDOWS;_WINDLL;_AFXDLL;_MBCS;_AFXEXT;__x86__;__NT__;__OSVERSION__=5;__WIN32__;_WINSTATIC;EXPORT_FILTERS_DLL;_MT;_DLL
+

@@ -1,0 +1,50 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000315400.005.uss
+LocalModotGrantee10=[by]^9~between^?Grantor^160~hereinafter^12~trustor^240~hereina|inafter^12~Trustee^6~[and]^?SecondGrantor^160~hereinafter^24~lende
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000019300.005
+LocalModotGrantee01=between^360~borrower^7~[and]^?Grantee^160~and amends|amends
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000564600.004.uss
+LocaModotGrantee11=[by^9~between^?Grantee^160~"Lender|Lender"^6~[and]^240~"Borrower|Borrower"
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000096900.006.uss
+LocalModotGrantee02=[our"^3~mean^?Grantee^160~Whereas^5~borrower
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000290300.008
+LocalModotGrantee03=[by]^10~between^?Grantee^120~[we"|"we]^36"Bank]|"Bank]
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\modification of deed of trust\20049001312100.006.tif.uss
+LocalMODOT_GRANTEE_02=in favor of^?Trustee^250~trustee
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION\20079000307600.004.uss
+LocalModotGrantee04=[by]^10~between^?Grantee^120~whose^3~place^9~busi^120~lender
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000315500.005.uss
+//don't care if hereinater is a little broken
+LocalModotGrantee05=Agreement^80~between^?OriginalGrantor^120~hereina^48~borrower^240~hereina|inafter^16~trustee^12~[and]^?Grantee^120~hereina^48~current^3~lender
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000830800.007
+LocalModotGrantee06=\r|\n^3~Lender:^?Grantee<^120~organized^9~[existing
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079001081100.003
+//splitter doesn't work on sample
+LocalModotGrantee07=executed^5~between^80~Trustor^6~[and]^?Grantee^120~whose^3~addr^180~lender
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079001081100.003.uss
+//entity finder missed but keep rule
+LocalModotGrantee08a=modification^120~between^180~Trustor"|"Trustor^5~[and]^?Grantee^160~whose^3~addr^100~"Lender|Lender"
+LocalModotGrantee08b=modification^120~between^180~Trustor"|"Trustor^5~[and]^?Grantee^240~"Lender|Lender"
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000090300.003.uss
+LocalModotGrantee08=modification^120~between^180~Trustor"|"Trustor^80~[and]^?Grantee^160~[referred^80~lender 
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079001132100.006.uss
+LocalModotGrantee11=modification^5~agreement^80~between^?Grantor^160~[the lender|the "Lender|"Lender|Lender"
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\modification of deed of trust\20049000065400.008.tif.uss
+MODOT_GRANTEE_01=trustee^?Trustee^250~lender|beneficiary
+[PATTERNS_END]

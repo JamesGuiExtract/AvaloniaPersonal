@@ -1,0 +1,3 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set002\RandomSubsetBackfile;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

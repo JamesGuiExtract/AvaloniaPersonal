@@ -1,0 +1,781 @@
+<?xml version='1.0'?>
+<TestData>
+
+	<!-- ##### String Pattern Matcher Test Cases ###### -->
+
+	<!-- demonstrate example with being able to specify ?<Var< -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 jhfg word1 123 word2 234 word2
+		</Input>
+		<Pattern> word1^?&lt;M1&lt;^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> jhfg word1 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate example with being able to specify ?<Var> -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 jhfg word1 123 word2 234 word2
+		</Input>
+		<Pattern> word1^?&lt;M1&gt;^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> jhfg word1 123 word2 234 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate example with being able to specify ?>Var< -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 jhfg word1 123 word2 234 word2
+		</Input>
+		<Pattern> word1^?&gt;M1&lt;^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate example with being able to specify ?>Var> -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 jhfg word1 123 word2 234 word2
+		</Input>
+		<Pattern> word1^?&gt;M1&gt;^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> 123 word2 234 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate example with being able to specify max-ignore
+		chars on the token after the match variable -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 jhfg word1 123 word2
+		</Input>
+		<Pattern> word1^?M1^8~word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate example with pattern matching being able
+		to back-track and continue finding a match later in the
+		document -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			mortgage mortgage executed by by by John Smith on 1/11/1911
+		</Input>
+		<Pattern>mortgage^5~executed^[by]^?Grantor^on</Pattern>
+		<ExpectedMatches>
+			<Match Name="Grantor"> John Smith </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- same as above, except greedy -->
+	<TestCase Greedy="1" CaseSensitive="0">
+		<Input>
+			mortgage mortgage executed by by by John Smith on 1/11/1911
+		</Input>
+		<Pattern>mortgage^5~executed^[by]^?Grantor^on</Pattern>
+		<ExpectedMatches>
+			<Match Name="Grantor"> by by John Smith </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- same as above, except non-greedy with constraint -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			mortgage mortgage executed by by by John Smith on 1/11/1911
+		</Input>
+		<Pattern>mortgage^5~executed^5~[by]^?Grantor^on</Pattern>
+		<ExpectedMatches>
+			<Match Name="Grantor"> by John Smith </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- testing greediness after the match value -->
+	<TestCase Greedy="1" CaseSensitive="0">
+		<Input>
+			mortgage mortgage executed by by by John Smith on 1/11/1911 and on Tuesday
+		</Input>
+		<Pattern>mortgage^5~executed^5~[by]^?Grantor^on</Pattern>
+		<ExpectedMatches>
+			<Match Name="Grantor"> by by John Smith on 1/11/1911 and </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars real life example -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Known all men by these presents that MORTGAGE EDGE CORPORATION
+			Organized and existing under the laws of the State of Delaware
+			party of the first part, in consideration of the sum of One 
+			Dollar ($1.00) and other good and valuable consideration in 
+			lawful money of the United States to it in hand paid by:
+				GMAC MORTGAGE CORPORATION
+				100 Witmer Road, Horsham, PA 19044
+			party of the second part, at or before the ensealing and delivery
+			of these presents, the receipt whereof is hereby acknowledged, 
+			has granted,bargained, sold, assigned, transferred and set over 
+			and by these presents does hereby grant, bargain, sell, 
+			assign, transfer and set over unto the said party of the second
+			part that certain Security Instrument 'executed by...
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> GrantsKeyword </Name>
+				<Value> [grant]|[grants]|[granted]|[assign]|[assigns]|[assigned]|[transfer]|[transfers]|[transferred]|[sell]|[sells]|[sold]|[bargain]|[bargains]|[bargained]|[convey]|[conveys]|[conveyed]|[deliver]|[delivers]|[delivered]|set over|sets over </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> [know^[that]^?Grantor^consideration^paid by^?Grantee^@GrantsKeyword^40~@GrantsKeyword </Pattern>
+		<ExpectedMatches>
+			<Match Name="Grantor"> MORTGAGE EDGE CORPORATION
+			Organized and existing under the laws of the State of Delaware
+			party of the first part, in </Match>
+			<Match Name="Grantee"> :
+				GMAC MORTGAGE CORPORATION
+				100 Witmer Road, Horsham, PA 19044
+			party of the second part, at or before the ensealing and delivery
+			of these presents, the receipt whereof is hereby acknowledged, 
+			has </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 1a (literal match found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Mary grants, blah blah blah and assigns to John
+		</Input>
+		<Pattern> ?Person1^grant^120~assign^to^?Person2</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person1"> Mary </Match>
+			<Match Name="Person2"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 1b (literal no match) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Mary grants, blah blah blah and assigns to John
+		</Input>
+		<Pattern> ?Person1^grant^12~assign^to^?Person2</Pattern>
+		<ExpectedMatches>
+			<!-- no matches are expected because
+				the maximum number of ignore characters constraint
+				cannot be met -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 2a (literal-or-list match) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Mary grants, assigns, and transfers her property to John
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> GrantKeywords </Name>
+				<Value> grant|assign|transfer </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> ?Person1^@GrantKeywords^3~@GrantKeywords^to^?Person2</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person1"> Mary </Match>
+			<Match Name="Person2"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 2a (literal-or-list no match) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Mary grants to MERS, it's assignors and successors, and transfers her property to John
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> GrantKeywords </Name>
+				<Value> grants|assigns|transfers </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> ?Person1^@GrantKeywords^3~@GrantKeywords^to^?Person2</Pattern>
+		<ExpectedMatches>
+			<!-- no matches are expected because
+				the maximum number of ignore characters constraint
+				cannot be met -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 3a (@+ no match) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			asd 3 asd 4 word1 John word2
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @+Digits^2~@+Digits^word1^?Person^word2</Pattern>
+		<ExpectedMatches>
+			<!-- no matches are expected because
+				the maximum number of ignore characters constraint
+				cannot be met -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 3b (@+ match found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			asd 3 a4 word1 John word2
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @+Digits^2~@+Digits^word1^?Person^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 3c (@+ match found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			asd 3a4 word1 John word2
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @+Digits^2~@+Digits^word1^?Person^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 3d (@+ match found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			asd 34 word1 John word2
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @+Digits^2~@+Digits^word1^?Person^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 3e (@+ match not found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			asd 3 a 3 word1 John word2
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @+Digits^2~@+Digits^word1^?Person^word2</Pattern>
+		<ExpectedMatches>
+			<!-- no matches are expected because
+				the maximum number of ignore characters constraint
+				cannot be met -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 4a (@- match found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			John gave 3 roses to Mary.
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> DigitsAndSpace </Name>
+				<Value> 0 123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> gave^3~@-DigitsAndSpace^to^?Person</Pattern>
+		<ExpectedMatches>
+			<Match Name="Person"> Mary. </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate max ignore chars constraint example 4b (@- match not found) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			John gave 30 roses to Mary.
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> DigitsAndSpace </Name>
+				<Value> 0 123456789 </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> gave^1~@-DigitsAndSpace^to^?Person</Pattern>
+		<ExpectedMatches>
+			<!-- no matches are expected because
+				the maximum number of ignore characters constraint
+				cannot be met -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate greedy search -->
+	<TestCase Greedy="1" CaseSensitive="0">
+		<Input>
+			word1 word1 123 word2
+		</Input>
+		<Pattern> word1^?M1^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> word1 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- demonstrate non-greedy search -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			word1 word1 123 word2
+		</Input>
+		<Pattern> word1^?M1^word2</Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a basic example -->
+	<TestCase Greedy="0">
+		<Input>
+			this mortgage is transferred from John to Mary on Oct 1st, 2003
+			and was registered with the county on Oct 3rd, 2003.
+		</Input>
+		<Pattern> from^?FromPerson^to^?ToPerson^on </Pattern>
+		<ExpectedMatches>
+			<Match Name="ToPerson"> Mary </Match>
+			<Match Name="FromPerson"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- an example with multiple words in sequence -->
+	<TestCase Greedy="0">
+		<Input>
+			this mortgage is transferred from Kim to John on Oct 1st, 2003
+			and was registed with the county on Oct 3rd, 2003.
+		</Input>
+		<Pattern> mortgage^from^?FromPerson^to^?ToPerson^on </Pattern>
+		<ExpectedMatches>
+			<Match Name="FromPerson"> Kim </Match>
+			<Match Name="ToPerson"> John </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- an example with usage of expressions -->
+	<TestCase Greedy="0">
+		<Input>
+			The undersigned grants, conveys, assigns, transfers, and 
+			sells onto ACME Mortgage, LLC, operating at 111 N. Wisconsin Ave,
+			Milwaukee, Wisconsin
+		</Input>
+		<Pattern> @GrantKeywords^@GrantKeywords^@GrantToKeywords^?Assignee^@-NonTerminatingChars </Pattern>
+		<Expressions>
+			<Expression>
+    			<Name> GrantKeywords </Name>
+				<Value> grant|convey|sell|transfer|assign </Value>
+			</Expression>
+			<Expression>
+    			<Name> GrantToKeywords </Name>
+				<Value> to|unto </Value>
+			</Expression>
+			<Expression>
+    			<Name> NonTerminatingChars </Name>
+				<Value> AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz \r\n\t.,</Value>
+			</Expression>
+		</Expressions>
+		<ExpectedMatches>
+			<Match Name="Assignee"> ACME Mortgage, LLC, operating at </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a precursor test to demonstrate the need for square brackets-->
+	<TestCase Greedy="1">
+		<Input>
+			this and that is a sample test
+		</Input>
+		<Pattern> is^?M1^test </Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> and that is a sample </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a non-greedy version of above test-->
+	<TestCase Greedy="0">
+		<Input>
+			this and that is a sample test
+		</Input>
+		<Pattern> is^?M1^test </Pattern>
+		<ExpectedMatches>
+			<Match Name="M1"> a sample </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to show correct interpretation of square brackets-->
+	<TestCase Greedy="0">
+		<Input>
+			this and that is a sample test
+		</Input>
+		<Pattern> [is]^?MyMatch^test </Pattern>
+		<ExpectedMatches>
+			<Match Name="MyMatch"> a sample </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check picking up of more than two matches-->
+	<TestCase Greedy="0">
+		<Input>
+			It was handed over from John to Smith to Larry to Jones and lastly to Mary.
+		</Input>
+		<Pattern> [from]^?Person1^to^?Person2^to^?Person3^to^?Person4^and^to^?Person5^. </Pattern>
+		<ExpectedMatches>
+			<Match Name="Person1"> John </Match>
+			<Match Name="Person5"> Mary </Match>
+			<Match Name="Person3"> Larry </Match>
+			<Match Name="Person4"> Jones </Match>
+			<Match Name="Person2"> Smith </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of ? at the beginning of the pattern -->
+	<TestCase Greedy="0">
+		<Input>
+			John said "Hi" to Mary via email
+		</Input>
+		<Pattern> ?A^said^to^?B^via </Pattern>
+		<ExpectedMatches>
+			<Match Name="A"> John </Match>
+			<Match Name="B"> Mary </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of ? at the end of the pattern -->
+	<TestCase Greedy="0">
+		<Input>
+			Somebody said "Hi" to Mary
+		</Input>
+		<Pattern> said^to^?Person </Pattern>
+		<ExpectedMatches>
+			<Match Name="Person"> Mary </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of ? at both the beginning and the end of the pattern -->
+	<TestCase Greedy="0">
+		<Input>
+			John gave his watch to David
+		</Input>
+		<Pattern> ?Person1^gave^to^?Person2 </Pattern>
+		<ExpectedMatches>
+			<Match Name="Person1"> John </Match>
+			<Match Name="Person2"> David </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of @+ -->
+	<TestCase Greedy="0">
+		<Input>
+			Somebody lives in Madison, WI 53717
+		</Input>
+		<Pattern> in^?CityState^@+Digits </Pattern>
+		<Expressions>
+			<Expression>
+    			<Name> Digits </Name>
+				<Value> 0123456789 </Value>
+			</Expression>
+		</Expressions>
+		<ExpectedMatches>
+			<Match Name="CityState"> Madison, WI </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of @- -->
+	<TestCase Greedy="0">
+		<Input>
+			My email id is 123Test
+		</Input>
+		<Pattern> is^?ID^@-DigitsAndSpace </Pattern>
+		<Expressions>
+			<Expression>
+    			<Name> DigitsAndSpace </Name>
+				<Value>0123 456789 </Value>
+			</Expression>
+		</Expressions>
+		<ExpectedMatches>
+			<Match Name="ID"> 123 </Match>
+		</ExpectedMatches>
+	</TestCase>
+	
+	<!-- a test to check usage of | (OR operator) -->
+	<TestCase Greedy="1">
+		<Input>
+			He said that this is totally wrong.
+		</Input>
+		<Pattern> this|that^is^?Match1^wrong</Pattern>
+		<ExpectedMatches>
+		    <!-- the "is" is part of the below match because
+			     the last two chars of "this" matched the "is"
+				 in the pattern -->
+			<Match Name="Match1"> is totally </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- non-greedy version of above test -->
+	<TestCase Greedy="0">
+		<Input>
+			He said that this is totally wrong.
+		</Input>
+		<Pattern> this|that^is^?Match1^wrong</Pattern>
+		<ExpectedMatches>
+		    <!-- the "is" is part of the below match because
+			     the last two chars of "this" matched the "is"
+				 in the pattern -->
+			<Match Name="Match1"> totally </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check usage of | (OR operator) -->
+	<TestCase Greedy="0">
+		<Input>
+			He said that this is totally wrong.
+		</Input>
+		<Pattern> this|that^[is]^?Match1^wrong</Pattern>
+		<ExpectedMatches>
+		    <!-- the "is" is part of the below match because
+			     the last two chars of "this" matched the "is"
+				 in the pattern -->
+			<Match Name="Match1"> totally </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check case-sensitive search -->
+	<TestCase Greedy="0" CaseSensitive="1">
+		<Input>
+			He said that this is totally wrong.
+		</Input>
+		<Pattern> this|THAT^?Match1^wrong</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> is totally </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to check case-sensitive search -->
+	<TestCase Greedy="0" CaseSensitive="1">
+		<Input>
+			He said that this is totally wrong.
+		</Input>
+		<Pattern> this|THAT^?Match1^wrong</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> is totally </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- a test to test skipping of multiple whitespace -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Law
+			of   impermanency
+			   says that which begins must necessarily end.
+		</Input>
+		<Pattern> law of impermanency says^?lawOfP^.</Pattern>
+		<ExpectedMatches>
+			<Match Name="lawOfP"> that which begins must necessarily end </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+
+	<!-- another test to test skipping of multiple whitespace 
+		 (this test also ensures that the TreatMultipleWSAsOne
+		 attribute's default value is True) -->
+	<TestCase Greedy="0" CaseSensitive="0">
+		<Input>
+			Law    of   permanency   says that which never began never ends.
+		</Input>
+		<Pattern> law of permanency says^?lawOfP^.</Pattern>
+		<ExpectedMatches>
+			<Match Name="lawOfP"> that which never began never ends </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+
+	<!-- this testcase checks whether the TreatMultipleWSAsOne
+		 attribute value being set to False exhibits correct behavior
+		 in the StringPatternMatcher object -->
+	<TestCase Greedy="1" CaseSensitive="0" TreatMultipleWSAsOne="0">
+		<Input>
+			word1     
+			     word2 123 word1 word2 456 word1 word2 789 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 456 word1 word2 789 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- same as above test case except for TreatMultipleWSAsOne -->
+	<TestCase Greedy="1" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			word1     
+			     word2 123 word1 word2 456 word1 word2 789 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 123 word1 word2 456 word1 word2 789 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- same as above test case except for Greedy -->
+	<TestCase Greedy="0" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			word1     
+			     word2 123 word1 word2 456 word1 
+				 word2 789 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 789 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- same as above test case except for TreatMultipleWSAsOne -->
+	<TestCase Greedy="0" CaseSensitive="0" TreatMultipleWSAsOne="0">
+		<Input>
+			word1     
+			     word2 123 word1 word2 456 word1 
+				 word2 789 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 456 word1 
+				 word2 789 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- this testcase checks whether the TreatMultipleWSAsOne
+		 attribute value being set to True exhibits correct behavior
+		 in the StringPatternMatcher object -->
+	<TestCase Greedy="1" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			word1  
+			    word2 243 word1 word2 645 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 243 word1 word2 645 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- non-greedy version of above test -->
+	<TestCase Greedy="0" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			word1  
+			    word2 243 word1 word2 645 endword.
+		</Input>
+		<Pattern> word1 word2^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 645 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- this testcase checks the case where one or more
+		of the leading words in a pattern appear in the input
+		but all the necessary words don't appear in sequence
+		until later in the input -->
+	<TestCase Greedy="0" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			word1  
+			    word2 5123 endword word1 word2 6456 endword
+			word2 word3 1789 endword word1
+			   word2
+			word3 2345 endword
+		</Input>
+		<Pattern> word1 word2 word3^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 2345 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- this testcase checks whether we're able to find
+	multiple words in sequence with any amount of whitespace
+	in between them and where such sequence of words is not
+	the first expected token in the pattern -->
+	<TestCase Greedy="0" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>
+			test of soccer in madison word1  
+			    word2 823 endword word1 word2 456 endword
+			word2 word3 789 endword word1
+			   word2
+			word3 2157 endword
+		</Input>
+		<Pattern> test^soccer^word1 word2 word3^?Match1^endword</Pattern>
+		<ExpectedMatches>
+			<Match Name="Match1"> 2157 </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- the purpose of this testcase is to ensure that 
+	a match won't be returned unless ALL tokens are matched -->
+	<TestCase Greedy="0">
+		<Input>
+			word1 abcd word2 word4
+		</Input>
+		<Pattern> word1^?MyWord^word2^word3</Pattern>
+		<ExpectedMatches>
+			<!-- no matches expected -->
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- another test case for a non-greedy search -->
+	<TestCase Greedy="0">
+		<Input>
+			  THIS DEED OF TRUST ("Security Instrument") is made on
+			  among the grantor, Steven A. Baker June 25th 2003 
+			  whose mailing address is-("Borrower"), the Public 
+			  Trustee of Douglas County ("Trustee"), and the beneficiary.
+			  Mortgage Electronic Registration Systems, Inc. ("MERS"), 
+			  which is acting solely as nominee for Lender (as hereinafter
+			  defined) and Lender's successors and assigns. MERS is 
+			  organized and existing under the laws of Delaware, and has an
+			  address and telephone number of PO Box 2026, Flint,
+			  MI 48501-2026, tel. (888) 679-MERS.
+			  Clarion Mortgage Capital, Inc. ("Lender") is organized and 
+			  existing under the laws of the State of Colorado and has 
+			  an address of 9034 East Faster Place #205 Fagleuood, CO 80112
+		</Input>
+		<Expressions>
+			<Expression>
+    			<Name> NonTP </Name>
+				<Value> \n\r\t aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ,.'- </Value>
+			</Expression>
+		</Expressions>
+		<Pattern> @-NonTP^?LenderName^("Lender|"Lender"</Pattern>
+		<ExpectedMatches>
+			<Match Name="LenderName"> -MERS.
+			  Clarion Mortgage Capital, Inc. </Match>
+		</ExpectedMatches>
+	</TestCase>
+
+	<!-- another test case for a TreatMultipleWSAsOne -->
+	<TestCase Greedy="1" CaseSensitive="0" TreatMultipleWSAsOne="1">
+		<Input>this is a test.</Input>
+		<Pattern> this^is^ a ^?test^.</Pattern>
+		<ExpectedMatches>
+			<Match Name="test">test</Match>
+		</ExpectedMatches>
+	</TestCase>
+</TestData>

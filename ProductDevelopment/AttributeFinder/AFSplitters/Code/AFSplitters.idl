@@ -1,0 +1,284 @@
+// AFSplitters.idl : IDL source for AFSplitters.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFSplitters.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(9C61A6A5-6789-4648-9777-5405D6C517DF),
+	version(1.0),
+	helpstring("UCLID AFSplitters 1.0 Type Library")
+]
+library UCLID_AFSPLITTERSLib
+{
+	//////////////
+	// imports
+	//////////////
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//////////////
+	// Enums
+	//////////////
+	typedef
+	[
+		uuid(76E243D0-47EB-407e-9B5F-0F8DD29F7748), 
+		helpstring("UCLID EStringTokenizerSplitType")
+	]
+	enum EStringTokenizerSplitType
+	{
+		kEachTokenAsSubAttribute,
+		kEachTokenAsSpecified
+	} EStringTokenizerSplitType;
+
+	typedef
+	[
+		uuid(B23AEE49-AB86-44CF-9D36-3CE61FD8FC34), 
+		helpstring("UCLID EEntityAliasChoice")
+	]
+	enum EEntityAliasChoice
+	{
+		kIgnoreLaterEntities = 0,
+		kLaterEntitiesAsAttributes = 1,
+		kLaterEntitiesAsSubattributes = 2
+	}EEntityAliasChoice;
+
+
+	//////////////
+	// Interfaces
+	//////////////
+	[
+		object,
+		uuid(36A6840B-7319-49c8-882D-3795445636E7),
+		dual,
+		helpstring("IStringTokenizerSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IStringTokenizerSplitter : IDispatch
+	{
+		[propget, id(1), helpstring("property Delimiter")] HRESULT Delimiter([out, retval] short *pVal);
+		[propput, id(1), helpstring("property Delimiter")] HRESULT Delimiter([in] short newVal);
+		[propget, id(2), helpstring("property SplitType")] HRESULT SplitType([out, retval] EStringTokenizerSplitType *pVal);
+		[propput, id(2), helpstring("property SplitType")] HRESULT SplitType([in] EStringTokenizerSplitType newVal);
+		[propget, id(3), helpstring("property FieldNameExpression")] HRESULT FieldNameExpression([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property FieldNameExpression")] HRESULT FieldNameExpression([in] BSTR newVal);
+		[propget, id(4), helpstring("property AttributeNameToValueExprMap")] HRESULT AttributeNameAndValueExprVector([out, retval] IIUnknownVector* *pVal);
+		[propput, id(4), helpstring("property AttributeNameToValueExprMap")] HRESULT AttributeNameAndValueExprVector([in] IIUnknownVector *newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If strExpr is not a valid sub-attribute-value-expression, then
+		//			an appropriate error message will be displayed following which
+		//			VARIANT_FALSE will be returned.
+		//			If strExpr is a valid sub-attribute-value-expression, then this
+		//			method call returns VARIANT_TRUE
+		[id(5), helpstring("method IsValidSubAttributeValueExpression")] HRESULT IsValidSubAttributeValueExpression([in] BSTR strExpr, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If strName is not a valid sub-attribute-name, then
+		//			an appropriate error message will be displayed following which
+		//			VARIANT_FALSE will be returned.
+		//			If strName is a valid sub-attribute-name, then this
+		//			method call returns VARIANT_TRUE
+		[id(6), helpstring("method IsValidSubAttributeName")] HRESULT IsValidSubAttributeName([in] BSTR strName, [out, retval] VARIANT_BOOL *pbValue);
+		//-----------------------------------------------------------------------------------------
+	};
+
+	[
+		object,
+		uuid(F08ECF30-32E3-4725-9663-02A15DA5489E),
+		dual,
+		helpstring("IRSDSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IRSDSplitter : IDispatch
+	{
+		[propget, id(1), helpstring("property RSDFileName")] HRESULT RSDFileName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property RSDFileName")] HRESULT RSDFileName([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(20768AFB-862C-4172-A56B-6CB6D7FF3BAC),
+		dual,
+		helpstring("IAddressSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IAddressSplitter : IDispatch
+	{
+		[propget, id(1), helpstring("property CombinedNameAddress")] HRESULT CombinedNameAddress([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property CombinedNameAddress")] HRESULT CombinedNameAddress([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(A47D0A22-6276-43EC-A3B0-15E0D6792C23),
+		dual,
+		helpstring("IPersonNameSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IPersonNameSplitter : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: Builds and returns an IAttribute object with the specified sub-attributes.  
+		//          Also builds the parent attribute text if bAutoBuildParent == VARIANT_TRUE.  
+		//          The Name of the returned Attribute is strParentName.
+		[id(1), helpstring("method BuildAttribute")] HRESULT BuildAttribute([in] BSTR strParentName, [in] BSTR strTitle, [in] BSTR strFirst, [in] BSTR strMiddle, [in] BSTR strLast, [in] BSTR strSuffix, [in] VARIANT_BOOL bAutoBuildParent, [out, retval] IAttribute* *pVal);
+	};
+
+	[
+		object,
+		uuid(2F19D1D9-F383-4203-9205-C5E0EE520B8B),
+		dual,
+		helpstring("IEntityNameSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IEntityNameSplitter : IDispatch
+	{
+		[propget, id(1), helpstring("property EntityAliasChoice")] HRESULT EntityAliasChoice([out, retval] EEntityAliasChoice *pChoice);
+		[propput, id(1), helpstring("property EntityAliasChoice")] HRESULT EntityAliasChoice([in] EEntityAliasChoice newChoice);
+	};
+	[
+		object,
+		uuid(C7E1753C-6915-472A-9E33-57E3CF60CA4C),
+		dual,
+		helpstring("IDateTimeSplitter Interface"),
+		pointer_default(unique)
+	]
+	interface IDateTimeSplitter : IDispatch
+	{
+		[propget, id(1), helpstring("property SplitMonthAsName")] HRESULT SplitMonthAsName([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property SplitMonthAsName")] HRESULT SplitMonthAsName([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property SplitFourDigitYear")] HRESULT SplitFourDigitYear([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property SplitFourDigitYear")] HRESULT SplitFourDigitYear([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property SplitDayOfWeek")] HRESULT SplitDayOfWeek([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property SplitDayOfWeek")] HRESULT SplitDayOfWeek([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property SplitMilitaryTime")] HRESULT SplitMilitaryTime([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property SplitMilitaryTime")] HRESULT SplitMilitaryTime([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property ShowFormattedOutput")] HRESULT ShowFormattedOutput([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property ShowFormattedOutput")] HRESULT ShowFormattedOutput([in] VARIANT_BOOL newVal);
+		[propget, id(6), helpstring("property OutputFormat")] HRESULT OutputFormat([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property OutputFormat")] HRESULT OutputFormat([in] BSTR newVal);
+		[propget, id(7), helpstring("property SplitDefaults")] HRESULT SplitDefaults([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property SplitDefaults")] HRESULT SplitDefaults([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property MinimumTwoDigitYear")] HRESULT MinimumTwoDigitYear(
+			[out, retval] long *plVal);
+		[propput, id(8), helpstring("property MinimumTwoDigitYear")] HRESULT MinimumTwoDigitYear(
+			[in] long lVal);
+		[propget, id(9), helpstring("property TwoDigitYearBeforeCurrent")] HRESULT 
+			TwoDigitYearBeforeCurrent([out, retval] VARIANT_BOOL *pvbVal);
+		[propput, id(9), helpstring("property TwoDigitYearBeforeCurrent")] HRESULT 
+			TwoDigitYearBeforeCurrent([in] VARIANT_BOOL vbVal);
+	};
+
+	//////////////
+	// CoClasses
+	//////////////
+	[
+		uuid(AC4FC3A7-B932-4BB6-B84E-00C66C6DADC2),
+		helpstring("StringTokenizerSplitter Class")
+	]
+	coclass StringTokenizerSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IStringTokenizerSplitter;
+	};
+
+	[
+		uuid(AA5236DF-61A3-4463-986D-97172059F3F2),
+		helpstring("StringTokenizerSplitterPP Class")
+	]
+	coclass StringTokenizerSplitterPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(11223233-7061-4FDE-8EC9-85997EF1D621),
+		helpstring("EntityNameSplitter Class")
+	]
+	coclass EntityNameSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IEntityNameSplitter;
+	};
+	[
+		uuid(18D56BF1-5530-470B-9368-621BC27FAC67),
+		helpstring("PersonNameSplitter Class")
+	]
+	coclass PersonNameSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IPersonNameSplitter;
+	};
+
+	[
+		uuid(C0E3C150-68C7-47CB-AFE0-799724AF8D1C),
+		helpstring("RSDSplitter Class")
+	]
+	coclass RSDSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IRSDSplitter;
+	};
+
+	[
+		uuid(33CFE972-1333-460C-A5A7-054D7B715CDD),
+		helpstring("RSDSplitterPP Class")
+	]
+	coclass RSDSplitterPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(C2098A76-21B8-4C1E-B538-D4683B6C10F9),
+		helpstring("AddressSplitter Class")
+	]
+	coclass AddressSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IAddressSplitter;
+	};
+	[
+		uuid(AFB874BB-FEC2-4F1E-9439-2D9DC7842F13),
+		helpstring("LegalDescSplitter Class")
+	]
+	coclass LegalDescSplitter
+	{
+		[default] interface IAttributeSplitter;
+	};
+	[
+		uuid(A95FB103-86BF-47CF-9CD6-3E9FCD211B30),
+		helpstring("AddressSplitterPP Class")
+	]
+	coclass AddressSplitterPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(CCAF65D5-5584-45CD-B264-38687AA3A2A0),
+		helpstring("EntityNameSplitterPP Class")
+	]
+	coclass EntityNameSplitterPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(22DE2A7D-C42A-49B4-9894-FF2A3B494025),
+		helpstring("DateTimeSplitter Class")
+	]
+	coclass DateTimeSplitter
+	{
+		[default] interface IAttributeSplitter;
+		interface IDateTimeSplitter;
+	};
+
+	[
+		uuid(7EDF8918-6CCA-45B9-BD72-3C3481FA753C),
+		helpstring("DateTimeSplitterPP Class")
+	]
+	coclass DateTimeSplitterPP
+	{
+		interface IUnknown;
+	};
+};

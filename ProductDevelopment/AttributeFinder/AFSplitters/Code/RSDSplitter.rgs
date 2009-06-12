@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFSplitters.RSDSplitter.1 = s 'RSDSplitter Class'
+	{
+		CLSID = s '{C0E3C150-68C7-47CB-AFE0-799724AF8D1C}'
+	}
+	UCLIDAFSplitters.RSDSplitter = s 'RSDSplitter Class'
+	{
+		CLSID = s '{C0E3C150-68C7-47CB-AFE0-799724AF8D1C}'
+		CurVer = s 'UCLIDAFSplitters.RSDSplitter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {C0E3C150-68C7-47CB-AFE0-799724AF8D1C} = s 'RSDSplitter Class'
+		{
+			ProgID = s 'UCLIDAFSplitters.RSDSplitter.1'
+			VersionIndependentProgID = s 'UCLIDAFSplitters.RSDSplitter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{9C61A6A5-6789-4648-9777-5405D6C517DF}'
+		}
+	}
+}

@@ -1,0 +1,118 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+SCOPE_BEGIN,0,1,1,1
+	OR_BEGIN,L-O_ZERO_01,false
+		01=^NOTICE\s*OF\s*(?:COUNTY|STATE|FEDERAL)\s*TAX\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		02=^NOTICE\s*OF\s*.{0,40}(?:COUNTY|STATE|FEDERAL)\s*TAX\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,L-O_SURE_01,false,Utility Lien
+		// 
+		01=^(?:MUNICIPAL\s*)?UTILITY\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		02=\bhereby\s*imposes\s*a\s*\bL(?:ie|ei)n\b[\s\S]{0,200}?for\s*delinquency\s*in\s*payment\s*for\s*water,\s*sewer,\s*or\s*garbage\s*services\b
+	OR_END
+
+	OR_BEGIN,L-O_SURE_03,false,Child Support Lien
+		//
+		01=^Notice\s*of\s*Child\s*Support\s*\bL(?:ie|ei)n\b\s*(?:\r?$)
+	OR_END
+
+	OR_BEGIN,L-O_SURE_04,false,Construction Lien
+		//
+		01=^CLAIM\s*OF\s*\bL(?:IE|EI)N\b\s*\(?CONSTRUCTION\s*\bL(?:IE|EI)N\b\)?\s*(?:\r?$)
+	OR_END
+
+	OR_BEGIN,L-O_SURE_05,false
+		//
+		01=^Notice\s*of\s*Assessment\s*of\s*\bL(?:ie|ei)n\b\s*(?:\r?$)
+		02=^LABORERS\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		03=^(?:(?:AMENDED|CONSENT)\s*)?CLAIM\s*OF\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		04=^CONSENTUAL\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		05=^(?:NOTICE\s*OF\s*)?ATTORNEY'S\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		06=^NOTICE\s*OF\s*MICHIGAN\s*EMPLOYMENT\s*SECURITY\s*AGENCY\s*TAX\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		07=^\bL(?:IE|EI)N\b\s*FOR\s*UNPAID\s*DUES\s*AND/OR\s*ASSESSMENTS\s*(?:\r?$)
+		08=^NOTICE\s*OF\s*\bL(?:IE|EI)N\b\s*AND\s*AFFIDAVIT\s*REGARDING\s*\bL(?:IE|EI)N\b\s*FOR\s*NONPAYMENT\s*OF\s*ASSESSMENTS\s*(?:\r?$)
+//		also a zero ????????
+//		09=^NOTICE\s*OF\s*.{0,40}TAX\s*LIEN\s*(?:\r?$)
+		// 0001.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06174AA.AHW.TIF.uss
+		09=^(?:NOTICE|CLAIM)\s*OF\s*\bL(?:IE|EI)N\b\s*(?:\r?$)
+		10=^DISTRAINT\s*WARRANT(?:\r?$)
+		// 0002.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002646.tif.uss
+		11=^PERSONAL\s*PROPERTY\s*TAX\s*WARRANT(?:\r?$)
+		// 0003.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-001846.tif.uss
+		12=^NOTICE\s*OF\s*\bL(?:IE|EI)N\b\s*FOR\s*FINE\s*AND/OR\s*RESTITUTION(?:\r?$)
+		// 0004.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06172AA.AKX.TIF.uss
+		// 0010.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FTO.TIF.uss
+		// 0011.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FTS.TIF.uss
+		13=^(?:NOTICE\s*OF\s*)?\bL(?:ie|ei)n\b\s*FOR\s*NON(?:\s*\-\s*|\-|\s*)PAYMENT\s*OF\s*(?:CONDOMINIUM\s*(?:ASSOCIATION\s*)?)?ASSESSMENTS?(?:\r?$)
+		// 0008.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FSC.TIF.uss
+		14=ASSESSMENT\s*\bL(?:IE|EI)N\b\s*IN\s*REAL\s*ESTATE
+		// 0009.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06177AA.FTN.TIF.uss
+		15=\bATTORNEY'?S\s*\bL(?:IE|EI)N\b\s*ON\s*REAL\s*PROPERTY\b
+		16=^L(?:IE|EI)N\s*AND\s*AFFIDAVIT\s*REGARDING\s*L(?:IE|EI)N\s*FOR\s*NONPAYMENT\s*OF\s*ASSESSMENTS(?:\r?$)
+		
+	OR_END
+
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,2
+
+	OR_BEGIN,L-O_PROBABLE_01,false
+		01=^Warrant\s*and\s*Writ\s*of\s*Execution
+		// 0005.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-001846.tif.uss
+		02=Notice\s*is\s*hereby\s*given\s*of\s*\bL(?:ie|ei)n\b\s*against\s*the\s*property\s*of 
+		03=^.{0,4}PERSONAL\s*PROPERTY\s*TAX\s*WARRANT(?:\r?$)
+		04=\(This\s*is\s*a\s*\bL(?:ie|ei)n\b\s*demand\s*and\s*not\s*an\s*arrest\s*warrant\.?\)
+		// 0006.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06173AA.AD1.TIF.uss
+		05=\bFirst\s*amendment\s*to(?:\s*notice\s*of)?\s*\bL(?:ie|ei)n\b
+		06=^(?:NOTICE|CLAIM)\s*OF\s*LEIN\s*(?:\r?$)
+		07=^(?:NOTICE\s*OF\s*)?\bL(?:ie|ei)n\b\s*FOR\s*NON(?:\s*\-\s*|\-|\s*)PAYMENT\s*OF\s*(?:CONDOMINIUM\s*(?:ASSOCIATION\s*)?)?ASSESSMENTS?
+		08=^.{0,3}Notice\s*of\s*claim\s*of\s*lien.{0,3}(?:\r?$)
+	OR_END
+		
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,L-O_MAYBE_01,false
+		01=YOU\s*ARE\s*HEREBY\s*COMMANDED\s*to\s*levy\s*upon\s*and\s*sell[\s\S]{3,36}property\s*of[\s\S]{4,50}for[\s\S]{1,8}payment\s*of\b
+		02=\bI\s*am\s*recording\s*a\s*judgment\s*\bL(?:ie|ei)n\b\b
+		03=\bthis\s*judgment\s*\bL(?:ie|ei)n\b\s*expires\b
+		// 0007.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06173AA.AD1.TIF.uss
+		04=this\s*First\s*Amendment\s*and\s*the\s*Affidavit\s*and\s*Notice\s*of\s*\bL(?:ie|ei)n\b
+	OR_END		
+
+	OR_BEGIN,L-O_MAYBE_02,false,Construction Lien
+		01=\btherefore\s*claims\s*a\s*construction\s*\bL(?:ie|ei)n\b\b
+	OR_END		
+SCOPE_END
+[MAYBE_END]

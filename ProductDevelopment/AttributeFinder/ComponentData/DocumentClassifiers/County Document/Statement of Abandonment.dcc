@@ -1,0 +1,39 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,0.5,1,1
+	OR_BEGIN,SOA_SURE_01,false
+		// STATEMENT OF ABANDONMENT OF USE OF A BUSINESS OR PROFESSIONAL NAME
+		// 0001.tif;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ABANDMENT\00006747.tif.uss
+		01=\bSTATEMENT\s*OF\s*ABANDONMENT\s*OF\s*USE\s*OF\s*A\s*BUSINESS\s*OR\s*PROFESSIONAL\s*NAME\b
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

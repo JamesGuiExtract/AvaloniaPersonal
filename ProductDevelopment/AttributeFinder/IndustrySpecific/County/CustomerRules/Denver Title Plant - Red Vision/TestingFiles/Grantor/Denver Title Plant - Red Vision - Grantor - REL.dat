@@ -1,0 +1,2 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\REL;<SourceDocName>.voa;K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

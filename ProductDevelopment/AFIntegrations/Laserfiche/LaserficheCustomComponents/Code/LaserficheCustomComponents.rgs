@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		'%APPID%' = s 'ESLaserficheCC'
+		'ESLaserficheCC.DLL'
+		{
+			val AppID = s '%APPID%'
+		}
+	}
+}

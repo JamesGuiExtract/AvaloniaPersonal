@@ -1,0 +1,65 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,EASE_SURE_01,false
+		// EASEMENT
+		// PIPELINE EASEMENT
+		// RIGHT OF WAY EASEMENT
+		01=^(?:(?:RIGHT\s*OF\s*WAY|PIPELINE)\s*)?EASEMENT\s*(?:\r?$)
+		02=^EASEMENT\s*AND\s*RIGHT\s*.?\s*OF\s*.?\s*WAY\s*(?:\r?$)
+		03=^Easement\s*Agreement\s*for\s*Access\s*(?:\r?$)
+		04=^AGREEMENT\s*TO\s*DESIGNATE\s*EASEMENT\s*(?:\r?$)
+		05=^SANITARY\s*CONTROL\s*EASEMENT\s*(?:\r?$)
+		06=^GRANT\s*OF\s*EASEMENT\s*(?:\r?$)
+		07=^DRIVEWAY\s*EASEMENT\s*AGREEMENT\s*(?:\r?$)
+		08=^(?:PUBLIC\s*)?UTILITY\s*EASEMENT\s*(?:\r?$)
+		09=^DECLARATION\s*OF\s*COMMON\s*DRIVEWAY\s*EASEMENTS\s*(?:\r?$)
+		10=^DEED\s*OF\s*EASEMENT\s*(?:\r?$)
+		11=^EASEMENT\s*AGREEMENT\s*(?:\r?$)
+		12=^EXCLUSIVE\s*EASEMENT\s*(?:\r?$)
+	OR_END
+SCOPE_END
+
+SCOPE_BEGIN,0,0.3,1,2
+	OR_BEGIN,EASE_SURE_02,TRUE
+		// 
+		01=\bEASEMENT\s*AND\s*RIGHT\s*.?\s*OF\s*.?\s*WAY\b
+	OR_END
+SCOPE_END
+
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,0.4,1,2
+	OR_BEGIN,EASE_PROBABLE_01,TRUE
+		01=\bEASEMENT\s*AND\s*RIGHT\s*.?\s*OF\s*.?\s*WAY\b
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+[MAYBE_END]

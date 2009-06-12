@@ -1,0 +1,3 @@
+pl.c..{2,6}(?:f.l.ng|.ilin|..ling)
+^[\s\S]{0,6}of\s*(?:f.l.ng|.ilin|..ling)
+^pl.c.\s*of\s*(?:f.l.ng|.ilin|..ling)

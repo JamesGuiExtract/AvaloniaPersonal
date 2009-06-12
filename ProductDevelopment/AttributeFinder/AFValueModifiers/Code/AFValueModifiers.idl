@@ -1,0 +1,745 @@
+// AFValueModifiers.idl : IDL source for AFValueModifiers.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFValueModifiers.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(C5230183-3ACC-4C4F-8D91-745FFB3C018E),
+	version(1.0),
+	helpstring("UCLID Attribute Value Modifiers 1.0 Type Library")
+]
+library UCLID_AFVALUEMODIFIERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//////////////////
+	// Enum
+	//////////////////
+	// This enum is used in InsertCharacters
+	typedef
+	[
+		uuid(9CC62A2C-58BA-46d0-9B90-EBCB506F24C3), 
+		helpstring("UCLID EInsertCharsLengthType Types")
+	]
+	enum EInsertCharsLengthType
+	{
+		kAnyLength = 0,
+		kEqual = 1,
+		kLessThanEqual = 2,
+		kLessThan = 3,
+		kGreaterThanEqual = 4,
+		kGreaterThan = 5,
+		kNotEqual = 6
+	} EInsertCharsLengthType;
+	
+	// This enum is used in AdvancedReplaceStrings
+	typedef
+	[
+		uuid(32C8A1F2-BB8D-4734-8D94-EDFF1510F854), 
+		helpstring("UCLID EReplacementOccurrenceType Types")
+	]
+	enum EReplacementOccurrenceType
+	{
+		kAllOccurrences = 0,
+		kFirstOccurrence = 1,
+		kLastOccurrence = 2,
+		kSpecifiedOccurrence = 3,
+	} EReplacementOccurrenceType;
+
+	// This enum is used in StringTokenizer
+	typedef
+	[
+		uuid(A82A5B2F-84C6-4398-8A40-1ABC69E66315), 
+		helpstring("UCLID Number of Tokens Types")
+	]
+	enum ENumOfTokensType
+	{
+		kAnyNumber = 0,
+		kEqualNumber = 1,
+		kGreaterThanNumber = 2,
+		kGreaterThanEqualNumber = 3
+	} ENumOfTokensType;
+	
+	// This enum is used in ChangeCase
+	typedef
+	[
+		uuid(6B89DBC0-3F37-4B61-91C7-23125031B748), 
+		helpstring("UCLID EChangeCaseType Types")
+	]
+	enum EChangeCaseType
+	{
+		kNoChangeCase = 0,
+		kMakeUpperCase = 1,
+		kMakeLowerCase = 2,
+		kMakeTitleCase = 3,
+	} EChangeCaseType;
+
+	// This enum is used in AdvancedReplaceStrings
+	typedef
+	[
+		uuid(331E93A8-E74E-44dc-B096-7F910995EB86), 
+		helpstring("UCLID ETranslateFieldType Types")
+	]
+	enum ETranslateFieldType
+	{
+		kTranslateName = 0,
+		kTranslateType = 1,
+		kTranslateValue = 2
+	} ETranslateFieldType;
+
+	//////////////////
+	// Interfaces
+	//////////////////
+	[
+		object,
+		uuid(BB7EE5EC-9E12-424B-B8FA-77DE70517BFB),
+		dual,
+		helpstring("ILimitAsLeftPart Interface"),
+		pointer_default(unique)
+	]
+	interface ILimitAsLeftPart : IDispatch
+	{
+		[propget, id(1), helpstring("property NumberOfCharacters")] HRESULT NumberOfCharacters([out, retval] long *pVal);
+		[propput, id(1), helpstring("property NumberOfCharacters")] HRESULT NumberOfCharacters([in] long newVal);
+		[propget, id(2), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property Extract")] HRESULT Extract([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property Extract")] HRESULT Extract([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(927B502C-4A5B-49C7-BC9D-E90DA284F008),
+		dual,
+		helpstring("ILimitAsRightPart Interface"),
+		pointer_default(unique)
+	]
+	interface ILimitAsRightPart : IDispatch
+	{
+		[propget, id(1), helpstring("property NumberOfCharacters")] HRESULT NumberOfCharacters([out, retval] long *pVal);
+		[propput, id(1), helpstring("property NumberOfCharacters")] HRESULT NumberOfCharacters([in] long newVal);
+		[propget, id(2), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property Extract")] HRESULT Extract([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property Extract")] HRESULT Extract([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(D1579870-5071-42AD-B386-F4B3432708E1),
+		dual,
+		helpstring("ILimitAsMidPart Interface"),
+		pointer_default(unique)
+	]
+	interface ILimitAsMidPart : IDispatch
+	{
+		[propget, id(1), helpstring("property StartPosition")] HRESULT StartPosition([out, retval] long *pVal);
+		[propput, id(1), helpstring("property StartPosition")] HRESULT StartPosition([in] long newVal);
+		[propget, id(2), helpstring("property EndPosition")] HRESULT EndPosition([out, retval] long *pVal);
+		[propput, id(2), helpstring("property EndPosition")] HRESULT EndPosition([in] long newVal);
+		[propget, id(3), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property AcceptSmallerLength")] HRESULT AcceptSmallerLength([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property Extract")] HRESULT Extract([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property Extract")] HRESULT Extract([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(A862226C-BA1A-4ED1-B896-7A0573F6FB71),
+		dual,
+		helpstring("ITranslateValue Interface"),
+		pointer_default(unique)
+	]
+	interface ITranslateValue : IDispatch
+	{
+		[propget, id(1), helpstring("property TranslationStringPairs")] HRESULT TranslationStringPairs([out, retval] IIUnknownVector** pVal);
+		[propput, id(1), helpstring("property TranslationStringPairs")] HRESULT TranslationStringPairs([in] IIUnknownVector* pVal);
+		[propget, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[id(3), helpstring("method LoadTranslationsFromFile")] HRESULT LoadTranslationsFromFile([in] BSTR strFileFullName, [in] BSTR strDelimiter);
+		[id(4), helpstring("method SaveTranslationsToFile")] HRESULT SaveTranslationsToFile([in] BSTR strFileFullName, [in] BSTR cDelimiter);
+		[propget, id(5), helpstring("property TranslateFieldType")] HRESULT TranslateFieldType([out, retval] ETranslateFieldType *pVal);
+		[propput, id(5), helpstring("property TranslateFieldType")] HRESULT TranslateFieldType([in] ETranslateFieldType newVal);
+	};
+
+	[
+		object,
+		uuid(90C281D8-53EF-40C6-B653-1857C835414C),
+		dual,
+		helpstring("IRemoveCharacters Interface"),
+		pointer_default(unique)
+	]
+	interface IRemoveCharacters : IDispatch
+	{
+		[propget, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property Characters")] HRESULT Characters([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property Characters")] HRESULT Characters([in] BSTR newVal);
+		[propget, id(3), helpstring("property RemoveAll")] HRESULT RemoveAll([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property RemoveAll")] HRESULT RemoveAll([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property Consolidate")] HRESULT Consolidate([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property Consolidate")] HRESULT Consolidate([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property TrimLeading")] HRESULT TrimLeading([out, retval] VARIANT_BOOL  *pVal);
+		[propput, id(5), helpstring("property TrimLeading")] HRESULT TrimLeading([in] VARIANT_BOOL  newVal);
+		[propget, id(6), helpstring("property TrimTrailing")] HRESULT TrimTrailing([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property TrimTrailing")] HRESULT TrimTrailing([in] VARIANT_BOOL newVal);
+	};
+
+	[
+		object,
+		uuid(5665A7B3-3F9A-41C6-9BF8-B81D2520DB26),
+		dual,
+		helpstring("IReplaceStrings Interface"),
+		pointer_default(unique)
+	]
+	interface IReplaceStrings : IDispatch
+	{
+		[propget, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property Replacements")] HRESULT Replacements([out, retval] IIUnknownVector* *pVal);
+		[propput, id(2), helpstring("property Replacements")] HRESULT Replacements([in] IIUnknownVector *pVal);
+		[propget, id(3), helpstring("property AsRegularExpr")] HRESULT AsRegularExpr([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property AsRegularExpr")] HRESULT AsRegularExpr([in] VARIANT_BOOL newVal);
+		[id(4), helpstring("method LoadReplaceInfoFromFile")] HRESULT LoadReplaceInfoFromFile([in] BSTR strFileFullName, [in] BSTR cDelimiter);
+		[id(5), helpstring("method SaveReplaceInfoToFile")] HRESULT SaveReplaceInfoToFile([in] BSTR strFileFullName, [in] BSTR cDelimiter);
+	};
+	[
+		object,
+		uuid(EED46FBE-95DD-421B-A63E-06832639ED51),
+		dual,
+		helpstring("ITranslateToClosestValueInList Interface"),
+		pointer_default(unique)
+	]
+	interface ITranslateToClosestValueInList : IDispatch
+	{
+		[propget, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property ClosestValueList")] HRESULT ClosestValueList([out, retval] IVariantVector* *pVal);
+		[propput, id(2), helpstring("property ClosestValueList")] HRESULT ClosestValueList([in] IVariantVector* newVal);
+		[id(3), helpstring("method LoadValuesFromFile")] HRESULT LoadValuesFromFile([in] BSTR strFileFullName);
+		[propget, id(4), helpstring("property IsForcedMatch")] HRESULT IsForcedMatch([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property IsForcedMatch")] HRESULT IsForcedMatch([in] VARIANT_BOOL newVal);
+		[id(5), helpstring("method SaveValuesToFile")] HRESULT SaveValuesToFile([in] BSTR strFileFullName);
+	};
+	[
+		object,
+		uuid(7745B971-B6AD-4F78-A83F-70F70C8588F5),
+		dual,
+		helpstring("IAdvancedReplaceString Interface"),
+		pointer_default(unique)
+	]
+	interface IAdvancedReplaceString : IDispatch
+	{
+		[propget, id(1), helpstring("property StrToBeReplaced")] HRESULT StrToBeReplaced([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property StrToBeReplaced")] HRESULT StrToBeReplaced([in] BSTR newVal);
+		[propget, id(2), helpstring("property Replacement")] HRESULT Replacement([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property Replacement")] HRESULT Replacement([in] BSTR newVal);
+		[propget, id(3), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(4), helpstring("property AsRegularExpression")] HRESULT AsRegularExpression([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property AsRegularExpression")] HRESULT AsRegularExpression([in] VARIANT_BOOL newVal);
+		[propget, id(5), helpstring("property ReplacementOccurrenceType")] HRESULT ReplacementOccurrenceType([out, retval] EReplacementOccurrenceType *pVal);
+		[propput, id(5), helpstring("property ReplacementOccurrenceType")] HRESULT ReplacementOccurrenceType([in] EReplacementOccurrenceType newVal);
+		[propget, id(6), helpstring("property SpecifiedOccurrence")] HRESULT SpecifiedOccurrence([out, retval] long *pVal);
+		[propput, id(6), helpstring("property SpecifiedOccurrence")] HRESULT SpecifiedOccurrence([in] long newVal);
+	};
+	[
+		object,
+		uuid(1767A916-28E9-4A0F-A8F4-9394FD46400B),
+		dual,
+		helpstring("IInsertCharacters Interface"),
+		pointer_default(unique)
+	]
+	interface IInsertCharacters : IDispatch
+	{
+		[propget, id(1), helpstring("property LengthType")] HRESULT LengthType([out, retval] EInsertCharsLengthType *pVal);
+		[propput, id(1), helpstring("property LengthType")] HRESULT LengthType([in] EInsertCharsLengthType newVal);
+		[propget, id(2), helpstring("property NumOfChars")] HRESULT NumOfCharsLong([out, retval] long *pVal);
+		[propput, id(2), helpstring("property NumOfChars")] HRESULT NumOfCharsLong([in] long newVal);
+		[propget, id(3), helpstring("property CharsToInsert")] HRESULT CharsToInsert([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property CharsToInsert")] HRESULT CharsToInsert([in] BSTR newVal);
+		[propget, id(4), helpstring("property InsertAt")] HRESULT InsertAt([out, retval] long *pVal);
+		[propput, id(4), helpstring("property InsertAt")] HRESULT InsertAt([in] long newVal);
+		[propget, id(5), helpstring("property AppendToEnd")] HRESULT AppendToEnd([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property AppendToEnd")] HRESULT AppendToEnd([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(56B9FAEC-BFAE-45F4-8F7A-0A0F6BA2CF01),
+		dual,
+		helpstring("IStringTokenizerModifier Interface"),
+		pointer_default(unique)
+	]
+	interface IStringTokenizerModifier : IDispatch
+	{
+		[propget, id(1), helpstring("property Delimiter")] HRESULT Delimiter([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Delimiter")] HRESULT Delimiter([in] BSTR newVal);
+		[propget, id(2), helpstring("property ResultExpression")] HRESULT ResultExpression([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property ResultExpression")] HRESULT ResultExpression([in] BSTR newVal);
+		// NumberOfTokensType defines whether the user chooses limit a certain number of tokens found.
+		[propget, id(3), helpstring("property NumberOfTokensType")] HRESULT NumberOfTokensType([out, retval] ENumOfTokensType *pVal);
+		[propput, id(3), helpstring("property NumberOfTokensType")] HRESULT NumberOfTokensType([in] ENumOfTokensType newVal);
+		// NumberOfTokensRequired will be checked if NumberOfTokensType is other than kAnyNumber
+		[propget, id(4), helpstring("property NumberOfTokensRequired")] HRESULT NumberOfTokensRequired([out, retval] long *pVal);
+		[propput, id(4), helpstring("property NumberOfTokensRequired")] HRESULT NumberOfTokensRequired([in] long newVal);
+		// If ranges of tokens are defined, what's the text to place in between every two adjacent tokens. 
+		// This could be empty.
+		[propget, id(5), helpstring("property TextInBetween")] HRESULT TextInBetween([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property TextInBetween")] HRESULT TextInBetween([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(EB41E2CE-1A90-442D-B507-78828483A0F9),
+		dual,
+		helpstring("IChangeCase Interface"),
+		pointer_default(unique)
+	]
+	interface IChangeCase : IDispatch
+	{
+		[propget, id(1), helpstring("property CaseType")] HRESULT CaseType([out, retval] EChangeCaseType *pVal);
+		[propput, id(1), helpstring("property CaseType")] HRESULT CaseType([in] EChangeCaseType newVal);
+	};
+	[
+		object,
+		uuid(26083F8E-5E86-455C-9450-027F7CFC76DF),
+		dual,
+		helpstring("IPadValue Interface"),
+		pointer_default(unique)
+	]
+	interface IPadValue : IDispatch
+	{
+		[propget, id(1), helpstring("property RequiredSize")] HRESULT RequiredSize([out, retval] long *pVal);
+		[propput, id(1), helpstring("property RequiredSize")] HRESULT RequiredSize([in] long newVal);
+		[propget, id(2), helpstring("property PaddingCharacter")] HRESULT PaddingCharacter([out, retval] long *pVal);
+		[propput, id(2), helpstring("property PaddingCharacter")] HRESULT PaddingCharacter([in] long newVal);
+		[propget, id(3), helpstring("property PadLeft")] HRESULT PadLeft([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property PadLeft")] HRESULT PadLeft([in] VARIANT_BOOL newVal);
+	};
+	[ 
+	  object,
+	  uuid(B73E5D57-1A3A-4A9B-9164-4579F60D5011),
+	  dual,
+	  helpstring("IOCRArea Interface"),
+	  pointer_default(unique)
+	]
+	interface IOCRArea : IDispatch
+	{
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: Sets/Gets all the user options for the OCRArea object.
+		// PARAMS:  (1) eFilter - bitwise OR-ed set of filter options to use when OCRing.
+		//          (2) bstrCustomFilterCharacters - set of characters for the OCR engine to 
+		//          recognize. Ignored if eFilter's kCustomFilter bit is not set.
+		//          (3) vbDetectHandwriting - whether to detect handwriting (true) or printed
+		//          text (false).
+		//          (4) vbReturnUnrecognized - whether to return all found characters (true) or
+		//          only text which the OCR engine identified as a particular character (false).
+		//          (5) vbClearIfNoneFound - if no text has been found whether to discard the 
+		//          attribute (true) or retain the original attribute (false).
+		[id(1), helpstring("method SetOptions")] HRESULT SetOptions([in] EFilterCharacters eFilter,
+			[in] BSTR bstrCustomFilterCharacters, [in] VARIANT_BOOL vbDetectHandwriting,
+			[in] VARIANT_BOOL vbReturnUnrecognized, [in] VARIANT_BOOL vbClearIfNoneFound);
+		[id(2), helpstring("method GetOptions")] HRESULT GetOptions([out] EFilterCharacters* peFilter,
+			[out] BSTR* pbstrCustomFilterCharacters, [out] VARIANT_BOOL* pvbDetectHandwriting,
+			[out] VARIANT_BOOL* pvbReturnUnrecognized, [out] VARIANT_BOOL* pvbClearIfNoneFound);
+	};
+
+	[
+	object,
+	uuid(6B111F1E-EE26-4E26-BD6D-2D61C877B005),
+	dual,
+	nonextensible,
+	helpstring("ISplitRegionIntoContentAreas Interface"),
+	pointer_default(unique)
+	]
+	interface ISplitRegionIntoContentAreas : IDispatch
+	{
+		// The text to assign to any resulting sub-attribute that does not contain OCR data
+		[propget, id(1), helpstring("property DefaultAttributeText")] HRESULT DefaultAttributeText([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property DefaultAttributeText")] HRESULT DefaultAttributeText([in] BSTR newVal);
+		
+		// The name to assign to any resulting sub-attribute.
+		[propget, id(2), helpstring("property AttributeName")] HRESULT AttributeName([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property AttributeName")] HRESULT AttributeName([in] BSTR newVal);
+
+		// The minimum width a returned area must be (units = average char width)
+		[propget, id(3), helpstring("property MinimumWidth")] HRESULT MinimumWidth([out, retval] double *pVal);
+		[propput, id(3), helpstring("property MinimumWidth")] HRESULT MinimumWidth([in] double newVal);
+
+		// The minimum height a returned area must be (units = average char height)
+		[propget, id(9), helpstring("property MinimumHeight")] HRESULT MinimumHeight([out, retval] double *pVal);
+		[propput, id(9), helpstring("property MinimumHeight")] HRESULT MinimumHeight([in] double newVal);
+
+		// Whether or not to include resulting areas based on well-OCR'd text
+		[propget, id(10), helpstring("property IncludeGoodOCR")] HRESULT IncludeGoodOCR([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property IncludeGoodOCR")] HRESULT IncludeGoodOCR([in] VARIANT_BOOL newVal);
+
+		// Whether or not to include resulting areas based on poorly OCR'd text
+		[propget, id(11), helpstring("property IncludePoorOCR")] HRESULT IncludePoorOCR([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property IncludePoorOCR")] HRESULT IncludePoorOCR([in] VARIANT_BOOL newVal);
+
+		// The type assigned to content areas based on well-OCR'd text.
+		[propget, id(12), helpstring("property GoodOCRType")] HRESULT GoodOCRType([out, retval] BSTR *pVal);
+		[propput, id(12), helpstring("property GoodOCRType")] HRESULT GoodOCRType([in] BSTR newVal);
+
+		// The type assigned to content areas based on poorly OCR'd text.
+		[propget, id(13), helpstring("property PoorOCRType")] HRESULT PoorOCRType([out, retval] BSTR *pVal);
+		[propput, id(13), helpstring("property PoorOCRType")] HRESULT PoorOCRType([in] BSTR newVal);
+		
+		// If using OCR confidence to exclude results, what is the cuttoff value for OCR
+		// quality? (0 = worst OCR confidence, 100 = best)
+		[propget, id(6), helpstring("property OCRThreshold")] HRESULT OCRThreshold([out, retval] long *pVal);
+		[propput, id(6), helpstring("property OCRThreshold")] HRESULT OCRThreshold([in] long newVal);
+		
+		// If VARIANT_TRUE, lines will be searched for and ignored when creating content areas and
+		// removed if attempting to re-OCR for handwriting.
+		[propget, id(7), helpstring("property UseLines")] HRESULT UseLines([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property UseLines")] HRESULT UseLines([in] VARIANT_BOOL newVal);
+		
+		// If VARIANT_TRUE, content areas that are based off text that OCR'd poorly (or not at all)
+		// will be re-OCR'd using handwriting recognition.  If the results from this OCR
+		// attempt are improved, the original area value will be replaced.
+		[propget, id(8), helpstring("property ReOCRWithHandwriting")] HRESULT ReOCRWithHandwriting([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property ReOCRWithHandwriting")] HRESULT ReOCRWithHandwriting([in] VARIANT_BOOL newVal);
+
+		// If VARIANT_TRUE, include the original spatial string of the resulting area's OCR content
+		// as a subattribute to the primary result.
+		[propget, id(14), helpstring("property IncludeOCRAsTrueSpatialString")] HRESULT IncludeOCRAsTrueSpatialString([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(14), helpstring("property IncludeOCRAsTrueSpatialString")] HRESULT IncludeOCRAsTrueSpatialString([in] VARIANT_BOOL newVal);		
+	};
+
+	//////////////////
+	// CoClasses
+	//////////////////
+	[
+		uuid(41E9B779-5B38-4521-B61A-AFD210B93444),
+		helpstring("LimitAsLeftPart Class")
+	]
+	coclass LimitAsLeftPart
+	{
+		[default] interface ILimitAsLeftPart;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(1F7CE983-A691-43B1-A4B0-F4FB3C7EA692),
+		helpstring("LimitAsRightPart Class")
+	]
+	coclass LimitAsRightPart
+	{
+		[default] interface ILimitAsRightPart;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(40B70336-206D-4810-97AB-87E1D5E9C16E),
+		helpstring("LimitAsMidPart Class")
+	]
+	coclass LimitAsMidPart
+	{
+		[default] interface ILimitAsMidPart;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(EBF2801C-7387-4F74-AE48-99D9925696B4),
+		helpstring("TranslateValue Class")
+	]
+	coclass TranslateValue
+	{
+		[default] interface ITranslateValue;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IOutputHandler;
+	};
+	[
+		uuid(B343218E-713E-455D-B33B-349217F73BFC),
+		helpstring("RemoveCharacters Class")
+	]
+	coclass RemoveCharacters
+	{
+		[default] interface IRemoveCharacters;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IOutputHandler;
+	};
+	[
+		uuid(CE20AE7A-E92D-4CDA-8C8E-B22A9C5F1D4E),
+		helpstring("ReplaceStrings Class")
+	]
+	coclass ReplaceStrings
+	{
+		[default] interface IReplaceStrings;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IDocumentPreprocessor;
+		interface IOutputHandler;
+	};
+	[
+		uuid(32EDF892-71E4-4F9A-91BC-78288F762658),
+		helpstring("TranslateToClosestValueInList Class")
+	]
+	coclass TranslateToClosestValueInList
+	{
+		[default] interface ITranslateToClosestValueInList;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(61F6F2C5-F26D-4C1B-AD4C-78B1E89A1950),
+		helpstring("AdvancedReplaceString Class")
+	]
+	coclass AdvancedReplaceString
+	{
+		[default] interface IAdvancedReplaceString;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IDocumentPreprocessor;
+	};
+	[
+		uuid(AE1CBA8A-C9F2-4DDB-92C3-79C99BD3418A),
+		helpstring("InsertCharacters Class")
+	]
+	coclass InsertCharacters
+	{
+		[default] interface IInsertCharacters;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(4660F9B6-8E2E-42F3-94B0-B35E906F3D28),
+		helpstring("StringTokenizerModifier Class")
+	]
+	coclass StringTokenizerModifier
+	{
+		[default] interface IStringTokenizerModifier;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IAttributeModifyingRule;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(5F55A42D-5C86-4A2D-8B92-8CD65EF593E9),
+		helpstring("LimitAsLeftPartPP Class")
+	]
+	coclass LimitAsLeftPartPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(8EA0358C-FF01-4D36-B3C5-71205C426EEA),
+		helpstring("LimitAsMidPartPP Class")
+	]
+	coclass LimitAsMidPartPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(DBF61D34-0315-48D5-BD14-F5E0A51EB90A),
+		helpstring("LimitAsRightPartPP Class")
+	]
+	coclass LimitAsRightPartPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(DDC9C138-8859-4AF6-8FD5-5E37CB5919CE),
+		helpstring("RemoveCharactersPP Class")
+	]
+	coclass RemoveCharactersPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(5D3D6F79-A660-451D-819A-165BA56427A2),
+		helpstring("ReplaceStringsPP Class")
+	]
+	coclass ReplaceStringsPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(2D25A630-233F-42B3-A778-27D11AD431F6),
+		helpstring("TranslateValuePP Class")
+	]
+	coclass TranslateValuePP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(A37BB947-F221-42E0-98EB-9933554863B8),
+		helpstring("TranslateToClosestValueInListPP Class")
+	]
+	coclass TranslateToClosestValueInListPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(828CEA19-C36A-4A60-AF35-CFBC69F03E74),
+		helpstring("AdvancedReplaceStringPP Class")
+	]
+	coclass AdvancedReplaceStringPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(3B20EFB8-74D6-4771-91B5-A086D300C90B),
+		helpstring("InsertCharactersPP Class")
+	]
+	coclass InsertCharactersPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(7AEEDAAB-689B-4198-B93A-9009D9E9E536),
+		helpstring("StringTokenizerModifierPP Class")
+	]
+	coclass StringTokenizerModifierPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(DE534FB6-9B14-4D3B-9EBD-5713F2290C58),
+		helpstring("ChangeCase Class")
+	]
+	coclass ChangeCase
+	{
+		[default] interface IChangeCase;
+		interface IAttributeModifyingRule;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IOutputHandler;
+	};
+
+	[
+		uuid(280B434E-2AE7-4CA6-AE22-C94D7A5CEF9E),
+		helpstring("ChangeCasePP Class")
+	]
+	coclass ChangeCasePP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(3AEEC805-8032-4EC6-B1A8-9573DDAFA113),
+		helpstring("PadValue Class")
+	]
+	coclass PadValue
+	{
+		[default] interface IPadValue;
+		interface IAttributeModifyingRule;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(DD5CA018-3858-4C9D-B074-D5E45A703720),
+		helpstring("PadValuePP Class")
+	]
+	coclass PadValuePP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(20E0E0D6-FF94-42C8-ADA1-D810E294DFEC),
+		helpstring("ConditionalAttributeModifier Class")
+	]
+	coclass ConditionalAttributeModifier
+	{
+		[default] interface IConditionalRule;
+		interface IAttributeModifyingRule;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IOutputHandler;
+	};
+	[
+		uuid(3CCA1475-FE67-4a14-B7DB-0478A1DABBFB),
+		helpstring("OCRArea Class")
+	]
+	coclass OCRArea
+	{
+		[default] interface IOCRArea;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[ 
+	  uuid(1C197EB9-C0AA-4fe3-940D-4D13058236F9),
+	  helpstring("OCRAreaPP Class")
+	]
+	coclass OCRAreaPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(AC8DB80B-8901-480E-AF5B-D4E9DA9EC0CA),
+		helpstring("SplitRegionIntoContentAreas Class")
+	]
+	coclass SplitRegionIntoContentAreas
+	{
+		[default] interface ISplitRegionIntoContentAreas;
+		interface ISplitRegionIntoContentAreas;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(85A0A974-737E-4A34-B630-3AA0B3AA20F3),
+		helpstring("SplitRegionIntoContentAreasPP Class")
+	]
+	coclass SplitRegionIntoContentAreasPP
+	{
+		[default] interface IUnknown;
+	};
+};

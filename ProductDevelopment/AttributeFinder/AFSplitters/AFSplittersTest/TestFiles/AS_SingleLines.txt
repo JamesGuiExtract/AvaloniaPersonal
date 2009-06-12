@@ -1,0 +1,48 @@
+// Single-line test cases for address splitting
+// Note that comment lines should be removed
+// by the RSD file
+
+// Street delimiter
+Mr. John Smith 123 Main Street Madison Wisconsin 53719
+
+// Street delimiter with commas
+Mr. John Smith, 123 Main Street, Madison, Wisconsin 53719
+
+// St delimiter
+Mrs. Jane Smith 123 Main St Madison Wisconsin 53719
+
+// St delimiter with commas
+Mrs. Jane Smith, 123 Main St., Madison Wisconsin 53719
+
+// Apartment # delimiter
+Mrs. Jane Smith 123 Main Apt. 2A Madison Wisconsin 53719
+
+// Apartment # delimiter with comma
+Mrs. Jane Smith, 123 Main, Apt. 2A, Madison, Wisconsin 53719
+
+// St & St words
+Mrs. Jane Smith 123 Main St St Paul MN 55533
+
+// St & St words with comma
+Mrs. Jane Smith 123 Main St, St Paul, MN 55533
+
+// Rd & St words
+Mrs. Jane Smith 123 Branch Rd St. Paul MN 55533
+
+// Rd & St words with comma
+Mrs. Jane Smith, 123 Branch Rd, St. Paul MN 55533
+
+// Avenue & St words
+Mrs. Jane Smith 123 Main Avenue St Paul MN 55533
+
+// Apartment # & St words
+Mrs. Jane Smith 123 Main Apt. 2A St Paul MN 55533
+
+// Apartment # & St words with comma
+Mrs. Jane Smith, 123 Main Apt. 2A, St Paul, MN 55533
+
+// 5 digit address no zip code
+33199 Obadiah Holmes Ave Salem MA
+
+// 5 digit address no zip code with comma
+33199 Obadiah Holmes Ave, Salem, MA

@@ -1,0 +1,1 @@
+del TestArea\%1.*

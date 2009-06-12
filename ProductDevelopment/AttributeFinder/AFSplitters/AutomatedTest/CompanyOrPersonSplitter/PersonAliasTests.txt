@@ -1,0 +1,55 @@
+// Person Name Splitter tests
+// Person Alias
+// This is a subset of the NS_Abc.txt test files from the AFSplittersTest\TestFiles folder
+John Henry Smith AKA John H. Smith
+
+John Henry Smith A/K/A John H. Smith
+
+Mr. John Henry Smith FKA John Smith
+
+Jane W. Smith F/K/A Jane Williams
+
+Mr. John Henry Smith formerly known as John Smith
+
+Mr. John Henry Smith II also known as John Smith, Jr
+
+Mr. John Henry Smith II also know as John Smith, Jr
+
+Jane Williams now known as Jane W. Smith
+
+Jane W. Smith formerly Jane Williams
+
+Jane W. Smith was the same person as Jane Williams
+
+Jane W. Smith is the same person as Jane Williams
+
+John Henry Smith WATA John H. Smith
+
+John Henry Smith erroneously spelled Jon Henry Smith
+
+John Henry Smith Being one and the same person as Jon Henry Smith
+
+John Henry Smith who Acquired Title as Jon Henry Smith
+
+John Henry Smith who Also took Title as Jon Henry Smith
+
+John Henry Smith currently known as Jon Henry Smith
+
+Jane W. Smith formerly Jane Williams also known as Jane F. Williams
+
+John Henry Smith AKA John H. Smith and Jane Williams now known as Jane W. Smith
+
+John Henry Smith and Jane Williams now known as Jane W. Smith
+
+LUZ E SALAZAR AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+
+LUZ E SALAZAR, AKA LUZ ESPERANZA SALAZAR, FERNANDO OTERO
+
+John Smith and Jane Williams, now known as, Jane W. Smith
+
+John Smith and Jane Williams, now known as Jane W. Smith
+
+John Smith and Jane Williams now known as, Jane W. Smith
+
+Alejandro Reyes (also known as Alejandro Reyes Dolores)
+

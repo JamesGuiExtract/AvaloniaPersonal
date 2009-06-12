@@ -1,0 +1,33 @@
+[CharsAlwaysEnabled]
+0123456789
+
+[InputTypes]
+Angle
+Bearing
+Direction
+
+[Choices]
+0001|Degrees|Degrs
+0002|Degree|Degr
+0003|Deg.|Deg.
+0004|Deg|Deg
+0005|D|D
+0006|° (Degree symbol)|°
+0007|Minutes|Minutes
+0008|Minute|Minute
+0009|Min.|Min.
+0010|Min|Min
+0011|M|M
+0012|' (Apostrophe)|'
+0013|Seconds|Seconds
+0014|Second|Second
+0015|Sec.|Sec.
+0016|Sec|Sec
+0017|S|S
+0018|" (Quote)|"
+0019|- (Hyphen)|-
+0020|_ (Underscore)|_
+0021|* (Asterisk)|*
+0022|. (Decimal point)|.
+0023|, (Comma)|,
+0024|; (Semicolon)|;

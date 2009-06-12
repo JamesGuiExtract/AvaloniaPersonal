@@ -1,0 +1,40 @@
+// ParagraphTextCorrectors.idl : IDL source for ParagraphTextCorrectors.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (ParagraphTextCorrectors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(FA7C4DC6-E679-461A-BE65-25B50DD25597),
+	version(1.0),
+	helpstring("UCLID SpotRecognitionIR ParagraphTextCorrectors 1.0 Type Library")
+]
+library UCLID_PARAGRAPHTEXTCORRECTORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\Core\SpotRecognitionIR.tlb");
+	importlib("..\..\..\..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	[
+		uuid(6F0C8A6C-B704-46A7-9624-D21ADA6414AE),
+		helpstring("LegalDescriptionTextCorrector Class")
+	]
+	coclass LegalDescriptionTextCorrector
+	{
+		[default] interface IParagraphTextCorrector;
+		interface ILicensedComponent;
+	};
+
+	[
+		uuid(2F8070FB-69D2-478D-8131-1CE44E3CC80D),
+		helpstring("CRLFParagraphTextCorrector Class")
+	]
+	coclass CRLFParagraphTextCorrector
+	{
+		[default] interface IParagraphTextCorrector;
+	};
+};

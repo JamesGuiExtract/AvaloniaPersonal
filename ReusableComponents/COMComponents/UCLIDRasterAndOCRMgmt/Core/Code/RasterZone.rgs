@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRasterAndOCRMgmt.RasterZone.1 = s 'RasterZone Class'
+	{
+		CLSID = s '{FA4D38F5-A212-43E6-ACEA-234D6468214A}'
+	}
+	UCLIDRasterAndOCRMgmt.RasterZone = s 'RasterZone Class'
+	{
+		CLSID = s '{FA4D38F5-A212-43E6-ACEA-234D6468214A}'
+		CurVer = s 'UCLIDRasterAndOCRMgmt.RasterZone.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {FA4D38F5-A212-43E6-ACEA-234D6468214A} = s 'RasterZone Class'
+		{
+			ProgID = s 'UCLIDRasterAndOCRMgmt.RasterZone.1'
+			VersionIndependentProgID = s 'UCLIDRasterAndOCRMgmt.RasterZone'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}'
+		}
+	}
+}

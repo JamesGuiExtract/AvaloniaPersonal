@@ -1,0 +1,51 @@
+(?x)
+
+(?#
+#------------------------------------------------
+# Remove "SS" if ...
+#------------------------------------------------
+)
+
+[S$5]\s?\.?\s?[S$5]
+
+(?:
+
+	(?#
+	#------------------------------------------------
+	# It is right before "MORTGAGOR" or "LENDER"
+	#------------------------------------------------
+	)
+
+	[\s\S]{0,5}(LEND|MORT)
+	
+	(?#
+	#------------------------------------------------
+	# It is right before a street suffix
+	#------------------------------------------------
+	)
+	
+	[\s\S]{5,20}(?:\bAVE\b|\bAVENUE\b|\bBLVD\b|\bBOULEVARD\b|\bCI\b|\bCIR\b|\bCIRCLE\b|\bCOURT\b|\bCT\b|\bDR\b|\bDRIVE\b|\bHWY\b|\bLANE\b|\bLN\b|\bPARKWAY\b|\bPLACE\b|\bPL\b|\bRD\b|\bROAD\b|\bST\b|\bSTREET\b|\bWAY\b|\bWO\b|\bWOODS\b|\bWY\b)
+
+	
+	|
+	
+	(?#
+	#------------------------------------------------
+	# It is part of a dollar amount
+	#------------------------------------------------
+	)
+	
+	[\s\S]{0,17}(SUM|AMOU|OUNT|DOLL|LLAR|LARS|HUND|DRED|THOUS|USAND)
+	
+	|
+	
+	(?#
+	#------------------------------------------------
+	# It is part of a legal description
+	#------------------------------------------------
+	)
+	
+	[\s\S]{0,20}(?:DEG|GREE|MINU|NUTE|FEE|EET|FT|INCHES)
+	
+)
+

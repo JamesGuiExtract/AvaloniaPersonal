@@ -1,0 +1,101 @@
+// ImageEdit.odl : type library source for ActiveX Control project.
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (ImageEdit.tlb) that will become a resource in
+// ImageEdit.ocx.
+
+#include <olectl.h>
+#include <idispids.h>
+
+[ uuid(65C0B2EA-166A-4212-92C8-42E5A319C093), version(1.0),
+  helpfile("ImageEdit.hlp"),
+  helpstring("ImageEdit ActiveX Control module"),
+  control ]
+library IMAGEEDITLib
+{
+	importlib(STDOLE_TLB);
+	importlib(STDTYPE_TLB);
+
+	//  Primary dispatch interface for CImageEditCtrl
+
+	[ uuid(3C1EB7A4-7F27-4D6E-BAE5-3413BDBA5CCD),
+	  helpstring("Dispatch interface for ImageEdit Control"), hidden ]
+	dispinterface _DImageEdit
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CImageEditCtrl)
+			[id(1)] long Page;
+			[id(2)] long ScrollPositionX;
+			[id(3)] long ScrollPositionY;
+			[id(4)] long MousePointer;
+			[id(5)] double BaseRotation;
+			//}}AFX_ODL_PROP
+
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CImageEditCtrl)
+			[id(6)] void SetImage(BSTR szImagePath);
+			[id(7)] void Display();
+			[id(8)] void ClearDisplay();
+			[id(DISPID_REFRESH)] void Refresh();
+			[id(9)] void LockLeadWndUpdate();
+			[id(10)] void UnlockLeadWndUpdate();
+			[id(11)] void Scroll(short iType, long iDistance);
+			[id(12)] long GetImageWidth();
+			[id(13)] long GetPageCount();
+			[id(14)] long GetImageHeight();
+			[id(15)] BSTR GetImage();
+			[id(16)] void FitToParent(BOOL bFitPage);
+			[id(17)] void DrawSelectionRect(long Left, long Top, long Right, long Bottom);
+			[id(18)] long GetXResolution();
+			[id(19)] long GetYResolution();
+			[id(20)] void ZoomInAroundPoint(long PosX, long PosY);
+			[id(21)] void ZoomOutAroundPoint(long PosX, long PosY);
+			[id(22)] void SetZoomMagnifyFactor(long lPercentMagnify);
+			[id(23)] long GetZoomMagnifyFactor();
+			[id(24)] double GetZoom();
+			[id(25)] void SetZoom(long newValue);
+			[id(26)] void SetCursorHandle(OLE_HANDLE* hCursor);
+			[id(27)] void ExtractZoneImage(long nX1, long nY1, long nX2, long nY2, long nHeight, long nPageNum, BSTR strFileName);
+			[id(28)] void EnableVerticalScroll(BOOL bEnable);
+			[id(29)] void RefreshRect(long lLeft, long lTop, long lRight, long lBottom);
+			//}}AFX_ODL_METHOD
+
+			[id(DISPID_ABOUTBOX)] void AboutBox();
+	};
+
+	//  Event dispatch interface for CImageEditCtrl
+
+	[ uuid(9D62E079-291A-4A5C-907B-0B780E1AE317),
+	  helpstring("Event interface for ImageEdit Control") ]
+	dispinterface _DImageEditEvents
+	{
+		properties:
+			//  Event interface has no properties
+
+		methods:
+			// NOTE - ClassWizard will maintain event information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_EVENT(CImageEditCtrl)
+			[id(1)] void Scroll();
+			[id(DISPID_KEYUP)] void KeyUp(short* KeyCode, short Shift);
+			//}}AFX_ODL_EVENT
+	};
+
+	//  Class information for CImageEditCtrl
+
+	[ uuid(96A61232-6749-4B65-823F-4A6EE6D003C4),
+	  helpstring("ImageEdit Control"), control ]
+	coclass ImageEdit
+	{
+		[default] dispinterface _DImageEdit;
+		[default, source] dispinterface _DImageEditEvents;
+	};
+
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

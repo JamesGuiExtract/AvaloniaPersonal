@@ -1,0 +1,25 @@
+(?:
+
+	(?:Inst|trum|ument)[\s\S]{0,11}(?:Num|ber|N[o0]|#)|
+
+	IN[\s\S]{0,7}(DOCU|UMENT)|
+
+	(?:Boo|ook)[\s\S]{0,8}(?:Pag|age)[\s\S]{0,10}(?:Docu|ument|Inst)|
+
+	(?:recor|rded)[\s\S]{0,8}in|
+
+	(?:Docu|cume|ument)[\s\S]{0,10}(?:N[o0]|#)|
+	
+	(?:Mort|gage)[\s\S]{0,10}(?:Rec|cord)[\s\S]{0,8}(?:N[o0]|#)?|
+	
+	(?:recor|rded)[\s\S]{0,25}\bin\b[\s\S]{0,100}a[st]|
+	
+	as\s+Inst\s*[.,]\s*(?:\w{2})?|
+	
+	\bD[0O]C\s*#|
+	
+	(?:recor|rded)[\s\S]{0,5}\bon\b[\s\S]{0,25}(?:Docu|cume|ument)
+	
+)
+
+[\s\S]{0,5}\d[\s\d_.:;-]{5,35}

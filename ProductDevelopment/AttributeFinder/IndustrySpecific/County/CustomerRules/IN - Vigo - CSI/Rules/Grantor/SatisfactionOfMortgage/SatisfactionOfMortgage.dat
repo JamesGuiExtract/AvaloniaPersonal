@@ -1,0 +1,440 @@
+[VARS_BEGIN]
+
+PRE_Mortgagor=Original Grantor|Original Granter|Original Mortgagor / Trustor|Original Mortgagor|Mortgagor|Original Borrower(s)|Original Borrower|Borrower(s)|Grantor
+PRE_Mortgagee=Original Grantee|Original Mortgagee / Beneficiary|Original Mortgage|Mortgagee|Original Beneficiary|Original Mortgagee
+PRE_NameOfMortgagor=Name(s) of MORTGAGORS (S)|Name of Mortgagor|Name of Maker / Mortgagor|Name of Mortgagors|Name of Mortgagor ( s )|Name of Mortgage|Mortgagor ( s )
+PRE_NameOfMortgagor2=Name(s) of MORTGAGORS (S)|Name of Mortgagor|Name of Maker / Mortgagor|Name of Mortgagors|Name of Mortgagor ( s )|Name of Mortgage|Mortgagor ( s )|Mortgagor
+PRE_NameOfMortgagee=Name(s) of MORTGAGEE (S)|Name of Mortgagee|Name of Mortgage|Name of Payee / Mortgagee|Name of Original Mortgagee|Mortgage Holder|Name of Morgagee|Mortgagee
+PRE_CurrentAssignee=Address of mortgagee|Name of Last Assignee|name of first assignee|Name of Current Assignee|Current Owner|Last Assignee|Last Name of Assignee|Name of Assignee|Name of Last Mortgagee|last assigned to
+PRE_Borrower=Borrower :|Borrower:|Borrower|Borrower(s)
+PRE_Beneficiary=Original Beneficiary|Beneficiary :|Beneficiary:|Beneficiary
+PRE_MadeAndExcuted=made and executed by|executed by|made and executed|made by|executed
+PRE_PresentThat=presents: that|presents, that|presents that|presents:|presents
+PRE_AssignedFrom=assignment from|real estate mortgage from
+PRE_HeldBy=held and owned by|now held by|held by
+SUF_Mortgagor=Original Grantor|Original Granter|Original Mortgagor / Trustor|Original Mortgagor|Mortgagor|Original Borrower(s)|Original Borrower|Borrower(s)|Grantor
+SUF_Mortgagee=Original Grantee|Original Mortgagee / Beneficiary|Original Mortgage|Mortgagee|Original Beneficiary|Recorded in
+SUF_NameOfMortgagee=Name(s) of MORTGAGEE (S)|Name of Mortgagee|Name of Mortgage|Name of Payee / Mortgagee|Name of Original Mortgagee|Mortgage Holder|Name of Morgagee|Mortgagee|Original|[Tax]|Record and Return
+SUF_CurrentAssignee=Address of mortgagee|Name of Last Assignee|name of first assignee|Name of Current Assignee|Current Owner|Last Assignee|Last Name of Assignee|Name of Assignee|Name of Last Mortgagee|Date of mortgage|Original Mortgage Amount|Property Address|Prop Addr|Assignment Information
+SUF_Beneficiary=Original Beneficiary|Beneficiary :|Beneficiary:|Beneficiary
+SUF_OwnerOf=owner of|holder of|of the beneficial|owner and holder of|the beneficial interest|[a corporation|[a national bank|organized and existing
+SUF_Acknowledge=acknowledges to have received|hereby acknowledge|hereby certify|hereby certifies|hereby declare|hereby discharge|hereby release|the mortgage above
+SUF_Dated=Date of|Dated|Loan|Recorded|Instrument
+None=N o n e|N / A|None
+Numbers=0|1|2|3|4|5|6|7|8|9
+Digit=0123456789
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+SM_GRANTOR_01=Mortgage executed by^?Grantor^80~AN ADULT^10~Mortgagee
+
+SM_GRANTOR_02=Mortgage^30~executed by^?Grantor^80~having^3~an^3~address^2~of
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000373945.TIF
+SM_GRANTOR_03=[This certifies]|[This instrument certifies]|[THIS IS TO CERTIFY]|[HEREBY CERTIFIES]^3~that a certain [mortgage]|[mortgage deed]^40~executed by^?Grantor^150~[with]|[to]|[of]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000372966.TIF
+SM_GRANTOR_04=Mortgage [executed by]|[made and executed by]^?Grantor^80~A SINGLE MAN^10~INVESTAID
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374198.TIF
+SM_GRANTOR_05=Mortgage [executed by]|[made and executed by]^?Grantor^80~as mortgagor
+
+SM_GRANTOR_06=This certifies^3~that a certain mortgage executed by^10~(Mortgagor)^?Grantor^100~[with]|[to]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374421.TIF
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000373232.TIF
+SM_GRANTOR_07=hereby RELEASES the^5~Mortgage^3~executed by^?Grantor^100~[AN ADULT]|[to Mortgagee]
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000373040.TIF
+SM_GRANTOR_08=Name^?Grantor^80~To^3~Vigo^3~County^3~Recorder^4~Office
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374037.TIF
+SM_GRANTOR_09=said Mortgage^5~Borrower^?Grantor^80~Property Address^100~Date of Mortgage
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374933.TIF
+SM_GRANTOR_10=This indenture^5~made this^80~by^?Grantor^80~WHEREAS^5~the Grantor is seized
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000375108.TIF
+SM_GRANTOR_11=the Mortgage described below^5~Original Lender^150~Borrower^?Grantor^80~Date of Mortgage
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000375786.TIF
+SM_GRANTOR_12=made^3~and^3~executed^3~by^?Grantor^80~of^3~the^3~first^3~part
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000372983.TIF
+SM_GRANTOR_13=THIS^3~CERTIFIES^3~that^5~mortgage^3~executed^3~by^?Grantor^80~to
+
+// 0001.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110973.tif.uss
+SM_GRANTOR_14=loan number^mortgagor^250~mortgagee^?Grantor^250~when recorded^all that certain lot
+
+// 0002.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00105135.tif.uss
+SM_GRANTOR_15=name^7~mortgage^3~servicer^?Grantor^350~name^7~last^3~assignee
+
+// 0003.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00106174.tif.uss
+SM_GRANTOR_16=satisfaction^\r\n\r\nfrom^?Grantor^350~address^mail^3~to^mortgage hereby
+
+// 0004.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00105100.tif.uss
+SM_GRANTOR_17=satisfaction^7~mortgage^3~between^[and]^\r\n\r\n^?Grantor^350~\r\n\r\n^[do^4~hereby^3~certify
+
+SM_GRANTOR_18=satisfaction^7~mortgage^10~between^?Grantor^350~[and]^mail to^certificate of residence
+
+SM_GRANTOR_19=satisfaction^7~mortgage^certificate^7~residence\r\n^?Grantor^350~does^3~hereby^3~certify
+
+// 0005.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110865.tif.uss
+SM_GRANTOR_20=mortgage^3~full^3~satisfaction^\r\n\r\nbetween^\r\n\r\n^[and]^?Grantor^350~Mail^3~to
+
+// 0006.tif;k:\common\engineering\sample files\waukesha\set004\images\satisfaction of mortgage\00000092.tif.uss
+SM_GRANTOR_21=paid^3~and^3~satisfied^?Grantor^350~as trustee|owner and holder
+
+// 0007.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00107117.tif.uss
+SM_GRANTOR_22=name^3~of^3~document^?Grantor^350~current^3~beneficiary^350~[to]^350~mortgagor
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000373620.TIF
+SM_GRANTOR_23=THIS RELEASE OF MORTGAGE^80~by and between^150~hereinafter^10~referred^3~to^3~as^3~FIRST PARTY^4~and^?Grantor^80~hereinafter^3~referred^3~to^10~SECOND PARTY
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374272.TIF
+SM_GRANTOR_24=that certain mortgage^3~made to it on^50~by^?Grantor^80~recorded
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000373003.TIF
+SM_GRANTOR_25=that certain mortgage^3~owned by the undersigned]^100~executed by^?Grantor^80~as^3~mortgagor^3~to
+
+SM_GRANTOR_26=satisfaction^3~of^8~debt^3~secured^10~that certain mortgage^3~made^3~to it^80~by^?Grantor^100~the^6~payment of^10~[principle]|[principal] sum
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage\0000374385.TIF
+SM_GRANTOR_27=that^3~a^3~certain Mortgage^80~recorded^6~Mortgage Instrument^80~executed by^?Grantor^100~To^50~a successor of
+
+// 0008.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\prm\2005272704.tif.uss
+SM_GRANTOR_1008=Mortgagee^75~owner|holder^40~mortgage^60~executed^5~by^120~hereinafter^24~mortgagor^5~in^5~favor^5~of^?Grantor^120~recorded
+
+// 0009.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\prm\2005273285.tif.uss
+SM_GRANTOR_1009=WHEREAS^?Grantor^120~hereinafter^5~referred^12~Mortgagee
+
+// 0107.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\sm\2005273519.tif.uss
+SM_GRANTOR_112=Know^28~these^3~presents^?Grantor^250~the^3~owner^8~holder^3~of 
+
+// 0138.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-023497.tif.uss
+SM_GRANTOR_80=WITNESS^5~WHEREOF^?Grantor^240~[as trustee^300~hereby^5~reconvey
+
+// 0036.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00106947.tif.uss
+SM_GRANTOR_106=Conveyed^3~unto^?Grantor^250~herein^10~called|referred^18~mortgagee^500~requested^3~the^3~mortgagee^3~to^3~release
+//SM_GRANTOR_106=Conveyed^3~unto^?Grantor^250~herein^10~called|referred^10~mortgagee^500~requested^3~the^3~mortgagee^3~to^3~release
+
+// 0148.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06174AA.AAZ.TIF.uss
+SM_GRANTOR_98=mortgage^subsequently^3~assigned^80~[to]^?Grantor^240~[is^3~fully^48~paid|satisfied|discharged
+
+// 0068.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\prm\2005257953.tif.uss
+SM_GRANTOR_1005=WHEREAS^160~hereinafter^5~referred^5~to^5~as^5~the^5~Mortgagor^480~granted^5~and^5~conveyed^5~unto^?Grantor^120~hereinafter^5~referred^5~to^5~as^5~the^5~Mortgagee 
+
+SM_GRANTOR_11=[know]|[known]^20~by these present^40~whereas|that^?Grantor^1100~the holder|the undersigned|does hereby certify|hereby certif|is the owner|owner and holder|in consideration
+
+
+// 0149.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage\3000324.tif.uss
+SM_GRANTOR_95=witness^3~whereof^10~undersigned^64~executed^42~instrument^?Grantor^240~[on]^36~@Numbers
+
+// 0150.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage\3000176.tif.uss
+SM_GRANTOR_94=witness^3~whereof^10~undersigned^64~executed^42~instrument^3~on^36~@Numbers^3~\r\n^?Grantor^160~\r\nby
+
+// 0019.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110071.tif.uss
+SM_GRANTOR_10=to: (name^6~mortgagee)^?Grantor^350~name^6~last^3~assignee
+
+SM_GRANTOR_1003=w^5~all^12~these^3~presents^3~that^?Grantor^120~[the]^5~Lender
+
+SM_GRANTOR_111=Known^20~by^3~these^3~presents^?Grantor^250~does^5~hereby^3~certify
+
+// 0021.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\release of lien\00017077.tif.uss
+SM_GRANTOR_12=in^3~favor^3~of^?Grantor^200~as^3~Beneficiary
+
+// 0109.tif;k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00012042.tif.uss
+SM_GRANTOR_13=payable^12~order^3~of^?Grantor^250~pursuant^3~to
+
+// 0022.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\dis\b04288aabd5.tif.uss
+SM_GRANTOR_16=fully^3~paid|paid,^3~satisfied^8~discharged^500~\r\n\r\n^?Grantor^300~a corporation organized|which is organized|does hereby certify|whose address|by and through^owner|owned|executed|beneficiary
+
+// 0023.tif;k:\common\engineering\sample files\waukesha\set008\images\satisfaction of mortgage\2999231.tif.uss
+SM_GRANTOR_161=\r\n\r\n^?>Grantor^300~Located^4~[at]|[in]^100~hereby^3~certify
+
+// 0032.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110952.tif.uss
+
+// 0041.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110480.tif.uss
+SM_GRANTOR_48=@PRE_NameOfMortgagee^by assignment^?Grantor^350~@SUF_Dated
+
+// 0024.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\dis\b04314aaa74.tif.uss
+SM_GRANTOR_113=Dated this^@Numbers^2~.^?Grantor^250~whose^3~address^3~is
+
+// 0025.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\dis\b04313aaao0.tif.uss
+SM_GRANTOR_114=of^3~the^3~first^3~part^5~[to]^?Grantor^250~of^3~the^3~second^3~part
+
+SM_GRANTOR_14=undersigned^?Grantor^300~hereby discharges|which is organized|located in|does hereby certify|does hereby release|whose address|by and through^owner|owned|executed|beneficiary
+
+// 0033.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110628.tif.uss
+SM_GRANTOR_141=undersigned^75~appeared^40~PRESIDENT^4~of^?Grantor^300~known^3~to^3~me^30~executed
+
+// 0034.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\dis\b04293aaara.tif.uss
+SM_GRANTOR_15=described^3~below^?Grantor^300~which is organized|located in|does hereby certify|whose address|by and through^owner|owned|executed|beneficiary
+
+// 0035.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\dis\b04320aaal2.tif.uss
+SM_GRANTOR_115=executed^3~by^300~Mortgagor^5~[to]^?Grantor^300~Mortgagee
+
+//sample moved above SM_GRANTOR_106
+SM_GRANTOR_17=Mortgagee^3~herein^3~is^\r\n\r\n^?Grantor^350~witness^signor
+
+SM_GRANTOR_18=holder^6~note^8~lien^?Grantor^250~Holder^5~Mailing^3~Address
+
+// <FIX>NEEDS SPATIAL RULE;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\RELEASE OF LIEN\00016786.tif.uss
+SM_GRANTOR_19=holder^6~note^8~lien^?Grantor^250~deed^3~of
+
+// 0039.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\release of lien\00007954.tif.uss
+SM_GRANTOR_20=\r\nholder^?Grantor^250~Holder^5~Mailing^3~Address
+
+SM_GRANTOR_21=[in^8~presence^3~of^?Grantor^300~(witness)
+
+
+SM_GRANTOR_72=undersigned^5~trustee^480~\r\n^3~Trustee^3~:^?Grantor^64~\r\n^3~Beneficiary^80~received^24~Beneficiary^5~under^12~Deed^6~Trust
+
+// 0141.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-000040.tif.uss
+SM_GRANTOR_77=\r\n^5~DEED^5~OF]^5~CONVEYANCE^?Grantor^240~[hereinafter^5~Trustee^32~deed^48~executed
+
+// 0142.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-002561.tif.uss
+SM_GRANTOR_70=instrument^8~acknowledged^16~this^36~by^61~COORDINATOR^5~[of]^?Grantor^86~behalf
+
+// 0116.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\005-006462.tif.uss
+SM_GRANTOR_78=appeared^16~known^14~[be]^54~[of]^?Grantor^130~entity|company|corporation^15~executed^21~instrument
+
+
+// 0143.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-028790.tif.uss
+SM_GRANTOR_71=WITNESS^20~undersigned^3~trustee^8~executed^12~instrument^12~date^39~1|2|3|4|5|6|7|8|9|0^?Grantor^120~[by]
+
+// 0105.tif;k:\common\engineering\sample files\waukesha\set008\images\satisfaction of mortgage\3000105.tif.uss
+SM_GRANTOR_63=now therefore|\r\n\r\n^?>Grantor^120~organized and existing^100~holder of]
+
+// 0144.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-008994.tif.uss
+SM_GRANTOR_73=instrument was acknowledged before me^64~[by]^64~[as]^3~Asst. Vice President|Assistant Vice President|Vice President|President|Collateral Officer^8~[of]^?Grantor^80~Official Seal|Notary
+
+// 0042.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set004\images\release\2003135703.tif.uss
+SM_GRANTOR_22=now therefore,\r\n^?Grantor^250~a corporation, duly
+
+// 0043.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\release of lien\00016288.tif
+SM_GRANTOR_23=\r\n\r\n^?Grantor^100~assignee^75~current holder
+
+// 0044.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\release of lien\00006576.tif.uss
+SM_GRANTOR_24=payable to the order of^?Grantor^250~more fully described
+
+
+// 0151.tif;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE\B06181AA.AGB.TIF.uss
+SM_GRANTOR_99=Lien^3~heretofore^3~filed^60~[by]^?Grantor^120~Said^3~Lien^12~recorded^600~hereby^24~released|discharged.
+
+// 0050.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\release\2003134235.tif.uss
+SM_GRANTOR_25=payable^3~to^?Grantor^300~described^3~in
+
+SM_GRANTOR_26=IN^3~WITNESS^3~Whereof, the said|whereof the said|whereof, said|whereof said|WHEREOF^?Grantor^250~owner and holder|duly organized|has caused|has hereunto
+
+
+// 0154.tif;K:\Common\Engineering\Sample Files\Waukesha\Set008\Images\Satisfaction Of Mortgage\2998435.tif.uss
+SM_GRANTOR_93=w|wn^3~all^15~these^3~presents^?Grantor^100~owner and holder|duly organized|owner of a mortgage
+
+SM_GRANTOR_27=\r\n\r\n^?Grantor^100~owner and holder|duly organized|owner of a mortgage
+
+SM_GRANTOR_28=witness^3~whereof^80~authorized^3~signer|officer^@Numbers^\r\n^?Grantor^350~\r\n\r\n^[by]|by:
+
+// 0056.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00105522.tif.uss
+SM_GRANTOR_29=witness^3~whereof^9~said^?Grantor^350~officer^3~duly
+
+
+// 0057.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00107044.tif.uss
+SM_GRANTOR_30=release of mortgage^between^?Grantor^350~[at]^certificate of residence
+
+// 0058.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00107080.tif.uss
+SM_GRANTOR_31=satisfaction^3~of^3~mortgage^between^?Grantor^350~[and]^500~after^3~recording
+
+SM_GRANTOR_32=name^3~of^3~document^?Grantor^240~current^3~beneficiary
+
+// 0145.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-032341.tif.uss
+SM_GRANTOR_87=THEREFORE^?Grantor^128~HEREBY^14~GRANT|RECONVEY
+
+// 0120.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-008958.tif.uss
+SM_GRANTOR_68=Date|amount^14~deed^7~trust^120~\r\n^?Grantor^64~Successor^5~Trustee\r\n^90~instrument^9~acknowledged
+
+
+// 0121.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-026792.tif.uss
+SM_GRANTOR_79=undersigned^9~Trustee^\r\nTrustee^?Grantor^72~\r\n^received^12~Beneficiary
+
+SM_GRANTOR_75=WHEREAS, the undersigned^12~original or present Trustee|original Trustee|present Trustee^35~under the following^36~Deed of Trust^360~\r\nTrustee:^?Grantor^120~\r\nOriginal Mortgage Date|\r\nDate:
+
+// 0123.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-007773.tif.uss
+SM_GRANTOR_76=WHEREAS^?Grantor^160~whose address is^120~[is the]^5~Trustee or Successor Trustee|Trustee^48~under the following^36~Deed of Trust
+
+// 0124.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-012173.tif.uss
+SM_GRANTOR_81=the undersigned Trustee or successor Trustee^?Grantor^240~under that certain Deed of Trust
+
+// 0125.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-012121.tif.uss
+SM_GRANTOR_84=On this day personally appeared before me^?Grantor^120~to me known to be the individual described in and who executed the within and foregoing instrument
+
+SM_GRANTOR_82=personally appeared^180~known to be|acknowledged^60~representative|officer|secretary|president|assistant|authorized|signer|administrative^24~[of]^?Grantor<^80~on behalf|acknowledged|executed^160~instrument
+
+SM_GRANTOR_86=personally appeared^240~respectively, of]^?Grantor^80~who as such officers for^120~acknowledged the execution
+
+// 0128.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-001406.tif.uss 
+SM_GRANTOR_83=duly appointed^?Grantor^120~[as duly appointed Trustee under Deed of Trust hereinafter referred to, having received^80~written request to Reconvey
+
+// 0129.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-032775.tif.uss
+SM_GRANTOR_88=as more fully described in said Deed of Trust. By^?Grantor^80~[as Trustee
+
+// 0130.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-022246.tif.uss
+SM_GRANTOR_89=Personally^5~appeared^10~above^3~named^?Grantor^80~acknowledged^24~instrument
+
+// 0131.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-000521.tif.uss
+SM_GRANTOR_90=does hereby RECONVEY^120~[held by it thereunder^[in Witness Whereof^?Grantor^120~[as Trustee
+
+SM_GRANTOR_67=RECONVEYANCE^14~DEED^5~RECITALS^1~\r\n\r\nA.|\r\nA.|\r\n\r\n|\r\n^?Grantor^280~[herein]^5~Trustee
+
+//need sample
+SM_GRANTOR_74=Original^5~Trustee^3~:^?Grantor^64~Original^3~Beneficiary^360~Trustee^9~received^3~from^3~the^3~beneficiary^80~request
+
+SM_GRANTOR_100=whereas^?Grantor^250~is^3~the^3~present^3~trustee
+
+SM_GRANTOR_103=whereas^?Grantor^250~as^9~duly^3~authorized
+
+SM_GRANTOR_101=FULL RECONVEYANCE^?Grantor^250~[as^9~present^3~trustee
+
+//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Reconveyance\200406300008209.tif
+SM_GRANTOR_102=FULL RECONVEYANCE^40~\r\n\r\n^?Grantor^250~as^3~duly^3~appointed
+
+SM_GRANTOR_33=@PRE_Beneficiary^?Grantor^120~original trustor|received|[date]|signing
+
+SM_GRANTOR_69=appeared^120~[known|[say]^112~Secretary|Representative|President|Officer^3~[of]^?Grantor^190~instrument|behalf
+
+// <FIX>NEEDS SPATIAL RULE;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\IMAGES\RELEASE\2003133691.tif.uss
+SM_GRANTOR_35=payee^?Grantor^350~note^3~and^3~lien
+
+SM_GRANTOR_36=@PRE_CurrentAssignee^?Grantor^350~who by signing|date of mortgage|original mortgage debt|name of morgagee|dated
+
+// 0066.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\sat\00007-0724.tif.uss
+SM_GRANTOR_1000=W^5~ALL^16~THESE^3~PRESENTS^100~that]^?Grantor^250~[do^3~hereby^3~certify
+
+// 0067.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\sat\00007-0329.tif.uss
+SM_GRANTOR_1001=\r\nTHAT]|\r\nTHE]^?Grantor^350~DO^2~ES HEREBY CERTIFY
+
+// 0068.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\prm\2005257953.tif.uss
+SM_GRANTOR_1005=WHEREAS^160~hereinafter^5~referred^5~to^5~as^5~the^5~Mortgagor^480~granted^5~and^5~conveyed^5~unto^?Grantor^120~hereinafter^5~referred^5~to^5~as^5~the^5~Mortgagee 
+
+// 0069.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\prm\2005258302.tif.uss
+SM_GRANTOR_1006=mortgaged^5~unto^?Grantor^160~mortgagee
+
+// 0070.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\prm\2005272556.tif.uss
+SM_GRANTOR_1007=W^5~ALL^16~THESE^5~PRESENTS^5~that^?Grantor^120~Mortgagee
+
+// 0112.tif;k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00011114.tif.uss
+SM_GRANTOR_46=mortgages^5~from^?Grantor^250~grantor
+
+// 0072.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\prm\2005273431.tif.uss
+SM_GRANTOR_1010=mortgage^500~granted^9~conveyed^3~unto^?Grantor^80~hereinafter^48~Mortgagee
+
+SM_GRANTOR_37=@PRE_PresentThat^?Grantor^350~@SUF_Acknowledge
+
+// 0076.tif;k:\common\engineering\sample files\waukesha\set003\images\satisfaction of mortgage\001873.tif.uss
+SM_GRANTOR_38=@PRE_PresentThat^?Grantor^350~@SUF_OwnerOf
+
+SM_GRANTOR_39=@PRE_PresentThat^?Grantor^350~hereby discharges|whose address|in consideration of|a certain indenture
+
+// 0078.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00105392.tif.uss
+SM_GRANTOR_40=@PRE_AssignedFrom^[to]^?Grantor^350~[dated]|assigned
+
+// 0113.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\sm\2005258089.tif.uss
+SM_GRANTOR_41=executed^3~by^[to]^?Grantor^350~[and filed for record|[date]
+
+// 0079.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110952.tif.uss
+SM_GRANTOR_411=executed^12~date^30~\r\n\r\n^?Grantor^300~\r\n\r\n^State of
+
+SM_GRANTOR_42=@PRE_NameOfMortgagee^?Grantor^350~@SUF_CurrentAssignee
+
+
+SM_GRANTOR_43=@PRE_NameOfMortgagee^?Grantor^350~street address|original mortgage|original amount|assignment information|property address|prop addr|whose address|property municipality|lot and block|date of mortgage|[tax]|name of
+
+
+SM_GRANTOR_58=satisfaction|discharge|mortgage^40~\r\n\r\n^?<Grantor^250~hereby certifies|certifies that|as owner of that certain mortgage
+
+SM_GRANTOR_45=@PRE_HeldBy^?Grantor^350~recorded in|recorded on
+
+// 0086.tif;k:\common\engineering\sample files\waukesha\set004\images\satisfaction of mortgage\00000776.tif.uss
+SM_GRANTOR_43a=@PRE_NameOfMortgagee^?Grantor<^350~\r\n^50~:
+
+// 0090.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00107122.tif.uss
+SM_GRANTOR_44=granted^8~conveyed^3~unto^?Grantor^350~hereinafter^20~mortgagee
+
+// 0135.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2005-000186.tif
+SM_GRANTOR_64=WITNESS^5~WHEREOF|thereof^8~undersigned^28~executed^3~this]^320~Dated^?Grantor<^120~\r\n\r\n^100~[by:^280~known|proved^3~to me
+
+// 0093.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\sat\00007-0045.tif.uss
+SM_GRANTOR_1100=\r\nthe]|\r\nthat]^?Grantor^300~that^5~certain^3~indenture^6~mortgage
+
+// 0114.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\sm\2005257360.tif.uss
+SM_GRANTOR_1200=@PRE_MadeAndExcuted^150~on behalf of^?Grantor^200~located at
+
+// 0115.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\sm\2005257460.tif.uss
+SM_GRANTOR_1200=mortgage^150~[by]^150~[to]^?Grantor^150~[for]^100~sum of
+// 0098.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\sat\00110583.tif.uss
+
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN\2007-022958.tif.uss
+SM_GRANTOR_47a=@PRE_MadeAndExcuted^250~[to]|in favor of^160~subse|quent|uentl^12~assigned^3~to^?Grantor^240~recorded|dated|and last assigned
+
+SM_GRANTOR_47=@PRE_MadeAndExcuted^250~[to]|in favor of^?Grantor^200~recorded|dated|and last assigned
+//SM_GRANTOR_47=@PRE_MadeAndExcuted^250~[to]|in favor of^?Grantor^200~recorded|dated|and last assigned|1|2|3|4|5|6|7|8|9|0
+
+//SM_GRANTOR_49=@PRE_Mortgagee^?Grantor^350~property|prop addr|date of mortgage|original trustor|original mortgage
+SM_GRANTOR_49=@PRE_Mortgagee^?Grantor^350~property|prop addr|date of mortgage|original trustor|original mortgage|mortgage dated
+
+SM_GRANTOR_50=\r\n\r\n^?Grantor^350~located^above named
+
+SM_GRANTOR_51=this^3~agreement^between^and^3~us]^?Grantor^350~[for^8~purpose
+
+// 0099.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\release of lien\00016306.tif.uss
+SM_GRANTOR_52=Holder^6~Note^8~Lien:^?Grantor^200~Holder^3~Address
+
+// 0116.tif;k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00012873.tif.uss
+SM_GRANTOR_53=authorized^3~representative^3~of]^?Grantor^250~[and^3~is^3~authorized
+
+SM_GRANTOR_54=stated^3~premises^3~the^?Grantor^250~abandons
+
+SM_GRANTOR_55=Now^3~therefore^?Grantor^250~duly^3~organized
+
+// 0100.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\dis\b04288aabvi.tif.uss
+SM_GRANTOR_56=DISCHARGE^5~MORGAGE^5~CORPORTATION^12~THE MORTGAGE^50~given^3~by]^?Grantor^250~[to]|[t0]
+
+// 0101.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\dis\b04292aaawv.tif.uss
+SM_GRANTOR_57=consumer^3~lending^3~officer^3~of]^?Grantor^250~[and^3~that^3~they
+
+
+SM_GRANTOR_11a=[know]|[known]^20~by these present^40~that^?Grantor^350~A CERTAIN INDENTURE|whose address
+
+// 0103.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\dis\b04314aaa0c.tif.uss
+SM_GRANTOR_59=\r\n\r\nto]^?Grantor^250~[and^3~recorded^3~in
+
+// 0104.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\reconveyance\20049000025300.001.tif.uss
+SM_GRANTOR_60=full^3~force^9~effect^20~dated^?Grantor^300~Trustee^5~\r\n\r\n^100~State^3~of
+
+// 0118.tif;k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00013006.tif.uss
+SM_GRANTOR_61=County^3~of^50~undersigned^3~authority^30~appeared^24~[of]^?Grantor^250~[on]^30~Notary^3~Public
+
+// 0119.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\release of lien\00013660.tif.uss
+SM_GRANTOR_62=property^3~described^20~executed^3~this^30~\r\n\r\n^?Grantor^300~\r\n\r\n^10~State^3~of
+
+// 0106.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set001\images\multi-page\prm\2005257859.tif.uss
+SM_GRANTOR_1004=w|wn^5~ALL^5~MEN^6~THESE^5~PRESENTS^450~has^5~granted^8~conveyed^5~unto^?Grantor^240~herein^5~called^5~Mortgagee
+
+SM_GRANTOR_92=UNDERSIGNED^3~CERTIFIES^3~that]^?Grantor^120~[is^3~the present|the^15~[holder]^9~mortgage^3~executed^3~by]
+
+SM_GRANTOR_65=witness^3~whereof^80~[as]^3~trustee^5~dated^?Grantor^80~[by:^280~proved|known^3~to^3~[me]|[be]
+
+SM_GRANTOR_96=\r\n^3~Mortgagor:^120~\r\n^3~Lender:^?Grantor^120~\r\nDate^3~of
+
+SM_GRANTOR_66=\r\n^3~FULL^4~RECONVEYANCE^3~\r\n^?Grantor^80~[as trustee under^15~deed^5~trust^5~dated|made
+
+SM_GRANTOR_91=st|nd|th^10~2^?Grantor^80~STREET ADDRESS
+
+SM_GRANTOR_107=\r\n^2~NAME OF MORTGAGEE^2~\r\n^?Grantor^80~\r\n^2~STREET ADDRESS^2~\r\n
+
+SM_GRANTOR_97=prepared by^50~:\r\n\r\n|\r\n^?Grantor^80~\r\n
+
+
+[PATTERNS_END]

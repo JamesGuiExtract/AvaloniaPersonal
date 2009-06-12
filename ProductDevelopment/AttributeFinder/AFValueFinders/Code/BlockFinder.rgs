@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueFinders.BlockFinder.1 = s 'BlockFinder Class'
+	{
+		CLSID = s '{94C3D7BE-0CF4-453C-9AF9-52C6867DF9CF}'
+	}
+	UCLIDAFValueFinders.BlockFinder = s 'BlockFinder Class'
+	{
+		CLSID = s '{94C3D7BE-0CF4-453C-9AF9-52C6867DF9CF}'
+		CurVer = s 'UCLIDAFValueFinders.BlockFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {94C3D7BE-0CF4-453C-9AF9-52C6867DF9CF} = s 'BlockFinder Class'
+		{
+			ProgID = s 'UCLIDAFValueFinders.BlockFinder.1'
+			VersionIndependentProgID = s 'UCLIDAFValueFinders.BlockFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{55A9DE56-080B-43E0-AC99-02B815C1DF6C}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	ESImageCleanup.ImageCleanupSettings.1 = s 'ImageCleanupSettings Class'
+	{
+		CLSID = s '{00978A6E-1CDD-4E13-BF37-3B7AB86645BB}'
+	}
+	ESImageCleanup.ImageCleanupSettings = s 'ImageCleanupSettings Class'
+	{
+		CLSID = s '{00978A6E-1CDD-4E13-BF37-3B7AB86645BB}'
+		CurVer = s 'ESImageCleanup.ImageCleanupSettings.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {00978A6E-1CDD-4E13-BF37-3B7AB86645BB} = s 'ImageCleanupSettings Class'
+		{
+			ProgID = s 'ESImageCleanup.ImageCleanupSettings.1'
+			VersionIndependentProgID = s 'ESImageCleanup.ImageCleanupSettings'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			val AppID = s '%APPID%'
+			'TypeLib' = s '{937F7C5D-181C-401D-ACF1-B996AF0A4B49}'
+		}
+	}
+}

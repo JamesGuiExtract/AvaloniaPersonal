@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRasterAndOCRMgmt.SpatialPageInfo.1 = s 'SpatialPageInfo Class'
+	{
+		CLSID = s '{A47D5752-12AD-42A6-987F-598DC1B3514E}'
+	}
+	UCLIDRasterAndOCRMgmt.SpatialPageInfo = s 'SpatialPageInfo Class'
+	{
+		CLSID = s '{A47D5752-12AD-42A6-987F-598DC1B3514E}'
+		CurVer = s 'UCLIDRasterAndOCRMgmt.SpatialPageInfo.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {A47D5752-12AD-42A6-987F-598DC1B3514E} = s 'SpatialPageInfo Class'
+		{
+			ProgID = s 'UCLIDRasterAndOCRMgmt.SpatialPageInfo.1'
+			VersionIndependentProgID = s 'UCLIDRasterAndOCRMgmt.SpatialPageInfo'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}'
+		}
+	}
+}

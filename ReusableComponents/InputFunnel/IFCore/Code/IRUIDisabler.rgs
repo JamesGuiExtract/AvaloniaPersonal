@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFunnel.IRUIDisabler.1 = s 'IRUIDisabler Class'
+	{
+		CLSID = s '{0098F184-C600-46FD-B870-16DB5437D22F}'
+	}
+	UCLIDInputFunnel.IRUIDisabler = s 'IRUIDisabler Class'
+	{
+		CLSID = s '{0098F184-C600-46FD-B870-16DB5437D22F}'
+		CurVer = s 'UCLIDInputFunnel.IRUIDisabler.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {0098F184-C600-46FD-B870-16DB5437D22F} = s 'IRUIDisabler Class'
+		{
+			ProgID = s 'UCLIDInputFunnel.IRUIDisabler.1'
+			VersionIndependentProgID = s 'UCLIDInputFunnel.IRUIDisabler'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{775ACC91-32AC-11D6-8259-0050DAD4FF55}'
+		}
+	}
+}

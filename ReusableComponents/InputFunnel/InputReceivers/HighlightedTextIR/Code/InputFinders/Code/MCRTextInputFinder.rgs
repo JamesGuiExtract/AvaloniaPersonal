@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDInputFinders.MCRTextInputFinder.1 = s 'MCRTextInputFinder Class'
+	{
+		CLSID = s '{F1EBCB34-4585-11D6-826D-0050DAD4FF55}'
+	}
+	UCLIDInputFinders.MCRTextInputFinder = s 'MCRTextInputFinder Class'
+	{
+		CLSID = s '{F1EBCB34-4585-11D6-826D-0050DAD4FF55}'
+		CurVer = s 'UCLIDInputFinders.MCRTextInputFinder.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F1EBCB34-4585-11D6-826D-0050DAD4FF55} = s 'MCRTextInputFinder Class'
+		{
+			ProgID = s 'UCLIDInputFinders.MCRTextInputFinder.1'
+			VersionIndependentProgID = s 'UCLIDInputFinders.MCRTextInputFinder'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D76C8853-4347-11D6-826C-0050DAD4FF55}'
+		}
+	}
+}

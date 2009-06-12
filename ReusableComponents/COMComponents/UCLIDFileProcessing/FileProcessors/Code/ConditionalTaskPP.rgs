@@ -1,0 +1,23 @@
+HKCR
+{
+	FileProcessors.ConditionalTaskPP.1 = s 'ConditionalTaskPP Class'
+	{
+		CLSID = s '{61B2E085-C0E2-48FF-9DC6-B8253E429461}'
+	}
+	FileProcessors.ConditionalTaskPP = s 'ConditionalTaskPP Class'
+	{
+		CLSID = s '{61B2E085-C0E2-48FF-9DC6-B8253E429461}'
+		CurVer = s 'FileProcessors.ConditionalTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {61B2E085-C0E2-48FF-9DC6-B8253E429461} = s 'ConditionalTaskPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

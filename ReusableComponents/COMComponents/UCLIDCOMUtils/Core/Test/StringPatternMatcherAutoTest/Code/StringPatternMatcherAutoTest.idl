@@ -1,0 +1,44 @@
+// StringPatternMatcherAutoTest.idl : IDL source for StringPatternMatcherAutoTest.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (StringPatternMatcherAutoTest.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(49823B6C-F9CB-4B89-8867-099C2852F970),
+	version(1.0),
+	helpstring("StringPatternMatcherAutoTest 1.0 Type Library")
+]
+library STRINGPATTERNMATCHERAUTOTESTLib
+{
+	// imports
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+
+	// interfaces
+	[
+		object,
+		uuid(A221AE08-7D73-4928-8358-24D1711766F0),
+		dual,
+		helpstring("ISPMAutomatedTester Interface"),
+		pointer_default(unique)
+	]
+	interface ISPMAutomatedTester : IDispatch
+	{
+	};
+
+	// coclasses
+	[
+		uuid(54C8D41F-530A-4564-BDCA-4FA678F28D8E),
+		helpstring("SPMAutomatedTester Class")
+	]
+	coclass SPMAutomatedTester
+	{
+		[default] interface ISPMAutomatedTester;
+		interface ITestableComponent;
+	};
+};

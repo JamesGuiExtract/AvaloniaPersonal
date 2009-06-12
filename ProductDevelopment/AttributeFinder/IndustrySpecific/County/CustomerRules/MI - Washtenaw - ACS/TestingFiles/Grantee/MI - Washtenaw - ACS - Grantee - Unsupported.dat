@@ -1,0 +1,84 @@
+//AFFIDAVIT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AFFIDAVIT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//AGREEMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AGREEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//AMENDMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\AMENDMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//CERTIFICATE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\CERTIFICATE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//CORNER - LAND
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\CORNER - LAND;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//COURT - PROBATE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\COURT - PROBATE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//COURT DOCUMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\COURT DOCUMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED - MASTER
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED - MASTER;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED SHERIFF CLK-JUD
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED SHERIFF CLK-JUD;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//EASEMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\EASEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//FED TAX LIEN RELEASE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FED TAX LIEN RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//FEDERAL TAX LIEN
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FEDERAL TAX LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING AMEND
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING AMEND;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//FIXTURE FILING TERM
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\FIXTURE FILING TERM;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//GOVERNMENT DOCUMENTS
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\GOVERNMENT DOCUMENTS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//JUDGMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\JUDGMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//LAND CONTRACT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LAND CONTRACT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MICH UNEMP LIEN DIS
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICH UNEMP LIEN DIS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MICHIGAN TAX LIEN
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICHIGAN TAX LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MICHIGAN TX LN REL
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MICHIGAN TX LN REL;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MISCELLANEOUS
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MISCELLANEOUS;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//MODIFICATION
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MODIFICATION;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\NOTICE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//NOTICE-COMMENCEMENT
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\NOTICE-COMMENCEMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//RELEASE - PARTIAL
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE - PARTIAL;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//SURVEY
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\SURVEY;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+
+//TRUST
+<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\TRUST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantee.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
+

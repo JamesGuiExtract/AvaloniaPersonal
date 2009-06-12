@@ -1,0 +1,757 @@
+<HTML>
+
+<HEAD>
+<TITLE>Standard LabDE Sanity Test Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> Standard LabDE<br>Sanity Test Checklist<br>
+<IMG src="../../../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><h3>Installation and Licensing</h3>
+	<ul>
+		<LI>Confirm that <b>LabDE</b> installs successfully on this operating system.
+		<LI>Create individual license files for <b>FLEX Index Server</b> and <b>LabDE</b>.
+		<ul>
+			<LI>Confirm that LabDE <b>does not</b> run in stand-alone mode with only 
+			the <b>FLEX Index Server</b> license.
+			<LI>Confirm that LabDE <b>does</b> run in stand-alone mode with only 
+			the <b>LabDE</b> license.
+			<LI>Confirm that LabDE <b>does not</b> run in FAM mode with only 
+			the <b>FLEX Index Server</b> license.
+			<LI>Confirm that LabDE <b>does</b> run in FAM mode with only 
+			the <b>LabDE</b> license.
+		</ul>
+		<LI>Uninstall <b>LabDE</b>.
+		<ul>
+			<LI>Confirm that <b>Extract Systems LabDE</b> is completely removed from the 
+			Start menu.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>LabDE - Start Menu</h3>
+	<ul>
+		<li><b>Database Administration</b>
+		<ul>
+			<li>Confirm that <b>Database server name</b> is prepopulated with the previously 
+			selected server.
+			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
+			database name.
+			<li>Confirm that <b>Database server name</b> includes a <b>&lt;Browse...&gt;</b> 
+			choice that populates the combo box with names of all reachable SQL Server machines.
+			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
+			choice that populates the combo box with names of all databases available on the 
+			selected server.
+<p>
+			<li>Confirm that an action can be <b>added</b> to the database.
+			<li>Confirm that an action can be <b>removed</b> from the database.
+			<li>Confirm that an action can be <b>renamed</b> in the database.
+			<li>Confirm that action status can be <b>modified</b>.
+<p>
+			<li>Confirm that the <b>Summary</b> tab displays current counts for the actions 
+			defined in the selected database.
+			<li>Confirm that the <b>Refresh</b> button updates the current counts.
+<p>
+			<li>Confirm that a file list can be <b>exported</b>.
+			<li>Confirm that the <b>File Action Manager</b> can be started from the Tools 
+			menu and that the active database is preselected.
+			<li>Confirm that each available <b>Report</b> can be generated.
+		</ul>
+<p>
+		<li><b>Help File - TBD</b>
+		<ul>
+			<li>Confirm that the <b>Lab DE</b> help file opens without error.
+			<li>Confirm that the <b>Lab DE</b> help file contains the expected contents.
+		</ul>
+<p>
+		<li><b>User License</b>
+		<ul>
+			<li>Confirm that the <b>User License</b> application when selected from the 
+			Start menu starts with empty <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b> 
+			and <b>Email</b> fields.
+			<li>Confirm that the <b>User License Key</b> field is populated and read-only.
+			<li>Confirm that one or more of the Extract Systems software products is 
+			available for selection.
+			<li>Confirm that the selected software product includes the appropriate 
+			version number.
+			<li>Confirm that when <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b>, 
+			and <b>Email</b> fields and <b>Product</b>, <b>Version</b>, and <b>Type</b> 
+			drop-boxes are populated, the<b> &lt;Next&gt;</b> button becomes active.
+          		<li>Confirm that selecting the "<b>I use a desktop email application...</b>" 
+			radio button and pressing <b>&lt;Next&gt;</b> takes you to step three.
+			<li>Confirm that <b>here</b> displays an email message to the specified 
+			email address.  Note that email setup can be skipped since the email 
+			will not actually be sent.
+			<li>Confirm that <b>&lt;Show manual license request instructions&gt;</b> takes you 
+			to the correct page.
+			<li>Confirm that the earlier "<b>I use web based email on this machine</b>" 
+			option also takes you to the manual license request instructions.
+			<li>Confirm that the three buttons copy the appropriate information 
+			onto the clipboard.
+		</ul>
+<p>
+		<li><b>USB License Key Manager</b>
+		<ul>
+			<li>Confirm that connecting to a USB key on a remote machine (i.e. <b>LISA</b>) 
+			populates the appropriate fields.
+			<li>Confirm that connecting to a USB key on the <b>local</b> machine 
+			populates the appropriate fields.
+			<li>Confirm that clicking the <b>Server Status</b> button displays a browser 
+			window with details about the local key.
+		</ul>
+	</ul>
+<p>
+	<li><h3>LabDE - Start Menu - Utilities</h3>
+	<ul>
+		<li><b>Image Viewer</b>
+		<ul>
+			<li><b>TIF image</b>
+			<ul>
+				<li>Confirm that an image can be opened and rotated.
+				<li>Confirm that a region of text can be OCR'd.
+				<li>Confirm that a page of text can be OCR'd.
+				<li>Confirm that an angular swipe of text OCRs properly.
+				<li>Confirm that a rectangular swipe of text OCRs properly.
+				<li>Confirm that a highlight can be deleted.
+			</ul>
+<p>
+			<li><b>PDF image</b>
+			<ul>
+				<li>Confirm that an image can be opened and rotated.
+				<li>Confirm that a region of text can be OCR'd.
+				<li>Confirm that a page of text can be OCR'd.
+				<li>Confirm that an angular swipe of text OCRs properly.
+				<li>Confirm that a rectangular swipe of text OCRs properly.
+				<li>Confirm that a highlight can be deleted.
+			</ul>
+		</ul>
+<p>
+		<li><b>Rule Tester</b>
+		<ul>
+			<li>Confirm that the Rule Tester <b>About box</b> displays the expected version number, 
+			patch, and FKB update.
+			<li>Confirm that <b>Rule Tester</b> can exercise <b>Master.rsd.etf</b> from 
+			<b>Demo_LabDE</b>.
+			<li>Confirm that <b>Rule Tester</b> displays an exception when trying to exercise a 
+			different <b>rsd.etf</b> file from <b>Demo_LabDE</b>.
+			<br>Note: For the exception to be thrown, the RDT cannot be licensed.
+		</ul>
+<p>
+		<li><b>USS Viewer</b>
+		<ul>
+			<li>Confirm that a USS file can be opened.
+			<li>Confirm that <b>File - Properties</b> displays appropriate information.
+			<li>Confirm that <b>Find</b> finds text via regular expression.
+			<li>Confirm that <b>Find</b> finds text that is not a regular expression.
+		</ul>
+<p>
+		<li><b>View Exception Log</b>
+		<ul>
+			<li>Confirm that the <b>UEX Viewer</b> opens the current exception log.
+			<li>Confirm that if older UEX files are present, the file navigation buttons 
+			successfully open other UEX files.
+		</ul>
+<p>
+		<li><b>VOA Viewer</b>
+		<ul>
+			<li>Confirm that an <b>EAV</b> file can be opened.
+			<li>Confirm that a <b>VOA</b> file can be opened.
+			<li>Confirm that changes made to a VOA file can be saved.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>File Action Manager</h3>
+	<ul>
+		<LI>Confirm that a <b>Verify indexed documents</b> task is available as a file 
+		processing task.
+		<LI><b>[DataEntry #358]</b> Confirm that <b>Configure</b> button allows specification 
+		of a <b>.config</b> file.
+		<LI>Start processing with different numbers of threads and confirm that 
+		exactly one <b>Data Entry Application</b> is started.
+		<LI>Stop processing from the FAM and confirm that the active document is closed and 
+		that its status returns to <b>Pending</b>.
+		<LI>Stop processing from <b>File - Stop processing</b> in the Data Entry Application. 
+		Confirm that the active document is closed and that its status returns to <b>Pending</b>.
+		<LI>Stop processing from the <b>red X</b> on the title bar in the Data Entry Application. 
+		Confirm that the active document is closed and that its status returns to <b>Pending</b>.
+	</ul>
+<p>
+	<LI><h3>Toolbar</h3>
+	<ul>
+		<LI>Confirm that each toolbar button has a tooltip.
+		<LI>Confirm that each tooltip is displayed in title case followed by a shortcut key 
+		if defined.
+	</ul>
+<p>
+	<LI><h3>Highlighting</h3>
+	<ul>
+		<LI><b>OCR confidence</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Street</b> cell in the <b>Laboratory - Address</b> table.
+			<LI>Confirm that in the <b>N7950</b> text that the <b>9</b> and the <b>0</b> 
+			have a red background indicating lower OCR confidence.
+			<LI>Swipe <b>N7950 Town Hall</b> to replace the Street Address.
+			<LI>Confirm that the text OCRs correctly.
+			<LI>Confirm that now only the <b>0</b> has a red background indicating 
+			lower OCR confidence.
+			<LI>Manually edit the <b>Street</b> cell such that <b>N7950</b> becomes <b>N7960</b>.
+			<ul>
+				<LI>Confirm that the tooltip changes to <b>N7960 Town Hall</b>.
+				<LI>Confirm that the highlight is now completely <b>green</b>.
+			</ul>
+			<LI>Re-swipe <b>N7950 Town Hall</b> to replace the Street Address.
+			<LI>Confirm that the text OCRs correctly.
+			<LI>Confirm that the <b>0</b> again has a red background indicating 
+			lower OCR confidence.
+		</ul>
+<p>
+		<LI><b>Highlights and hints on tables</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Laboratory Address</b> table.
+			<LI>Confirm that selecting each individual row of the address table provides the 
+			appropriate highlight and hint.
+			<LI>Confirm that selecting multiple rows of the address table in various 
+			combinations provides the appropriate highlights but without any hints.
+<p>
+			<LI>Select one of the <b>Basic Metabolic Panel</b> cells in the 
+			<b>Completed Tests</b> table.
+			<LI>Confirm that the <b>Basic Metabolic Panel</b> text is highlighted 
+			and that a hint is also displayed.
+			<LI>Select an entire <b>Basic Metabolic Panel</b> row in the 
+			<b>Completed Tests</b> table.
+			<ul>
+				<LI>Confirm that all of the test results for the <b>Panel</b> are 
+				highlighted and that no hint is displayed.
+				<LI>Confirm that both <b>Red</b> and <b>Green</b> highlights are 
+				visible for individual characters.
+				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
+				provided for <b>Flag</b> items under the <b>OUT OF RANGE</b> column.
+			</ul>
+			<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that a <b>direct</b> hint is provided under the 
+			<b>OUT OF RANGE</b> column.
+			<LI>Select one of the empty <b>Comment</b> cells in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that an <b>indirect</b> hint is provided with dotted line boxes 
+			around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
+			<b>UNITS</b> and <b>REFERENCE RANGE</b> columns.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Tooltips</h3>
+	<ul>
+		<LI><b>Tooltips and swipes</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Swipe different text and confirm that the new text is entered 
+			in the field.
+			<LI>Confirm that the tooltip moves to directly above the swiped text 
+			and now reflects the OCR result from the swipe.
+			<LI>Swipe the original text.
+			<LI>Confirm that the recognized text is entered in the field.
+			<LI>Confirm that the tooltip is displayed above the swipe.
+		</ul>
+<p>
+		<LI><b>Tooltips and manual updates</b>
+		<ul>
+			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
+			are available.
+			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Manually edit the text in the field.
+			<LI>Confirm that the tooltip changes properly with each character change.
+			<LI>Confirm that whitespace is trimmed from each end of the tooltip as 
+			the text is updated.
+<p>
+			<LI>Click the <b>Highlight all data in image</b> button.
+			<LI>Use <b>Tab</b> to navigate through some of the data fields.
+			<LI>Confirm that tooltips <b>are</b> visible for found data.
+			<LI>Confirm that tooltips <b>are not</b> visible for data that was not found.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Swiping from tables</h3>
+	<ul>
+		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Select the <b>Basic Metabolic Panel</b>.
+		<LI>Select the empty row at the bottom of the <b>Selected Test Details</b>.
+		<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
+		<ul>
+			<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Test 
+			Details</b> table.
+			<LI>Select the individual <b>Sodium</b> cell.
+			<LI>Zoom in close to the <b>Sodium</b> text and swipe it carefully. 
+			<LI>Confirm that the newly recognized text appears in the cell. 
+			<LI>Select another cell with missing or incorrect text.
+			<LI>Zoom in close to the text and swipe it carefully. 
+			<LI>Confirm that the newly recognized text appears in the cell. 
+		</ul>
+<p>
+		<LI>Open image <b>191.tif</b> from Demo_LabDE.
+		<LI>Select the empty row at the bottom of <b>Completed Tests</b>.
+		<LI>Use the rectangular highlight tool to swipe the entire <b>TUMOR MARKER 
+		STUDIES</b> test and data including the collection date and time.
+		<ul>
+			<LI>Confirm that a new <b>TUMOR MARKER STUDIES</b> test appears in the 
+			<b>Completed Tests</b> table.
+			<LI>Confirm that test information is provided for <b>TOTAL PSA</b>, 
+			<b>FREE PSA</b>, and <b>% FREE PSA</b>.
+			<LI>Confirm that highlights and hints are provided.
+			<LI>Note whether or not the <b>TOTAL PSA</b> data was found correctly. 
+			<LI>Note whether or not the <b>FREE PSA</b> data was found correctly. 
+			<LI>Note whether or not the <b>% FREE PSA</b> data was found correctly. 
+			<LI>Select a cell with missing or incorrect text.
+			<LI>Zoom in close to the text and swipe it carefully. 
+			<LI>Confirm that the newly recognized text appears in the cell. 
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Copy and Paste from tables</h3>
+	<ul>
+		<LI>Open image <b>151.tif</b> from Demo_LabDE.
+		<LI>Select the entire <b>Potassium</b> row from the test details in the first 
+		<b>Basic Metabolic Panel</b>.
+		<LI>Right-click and select <b>Copy row(s)</b>.
+		<LI>Select the second <b>Basic Metabolic Panel</b>.
+		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<ul>
+			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that selecting individual cells displays proper highlights 
+			and tooltips. 
+			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
+			proper highlights and no tooltips. 
+		</ul>
+		<LI>Select <b>multiple</b> rows from the test details in the first 
+		<b>Basic Metabolic Panel</b>.
+		<LI>Right-click and select <b>Copy row(s)</b>.
+		<LI>Select the second <b>Basic Metabolic Panel</b>.
+		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<ul>
+			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
+			Details</b> table.
+			<LI>Confirm that selecting individual cells displays proper highlights 
+			and tooltips. 
+			<LI>Confirm that selecting the entire rows displays 
+			proper highlights and no tooltips. 
+		</ul>
+	</ul>
+<p>
+	<LI><h3>Demo_LabDE</h3>
+	<ul>
+		<LI><b>Test Setup</b>
+		<ul>
+			<LI>Delete any existing VOA files.
+			<LI>Queue and process the images using the FAM.  
+			<LI>Confirm that no exceptions are noted.
+			<LI>Prepare to <b>Verify indexed data</b> for some of the images.
+			<LI>Prepare to <b>Manually index</b> some of the images.
+		</ul>
+<p>
+		<LI><b>003.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that one <b>Completed Test</b> is present for 
+			<b>Chemistry - Blood</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that <b>Test</b> data is only present for <b>Creatinine</b>, 
+			<b>eGFR for African Americans</b> and <b>eGFR for Non-African Americans</b>.
+		</ul>
+<p>
+		<LI><b>004.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
+			except for <b>Gender</b>.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
+			and <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<b>HEMATOLOGY</b> and <b>DIFFERENTIAL (AUTOMATED)</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that <b>HEMATOLOGY</b> test data is present for <b>10</b> tests.
+			<LI>Confirm that <b>DIFFERENTIAL (AUTOMATED)</b> test data is present 
+			for <b>10</b> tests.
+		</ul>
+<p>
+		<LI><b>057.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete and valid.
+			<LI>Confirm that one <b>Completed Test</b> is present for 
+			<b>Other</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is not present.
+			<LI>Confirm that <b>Test</b> data is only present for <b>GLUCOSE</b> 
+			and <b>HEMOGLOBIN</b>.
+		</ul>
+<p>
+		<LI><b>151.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that two <b>Completed Tests</b> are present for 
+			<b>Basic Metabolic Panel</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for the first <b>Basic Metabolic Panel</b> is present 
+			for <b>9</b> tests.
+			<LI>Confirm that test data for the first <b>Basic Metabolic Panel</b> was not found  
+			for <b>Sodium</b>.
+			<LI>Confirm that test data for the second <b>Basic Metabolic Panel</b> is present 
+			for <b>Calcium</b>.
+<p>
+			<LI>Confirm that a validation icon is present for the 
+			<b>Patient Information - Date of Birth</b> field.
+			<LI>Select the field.
+			<LI>Confirm that the appropriate text is highlighted.
+			<LI>Manually modify the text to be a valid date (i.e. 1/1/2008).
+			<LI>Confirm that the tooltip is still displayed above the original text and 
+			that it is modified with each character typed.
+			<LI>Confirm that the validation icon is present until a valid date is 
+			completely entered.
+			<LI>Swipe a different date from the document.
+			<LI>Confirm that a tooltip is displayed above the swiped text.
+			<LI>Confirm that a validation icon is no longer present.
+		</ul>
+<p>
+		<LI><b>191.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
+			except for <b>Gender</b>.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
+			and <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<b>TUMOR MARKER STUDIES</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that <b>Test</b> data is present for <b>TOTAL PSA</b>, <b>FREE PSA</b> 
+			and <b>% FREE PSA</b>.
+		</ul>
+<p>
+		<LI><b>221.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that one <b>Completed Test</b> is present for 
+			<b>Hemogram with Differential</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data is present for <b>20 of 21</b> tests.
+			<LI>Confirm that test data was not found for the <b>Hct</b> test.
+			<LI>Confirm that the found test data was all valid except for <b>Units</b> on 
+			the <b>MCH</b> test.
+			<LI>Confirm that the <b>Flags</b> item was missed on the <b>Lymphs</b> test.
+		</ul>
+<p>
+		<LI><b>348.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
+			except for <b>Gender</b>.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
+			and <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<b>CHEMISTRY</b> and <b>ELECTROLYTES/BLOOD GASES</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that <b>CHEMISTRY</b> test data is present for <b>6</b> of 
+			<b>6</b> tests.
+			<LI>Confirm that 1 of 6 <b>Value</b> items is blank and invalid.  Note that 
+			Glucose and Bun results are also incorrect due to the cross-outs.
+			<LI>Confirm that <b>ELECTROLYTES/BLOOD GASES</b> test data is present for 
+			<b>5</b> of <b>5</b> tests.
+			<LI>Confirm that 3 of 5 <b>Value</b> items are blank and invalid.
+		</ul>
+<p>
+		<LI><b>350.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
+			and <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<b>LIPID PANEL</b> and <b>Other</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for the <b>LIPID PANEL</b> is present 
+			for <b>5</b> tests.
+			<LI>Confirm that test data for <b>Other</b> is present 
+			for <b>1</b> test <b>(AST)</b>.
+		</ul>
+<p>
+		<LI><b>352.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>NT, CLIE</b> physician is incorrect.
+			<LI>Confirm that the <b>Laboratory</b> data is complete and correct.
+			<LI>Confirm that <b>Completed Tests</b> are present for two 
+			<b>COMP METABOLIC PNL</b> plus <b>Other</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Components</b>.
+			<LI>Confirm that test data for the first <b>COMP METABOLIC PNL</b> is present 
+			for <b>20</b> tests plus <b>3</b> tests underneath a <b>LIPID PANEL 
+			W/REFLEX</b> heading.  Note that each test is present on page 1.
+			<LI>Confirm that test data for the second <b>COMP METABOLIC PNL</b> is present 
+			for <b>4</b> more tests underneath the original <b>LIPID PANEL 
+			W/REFLEX</b> heading.  Note that each test is present on page 2.
+			<LI>Confirm that test data for <b>Other</b> is present 
+			for <b>1</b> test <b>(TSH)</b> on page 2.
+		</ul>
+<p>
+		<LI><b>402.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that one <b>Completed Test</b> is present for 
+			<b>URINE MACROSCOPIC</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data is present for <b>12</b> of <b>12</b> tests.
+			<LI>Confirm that all found data is valid.
+		</ul>
+<p>
+		<LI><b>403.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for <b>Thyroid Stimulating 
+			Hormone</b> and <b>Free T4</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for <b>Thyroid Stimulating Hormone</b> is present 
+			for <b>1</b> test.
+			<LI>Confirm that test data for <b>Free T4</b> is present for <b>1</b> test.
+			<LI>Confirm that all found data is valid.
+		</ul>
+<p>
+		<LI><b>413.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
+			and <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<b>HEMATOLOGY</b> (twice), <b>INDICES DATA</b> (twice), <b>DIFFERENTIAL 
+			(AUTOMATED)</b> (twice, not four times), <b>COAGULATION</b>, <b>CHEMISTRY</b> 
+			(six, not fourteen times), <b>LIPID STUDIES</b> (once, not twice), 
+			<b>ELECTROLYTES - BLOOD GASES</b> (three, not five times), 
+			<b>THYROID</b> (once, not twice).
+			<LI>Note whether or not <b>Other</b> results were found.  Information found 
+			in footnotes is generally not expected to be reported as test data.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<b>Result Date</b> and <b>Result Time</b> for the <b>Other</b> test.
+			<LI><b>HEMATOLOGY</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>6</b> of 
+				<b>6</b> tests for each of the two collection times.
+				<LI>Confirm that Units are invalid for <b>HCT</b>.
+			</ul>
+			<LI><b>INDICES DATA</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>4</b> of 
+				<b>4</b> tests for each of the two collection times.
+				<LI>Confirm that all found data is valid.
+			</ul>
+			<LI><b>DIFFERENTIAL (AUTOMATED)</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>10</b> of 
+				<b>10</b> tests for each of the two collection times.
+				<LI>Confirm that all found data is valid.
+				<LI>Note whether or not NEUT, LYMPH, MONO, EOS, and BASOS 
+				correctly found % for Units.
+			</ul>
+			<LI><b>COAGULATION</b> test data
+			<ul>
+				<LI>Confirm that test data is present for the <b>D-DIMER QUANT</b> test.
+				<LI>Confirm that all found data is valid.
+			</ul>
+			<LI><b>CHEMISTRY</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>7</b> tests for the  
+				<b>10/03/08 0533</b> collection time.
+				<LI>Confirm that test data is present for <b>3</b> tests for the  
+				<b>10/03/08 0557</b> collection time.
+				<LI>Confirm that test data is present for <b>4</b> tests for the  
+				<b>10/03/08 1152</b> collection time.
+				<LI>Confirm that test data is present for <b>4</b> tests for the  
+				<b>10/03/08 1825</b> collection time.
+				<LI>Confirm that test data is present for <b>6</b> tests for the  
+				<b>10/04/08 0445</b> collection time.
+				<LI>Confirm that test data is present for <b>1</b> test for the  
+				<b>10/04/08 1450</b> collection time.
+				<LI>Confirm that all found data is valid.
+			</ul>
+			<LI><b>LIPID STUDIES</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>5</b> of 
+				<b>5</b> tests.
+				<LI>Confirm that all found data is valid.
+			</ul>
+			<LI><b>ELECTROLYTES - BLOOD GASES</b> test data
+			<ul>
+				<LI>Confirm that test data is present for <b>3</b> tests for the  
+				<b>10/03/08 0533</b> collection time.
+				<LI>Confirm that test data is present for <b>1</b> test for the  
+				<b>10/03/08 1825</b> collection time.
+				<LI>Confirm that test data is present for <b>5</b> tests for the  
+				<b>10/04/08 0445</b> collection time.
+				<LI>Confirm that all found data is valid.
+			</ul>
+			<LI><b>THYROID</b> test data
+			<ul>
+				<LI>Confirm that test data is present for the single <b>TSH</b> test.
+				<LI>Confirm that all found data is valid.
+			</ul>
+		</ul>
+<p>
+		<LI><b>418.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that two <b>Physicians</b> are present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
+			<LI>Confirm that <b>Completed Tests</b> are present for <b>Glucose, Blood</b>, 
+			<b>HGB A1C, Hemoglobin A1C</b>, and <b>CBC, Complete Blood Count</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is not present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for <b>Glucose, Blood</b> is present 
+			for <b>1</b> test and all found data is valid.
+			<LI>Confirm that test data for <b>HGB A1C, Hemoglobin A1C</b> is present 
+			for <b>1</b> test and all found data is valid.  Note whether or not the 
+			<b>H</b> flag was found correctly.
+			<LI>Confirm that test data for <b>CBC, Complete Blood Count</b> is present 
+			for <b>21</b> tests and all found data is valid.  Note whether or not the 
+			<b>Units</b> were all found correctly.
+		</ul>
+<p>
+		<LI><b>498.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete and correct except 
+			for <b>Lab ID</b>.
+			<LI>Confirm that one <b>Completed Test</b> is present for <b>CBC</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for <b>CBC</b> is present 
+			for <b>20</b> tests.
+			<LI>Confirm that all found data is valid.
+			<LI>Confirm that all <b>11</b> Flags were found correctly.
+		</ul>
+<p>
+		<LI><b>1270.tif</b>
+		<ul>
+			<LI>Open the image.
+			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Patient Information</b> data is complete 
+			except for <b>Medical Record #</b>.
+			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Laboratory</b> data is complete and correct except 
+			for <b>Phone</b> and <b>Lab ID</b>.
+			<LI>Confirm that two <b>Completed Tests</b> are present for <b>Other</b>.
+			<LI>Confirm that each test has data for <b>Collection Date</b> and 
+			<b>Collection Time</b>.
+			<LI>Confirm that <b>Selected Test Details</b> data is not present for 
+			<b>Result Date</b> and <b>Result Time</b>.
+			<LI>Confirm that test data for the first <b>Other</b> is present 
+			for <b>TSH</b> and <b>FT4</b> tests.
+			<LI>Confirm that test data for the second <b>Other</b> is present 
+			for <b>TSH</b> and <b>FREE T3</b> tests.
+			<LI>Confirm that all found data is valid.
+		</ul>
+	</ul>
+<p>
+	<LI><h3>File Formats</h3>
+	<ul>
+		<LI>Make a local copy of the images from 
+		<b>I:\Common\Testing\ProductTesting\LabDE\FileFormats</b>.
+		<LI>Process the images in the FAM to prepare the documents for verification.
+		<LI>Verify the images using <b>FAM</b> mode.  Confirm that each image appears in the 
+		Image Viewer and the appropriate highlights are displayed.
+		<LI>Re-verify the images using <b>stand-alone</b> mode.  Confirm that each image appears 
+		in the Image Viewer and the appropriate highlights are displayed.
+	</ul>
+</UL>
+</BODY>
+</HTML>

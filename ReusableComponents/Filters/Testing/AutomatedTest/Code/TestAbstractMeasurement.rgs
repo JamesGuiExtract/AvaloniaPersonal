@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDTestFilters.TestAbstractMeasurement.1 = s 'TestAbstractMeasurement Class'
+	{
+		CLSID = s '{5DAD75FF-429B-11D6-826B-0050DAD4FF55}'
+	}
+	UCLIDTestFilters.TestAbstractMeasurement = s 'TestAbstractMeasurement Class'
+	{
+		CLSID = s '{5DAD75FF-429B-11D6-826B-0050DAD4FF55}'
+		CurVer = s 'UCLIDTestFilters.TestAbstractMeasurement.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5DAD75FF-429B-11D6-826B-0050DAD4FF55} = s 'TestAbstractMeasurement Class'
+		{
+			ProgID = s 'UCLIDTestFilters.TestAbstractMeasurement.1'
+			VersionIndependentProgID = s 'UCLIDTestFilters.TestAbstractMeasurement'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{5DAD75F1-429B-11D6-826B-0050DAD4FF55}'
+		}
+	}
+}

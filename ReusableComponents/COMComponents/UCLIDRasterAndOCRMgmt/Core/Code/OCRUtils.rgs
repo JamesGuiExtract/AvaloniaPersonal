@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDRasterAndOCRMgmt.OCRUtils.1 = s 'OCRUtils Class'
+	{
+		CLSID = s '{5F0EF9A8-5F4C-4256-B50F-FF16C953CD34}'
+	}
+	UCLIDRasterAndOCRMgmt.OCRUtils = s 'OCRUtils Class'
+	{
+		CLSID = s '{5F0EF9A8-5F4C-4256-B50F-FF16C953CD34}'
+		CurVer = s 'UCLIDRasterAndOCRMgmt.OCRUtils.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {5F0EF9A8-5F4C-4256-B50F-FF16C953CD34} = s 'OCRUtils Class'
+		{
+			ProgID = s 'UCLIDRasterAndOCRMgmt.OCRUtils.1'
+			VersionIndependentProgID = s 'UCLIDRasterAndOCRMgmt.OCRUtils'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}'
+		}
+	}
+}

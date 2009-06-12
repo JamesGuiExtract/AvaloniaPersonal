@@ -1,0 +1,57 @@
+// Will Call Companies
+// (by order of appearance)
+(
+
+// Can Cause false 
+(P\s*N\s*C\s*BANK(\s*U\s*S\s*A)?) | 
+
+// Stamp will Never OCR correctly
+(FIRST\s*AMERICAN\s*EQUITY\s*LOAN\s*SERVICES) |
+
+(BARRISTERS) | 
+
+(GENERAL\s*AMERICAN(\s*CORP(ORATION)?)?) |
+
+(KEYSTONE\s*CLOSING(\s*SERVICES)?) | 
+
+// Bad stamp will Never OCR Well at all
+(EXPRESS\s*FINANCIAL) |
+
+(P\s*A\s*LAND\s*TITLES) |
+
+(UNIVERSAL\s*SETTLEMENT(\s*SERVICES,?(\s*INC))?) |
+
+// Ocassionally ocr's well
+(CAIN\s*,?\s*ACKERMAN\s*((&|AND)\s*)?MCCORMICK(\s*P\s*C)?) |
+
+// Handwritten, will not ocr
+(MILLS\s*(AND|&)\s*HENRY) |
+
+// Can cause false positives
+// but generally ocr's well
+(\n\s*SETTLEMENT\s*SERVICES\s*\n) |
+
+// Always Handwritten
+(\n\s*GENESIS\s*\n) | 
+
+(LANDCO\s*USA,?\s*INC.?) | 
+
+(MEYER\s*,?\s*UNKOVIC\s*(.|AND)\s*SCOTT(\s*,?\s*L\s*L\s*P)?) | 
+
+(AMERIFIRST\s*SETTLEMENT\s*SERVICES) | 
+
+(PENNSYLVANIA\s*LAND\s*TITLES\s*) |
+
+(AMERICAN\s*GENERAL\s*SERVICES(\s*CORP(ORATION)?)?) |
+
+(F\s*\.\s*A\s*\.\s*C\s*\.\s*S) |
+
+(FEDERATED\s*APPRAISAL\s*(AND|.)\s*CLOSING\s*SERVICES) |
+
+(FINANCIAL\s*DIMENSIONS\s*.?\s*INC) |
+
+(CHELSEA\s*SETTLEMENT\s*AGENCY) |
+
+(LAWYERS\s*TITLE\s*INS(URANCE)?\s*CORP(ORATION)?)
+
+)

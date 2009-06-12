@@ -1,0 +1,164 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Address Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Address Splitter tests
+// Test Type: Single-line test cases
+// Note that comment lines should be removed by the RSD file
+
+<TESTCASE>|Street delimiter|Mr. John Smith 123 Main Street Madison Wisconsin 53719
+Address|Mr. John Smith 123 Main Street Madison Wisconsin 53719
+.Address1|Mr. John Smith
+.Address2|123 Main Street
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|Street delimiter with commas|Mr. John Smith, 123 Main Street, Madison, Wisconsin 53719
+Address|Mr. John Smith, 123 Main Street, Madison, Wisconsin 53719
+.Address1|Mr. John Smith
+.Address2|123 Main Street
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|St delimiter|Mrs. Jane Smith 123 Main St Madison Wisconsin 53719
+Address|Mrs. Jane Smith 123 Main St Madison Wisconsin 53719
+.Address1|Mrs. Jane Smith
+.Address2|123 Main St
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|St delimiter with commas|Mrs. Jane Smith, 123 Main St., Madison Wisconsin 53719
+Address|Mrs. Jane Smith, 123 Main St., Madison Wisconsin 53719
+.Address1|Mrs. Jane Smith
+.Address2|123 Main St.
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|Apartment # delimiter|Mrs. Jane Smith 123 Main Apt. 2A Madison Wisconsin 53719
+Address|Mrs. Jane Smith 123 Main Apt. 2A Madison Wisconsin 53719
+.Address1|Mrs. Jane Smith
+.Address2|123 Main Apt. 2A
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|Apartment # delimiter with comma|Mrs. Jane Smith, 123 Main, Apt. 2A, Madison, Wisconsin 53719
+Address|Mrs. Jane Smith, 123 Main, Apt. 2A, Madison, Wisconsin 53719
+.Address1|Mrs. Jane Smith
+.Address2|123 Main, Apt. 2A
+.City|Madison
+.State|Wisconsin
+.ZipCode|53719
+
+<TESTCASE>|St & St words|Mrs. Jane Smith 123 Main St St Paul MN 55533
+Address|Mrs. Jane Smith 123 Main St St Paul MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Main St
+.City|St Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|St & St words with comma|Mrs. Jane Smith 123 Main St, St Paul, MN 55533
+Address|Mrs. Jane Smith 123 Main St, St Paul, MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Main St
+.City|St Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|Rd & St words|Mrs. Jane Smith 123 Branch Rd St. Paul MN 55533
+Address|Mrs. Jane Smith 123 Branch Rd St. Paul MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Branch Rd
+.City|St. Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|Rd & St words with comma|Mrs. Jane Smith, 123 Branch Rd, St. Paul MN 55533
+Address|Mrs. Jane Smith, 123 Branch Rd, St. Paul MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Branch Rd
+.City|St. Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|Avenue & St words|Mrs. Jane Smith 123 Main Avenue St Paul MN 55533
+Address|Mrs. Jane Smith 123 Main Avenue St Paul MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Main Avenue
+.City|St Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|Apartment # & St words|Mrs. Jane Smith 123 Main Apt. 2A St Paul MN 55533
+Address|Mrs. Jane Smith 123 Main Apt. 2A St Paul MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Main Apt. 2A
+.City|St Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|Apartment # & St words with comma|Mrs. Jane Smith, 123 Main Apt. 2A, St Paul, MN 55533
+Address|Mrs. Jane Smith, 123 Main Apt. 2A, St Paul, MN 55533
+.Address1|Mrs. Jane Smith
+.Address2|123 Main Apt. 2A
+.City|St Paul
+.State|MN
+.ZipCode|55533
+
+<TESTCASE>|5 digit address no zip code|33199 Obadiah Holmes Ave Salem MA
+Address|33199 Obadiah Holmes Ave Salem MA
+.Address1|33199 Obadiah Holmes Ave 
+.City|Salem
+.State|MA
+
+<TESTCASE>|5 digit address no zip code with comma|33199 Obadiah Holmes Ave, Salem, MA
+Address|33199 Obadiah Holmes Ave, Salem, MA
+.Address1|33199 Obadiah Holmes Ave 
+.City|Salem
+.State|MA
+
+<TESTCASE>|Directional Street Names|W180 N7950 Town Hall Road Menomonee Falls, WI 53705
+Address|W180 N7950 Town Hall Road Menomonee Falls, WI 53705
+.Address1|W180 N7950 Town Hall Road
+.City|Menomonee Falls
+.State|WI
+.ZipCode|53705
+
+<TESTCASE>|Directional Street Names with Recipient|Mau-Mau Pigritia W180 N7950 Town Hall Road Menomonee Falls, WI 53705
+Address|Mau-Mau Pigritia W180 N7950 Town Hall Road Menomonee Falls, WI 53705
+.Address1|Mau-Mau Pigritia
+.Address2|W180 N7950 Town Hall Road
+.City|Menomonee Falls
+.State|WI
+.ZipCode|53705
+
+<TESTCASE>|Ordinal Street Name|201 W. 1st Street Monkeyville, HI 12345
+Address|201 W. 1st Street Monkeyville, HI 12345
+.Address1|201 W. 1st Street
+.City|Monkeyville
+.State|HI
+.ZipCode|12345
+
+<TESTCASE>|Ordinal Street Name with Recipient|D.K. 201 W. 1st Street Monkeyville, HI 12345
+Address|D.K. 201 W. 1st Street Monkeyville, HI 12345
+.Address1|D.K.
+.Address2|201 W. 1st Street
+.City|Monkeyville
+.State|HI
+.ZipCode|12345

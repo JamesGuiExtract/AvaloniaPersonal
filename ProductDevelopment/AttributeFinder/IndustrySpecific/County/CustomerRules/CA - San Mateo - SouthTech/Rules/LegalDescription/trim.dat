@@ -1,0 +1,21 @@
+[\s\S]*\blender\b[\s\S]*%
+//mask phrase containing 'exhibit "a"'
+(\bset\s{0,4}forth\s{0,4}as\s{0,4})exhibit\s{0,4}\"a\b\"%$1placeholder955
+(\battached\s{0,4}as\s{0,4})exhibit\s{0,4}\"a\b\"%$1placeholder955
+//remove 'exhibit "a"'
+\bexhibit\s{0,4}\"?\ba\b\"?%
+//restore phrase containing 'exhibit "a"'
+placeholder955\b%EXHIBIT "A"
+\bAPN\b[\s\S]*%
+\bTax\s{0,4}ID[\s\S]*%
+\bexcepting\b[\s\S]*%
+[\s\S]*\bingress\b[\s\S]*%
+[\s\S]*\begress\b[\s\S]*%
+^[\s\S]*\bparcel\s{0,4}(?:one|1|I|A)\:%
+\bparcel\s{0,4}[\da-z]+\:%
+\bparcel\:%
+^[\s\S]*\[[\s\S]*\]%
+[\s\S]*?\beasements?\b[\s\S]*?\benjoyment\b[\s\S]*%
+\bcali-fornia\b%california
+[\s\S]*\bdeed\s{0,4}of\s{0,4}trust\b[\s\S]*%
+[\s\S]*\b(?:mineral|oil|gas)\b[\s\S]*%

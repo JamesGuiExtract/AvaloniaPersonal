@@ -1,0 +1,3 @@
+.\AnnotationTypes.tif
+.\FourPagesWithAnnoA.tif
+.\FourPagesWithAnnoB.tif

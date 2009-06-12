@@ -1,0 +1,15 @@
+// Valid Date items should be properly split
+// Invalid Date items should be discarded
+<TESTCASE>;Date1.rsd;Date1.txt;;Date1.eav
+
+// Two digit years should be split based on settings
+<TESTCASE>;Date2.rsd;Date2.txt;;Date2.eav
+
+// Valid Time items should be properly split
+// Invalid Time items should be discarded
+<TESTCASE>;Time1.rsd;Time1.txt;;Time1.eav
+
+// Valid Date/Time items should be properly split
+// Invalid Date/Time items should be discarded
+<TESTCASE>;DateTime.rsd;DateTime.txt;;DateTime.eav
+

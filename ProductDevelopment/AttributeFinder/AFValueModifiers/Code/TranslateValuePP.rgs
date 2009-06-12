@@ -1,0 +1,23 @@
+HKCR
+{
+	UCLIDAFValueModifiers.TranslateValuePP.1 = s 'TranslateValuePP Class'
+	{
+		CLSID = s '{2D25A630-233F-42B3-A778-27D11AD431F6}'
+	}
+	UCLIDAFValueModifiers.TranslateValuePP = s 'TranslateValuePP Class'
+	{
+		CLSID = s '{2D25A630-233F-42B3-A778-27D11AD431F6}'
+		CurVer = s 'UCLIDAFValueModifiers.TranslateValuePP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {2D25A630-233F-42B3-A778-27D11AD431F6} = s 'TranslateValuePP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

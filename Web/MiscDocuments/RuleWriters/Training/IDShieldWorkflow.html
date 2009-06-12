@@ -1,0 +1,165 @@
+<HTML>
+	<HEAD>
+		<TITLE>ID Shield Workflow</TITLE>
+		<link type="text/css" rel="stylesheet" href="./UCLIDTesting.css">
+	</HEAD>
+	<BODY>
+		<h1>ID Shield Workflow</h1>
+		<hr>
+		<h3>Setup and Verification</h3>
+		<ul>
+			<li>For every ID Shield project, we receive the following items from our customers:
+				<ol>
+					<li>A set of sample images.
+						<ul>
+							<li>Our customers often need to redact millions of images.</li>
+							<li>Since it is impractical to analyze all of the customer's images, we ask the customer to provide us with a small, representative sampling of the images that they want to redact.</li>
+							<li>Generally, this sample set is approximately 10,000 pages.</li>
+							<li>If the customer provides us with a set of sample images that is larger than 10,000 pages, we will take a random subset of 10,000 pages from the provided sample set.</li>
+							<li>The sample images are stored at <b>K:\Common\Engineering\Sample Files</b>.
+						</ul>
+					</li>
+					<li>Directions about which field or fields to redact.
+						<ul>
+							<li>For example, a customer may want to redact social security numbers and dates of birth.</li>
+						</ul>
+					</li>
+					<li>Details about the customer's workflow, including:
+						<ul>
+							<li>Whether the customer will be verifying images or using fully automated redaction.</li>
+							<li>The desired capture rates.</li>
+							<li>Other specific constraints.</li>
+						</ul>
+					</li>
+				</ol>
+			</li>
+			<p>
+				<li>After the sample images are received, they must be verified to create Expected Redactions .voa files.
+					<ul>
+						<li>First, the sample images are OCRed.</li>
+						<li>Next, rules are run on the OCRed sample images in order to create output .voa files that will be used to pre-populated the verification window with data.
+							<ul>
+								<li>Generally, the rules that are run on the OCRed images are rules that were previously completed for another, similar project.</li></li>
+								<li>If we have never completed a similar project before, we will run a "skeleton" rules set on the OCRed images.
+									<ul>
+										<li>These "skeleton" rules will only contain the ComponentData redaction rules for the desired fields. </li>
+									</ul>
+							</ul>
+						</li>
+						<li>Lastly, each image is verified by a human operator and an Expected Redaction .voa file is created.</li>
+					</ul>
+				</li>
+			</p>
+		</ul>
+		<hr>
+		<h3>Rule Writing</h3>
+		<ul>
+			<li>Rather than writing rules from scratch, rule writers generally take an existing set of rules and add new rules to them.
+				<ul>
+					<li>If we have previously completed a project that is similar to the current project, the rules from the older project can be used as a basis for the current project.</li>
+					<li>If there is no suitable pre-existing rules set, you can start with a "skeleton" rules set that does nothing but call the appropriate attributes from ComponentData.</li>
+				</ul>
+			</li>
+			<li>The focus of rule writing is different for customers who are verifying documents and customers who are automatically redacting documents.
+				<ul>
+					<li>For customers that are manually verifying documents, focus on increasing the number of data items found during verification while reducing the number of files selected for review.
+						<ul>
+							<li>Unless otherwise instructed, the percentage of items found during verification needs to be 99% or greater.</li>
+							<li>When writing redaction rules for customers who are verifying, write the rules in a manner that will increase the speed of verifiers.</li>
+								<ul>
+									<li>Increase the automated capture rate and reduce the number of false positives as much as possible.  The more items that the rules capture correctly, the less time verifiers have to spend adding redaction boxes or deleting incorrect redaction boxes.</li>
+									<li>Avoid over-redactions whenever possible.  If a redaction box is too large, a verifier may have to spend time resizing it.</li>
+									<li>Avoid redacting the same item twice.  Double redactions can be confusing to verifiers.</li>
+								</ul>
+							</li>
+						</ul>
+					</li>
+					<li>For customers that are automatically redacting documents, focus on increasing automated capture rate and reducing the number false positives.
+						<ul>
+							<li>Unless otherwise instructed, the automated capture rate should be over 95% and the ROCE should be 5 or greater.</li>
+							<li>Reduce the number over-redactions that cover non-sensitive data.  Since the customer is not verifying, they will not have a chance to resize redactions that are too large.</li>
+							<li>Double redactions are acceptable for automated projects.</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>Use the Test Harness to test the improvements that you make to the rules.
+				<ul>
+					<li>You should record the results of your Test Harness tests at least once a day.</li>
+					<li>Every project has its own folder under <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files</b>.  Record your Test Harness test results in the Performance Results spreadsheet that is located in the <b>Performance Results</b> subfolder of the project's folder.</li>
+				</ul>
+			</li>
+			<li>Generally, you should continue to improve the rules either until you completely meet the requirements of the project or until you work an entire day an achieve less than a 2% improvement in capture rates.
+			</li>
+		</ul>
+		<hr>
+		<h3>Turning in a Project</h3>
+		<ul>
+			<li>When you think you are done with your rules, you will need to have another rule writer review them.
+				<ul>
+					<li>Explain how your rules work to the other rule writer.</li>
+					<li>The other rule writer will often catch mistakes or make suggestions about how you can improve your rules.</li>
+					<li>Be sure to correct and test any items that were discovered during rules review before you check in your rules.</li>
+				</ul>
+			</li>
+			<li>After your rules have been reviewed, you will need to add your rules and testing files to SourceSafe.
+				<ul>
+					<li>All redaction project have their own folder in SourceSafe under <b>$\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules</b>.</li>
+					<li>If the project folder does not exist, create it.</li>
+					<li>Add your rules to the <b>Rules</b> sub-directory of the project folder.</li>
+					<li>Add any .tcl and .dat files used for testing to the <b>TestingFiles</b> sub-directory of the project folder.</li>
+				</ul>
+			</li>
+			<li>Next, you will need to add sample images to the delivery test.
+				<ul>
+					<li>The delivery test is a very short test that is run by the rules QA personnel just before the rules are sent to the customer to ensure that the rules are working properly.</li>
+					<li>The delivery test should generally only contain between 5 and 25 images.</li>
+					<li>In the project's folder under <b>I:\Common\Engineering\ProductDevelopment\AttributeFinder\Customer Specific Files</b>, there is a sub-folder labeled <b>Delivery Test Files</b>.</li>
+					<li>You will need to add your sample files to the <b>Images</b> sub-folder of the <b>Delivery Test Files</b> folder.</li>
+					<li>In general, you will need to include one example of every major document format for which you wrote rules.</b>
+					<li>Include the .uss files for any image that you add.</li>
+				</ul>
+			</li>
+			<li>Be sure that you have recorded the final statistics for your rules in the Performance Results spreadsheet.</li>
+			<li>Notify the QA personnel that your rules are checked in and ready to be delivered.</li>
+		</ul>
+		<hr>
+		<h3>Exercises</h3>
+		<ol>
+			<li><b>Test Set #1</b> - Redact all social security numbers
+				<ul>
+					<li>Copy the sample images from <b>I:\Common\Testing\Product Testing\IDShield_Training\Set001\Images</b> to your local machine.</li>
+					<li>Create a rules file called <b>Master.rsd</b> that calls the ComponentData rules for social security numbers.</li>
+					<li>OCR the sample images and run <b>Master.rsd</b> on them.</li>
+					<li>Verify the sample images, saving the Expected Redactions files to an <b>ExpectedRedactions</b> subfolder.</li>
+					<li>Use <b>Test Harness</b> to compute initial capture rates of <b>Master.rsd</b>.</li>
+					<li>Improve rules to achieve &gt;99% post-verification capture rate.</li>
+				</ul>
+			</li>
+			<p>
+				<li><b>Test Set #2</b> - Redact the first five digits of all social security numbers
+					<ul>
+						<li>Copy the sample images from <b>I:\Common\Testing\Product Testing\IDShield_Training\Set002\Images</b> to your local machine.</li>
+						<li>Create a rules file called <b>Master.rsd</b> that calls the ComponentData rules for social security numbers and chops off the last four digits of all numbers.</li>
+						<li>OCR the sample images and run <b>Master.rsd</b> on them.</li>
+						<li>Verify the sample images, saving the Expected Redactions files to an <b>ExpectedRedactions</b> subfolder.</li>
+						<li>Use <b>Test Harness</b> to compute initial capture rates of <b>Master.rsd</b>.</li>
+						<li>Improve the rules to achieve &gt;99% post-verification capture rate.</li>
+					</ul>
+				</li>
+			</p>
+			<p>
+				<li><b>Test Set #3</b> - Redact all social security numbers, dates of birth, and driver's license numbers
+					<ul>
+						<li>Copy the sample images from <b>I:\Common\Testing\Product Testing\IDShield_Training\Set003\Images</b> to your local machine.</li>
+						<li>Create a rules file called <b>Master.rsd</b> that calls the ComponentData rules for social security numbers, dates of birth, and driver's license numbers.</li>
+						<li>OCR the sample images and run <b>Master.rsd</b> on them.</li>
+						<li>Verify the sample images, saving the Expected Redactions files to an <b>ExpectedRedactions</b> subfolder.</li>
+						<li>Use <b>Test Harness</b> to compute initial capture rates of <b>Master.rsd</b>.</li>
+						<li>Improve rules to achieve &gt;99% post-verification capture rate.</li>
+					</ul>
+				</li>
+			</p>
+		</ol>
+	</BODY>
+</HTML>

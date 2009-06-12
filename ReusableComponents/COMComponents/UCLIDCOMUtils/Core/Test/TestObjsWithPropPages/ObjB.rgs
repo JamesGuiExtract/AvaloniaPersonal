@@ -1,0 +1,26 @@
+HKCR
+{
+	TestObjsWithPropPages.ObjB.1 = s 'ObjB Class'
+	{
+		CLSID = s '{1709A600-92F8-4232-8544-E472BE015B2D}'
+	}
+	TestObjsWithPropPages.ObjB = s 'ObjB Class'
+	{
+		CLSID = s '{1709A600-92F8-4232-8544-E472BE015B2D}'
+		CurVer = s 'TestObjsWithPropPages.ObjB.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {1709A600-92F8-4232-8544-E472BE015B2D} = s 'ObjB Class'
+		{
+			ProgID = s 'TestObjsWithPropPages.ObjB.1'
+			VersionIndependentProgID = s 'TestObjsWithPropPages.ObjB'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{B42DD683-BE90-43F0-823B-E7DB366E34D5}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCOMUtils.LongToObjectMap.1 = s 'LongToObjectMap Class'
+	{
+		CLSID = s '{F1752718-D153-4458-BEEE-F1C51F398C79}'
+	}
+	UCLIDCOMUtils.LongToObjectMap = s 'LongToObjectMap Class'
+	{
+		CLSID = s '{F1752718-D153-4458-BEEE-F1C51F398C79}'
+		CurVer = s 'UCLIDCOMUtils.LongToObjectMap.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F1752718-D153-4458-BEEE-F1C51F398C79} = s 'LongToObjectMap Class'
+		{
+			ProgID = s 'UCLIDCOMUtils.LongToObjectMap.1'
+			VersionIndependentProgID = s 'UCLIDCOMUtils.LongToObjectMap'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
+		}
+	}
+}

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDCountyCustomComponents.GrantorGranteeFinderV2.1 = s 'GrantorGranteeFinderV2 Class'
+	{
+		CLSID = s '{23A9D2D3-675D-4CA7-BCE1-3650E3CF9171}'
+	}
+	UCLIDCountyCustomComponents.GrantorGranteeFinderV2 = s 'GrantorGranteeFinderV2 Class'
+	{
+		CLSID = s '{23A9D2D3-675D-4CA7-BCE1-3650E3CF9171}'
+		CurVer = s 'UCLIDCountyCustomComponents.GrantorGranteeFinderV2.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {23A9D2D3-675D-4CA7-BCE1-3650E3CF9171} = s 'GrantorGranteeFinderV2 Class'
+		{
+			ProgID = s 'UCLIDCountyCustomComponents.GrantorGranteeFinderV2.1'
+			VersionIndependentProgID = s 'UCLIDCountyCustomComponents.GrantorGranteeFinderV2'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{3C187D28-0950-4498-A607-B122D7544DBA}'
+		}
+	}
+}

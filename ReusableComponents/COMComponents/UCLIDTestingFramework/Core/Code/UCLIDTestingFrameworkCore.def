@@ -1,0 +1,9 @@
+; UCLIDTestingFrameworkCore.def : Declares the module parameters.
+
+LIBRARY      "UCLIDTestingFrameworkCore.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

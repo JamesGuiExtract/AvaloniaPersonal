@@ -1,0 +1,6 @@
+Test|18823;03/12/03;133223.22; Joe Smith; Invalid Stuff:% 3, 22, 553,*,<>
+.PolicyNumber|18823
+.PolicyDate|03/12/03
+.PolicyAmount|133223.22
+.OwnerName| Joe Smith
+.Invalid| Invalid Stuff:% 3, 22, 553,*,<>

@@ -1,0 +1,9 @@
+; LineTextEvaluators.def : Declares the module parameters.
+
+LIBRARY      "LineTextEvaluators.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

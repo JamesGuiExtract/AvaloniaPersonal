@@ -1,0 +1,158 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+UntoKeyword=[unto:|[to:|[unto :|[to :|[unto]|[to]|[t0]
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109257.tif.uss
+ASM_ORIGINAL_GRANTOR_01=name of original mortgagor(s)^?OriginalGrantor^250~secured by the
+
+// 0041.tif;0043.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-004915.tif.uss
+// 0042.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-032303.tif.uss
+ASM_ORIGINAL_GRANTOR_02a=executed by:|made by^?OriginalGrantor^250~[tru^9~[per^3~trust^3~deed
+// 0002.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00111051.tif.uss
+// 0003.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005273349.tif.uss
+// 0024.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059021997100.tif.uss
+// 0041.tif;0043.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-004915.tif.uss
+// 0044.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-009934.tif.uss
+ASM_ORIGINAL_GRANTOR_02=executed by|made by|delivered by^?OriginalGrantor^250~clerks file|to:|recorded in|[on]|grantor, to
+
+// 0004.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106810.tif.uss
+ASM_ORIGINAL_GRANTOR_03=mortgage^3~from:^?OriginalGrantor^250~mortgage^3~to:
+
+// 0005.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110359.tif.uss
+ASM_ORIGINAL_GRANTOR_04=the^3~mortgage dated^20~from^?OriginalGrantor^250~[to]
+
+// 0006.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110523.tif.uss
+ASM_ORIGINAL_GRANTOR_05=certain^3~mortgage^10~bearing^10~date^made^3~by^?OriginalGrantor^250~[to]|in favor of
+
+// 0045.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003549.tif.uss
+// 0007.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106986.tif.uss
+ASM_ORIGINAL_GRANTOR_06=certain^20~mortgage|deed^50~given|executed^20~[by]^?OriginalGrantor^250~trustor, to]|[to]|[unto]|in favor of|recorded on|recorded in
+// 0008.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00107101.tif.uss
+ASM_ORIGINAL_GRANTOR_07=certain^20~mortgage^100~[by:]^?OriginalGrantor^250~[to]|[unto]|in favor of
+
+// the following rule does not work without the prefix assignee because of a flaw in SPM
+// 0009.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106972.tif.uss
+ASM_ORIGINAL_GRANTOR_08=assignee^mortgage^100~dated^300~[by]^?OriginalGrantor^250~@UntoKeyword
+
+// 0010.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110613.tif.uss
+ASM_ORIGINAL_GRANTOR_09=assignment^3~of^3~mortgage^10~[from]^?OriginalGrantor^250~mortgage dated|[to]^250~assigned to
+
+// 0011.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110240.tif.uss
+ASM_ORIGINAL_GRANTOR_10=assignment^3~of^3~mortgage^10~from^?OriginalGrantor^250~@-NonTP
+
+// 0030.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106755.tif.uss
+ASM_ORIGINAL_GRANTOR_11=mortgagor/borrower:^?OriginalGrantor^120~\r\n
+
+// 0012.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000365900.005.tif.uss/
+ASM_ORIGINAL_GRANTOR_12=FIXTURE^3~FILING^3~by^?OriginalGrantor^250~borrower
+
+// 0013.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000288900.001.tif.uss
+ASM_ORIGINAL_GRANTOR_13=original^3~trustor^?OriginalGrantor^250~original^3~beneficiary
+
+// The 5 chars allowance in front of the colon is to allow for (s) after mortgagor
+ASM_ORIGINAL_GRANTOR_15=original^3~mortgagor^5~:^?OriginalGrantor^120~\r\n
+
+// 0034.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-026757.tif.uss
+ASM_ORIGINAL_GRANTOR_40=grants|assigns|transfers^120~certain^3~Deed^6~Trust^48~dated^48~from^?OriginalGrantor^120~[to]
+
+// 0035.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-013158.tif.uss
+ASM_ORIGINAL_GRANTOR_39=executed^3~by^?OriginalGrantor^120~trustor^8~[to]
+
+// 0018.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110417.tif.uss
+ASM_ORIGINAL_GRANTOR_14=given|executed|delivered^5~[by]^?OriginalGrantor^420~grantor|SECURED BY|trustor|[to]|[unto]|in favor of
+
+
+// 0014.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109304.tif.uss
+ASM_ORIGINAL_GRANTOR_16=executed^3~[by^?OriginalGrantor^120~[to]^corporation
+
+// 0015.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00108967.tif.uss
+ASM_ORIGINAL_GRANTOR_17=mortgage^3~dated^50~executed^5~by^?OriginalGrantor^250~[as]^3~mortgagor
+
+// 0016.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109012.tif.uss
+// 0017.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005273428.tif.uss
+ASM_ORIGINAL_GRANTOR_18=mortgagor:^?OriginalGrantor^250~property address|mortgagee
+
+// 0025.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059020639500.tif.uss
+ASM_ORIGINAL_GRANTOR_30=Name^10~of^5~Maker^?OriginalGrantor^250~Mortgagor^3~or^3~Grantor
+
+
+// 0019.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109764.tif.uss
+// k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059020342900.tif.uss
+ASM_ORIGINAL_GRANTOR_19=mortgage^3~given^8~executed^?OriginalGrantor^250~dated^50~recorded^6~mortgage
+
+// 0020.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109018.tif.uss
+ASM_ORIGINAL_GRANTOR_20=assignment^3~of^3~mortgage^50~from:^?OriginalGrantor^250~\r\n\r\n
+
+//
+ASM_ORIGINAL_GRANTOR_21=dated^25~by^3~and^3~between^?OriginalGrantor>^250~[and]^250~and^3~recorded
+
+// 0021.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272826.tif.uss
+ASM_ORIGINAL_GRANTOR_21_02=dated^35~by^3~and^3~among^?OriginalGrantor>^350~as^3~recorded
+
+// 0022.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000046400.001.tif.uss
+ASM_ORIGINAL_GRANTOR_22=Names^10~Maker^?OriginalGrantor^250~Mortgagor^3~or^3~Grantor
+
+// 0026.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059020342900.tif.uss
+
+ASM_ORIGINAL_GRANTOR_23=deed^6~trust^5~dated^20~\r\n|[by]^?OriginalGrantor^250~[to]|[t0]^200~and recorded|following described
+//ASM_ORIGINAL_GRANTOR_23=deed of trust^5~dated^20~\r\n|[by]^?OriginalGrantor^250~[to]|[t0]^200~and recorded|following described|\r\n
+
+// 
+ASM_ORIGINAL_GRANTOR_24=\r\nTo^?OriginalGrantor^250~as^3~Trustee
+
+//
+ASM_ORIGINAL_GRANTOR_25=executed^3~by^?OriginalGrantor^250~Borrower
+
+// 0023.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000323400.002.tif.uss
+ASM_ORIGINAL_GRANTOR_26=\r\nGrantor:^?OriginalGrantor^250~\r\nTrustee:
+
+// 0031.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000245800.005.tif.uss
+//NRS sample above is original document with cover page removed
+// 0027.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059021453300.tif.uss
+// 0028.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059022131700.tif.uss
+ASM_ORIGINAL_GRANTOR_31=Borrower(s):|TRUSTOR:|TRUSTOR/BORROWER^?OriginalGrantor<^250~ORIGINAL BENEFICIARY|BENEFICIARY:|Trustee:
+
+// 0032.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000170600.001.tif.uss
+ASM_ORIGINAL_GRANTOR_32=executed^?OriginalGrantor^250~trustor
+
+
+// 0033.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000214400.001.tif.uss
+ASM_ORIGINAL_GRANTOR_33=borrower^?OriginalGrantor^250~naming
+
+ASM_ORIGINAL_GRANTOR_34=made^3~by^?OriginalGrantor^250~[to]^250~recorded^3~in
+
+// 0029.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059022176800.tif
+ASM_ORIGINAL_GRANTOR_35=executed by]^50~TRUSTOR(S)^?OriginalGrantor^250~[to]
+
+// 0036.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-027532.tif.uss
+ASM_ORIGINAL_GRANTOR_36=Deed^6~Trust^3~executed^3~by^?OriginalGrantor^120~[in^8~original^3~principal^3~amount
+
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Random10000Subset\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2007-023498.tif 
+ASM_ORIGINAL_GRANTOR_50=Original^3~Trustor|Trustor(s^?OriginalGrantor^80~Original^3~Truste
+// 0037.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-008939.tif.uss
+ASM_ORIGINAL_GRANTOR_37=undersigned^120~transfers|grants|assigns^120~that certain|Deed|Mortgage^24~executed^?OriginalGrantor^120~Trustor
+
+// 0038.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003988.tif.uss
+ASM_ORIGINAL_GRANTOR_38=assign|transfer|convey^5~[unto]|[to]^280~executed^3~by^5~Trustor^?OriginalGrantor^120~Trustee
+
+// 0039.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-012174.tif.uss
+ASM_ORIGINAL_GRANTOR_41=deed^60~excuted^3~[by]^?OriginalGrantor^160~Trustor
+
+// 0040.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-008605.tif.uss
+// 0047.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-038368.tif.uss
+ASM_ORIGINAL_GRANTOR_42=deed^60~executed^?OriginalGrantor^80~Grantor^4~[to]
+// 0048.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-035069.tif.uss
+ASM_ORIGINAL_GRANTOR_43=\r\nBORROWER:^?OriginalGrantor<^120~TOGETHER^3~WITH^24~promissory|note
+
+// 0049.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-012543.tif.uss 
+ASM_ORIGINAL_GRANTOR_44=Security^3~Agreement^3~[by]^?OriginalGrantor^250~[the^4~Borrower
+// 0046.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-024947.tif.uss
+ASM_ORIGINAL_GRANTOR_06a=certain^20~mortgage|deed^50~executed^?OriginalGrantor^250~[to]|[unto]|in favor of|recorded on|recorded in
+[PATTERNS_END]

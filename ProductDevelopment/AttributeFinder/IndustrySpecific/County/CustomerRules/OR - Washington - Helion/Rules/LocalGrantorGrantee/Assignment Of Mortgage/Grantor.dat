@@ -1,0 +1,350 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+GrantsKeyword=[grant]|[grants]|[granted]|[assign]|[assigns]|[assigned]|[transfer]|[transfers]|[transferred]|[sell]|[sells]|[sold]|[bargain]|[bargains]|[bargained]|[convey]|[conveys]|[conveyed]|[deliver]|[delivers]|[delivered]|set over|sets over
+
+UntoKeyword=[unto:|[to:|[unto :|[to :|[unto]|[to]|[t0]
+Numbers=0|1|2|3|4|5|6|7|8|9
+Transfer=[transfer]
+Behalf=[behalf]
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110507.tif.uss
+ASM_GRANTOR_01=assignment of mortgage^10~between^?Grantor^250~\r\nand\r\n^400~mail to
+
+// 0002.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00010509.tif.uss
+ASM_GRANTOR_02=undersigned holder^15~deed of trust^?TRGrantor^250~assignor
+
+// 0095.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-000472.tif.uss
+ASM_GRANTOR_86=FOR VALUE RECEIVED^?Grantor^120~assignor^5~assigns
+
+// 0003.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000918.tif.uss
+// 0004.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00006598.tif.uss
+ASM_GRANTOR_0a3=the undersigned^?TRGrantor^180~assignor|assign to^Successor^3~truste
+ASM_GRANTOR_03=the undersigned^?Grantor^180~assignor|assign to
+
+// 0005.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00007144.tif.uss
+ASM_GRANTOR_04=acknowledged that^20~authorized signator^5~of|for^?Grantor^300~and that^10~executed the foregoing
+
+// 0006.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00006841.tif.uss
+// 0007.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005273428.tif.uss
+ASM_GRANTOR_05=THIS ASSIGNMENT OF^5~DEED|MORTGAGE^150~from^?Grantor^300~Assignor
+
+// 0008.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00014053.tif.uss
+ASM_GRANTOR_06=\r\n\r\n^?Grantor^300~Witness^10~Printed^20~Assignor
+
+// 0009.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110613.tif.uss
+ASM_GRANTOR_07=assignment of mortgage^10~[from]^250~[to]^?Grantor^250~mortgagee|assigned to
+
+// 0010.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00013918.tif.uss
+ASM_GRANTOR_08=presents:^10~County Of^50~For Value Received^?Grantor^250~@GrantsKeyword
+
+// 0011.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110359.tif.uss
+ASM_GRANTOR_10=know^5~all^5~men^15~present^10~that^5~assignor^?Grantor^120~@-NonTP
+
+// 0012.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110527.tif.uss
+ASM_GRANTOR_53=know all by men these presents^50~president^?Grantor^200~party of the first
+
+// 0013.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04292aaa0t.tif.uss
+// 0014.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272826.tif.uss
+ASM_GRANTOR_09=these^5~present^10~that^?Grantor^350~for value received|in consideration of
+
+// 0015.tif;k:\common\engineering\sample files\waukesha\set003\images\assignment of mortgage\002955.tif.uss
+ASM_GRANTOR_11=know^5~all^5~men^15~present^50~that^?Grantor^250~'assignor'|"assignor"
+
+// 0016.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110523.tif.uss
+ASM_GRANTOR_12=know^5~all^5~men^15~present^10~that^?Grantor^250~party^10~first part
+
+// 0017.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110438.tif.uss
+// 0018.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272949.tif.uss
+ASM_GRANTOR_13=know^5~all^5~men^15~present^10~that^?Grantor^250~first party|for consideration paid|the payee|transferor
+
+// 0019.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aabt7.tif.uss
+ASM_GRANTOR_14=all^5~men^15~present^10~County of^40~that^?Grantor^250~@-NonTP
+
+// 0020.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016434.tif.uss
+ASM_GRANTOR_15=know^5~all^5~men^15~presents:^?Grantor^250~@GrantsKeyword
+
+// 0021.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016656.tif.uss
+ASM_GRANTOR_16=know^5~all^5~men^15~present^10~that^5~undersigned^?Grantor^300~consideration of
+
+ASM_GRANTOR_5017=KNOW THAT^50~\r\n\r\n^?Grantor^250~assignor^5~in consideration of
+
+// 0022.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106972.tif.uss
+ASM_GRANTOR_17=know that^?Grantor^250~assignor
+
+// 0023.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132661.tif.uss
+ASM_GRANTOR_18=\r\nASSIGNMENT\r\n^50~County of^30~\r\n\r\n^?Grantor^250~"Assignor"^10~valuable consideration
+
+// 0024.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00111051.tif.uss
+// <FIX>NEED SPATIAL RULE;K:\Common\Engineering\Sample files\ACS\PA - Allegheny\Set001\Images\ASM\00106755.tif.uss
+ASM_GRANTOR_19=Assignor:^?Grantor^250~Assignee:|Assignor's address:
+
+// 0025.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04293aaars.tif.uss
+ASM_GRANTOR_20=\r\nassignor:^?Grantor^250~@-NonTP
+
+// 0026.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00105333.tif.uss
+ASM_GRANTOR_21=for value received^50~holder of a mortgage^?Grantor^250~here^10~@GrantsKeyword^50~@UntoKeyword
+
+// <FIX>document classification issue;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT\00015181.tif.uss
+ASM_GRANTOR_22=for value received^5~we^?Grantor^250~have this day
+
+// <FIX>;Needs Spatial Rule;K:\Common\Engineering\Sample files\Fort Bend Central Appraisal District - TX\Set001\Images\ASSIGNMT\2003133216.tif.uss
+ASM_GRANTOR_23=holder of note^?Grantor^250~\r\n^10~deed of trust
+
+//
+ASM_GRANTOR_24=holder^9~note^?Grantor^250~deed^9~trust^10~Holder's Mailing
+
+// 0027.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04320aaaq0.tif.uss
+ASM_GRANTOR_25=for value received^?Grantor^250~the holder
+
+ASM_GRANTOR_90=for^3~value^3~received^?Grantor^250~holder^10~deed
+
+// 0028.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000159.tif.uss
+ASM_GRANTOR_26=for value received^?Grantor^250~its successors|hereby^10~@GrantsKeyword^50~@UntoKeyword
+
+// 0029.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000595.tif.uss
+// false positive on K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-006559.tif.uss
+ASM_GRANTOR_27=for value received^?Grantor^250~transfers to|does hereby grant|a corporation duly|organized|located at
+
+// 0030.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132715.tif.uss
+// 0031.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015984.tif.uss
+// 0090.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00013718.tif.uss
+ASM_GRANTOR_28=for good and valuable|valuable consideration^acknowledged^?Grantor^250~hereby|does^10~@GrantsKeyword^70~@UntoKeyword
+
+// 0032.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000537.tif.uss
+ASM_GRANTOR_29=for valuable consideration^?Grantor^240~hereby^10~@GrantsKeyword^50~@UntoKeyword
+
+//
+ASM_GRANTOR_30=this instrument was acknowledged^vice president of^?Grantor^250~on behalf of said bank
+
+// 0033.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106760.tif.uss
+ASM_GRANTOR_31=in witness whereof^?Grantor^250~has adopted the seal
+
+// 0034.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015948.tif.uss
+// 0035.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015118.tif.uss
+// 0036.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00013783.tif.uss
+ASM_GRANTOR_32=TRANSFER OF NOTE AND DEED OF TRUST|Transferor of note and lien^?Grantor^500~TRANSFEREE
+
+// 
+ASM_GRANTOR_33=\r\nThat^?Grantor^250~Assignor
+
+ASM_GRANTOR_73SM=instrument was acknowledged before me^64~[by]^64~[as]^3~Asst. Vice President|Assistant Vice President|Vice President|President|Collateral Officer^8~[of]^?Grantor^80~Official Seal|Notary
+// 0037.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00007081.tif.uss
+// 0038.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00014052.tif.uss
+// 0039.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016584.tif.uss
+ASM_GRANTOR_34=acknowledged before me^100~[by]^100~[of]^?<Grantor^300~on behalf of said^5~entity|corporation^5~\r\n\r\n
+
+//
+ASM_GRANTOR_35=Seal^?Grantor^250~(assignor)
+
+// 0040.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015488.tif.uss
+ASM_GRANTOR_36=acknowledged before me^30~[by]^100~title of officer^5~of^?<Grantor^300~on behalf of said^5~entity|corporation^5~\r\n\r\n
+
+// 0091.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000073200.001.tif.uss
+// DELETE THIS OLD RULE - ASM_GRANTOR_37=SS.^?Grantor^250~[On]^15~before me
+ASM_GRANTOR_37=(Seal)^?Grantor^250~(This area for official notarial seal.)
+
+// 0041.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000074500.003.tif.uss
+// changed to remove false positive on:
+// 0096.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-006123.tif.uss
+ASM_GRANTOR_38=Assignment^5~Deed^5~Trust]^3~[on]^?Grantor^80~[by:
+
+//
+ASM_GRANTOR_39=Assignment^5~is made by^?Grantor^250~Assignor
+
+//
+ASM_GRANTOR_40=Executed this^50~but effective^25~\r\n\r\n^?Grantor<^\r\n\r\n^150~ACKNOWLEDGMENT
+
+// <FIX>Low Score;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Assignment of Deed of Trust\20049000093600.002.tif.uss
+ASM_GRANTOR_41=Dated:^20~\r\n\r\n^?Grantor^250~\r\n\r\nthis instrument filed|\r\n\r\nBy:
+
+// 0085.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059020053600.tif.uss
+ASM_GRANTOR_111=signature\r\n\r\n^?Grantor^250~\r\n\r\n^50~president
+
+// 0042.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000244300.001.tif.uss
+ASM_GRANTOR_110=under said Deed of Trust^?Grantor^250~\r\ndated
+
+// 
+ASM_GRANTOR_100=as assigned to^?Grantor^250~upon the following
+
+
+// 0097.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-036926.tif.uss
+ASM_GRANTOR_92=appeared^60~known^64~[of]^?Grantor^60~[the^3~corporation|company^12~executed
+
+// 0098.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003550.tif.uss
+ASM_GRANTOR_93=rights|accrue^48~under^12~mortgage^8~\r\nattest:^?Grantor^60~[By]
+
+// 0099;tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-030858.tif.uss
+//ASM_GRANTOR_94=In Witness|Witness Whereof^11~undersigned^42~instrument^9~executed^180~effective^3~[as]^3~[of]^42~@numbers\r\n^?Grantor^80~\r\n[by
+ASM_GRANTOR_94=In Witness|Witness Whereof^11~undersigned^42~instrument^9~executed^180~effective^3~[as]^3~[of]^42~1|2|3|4|5|6|7|8|9|0^1~\r\n^?Grantor^80~\r\n[by
+
+//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2007-028244.tif
+ASM_GRANTOR_90b=undersigned^6~benefi^\r\nDated^18~\r\n^?Grantee^120~Successor^12~trustee
+//ASM_GRANTOR_90b=undersigned^6~benefi^\r\nDated^12~\r\n^?Grantee^180~Successor^12~trustee
+ASM_GRANTOR_90=undersigned^6~benefi^\r\nBeneficiary:^?Grantee^90~By:|\r\nBy|\r\nBv:
+ASM_GRANTOR_90a=undersigned^6~benefi^\r\nDated^18~\r\n^?Grantee^90~By:|\r\nBy|\r\nBv:
+
+ASM_GRANTOR_43=executed^10~by]^250~[to]|[t0]^10~and in favor of^?<Grantor^250~@-NonTP
+
+// 0100.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003727.tif.uss
+ASM_GRANTOR_89=under that certain Deed of Trust Dated^48~Executed by^160~Trustor^5~[to]^?Grantor^160~Trustee
+
+// 0044.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aabc9.tif.uss
+// 0092.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000073000.002.tif.uss
+ASM_GRANTOR_42=executed^10~by]^250~[to]|[t0]^?<Grantor^250~and whose|recorded|and bearing the date
+
+// 0045.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04313aaadc.tif.uss
+ASM_GRANTOR_44=executed^10~by]^250~\r\nto^?Grantor^250~a corporation|and whose principal
+
+// 0046.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00108967.tif.uss
+ASM_GRANTOR_45=executed by^250~as mortgagor|[to]^?Grantor^250~as mortgagee|and recorded as
+
+// 0047.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000472.tif.uss
+// 0048.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000337.tif.uss
+// 0049.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000536.tif.uss
+// 0050.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set001\images\assignmt\2003132477.tif.uss
+// 0051.tif;k:\common\engineering\sample files\waukesha\set004\images\assignment of mortgage\00000221.tif.uss
+// 0071.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00014268.tif.uss
+ASM_GRANTOR_46=mortgage|deed|note^64~executed^10~by]^250~[to]|[t0]^?<Grantor^250~@-NonTP
+//ASM_GRANTOR_46=executed^10~by]^250~[to]|[t0]^?<Grantor^250~@-NonTP
+
+// 0093.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110159.tif.uss
+ASM_GRANTOR_47=\r\n\r\nthat^?Grantor^250~hereinafter^50~Assignor
+
+// 0052.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106810.tif.uss
+ASM_GRANTOR_48=mortgage from:^250~mortgage to:^?Grantor^250~\r\n
+
+// 0053.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00108334.tif.uss
+ASM_GRANTOR_49=this assignment^20~mortgage^whereby^?Grantor^250~"assignor"
+
+// 0094.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110373.tif.uss
+ASM_GRANTOR_50=assignment of mortgage^that^?Grantor^250~hereinafter^10~assignor
+
+// 0054.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110390.tif.uss
+ASM_GRANTOR_51=undersigned assignor^?Grantor^250~@GrantsKeyword^10~@Grantskeyword
+
+// 0055.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00110439.tif.uss
+ASM_GRANTOR_52=know all men by these^5~presents|presence^20~[that]^?Grantor^250~does hereby grant|acting herein by
+
+// 0056.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set004\images\assignmt\2003137283.tif.uss
+// 0057.tif;k:\common\engineering\sample files\fort bend central appraisal district - tx\set002\images\assignmt\2003131963.tif.uss
+ASM_GRANTOR_54=the^5~undersigned^?Grantor^250~Assignor
+
+// 
+ASM_GRANTOR_55=made as of^50~between^?Grantor^250~assignor^250~assignee
+
+// 0058.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00109304.tif.uss
+ASM_GRANTOR_56=executed by^500~[to]^?Grantor^250~a corporation organized
+
+// 
+ASM_GRANTOR_57=the sole member of^?Grantor^250~and that he as such officer
+
+ASM_GRANTOR_58=know all men by these presents, that^?Grantor^250~for valuable consideration
+
+// 0059.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272898.tif.uss
+ASM_GRANTOR_500=Witnesseth:^?Grantor^250~, assignor
+
+// 0060.tif;k:\common\engineering\sample files\acs\pa - allegheny\set001\images\asm\00106551.tif.uss
+ASM_GRANTOR_59=in favor of^?Grantor^300~and given to secure payment|upon the following|recorded|dated|described
+
+//
+ASM_GRANTOR_60=assignment of mortgage^50~\r\n\r\n^?Grantor^250~\r\n\r\nAssignor, for
+
+// 0061.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00006712.tif.uss
+ASM_GRANTOR_61=Holder^8~Note^9~Lien^?Grantor^200~Transferee
+
+//
+ASM_GRANTOR_62=LOAN DOCUMENTS\r\n^?Grantor^250~whose address
+
+// 0101.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-001310.tif.uss
+ASM_GRANTOR_87=this^5~Assignment^5~is made^36~by^?Grantor^160~("Assignor
+
+// 0062.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016432.tif.uss
+ASM_GRANTOR_63=\r\n\r\n^?Grantor^300~"Assignor"
+
+// 0064.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000289000.002.tif.uss
+ASM_GRANTOR_64=DATED this^25~\r\n^?Grantor^250~STATE OF
+
+// 0065.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016387.tif.uss
+ASM_GRANTOR_65=\r\ndated^@Numbers^?>Grantor^250~\r\nname of lender|\r\nBy
+
+// 0066.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00008075.tif.uss
+// 0067.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00007359.tif.uss
+// 0068.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000202400.002.tif.uss
+ASM_GRANTOR_66=accrue under said|executed this assignment^5~Deed of Trust^?Grantor^300~by|witness|assignor
+
+// 0069.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00008542.tif.uss
+ASM_GRANTOR_67=DEED OF TRUST^5~\r\n^?Grantor^200~holder of a deed of trust from
+
+// 0070.tif;k:\common\engineering\sample files\acs\tx - midland\set004\images\assignment\00015391.tif.uss
+ASM_GRANTOR_68=Holder of Note and Lien:^?Grantor^250~Holder's Mailing Address
+
+ASM_GRANTOR_69=payable to the^5~order of^?Grantor^250~whose address
+
+// 0072.tif;k:\common\engineering\sample files\acs\tx - midland\set001\images\assignment\00016354.tif.uss
+ASM_GRANTOR_70=\r\nPayable to^?Grantor^250~\r\nNote and Lien
+
+// 0063.tif;k:\common\engineering\sample files\acs\tx - midland\set002\images\assignment\00007176.tif.uss
+ASM_GRANTOR_71=\r\nBeneficiary^?Grantor^250~and recorded
+
+// 0073.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aaafg.tif.uss
+ASM_GRANTOR_72=under said Mortgage^25~\r\n^?>Grantor>^250~, a|[by]|\r\n\r\n
+
+// 0074.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aabbx.tif.uss
+ASM_GRANTOR_73=assignment of mortgage\r\n^5~that^?Grantor^250~organized and existing 
+
+// 0075.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04314aaaxx.tif.uss
+ASM_GRANTOR_74=assignment of mortgage\r\n^300~\r\n^?>Grantor^250~[a]^15~corporation
+
+// 0076.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04288aabg3.tif.uss
+ASM_GRANTOR_75=FOR VALUE RECEIVED^5~the undersigned^?Grantor^250~hereby^5~grant
+
+// 0077.tif;k:\common\engineering\sample files\acs\mi - oakland\set001\images\ast\b04289aaahg.tif.uss
+ASM_GRANTOR_76=appeared^150~president of^?Grantor^250~known^5~to^5~me^150~instrument
+
+// 0078.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04317aaawt.tif.uss
+ASM_GRANTOR_77=appeared^150~president^?Grantor^250~personally|known^5~to^5~me
+
+// 0079.tif;k:\common\engineering\sample files\acs\mi - oakland\set002\images\ast\b04293aaajl.tif.uss
+ASM_GRANTOR_78=executed in the presence of^?Grantor^250~\r\n\r\n 
+
+// 0080.tif;k:\common\engineering\sample files\acs\ny - richmond\set003\images\a-m\00007-6183.tif.uss
+ASM_GRANTOR_1010=\r\nk^4~ that^?Grantor^350~in consideration of^paid by^hereby assigns unto the assignee
+
+// 0081.tif;k:\common\engineering\sample files\acs\mi - oakland\set003\images\ast\b04314aaa1n.tif.uss
+ASM_GRANTOR_79=made by^250~[to]^?Grantor^250~and recorded
+
+// 0082.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000046400.001.tif.uss
+ASM_GRANTOR_80=FOR^3~VALUE^4~RECEIVED^8~sufficiency^8~receipt^5~which^15~acknowledged^?Grantor^250~hereby^3~assigns
+
+// 0083.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\assignment of deed of trust\20049000150400.002.tif.uss
+ASM_GRANTOR_81=Assignment^8~Deed^8~Trust^3~on^20~\r\n\r\n^?Grantor^250~(assignor)
+
+// 0084.tif;k:\common\engineering\sample files\the_fund\fl - sarasota\set002\images\multi-page\am\2005272637.tif.uss
+ASM_GRANTOR_73=assignment^3~of^16~mortgage\r\n\r\n^?Grantor^250~hereby^3~grants^4~assigns^8~transfers^3~[to]
+
+// 0086.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059019737500.tif.uss
+ASM_GRANTOR_82=SS.^?Grantor^250~County of
+
+// 0087.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059023177000.tif.uss
+ASM_GRANTOR_83=Beneticiary:|Beneficiary:^?Grantor^250~Trustee:
+
+// 0088.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059023327900.tif.uss
+// 0089.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\assignment deed of trust\20059023373300.tif.uss
+ASM_GRANTOR_84=Dated:|BY\r\n^?Grantor^250~state of
+
+// 0102.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003550.tif.uss
+ASM_GRANTOR_85=under^3~said^3~Mortgage^3~Attest:^?Grantor^120~by
+
+// 0103.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-040561.tif.uss
+ASM_GRANTOR_91=[sign^5~this]|[the]^12~day^42~@Numbers^?Grantor^80~[By]
+// 0104.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-003988.tif.uss
+ASM_GRANTOR_95=described^3~therein^6~\r\nDated^42~\r\n^?Grantor<^60~\r\n
+[PATTERNS_END]

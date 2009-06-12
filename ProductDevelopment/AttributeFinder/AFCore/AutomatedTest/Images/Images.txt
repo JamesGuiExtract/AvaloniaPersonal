@@ -1,0 +1,12 @@
+////////////
+// Image1
+////////////
+K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\RELEASE OF LIEN\00006560.tif
+
+////////////
+// Image2
+////////////
+K:\Common\Engineering\Sample Files\ACS\PA - Allegheny\Set001\Images\ASM\00107197.tif
+
+////////////
+PDF's were created using Irfanview to print to CutePDF Writer.

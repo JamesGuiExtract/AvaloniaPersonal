@@ -1,0 +1,3 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+//Top 80 Percent: 
+<TESTFOLDER>;TestReference.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Random200Subset;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).Reference.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Random200Subset\EAV\CrossReference_EAV\$FileNoExtOf(<SourceDocName>).eav

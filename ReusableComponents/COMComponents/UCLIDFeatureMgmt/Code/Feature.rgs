@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDFeatureMgmt.Feature.1 = s 'Feature Class'
+	{
+		CLSID = s '{4509A6A0-AE81-4B56-8983-301B6BE84A87}'
+	}
+	UCLIDFeatureMgmt.Feature = s 'Feature Class'
+	{
+		CLSID = s '{4509A6A0-AE81-4B56-8983-301B6BE84A87}'
+		CurVer = s 'UCLIDFeatureMgmt.Feature.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {4509A6A0-AE81-4B56-8983-301B6BE84A87} = s 'Feature Class'
+		{
+			ProgID = s 'UCLIDFeatureMgmt.Feature.1'
+			VersionIndependentProgID = s 'UCLIDFeatureMgmt.Feature'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{691AD683-B1D9-42E1-99B8-3398A794CDB1}'
+		}
+	}
+}

@@ -1,0 +1,1194 @@
+// AFValueFinders.idl : IDL source for AFValueFinders.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFValueFinders.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(55A9DE56-080B-43E0-AC99-02B815C1DF6C),
+	version(1.0),
+	helpstring("UCLID Attribute Value Finders 1.0 Type Library")
+]
+library	UCLID_AFVALUEFINDERSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
+	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	////////
+	// Enums
+	////////
+	typedef
+	[
+		uuid(21D18509-C960-4f5f-8D82-5F30982FC2A3), 
+		helpstring("UCLID ERuleRefiningType")
+	]
+	enum ERuleRefiningType
+	{
+		kNoRefiningType = 0,
+		kUptoXWords = 1,
+		kClueLine = 2,
+		kUptoXLines = 3,
+		kClueToString = 4
+	}ERuleRefiningType;
+
+	typedef
+	[
+		uuid(B441EC98-E365-4a3a-B8F9-A5DFECEF0419), 
+		helpstring("UCLID EClueListIndex Type")
+	]
+	enum EClueListIndex
+	{
+		kNoIndex = 0,
+		kList1 = 1,
+		kList2 = 2,
+		kList3 = 3,
+		kList4 = 4
+	}EClueListIndex;
+
+	typedef
+	[
+		uuid(2407C764-67A7-46d1-93BB-7E073808FFCF), 
+		helpstring("UCLID EBoundary Type")
+	]
+	enum EBoundary
+	{
+		kNoBoundary = 0,
+		kTop = 1, 
+		kBottom= 2, 
+		kLeft = 3, 
+		kRight = 4
+	}EBoundary;
+
+	typedef
+	[
+		uuid(93ACACDD-9BA6-4ef2-B389-6027BE9D6642), 
+		helpstring("UCLID Expand Direction Type")
+	]
+	enum EExpandDirection
+	{
+		kNoDirection = 0,
+		kExpandUp = 1, 
+		kExpandDown= 2, 
+		kExpandLeft = 3, 
+		kExpandRight = 4
+	} EExpandDirection;
+
+	typedef
+	[
+		uuid(286D7BB5-2BCD-48f6-BCB5-7115CD3A2D7D), 
+		helpstring("UCLID EBoundaryCondition Type")
+	]
+	enum EBoundaryCondition
+	{
+		kNoCondition = 0,
+		kClueList1 = 1, 
+		kClueList2 = 2, 
+		kClueList3 = 3, 
+		kClueList4 = 4, 
+		kPage = 5
+	}EBoundaryCondition;
+
+	typedef
+	[
+		uuid(B85BEACE-1559-4b32-8C03-051821A103D0), 
+		helpstring("Locate Image Region Find Type")
+	]
+	enum EFindType
+	{
+		kText = 0, // default
+		kImageRegion = 1
+	} EFindType;
+
+	typedef
+	[
+		uuid(C7755A9B-48A0-4884-B68C-C4A56CCFE765), 
+		helpstring("UCLID SPM Match Type")
+	]
+	enum ESPMReturnMatchType
+	{
+		kReturnFirstMatch = 1, // default
+		kReturnBestMatch = 2, 
+		kReturnAllMatches = 3, 
+		kReturnFirstOrBest = 4
+	} ESPMReturnMatchType;
+
+	typedef
+	[
+		uuid(4004F5AC-998F-4a47-BBFB-93B121E06545), 
+		helpstring("UCLID Define Blocks Type")
+	]
+	enum EDefineBlocksType
+	{
+		kSeparatorString = 0, // default
+		kBeginAndEndString = 1
+	} EDefineBlocksType;
+
+	typedef
+	[
+		uuid(D52A6671-F931-4c09-8D06-9BF3E08F0320), 
+		helpstring("UCLID Page Selection Mode")
+	]
+	enum EPageSelectionMode
+	{
+		kAllPages,
+		kFirstPages,
+		kLastPages,
+		kSpecifiedPages
+	} EPageSelectionMode;
+
+	typedef
+	[
+		uuid(6B2EBA05-3EDB-4f61-A743-407444A1D755), 
+		helpstring("UCLID Clue Location")
+	]
+	enum EClueLocation
+	{
+		kSameBox,
+		kBoxToTopLeft,
+		kBoxToTop,
+		kBoxToTopRight,
+		kBoxToRight,
+		kBoxToBottomRight,
+		kBoxToBottom,
+		kBoxToBottomLeft,
+		kBoxToLeft,
+	} EClueLocation;
+
+	typedef
+	[
+		uuid(A1B91947-94C0-466d-A09D-1131A16524CA), 
+		helpstring("Loop Type")
+	]
+	enum ELoopType
+	{
+		kDoLoop,
+		kWhileLoop,
+		kForLoop
+		
+	} ELoopType;
+
+	/////////////////
+	// CoClasses
+	/////////////////
+	[
+		object,
+		uuid(8C6F7C07-7239-4478-8D36-F00B6ABEA9E8),
+		dual,
+		helpstring("IValueBeforeClue Interface"),
+		pointer_default(unique)
+	]
+	interface IValueBeforeClue : IDispatch
+	{
+		[propget, id(1), helpstring("property Clues")] HRESULT Clues([out, retval] IVariantVector* *pVal);
+		[propput, id(1), helpstring("property Clues")] HRESULT Clues([in] IVariantVector* newVal);
+		[propget, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property RefiningType")] HRESULT RefiningType([out, retval] ERuleRefiningType *pVal);
+		[id(4), helpstring("method SetNoRefiningType")] HRESULT SetNoRefiningType();
+		[id(5), helpstring("method SetClueLineType")] HRESULT SetClueLineType();
+		[id(6), helpstring("method GetUptoXWords")] HRESULT GetUptoXWords([in, out] long* nNumOfWords, [in, out] BSTR *pstrPunctuations, [in, out] VARIANT_BOOL* bStopAtNewLine, [in, out] BSTR *pstrStops);
+		[id(7), helpstring("method SetUptoXWords")] HRESULT SetUptoXWords([in] long nNumOfWords, [in] BSTR strPunctuations, [in] VARIANT_BOOL bStopAtNewLine, [in] BSTR strStops);
+		[id(8), helpstring("method GetUptoXLines")] HRESULT GetUptoXLines([in, out] long* nNumOfLines, [in, out] VARIANT_BOOL* bIncludeClueLine);
+		[id(9), helpstring("method SetUptoXLines")] HRESULT SetUptoXLines([in] long nNumOfLines, [in] VARIANT_BOOL bIncludeClueLine);
+		[id(10), helpstring("method GetClueToString")] HRESULT GetClueToString([out, retval] BSTR* strString);
+		[id(11), helpstring("method SetClueToString")] HRESULT SetClueToString([in] BSTR strString);
+//		[id(12), helpstring("method GetClueToRegExpression")] HRESULT GetClueToRegExpression([out, retval] BSTR* strRegExpr);
+//		[id(13), helpstring("method SetClueToRegExpression")] HRESULT SetClueToRegExpression([in] BSTR strRegExpr);
+		[propget, id(14), helpstring("property ClueAsRegExpr")] HRESULT ClueAsRegExpr([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(14), helpstring("property ClueAsRegExpr")] HRESULT ClueAsRegExpr([in] VARIANT_BOOL newVal);
+		[propget, id(15), helpstring("property ClueToStringAsRegExpr")] HRESULT ClueToStringAsRegExpr([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(15), helpstring("property ClueToStringAsRegExpr")] HRESULT ClueToStringAsRegExpr([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(91697445-EFD1-41fa-AD47-F25D1CD16999),
+		dual,
+		helpstring("IValueAfterClue Interface"),
+		pointer_default(unique)
+	]
+	interface IValueAfterClue : IDispatch
+	{
+		[propget, id(1), helpstring("property Clues")] HRESULT Clues([out, retval] IVariantVector* *pVal);
+		[propput, id(1), helpstring("property Clues")] HRESULT Clues([in] IVariantVector* newVal);
+		[propget, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property RefiningType")] HRESULT RefiningType([out, retval] ERuleRefiningType *pVal);
+		[id(4), helpstring("method SetNoRefiningType")] HRESULT SetNoRefiningType();
+		[id(5), helpstring("method SetClueLineType")] HRESULT SetClueLineType();
+		[id(6), helpstring("method GetUptoXWords")] HRESULT GetUptoXWords([in, out] long* nNumOfWords, [in, out] BSTR *pstrPunctuations, [in, out] VARIANT_BOOL* bStopAtNewLine, [in, out] BSTR *pstrStopChars);
+		[id(7), helpstring("method SetUptoXWords")] HRESULT SetUptoXWords([in] long nNumOfWords, [in] BSTR strPunctuations, [in] VARIANT_BOOL bStopAtNewLine, [in] BSTR strStops);
+		[id(8), helpstring("method GetUptoXLines")] HRESULT GetUptoXLines([in, out] long* nNumOfLines, [in, out] VARIANT_BOOL* bIncludeClueLine);
+		[id(9), helpstring("method SetUptoXLines")] HRESULT SetUptoXLines([in] long nNumOfLines, [in] VARIANT_BOOL bIncludeClueLine);
+		[id(10), helpstring("method GetClueToString")] HRESULT GetClueToString([out, retval] BSTR* strString);
+		[id(11), helpstring("method SetClueToString")] HRESULT SetClueToString([in] BSTR strString);
+//		[id(12), helpstring("method GetClueToRegExpression")] HRESULT GetClueToRegExpression([out, retval] BSTR* strRegExpr);
+//		[id(13), helpstring("method SetClueToRegExpression")] HRESULT SetClueToRegExpression([in] BSTR strRegExpr);
+		[propget, id(14), helpstring("property ClueAsRegExpr")] HRESULT ClueAsRegExpr([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(14), helpstring("property ClueAsRegExpr")] HRESULT ClueAsRegExpr([in] VARIANT_BOOL newVal);
+		[propget, id(15), helpstring("property ClueToStringAsRegExpr")] HRESULT ClueToStringAsRegExpr([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(15), helpstring("property ClueToStringAsRegExpr")] HRESULT ClueToStringAsRegExpr([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(46F14195-99D8-4677-9831-E639FF631E57),
+		dual,
+		helpstring("IValueFromList Interface"),
+		pointer_default(unique)
+	]
+	interface IValueFromList : IDispatch
+	{
+		[propget, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(2), helpstring("property ValueList")] HRESULT ValueList([out, retval] IVariantVector* *pVal);
+		[propput, id(2), helpstring("property ValueList")] HRESULT ValueList([in] IVariantVector* newVal);
+		[id(3), helpstring("method LoadListFromFile")] HRESULT LoadListFromFile([in] BSTR strFileFullName);
+		[id(4), helpstring("method SaveListToFile")] HRESULT SaveListToFile([in] BSTR strFileFullName);
+	};
+	[
+		object,
+		uuid(E8B4E09B-5C00-4191-B262-90BB47265F38),
+		dual,
+		helpstring("IRegExprRule Interface"),
+		pointer_default(unique)
+	]
+	interface IRegExprRule : IDispatch
+	{
+		[propget, id(1), helpstring("property Pattern")] HRESULT Pattern([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property Pattern")] HRESULT Pattern([in] BSTR newVal);
+		[propget, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+		[propget, id(3), helpstring("property IsRegExpFromFile")] HRESULT IsRegExpFromFile([out, retval] BOOL *pVal);
+		[propput, id(3), helpstring("property IsRegExpFromFile")] HRESULT IsRegExpFromFile([in] BOOL newVal);
+		[propget, id(4), helpstring("property RegExpFileName")] HRESULT RegExpFileName([out, retval] BSTR *pVal);
+		[propput, id(4), helpstring("property RegExpFileName")] HRESULT RegExpFileName([in] BSTR newVal);
+		[propget, id(5), helpstring("property CreateSubAttributesFromNamedMatches")] 
+			HRESULT CreateSubAttributesFromNamedMatches([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property CreateSubAttributesFromNamedMatches")] 
+			HRESULT CreateSubAttributesFromNamedMatches([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(EE9F030D-9947-4557-88BF-9A2E51075EFB),
+		dual,
+		helpstring("IExtractLine Interface"),
+		pointer_default(unique)
+	]
+	interface IExtractLine : IDispatch
+	{
+		// To extract specified lines or to extract each line as a unique value for the attribute
+		[propget, id(1), helpstring("property EachLineAsUniqueValue")] HRESULT EachLineAsUniqueValue([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property EachLineAsUniqueValue")] HRESULT EachLineAsUniqueValue([in] VARIANT_BOOL newVal);
+		// If EachLineAsUniqueValue is false, this property shall be used for storing
+		// all specific line numbers for extracting. This vector will contain line numbers in the format of string
+		// individual line numbers are seperated by comma(,). A range of lines will be in the format
+		// of line#-line#, ex, 3-9, etc.
+		[propget, id(2), helpstring("property LineNumbers")] HRESULT LineNumbers([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property LineNumbers")] HRESULT LineNumbers([in] BSTR newVal);
+		// whether or not, when return, the line breaks shall be included. This variable only
+		// applicable if multiple lines are specified
+		[propget, id(3), helpstring("property IncludeLineBreak")] HRESULT IncludeLineBreak([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property IncludeLineBreak")] HRESULT IncludeLineBreak([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(98578306-7DA4-4138-82B2-2738F86E9B8D),
+		dual,
+		helpstring("ILegalDescriptionFinder Interface"),
+		pointer_default(unique)
+	]
+	interface ILegalDescriptionFinder : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(3A10BDEA-2655-41BA-B6A8-3B5D79B450A1),
+		dual,
+		helpstring("IBlockFinder Interface"),
+		pointer_default(unique)
+	]
+	interface IBlockFinder : IDispatch
+	{
+		[propget, id(1), helpstring("property BlockSeperator")] HRESULT BlockSeperator([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property BlockSeperator")] HRESULT BlockSeperator([in] BSTR newVal);
+		// If no seperator is found in the input text, whether the entire input text will be treated as a block
+		[propget, id(2), helpstring("property InputAsOneBlock")] HRESULT InputAsOneBlock([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property InputAsOneBlock")] HRESULT InputAsOneBlock([in] VARIANT_BOOL newVal);
+		// true -- get all the blocks
+		// false -- only get the blocks containing defined clues based on certain criteria
+		[propget, id(3), helpstring("property FindAllBlocks")] HRESULT FindAllBlocks([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property FindAllBlocks")] HRESULT FindAllBlocks([in] VARIANT_BOOL newVal);
+		// whether or not the defined clues are regular expressions
+		[propget, id(4), helpstring("property IsClueRegularExpression")] HRESULT IsClueRegularExpression([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property IsClueRegularExpression")] HRESULT IsClueRegularExpression([in] VARIANT_BOOL newVal);
+		// minimum number of clues
+		[propget, id(5), helpstring("property MinNumberOfClues")] HRESULT MinNumberOfClues([out, retval] long *pVal);
+		[propput, id(5), helpstring("property MinNumberOfClues")] HRESULT MinNumberOfClues([in] long newVal);
+		// whether or not to get those blocks containing maximum number of clues
+		[propget, id(6), helpstring("property GetMaxOnly")] HRESULT GetMaxOnly([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property GetMaxOnly")] HRESULT GetMaxOnly([in] VARIANT_BOOL newVal);
+		// with clues set, get the score for strBlockText.
+		[id(7), helpstring("method GetBlockScore")] HRESULT GetBlockScore([in] BSTR strBlockText, [out, retval] long *pScore);
+		[propget, id(8), helpstring("property Clues")] HRESULT Clues([out, retval] IVariantVector **pVal);
+		[propput, id(8), helpstring("property Clues")] HRESULT Clues([in] IVariantVector *newVal);
+		// whether or not each clue is a word by its own. In other words, if false, the clue text to be found
+		// in the input text must not be contained in another word. For example, if IsCluePartOfAWord = false, 
+		// clue text 'verb' shall not be found in the input text 'verbal'.
+		[propget, id(9), helpstring("property IsCluePartOfAWord")] HRESULT IsCluePartOfAWord([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(9), helpstring("property IsCluePartOfAWord")] HRESULT IsCluePartOfAWord([in] VARIANT_BOOL newVal);
+		[propget, id(10), helpstring("property DefineBlocksType")] HRESULT DefineBlocksType([out, retval] EDefineBlocksType *pVal);
+		[propput, id(10), helpstring("property DefineBlocksType")] HRESULT DefineBlocksType([in] EDefineBlocksType newVal);
+		[propget, id(11), helpstring("property BlockBegin")] HRESULT BlockBegin([out, retval] BSTR *pVal);
+		[propput, id(11), helpstring("property BlockBegin")] HRESULT BlockBegin([in] BSTR newVal);
+		[propget, id(12), helpstring("property BlockEnd")] HRESULT BlockEnd([out, retval] BSTR *pVal);
+		[propput, id(12), helpstring("property BlockEnd")] HRESULT BlockEnd([in] BSTR newVal);
+		[propget, id(13), helpstring("property PairBeginAndEnd")] HRESULT PairBeginAndEnd([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(13), helpstring("property PairBeginAndEnd")] HRESULT PairBeginAndEnd([in] VARIANT_BOOL newVal);
+
+
+	};
+	[
+		object,
+		uuid(4D70833F-0848-4ED1-9854-FCD1E2900AD6),
+		dual,
+		helpstring("ISPMFinder Interface"),
+		pointer_default(unique)
+	]
+	interface ISPMFinder : IDispatch
+	{
+		// Whether or not the rules are loaded from a file
+		[propget, id(1), helpstring("property IsPatternsFromFile")] HRESULT IsPatternsFromFile([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IsPatternsFromFile")] HRESULT IsPatternsFromFile([in] VARIANT_BOOL newVal);
+		// If IsPatternsFromFile is true, this variable contains the name of the file that has rules
+		[propget, id(2), helpstring("property RulesFileName")] HRESULT RulesFileName([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property RulesFileName")] HRESULT RulesFileName([in] BSTR newVal);
+		// If IsPatternsFromFile is false, this variable contains text of rules
+		[propget, id(3), helpstring("property RulesText")] HRESULT RulesText([out, retval] BSTR *pVal);
+		[propput, id(3), helpstring("property RulesText")] HRESULT RulesText([in] BSTR newVal);
+		// Whether or not store successfuly executed rule as a document tag in AFDocument
+		[propget, id(4), helpstring("property StoreRuleWorked")] HRESULT StoreRuleWorked([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property StoreRuleWorked")] HRESULT StoreRuleWorked([in] VARIANT_BOOL newVal);
+		// In order to be able to tell which rule was actually effective on finding
+		// the attribute, a special "Attribute" will be created to hold the info about
+		// which rule is used. The "Attribute" name will be default to "RuleWorked". 
+		// User has the choice to define other name through this property.
+		// This property shall be set if StoreRuleWorked is true
+		[propget, id(5), helpstring("property RuleWorkedName")] HRESULT RuleWorkedName([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property RuleWorkedName")] HRESULT RuleWorkedName([in] BSTR newVal);
+		// Case sensitivity
+		[propget, id(6), helpstring("property CaseSensitive")] HRESULT CaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(6), helpstring("property CaseSensitive")] HRESULT CaseSensitive([in] VARIANT_BOOL newVal);
+		// Whether or not to treat multiple white space as one character
+		[propget, id(7), helpstring("property TreatMultipleWSAsOne")] HRESULT TreatMultipleWSAsOne([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property TreatMultipleWSAsOne")] HRESULT TreatMultipleWSAsOne([in] VARIANT_BOOL newVal);
+		// Whether or not SPM search should be greedy
+		[propget, id(8), helpstring("property GreedySearch")] HRESULT GreedySearch([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(8), helpstring("property GreedySearch")] HRESULT GreedySearch([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		// The DataScorer, if any, that should be used to score the found data
+		// REQUIRE: The Object inside IObjectWithDescription should be of type ISPMDataScorer
+		[propget, id(9), helpstring("property DataScorer")] HRESULT DataScorer([out, retval] IObjectWithDescription **ppObj);
+		[propput, id(9), helpstring("property DataScorer")] HRESULT DataScorer([in] IObjectWithDescription *pObj);
+		//-----------------------------------------------------------------------------------------
+		// The minimum score to use to determine match, if the data scorer is specified
+		// REQUIRE: The only valid match scores are between 0 and 100 inclusive.
+		[propget, id(10), helpstring("property MinScoreToConsiderAsMatch")] HRESULT MinScoreToConsiderAsMatch([out, retval] long *pVal);
+		[propput, id(10), helpstring("property MinScoreToConsiderAsMatch")] HRESULT MinScoreToConsiderAsMatch([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// Whether all the matches, or only the first match should be returned
+		// PROMISE: If ReturnAllMatches == VARIANT_TRUE, all rules will be executed
+		//			and all matches that are found will be returned.  If 
+		//			ReturnAllMatches == VARIANT_FALSE, then only the first match
+		//			(if any) will be returned.
+		[propget, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([out, retval] ESPMReturnMatchType *peVal);
+		[propput, id(11), helpstring("property ReturnMatchType")] HRESULT ReturnMatchType([in] ESPMReturnMatchType eNewVal);
+		//-----------------------------------------------------------------------------------------
+		// List of strings that are used as preprocessors in the input text/file
+		// For instance: 
+		//
+		// #ifdef PICK_ORIGINAL_MORTGAGOR
+		// SM_10=...........
+		// #else
+		// SM_10=.............
+		// #endif
+		//
+		//  PICK_ORIGINAL_MORTGAGOR is the preprocessor
+		[propget, id(12), helpstring("property Preprocessors")] HRESULT Preprocessors([out, retval] IVariantVector **pVal);
+		[propput, id(12), helpstring("property Preprocessors")] HRESULT Preprocessors([in] IVariantVector *newVal);
+		[propget, id(13), helpstring("property MinFirstToConsiderAsMatch")] HRESULT MinFirstToConsiderAsMatch([out, retval] long *pVal);
+		[propput, id(13), helpstring("property MinFirstToConsiderAsMatch")] HRESULT MinFirstToConsiderAsMatch([in] long newVal);
+		//-----------------------------------------------------------------------------------------
+		// PROMISE: If IgnoreInvalidTags is true and IsPatternsFromFile is true and the pattern file 
+		//			name contains tags and any of the tags do not exist then instead of throwing an 
+		//			exception the SPMFinder will return no found attributes.  This can prevent
+		//			documents that don't get classified from throwing exceptions
+		[propget, id(14), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(14), helpstring("property IgnoreInvalidTags")] HRESULT IgnoreInvalidTags([in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+	};
+	[
+		object,
+		uuid(77712788-30ED-465B-945E-6EA4EF8155DC),
+		dual,
+		helpstring("IReturnAddrFinder Interface"),
+		pointer_default(unique)
+	]
+	interface IReturnAddrFinder : IDispatch
+	{
+		// Whether or not the AddressFinder should be used as a backup when no return addresses are found
+		[propget, id(1), helpstring("property FindNonReturnAddresses")] HRESULT FindNonReturnAddresses([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property FindNonReturnAddresses")] HRESULT FindNonReturnAddresses([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(5E934FD4-16DE-41D7-9CE8-AACE94127250),
+		dual,
+		helpstring("ILocateImageRegion Interface"),
+		pointer_default(unique)
+	]
+	interface ILocateImageRegion : IDispatch
+	{
+		// whether or not the data is inside the defined boundaries
+		[propget, id(1), helpstring("property DataInsideBoundaries")] HRESULT DataInsideBoundaries([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property DataInsideBoundaries")] HRESULT DataInsideBoundaries([in] VARIANT_BOOL newVal);
+		// whether or not to include any intersecting entities
+		[propget, id(2), helpstring("property IncludeIntersectingEntities")] HRESULT IncludeIntersectingEntities([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property IncludeIntersectingEntities")] HRESULT IncludeIntersectingEntities([in] VARIANT_BOOL newVal);
+		// what's the type of the intersecting entity if any
+		[propget, id(3), helpstring("property IntersectingEntityType")] HRESULT IntersectingEntityType([out, retval] ESpatialEntity *pVal);
+		[propput, id(3), helpstring("property IntersectingEntityType")] HRESULT IntersectingEntityType([in] ESpatialEntity newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set/get the one of the boundaries of the region to locate.
+		// PARAMS:  (1) eRegionBoundary - The side of the region being defined/retrieved
+		//              (top, bottom, left, or right).
+		//          (2) eSide - The side of the clue or page that the boundary is dependent on.
+		//          (3) eCondition - The area that the boundary is dependent on. Either one of the
+		//              clue lists or the page itself.
+		//          (4) eExpandDirection - The direction to expand the defined boundary
+		//              (up, down, left, or right).
+		//          (5) dExpandNumber - If expanding up or down, the number of spatial lines to 
+		//              expand from the boundary condition; if expanding left or right, the number 
+		//              of characters to expand from the boundary condition.
+		[id(4), helpstring("method SetRegionBoundary")] HRESULT SetRegionBoundary(
+			[in] EBoundary eRegionBoundary, [in] EBoundary eSide, 
+			[in] EBoundaryCondition eCondition, 
+			[in] EExpandDirection eExpandDirection, [in] double dExpandNumber);
+		[id(5), helpstring("method GetRegionBoundary")] HRESULT GetRegionBoundary(
+			[in] EBoundary eRegionBoundary, [in, out] EBoundary *peSide, 
+			[in, out] EBoundaryCondition *peCondition, 
+			[in, out] EExpandDirection *peExpandDirection, [in, out] double *pdExpandNumber);
+		// Set clue list along with its flags
+		// eIndex: which list are we setting
+		// pvecClues: list of clues in string format
+		// bAsRegExpr: whether or not the clues are treated as regular expression
+		// bRestrictByBoundary: if any higher priority clue list is defined, then whether or 
+		//						not to restrict search for current clues within the defined boundaries
+		[id(6), helpstring("method SetClueList")] HRESULT SetClueList([in] EClueListIndex eIndex, [in] IVariantVector* pvecClues, 
+					[in] VARIANT_BOOL bCaseSensitive, [in] VARIANT_BOOL bAsRegExpr, [in] VARIANT_BOOL bRestrictByBoundary);
+		[id(7), helpstring("method GetClueList")] HRESULT GetClueList([in] EClueListIndex eIndex, [in, out] IVariantVector** ppvecClues, 
+					[in, out] VARIANT_BOOL *pbCaseSensitive, [in, out] VARIANT_BOOL *pbAsRegExpr, [in, out] VARIANT_BOOL *pbRestrictByBoundary);
+		// removes all clue lists
+		[id(8), helpstring("method ClearAllClueLists")] HRESULT ClearAllClueLists();
+		// determines whether to locate text or an image region
+		[propget, id(9), helpstring("property FindType")] HRESULT FindType([out, retval] EFindType* pVal);
+		[propput, id(9), helpstring("property FindType")] HRESULT FindType([in] EFindType newVal);
+		[propget, id(10), helpstring("property ImageRegionText")] HRESULT ImageRegionText([out, retval] BSTR* pVal);
+		[propput, id(10), helpstring("property ImageRegionText")] HRESULT ImageRegionText([in] BSTR newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: get or set whether to:
+		//          (1) VARIANT_TRUE - locate region on each page that matches clues.
+		//          (2) VARIANT_FALSE - locate region on first page that matches clues.
+		// NOTE:    Only one region per matched page will be located
+		[propget, id(11), helpstring("property MatchMultiplePagesPerDocument")] HRESULT MatchMultiplePagesPerDocument([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property MatchMultiplePagesPerDocument")] HRESULT MatchMultiplePagesPerDocument([in] VARIANT_BOOL newVal);
+	};
+	[
+		object,
+		uuid(8A95DB1B-4987-414B-B275-40F3FAE2C26C),
+		dual,
+		helpstring("IAddressFinder Interface"),
+		pointer_default(unique)
+	]
+	interface IAddressFinder : IDispatch
+	{
+	};
+	[
+		object,
+		uuid(BE33424D-87F8-40CB-A875-97A31FD30879),
+		dual,
+		helpstring("ICreateValue Interface"),
+		pointer_default(unique)
+	]
+	interface ICreateValue : IDispatch
+	{
+		[propget, id(1), helpstring("property ValueString")] HRESULT ValueString([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property ValueString")] HRESULT ValueString([in] BSTR newVal);
+		[propget, id(2), helpstring("property TypeString")] HRESULT TypeString([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property TypeString")] HRESULT TypeString([in] BSTR newVal);
+	};
+	[
+		object,
+		uuid(02E29F4C-3467-4BE6-8204-85B1953194DF),
+		dual,
+		helpstring("IFindFromRSD Interface"),
+		pointer_default(unique)
+	]
+	interface IFindFromRSD : IDispatch
+	{
+		[propget, id(1), helpstring("property AttributeName")] HRESULT AttributeName([out, retval] BSTR *pVal);
+		[propput, id(1), helpstring("property AttributeName")] HRESULT AttributeName([in] BSTR newVal);
+		[propget, id(2), helpstring("property RSDFileName")] HRESULT RSDFileName([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property RSDFileName")] HRESULT RSDFileName([in] BSTR newVal);
+	};
+
+	[
+		object,
+		uuid(04A50183-293D-412B-9C33-540CDB5336DC),
+		dual,
+		nonextensible,
+		helpstring("IImageRegionWithLines Interface"),
+		pointer_default(unique)
+	]
+	interface IImageRegionWithLines : IDispatch
+	{
+		// A pointer to the IImageLineUtility member of ImageRegionWithLines
+		[propget, id(1), helpstring("property LineUtil")] HRESULT LineUtil([out, retval] IUnknown **ppVal);
+		[propput, id(1), helpstring("property LineUtil")] HRESULT LineUtil([in] IUnknown *pNewVal);
+
+		// The page selection mode to determine which pages are processed
+		[propget, id(2), helpstring("property PageSelectionMode")] HRESULT PageSelectionMode([out, retval] EPageSelectionMode *pVal);
+		[propput, id(2), helpstring("property PageSelectionMode")] HRESULT PageSelectionMode([in] EPageSelectionMode newVal);
+
+		// If kFirstPages is selected, specifies to process this many
+		[propget, id(3), helpstring("property NumFirstPages")] HRESULT NumFirstPages([out, retval] long *pVal);
+		[propput, id(3), helpstring("property NumFirstPages")] HRESULT NumFirstPages([in] long newVal);
+
+		// If kLastPages is selected, specifies to process this many
+		[propget, id(4), helpstring("property NumLastPages")] HRESULT NumLastPages([out, retval] long *pVal);
+		[propput, id(4), helpstring("property NumLastPages")] HRESULT NumLastPages([in] long newVal);
+
+		// If kSpecifiedPages is selected, this specifies the pages to process
+		[propget, id(5), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages([out, retval] BSTR *pVal);
+		[propput, id(5), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages([in] BSTR newVal);
+
+		// The text to assign to any resulting attributes
+		[propget, id(6), helpstring("property AttributeText")] HRESULT AttributeText([out, retval] BSTR *pVal);
+		[propput, id(6), helpstring("property AttributeText")] HRESULT AttributeText([in] BSTR newVal);
+
+		// Specifies whether lines that form the image areas will be included in the rule output
+		[propget, id(7), helpstring("property IncludeLines")] HRESULT IncludeLines([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(7), helpstring("property IncludeLines")] HRESULT IncludeLines([in] VARIANT_BOOL newVal);
+
+		// PROMISE: Resets all advanced settings to their default values
+		//[id(8), helpstring("method ResetAdvancedSettings")] HRESULT ResetAdvancedSettings();
+	};
+
+	[
+	object,
+	uuid(9F9C2F3A-3AF9-4000-985D-1BA682D3A01D),
+	dual,
+	nonextensible,
+	helpstring("IBoxFinder Interface"),
+	pointer_default(unique)
+	]
+	interface IBoxFinder : IDispatch
+	{
+		// A vector of clues to use to locate the desired box.  Can be simple strings or regular
+		// expressions depending upon the value of CluesAreRegularExpressions
+		[propget, id(1), helpstring("property Clues")] HRESULT Clues([out, retval] IUnknown **ppVal);
+		[propput, id(1), helpstring("property Clues")] HRESULT Clues([in] IUnknown *pNewVal);
+
+		// If VARIANT_TRUE, Clues are interpreted as regular expressions
+		[propget, id(2), helpstring("property CluesAreRegularExpressions")] HRESULT CluesAreRegularExpressions([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(2), helpstring("property CluesAreRegularExpressions")] HRESULT CluesAreRegularExpressions([in] VARIANT_BOOL newVal);
+
+		// If VARIANT_TRUE, Clues must match the case of any matches to be found
+		[propget, id(3), helpstring("property CluesAreCaseSensitive")] HRESULT CluesAreCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property CluesAreCaseSensitive")] HRESULT CluesAreCaseSensitive([in] VARIANT_BOOL newVal);
+
+		// Specifies the location of the clue relative to the box intended to be found
+		[propget, id(4), helpstring("property ClueLocation")] HRESULT ClueLocation([out, retval] EClueLocation *pVal);
+		[propput, id(4), helpstring("property ClueLocation")] HRESULT ClueLocation([in] EClueLocation newVal);
+
+		// The page selection mode to determine which pages are processed
+		[propget, id(5), helpstring("property PageSelectionMode")] HRESULT PageSelectionMode([out, retval] EPageSelectionMode *pVal);
+		[propput, id(5), helpstring("property PageSelectionMode")] HRESULT PageSelectionMode([in] EPageSelectionMode newVal);
+
+		// If kFirstPages is selected, specifies to process this many
+		[propget, id(6), helpstring("property NumFirstPages")] HRESULT NumFirstPages([out, retval] long *pVal);
+		[propput, id(6), helpstring("property NumFirstPages")] HRESULT NumFirstPages([in] long newVal);
+
+		// If kLastPages is selected, specifies to process this many
+		[propget, id(7), helpstring("property NumLastPages")] HRESULT NumLastPages([out, retval] long *pVal);
+		[propput, id(7), helpstring("property NumLastPages")] HRESULT NumLastPages([in] long newVal);
+
+		// If kSpecifiedPages is selected, this specifies the pages to process
+		[propget, id(8), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages([out, retval] BSTR *pVal);
+		[propput, id(8), helpstring("property SpecifiedPages")] HRESULT SpecifiedPages([in] BSTR newVal);
+
+		// The minimum width of a box to be found. Can be -1 for unspecified.
+		[propget, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([out, retval] long *pVal);
+		[propput, id(9), helpstring("property BoxWidthMin")] HRESULT BoxWidthMin([in] long newVal);
+
+		// The maximum width of a box to be found. Can be -1 for unspecified.
+		[propget, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([out, retval] long *pVal);
+		[propput, id(10), helpstring("property BoxWidthMax")] HRESULT BoxWidthMax([in] long newVal);
+
+		// The minimum height of a box to be found. Can be -1 for unspecified.
+		[propget, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([out, retval] long *pVal);
+		[propput, id(11), helpstring("property BoxHeightMin")] HRESULT BoxHeightMin([in] long newVal);
+
+		// The maximum height of a box to be found. Can be -1 for unspecified.
+		[propget, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([out, retval] long *pVal);
+		[propput, id(12), helpstring("property BoxHeightMax")] HRESULT BoxHeightMax([in] long newVal);
+
+		// Whether to find spatial area or the text in the box
+		[propget, id(13), helpstring("property FindType")] HRESULT FindType([out, retval] EFindType *pVal);
+		[propput, id(13), helpstring("property FindType")] HRESULT FindType([in] EFindType newVal);
+
+		// The text to assign to any resulting attributes
+		[propget, id(14), helpstring("property AttributeText")] HRESULT AttributeText([out, retval] BSTR *pVal);
+		[propput, id(14), helpstring("property AttributeText")] HRESULT AttributeText([in] BSTR newVal);
+
+		// What to do with the clue
+		[propget, id(15), helpstring("property ExcludeClueArea")] HRESULT ExcludeClueArea([out, retval] VARIANT_BOOL *pNewVal);
+		[propput, id(15), helpstring("property ExcludeClueArea")] HRESULT ExcludeClueArea([in] VARIANT_BOOL newVal);
+
+		// What to do with the clue
+		[propget, id(16), helpstring("property IncludeClueText")] HRESULT IncludeClueText([out, retval] VARIANT_BOOL *pNewVal);
+		[propput, id(16), helpstring("property IncludeClueText")] HRESULT IncludeClueText([in] VARIANT_BOOL newVal);
+
+		// Specifies whether lines that form the image areas will be included in the rule output
+		[propget, id(17), helpstring("property IncludeLines")] HRESULT IncludeLines([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(17), helpstring("property IncludeLines")] HRESULT IncludeLines([in] VARIANT_BOOL newVal);
+
+		// Specifies whether to search for only the first qualifying box or all qualifying boxes
+		[propget, id(18), helpstring("property FirstBoxOnly")] HRESULT FirstBoxOnly([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(18), helpstring("property FirstBoxOnly")] HRESULT FirstBoxOnly([in] VARIANT_BOOL newVal);
+	};
+	
+	[
+		object,
+		uuid(90CEED8D-E6D7-4552-8F4A-15682D338D35),
+		dual,
+		nonextensible,
+		helpstring("ILoopFinder Interface"),
+		pointer_default(unique)
+	]
+	interface ILoopFinder : IDispatch{
+		// Specifies an IObjectWithDescription that contains an IAttributeFindingRule to use 
+		//within the loop.
+		[propget, id(1), helpstring("property FindingRule")] 
+			HRESULT FindingRule([out, retval] IObjectWithDescription ** pVal);
+		[propput, id(1), helpstring("property FindingRule")] 
+			HRESULT FindingRule([in] IObjectWithDescription * newVal);
+
+		// Specifies an IObjectWithDescription that contains an IDocumentPreprocessor to run after
+		// the rule has been run within the loop
+		[propget, id(2), helpstring("property Preprocessor")] 
+			HRESULT Preprocessor([out, retval] IObjectWithDescription ** pVal);
+		[propput, id(2), helpstring("property Preprocessor")] 
+			HRESULT Preprocessor([in] IObjectWithDescription * newVal);
+
+		// Specifies an IObjectWithDescription that contains IAFCondition  to use if the LoopType is
+		// kDoLoop or kWhileLoop
+		// NOTE: This property is set to NULL if the LoopType is set to kForLoop
+		[propget, id(3), helpstring("property Condition")] 
+			HRESULT Condition([out, retval] IObjectWithDescription ** pVal);
+		[propput, id(3), helpstring("property Condition")] 
+			HRESULT Condition([in] IObjectWithDescription * newVal);
+
+		// Specifies the Condition state that will continue the loop for kDoLoop or kWhileLoop.
+		[propget, id(4), helpstring("property ConditionValue")] 
+			HRESULT ConditionValue([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property ConditionValue")] 
+			HRESULT ConditionValue([in] VARIANT_BOOL newVal);
+
+		// Flag to indicate if an exception should be logged if the kDoLoop or kWhileLoop executes
+		// for the number of Iterations without meeting the condition.
+		[propget, id(5), helpstring("property LogExceptionForMaxIterations")] 
+			HRESULT LogExceptionForMaxIterations([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(5), helpstring("property LogExceptionForMaxIterations")] 
+			HRESULT LogExceptionForMaxIterations([in] VARIANT_BOOL newVal);
+
+		// Specifies the number of iterations to run a kForLoop or the maximum number of iterations
+		// to run if the LoopType is kDoLoop or kWhileLoop
+		[propget, id(6), helpstring("property Iterations")] 
+			HRESULT Iterations([out, retval] long *pVal);
+		[propput, id(6), helpstring("property Iterations")] 
+			HRESULT Iterations([in] long newVal);
+
+		// Specifies the type of loop.
+		[propget, id(7), helpstring("property LoopType")] 
+			HRESULT LoopType([out, retval] ELoopType *pVal);
+		[propput, id(7), helpstring("property LoopType")] 
+			HRESULT LoopType([in] ELoopType newVal);
+	};
+
+	[
+	object,
+	uuid(B3132BBB-EDD3-4CD1-9D57-9C641FD13589),
+	dual,
+	nonextensible,
+	helpstring("IMicrFinder Interface"),
+	pointer_default(unique)
+	]
+	interface IMicrFinder : IDispatch
+	{
+		// If true will add a sub attribute for the routing number (if found)
+		[propget, id(1), helpstring("property SplitRoutingNumber")]
+			HRESULT SplitRoutingNumber([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(1), helpstring("property SplitRoutingNumber")]
+			HRESULT SplitRoutingNumber([in] VARIANT_BOOL newVal);
+
+		// If true will add a sub attribute for the account number (if found)
+		[propget, id(2), helpstring("property SplitAccountNumber")]
+			HRESULT SplitAccountNumber([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(2), helpstring("property SplitAccountNumber")]
+			HRESULT SplitAccountNumber([in] VARIANT_BOOL newVal);
+
+		// If true will add a sub attribute for the check number (if found)
+		[propget, id(3), helpstring("property SplitCheckNumber")]
+			HRESULT SplitCheckNumber([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(3), helpstring("property SplitCheckNumber")]
+			HRESULT SplitCheckNumber([in] VARIANT_BOOL newVal);
+
+		// If true will add a sub attribute for the amount (if found)
+		[propget, id(4), helpstring("property SplitAmount")]
+			HRESULT SplitAmount([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(4), helpstring("property SplitAmount")]
+			HRESULT SplitAmount([in] VARIANT_BOOL newVal);
+
+		// If true will search for MICR without rotating the image page
+		[propget, id(6), helpstring("property Rotate0")]
+			HRESULT Rotate0([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(6), helpstring("property Rotate0")]
+			HRESULT Rotate0([in] VARIANT_BOOL newVal);
+
+		// If true will search for MICR after rotating the image page 90 degrees
+		[propget, id(7), helpstring("property Rotate90")]
+			HRESULT Rotate90([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(7), helpstring("property Rotate90")]
+			HRESULT Rotate90([in] VARIANT_BOOL newVal);
+
+		// If true will search for MICR after rotating the image page 180 degrees
+		[propget, id(8), helpstring("property Rotate180")]
+			HRESULT Rotate180([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(8), helpstring("property Rotate180")]
+			HRESULT Rotate180([in] VARIANT_BOOL newVal);
+
+		// If true will search for MICR after rotating the image page 270 degrees
+		[propget, id(9), helpstring("property Rotate270")]
+			HRESULT Rotate270([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(9), helpstring("property Rotate270")]
+			HRESULT Rotate270([in] VARIANT_BOOL newVal);
+	};
+
+	[
+	object,
+	uuid(4AE988E0-BA6D-403A-93C5-5F7031D58F6A),
+	dual,
+	nonextensible,
+	helpstring("ICheckFinder Interface"),
+	pointer_default(unique)
+	]
+	interface ICheckFinder : IDispatch
+	{
+	};
+
+	/////////////////
+	// CoClasses
+	/////////////////
+	[
+		uuid(69F2031E-B5C7-4905-A0C8-53FD5B52E369),
+		helpstring("ValueBeforeClue Class")
+	]
+	coclass ValueBeforeClue
+	{
+		[default] interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface IValueBeforeClue;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+	[
+		uuid(EFC88740-39E2-4583-8ED5-C63C4EEF75D3),
+		helpstring("ValueAfterClue Class")
+	]
+	coclass ValueAfterClue
+	{
+		[default] interface IAttributeFindingRule;
+		interface IValueAfterClue;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+	[
+		uuid(BE80B7CF-B930-485F-8857-E5EAE5BC97A9),
+		helpstring("ValueFromList Class")
+	]
+	coclass ValueFromList
+	{
+		[default] interface IAttributeFindingRule;
+		interface IInputValidator;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface IValueFromList;
+		interface ICopyableObject;
+	};
+	[
+		uuid(5B7C7985-3659-4249-BF9D-40A26B50E1AF),
+		helpstring("RegExprRule Class")
+	]
+	coclass RegExprRule
+	{
+		[default] interface IRegExprRule;
+		interface IAttributeFindingRule;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(DB2C885D-8E39-4206-B8CF-205761C795C4),
+		helpstring("ExtractLine Class")
+	]
+	coclass ExtractLine
+	{
+		[default] interface IExtractLine;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(94C3D7BE-0CF4-453C-9AF9-52C6867DF9CF),
+		helpstring("BlockFinder Class")
+	]
+	coclass BlockFinder
+	{
+		[default] interface IBlockFinder;
+		interface IAttributeFindingRule;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(89C69237-B2BC-4878-89EA-91B37BF08DF7),
+		helpstring("LegalDescriptionFinder Class")
+	]
+	coclass LegalDescriptionFinder
+	{
+		[default] interface ILegalDescriptionFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(AC479A87-7A47-4E46-8B16-F78C5ED0520A),
+		helpstring("SPMFinder Class")
+	]
+	coclass SPMFinder
+	{
+		[default] interface ISPMFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(8D774DD6-7026-4FE1-9517-B448FDFB76BF),
+		helpstring("ReturnAddrFinder Class")
+	]
+	coclass ReturnAddrFinder
+	{
+		[default] interface IReturnAddrFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(E3B9A8BF-1FB6-414D-B65D-3EB1058BEAC5),
+		helpstring("LocateImageRegion Class")
+	]
+	coclass LocateImageRegion
+	{
+		[default] interface ILocateImageRegion;
+		interface IAttributeFindingRule;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IDocumentPreprocessor;
+	};
+
+	[
+		uuid(D8D33615-ACA8-4E32-831D-D1C2796BAAF3),
+		helpstring("RegExprRulePP Class")
+	]
+	coclass RegExprRulePP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(AE1A66A5-E8E4-4871-A3C4-EEF2FE3DB342),
+		helpstring("ValueAfterCluePP Class")
+	]
+	coclass ValueAfterCluePP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(D9ADA4DC-D0A8-4143-9E2A-99019D1A806E),
+		helpstring("ValueBeforeCluePP Class")
+	]
+	coclass ValueBeforeCluePP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(F729FDBE-7BE8-448A-99C4-DAD61AE57BA7),
+		helpstring("ValueFromListPP Class")
+	]
+	coclass ValueFromListPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(8A00EEB4-9343-417C-A083-46E9219BDDD1),
+		helpstring("ExtractLinePP Class")
+	]
+	coclass ExtractLinePP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(896591C2-CB56-4CE6-82E2-C5765A9A92EF),
+		helpstring("BlockFinderPP Class")
+	]
+	coclass BlockFinderPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(D88AC499-A259-4F6D-940D-34FD0B404D6E),
+		helpstring("SPMFinderPP Class")
+	]
+	coclass SPMFinderPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(F531E1C2-FB3E-4829-8224-60BD51E38E1C),
+		helpstring("LocateImageRegionPP Class")
+	]
+	coclass LocateImageRegionPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(80918C98-C47C-4B3D-BF28-1D8469189515),
+		helpstring("AddressFinder Class")
+	]
+	coclass AddressFinder
+	{
+		[default] interface IAddressFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(C8435CA1-AE29-419A-922D-240949E756F9),
+		helpstring("ReturnAddrFinderPP Class")
+	]
+	coclass ReturnAddrFinderPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(E5FCEC86-A47A-483E-9A6C-280A84B78041),
+		helpstring("CreateValue Class")
+	]
+	coclass CreateValue
+	{
+		[default] interface ICreateValue;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(3706BD69-EACF-455D-9DBA-2E54907897A2),
+		helpstring("CreateValuePP Class")
+	]
+	coclass CreateValuePP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(49C7D808-6593-47F9-8ED7-D2F59F6D7657),
+		helpstring("FindFromRSD Class")
+	]
+	coclass FindFromRSD
+	{
+		[default] interface IFindFromRSD;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(FE693CC6-5B09-4582-8EDD-59C7E77F749C),
+		helpstring("FindFromRSDPP Class")
+	]
+	coclass FindFromRSDPP
+	{
+		interface IUnknown;
+	};
+	
+	[
+		uuid(2ADCF61C-813B-488E-91A6-0D746B38BEE2),
+		helpstring("ConditionalValueFinder Class")
+	]
+	coclass ConditionalValueFinder
+	{
+		[default] interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+		interface IConditionalRule;
+	};
+	
+	[
+		uuid(9E3925AC-3685-4A6E-A769-995AA4DEE874),
+		helpstring("ImageRegionWithLines Class")
+	]
+	coclass ImageRegionWithLines
+	{
+		[default] interface IImageRegionWithLines;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(E2D32EC9-5412-43C0-83F4-DB7617AD9FB7),
+		helpstring("ImageRegionWithLinesPP Class")
+	]
+	coclass ImageRegionWithLinesPP
+	{
+		[default] interface IUnknown;
+	};
+
+	[
+		uuid(8F181D4E-DF97-4813-8708-17EF2587BD28),
+		helpstring("BoxFinder Class")
+	]
+	coclass BoxFinder
+	{
+		[default] interface IBoxFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(4F485DCB-E548-4C1B-B3D5-D611F318E01C),
+		helpstring("BoxFinderPP Class")
+	]
+	coclass BoxFinderPP
+	{
+		[default] interface IUnknown;
+	};
+
+	[
+		uuid(5B81790B-FA5D-40DD-9BD7-802420B44933),
+		helpstring("LoopFinderPP Class")
+	]
+	coclass LoopFinderPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(857B3D16-FB25-4C83-9661-A2FFD5F2383B),
+		helpstring("LoopFinder Class")
+	]
+	coclass LoopFinder
+	{
+		[default] interface ILoopFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(895D780B-8C6F-46FD-A034-6C2BCF622B39),
+		helpstring("MicrFinder Class")
+	]
+	coclass MicrFinder
+	{
+		[default] interface IMicrFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(A34E445F-9560-4A78-9B1D-146E18BC2EED),
+		helpstring("MicrFinderPP Class")
+	]
+	coclass MicrFinderPP
+	{
+		[default] interface IUnknown;
+	};
+	[
+		uuid(E4EC6E42-1CEA-4925-A97E-C049A889ED0D),
+		helpstring("CheckFinder Class")
+	]
+	coclass CheckFinder
+	{
+		[default] interface ICheckFinder;
+		interface IAttributeFindingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+};

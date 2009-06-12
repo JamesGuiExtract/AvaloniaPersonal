@@ -1,0 +1,41 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000016600.002.tif.uss
+SA_ORIGGRANTOR_01=debtor^?OriginalGrantor^250~in consideration
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000252900.004.tif.uss
+SA_ORIGGRANTOR_03=whereas^?OriginalGrantor^250~owner|borrower
+
+// 0003.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000093100.004.tif.uss
+SA_ORIGGRANTOR_02=this^30~agreement^30~made^50~[by]|between^?OriginalGrantor^250~owner
+
+// 0004.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000519600.004.tif.uss
+SA_ORIGGRANTOR_07=this^30~agreement^100~[by]|between^?OriginalGrantor^250~owner
+
+// 0005.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000231500.003.tif.uss
+SA_ORIGGRANTOR_04=executed by^?OriginalGrantor^250~and which is recorded
+
+// 0006.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049003043300.010.tif.uss
+SA_ORIGGRANTOR_05=among the trustor^?OriginalGrantor^250~borrower
+
+// 0007.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049001141600.006.tif.uss
+SA_ORIGGRANTOR_06=lease^5~[by]^?OriginalGrantor^250~lessor|landlord
+
+// 0008.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049000750500.010.tif.uss
+SA_ORIGGRANTOR_08=by and among^?OriginalGrantor^250~owner
+
+// 0009.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\subordination agreement\20049002908000.005.tif.uss
+SA_ORIGGRANTOR_09=Borrowers^?OriginalGrantor^250~Property Address
+
+[PATTERNS_END]
+
+

@@ -1,0 +1,257 @@
+// AFPreProcessors.idl : IDL source for AFPreProcessors.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (AFPreProcessors.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(6E739155-A988-45D0-8FF9-D2718B7B4126),
+	version(1.0),
+	helpstring("UCLID AFPreProcessors 1.0 Type Library")
+]
+library UCLID_AFPREPROCESSORSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\AFCore\Code\AFCore.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef 
+	[
+		uuid(874D2D9F-5E26-459a-A231-7AFA69EE103F), 
+		helpstring("UCLID Page Selection Types")
+	]
+    enum
+	{
+		kSelectAll = 0,
+        kSelectSpecified = 1,
+        kSelectWithRegExp = 2
+    } EPageSelectionType;
+	typedef 
+	[
+		uuid(327926C7-4D32-406f-9CE8-61A8B9197E1D), 
+		helpstring("UCLID Regular Expression Page Selection Types")
+	]
+    enum
+	{
+		kSelectAllPagesWithRegExp = 0,
+		kSelectLeadingPagesWithRegExp = 1,
+		kSelectTrailingPagesWithRegExp = 2
+    } ERegExpPageSelectionType;
+	typedef
+	[
+		uuid(04578668-E976-4900-9A70-CC3D9CA27B6E), 
+		helpstring("Loop Type")
+	]
+	enum ELoopType
+	{
+		kDoLoop,
+		kWhileLoop,
+		kForLoop
+		
+	} ELoopType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(D961D2BA-CD86-4DF1-A027-0F234AD60A40),
+		dual,
+		helpstring("ISelectPageRegion Interface"),
+		pointer_default(unique)
+	]
+	interface ISelectPageRegion : IDispatch
+	{
+		[propget, id(1), helpstring("property IncludeRegionDefined")] HRESULT IncludeRegionDefined([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(1), helpstring("property IncludeRegionDefined")] HRESULT IncludeRegionDefined([in] VARIANT_BOOL newVal);
+		// if bSpecificPages == true, strSpecificPages shall not be empty
+		// if bSpecificPages == false, strSpecificPages must be empty, and it means all pages will be selected
+		[id(2), helpstring("method SelectPages")] HRESULT SelectPages([in] VARIANT_BOOL bSpecificPages, [in] BSTR strSpecificPages);
+		// return the page selections
+		[id(3), helpstring("method GetPageSelections")] HRESULT GetPageSelections([in, out] VARIANT_BOOL *pbSpecificPages, [in, out] BSTR *pstrSpecificPages);
+		// nStartPercentage and nEndPercentage must be 0 ~ 100
+		[id(4), helpstring("method SetHorizontalRestriction")] HRESULT SetHorizontalRestriction([in] long nStartPercentage, [in] long nEndPercentage);
+		[id(5), helpstring("method GetHorizontalRestriction")] HRESULT GetHorizontalRestriction([in, out] long* pnStartPercentage, [in, out] long* pnEndPercentage);
+		[id(6), helpstring("method SetVerticalRestriction")] HRESULT SetVerticalRestriction([in] long nStartPercentage, [in] long nEndPercentage);
+		[id(7), helpstring("method GetVerticalRestriction")] HRESULT GetVerticalRestriction([in, out] long* pnStartPercentage, [in, out] long* pnEndPercentage);
+
+		[propget, id(8), helpstring("property PageSelectionType")] HRESULT PageSelectionType([out, retval] EPageSelectionType *pVal);
+		[propput, id(8), helpstring("property PageSelectionType")] HRESULT PageSelectionType([in] EPageSelectionType newVal);
+
+		[propget, id(9), helpstring("property Pattern")] HRESULT Pattern([out, retval] BSTR *pVal);
+		[propput, id(9), helpstring("property Pattern")] HRESULT Pattern([in] BSTR newVal);
+
+		[propget, id(10), helpstring("property IsRegExp")] HRESULT IsRegExp([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property IsRegExp")] HRESULT IsRegExp([in] VARIANT_BOOL newVal);
+
+		[propget, id(11), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property IsCaseSensitive")] HRESULT IsCaseSensitive([in] VARIANT_BOOL newVal);
+
+		[propget, id(12), helpstring("property RegExpPageSelectionType")] HRESULT RegExpPageSelectionType([out, retval] ERegExpPageSelectionType *pVal);
+		[propput, id(12), helpstring("property RegExpPageSelectionType")] HRESULT RegExpPageSelectionType([in] ERegExpPageSelectionType newVal);
+
+		[propget, id(13), helpstring("property OCRSelectedRegion")] HRESULT OCRSelectedRegion([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(13), helpstring("property OCRSelectedRegion")] HRESULT OCRSelectedRegion([in] VARIANT_BOOL newVal);
+
+		[propget, id(14), helpstring("property SelectedRegionRotation")] HRESULT SelectedRegionRotation([out, retval] long* pVal);
+		[propput, id(14), helpstring("property SelectedRegionRotation")] HRESULT SelectedRegionRotation([in] long newVal);
+	};
+
+	[
+		object,
+		uuid(73F2BD46-9ECA-4136-AAD3-F5950E8217ED),
+		dual,
+		nonextensible,
+		helpstring("ILoopPreprocessor Interface"),
+		pointer_default(unique)
+	]
+	interface ILoopPreprocessor : IDispatch{
+		// Specifies an IObjectWithDescription that contains an IDocumentPreprocessor to run after
+		// the rule has been run within the loop
+		[propget, id(1), helpstring("property Preprocessor")] 
+			HRESULT Preprocessor([out, retval] IObjectWithDescription ** pVal);
+		[propput, id(1), helpstring("property Preprocessor")] 
+			HRESULT Preprocessor([in] IObjectWithDescription * newVal);
+
+		// Specifies an IObjectWithDescription that contains IAFCondition  to use if the LoopType is
+		// kDoLoop or kWhileLoop
+		// NOTE: This property is set to NULL if the LoopType is set to kForLoop
+		[propget, id(2), helpstring("property Condition")] 
+			HRESULT Condition([out, retval] IObjectWithDescription ** pVal);
+		[propput, id(2), helpstring("property Condition")] 
+			HRESULT Condition([in] IObjectWithDescription * newVal);
+
+		// Specifies the Condition state that will continue the loop for kDoLoop or kWhileLoop.
+		[propget, id(3), helpstring("property ConditionValue")] 
+			HRESULT ConditionValue([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(3), helpstring("property ConditionValue")] 
+			HRESULT ConditionValue([in] VARIANT_BOOL newVal);
+
+		// Flag to indicate if an exception should be logged if the kDoLoop or kWhileLoop executes
+		// for the number of Iterations without meeting the condition.
+		[propget, id(4), helpstring("property LogExceptionForMaxIterations")] 
+			HRESULT LogExceptionForMaxIterations([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(4), helpstring("property LogExceptionForMaxIterations")] 
+			HRESULT LogExceptionForMaxIterations([in] VARIANT_BOOL newVal);
+
+		// Specifies the number of iterations to run a kForLoop or the maximum number of iterations
+		// to run if the LoopType is kDoLoop or kWhileLoop
+		[propget, id(5), helpstring("property Iterations")] 
+			HRESULT Iterations([out, retval] long *pVal);
+		[propput, id(5), helpstring("property Iterations")] 
+			HRESULT Iterations([in] long newVal);
+
+		// Specifies the type of loop.
+		[propget, id(6), helpstring("property LoopType")] 
+			HRESULT LoopType([out, retval] ELoopType *pVal);
+		[propput, id(6), helpstring("property LoopType")] 
+			HRESULT LoopType([in] ELoopType newVal);
+	};
+
+	[
+		object,
+		uuid(DB144650-6168-4BD8-BEC0-95A1FA25D750),
+		dual,
+		helpstring("IRemoveSpatialInfo Interface"),
+		pointer_default(unique)
+	]
+	interface IRemoveSpatialInfo : IDispatch
+	{
+	};
+
+	// Coclasses
+	[
+		uuid(B4311777-3118-4E5C-B041-1A75C70E8B95),
+		helpstring("SelectPageRegion Class")
+	]
+	coclass SelectPageRegion
+	{
+		[default] interface ISelectPageRegion;
+		interface IDocumentPreprocessor;
+		interface ICategorizedComponent;
+		interface IMustBeConfiguredObject;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(C1ECC9BB-1C69-4D96-AD5A-F0CC2D3DEAD6),
+		helpstring("SelectPageRegionPP Class")
+	]
+	coclass SelectPageRegionPP
+	{
+		interface IUnknown;
+	};
+	[
+		uuid(3A17A77B-7F74-4A75-9191-C54A0251C967),
+		helpstring("DocPreprocessorSequence Class")
+	]
+	coclass DocPreprocessorSequence
+	{
+		[default] interface IDocumentPreprocessor;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IMultipleObjectHolder;
+	};
+	[
+		uuid(B8C69AE6-2999-4F37-9F1E-6C029DECB587),
+		helpstring("RemoveSpatialInfo Class")
+	]
+	coclass RemoveSpatialInfo
+	{
+		[default] interface IRemoveSpatialInfo;
+		interface IDocumentPreprocessor;
+		interface IOutputHandler;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(48C52A48-02C5-4C98-9AE2-459861484958),
+		helpstring("ConditionalPreprocessor Class")
+	]
+	coclass ConditionalPreprocessor
+	{
+		[default] interface IConditionalRule;
+		interface IDocumentPreprocessor;
+		interface IOutputHandler;
+		interface IAttributeModifyingRule;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+	};
+
+	[
+		uuid(6A78A99A-E085-4ead-92D8-E6469FDCFB02),
+		helpstring("LoopPreprocessorPP Class")
+	]
+	coclass LoopPreprocessorPP
+	{
+		interface IUnknown;
+	};
+	
+	[
+		uuid(E5F3CDEC-A737-41db-9696-523559762A17),
+		helpstring("LoopPreprocessor Class")
+	]
+	coclass LoopPreprocessor
+	{
+		[default] interface ILoopPreprocessor;
+		interface IDocumentPreprocessor;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICopyableObject;
+	};
+};

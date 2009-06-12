@@ -1,0 +1,303 @@
+// UCLIDFeatureMgmt.idl : IDL source for UCLIDFeatureMgmt.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDFeatureMgmt.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(691AD683-B1D9-42E1-99B8-3398A794CDB1),
+	version(1.0),
+	helpstring("UCLID FeatureMgmt 1.0 Type Library")
+]
+library UCLID_FEATUREMGMTLib
+{
+	//----------------------------------------------------------------------------------------------
+	//-I M P O R T S -------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\UCLIDCurveParameter\Code\UCLIDCurveParameter.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+	importlib("..\..\UCLIDMeasurements\Code\UCLIDMeasurements.tlb");
+
+	//----------------------------------------------------------------------------------------------
+	//-E N U M S -----------------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	typedef
+	[
+		uuid(9BAD54C0-7C50-462f-B375-0AC511FCC328), 
+		helpstring("UCLID Segment Types")
+	]
+	enum ESegmentType
+	{
+		// zero is not a valid value for ESegmentType
+		kInvalidSegmentType = 0,
+
+		// actual segment types
+		kLine = 1,
+		kArc = 2
+	} ESegmentType;
+
+	typedef
+	[
+		uuid(684D97F5-A6D4-442a-B0CF-0439EBE8C315), 
+		helpstring("UCLID Feature Types")
+	]
+	enum EFeatureType
+	{
+		// zero is not a valid value for EFeatureType
+		kInvalidFeatureType = 0,
+
+		// actual feature types
+		kPolyline = 1,
+		kPolygon = 2
+	} EFeatureType;
+
+	//----------------------------------------------------------------------------------------------
+	//-I N T E R F A C E S -------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		object,
+		uuid(20E51164-11E3-4577-AF3A-519B3B95F89B),
+		dual,
+		helpstring("IESSegment Interface"),
+		pointer_default(unique)
+	]
+	interface IESSegment : IDispatch
+	{
+		[id(1), helpstring("method getSegmentType")] HRESULT getSegmentType([out, retval] ESegmentType *pSegmentType);
+		// parameters as pairs of IParameterTypeValuePair
+		[id(2), helpstring("method getParameters")] HRESULT getParameters([out, retval] IIUnknownVector** ppvecTypeValuePairs);
+		[id(3), helpstring("method setParameters")] HRESULT setParameters([in] IIUnknownVector* pvecTypeValuePairs);
+		// whether or not this segment needs tangent-in direction to calculate 
+		// all of its parameters. For instance, a line formed by deflection/internal 
+		// angle, a curve formed by tangent-in and other parameters, etc.
+		[id(4), helpstring("method requireTangentInDirection")] HRESULT requireTangentInDirection([out, retval] VARIANT_BOOL* pRequire);
+		// Returns tangent-out direction of this segment
+		[id(5), helpstring("method getTangentOutDirection")] HRESULT getTangentOutDirection([out, retval] BSTR* pstrTangentOut);
+		// Sets tangent-in direction of this segment. This parameter will be set
+		// only if this segment requires tangent-in direction
+		[id(6), helpstring("method setTangentInDirection")] HRESULT setTangentInDirection([in] BSTR strTangentInDirection);
+		// get the segment length string. If the segment is an arc, it will be the arc length
+		// Note: the distance is always stored in feet
+		[id(7), helpstring("method getSegmentLengthString")] HRESULT getSegmentLengthString([out, retval] BSTR* pstrLength);
+	};
+
+	[
+		object,
+		uuid(37EDD4ED-C304-4EA0-BE42-AB70F2BC6550),
+		dual,
+		helpstring("IEnumSegment Interface"),
+		pointer_default(unique)
+	]
+	interface IEnumSegment : IDispatch
+	{
+		[id(1), helpstring("method reset")] HRESULT reset();
+		[id(2), helpstring("method next")] HRESULT next([out, retval] IESSegment **pSegment);
+	};
+	[
+		object,
+		uuid(A3455C29-9BAB-4965-BA58-147E8673E184),
+		dual,
+		helpstring("IEnumSegmentModifier Interface"),
+		pointer_default(unique)
+	]
+	interface IEnumSegmentModifier : IDispatch
+	{
+		[id(1), helpstring("method addSegment")] HRESULT addSegment([in] IESSegment *pSegment);
+	};
+	[
+		object,
+		uuid(6C9E597B-D3C1-402C-80FF-F80CBA994B71),
+		dual,
+		helpstring("IPart Interface"),
+		pointer_default(unique)
+	]
+	interface IPart : IDispatch
+	{
+		[id(1), helpstring("method getSegments")] HRESULT getSegments([out, retval] IEnumSegment **pEnumSegment);
+		[id(2), helpstring("method getNumSegments")] HRESULT getNumSegments([out, retval] long *pulNumSegments);
+		[id(3), helpstring("method addSegment")] HRESULT addSegment([in] IESSegment *pSegment);
+		[id(4), helpstring("method setStartingPoint")] HRESULT setStartingPoint([in] ICartographicPoint *pStartingPoint);
+		[id(5), helpstring("method getStartingPoint")] HRESULT getStartingPoint([out, retval] ICartographicPoint **pStartingPoint);
+		[id(6), helpstring("method valueIsEqualTo")] HRESULT valueIsEqualTo([in] IPart *pPart, [out, retval] VARIANT_BOOL *pbValue);
+		[id(7), helpstring("method getEndingPoint")] HRESULT getEndingPoint([out, retval] ICartographicPoint **pEndingPoint);
+	};
+	[
+		object,
+		uuid(E69731DE-0120-43FF-BD40-B002F8409374),
+		dual,
+		helpstring("IEnumPart Interface"),
+		pointer_default(unique)
+	]
+	interface IEnumPart : IDispatch
+	{
+		[id(1), helpstring("method reset")] HRESULT reset();
+		[id(2), helpstring("method next")] HRESULT next([out, retval] IPart **pPart);
+	};
+	[
+		object,
+		uuid(53650EFA-A1C3-4EAE-8AE0-6AD639FDFAFF),
+		dual,
+		helpstring("IEnumPartModifier Interface"),
+		pointer_default(unique)
+	]
+	interface IEnumPartModifier : IDispatch
+	{
+		[id(1), helpstring("method addPart")] HRESULT addPart([in] IPart *pPart);
+	};
+	[
+		object,
+		uuid(BBDEFC8D-CFC5-468E-B737-B7BA1465AC9B),
+		dual,
+		helpstring("IUCLDFeature Interface"),
+		pointer_default(unique)
+	]
+	interface IUCLDFeature : IDispatch
+	{
+		[id(1), helpstring("method getParts")] HRESULT getParts([out, retval] IEnumPart **pEnumPart);
+		[id(2), helpstring("method getNumParts")] HRESULT getNumParts([out, retval] long *pulNumParts);
+		[id(3), helpstring("method addPart")] HRESULT addPart([in] IPart *pPart);
+		[id(4), helpstring("method getFeatureType")] HRESULT getFeatureType([out, retval] EFeatureType *pFeatureType);
+		[id(5), helpstring("method setFeatureType")] HRESULT setFeatureType([in] EFeatureType eFeatureType);
+		[id(6), helpstring("method valueIsEqualTo")] HRESULT valueIsEqualTo([in] IUCLDFeature *pFeature, [out, retval] VARIANT_BOOL *pbValue);
+	};
+	[
+		object,
+		uuid(E234FB3C-8ED4-4A22-A0D2-099706318BEF),
+		dual,
+		helpstring("IFeatureAttributeDataInterpreter Interface"),
+		pointer_default(unique)
+	]
+	interface IFeatureAttributeDataInterpreter : IDispatch
+	{
+		[id(1), helpstring("method getFeatureFromAttributeData")] HRESULT getFeatureFromAttributeData([in] BSTR strData, [out, retval] IUCLDFeature **pFeature);
+		[id(2), helpstring("method getAttributeDataFromFeature")] HRESULT getAttributeDataFromFeature([in] IUCLDFeature *pFeature, [out, retval] BSTR *pstrData);
+	};
+	[
+		object,
+		uuid(76B059D1-1635-4FF6-8168-0BACC1481B0D),
+		dual,
+		helpstring("ILineSegment Interface"),
+		pointer_default(unique)
+	]
+	interface ILineSegment : IDispatch
+	{
+		[id(1), helpstring("method setParamsFromCoords")] HRESULT setParamsFromCoords([in] ICartographicPoint *pStart, [in] ICartographicPoint *pEnd);
+		[id(2), helpstring("method getCoordsFromParams")] HRESULT getCoordsFromParams([in] ICartographicPoint *pStart, [out] ICartographicPoint **pEnd);
+		[id(3), helpstring("method valueIsEqualTo")] HRESULT valueIsEqualTo([in] ILineSegment *pSegment, [out, retval] VARIANT_BOOL *pbValue);
+	};
+	[
+		object,
+		uuid(948B9B43-B286-46E5-8652-C308EAD90AB3),
+		dual,
+		helpstring("IArcSegment Interface"),
+		pointer_default(unique)
+	]
+	interface IArcSegment : IDispatch
+	{
+		[id(1), helpstring("method setDefaultParamsFromCoords")] HRESULT setDefaultParamsFromCoords([in] ICartographicPoint *pStart, [in] ICartographicPoint *pMid, [in] ICartographicPoint *pEnd);
+		[id(2), helpstring("method getCoordsFromParams")] HRESULT getCoordsFromParams([in] ICartographicPoint *pStart, [out] ICartographicPoint **pMid, [out] ICartographicPoint **pEnd);
+		[id(3), helpstring("method valueIsEqualTo")] HRESULT valueIsEqualTo([in] IArcSegment *pArc, [out, retval] VARIANT_BOOL *pbValue);
+	};
+	[
+		object,
+		uuid(79C01B5E-B93C-47AC-8FC0-5598D4DA21E3),
+		dual,
+		helpstring("IParameterTypeValuePair Interface"),
+		pointer_default(unique)
+	]
+	interface IParameterTypeValuePair : IDispatch
+	{
+		[propget, id(1), helpstring("property eParamType")] HRESULT eParamType([out, retval] enum ECurveParameterType *pVal);
+		[propput, id(1), helpstring("property eParamType")] HRESULT eParamType([in] enum ECurveParameterType newVal);
+		[propget, id(2), helpstring("property strValue")] HRESULT strValue([out, retval] BSTR *pVal);
+		[propput, id(2), helpstring("property strValue")] HRESULT strValue([in] BSTR newVal);
+		[id(3), helpstring("method valueIsEqualTo")] HRESULT valueIsEqualTo([in] IParameterTypeValuePair *pParamValueTypePair, [out, retval] VARIANT_BOOL *pbValue);
+	};
+
+	//----------------------------------------------------------------------------------------------
+	//-C O C L A S S E S ---------------------------------------------------------------------------
+	//----------------------------------------------------------------------------------------------
+	[
+		uuid(18775112-1D9A-4715-9519-F03E0F6636C1),
+		helpstring("EnumSegment Class")
+	]
+	coclass EnumSegment
+	{
+		[default] interface IEnumSegment;
+		interface IEnumSegmentModifier;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(317DED3A-2C76-402D-88EF-1550293A07F5),
+		helpstring("Part Class")
+	]
+	coclass Part
+	{
+		[default] interface IPart;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(6C0626CC-43FB-4DF0-A41D-5AF962BDE9CC),
+		helpstring("EnumPart Class")
+	]
+	coclass EnumPart
+	{
+		[default] interface IEnumPart;
+		interface IEnumPartModifier;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(4509A6A0-AE81-4B56-8983-301B6BE84A87),
+		helpstring("Feature Class")
+	]
+	coclass Feature
+	{
+		[default] interface IUCLDFeature;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(9E9EE551-B637-4783-9329-022315F427F8),
+		helpstring("CommaDelimitedFeatureAttributeDataInterpreter Class")
+	]
+	coclass CommaDelimitedFeatureAttributeDataInterpreter
+	{
+		[default] interface IFeatureAttributeDataInterpreter;
+		interface ICategorizedComponent;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(D4CD878A-1B5E-4589-A629-FA2865BC9688),
+		helpstring("LineSegment Class")
+	]
+	coclass LineSegment
+	{
+		[default] interface ILineSegment;
+		interface IESSegment;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(57A19981-9CF0-4E05-A710-954FCD86E06D),
+		helpstring("ArcSegment Class")
+	]
+	coclass ArcSegment
+	{
+		[default] interface IArcSegment;
+		interface IESSegment;
+		interface ILicensedComponent;
+	};
+	[
+		uuid(CE733926-BF3D-45E6-B89E-B05B8A70283B),
+		helpstring("ParameterTypeValuePair Class")
+	]
+	coclass ParameterTypeValuePair
+	{
+		[default] interface IParameterTypeValuePair;
+		interface ILicensedComponent;
+	};
+};

@@ -1,0 +1,9 @@
+; TestEncryptFileMgr.def : Declares the module parameters.
+
+LIBRARY      "TestEncryptFileMgr.DLL"
+
+EXPORTS
+	DllCanUnloadNow     PRIVATE
+	DllGetClassObject   PRIVATE
+	DllRegisterServer   PRIVATE
+	DllUnregisterServer	PRIVATE

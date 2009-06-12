@@ -1,0 +1,241 @@
+<HTML>
+
+<HEAD>
+<TITLE>Installation and Licensing Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> ID Shield Office<br>Installation and Licensing Testing Checklist<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<UL>
+	<LI><b>Installation</b>
+	<ul>
+		<!-- SCR# 18 -->
+		<b>[IDSO #18]</b> Confirm that "IDShieldOffice" should be replaced with "ID Shield Office" 
+		in all InstallShield Wizard Screens
+		<li>Unprivileged user installation
+		<ul>
+			<li>Login as an unprivileged user.
+			<li>Insert installation CD into CD-ROM.
+			<li>Confirm that <b>ID Shield Office</b> splash screen appears.
+			<li>Confirm that <b>ID Shield Office - InstallShield Wizard</b> messagebox that prompts 
+			installation needs administrator privileges appears.
+			<li>Click <b>OK</b> in the messagebox.
+			<li>Confirm that <b>InstallShield Wizard Complete</b> dialog appears.
+			<li>Click <b>Finish</b>.
+			<li>Confirm that <b>ID Shield Office</b> is not installed.
+		</ul>			
+		<p>
+
+		<li>Initial Installation
+		<ul>
+			<li>Prepare a clean machine <b>without ID Shield Office</b> installed before.
+			<li>Login in as privileged user.
+			<li>Insert installation CD into CD-ROM.
+			<li>Confirm that <b>ID Shield Office</b> splash screen appears.
+			<li>Confirm that <b>Welcome to the InstallShield Wizard for ID Shield Office</b> 
+			dialog appears and click <b>Next</b>.
+			<li>Select <b>I accept the terms of the license agreement</b> radio button on 
+			<b>License Agreement</b> dialog and click next.
+			<li>Confirm that the <b>Select Options</b> dialog appears and click next with its 
+			default options.
+			<li>Confirm that the <b>Setup Status</b> dialog appears.
+			<!-- SCR# 301 -->
+			<li>Confirm that a dialog asking the user <b>Would you like to set ID Shield as default printer for current user? This will make this software easier to use.</b> does not appear.
+			<li>Confirm that a status bar appears for installation of the <b>Virtual printer</b>.
+			<li>Confirm that <b>InstallShield Wizard</b> dialogs appears and click finish.		
+			<!-- SCR# 281 -->
+			<li>Confirm that a <b>Yes/No messagebox</b> appears to request a license file.
+			<li>Click <b>Yes</b> 
+			<!-- SCR# 307 -->
+			<li>Confirm that <b>ID Shield Office</b> install wizard is ended gracefully.
+			<li>Confirm that the UserLicense.exe and the corresponding help pages are provided to help the user go through the licensing process. 
+			<li>Confirm that following rule files are installed in the <b>C:\Program Files\Extract Systems\IDShieldOffice\Rules\DataTypes</b> folder:
+			<ul>
+				<li>Account numbers - Credit and debit card numbers\Clues.dat.ese
+				<li>Account numbers - Credit and debit card numbers\Data.dat.ese
+				<li>Account numbers - Other account numbers\Clues.dat.ese
+				<li>Account numbers - Other account numbers\Data.dat.ese
+				<li>Account numbers - Savings, checking, and bank account numbers\Clues.dat.ese
+				<li>Account numbers - Savings, checking, and bank account numbers\Data.dat.ese
+				<li>Driver's license numbers\Clues.dat.ese
+				<li>Driver's license numbers\Data.dat.ese
+				<li>E-mail addresses\Clues.dat.ese
+				<li>E-mail addresses\Data.dat.ese
+				<li>Federal tax identification numbers\Clues.dat.ese
+				<li>Federal tax identification numbers\Data.dat.ese
+				<li>Social security numbers\Clues.dat.ese
+				<li>Social security numbers\Data.dat.ese
+			</ul>
+<p>
+			<!-- SCR# 156 -->
+			<li>Confirm that <b>shortcuts</b> on desktop and launch bar are provided
+			<!-- SCR# 17,78 -->
+			<li>Confirm <b>following items</b> are included in <b>Extract Systems</b> group in the Start menu:
+			<ul>
+				<li>ID Shield Office
+				<li>ID Shield Office Help
+				<li>User License
+				<li>View Exception Log
+			</ul>
+<p>
+			<!-- SCR# 265 -->
+			<li>Confirm that CD drive icon is the <b>ID Shield Office</b> icon
+			<li>Open CD drive and confirm that the <b>following files</b> are available:
+			<ul>
+				<li>An installation help file: <b>IDShieldOffice_install.chm</b>
+				<li>autorun.inf
+				<li>IDShield.ico
+				<li>readme.txt
+				<li>Setup.exe
+			</ul>
+<p>				
+			<!-- SCR# 131 -->
+			<li>Generate a license file and copy it to <b>C:\Program Files\Extract 
+			Systems\CommonComponents</b>
+			<li>Launch IDSO and confirm that <b>Toolbars are not stacked in 4 rows</b>.
+			<!-- SCR# 302 -->
+			<li>Confirm that <b>Create angular redaction</b> and <b>Create rectangular redaction</b> 
+			toolbar buttons are separated.
+			<!-- SCR# 251 -->
+			<li>Launch <b>View Exception Log</b> and confirm that either 
+			<ul>
+				<li>An <b>Error 2, file not found</b> message is presented if the exception log 
+				is not available, OR
+				<li><b>UCLIDException.uex</b> is opened by default.
+			</ul>
+		</ul>
+		<p>
+		
+		<li>Installation - repair
+		<ul>
+			<li>Confirm that <b>ID Shield Office</b> has been installed.
+			<li>Delete the <b>ID Shield Office</b> executable file.
+			<li>Confirm that <b>ID Shield Office</b> does not start.
+			<li>Insert <b>ID Shield Office</b> installation CD into CD-ROM.
+			<li>Confirm that <b>Welcome</b> dialog appears.
+			<li>Select <b>Repair</b> radio button and then click <b>Next</b>.
+			<li>Confirm that the <b>Setup Status</b> dialog appears.
+			<li>Confirm that the <b>InstallShield Wizard Complete</b> dialog appears and click <b>Finish</b>.
+			<li>Confirm that <b>ID Shield Office</b> starts.
+		</ul>
+		<p>
+
+		<li>Downgrade Installation
+		<ul>
+			<li>Confirm that <b>ID Shield Office</b> has been installed.
+			<li>Insert an installation CD for <b>an earlier version of ID Shield Office</b>.  
+			Alternatively, <b>Setup.exe</b> for an earlier version can be run from the network.
+			<li>Confirm that <b>Another version of 'ID Shield Office' is already installed on this 
+			machine. The setup can not continue.</b> error dialog appears.
+			<li>Click <b>OK</b> in the dialog.
+		</ul>
+		<p>
+
+		<li>Upgrade Installation
+		<ul>
+			<li>Confirm that <b>ID Shield Office</b> has been installed.
+			<li>Insert an installation CD for <b>a newer version of ID Shield Office</b>.  
+			Alternatively, b>Setup.exe</b> for a newer version can be run from the network.
+			<li>Confirm that <b>Another version of this product is already installed. To configure or 
+			remove the existing version of this product, use Add/Remove programs on the control 
+			panel.</b> dialog appears and then close <b>OK</b>.
+			<li>Confirm that <b>Installation</b> terminates.
+			<li>Confirm that the <b>Current version</b> is not removed.
+		</ul>
+		<p>
+
+		<li>Uninstallation
+		<ul>
+			<li>Control Panel Uninstallation
+			<ul>
+				<li>Open Control Panel and click <b>Add or Remove Programs</b>.
+				<li>Select <b>ID Shield Office</b> and click Remove.
+				<li>Confirm that the screen is not frozen during uninstallation.
+				<li>Confirm that <b>Extract Systems</b> folder in the Start menu is removed.
+				<li>Confirm that <b>ID Shield Office</b> in the installation folder is removed.
+				<li>Confirm that the <b>ID Shield</b> Printer is removed.
+			</ul>
+			<p>
+
+			<li>Setup Program Uninstallation
+			<ul>				
+				<li>Click the <b>ID Shield Office</b> setup.exe file in the CD drive.
+				<li>Select <b>Remove</b> radio button in the <b>Welcome</b> dialog and click next.
+				<li>Confirm that <b>Do you want completely remove the selected application and all of its features?</b> dialog appears and click <b>No</b>.
+				<li>Confirm that the <b>Welcome</b> dialog reappears and click <b>Cancel</b>.
+				<li>Confirm that the <b>Exit Setup</b> dialog appears and click <b>Yes</b>.
+				<li>Confirm that <b>InstallShield Wizard Complete</b> dialog appears and click <b>Finish</b>.
+				<li>Confirm that <b>ID Shield Office</b> is not removed.
+				<li>Confirm that the <b>ID Shield</b> Printer is not removed.
+				<p>
+				<li>Insert <b>ID Shield Office</b> installation CD into CD-ROM.
+				<li>Select <b>Remove</b> radio button in the <b>Welcome</b> dialog and click next.
+				<li>Confirm that <b>Do you want completely remove the selected application and all of its features?</b> dialog appears and click <b>Yes</b>.
+				<li>Confirm that the screen is not frozen during uninstallation.
+				<li>Confirm that <b>Uninstall Complete</b> dialog appears and click <b>Finish</b>.
+				<li>Confirm that <b>Extract Systems</b> folder in the Start menu is removed.
+				<li>Confirm that <b>ID Shield Office</b> in the installation folder is removed.
+				<li>Confirm that the <b>ID Shield</b> Printer is removed.
+			</ul>
+		</ul>
+	</ul>
+	<p>
+
+<LI><b>Licensing</b>
+	<ul>
+		<li>No License
+		<ul>
+			<li>Remove or rename <b>any existing license file</b> to a different extension in 
+			the CommonComponents folder.
+			<li>Start <b>ID Shield Office</b> from start menu.
+			<li>Confirm that <b>a Message box</b> appears to request a license file.
+			<li>Click <b>OK</b>
+			<li>Confirm that <b>UserLicense.exe</b> is launched.
+			<li>Confirm that the corresponding Help file page is displayed.
+			<li>Confirm that <b>ID Shield Office</b> is not launched.
+		</ul>
+		<p>
+
+		<li>Evaluation License
+		<ul>
+			<li>Copy an <b>evaluation license</b> file into the CommonComponents folder.
+			<li>Start <b>ID Shield Office</b> from Start menu.
+			<li>Confirm that <b>ID Shield Office</b> starts.
+			<li>Click <b>Help - About ID Shield Office...</b>.
+			<li>Confirm that the <b>About ID Shield Office</b> dialog appears.
+			<li>Confirm that a <b>license expiration date</b> is provided in the license 
+			information region.	
+		</ul>
+		<p>
+
+		<li>Full License
+		<ul>
+			<li>Copy a <b>full license</b> file into the CommonComponents folder.
+			<li>Start <b>ID Shield Office</b> from Start menu.
+			<li>Confirm that <b>ID Shield Office</b> starts.
+			<li>Click <b>Help - About ID Shield Office...</b>.
+			<li>Confirm that the <b>About ID Shield Office</b> dialog appears.
+			<li>Confirm that <b>Permanently licensed</b> is provided in the license 
+			information region.	
+		</ul>
+		<p>
+
+		<li>Evaluation/Full License
+		<ul>
+			<li>Copy <b>both</b> license files into the CommonComponents folder.
+			<li>Start <b>ID Shield Office</b> from Start menu.
+			<li>Confirm that the <b>ID Shield Office</b> starts.
+			<li>Click <b>Help - About ID Shield Office...</b>.
+			<li>Confirm that the <b>About ID Shield Office</b> dialog appears.
+			<li>Confirm that the <b>Permanently licensed</b> is provided in the license 
+			information region.	
+		</ul>
+	</ul>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,14 @@
+<SETTING>;QueryForVerification=MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData
+
+//<SETTING>;CreateTestOutputVOAFiles=1
+//<SETTING>;OutputAttributeNamesFileLists=1 
+
+//All
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set006\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsAll\$FileOf(<SourceDocName>).voa
+
+//Sensitive Boxes
+//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set006\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsSensitiveBoxes\$FileOf(<SourceDocName>).voa
+
+//All Boxes
+//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set006\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactionsAllBoxes\$FileOf(<SourceDocName>).voa

@@ -1,0 +1,26 @@
+\btenants\b%
+(Original\s)?Grantor\s{0,3}(\(?Borrower\)?)?%
+\(?Borrow.{1,2}?er\)?%
+\bBorrow\w*\b%
+\bBorro.{1,3}er.?\b%
+Denver%
+C.lorad.%
+Colo.{1,3}do%
+county\sof%
+county%
+city\sof%
+of\sthe\sCity\b%
+city%
+State\sof%
+State%
+\bin\sseveralty\b%
+\btenants?%
+whose\slegal\saddress\sis\b%
+\bIN\b%
+\bparty\w*of\w*the\w*\b%
+\bDate\b%
+(\(|\[)\bB.{1,4}er(\)|\])%
+\bGrant.r\b%
+\bGra.{0,3}tor\b%
+\r\n(\r\n)?% ,
+\/% ,

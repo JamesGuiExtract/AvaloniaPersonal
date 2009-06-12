@@ -1,0 +1,205 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: More than Two Persons
+// Purpose: Check Division, Proper SubAttributes
+
+<TESTCASE>|Three Plain Names|John Smith, Mary Smith, Peter Smith
+Names|John Smith, Mary Smith, Peter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Three Names with Semicolons|John Smith; Mary Smith; Peter Smith
+Names|John Smith; Mary Smith; Peter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Three Names with Slashes|John Smith / Mary Smith / Peter Smith
+Names|John Smith / Mary Smith / Peter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Three Names with Mixed Delimiters1|John Smith; Mary Q. Smith and Peter Smith
+Names|John Smith; Mary Q. Smith and Peter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Q. Smith
+..First|Mary
+..Last|Smith
+..Middle|Q.
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Three Names with Mixed Delimiters2|John Smith & Mary Q. Smith and Peter Smith, Jr.
+Names|John Smith & Mary Q. Smith and Peter Smith, Jr.
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Q. Smith
+..First|Mary
+..Last|Smith
+..Middle|Q.
+.Person|Peter Smith, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Four Names with Mixed Delimiters1|John Smith & Mary Q. Smith and Peter Smith, Jr. & Mrs. Jane Smith
+Names|John Smith & Mary Q. Smith and Peter Smith, Jr. & Mrs. Jane Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Q. Smith
+..First|Mary
+..Last|Smith
+..Middle|Q.
+.Person|Peter Smith, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Smith
+.Person|Mrs. Jane Smith
+..Title|Mrs.
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Four Names with Mixed Delimiters2|John Smith, Mary Q. Smith and Peter Smith, Jr., Mrs. Jane Smith
+Names|John Smith, Mary Q. Smith and Peter Smith, Jr., Mrs. Jane Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Q. Smith
+..First|Mary
+..Last|Smith
+..Middle|Q.
+.Person|Peter Smith, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Smith
+.Person|Mrs. Jane Smith
+..Title|Mrs.
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Four Names with Mixed Delimiters3|John Smith & Mary Q. Smith / Peter Smith, Jr. / Mrs. Jane Smith
+Names|John Smith & Mary Q. Smith / Peter Smith, Jr. / Mrs. Jane Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Q. Smith
+..First|Mary
+..Last|Smith
+..Middle|Q.
+.Person|Peter Smith, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Smith
+.Person|Mrs. Jane Smith
+..Title|Mrs.
+..First|Jane
+..Last|Smith
+
+<TESTCASE>|Three Names w/o Commas|John Smith Mary Smith Peter Smith
+Names|John Smith Mary Smith Peter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+<TESTCASE>|Three Names w/ Initials w/o Commas|John H. Smith Mary W Smith Peter H. Smith
+Names|John H. Smith Mary W Smith Peter H. Smith
+.Person|John H. Smith
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Mary W Smith
+..First|Mary
+..Last|Smith
+..Middle|W
+.Person|Peter H. Smith
+..First|Peter
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Three Long Names With &|Mr. John H. Smith & Ms. Mary W Smith & Peter H. Smith, Jr.
+Names|Mr. John H. Smith & Ms. Mary W Smith & Peter H. Smith, Jr.
+.Person|Mr. John H. Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+..Middle|H.
+.Person|Ms. Mary W Smith
+..Title|Ms.
+..First|Mary
+..Last|Smith
+..Middle|W
+.Person|Peter H. Smith, Jr.
+..Suffix|Jr.
+..First|Peter
+..Last|Smith
+..Middle|H.
+
+<TESTCASE>|Three Names on Three Lines1|John Smith\r\nMary Smith\r\nPeter Smith
+Names|John Smith\r\nMary Smith\r\nPeter Smith
+.Person|John Smith
+..First|John
+..Last|Smith
+.Person|Mary Smith
+..First|Mary
+..Last|Smith
+.Person|Peter Smith
+..First|Peter
+..Last|Smith
+
+// P16 #2960
+//<TESTCASE>|Three Names on Three Lines2|JEANENE MARGARET RUMSEY\r\nDAN H. RUMSEY\r\nMINUTEMAN PRESS OF SANTA CLARA
+//Names|JEANENE MARGARET RUMSEY\r\nDAN H. RUMSEY\r\nMINUTEMAN PRESS OF SANTA CLARA
+//.Person|JEANENE MARGARET RUMSEY
+//..First|JEANENE
+//..Last|RUMSEY
+//..Middle|MARGARET
+//.Person|DAN H. RUMSEY
+//..First|DAN
+//..Last|RUMSEY
+//..Middle|H.
+//.Company|MINUTEMAN PRESS OF SANTA CLARA

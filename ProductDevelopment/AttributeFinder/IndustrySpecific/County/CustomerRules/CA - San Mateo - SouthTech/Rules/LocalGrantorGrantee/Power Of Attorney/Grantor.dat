@@ -1,0 +1,41 @@
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+[VARS_END]
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000295400.006
+LocalPoaGrantor01=[1,|I,^?Grantor^80~hereinafter^80~principal^6~appoint
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000450200.004.uss
+LocalPoaGrantor01=known^5~that^?Grantor^80~hereinafter^8~principal
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079005553500.005.uss
+LocalPoaGrantor02=REVOKE^12~POWER^7~ATTORNEY^48~WISH^9~[DO^3~SO]^?Grantee^80~[of]^100~principal
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000780900.003
+LocalPoaGrantor05=KNOWN^16~that]^?Grantor^120~[hereby appoints|[appoint
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079006175100.004.uss
+LocalPoaGrantor03=LIMITED^3~POWER^7~ATTORNEY\r\n^?Grantor^140~hereby^20~constitutes|appoints
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079000139200.002.uss
+LocalPoaGrantor04a=PRESENTS|PRESENT^5~that^?Grantor^80~[member of]^?SecondGrantor^80~[has]|[have]^40~constituted|appointed
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079001564800.003.uss
+LocalPoaGrantor04=PRESENTS|PRESENT^5~that^?Grantor^80~[has]|[have]^40~constituted|appointed
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079009586200.001.uss
+LocalPoaGrantor04=PRESENTS|PRESENT^5~that^?Grantor^360~constitute|appoint
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079001074400.012.uss
+LocalPoaGrantor05=power^7~attorney^50~given^3~[by me]|by^?Grantor^80~presently^3~of
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079002256400.004
+LocalPoaGrantor06=[I]|[l],^?Grantor^60~[of]^48~appoint
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079006250900.005
+LocalPoaGrantor07=[be^6~known^3~that]^?Grantor^80~[and]^?SecondGrantor^80~whose^3~address^120~[has]^16~appointed
+//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\POWER OF ATTORNEY\20079007581300.003.uss
+LocalPoaGrantor08=\r\nPower of Attorney\r\n|\r\nLimited Power of Attorney\r\n^?Grantor^160~[constitute^9~[appoint
+[PATTERNS_END]

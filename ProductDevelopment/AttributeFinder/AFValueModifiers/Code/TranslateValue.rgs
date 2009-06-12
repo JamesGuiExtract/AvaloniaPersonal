@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFValueModifiers.TranslateValue.1 = s 'TranslateValue Class'
+	{
+		CLSID = s '{EBF2801C-7387-4F74-AE48-99D9925696B4}'
+	}
+	UCLIDAFValueModifiers.TranslateValue = s 'TranslateValue Class'
+	{
+		CLSID = s '{EBF2801C-7387-4F74-AE48-99D9925696B4}'
+		CurVer = s 'UCLIDAFValueModifiers.TranslateValue.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {EBF2801C-7387-4F74-AE48-99D9925696B4} = s 'TranslateValue Class'
+		{
+			ProgID = s 'UCLIDAFValueModifiers.TranslateValue.1'
+			VersionIndependentProgID = s 'UCLIDAFValueModifiers.TranslateValue'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{C5230183-3ACC-4C4F-8D91-745FFB3C018E}'
+		}
+	}
+}

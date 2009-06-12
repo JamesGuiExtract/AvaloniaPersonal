@@ -1,0 +1,52 @@
+// UCLIDMeasurements.idl : IDL source for UCLIDMeasurements.dll
+//
+
+// This file will be processed by the MIDL tool to
+// produce the type library (UCLIDMeasurements.tlb) and marshalling code.
+
+import "oaidl.idl";
+import "ocidl.idl";
+
+[
+	uuid(FAD6DEA1-C5A8-11D6-8301-0050DAD4FF55),
+	version(1.0),
+	helpstring("UCLID Measurements 1.0 Type Library")
+]
+library UCLID_MEASUREMENTSLib
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+	importlib("..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
+	importlib("..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb");
+	importlib("..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
+
+	// Interfaces
+	[
+		object,
+		uuid(FAD6DEAE-C5A8-11D6-8301-0050DAD4FF55),
+		dual,
+		helpstring("ICartographicPoint Interface"),
+		pointer_default(unique)
+	]
+	interface ICartographicPoint : IDispatch
+	{
+		[id(1), helpstring("method InitPointInString")] HRESULT InitPointInString([in] BSTR strInput);
+		[id(2), helpstring("method InitPointInXY")] HRESULT InitPointInXY([in] double dX, [in] double dY);
+		[id(3), helpstring("method GetPointInXY")] HRESULT GetPointInXY([in, out] double *pdX, [in, out] double *pdY);
+		[id(4), helpstring("method IsEqual")] HRESULT IsEqual([in] ICartographicPoint *pPointToCompare, [out, retval] VARIANT_BOOL *pbVal);
+		[id(5), helpstring("method IsValid")] HRESULT IsValid([out, retval] VARIANT_BOOL *pbValid);
+	};
+
+
+	// Coclasses
+	[
+		uuid(FAD6DEAF-C5A8-11D6-8301-0050DAD4FF55),
+		helpstring("CartographicPoint Class")
+	]
+	coclass CartographicPoint
+	{
+		[default] interface ICartographicPoint;
+		interface ILicensedComponent;
+		interface ITestableComponent;
+	};
+};

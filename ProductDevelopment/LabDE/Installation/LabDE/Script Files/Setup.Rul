@@ -1,0 +1,76 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:    Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                          
+//                                                                            
+//  Comments:     This minimal project is intended for advanced users. 
+//                To create a robust project with step-by-step 
+//				  instructions, use the Project Wizard. 
+//                                                                                                               
+/////////////////////////////////////////////////////////////////////////////
+
+// Include header files /////////////////////////////////////////////////////
+#include "ifx.h"
+
+#include "..\..\..\..\Common\InstallScripts\Common.rul"
+
+#include "..\..\..\..\Common\InstallScripts\OnFirstUIBefore.rul"
+
+#include "..\..\..\..\Common\InstallScripts\OnMaintUIBefore.rul"
+
+#include "..\..\..\..\Common\InstallScripts\OnMaintUIAfter.rul"
+                                 
+                                 
+#define PATH_TO_REGASM WINDIR ^ "Microsoft.NET\\Framework\\v2.0.50727\\RegAsm.exe"                                 
+
+prototype RegisterDataEntryApp();
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnFirstUIAfter
+//
+//  EVENT:      FirstUIAfter event is sent after file transfer, when installation 
+//              is run for the first time on given machine. In this event handler 
+//              installation usually displays UI that will inform end user that
+//              installation has been completed successfully.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szRegAllCmdLine, szCmd;
+    BOOL bOpt1, bOpt2;    
+begin
+   	// Rename the uex file
+   	RenameUEXFile();
+                                                                                                                              
+    // Register Dlls
+	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
+	szCmd = "cmd";
+	LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+    RegisterDataEntryApp();   
+    
+    Disable(STATUSEX);
+
+	if ( gbInstalled ) then
+		szMsg1 = SdLoadString(IFX_SDFINISH_MSG1);   
+	    SdFinishReboot(szTitle, szMsg1, SYS_BOOTMACHINE, szMsg2, 0);
+	else
+		szMsg1 = "Installation was unable to complete, because does not have administrative privileges.";
+		SdFinish(szTitle, szMsg1, "Click Finish to exit.", "", "", bOpt1, bOpt2);
+	endif;
+end; 
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: RegisterDataEntryApp
+//
+//  Purpose: To call Regasm for the dataEntryApplication
+///////////////////////////////////////////////////////////////////////////////
+function RegisterDataEntryApp()
+	STRING strPathForDataEntryApplication;
+begin
+	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "DataEntryApplication.exe" + "\"";
+	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;

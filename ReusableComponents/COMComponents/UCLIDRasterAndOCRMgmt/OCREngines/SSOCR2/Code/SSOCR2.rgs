@@ -1,0 +1,11 @@
+HKCR
+{
+	NoRemove AppID
+	{
+		{752139E2-5977-4AD2-9E26-BE3B9235524C} = s 'SSOCR2'
+		'SSOCR2.EXE'
+		{
+			val AppID = s {752139E2-5977-4AD2-9E26-BE3B9235524C}
+		}
+	}
+}

@@ -1,0 +1,6 @@
+<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues|Notice of Federal Tax Lien|Notice of State Tax Lien|Certificate of Death
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+<SETTING>;OutputAttributeNamesFileLists=1
+ 
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set020\RandomSubset\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

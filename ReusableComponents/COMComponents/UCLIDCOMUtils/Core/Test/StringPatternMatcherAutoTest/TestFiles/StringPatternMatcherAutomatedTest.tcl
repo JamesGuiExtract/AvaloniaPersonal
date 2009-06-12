@@ -1,0 +1,1 @@
+StringPatternMatcherAutoTest.SPMAutomatedTester.1;;.

@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDAFOutputHandlers.OutputHandlerSequence.1 = s 'OutputHandlerSequence Class'
+	{
+		CLSID = s '{99292FCC-8475-4680-9B43-41B56F40CE75}'
+	}
+	UCLIDAFOutputHandlers.OutputHandlerSequence = s 'OutputHandlerSequence Class'
+	{
+		CLSID = s '{99292FCC-8475-4680-9B43-41B56F40CE75}'
+		CurVer = s 'UCLIDAFOutputHandlers.OutputHandlerSequence.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {99292FCC-8475-4680-9B43-41B56F40CE75} = s 'OutputHandlerSequence Class'
+		{
+			ProgID = s 'UCLIDAFOutputHandlers.OutputHandlerSequence.1'
+			VersionIndependentProgID = s 'UCLIDAFOutputHandlers.OutputHandlerSequence'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

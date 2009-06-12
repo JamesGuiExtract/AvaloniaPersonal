@@ -1,0 +1,14 @@
+//DEED OF TRUST
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//RECONVEYANCE
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\RECONVEYANCE;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//SUBSTITUTION OF TRUSTEE
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\SUBSTITUTION OF TRUSTEE;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//DEED
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\DEED;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//ABSTRACT OF JUDGMENT
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\Images\ABSTRACT OF JUDGMENT;;K:\Common\Engineering\Sample Files\DFM\CA - Santa Cruz\Set001\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav

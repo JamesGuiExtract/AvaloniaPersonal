@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDArcGISUtils.ArcGISDisplayAdapter.1 = s 'ArcGISDisplayAdapter Class'
+	{
+		CLSID = s '{33624806-C0A2-412F-9FEE-9F1BA347E2E9}'
+	}
+	UCLIDArcGISUtils.ArcGISDisplayAdapter = s 'ArcGISDisplayAdapter Class'
+	{
+		CLSID = s '{33624806-C0A2-412F-9FEE-9F1BA347E2E9}'
+		CurVer = s 'UCLIDArcGISUtils.ArcGISDisplayAdapter.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {33624806-C0A2-412F-9FEE-9F1BA347E2E9} = s 'ArcGISDisplayAdapter Class'
+		{
+			ProgID = s 'UCLIDArcGISUtils.ArcGISDisplayAdapter.1'
+			VersionIndependentProgID = s 'UCLIDArcGISUtils.ArcGISDisplayAdapter'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{EC0C8698-B764-429F-8CFF-EB0A540603C6}'
+		}
+	}
+}

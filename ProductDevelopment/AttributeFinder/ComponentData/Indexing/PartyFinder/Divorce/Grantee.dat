@@ -1,0 +1,76 @@
+////////////////////////////////////////////////////////////////////////////////////
+//
+// Syntax:
+// 
+// #import "xxx.dat"
+//
+// [VARS_BEGIN]
+// VAR_NAME=variable definition
+// .......
+// [VARS_END]
+//
+// [PATTERNS_BEGIN]
+// PAT_ID_1=pattern text
+// PAT_ID_2=pattern text
+// .......
+// [PATTERNS_END]
+//
+// Note:
+// 1)  Use #import statement to include a file. The syntex is similar to C++ syntex, where
+//     a file name must be enclosed in a pair of quotes. The file name must either be fully
+//     specified, or without specifying the full path. In the latter case, the file name could
+//     be a relative path (e.g. #import "..\..\Abc.dat") or without any path (e.g. #import "Abc.dat").
+// 2)  All variables must be declared inside VARS block, which has a start tag [VARS_BEGIN]
+//     and an end tag [VARS_END]. 
+// 3)  Each variable name must be followed by an equal sign, and then immediately followed 
+//     by the actual variable definition. No white space is allowed on left side of the 
+//     equal sign. If one or more white space is presented on the right side of the equal 
+//     sign, it will be considered as a part of the variable definition.
+// 4)  Variable name can use any characters except equal sign (=) or any white space chars.
+//     It is recommended using alpha-characters in naming each variable.
+// 5)  All patterns must be declared inside PATTERNS block, which starts with [PATTERNS_BEGIN]
+//     and ends with [PATTERNS_END]
+// 6)  Each pattern declaration must have a unique pattern ID, followed by an equal sign, 
+//     followed by pattern text. No white space is allowed on the left side of the equal 
+//     sign. Any white presented to the right of the equal sign will be considered as a 
+//     part of the pattern text.
+// 7)  Pattern ID can be composed of any characters except equal sign (=) or any white space 
+//     characters. There's no limit on number of characters to form a pattern ID as long as 
+//     it's unique in the "reading scope". It is recommended to have a certain prefix for 
+//     each document type. For instance, Assignment of Mortgage patterns can use "AM_" as 
+//     each pattern ID's prefix.
+// 8)  Patterns are read from top to bottom. Pattern ID will not affect this reading sequence.
+// 9)  Use escape squences for special characters, ex. \r\n, \t, etc.
+// 10) If duplicate entries are defined for variables or patterns, whichever comes last will 
+//     be the one loaded into the rule definition set in the application.
+//
+/////////////////////////////////////////////////////////////////////////////////////
+
+// *******
+// Imports
+// *******
+#import "..\\Common\\CommonDef.dat"
+
+// *********
+// Variables
+// *********
+[VARS_BEGIN]
+
+
+[VARS_END]
+
+
+
+// ********
+// Patterns
+// ********
+[PATTERNS_BEGIN]
+// 0001.tif;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set002\Images\Multi-Page\DIMFAM\2005272339.tif.uss
+DIV_GRANTEE_01=Petitioner^80~and^?Grantee^80~Respondent
+
+// 0002.tif;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set002\Images\Multi-Page\DIMFAM\2005272335.tif.uss
+DIV_GRANTEE_02=Marriage^3~filed^3~by^3~the^3~wife|husband^?Grantee^80~and^3~on^3~the^3~Counter-Petition^3~for^3~Dissolution^3~of^3~Marriage^3~filed^3~by^3~the^3~Husband|Wife
+
+DIV_GRANTEE_04=\r\n\r\n^?Grantee^80~respondent
+[PATTERNS_END]
+

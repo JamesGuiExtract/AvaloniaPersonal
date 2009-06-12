@@ -1,0 +1,48 @@
+// *******
+// Imports
+// *******
+// #import "..\\Common\\CommonDef.dat"
+
+[VARS_BEGIN]
+
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005257953.tif.uss
+ALL_MTG_AMT_01=[payment|principal sum^5~[of]^?MtgAmt^250~with interest|dated|which indebtedness|this debt|evi enced by|evidenced by
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005257960.tif.uss
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257538.tif.uss
+ALL_MTG_AMT_02=in the|up to^50~amount of^?MtgAmt^150~recorded|whereas|or so much thereof|as evidenced|due and payable|payment of
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set003\Images\MultiPage\2005257960.tif.uss
+ALL_MTG_AMT_03=amount payable^150~[is]^?MtgAmt^250~consisting of
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257379.tif.uss
+ALL_MTG_AMT_04=principal indebtedness^250~shall not exceed^?MtgAmt^150~plus interest
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257412.tif.uss
+ALL_MTG_AMT_05=Borrower owes Lender^250~Dollars^20~$|S^?MtgAmt^150~plus interest|evidenced by
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005258308.tif.uss
+ALL_MTG_AMT_06=of the^50~sum of^150~$^?MtgAmt^250~the receipt of which
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257597.tif.uss
+ALL_MTG_AMT_07=MAXIMUM OBLIGATION^250~shall not exceed^?MtgAmt^150~This limitation
+
+// <NRS>;K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257642.tif.uss
+ALL_MTG_AMT_08=shall not|at no time^5~exceed^?MtgAmt^150~plus interest|This limitation
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257511.tif.uss
+ALL_MTG_AMT_09=given to secure the original principal amount of^?MtgAmt^125~a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z
+
+// K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005258095.tif.uss
+ALL_MTG_AMT_10=X WHEREAS, Borrower is indebted to Lender in the principal sum of^?MtgAmt^60~a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z
+
+ALL_MTG_AMT_11=The Note states that Borrower owes Lender^?MtgAmt^150~plus interest
+
+
+[PATTERNS_END]
+

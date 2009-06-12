@@ -1,0 +1,84 @@
+[PATTERNS_BEGIN]
+
+// *******
+
+SOT_RECON_GRANTEE_00=original^3~trustor:|trustor is:|trustor is^?ReconveyanceGrantee^250~Original Trustee
+// 0001.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000001700.001.tif.uss
+SOT_RECON_GRANTEE_01=WHEREAS^?ReconveyanceGrantee^150~was the Original Trustor
+
+// 0002.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\substitution of trustee\20049000009800.002.tif.uss
+SOT_RECON_GRANTEE_02=Original Trustor^4~:^?ReconveyanceGrantee^150~Original Beneficiary
+
+// 0003.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0063499.tif.uss
+SOT_RECON_GRANTEE_03=executed by^?ReconveyanceGrantee^250~Trustor
+
+// 0004.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060275.tif.uss
+SOT_RECON_GRANTEE_04=Deed of Trust dated^20~[by]^?ReconveyanceGrantee^250~as Trustor
+
+// 0005.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060468.tif.uss
+SOT_RECON_GRANTEE_05=Deed of Trust dated^?ReconveyanceGrantee^250~as Trustor
+
+// 0006.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0064526.tif.uss
+SOT_RECON_GRANTEE_06=executed on^15~[by]^?ReconveyanceGrantee^250~as Trustor
+
+//K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Reconveyance\200406300003240.tif
+SOT_RECON_GRANTEE_07A=as trustee^?ReconveyanceGrantee^250~as Trustor
+
+// 0007.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062020.tif.uss
+//rule caused problem
+//SOT_RECON_GRANTEE_07=WHEREAS^?ReconveyanceGrantee^250~as Trustor
+
+// 0008.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062679.tif.uss
+SOT_RECON_GRANTEE_08=Original Trustor^2~:^?ReconveyanceGrantee^250~Original Beneficiary:
+
+SOT_RECON_GRANTEE_09=Original Trustor:^?ReconveyanceGrantee^250~Original Trustee:|Recorded In
+
+// 0009.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062689.tif.uss
+SOT_RECON_GRANTEE_10=executed on^15~[by]^?ReconveyanceGrantee^250~Trustors^5~[to]
+
+// 
+SOT_RECON_GRANTEE_11=executed among^?ReconveyanceGrantee^250~recorded on
+
+// 0010.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060410.tif.uss
+SOT_RECON_GRANTEE_12=Trustor(s):^?ReconveyanceGrantee^250~Original Trustee:
+
+// 0015.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020413900.tif.uss
+SOT_RECON_GRANTEE_12A=\r\nTrustor:|\r\nTrustors:^?ReconveyanceGrantee<^250~\r\nTrustee|\r\nBeneficiary
+SOT_RECON_GRANTEE_12B=Trustor:|Trustors:^?ReconveyanceGrantee<^80~Trustee:|Beneficiary:|Recorded:
+//SOT_RECON_GRANTEE_12A=Trustor:^?ReconveyanceGrantee^250~Beneficiary
+
+//
+SOT_RECON_GRANTEE_13=executed by^?ReconveyanceGrantee^250~in the amount of
+
+// 0011.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060413.tif.uss
+SOT_RECON_GRANTEE_14=made by^?ReconveyanceGrantee^250~Trustor^5~[to]
+SOT_RECON_GRANTEE_14A=made by^?ReconveyanceGrantee^160~Trustor^5~[to]|and recorded
+
+//
+SOT_RECON_GRANTEE_15=WHEREAS^?ReconveyanceGrantee^250~original Trustor
+
+// 0012.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0060294.tif.uss
+SOT_RECON_GRANTEE_16=WHEREAS^?ReconveyanceGrantee^250~Trustor^250~Trustee
+
+// 0013.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0061694.tif.uss
+SOT_RECON_GRANTEE_17=Original Borrower:^?ReconveyanceGrantee^250~Original Trustee:
+
+// 
+SOT_RECON_GRANTEE_18=GRANTOR:^?ReconveyanceGrantee^250~ORIGINAL TRUSTEE:
+
+// 0014.tif;k:\common\engineering\sample files\dfm\ca - santa cruz\set001\images\substitution of trustee\2005-0062431.tif.uss
+SOT_RECON_GRANTEE_19=\r\nBorrower:^?ReconveyanceGrantee^250~\r\n\r\n
+
+// 0016.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set001\images\substitution of trustee\20059020089900.tif.uss
+SOT_RECON_GRANTEE_20=executed by^?ReconveyanceGrantee^250~[to]^250~as Trustee
+
+// 0017.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000176.tif.uss
+SOT_RECON_GRANTEE_21=made by^?ReconveyanceGrantee^160~as the original^5~Grantor(s)|Grantor^5~[to]
+// 0018.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-042028.tif.uss
+SOT_RECON_GRANTEE_22=present Trustee^36~and^?ReconveyanceGrantee^160~[is the]^5~trustor/grantor|trustor|grantor
+
+// 0019.tif;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-040981.tif.uss 
+SOT_RECON_GRANTEE_23=\r\nOriginal^3~Borrower(s):|Borrower^?ReconeyanceGrantee^160~\r\nOriginal Trustee|\r\n
+[PATTERNS_END]
+
+

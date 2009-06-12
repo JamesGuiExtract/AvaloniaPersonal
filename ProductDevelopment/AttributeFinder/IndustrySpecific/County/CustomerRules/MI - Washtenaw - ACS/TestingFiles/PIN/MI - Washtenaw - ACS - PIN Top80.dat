@@ -1,0 +1,14 @@
+//Assignment of Mortgage
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\ASSIGNMENT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Lien - Misc
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Mortgage - Deed of Trust
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Quit Claim Deed
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav
+
+//Satisfaction of Mortgage
+<TESTFOLDER>;TestPIN.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\RELEASE;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pin.voa;K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\EAV\PIN\$FileNoExtOf(<SourceDocName>).eav

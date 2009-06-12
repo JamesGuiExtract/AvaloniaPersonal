@@ -1,0 +1,57 @@
+#import "CommonDT.dcc"
+
+// **********
+// Zero Block
+// **********
+[ZERO_BEGIN]
+
+[ZERO_END]
+
+// **********
+// Sure Block
+// **********
+[SURE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SOT_SURE_01,false
+		// SUBSTITUTION OF TRUSTEE
+		// 0001.tif;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Substitution of Trustee\20049000001700.001.tif.uss
+		01=^(?:REMOVAL\s*AND\s*)?SUBSTITUTION\s*OF\s*TRUSTEE\s*(?:\r?$)
+		02=^APPOINTMENT\s*OF\s*SUBSTITUTE\s*TRUSTEE\s*(?:\r?$)
+		03=^SUBSTITUTION\s*OF\s*TRUSTEE\W*(?:AND\W*)?(?:\s*DEED\s*OF)?(?:\s*FULL)?\s*RECONVEYANCE\b
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-026492.tif.uss 
+		04=^Appointment\s*of\s*Successor\s*Trustee(?:\s*and\s*Deed\s*of\s*Full\s*Reconveyance)?(?:\r?$)
+	OR_END
+SCOPE_END
+
+[SURE_END]
+
+// **************
+// Probable Block
+// **************
+[PROBABLE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SOT_PROBABLE_01,false
+		01=^.{0,20}SUBSTITUTION\s*OF\s*TRUSTEE.{0,20}(?:\r?$)
+	OR_END
+SCOPE_END
+
+[PROBABLE_END]
+
+
+// ***********
+// Maybe Block
+// ***********
+[MAYBE_BEGIN]
+
+SCOPE_BEGIN,0,1,1,2
+	OR_BEGIN,SOT_MAYBE_01,false
+		// 0002.tif;k:\common\engineering\sample files\atpac\ca - contracosta\set002\images\substitution of trustee\20059021062700.tif.uss
+		01=\s*hereby\s*substitutes[\S\s]{0,150}as\s*Trustee\s*
+		// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\APPOINT SUCC TRUSTEE, SUBST, DESIGNATION, APPOINT TR-TRUST DEED\2005-000661.tif.uss
+		02=The\s*undersigned\s*hereby\s*appoints[\s\S]{7,160}as\s*successor\s*trustee\s*of\s*said\s*deed\s*of\s*trust
+	OR_END
+SCOPE_END
+
+[MAYBE_END]

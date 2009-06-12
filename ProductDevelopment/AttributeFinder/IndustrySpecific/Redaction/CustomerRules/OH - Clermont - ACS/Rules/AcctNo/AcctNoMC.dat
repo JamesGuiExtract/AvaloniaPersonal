@@ -1,0 +1,2 @@
+#import AcctNoClue.dat.etf
+\D{0,8}\d\S+

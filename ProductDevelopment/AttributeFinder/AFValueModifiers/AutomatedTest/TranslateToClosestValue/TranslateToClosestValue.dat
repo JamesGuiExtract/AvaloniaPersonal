@@ -1,0 +1,26 @@
+// This is a barebone testcase with a single entry and no checkbox checked. 
+<TESTCASE>;Test1.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test1.eav
+
+// "String comparison is case Sensitive" is checked.
+<TESTCASE>;Test2.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test2.eav
+
+// Another barebone testcase with a single entry and no checkbox checked.
+<TESTCASE>;Test3.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test3.eav
+
+// "Force selection of best match" is checked.
+<TESTCASE>;Test4.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test4.eav
+
+// This testcase has multiple entries and with "Force selection of best match" checked.
+<TESTCASE>;Test5.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test5.eav
+
+// This testcase has multiple entries and with both "String comarison is Case Sensitive"
+//and "Force selection of best match" checked.
+<TESTCASE>;Test6.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test6.eav
+
+// Multiple entries with "Force selection of best match" checked. The entries are exactly
+//the same as in test6, but because "String comparison is Case Sensitive" is not selected,
+//it will generate a different result. 
+<TESTCASE>;Test7.rsd;..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss;;Test7.eav
+
+// Preferring larger closer matches to substrings [FlexIDSCore #3537]
+<TESTCASE>;Test8.rsd;Test8.txt;;Test8.eav

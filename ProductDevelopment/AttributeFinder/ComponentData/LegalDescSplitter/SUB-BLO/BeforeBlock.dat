@@ -1,0 +1,13 @@
+// used to determine if the subdivision is before the block 
+// if the regular expression is found before a block when trying to 
+// find the subdivision the block part and after will be removed instead of before
+
+
+// DT:0012  WAUKESHA-7-17-L-MB4-00000409.TIF.uss ADDED PARK
+
+// DT:0077
+// added MEADOWS
+
+// DT:0076
+// added AIRE
+(ESTATE|VALLEY|ADDITION|HILLS|SUBDIVISION|RIDGE|HEIGHTS|TERRACE|VILLAGE|VIEW|COURT|PARK|MEADOWS|AIRE|RESERVE)

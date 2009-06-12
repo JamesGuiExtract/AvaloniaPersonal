@@ -1,0 +1,504 @@
+/////////////////////////////////////////////////////////////////////////////
+//                                                                            
+//  File Name:    Setup.rul                                                   
+//                                                                            
+//  Description:  InstallShield script                                          
+//                                                                            
+//  Comments:     This minimal project is intended for advanced users. 
+//                To create a robust project with step-by-step 
+//				  instructions, use the Project Wizard. 
+//                                                                                                               
+/////////////////////////////////////////////////////////////////////////////
+
+// Include header files /////////////////////////////////////////////////////
+#include "ifx.h"
+
+////////////////////// string defines ////////////////////////////
+    #define UCLID_DIR "\\UCLID Software\\CommonComponents"
+    #define EXTRACT_DIR INSTALLDIR ^ "\\CommonComponents" 
+    #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
+    #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
+    #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
+    #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
+    #define IDSHIELD_PRODUCT_CODE "{158160CD-7B55-462F-8477-7E18B2937D40}"
+    #define EXTRACT_LM_PRODUCT_CODE "{EB8DE231-8B66-4DE6-A56D-39452D8CF35F}"
+    #define EXTRACT_IDSHIELD_OFFICE_CODE "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}"
+	#define LOG_FILE_PATH CommonAppDataFolder ^ "\\Extract Systems\\LogFiles\\Misc"
+    #define PRINT_CAPTURE_APP "ESPrintManager.exe"
+    #define IDSHIELDOFFICE_BIN_DIR INSTALLDIR ^ "IDShieldOffice\\Bin"
+    #define EXCEPTION_FILE_NAME "ExtractException.uex"
+//////////////////// installation declarations ///////////////////
+
+    // In order to have your InstallScript function executed as a custom
+    // action by the Windows Installer, it must be prototyped as an 
+    // entry-point function.
+
+    // The keyword export identifies MyFunction() as an entry-point function.
+    // The argument it accepts must be a handle to the Installer database.
+    
+      /* export prototype MyFunction(HWND); */  
+
+    // To Do:  Declare global variables, define constants, and prototype user-
+    //         defined and DLL functions here.
+
+
+// ----- DLL function prototypes -----
+
+
+    // your DLL function prototypes
+
+
+// ---- script function prototypes -----
+
+
+    // your script function prototypes    
+    prototype InstallDotNET();
+    prototype CheckOtherExtractProducts();
+	prototype RenameUEXFile();
+	prototype InstallPrintCaptureEngine();
+	prototype UninstallPrintCaptureEngine();
+	prototype CloseApps();
+	prototype LicenseIDShieldOffice();
+    // your global variables
+    STRING gszCompletedMsg;
+    BOOL gbInstalled;
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+//                                                                           
+//  FUNCTION:   OnFirstUIBefore                                            
+//                                                                           
+//  EVENT:      FirstUIBefore event is sent when installation is run for the first
+//              time on given machine. In the handler installation usually displays
+//              UI allowing end user to specify installation parameters. After this
+//              function returns, ComponentTransferData is called to perform file
+//              transfer.
+//                                                                           
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIBefore()
+    NUMBER nResult, nSetupType, nvSize, nUser;
+    NUMBER bOpt1, bOpt2;
+    STRING szTitle, szMsg, szQuestion, svName, svCompany, szFile;
+    STRING szLicenseFile;
+    STRING szMsg1;
+    LIST list, listStartCopy;
+    BOOL bCustom;
+begin	        
+	gbInstalled = FALSE;
+    // TO DO: if you want to enable background, window title, and caption bar title                                                                   
+    // SetTitle( @PRODUCT_NAME, 24, WHITE );                                        
+    // SetTitle( @PRODUCT_NAME, 0, BACKGROUNDCAPTION ); 	                  
+    // Enable( FULLWINDOWMODE );						   
+    // Enable( BACKGROUND );							  
+    // SetColor(BACKGROUND,RGB (0, 128, 128));					   
+ 
+ 	// make sure the user has administrative privilege
+	if (Is(USER_ADMINISTRATOR, "") <= 0) then
+		MessageBox("You must have administrative privileges on this computer to install the software package. Setup will terminate.", WARNING);
+	    bOpt1  = FALSE;
+	    bOpt2  = FALSE;
+	    gszCompletedMsg = "IDShield Office was not installed.";
+		abort;
+	endif;                    
+	                            
+	// Check for different versions of Extract products
+	CheckOtherExtractProducts();
+	
+    SHELL_OBJECT_FOLDER = @PRODUCT_NAME;	   
+    
+    nSetupType = TYPICAL;	
+
+Dlg_SdWelcome:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SdWelcome(szTitle, szMsg);
+    if (nResult = BACK) goto Dlg_SdWelcome;
+	
+    szTitle   = "";
+    svName    = "";
+    svCompany = "";
+    
+Dlg_SdLicense:
+	nResult = SdLicense2(szTitle, "", "", "License.txt", FALSE);
+	if nResult = BACK goto Dlg_SdWelcome; 
+
+Dlg_SdShortcutOptions:
+	nResult = SdAskOptions (szTitle, "Select Shortcuts to install.", "", "", "Shortcuts", NONEXCLUSIVE);
+	if nResult = BACK goto Dlg_SdLicense;
+/*
+Dlg_SdAskDestPath:    	
+    nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
+    if (nResult = BACK) goto Dlg_SdLicense;  
+
+Dlg_SetupType:
+    szTitle = "";
+    szMsg   = "";
+    nResult = SetupType(szTitle, szMsg, "", nSetupType, 0);
+    if (nResult = BACK) then
+        goto Dlg_SdAskDestPath;
+    else
+        nSetupType = nResult;
+        if (nSetupType != CUSTOM) then
+            nvSize = 0;
+            FeatureCompareSizeRequired(MEDIA, INSTALLDIR, nvSize);
+            // if there's no enough space for installation
+            if (nvSize != 0) then      
+            	MessageBox(szSdStr_NotEnoughSpace, WARNING);
+                goto Dlg_SetupType;
+            endif;
+            bCustom = FALSE;
+        else
+            bCustom = TRUE;
+        endif;
+    endif;    
+
+Dlg_SdFeatureTree: 
+    szTitle    = "";
+    szMsg      = "";
+    if (nSetupType = CUSTOM) then
+        nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
+        if (nResult = BACK) goto Dlg_SetupType;  
+    endif;
+
+Dlg_SdStartCopy:	
+    if (nResult = BACK) then
+        if (!bCustom) then
+            goto Dlg_SetupType;    
+    	else
+            goto Dlg_SdFeatureTree;
+    	endif;
+    endif;
+*/
+    // setup default status
+    Enable(STATUSEX);
+   	                
+   	// Install .NET if required
+   	InstallDotNET();
+   	            
+   	// Closes ExtractTRP2 if it is running
+   	CloseApps();    
+   	gszCompletedMsg = SdLoadString(IFX_SDFINISH_MSG1);
+   	gbInstalled = TRUE;
+   	
+    return 0;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   OnFirstUIAfter
+//
+//  EVENT:      FirstUIAfter event is sent after file transfer, when installation 
+//              is run for the first time on given machine. In this event handler 
+//              installation usually displays UI that will inform end user that
+//              installation has been completed successfully.
+//
+///////////////////////////////////////////////////////////////////////////////
+function OnFirstUIAfter()
+    STRING szTitle, szMsg1, szMsg2, szRegAllCmdLine, szCmd;
+    BOOL bvOpt1, bvOpt2 ;
+begin
+   	// Rename the uex file
+   	RenameUEXFile();
+                                                                                                                              
+    // Register Dlls
+	//szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
+	//szCmd = "cmd";
+	//LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+
+	InstallPrintCaptureEngine();
+	
+    Disable(STATUSEX);
+	
+    szMsg1 = SdLoadString(IFX_SDFINISH_MSG1);
+    //SdFinishReboot(szTitle, szMsg1, SYS_BOOTMACHINE, szMsg2, 0);
+    SdFinish(szTitle, gszCompletedMsg, "", "", "", bvOpt1, bvOpt2);
+    if ( gbInstalled ) then
+       	LicenseIDShieldOffice();
+    endif;
+end; 
+
+// --- include script file section ---
+
+            
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   InstallDotNET
+//
+//  EVENT:      Installs .NET 2.0 if it is not installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function InstallDotNET()
+STRING szProgram;
+int nResult, svServiceState;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0) then
+		if ( SYSINFO.bIsWow64 ) then
+			szProgram = SUPPORTDIR ^ "\\NetFx64.exe";
+		else
+			szProgram = SUPPORTDIR ^ "\\dotnetfx.exe";
+		endif;
+		LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
+		SdShowMsg("Setup is Installing .NET Framework 2.0", FALSE);
+		if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0  ) then
+			MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
+			abort;
+		endif;
+	endif;
+
+end;
+            
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   CheckOtherExtractProducts
+//
+//  EVENT:      Checks for install of FLEX Index that is a different version
+//				than the version of ID Shield that is being installed.
+//
+///////////////////////////////////////////////////////////////////////////////
+function CheckOtherExtractProducts()
+	STRING strUninstallKey;
+	STRING strVersion;
+	NUMBER nSize, nType;
+	STRING strMsg;
+begin     
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	// check uninstall key in registry     
+	strUninstallKey = REG_PATH_UNINSTALL ^ FLEX_INDEX_PRODUCT_CODE;
+	
+	if (RegDBKeyExist(strUninstallKey) = 1 ) then
+		// Read the key if it does not match the version being installed exit
+		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, strVersion, nSize); 
+		
+		if ( strVersion != IFX_PRODUCT_VERSION) then
+			// A different version of FLEX index is installed than this version of ID Shield so abort
+			strMsg = "FLEX Index version " + strVersion + " must be uninstalled before ID Shield can be installed.";	
+			MessageBox(strMsg, SEVERE);
+			abort;
+		endif;
+	endif;	
+
+ 	// check uninstall key in registry     
+	strUninstallKey = REG_PATH_UNINSTALL ^ EXTRACT_LM_PRODUCT_CODE;
+
+	if (RegDBKeyExist(strUninstallKey) = 1 ) then
+		// Read the key if it does not match the version being installed exit
+		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, strVersion, nSize); 
+		
+		if ( strVersion != IFX_PRODUCT_VERSION) then
+			// A different version of Extract Systems LM is installed than this version of ID Shield so abort
+			strMsg = "Extract Systems LM version " + strVersion + " must be uninstalled before ID Shield can be installed.";
+			MessageBox(strMsg, SEVERE);
+			abort;
+		endif;
+	endif;
+
+	return 0;
+end;	
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: RenameUEXFile
+//
+//  Purpose: This function renames exception file if it exist to
+//			 "YYYY-MM-DD HHhMMmSSs <EXCEPTION_FILE_NAME>" where the YYYY/MM/DD/etc 
+//			 are the year/month/day and other time related fields
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function RenameUEXFile()
+	STRING strSource;
+	STRING strDest;
+	NUMBER nvResult;
+	STRING strDate;
+	STRING strTime;
+	LIST listDateID;
+	LIST listTimeID;
+	STRING strMonth, strDay, strYear;
+	STRING strHour, strMinute, strSeconds;
+begin
+	strSource  = LOG_FILE_PATH ^ EXCEPTION_FILE_NAME;
+	
+	// Check if the exception file exists
+	if ( Is( FILE_EXISTS, strSource )) then  
+		// Get the date
+		GetSystemInfo ( DATE , nvResult , strDate );
+		
+		// Separate date into Month, Day, year
+		listDateID = ListCreate(STRINGLIST);
+		StrGetTokens ( listDateID , strDate , "-" );
+		ListGetFirstString ( listDateID, strMonth );
+		ListGetNextString ( listDateID, strDay );
+		ListGetNextString ( listDateID, strYear );
+
+		// Get the time
+		GetSystemInfo ( TIME , nvResult , strTime );  
+		
+		// Separate the Time into Hours, Minutes, Seconds
+		listTimeID = ListCreate(STRINGLIST);
+		StrGetTokens ( listTimeID , strTime , ":" );
+		ListGetFirstString ( listTimeID, strHour );
+		ListGetNextString ( listTimeID, strMinute );
+		ListGetNextString ( listTimeID, strSeconds );
+	
+		// Create the new filename for the exception file
+		strDest = LOG_FILE_PATH + "\\";
+		strDest = strDest + strYear + "-" + strMonth + "-" + strDay;
+		strDest = strDest + " " + strHour + "h" + strMinute + "m" + strSeconds + "s ";
+		strDest = strDest + EXCEPTION_FILE_NAME;
+		
+		// Rename exception file
+		RenameFile ( strSource , strDest );
+	endif;
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallPrintCaptureEngine
+//
+//  Purpose: To setup the print capture driver to use the given intermediate app
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallPrintCaptureEngine()
+	string strIntermediateAppPath;
+	string strInstallerPath;
+	string strArguments;
+begin
+	strInstallerPath = EXTRACT_DIR ^ "InstallPCE.exe";
+	strIntermediateAppPath = EXTRACT_DIR ^ PRINT_CAPTURE_APP;
+	strArguments = "\"ESActMaskPCE.ActMaskTIFPrintCaptureEngine.1\" \"" + strIntermediateAppPath + "\"";
+	
+	LaunchAppAndWait( strInstallerPath, strArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end; 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallPrintCaptureEngine
+//
+//  Purpose: uninstalls the print capture engine
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function UninstallPrintCaptureEngine()
+	string strIntermediateAppPath;
+	string strInstallerPath;
+	string strArguments;
+begin
+	strInstallerPath = EXTRACT_DIR ^ "InstallPCE.exe";
+	strIntermediateAppPath = EXTRACT_DIR ^ PRINT_CAPTURE_APP;
+	strArguments = "\"ESActMaskPCE.ActMaskTIFPrintCaptureEngine.1\" " + " /u";
+	
+	LaunchAppAndWait( strInstallerPath, strArguments, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end; 
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: CloseApps
+//
+//  Purpose: To close running apps before installing or uninstalling
+///////////////////////////////////////////////////////////////////////////////
+function CloseApps()
+	string strExtractTRPPath;
+begin
+	strExtractTRPPath = EXTRACT_DIR ^ "ExtractTRP2.exe";
+	LaunchAppAndWait(strExtractTRPPath , "/exit", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+
+//---------------------------------------------------------------------------
+// OnMaintUIBefore
+//
+// The OnMaintUIBefore event is called by the framework when the setup is
+// running in maintenance mode. By default this event displays UI that
+// allows the end user to add or remove features, repair currently
+// installed features or uninstall the application.
+//---------------------------------------------------------------------------
+function OnMaintUIBefore()
+	NUMBER nResult, nType;
+	STRING szTitle, szMsg, svDir, svResult, szCaption;
+begin
+	// TO DO: if you want to enable background, window title, and caption bar title   								
+	// SetTitle( @PRODUCT_NAME, 24, WHITE );					
+	// SetTitle( @PRODUCT_NAME, 0, BACKGROUNDCAPTION );  			
+	// SetColor(BACKGROUND,RGB (0, 128, 128));					
+	// Enable( FULLWINDOWMODE );						
+	// Enable( BACKGROUND );							
+	
+Dlg_Start:
+
+    // Added in Version 9.5 - Support for REMOVEONLY option.
+    if( !REMOVEONLY ) then
+		// In standard mode show maintenance dialog
+		Disable(BACKBUTTON);
+		nType = SdWelcomeMaint(szTitle, szMsg, MODIFY);
+		Enable(BACKBUTTON);
+	else
+        // Hide the initial progress dialog as otherwise the user can
+        // click on it, and hide the MessageBox.
+        Disable( DIALOGCACHE );
+
+        // In RemoveOnly mode, set to remove.
+        nType = REMOVEALL;
+    endif;
+	
+	// Show Uninstall Confirmation Dialog
+    if ( nType = REMOVEALL ) then
+		nResult = MessageBox( SdLoadString( IFX_MAINTUI_MSG ), MB_YESNO );
+		if (nResult != IDYES ) then
+            
+            if( REMOVEONLY ) then
+                // In REMOVEONLY mode, abort the setup.
+                abort;
+            else
+                // In non-REMOVEONLY mode, redisplay the previous dialog.
+			    goto Dlg_Start;
+            endif;
+
+		endif;
+	endif;
+
+	nResult = NEXT;
+
+Dlg_SdFeatureTree:
+	if (nType = MODIFY) then
+		szTitle = "";
+		szMsg = "";
+		nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
+		if (nResult = BACK) goto Dlg_Start;
+	endif;
+
+	switch(nType)
+		case REMOVEALL:
+			CloseApps();
+			UninstallPrintCaptureEngine();
+		 	FeatureRemoveAll();
+		case REPAIR:    
+			CloseApps();
+			FeatureReinstall();
+	endswitch;
+    
+	// setup default status 
+	SetStatusWindow(0, "");
+	Enable(STATUSEX);
+	StatusUpdate(ON, 100);
+end;
+
+//---------------------------------------------------------------------------
+// LicenseIDShieldOffice
+//
+// This function displays a dialog to remind user that Licensing is required and
+// if they don't have a license allows them to select option that will open
+// the UserLicense utility to request license.
+//---------------------------------------------------------------------------
+function LicenseIDShieldOffice()
+begin
+	if ( MessageBoxEx( "A license file is required to activate ID Shield Office. " +
+		"Would you like to request a license file now?\r\n\r\n" +
+		"Click Yes to launch the licensing application to request a license file.\r\n" +
+		"Click No if you already have a license file available, " +
+		"or if you want to request one later.", "License Required", MB_YESNO) == IDYES)
+	then
+	     ChangeDirectory(EXTRACT_DIR);
+		 LaunchAppAndWait( IDSHIELDOFFICE_BIN_DIR ^ "IDShieldOffice.exe" , "/license",
+		 	 LAAW_OPTION_NOWAIT | LAAW_OPTION_NO_CHANGEDIRECTORY);
+	endif; 
+end;

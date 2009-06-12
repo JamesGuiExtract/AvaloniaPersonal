@@ -1,0 +1,2 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\ASSIGNMENT OF DEED OF TRUST;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).Grantor.voa;K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
