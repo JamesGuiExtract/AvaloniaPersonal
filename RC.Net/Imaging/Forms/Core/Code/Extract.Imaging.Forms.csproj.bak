@@ -1,0 +1,812 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Extract.Imaging.Forms</RootNamespace>
+    <AssemblyName>Extract.Imaging.Forms</AssemblyName>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\..\..\Core\Code\ExtractInternalKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>obj\Debug\Extract.Imaging.Forms.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\..\..\Binaries\Release\</OutputPath>
+    <DefineConstants>TRACE;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>obj\Release\Extract.Imaging.Forms.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Leadtools, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Annotations, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AnchoredObject.cs" />
+    <Compile Include="Clue.cs" />
+    <Compile Include="CompositeHighlightLayerObject.cs" />
+    <Compile Include="CompositeLayerObject.cs" />
+    <Compile Include="Controls\AngularHighlightToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AngularHighlightToolStripButton.Designer.cs">
+      <DependentUpon>AngularHighlightToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\AngularRedactionToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\AngularRedactionToolStripButton.Designer.cs">
+      <DependentUpon>AngularRedactionToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DeleteLayerObjectsToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DeleteLayerObjectsToolStripButton.Designer.cs">
+      <DependentUpon>DeleteLayerObjectsToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\DeleteSelectionToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\DeleteSelectionToolStripButton.Designer.cs">
+      <DependentUpon>DeleteSelectionToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\EditHighlightTextToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\EditHighlightTextToolStripButton.Designer.cs">
+      <DependentUpon>EditHighlightTextToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FirstPageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\FirstPageToolStripButton.Designer.cs">
+      <DependentUpon>FirstPageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FitToPageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\FitToPageToolStripButton.Designer.cs">
+      <DependentUpon>FitToPageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\FitToWidthToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\FitToWidthToolStripButton.Designer.cs">
+      <DependentUpon>FitToWidthToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NextLayerObjectToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\NextLayerObjectToolStripButton.Designer.cs">
+      <DependentUpon>NextLayerObjectToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NextTileToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\NextTileToolStripButton.Designer.cs">
+      <DependentUpon>NextTileToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PageNavigationToolStripTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PageNavigationToolStripTextBox.Designer.cs">
+      <DependentUpon>PageNavigationToolStripTextBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PreviousLayerObjectToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PreviousLayerObjectToolStripButton.Designer.cs">
+      <DependentUpon>PreviousLayerObjectToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PreviousTileToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PreviousTileToolStripButton.Designer.cs">
+      <DependentUpon>PreviousTileToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PrintPreviewToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PrintPreviewToolStripButton.Designer.cs">
+      <DependentUpon>PrintPreviewToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RedactionToolStripSplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RedactionToolStripSplitButton.Designer.cs">
+      <DependentUpon>RedactionToolStripSplitButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SelectLayerObjectToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SelectLayerObjectToolStripButton.Designer.cs">
+      <DependentUpon>SelectLayerObjectToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="EditHighlightTextForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="EditHighlightTextForm.Designer.cs">
+      <DependentUpon>EditHighlightTextForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LayerObjectsCollectionEventArguments.cs" />
+    <Compile Include="Controls\HighlightToolStripSplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\HighlightToolStripSplitButton.Designer.cs">
+      <DependentUpon>HighlightToolStripSplitButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ImageViewerCommandToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ImageViewerCommandToolStripButton.Designer.cs">
+      <DependentUpon>ImageViewerCommandToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImagePageData.cs" />
+    <Compile Include="ImageViewerEventArguments.cs" />
+    <Compile Include="Highlight.cs">
+    </Compile>
+    <Compile Include="LayerObjectsCollection.cs" />
+    <Compile Include="IImageViewerControl.cs" />
+    <Compile Include="ImageViewer.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageViewer.Designer.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImageViewer_Methods.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ImageViewer_Obsolete.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ImageViewerCursorToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ImageViewerCursorToolStripButton.Designer.cs">
+      <DependentUpon>ImageViewerCursorToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\LastPageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\LastPageToolStripButton.Designer.cs">
+      <DependentUpon>LastPageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LayerObject.cs" />
+    <Compile Include="MenuItems\AngularHighlightToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\AngularHighlightToolStripMenuItem.designer.cs">
+      <DependentUpon>AngularHighlightToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\AngularRedactionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\AngularRedactionToolStripMenuItem.Designer.cs">
+      <DependentUpon>AngularRedactionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\CloseImageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\CloseImageToolStripMenuItem.Designer.cs">
+      <DependentUpon>CloseImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\DeleteLayerObjectsToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\DeleteLayerObjectsToolStripMenuItem.designer.cs">
+      <DependentUpon>DeleteLayerObjectsToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\DeleteSelectionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\DeleteSelectionToolStripMenuItem.Designer.cs">
+      <DependentUpon>DeleteSelectionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\EditHighlightTextToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\EditHighlightTextToolStripMenuItem.designer.cs">
+      <DependentUpon>EditHighlightTextToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\FirstPageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\FirstPageToolStripMenuItem.designer.cs">
+      <DependentUpon>FirstPageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\FitToPageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\FitToPageToolStripMenuItem.Designer.cs">
+      <DependentUpon>FitToPageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\FitToWidthToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\FitToWidthToolStripMenuItem.Designer.cs">
+      <DependentUpon>FitToWidthToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\HighlightToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\HighlightToolStripMenuItem.Designer.cs">
+      <DependentUpon>HighlightToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerContextMenuStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerContextMenuStrip.Designer.cs">
+      <DependentUpon>ImageViewerContextMenuStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerCommandToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerCommandToolStripMenuItem.Designer.cs">
+      <DependentUpon>ImageViewerCommandToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerCursorToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ImageViewerCursorToolStripMenuItem.designer.cs">
+      <DependentUpon>ImageViewerCursorToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\LastPageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\LastPageToolStripMenuItem.designer.cs">
+      <DependentUpon>LastPageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\NextLayerObjectToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\NextLayerObjectToolStripMenuItem.Designer.cs">
+      <DependentUpon>NextLayerObjectToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\NextPageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\NextPageToolStripMenuItem.designer.cs">
+      <DependentUpon>NextPageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\OpenImageMruToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\OpenImageMruToolStripMenuItem.Designer.cs">
+      <DependentUpon>OpenImageMruToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\OpenImageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\OpenImageToolStripMenuItem.Designer.cs">
+      <DependentUpon>OpenImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PageNavigationToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PageNavigationToolStripMenuItem.Designer.cs">
+      <DependentUpon>PageNavigationToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PanToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PanToolStripMenuItem.designer.cs">
+      <DependentUpon>PanToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PreviousLayerObjectToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PreviousLayerObjectToolStripMenuItem.Designer.cs">
+      <DependentUpon>PreviousLayerObjectToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PreviousPageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PreviousPageToolStripMenuItem.designer.cs">
+      <DependentUpon>PreviousPageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PrintImageToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PrintImageToolStripMenuItem.designer.cs">
+      <DependentUpon>PrintImageToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PrintPreviewToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PrintPreviewToolStripMenuItem.Designer.cs">
+      <DependentUpon>PrintPreviewToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RectangularHighlightToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RectangularHighlightToolStripMenuItem.Designer.cs">
+      <DependentUpon>RectangularHighlightToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RectangularRedactionToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RectangularRedactionToolStripButton.Designer.cs">
+      <DependentUpon>RectangularRedactionToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RectangularRedactionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RectangularRedactionToolStripMenuItem.Designer.cs">
+      <DependentUpon>RectangularRedactionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RedactionToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RedactionToolStripMenuItem.Designer.cs">
+      <DependentUpon>RedactionToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RotateClockwiseToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RotateClockwiseToolStripMenuItem.Designer.cs">
+      <DependentUpon>RotateClockwiseToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\RotateCounterclockwiseToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\RotateCounterclockwiseToolStripMenuItem.Designer.cs">
+      <DependentUpon>RotateCounterclockwiseToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\SelectAllLayerObjectsToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\SelectAllLayerObjectsToolStripMenuItem.Designer.cs">
+      <DependentUpon>SelectAllLayerObjectsToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\SelectLayerObjectToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\SelectLayerObjectToolStripMenuItem.Designer.cs">
+      <DependentUpon>SelectLayerObjectToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\SetHighlightHeightToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\SetHighlightHeightToolStripMenuItem.Designer.cs">
+      <DependentUpon>SetHighlightHeightToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ZoomInToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ZoomInToolStripMenuItem.Designer.cs">
+      <DependentUpon>ZoomInToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ZoomNextToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ZoomNextToolStripMenuItem.Designer.cs">
+      <DependentUpon>ZoomNextToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ZoomOutToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ZoomOutToolStripMenuItem.Designer.cs">
+      <DependentUpon>ZoomOutToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ZoomPreviousToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ZoomPreviousToolStripMenuItem.Designer.cs">
+      <DependentUpon>ZoomPreviousToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\ZoomWindowToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\ZoomWindowToolStripMenuItem.Designer.cs">
+      <DependentUpon>ZoomWindowToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="Controls\NextPageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\NextPageToolStripButton.Designer.cs">
+      <DependentUpon>NextPageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\OpenImageToolStripSplitButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\OpenImageToolStripSplitButton.Designer.cs">
+      <DependentUpon>OpenImageToolStripSplitButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PanToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PanToolStripButton.Designer.cs">
+      <DependentUpon>PanToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PreviousPageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PreviousPageToolStripButton.Designer.cs">
+      <DependentUpon>PreviousPageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PrintImageToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\PrintImageToolStripButton.Designer.cs">
+      <DependentUpon>PrintImageToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\NextTileToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\NextTileToolStripMenuItem.Designer.cs">
+      <DependentUpon>NextTileToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MenuItems\PreviousTileToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="MenuItems\PreviousTileToolStripMenuItem.Designer.cs">
+      <DependentUpon>PreviousTileToolStripMenuItem.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Controls\RectangularHighlightToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RectangularHighlightToolStripButton.Designer.cs">
+      <DependentUpon>RectangularHighlightToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Redaction.cs" />
+    <Compile Include="RegistryManager.cs" />
+    <Compile Include="Controls\RotateClockwiseToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RotateClockwiseToolStripButton.Designer.cs">
+      <DependentUpon>RotateClockwiseToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RotateCounterclockwiseToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\RotateCounterclockwiseToolStripButton.Designer.cs">
+      <DependentUpon>RotateCounterclockwiseToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SetHighlightHeightToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\SetHighlightHeightToolStripButton.Designer.cs">
+      <DependentUpon>SetHighlightHeightToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusStripItems\ImageViewerStatusStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\ImageViewerStatusStrip.Designer.cs">
+      <DependentUpon>ImageViewerStatusStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusStripItems\MousePositionToolStripStatusLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\MousePositionToolStripStatusLabel.Designer.cs">
+      <DependentUpon>MousePositionToolStripStatusLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusStripItems\ResolutionToolStripStatusLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\ResolutionToolStripStatusLabel.Designer.cs">
+      <DependentUpon>ResolutionToolStripStatusLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StatusStripItems\UserActionToolStripStatusLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="StatusStripItems\UserActionToolStripStatusLabel.Designer.cs">
+      <DependentUpon>UserActionToolStripStatusLabel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextLayerObject.cs" />
+    <Compile Include="ToolStripButtonConstants.cs" />
+    <Compile Include="Controls\ZoomInToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomInToolStripButton.Designer.cs">
+      <DependentUpon>ZoomInToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ZoomNextToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomNextToolStripButton.Designer.cs">
+      <DependentUpon>ZoomNextToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ZoomOutToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomOutToolStripButton.Designer.cs">
+      <DependentUpon>ZoomOutToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ZoomPreviousToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomPreviousToolStripButton.Designer.cs">
+      <DependentUpon>ZoomPreviousToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ZoomWindowToolStripButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Controls\ZoomWindowToolStripButton.Designer.cs">
+      <DependentUpon>ZoomWindowToolStripButton.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolStrips\BasicToolsImageViewerToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStrips\BasicToolsImageViewerToolStrip.Designer.cs">
+      <DependentUpon>BasicToolsImageViewerToolStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolStrips\FileCommandsImageViewerToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStrips\FileCommandsImageViewerToolStrip.Designer.cs">
+      <DependentUpon>FileCommandsImageViewerToolStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolStrips\ImageViewerPrePopulatedToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStrips\ImageViewerPrePopulatedToolStrip.Designer.cs">
+      <DependentUpon>ImageViewerPrePopulatedToolStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolStrips\NavigationToolsImageViewerToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStrips\NavigationToolsImageViewerToolStrip.Designer.cs">
+      <DependentUpon>NavigationToolsImageViewerToolStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ToolStrips\ViewCommandsImageViewerToolStrip.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolStrips\ViewCommandsImageViewerToolStrip.Designer.cs">
+      <DependentUpon>ViewCommandsImageViewerToolStrip.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TrackingData.cs" />
+    <Service Include="{94E38DFF-614B-4cbd-B67C-F211BB35CE8B}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
+      <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
+      <Name>Extract.Licensing</Name>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Core\Code\Extract.Imaging.csproj">
+      <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
+      <Name>Extract.Imaging</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EditHighlightTextForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>EditHighlightTextForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\OpenImageButton.png" />
+    <EmbeddedResource Include="Resources\AngularHighlightButton.png" />
+    <EmbeddedResource Include="Resources\EditHighlightTextButton.png" />
+    <EmbeddedResource Include="Resources\FitToPageButton.png" />
+    <EmbeddedResource Include="Resources\PanButton.png" />
+    <EmbeddedResource Include="Resources\PrintImageButton.png" />
+    <EmbeddedResource Include="Resources\RectangularHighlightButton.png" />
+    <EmbeddedResource Include="Resources\SetHighlightHeightButton.png" />
+    <EmbeddedResource Include="Resources\ZoomInButton.png" />
+    <EmbeddedResource Include="Resources\ZoomNextButton.png" />
+    <EmbeddedResource Include="Resources\ZoomOutButton.png" />
+    <EmbeddedResource Include="Resources\ZoomPreviousButton.png" />
+    <EmbeddedResource Include="Resources\ZoomWindowButton.png" />
+    <EmbeddedResource Include="Resources\FirstPageButton.png" />
+    <EmbeddedResource Include="Resources\LastPageButton.png" />
+    <EmbeddedResource Include="Resources\NextPageButton.png" />
+    <EmbeddedResource Include="Resources\PreviousPageButton.png" />
+    <EmbeddedResource Include="Resources\RotateClockwiseButton.png" />
+    <EmbeddedResource Include="Resources\RotateCounterclockwiseButton.png" />
+    <EmbeddedResource Include="Resources\FitToWidthButton.png" />
+    <EmbeddedResource Include="Resources\HighlightSplitButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\MruListMenuItem.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PageNavigationToolStripTextBox.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SaveImageButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ViewCommands.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\BasicToolsIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ImageViewerIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NextTileButton.png" />
+    <EmbeddedResource Include="Resources\PreviousTileButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteLayerObjectsButton.png" />
+    <EmbeddedResource Include="Resources\SelectLayerObjectButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="UCLID_COMLMLib">
+      <Guid>{A71EE8CD-A2C1-4C5B-A593-12FF4931C820}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_COMUTILSLib">
+      <Guid>{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_RASTERANDOCRMGMTLib">
+      <Guid>{D73F62A5-9E9F-4A65-9690-491AF2F77FAA}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AngularRedactionButton.png" />
+    <EmbeddedResource Include="Resources\RectangularRedactionButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RedactionSplitButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NextLayerObjectButton.png" />
+    <EmbeddedResource Include="Resources\PreviousLayerObjectButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteSelectionButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PrintPreviewButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\AngularHighlightButtonSmall.png" />
+    <EmbeddedResource Include="Resources\AngularRedactionButtonSmall.png" />
+    <EmbeddedResource Include="Resources\FitToPageButtonSmall.png" />
+    <EmbeddedResource Include="Resources\FitToWidthButtonSmall.png" />
+    <EmbeddedResource Include="Resources\PanButtonSmall.png" />
+    <EmbeddedResource Include="Resources\SelectLayerObjectButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\SaveImageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PrintPreviewButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PrintImageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ZoomWindowButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ZoomInButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ZoomOutButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ZoomNextButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\ZoomPreviousButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NextTileButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PreviousTileButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\FirstPageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NextPageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\LastPageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PreviousPageButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RotateClockwiseButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RotateCounterclockwiseButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\PreviousLayerObjectButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\NextLayerObjectButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteLayerObjectsButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\DeleteSelectionButtonSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\OpenImageButtonSmall.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <PropertyGroup>
+    <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

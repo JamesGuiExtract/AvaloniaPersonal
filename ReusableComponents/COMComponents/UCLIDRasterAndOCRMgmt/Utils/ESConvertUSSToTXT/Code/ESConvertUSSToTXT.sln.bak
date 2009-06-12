@@ -1,0 +1,119 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESConvertUSSToTXT", "ESConvertUSSToTXT.vcproj", "{2ABF7BC9-B805-4308-B9C6-00244C83C258}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE} = {3EDFA52F-F37C-4417-A818-EF4D254796FE}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BaseUtils", "..\..\..\..\..\BaseUtils\Code\BaseUtils.vcproj", "{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLMCore", "..\..\..\..\UCLIDComponentsLM\COMLMCore\Code\COMLMCore.vcproj", "{6FA06B83-AC26-49B7-8138-9342792EACC4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D} = {14D4D963-B656-4B04-ADD7-8F98FC4F664D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExtractTRP2", "..\..\..\..\UCLIDComponentsLM\ExtractTRP2\Code\ExtractTRP2.vcproj", "{14D4D963-B656-4B04-ADD7-8F98FC4F664D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SafeNetUtils", "..\..\..\..\..\VendorSpecificUtils\SafeNetUtils\Code\SafeNetUtils.vcproj", "{3EDFA52F-F37C-4417-A818-EF4D254796FE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A} = {D026CB45-DFA8-4FD7-AE12-C6F05978187A}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "COMLM", "..\..\..\..\UCLIDComponentsLM\COMLM\Code\COMLM.vcproj", "{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "UCLIDCOMUtils", "..\..\..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.vcproj", "{7F591058-6DC9-4787-AE25-5A45AE78E3FA}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984} = {4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}
+		{6FA06B83-AC26-49B7-8138-9342792EACC4} = {6FA06B83-AC26-49B7-8138-9342792EACC4}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESMessageUtils", "..\..\..\..\ESMessageUtils\Code\ESMessageUtils.vcproj", "{D026CB45-DFA8-4FD7-AE12-C6F05978187A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF} = {91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SourceCodeControl) = preSolution
+		SccNumberOfProjects = 9
+		SccProjectUniqueName0 = ..\\..\\..\\..\\..\\BaseUtils\\Code\\BaseUtils.vcproj
+		SccProjectName0 = \u0022$/Engineering/ReusableComponents/BaseUtils/Code\u0022,\u0020WLPAAAAA
+		SccLocalPath0 = ..\\..\\..\\..\\..\\BaseUtils\\Code
+		SccProjectUniqueName1 = ..\\..\\..\\..\\UCLIDComponentsLM\\COMLMCore\\Code\\COMLMCore.vcproj
+		SccProjectName1 = \u0022$/Engineering/ReusableComponents/COMComponents/UCLIDComponentsLM/COMLMCore/Code\u0022,\u0020ECQAAAAA
+		SccLocalPath1 = ..\\..\\..\\..\\UCLIDComponentsLM\\COMLMCore\\Code
+		SccProjectUniqueName2 = ..\\..\\..\\..\\UCLIDComponentsLM\\ExtractTRP2\\Code\\ExtractTRP2.vcproj
+		SccProjectName2 = \u0022$/Engineering/ReusableComponents/COMComponents/UCLIDComponentsLM/ExtractTRP2/Code\u0022,\u0020AFQAAAAA
+		SccLocalPath2 = ..\\..\\..\\..\\UCLIDComponentsLM\\ExtractTRP2\\Code
+		SccProjectUniqueName3 = ..\\..\\..\\..\\..\\VendorSpecificUtils\\SafeNetUtils\\Code\\SafeNetUtils.vcproj
+		SccProjectName3 = \u0022$/Engineering/ReusableComponents\u0022,\u0020CNMAAAAA
+		SccLocalPath3 = ..\\..\\..\\..\\..
+		SccProjectFilePathRelativizedFromConnection3 = VendorSpecificUtils\\SafeNetUtils\\Code\\
+		SccProjectUniqueName4 = ..\\..\\..\\..\\UCLIDComponentsLM\\COMLM\\Code\\COMLM.vcproj
+		SccProjectName4 = \u0022$/Engineering/ReusableComponents/COMComponents/UCLIDComponentsLM/COMLM/Code\u0022,\u0020RBQAAAAA
+		SccLocalPath4 = ..\\..\\..\\..\\UCLIDComponentsLM\\COMLM\\Code
+		SccProjectUniqueName5 = ..\\..\\..\\..\\UCLIDCOMUtils\\Core\\Code\\UCLIDCOMUtils.vcproj
+		SccProjectName5 = \u0022$/Engineering/ReusableComponents/COMComponents/UCLIDCOMUtils/Core/Code\u0022,\u0020QFQAAAAA
+		SccLocalPath5 = ..\\..\\..\\..\\UCLIDCOMUtils\\Core\\Code
+		SccProjectUniqueName6 = ..\\..\\..\\..\\ESMessageUtils\\Code\\ESMessageUtils.vcproj
+		SccProjectName6 = \u0022$/Engineering/ReusableComponents/COMComponents/ESMessageUtils/Code\u0022,\u0020NAQAAAAA
+		SccLocalPath6 = ..\\..\\..\\..\\ESMessageUtils\\Code
+		SccLocalPath7 = .
+		SccProjectUniqueName8 = ESConvertUSSToTXT.vcproj
+		SccLocalPath8 = .
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Debug|Win32.ActiveCfg = Debug|Win32
+		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Debug|Win32.Build.0 = Debug|Win32
+		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Release|Win32.ActiveCfg = Release|Win32
+		{2ABF7BC9-B805-4308-B9C6-00244C83C258}.Release|Win32.Build.0 = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Debug|Win32.Build.0 = Debug|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.ActiveCfg = Release|Win32
+		{91B17D62-305C-4EA4-ADD2-72AC7FE8D0AF}.Release|Win32.Build.0 = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Debug|Win32.Build.0 = Debug|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.ActiveCfg = Release|Win32
+		{6FA06B83-AC26-49B7-8138-9342792EACC4}.Release|Win32.Build.0 = Release|Win32
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D}.Debug|Win32.Build.0 = Debug|Win32
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D}.Release|Win32.ActiveCfg = Release|Win32
+		{14D4D963-B656-4B04-ADD7-8F98FC4F664D}.Release|Win32.Build.0 = Release|Win32
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Debug|Win32.Build.0 = Debug|Win32
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Release|Win32.ActiveCfg = Release|Win32
+		{3EDFA52F-F37C-4417-A818-EF4D254796FE}.Release|Win32.Build.0 = Release|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Debug|Win32.Build.0 = Debug|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Release|Win32.ActiveCfg = Release|Win32
+		{4A3A15DD-5C9D-4921-8D7E-3BAF065FE984}.Release|Win32.Build.0 = Release|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Debug|Win32.Build.0 = Debug|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Release|Win32.ActiveCfg = Release|Win32
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA}.Release|Win32.Build.0 = Release|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Debug|Win32.Build.0 = Debug|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Release|Win32.ActiveCfg = Release|Win32
+		{D026CB45-DFA8-4FD7-AE12-C6F05978187A}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
