@@ -476,6 +476,11 @@ namespace Extract.DataEntry
         /// </summary>
         private DbConnection _dbConnection;
 
+        /// <summary>
+        /// Indicates if the host is in design mode or not.
+        /// </summary>
+        private bool _inDesignMode;
+
         #endregion Fields
 
         #region Constructors
@@ -488,7 +493,9 @@ namespace Extract.DataEntry
             try
             {
                 // Load licenses in design mode
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                _inDesignMode = LicenseManager.UsageMode == LicenseUsageMode.Designtime;
+
+                if (_inDesignMode)
                 {
                     // Load the license files from folder
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
@@ -845,6 +852,12 @@ namespace Extract.DataEntry
         {
             try
             {
+                // If in design mode, just return false
+                if (_inDesignMode)
+                {
+                    return false;
+                }
+
                 if (m.Msg == _WM_KEYDOWN || m.Msg == _WM_KEYUP)
                 {
                     // Check for shift or tab key press events
