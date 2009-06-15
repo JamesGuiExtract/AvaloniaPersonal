@@ -1,6 +1,7 @@
 //fixing addresses
 \bDRIVB\b~DRIVE
 \b(?:W.|[Vv]{2}[iIl1!])(?=.{0,3}5\d{4})~WI
+(?<=\x20,|,\x20)(?:W.|[Vv]{2}[iIl1!])\b~WI
 ALLI(?!ANCE).{0,10}WI(\s*?=\d{5}\b)~ALLIS, WI
 WE(?!ST.{0,3}LINCOLN).*WI 53227~WEST ALLIS, WI 53227
 \bWAY\b~WAY,
@@ -31,7 +32,7 @@ Milwaukee.{3,8}53222~Milwaukee, WI 53222
 Wauwatosa(.{0,3})(?:(?:W|VV)[Il1!]|.I|W.)(.{0,7}53226)~Wauwatosa$1WI$2
 K[ilI1!\|]nn[ilI1!\|]k[ilI1!\|]nn[ilI1!\|]c\x20*River~Kinnikinnic River
 NEWP[O0QD]RT~NEWPORT
-[71!lI]355.{0,3}(?=Mittel|MITTEL)~1355
+[71!lI]355(?=.{0,3}Mittel|MITTEL)~1355
 W[\s,_]{0,4}Kinnikinnic~W. Kinnikinnic
 \\W\.~ W.
 \bM[a-z](?=[A-Z])~Mc
@@ -97,6 +98,8 @@ C\s*l\s*i\s*n\s*i\s*c~Clinic
 \b\x20+OCONOMOWOC~, OCONOMOWOC
 Suite\x20*(\d+)\b~Suite $1,
 ^9\x20*Mon~Mon
+San\x20Juan\x20Capi.~San Juan Capis
+(?:LabCor.|LabCo.p|LabC.rp|LabC.{0,2}p|Lab.orp|La.Corp|L.Corp|.abCorp)\b~LabCorp
 
 //fixing phone numbers
 \b1-000-~1-800-
