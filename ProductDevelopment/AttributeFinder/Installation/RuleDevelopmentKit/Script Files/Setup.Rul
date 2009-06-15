@@ -76,7 +76,7 @@ begin
     nSetupType = TYPICAL;	
 
 	// check installed Flex Index SDK
-	detectFlexIndexSDKInstall();
+	//detectFlexIndexSDKInstall();
 
 Dlg_SdWelcome:
     szTitle = "";
