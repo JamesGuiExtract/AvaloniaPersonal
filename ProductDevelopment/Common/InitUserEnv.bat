@@ -13,7 +13,7 @@ SET VB_DIR=%VISUAL_STUDIO%\VB
 SET VCPP_DIR=%VISUAL_STUDIO%\VC
 SET DevEnvDir=%VISUAL_STUDIO%\Common7\IDE
 SET VS_COMMON=C:\Program Files\Microsoft Visual Studio 8\Common7
-SET VSS_DIR=C:\Program Files\Microsoft Visual Studio\Common\VSS
+SET VAULT_DIR=C:\Program Files\SourceGear\Vault Client
 
 SET INSTALL_SHIELD_DIR=C:\Program Files\InstallShield\InstallShield 5.5 Professional Edition
 SET WINZIP_DIR=C:\Program Files\WinZip

@@ -37,7 +37,7 @@ VcppLibDirs=$(VCPP_DIR)\ATLMFC\LIB;$(VCPP_DIR)\LIB;$(VCPP_DIR)\PlatformSDK\lib;$
 IncludeDirs=$(VcppIncludeDirs)
 LibDirs=$(VcppLibDirs)
 
-Label=ss label
+Label="C:\Program Files\SourceGear\Vault Client\vault" LABEL -server white.extract.local -repository "Extract Repository"
 DelOptions=/Q /F /S
 ISCompile=Compile
 ISCompileOptions=-I"$(INSTALL_SHIELD_DIR)\Include"
@@ -50,7 +50,7 @@ UpdateFileVersion="I:\Common\Engineering\Tools\Utils\UpdateFileVersion\UpdateFil
 !IF "$(BUILD_FROM_SVN)" == "YES"
 !include GetFromSVN.mak
 !ELSE
-!include GetFromSS.mak
+!include GetFromVault.mak
 !ENDIF
 
 #############################################################################
@@ -70,12 +70,12 @@ SetupBuildEnv:
 	@SET LIBPATH=C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\ATLMFC\LIB
 	
 LabelCommonDir:
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(FlexIndexVersion)" -O
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(IcoMapESRIVersion)" -O
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(RCDotNetVersion)" -O
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(LaserficheVersion)" -O
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(IDShieldOfficeVersion)" -O
-	$(Label) $$/Engineering/ProductDevelopment/Common -I- -L"$(LabDEVersion)" -O
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(FlexIndexVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(IcoMapESRIVersion)" 
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(RCDotNetVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(LaserficheVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(IDShieldOfficeVersion)"
+	$(Label) $$/Engineering/ProductDevelopment/Common "$(LabDEVersion)"
 	
 #Do not remove the tabs in the following echo statements they are required.
 CreateVersionISImportFile:
