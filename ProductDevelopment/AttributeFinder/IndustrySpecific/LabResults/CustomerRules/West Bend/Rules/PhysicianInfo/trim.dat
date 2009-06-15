@@ -4,7 +4,7 @@
 0%O
 \/%, 
 ,([a-z]+)%, $1
--cmh[\s\S]*%
+-c(?:m|in)h[\s\S]*%
 PHY:%
 \b(?:Patient|Pt\.?)\s*Ph(?:one)?[\s\S]*%
 ^\s%
