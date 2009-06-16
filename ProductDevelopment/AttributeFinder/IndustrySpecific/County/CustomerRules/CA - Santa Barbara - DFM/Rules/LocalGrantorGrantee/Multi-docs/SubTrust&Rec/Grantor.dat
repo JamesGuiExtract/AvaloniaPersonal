@@ -1,4 +1,13 @@
 [PATTERNS_BEGIN]
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011235.tif
-rule01=WHEREAS^?Substitution of Trustee^250~[Is/are^5~present^5~owner^5~of^5~promissory
+rule001=WHEREAS^?Substitution of Trustee^250~[Is/are^5~present^5~owner^5~of^5~promissory
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0015488.tif
+rule010=WHEREAS^5~the undersigned^?Substitution of Trustee^250~as^6~the present Beneficiary
+
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0012066.tif
+rule020=RECONVEYANCE^?Substitution of Trustee^250~the present beneficiary
+
+
+
 [PATTERNS_END]
