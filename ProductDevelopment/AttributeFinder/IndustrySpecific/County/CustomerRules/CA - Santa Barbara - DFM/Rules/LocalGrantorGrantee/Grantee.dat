@@ -1,0 +1,10 @@
+[PATTERNS_BEGIN]
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011237.tif
+rule01=executed^5~by^?Reconveyance^250~A^5~SINGLE^5~MAN^100~AND^?Reconveyance2^250~AN^5~UNMARRIED^10~MAN
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0024284.tif
+rule02=executed^5~by^?Reconveyance^250~HUSBAND^5~AND^5~WIFE
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011236.tif
+rule03=executed^5~by^?Reconveyance^250~AN^5~UNMARRIED^10~MAN
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011238.tif
+rule04=executed^5~by^?Reconveyance^250~TRUSTEE^5~OF^5~[THE]
+[PATTERNS_END]
