@@ -1,1 +1,0 @@
-(?:\bentity(?!['"s])\s{0,4}debtor)
