@@ -1,9 +1,0 @@
-(?:
-(?:(?:CERTIF|\w*ERTIFIC|\w*TIFICA|\w*FICATION).+(?:VIT|ITAL).+(?:RECO\w*|ECORD))
-|
-(?:\w*CATION\W*OF\W*VITAL\W*RECORD)
-)
-(?=
-[\s\S]+
-Death|pulmon|metastat|cancer|cardiac|coronar|embalm|funer|cremat
-)
