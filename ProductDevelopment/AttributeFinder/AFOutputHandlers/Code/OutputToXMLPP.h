@@ -4,6 +4,10 @@
 
 #include "resource.h"       // main symbols
 
+#include <string>
+
+using namespace std;
+
 EXTERN_C const CLSID CLSID_OutputToXMLPP;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -63,6 +67,9 @@ private:
 	bool	m_bNamedAttributes;
 	bool	m_bSchemaName;
 
+	// Whether the doc tags button should display FAM tags or AFUtils tags
+	bool	m_bFAMTags;
+
 	// controls
 	ATLControls::CEdit m_editFileName;
 	ATLControls::CButton m_btnBrowse;
@@ -73,4 +80,7 @@ private:
 
 	// helper functions
 	void validateLicense();
+
+	// helper function to display the appropriate doc tags list when the doc tag button is clicked
+	string chooseDocTag(HWND hWnd, long x, long y);
 };

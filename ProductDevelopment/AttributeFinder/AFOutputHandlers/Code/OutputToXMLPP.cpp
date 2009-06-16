@@ -8,7 +8,10 @@
 #include <LicenseMgmt.h>
 #include <UCLIDException.h>
 #include <AFTagManager.h>
+#include <QuickMenuChooser.h>
 #include <ComponentLicenseIDs.h>
+#include <ComUtils.h>
+#include <TextFunctionExpander.h>
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXMLPP
@@ -157,11 +160,19 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			m_editSchemaName.SetWindowText( "" );
 			m_editSchemaName.EnableWindow( FALSE );
 
+			// Determine which set of doc tags to display
+			m_bFAMTags = asCppBool(ipOutputToXML->FAMTags);
+
 			// Set radio button
 			m_iXMLFormat = (int)ipOutputToXML->Format;
 			if (m_iXMLFormat == (int)kXMLOriginal)
 			{
 				CheckRadioButton( IDC_RADIO_ORIGINAL, IDC_RADIO_SCHEMA, IDC_RADIO_ORIGINAL );
+
+				// Disable checkboxes and edit box [FlexIDSCore #3559]
+				m_btnNames.EnableWindow( FALSE );
+				m_btnSchema.EnableWindow( FALSE );
+				m_editSchemaName.EnableWindow( FALSE );
 			}
 			else if (m_iXMLFormat == (int)kXMLSchema)
 			{
@@ -213,7 +224,7 @@ LRESULT COutputToXMLPP::OnClickedBtnBrowseFile(WORD wNotifyCode,
 
 		// bring open file dialog
 		string strFileExtension(s_strAllFiles);
-		CFileDialogEx fileDlg(FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
+		CFileDialogEx fileDlg(FALSE, ".xml", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
 			strFileExtension.c_str(), NULL);
 		
@@ -237,10 +248,8 @@ LRESULT COutputToXMLPP::OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND h
 	{
 		RECT rect;
 		m_btnSelectDocTag.GetWindowRect(&rect);
-		CRect rc(rect);
-		
-		AFTagManager tagMgr;
-		string strChoice = tagMgr.displayTagsForSelection(CWnd::FromHandle(m_hWnd), rc.right, rc.top);
+
+		string strChoice = chooseDocTag(m_hWnd, rect.right, rect.top);
 		if (strChoice != "")
 		{
 			m_editFileName.ReplaceSel(strChoice.c_str(), TRUE);
@@ -330,8 +339,80 @@ LRESULT COutputToXMLPP::OnBnClickedCheckSchema(WORD /*wNotifyCode*/, WORD /*wID*
 //-------------------------------------------------------------------------------------------------
 void COutputToXMLPP::validateLicense()
 {
-	// Property Page requires Editor license
-	VALIDATE_LICENSE( gnRULESET_EDITOR_UI_OBJECT, "ELI07913", 
+	// Property page used to require editor license, but now just requires general FAM license
+	// since this property page may be displayed in both the rule set editor and the
+	// FAM ConvertVOAToXML task.
+	VALIDATE_LICENSE( gnFILE_ACTION_MANAGER_OBJECTS, "ELI07913", 
 		"OutputToXML PP" );
+}
+//-------------------------------------------------------------------------------------------------
+string COutputToXMLPP::chooseDocTag(HWND hWnd, long x, long y)
+{
+	try
+	{
+		IVariantVectorPtr ipVecBuiltInTags = NULL;
+		IVariantVectorPtr ipVecINITags = NULL;
+		if (m_bFAMTags)
+		{
+			IFAMTagManagerPtr ipFAMTags(CLSID_FAMTagManager);
+			ASSERT_RESOURCE_ALLOCATION("ELI26319", ipFAMTags != NULL);
+			ipVecBuiltInTags = ipFAMTags->GetBuiltInTags();
+			ipVecINITags = ipFAMTags->GetINIFileTags();
+		}
+		else
+		{
+			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI26320", ipAFTags != NULL);
+			ipVecBuiltInTags = ipAFTags->GetBuiltInTags();
+			ipVecINITags = ipAFTags->GetINIFileTags();
+		}
+		ASSERT_RESOURCE_ALLOCATION("ELI26321", ipVecBuiltInTags != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26322", ipVecINITags != NULL);
+
+
+		vector<string> vecChoices;
+
+		// Add the built in tags
+		long lBuiltInSize = ipVecBuiltInTags->Size;
+		for (long i = 0; i < lBuiltInSize; i++)
+		{
+			_variant_t var = ipVecBuiltInTags->Item[i];
+			vecChoices.push_back(asString(var.bstrVal));
+		}
+
+		// Add a separator if there is at
+		// least one built in tags
+		if (lBuiltInSize > 0)
+		{
+			vecChoices.push_back(""); // Separator
+		}
+
+		// Add tags in specified ini file
+		long lIniSize = ipVecINITags->Size;
+		for (long i = 0; i < lIniSize; i++)
+		{
+			_variant_t var = ipVecINITags->Item[i];
+			vecChoices.push_back(asString(var.bstrVal));
+		}
+
+		// Add a separator if there is
+		// at least one tag from INI file
+		if (lIniSize > 0)
+		{
+			vecChoices.push_back(""); // Separator
+		}
+
+		// Add utility functions
+		TextFunctionExpander tfe;
+		std::vector<std::string> vecFunctions = tfe.getAvailableFunctions();
+		tfe.formatFunctions(vecFunctions);
+		addVectors(vecChoices, vecFunctions); // add the functions
+
+		QuickMenuChooser qmc;
+		qmc.setChoices(vecChoices);
+
+		return qmc.getChoiceString(CWnd::FromHandle(hWnd), x, y);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26317");
 }
 //-------------------------------------------------------------------------------------------------

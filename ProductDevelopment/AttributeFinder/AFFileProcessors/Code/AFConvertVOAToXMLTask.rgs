@@ -1,0 +1,26 @@
+HKCR
+{
+	AFFileProcessors.AFConvertVOAToXMLTask.1 = s 'AFConvertVOAToXMLTask Class'
+	{
+		CLSID = s '{23FB28AB-EE7D-4708-AA23-B3F96B0DA094}'
+	}
+	AFFileProcessors.AFConvertVOAToXMLTask = s 'AFConvertVOAToXMLTask Class'
+	{
+		CLSID = s '{23FB28AB-EE7D-4708-AA23-B3F96B0DA094}'
+		CurVer = s 'AFFileProcessors.AFConvertVOAToXMLTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {23FB28AB-EE7D-4708-AA23-B3F96B0DA094} = s 'AFConvertVOAToXMLTask Class'
+		{
+			ProgID = s 'AFFileProcessors.AFConvertVOAToXMLTask.1'
+			VersionIndependentProgID = s 'AFFileProcessors.AFConvertVOAToXMLTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{0D45D3B2-CF74-4000-9549-EC5BD95B6A55}'
+		}
+	}
+}

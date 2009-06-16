@@ -6,14 +6,10 @@
 #include "..\..\AFCore\Code\AFCategories.h"
 
 #include <string>
-/*
-//-------------------------------------------------------------------------------------------------
-// Imports
-//-------------------------------------------------------------------------------------------------
-// NOTE: The import is being done here instead of stdafx.h because this class is
-// the only one that needs the XML support
-#import <msxml.dll> named_guids
-*/
+#include <utility>
+
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // COutputToXML
 class ATL_NO_VTABLE COutputToXML : 
@@ -72,6 +68,8 @@ public:
 	STDMETHOD(put_UseSchemaName)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_SchemaName)(/*[out, retval]*/ BSTR *pVal);
 	STDMETHOD(put_SchemaName)(/*[in]*/ BSTR newVal);
+	STDMETHOD(get_FAMTags)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_FAMTags)(VARIANT_BOOL newVal);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -103,7 +101,7 @@ private:
 	IAFUtilityPtr m_ipAFUtils;
 
 	// the filename string that represents where the XML data must be saved to
-	std::string m_strFileName;
+	string m_strFileName;
 
 	// Format in which to write XML output
 	EXMLOutputFormat	m_eOutputFormat;
@@ -115,7 +113,18 @@ private:
 	bool m_bSchemaName;
 
 	// String that represents the XML schema name
-	std::string m_strSchemaName;
+	string m_strSchemaName;
+
+	// Flag to indicate doc tags restriction to <SourceDocName>
+	bool m_bFAMTags;
 
 	void validateLicense();
+
+	// Expands the file name based on the doc tags
+	string expandFileName(IAFDocumentPtr ipDoc);
+
+	// Checks if the the file name contains tags and whether those tags are valid
+	// pair.first holds the contains tags value
+	// pair.second holds the valid tags value
+	pair<bool, bool> getContainsTagsAndTagsAreValid(const string& strFileName);
 };

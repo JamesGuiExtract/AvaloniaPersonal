@@ -40,24 +40,6 @@ library UCLID_AFFILEPROCESSORSLib
 	//////////////
 	[
 		object,
-		uuid(F4C65FD0-4DE5-4E37-81D9-14CB6168C1E3),
-		dual,
-		helpstring("IDetectFirstPageCreateMPI Interface"),
-		pointer_default(unique)
-	]
-	interface IDetectFirstPageCreateMPI : IDispatch
-	{
-		[propget, id(1), helpstring("property RulesFile")] HRESULT RulesFile([out, retval] BSTR *pVal);
-		[propput, id(1), helpstring("property RulesFile")] HRESULT RulesFile([in] BSTR newVal);
-		[propget, id(2), helpstring("property OutputImageName")] HRESULT OutputImageName([out, retval] BSTR *pVal);
-		[propput, id(2), helpstring("property OutputImageName")] HRESULT OutputImageName([in] BSTR newVal);
-		[propget, id(3), helpstring("property CreateOutputUSS")] HRESULT CreateOutputUSS([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(3), helpstring("property CreateOutputUSS")] HRESULT CreateOutputUSS([in] VARIANT_BOOL newVal);
-		[propget, id(4), helpstring("property UseUSS")] HRESULT UseUSS([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(4), helpstring("property UseUSS")] HRESULT UseUSS([in] VARIANT_BOOL newVal);
-	};
-	[
-		object,
 		uuid(06557EDF-0C1E-4A5D-8B6C-51E60860FCE7),
 		dual,
 		helpstring("IAFEngineFileProcessor Interface"),
@@ -84,27 +66,27 @@ library UCLID_AFFILEPROCESSORSLib
 	};
 
 	[
-		uuid(7009B66A-BF97-4557-A029-FBF178ADAAA5),
-		helpstring("DetectFirstPageCreateMPI Class")
+		object,
+		uuid(F96AFDF1-0F7D-4E71-A0E8-E38FF7BBF250),
+		dual,
+		helpstring("IAFConvertVOAToXMLTask Interface"),
+		pointer_default(unique)
 	]
-	coclass DetectFirstPageCreateMPI
+	interface IAFConvertVOAToXMLTask : IDispatch
 	{
-		[default] interface IDetectFirstPageCreateMPI;
-		interface IFileProcessingTask;
-		interface ICategorizedComponent;
-		interface ICopyableObject;
-		interface ILicensedComponent;
-		interface IMustBeConfiguredObject;
+		[propget, id(1), helpstring("property VOAFile")] HRESULT
+			VOAFile([out, retval] BSTR* pbstrVOAFile);
+		[propput, id(1), helpstring("property VOAFile")] HRESULT
+			VOAFile([in] BSTR bstrVOAFile);
+		[propget, id(2), helpstring("property XMLOutputHandler")] HRESULT
+			XMLOutputHandler([out, retval] IUnknown** ppXMLOutputHandler);
+		[propput, id(2), helpstring("property XMLOutputHandler")] HRESULT
+			XMLOutputHandler([in] IUnknown* pXMLOutputHandler);
 	};
 
-	[
-		uuid(0DF8637C-E581-4EC3-992D-A375E92183E1),
-		helpstring("DetectFirstPageCreateMPIPP Class")
-	]
-	coclass DetectFirstPageCreateMPIPP
-	{
-		interface IUnknown;
-	};
+	//////////////
+	// CoClasses
+	//////////////
 	[
 		uuid(0F831302-E48D-4A2C-B636-485612A60262),
 		helpstring("AFEngineFileProcessor Class")
@@ -118,12 +100,33 @@ library UCLID_AFFILEPROCESSORSLib
 		interface ILicensedComponent;
 		interface IMustBeConfiguredObject;
 	};
-
 	[
 		uuid(F0B58CEC-401F-42AC-BA0C-F11E3A3ED3F4),
 		helpstring("AFEngineFileProcessorPP Class")
 	]
 	coclass AFEngineFileProcessorPP
+	{
+		interface IUnknown;
+	};
+
+	[
+		uuid(23FB28AB-EE7D-4708-AA23-B3F96B0DA094),
+		helpstring("AFConvertVOAToXMLTask Class")
+	]
+	coclass AFConvertVOAToXMLTask
+	{
+		[default] interface IAFConvertVOAToXMLTask;
+		interface IFileProcessingTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(A7E8330B-AC29-445A-AF59-970D0EE469CA),
+		helpstring("AFConvertVOAToXMLTaskPP Class")
+	]
+	coclass AFConvertVOAToXMLTaskPP
 	{
 		interface IUnknown;
 	};

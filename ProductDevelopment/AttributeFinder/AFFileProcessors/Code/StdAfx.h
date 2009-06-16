@@ -44,6 +44,9 @@ using namespace UCLID_SSOCRLib;
 #import "..\..\AFCore\Code\AFCore.tlb" named_guids
 using namespace UCLID_AFCORELib;
 
+#import "..\..\AFOutputHandlers\Code\AFOutputHandlers.tlb" named_guids
+using namespace UCLID_AFOUTPUTHANDLERSLib;
+
 #import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;

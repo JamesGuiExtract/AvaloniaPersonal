@@ -13,6 +13,8 @@
 #include "AFFileProcessors_i.c"
 #include "AFEngineFileProcessor.h"
 #include "AFEngineFileProcessorPP.h"
+#include "AFConvertVOAToXMLTask.h"
+#include "AFConvertVOAToXMLTaskPP.h"
 
 
 CComModule _Module;
@@ -20,6 +22,8 @@ CComModule _Module;
 BEGIN_OBJECT_MAP(ObjectMap)
 OBJECT_ENTRY(CLSID_AFEngineFileProcessor, CAFEngineFileProcessor)
 OBJECT_ENTRY(CLSID_AFEngineFileProcessorPP, CAFEngineFileProcessorPP)
+OBJECT_ENTRY(CLSID_AFConvertVOAToXMLTask, CAFConvertVOAToXMLTask)
+OBJECT_ENTRY(CLSID_AFConvertVOAToXMLTaskPP, CAFConvertVOAToXMLTaskPP)
 END_OBJECT_MAP()
 
 class CAFFileProcessorsApp : public CWinApp

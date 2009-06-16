@@ -43,6 +43,13 @@ using namespace UCLID_INPUTFUNNELLib;
 #import "..\..\AFCore\Code\AFCore.tlb" named_guids
 using namespace UCLID_AFCORELib;
 
+#import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
+	rename ("EOF", "adoEOF")
+using namespace ADODB;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb" named_guids
+using namespace UCLID_FILEPROCESSINGLib;
+
 #import "..\..\AFUtils\Code\AFUtils.tlb" named_guids
 using namespace UCLID_AFUTILSLib;
 

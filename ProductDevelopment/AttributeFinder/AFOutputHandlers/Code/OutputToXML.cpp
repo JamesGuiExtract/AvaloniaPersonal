@@ -5,19 +5,18 @@
 #include "XMLVersion1Writer.h"
 #include "XMLVersion2Writer.h"
 
-#include <UCLIDException.h>
-#include <LicenseMgmt.h>
-#include <cpputil.h>
-#include <comutils.h>
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
-
-#include <io.h>
+#include <comutils.h>
+#include <cpputil.h>
+#include <LicenseMgmt.h>
+#include <TextFunctionExpander.h>
+#include <UCLIDException.h>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 4;
+const unsigned long gnCurrentVersion = 5;
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXML
@@ -26,6 +25,7 @@ COutputToXML::COutputToXML()
 :	m_bDirty(false),
 	m_eOutputFormat(kXMLSchema),
 	m_bUseNamedAttributes(false),
+	m_bFAMTags(false),
 	m_bSchemaName(false)
 {
 	try
@@ -94,26 +94,33 @@ STDMETHODIMP COutputToXML::put_FileName(BSTR newVal)
 
 		// make sure the file exists
 		// or that it contains valid string tags
-		if (m_ipAFUtils->StringContainsInvalidTags(strFile.c_str()) == VARIANT_TRUE)
+		pair<bool, bool> prTagsCheck = getContainsTagsAndTagsAreValid(strFile);
+
+		// Check if there were any doc tags
+		if (prTagsCheck.first)
 		{
-			UCLIDException ue("ELI07899", "The rules file contains invalid tags!");
-			ue.addDebugInfo("File", strFile);
-			throw ue;
+			// Check if the doc tags were valid
+			if (!prTagsCheck.second)
+			{
+				UCLIDException ue("ELI07899", "The xml file name contains invalid tags!");
+				ue.addDebugInfo("XML File", strFile);
+				throw ue;
+			}
 		}
-		else if (m_ipAFUtils->StringContainsTags(strFile.c_str()) == VARIANT_FALSE)
+		else
 		{
 			// if no tags are defined, make sure the filename represents
 			// an absolute path that can be written to
 			if (!isAbsolutePath(strFile))
 			{
 				UCLIDException ue("ELI07900", "Specification of a relative path is not allowed!");
-				ue.addDebugInfo("File", strFile);
+				ue.addDebugInfo("XML File", strFile);
 				throw ue;
 			}
 			else if (!canCreateFile(strFile)) 
 			{
 				UCLIDException ue("ELI07901", "The specified file cannot be written to!");
-				ue.addDebugInfo("File", strFile);
+				ue.addDebugInfo("XML File", strFile);
 				throw ue;
 			}
 		}
@@ -274,6 +281,45 @@ STDMETHODIMP COutputToXML::put_SchemaName(BSTR newVal)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::get_FAMTags(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		ASSERT_ARGUMENT("ELI26323", pVal != NULL);
+
+		// Validate license
+		validateLicense();
+
+		*pVal = asVariantBool(m_bFAMTags);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26324");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::put_FAMTags(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		// Validate license
+		validateLicense();
+
+		bool bNewVal = asCppBool(newVal);
+
+		// Only set the dirty flag if the value is changing
+		if (bNewVal != m_bFAMTags)
+		{
+			m_bFAMTags = bNewVal;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26318");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -287,12 +333,14 @@ STDMETHODIMP COutputToXML::raw_ProcessOutput(IIUnknownVector *pAttributes,
 	{
 		validateLicense();
 
-		// expand the filename as it may have tags defined in it.
-		AFTagManager tagMgr;
-		string strFileName = tagMgr.expandTagsAndFunctions(m_strFileName, pAFDoc);
+		IAFDocumentPtr ipAFDoc(pAFDoc);
+		ASSERT_ARGUMENT("ELI26298", ipAFDoc != NULL);
 
 		// ensure  valid parameters
 		ASSERT_ARGUMENT("ELI10489", pAttributes != NULL);
+
+		// Expand the file name based on the Doc tags
+		string strFileName = expandFileName(ipAFDoc);
 
 		// Pass Attributes to appropriate XMLWriter object
 		if (m_eOutputFormat == kXMLOriginal)
@@ -417,6 +465,9 @@ STDMETHODIMP COutputToXML::raw_CopyFrom(IUnknown *pObject)
 		// Set schema name flag and text
 		m_bSchemaName = asCppBool(ipSource->UseSchemaName);
 		m_strSchemaName = asString(ipSource->SchemaName);
+
+		// Copy the FAM tags flag
+		m_bFAMTags = asCppBool(ipSource->FAMTags);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12816");
 
@@ -474,6 +525,7 @@ STDMETHODIMP COutputToXML::IsDirty(void)
 // Version 3: Store m_bUseNamedAttributes
 // Version 4: Store m_bSchemaName
 //            Store m_strSchemaName
+// Version 5: Store m_bFAMTags
 STDMETHODIMP COutputToXML::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -549,6 +601,11 @@ STDMETHODIMP COutputToXML::Load(IStream *pStream)
 			dataReader >> m_strSchemaName;
 		}
 
+		if (nDataVersion >= 5)
+		{
+			dataReader >> m_bFAMTags;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -588,6 +645,8 @@ STDMETHODIMP COutputToXML::Save(IStream *pStream, BOOL fClearDirty)
 			dataWriter << m_bSchemaName;
 			dataWriter << m_strSchemaName;
 		}
+		dataWriter << m_bFAMTags;
+
 		dataWriter.flushToByteStream();
 
 		// Write the bytestream data into the IStream object
@@ -619,5 +678,87 @@ STDMETHODIMP COutputToXML::GetSizeMax(ULARGE_INTEGER *pcbSize)
 void COutputToXML::validateLicense()
 {
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI07892", "OutputToXML Output Handler" );
+}
+//-------------------------------------------------------------------------------------------------
+string COutputToXML::expandFileName(IAFDocumentPtr ipDoc)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI26300", ipDoc != NULL);
+
+		string strFileName;
+
+		// Check for expanding FAM tags or AF tags
+		if (m_bFAMTags)
+		{
+			// Get the FAM tag manager
+			IFAMTagManagerPtr ipFamTags(CLSID_FAMTagManager);
+			ASSERT_RESOURCE_ALLOCATION("ELI26301", ipFamTags != NULL);
+
+			// Get the source doc name from the AF doc object
+			ISpatialStringPtr ipString = ipDoc->Text;
+			ASSERT_RESOURCE_ALLOCATION("ELI26302", ipString != NULL);
+			_bstr_t bstrSourceDoc = ipString->SourceDocName;
+
+			// Get the expanded file name
+			strFileName = asString(ipFamTags->ExpandTags(m_strFileName.c_str(), bstrSourceDoc));
+		}
+		else
+		{
+			// Get the AFUtils tag manager
+			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI26303", ipAFTags != NULL);
+
+			// Get the expanded file name
+			strFileName = asString(ipAFTags->ExpandTags(m_strFileName.c_str(), ipDoc));
+		}
+
+		// Expand the text functions
+		TextFunctionExpander tfe;
+		strFileName = tfe.expandFunctions(strFileName);
+
+		return strFileName;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26304");
+}
+//-------------------------------------------------------------------------------------------------
+pair<bool, bool> COutputToXML::getContainsTagsAndTagsAreValid(const string &strFileName)
+{
+	try
+	{
+		// Default the return to no tags and valid tags
+		pair<bool, bool> prResult = pair<bool, bool>(false, true);
+
+		// Check for FAM tags
+		if (m_bFAMTags)
+		{
+			// Using FAM tags so check via FAM tag manager
+			IFAMTagManagerPtr ipFamTags(CLSID_FAMTagManager);
+			ASSERT_RESOURCE_ALLOCATION("ELI26311", ipFamTags != NULL);
+
+			prResult.first = asCppBool(ipFamTags->StringContainsTags(strFileName.c_str()));
+			if (prResult.first)
+			{
+				prResult.second = !asCppBool(ipFamTags->StringContainsInvalidTags(
+					strFileName.c_str()));
+			}
+		}
+		else
+		{
+			// Not FAM tags, use AF tag manager
+			IAFUtilityPtr ipAFTags(CLSID_AFUtility);
+			ASSERT_RESOURCE_ALLOCATION("ELI26312", ipAFTags != NULL);
+
+			prResult.first = asCppBool(ipAFTags->StringContainsTags(strFileName.c_str()));
+			if (prResult.first)
+			{
+				prResult.second = !asCppBool(ipAFTags->StringContainsInvalidTags(
+					strFileName.c_str()));
+			}
+		}
+
+		return prResult;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26313");
 }
 //-------------------------------------------------------------------------------------------------

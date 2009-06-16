@@ -224,6 +224,14 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\AFConvertVOAToXMLTask.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\AFConvertVOAToXMLTaskPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="AFEngineFileProcessor.cpp"
 				>
 				<FileConfiguration
@@ -379,6 +387,14 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
+				RelativePath=".\AFConvertVOAToXMLTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\AFConvertVOAToXMLTaskPP.h"
+				>
+			</File>
+			<File
 				RelativePath="AFEngineFileProcessor.h"
 				>
 			</File>
@@ -403,6 +419,14 @@
 			Name="Resource Files"
 			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
 			>
+			<File
+				RelativePath=".\AFConvertVOAToXMLTask.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\AFConvertVOAToXMLTaskPP.rgs"
+				>
+			</File>
 			<File
 				RelativePath="AFEngineFileProcessor.rgs"
 				>
