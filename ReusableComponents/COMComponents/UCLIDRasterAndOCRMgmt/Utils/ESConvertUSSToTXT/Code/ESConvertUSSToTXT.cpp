@@ -36,6 +36,7 @@ int nExitCode = EXIT_SUCCESS;
 // CESConvertUSSToTXTApp construction
 //-------------------------------------------------------------------------------------------------
 CESConvertUSSToTXTApp::CESConvertUSSToTXTApp()
+: m_eCounterToDecrement(kRedaction)
 {
 }
 
@@ -49,16 +50,21 @@ CESConvertUSSToTXTApp theApp;
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application has 2 required arguments and two optional arguments:\n";
+	string strUsage = "This application has 2 required arguments and three optional arguments:\n";
 		strUsage += "An input filename for conversion and an output filename.\n\n"
 			"The optional argument (/m:none) indicates that a missing input file should "
 			"not create an output text file.  The optional argument (/m:zero) indicates that "
-			"a missing input file should create a zero-length output text file.\n"
+			"a missing input file should create a zero-length output text file.\n\n"
+			"The 2nd optional argument indicates the counter that should be decremented by the "
+			"page count and can be one of the following:\n"
+			"\t/Indexing\n"
+			"\t/Pagination\n"
+			"\t/Redaction\n\n"
 			"The optional argument (/ef <filename>) specifies the location of an \n"
 			"exception log that will store any thrown exception.  Without an exception \n"
 			"log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
-		strUsage += "ESConvertUSSToTXT.exe <strInputFile> <strOutputFile> [/m:<none|zero>] [/ef <filename>]\n"
+		strUsage += "ESConvertUSSToTXT.exe <strInputFile> <strOutputFile> [/m:<none|zero>] [/Indexing|/Pagination|/Redaction] [/ef <filename>]\n"
 					"where:\n"
 					"\t<strInputFile> is a USS file to be converted\n"
 					"\t<strOutputFile> is the output TXT file\n"
@@ -97,9 +103,9 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 					vecParams.push_back( __argv[i]);
 				}
 
-				// Make sure the number of parameters is between 2 and 5
+				// Make sure the number of parameters is between 2 and 6
 				unsigned int uiParamCount = (unsigned int)vecParams.size();
-				if ((uiParamCount < 2) || (uiParamCount > 5))
+				if ((uiParamCount < 2) || (uiParamCount > 6))
 				{
 					usage();
 					return FALSE;
@@ -111,6 +117,9 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 				// Retrieve file names and output type
 				string strInputName = vecParams[0];
 				string strOutputName = vecParams[1];
+
+				// Set a flag to indicate if the counter switch has been specified
+				bool bCounterSwitchSpecified = false;
 
 				// Check for additional options
 				if (uiParamCount > 2)
@@ -156,6 +165,21 @@ BOOL CESConvertUSSToTXTApp::InitInstance()
 								usage();
 								return FALSE;
 							}
+						}
+						else if (!bCounterSwitchSpecified && strArgument.find( "/indexing" ) == 0)
+						{
+							bCounterSwitchSpecified = true;
+							m_eCounterToDecrement = kIndexing;
+						}
+						else if (!bCounterSwitchSpecified && strArgument.find( "/pagination" ) == 0)
+						{
+							bCounterSwitchSpecified = true;
+							m_eCounterToDecrement = kPagination;
+						}
+						else if (!bCounterSwitchSpecified && strArgument.find( "/redaction" ) == 0)
+						{
+							bCounterSwitchSpecified = true;
+							m_eCounterToDecrement = kRedaction;
 						}
 						// Unsupported argument
 						else
@@ -271,38 +295,29 @@ void CESConvertUSSToTXTApp::decrementCounter(ISpatialStringPtr ipText)
 		return;
 	}
 
-	// Use page-level redaction counter at this time - WEL 02/06/2008
-	bool bUsePagesRedactionCounter = true;
-	bool bUseDocsRedactionCounter = false;
+	// Create the License Manager object
+	SafeNetLicenseMgr snlMgr( gusblFlexIndex );
 
-	// Only check counters if necessary
-	if (bUsePagesRedactionCounter || bUseDocsRedactionCounter)
+	// Decrement counter once if non-spatial (P16 #1907)
+	long nNumberOfPages = 1;
+
+	// Decrement counter once for each page if spatial
+	if ( ipText->HasSpatialInfo() == VARIANT_TRUE)
 	{
-		// Create the License Manager object
-		SafeNetLicenseMgr snlMgr( gusblFlexIndex );
+		nNumberOfPages = ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
+	}
 
-		// DO NOT check USB Key serial number
-
-		// Update counters as needed
-		if (bUsePagesRedactionCounter)
-		{
-			// Decrement counter once if non-spatial (P16 #1907)
-			long nNumberOfPages = 1;
-
-			// Decrement counter once for each page if spatial
-			if (ipText->HasSpatialInfo() == VARIANT_TRUE)
-			{
-				nNumberOfPages = ipText->GetLastPageNumber() - ipText->GetFirstPageNumber() + 1;
-			}
-
-			snlMgr.decreaseCellValue( gdcellIDShieldRedactionCounter, nNumberOfPages );
-		}
-
-		if (bUseDocsRedactionCounter)
-		{
-			// Decrement counter once for the document.
-			snlMgr.decreaseCellValue( gdcellIDShieldRedactionCounter, 1 );
-		}
+	switch (m_eCounterToDecrement)
+	{
+	case kIndexing:
+		snlMgr.decreaseCellValue( gdcellFlexIndexingCounter, nNumberOfPages );
+		break;
+	case kPagination:
+		snlMgr.decreaseCellValue( gdcellFlexPaginationCounter, nNumberOfPages );
+		break;
+	case kRedaction:
+		snlMgr.decreaseCellValue( gdcellIDShieldRedactionCounter, nNumberOfPages );
+		break;
 	}
 }
 //-------------------------------------------------------------------------------------------------

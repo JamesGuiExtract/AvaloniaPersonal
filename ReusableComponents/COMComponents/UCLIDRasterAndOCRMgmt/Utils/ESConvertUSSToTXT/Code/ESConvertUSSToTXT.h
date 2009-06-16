@@ -36,6 +36,15 @@ public:
 	DECLARE_MESSAGE_MAP()
 
 private:
+	enum ECounterType {
+		kIndexing,
+		kPagination,
+		kRedaction
+	};
+
+	// Counter to decrement
+	ECounterType m_eCounterToDecrement;
+
 	// Writes the test from the strInputFileName USS file to the strOutputFileName TXT file
 	void convertUSSFile(const string strInputFileName, const string strOutputFileName, 
 		const EHandlingType eNoUSSFile);
