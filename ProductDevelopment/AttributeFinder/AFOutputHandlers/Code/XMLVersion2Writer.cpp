@@ -32,8 +32,8 @@ const string gstrXSI_NAME = "xsi:noNamespaceSchemaLocation";
 //-------------------------------------------------------------------------------------------------
 // XMLVersion2Writer
 //-------------------------------------------------------------------------------------------------
-XMLVersion2Writer::XMLVersion2Writer()
-:	m_bUseNamedAttributes(false)
+XMLVersion2Writer::XMLVersion2Writer(bool bRemoveSpatialInfo)
+:	m_bUseNamedAttributes(false), m_bRemoveSpatialInfo(bRemoveSpatialInfo)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -127,7 +127,7 @@ void XMLVersion2Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 
 	// Iterate through each of the attributes and handle them
 	long nNumAttributes = ipAttributes->Size();
-	for (int i = 0; i < nNumAttributes; i++)
+	for (long i = 0; i < nNumAttributes; i++)
 	{
 		// Get the current attribute
 		UCLID_AFCORELib::IAttributePtr ipAttribute = ipAttributes->At(i);
@@ -151,56 +151,58 @@ void XMLVersion2Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 
 			// Set the name attribute for the element
 			MSXML::IXMLDOMElementPtr ipAttr = ipAttributeNode;
-			ipAttr->setAttribute( _bstr_t( gstrFIELD_LEVEL_NAME_LABEL.c_str() ), 
-				ipAttribute->Name );
+			ipAttr->setAttribute(gstrFIELD_LEVEL_NAME_LABEL.c_str(), ipAttribute->Name);
 		}
 
 		// Set the type attribute for the element optionally if it is defined
 		_bstr_t _bstrAttrType = ipAttribute->Type;
-		if (string(_bstrAttrType) != "")
+		if (_bstrAttrType.length() > 0)
 		{
 			MSXML::IXMLDOMElementPtr ipAttr = ipAttributeNode;
 			ipAttr->setAttribute(_bstr_t( gstrFIELD_LEVEL_TYPE_LABEL.c_str() ), 
 				_bstrAttrType);
 		}
 
-		//////////////////////////////
-		// Create the FullText element
-		//////////////////////////////
-		MSXML::IXMLDOMElementPtr ipValueElement = getValueElement( ipXMLDOMDocument, 
-			ipAttribute );
-
-		// Append the FullText node to the attribute
-		ipAttributeNode->appendChild( ipValueElement );
-
-		//////////////////////////////////
-		// Create the FieldLine element(s)
-		//////////////////////////////////
-		// Get the text
+		// Get the spatial string from the attribute
 		ISpatialStringPtr ipText = ipAttribute->Value;
 		ASSERT_RESOURCE_ALLOCATION("ELI15536", ipText != NULL);
 
-		// Each line in the text will get a node
-		IIUnknownVectorPtr ipLines = ipText->GetLines();
-		ASSERT_RESOURCE_ALLOCATION("ELI19170", ipLines != NULL);
+		//////////////////////////////
+		// Create the FullText element
+		//////////////////////////////
+		MSXML::IXMLDOMElementPtr ipValueElement = getValueElement(ipXMLDOMDocument, ipText);
 
-		long nNumLines = ipLines->Size();
-		for (long nLineNum = 0; nLineNum < nNumLines; nLineNum++)
+		// Append the FullText node to the attribute
+		ipAttributeNode->appendChild(ipValueElement);
+
+		// Only add the spatial line information if not removing spatial info [FlexIDSCore #3557]
+		if (!m_bRemoveSpatialInfo)
 		{
-			// Get the spatial string on the line
-			ISpatialStringPtr ipLine = ipLines->At( nLineNum );
-			ASSERT_RESOURCE_ALLOCATION("ELI19171", ipLine != NULL);
+			//////////////////////////////////
+			// Create the FieldLine element(s)
+			//////////////////////////////////
+			// Each line in the text will get a node
+			IIUnknownVectorPtr ipLines = ipText->GetLines();
+			ASSERT_RESOURCE_ALLOCATION("ELI19170", ipLines != NULL);
 
-			// Skip this line if NOT spatial
-			if (ipLine->HasSpatialInfo() == VARIANT_TRUE)
+			long nNumLines = ipLines->Size();
+			for (long nLineNum = 0; nLineNum < nNumLines; nLineNum++)
 			{
-				// Create the FieldLine element
-				MSXML::IXMLDOMElementPtr ipLineElement = getLineElement(
-					ipXMLDOMDocument, ipAttribute, ipLine, nLineNum );
-				ASSERT_RESOURCE_ALLOCATION("ELI19176", ipLineElement != NULL)
+				// Get the spatial string on the line
+				ISpatialStringPtr ipLine = ipLines->At( nLineNum );
+				ASSERT_RESOURCE_ALLOCATION("ELI19171", ipLine != NULL);
 
-				// Append the FieldLine node to the attribute
-				ipAttributeNode->appendChild( ipLineElement );
+				// Skip this line if NOT spatial 
+				if (ipLine->HasSpatialInfo() == VARIANT_TRUE)
+				{
+					// Create the FieldLine element
+					MSXML::IXMLDOMElementPtr ipLineElement = getLineElement(
+						ipXMLDOMDocument, ipAttribute, ipLine, nLineNum );
+					ASSERT_RESOURCE_ALLOCATION("ELI19176", ipLineElement != NULL)
+
+						// Append the FieldLine node to the attribute
+						ipAttributeNode->appendChild( ipLineElement );
+				}
 			}
 		}
 
@@ -220,20 +222,18 @@ void XMLVersion2Writer::addNodesForAttributes(MSXML::IXMLDOMDocumentPtr ipXMLDOM
 }
 //-------------------------------------------------------------------------------------------------
 MSXML::IXMLDOMElementPtr XMLVersion2Writer::getValueElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
-															IAttributePtr ipAttribute)
+															ISpatialStringPtr ipValue)
 {
+	ASSERT_ARGUMENT("ELI19173", ipValue != NULL);
+
 	// Create the attribute value node
 	MSXML::IXMLDOMNodePtr ipValueNode = ipXMLDOMDocument->createElement( 
 		gstrFULLTEXT_LEVEL_ATTRIBUTE_NAME.c_str() );
 	ASSERT_RESOURCE_ALLOCATION("ELI19172", ipValueNode != NULL);
 
-	// Get the attribute and its value into local vars
-	ISpatialStringPtr ipValue = ipAttribute->Value;
-	ASSERT_RESOURCE_ALLOCATION("ELI19173", ipValue != NULL);
-
 	// Create a text node with the actual attribute value's text
 	// removing any unprintable characters (P16 #1413)
-	string strTest = ipValue->String;
+	string strTest = asString(ipValue->String);
 	string strValue = removeUnprintableCharacters( strTest );
 	MSXML::IXMLDOMNodePtr ipValueNodeText = ipXMLDOMDocument->createTextNode( 
 		strValue.c_str() );
@@ -244,7 +244,7 @@ MSXML::IXMLDOMElementPtr XMLVersion2Writer::getValueElement(MSXML::IXMLDOMDocume
 	MSXML::IXMLDOMElementPtr ipValueElement = ipValueNode;
 	ASSERT_RESOURCE_ALLOCATION("ELI19175", ipValueElement != NULL);
 
-	if (ipValue->HasSpatialInfo() == VARIANT_TRUE)
+	if (!m_bRemoveSpatialInfo && ipValue->HasSpatialInfo() == VARIANT_TRUE)
 	{
 		// Retrieve Average Character Confidence
 		long lMin = 0; 

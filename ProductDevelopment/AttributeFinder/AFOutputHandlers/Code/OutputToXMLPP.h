@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <ImageButtonWithStyle.h>
+
 #include <string>
 
 using namespace std;
@@ -41,8 +43,9 @@ BEGIN_MSG_MAP(COutputToXMLPP)
 	COMMAND_HANDLER(IDC_BTN_SELECT_DOC_TAG, BN_CLICKED, OnClickedSelectDocTag)
 	COMMAND_HANDLER(IDC_RADIO_ORIGINAL, BN_CLICKED, OnBnClickedRadioOriginal)
 	COMMAND_HANDLER(IDC_RADIO_SCHEMA, BN_CLICKED, OnBnClickedRadioSchema)
-	COMMAND_HANDLER(IDC_CHECK_NAMES, BN_CLICKED, OnBnClickedCheckNames)
 	COMMAND_HANDLER(IDC_CHECK_SCHEMA, BN_CLICKED, OnBnClickedCheckSchema)
+	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
+	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
 
 public:
@@ -58,14 +61,11 @@ public:
 	LRESULT OnClickedSelectDocTag(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnBnClickedRadioOriginal(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedRadioSchema(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
-	LRESULT OnBnClickedCheckNames(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnBnClickedCheckSchema(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 
 private:
 	// Data members
 	int		m_iXMLFormat;
-	bool	m_bNamedAttributes;
-	bool	m_bSchemaName;
 
 	// Whether the doc tags button should display FAM tags or AFUtils tags
 	bool	m_bFAMTags;
@@ -73,10 +73,11 @@ private:
 	// controls
 	ATLControls::CEdit m_editFileName;
 	ATLControls::CButton m_btnBrowse;
-	ATLControls::CButton m_btnSelectDocTag;
+	CImageButtonWithStyle m_btnSelectDocTag;
 	ATLControls::CButton m_btnNames;
 	ATLControls::CButton m_btnSchema;
 	ATLControls::CEdit m_editSchemaName;
+	ATLControls::CButton m_chkRemoveSpatialInfo;
 
 	// helper functions
 	void validateLicense();

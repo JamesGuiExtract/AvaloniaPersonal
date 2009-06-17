@@ -10,7 +10,7 @@ using namespace std;
 class XMLVersion2Writer : public XMLFileWriter
 {
 public:
-	XMLVersion2Writer();
+	XMLVersion2Writer(bool bRemoveSpatialInfo = false);
 
 	void UseNamedAttributes(bool bUseNamedAttributes);
 
@@ -24,9 +24,12 @@ private:
 
 	string m_strSchemaName;
 
+	// If true then spatial info will not be written out when the XML is written
+	bool m_bRemoveSpatialInfo;
+
 	// helper functions
 	MSXML::IXMLDOMElementPtr getValueElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
-		IAttributePtr ipAttribute);
+		ISpatialStringPtr ipValue);
 
 	MSXML::IXMLDOMElementPtr getLineElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 
 		IAttributePtr ipAttribute, ISpatialStringPtr ipLine, long nLineNum);

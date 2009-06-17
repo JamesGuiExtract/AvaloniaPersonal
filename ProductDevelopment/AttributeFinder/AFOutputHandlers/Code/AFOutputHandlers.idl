@@ -132,6 +132,12 @@ library UCLID_AFOUTPUTHANDLERSLib
 			FAMTags([out, retval] VARIANT_BOOL* pVal);
 		[propput, id(6), helpstring("property FAMTags")] HRESULT
 			FAMTags([in] VARIANT_BOOL newVal);
+		//------------------------------------------------------------------------------------------
+		// PURPOSE: If VARIANT_TRUE will remove any spatial information in the XML that is output
+		[propget, id(7), helpstring("property RemoveSpatialInfo")] HRESULT
+			RemoveSpatialInfo([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(7), helpstring("property RemoveSpatialInfo")] HRESULT
+			RemoveSpatialInfo([in] VARIANT_BOOL newVal);
 	};
 	[
 		object,

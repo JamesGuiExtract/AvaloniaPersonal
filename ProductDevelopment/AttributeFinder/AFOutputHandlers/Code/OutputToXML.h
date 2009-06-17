@@ -70,6 +70,8 @@ public:
 	STDMETHOD(put_SchemaName)(/*[in]*/ BSTR newVal);
 	STDMETHOD(get_FAMTags)(VARIANT_BOOL* pVal);
 	STDMETHOD(put_FAMTags)(VARIANT_BOOL newVal);
+	STDMETHOD(get_RemoveSpatialInfo)(VARIANT_BOOL* pVal);
+	STDMETHOD(put_RemoveSpatialInfo)(VARIANT_BOOL newVal);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -117,6 +119,9 @@ private:
 
 	// Flag to indicate doc tags restriction to <SourceDocName>
 	bool m_bFAMTags;
+
+	// Flag to indicate whether spatial info should be removed from the XML output
+	bool m_bRemoveSpatialInfo;
 
 	void validateLicense();
 

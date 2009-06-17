@@ -10,11 +10,14 @@ using namespace std;
 class XMLVersion1Writer : public XMLFileWriter
 {
 public:
-	XMLVersion1Writer();
+	XMLVersion1Writer(bool m_bRemoveSpatialInfo = false);
 
 	void WriteFile(const string& strFile, IIUnknownVector *pAttributes);
 
 private:
+
+	// If true then when the XML is written the spatial information will not be written out
+	bool m_bRemoveSpatialInfo;
 
 	// helper functions
 	MSXML::IXMLDOMElementPtr getValueElement(MSXML::IXMLDOMDocumentPtr ipXMLDOMDocument, 

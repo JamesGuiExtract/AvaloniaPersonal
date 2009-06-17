@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 5;
+const unsigned long gnCurrentVersion = 6;
 
 //-------------------------------------------------------------------------------------------------
 // COutputToXML
@@ -26,6 +26,7 @@ COutputToXML::COutputToXML()
 	m_eOutputFormat(kXMLSchema),
 	m_bUseNamedAttributes(false),
 	m_bFAMTags(false),
+	m_bRemoveSpatialInfo(false),
 	m_bSchemaName(false)
 {
 	try
@@ -320,6 +321,45 @@ STDMETHODIMP COutputToXML::put_FAMTags(VARIANT_BOOL newVal)
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26318");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::get_RemoveSpatialInfo(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		ASSERT_ARGUMENT("ELI26325", pVal != NULL);
+
+		// Validate license
+		validateLicense();
+
+		*pVal = asVariantBool(m_bRemoveSpatialInfo);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26326");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP COutputToXML::put_RemoveSpatialInfo(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		// Validate license
+		validateLicense();
+
+		bool bNewVal = asCppBool(newVal);
+
+		// Only set the dirty flag if the value is changing
+		if (bNewVal != m_bRemoveSpatialInfo)
+		{
+			m_bRemoveSpatialInfo = bNewVal;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26327");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -345,12 +385,12 @@ STDMETHODIMP COutputToXML::raw_ProcessOutput(IIUnknownVector *pAttributes,
 		// Pass Attributes to appropriate XMLWriter object
 		if (m_eOutputFormat == kXMLOriginal)
 		{
-			XMLVersion1Writer	xml1;
+			XMLVersion1Writer	xml1(m_bRemoveSpatialInfo);
 			xml1.WriteFile( strFileName.c_str(), pAttributes );
 		}
 		else if (m_eOutputFormat == kXMLSchema)
 		{
-			XMLVersion2Writer	xml2;
+			XMLVersion2Writer	xml2(m_bRemoveSpatialInfo);
 
 			// Provide UseNamedAttributes value
 			xml2.UseNamedAttributes( m_bUseNamedAttributes );
@@ -468,6 +508,9 @@ STDMETHODIMP COutputToXML::raw_CopyFrom(IUnknown *pObject)
 
 		// Copy the FAM tags flag
 		m_bFAMTags = asCppBool(ipSource->FAMTags);
+
+		// Copy the Remove spatial info value
+		m_bRemoveSpatialInfo = asCppBool(ipSource->RemoveSpatialInfo);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI12816");
 
@@ -526,6 +569,7 @@ STDMETHODIMP COutputToXML::IsDirty(void)
 // Version 4: Store m_bSchemaName
 //            Store m_strSchemaName
 // Version 5: Store m_bFAMTags
+// Version 6: Store m_bRemoveSpatialInfo
 STDMETHODIMP COutputToXML::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -606,6 +650,11 @@ STDMETHODIMP COutputToXML::Load(IStream *pStream)
 			dataReader >> m_bFAMTags;
 		}
 
+		if (nDataVersion >= 6)
+		{
+			dataReader >> m_bRemoveSpatialInfo;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 	}
@@ -646,6 +695,7 @@ STDMETHODIMP COutputToXML::Save(IStream *pStream, BOOL fClearDirty)
 			dataWriter << m_strSchemaName;
 		}
 		dataWriter << m_bFAMTags;
+		dataWriter << m_bRemoveSpatialInfo;
 
 		dataWriter.flushToByteStream();
 

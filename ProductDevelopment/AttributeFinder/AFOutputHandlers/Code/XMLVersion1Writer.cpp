@@ -20,7 +20,8 @@ const string gstrCONFIDENCE_ATTRIBUTE_NAME = "AverageCharConfidence";
 //-------------------------------------------------------------------------------------------------
 // XMLVersion1Writer
 //-------------------------------------------------------------------------------------------------
-XMLVersion1Writer::XMLVersion1Writer()
+XMLVersion1Writer::XMLVersion1Writer(bool bRemoveSpatialInfo) :
+m_bRemoveSpatialInfo(bRemoveSpatialInfo)
 {
 }
 //-------------------------------------------------------------------------------------------------
@@ -131,7 +132,7 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 
 	// Create a text node with the actual attribute value's text
 	// removing any unprintable characters (P16 #1413)
-	string strTest = ipValue->String;
+	string strTest = asString(ipValue->String);
 	string strValue = removeUnprintableCharacters( strTest );
 	MSXML::IXMLDOMNodePtr ipValueNodeText = ipXMLDOMDocument->createTextNode( 
 		strValue.c_str() );
@@ -143,8 +144,10 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 	MSXML::IXMLDOMElementPtr ipValueElement = ipValueNode;
 	ASSERT_RESOURCE_ALLOCATION("ELI12877", ipValueElement != NULL);
 
+	// Only add the spatial information if not removing spatial information
+	// and it has spatial info [FlexIDSCore #3557]
 	_bstr_t _bstrIsSpatialAttrName = gstrSPATIAL_XML_ATTRIBUTE_NAME.c_str();
-	if (ipValue->HasSpatialInfo() == VARIANT_TRUE)
+	if (!m_bRemoveSpatialInfo && ipValue->HasSpatialInfo() == VARIANT_TRUE)
 	{
 		// Mark the value as spatial
 		ipValueElement->setAttribute(_bstrIsSpatialAttrName, gstrSPATIAL_YES.c_str());
@@ -157,8 +160,7 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getValueElement(MSXML::IXMLDOMDocume
 		string strAvg = asString( lAvg );
 
 		// Add Average Character Confidence - P16 #1680
-		_bstr_t _bstrConfAttrName = gstrCONFIDENCE_ATTRIBUTE_NAME.c_str();
-		ipValueElement->setAttribute( _bstrConfAttrName, strAvg.c_str());
+		ipValueElement->setAttribute( gstrCONFIDENCE_ATTRIBUTE_NAME.c_str(), strAvg.c_str());
 
 		// Get the lines associated with the spatial string so
 		// that a "Line" node can be created underneath the value
@@ -202,7 +204,7 @@ MSXML::IXMLDOMElementPtr XMLVersion1Writer::getLineElement(MSXML::IXMLDOMDocumen
 
 	// Create a text node with the actual line's text
 	// removing any unprintable characters (P16 #1413)
-	string strLine = ipLine->String;
+	string strLine = asString(ipLine->String);
 	string strValue = removeUnprintableCharacters( strLine );
 	MSXML::IXMLDOMNodePtr ipLineNodeText = ipXMLDOMDocument->
 		createTextNode( strValue.c_str() );
@@ -345,7 +347,6 @@ void XMLVersion1Writer::appendSpatialElements(MSXML::IXMLDOMNodePtr ipLineElemen
 		MSXML::IXMLDOMElementPtr ipZoneElement = getZoneElement(ipXMLDOMDocument, ipZone);
 		ASSERT_RESOURCE_ALLOCATION("ELI12885", ipZoneElement != NULL);
 		ipLineElement->appendChild(ipZoneElement);
-
 	}
 }
 //-------------------------------------------------------------------------------------------------

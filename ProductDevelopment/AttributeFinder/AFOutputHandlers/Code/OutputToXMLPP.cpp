@@ -17,9 +17,7 @@
 // COutputToXMLPP
 //-------------------------------------------------------------------------------------------------
 COutputToXMLPP::COutputToXMLPP() 
-:	m_iXMLFormat(kXMLSchema),
-	m_bNamedAttributes(false),
-	m_bSchemaName(true)
+:	m_iXMLFormat(kXMLSchema)
 {
 	m_dwTitleID = IDS_TITLEOutputToXMLPP;
 	m_dwHelpFileID = IDS_HELPFILEOutputToXMLPP;
@@ -72,23 +70,27 @@ STDMETHODIMP COutputToXMLPP::Apply(void)
 			}
 			else
 			{
-				ipOutputToXML->NamedAttributes = m_bNamedAttributes ? VARIANT_TRUE : VARIANT_FALSE;
-				ipOutputToXML->UseSchemaName = m_bSchemaName ? VARIANT_TRUE : VARIANT_FALSE;
+				bool bUseSchema = m_btnSchema.GetCheck() == BST_CHECKED;
+				ipOutputToXML->NamedAttributes = asVariantBool(m_btnNames.GetCheck() == BST_CHECKED);
+				ipOutputToXML->UseSchemaName = asVariantBool(bUseSchema);
 
 				// Cannot use an empty schema name
-				CComBSTR bstrSchemaName;
-				GetDlgItemText( IDC_EDIT_SCHEMANAME, bstrSchemaName.m_str );
-				_bstr_t _bstrSchemaName( bstrSchemaName );
-				if (m_bSchemaName && (_bstrSchemaName.length() == 0))
+				_bstr_t bstrSchemaName;
+				m_editSchemaName.GetWindowText(bstrSchemaName.GetAddress());
+				if (bUseSchema && (bstrSchemaName.length() == 0))
 				{
 					throw UCLIDException("ELI12915", "Please specify a schema name!");
 				}
 				else
 				{
 					// Store the schema name (can be empty if m_bSchemaName == false)
-					ipOutputToXML->SchemaName = _bstrSchemaName;
+					ipOutputToXML->SchemaName = bstrSchemaName;
 				}
 			}
+
+			// Set the remove spatial info value
+			ipOutputToXML->RemoveSpatialInfo =
+				asVariantBool(m_chkRemoveSpatialInfo.GetCheck() == BST_CHECKED);
 		}
 
 		SetDirty(FALSE);
@@ -145,13 +147,14 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 			// initialize controls
 			m_editFileName = GetDlgItem(IDC_EDIT_FILENAME);
 			m_btnBrowse = GetDlgItem(IDC_BTN_BROWSE_FILE);
-			m_btnSelectDocTag = GetDlgItem(IDC_BTN_SELECT_DOC_TAG);
+			m_btnSelectDocTag.SubclassDlgItem(IDC_BTN_SELECT_DOC_TAG, CWnd::FromHandle(m_hWnd));
 			m_btnSelectDocTag.SetIcon(::LoadIcon(_Module.m_hInstResource, MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 			m_btnNames = GetDlgItem( IDC_CHECK_NAMES );
 			m_btnSchema = GetDlgItem( IDC_CHECK_SCHEMA );
 			m_editSchemaName = GetDlgItem( IDC_EDIT_SCHEMANAME );
+			m_chkRemoveSpatialInfo = GetDlgItem(IDC_CHK_XML_OUT_REMOVE_SPATIAL);
 
-			string strFileName = ipOutputToXML->FileName;
+			string strFileName = asString(ipOutputToXML->FileName);
 			m_editFileName.SetWindowText(strFileName.c_str());
 
 			// Default checkboxes to unchecked and schema name to empty
@@ -179,25 +182,24 @@ LRESULT COutputToXMLPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam,
 				CheckRadioButton( IDC_RADIO_ORIGINAL, IDC_RADIO_SCHEMA, IDC_RADIO_SCHEMA );
 
 				// Set Names checkbox
-				if (ipOutputToXML->NamedAttributes == VARIANT_TRUE)
-				{
-					CheckDlgButton( IDC_CHECK_NAMES, BST_CHECKED );
-					m_bNamedAttributes = true;
-				}
-				// else retain default setting of unchecked
+				m_btnNames.SetCheck(asBSTChecked(ipOutputToXML->NamedAttributes));
 
 				// Set Schema checkbox
-				if (ipOutputToXML->UseSchemaName == VARIANT_TRUE)
+				bool bUseSchema = asCppBool(ipOutputToXML->UseSchemaName);
+				if (bUseSchema)
 				{
-					CheckDlgButton( IDC_CHECK_SCHEMA, BST_CHECKED );
+					m_btnSchema.SetCheck(asBSTChecked(bUseSchema));
 
 					// Set Schema name edit box
 					m_editSchemaName.EnableWindow( TRUE );
-					string strSchemaName = ipOutputToXML->SchemaName;
+					string strSchemaName = asString(ipOutputToXML->SchemaName);
 					m_editSchemaName.SetWindowText( strSchemaName.c_str() );
 				}
 				// else retain default settings of unchecked and empty
 			}
+
+			// Set the checked state on the remove spatial info check box
+			m_chkRemoveSpatialInfo.SetCheck(asBSTChecked(ipOutputToXML->RemoveSpatialInfo));
 
 			// set focus to the editbox
 			m_editFileName.SetSel(0, -1);
@@ -292,27 +294,10 @@ LRESULT COutputToXMLPP::OnBnClickedRadioSchema(WORD /*wNotifyCode*/, WORD /*wID*
 		m_btnNames.EnableWindow( TRUE );
 		m_btnSchema.EnableWindow( TRUE );
 
-		// Get current status of schema name check box
-		m_bSchemaName = (m_btnSchema.GetCheck() == BST_CHECKED);
-
 		// Enable or disable the edit box
-		m_editSchemaName.EnableWindow( m_bSchemaName ? TRUE : FALSE );
+		m_editSchemaName.EnableWindow(asMFCBool(m_btnSchema.GetCheck() == BST_CHECKED));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12894");
-
-	return 0;
-}
-//-------------------------------------------------------------------------------------------------
-LRESULT COutputToXMLPP::OnBnClickedCheckNames(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	try
-	{
-		// Save setting
-		m_bNamedAttributes = (m_btnNames.GetCheck() == BST_CHECKED);
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12904");
 
 	return 0;
 }
@@ -323,11 +308,8 @@ LRESULT COutputToXMLPP::OnBnClickedCheckSchema(WORD /*wNotifyCode*/, WORD /*wID*
 
 	try
 	{
-		// Save setting
-		m_bSchemaName = (m_btnSchema.GetCheck() == BST_CHECKED);
-
 		// Enable or disable the edit box
-		m_editSchemaName.EnableWindow( m_bSchemaName ? TRUE : FALSE );
+		m_editSchemaName.EnableWindow(asMFCBool(m_btnSchema.GetCheck() == BST_CHECKED));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI12909");
 
