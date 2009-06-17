@@ -61,8 +61,8 @@ namespace Extract.Interop
         /// <param name="stream"><see cref="IStream"/> into which the object should be saved.
         /// </param>
         /// <param name="clearDirty">Value that indicates whether to clear the dirty flag after the
-        /// save is complete. If <see langref="true"/>, the flag should be cleared. If 
-        /// <see langref="false"/>, the flag should be left unchanged.</param>
+        /// save is complete. If <see langword="true"/>, the flag should be cleared. If 
+        /// <see langword="false"/>, the flag should be left unchanged.</param>
         void Save(IStream stream, [MarshalAs(UnmanagedType.Bool)] bool clearDirty);
 
         /// <summary>
