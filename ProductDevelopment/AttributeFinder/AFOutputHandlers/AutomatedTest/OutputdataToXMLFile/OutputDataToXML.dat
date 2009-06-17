@@ -11,3 +11,6 @@
 
 //test4 "Version 2 format with<SpatialLine>", "Formatted with attribute names" selected.
 <TESTCASE>;Test4.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;Test4.eav
+
+//test5 "Output XML with spatial information and spatial information removed (all versions)
+<TESTCASE>;TestRemoveSpatialXMLOutput.rsd;..\..\..\AFCore\Automatedtest\Images\Image1.tif.uss;;TestRemoveSpatialXMLOutput.eav
