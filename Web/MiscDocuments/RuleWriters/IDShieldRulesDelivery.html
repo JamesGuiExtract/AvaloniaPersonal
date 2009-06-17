@@ -50,10 +50,10 @@
 				<tr>
 					<td style="width: 80%">
 						<p>
-							<u>Add rules to SourceSafe</u>
+							<u>Add rules to SourceGear Vault</u>
 							<ol START=1>
-								<li><img src="..\CheckDash.JPG"> Ensure that all rules related <b>.rsd</b> and <b>.dat</b> files have been checked into SourceSafe under the <i>Rules</i> sub-folder of the main project folder.</li>
-								<li><img src="..\CheckDash.JPG"> Ensure that all testing related <b>.tcl</b> and <b>.dat</b> files have been checked into SourceSafe under the <i>TestingFiles</i> sub-folder of the main project folder.</li>
+								<li><img src="..\CheckDash.JPG"> Ensure that all rules related <b>.rsd</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>Rules</i> sub-folder of the main project folder.</li>
+								<li><img src="..\CheckDash.JPG"> Ensure that all testing related <b>.tcl</b> and <b>.dat</b> files have been checked into SourceGear Vault under the <i>TestingFiles</i> sub-folder of the main project folder.</li>
 							</ol>
 						<p>
 					</td>
@@ -92,7 +92,7 @@
 							<li><img src="..\CheckDash.JPG"> Check to see if any rules objects have been accidentally turned off.  Rules that are turned off on purpose should be well labeled to avoid future confusion.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that the proper counter and USB key numbers are set in <b>Master.rsd</b> and that <b>Master.rsd</b> is NOT internal use only.</li>
 							<li><img src="..\CheckDash.JPG"> Confirm that the proper types of output files are being created by <b>Master.rsd</b>.</li>
-							<li><img src="..\CheckDash.JPG"> In SourceSafe, label the <i>Rules</i> sub-folder with the date, using the format <i>YYYY-MM-DD</i>.</li>
+							<li><img src="..\CheckDash.JPG"> In SourceGear Vault, label the <i>Rules</i> sub-folder with the date, using the format <i>YYYY-MM-DD</i>.</li>
 						</ol>
 					</td>
 					<td style="width: 20%">
@@ -124,9 +124,8 @@
 						<u>Create delivery</u>
 						<ol START=20>
 							<li><img src="..\CheckDash.JPG"> Create a <i>YYYY-MM-DD</i> sub-folder under the <i>Deliveries</i> folder.</li>
-							<li><img src="..\CheckDash.JPG"> Get the rules from the <i>YYYY-MM-DD</i> label in SourceSafe and place them in the <i>YYYY-MM-DD</i> folder.</li>
+							<li><img src="..\CheckDash.JPG"> Get the rules from the <i>YYYY-MM-DD</i> label in SourceGear Vault and place them in the <i>YYYY-MM-DD</i> folder.</li>
 							<li><img src="..\CheckDash.JPG"> Encrypt all <b>.rsd</b> and <b>.dat</b> files.</li>
-							<li><img src="..\CheckDash.JPG"> Delete the <b>vssver</b> files.</li>
 							<li><img src="..\CheckDash.JPG"> Delete the unencrypted files.</li>
 							<li><img src="..\CheckDash.JPG"> Create a <b>readme.txt</b> file <u>retaining the history</u> of previous deliveries that includes the following information:
 								<ol>
@@ -179,9 +178,10 @@
 					<td>
 						<u>Send delivery</u>
 						<ol START=41>
-							<li><img src="..\CheckDash.JPG"> Add an external statistics spreadsheet into the <i>YYYY-MM-DD</i> folder.  The template for the external spreadsheet is located at: $\Engineering\Web\MiscDocuments\RuleWriters\IDShieldStatisticsTemplateExternal.xls</li>
+							<li><img src="..\CheckDash.JPG"> Add an external statistics spreadsheet into the <i>YYYY-MM-DD</i> folder.  The templates for the external spreadsheets are located in SourceGear Vault under: <b>$\Engineering\Web\MiscDocuments\RuleWriters</b>.  For hybrid projects, use <b>IDShieldStatisticsTemplateExternal (Hybrid).xls</b>.  For all other projects, use <b>IDShieldStatisticsTemplateExternal (Classic).xls</b>.</li>
 							<li><img src="..\CheckDash.JPG"> Fill in the spreadsheet, using the statistics from the final capture rate test.</li>
-							<li><img src="..\CheckDash.JPG"> Create an appropriate e-mail and attach both the <b>.zip</b> file and the external statistics spreadsheet.</li>
+							<li><img src="..\CheckDash.JPG"> Place the spreadsheet inside of the <b>.zip</b> file.</li>
+							<li><img src="..\CheckDash.JPG"> Create an appropriate e-mail and attach the <b>.zip</b> file.  Be sure to mention which workflow the customer should use in the e-mail.</li>
 							<li><img src="..\CheckDash.JPG"> Send the e-mail to all support personnel, Wayne, and Arvind.</li>
 						</ol>
 					</td>
