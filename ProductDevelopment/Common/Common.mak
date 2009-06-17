@@ -79,11 +79,12 @@ LabelCommonDir:
 	
 #Do not remove the tabs in the following echo statements they are required.
 CreateVersionISImportFile:
-	@ECHO "FlexIndexVersion	$(FlexIndexVersion)	" >$(CommonDirectory)\ExtractSystemsVersions.txt
-	@ECHO "ReusableComponentsVersion	$(ReusableComponentsVersion)	" >>$(CommonDirectory)\ExtractSystemsVersions.txt
-	@ECHO "LaserficheVersion	$(LaserficheVersion)	" >>$(CommonDirectory)\ExtractSystemsVersions.txt
-	@ECHO "IDShieldOfficeVersion	$(IDShieldOfficeVersion)	" >>$(CommonDirectory)\ExtractSystemsVersions.txt
-	@ECHO "LabDEVersion	$(LabDEVersion)	" >>$(CommonDirectory)\ExtractSystemsVersions.txt
+	@SET FlexIndexVersion=$(FlexIndexVersion)
+	@SET ReusableComponentsVersion=$(ReusableComponentsVersion)
+	@SET LaserficheVersion=$(LaserficheVersion)
+	@SET IDShieldOfficeVersion=$(IDShieldOfficeVersion)
+	@SET LabDEVersion=$(LabDEVersion)
+	@"$(CommonDirectory)\CreateExtractVersionFile" "$(CommonDirectory)\ExtractSystemsVersions.txt"
 
 DisplayTimeStamp:
 	@ECHO.

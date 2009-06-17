@@ -1238,6 +1238,7 @@
 		<row><td>BiildCDROMEnabled</td><td/></row>
 		<row><td>BiildInternetEnabled</td><td/></row>
 		<row><td>BiildSingleExeEnabled</td><td/></row>
+		<row><td>BiildSingleMSIEnabled</td><td/></row>
 		<row><td>PROJECT_ASSISTANT_DEFAULT_FEATURE</td><td/></row>
 		<row><td>PROJECT_ASSISTANT_FEATURES</td><td>NonSelectable</td></row>
 		<row><td>RegistryPageEnabled</td><td/></row>
@@ -3394,8 +3395,9 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PatchSequence</td><td>1.0.0</td></row>
 		<row><td>PatchVersion</td><td>1.0.0</td></row>
 		<row><td>SaveAsSchema</td><td/></row>
-		<row><td>SccEnabled</td><td>0</td></row>
-		<row><td>SccPath</td><td/></row>
+		<row><td>SccDatabasePath</td><td>http://white.extract.local/VaultService</td></row>
+		<row><td>SccEnabled</td><td>-1</td></row>
+		<row><td>SccPath</td><td>$/Engineering/ProductDevelopment/AttributeFinder/Installation/RuleDevelopmentKit</td></row>
 		<row><td>SchemaVersion</td><td>765</td></row>
 		<row><td>Script</td><td>1</td></row>
 		<row><td>Skin</td><td>&lt;ISProductFolder&gt;\SkinsMSI\Slate.skin</td></row>

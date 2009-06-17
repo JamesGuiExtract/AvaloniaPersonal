@@ -396,7 +396,7 @@ end;
 function UnInstallInliteKeyDrivers()
 	string szProgram;
 begin       
-  	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);                        	
+  	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
    
    	szProgram = SUPPORTDIR ^ "\\CBUSetup.exe";
 	LaunchAppAndWait(szProgram, "/Q /U /CRYPTOKEN", LAAW_OPTION_WAIT); 

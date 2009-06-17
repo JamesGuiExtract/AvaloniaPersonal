@@ -2048,8 +2048,6 @@
 		<row><td>COMPANY_NAME</td><td>1033</td><td>Extract Systems, LLC.</td><td>0</td><td/><td>194603370</td></row>
 		<row><td>DN_AlwaysInstall</td><td>0</td><td>Always Install</td><td>0</td><td>	</td><td>178112137</td></row>
 		<row><td>DN_AlwaysInstall</td><td>1033</td><td>Always Install</td><td>0</td><td>	</td><td>479668549</td></row>
-		<row><td>FlexIndexVersion</td><td>0</td><td>FlexIndex Ver. 7.1.0.1</td><td>0</td><td/><td>178094858</td></row>
-		<row><td>FlexIndexVersion</td><td>1033</td><td>FlexIndex Ver. 7.1.0.1</td><td>0</td><td/><td>178094858</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>0</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>178112137</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_COLOR</td><td>1033</td><td>The color settings of your system are not adequate for running [ProductName].</td><td>0</td><td/><td>479668549</td></row>
 		<row><td>IDPROP_EXPRESS_LAUNCH_CONDITION_OS</td><td>0</td><td>The operating system is not adequate for running [ProductName].</td><td>0</td><td/><td>178112137</td></row>
@@ -4574,6 +4572,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PatchSequence</td><td>1.0.0</td></row>
 		<row><td>PatchVersion</td><td>1.0.0</td></row>
 		<row><td>SaveAsSchema</td><td/></row>
+		<row><td>SccDatabasePath</td><td>http://white.extract.local/VaultService|:2</td></row>
 		<row><td>SccEnabled</td><td>0</td></row>
 		<row><td>SccPath</td><td/></row>
 		<row><td>SchemaVersion</td><td>765</td></row>
@@ -4864,7 +4863,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS</td><td>##IDS_PROGMSG_IIS_ROLLBACKWEBSERVICEEXTENSIONS##</td><td/></row>
 		<row><td>ProductCode</td><td>{A7DFE34D-A07E-4D57-A624-B758E42A69D4}</td><td/></row>
 		<row><td>ProductName</td><td>Extract Systems FLEX Index</td><td/></row>
-		<row><td>ProductVersion</td><td>7.1.0.3</td><td/></row>
+		<row><td>ProductVersion</td><td>1.0.0.0</td><td/></row>
 		<row><td>REBOOT</td><td>Suppress</td><td/></row>
 		<row><td>STANDARD_USE_SETUPEXE</td><td>##IDS_STANDARD_USE_SETUPEXE##</td><td/></row>
 		<row><td>SecureCustomProperties</td><td>ISALWAYSINSTALLELEVATED;ISSETUPDRIVEN;ARPSYSTEMCOMPONENT;ARPNOMODIFY;ARPNOREMOVE;INSTALLDIR</td><td/></row>
