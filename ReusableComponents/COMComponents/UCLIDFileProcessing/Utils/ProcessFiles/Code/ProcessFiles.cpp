@@ -165,7 +165,8 @@ void setupDynamicListSupplier(IFileProcessingManagerPtr ipFPM, std::string strFi
 //-------------------------------------------------------------------------------------------------
 BOOL CProcessFilesApp::InitInstance()
 {
-	CoInitializeEx(NULL, COINIT_MULTITHREADED);
+	// Apartment threading is being used to support certain .Net UI elements [DNRCAU #328]
+	CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
 
 	bool bAbnormalExit = false;
 
