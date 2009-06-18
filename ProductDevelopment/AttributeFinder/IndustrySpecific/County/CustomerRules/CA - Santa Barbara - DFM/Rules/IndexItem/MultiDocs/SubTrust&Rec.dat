@@ -1,23 +1,4 @@
 [PATTERNS_BEGIN]
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011235.tif
-rule001=Filing^3~No^?Reconveyance^250~[in^3~Book
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0011792.tif
-rule010=Instrument or Document^3~No^?Reconveyance^250~[in^3~Book
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0012060.tif
-rule020=Instrument^5~Number^?Reconveyance^250~[in^3~Book
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0012066.tif
-rule030=Instrument^5~Number^?Reconveyance^250~[Book
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0023533.tif
-rule040=Volume^3~Book^3~Page^3~Document^?Reconveyance^250~[As^3~the^3~undersigned
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0023536.tif
-rule050=Document^3~#^?Reconveyance^250~[Book
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #11 - Multi-Docs\2009-0024284.tif
-rule060=in^3~Book^3~Instrument^?Reconveyance^250~\r\n
-
+rule01=Filing^3~No^?Reconveyance^250~[in^3~Book
 [PATTERNS_END]
