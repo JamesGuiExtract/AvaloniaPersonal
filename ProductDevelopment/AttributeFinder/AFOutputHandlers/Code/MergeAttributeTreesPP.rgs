@@ -1,0 +1,25 @@
+HKCR
+{
+	AFOutputHandlers.MergeAttributeTreesPP.1 = s 'MergeAttributeTreesPP Class'
+	{
+		CLSID = s '{8BE2E476-23DC-4622-AD87-124030A69CDE}'
+	}
+	AFOutputHandlers.MergeAttributeTreesPP = s 'MergeAttributeTreesPP Class'
+	{
+		CLSID = s '{8BE2E476-23DC-4622-AD87-124030A69CDE}'
+		CurVer = s 'AFOutputHandlers.MergeAttrib.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {8BE2E476-23DC-4622-AD87-124030A69CDE} = s 'MergeAttributeTreesPP Class'
+		{
+			ProgID = s 'AFOutputHandlers.MergeAttributeTreesPP.1'
+			VersionIndependentProgID = s 'AFOutputHandlers.MergeAttributeTreesPP'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{F8F1F33C-B4CE-4171-8855-7DE5AEC361B8}'
+		}
+	}
+}

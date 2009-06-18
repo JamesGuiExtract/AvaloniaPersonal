@@ -75,6 +75,17 @@ library UCLID_AFOUTPUTHANDLERSLib
 		kPreserveField
     } EFieldMergeMode;
 
+	// Options for the Merge attribute trees merge location
+	typedef
+	[
+		uuid(C0A15D9F-1051-4EDD-ACD9-D492DAAF7E2D),
+		helpstring("Extract Merge Attribute Trees Into")
+	]
+	enum
+	{
+		kFirstAttribute,
+		kAttributeWithMostChildren
+	} EMergeAttributeTreesInto;
 
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
@@ -309,6 +320,90 @@ library UCLID_AFOUTPUTHANDLERSLib
 		// If VARIANT_TRUE, the original attributes be added as as sub-attributes to the merged value.
 		[propget, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([out, retval] VARIANT_BOOL *pVal);
 		[propput, id(9), helpstring("property PreserveAsSubAttributes")] HRESULT PreserveAsSubAttributes([in] VARIANT_BOOL newVal);
+	};
+
+	[
+		object,
+		uuid(EF5EF14B-86F1-49BD-83C6-7F44AF8FD41C),
+		dual,
+		nonextensible,
+		helpstring("IMergeAttributeTrees Interface"),
+		pointer_default(unique)
+	]
+	interface IMergeAttributeTrees : IDispatch
+	{
+		//------------------------------------------------------------------------------------------
+		// PROPERTY:	The attribute query specifying which top level attributes should
+		//				have their trees merged
+		[propget, id(1), helpstring("property AttributesToBeMerged")] HRESULT AttributesToBeMerged(
+			[out, retval] BSTR* pbstrAttributesToBeMerged);
+		[propput, id(1), helpstring("property AttributesToBeMerged")] HRESULT AttributesToBeMerged(
+			[in] BSTR bstrAttributesToBeMerged);
+		//------------------------------------------------------------------------------------------
+		// PROPERTY:	The attribute which will contain the merged trees
+		[propget, id(2), helpstring("property MergeAttributeTreesInto")]
+			HRESULT MergeAttributeTreesInto([out, retval] EMergeAttributeTreesInto* pMergeInto);
+		[propput, id(2), helpstring("property MergeAttributeTreesInto")]
+			HRESULT MergeAttributeTreesInto([in] EMergeAttributeTreesInto mergeInto);
+		//------------------------------------------------------------------------------------------
+		// PROPERTY:	The list of subattributes (one per line) which will be compared
+		[propget, id(3), helpstring("property SubAttributesToCompare")]
+			HRESULT SubAttributesToCompare([out, retval] BSTR* pbstrSubAttributesToCompare);
+		[propput, id(3), helpstring("property SubAttributesToCompare")]
+			HRESULT SubAttributesToCompare([in] BSTR bstrSubAttributesToCompare);
+		//------------------------------------------------------------------------------------------
+		// PROPERTY:	Whether non-matching comparison attributes should be discarded or not.
+		//				If VARIANT_FALSE the non-matching comparison attributes will be moved
+		//				to the bottom of the list of subattributes.
+		// EXAMPLE:		A								B
+		//				Test|N/A						Test|N/A
+		//				.CollectionDate|11/06/2008		.CollectionDate|10/22/2008
+		//				.Data|SomeValue					.Data|SomeOtherValue
+		//				.CollectionDate|10/22/2008		.Data|AnotherValue
+		//
+		//				For this example the AttributesToBeMerged = Test
+		//				SubAttributesToCompare = CollectionDate
+		//				CaseSensitive = VARIANT_FALSE
+		//				(Other settings will not effect the outcome)
+		//				Results if DiscardNonMatchingComparisons == VARIANT_TRUE:
+		//				Test|N/A
+		//				.CollectionDate|10/22/2008
+		//				.Data|SomeValue
+		//				.Data|SomeOtherValue
+		//				.Data|AnotherValue
+		//
+		//				Results if DiscardNonMatchingComparisons == VARIANT_FALSE:
+		//				Test|N/A
+		//				.CollectionDate|10/22/2008
+		//				.Data|SomeValue
+		//				.Data|SomeOtherValue
+		//				.Data|AnotherValue
+		//				.CollectionDate|11/06/2008
+		[propget, id(4), helpstring("property DiscardNonMatchingComparisons")]
+			HRESULT DiscardNonMatchingComparisons([out, retval] VARIANT_BOOL* pvbDiscard);
+		[propput, id(4), helpstring("property DiscardNonMatchingComparisons")]
+			HRESULT DiscardNonMatchingComparisons([in] VARIANT_BOOL vbDiscard);
+		//------------------------------------------------------------------------------------------
+		// PROPERTY:	Whether the comparison of attribute should be case sensitive
+		[propget, id(5), helpstring("property CaseSensitive")]
+			HRESULT CaseSensitive([out, retval] VARIANT_BOOL* pvbCaseSensitive);
+		[propput, id(5), helpstring("property CaseSensitive")]
+			HRESULT CaseSensitive([in] VARIANT_BOOL vbCaseSensitive);
+		//------------------------------------------------------------------------------------------
+		// TODO: FUTURE currently VARIANT_TRUE and not changeable
+		// PROPERTY:	Whether the attribute type should be used as part of the comparison
+		[propget, id(6), helpstring("property CompareTypeInformation")]
+			HRESULT CompareTypeInformation([out, retval] VARIANT_BOOL* pvbCompareTypeInfo);
+		//[propput, id(6), helpstring("property CompareTypeInformation")]
+		//	HRESULT CompareTypeInformation([in] VARIANT_BOOL vbCompareTypeInfo);
+		//------------------------------------------------------------------------------------------
+		// TODO: FUTURE currently VARIANT_FALSE and not changeable
+		// PROPERTY:	Whether the attribute comparison should recursively compare subattributes
+		[propget, id(7), helpstring("property CompareSubAttributes")]
+			HRESULT CompareSubAttributes([out, retval] VARIANT_BOOL* pvbCompareSubAttributes);
+		//[propput, id(7), helpstring("property CompareSubAttributes")]
+		//	HRESULT CompareSubAttributes([in] VARIANT_BOOL vbCompareSubAttributes);
+		//------------------------------------------------------------------------------------------
 	};
 
 	//----------------------------------------------------------------------------------------------
@@ -606,6 +701,28 @@ library UCLID_AFOUTPUTHANDLERSLib
 		helpstring("MergeAttributesPP Class")
 	]
 	coclass MergeAttributesPP
+	{
+		[default] interface IUnknown;
+	};
+
+	[
+		uuid(6642FF76-6F54-4F30-A78E-617660FE3CA4),
+		helpstring("MergeAttributeTrees Class")
+	]
+	coclass MergeAttributeTrees
+	{
+		[default] interface IMergeAttributeTrees;
+		interface IOutputHandler;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+	};
+	[
+		uuid(8BE2E476-23DC-4622-AD87-124030A69CDE),
+		helpstring("MergeAttributeTreesPP Class")
+	]
+	coclass MergeAttributeTreesPP
 	{
 		[default] interface IUnknown;
 	};

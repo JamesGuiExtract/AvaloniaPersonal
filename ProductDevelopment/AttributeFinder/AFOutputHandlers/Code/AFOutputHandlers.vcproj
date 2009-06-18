@@ -378,6 +378,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MergeAttributeTrees.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MergeAttributeTreesPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="ModifyAttributeValueOH.cpp"
 				>
 				<FileConfiguration
@@ -923,6 +931,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MergeAttributeTrees.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MergeAttributeTreesPP.h"
+				>
+			</File>
+			<File
 				RelativePath="ModifyAttributeValueOH.h"
 				>
 			</File>
@@ -1065,6 +1081,14 @@
 			</File>
 			<File
 				RelativePath=".\MergeAttributesPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\MergeAttributeTrees.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\MergeAttributeTreesPP.rgs"
 				>
 			</File>
 			<File
