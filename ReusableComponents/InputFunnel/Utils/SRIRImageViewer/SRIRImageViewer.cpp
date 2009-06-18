@@ -566,7 +566,7 @@ const string CSRIRImageViewerApp::getScriptUsage()
 		"            Top - Top half of the screen\n"
 		"            Right - Right half of the screen\n"
 		"            Bottom - Bottom half of the screen\n"
-		"            <left>,<top>,<right>,<bottom> - Sized to specified coordinates\n"
+		"            <left>,<right>,<top>,<bottom> - Sized to specified pixel coordinates\n"
 		"    HideButtons <ctrlid> - Hide a toolbar control\n"
 		"        <ctrlid> - Comma separated list of toolbar control id numbers (see help file)\n"
 		"    OpenFile <filename> - Opens the specified file\n"
