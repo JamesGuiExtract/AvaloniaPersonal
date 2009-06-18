@@ -1,0 +1,14 @@
+// Open image file
+openfile D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif
+
+// Zoom in several steps
+ZoomIn
+ZoomIn
+ZoomIn
+ZoomIn
+
+// Add temporary highlight to page 2 (StartX, StartY, EndX, EndY, Height as odd number, Page)
+AddTempHighlight 1250,800,1600,810,141,2
+
+// Zoom to the temporary highlight
+ZoomToTempHighlight

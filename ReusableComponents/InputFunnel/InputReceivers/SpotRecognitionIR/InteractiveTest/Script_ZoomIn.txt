@@ -1,0 +1,9 @@
+// Open image file
+OpenFile D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif
+
+// Zoom to page extents - same as Fit To Page
+ZoomExtents
+
+// Zoom In twice - for an obvious change
+ZoomIn
+ZoomIn
