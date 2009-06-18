@@ -20,23 +20,152 @@
 <ol>
 
 <!-- *********************************************** -->
-<li><h2>Miscellaneous</h2>
+<li><h3>Command-line options</h3>
 <ul>
-   	<li><b>[FlexIDSCore #2930]</b> /l option.  
+   	<li><b>[LegacyRC #5342] /c</b> option - Send OCR text to Clipboard
 	<ul>
-		<li>Open an image file with the Image Viewer.
-		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command 
-		window where <b>&lt;second_image&gt;</b> is a different image file.
-		<li>Confirm that the new image is opened in the existing image window.
+		<li>Run <b>ImageViewer.exe &lt;image_file&gt; /c</b> from a command window.
+		<li>Confirm that the image opens in ImageViewer.exe.
+		<li>Use <b>Recognize text and process</b> to select some text for OCR.
+		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
+		<li>Confirm that the recognized text <b>is</b> available in the Clipboard.
 	</ul>
 <p>
-   	<li><b>[LegacyRC #3665]</b> /e option in usage.  
+   	<li><b>[LegacyRC #3462, #5341] /closeall</b> option - Close all open instances
+	<ul>
+		<li>Run <b>ImageViewer.exe &lt;image_file_one&gt;</b> from a command window.
+		<li>Run <b>ImageViewer.exe &lt;image_file_two&gt;</b> from a command window.
+		<li>Confirm that each image is displayed in a separate Image Viewer.
+		<li>Run <b>ImageViewer.exe /closeall</b> from a command window.
+		<li>Confirm that both open instances are closed.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3665] /e</b> option - Script file in usage message
 	<ul>
 		<li>Run <b>ImageViewer.exe /?</b> from a command window.
 		<li>Confirm that the usage statement includes a <b>/e</b> option to specify 
 		a script file.
 	</ul>
 <p>
+   	<li><b>[FlexIDSCore #2930] /l</b> option - Reuse current Image Viewer
+	<ul>
+		<li>Open an image file with the Image Viewer.
+		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command 
+		window where <b>&lt;second_image&gt;</b> is a different image file.
+		<li>Confirm that the new image is opened in the existing image window.
+<p>
+		<li>Close the image window.
+		<li>Run <b>ImageViewer.exe /l &lt;second_image&gt;</b> from a command window.
+		<li>Confirm that the image is opened in an image window.
+	</ul>
+<p>
+   	<li><b>/o</b> option - Send OCR text to file
+	<ul>
+		<li>Run <b>ImageViewer.exe &lt;image_file&gt; /o &lt;ocr_file&gt;</b> 
+		from a command window.
+		<li>Confirm that the image opens in ImageViewer.exe.
+		<li>Use <b>Recognize text and process</b> to select some text for OCR.
+		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
+		<li>Confirm that the recognized text <b>is</b> stored in <b>&lt;ocr_file&gt;</b>.
+	</ul>
+<p>
+   	<li><b>/r</b> option - Register TIF extension
+	<ul>
+		<li>Run <b>ImageViewer.exe /r</b> from a command window.
+		<li>Double-click on a <b>TIF</b> image file.
+		<li>Confirm that the image <b>does</b> open in ImageViewer.exe.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3418] /s</b> option - Search for image files
+	<ul>
+		<li>Run <b>ImageViewer.exe /s</b> from a command window.
+		<li>Confirm that the <b>Extract Image Viewer</b> dialog appears on top of 
+		an empty Image Viewer.
+		<li>Browse to an image folder such as <b>C:\RedactionDemo\Images</b>.
+		<li>Select a file extension such as <b>tif</b>.
+		<li>Select a file name end such as <b>02</b>.
+		<li>Confirm that an appropriate image opens in the Image Viewer.
+		<li>Confirm that closing the search dialog closes the Image Viewer.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #5340] /scripthelp</b> option - Display script usage
+	<ul>
+		<li>Run <b>ImageViewer.exe /scripthelp</b> from a command window.
+		<li>Confirm that a message box is displayed with usage information 
+		for scripting.
+	</ul>
+<p>
+   	<li><b>/u</b> option - Unregister TIF extension
+	<ul>
+		<li>Run <b>ImageViewer.exe /u</b> from a command window.
+		<li>Double-click on a <b>TIF</b> image file.
+		<li>Confirm that the image <b>does not</b> open in ImageViewer.exe.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3667] /z</b> option - Invalid command-line argument
+	<ul>
+		<li>Run <b>ImageViewer.exe /z</b> from a command window.
+		<li>Confirm that an <b>Invalid Argument</b> exception is displayed.
+	</ul>
+<p>
+   	<li><b>[LegacyRC #3419] /?</b> option - Display usage
+	<ul>
+		<li>Run <b>ImageViewer.exe /?</b> from a command window.
+		<li>Confirm that a message box is displayed with usage information.
+	</ul>
+</ul>
+<p>
+<!-- *********************************************** -->
+<li><h3>Scripting options</h3>
+<ul>
+   	<li><b>Test Setup</b>
+	<ul>
+		<li>Navigate to the
+		<b>ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\InteractiveTest</b> 
+		folder.
+		<li>Confirm that various <b>Script_&lt;Description&gt;.txt</b> files are present.
+	</ul>
+<p>
+   	<li><b>Test Execution</b> - Confirm that each of the following tests works as expected via 
+	<b>ImageViewer.exe /e &lt;script_file&gt;</b>
+	<ul>
+		<li><b>[LegacyRC #3476]</b> Script_SetCurrentPageNumber_2.txt
+		<li><b>[LegacyRC #3476]</b> Script_ZoomExtents.txt
+		<li><b>[LegacyRC #3476]</b> Script_ZoomIn.txt
+		<li><b>[LegacyRC #3476]</b> Script_ZoomOut.txt
+		<li><b>[LegacyRC #3476]</b> Script_ClearImage.txt
+<p>
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Top.txt
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Left.txt
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Bottom.txt
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Right.txt
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Full.txt
+		<li><b>[LegacyRC #3488]</b> Script_SetWindowPos_Specified.txt
+<p>
+		<li>Script_HideButtons_OpenSavePrint.txt
+		<li>Script_HideButtons_ZoomZoomInZoomOut.txt
+		<li>Script_HideButtons_ZoomPreviousZoomNext.txt
+		<li>Script_HideButtons_FitToPageFitToWidth.txt
+		<li>Script_HideButtons_PanSelectHighlight.txt
+		<li>Script_HideButtons_HighlightText.txt
+		<li>Script_HideButtons_SetHighlightHeight.txt
+		<li>Script_HideButtons_EditHighlightText.txt
+		<li>Script_HideButtons_DeleteHighlights.txt
+		<li>Script_HideButtons_RecognizeText.txt
+		<li>Script_HideButtons_OpenSubImage.txt
+		<li>Script_HideButtons_Rotate.txt
+		<li>Script_HideButtons_PageNavigation.txt
+<p>
+		<li>Script_AddTempHighlights.txt
+		<li>Script_ClearTempHighlights.txt
+		<li><b>[LegacyRC #3493]</b> Script_ZoomToTempHighlight.txt
+		<li>Script_CenterOnTempHighlight.txt
+	</ul>
+</ul>
+<p>
+<!-- *********************************************** -->
+<li><h3>Miscellaneous</h3>
+<ul>
    	<li><b>[LegacyRC #3688]</b> Display page percentage in status bar.  
 	<ul>
 		<li>Use <b>RegEdit</b> to remove the <b>DisplayPercentageEnabled</b> key under 
@@ -196,21 +325,21 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 <p>
 	<li><b>[LegacyRCAndUtils #5149]</b> Change Image Viewer title
 	<ul>
-		<li>Confirm that the name of the utility is "Extract Image Viewer."
+		<li>Confirm that the name of the utility is <b>Extract Image Viewer</b>.
 	</ul>
 </ul>
 </li>
 <br />
 
-<li><h2>Image Display in Image Viewer</h2>
+<li><h3>Image Display in Image Viewer</h3>
 <ul>
    	<li><b>[LegacyRC #3897]</b> Version 1.5 PDFs
 	<ul>
-		<li>Confirm that Image Viewer can open each image in the following folder.  I:\Common\Testing\PVCS_Testing\LegacyRC\3897
+		<li>Confirm that Image Viewer can open each image in the following folder.  		I:\Common\Testing\PVCS_Testing\LegacyRC\3897
 	</ul>
    	<li><b>[FlexIDSCore #2693]</b> Searchable PDFs
 	<ul>
-		<li>Confirm that Image Viewer can open and display each image in the following folder.  I:\Common\Testing\PVCS_Testing\FlexIDSCore\2693
+		<li>Confirm that Image Viewer can open and display each image in the following folder.  		I:\Common\Testing\PVCS_Testing\FlexIDSCore\2693
 	</ul>
 	<li><b>[LegacyRCAndUtils #5102]</b> Unable to open PDF - Unable to initialize PDF engine</li>
 	<ul>
@@ -228,7 +357,7 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 <br />
 
 <!-- *********************************************** -->
-<li><h2>Manual Rotation Testing</h2>
+<li><h3>Manual Rotation Testing</h3>
 <ul>
    	<li><b>Instructions</b>
 	<ul>
@@ -282,7 +411,7 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 <br />
 
 <!-- *********************************************** -->
-<li><h2>Automated Rotation Testing</h2>
+<li><h3>Automated Rotation Testing</h3>
 <ul>
 	<li>Use the <b>File Action Manager</b> to exercise automated redaction with the 
             RedactionDemo RSD file.</li>   
