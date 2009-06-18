@@ -5,22 +5,15 @@
 #include "SRIRImageViewer.h"
 #include "SRIRImageViewerDlg.h"
 
-#include <Win32GlobalAtom.h>
-#include <Win32Util.h>
-#include <UCLIDExceptionDlg.h>
-#include <UCLIDException.h>
 #include <cpputil.h>
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <LicenseMgmt.h>
-#include <StringTokenizer.h>
 #include <SRIRConstants.h>
-
-#include <io.h>
-#include <string>
-#include <vector>
-#include <map>
-
-using namespace std;
+#include <StringTokenizer.h>
+#include <UCLIDException.h>
+#include <UCLIDExceptionDlg.h>
+#include <Win32GlobalAtom.h>
+#include <Win32Util.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -40,16 +33,16 @@ const char *gpszOCRToMessageBoxMsgName = "UCLIDSRIROCRToMessageBoxMessage";
 
 const long gnMaxWindowNameSize = 512; 
 
-static const std::string gstrCmdLineRegister = "/r";
-static const std::string gstrCmdLineUnRegister = "/u";
-static const std::string gstrCmdLineDisplaySwipedTextInMessageBox = "/m";
-static const std::string gstrCmdLineWriteSwipedTextToFile = "/o";
-static const std::string gstrCmdLineWriteSwipedTextToClipboard = "/c";
-static const std::string gstrCmdLineDisplaySearchDialog = "/s";
-static const std::string gstrCmdLineReuseWindow = "/l";
-static const std::string gstrCmdLineExecScript = "/e";
-static const std::string gstrCmdLineCloseAll = "/closeall";
-static const std::string gstrCmdLineHelp = "/?";
+const string gstrCmdLineRegister = "/r";
+const string gstrCmdLineUnRegister = "/u";
+const string gstrCmdLineWriteSwipedTextToFile = "/o";
+const string gstrCmdLineWriteSwipedTextToClipboard = "/c";
+const string gstrCmdLineDisplaySearchDialog = "/s";
+const string gstrCmdLineReuseWindow = "/l";
+const string gstrCmdLineCloseAll = "/closeall";
+const string gstrCmdLineExecScript = "/e";
+const string gstrCmdLineScriptHelp = "/scripthelp";
+const string gstrCmdLineHelp = "/?";
 
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -127,7 +120,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		// To deal with this problem, we will try to put all the arguments
 		// together into a string, seperated with spaces.  If the resulting
 		// string is a valid filename, then lets assume that the surrounding
-		// quotes were ommitted by the calling application.
+		// quotes were omitted by the calling application.
 		
 		// compute the concatenation of all arguments
 		string strTemp;
@@ -176,11 +169,6 @@ BOOL CSRIRImageViewerApp::InitInstance()
 						gpszTIFFileDescription);
 					return FALSE;
 				}
-				else if (strArg == gstrCmdLineDisplaySwipedTextInMessageBox)
-				{
-					// Use the MessageBox PTH
-					eOCRTextHandlingType = kDisplayOCRTextInMessageBox;
-				}
 				else if (strArg == gstrCmdLineWriteSwipedTextToFile)
 				{
 					// Use the MessageBox PTH
@@ -220,11 +208,16 @@ BOOL CSRIRImageViewerApp::InitInstance()
 					i++;
 					strScriptFileName = __argv[i];
 				}
+				else if (strArg == gstrCmdLineScriptHelp)
+				{
+					AfxMessageBox(getScriptUsage().c_str());
+					return FALSE;
+				}
 				else if (strArg == gstrCmdLineCloseAll)
 				{
 					bCloseAll = true;
 				}
-				else if (_strcmpi(__argv[i], "/?") == 0)
+				else if (strArg == "/?")
 				{
 					AfxMessageBox(getUsage().c_str());
 					return FALSE;
@@ -248,7 +241,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 					{
 						if(strFileName[strFileName.size()-3] != '.')
 						{
-							if(! isFileOrFolderValid(strFileName))
+							if(!isFileOrFolderValid(strFileName))
 							{
 								//We know that it isnt a valid file name
 								UCLIDException ue("ELI13575", "File not found!");
@@ -280,7 +273,6 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 		// Here we register with windows the message that we will use to 
 		// communicate between instances of the SRIRImageViewer
-		// this is necessary for the /l option
 		m_uiMsgLoadImage = registerMessage(gpszLoadImageMsgName);
 		m_uiMsgExecScript = registerMessage(gpszExecScriptMsgName);
 		m_uiMsgCloseViewer = registerMessage(gpszCloseViewerMsgName);
@@ -288,10 +280,11 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		m_uiMsgOCRToClipboard = registerMessage(gpszOCRToClipboardMsgName);
 		m_uiMsgOCRToMessageBox = registerMessage(gpszOCRToMessageBoxMsgName);
 
-		bool bCreateAndUse = true;
+		// Default to creating an image viewer unless we are closing all
+		bool bCreateAndUse = !bCloseAll;
 
-		// if the /l option has been specified
-		if (bReuse)
+		// Check if existing windows should be enumerated
+		if (bReuse || bCloseAll)
 		{
 			EnumWindows(enumSRIRImageWindows, (LPARAM)this);
 			if (m_vecWindowHandles.size() > 0)
@@ -302,8 +295,6 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 		if (bCreateAndUse)
 		{
-			// initialize COM
-			//CoInitializeEx(NULL, COINIT_MULTITHREADED);
 			// This is being used instead of multithreaded version because
 			// This app uses the Spot Recognition Window that uses an OCX
 			// that will not work with the multithreaded option
@@ -314,15 +305,16 @@ BOOL CSRIRImageViewerApp::InitInstance()
 
 			// These must be called in order
 			// create the spot recognition window
-			ISpotRecognitionWindowPtr m_ipSRIR;
-			m_ipSRIR.CreateInstance(CLSID_SpotRecognitionWindow);
+			ISpotRecognitionWindowPtr m_ipSRIR(CLSID_SpotRecognitionWindow);
 			ASSERT_RESOURCE_ALLOCATION("ELI06300", m_ipSRIR != NULL);
 
 			// Cast the SRIR to an InputReceiver
 			IInputReceiverPtr m_ipInputReceiver = m_ipSRIR;
 			ASSERT_RESOURCE_ALLOCATION("ELI06301", m_ipSRIR != NULL);
+
 			// enable text input
 			m_ipInputReceiver->EnableInput("Text", "");
+
 			// show the spot recognition window
 			m_ipInputReceiver->ShowWindow(VARIANT_TRUE);
 
@@ -544,32 +536,52 @@ BOOL CSRIRImageViewerApp::PreTranslateMessage(MSG* pMsg)
 //-------------------------------------------------------------------------------------------------
 const string CSRIRImageViewerApp::getUsage()
 {
-	static string strUsage = "ImageViewer.exe [options] [<filename>]\n"
-							 "options:\n"
-								"\t/r - register the .tif file extension such that .tif files\n"
-								"\topen by default with the Image Viewer\n"
-								"\t/u - unregister the .tif file extension such that .tif files\n"
-								"\tdo NOT open by default with the Image Viewer\n"
-								"\t/m - Text that is OCR'ed in the Image Viewer will be\n"
-								"\tdisplayed in a message box rather than copied to the clipboard\n"
-								"\t/o <ocrfile> - Text that is OCR'ed in the Image Viewer will be\n"
-								"\tbe written to <ocrfile> rather than copied to the clipboard\n"
-								"\t/s - display the search window\n"
-								"\t/l - reuse a current image viewer if one already exists\n"
-								"\t/h <ctrlid> - hide a toolbar control on the Image Viewer\n"
-								"\t\t<ctrlid> - to see the valid values for <ctrlid> use the /c option\n"
-								"\t/e <scriptfile> - execute script commands specified in <scriptfile>\n"
-								"\t/c - display the valid control IDs\n"
-								"\t/p <position> - Set the position and size of the image viewer\n"
-								"\t\t<position> - position can be one of the following:\n"
-								"\t\tFull - display the window in fullscreen\n"
-								"\t\tTop - display the window in the top half of the screen\n"
-								"\t\tLeft - display the window in the left half of the screen\n"
-								"\t\tRight - display the window in the right half of the screen\n"
-								"\t\tBottom - display the window in the bottom half of the screen\n"
-								"\t/closeall - close any currently open Image Viewer\n"
-								"\t/? - show help\n"
-							 "<filename> - the name of a file to be opened by default\n";
+	string strUsage = "ImageViewer.exe [options] [filename]\n"
+		"options:\n"
+		"    /r - register the .tif file extension such that .tif files\n"
+		"        open by default with the Image Viewer\n"
+		"    /u - unregister the .tif file extension such that .tif files\n"
+		"        do NOT open by default with the Image Viewer\n"
+		"    /o <ocrfile> - Text that is OCRed in the Image Viewer will be\n"
+		"        written to <ocrfile> rather than displayed in a message box\n"
+		"    /c - Text that is OCRed in the Image Viewer will be copied to\n"
+		"        the clipboard rather than displayed in a message box\n"
+		"    /s - display the search window\n"
+		"    /l - reuse a current image viewer if one already exists\n"
+		"    /closeall - close any currently open Image Viewer\n"
+		"    /e <scriptfile> - execute script commands specified in <scriptfile>\n"
+		"    /scripthelp - displays help for script commands\n"
+		"    /? - show help\n"
+		"filename - the name of a file to be opened by default\n";
+	return strUsage;
+}
+//-------------------------------------------------------------------------------------------------
+const string CSRIRImageViewerApp::getScriptUsage()
+{
+	string strUsage = "Script commands:\n"
+		"    SetWindowPos <position> - Set the position and size of the image viewer\n"
+		"        <position> - May be one of the following values:\n"
+		"            Full - Fullscreen\n"
+		"            Left - Left half of the screen\n"
+		"            Top - Top half of the screen\n"
+		"            Right - Right half of the screen\n"
+		"            Bottom - Bottom half of the screen\n"
+		"            <left>,<top>,<right>,<bottom> - Sized to specified coordinates\n"
+		"    HideButtons <ctrlid> - Hide a toolbar control\n"
+		"        <ctrlid> - Comma separated list of toolbar control id numbers (see help file)\n"
+		"    OpenFile <filename> - Opens the specified file\n"
+		"    AddTempHighlight <startX>,<startY>,<endX>,<endY>,<height>,<pagenumber> -\n"
+		"        Creates a temporary highlight at the specified location\n"
+		"    ClearTempHighlights - Clears all highlights created by AddTempHighlight\n"
+		"    ClearImage - Closes any open image in the image window\n"
+		"    SetCurrentPageNumber <pagenumber> - Goes to the specified page\n"
+		"    ZoomIn - Zooms in\n"
+		"    ZoomOut - Zooms out\n"
+		"    ZoomExtents - Toggles fit to page mode\n"
+		"    CenterOnTempHighlight - Centers on the first temporary highlight\n"
+		"    ZoomToTempHighlight - Centers on the first temporary highlight and\n"
+		"        zooms in around the highlight.\n";
+
 	return strUsage;
 }
 //-------------------------------------------------------------------------------------------------
@@ -634,10 +646,6 @@ BOOL CALLBACK CSRIRImageViewerApp::enumSRIRImageWindows(HWND hWnd, LPARAM lParam
 	{
 		CSRIRImageViewerApp* pApp = (CSRIRImageViewerApp*)lParam;
 		pApp->addToWindowHandleVector(hWnd);
-
-		// "#32770" is the WNDCLASS name of a dialog and that is what we 
-		// are looking for
-		//	HWND hWnd = ::FindWindow(MAKEINTATOM(32770), "SRIRImageViewer");
 	}
 	return TRUE;
 }
@@ -653,150 +661,4 @@ UINT CSRIRImageViewerApp::registerMessage(const char* szMsgName)
 	}
 	return uiMsgId;
 }
-
-/*
-
-  else if (strArg == gstrCmdLineHideButtons)
-			{
-				// /h reqires an additional argument that is the button
-				// to be hidden so if there are no more arguments
-				// we throw an exception
-				if (i == __argc - 1)
-				{
-					UCLIDException ue("ELI11858", "The /h option requires an additional argument.");
-					throw ue;
-				}
-				i++;
-
-				// Following argument is of the form a:b:c... 
-				// where a, b, c are 0-relative button numbers
-				string strButtons = __argv[i];
-
-				// Tokenize the string
-				std::vector<std::string>	vecButtonTokens;
-				StringTokenizer::sGetTokens( strButtons, ':', vecButtonTokens );
-				int nNumOfTokens = vecButtonTokens.size();
-				int i;
-				for (i = 0; i < nNumOfTokens; i++)
-				{
-					// Add each button to the collection
-					vecButtonsToHide.push_back( vecButtonTokens[i] );
-				}
-			}
-			else if (strArg == gstrCmdLineDisplayButtonIDs)
-			{
-				AfxMessageBox(getControlIDString().c_str());
-				return FALSE;
-			}
-			else if (strArg == gstrCmdLineSetWindowPosition)
-			{
-				if (i == __argc - 1)
-				{
-					UCLIDException ue("ELI12046", "The /p option requires an additional argument.");
-					throw ue;
-				}
-				i++;
-				strPos = __argv[i];
-
-				if (strPos == "Full")
-				{
-					eWindowPos = kWindowFull;
-				}
-				else if(strPos == "Left")
-				{
-					eWindowPos = kWindowLeft;
-				}
-				else if(strPos == "Right")
-				{
-					eWindowPos = kWindowRight;
-				}
-				else if(strPos == "Top")
-				{
-					eWindowPos = kWindowTop;
-				}
-				else if(strPos == "Bottom")
-				{
-					eWindowPos = kWindowBottom;
-				}
-				else
-				{
-					UCLIDException ue("ELI12047", "Invalid window position specification.");
-					ue.addDebugInfo("Position", strPos);
-					throw ue;
-				}
-			}
-
-
-
-  //-------------------------------------------------------------------------------------------------
-const string CSRIRImageViewerApp::getControlIDString()
-{
-	static string strID = "Control IDs for the /h option\n"
-							"0 - Open\n"
-							"1 - Save\n"
-							"2 - ZoomWindow\n"
-							"3 - ZoomIn\n"
-							"4 - ZoomOut\n"
-							"5 - ZoomPrevious\n"
-							"6 - ZoomNext\n"
-							"7 - ZoomExtents\n"
-							"8 - Pan\n"
-							"9 - SelectText\n"
-							"10 - SetHighlightHeight\n"
-							"11 - EditZoneText\n"
-							"12 - DeleteEntries\n"
-							"13 - ParagraphText\n"
-							"14 - OpenSubImage\n"
-							"15 - RotateCounterClockwise\n"
-							"16 - RotateClockwise\n"
-							"17 - FirstPage\n"
-							"18 - LastPage\n"
-							"19 - PrevPage\n"
-							"20 - NextPage\n"
-							"21 - EditPage\n";
-							"22 - Print\n";
-	return strID;
-}
 //-------------------------------------------------------------------------------------------------
-ESRIRToolbarCtrl CSRIRImageViewerApp::getControlId(std::string strControl)
-{
-	static bool bInit = false;
-	static map<string, ESRIRToolbarCtrl> controlMap;
-	if (!bInit)
-	{
-		controlMap["0"] = kBtnOpenImage;
-		controlMap["1"] = kBtnSave;
-		controlMap["2"] = kBtnZoomWindow;
-		controlMap["3"] = kBtnZoomIn;
-		controlMap["4"] = kBtnZoomOut;
-		controlMap["5"] = kBtnZoomPrevious;
-		controlMap["6"] = kBtnZoomNext;
-		controlMap["7"] = kBtnZoomExtents;
-		controlMap["8"] = kBtnPan;
-		controlMap["9"] = kBtnSelectText;
-		controlMap["10"] = kBtnSetHighlightHeight;
-		controlMap["11"] = kBtnEditZoneText;
-		controlMap["12"] = kBtnDeleteEntities;
-		controlMap["13"] = kBtnPTH;
-		controlMap["14"] = kBtnOpenSubImgInWindow;
-		controlMap["15"] = kBtnRotateCounterClockwise;
-		controlMap["16"] = kBtnRotateClockwise;
-		controlMap["17"] = kBtnFirstPage;
-		controlMap["18"] = kBtnLastPage;
-		controlMap["19"] = kBtnPrevPage;
-		controlMap["20"] = kBtnNextPage;
-		controlMap["21"] = kEditPageNum;
-		controlMap["22"] = kBtnPrint;
-
-		bInit = true;
-	}
-	map<string, ESRIRToolbarCtrl>::iterator it = controlMap.find(strControl);
-	if (it == controlMap.end())
-	{
-		UCLIDException ue("ELI11859", "Invalid /h argument value.");
-		ue.addDebugInfo("Arg", strControl);
-	}
-	return it->second;		
-}
-//-------------------------------------------------------------------------------------------------
-*/

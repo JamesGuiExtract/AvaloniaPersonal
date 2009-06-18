@@ -13,15 +13,17 @@
 #endif
 
 #include "resource.h"		// main symbols
+#include "SRIRImageViewerDlg.h"
+
 #include <memory>
 #include <vector>
 #include <string>
-#include "SRIRImageViewerDlg.h"
+
+using namespace std;
 /////////////////////////////////////////////////////////////////////////////
 // CSRIRImageViewerApp:
 // See SRIRImageViewer.cpp for the implementation of this class
 //
-
 class CSRIRImageViewerApp : public CWinApp
 {
 public:
@@ -53,9 +55,8 @@ private:
 	///////////////
 	// Methods
 	///////////////
-	const std::string getUsage();
-	const std::string getControlIDString();
-	ESRIRToolbarCtrl getControlId(std::string strControl);
+	const string getUsage();
+	const string getScriptUsage();
 	
 	UINT registerMessage(const char* szMsgName);
 
@@ -67,7 +68,7 @@ private:
 	///////////////
 	// Data
 	///////////////
-	std::auto_ptr<CSRIRImageViewerDlg> m_apDlg;
+	auto_ptr<CSRIRImageViewerDlg> m_apDlg;
 	UINT m_uiMsgLoadImage;
 	UINT m_uiMsgExecScript;
 	UINT m_uiMsgCloseViewer;
@@ -78,8 +79,8 @@ private:
 
 	// Messaging
 	UINT m_uiMsgToSend;
-	std::string m_strMessageFileName;
-	std::vector<HWND> m_vecWindowHandles;
+	string m_strMessageFileName;
+	vector<HWND> m_vecWindowHandles;
 
 };
 
