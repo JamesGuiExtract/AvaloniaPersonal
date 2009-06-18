@@ -172,12 +172,8 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Interop.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Redaction.Verification.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Parsers.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMLMLib.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_EXCEPTIONMGMTLib.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMUTILSLib.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_RASTERANDOCRMGMTLib.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-	@COPY /V "$(BinariesFolder)\Interop.UCLID_SSOCRLib.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
-
+	@COPY /V "$(BinariesFolder)\Interop.*.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	
 # Need the .net DLLs  in the same folder as Extract.Utilities.Parsers.dll
 	@COPY /v  "$(BinariesFolder)\FAMUtils.dll" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /v  "$(BinariesFolder)\ConvertFAMDB.exe" "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents"
