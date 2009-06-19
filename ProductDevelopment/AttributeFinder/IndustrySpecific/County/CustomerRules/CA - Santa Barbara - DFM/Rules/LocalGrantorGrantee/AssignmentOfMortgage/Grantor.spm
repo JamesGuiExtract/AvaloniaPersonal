@@ -37,6 +37,9 @@ rule10=AGREEMENT AND FIXTURE FILING^?Grantor^180~a California corporation
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0065097.tif.uss
 rule11="ASSIGNOR"|ASSIGNOR:^?Grantor^100~[a Oregon|[a Delaware|[a California|[a Wisconsin
 
+//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set007\Images\SBC Flex #4\ATDE-Atty in Fact\2009-0008312.tif
+rule17=good^6~valuable^6~consideration^25~sufficiency^25~hereby^6~acknowledged^6~undersigned^100~AS^4~ATTORNEY^2~IN^2~FACT^2~FOR^?Grantor^100~WHOSE ADDRESS
+
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Assignment of Mortgage\2008-0055460.tif
 rule13=good^6~valuable^6~consideration^25~sufficiency^25~hereby^6~acknowledged^6~undersigned^?Grantor13^(assignor
 
