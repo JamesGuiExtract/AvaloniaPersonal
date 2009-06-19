@@ -70,6 +70,7 @@ namespace Extract.Utilities.Forms
     /// <summary>
     /// Represents a button with a drop down that allows the user to select expandable path tags.
     /// </summary>
+    [DefaultEvent("TagSelected")]
     public partial class PathTagsButton : Button
     {
         #region Constants
@@ -117,6 +118,8 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Occurs when a tag is selected.
         /// </summary>
+        [Category("Action")]
+        [Description("Occurs when a tag is selected.")]
         public event EventHandler<TagSelectedEventArgs> TagSelected;
 
         #endregion PathTagsButton Events
@@ -158,6 +161,8 @@ namespace Extract.Utilities.Forms
                 }
 
                 InitializeComponent();
+
+                this.Size = new Size(18, 20);
             }
             catch (Exception ex)
             {
@@ -239,9 +244,6 @@ namespace Extract.Utilities.Forms
                     _docTags.AddRange(tags);
                 }
 
-                // Ensure the doc tags are sorted
-                _docTags.Sort();
-
                 // If the context menu has been created, clear it so that it will be reset
                 // the next time the button is clicked
                 if (_dropDown != null)
@@ -271,9 +273,6 @@ namespace Extract.Utilities.Forms
                     tags != null);
 
                 _docTags.AddRange(tags);
-
-                // Ensure the doc tags are sorted
-                _docTags.Sort();
 
                 // If the context menu has been created, clear it so that it will be reset
                 // the next time the button is clicked
