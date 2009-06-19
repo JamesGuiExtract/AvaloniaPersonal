@@ -1,0 +1,15 @@
+//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData
+<SETTING>;AutomatedConditionQuantifier=only any
+//only any
+<SETTING>;AutomatedCondition=HCData
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=MCData|Clues|LCData
+<SETTING>;OutputHybridStats=1
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;OUTPUT_FINAL_STATS_ONLY=TRUE
+<SETTING>;OutputFinalStatsOnly=1
+//<SETTING>;CreateTestOutputVOAFiles=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\VA - Louisa\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\CO - SoS\Set005\Images;<SourceDocName>.newCompData.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
