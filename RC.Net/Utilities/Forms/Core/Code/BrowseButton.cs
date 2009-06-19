@@ -46,6 +46,7 @@ namespace Extract.Utilities.Forms
     /// or <see cref="OpenFileDialog"/> allowing the user to select a path. Optionally
     /// will set the value of a <see cref="TextBox"/> control with the selected data.
     /// </summary>
+    [DefaultEvent("PathSelected")]
     public partial class BrowseButton : Button
     {
         #region Constants
@@ -98,6 +99,8 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Occurs when a path is selected.
         /// </summary>
+        [Category("Action")]
+        [Description("Occurs when a path is selected.")]
         public event EventHandler<PathSelectedEventArgs> PathSelected;
 
         #endregion Events

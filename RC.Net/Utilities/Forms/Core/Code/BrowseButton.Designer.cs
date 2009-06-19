@@ -35,7 +35,7 @@ namespace Extract.Utilities.Forms
             this.Text = _BUTTON_TEXT;
 
             // Set the default size
-            this.Size = new Size(27, 22);
+            this.Size = new Size(27, 20);
         }
 
         #endregion
