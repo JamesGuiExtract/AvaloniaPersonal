@@ -1,0 +1,4 @@
+//output from make_approx.rb
+//string    = "CASE:"
+//tolerance = "1"
+(?x)\b(?<error>){1}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^C]|[^C](?=C)))*?(?<match>C)|(?<-error>)[^C]?)|((?<match>C)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^A]|[^A](?=A)))*?(?<match>A)|(?<-error>)[^A]?)|((?<match>A)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^E]|[^E](?=E)))*?(?<match>E)|(?<-error>)[^E]?)|((?<match>E)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^:]|[^:](?=:)))*?(?<match>:)|(?<-error>)[^:]?)|((?<match>:)|(?<-error>)))

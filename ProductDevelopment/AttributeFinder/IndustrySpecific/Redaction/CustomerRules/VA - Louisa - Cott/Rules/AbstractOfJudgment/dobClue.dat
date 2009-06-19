@@ -1,0 +1,4 @@
+//output from make_approx.rb
+//string    = "DOB:"
+//tolerance = "1"
+(?x)\b(?<error>){1}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^D]|[^D](?=D)))*?(?<match>D)|(?<-error>)[^D]?)|((?<match>D)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^O]|[^O](?=O)))*?(?<match>O)|(?<-error>)[^O]?)|((?<match>O)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^B]|[^B](?=B)))*?(?<match>B)|(?<-error>)[^B]?)|((?<match>B)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^:]|[^:](?=:)))*?(?<match>:)|(?<-error>)[^:]?)|((?<match>:)|(?<-error>)))
