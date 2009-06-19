@@ -1,1 +1,5 @@
-(?:NO\W*DOB|\bNO\W+DO|\b(?:N.|.O)\b\W*D.B)
+//(?:NO\W*DOB|\bNO\W+DO|\b(?:N.|.O)\b\W*D.B)
+//from make_approx.rb
+//string="NO DOB"
+//tolerance=2
+(?x) \b (?<error>){2} (?(match)(((?<-error>)(?<-match>)((?<-match>)[^N]|[^N](?=N)))*?(?<match> N)|(?<-error>)[^N]?)|((?<match>N)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^O]|[^O](?=O)))*?(?<match> O)|(?<-error>)[^O]?)|((?<match>O)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\x20]|[^\x20](?=\x20)))*?(?<match> \x20)|(?<-error>)[^\x20]?)|((?<match>\x20)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^D]|[^D](?=D)))*?(?<match> D)|(?<-error>)[^D]?)|((?<match>D)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^O]|[^O](?=O)))*?(?<match> O)|(?<-error>)[^O]?)|((?<match>O)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^B]|[^B](?=B)))*?(?<match> B)|(?<-error>)[^B]?)|((?<match>B)|(?<-error>))) \b 
