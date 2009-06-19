@@ -1,0 +1,612 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield Miscellaneous 7.0 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of FlexIDSCore Changes</h3>
+       	<ul>
+      		<li><b>[FlexIDSCore #2508]</b> Advanced Replace String and Back References
+		<ul>
+	      		<li>Exercise the <b>RSD file and image</b> in
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\2508</b>.
+			<li>Confirm that spatial information is retained for 
+			<b>First occurrence</b>.
+			<li>Confirm that spatial information is retained for 
+			<b>Last occurrence</b>.
+			<li>Confirm that spatial information is retained for 
+			<b>Specified occurrence</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3038]</b> VOA Viewer displays multiple selected highlights
+	       	<ul>
+	      		<li>Open a VOA file that contains multiple attributes from a single page.
+			<li>Confirm that more than one of the attributes can be selected at 
+			one time.
+			<li>Confirm that the group of selected attributes is highlighted in 
+			the Image Viewer.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3081]</b> Test Harness is too slow
+		<ul>
+	      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+			<li>Measure the processing time using <b>OutputFinalStatsOnly=0</b> as a 
+			DAT file setting.
+			<li>Measure the processing time using <b>OutputFinalStatsOnly=1</b> as a 
+			DAT file setting.
+			<li>Confirm that processing time is less with <b>OutputFinalStatsOnly=1</b>.
+			<li>Confirm that the required/desired output files are still present.
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3089]</b> Modify attributes OH to use spatial info of replacement string
+	       	<ul>
+	      		<li>Exercise the RSD file and image file in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3089</b>.
+			<li>Confirm that appropriate spatial information is provided for the attribute and 
+			sub-attributes whether or not the output handler is enabled.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3100]</b> Legal Description Splitter
+	       	<ul>
+	      		<li>Create an RSD file using <b>LOT 16, BLOCK 1, CHERRY LEA SUBDIVISION</b> as 
+			input text.  Include a <b>Legal description splitter</b>.
+			<li>Confirm that output attribute includes a <b>CHERRY LEA SUBDIVISION</b> 
+			Subdivision.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3141]</b> Merge attributes and skewed images
+		<ul>
+	      		<li>Exercise the RSD file and images in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3141</b>.
+			<li>Confirm that merging of attributes works properly for the <b>good</b> image.
+			<li>Confirm that merging of attributes works properly for the <b>skewed</b> image.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3211, #3215]</b> Verification and Auto-redact Property Pages
+	       	<ul>
+	      		<li>Confirm that the <b>property pages</b> have changed in the following ways.
+		       	<ul>
+		      		<li><b>Metadata output</b> settings are configured in a separate dialog.
+		      		<li><b>Feedback collection</b> settings are configured in a separate dialog.
+		      		<li><b>Image output</b> settings for verification are configured in a 
+				separate dialog.
+		      		<li>The <b>Verification</b> property page includes a button to configure 
+				<b>Redaction text and color settings</b>.
+		      		<li>The <b>Auto redaction</b> property page includes a button to configure 
+				<b>Redaction text and color settings</b>.
+<p>
+		      		<li>The <b>Redaction text and color settings</b> dialog includes the 
+				following elements.
+			       	<ul>
+			      		<li>A group box for <b>Text to place in redaction zones</b>.
+			      		<li>A pre-populated combo box for <b>Redaction text</b>.
+			      		<li>An associated <b>tag selector</b>.
+			      		<li>An associated read-only edit box for <b>Sample text that uses 
+					the above pattern</b>.
+			      		<li>A group box for <b>Redaction colors</b>.
+			      		<li>A pre-populated combo box for <b>Border color</b>.
+			      		<li>A pre-populated combo box for <b>Fill color</b>.
+			      		<li>Color support for <b>Black</b> and <b>White</b>.
+			      		<li>A group box for <b>Preferred text size and font</b>.
+			      		<li>An associated read-only edit box that displays the font name and size.
+			      		<li>An associated <b>...</b> (Browse) button that displays a 
+					Font selection dialog.
+			      		<li>An associated label with <b>If text is too large to fit inside 
+					redaction zone, it will automatically be scaled to fit</b>.
+			       	</ul>
+		       	</ul>
+	      		<li>Confirm that the various changes are stable and persistent.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3219]</b> Redact From XML
+	       	<ul>
+	      		<li>Exercise <b>RedactFromXML.exe</b> for the image and each metadata XML file 
+			found in the <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3219</b> 
+			folder.
+			<li>Confirm that the utility correctly creates a redacted image for each of the 
+			metadata formats.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3224]</b> Support for multiple Verification sessions in metadata
+	       	<ul>
+			<li>Confirm that Metadata output contains a <b>&lt;IDShieldVerificationSession&gt;</b>
+			node.
+			<li>Re-verify the image 
+			<ul>
+				<li>Confirm that the original session information is still present in 
+				the metadata output.
+				<li>Confirm that a new session information node is still present.
+			</ul>
+<p>
+	      		<li>Confirm that metadata includes a <b>&lt;RedactionTextAndColorSettings&gt;</b>
+			node.
+	      		<li>Confirm that <b>Exemption Code</b> information is included in the metadata.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3226]</b> Apply last Exemption codes
+	       	<ul>
+			<li>Confirm that <b>Ctrl+L</b> works as a shortcut for <b>Apply last 
+			exemption code</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3272]</b> Filter ID Shield Data File task
+	       	<ul>
+	      		<li>Manually test the filtering functionality of the task.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3280]</b> Resized highlights are always of legal height
+	       	<ul>
+	      		<li>Exercise verification.
+	      		<li>Create many individual highlights and resize heights and widths.
+			<li>Save the output file and confirm that each highlight is converted to a redaction.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3290]</b> Option to auto-select the Select Highlight Tool
+	       	<ul>
+	      		<li>Exercise verification and display the <b>Options</b> dialog.
+			<li>Confirm that the <b>Enable ... tool after highlight</b> checkbox is available.
+			<li>Confirm that the associated combo box is enabled only if the checkbox is checked.
+			<li>Confirm that the setting is persistent.
+<p>
+			<li>Confirm that selecting <b>pan</b> in the combo box results in the Pan tool 
+			being activated after each highlight.
+			<li>Confirm that selecting <b>select highlight</b> in the combo box results in the 
+			Select Highlight tool being activated after each highlight.
+			<li>Confirm that <b>unchecking</b> the check box results in the Highlight tool 
+			remaining activated after each highlight.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3291]</b> Text centered on angled redactions
+		<ul>
+	      		<li>Exercise <b>Verification</b> adding text to each redaction.
+			<li>Verify some images and draw some angled redactions.
+			<li>Confirm that each output file has the text centered in redaction area. 
+			Note that the text may extend a little bit above or below the redaction zone.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3298]</b> Automated Rule Tester
+	       	<ul>
+	      		<li>Exercise <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3298\Test.tcl</b>.
+	      		<li>Confirm that each of the green nodes is an exact match between expected 
+			and found attributes.
+	      		<li>Confirm that each of the red nodes is a mismatch between expected 
+			and found attributes.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3310]</b> Support for Exemption codes in Verification
+	       	<ul>
+	      		<li>Confirm that the user can double-click in the <b>Exemption codes</b> cell 
+			to display an appropriately populated dialog.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3326]</b> MICR Finder and rotated checks
+	       	<ul>
+	      		<li>Confirm that the <b>MICR Finder</b> correctly finds appropriate sub-attributes 
+			from rotated check images.
+	      		<li>Confirm that the <b>Check Finder</b> is available as a rule object. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3331]</b> Prompt user if stopping verification and file is dirty
+	       	<ul>
+	      		<li>Exercise verification and make one or more changes to the image.
+	      		<li>Click the <b>Stop reviewing</b> toolbar button.
+	      		<li>Confirm that a <b>Close and lose changes</b> prompt dialog is displayed.
+	      		<li>Confirm that the response to the prompt is handled correctly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3341]</b> Loop Finder error
+	       	<ul>
+	      		<li>Exercise the RSD file and image attached to the SCR.
+	      		<li>Confirm that a <b>GetLastPageNumber() requires spatial or hybrid mode!</b> 
+			error is not seen.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3344, #3359]</b> Support for conditions and condition quantifiers
+		<ul>
+	      		<li>Review the VOA files in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3344</b>.  Note that files 
+			are present with each combination of HCData, MCData, LCData, Manual, and 
+			Clues attributes.
+	      		<li>Review the FPS file.  It uses <b>local</b> as a database server and 
+			<b>SANITY_TEST</b> as a database name.  The action is <b>Compute</b>. 
+	      		<li>Run the processing task as is to exercise <b>ID Shield data file 
+			contents</b> condition for <b>any HCData</b>.  
+			<li>Confirm that the 16 completed VOA files each contain HCData.
+			<li>Confirm that the 16 failed VOA files each do not contain HCData.
+			<li>Create a list of at least 12 different configurations changing the 
+			data types and the accepted combinations of data types.
+			<li>Exercise each configuration and confirm that results are as expected.
+			<ul>
+				<li>Configuration #01 ---> 
+				<li>Configuration #02 ---> 
+				<li>Configuration #03 ---> 
+				<li>Configuration #04 ---> 
+				<li>Configuration #05 ---> 
+				<li>Configuration #06 ---> 
+				<li>Configuration #07 ---> 
+				<li>Configuration #08 ---> 
+				<li>Configuration #09 ---> 
+				<li>Configuration #10 ---> 
+				<li>Configuration #11 ---> 
+				<li>Configuration #12 ---> 
+			</ul>
+		</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3345]</b> Exemption codes shown by default
+	       	<ul>
+	      		<li>Configure a <b>Redact images (no verification)</b> task.
+	      		<li>Configure the <b>Redaction text and color settings</b>.
+	      		<li>Confirm that <b>&lt;ExemptionCodes&gt;</b> is selected by default 
+			in the Redaction text combo box.
+<p>
+	      		<li>Configure a <b> Verify redactions</b> task.
+	      		<li>Configure the <b>Redaction text and color settings</b>.
+	      		<li>Confirm that <b>&lt;ExemptionCodes&gt;</b> is selected by default 
+			in the Redaction text combo box.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3346, #3347, #3358, #3364]</b> Support for hybrid and/or 
+		document type statistics
+		<ul>
+	      		<li>Review the XLS file in 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3346</b>.
+			<li><b>Normal Statistics</b>
+			<ul>
+		      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+				<li>Add <b>OutputHybridStats=0</b> to the DAT file.
+		      		<li>Exercise each of the <b>Automated Redaction</b> queries.
+		      		<li>Confirm that the reported results match the XLS expectations.
+		      		<li>Exercise each of the <b>Redaction with Manual Verification</b> queries.
+		      		<li>Confirm that the reported results match the XLS expectations.
+			</ul>
+<p>
+			<li><b>Hybrid Statistics</b>
+			<ul>
+		      		<li>Prepare a TCL and DAT file to exercise <b>ID Shield Tester</b>.
+				<li>Add <b>OutputHybridStats=1</b> to the DAT file.
+		      		<li>Exercise each of the <b>Hybrid Redaction</b> queries.
+		      		<li>Confirm that the reported results match the XLS expectations.
+			</ul>
+		</ul>
+<p>
+      		<li><b>[FlexIDSCore #3349]</b> Close FAM after stopping verification
+		<ul>
+	      		<li>Exercise <b>Verification</b> while queueing from a listening folder.
+			<li>Stop verifying from the <b>Verification</b> toolbar.
+			<li>Confirm that the <b>FAM</b> stops queuing and processing as expected.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3350]</b> Metadata and exemption codes
+		<ul>
+	      		<li>Exercise <b>Verification</b> adding <b>Exemption codes</b> to some but 
+			not all redactions.
+			<li>Review the metadata output files.
+			<li>Confirm that <b>ExemptionCode</b> nodes are only added to those redactions 
+			where exemption codes were specified.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3354]</b> RedactFromXml after modifying a redaction
+	       	<ul>
+	      		<li>Verify a document that contains a redaction and move on to the next document.
+	      		<li>Return to the previous document and turn off the redaction.
+	      		<li>Continue with the next document.
+	      		<li>Run <b>RedactFromXml</b> and confirm that the redaction area that was turned 
+			remains visible.
+<p>
+	      		<li>Verify a document that contains a redaction and move on to the next document.
+	      		<li>Return to the previous document and move the redaction to a different location.
+	      		<li>Continue with the next document.
+	      		<li>Run <b>RedactFromXml</b> and confirm that the redaction area was moved.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3355]</b> /ef option in RunRules
+	       	<ul>
+	      		<li>Exercise a rule set and image that logs an exception.
+      			<li>Confirm that using <b>RunRules</b> and the /ef &lt;filename&gt; option, the 
+			exception is logged to the specified file and not displayed.
+      			<li>Confirm that using <b>RunRules</b> and the /ef option without a filename, the 
+			exception is logged to the usual exception log and not displayed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3362]</b> Verify files with apostrophes
+	       	<ul>
+	      		<li>Exercise the Redaction Demo rules and images, modifying one or more images 
+			and VOA files to include an apostrophe within the filename.
+	      		<li>Confirm that verification works without error.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3373]</b> Grip handles on current selection
+		<ul>
+	      		<li>Exercise <b>Verification</b> and create a manual redaction.
+			<li>Click the <b>Select highlight</b> toolbar button.
+			<li>Confirm that grip handles are visible on the recently created manual redaction.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3376, #3377, #3378, #3379]</b> Image Viewer and Verification
+		<ul>
+	      		<li>Exercise <b>Verification</b> and add 4 large redactions.
+			<li>Try to move each redaction past the left and top edges of the page.
+			<li>Confirm that the displayed redactions do not appear to move completely 
+			past the page bounds.
+			<li>Confirm that redactions moved past the image bounds snap back to 
+			their original locations.
+<p>
+	      		<li>Exercise <b>Verification</b> and add 1 large redaction in the middle 
+			of the page.
+			<li>Click near the top-right corner of the redaction and drag it toward the 
+			top left of the page.
+			<li>Release the mouse only after the cursor is approximately two inches from the 
+			left edge of the page.
+			<li>Start dragging the moved redaction back toward the right edge.
+			<li>Confirm that there <b>is not</b> two inches of mouse drag before the redaction 
+			starts moving.
+<p>
+	      		<li>Exercise <b>Verification</b> and add 1 large redaction in the middle 
+			of the page.
+			<li>Click near the top-right corner of the redaction and drag it toward the 
+			top left of the page.
+			<li>Release the mouse only after the cursor is approximately two inches from the 
+			left edge of the page.
+			<li>Save the document and move on to the next document.
+			<li>Return to the previous document.
+		       	<ul>
+				<li>Confirm that no exception about negative coordinates is thrown.
+				<li>Confirm that verification properly returns to the previous document.
+				<li>Confirm that the <b>Previous reviewed document</b> toolbar button is 
+				properly disabled.
+		       	</ul>
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3381]</b> Prompt on stop after document navigation
+		<ul>
+	      		<li>Exercise <b>Verification</b> and create a manual redaction.
+			<li>Click the <b>Stop</b> button.
+			<li>Confirm that a <b>Confirmation</b> message is presented.  Click <b>No</b> 
+			and save the document.
+	      		<li>Create a manual redaction on the next document.
+	      		<li>Navigate back to the previous document and click the <b>Stop</b> button.
+			<li>Confirm that a <b>Confirmation</b> message is presented.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3382]</b> Default VOA file in auto-redaction task
+		<ul>
+	      		<li>Open the <b>Configure Redact images (no verification)</b> page.
+			<li>Confirm that the VOA file edit box reads <b>&lt:SourceDocName&gt;</b> and 
+			is disabled by default.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3393]</b> OUTPUT_FINAL_STATS_ONLY in Automated Rule Tester
+		<ul>
+	      		<li>Exercise the <b>Automated Rule Tester</b>.
+			<li>Confirm that usual nodes and stats are generated without an 
+			<b>OUTPUT_FINAL_STATS_ONLY</b> setting.
+			<li>Confirm that usual nodes and stats are generated with an 
+			<b>OUTPUT_FINAL_STATS_ONLY=0</b> setting.
+			<li>Confirm that usual nodes are not generated and stats are generated with an 
+			<b>OUTPUT_FINAL_STATS_ONLY=1</b> setting.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3402]</b> Exemption codes and unredacted items
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add an exemption code to a redacted item.  Toggle the item to unredacted 
+			and save the document.
+			<li>Confirm that an error message is displayed preventing the user from 
+			saving exemption codes to unredacted items.
+			<li>Confirm that applying exemption codes to all items adds the chosen 
+			exemption codes only to redacted items.
+			<li>Confirm that trying to apply exemption codes to an unredacted item 
+			displays a meaningful error.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3403, #3408]</b> Long exemption codes
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add a very long exemption code to a redacted item.
+			<li>Confirm that the exemption code text is displayed only within the 
+			redacted area.  Note that it may not extend from end to end.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3404]</b> Strange behavior with auto-zoom
+		<ul>
+	      		<li>Watch the movie clip attached to the SCR.
+			<li>During verification, select highlights and move them.
+			<li>Confirm that no unusual zoom behavior is seen.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3410]</b> Threading-related problems with auto-redaction
+		<ul>
+	      		<li>Exercise the FPS file and images attached to the SCR.
+			<li>Confirm that no unexpected or weird exceptions are seen - 
+			especially with <b>Image087_R270.tif</b>.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3413]</b> Auto-encryption of rules files
+		<ul>
+	      		<li>Create an FPS file with an <b>Execute rules</b> task pointing to 
+			an RSD.ETF file.
+			<li>Confirm that the associated <b>RSD file</b> exists.
+	      		<li>Save the FPS file and delete the <b>RSD.ETF</b> file.
+			<li>Confirm that the <b>RDT</b> is licensed.
+			<li>Confirm that the <b>auto-encrypt</b> setting is enabled in 
+			<b>RDTCOnfig</b>.
+			<li>Exercise the <b>FPS file</b>.
+			<li>Confirm that the <b>ETF file</b> is automatically created from 
+			the RSD file.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3416]</b> Redaction zones shifted in verification
+		<ul>
+	      		<li>Verify the attached image and VOA file.
+			<li>Confirm that the redactions on each page are properly aligned 
+			with the text.
+	       	</ul>
+<p>
+      		<li><b>[FlexIDSCore #3423]</b> Enable / disable exemption codes buttons
+		<ul>
+	      		<li>Exercise <b>Verification</b>.
+			<li>Add an exemption code to a redacted item.
+			<li>Confirm that the <b>Exemption code</b> toolbar buttons enable and 
+			disable as appropriate depending on whether or not the selected item 
+			is redacted.
+	       	</ul>
+    	</ul>
+<p>
+	<LI><h3>Descriptions of LegacyRCAndUtils Changes</h3>
+       	<ul>
+  	   	<LI><b>[LegacyRC #5031]</b> Verbose logging for CSharpDatabaseUtils
+	       	<ul>
+	      		<li>Add a <b>Verbose logging</b> key to 
+			<b>HKCU\Software\Extract Systems\ReusableComponents\CSharpDatabaseUtilities</b>.
+	      		<li>With the key set to "0", confirm that attempting to connect to a 
+			non-existent server or database, logs simple error information.
+	      		<li>With the key set to "1", confirm that attempting to connect to a 
+			non-existent server or database, logs more complex error information.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5090]</b> Various issues with write-caching
+	       	<ul>
+	      		<li>Locate a collection of several thousand sample images on <b>FNP2</b>.
+	      		<li>Create an FPS file to <b>queue</b> the images.
+	      		<li>Create an FPS file to <b>process</b> the images.  Include an <b>Execute rules</b> 
+			task and a <b>Conditionally evaluate VOA file</b> task.  If file is sensitive, set 
+			<b>Verify</b> action to Pending.  If file is not sensitive, set <b>Export</b> action 
+			to Pending.
+	      		<li>Create an FPS file to <b>Export</b> the images.  Several <b>Delete</b> tasks 
+			remove the image file, the USS file, the VOA file, and the XML file.
+	      		<li>Confirm that <b>no</b> file access exceptions are seen in the UEX logs.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5162]</b> Folder file supplier crash
+	       	<ul>
+	      		<li>Run <b>Auto-redact.fps</b> from the Redaction Demo.
+	      		<li>Pause processing.
+	      		<li>Click on <b>Pause</b> again to resume processing.
+	      		<li>Confirm that the <b>File Action Manager</b> successfully resumes processing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5169]</b> Additional error info for OCR failures
+	       	<ul>
+	      		<li>OCR one or more documents that demonstrate decomposition failure.
+	      		<li>Confirm that the displayed exception includes detailed information 
+			about what went wrong.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5173]</b> Encrypt email user name & password in registry
+	       	<ul>
+	      		<li>Use <b>EmailFile /c</b> or <b>DetectAndReportFailure</b> to configure 
+			email settings.
+	      		<li>Require authorization and provide a user name and password.
+	      		<li>Confirm that the user name is encrypted in <b>HKLM/Software/Extract 
+			Systems/EmailSettings</b>.
+	      		<li>Confirm that the password is encrypted in <b>HKLM/Software/Extract 
+			Systems/EmailSettings</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5199]</b> Image Viewer zoom with mouse wheel
+	       	<ul>
+	      		<li>Open an image.
+	      		<li>Confirm that using <b>Mousewheel Up</b> zooms in.
+	      		<li>Confirm that using <b>Mousewheel Down</b> zooms out.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5202, #5203]</b> Image Viewer refresh issues
+	       	<ul>
+	      		<li>Draw an angular highlight.
+	      		<li>Grab a longer-edge grip handle and move it closer to and past the other 
+			long-edge grip handle.
+	      		<li>Confirm that there is no weird 90-degree flip of the redaction zone.  
+			Note that this may not be completely fixed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5205]</b> Line-fitting for right-to-left swiping
+	       	<ul>
+	      		<li>Exercise <b>Verification</b> and draw a manual redaction from left-to-right 
+			while holding down <b>Ctrl</b>.
+	      		<li>Confirm that the redaction region is properly split into separate lines.
+	      		<li>Draw another manual redaction from right-to-left 
+			while holding down <b>Ctrl</b>.
+	      		<li>Confirm that the redaction region is properly split into separate lines.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5220]</b> Cannot Adjust Image Resolution
+	       	<ul>
+	      		<li>Run <b>Adjust Image Resolution</b> on the image 
+			attached to the SCR.
+	      		<li>Confirm that the image resolution can be adjusted without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5232]</b> Last used Exemption codes category
+	       	<ul>
+	      		<li>Verify an image with several redactions.
+	      		<li>Apply an <b>Privacy Act</b> exemption code.
+	      		<li>Confirm that when you start applying an exemption code to another 
+			redaction, the <b>Privacy Act</b> category is selected by default.  
+	      		<li>Apply an <b>Freedom of Information Act</b> exemption code.
+	      		<li>Confirm that when you start applying an exemption code to another 
+			redaction, the <b>Freedom of Information Act</b> category is selected by default.  
+	      		<li>Confirm that modifying each exemption code displays the proper category.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5233]</b> Keyboard shortcuts for Exemption codes dialog
+	       	<ul>
+	      		<li>Confirm that <b>Alt+C</b> is the shortcut for <b>Clear All</b>.
+	      		<li>Confirm that <b>Alt+L</b> is the shortcut for <b>Apply Last</b>.
+	      		<li>Confirm that <b>Alt+A</b> is the shortcut for <b>Additionally associate</b>.
+	      		<li>Confirm that <b>Alt+E</b> is the shortcut for <b>Exemption code categories</b>.
+	      		<li>Confirm that <b>Alt+S</b> is the shortcut for <b>Select exemption codes</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5234]</b> Default focus in Exemption codes dialog
+	       	<ul>
+	      		<li>Verify an image and display the <b>Exemption codes</b> dialog.
+	      		<li>Confirm that initial focus is on the exemption codes list box 
+			so that the user can simply use the arrow keys and space bar to 
+			select exemption codes.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5235]</b> Supplying FAM should stop after DB connection timeout
+	       	<ul>
+	      		<li>Create and run an FPS file for supplying - include listening for 
+			added files.
+	      		<li>Create and run an FPS file for processing.
+	      		<li>Stop the SQL service.
+	      		<li>Add a few files into the listening folder.
+	      		<li>Wait for the processing FAM to timeout after the processing files finish.
+	      		<li>Confirm that the supplying FAM also times out and stops.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h3>Descriptions of Miscellaneous Changes</h3>
+       	<ul>
+  	   	<LI><b>Miscellaneous #1</b>
+	       	<ul>
+			<li>From the verification UI, confirm that the image cannot be scrolled during 
+			creation, movement, or resize of a manual redaction.
+<p>
+			<li>Confirm that <b>ImageFormatConverter.exe</b> supports a <b>/retain</b> option 
+			that retains redaction annotations.
+			<li>Confirm that the auto-redaction property page mentions that saving redactions 
+			as annotations only applies to TIF images.
+			<li>Confirm that the verification property page mentions that saving redactions 
+			as annotations only applies to TIF images.
+			<li>Confirm that an <b>Application trace</b> exception is logged when retaining 
+			annotations and the output image is a PDF.
+			<li>Confirm that an <b>Application trace</b> exception is logged when saving 
+			redactions as annotations and the output image is a PDF.
+<p>
+			<li><b>(?)</b> Confirm that <b>OCRSingleDocument.exe</b> is installed with the <b>Rule 
+			Development Toolkit</b>.
+	       	</ul>
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
