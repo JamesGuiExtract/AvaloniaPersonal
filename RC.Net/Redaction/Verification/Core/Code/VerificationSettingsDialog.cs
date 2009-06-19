@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Redaction.Verification
 {
@@ -48,6 +49,11 @@ namespace Extract.Redaction.Verification
             InitializeComponent();
 
             _settings = settings ?? new VerificationSettings();
+
+            // Add the doc tags
+            List<string> docTags = DocumentTags.GetAll();
+            _dataFilePathTagsButton.ResetDocTags(docTags);
+            _metadataPathTagsButton.ResetDocTags(docTags);
         }
 
         #endregion VerificationSettingsDialog Constructors
@@ -83,10 +89,11 @@ namespace Extract.Redaction.Verification
         {
             // Get the settings
             GeneralVerificationSettings general = GetGeneralSettings();
+            FeedbackSettings feedback = GetFeedbackSettings();
             string dataFile = _dataFileTextBox.Text;
             MetadataSettings metadata = GetMetaDataSettings();
 
-            return new VerificationSettings(general, _feedback, dataFile, metadata);
+            return new VerificationSettings(general, feedback, dataFile, metadata);
         }
 
         /// <summary>
@@ -102,6 +109,24 @@ namespace Extract.Redaction.Verification
             bool requireExemptions = _requireExemptionsCheckBox.Checked;
 
             return new GeneralVerificationSettings(verifyAllPages, requireTypes, requireExemptions);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="FeedbackSettings"/> from the user interface.
+        /// </summary>
+        /// <returns>The <see cref="FeedbackSettings"/> from the user interface.
+        /// </returns>
+        FeedbackSettings GetFeedbackSettings()
+        {
+            // Get the settings
+            bool collectFeedback = _collectFeedbackCheckBox.Checked;
+            string dataFolder = _feedback.DataFolder;
+            bool collectOriginalDocument = _feedback.CollectOriginalDocument;
+            bool useOriginalFileNames = _feedback.UseOriginalFileNames;
+            CollectionTypes collectionTypes = _feedback.CollectionTypes;
+
+            return new FeedbackSettings(collectFeedback, dataFolder, collectOriginalDocument,
+                useOriginalFileNames, collectionTypes);
         }
 
         /// <summary>
@@ -208,7 +233,13 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Bring up feedback settings dialog
+                using (FeedbackSettingsDialog dialog = new FeedbackSettingsDialog(_feedback))
+                {
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        _feedback = dialog.FeedbackSettings;
+                    }
+                }
             }
             catch (Exception ex)
             {

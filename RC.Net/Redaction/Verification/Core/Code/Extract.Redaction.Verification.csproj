@@ -58,7 +58,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DocumentTags.cs" />
     <Compile Include="FeedbackSettings.cs" />
+    <Compile Include="FeedbackSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FeedbackSettingsDialog.Designer.cs">
+      <DependentUpon>FeedbackSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="GeneralVerificationSettings.cs" />
     <Compile Include="MetadataSettings.cs" />
     <Compile Include="VerificationSettings.cs" />
@@ -120,6 +127,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="FeedbackSettingsDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>FeedbackSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="VerificationSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>VerificationSettingsDialog.cs</DependentUpon>
