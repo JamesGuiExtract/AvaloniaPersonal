@@ -12,4 +12,3 @@
 //<SETTING>;CreateTestOutputVOAFiles=1
 
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\VA - Louisa\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\CO - SoS\Set005\Images;<SourceDocName>.newCompData.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
