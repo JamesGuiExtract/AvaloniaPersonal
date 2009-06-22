@@ -223,162 +223,138 @@
 \b((Co-)?Trustee(s(,)?)?\s+of\s+Trust\s+[\s\S]{5,50}\s+under\s+the)\b
 \b(sole\s+trustee\s+(or\s+(his|her)\s+successor[\S\s]{0,15}\s+)?(?:of|under)(\s+the)?)\b
 
-// Examples: "Corporation", "Mortgage"
+//===============================================
+// Company Desginators: 
+//   If any of these expressions are found 
+//   anywhere in the entity, the entity will be 
+//   split as a company.
+//===============================================
+
 <CompanyDesignators>
-\bCorporation\b
-\bCorp\b(.)?
 
+\bAcademy\b
+\bAdministration\b
+\bAgen(?:cy|ts?)\b
+\bAmerica(?:n|\x20?['"]\x20?s)?\b
+\bApartments?\b
+\bArchitects?\b
+\bAssoc(?:iat(?:es|ion))?\b
+\bAutomotive\b
+\bAvionics\b
+\bBake\x20{0,2}Shop\b
+\bBakery\b
+\bBank(?:ing|ers?)?\b
+\bBaptist\b
+\bBoard\b
+\bBody.{0,5}Paint\b
+\bBook\x20{0,2}keeping\b 
+\bBorough\b
+\bBuilders?\b
+\bBureau\b
+\bCafe\b
+\bCameras?\b
+\bCatholic\b
+\bCasualty\b
+\bCenters?\b
+\bChapel\b
+\bChurchs?\b
+\bCleaners?\b
+\bCoffee\b
+\bCollege\b
+\bCommercial\b
+\bCommission\b
+\bCommunit(?:y|ies)\b
 \bCompany\b
+\bConstruction\b
+\bConsultants\b
+\bCount(?:y|ies)\b
+\bCorp(?:oration|orate)?\b
+\bCredit(?:ors?)?\b
+\bDayCare\b
+\bDepartment\b
+\bDesigns?\b
+\bDevelop(?:ers?|ment)\b
+\bDistrict\b
+\bEducation\b
+\bElectric(?:al)?\b
+\bEngineer(?:s|ing)\b
+\bEnterprises?\b
+\bEquilization\b
+\bEquity\b
+\bExchange\b
+\bFannie\s{0,2}Mae\b
+\bFarms?\b
+\bFinanc(?:es?|ial|ings?)\b
+\bFirst\b
+\bFranchise\b
+\bFunding\b
+\bFurnisnings?\b
+\bGlobal\b
+\bGraduates?\b
+\bGroups?\b
+\bHair\b
+\bHomes\b
+\bHospitals?\b
+\bHousing\b
+\bIndustr(?:ial|ies|y)\b
+\bInsurance\b
+\bInstallations?\b
+\bInvest(?:ments?|tors?)\b
+\bLandscap(ing|ers?)\b
+\bLeasing\b
+\bLend(?:ers?|ing)\b
 \bLimited\b
-\bPartners(hip)?\b
-\bTrust\b
-
-// These industry-specific strings are for banks and mortgage companies
-\S{3,}Bank\b
-\bBank(ing)?\b
+\bLoans?\b
+\bLutheran\b
+\bManufacturing\b
+\bMaterials?\b
+\bMERS\b
+\bMethodist\b
 \bMortgage\b
-\bSavings\b
-// "Title" but 
-//   NOT "Title Vested"
-//   NOT "Title As"
-//\b(?!Acquired\s+Title)|Title(?!\s+Vested)\b
+\bMutual\b
+\bNatural\b
+\bNeighborhood\b
+\bOpenings\b
+\bPartners(?:hip)?\b
+\bPizza\b
+\bProper(ty|ties)\b
+\bPublic\b
+\bReal(?:ty|ors?)\b
+\bRecordings\b
+\bRentals?\b
+\bRepairs?\b
+\bResidential\b
+\bRestaurants?\b
+\bSalons?\b
+\bSavings?\b
+\bSchools?\b
+\bScrap\x20{0,2}book(?:ing)?\b
+\bServices?\b
+\bSolutions\b
+\bSons\b
+\bStudios?\b
+\bSystems?\b
+\bTax\b
+\bTechnolog(?:y|ies)\b
+\bTrust\b
+\bUniversity\b
+\bVeterans\b
+\bVideos?\b
+\bWeddings?\b
+\bWholesale\b
+
+// Company names with dot com
+\b\w+\.com\b
+
+// "Title" not followed by "vested" or "as"
 \bTitle(?!\s+(Vested|As))\b
 
-Credit\b(?!\s+Agreement)
-Financ(e|ial|ing)\b
-\bLending\b
-\bAssoc(iat(es|ion))?\b
-\bEquity\b
-\b(Fannie\s+Mae)\b
-
-\b((a\s+)?joint\s+venture)\b
-\b(Resident|Industr|Commerc)ial\b
-\bAmerica(n|'s)?\b
-
-\bInvestment(s)?\b
-\bWholesale\b
-\bRealty\b
-\bLeasing\b
-\bRental(s)?\b
-// k:\common\engineering\sample files\acs\pa - allegheny\set002\images\shd\00018329.tif.uss
-\bVeterans\b
-
-\b(School\s+)?District\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000599000.003.tif.uss
-\b(Public\s+)?School\b
-\bCommunity\s+College\b
-\bGraduate\s+Center\b
-\bCollege\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001354100.001.tif.uss
-\bUniversity\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001197600.001.tif.uss
-\bEducation\b
-
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000102800.002.tif.uss
-\b(Methodist|Catholic|Baptist|Lutheran|Wedding)\s+Church\b
-
-//\bWedding\s+Chapel\b
-\bBorough\b
-\bAgency\b
-\bPro(pertie|duct)s\b
-\bConstruction\b
-\b(Re)?Development\b
-\bBuilders\b
-\bEnterprises\b
-\bNeighborhood\b
-\bHomes\b
-\bServices?\b
-\bGroup\b
-\bAdministration\b
-\bCollector\b
-\bFranchise\b
-\bEquilization\b
-\bDepartment\b
-\bBoard\b
-\bCounties\b
-\bOpenings\b
-\bFarms\b
-\bHospital\b
-\bSpecialists\b
-// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\County\Images\GrantorGrantee\Mortgage - Deed of Trust\Grantor\0113.tif.uss
-\bSystems?\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Acknowledgement of Satisfaction of Judgment\20049000006900.003.tif.uss
-\bBureau\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Acknowledgement of Satisfaction of Judgment\20049000113800.003.tif.uss
-\bInsurance\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001549300.002.tif.uss
-\bSons\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049000266800.001.tif.uss
-\bEngineering\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001482900.002.tif.uss
-\bCommunities\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001191200.002.tif.uss
-\bElectric\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049000426700.002.tif.uss
-//\bSales\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Notice of Completion\20049001466600.002.tif.uss
-//\bEstates\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000066500.003.tif.uss
-\bAutomotive\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000080400.001.tif.uss
-\bInstallations\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000679500.003.tif.uss
-\bMaterials\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000538400.001.tif.uss
-\bRepair\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000153000.003.tif.uss
-\bExchange\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Abstract of Judgment\20049000282800.002.tif.uss
-\bConsultants\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set003\Images\Federal Tax Lien\20049000301300.001.tif.uss
-\bManufacturing\b
-// k:\common\engineering\sample files\acs\tx - midland\set004\images\release of lien\00013660.tif.uss
-\bApartment(s)?\b
-// K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set002\Images\00000001.tif.uss
-\bCommission\b
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\DOC\2005257950.tif.uss
-\bcenter\b
-//K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set001\Images\DEED OF TRUST-MORTGAGE\20059019606500.tif.uss
-\bFirst\b
-//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED\2005-031380.tif.uss
-\bGlobal\b
-//K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set002\Images\ASMT\0097514.TIF.uss
-\bFunding\b
-
-// words indicating businesses performing services
-\bCleaners\b
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002841.tif.uss
-\bSolutions\b
-//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002753.tif.uss
-\bAvionics\b
-//K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002752.tif.uss
-\bTechnologies\b
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-005719.tif.uss
-\bMERS\b
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\LIEN,STATE WARR,ATTY LIEN,WAIV,CERT NON-ATTACH,NOTICE\LIEN,JUDGMT,WRIT\2005-002755.tif.uss
-\brestaurant\b
-\bpreferred\b
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set003\Images\2006_100228.tif.uss
-\bRecordings\b 
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set003\Images\2006_100227.tif.uss
-\bMutual\b
-// K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\LIEN\B06180AA.CR3.TIF.uss
-\barchitects?\b
-// Company names with dot com
-// K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set001\Images\MORTGAGE or TRUST DEED or WEATHERIZATION LIEN\2005-001080.tif
-\b\w+\.com\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079000228500.001
-\bLandscaping\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079001378600.001
-\bIron\s+Works\b
-// K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\LIEN\20079002124000.001
-\bCameras?\b
-//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\NOTICE OF COMPLETION\20079000259600.002
-\bHousing\b
-//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\ABSTRACT OF JUDGMENT\20079000024600.003
-\bCasualty\b
-
-// Examples: "Inc.", "LLC"
+//===============================================
+// Company Suffixes: 
+//   If any of these expressions are found in the
+//   entity, the entity will be split as a 
+//   company.
+//===============================================
 <CompanySuffixes>
 \bL(\s*(\.\s*)?)?L(\s*(\.\s*)?)?(C|P)\b(\s*\.)?
 \bL(\s*(\.\s*)?)?(C|P)\b(\s*\.)?
