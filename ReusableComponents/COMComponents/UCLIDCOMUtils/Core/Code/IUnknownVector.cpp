@@ -689,12 +689,18 @@ STDMETHODIMP CIUnknownVector::FindByReference(IUnknown *pObj, long nStartPos, lo
 		// Check license
 		validateLicense();
 
-		// Check start index
-		validateIndex(nStartPos);
-
 		// Default to not found
 		long nFoundIndex = -1;
 		*pRetVal = nFoundIndex;
+
+		// If there are no items in the vector just return
+		if (m_vecIUnknowns.size() == 0)
+		{
+			return S_OK;
+		}
+			
+		// Check start index
+		validateIndex(nStartPos);
 
 		// Step through vector looking for the specified object
 		for (unsigned int i = nStartPos; i < m_vecIUnknowns.size(); i++)

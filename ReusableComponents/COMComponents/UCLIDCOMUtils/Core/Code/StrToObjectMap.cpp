@@ -535,6 +535,36 @@ STDMETHODIMP CStrToObjectMap::put_CaseSensitive(VARIANT_BOOL newVal)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CStrToObjectMap::TryGetValue(BSTR bstrKey, IUnknown **ppObject)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	try
+	{
+		ASSERT_ARGUMENT("ELI26398", ppObject != NULL);
+
+		validateLicense();
+
+		stringCSIS strKey(asString(bstrKey), m_bCaseSensitive);
+
+		// Search for the key
+		map<stringCSIS, IUnknownPtr>::iterator it = m_mapKeyToValue.find(strKey);
+		if (it != m_mapKeyToValue.end())
+		{
+			// If the map contains the key, then return the object
+			IUnknownPtr ipShallowCopy = it->second;
+			*ppObject = ipShallowCopy.Detach();
+		}
+		else
+		{
+			// Map does not contain key, return NULL
+			*ppObject = NULL;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26399");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent

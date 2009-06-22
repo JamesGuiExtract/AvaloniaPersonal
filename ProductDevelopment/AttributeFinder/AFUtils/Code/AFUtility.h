@@ -204,6 +204,14 @@ private:
 	// Check license state
 	void validateLicense();
 
+	// Removes the specified attribute from the collection of attributes (no matter where
+	// in the collection it lives)
+	void removeAttribute(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
+
+	// Searches the collection of attributes and finds the parent attribute for the
+	// specified attribute.  If no parent attribute is found just returns NULL.
+	IAttributePtr getAttributeParent(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
+
 	/////////////
 	// Variables
 	/////////////

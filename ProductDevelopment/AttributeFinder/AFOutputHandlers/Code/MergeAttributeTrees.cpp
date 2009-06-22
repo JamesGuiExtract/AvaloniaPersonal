@@ -10,6 +10,23 @@
 #include <StringTokenizer.h>
 #include <UCLIDException.h>
 
+#include <utility>
+#include <vector>
+
+//--------------------------------------------------------------------------------------------------
+// Local structs
+//--------------------------------------------------------------------------------------------------
+struct AttributeData
+{
+	AttributeData(const string& strValue = "", const string& strType = "") :
+	value(strValue), type(strType)
+	{
+	}
+
+	string value;
+	string type;
+};
+
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
@@ -20,9 +37,11 @@ const unsigned long gnCurrentVersion = 1;
 //--------------------------------------------------------------------------------------------------
 CMergeAttributeTrees::CMergeAttributeTrees()
 :
+m_ipAFUtils(NULL),
 m_strAttributesToBeMerged(""),
 m_eMergeInto(kFirstAttribute),
 m_bDirty(false),
+m_bCaseSensitive(false),
 m_bDiscardNonMatch(false),
 m_bCompareTypeInfo(true),
 m_bCompareSubAttributes(false)
@@ -48,6 +67,12 @@ HRESULT CMergeAttributeTrees::FinalConstruct()
 //--------------------------------------------------------------------------------------------------
 void CMergeAttributeTrees::FinalRelease()
 {
+	try
+	{
+		// Ensure the AFUtils object is released before the object is destructed
+		m_ipAFUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26396");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -307,7 +332,7 @@ STDMETHODIMP CMergeAttributeTrees::get_CompareSubAttributes(VARIANT_BOOL* pvbCom
 STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttributes, IAFDocument *pAFDoc,
 												 IProgressStatus *pProgressStatus)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	try
 	{
@@ -320,7 +345,150 @@ STDMETHODIMP CMergeAttributeTrees::raw_ProcessOutput(IIUnknownVector* pAttribute
 		IAFDocumentPtr ipAFDocument(pAFDoc);
 		ASSERT_ARGUMENT("ELI26361", ipAFDocument != NULL);
 
-		// TODO: Implement the output handler logic
+		// Get an AFUtility object to query attributes
+		IAFUtilityPtr ipAFUtil = getAFUtility();
+
+		// Get a vector of attributes matching the specified query (do not remove the attributes
+		// from the original vector of attributes)
+		IIUnknownVectorPtr ipMatches = ipAFUtil->QueryAttributes(ipAttributes,
+			m_strAttributesToBeMerged.c_str(), VARIANT_FALSE);
+		ASSERT_RESOURCE_ALLOCATION("ELI26407", ipMatches != NULL);
+
+		// Loop through all matches, comparing sub attributes and add each attribute
+		// which matches other attributes to a collection of matches that will then be
+		// processed
+		vector<pair<IAttributePtr, vector<IAttributePtr>>> vecMatches;
+		long lSize = ipMatches->Size();
+		for (long i=0; i < lSize; i++)
+		{
+			// Get the first attribute
+			IAttributePtr ipAttribute1 = ipMatches->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI26408", ipAttribute1 != NULL);
+
+			// Get the sub attributes for the comparison
+			IIUnknownVectorPtr ipSubAttributes1 = ipAttribute1->SubAttributes;
+			ASSERT_RESOURCE_ALLOCATION("ELI26409", ipSubAttributes1 != NULL);
+
+			// Vector to hold the list of attributes that need to be merged
+			// with the first attribute
+			vector<IAttributePtr> vecSubMatches;
+			for (long j=i+1; j < lSize; j++)
+			{
+				// Get the next attribute
+				IAttributePtr ipAttribute2 = ipMatches->At(j);
+				ASSERT_RESOURCE_ALLOCATION("ELI26410", ipAttribute2 != NULL);
+
+				// Get the sub attributes for comparison
+				IIUnknownVectorPtr ipSubAttributes2 = ipAttribute2->SubAttributes;
+				ASSERT_RESOURCE_ALLOCATION("ELI26411", ipSubAttributes2 != NULL);
+
+				// Check if there is a match between these attributes
+				if (compareSubAttributes(ipSubAttributes1, ipSubAttributes2))
+				{
+					// Add the match to the sub match vector, remove this value
+					// from the matches collection and update index values
+					vecSubMatches.push_back(ipAttribute2);
+					ipMatches->Remove(j);
+					j--;
+					lSize--;
+				}
+			}
+
+			// If there was at least one match, add the match to the match vector
+			if (vecSubMatches.size() > 0)
+			{
+				vecMatches.push_back(pair<IAttributePtr, vector<IAttributePtr>>(ipAttribute1,
+					vecSubMatches));
+			}
+		}
+
+		// For all the matches, merge the sub attributes into a single attribute (the
+		// single attribute will be either the first attribute or the one with the most children)
+		vector<IAttributePtr> vecMergedAttributes;
+		long lMatchSize = vecMatches.size();
+		for(long i=0; i < lMatchSize; i++)
+		{
+			// Build a vector of all attributes that matched
+			vector<IAttributePtr> vecNewMatch;
+			vecNewMatch.push_back(vecMatches[i].first);
+			vecNewMatch.insert(vecNewMatch.begin()+1, vecMatches[i].second.begin(),
+				vecMatches[i].second.end());
+
+			// Find which attribute to keep (either first or one with the most children)
+			IAttributePtr ipKeep = NULL;
+			if (m_eMergeInto == kFirstAttribute)
+			{
+				ipKeep = vecNewMatch[0];
+				vecNewMatch.erase(vecNewMatch.begin());
+			}
+			else
+			{
+				// Start with the first item
+				ipKeep = vecNewMatch[0];
+				IIUnknownVectorPtr ipSubs = ipKeep->SubAttributes;
+				ASSERT_RESOURCE_ALLOCATION("ELI26412", ipSubs != NULL);
+				long lCurrentMax = ipSubs->Size();
+
+				// Get the count of sub attributes and find the largest one
+				vector<IAttributePtr>::iterator biggest = vecNewMatch.begin();
+				for(vector<IAttributePtr>::iterator it = biggest+1; it != vecNewMatch.end(); it++)
+				{
+					ipSubs = (*it)->SubAttributes;
+					ASSERT_RESOURCE_ALLOCATION("ELI26413", ipSubs != NULL);
+
+					long lCount = ipSubs->Size();
+					if (lCount > lCurrentMax)
+					{
+						lCurrentMax = lCount;
+						ipKeep = (*it);
+						biggest = it;
+					}
+				}
+
+				// Remove the largest item from the match vector
+				vecNewMatch.erase(biggest);
+			}
+			ASSERT_RESOURCE_ALLOCATION("ELI26414", ipKeep != NULL);
+
+			// Now combine the sub attributes from all other attributes into the keeper
+			IIUnknownVectorPtr ipKeepSubs = ipKeep->SubAttributes;
+			ASSERT_RESOURCE_ALLOCATION("ELI26415", ipKeepSubs != NULL);
+			vector<IAttributePtr> vecMoveRemove;
+			for(vector<IAttributePtr>::iterator it = vecNewMatch.begin();
+				it != vecNewMatch.end(); it++)
+			{
+				IIUnknownVectorPtr ipSubs = (*it)->SubAttributes;
+
+				// And remove the non-matching sub attributes that need to be either removed
+				// or moved to the very end
+				getAttributesToMoveOrRemove(ipKeepSubs, ipSubs, vecMoveRemove);
+
+				// Add the sub attributes to the keep attribute
+				ipKeepSubs->Append(ipSubs);
+
+				// Now clear the subattributes from this value
+				ipSubs->Clear();
+			}
+
+			// If keeping the non-matching comparison attributes, append them
+			// to the end of the list
+			if (!m_bDiscardNonMatch && vecMoveRemove.size() > 0)
+			{
+				for (vector<IAttributePtr>::iterator it = vecMoveRemove.begin();
+					it != vecMoveRemove.end(); it++)
+				{
+					ipKeepSubs->PushBack((*it));
+				}
+			}
+			vecMoveRemove.clear();
+
+			// Add the merged attributes to the merged attributes collection
+			vecMergedAttributes.insert(vecMergedAttributes.begin(), vecNewMatch.begin(),
+				vecNewMatch.end());
+		}
+
+		// Remove the merged attributes from the main attribute collection
+		removeMergedAttributes(ipAttributes, vecMergedAttributes);
 
 		return S_OK;
 	}
@@ -692,5 +860,254 @@ void CMergeAttributeTrees::validateAttributeString(const string& strSubAttribute
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26387");
+}
+//--------------------------------------------------------------------------------------------------
+bool CMergeAttributeTrees::compareSubAttributes(IIUnknownVectorPtr ipSubAttributes1,
+												IIUnknownVectorPtr ipSubAttributes2)
+{
+	try
+	{
+		// Get the attribute finder utility pointer
+		IAFUtilityPtr ipAFUtil = getAFUtility();
+
+		// Get the collection of sub attributes grouped by name
+		IStrToObjectMapPtr ipNames1 = ipAFUtil->GetNameToAttributesMap(ipSubAttributes1);
+		ASSERT_RESOURCE_ALLOCATION("ELI26400", ipNames1 != NULL);
+		IStrToObjectMapPtr ipNames2 = ipAFUtil->GetNameToAttributesMap(ipSubAttributes2);
+		ASSERT_RESOURCE_ALLOCATION("ELI26401", ipNames2 != NULL);
+
+		// Loop through each of the comparison strings to find matches
+		bool bMatch = true;
+		for (vector<string>::iterator it = m_vecSubattributesToCompare.begin();
+			it != m_vecSubattributesToCompare.end(); it++)
+		{
+			// Try to get the collection for this value
+			_bstr_t bstrName((*it).c_str());
+			IIUnknownVectorPtr ipValues1 = ipNames1->TryGetValue(bstrName);
+			IIUnknownVectorPtr ipValues2 = ipNames2->TryGetValue(bstrName);
+
+			// If either collection is NULL these attributes do not match
+			// set match to false and break
+			if (ipValues1 == NULL || ipValues2 == NULL)
+			{
+				bMatch = false;
+				break;
+			}
+
+			// Get the sizes
+			long lSize1 = ipValues1->Size();
+			long lSize2 = ipValues2->Size();
+
+			// Create and initialize vector to cache the values of the second collection
+			vector<pair<bool, AttributeData>> vecCachedValues;
+			vecCachedValues.resize(lSize2);
+			for (long i=0; i < lSize2; i++)
+			{
+				AttributeData attrTemp;
+				vecCachedValues[i] = pair<bool, AttributeData>(false, attrTemp);
+			}
+
+			// For each value in the first collection, search for a match in the second collection
+			for (long i=0; i < lSize1; i++)
+			{
+				// Get the attribute
+				IAttributePtr ipAttr1 = ipValues1->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI26402", ipAttr1 != NULL);
+
+				// Get the value
+				ISpatialStringPtr ipString1 = ipAttr1->Value;
+				ASSERT_RESOURCE_ALLOCATION("ELI26403", ipString1 != NULL);
+
+				// Get the strings and check case sensitivity
+				AttributeData attr1(asString(ipString1->String), asString(ipAttr1->Type));
+				if (!m_bCaseSensitive)
+				{
+					makeUpperCase(attr1.value);
+					makeUpperCase(attr1.type);
+				}
+
+				// Now check if the first attribute matches any attribute in the second collection
+				bool bInnerMatch = false;
+				for (long j=0; j < lSize2; j++)
+				{
+					// Get the value from the cached collection
+					AttributeData& attr2 = vecCachedValues[j].second;
+
+					// Check if the cached value for this attribute exists
+					if (!vecCachedValues[j].first)
+					{
+						// Build the value (get the attribute)
+						IAttributePtr ipAttr2 = ipValues2->At(j);
+						ASSERT_RESOURCE_ALLOCATION("ELI26404", ipAttr2 != NULL);
+
+						// Get the value
+						ISpatialStringPtr ipString2 = ipAttr2->Value;
+						ASSERT_RESOURCE_ALLOCATION("ELI26405", ipString2 != NULL);
+
+						// Get the strings and check case sensitivity
+						attr2.value = asString(ipString2->String);
+						attr2.type = asString(ipAttr2->Type);
+						if (!m_bCaseSensitive)
+						{
+							makeUpperCase(attr2.value);
+							makeUpperCase(attr2.type);
+						}
+
+						// Set the cached value flag to true
+						vecCachedValues[j].first = true;
+					}
+
+					// Check the values
+					if (attr1.value == attr2.value
+						&& (!m_bCompareTypeInfo || attr1.type == attr2.type))
+					{
+						// Found a match, no need to keep searching
+						bInnerMatch = true;
+						break;
+					}
+				}
+
+				if (!bInnerMatch)
+				{
+					bMatch = false;
+					break;
+				}
+			}
+		}
+
+		return bMatch;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26406");
+}
+//--------------------------------------------------------------------------------------------------
+IAFUtilityPtr CMergeAttributeTrees::getAFUtility()
+{
+	// If the AFUtils object has not been created yet, create one
+	if (m_ipAFUtils == NULL)
+	{
+		m_ipAFUtils.CreateInstance(CLSID_AFUtility);
+		ASSERT_RESOURCE_ALLOCATION("ELI26397", m_ipAFUtils != NULL);
+	}
+
+	// Return the AFUtils object
+	return m_ipAFUtils;
+}
+//--------------------------------------------------------------------------------------------------
+void CMergeAttributeTrees::getAttributesToMoveOrRemove(IIUnknownVectorPtr ipToKeep,
+												   IIUnknownVectorPtr ipToCheck,
+												   vector<IAttributePtr> &rvecAttributesToChange)
+{
+	try
+	{
+		IAFUtilityPtr ipAFUtil = getAFUtility();
+
+		IStrToObjectMapPtr ipKeepMap = ipAFUtil->GetNameToAttributesMap(ipToKeep);
+		ASSERT_RESOURCE_ALLOCATION("ELI26416", ipKeepMap != NULL);
+		IStrToObjectMapPtr ipCheckMap = ipAFUtil->GetNameToAttributesMap(ipToCheck);
+		ASSERT_RESOURCE_ALLOCATION("ELI26417", ipCheckMap != NULL);
+
+		// Perform the comparison to find the matching attributes and the non-matching
+		// (since this function is called after attributes have already been compared and
+		// while the merge is being performed, we know that there is a match in the list
+		for(vector<string>::iterator it = m_vecSubattributesToCompare.begin();
+			it != m_vecSubattributesToCompare.end(); it++)
+		{
+			// Get the collection of values that have this name
+			_bstr_t bstrName(it->c_str());
+			IIUnknownVectorPtr ipKeepList = ipKeepMap->TryGetValue(bstrName);
+			ASSERT_RESOURCE_ALLOCATION("ELI26418", ipKeepList != NULL);
+			IIUnknownVectorPtr ipCheckList = ipCheckMap->TryGetValue(bstrName);
+			ASSERT_RESOURCE_ALLOCATION("ELI26419", ipCheckList != NULL);
+
+			// Get the size of the collections
+			long lKeepSize = ipKeepList->Size();
+			long lCheckSize = ipCheckList->Size();
+			for (long i=0; i < lKeepSize; i++)
+			{
+				// Get the first keep item from the list
+				IAttributePtr ipKeep = ipKeepList->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI26420", ipKeep != NULL);
+
+				// Get the first keep spatial string
+				ISpatialStringPtr ipKeepValue = ipKeep->Value;
+				ASSERT_RESOURCE_ALLOCATION("ELI26421", ipKeepValue != NULL);
+
+				// Get the strings and check case sensitivity
+				string strKeepType = asString(ipKeep->Type);
+				string strKeepValue = asString(ipKeepValue->String);
+				if (!m_bCaseSensitive)
+				{
+					makeUpperCase(strKeepType);
+					makeUpperCase(strKeepValue);
+				}
+
+				// Now find the value in the to check collection
+				bool bMatched = false;
+				for (long j=0; j < lCheckSize; j++)
+				{
+					// Get the to check attribute
+					IAttributePtr ipCheck = ipCheckList->At(j);
+					ASSERT_RESOURCE_ALLOCATION("ELI26422", ipCheck != NULL);
+
+					// Get the value
+					ISpatialStringPtr ipCheckValue = ipCheck->Value;
+					ASSERT_RESOURCE_ALLOCATION("ELI26423", ipCheckValue != NULL);
+
+					// Get the strings and check case sensitivity
+					string strCheckType = asString(ipCheck->Type);
+					string strCheckValue = asString(ipCheckValue->String);
+					if (!m_bCaseSensitive)
+					{
+						makeUpperCase(strCheckType);
+						makeUpperCase(strCheckValue);
+					}
+
+					// If this is the matching value, remove it from the ToCheck collection
+					if (strCheckValue == strKeepValue
+						&& (!m_bCompareTypeInfo || strCheckType == strKeepType))
+					{
+						bMatched = true;
+						ipCheckList->Remove(j);
+						j--;
+						lCheckSize--;
+
+						// Remove the attribute from the to check collection since it matches
+						ipToCheck->RemoveValue(ipCheck);
+					}
+					else
+					{
+						// Non-matching comparison - add it to the to change collection
+						rvecAttributesToChange.push_back(ipCheck);
+					}
+				}
+
+				// If this attribute did not match any, add it to the to change collection
+				if (!bMatched)
+				{
+					rvecAttributesToChange.push_back(ipKeep);
+				}
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26424");
+}
+//--------------------------------------------------------------------------------------------------
+void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttributes,
+												  const vector<IAttributePtr>& vecMergedAttributes)
+{
+	try
+	{
+		// Get an AFUtility pointer
+		IAFUtilityPtr ipAFUtils = getAFUtility();
+
+		// Iterate the vector of attributes to be removed (the sub-attributes that were merged)
+		// and remove them from the attribute collection
+		for (vector<IAttributePtr>::const_iterator it = vecMergedAttributes.begin();
+			it != vecMergedAttributes.end(); it++)
+		{
+			ipAFUtils->RemoveAttribute(ipAttributes, (*it));
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26428");
 }
 //--------------------------------------------------------------------------------------------------

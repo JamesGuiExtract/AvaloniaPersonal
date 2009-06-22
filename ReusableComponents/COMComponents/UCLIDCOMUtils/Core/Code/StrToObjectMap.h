@@ -55,6 +55,7 @@ public:
 	STDMETHOD(Set)(/*[in]*/ BSTR key, /*[in]*/ IUnknown* pObject);
 	STDMETHOD(GetKeyValue)(/*[in]*/ long nIndex, /*[out]*/ BSTR *pstrKey, /*[out]*/ IUnknown* *pObject);
 	STDMETHOD(RenameKey)(/*[in]*/ BSTR strKey, /*[in]*/ BSTR strNewKeyName);
+	STDMETHOD(TryGetValue)(BSTR bstrKey, IUnknown** ppObject);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);

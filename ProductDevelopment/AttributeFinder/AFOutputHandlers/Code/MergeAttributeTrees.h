@@ -132,6 +132,9 @@ private:
 	// Whether to compare sub attributes
 	bool m_bCompareSubAttributes;
 
+	// The AFUtility object to be used in this object
+	IAFUtilityPtr m_ipAFUtils;
+
 	/////////////////
 	// Methods
 	/////////////////
@@ -139,12 +142,30 @@ private:
 	// Validate license.
 	void validateLicense();
 
+	// Sets the sub attribute compare vector from the \r\n tokenized string
 	void setSubAttributeComparesFromString(const string& strSubAttributes);
 
+	// Gets the sub attribute compare vector as a \r\n tokenized string
 	string getSubAttributeComparesAsString();
+
+	// Compares the sub attribute vectors based on the sub attribute compare strings
+	bool compareSubAttributes(IIUnknownVectorPtr ipSubAttributes1,
+		IIUnknownVectorPtr ipSubAttributes2);
+
+	// Gets the collection of sub attributes that will either be moved (place at the end of
+	// the attribute collection) or removed
+	void getAttributesToMoveOrRemove(IIUnknownVectorPtr ipKeep, IIUnknownVectorPtr ipToCheck,
+		vector<IAttributePtr>& rvecAttributesToModify);
 
 	// Validates the string (string cannot contain | characters)
 	static void validateAttributeString(const string& strSubAttributes);
+
+	// Removes the attributes that have already been merged from the attribute collection
+	void removeMergedAttributes(IIUnknownVectorPtr ipAttributes,
+		const vector<IAttributePtr>& vecMergedAttributes);
+
+	// Gets the AFUtility pointer for this object
+	IAFUtilityPtr getAFUtility();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(MergeAttributeTrees), CMergeAttributeTrees)

@@ -532,11 +532,11 @@ library UCLID_COMUTILSLib
 			[out, retval] VARIANT_BOOL *pVal);
 		[propput, id(10), helpstring("property CaseSensitive")] HRESULT CaseSensitive(
 			[in] VARIANT_BOOL newVal);
-
-//		[id(11), helpstring("method Merge")] HRESULT Merge([in] IStrToObjectMap *pMapToMerge, 
-//			[in] EMergeMethod eMergeMethod);
-//		[id(12), helpstring("method MergeKeyValue")] HRESULT MergeKeyValue(
-//			[in] BSTR bstrKey, [in] IUnknown *pValue, [in] EMergeMethod eMergeMethod);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To attempt to get a value from the collection, sets ppObject to the object
+		//			if it was found and NULL otherwise
+		[id(13), helpstring("method TryGetValue")] HRESULT TryGetValue([in] BSTR bstrKey,
+			[out, retval] IUnknown** ppObject);
 	};
 	[
 		object,

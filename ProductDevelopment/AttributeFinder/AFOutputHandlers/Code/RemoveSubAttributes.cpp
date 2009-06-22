@@ -268,8 +268,8 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 			IDataScorerPtr ipDataScorer = m_ipDataScorer->GetObject();
 			ASSERT_RESOURCE_ALLOCATION("ELI09802", ipDataScorer != NULL);
 
-			int i;
-			for (i = 0; i < ipFoundAttributes->Size(); i++)
+			long lSize = ipFoundAttributes->Size();
+			for (long i = 0; i < lSize; i++)
 			{
 				IAttributePtr ipAttr = ipFoundAttributes->At(i);
 				ASSERT_RESOURCE_ALLOCATION("ELI09566", ipAttr != NULL);
@@ -305,6 +305,7 @@ STDMETHODIMP CRemoveSubAttributes::raw_ProcessOutput(IIUnknownVector* pAttribute
 				{
 					ipFoundAttributes->Remove(i);
 					i--;
+					lSize--;
 				}
 			}
 		}
