@@ -1,14 +1,18 @@
-//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData
-<SETTING>;AutomatedConditionQuantifier=only any
-//only any
-<SETTING>;AutomatedCondition=HCData
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Old Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=any
+//<SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
+
+//Hybrid Stats
 <SETTING>;VerificationConditionQuantifier=any
-<SETTING>;VerificationCondition=MCData|Clues|LCData
+<SETTING>;VerificationCondition=MCData|LCData|Clues
+<SETTING>;AutomatedConditionQuantifier=only any
+<SETTING>;AutomatedCondition=HCData
 <SETTING>;OutputHybridStats=1
-//<SETTING>;TypeToBeTested=SSN
-//<SETTING>;OUTPUT_FINAL_STATS_ONLY=TRUE
+
 <SETTING>;OutputFinalStatsOnly=1
-//<SETTING>;CreateTestOutputVOAFiles=1
 
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\VA - Louisa\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
