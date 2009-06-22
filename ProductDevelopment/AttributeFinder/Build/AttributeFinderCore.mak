@@ -99,10 +99,12 @@ EncryptAndCopyComponentDataFiles:
     @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @SendFilesAsArgumentToApplication "$(AFCoreInstallFilesRootDir)\ComponentData\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.dcc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.dat"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.rsd"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.txt"
+	@DeleteFiles "$(AFCoreInstallFilesRootDir)\ComponentData\*.spm"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @ECHO $(FKBVersion) > "$(AFCoreInstallFilesRootDir)\ComponentData\FKBVersion.txt"
 

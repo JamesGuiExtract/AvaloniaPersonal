@@ -17,6 +17,7 @@
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
+    #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\v3.5\\Version"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
     #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
@@ -68,6 +69,7 @@
     prototype CloseApps();
     prototype UnnstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
+    prototype InstallSQLCE();
     
     // your global variables
     BOOL gbInstalled;
@@ -284,7 +286,10 @@ function CheckOtherExtractProducts()
 begin
 	bInstalled = FALSE;     
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-    
+ 	
+ 	// TODO: This check does not seem to be working correctly so I have added the following line to until it is fixed
+ 	return 0;
+	    
     // Check each of the expected version against any installed versions
     if (CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
     	strMsg = "ID Shield version " + strVersion + " must be uninstalled before product can be installed.";	
@@ -462,4 +467,38 @@ begin
 	if (nResult = IDYES) then
 	    UninstallApplication(CRYSTAL_REPORTS_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
   	endif;
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallSQLCE
+//
+//  Purpose: This function installs the SQL Compact Edition if it is not installed
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallSQLCE()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0) then
+		// Install SQL Compact Edition
+		szProgram = "msiexec";
+		if ( SYSINFO.bIsWow64 ) then
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime-ENU-x64.msi /passive";
+		else
+			szCmdLine = " /i " + SUPPORTDIR ^ "\\SSCERuntime-ENU-x86.msi /passive";
+		endif;
+		SdShowMsg("Setup is Installing SQL Compact Edition", TRUE);
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
+		SdShowMsg("Setup is Installing SQL Compact Edition", FALSE);
+		//if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0  ) then
+		//	MessageBox("SQL Compact Edition was not successfully Installed, installation will be aborted", SEVERE);
+		//	gbInstalled = FALSE;
+		//	abort;
+		//endif;
+	endif;
+
 end;

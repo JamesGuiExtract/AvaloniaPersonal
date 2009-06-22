@@ -1676,6 +1676,7 @@
 		<row><td>PATH_TO_DOT_NET_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_KEY_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SQL_COMPACT_EDITION</td><td>P:\AttributeFinder\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2005</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
@@ -1918,6 +1919,8 @@
 		<col def="S0">Path</col>
 		<row><td>SetupFile1</td><td>license.txt</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\license.txt</td></row>
 		<row><td>SetupFile10</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_KEY_INSTALL&gt;\CBUSetup.exe</td></row>
+		<row><td>SetupFile11</td><td>SSCERuntime-ENU-x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL_COMPACT_EDITION&gt;\SSCERuntime-ENU-x64.msi</td></row>
+		<row><td>SetupFile12</td><td>SSCERuntime-ENU-x86.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL_COMPACT_EDITION&gt;\SSCERuntime-ENU-x86.msi</td></row>
 		<row><td>SetupFile2</td><td>setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISPROJECTDIR&gt;\support files\setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>UninstallInlite.bat</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\UninstallInlite.bat</td></row>
 		<row><td>SetupFile4</td><td>ClearImageEUK_5_7_3.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_INSTALL&gt;\ClearImageEUK_5_7_3.exe</td></row>

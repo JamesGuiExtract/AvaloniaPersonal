@@ -134,9 +134,11 @@ CreateDemo_LabDE:
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dat"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.rsd"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dcc"
+	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.spm"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\vssver.scc"
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
