@@ -56,8 +56,8 @@ public:
 	virtual ~SpotRecDlgToolBar();
 	void createGoToPageEditBox();
 	void enableGoToEditBox(bool bEnable);
-	std::string getCurrentGoToPageText();
-	void setCurrentGoToPageText(const std::string& strText);
+	string getCurrentGoToPageText();
+	void setCurrentGoToPageText(const string& strText);
 	void clearGoToPageText();
 	void showToolbarCtrl(ESRIRToolbarCtrl eCtrl, bool bShow);
 	void updateGotoEditBoxPos();
@@ -66,6 +66,8 @@ private:
 	CEdit *m_wndSnap;
 
 	int getButtonId(ESRIRToolbarCtrl eCtrl);
+
+	void showAdjacentSeparators(int iButtonIndex, bool bShow);
 };
 
 #endif // SPOT_REC_DLG_TOOLBAR_H

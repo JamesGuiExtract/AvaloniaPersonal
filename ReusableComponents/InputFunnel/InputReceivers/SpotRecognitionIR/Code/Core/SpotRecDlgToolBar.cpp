@@ -127,17 +127,23 @@ void SpotRecDlgToolBar::showToolbarCtrl(ESRIRToolbarCtrl eCtrl, bool bShow)
 	CToolBarCtrl& toolbar = GetToolBarCtrl();
 	toolbar.HideButton(iButtonId, asMFCBool(!bShow));
 
-	// Update the go to page edit box position
-	updateGotoEditBoxPos();
-
-	// Get the number of buttons in the toolbar
-	int iButtonCount = toolbar.GetButtonCount();
-
 	// Get the index of the button that was shown/hidden
 	int iButtonIndex = CommandToIndex(iButtonId);
 
+	// If this was the last button to be hidden or the first button to be shown in a group, 
+	// then hide or show the adjacent separators. [LegacyRCAndUtils #5184]
+	showAdjacentSeparators(iButtonIndex, bShow);
+
+	// Update the go to page edit box position
+	updateGotoEditBoxPos();
+}
+//--------------------------------------------------------------------------------------------------
+void SpotRecDlgToolBar::showAdjacentSeparators(int iButtonIndex, bool bShow)
+{
+	// Get the toolbar
+	CToolBarCtrl& toolbar = GetToolBarCtrl();
+
 	// If there are no other visible buttons in this group, update the separator. 
-	// [LegacyRCAndUtils #5184]
 	TBBUTTONINFO buttonInfo = {0};
 	buttonInfo.cbSize = sizeof(TBBUTTONINFO);
 	buttonInfo.dwMask = TBIF_BYINDEX | TBIF_STATE | TBIF_STYLE;
@@ -158,6 +164,7 @@ void SpotRecDlgToolBar::showToolbarCtrl(ESRIRToolbarCtrl eCtrl, bool bShow)
 			return;
 		}
 	}
+	int iButtonCount = toolbar.GetButtonCount();
 	for (int i = iButtonIndex + 1; i < iButtonCount; i++)
 	{
 		// Get the state and style for this button
