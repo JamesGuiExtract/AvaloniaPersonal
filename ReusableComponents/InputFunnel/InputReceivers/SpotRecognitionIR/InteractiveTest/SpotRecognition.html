@@ -24,7 +24,7 @@
 <ul>
    	<li><b>[LegacyRC #5342] /c</b> option - Send OCR text to Clipboard
 	<ul>
-		<li>Run <b>ImageViewer.exe &lt;image_file&gt; /c</b> from a command window.
+		<li>Run <b>ImageViewer.exe /c &lt;image_file&gt;</b> from a command window.
 		<li>Confirm that the image opens in ImageViewer.exe.
 		<li>Use <b>Recognize text and process</b> to select some text for OCR.
 		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
@@ -61,12 +61,12 @@
 <p>
    	<li><b>/o</b> option - Send OCR text to file
 	<ul>
-		<li>Run <b>ImageViewer.exe &lt;image_file&gt; /o &lt;ocr_file&gt;</b> 
+		<li>Run <b>ImageViewer.exe /o &lt;ocr_file.txt&gt; &lt;image_file&gt;</b> 
 		from a command window.
 		<li>Confirm that the image opens in ImageViewer.exe.
 		<li>Use <b>Recognize text and process</b> to select some text for OCR.
 		<li>Confirm that the recognized text <b>is not displayed</b> in a message box.
-		<li>Confirm that the recognized text <b>is</b> stored in <b>&lt;ocr_file&gt;</b>.
+		<li>Confirm that the recognized text <b>is</b> stored in <b>&lt;ocr_file.txt&gt;</b>.
 	</ul>
 <p>
    	<li><b>/r</b> option - Register TIF extension
@@ -124,6 +124,9 @@
 		<b>ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\InteractiveTest</b> 
 		folder.
 		<li>Confirm that various <b>Script_&lt;Description&gt;.txt</b> files are present.
+		<li>Copy the first image from the RDT automated to
+		<b>D:\Engineering\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image1.tif</b>.  
+		Without copying this file, all of the following script tests will fail.
 	</ul>
 <p>
    	<li><b>Test Execution</b> - Confirm that each of the following tests works as expected via 
@@ -199,7 +202,7 @@
 	<li><b>[LegacyRC #4475, #4477]</b> Highlights offset for images with small deskew angle.</li>   
 	<ul>
 		<li>Open <b>PoBox.rsd</b> and start the Rule Tester utility.</li> 
-		<li>Open <b>SlightDeskew.tif</b> in the Rule Tester.</li> 
+		<li>Open <b>Small_Deskew.tif</b> in the Rule Tester.</li> 
 		<li>Execute the rules from the <b>Rule Tester</b>.</li> 
 		<li>Review the two found attributes and confirm that the highlights are 
 		    properly aligned with the text.</li> 
@@ -361,7 +364,7 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 <ul>
    	<li><b>Instructions</b>
 	<ul>
-		<li>Use the Rule Tester and Spot Recognition Window with <b>ExtractLines.rsd</b>.</li> 
+		<li>Use the Rule Tester and Image Viewer with <b>ExtractLines.rsd</b>.</li> 
 		<li>Use <b>RotationTesting.xls</b> to track performance of OCR and Highlights.</li> 
 		<li>The RSD and XLS files can be found in 
                     <b>./AttributeFinder/Testing/RotationTesting</b>.</li> 
