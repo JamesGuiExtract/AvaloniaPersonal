@@ -232,9 +232,10 @@
 
 <CompanyDesignators>
 
+//Whole words and phrases
 \bAcademy\b
 \bAdministration\b
-\bAgen(?:cy|ts?)\b
+\bAgency\b
 \bAmerica(?:n|\x20?['"]\x20?s)?\b
 \bApartments?\b
 \bArchitects?\b
@@ -282,7 +283,7 @@
 \bEquilization\b
 \bEquity\b
 \bExchange\b
-\bFannie\s{0,2}Mae\b
+\bFannie\x20{0,2}Mae\b
 \bFarms?\b
 \bFinanc(?:es?|ial|ings?)\b
 \bFirst\b
@@ -300,6 +301,7 @@
 \bInsurance\b
 \bInstallations?\b
 \bInvest(?:ments?|tors?)\b
+\bIron\x20{0,2}Works\b
 \bLandscap(ing|ers?)\b
 \bLeasing\b
 \bLend(?:ers?|ing)\b
@@ -321,6 +323,7 @@
 \bPublic\b
 \bReal(?:ty|ors?)\b
 \bRecordings\b
+\bRedevelop(?:ers?|ment)\b
 \bRentals?\b
 \bRepairs?\b
 \bResidential\b
@@ -332,6 +335,7 @@
 \bServices?\b
 \bSolutions\b
 \bSons\b
+\bSpecialists?\b
 \bStudios?\b
 \bSystems?\b
 \bTax\b
@@ -342,6 +346,10 @@
 \bVideos?\b
 \bWeddings?\b
 \bWholesale\b
+
+// Investorsbank and Citifinancial
+Investorsbank
+Citifinancial
 
 // Company names with dot com
 \b\w+\.com\b
