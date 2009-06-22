@@ -35,7 +35,7 @@ LocalGrantor11=as^4~Trustee^4~under^4~said^4~Deed^4~of^4~Trust^?Grantor^100~AS^4
 LocalGrantor12=in^4~the^4~real^4~property^4~described^4~therein^15~IN WITNESS WHEREOF^?Grantor^100~Beneficiary
 
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\STRU\2008-0065314.tif
-LocalGrantor13=Current/Present Beneficiary:^?Grantor^100~ATTORNEY IN FACT FOR
+LocalGrantor13=Current/Present Beneficiary:|Current/Present Beneficiary;^?Grantor^100~ATTORNEY IN FACT FOR
 
 //K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\STRU\2008-0065305.tif
 LocalGrantor14=IN WITNESS WHEREOF^10~undersigned^4~has^4~caused^4~this^4~Substitution^4~of^4~Trustee^4~and^4~Full^4~Reconveyance^6~to^4~[be]^4~executed^4~[on]^?Grantor^100~successor in interest
@@ -80,12 +80,12 @@ LocalGrantor24=was^4~the^4~original^4~Trustee^10~and^?Grantor^100~w^4~as^4~the^4
 
 
 //K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000011300.002.uss
-LocalSotGrantor01=\r\nBeneficiar^8~:^?Grantor^60~[By^1~:
+LocalSotGrantor01=\r\nBeneficiar^8~:|;^?Grantor^60~[By^1~:|;
 //K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000010300.003
-LocalSotGrantor02=\r\n^2~Dated:^24~\r\n^?Grantor^160~[By^1~:
-LocalSotGrantor05=\r\n^2~Dated:^24~\r\n^?Grantor^160~\r\n\r\n^24~president
+LocalSotGrantor02=\r\n^2~Dated:|Dated;^24~\r\n^?Grantor^160~[By^1~:|;
+LocalSotGrantor05=\r\n^2~Dated:|Dated;^24~\r\n^?Grantor^160~\r\n\r\n^24~president
 //K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000012600.003.uss
-LocalSotGrantor04=0|1|2|3|4|5|6|7|8|9^1~\r\n\r\n^?Grantor^160~\r\n^1~[By:
+LocalSotGrantor04=0|1|2|3|4|5|6|7|8|9^1~\r\n\r\n^?Grantor^160~\r\n^1~[By:|[By;
 LocalSotGrantor03=0|1|2|3|4|5|6|7|8|9^1~\r\n\r\n^?Trustee^160~[acting^10~capacity^9~Trustee^16~[for^3~the
 //K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\SUBSTITUTION TRUSTEE\20079000016300.002.uss
 LocalSotGrantor06=0|1|2|3|4|5|6|7|8|9^1~\r\n\r\n^?Grantor^160~\r\n\r\n^24~president
