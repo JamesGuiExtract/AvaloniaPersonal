@@ -268,7 +268,7 @@
 \bCompany\b
 \bConstruction\b
 \bConsultants\b
-\bCount(?:y|ies)\b
+\bCounties\b
 \bCorp(?:oration|orate)?\b
 \bCredit(?:ors?)?\b
 \bDayCare\b
@@ -304,7 +304,7 @@
 \bIron\x20{0,2}Works\b
 \bLandscap(ing|ers?)\b
 \bLeasing\b
-\bLend(?:ers?|ing)\b
+\bLend(?:ers|ing)\b
 \bLimited\b
 \bLoans?\b
 \bLutheran\b
@@ -319,7 +319,7 @@
 \bOpenings\b
 \bPartners(?:hip)?\b
 \bPizza\b
-\bProper(ty|ties)\b
+\bProperties\b
 \bPublic\b
 \bReal(?:ty|ors?)\b
 \bRecordings\b
@@ -338,7 +338,6 @@
 \bSpecialists?\b
 \bStudios?\b
 \bSystems?\b
-\bTax\b
 \bTechnolog(?:y|ies)\b
 \bTrust\b
 \bUniversity\b
@@ -359,9 +358,10 @@ Citifinancial
 
 //===============================================
 // Company Suffixes: 
-//   If any of these expressions are found in the
-//   entity, the entity will be split as a 
-//   company.
+//   These are the words that are used to find
+//   the end of the company's name.  In addition,
+//   entities that contain these words will be
+//   split as companies.
 //===============================================
 <CompanySuffixes>
 \bL(\s*(\.\s*)?)?L(\s*(\.\s*)?)?(C|P)\b(\s*\.)?
