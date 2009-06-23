@@ -30,7 +30,12 @@ struct AttributeData
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+const unsigned long gnCurrentVersion = 2;
+const bool gbDEFAULT_CASE_SENSITIVE = false;
+const bool gbDEFAULT_DISCARD_NON_MATCH = false;
+const bool gbDEFAULT_REMOVE_EMPTY = true;
+const bool gbDEFAULT_COMPARE_TYPE_INFO = true;
+const bool gbDEFAULT_COMPARE_SUB_ATTRIBUTES = false;
 
 //--------------------------------------------------------------------------------------------------
 // CMergeAttributeTrees
@@ -41,10 +46,11 @@ m_ipAFUtils(NULL),
 m_strAttributesToBeMerged(""),
 m_eMergeInto(kFirstAttribute),
 m_bDirty(false),
-m_bCaseSensitive(false),
-m_bDiscardNonMatch(false),
-m_bCompareTypeInfo(true),
-m_bCompareSubAttributes(false)
+m_bCaseSensitive(gbDEFAULT_CASE_SENSITIVE),
+m_bDiscardNonMatch(gbDEFAULT_DISCARD_NON_MATCH),
+m_bRemoveEmptyHierarchy(gbDEFAULT_REMOVE_EMPTY),
+m_bCompareTypeInfo(gbDEFAULT_COMPARE_TYPE_INFO),
+m_bCompareSubAttributes(gbDEFAULT_COMPARE_SUB_ATTRIBUTES)
 {
 	try
 	{
@@ -325,6 +331,36 @@ STDMETHODIMP CMergeAttributeTrees::get_CompareSubAttributes(VARIANT_BOOL* pvbCom
 //	}
 //	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26359")
 //}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributeTrees::get_RemoveEmptyHierarchy(VARIANT_BOOL* pvbRemoveEmptyHierarchy)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI26455", pvbRemoveEmptyHierarchy != NULL);
+
+		validateLicense();
+
+		*pvbRemoveEmptyHierarchy = asVariantBool(m_bRemoveEmptyHierarchy);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26456");
+}
+//--------------------------------------------------------------------------------------------------
+STDMETHODIMP CMergeAttributeTrees::put_RemoveEmptyHierarchy(VARIANT_BOOL vbRemoveEmptyHierarchy)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		m_bRemoveEmptyHierarchy = asCppBool(vbRemoveEmptyHierarchy);
+
+		m_bDirty = true;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26457");
+}
 
 //--------------------------------------------------------------------------------------------------
 // IOutputHandler
@@ -524,6 +560,7 @@ STDMETHODIMP CMergeAttributeTrees::IsDirty(void)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26365");
 }
 //--------------------------------------------------------------------------------------------------
+// Version 2 - Added the remove empty attribute hierarchy setting
 STDMETHODIMP CMergeAttributeTrees::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -539,6 +576,11 @@ STDMETHODIMP CMergeAttributeTrees::Load(IStream *pStream)
 		m_strAttributesToBeMerged = "";
 		m_vecSubattributesToCompare.clear();
 		m_eMergeInto = kFirstAttribute;
+		m_bCaseSensitive = gbDEFAULT_CASE_SENSITIVE;
+		m_bDiscardNonMatch = gbDEFAULT_DISCARD_NON_MATCH;
+		m_bRemoveEmptyHierarchy = gbDEFAULT_REMOVE_EMPTY;
+		m_bCompareTypeInfo = gbDEFAULT_COMPARE_TYPE_INFO;
+		m_bCompareSubAttributes = gbDEFAULT_COMPARE_SUB_ATTRIBUTES;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -581,6 +623,12 @@ STDMETHODIMP CMergeAttributeTrees::Load(IStream *pStream)
 		dataReader >> m_bCompareTypeInfo;
 		dataReader >> m_bCompareSubAttributes;
 
+		// Read the remove empty hierarchy flag
+		if (nDataVersion >= 2)
+		{
+			dataReader >> m_bRemoveEmptyHierarchy;
+		}
+
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
 
@@ -615,6 +663,7 @@ STDMETHODIMP CMergeAttributeTrees::Save(IStream *pStream, BOOL fClearDirty)
 		dataWriter << m_bCaseSensitive;
 		dataWriter << m_bCompareTypeInfo;
 		dataWriter << m_bCompareSubAttributes;
+		dataWriter << m_bRemoveEmptyHierarchy;
 
 		dataWriter.flushToByteStream();
 
@@ -711,6 +760,7 @@ STDMETHODIMP CMergeAttributeTrees::raw_CopyFrom(IUnknown *pObject)
 		m_bCaseSensitive = asCppBool(ipSource->CaseSensitive);
 		m_bCompareTypeInfo = asCppBool(ipSource->CompareTypeInformation);
 		m_bCompareSubAttributes = asCppBool(ipSource->CompareSubAttributes);
+		m_bRemoveEmptyHierarchy = asCppBool(ipSource->RemoveEmptyHierarchy);
 
 		// Since this object has changed, set the dirty flag
 		m_bDirty = true;
@@ -1097,6 +1147,8 @@ void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttribute
 {
 	try
 	{
+		ASSERT_ARGUMENT("ELI26458", ipAttributes != NULL);
+
 		// Get an AFUtility pointer
 		IAFUtilityPtr ipAFUtils = getAFUtility();
 
@@ -1105,9 +1157,56 @@ void CMergeAttributeTrees::removeMergedAttributes(IIUnknownVectorPtr ipAttribute
 		for (vector<IAttributePtr>::const_iterator it = vecMergedAttributes.begin();
 			it != vecMergedAttributes.end(); it++)
 		{
+			// Create a null parent attribute
+			IAttributePtr ipParent = NULL;
+
+			// If removing empty hierarchy, check for a parent attribute
+			if (m_bRemoveEmptyHierarchy)
+			{
+				ipParent = ipAFUtils->GetAttributeParent(ipAttributes, (*it));
+			}
+
 			ipAFUtils->RemoveAttribute(ipAttributes, (*it));
+
+			// If the parent has been set then remove the hierarchy
+			if (ipParent != NULL)
+			{
+				removeEmptyAttributesFromHierarchy(ipAttributes, ipParent);
+			}
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26428");
+}
+//--------------------------------------------------------------------------------------------------
+void CMergeAttributeTrees::removeEmptyAttributesFromHierarchy(IIUnknownVectorPtr ipAttributes,
+															 IAttributePtr ipParent)
+{
+	try
+	{
+		ASSERT_ARGUMENT("ELI26451", ipAttributes != NULL);
+		ASSERT_ARGUMENT("ELI26452", ipParent != NULL);
+
+		// Get the sub attributes
+		IIUnknownVectorPtr ipSubs = ipParent->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI26453", ipSubs != NULL);
+
+		// If the sub attributes are empty then remove the parent
+		if (ipSubs->Size() == 0)
+		{
+			// Get the grand parent attribute
+			IAFUtilityPtr ipAFUtils = getAFUtility();
+			IAttributePtr ipGrandParent = ipAFUtils->GetAttributeParent(ipAttributes, ipParent);
+
+			// Remove the parent attribute
+			ipAFUtils->RemoveAttribute(ipAttributes, ipParent);
+
+			// If the grand parent is not null then check if this is now empty
+			if (ipGrandParent != NULL)
+			{
+				removeEmptyAttributesFromHierarchy(ipAttributes, ipGrandParent);
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26454");
 }
 //--------------------------------------------------------------------------------------------------

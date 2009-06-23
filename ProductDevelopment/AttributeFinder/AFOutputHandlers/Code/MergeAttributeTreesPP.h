@@ -4,6 +4,8 @@
 #include "resource.h"
 #include "AFOutputHandlers.h"
 
+#include <XInfoTip.h>
+
 #include <string>
 using namespace std;
 
@@ -39,10 +41,12 @@ public:
 	BEGIN_MSG_MAP(CMergeAttributeTreesPP)
 		CHAIN_MSG_MAP(IPropertyPageImpl<CMergeAttributeTreesPP>)
 		MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
+		COMMAND_HANDLER(IDC_MERGE_REMOVE_INFO, BN_CLICKED, OnClickedRemoveAttributeInfo)
 	END_MSG_MAP()
 
 	// Windows Message Handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	LRESULT OnClickedRemoveAttributeInfo(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 
 	// IPropertyPage
 	STDMETHOD(Apply)(void);
@@ -66,6 +70,9 @@ private:
 	ATLControls::CButton m_chkCaseSensitive;
 	ATLControls::CButton m_chkCompareTypeInfo;
 	ATLControls::CButton m_chkCompareSubAttributes;
+	ATLControls::CButton m_chkRemoveEmptyAttributes;
+
+	CXInfoTip m_xinfoRemoveEmpty;
 
 	/////////////
 	// Methods

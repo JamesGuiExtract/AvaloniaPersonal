@@ -404,6 +404,13 @@ library UCLID_AFOUTPUTHANDLERSLib
 		//[propput, id(7), helpstring("property CompareSubAttributes")]
 		//	HRESULT CompareSubAttributes([in] VARIANT_BOOL vbCompareSubAttributes);
 		//------------------------------------------------------------------------------------------
+		// PROPERTY:	Whether to remove empty attribute hierarchies (formed when attributes
+		//				are moved to other attributes) after the merge has taken place
+		[propget, id(8), helpstring("property RemoveEmptyHierarchy")]
+			HRESULT RemoveEmptyHierarchy([out, retval] VARIANT_BOOL* pvbRemoveEmptyHiearchy);
+		[propput, id(8), helpstring("property RemoveEmptyHierarchy")]
+			HRESULT RemoveEmptyHierarchy([in] VARIANT_BOOL vbRemoveEmptyHiearchy);
+		//------------------------------------------------------------------------------------------
 	};
 
 	//----------------------------------------------------------------------------------------------

@@ -45,6 +45,10 @@ LRESULT CMergeAttributeTreesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 		UCLID_AFOUTPUTHANDLERSLib::IMergeAttributeTreesPtr ipRule = m_ppUnk[0];
 		ASSERT_RESOURCE_ALLOCATION("ELI26389", ipRule);
 
+		// Create tooltip object and set the delay to 0
+		m_xinfoRemoveEmpty.Create(CWnd::FromHandle(m_hWnd));
+		m_xinfoRemoveEmpty.SetShowDelay(0);
+
 		// Map controls to member variables
 		m_editAttributesToMergeQuery = GetDlgItem(IDC_EDIT_MERGE_TREES_QUERY);
 		m_radMergeIntoFirst = GetDlgItem(IDC_RADIO_MERGE_INTO_FIRST);
@@ -55,6 +59,7 @@ LRESULT CMergeAttributeTreesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 		m_chkCaseSensitive = GetDlgItem(IDC_CHECK_MERGE_CASESENSITIVE);
 		m_chkCompareTypeInfo = GetDlgItem(IDC_CHECK_MERGE_COMPARE_TYPE);
 		m_chkCompareSubAttributes = GetDlgItem(IDC_CHECK_MERGE_COMPARE_SUBATTR);
+		m_chkRemoveEmptyAttributes = GetDlgItem(IDC_CHECK_MERGE_REMOVE_EMPTY);
 		
 		// Set the query text
 		m_editAttributesToMergeQuery.SetWindowText(asString(ipRule->AttributesToBeMerged).c_str());
@@ -83,9 +88,50 @@ LRESULT CMergeAttributeTreesPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lP
 		m_chkCompareSubAttributes.SetCheck(asBSTChecked(ipRule->CompareSubAttributes));
 		m_chkCompareSubAttributes.EnableWindow(FALSE);
 
+		// Set the remove hierarchy check box
+		m_chkRemoveEmptyAttributes.SetCheck(asBSTChecked(ipRule->RemoveEmptyHierarchy));
+
 		SetDirty(FALSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26390");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
+LRESULT CMergeAttributeTreesPP::OnClickedRemoveAttributeInfo(WORD wNotifyCode, WORD wID,
+															 HWND hWndCtl, BOOL &bHandled)
+{
+	try
+	{
+		CString zText("This setting will cause any empty attribute hierarchy to be removed.\n"
+			"For example if you merge the following attributes with the query Data/Test:\n"
+			"Data|Test Data\n"
+			".Test|N/A\n"
+			"..CollectionDate|09/08/2008\n"
+			"..CollectionTime|11:34AM\n"
+			"..Component|HGB\n"
+			"\nData|Test Data\n"
+			".Test|N/A\n"
+			"..CollectionDate|09/08/2008\n"
+			"..CollectionTime|11:34AM\n"
+			"..Component|HCT\n"
+			"\nData|Test Data\n"
+			".Test|N/A\n"
+			"..Component|RBC\n"
+			".Tester|Jon Doe\n"
+			"\nAfter the merging with this setting turned on the resulting attribute collection will be:\n"
+			"Data|Test Data\n"
+			".Test|N/A\n"
+			"..CollectionDate|09/08/2008\n"
+			"..CollectionTime|11:34AM\n"
+			"..Component|HGB\n"
+			"..Component|HCT\n"
+			"..Component|RBC\n"
+			"\nData|Test Data\n"
+			".Tester|Jon Doe\n");
+		m_xinfoRemoveEmpty.Show(zText);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26459");
 
 	return 0;
 }
@@ -142,6 +188,9 @@ STDMETHODIMP CMergeAttributeTreesPP::Apply(void)
 			ipRule->DiscardNonMatchingComparisons =
 				asVariantBool(m_radDiscardNonMatch.GetCheck() == BST_CHECKED);
 			ipRule->CaseSensitive = asVariantBool(m_chkCaseSensitive.GetCheck() == BST_CHECKED);
+
+			ipRule->RemoveEmptyHierarchy =
+				asVariantBool(m_chkRemoveEmptyAttributes.GetCheck() == BST_CHECKED);
 
 			// TODO: FUTURE implement this functionality fully
 			//ipRule->CompareTypeInformation =

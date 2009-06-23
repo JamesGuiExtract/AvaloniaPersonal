@@ -321,7 +321,7 @@ BEGIN
     GROUPBOX        "Value of merged attribute",IDC_STATIC,6,207,244,41
 END
 
-IDD_MERGEATTRIBUTETREESPP DIALOGEX 0, 0, 240, 249
+IDD_MERGEATTRIBUTETREESPP DIALOGEX 0, 0, 240, 265
 STYLE DS_SETFONT | WS_CHILD
 EXSTYLE WS_EX_CONTROLPARENT
 FONT 8, "MS Sans Serif", 0, 0, 0x1
@@ -339,6 +339,8 @@ BEGIN
 	CONTROL			"Case sensitive comparison", IDC_CHECK_MERGE_CASESENSITIVE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 204, 110, 10
 	CONTROL			"Include type information in comparison", IDC_CHECK_MERGE_COMPARE_TYPE, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 219, 150, 10
 	CONTROL			"Include subattributes in comparison", IDC_CHECK_MERGE_COMPARE_SUBATTR, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 234, 140, 10
+	CONTROL			"Remove empty attribute hierarchy", IDC_CHECK_MERGE_REMOVE_EMPTY, "Button", BS_AUTOCHECKBOX | WS_TABSTOP, 5, 249, 120, 10
+    ICON            IDI_ICON_INFO,IDC_MERGE_REMOVE_INFO,130,250,15,10,SS_NOTIFY
 END
 
 /////////////////////////////////////////////////////////////////////////////

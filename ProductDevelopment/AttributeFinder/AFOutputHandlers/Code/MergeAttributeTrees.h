@@ -74,6 +74,8 @@ public:
 	// TODO: FUTURE - Allow these settings to be used
 	//STDMETHOD(put_CompareTypeInformation)(VARIANT_BOOL vbCompareTypeInformation);
 	//STDMETHOD(put_CompareSubAttributes)(VARIANT_BOOL vbCompareSubAttributes);
+	STDMETHOD(get_RemoveEmptyHierarchy)(VARIANT_BOOL* pvbRemoveEmptyHierarchy);
+	STDMETHOD(put_RemoveEmptyHierarchy)(VARIANT_BOOL vbRemoveEmptyHierarchy);
 
 // IOutputHandler
 	STDMETHOD(raw_ProcessOutput)(IIUnknownVector *pAttributes, IAFDocument *pAFDoc,
@@ -132,6 +134,9 @@ private:
 	// Whether to compare sub attributes
 	bool m_bCompareSubAttributes;
 
+	// Whether to remove empty attribute hierarchies after the merge is performed
+	bool m_bRemoveEmptyHierarchy;
+
 	// The AFUtility object to be used in this object
 	IAFUtilityPtr m_ipAFUtils;
 
@@ -163,6 +168,11 @@ private:
 	// Removes the attributes that have already been merged from the attribute collection
 	void removeMergedAttributes(IIUnknownVectorPtr ipAttributes,
 		const vector<IAttributePtr>& vecMergedAttributes);
+
+	// Removes the empty attribute hierarchy for the specified parent from the
+	// specified vector of attributes
+	void removeEmptyAttributesFromHierarchy(IIUnknownVectorPtr ipAttributes,
+		IAttributePtr ipParent);
 
 	// Gets the AFUtility pointer for this object
 	IAFUtilityPtr getAFUtility();
