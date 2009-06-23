@@ -81,7 +81,7 @@ STDMETHODIMP CAFConvertVOAToXMLTaskPP::Apply(void)
 		{
 			// get the output handler object
 			UCLID_AFFILEPROCESSORSLib::IAFConvertVOAToXMLTaskPtr ipAFConvertTask = m_ppUnk[i];
-			ASSERT_RESOURCE_ALLOCATION("ELI09018", ipAFConvertTask != NULL);
+			ASSERT_RESOURCE_ALLOCATION("ELI26444", ipAFConvertTask != NULL);
 
 			// Get the VOA file name and ensure it is at least 5 characters (smallest file name)
 			_bstr_t bstrVOAFileName;
