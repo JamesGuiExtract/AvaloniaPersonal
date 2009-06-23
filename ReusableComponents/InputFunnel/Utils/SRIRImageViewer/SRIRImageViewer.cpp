@@ -21,6 +21,20 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+//-------------------------------------------------------------------------------------------------
+// Declarations
+//-------------------------------------------------------------------------------------------------
+
+struct CtrlIdDescription
+{
+	int iId;
+	string strDescription;
+};
+
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+
 CComModule _Module;
 const char *gpszTIFFileDescription = "TIF Image File";
 const char *gpszTIFFileExtension = ".tif";
@@ -41,8 +55,40 @@ const string gstrCmdLineDisplaySearchDialog = "/s";
 const string gstrCmdLineReuseWindow = "/l";
 const string gstrCmdLineCloseAll = "/closeall";
 const string gstrCmdLineExecScript = "/e";
-const string gstrCmdLineScriptHelp = "/scripthelp";
+const string gstrCmdLineScriptHelp = "/script?";
+const string gstrCmdLineCtrlHelp = "/ctrlid?";
 const string gstrCmdLineHelp = "/?";
+
+const CtrlIdDescription gCONTROL_ID_DESCRIPTIONS[] = 
+{
+	{ kBtnOpenImage, "Open image file" },
+	{ kBtnSave, "Save highlights in a new image file" },
+	{ kBtnZoomWindow, "Zoom window" },
+	{ kBtnZoomIn, "Zoom in" },
+	{ kBtnZoomOut, "Zoom out" },
+	{ kBtnZoomPrevious, "Zoom previous" },
+	{ kBtnZoomNext, "Zoom next" },
+	{ kBtnPan, "Pan" },
+	{ kBtnSelectText, "Highlight text" },
+	{ kBtnSetHighlightHeight, "Set the default highlight height" },
+	{ kBtnEditZoneText, "Edit highlight text" },
+	{ kBtnDeleteEntities, "Delete highlights" },
+	{ kBtnPTH, "Recognize text and process" },
+	{ kBtnOpenSubImgInWindow, "Open portion of the image in another window" },
+	{ kBtnRotateCounterClockwise, "Rotate 90° left" },
+	{ kBtnRotateClockwise, "Rotate 90° right" },
+	{ kBtnFirstPage, "Go to the first page" },
+	{ kBtnLastPage, "Go to the last page" },
+	{ kBtnPrevPage, "Go to the previous page" },
+	{ kBtnNextPage, "Go to the next page" },
+	{ kEditPageNum, "Go to a specific page number" },
+	{ kBtnPrint, "Print document" },
+	{ kBtnFitPage, "Toggle fit to page mode" },
+	{ kBtnFitWidth, "Toggle fit to width mode" },
+	{ kBtnSelectHighlight, "Select highlight" }
+};
+
+const int giNUM_CONTROL_IDS = 25;
 
 // add license management password function
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
@@ -208,14 +254,19 @@ BOOL CSRIRImageViewerApp::InitInstance()
 					i++;
 					strScriptFileName = __argv[i];
 				}
+				else if (strArg == gstrCmdLineCloseAll)
+				{
+					bCloseAll = true;
+				}
 				else if (strArg == gstrCmdLineScriptHelp)
 				{
 					AfxMessageBox(getScriptUsage().c_str());
 					return FALSE;
 				}
-				else if (strArg == gstrCmdLineCloseAll)
+				else if (strArg == gstrCmdLineCtrlHelp)
 				{
-					bCloseAll = true;
+					AfxMessageBox(getCtrlIdUsage().c_str());
+					return FALSE;
 				}
 				else if (strArg == "/?")
 				{
@@ -550,7 +601,8 @@ const string CSRIRImageViewerApp::getUsage()
 		"    /l - reuse a current image viewer if one already exists\n"
 		"    /closeall - close any currently open Image Viewer\n"
 		"    /e <scriptfile> - execute script commands specified in <scriptfile>\n"
-		"    /scripthelp - displays help for script commands\n"
+		"    /script? - displays help for script commands\n"
+		"    /ctrlid? - lists toolbar control id numbers\n"
 		"    /? - show help\n"
 		"filename - the name of a file to be opened by default\n";
 	return strUsage;
@@ -568,7 +620,7 @@ const string CSRIRImageViewerApp::getScriptUsage()
 		"            Bottom - Bottom half of the screen\n"
 		"            <left>,<right>,<top>,<bottom> - Sized to specified pixel coordinates\n"
 		"    HideButtons <ctrlid> - Hide a toolbar control\n"
-		"        <ctrlid> - Comma separated list of toolbar control id numbers (see help file)\n"
+		"        <ctrlid> - Comma separated list of toolbar control id numbers\n"
 		"    OpenFile <filename> - Opens the specified file\n"
 		"    AddTempHighlight <startX>,<startY>,<endX>,<endY>,<height>,<pagenumber> -\n"
 		"        Creates a temporary highlight at the specified location\n"
@@ -581,6 +633,24 @@ const string CSRIRImageViewerApp::getScriptUsage()
 		"    CenterOnTempHighlight - Centers on the first temporary highlight\n"
 		"    ZoomToTempHighlight - Centers on the first temporary highlight and\n"
 		"        zooms in around the highlight.\n";
+
+	return strUsage;
+}
+//-------------------------------------------------------------------------------------------------
+const string CSRIRImageViewerApp::getCtrlIdUsage()
+{
+	string strUsage = "Toolbar control ids:\n";
+
+	for (int i = 0; i < giNUM_CONTROL_IDS; i++)
+	{
+		const CtrlIdDescription& ctrlId = gCONTROL_ID_DESCRIPTIONS[i];
+		
+		strUsage += "    ";
+		strUsage += asString(ctrlId.iId);
+		strUsage += " - ";
+		strUsage += ctrlId.strDescription;
+		strUsage += "\n";
+	}
 
 	return strUsage;
 }

@@ -57,6 +57,7 @@ private:
 	///////////////
 	const string getUsage();
 	const string getScriptUsage();
+	const string getCtrlIdUsage();
 	
 	UINT registerMessage(const char* szMsgName);
 
