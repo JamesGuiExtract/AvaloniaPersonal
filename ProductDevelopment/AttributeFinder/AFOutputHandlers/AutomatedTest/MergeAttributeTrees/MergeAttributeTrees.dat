@@ -1,0 +1,22 @@
+// Tests merging top level Test attributes
+<TESTCASE>;Test1.rsd;test1.tif.txt;;Test1.eav
+
+// Tests merging Test2/Test attributes where all will be merged into one with
+// empty Test2 attributes remaining
+<TESTCASE>;Test2.rsd;test2.tif.txt;;Test2.eav
+
+// Tests merging Test2/Test attributes where all will be merged into one
+// with empty Test2 attributes remaining (except for one which contains
+// a sub attribute called Tester
+<TESTCASE>;Test3.rsd;test3.tif.txt;;Test3.eav
+
+// Tests merging Test2/Test attributes where all will be merged into one
+// and all empty Test2 attributes will be removed (will leave only one
+// attribute remaining in the collection)
+<TESTCASE>;Test4.rsd;test2.tif.txt;;Test4.eav
+
+// Tests merging Test2/Test attributes where all will be merged into one
+// and all empty Test2 attributes will be removed (will leave only one
+// attribute containing the tests and another containing only the
+// Tester)
+<TESTCASE>;Test5.rsd;test3.tif.txt;;Test5.eav
