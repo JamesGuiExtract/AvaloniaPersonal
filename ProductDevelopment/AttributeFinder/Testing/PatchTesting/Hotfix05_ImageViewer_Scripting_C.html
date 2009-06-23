@@ -1,0 +1,47 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 05 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 05 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> AtPac
+   	<LI><b>SCRs:</b> LegacyRCAndUtils #5339, #5340, #5341, #5342, #5347
+   	<LI><b>Issue:</b> AtPac would like to use the ImageViewer EXE programmatically as 
+	part of their workflow (similar to Waukesha County).  Scripting and command-line 
+	support must work properly as it did for SpotRecognitionWindow.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Re-exercise Image Viewer command-line functionality</b>
+	<ul>
+	   	<li><b>[LegacyRC #5347] /ctrlid?</b> option - Display button IDs
+		<ul>
+			<li>Run <b>ImageViewer.exe /ctrlid?</b> from a command window.
+			<li>Confirm that a message box is displayed with button ID usage information 
+			for use during scripting.
+		</ul>
+<p>
+	   	<li><b>[LegacyRC #5340] /script?</b> option - Display script usage
+		<ul>
+			<li>Run <b>ImageViewer.exe /script?</b> from a command window.
+			<li>Confirm that a message box is displayed with usage information 
+			for scripting.
+		</ul>
+<p>
+	   	<li><b>[LegacyRC #3419] /?</b> option - Display usage
+		<ul>
+			<li>Run <b>ImageViewer.exe /?</b> from a command window.
+			<li>Confirm that a message box is displayed with usage information.
+	</ul>
+</OL>
+</BODY>
+</HTML>
