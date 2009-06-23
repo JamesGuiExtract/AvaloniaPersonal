@@ -313,7 +313,7 @@ namespace Extract.Drawing
             try
             {
                 // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23167",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26445",
                     _OBJECT_NAME);
 
                 ExtractException.Assert("ELI25671", "Invalid parameter!", points.Length > 0);
@@ -354,7 +354,7 @@ namespace Extract.Drawing
             try
             {
                 // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23167",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26446",
                     _OBJECT_NAME);
 
                 // Initialize a vector of point representing the corners of the rectangle.
@@ -391,7 +391,7 @@ namespace Extract.Drawing
             try
             {
                 // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23167",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26447",
                     _OBJECT_NAME);
 
                 // Compute the X and Y distance

@@ -1732,7 +1732,7 @@ namespace Extract.LabDE.StandardLabDE.Test
             _imageViewer.FitMode = FitMode.None;
 
             // Check that fit mode changed to none
-            ExtractException.Assert("ELI26127", "Could not change fit mode to none!",
+            ExtractException.Assert("ELI26448", "Could not change fit mode to none!",
                 _imageViewer.FitMode == FitMode.None);
 
             // Get the FitToWidth toolbar button
@@ -1762,7 +1762,7 @@ namespace Extract.LabDE.StandardLabDE.Test
             _imageViewer.FitMode = FitMode.None;
 
             // Check that fit mode changed to none
-            ExtractException.Assert("ELI26128", "Could not change fit mode to none!",
+            ExtractException.Assert("ELI26449", "Could not change fit mode to none!",
                 _imageViewer.FitMode == FitMode.None);
 
             // Get the FitToWidth button

@@ -1195,7 +1195,7 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
-		ASSERT_RESOURCE_ALLOCATION("ELI07464", ipDoc != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26443", ipDoc != NULL);
 
 		// Get the string from the input
 		string strInput = asString(bstrInput);
