@@ -1,7 +1,25 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//ruletester2
+//<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues
+//|Affidavit of Death|Certificate of Death|Discharge from Active Duty|Power of Attorney|Special
 
-<SETTING>;CreateTestOutputVOAFiles=1
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
+
+//Old Stats
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
+
+//Hybrid Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=only any
+//<SETTING>;AutomatedCondition=HCData
+//<SETTING>;OutputHybridStats=1
+
+//<SETTING>;DocTypesToVerify=Mortgage|Abstract of Judgment|Certificate of Death
+<SETTING>;OutputFinalStatsOnly=1
+
 <SETTING>;OutputAttributeNamesFileLists=1
 
 
