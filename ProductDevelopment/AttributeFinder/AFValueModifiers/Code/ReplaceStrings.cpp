@@ -28,8 +28,8 @@ CReplaceStrings::CReplaceStrings()
   m_bAsRegExpr(false),
   m_ipReplaceInfos(CLSID_IUnknownVector),
   m_bDirty(false),
-  m_lCurrentStringNumber(1),
-  m_lTotalStringsToReplace(1)
+  m_lCurrentAttributeNumber(1),
+  m_lAttributeCount(1)
 {
 	try
 	{
@@ -100,8 +100,8 @@ STDMETHODIMP CReplaceStrings::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		if (m_ipProgressStatus)
 		{
 			m_ipProgressStatus->StartNextItemGroup(
-				get_bstr_t( "Replacing string " + asString(m_lCurrentStringNumber) + 
-				" of " + asString(m_lTotalStringsToReplace) ), 
+				get_bstr_t( "Replacing string " + asString(m_lCurrentAttributeNumber) + 
+				" of " + asString(m_lAttributeCount) ), 
 				ms_lPROGRESS_ITEMS_PER_REPLACEMENT);
 		}
 
@@ -111,7 +111,7 @@ STDMETHODIMP CReplaceStrings::raw_ModifyValue(IAttribute* pAttribute, IAFDocumen
 		if (m_ipProgressStatus)
 		{
 			// Increment the string number
-			m_lCurrentStringNumber++;
+			m_lCurrentAttributeNumber++;
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04209");
@@ -147,14 +147,25 @@ STDMETHODIMP CReplaceStrings::raw_ProcessOutput(IIUnknownVector * pAttributes, I
 		if (m_ipProgressStatus)
 		{
 			// Initialize the string number counter
-			m_lCurrentStringNumber = 1;
+			m_lCurrentAttributeNumber = 1;
 
-			// Store the number of strings
-			m_lTotalStringsToReplace = ipAttributes->Size();
+			// Default count to 0
+			m_lAttributeCount = 0;
+
+			// Compute the total attribute count (sum of the size of each attribute)
+			// [FlexIDSCore #3566]
+			long lSize = ipAttributes->Size();
+			for (long i=0; i < lSize; i++)
+			{
+				IAttributePtr ipAttr = ipAttributes->At(i);
+				ASSERT_RESOURCE_ALLOCATION("ELI26470", ipAttr != NULL);
+
+				m_lAttributeCount += ipAttr->GetAttributeSize();
+			}
 
 			// Initialize progress status object
 			m_ipProgressStatus->InitProgressStatus("Replacing strings", 0, 
-				m_lTotalStringsToReplace * ms_lPROGRESS_ITEMS_PER_REPLACEMENT, VARIANT_TRUE);
+				m_lAttributeCount * ms_lPROGRESS_ITEMS_PER_REPLACEMENT, VARIANT_TRUE);
 		}
 
 		// Apply Attribute Modification

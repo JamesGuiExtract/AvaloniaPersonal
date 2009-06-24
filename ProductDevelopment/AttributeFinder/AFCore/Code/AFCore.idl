@@ -89,6 +89,9 @@ library UCLID_AFCORELib
 		// information with an IAttribute instance.
 		[propget, id(10), helpstring("property DataObject")] HRESULT DataObject([out, retval] IUnknown **pVal);
 		[propput, id(10), helpstring("property DataObject")] HRESULT DataObject([in] IUnknown *newVal);
+		// Gets the size of this attribute (1 + sum of size of each subattribute)
+		[id(11), helpstring("method GetAttributeSize")]
+			HRESULT GetAttributeSize([out, retval] long* plAttributeSize);
 	};
 	[
 		object,

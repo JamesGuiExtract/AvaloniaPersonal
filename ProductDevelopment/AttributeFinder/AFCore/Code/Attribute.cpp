@@ -26,6 +26,8 @@ CAttribute::CAttribute()
   m_strAttributeType(""),
   m_ipAttributeValue(NULL),
   m_ipInputValidator(NULL),
+  m_ipAttributeSplitter(NULL),
+  m_ipSubAttributes(NULL),
   m_ipDataObject(NULL),
   m_bDirty(false)
 {
@@ -35,11 +37,27 @@ CAttribute::~CAttribute()
 {
 	try
 	{
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16299");
+}
+//-------------------------------------------------------------------------------------------------
+HRESULT CAttribute::FinalConstruct()
+{
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+void CAttribute::FinalRelease()
+{
+	try
+	{
+		// Release COM objects before the object is destructed
+		m_ipSubAttributes = NULL;
 		m_ipAttributeValue = NULL;
+		m_ipAttributeSplitter = NULL;
 		m_ipInputValidator = NULL;
 		m_ipDataObject = NULL;
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16299");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26474");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -151,14 +169,18 @@ STDMETHODIMP CAttribute::get_InputValidator(IInputValidator **pVal)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI26476", pVal != NULL);
 		validateLicense();
 
+		// Default to NULL
 		*pVal = NULL;
 
 		if (m_ipInputValidator)
 		{
-			CComQIPtr<IInputValidator> ipIV(m_ipInputValidator);
-			ipIV.CopyTo(pVal);
+			IInputValidatorPtr ipShallowCopy = m_ipInputValidator;
+			ASSERT_RESOURCE_ALLOCATION("ELI26475", ipShallowCopy != NULL);
+
+			*pVal = ipShallowCopy.Detach();
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04144");
@@ -188,18 +210,13 @@ STDMETHODIMP CAttribute::get_SubAttributes(IIUnknownVector **pVal)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI26472", pVal != NULL);
+
 		validateLicense();
 
-		// if a vector of sub-attributes doesn't exist, create an empty 
-		// vector object
-		if (m_ipSubAttributes == NULL)
-		{
-			m_ipSubAttributes.CreateInstance(CLSID_IUnknownVector);
-			ASSERT_RESOURCE_ALLOCATION("ELI05311", m_ipSubAttributes != NULL);
-		}
+		IIUnknownVectorPtr ipSubAttributes = getSubAttributes();
 
-		CComQIPtr<IIUnknownVector> ipSubAttributes(m_ipSubAttributes);
-		ipSubAttributes.CopyTo(pVal);
+		*pVal = ipSubAttributes.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05263");
 
@@ -228,14 +245,18 @@ STDMETHODIMP CAttribute::get_AttributeSplitter(IAttributeSplitter **pVal)
 
 	try
 	{
+		ASSERT_ARGUMENT("ELI26478", pVal != NULL);
+
 		validateLicense();
 
 		*pVal = NULL;
 
 		if (m_ipAttributeSplitter)
 		{
-			CComQIPtr<IAttributeSplitter> ipSplitter(m_ipAttributeSplitter);
-			ipSplitter.CopyTo(pVal);
+			UCLID_AFCORELib::IAttributeSplitterPtr ipShallowCopy = m_ipAttributeSplitter;
+			ASSERT_RESOURCE_ALLOCATION("ELI26477", ipShallowCopy != NULL);
+
+			*pVal = (IAttributeSplitter*) ipShallowCopy.Detach();
 		}
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05261");
@@ -269,7 +290,7 @@ STDMETHODIMP CAttribute::get_Type(BSTR *pVal)
 		validateLicense();
 
 		// Provide string
-		*pVal = get_bstr_t(m_strAttributeType.c_str()).copy();
+		*pVal = get_bstr_t(m_strAttributeType).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI05838");
 
@@ -289,7 +310,7 @@ STDMETHODIMP CAttribute::put_Type(BSTR newVal)
 		string strValue = asString( newVal );
 		std::vector<std::string>	vecTypes;
 		StringTokenizer	st( '+' );
-		st.parse( strValue.c_str(), vecTypes );
+		st.parse( strValue, vecTypes );
 
 		// Check that each Type (separated by +) is a valid identifier
 		for (unsigned int ui = 0; ui < vecTypes.size(); ui++)
@@ -335,7 +356,7 @@ STDMETHODIMP CAttribute::AddType(BSTR newVal)
 		string strValue = asString( newVal );
 		std::vector<std::string>	vecTypes;
 		StringTokenizer	st( '+' );
-		st.parse( strValue.c_str(), vecTypes );
+		st.parse( strValue, vecTypes );
 
 		string strNewType = m_strAttributeType;
 
@@ -374,7 +395,6 @@ STDMETHODIMP CAttribute::AddType(BSTR newVal)
 		}
 
 		m_strAttributeType = strNewType;
-		
 		
 		m_bDirty = true;
 	}
@@ -572,6 +592,35 @@ STDMETHODIMP CAttribute::put_DataObject(IUnknown *newVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI24402");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CAttribute::GetAttributeSize(long* plAttributeSize)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI26467", plAttributeSize != NULL);
+
+		validateLicense();
+
+		// Default the count to 1
+		long lCount = 1;
+
+		// Add in the size of each sub attribute
+		IIUnknownVectorPtr ipSubAttributes = getSubAttributes();
+		long lSize = ipSubAttributes->Size();
+		for (long i = 0; i < lSize; i++)
+		{
+			UCLID_AFCORELib::IAttributePtr ipAttr = ipSubAttributes->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI26468", ipAttr != NULL);
+
+			lCount += ipAttr->GetAttributeSize();
+		}
+
+		*plAttributeSize = lCount;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26469");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1387,6 +1436,17 @@ void CAttribute::validateIdentifier(std::string strName)
 			throw ue;
 		}
 	}
+}
+//-------------------------------------------------------------------------------------------------
+IIUnknownVectorPtr CAttribute::getSubAttributes()
+{
+	if (m_ipSubAttributes == NULL)
+	{
+		m_ipSubAttributes.CreateInstance(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI26471", m_ipSubAttributes != NULL);
+	}
+
+	return m_ipSubAttributes;
 }
 //-------------------------------------------------------------------------------------------------
 void CAttribute::validateLicense()

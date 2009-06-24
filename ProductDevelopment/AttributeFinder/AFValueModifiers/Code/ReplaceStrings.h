@@ -122,12 +122,13 @@ private:
 	// progress status object
 	IProgressStatusPtr m_ipProgressStatus;
 
-	// counter to keep track of the number of the current string that is being replaced
-	long m_lCurrentStringNumber;
+	// counter to keep track of the number of the current attribute that is being modified
+	long m_lCurrentAttributeNumber;
 
-	// total number of replacement strings that need to be processed
+	// Total number of attributes to be modified (count of each attribute and its
+	// subattributes)
 	// NOTE: this is different from the number of replacements that will be made
-	long m_lTotalStringsToReplace;
+	long m_lAttributeCount;
 
 	// weighted value for the number of progress items per replacement string
 	// NOTE: the value of 1 was chosen, because progress status is not updated

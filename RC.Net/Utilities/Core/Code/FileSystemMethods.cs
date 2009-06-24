@@ -231,42 +231,49 @@ namespace Extract.Utilities
         /// <see langword="false"/> if it does not.</returns>
         public static bool HasImageFileExtension(string fileName)
         {
-            // Get the file's extention
-            string extension = Path.GetExtension(fileName);
-
-            if (!String.IsNullOrEmpty(extension))
+            try
             {
-                // Test to see if the extension matches a known image extension or has
-                // a numbered file extension
-                if (Regex.IsMatch(extension, @"\.\d+$") ||
-                    extension.Equals(".tif", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".tiff", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".gif", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".bmp", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".rle", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".dib", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".rst", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".gp4", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".mil", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".cal", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".cg4", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".flc", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".fli", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".tga", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".pct", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".pcx", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".png", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".bin", StringComparison.OrdinalIgnoreCase) ||
-                    extension.Equals(".pct", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
+                // Get the file's extention
+                string extension = Path.GetExtension(fileName);
 
-            return false;
+                if (!String.IsNullOrEmpty(extension))
+                {
+                    // Test to see if the extension matches a known image extension or has
+                    // a numbered file extension
+                    if (Regex.IsMatch(extension, @"\.\d+$") ||
+                        extension.Equals(".tif", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".tiff", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".gif", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".rle", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".dib", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".rst", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".gp4", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".mil", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".cal", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".cg4", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".flc", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".fli", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".tga", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".pct", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".pcx", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".png", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".bin", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".pct", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26462", ex);
+            }
         }
 
         /// <summary>

@@ -25,6 +25,8 @@ public:
 DECLARE_REGISTRY_RESOURCEID(IDR_ATTRIBUTE)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
+	HRESULT FinalConstruct();
+	void FinalRelease();
 
 BEGIN_COM_MAP(CAttribute)
 	COM_INTERFACE_ENTRY(IAttribute)
@@ -58,6 +60,7 @@ public:
 	STDMETHOD(IsNonSpatialMatch)(/*[in]*/ IAttribute* pTest, /*[out, retval]*/ VARIANT_BOOL *pVal);
 	STDMETHOD(get_DataObject)(/*[out, retval]*/ IUnknown **pVal);
 	STDMETHOD(put_DataObject)(/*[in]*/ IUnknown* newVal);
+	STDMETHOD(GetAttributeSize)(long* plAttributeSize);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown ** pObject);
@@ -102,6 +105,9 @@ private:
 	// Validates strName as valid Identifier.  This method is used to 
 	// validate both Names and Types
 	void validateIdentifier(std::string strName);
+
+	// Gets the sub attribute collection (will create an empty one if it doesn't exist)
+	IIUnknownVectorPtr getSubAttributes();
 
 	void validateLicense();
 };
