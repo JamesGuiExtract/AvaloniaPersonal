@@ -78,13 +78,12 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(PathTagsButton).ToString();
+        static readonly string _OBJECT_NAME = typeof(PathTagsButton).ToString();
 
         /// <summary>
         /// The text to display in the button if set to display text.
         /// </summary>
-        private static readonly string _BUTTON_TEXT = "Tags >";
+        static readonly string _BUTTON_TEXT = "Tags >";
 
         #endregion Constants
 
@@ -93,23 +92,23 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// The names of valid function tags.
         /// </summary>
-        private static string[] _functionTags = GetFunctionTags();
+        static string[] _functionTags = GetFunctionTags();
 
         /// <summary>
         /// The context menu that is displayed when the tag button is clicked.
         /// </summary>
-        private ContextMenuStrip _dropDown;
+        ContextMenuStrip _dropDown;
 
         /// <summary>
         /// The list of document tags to be displayed in the context menu drop down.
         /// </summary>
-        private List<string> _docTags = new List<string>();
+        List<string> _docTags = new List<string>();
 
         /// <summary>
         /// The display style for this <see cref="PathTagsButton"/>. Default style is
         /// image only.
         /// </summary>
-        private PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
+        PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
 
         #endregion PathTagsButton Fields
 
@@ -179,8 +178,10 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <returns>The <see cref="PathTagsButtonDisplayStyle"/> for this button.</returns>
         /// <value>The <see cref="PathTagsButtonDisplayStyle"/> for this button.</value>
+        [Category("Appearance")]
         [DefaultValue(PathTagsButtonDisplayStyle.ImageOnly)]
-        public PathTagsButtonDisplayStyle PathTagsButtonDisplayStyle
+        [Description("Whether to display an image or text.")]
+        public PathTagsButtonDisplayStyle DisplayStyle
         {
             get
             {
@@ -443,7 +444,7 @@ namespace Extract.Utilities.Forms
         /// <see cref="ToolStrip.ItemClicked"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStrip.ItemClicked"/> event.</param>
-        private void HandleItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        void HandleItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             try
             {
