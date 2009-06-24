@@ -39,6 +39,13 @@
 			<LI>Confirm that the view and zoom level changes such that the highlights and 
 			hint are visible.
 			<LI>Confirm that tooltips <b>are not</b> visible.
+<p>
+			<li><b>[DataEntry #294]</b> Angular highlights highlight too much.
+			<ul>
+				<li>Swipe the row in the document that contains information about the "Sodium"
+				test.
+				<li>Confirm that the appropriate region is highlighted and OCRed.
+			</ul>
 		</ul>
 <p>
 		<LI><b>Highlights and OCR confidence</b>
@@ -60,6 +67,16 @@
 			<LI>Confirm that the text OCRs correctly.
 			<LI>Confirm that the <b>0</b> again has a red background indicating 
 			lower OCR confidence.
+			<li><b>[DataEntry #297]</b> Confidence highlight threshold should be configurable
+			<ul>
+				<li>Open a document that has a .voa file.
+				<li>Enable "Show all highlights" and observe the areas of highlight confidence.
+				<li>Close LabDE. In the .config file, edit the value of the setting
+				"HighlightConfidenceBoundary." This value represents the minimum OCR confidence
+				for text to be highlighted as well-OCRed.
+				<li>Reopen the first document and show all highlights.
+				<li>Confirm that the highlight colors reflect the new confidence boundary.
+			</ul>
 		</ul>
 <p>
 		<LI><b>Highlights across pages</b>
@@ -200,6 +217,29 @@
 				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
 				<LI>Confirm that <b>all</b> found data and hints are highlighted.
 			</ul>
+<p>
+			<li><b>[DataEntry #235]</b> Show all should update hints in realtime.
+			<ul>
+				<li>Open a new document.
+				<li>Turn on the "Highlight all data" feature.
+				<li>Go through the document adding data and confirm that hints are
+				updated in realtime.
+			</ul>
+			<li><b>[DataEntry #237]</b> Highlights on top of tooltips?
+			<ul>
+				<li>Load a document.
+				<li>Enable the "Highlight all data" feature.
+				<li>Tab through the document and confirm that highlights are never drawn
+				on top of tooltips.
+			</ul>
+			<li><b>[DataEntry #238]</b> Tables revert to single cell selection
+			<ul>
+				<li>Load a document.
+				<li>Select an entire populated row in the test table.
+				<li>Confirm that all data in the test is highlighted.
+				<li>Turn on "Highlight all data."
+				<li>Confirm that the entire row of the table is still selected.
+			</ul>
 		</ul>
 	</ul>
 <p>
@@ -217,6 +257,14 @@
 			<LI>Swipe the original text.
 			<LI>Confirm that the recognized text is entered in the field.
 			<LI>Confirm that the tooltip is displayed above the swipe.
+			<li><b>[DataEntry #224]</b> Confirm that the font size for tooltips is consistent.
+<p>
+			<li><b>[DataEntry #225]</b> Tooltips and skew
+			<ul>
+				<li>Open a skewed document, such as the one attached to the SCR.
+				<li>Swipe some data.
+				<li>Confirm that the tooltips are displayed relative to the image skew.
+			</ul>
 <p>
 			<li><b>[DataEntry #332]</b> Tooltips from angled swipes not positioned correctly
 			<ul>
@@ -284,6 +332,32 @@
 			expected.
 			<LI>Confirm that the recognized text is entered in the selected field.
 			<LI>Confirm that the tooltip is displayed above the swipe.
+			<li><b>[DataEntry #220]</b> Upright tooltips on rotated images
+			<ul>
+				<li>Open an image that requires rotation in order to be upright.
+				<li>Rotate the image to be rightside-up.
+				<li>Swipe some text.
+				<li>Confirm that the tooltip appears rightside-up as well.
+			</ul>
+		</ul>
+	</ul>
+<p>
+	<li><h3>Hints - General</h3>
+	<ul>
+		<li><b>Test Cases</b>
+		<ul>
+			<li><b>[DataEntry #226]</b> Hints do not take skew into account.
+			<ul>
+				<li>Open 352.tif from the LabDE demo.
+				<li>Tab through the data.
+				<li>Confirm that hints are displayed relative to the image skew.
+			</ul>
+			<li><b>[DataEntry #247]</b> Hint colors
+			<ul>
+				<li>Open a document.
+				<li>Confirm that unviewed hints are red.
+				<li>Confirm that hints become green once data is entered.
+			</ul>
 		</ul>
 	</ul>
 <p>

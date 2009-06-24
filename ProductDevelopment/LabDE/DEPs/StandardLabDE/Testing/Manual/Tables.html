@@ -60,6 +60,12 @@
 			<LI>Confirm that the only highlights are for the selected cells.
 			<LI>Confirm that the <b>Selected Test Details</b> data has been cleared.
 		</ul>
+<p>
+		<li><b>[DataEntry #298]</b> Unexpected attributes
+		<ul>
+			<li>Click on the starred row of the order table.
+			<li>Confirm that the dependent test table is disabled.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Row Swiping</h3>
@@ -171,6 +177,35 @@
 			<LI>Confirm that selecting the entire rows displays 
 			proper highlights and no tooltips. 
 		</ul>
+<p>
+		<li><b>[DataEntry #261]</b> Highlight when inserting copied order
+		<ul>
+			<li>Open the image attached to the SCR.
+			<li>Right click on the second order row header and select "Copy row(s)".
+			<li>Right click in the same place and select "Insert copied row(s)".
+			<li>Select the first test row.
+			<li>Confirm that only appropriate data is highlighted.
+		</ul>
+		<li><b>[DataEntry #262]</b> Tab order after inserting copied order row
+		<ul>
+			<li>Open the image attached to the SCR.
+			<li>Copy and insert the second row of the order table.
+			<li>Click on the Name field in the inserted test row.
+			<li>Press tab.
+			<li>Confirm that focus moves to the appropriate field (does not jump to the
+			Patient Name field).
+		</ul>
+		<li><b>[DataEntry #265]</b> Add copy/paste/delete functionality to table controls
+		<ul>
+			<li>Open an image.
+			<li>Confirm that for single cells that are selected but not in edit mode:
+			<ul>
+				<li>CTRL+C can be used to copy text from the cell to the clipboard.
+				<li>CTRL+V can be used to overwrite the contents of a cell with text in the
+				clipboard.
+				<li>DELETE can be used to clear the contents of a cell.
+			</ul>
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Context menu for tables</h3>
@@ -201,6 +236,13 @@
 			and tooltips. 
 			<LI>Confirm that selecting the entire rows displays 
 			proper highlights and no tooltips. 
+		</ul>
+		<li><b>[Data Entry #177]</b> Row deletion
+		<ul>
+			<li>Select an individual table cell.
+			<li>Right-click on the row header for the row containing the selected cell.
+			<li>Select "Deleter Row(s)".
+			<li>Confirm that the entire row is deleted.
 		</ul>
 	</ul>
 <p>

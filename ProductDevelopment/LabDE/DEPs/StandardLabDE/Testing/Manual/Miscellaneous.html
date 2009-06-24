@@ -34,129 +34,230 @@
 <p>
 	<LI><h3>Data Entry</h3>
 	<ul>
-		<LI><b>[DataEntry #144]</b> Angular swipes near page bounds
+		<li><b>Swiping</b>
 		<ul>
-			<LI>For each image found in <b>I:\Common\Testing\PVCS_Testing\DataEntry\144</b>
+			<LI><b>[DataEntry #144]</b> Angular swipes near page bounds
 			<ul>
-				<LI>Open the image and activate a field that allows swiping.
-				<LI>Make an angular swipe of <b>Residence</b> in the lower left 
-				of the image.
-				<LI>Confirm that the proper text is recognized.
-				<LI>Confirm that the proper screen region is highlighted.
+				<LI>For each image found in <b>I:\Common\Testing\PVCS_Testing\DataEntry\144</b>
+				<ul>
+					<LI>Open the image and activate a field that allows swiping.
+					<LI>Make an angular swipe of <b>Residence</b> in the lower left 
+					of the image.
+					<LI>Confirm that the proper text is recognized.
+					<LI>Confirm that the proper screen region is highlighted.
+				</ul>
+			</ul>
+<p>
+			<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Laboratory Name</b> field.
+				<LI>Carefully swipe <b>Community Memorial</b>.
+				<LI>Confirm that newline characters are replaced by spaces in the swiped text.
+			</ul>
+<p>
+			<LI><b>[DataEntry #278]</b> Tab loop after swiping
+			<ul>
+				<LI>Open image <b>004.tif</b> from Demo_LabDE.
+				<LI>Select the first <b>Completed Test</b>.
+				<LI>Select the <b>Result Date</b> field.
+				<LI>Swipe a different date from the image.
+				<LI>Click the <b>Tab</b> key to step through elements of the selected test.
+				<LI>Confirm that after viewing all entries in the Completed Test, the 
+				next Completed Test is selected and subsequent Tabs move through its fields.
+			</ul>
+<p>
+			<li><b>[DataEntry #288]</b> Smarter cell selection after swiping new data
+			<ul>
+				<li>Open a document.
+				<li>Select the the Name cell of the starred row of the test table.
+				<li>Swipe some text.
+				<li>Confirm that a new test row is created with the name that you swiped.
+				<li>Confirm that the newly-swiped Name cell is still selected.
+			</ul>
+<p>
+			<li><b>[DataEntry #289]</b> Arrow keys disabled after swiping new test name
+			<ul>
+				<li>Open a document and select the Name cell of the starred row of the test table.
+				<li>Swipe some text.
+				<li>Confirm that the arrow keys can still be used to navigate the table.
+			</ul>
+<p>
+			<li><b>[DataEntry #290]</b> Strange shift-tab behavior after swiping
+			<ul>
+				<li>Open a document and swipe some data somewhere.
+				<li>Press left shift + tab. Do not release the shift key. Confirm that focus moves
+				backwards one step.
+				<li>Press tab again (still holding down the shift key). Confirm that focus moves
+				backwards another step.
+			</ul>
+<p>
+			<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
+			<ul>
+				<LI>Open image <b>151.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Carbon Dioxide</b> component name field.
+				<LI>Confirm that original OCR confidence includes some red background. 
+				<LI>Reswipe the text.
+				<LI>Confirm that the new text also includes some red characters.
+			</ul>
+<p>
+			<li><b>[DataEntry #334]</b> File not found exception
+			<ul>
+				<li>Load the image attached to the SCR.
+				<li>Add a new order.
+				<li>Select the starred row of the test table.
+				<li>Swipe one or more test rows with the angular highlight tool.
+				<li>Confirm that no exception is thrown.
 			</ul>
 		</ul>
 <p>
-		<LI><b>[DataEntry #256]</b> Typing into empty table cell
+		<li><b>Using the keyboard</b>
 		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Comment</b> cell in one of the the <b>Component</b> rows.
-			<LI>Type some text into the cell.
-			<LI>Confirm that the text is accepted and that <b>Unable to draw image</b> 
-			exceptions are not seen.
-		</ul>
+			<li><b>[DataEntry #214]</b> New components for new tables
+			<ul>
+				<li>Open an image.
+				<li>In the starred row of the order table, type something to create a new order.
+				<li>Without changing selection in the order table, highlight the starred row of
+				the test table and try to swipe a test into the table.
+				<li>Confirm that no exception is thrown.
+			</ul>
 <p>
-		<LI><b>[DataEntry #257]</b> Navigation after Enter key
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select one of the the <b>Component</b> cells.
-			<LI>Type some text into the cell and then the <b>Enter</b> key.
-			<LI>Confirm that the next selected cell is the first cell in the next row.
-		</ul>
+			<li><b>[DataEntry #242]</b> Date of Birth should be allowed to be left blank
+			<ul>
+				<li>Open an image.
+				<li>Add valid data for all required fields; leave the "date of birth" field blank.
+				<li>Confirm that there is no "invalid data" warning for the blank "date of birth"
+				field.
+				<li>Confirm that you can save the document.
+			</ul>
 <p>
-		<LI><b>[DataEntry #267, #275]</b> Home, End, Shift+Space when editing a text box
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Double-click the <b>Patient Information - Name</b> field.
-			<LI>Confirm that the entire contents of the text box are selected for editing.
-			<LI>Type <b>Home</b>.
-			<LI>Confirm that the edit cursor moves to the beginning of the text.
-			<LI>Type <b>End</b>.
-			<LI>Confirm that the edit cursor moves to the end of the text.
-			<LI>Modify the text of the edit box.
-			<LI>Type <b>Shift+Space</b>.
-			<LI>Confirm that a space was added to the edited text without selecting 
-			the entire contents.
-		</ul>
+			<li><b>[DataEntry #243]</b> Lab Address is always in a viewed state
+			<ul>
+				<li>Open a document with a fresh .voa file.
+				<li>Confirm that all fields begin in an unviewed state.
+			</ul>
 <p>
-		<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Laboratory Name</b> field.
-			<LI>Carefully swipe <b>Community Memorial</b>.
-			<LI>Confirm that newline characters are replaced by spaces in the swiped text.
-		</ul>
+			<LI><b>[DataEntry #256]</b> Typing into empty table cell
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Comment</b> cell in one of the the <b>Component</b> rows.
+				<LI>Type some text into the cell.
+				<LI>Confirm that the text is accepted and that <b>Unable to draw image</b> 
+				exceptions are not seen.
+			</ul>
 <p>
-		<LI><b>[DataEntry #274]</b> Tooltips and editing text
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Patient Information - Name</b> field.
-			<LI>Confirm that the appropriate tooltip is displayed.
-			<LI>Modify the text of the edit box.
-			<LI>Confirm that the tooltip changes with the edits.
-			<LI>Accept the changes and move to another cell.
-			<LI>Confirm that the <b>Name</b> tooltip is removed.
-		</ul>
+			<LI><b>[DataEntry #257]</b> Navigation after Enter key
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select one of the the <b>Component</b> cells.
+				<LI>Type some text into the cell and then the <b>Enter</b> key.
+				<LI>Confirm that the next selected cell is the first cell in the next row.
+			</ul>
 <p>
-		<LI><b>[DataEntry #277]</b> Unexpected exception for go to next unviewed
-		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Result Date</b> for the first Completed Test.
-			<LI>Swipe in a new <b>Result Date</b>.
-			<LI>Type the <b>F10</b> key to ghighlight all attributes.
-			<LI>Select a different <b>Completed Test</b>.
-			<LI>Type <b>Alt+G</b> and select the highlight for the previously 
-			swiped <b>Result Date</b>.
-			<LI>Confirm that the date is accepted and no exception is displayed.
-		</ul>
+			<li><b>[DataEntry #264]</b> Ctrl+C error
+			<ul>
+				<li>Open an image in LabDE as a FAM task.
+				<li>In the following situations, press CTRL+C and confirm that no
+				error is displayed:
+				<ul>
+					<li>Select a cell in a table (not in edit mode).
+					<li>Select a cell in a table in edit mode.
+					<li>Select multiple cells in a table (not in edit mode).
+					<li>Select multiple cells in a table with one of them in edit mode.
+				</ul>
+			</ul>
 <p>
-		<LI><b>[DataEntry #278]</b> Tab loop after swiping
-		<ul>
-			<LI>Open image <b>004.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>Completed Test</b>.
-			<LI>Select the <b>Result Date</b> field.
-			<LI>Swipe a different date from the image.
-			<LI>Click the <b>Tab</b> key to step through elements of the selected test.
-			<LI>Confirm that after viewing all entries in the Completed Test, the 
-			next Completed Test is selected and subsequent Tabs move through its fields.
-		</ul>
+			<LI><b>[DataEntry #267, #275]</b> Home, End, Shift+Space when editing a text box
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Double-click the <b>Patient Information - Name</b> field.
+				<LI>Confirm that the entire contents of the text box are selected for editing.
+				<LI>Type <b>Home</b>.
+				<LI>Confirm that the edit cursor moves to the beginning of the text.
+				<LI>Type <b>End</b>.
+				<LI>Confirm that the edit cursor moves to the end of the text.
+				<LI>Modify the text of the edit box.
+				<LI>Type <b>Shift+Space</b>.
+				<LI>Confirm that a space was added to the edited text without selecting 
+				the entire contents.
+			</ul>
 <p>
-		<LI><b>[DataEntry #295]</b> Ctrl+A in a text box
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Patient Information - Name</b> field.
-			<LI>Type <b>Ctrl+A</b>.
-			<LI>Confirm that the entire contents of the text box are selected.
-		</ul>
+			<LI><b>[DataEntry #274]</b> Tooltips and editing text
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Patient Information - Name</b> field.
+				<LI>Confirm that the appropriate tooltip is displayed.
+				<LI>Modify the text of the edit box.
+				<LI>Confirm that the tooltip changes with the edits.
+				<LI>Accept the changes and move to another cell.
+				<LI>Confirm that the <b>Name</b> tooltip is removed.
+			</ul>
 <p>
-		<LI><b>[DataEntry #306]</b> CAPS LOCK ignored
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select a field.
-			<LI>Turn on CAPS LOCK. 
-			<LI>Type some characters.
-			<LI>Confirm that all typed characters are entered in upper case.
-		</ul>
+			<LI><b>[DataEntry #277]</b> Unexpected exception for go to next unviewed
+			<ul>
+				<LI>Open image <b>151.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Result Date</b> for the first Completed Test.
+				<LI>Swipe in a new <b>Result Date</b>.
+				<LI>Type the <b>F10</b> key to ghighlight all attributes.
+				<LI>Select a different <b>Completed Test</b>.
+				<LI>Type <b>Alt+G</b> and select the highlight for the previously 
+				swiped <b>Result Date</b>.
+				<LI>Confirm that the date is accepted and no exception is displayed.
+			</ul>
 <p>
-		<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
-		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Carbon Dioxide</b> component name field.
-			<LI>Confirm that original OCR confidence includes some red background. 
-			<LI>Reswipe the text.
-			<LI>Confirm that the new text also includes some red characters.
-		</ul>
+			<li><b>[DataEntry #286]</b> Add auto-complete help for fields with validation lists.
+			<ul>
+				<li>For cells and text boxes for which validation lists have been specified,
+				confirm that auto-complete values are displayed.
+				<li>As of build 1.0.1.15, validation lists have been supplied for these fields:
+				<ul>
+					<li>Lab code
+					<li>Order name
+					<li>Order code
+					<li>Test name
+					<li>Test code
+					<li>Units
+				</ul>
+			</ul>
 <p>
-		<LI><b>[DataEntry #353]</b> Focus jumping to Result Status
-		<ul>
-			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
-			<LI>Confirm that each and every <b>Tab</b> is handled correctly 
-			by advancing to the next appropriate field.
+			<LI><b>[DataEntry #295]</b> Ctrl+A in a text box
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select the <b>Patient Information - Name</b> field.
+				<LI>Type <b>Ctrl+A</b>.
+				<LI>Confirm that the entire contents of the text box are selected.
+			</ul>
+<p>
+			<LI><b>[DataEntry #306]</b> CAPS LOCK ignored
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Select a field.
+				<LI>Turn on CAPS LOCK. 
+				<LI>Type some characters.
+				<LI>Confirm that all typed characters are entered in upper case.
+			</ul>
+<p>
+			<LI><b>[DataEntry #353]</b> Focus jumping to Result Status
+			<ul>
+				<LI>Open image <b>003.tif</b> from Demo_LabDE.
+				<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
+				<LI>Confirm that each and every <b>Tab</b> is handled correctly 
+				by advancing to the next appropriate field.
+			</ul>
 		</ul>
 	</ul>
 <p>
 	<LI><h3>Navigation</h3>
 	<ul>
+		<li><b>[DataEntry #251]</b> Tab order wrong after swiping
+		<ul>
+			<li>Open a document.
+			<li>Set focus to the Result Date field.
+			<li>Swipe a date.
+			<li>Press tab.
+			<li>Confirm that focus jumps to Result Time.
+		</ul>
+<p>
 		<LI><b>[DataEntry #255]</b> Tab loop after swiping
 		<ul>
 			<LI>Open image <b>004.tif</b> from Demo_LabDE.
@@ -179,9 +280,39 @@
 			<LI>Confirm that even though no Components are available, the empty row 
 			can be selected.
 		</ul>
+<p>
+		<li><b>[DataEntry #343]</b> More efficient tabbing
+		<ul>
+			<li>Open a document that has a populated .voa file.
+			<li>Tab through the data and confirm that you:
+			<ul>
+				<li>stop in every field that contains data.
+				<li>do not stop in empty Comment fields.
+			</ul>
+		</ul>
+<p>
+		<li><b>[DataEntry #346]</b> Tab key malfunction
+		<ul>
+			<li>Open a document.
+			<li>Select any populated row in the order table except the last.
+			<li>Select the entire starred row of the test table.
+			<li>Press tab and confirm that focus advances to the last row of the order
+			table.
+		</ul>
 	</ul>
 <p>
-	<LI><h3>TBD</h3>
+	<LI><h3>Other</h3>
+	<ul>
+		<li><b>[DataEntry #302]</b> Scroll wheel operations should work without clicking
+		<ul>
+			<li>Open an image and type something in any field in the Data Entry Panel.
+			<li>Move the mouse over the Image Viewer.
+			<li>Confirm that CTRL + mouse wheel can be used to zoom.
+			<li>Confirm that the mouse wheel can be used to scroll. Note that this
+			functionality may not have been implemented yet.
+	</ul>
+<p>
+	<li><h3>TBD</h3>
 	<ul>
 	</ul>
 </UL>
