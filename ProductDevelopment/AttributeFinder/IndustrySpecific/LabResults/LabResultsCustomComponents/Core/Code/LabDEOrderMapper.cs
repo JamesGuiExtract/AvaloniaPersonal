@@ -6,6 +6,7 @@ using System.Data.SqlServerCe;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Windows.Forms;
@@ -255,8 +256,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26171", ex);
-                throw new ExtractException("ELI26172", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26171", "Unable to handle output.", ex);
             }
         }
 
@@ -278,8 +278,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26173", ex);
-                throw new ExtractException("ELI26174", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26173", "Clone failed.", ex);
             }
         }
 
@@ -304,8 +303,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26176", ex);
-                throw new ExtractException("ELI26177", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26176", "Unable to copy order mapper.", ex);
             }
         }
 
@@ -326,8 +324,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26178", ex);
-                throw new ExtractException("ELI26179", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26178", "Unable to get component description.", ex);
             }
         }
 
@@ -347,8 +344,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26180", ex);
-                throw new ExtractException("ELI26181", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26180", "Unable to get class ID.", ex);
             }
         }
 
@@ -364,8 +360,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26182", ex);
-                throw new ExtractException("ELI26183", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26182", "Unable to get dirty flag.", ex);
             }
         }
 
@@ -373,34 +368,14 @@ namespace Extract.LabResultsCustomComponents
         /// Loads this object from the specified stream.
         /// </summary>
         /// <param name="stream">The stream to load from.</param>
-        public void Load(System.Runtime.InteropServices.ComTypes.IStream stream)
+        public void Load(IStream stream)
         {
             try
             {
-                ExtractException.Assert("ELI26184", "Stream is null!", stream != null);
-
-                // Get the size of data stream to load
-                byte[] dataLengthBuffer = new Byte[4];
-                stream.Read(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                int dataLength = BitConverter.ToInt32(dataLengthBuffer, 0);
-
-                // Read the data from the provided stream into a buffer
-                byte[] dataBuffer = new byte[dataLength];
-                stream.Read(dataBuffer, dataLength, IntPtr.Zero);
-
-                // Read the settings from the buffer; 
-                // Create a memory stream and binary formatter to deserialize the settings.
-                using (MemoryStream memoryStream = new MemoryStream(dataBuffer))
+                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-                    // Read the version of the object being loaded.
-                    int version = (int)binaryFormatter.Deserialize(memoryStream);
-                    ExtractException.Assert("ELI26185", "Unable to load newer data entry task!",
-                        version <= _CURRENT_VERSION);
-
                     // Read the database file name from the stream
-                    _databaseFile = (string)binaryFormatter.Deserialize(memoryStream);
+                    _databaseFile = reader.ReadString();
                 }
 
                 // False since a new object was just loaded
@@ -408,8 +383,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26186", ex);
-                throw new ExtractException("ELI26187", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26186", "Unable to load order mapper.", ex);
             }
         }
 
@@ -418,28 +392,17 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="stream">The stream to save to.</param>
         /// <param name="clearDirty">If <see langword="true"/> will clear the dirty flag.</param>
-        public void Save(System.Runtime.InteropServices.ComTypes.IStream stream, bool clearDirty)
+        public void Save(IStream stream, bool clearDirty)
         {
             try
             {
-                ExtractException.Assert("ELI26188", "Stream is null!", stream != null);
-
-                // Create a memory stream and binary formatter to serialize the settings.
-                using (MemoryStream memoryStream = new MemoryStream())
+                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
                 {
-                    BinaryFormatter binaryFormatter = new BinaryFormatter();
+                    // Serialize the settings
+                    writer.Write(_databaseFile);
 
-                    // Write the version of the object being saved.
-                    binaryFormatter.Serialize(memoryStream, _CURRENT_VERSION);
-
-                    // Save the settings to the memory stream
-                    binaryFormatter.Serialize(memoryStream, _databaseFile ?? "");
-
-                    // Write the memory stream to the provided IStream.
-                    byte[] dataBuffer = memoryStream.ToArray();
-                    byte[] dataLengthBuffer = BitConverter.GetBytes(dataBuffer.Length);
-                    stream.Write(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                    stream.Write(dataBuffer, dataBuffer.Length, IntPtr.Zero);
+                    // Write to the provided IStream.
+                    writer.WriteTo(stream);
 
                     if (clearDirty)
                     {
@@ -449,8 +412,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26189", ex);
-                throw new ExtractException("ELI26190", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26189", "Unable to save order mapper.", ex);
             }
         }
 
@@ -468,8 +430,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26191", ex);
-                throw new ExtractException("ELI26192", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26191", "Unable to get max size.", ex);
             }
         }
 
@@ -506,8 +467,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26193", ex);
-                throw new ExtractException("ELI26194", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26193", "Unable to configure order mapper.", ex);
             }
         }
 
@@ -530,8 +490,7 @@ namespace Extract.LabResultsCustomComponents
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26195", ex);
-                throw new ExtractException("ELI26196", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI26195", "Unable to determine configuration status.", ex);
             }
         }
 
@@ -543,7 +502,7 @@ namespace Extract.LabResultsCustomComponents
         /// Code to be executed upon registration in order to add this class to the
         /// "UCLID Output Handler" COM category.
         /// </summary>
-        /// <param name="type">The <see langref="type"/> being registered.</param>
+        /// <param name="type">The <see langword="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
         private static void RegisterFunction(Type type)
@@ -555,7 +514,7 @@ namespace Extract.LabResultsCustomComponents
         /// Code to be executed upon unregistration in order to remove this class from the
         /// "UCLID Output Handler" COM category.
         /// </summary>
-        /// <param name="type">The <see langref="type"/> being unregistered.</param>
+        /// <param name="type">The <see langword="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
         private static void UnregisterFunction(Type type)

@@ -158,29 +158,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
             try
             {
-                // Get the size of data stream to load
-                byte[] dataLengthBuffer = new Byte[4];
-                stream.Read(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                int dataLength = BitConverter.ToInt32(dataLengthBuffer, 0);
-
-                // Read the data from the provided stream into a buffer
-                byte[] dataBuffer = new byte[dataLength];
-                stream.Read(dataBuffer, dataLength, IntPtr.Zero);
-
-                // Read the settings from the buffer; 
-                // Create a memory stream and binary formatter to deserialize the settings.
-                memoryStream = new MemoryStream(dataBuffer);
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-                // Read the version of the object being loaded.
-                int version = (int) binaryFormatter.Deserialize(memoryStream);
-                ExtractException.Assert("ELI23869", "Unable to load newer data entry task!",
-                    version <= _CURRENT_VERSION);
-
-                // Read the settings from the memory stream
-                if (version >= 2)
+                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    _configFileName = (string)binaryFormatter.Deserialize(memoryStream);
+                    // Read the settings from the memory stream
+                    if (reader.Version >= 2)
+                    {
+                        _configFileName = reader.ReadString();
+                    }
                 }
 
                 _dirty = HResult.False;
@@ -188,9 +172,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = new ExtractException("ELI23992",
-                    "Error loading data entry application settings!", ex);
-                throw new ExtractException("ELI23991", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23992", 
+                    "Error loading data entry application settings.", ex);
             }
             finally
             {
@@ -208,31 +191,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="stream"><see cref="IStream"/> into which the object should be saved.
         /// </param>
         /// <param name="clearDirty">Value that indicates whether to clear the dirty flag after the
-        /// save is complete. If <see langref="true"/>, the flag should be cleared. If 
-        /// <see langref="false"/>, the flag should be left unchanged.</param>
+        /// save is complete. If <see langword="true"/>, the flag should be cleared. If 
+        /// <see langword="false"/>, the flag should be left unchanged.</param>
         public void Save(IStream stream, bool clearDirty)
         {
-            MemoryStream memoryStream = null;
-
             try
             {
-                ExtractException.Assert("ELI23786", "Memory stream is null!", stream != null);
+                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
+                {
+                    // Save the settings
+                    writer.Write(_configFileName);
 
-                // Create a memory stream and binary formatter to serialize the settings.
-                memoryStream = new MemoryStream();
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-                // Write the version of the object being saved.
-                binaryFormatter.Serialize(memoryStream, _CURRENT_VERSION);
-
-                // Save the settings to the memory stream
-                binaryFormatter.Serialize(memoryStream, _configFileName);
-
-                // Write the memory stream to the provided IStream.
-                byte[] dataBuffer = memoryStream.ToArray();
-                byte[] dataLengthBuffer = BitConverter.GetBytes(dataBuffer.Length);  
-                stream.Write(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                stream.Write(dataBuffer, dataBuffer.Length, IntPtr.Zero);
+                    // Write to the provided IStream.
+                    writer.WriteTo(stream);
+                }
 
                 if (clearDirty)
                 {
@@ -242,17 +214,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = new ExtractException("ELI23789", 
-                    "Error saving data entry application settings!", ex);
-                throw new ExtractException("ELI23990", ee.AsStringizedByteStream());
-            }
-            finally
-            {
-                if (memoryStream != null)
-                {
-                    memoryStream.Close();
-                    memoryStream.Dispose();
-                }
+                throw ExtractException.CreateComVisible("ELI23789", 
+                    "Error saving data entry application settings.", ex);
             }
         }
 
@@ -286,8 +249,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23993", ex);
-                throw new ExtractException("ELI23994", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23993", "License validation failed.", ex);
             }
         }
 
@@ -309,8 +271,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23877", ex);
-                throw new ExtractException("ELI23995", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23877", "Unable to get component description.", ex);
             }
         }
 
@@ -335,25 +296,25 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23983", ex);
-                throw new ExtractException("ELI23996", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23983", 
+                    "Failed to initialize data entry form.", ex);
             }
         }
 
         /// <summary>
         /// Opens the specified document to allow indexed data to be verified/edited.
         /// </summary>
-        /// <param name="bstrFileFullName">A <see langref="string"/> that specifies the file being
+        /// <param name="bstrFileFullName">A <see langword="string"/> that specifies the file being
         /// processed.</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
         /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
         /// <param name="pProgressStatus">A <see cref="ProgressStatus"/> object to update progress
         /// (not updated by this class).</param>
-        /// <param name="bCancelRequested">If <see langref="true"/>, the user has requested that
+        /// <param name="bCancelRequested">If <see langword="true"/>, the user has requested that
         /// processing be cancelled. In this case, the provided document will not be processed.
         /// </param>
-        /// <returns><see langref="true"/> if processing of the document completed successfully.
-        /// <see langref="false"/> if processing of the document was cancelled by the user.
+        /// <returns><see langword="true"/> if processing of the document completed successfully.
+        /// <see langword="false"/> if processing of the document was cancelled by the user.
         /// </returns>
         [CLSCompliant(false)]
         public bool ProcessFile(string bstrFileFullName, FAMTagManager pFAMTM, FileProcessingDB pDB,
@@ -382,8 +343,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23875", ex);
-                throw new ExtractException("ELI23997", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23875", 
+                    "Failed processing file.", ex);
             }
         }
 
@@ -400,8 +361,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23874", ex);
-                throw new ExtractException("ELI23998", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23874", "Unable to cancel.", ex);
             }
         }
 
@@ -420,8 +380,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23873", ex);
-                throw new ExtractException("ELI23999", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23873", "Unable to close.", ex);
             }
         }
 
@@ -446,8 +405,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23879", ex);
-                throw new ExtractException("ELI24000", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23879", "Clone failed.", ex);
             }
         }
 
@@ -471,8 +429,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             catch (Exception ex)
             {
                 // Memory leak?  See: [DataEntry:143]
-                ExtractException ee = ExtractException.AsExtractException("ELI23880", ex);
-                throw new ExtractException("ELI24001", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI23880", "Unable to copy COM class.", ex);
             }
         }
 
@@ -527,8 +484,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI25471", ex);
-                throw new ExtractException("ELI25485", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI25471", "Configuration failed.", ex);
             }
         }
 
@@ -568,8 +524,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI25486", ex);
-                throw new ExtractException("ELI25487", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI25486", "Unable to determine if configured.", ex);
             }
         }
 
@@ -581,7 +536,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Code to be executed upon registration in order to add this class to the
         /// "UCLID File Processors" COM category.
         /// </summary>
-        /// <param name="type">The <see langref="type"/> being registered.</param>
+        /// <param name="type">The <see langword="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
         private static void RegisterFunction(Type type)
@@ -593,7 +548,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Code to be executed upon unregistration in order to remove this class from the
         /// "UCLID File Processors" COM category.
         /// </summary>
-        /// <param name="type">The <see langref="type"/> being unregistered.</param>
+        /// <param name="type">The <see langword="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
         private static void UnregisterFunction(Type type)

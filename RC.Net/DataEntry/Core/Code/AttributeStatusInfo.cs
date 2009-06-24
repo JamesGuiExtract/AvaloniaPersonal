@@ -2530,56 +2530,30 @@ namespace Extract.DataEntry
         /// </param>
         public void Load(IStream stream)
         {
-            MemoryStream memoryStream = null;
-
             try
             {
-                // Get the size of data stream to load
-                byte[] dataLengthBuffer = new Byte[4];
-                stream.Read(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                int dataLength = BitConverter.ToInt32(dataLengthBuffer, 0);
-
-                // Read the data from the provided stream into a buffer
-                byte[] dataBuffer = new byte[dataLength];
-                stream.Read(dataBuffer, dataLength, IntPtr.Zero);
-
-                // Read the settings from the buffer; 
-                // Create a memory stream and binary formatter to deserialize the settings.
-                memoryStream = new MemoryStream(dataBuffer);
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
-
-                // Read the version of the object being loaded.
-                int version = (int)binaryFormatter.Deserialize(memoryStream);
-                ExtractException.Assert("ELI24394", "Unable to load newer AttributeStatusInfo object!",
-                    version <= _CURRENT_VERSION);
-
-                // Read the settings from the memory stream
-                _hasBeenViewed = (bool)binaryFormatter.Deserialize(memoryStream);
-                
-                if (version >= 2)
+                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
                 {
-                    _isAccepted = (bool)binaryFormatter.Deserialize(memoryStream);
-                }
+                    // Read the settings from the memory stream
+                    _hasBeenViewed = reader.ReadBoolean();
 
-                if (version >= 3)
-                {
-                    _hintEnabled = (bool)binaryFormatter.Deserialize(memoryStream);
+                    if (reader.Version >= 2)
+                    {
+                        _isAccepted = reader.ReadBoolean();
+                    }
+
+                    if (reader.Version >= 3)
+                    {
+                        _hintEnabled = reader.ReadBoolean();
+                    }
                 }
 
                 _dirty = HResult.False;
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI24395",
-                    "Error loading AttributeStatusInfo settings!", ex);
-                throw new ExtractException("ELI24396", ee.AsStringizedByteStream());
-            }
-            finally
-            {
-                if (memoryStream != null)
-                {
-                    memoryStream.Dispose();
-                }
+                throw ExtractException.CreateComVisible("ELI24395", 
+                    "Error loading AttributeStatusInfo settings.", ex);
             }
         }
 
@@ -2600,24 +2574,16 @@ namespace Extract.DataEntry
             {
                 ExtractException.Assert("ELI24397", "Memory stream is null!", stream != null);
 
-                // Create a memory stream and binary formatter to serialize the settings.
-                memoryStream = new MemoryStream();
-                BinaryFormatter binaryFormatter = new BinaryFormatter();
+                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
+                {
+                    // Save the settings that cannot be reconstructed using the DataEntryControlHost
+                    writer.Write(_hasBeenViewed);
+                    writer.Write(_isAccepted);
+                    writer.Write(_hintEnabled);
 
-                // Write the version of the object being saved.
-                binaryFormatter.Serialize(memoryStream, _CURRENT_VERSION);
-
-                // Save the settings to the memory stream (save only the settings that cannot be
-                // reconstructed with using the DataEntryControlHost)
-                binaryFormatter.Serialize(memoryStream, _hasBeenViewed);
-                binaryFormatter.Serialize(memoryStream, _isAccepted);
-                binaryFormatter.Serialize(memoryStream, _hintEnabled);
-
-                // Write the memory stream to the provided IStream.
-                byte[] dataBuffer = memoryStream.ToArray();
-                byte[] dataLengthBuffer = BitConverter.GetBytes(dataBuffer.Length);
-                stream.Write(dataLengthBuffer, dataLengthBuffer.Length, IntPtr.Zero);
-                stream.Write(dataBuffer, dataBuffer.Length, IntPtr.Zero);
+                    // Write to the provided IStream.
+                    writer.WriteTo(stream);
+                }
 
                 if (clearDirty)
                 {
@@ -2626,9 +2592,8 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI24398",
-                    "Error saving data entry application settings!", ex);
-                throw new ExtractException("ELI24399", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI24398", 
+                    "Error saving data entry application settings.", ex);
             }
             finally
             {
@@ -2672,8 +2637,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI24909", ex);
-                throw new ExtractException("ELI24910", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI24909", "Clone failed.", ex);
             }
         }
 
@@ -2720,8 +2684,8 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI24911", ex);
-                throw new ExtractException("ELI24912", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI24911", 
+                    "Unable to copy AttributeStatusInfo", ex);
             }
         }
 
