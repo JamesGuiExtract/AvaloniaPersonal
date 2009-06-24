@@ -180,12 +180,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI22259", "Could not process find!", ex);
-
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI22981", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI22259", "Could not process find.", ex);
             }
         }
 
@@ -215,12 +210,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI22260", "Could not process Replace!", ex);
-
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI22986", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI22260", "Could not process Replace.", ex);
             }
         }
         
@@ -242,12 +232,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI22261", "Could not process Replace!", ex);
-
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI22987", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI22261", "Could not process find pattern.", ex);
             }
         }
 
@@ -294,12 +279,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI22445", "Could not process StringContainsPatterns!", ex);
-                
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI22988", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI22445", "Could not process StringContainsPatterns.", ex);
             }
         }
         
@@ -335,12 +315,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = new ExtractException("ELI22262", "Could not process Replace!", ex);
-
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI22990", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI22262", "Could not determine whether pattern matches.", ex);
             }
         }
 
@@ -400,13 +375,7 @@ namespace Extract.Utilities.Parsers
             }
             catch (Exception ex)
             {
-                ExtractException ee = 
-                    new ExtractException("ELI24230", "Could not find replacements.", ex);
-                
-                // Throw the exception with the stringized so that COM can get the data from it
-                // if the ee exception is thrown the line position of the original exception will
-                // be lost.
-                throw new ExtractException("ELI24231", ee.AsStringizedByteStream());
+                throw ExtractException.CreateComVisible("ELI24230", "Could not find replacements.", ex);
             }
         }
 
