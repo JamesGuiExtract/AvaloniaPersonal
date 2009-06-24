@@ -1100,7 +1100,25 @@ namespace Extract
                 ex2.CopyInformationFrom(ex);
                 return ex2;
             }
-        }        
+        }     
+   
+        /// <summary>
+        /// Create an <see cref="ExtractException"/> that can be thrown from a COM visible method.
+        /// </summary>
+        /// <param name="eliCode">The ELI code for the new exception.</param>
+        /// <param name="message">The message string associated with the exception.</param>
+        /// <param name="ex">The exception from which the <see cref="ExtractException"/> will be 
+        /// created.</param>
+        /// <returns>An <see cref="ExtractException"/> that can be thrown from a COM visible 
+        /// method.</returns>
+        public static ExtractException CreateComVisible(string eliCode, string message, Exception ex)
+        {
+            ExtractException ee = new ExtractException(eliCode, message, ex);
+
+            // Stringize ee so that COM can get the data from it. If the ee exception is thrown 
+            // across a COM boundary the line position of the original exception will be lost.
+            return new ExtractException("ELI26464", ee.AsStringizedByteStream());
+        }
 
         /// <summary>
         /// Throws an ExtractException built from the provided ELICode containing no debug data
