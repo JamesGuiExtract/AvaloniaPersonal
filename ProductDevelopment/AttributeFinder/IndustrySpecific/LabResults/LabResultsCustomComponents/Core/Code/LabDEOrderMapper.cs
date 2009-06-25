@@ -547,6 +547,7 @@ namespace Extract.LabResultsCustomComponents
 
             IAttribute dateAttribute = null;
             IAttribute timeAttribute = null;
+            IAttribute labInfoAttribute = null;
 
             // Get the date and time from the attributes
             List<IAttribute> temp;
@@ -554,8 +555,7 @@ namespace Extract.LabResultsCustomComponents
             {
                 // List should have at least 1 item, pick the first
                 ExtractException.Assert("ELI26231", "Attribute list should have at least 1"
-                    + " collection date.",
-                    temp.Count > 0);
+                    + " collection date.", temp.Count > 0);
 
                 dateAttribute = temp[0];
             }
@@ -564,10 +564,18 @@ namespace Extract.LabResultsCustomComponents
             {
                 // List should have at least 1 item, pick the first
                 ExtractException.Assert("ELI26232", "Attribute list should have at least 1"
-                    + " collection time.",
-                    temp.Count > 0);
+                    + " collection time.", temp.Count > 0);
 
                 timeAttribute = temp[0];
+            }
+            temp = null;
+            if (nameToAttributes.TryGetValue("LABINFO", out temp))
+            {
+                // List should have at least 1 item, pick the first
+                ExtractException.Assert("ELI26522", "Attribute list should have at least 1"
+                    + " lab info object", temp.Count > 0);
+
+                labInfoAttribute = temp[0];
             }
 
             List<IAttribute> mappedList = new List<IAttribute>();
@@ -594,7 +602,7 @@ namespace Extract.LabResultsCustomComponents
                         orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
                         vecMatched.PushBack(orderGrouping);
 
-                        // Add the date and time attribute (if available)
+                        // Add the date, time, and lab info attribute (if available)
                         if (dateAttribute != null)
                         {
                             vecMatched.PushBack(dateAttribute);
@@ -602,6 +610,10 @@ namespace Extract.LabResultsCustomComponents
                         if (timeAttribute != null)
                         {
                             vecMatched.PushBack(timeAttribute);
+                        }
+                        if (labInfoAttribute != null)
+                        {
+                            vecMatched.PushBack(labInfoAttribute);
                         }
 
                         // Get the best match order for the remaining unmatched tests
