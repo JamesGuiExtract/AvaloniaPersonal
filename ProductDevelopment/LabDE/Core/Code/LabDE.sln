@@ -711,7 +711,7 @@ Global
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 60
+		ProjectCount = 61
 		ProjectRelativeDiskPath1 = ..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj
 		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
 		ProjectRelativeDiskPath3 = LabDE.sln
@@ -772,6 +772,7 @@ Global
 		ProjectRelativeDiskPath58 = ..\..\..\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
 		ProjectRelativeDiskPath59 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
 		ProjectRelativeDiskPath60 = ..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
+		ProjectRelativeDiskPath61 = ..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
