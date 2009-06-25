@@ -58,7 +58,7 @@ namespace Extract.LabResultsCustomComponents
             this._buttonTags.Image = ((System.Drawing.Image)(resources.GetObject("_buttonTags.Image")));
             this._buttonTags.Location = new System.Drawing.Point(429, 23);
             this._buttonTags.Name = "_buttonTags";
-            this._buttonTags.PathTags = new Extract.Utilities.AttributeFinderPathTags();
+            this._buttonTags.PathTags = new Extract.AttributeFinder.AttributeFinderPathTags();
             this._buttonTags.Size = new System.Drawing.Size(22, 22);
             this._buttonTags.TabIndex = 2;
             this._buttonTags.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePathTagsButtonSelected);
