@@ -204,10 +204,6 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 				   const std::vector<PageRasterZone> &vecZones, bool bRetainAnnotations, 
 				   bool bApplyAsAnnotations)
 {
-	// Auto pointer for temp file to be used if input and output image are the same
-	// [FlexIDSCore #3517]
-	auto_ptr<TemporaryFileName> apTempFileName(NULL);
-
 	INIT_EXCEPTION_AND_TRACING("MLI02774");
 	try
 	{
@@ -238,18 +234,6 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strImageFileName);
 		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strOutputImageName);
 
-		// Check if the input and output image are the same and ensure that if they are
-		// the same we output the redacted image to a temporary file and copy it to the
-		// original output image at the end. [FlexIDSCore #3517]
-		string strTempOutput = strOutputImageName;
-		bool bInputOutputSame = stringCSIS::sEqual(strImageFileName, strOutputImageName);
-		if (bInputOutputSame)
-		{
-			apTempFileName.reset(new TemporaryFileName("",
-				getExtensionFromFullPath(strOutputImageName).c_str()));
-			strTempOutput = apTempFileName->getName();
-		}
-
 		// Get the retry counts and timeout value
 		int iRetryCount(0), iRetryTimeout(0);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
@@ -260,6 +244,11 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 		bool bAnnotationsAppliedToDocument = false;
 		for (int i=0; i < gnOUTPUT_IMAGE_RETRIES; i++)
 		{
+			// Write the output to a temporary file so that the creation of the
+			// redacted image appears as an atomic operation [FlexIDSCore #3547]
+			TemporaryFileName tempOutFile(NULL,
+				getExtensionFromFullPath(strOutputImageName).c_str(), true);
+
 			// Flag to indicate if any annotations been applied, if so then
 			// L_AnnSetTag will need to be called to reset them
 			bool bAnnotationsAppliedToPage = false;
@@ -339,7 +328,7 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 					// If result will be PDF
 					// - Each page processed in the loop below will be appended to an internal temporary file
 					// - Desired PDF output file will be created from conversion of this temporary TIF
-					PDFInputOutputMgr outMgr( strTempOutput, false );
+					PDFInputOutputMgr outMgr( tempOutFile.getName(), false );
 					_lastCodePos = "80";
 
 					// Create the brush and pen collections
@@ -657,8 +646,9 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 						if (nRet != SUCCESS)
 						{
 							UCLIDException ue("ELI09202", "Could not save image.");
-							ue.addDebugInfo("Original Image", outMgr.getFileNameInformationString());
-							ue.addDebugInfo("Temporary Image", outMgr.getFileName());
+							ue.addDebugInfo("Output Image", strOutputImageName);
+							ue.addDebugInfo("Temporary Image", tempOutFile.getName());
+							ue.addDebugInfo("Output Manager File", outMgr.getFileName());
 							ue.addDebugInfo("Actual Page", j + 1);
 							ue.addDebugInfo("Error description", getErrorCodeDescription(nRet));
 							ue.addDebugInfo("Actual Error Code", nRet);
@@ -675,7 +665,8 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 								UCLIDException ue("ELI20366",
 									"Application Trace:Saved image page successfully after retry.");
 								ue.addDebugInfo("Retries", nNumFailedAttempts);
-								ue.addDebugInfo("Image", outMgr.getFileNameInformationString());
+								ue.addDebugInfo("Temporary Image", tempOutFile.getName());
+								ue.addDebugInfo("Output Image", strOutputImageName);
 								ue.addDebugInfo("Page", j+1);
 								ue.log();
 							}
@@ -761,7 +752,7 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 			_lastCodePos = "180";
 
 			// check the number of pages in the output
-			int nNumberOfPagesInOutput = getNumberOfPagesInImage(strTempOutput);
+			int nNumberOfPagesInOutput = getNumberOfPagesInImage(tempOutFile.getName());
 			_lastCodePos = "190";
 
 			// if the page numbers don't match log an exception and retry
@@ -773,6 +764,7 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 				ue.addDebugInfo("Source Image", strImageFileName);
 				ue.addDebugInfo("Output Pages", nNumberOfPagesInOutput);
 				ue.addDebugInfo("Output Image", strOutputImageName);
+				ue.addDebugInfo("Temporary Image", tempOutFile.getName());
 				ue.log();
 			}
 			// else page numbers match
@@ -780,6 +772,10 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 			{
 				// saved successfully, break from loop
 				bSuccessful = true;
+
+				// Since save was successful, copy the temp file to the output file
+				// [FlexIDSCore #3547]
+				copyFile(tempOutFile.getName(), strOutputImageName);
 				break;
 			}
 		}
@@ -795,21 +791,6 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 		}
 		else
 		{
-			// Handle legislation guard case of input and output images being the same
-			// [FlexIDSCore #3517]
-			if (bInputOutputSame)
-			{
-				// Copy the temp file to the output file
-				copyFile(strTempOutput, strOutputImageName, true);
-
-				try
-				{
-					// Reset the temp file autoptr to clean up the temp file
-					apTempFileName.reset();
-				}
-				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI25515");
-			}
-
 			if(bAnnotationsAppliedToDocument && isPDFFile(strOutputImageName))
 			{
 				// Log application trace if annotations added to the document and
