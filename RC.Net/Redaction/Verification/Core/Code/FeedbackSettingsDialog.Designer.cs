@@ -105,6 +105,7 @@ namespace Extract.Redaction.Verification
             this._dataFolderPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFolderPathTagsButton.Image")));
             this._dataFolderPathTagsButton.Location = new System.Drawing.Point(311, 37);
             this._dataFolderPathTagsButton.Name = "_dataFolderPathTagsButton";
+            this._dataFolderPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._dataFolderPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFolderPathTagsButton.TabIndex = 2;
             this._dataFolderPathTagsButton.UseVisualStyleBackColor = true;

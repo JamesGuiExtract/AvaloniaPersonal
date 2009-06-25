@@ -42,8 +42,6 @@ namespace Extract.Redaction.Verification
             InitializeComponent();
 
             _settings = settings ?? new FeedbackSettings();
-
-            _dataFolderPathTagsButton.ResetDocTags(DocumentTags.GetAll());
         }
 
         #endregion FeedbackSettingsDialog Constructors

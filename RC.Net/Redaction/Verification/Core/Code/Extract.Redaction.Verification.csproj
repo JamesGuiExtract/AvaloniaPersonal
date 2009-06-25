@@ -58,7 +58,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DocumentTags.cs" />
     <Compile Include="FeedbackSettings.cs" />
     <Compile Include="FeedbackSettingsDialog.cs">
       <SubType>Form</SubType>

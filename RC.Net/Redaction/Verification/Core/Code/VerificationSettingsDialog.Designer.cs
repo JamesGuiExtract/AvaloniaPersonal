@@ -144,6 +144,7 @@ namespace Extract.Redaction.Verification
             this._dataFilePathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_dataFilePathTagsButton.Image")));
             this._dataFilePathTagsButton.Location = new System.Drawing.Point(311, 20);
             this._dataFilePathTagsButton.Name = "_dataFilePathTagsButton";
+            this._dataFilePathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._dataFilePathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._dataFilePathTagsButton.TabIndex = 2;
             this._dataFilePathTagsButton.UseVisualStyleBackColor = true;
@@ -190,6 +191,7 @@ namespace Extract.Redaction.Verification
             this._metadataPathTagsButton.Image = ((System.Drawing.Image)(resources.GetObject("_metadataPathTagsButton.Image")));
             this._metadataPathTagsButton.Location = new System.Drawing.Point(311, 68);
             this._metadataPathTagsButton.Name = "_metadataPathTagsButton";
+            this._metadataPathTagsButton.PathTags = new Extract.Utilities.FileActionManagerPathTags();
             this._metadataPathTagsButton.Size = new System.Drawing.Size(18, 20);
             this._metadataPathTagsButton.TabIndex = 4;
             this._metadataPathTagsButton.UseVisualStyleBackColor = true;

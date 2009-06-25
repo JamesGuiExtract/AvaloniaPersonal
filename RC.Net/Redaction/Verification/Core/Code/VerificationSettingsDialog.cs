@@ -49,11 +49,6 @@ namespace Extract.Redaction.Verification
             InitializeComponent();
 
             _settings = settings ?? new VerificationSettings();
-
-            // Add the doc tags
-            List<string> docTags = DocumentTags.GetAll();
-            _dataFilePathTagsButton.ResetDocTags(docTags);
-            _metadataPathTagsButton.ResetDocTags(docTags);
         }
 
         #endregion VerificationSettingsDialog Constructors
