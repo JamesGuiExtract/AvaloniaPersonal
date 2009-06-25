@@ -236,18 +236,14 @@ function BOOL CheckProductKeyInstalled(strExpectedVersion, strProductKey, svInst
 	NUMBER nSize, nType;
 	STRING strMsg;
 	STRING strProductName;
-	NUMBER nEnd; 
+	NUMBER nPos; 
 	NUMBER i;
 begin 
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	
-	// Get the version from the version string
-	nEnd = StrLengthChars(strExpectedVersion);
-	for i = nEnd-1 downto 0
-		if ( StrSub(strRtn, strExpectedVersion, i, 1) = " ") then
-			StrSub(strVersion, strExpectedVersion, i +1, nEnd-i);
-		endif;
-	endfor;
+
+	// Get the Expected Version	                                          
+	nPos = StrFind(strExpectedVersion, "Ver. ");
+	StrSub(strVersion, strExpectedVersion, nPos + 5 , 20 );
 	  
 	// Create the path for the uninstall key
 	strUninstallKey = REG_PATH_UNINSTALL ^ strProductKey;
@@ -256,9 +252,11 @@ begin
 	if (RegDBKeyExist(strUninstallKey) = 1 ) then
 		// Read the key if it does not match the version being installed exit
 		RegDBGetKeyValueEx( strUninstallKey, "DisplayVersion", nType, svInstalledVersion, nSize); 
-		
-		if (bCheckForSame) then
-			return strVersion == svInstalledVersion;                            
+
+		if (bCheckForSame) then   
+			if ( strVersion = svInstalledVersion ) then
+				return TRUE;                            
+			endif;
 		else
 			return strVersion != svInstalledVersion;
 		endif;
@@ -266,7 +264,7 @@ begin
 	                    
 	// No previous version was found
 	return FALSE;	
-end;   
+end;
             
 ///////////////////////////////////////////////////////////////////////////////
 //
@@ -287,9 +285,6 @@ begin
 	bInstalled = FALSE;     
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
  	
- 	// TODO: This check does not seem to be working correctly so I have added the following line to until it is fixed
- 	return 0;
-	    
     // Check each of the expected version against any installed versions
     if (CheckProductKeyInstalled(@FlexIndexVersion, IDSHIELD_PRODUCT_CODE, strVersion, FALSE)) then
     	strMsg = "ID Shield version " + strVersion + " must be uninstalled before product can be installed.";	
@@ -483,6 +478,7 @@ int nResult, svServiceState;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	MessageBox( REG_PATH_SQL_COMPACT_EDITION, MB_OK);
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0) then
 		// Install SQL Compact Edition
 		szProgram = "msiexec";
