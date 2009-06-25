@@ -69,6 +69,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj">
+      <Project>{6DD0855C-6031-49F4-874C-667F3A576345}</Project>
+      <Name>Extract.AttributeFinder</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Core\Code\Extract.csproj">
       <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
       <Name>Extract</Name>
@@ -80,6 +84,10 @@
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
       <Name>Extract.Licensing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Core\Code\Extract.Utilities.csproj">
+      <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
+      <Name>Extract.Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\..\..\..\RC.Net\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
       <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>

@@ -7,8 +7,6 @@ using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
-using UCLID_AFUTILSLib;
-using UCLID_COMUTILSLib;
 
 namespace Extract.LabResultsCustomComponents
 {
@@ -44,20 +42,6 @@ namespace Extract.LabResultsCustomComponents
                 _databaseFile = databaseFile;
 
                 _textDatabaseFile.Text = _databaseFile ?? "";
-
-                // Set the doc tags for the path tags button
-                AFUtility afUtils = new AFUtility();
-                VariantVector tags = afUtils.GetBuiltInTags();
-                int tagsSize = tags.Size;
-                List<string> docTags = new List<string>(tagsSize);
-                for (int i = 0; i < tagsSize; i++)
-                {
-                    string tag = (string)tags[i];
-                    docTags.Add(tag);
-                }
-                docTags.Sort();
-
-                _buttonTags.ResetDocTags(docTags);
             }
             catch (Exception ex)
             {
