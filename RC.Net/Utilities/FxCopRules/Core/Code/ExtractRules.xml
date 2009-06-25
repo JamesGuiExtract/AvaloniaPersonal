@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Rules FriendlyName="Extract Rules">
+	<Rule TypeName="PublicMethodsContainTryCatch" Category="ExtractRules" CheckId="ES0001">
+		<Name>Public methods should contain try catch block</Name>
+		<Description>All public methods should contain a try catch block and should wrap all exceptions as ExtractException objects.</Description>
+		<Resolution>Add a try catch block that will wrap the caught exception as an ExtractException.</Resolution>
+		<MessageLevel Certainty="80">Error</MessageLevel>
+		<FixCategories>NonBreaking</FixCategories>
+		<Url></Url>
+		<Email></Email>
+		<Owner></Owner>
+	</Rule>
+</Rules>
