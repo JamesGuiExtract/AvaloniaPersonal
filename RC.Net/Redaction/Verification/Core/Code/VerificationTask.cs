@@ -24,6 +24,8 @@ namespace Extract.Redaction.Verification
         #region VerificationTask Constants
 
         const string _COMPONENT_DESCRIPTION = "Verify redactions two";
+
+        const int _CURRENT_VERSION = 1;
         
         #endregion VerificationTask Constants
 
@@ -255,8 +257,22 @@ namespace Extract.Redaction.Verification
         /// </param>
         public void Load(IStream stream)
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try
+            {
+                using (IStreamReader reader = new IStreamReader(stream, _CURRENT_VERSION))
+                {
+                    // Read the settings
+                    _settings = VerificationSettings.ReadFrom(reader);
+                }
+
+                // Freshly loaded object is no longer dirty
+                _dirty = false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI26465", 
+                    "Unable to load verification task.", ex);
+            }
         }
 
         /// <summary>
@@ -270,8 +286,27 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/>, the flag should be left unchanged.</param>
         public void Save(IStream stream, bool clearDirty)
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try 
+	        {
+                using (IStreamWriter writer = new IStreamWriter(_CURRENT_VERSION))
+                {
+                    // Serialize the settings
+                    _settings.WriteTo(writer);
+
+                    // Write to the provided IStream.
+                    writer.WriteTo(stream);
+                }
+
+                if (clearDirty)
+                {
+                    _dirty = false;
+                }
+	        }
+	        catch (Exception ex)
+	        {
+		        throw ExtractException.CreateComVisible("ELI26473", 
+			        "Unable to save verification task.", ex);
+	        }
         }
 
         /// <summary>

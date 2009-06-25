@@ -1,3 +1,4 @@
+using Extract.Interop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -166,5 +167,60 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion FeedbackSettings Properties
+
+        #region FeedbackSettings Methods
+
+        /// <summary>
+        /// Creates a <see cref="FeedbackSettings"/> from the specified 
+        /// <see cref="IStreamReader"/>.
+        /// </summary>
+        /// <param name="reader">The reader from which to create the 
+        /// <see cref="FeedbackSettings"/>.</param>
+        /// <returns>A <see cref="FeedbackSettings"/> created from the specified 
+        /// <see cref="IStreamReader"/>.</returns>
+        public static FeedbackSettings ReadFrom(IStreamReader reader)
+        {
+            try
+            {
+                bool collectFeedback = reader.ReadBoolean();
+                string dataFolder = reader.ReadString();
+                bool collectOriginalDocument = reader.ReadBoolean();
+                bool useOriginalFileNames = reader.ReadBoolean();
+                CollectionTypes collectionTypes = (CollectionTypes)reader.ReadInt32();
+
+                return new FeedbackSettings(collectFeedback, dataFolder, collectOriginalDocument,
+                    useOriginalFileNames, collectionTypes);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26514",
+                    "Unable to read verification feedback settings.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the <see cref="FeedbackSettings"/> to the specified 
+        /// <see cref="IStreamWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer into which the 
+        /// <see cref="FeedbackSettings"/> will be written.</param>
+        public void WriteTo(IStreamWriter writer)
+        {
+            try
+            {
+                writer.Write(_collectFeedback);
+                writer.Write(_dataFolder);
+                writer.Write(_collectOriginalDocument);
+                writer.Write(_useOriginalFileNames);
+                writer.Write((int)_collectionTypes);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26515",
+                    "Unable to write verification feedback settings.", ex);
+            }
+        }
+
+        #endregion FeedbackSettings Methods
     }
 }

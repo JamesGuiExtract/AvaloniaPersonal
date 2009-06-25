@@ -1,3 +1,4 @@
+using Extract.Interop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -98,5 +99,55 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion GeneralVerificationSettings Properties
+
+        #region GeneralVerificationSettings Methods
+
+        /// <summary>
+        /// Creates a <see cref="GeneralVerificationSettings"/> from the specified 
+        /// <see cref="IStreamReader"/>.
+        /// </summary>
+        /// <param name="reader">The reader from which to create the 
+        /// <see cref="GeneralVerificationSettings"/>.</param>
+        /// <returns>A <see cref="GeneralVerificationSettings"/> created from the specified 
+        /// <see cref="IStreamReader"/>.</returns>
+        public static GeneralVerificationSettings ReadFrom(IStreamReader reader)
+        {
+            try
+            {
+                bool verifyAllPages = reader.ReadBoolean();
+                bool requireTypes = reader.ReadBoolean();
+                bool requireExemptions = reader.ReadBoolean();
+
+                return new GeneralVerificationSettings(verifyAllPages, requireTypes, requireExemptions);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26516",
+                    "Unable to read general verification settings.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the <see cref="GeneralVerificationSettings"/> to the specified 
+        /// <see cref="IStreamWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer into which the 
+        /// <see cref="GeneralVerificationSettings"/> will be written.</param>
+        public void WriteTo(IStreamWriter writer)
+        {
+            try
+            {
+                writer.Write(_verifyAllPages);
+                writer.Write(_requireTypes);
+                writer.Write(_requireExemptions);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26517",
+                    "Unable to write general verification settings.", ex);
+            }
+        }
+
+        #endregion GeneralVerificationSettings Methods
     }
 }

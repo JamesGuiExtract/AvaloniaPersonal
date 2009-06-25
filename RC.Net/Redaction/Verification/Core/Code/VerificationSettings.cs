@@ -1,3 +1,4 @@
+using Extract.Interop;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -44,8 +45,8 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="VerificationSettings"/> class with 
-        /// default settings.
+        /// Initializes a new instance of the <see cref="VerificationSettings"/> class with the 
+        /// specified settings.
         /// </summary>
         public VerificationSettings(GeneralVerificationSettings general, FeedbackSettings feedback,
             string inputFile, MetadataSettings metadata)
@@ -110,5 +111,57 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion VerificationSettings Properties
+
+        #region VerificationSettings Methods
+
+        /// <summary>
+        /// Creates a <see cref="VerificationSettings"/> from the specified 
+        /// <see cref="IStreamReader"/>.
+        /// </summary>
+        /// <param name="reader">The reader from which to create the 
+        /// <see cref="VerificationSettings"/>.</param>
+        /// <returns>A <see cref="VerificationSettings"/> created from the specified 
+        /// <see cref="IStreamReader"/>.</returns>
+        public static VerificationSettings ReadFrom(IStreamReader reader)
+        {
+            try
+            {
+                GeneralVerificationSettings general = GeneralVerificationSettings.ReadFrom(reader);
+                FeedbackSettings feedback = FeedbackSettings.ReadFrom(reader);
+                string inputFile = reader.ReadString();
+                MetadataSettings metadata = MetadataSettings.ReadFrom(reader);
+
+                return new VerificationSettings(general, feedback, inputFile, metadata);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26520",
+                    "Unable to read verification settings.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the <see cref="VerificationSettings"/> to the specified 
+        /// <see cref="IStreamWriter"/>.
+        /// </summary>
+        /// <param name="writer">The writer into which the 
+        /// <see cref="VerificationSettings"/> will be written.</param>
+        public void WriteTo(IStreamWriter writer)
+        {
+            try
+            {
+                _generalSettings.WriteTo(writer);
+                _feedbackSettings.WriteTo(writer);
+                writer.Write(_inputFile);
+                _metadataSettings.WriteTo(writer);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26521",
+                    "Unable to write verification settings.", ex);
+            }
+        }
+
+        #endregion VerificationSettings Methods
     }
 }
