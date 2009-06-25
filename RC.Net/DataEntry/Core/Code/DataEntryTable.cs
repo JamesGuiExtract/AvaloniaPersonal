@@ -54,6 +54,12 @@ namespace Extract.DataEntry
         private IRuleSet _rowFormattingRule;
 
         /// <summary>
+        /// Specifies the minimum number of rows a DataEntryTable must have.  If the specified
+        /// number of attributes are not found, new, blank ones are created as necessary.
+        /// </summary>
+        private int _minimumNumberOfRows;
+
+        /// <summary>
         /// Context MenuItem that allows a row to be inserted at the current location.
         /// </summary>
         ToolStripMenuItem _rowInsertMenuItem = new ToolStripMenuItem("Insert row");
@@ -300,6 +306,27 @@ namespace Extract.DataEntry
             set
             {
                 base.ColumnHintsEnabled = value;
+            }
+        }
+
+        /// <summary>
+        /// Specifies the minimum number of rows the <see cref="DataEntryTable"/> must have. If the
+        /// specified number of attributes are not found, new, blank ones are created as necessary.
+        /// </summary>
+        /// <value>The minimum number of rows the <see cref="DataEntryTable"/> must have.</value>
+        /// <returns>The minimum number of rows the <see cref="DataEntryTable"/> must have.
+        /// </returns>
+        [Category("Data Entry Table")]  
+        public int MinimumNumberOfRows
+        {
+            get
+            {
+                return _minimumNumberOfRows;
+            }
+
+            set
+            {
+                _minimumNumberOfRows = value;
             }
         }
 
@@ -802,6 +829,16 @@ namespace Extract.DataEntry
                     for (int i = 0; i < count; i++)
                     {
                         ApplyAttributeToRow(i, (IAttribute)mappedAttributes.At(i), null);
+                    }
+
+                    // [DataEntry:393]
+                    // If the minimum number of rows are not present, add new blank rows as necessary.
+                    while (base.Rows.Count < _minimumNumberOfRows)
+                    {
+                        int addedRowIndex = base.Rows.Add();
+
+                        // Apply the new attribute to the added row.
+                        ApplyAttributeToRow(addedRowIndex, null, null);
                     }
 
                     if (base.AllowUserToAddRows && base.Visible)

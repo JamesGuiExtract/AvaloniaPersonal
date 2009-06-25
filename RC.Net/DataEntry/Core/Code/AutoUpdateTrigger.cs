@@ -327,8 +327,8 @@ namespace Extract.DataEntry
                         queryString = queryString.Remove(sqlQueryStart, sqlQueryLength + 11);
 
                         string queryResult = 
-                            DataEntryMethods.ExecuteSqlQuery(
-                                _dbConnection, sqlQueryString, "\r\n", ", ");
+                            DataEntryMethods.ExecuteSqlQuery(_dbConnection, sqlQueryString, 
+                                (_validationTrigger ? "\r\n" : null), ", ");
 
                         if (!string.IsNullOrEmpty(queryResult))
                         {

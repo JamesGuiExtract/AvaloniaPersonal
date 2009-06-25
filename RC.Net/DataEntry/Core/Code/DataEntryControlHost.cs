@@ -1033,14 +1033,6 @@ namespace Extract.DataEntry
                             // If all attributes passed validation, save the data.
                             _attributes.SaveTo(_imageViewer.ImageFile + ".voa", true);
 
-                            // TODO: Temporarily write xml here.  In production mode, this will be
-                            // a separate action.
-                            OutputToXMLClass XMLWriter = new OutputToXMLClass();
-                            XMLWriter.Format = EXMLOutputFormat.kXMLSchema;
-                            XMLWriter.NamedAttributes = true;
-                            XMLWriter.FileName = _imageViewer.ImageFile + ".xml";
-                            XMLWriter.ProcessOutput(_attributes, new AFDocumentClass(), null);
-
                             _dirty = false;
                         }
                         else
@@ -2893,7 +2885,7 @@ namespace Extract.DataEntry
             // Sometimes the window handle may be a child of a .Net control (such as the edit box
             // of a combo box). In this case, a Control will not be created from the handle.
             // Use the Win32 API to find the first ancestor that is a .Net control.
-            while (clickedControl == null && m.HWnd != null)
+            while (clickedControl == null && m.HWnd != IntPtr.Zero)
             {
                 m.HWnd = NativeMethods.GetParentWindowHandle(m.HWnd);
 

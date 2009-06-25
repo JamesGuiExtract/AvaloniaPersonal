@@ -691,7 +691,8 @@ namespace Extract.DataEntry
         /// <param name="dbConnection">The database connection to be queried.</param>
         /// <param name="query">The query to be applied.</param>
         /// <param name="rowSeparator">The string used to separate multiple row results. (Will not
-        /// be included in any result of less than 2 rows)</param>
+        /// be included in any result of less than 2 rows).  If <see langword="null"/>, no result
+        /// will be returned unless there is exactly 1 matching row.</param>
         /// <param name="columnSeparator">The string used to separate multiple column results.
         /// (Will not be included in any result with less than 2 columns)</param>
         public static string ExecuteSqlQuery(DbConnection dbConnection, string query,
@@ -717,6 +718,13 @@ namespace Extract.DataEntry
                             // If not the first row result, append the row separator
                             if (result.Length > 0)
                             {
+                                // If more than one row was found, do not return any value if
+                                // rowSeparator is null.
+                                if (rowSeparator == null)
+                                {
+                                    return "";
+                                }
+
                                 result.Append(rowSeparator);
                             }
 

@@ -256,6 +256,8 @@ namespace Extract.DataEntry
                 try
                 {
                     _validator.ValidationPattern = value;
+
+                    UpdateCellTemplate();
                 }
                 catch (ExtractException ex)
                 {
@@ -336,7 +338,16 @@ namespace Extract.DataEntry
 
             set
             {
-                _validationQuery = value;
+                try
+                {
+                    _validationQuery = value;
+
+                    UpdateCellTemplate();
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26512", ex);
+                }
             }
         }
 
@@ -368,6 +379,8 @@ namespace Extract.DataEntry
                 try
                 {
                     _validator.ValidationErrorMessage = value;
+
+                    UpdateCellTemplate();
                 }
                 catch (Exception ex)
                 {
@@ -445,7 +458,16 @@ namespace Extract.DataEntry
 
             set
             {
-                _useComboBoxCells = value;
+                try
+                {
+                    _useComboBoxCells = value;
+
+                    UpdateCellTemplate();
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26513", ex);
+                }
             }
         }
 

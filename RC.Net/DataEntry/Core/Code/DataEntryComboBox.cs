@@ -728,14 +728,6 @@ namespace Extract.DataEntry
                 }
                 else
                 {
-                    // If the text value is not editable (DropDownList style), use the first value in
-                    // the list as the default value.  Otherwise, allow the value to initialize to
-                    // blank.
-                    if (base.Items.Count > 0 && base.DropDownStyle == ComboBoxStyle.DropDownList)
-                    {
-                        base.SelectedIndex = 0;
-                    }
-
                     // Attempt to find a mapped attribute from the provided vector.  Create a new 
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
@@ -762,6 +754,15 @@ namespace Extract.DataEntry
                     {
                         base.Font = new Font(base.Font,
                             hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                    }
+
+                    // If the text value is not editable (DropDownList style), use the first value in
+                    // the list as the default value.  Otherwise, allow the value to initialize to
+                    // blank.
+                    if (base.Items.Count > 0 && base.DropDownStyle == ComboBoxStyle.DropDownList &&
+                        base.FindStringExact(_attribute.Value.String) == ListBox.NoMatches)
+                    {
+                        base.SelectedIndex = 0;
                     }
                 }
 

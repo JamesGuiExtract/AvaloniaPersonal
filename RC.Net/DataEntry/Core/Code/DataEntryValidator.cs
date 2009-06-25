@@ -352,6 +352,16 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Allow validation lists and queries to be used only to update auto-complete lists
+                // without actually ever validating based on the list items.  Also, since .Net won't
+                // display validation error icons without error text, this enforces consistency by
+                // preventing cases where the DataEntry framework considers a value invalid, yet
+                // no error icon is displayed.
+                if (string.IsNullOrEmpty(_validationErrorMessage))
+                {
+                    return true;
+                }
+
                 // Ensure the control's attribute value matches the value of the text it contains.
                 bool dataIsValid = (attribute.Value == null && string.IsNullOrEmpty(value)) ||
                                    (attribute.Value != null && attribute.Value.String == value);
