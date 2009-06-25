@@ -4,12 +4,12 @@
 //K:\Common\Engineering\Sample Files\LoganSystems\VA - Fluvanna\Set002\Images\0728_07280217.tif
 LOAN\W*(?:#|No|Num[\s\S]{0,4}|[\s\S]{0,4}ber|[\s\S]{1,3}umb[\s\S]{1,3})[\s\S]{0,8}(?:\d{3,}\x20*-\x20*\d{7,}|(?:\d{3}\x20){4}[-\d\x20]*)`
 //K:\Common\Engineering\Sample Files\LoganSystems\VA - Fluvanna\Set002\Images\0728_07280366.tif
-((?:ACAPS|.NSTR.M.NT|section|Form|\bFo[\s\S]{0,4}|rm\b)[^\w\r\n]*)\d[-\x20\d]*`(?=\r?$)1%Xo %Xo %Xo
-(.xp.r.s[^\w\r\n]*)\d[-\x20\d]*`(?=\r?$)1%Xo %Xo %Xo
-(\b(?:DOC|AP{1,2}L?)\b[^\w\r\n]*)\d[-\x20\d]*`(?=\r?$)1%Xo %Xo %Xo
-(Case\s*(?:#|No|Num[\s\S]{0,4}|[\s\S]{0,4}ber|[\s\S]{1,3}umb[\s\S]{1,3})\W*)\d[-\x20\d]*`(?=\r?$)1%Xo %Xo %Xo
+((?:ACAPS|.NSTR.M.NT|section|Form|\bFo[\s\S]{0,4}|rm\b)[^\w\r\n]*)\d[-\x20\d]*`$1%Xo %Xo %Xo
+(.xp.r.s[^\w\r\n]*)\d[-\x20\d]*`$1%Xo %Xo %Xo
+(\b(?:DOC|AP{1,2}L?)\b[^\w\r\n]*)\d[-\x20\d]*`$1%Xo %Xo %Xo
+(Case\s*(?:#|No|Num[\s\S]{0,4}|[\s\S]{0,4}ber|[\s\S]{1,3}umb[\s\S]{1,3})\W*)\d[-\x20\d]*`$1%Xo %Xo %Xo
 \d{3}-\d{9}`xxx-xxxxxxxxx
-((?:s.rv.c.ng|parcel\s*i.?d.?)\W*(?:#|No|Num[\s\S]{0,4}|[\s\S]{0,4}ber|[\s\S]{1,3}umb[\s\S]{1,3})\W*)\d[-\d\x20]*`(?=\r?$)1%Xo %Xo %Xo
+((?:s.rv.c.ng|parcel\s*i.?d.?)\W*(?:#|No|Num[\s\S]{0,4}|[\s\S]{0,4}ber|[\s\S]{1,3}umb[\s\S]{1,3})\W*)\d[-\d\x20]*`$1%Xo %Xo %Xo
 \b\d{3}\W\d{6}\W\d\b`Xo% Xo%Xo% X
 //from LoanNoPage:
 \bG\WVA\W\s*\W0507\W`Xo% Xo%Xo% X

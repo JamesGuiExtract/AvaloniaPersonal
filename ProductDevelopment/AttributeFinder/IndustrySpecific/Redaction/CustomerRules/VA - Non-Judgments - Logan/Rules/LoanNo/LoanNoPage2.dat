@@ -1,6 +1,6 @@
 (?:
-DEED[\S\s]{0,6}TRUST(?=\r?$)|
+DEED[\S\s]{0,6}TRUST$|
 ^.{0,4}DATE[\S\s]{0,6}DEED[\S\s]{0,6}TRUST|
-PLANNED\W*UNIT\W*DEVELOPMENT\W*RIDER(?=\r?$)|
+PLANNED\W*UNIT\W*DEVELOPMENT\W*RIDER$|
 ^.{0,4}C.RT.F.C.T.[\S\s]{0,6}S.T.SF.CT..N
 )
