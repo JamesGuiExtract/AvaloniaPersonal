@@ -322,20 +322,27 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                // Check if the dirty flag is changing value
-                if (_dirty ^ value)
+                try
                 {
-                    // Add one if the object is now dirty.
-                    // Subtract one if the object is no longer dirty.
-                    _revision += value ? 1 : -1;
+                    // Check if the dirty flag is changing value
+                    if (_dirty ^ value)
+                    {
+                        // Add one if the object is now dirty.
+                        // Subtract one if the object is no longer dirty.
+                        _revision += value ? 1 : -1;
+                    }
+
+                    _dirty = value;
+
+                    // Raise the LayerObjectChanged event if necessary
+                    if (_dirty == true && _imageViewer != null)
+                    {
+                        _imageViewer.LayerObjects.RaiseLayerObjectChangedEvent(this);
+                    }
                 }
-
-                _dirty = value;
-
-                // Raise the LayerObjectChanged event if necessary
-                if (_dirty == true && _imageViewer != null)
+                catch (Exception ex)
                 {
-                    _imageViewer.LayerObjects.RaiseLayerObjectChangedEvent(this);
+                    throw ExtractException.AsExtractException("ELI26546", ex);
                 }
             }
         }
@@ -483,6 +490,8 @@ namespace Extract.Imaging.Forms
         /// <returns><see langword="true"/> if the layer object is selectable; 
         /// <see langword="false"/> if the layer object is not selectable.</returns>
         [Browsable(false)]
+        // Just sets a property and clears another value, should not throw an exception
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool Selectable
         {
             get
@@ -767,16 +776,23 @@ namespace Extract.Imaging.Forms
         /// its link arrows; <see langword="false"/> otherwise.</returns>
         public virtual bool HitLinkAreaTest(Point point)
         {
-            // Ensure this layer object is on the active page
-            if (_imageViewer == null || _imageViewer.PageNumber != _pageNumber)
+            try
             {
-                return false;
+                // Ensure this layer object is on the active page
+                if (_imageViewer == null || _imageViewer.PageNumber != _pageNumber)
+                {
+                    return false;
+                }
+
+                Rectangle linkArea = GetLinkArea();
+
+                // Check if the point is contained in the link area
+                return linkArea.Contains(point);
             }
-
-            Rectangle linkArea = GetLinkArea();
-
-            // Check if the point is contained in the link area
-            return linkArea.Contains(point);
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26547", ex);
+            }
         }
 
         
@@ -790,31 +806,38 @@ namespace Extract.Imaging.Forms
         /// grip handle contains the specified point.</returns>
         public virtual int GetGripHandleId(Point point)
         {
-            // Get the grip handles in logical (image) coordinates
-            Point[] gripPoints = GetGripPoints();
-
-            // If there are no grip points, return -1
-            if (gripPoints == null || gripPoints.Length <= 0)
+            try
             {
+                // Get the grip handles in logical (image) coordinates
+                Point[] gripPoints = GetGripPoints();
+
+                // If there are no grip points, return -1
+                if (gripPoints == null || gripPoints.Length <= 0)
+                {
+                    return -1;
+                }
+
+                // Convert the grip points to physical (client) coordinates
+                _imageViewer.Transform.TransformPoints(gripPoints);
+
+                // Iterate through the grip points
+                for (int i = 0; i < gripPoints.Length; i++)
+                {
+                    // If this point is contained, return the grip handle id
+                    if (Math.Abs(gripPoints[i].X - point.X) <= _HALF_GRIP_HANDLE_SIDE &&
+                        Math.Abs(gripPoints[i].Y - point.Y) <= _HALF_GRIP_HANDLE_SIDE)
+                    {
+                        return i;
+                    }
+                }
+
+                // The grip handle wasn't found, return -1
                 return -1;
             }
-
-            // Convert the grip points to physical (client) coordinates
-            _imageViewer.Transform.TransformPoints(gripPoints);
-
-            // Iterate through the grip points
-            for (int i = 0; i < gripPoints.Length; i++)
+            catch (Exception ex)
             {
-                // If this point is contained, return the grip handle id
-                if (Math.Abs(gripPoints[i].X - point.X) <= _HALF_GRIP_HANDLE_SIDE && 
-                    Math.Abs(gripPoints[i].Y - point.Y) <= _HALF_GRIP_HANDLE_SIDE)
-                {
-                    return i;
-                }
+                throw ExtractException.AsExtractException("ELI26548", ex);
             }
-
-            // The grip handle wasn't found, return -1
-            return -1;
         }
 
         /// <summary>
@@ -826,39 +849,46 @@ namespace Extract.Imaging.Forms
         /// link arrow contains the specified point.</returns>
         public virtual int GetLinkArrowId(Point point)
         {
-            // Ensure the layer object is linked
-            if (!this.IsLinked)
+            try
             {
+                // Ensure the layer object is linked
+                if (!this.IsLinked)
+                {
+                    return -1;
+                }
+
+                // Get the link arrows in physical (client) coordinates
+                Point[] linkArrows = GetLinkPoints();
+
+                // If there are no link arrows, return -1
+                if (linkArrows == null || linkArrows.Length <= 0)
+                {
+                    return -1;
+                }
+
+                // Check if the mouse is over the previous link arrow
+                if (this.PreviousLink != null &&
+                    Math.Abs(linkArrows[0].X - point.X) <= _HALF_LINK_ARROW_SIDE &&
+                    Math.Abs(linkArrows[0].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
+                {
+                    return 0;
+                }
+
+                // Check if the mouse is over the next link arrow
+                if (this.NextLink != null &&
+                    Math.Abs(linkArrows[1].X - point.X) <= _HALF_LINK_ARROW_SIDE &&
+                    Math.Abs(linkArrows[1].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
+                {
+                    return 1;
+                }
+
+                // The mouse wasn't over the link arrow, return -1
                 return -1;
             }
-
-            // Get the link arrows in physical (client) coordinates
-            Point[] linkArrows = GetLinkPoints();
-
-            // If there are no link arrows, return -1
-            if (linkArrows == null || linkArrows.Length <= 0)
+            catch (Exception ex)
             {
-                return -1;
+                throw ExtractException.AsExtractException("ELI26549", ex);
             }
-
-            // Check if the mouse is over the previous link arrow
-            if (this.PreviousLink != null && 
-                Math.Abs(linkArrows[0].X - point.X) <= _HALF_LINK_ARROW_SIDE && 
-                Math.Abs(linkArrows[0].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
-            {
-                return 0;
-            }
-
-            // Check if the mouse is over the next link arrow
-            if (this.NextLink != null &&
-                Math.Abs(linkArrows[1].X - point.X) <= _HALF_LINK_ARROW_SIDE &&
-                Math.Abs(linkArrows[1].Y - point.Y) <= _HALF_LINK_ARROW_SIDE)
-            {
-                return 1;
-            }
-
-            // The mouse wasn't over the link arrow, return -1
-            return -1;
         }
 
         /// <summary>
@@ -874,18 +904,25 @@ namespace Extract.Imaging.Forms
         /// </returns>
         public virtual Point[] GetLinkPoints()
         {
-            // Get the bounds in physical (client) coordinates
-            Rectangle bounds = _imageViewer.GetTransformedRectangle(GetBounds(), false);
+            try
+            {
+                // Get the bounds in physical (client) coordinates
+                Rectangle bounds = _imageViewer.GetTransformedRectangle(GetBounds(), false);
 
-            // Calculate the y-coordinate of the center
-            int y = bounds.Top + bounds.Height / 2;
+                // Calculate the y-coordinate of the center
+                int y = bounds.Top + bounds.Height / 2;
 
-            // Calculate the link points
-            return new Point[]
+                // Calculate the link points
+                return new Point[]
             {
                 new Point(bounds.Left - _LINK_ARROW_DISTANCE, y),
                 new Point(bounds.Right + _LINK_ARROW_DISTANCE, y)
             };
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26550", ex);
+            }
         }
 
         /// <summary>
@@ -957,22 +994,29 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y-coordinate of the mouse cursor.</param>
         public virtual void StartTrackingSelection(int mouseX, int mouseY)
         {
-            if (_isSelectable && _isVisible && _isMovable)
+            try
             {
-                // Get the mouse position in image coordinates
-                Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                using (Matrix clientToImage = _imageViewer.Transform.Clone())
+                if (_isSelectable && _isVisible && _isMovable)
                 {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(mouse);
+                    // Get the mouse position in image coordinates
+                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
+                    using (Matrix clientToImage = _imageViewer.Transform.Clone())
+                    {
+                        clientToImage.Invert();
+                        clientToImage.TransformPoints(mouse);
+                    }
+
+                    // Start the tracking event
+                    this.TrackingData = new TrackingData(_imageViewer, mouse[0].X, mouse[0].Y,
+                        _imageViewer.GetTransformedRectangle(_imageViewer.GetVisibleImageArea(), true));
+
+                    // Store the spatial data associated with the layer object
+                    Store();
                 }
-
-                // Start the tracking event
-                this.TrackingData = new TrackingData(_imageViewer, mouse[0].X, mouse[0].Y,
-                    _imageViewer.GetTransformedRectangle(_imageViewer.GetVisibleImageArea(), true));
-
-                // Store the spatial data associated with the layer object
-                Store();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26551", ex);
             }
         }
 
@@ -983,28 +1027,35 @@ namespace Extract.Imaging.Forms
         /// <param name="mouseY">The physical (client) y-coordinate of the mouse cursor.</param>
         public virtual void UpdateTracking(int mouseX, int mouseY)
         {
-            // Check if this is a move event
-            if (_imageViewer.Cursor == Cursors.SizeAll)
+            try
             {
-                // Get the mouse position as a point in image coordinates
-                Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
-                using (Matrix clientToImage = _imageViewer.Transform.Clone())
+                // Check if this is a move event
+                if (_imageViewer.Cursor == Cursors.SizeAll)
                 {
-                    clientToImage.Invert();
-                    clientToImage.TransformPoints(mouse);
+                    // Get the mouse position as a point in image coordinates
+                    Point[] mouse = new Point[] { new Point(mouseX, mouseY) };
+                    using (Matrix clientToImage = _imageViewer.Transform.Clone())
+                    {
+                        clientToImage.Invert();
+                        clientToImage.TransformPoints(mouse);
+                    }
+
+                    // Compute the distance moved in the x and y direction
+                    int xDist = mouse[0].X - _trackingData.StartPoint.X;
+                    int yDist = mouse[0].Y - _trackingData.StartPoint.Y;
+
+                    // Update the tracking data
+                    _trackingData.StartPoint = mouse[0];
+
+                    // Now adjust the layer object accordingly
+                    Offset(xDist, yDist, false);
+
+                    _imageViewer.Invalidate();
                 }
-
-                // Compute the distance moved in the x and y direction
-                int xDist = mouse[0].X - _trackingData.StartPoint.X;
-                int yDist = mouse[0].Y - _trackingData.StartPoint.Y;
-
-                // Update the tracking data
-                _trackingData.StartPoint = mouse[0];
-
-                // Now adjust the layer object accordingly
-                Offset(xDist, yDist, false);
-
-                _imageViewer.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26552", ex);
             }
         }
 
@@ -1033,15 +1084,22 @@ namespace Extract.Imaging.Forms
         /// </returns>
         public virtual bool IsValid()
         {
-            // Ensure the bounds are the minimum size
-            Rectangle bounds = GetBounds();
-            if (bounds.Size.Height < _MIN_SIZE.Height || bounds.Size.Width < _MIN_SIZE.Width)
+            try
             {
-                return false;
-            }
+                // Ensure the bounds are the minimum size
+                Rectangle bounds = GetBounds();
+                if (bounds.Size.Height < _MIN_SIZE.Height || bounds.Size.Width < _MIN_SIZE.Width)
+                {
+                    return false;
+                }
 
-            // Ensure at least one pixel is contained on the page
-            return _imageViewer.Intersects(bounds);
+                // Ensure at least one pixel is contained on the page
+                return _imageViewer.Intersects(bounds);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26553", ex);
+            }
         }
 
         /// <summary>
@@ -1070,37 +1128,44 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</param>
         public virtual void DrawGripHandles(Graphics graphics)
         {
-            // Do nothing if not on the active page
-            if (_imageViewer == null || _pageNumber != _imageViewer.PageNumber)
+            try
             {
-                return;
+                // Do nothing if not on the active page
+                if (_imageViewer == null || _pageNumber != _imageViewer.PageNumber)
+                {
+                    return;
+                }
+
+                // Get the centers of the grip handles in logical (image) coordinates
+                Point[] gripPoints = GetGripPoints();
+
+                // Draw dashed lines around the layer object, if there is not a single grip point
+                // NOTE: A widthless highlight will only have one grip handle
+                if (gripPoints.Length != 1)
+                {
+                    Point[] vertices = GetVertices();
+                    _imageViewer.Transform.TransformPoints(vertices);
+                    graphics.DrawPolygon(ExtractPens.DashedBlack, vertices);
+                }
+
+                // If there are no grip points, we are done
+                if (gripPoints.Length <= 0)
+                {
+                    return;
+                }
+
+                // Convert the grip points to to physical (client) coordinates
+                _imageViewer.Transform.TransformPoints(gripPoints);
+
+                // Iterate through each grip center
+                for (int i = 0; i < gripPoints.Length; i++)
+                {
+                    LayerObject.DrawGripHandle(graphics, gripPoints[i]);
+                }
             }
-
-            // Get the centers of the grip handles in logical (image) coordinates
-            Point[] gripPoints = GetGripPoints();
-
-            // Draw dashed lines around the layer object, if there is not a single grip point
-            // NOTE: A widthless highlight will only have one grip handle
-            if (gripPoints.Length != 1)
+            catch (Exception ex)
             {
-                Point[] vertices = GetVertices();
-                _imageViewer.Transform.TransformPoints(vertices);
-                graphics.DrawPolygon(ExtractPens.DashedBlack, vertices);
-            }
-
-            // If there are no grip points, we are done
-            if (gripPoints.Length <= 0)
-            {
-                return;
-            }
-
-            // Convert the grip points to to physical (client) coordinates
-            _imageViewer.Transform.TransformPoints(gripPoints);
-
-            // Iterate through each grip center
-            for (int i = 0; i < gripPoints.Length; i++)
-            {
-                LayerObject.DrawGripHandle(graphics, gripPoints[i]);
+                throw ExtractException.AsExtractException("ELI26554", ex);
             }
         }
 
@@ -1111,51 +1176,58 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</param>
         public virtual void DrawLinkArrows(Graphics graphics)
         {
-            // Do nothing if not on the active page
-            if (_imageViewer == null || _pageNumber != _imageViewer.PageNumber)
+            try
             {
-                return;
-            }
+                // Do nothing if not on the active page
+                if (_imageViewer == null || _pageNumber != _imageViewer.PageNumber)
+                {
+                    return;
+                }
 
-            // Get the centers of the link arrows in logical (image) coordinates
-            Point[] linkPoints = GetLinkPoints();
+                // Get the centers of the link arrows in logical (image) coordinates
+                Point[] linkPoints = GetLinkPoints();
 
-            // Draw the left link arrow if necessary
-            if (_previousLink != null)
-            {
-                // Get the x-coordinate of rightside of the link arrow
-                int x = linkPoints[0].X + _HALF_LINK_ARROW_SIDE;
+                // Draw the left link arrow if necessary
+                if (_previousLink != null)
+                {
+                    // Get the x-coordinate of rightside of the link arrow
+                    int x = linkPoints[0].X + _HALF_LINK_ARROW_SIDE;
 
-                // Calculate the vertices of the link arrow
-                Point[] vertices = new Point[]
+                    // Calculate the vertices of the link arrow
+                    Point[] vertices = new Point[]
                 {
                     new Point(x, linkPoints[0].Y - _HALF_LINK_ARROW_SIDE),
                     new Point(x, linkPoints[0].Y + _HALF_LINK_ARROW_SIDE),
                     new Point(linkPoints[0].X - _HALF_LINK_ARROW_SIDE, linkPoints[0].Y)
                 };
 
-                // Draw the arrow
-                graphics.FillPolygon(Brushes.Red, vertices);
-                graphics.DrawPolygon(Pens.Black, vertices);
-            }
+                    // Draw the arrow
+                    graphics.FillPolygon(Brushes.Red, vertices);
+                    graphics.DrawPolygon(Pens.Black, vertices);
+                }
 
-            // Draw the right link arrow if necessary
-            if (_nextLink != null)
-            {
-                // Get the x-coordinate of leftside of the link arrow
-                int x = linkPoints[1].X - _HALF_LINK_ARROW_SIDE;
+                // Draw the right link arrow if necessary
+                if (_nextLink != null)
+                {
+                    // Get the x-coordinate of leftside of the link arrow
+                    int x = linkPoints[1].X - _HALF_LINK_ARROW_SIDE;
 
-                // Calculate the vertices of the link arrow
-                Point[] vertices = new Point[]
+                    // Calculate the vertices of the link arrow
+                    Point[] vertices = new Point[]
                 {
                     new Point(x, linkPoints[1].Y - _HALF_LINK_ARROW_SIDE),
                     new Point(x, linkPoints[1].Y + _HALF_LINK_ARROW_SIDE),
                     new Point(linkPoints[1].X + _HALF_LINK_ARROW_SIDE, linkPoints[1].Y)
                 };
 
-                // Draw the arrow
-                graphics.FillPolygon(Brushes.Red, vertices);
-                graphics.DrawPolygon(Pens.Black, vertices);
+                    // Draw the arrow
+                    graphics.FillPolygon(Brushes.Red, vertices);
+                    graphics.DrawPolygon(Pens.Black, vertices);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26555", ex);
             }
         }
 
@@ -1200,34 +1272,41 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public virtual Rectangle GetLinkArea()
         {
-            // Get the bounds in physical (client) coordinates
-            Rectangle linkArea = _imageViewer.GetTransformedRectangle(GetBounds(), false);
-
-            // Ensure the link area contains the height of the link arrow
-            int deltaY = _HALF_LINK_ARROW_SIDE * 2 - linkArea.Height;
-            if (deltaY > 0)
+            try
             {
-                linkArea.Offset(0, deltaY / -2);
-                linkArea.Height += deltaY;
-            }
+                // Get the bounds in physical (client) coordinates
+                Rectangle linkArea = _imageViewer.GetTransformedRectangle(GetBounds(), false);
 
-            // If the there is previous link arrow, expand to the left
-            if (this.PreviousLink != null)
+                // Ensure the link area contains the height of the link arrow
+                int deltaY = _HALF_LINK_ARROW_SIDE * 2 - linkArea.Height;
+                if (deltaY > 0)
+                {
+                    linkArea.Offset(0, deltaY / -2);
+                    linkArea.Height += deltaY;
+                }
+
+                // If the there is previous link arrow, expand to the left
+                if (this.PreviousLink != null)
+                {
+                    linkArea.Offset(-_LINK_ARROW_EXPAND_DISTANCE, 0);
+                    linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
+                }
+
+                // If there is a next link arrow, expand to the right
+                if (this.NextLink != null)
+                {
+                    linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
+                }
+
+                // Expand the link area by one pixel
+                linkArea.Inflate(1, 1);
+
+                return linkArea;
+            }
+            catch (Exception ex)
             {
-                linkArea.Offset(-_LINK_ARROW_EXPAND_DISTANCE, 0);
-                linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
+                throw ExtractException.AsExtractException("ELI26556", ex);
             }
-
-            // If there is a next link arrow, expand to the right
-            if (this.NextLink != null)
-            {
-                linkArea.Width += _LINK_ARROW_EXPAND_DISTANCE;
-            }
-
-            // Expand the link area by one pixel
-            linkArea.Inflate(1, 1);
-
-            return linkArea;
         }
 
         /// <summary>
@@ -1276,12 +1355,19 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObject"/> and <paramref name="layerObject"/>.</returns>
         public bool HorizontallyOverlap(LayerObject layerObject)
         {
-            // Get the bounds of both layer objects
-            Rectangle myBounds = GetBounds();
-            Rectangle yourBounds = layerObject.GetBounds();
+            try
+            {
+                // Get the bounds of both layer objects
+                Rectangle myBounds = GetBounds();
+                Rectangle yourBounds = layerObject.GetBounds();
 
-            // Determine whether they overlap horizontally
-            return yourBounds.Bottom > myBounds.Top && myBounds.Bottom > yourBounds.Top;
+                // Determine whether they overlap horizontally
+                return yourBounds.Bottom > myBounds.Top && myBounds.Bottom > yourBounds.Top;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26557", ex);
+            }
         }
 
         /// <summary>
@@ -1294,9 +1380,16 @@ namespace Extract.Imaging.Forms
         /// does not intersect the <see cref="LayerObject"/>.</returns>
         public virtual bool IsVisible(Rectangle rectangle)
         {
-            // Returns true iff the object is visible and on the currently visible page
-            return this.Visible && _imageViewer != null
-                && _imageViewer.PageNumber == this.PageNumber;
+            try
+            {
+                // Returns true iff the object is visible and on the currently visible page
+                return this.Visible && _imageViewer != null
+                    && _imageViewer.PageNumber == this.PageNumber;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26558", ex);
+            }
         }
 
         /// <summary>
@@ -1557,6 +1650,8 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObject"/>.</param>
         /// <returns>An <see cref="int"/> that indicates the relative order of the
         /// <see cref="LayerObject"/> objects that are being compared.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public virtual int CompareTo(LayerObject other)
         {
             // Check the page number of this object
@@ -1628,6 +1723,8 @@ namespace Extract.Imaging.Forms
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)

@@ -1033,11 +1033,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public void GoToNextLayerObject()
         {
-            // Ensure it is possible to go to the next layer object.
-            if (base.IsImageAvailable && CanGoToNextLayerObject)
+            try
             {
-                // Go to the next layer object.
-                GoToNextVisibleLayerObject(true);
+                // Ensure it is possible to go to the next layer object.
+                if (base.IsImageAvailable && CanGoToNextLayerObject)
+                {
+                    // Go to the next layer object.
+                    GoToNextVisibleLayerObject(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26539", ex);
             }
         }
 
@@ -1050,21 +1057,28 @@ namespace Extract.Imaging.Forms
         /// clear the current selection and select the next <see cref="LayerObject"/>.</param>
         public void GoToNextVisibleLayerObject(bool selectObject)
         {
-            // Get the next visible layer object
-            LayerObject nextLayerObject = this.GetNextVisibleLayerObject();
-
-            if (nextLayerObject != null)
+            try
             {
-                this.CenterOnLayerObject(nextLayerObject, true);
+                // Get the next visible layer object
+                LayerObject nextLayerObject = this.GetNextVisibleLayerObject();
 
-                if (selectObject)
+                if (nextLayerObject != null)
                 {
-                    // Clear the current selection
-                    _layerObjects.Selection.Clear();
+                    this.CenterOnLayerObject(nextLayerObject, true);
 
-                    // Make this object the selection object
-                    nextLayerObject.Selected = true;
+                    if (selectObject)
+                    {
+                        // Clear the current selection
+                        _layerObjects.Selection.Clear();
+
+                        // Make this object the selection object
+                        nextLayerObject.Selected = true;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26540", ex);
             }
         }
 
@@ -1073,11 +1087,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public void GoToPreviousLayerObject()
         {
-            // Ensure it is possible to go to the Previous layer object.
-            if (base.IsImageAvailable && CanGoToPreviousLayerObject)
+            try
             {
-                // Go to the previous layer object.
-                GoToPreviousVisibleLayerObject(true);
+                // Ensure it is possible to go to the Previous layer object.
+                if (base.IsImageAvailable && CanGoToPreviousLayerObject)
+                {
+                    // Go to the previous layer object.
+                    GoToPreviousVisibleLayerObject(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26541", ex);
             }
         }
 
@@ -1090,21 +1111,28 @@ namespace Extract.Imaging.Forms
         /// clear the current selection and select the previous <see cref="LayerObject"/>.</param>
         public void GoToPreviousVisibleLayerObject(bool selectObject)
         {
-            // Get the next visible layer object
-            LayerObject previousLayerObject = this.GetPreviousVisibleLayerObject();
-
-            if (previousLayerObject != null)
+            try
             {
-                this.CenterOnLayerObject(previousLayerObject, true);
+                // Get the next visible layer object
+                LayerObject previousLayerObject = this.GetPreviousVisibleLayerObject();
 
-                if (selectObject)
+                if (previousLayerObject != null)
                 {
-                    // Clear the current selection
-                    _layerObjects.Selection.Clear();
+                    this.CenterOnLayerObject(previousLayerObject, true);
 
-                    // Make this object the selection object
-                    previousLayerObject.Selected = true;
+                    if (selectObject)
+                    {
+                        // Clear the current selection
+                        _layerObjects.Selection.Clear();
+
+                        // Make this object the selection object
+                        previousLayerObject.Selected = true;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26542", ex);
             }
         }
 
@@ -3355,49 +3383,56 @@ namespace Extract.Imaging.Forms
         /// <remarks>The result is undefined if no image is open.</remarks>
         public Rectangle GetTransformedRectangle(Rectangle rectangle, bool clientToImage)
         {
-            // Get the top-left and bottom-right corners of the rectangle.
-            Point[] corners = new Point[] 
+            try
+            {
+                // Get the top-left and bottom-right corners of the rectangle.
+                Point[] corners = new Point[] 
             {
                 new Point(rectangle.Left, rectangle.Top),
                 new Point(rectangle.Right, rectangle.Bottom)
             };
 
-            // Check the direction of conversion
-            if (clientToImage)
-            {
-                // Convert the corners from client coordinates to image coordinates
-                using (Matrix clientToImageMatrix = _transform.Clone())
+                // Check the direction of conversion
+                if (clientToImage)
                 {
-                    clientToImageMatrix.Invert();
-                    clientToImageMatrix.TransformPoints(corners);
+                    // Convert the corners from client coordinates to image coordinates
+                    using (Matrix clientToImageMatrix = _transform.Clone())
+                    {
+                        clientToImageMatrix.Invert();
+                        clientToImageMatrix.TransformPoints(corners);
+                    }
                 }
-            }
-            else
-            {
-                // Convert the corners from image to client coordinates
-                _transform.TransformPoints(corners);
-            }
+                else
+                {
+                    // Convert the corners from image to client coordinates
+                    _transform.TransformPoints(corners);
+                }
 
-            // Calculate the x coordinates of the rectangle
-            int left = corners[0].X;
-            int right = corners[1].X;
-            if (left > right)
-            {
-                left = right;
-                right = corners[0].X;
-            }
+                // Calculate the x coordinates of the rectangle
+                int left = corners[0].X;
+                int right = corners[1].X;
+                if (left > right)
+                {
+                    left = right;
+                    right = corners[0].X;
+                }
 
-            // Calculate the y coordinates of the rectangle
-            int top = corners[0].Y;
-            int bottom = corners[1].Y;
-            if (top > bottom)
-            {
-                top = bottom;
-                bottom = corners[0].Y;
-            }
+                // Calculate the y coordinates of the rectangle
+                int top = corners[0].Y;
+                int bottom = corners[1].Y;
+                if (top > bottom)
+                {
+                    top = bottom;
+                    bottom = corners[0].Y;
+                }
 
-            // Construct and return the resultant rectangle
-            return Rectangle.FromLTRB(left, top, right, bottom);
+                // Construct and return the resultant rectangle
+                return Rectangle.FromLTRB(left, top, right, bottom);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26543", ex);
+            }
         }
 
         /// <summary>
@@ -4207,8 +4242,15 @@ namespace Extract.Imaging.Forms
         /// off the page.</returns>
         public bool Contains(RectangleF rectangle)
         {
-            return rectangle.Left >= 0 && rectangle.Top >= 0 &&
-                rectangle.Right <= this.ImageWidth && rectangle.Bottom <= this.ImageHeight;
+            try
+            {
+                return rectangle.Left >= 0 && rectangle.Top >= 0 &&
+            rectangle.Right <= this.ImageWidth && rectangle.Bottom <= this.ImageHeight;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26544", ex);
+            }
         }
 
         /// <overloads>Checks whether any part of the specified object appears on the current page.
@@ -4236,8 +4278,15 @@ namespace Extract.Imaging.Forms
         /// completely off the page.</returns>
         public bool Intersects(RectangleF rectangle)
         {
-            return rectangle.Left < this.ImageWidth && rectangle.Top < this.ImageHeight &&
-                rectangle.Right > 0 && rectangle.Bottom > 0;
+            try
+            {
+                return rectangle.Left < this.ImageWidth && rectangle.Top < this.ImageHeight &&
+            rectangle.Right > 0 && rectangle.Bottom > 0;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26545", ex);
+            }
         }
 
         #region Image Viewer Shortcut Key Methods

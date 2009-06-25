@@ -475,64 +475,71 @@ namespace Extract.Imaging.Forms
         /// destination coordinates.</param>
         public override void Paint(Graphics graphics, Region clip, Matrix transform)
         {
-            // Ensure this text layer object is attached to an image viewer
-            if (base.ImageViewer == null)
-            {
-                return;
-            }
-
-            // Store the original graphics settings
-            Matrix originalTransform = graphics.Transform;
-            SmoothingMode originalSmoothingMode = graphics.SmoothingMode;
-            TextRenderingHint originalTextRenderingHint = graphics.TextRenderingHint;
-
             try
             {
-                // Set a new transformation matrix, so that the text 
-                // will be drawn with the same orientation as the page.
-                graphics.Transform = transform;
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-
-                // Apply any specified rotation to the to the graphics object.
-                graphics.RotateTransform(_orientation);
-
-                // The location to draw the text will be based off the bounds location (but may be 
-                // offset to account for a border.
-                Point textLocation = _bounds.Location;
-
-                // Check to see if a background color needs to be filled in.
-                if (_backgroundColor != null)
+                // Ensure this text layer object is attached to an image viewer
+                if (base.ImageViewer == null)
                 {
-                    // Use the highlight's region
-                    using (Region region = new Region(_bounds))
+                    return;
+                }
+
+                // Store the original graphics settings
+                Matrix originalTransform = graphics.Transform;
+                SmoothingMode originalSmoothingMode = graphics.SmoothingMode;
+                TextRenderingHint originalTextRenderingHint = graphics.TextRenderingHint;
+
+                try
+                {
+                    // Set a new transformation matrix, so that the text 
+                    // will be drawn with the same orientation as the page.
+                    graphics.Transform = transform;
+                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                    graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
+
+                    // Apply any specified rotation to the to the graphics object.
+                    graphics.RotateTransform(_orientation);
+
+                    // The location to draw the text will be based off the bounds location (but may be 
+                    // offset to account for a border.
+                    Point textLocation = _bounds.Location;
+
+                    // Check to see if a background color needs to be filled in.
+                    if (_backgroundColor != null)
                     {
-                        // Draw the highlight (use copypen to make the highlight opaque)
-                        ImageViewer.DrawRegion(region, graphics, _backgroundColor.Value,
-                            NativeMethods.BinaryRasterOperations.R2_COPYPEN);
+                        // Use the highlight's region
+                        using (Region region = new Region(_bounds))
+                        {
+                            // Draw the highlight (use copypen to make the highlight opaque)
+                            ImageViewer.DrawRegion(region, graphics, _backgroundColor.Value,
+                                NativeMethods.BinaryRasterOperations.R2_COPYPEN);
+                        }
                     }
-                }
 
-                // Check to see if a border needs to be drawn
-                if (_borderColor != null)
+                    // Check to see if a border needs to be drawn
+                    if (_borderColor != null)
+                    {
+                        graphics.DrawPolygon(ExtractPens.GetPen(_borderColor.Value), GetVertices(false));
+
+                        // The location the text is drawn is offset from the padded bounds so that the text
+                        // is centered properly.
+                        textLocation.Offset(_BORDER_PADDING, _BORDER_PADDING);
+                    }
+
+                    // Draw the text
+                    graphics.DrawString(_text, GetPixelFont(), Brushes.Black, textLocation,
+                        StringFormat.GenericTypographic);
+                }
+                finally
                 {
-                    graphics.DrawPolygon(ExtractPens.GetPen(_borderColor.Value), GetVertices(false));
-                    
-                    // The location the text is drawn is offset from the padded bounds so that the text
-                    // is centered properly.
-                    textLocation.Offset(_BORDER_PADDING, _BORDER_PADDING);
+                    // Restore the original graphics settings.
+                    graphics.Transform = originalTransform;
+                    graphics.SmoothingMode = originalSmoothingMode;
+                    graphics.TextRenderingHint = originalTextRenderingHint;
                 }
-
-                // Draw the text
-                graphics.DrawString(_text, GetPixelFont(), Brushes.Black, textLocation,
-                    StringFormat.GenericTypographic);
             }
-            finally
+            catch (Exception ex)
             {
-                // Restore the original graphics settings.
-                graphics.Transform = originalTransform;
-                graphics.SmoothingMode = originalSmoothingMode;
-                graphics.TextRenderingHint = originalTextRenderingHint;
+                throw ExtractException.AsExtractException("ELI26565", ex);
             }
         }
 
@@ -547,10 +554,17 @@ namespace Extract.Imaging.Forms
         /// </returns>
         public override bool HitTest(Point point)
         {
-            // Ensure the text layer is on the active page            
-            ImageViewer imageViewer = base.ImageViewer;
-            return imageViewer != null && imageViewer.PageNumber == base.PageNumber && 
-                GetBounds().Contains(point);
+            try
+            {
+                // Ensure the text layer is on the active page            
+                ImageViewer imageViewer = base.ImageViewer;
+                return imageViewer != null && imageViewer.PageNumber == base.PageNumber &&
+                    GetBounds().Contains(point);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26566", ex);
+            }
         }
 
         /// <summary>

@@ -88,6 +88,8 @@ namespace Extract.DataEntry
         /// </summary>
         /// <value>The location to use as the root directory when resolving relative paths.</value>
         /// <returns>The location to use as the root directory when resolving relative paths.</returns>
+        // No need for try catch, just sets a string value
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public static string SolutionRootDirectory
         {
             get

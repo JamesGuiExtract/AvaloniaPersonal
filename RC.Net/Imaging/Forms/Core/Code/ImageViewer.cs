@@ -284,6 +284,8 @@ namespace Extract.Imaging.Forms
         /// <param name="other">The <see cref="ZoomInfo"/> object to compare.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> describes the same zoom 
         /// setting as this <see cref="ZoomInfo"/>; <see langword="false"/> if they differ.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool Equals(ZoomInfo other)
         {
             return _fitMode == other._fitMode &&
@@ -1644,18 +1646,25 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                // Clear the shortcuts
-                _mainShortcuts.Clear();
-                _captureShortcuts.Clear();
-
-                // Load default shortcuts if requested
-                if (value)
+                try
                 {
-                    LoadDefaultShortcuts();
-                }
+                    // Clear the shortcuts
+                    _mainShortcuts.Clear();
+                    _captureShortcuts.Clear();
 
-                // Store whether default shortcuts were loaded
-                _useDefaultShortcuts = value;
+                    // Load default shortcuts if requested
+                    if (value)
+                    {
+                        LoadDefaultShortcuts();
+                    }
+
+                    // Store whether default shortcuts were loaded
+                    _useDefaultShortcuts = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26538", ex);
+                }
             }
         }
 
@@ -1922,6 +1931,8 @@ namespace Extract.Imaging.Forms
         /// </summary>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        // Just setting the filter index value, nothing complex, should not throw an exception 
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public int OpenImageFileTypeFilterIndex
         {
             get

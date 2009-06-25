@@ -224,18 +224,19 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
+                IAttribute labInfo = null;
+                List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo);
+
                 string connectionString = "Data Source=" + databaseFile;
                 using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
                 {
                     IUnknownVector newAttributes = new IUnknownVector();
-                    int size = pAttributes.Size();
-                    for (int i = 0; i < size; i++)
+                    foreach (IAttribute attribute in attributes)
                     {
-                        IAttribute attribute = (IAttribute)pAttributes.At(i);
                         if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
                         {
                             List<IAttribute> mappedAttributes =
-                                MapOrders(attribute.SubAttributes, dbConnection);
+                                MapOrders(attribute.SubAttributes, labInfo, dbConnection);
                             foreach (IAttribute newAttribute in mappedAttributes)
                             {
                                 newAttributes.PushBack(newAttribute);
@@ -523,12 +524,49 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
+        /// Searches the attribute collection for the LabInfo attribute and stores that
+        /// as an out parameter.  Returns the entire attribute collection as a
+        /// <see cref="List{T}"/> of IAttributes.
+        /// </summary>
+        /// <param name="attributes">The unknown vector of attributes to search.</param>
+        /// <param name="labInfo">The lab info attribute (if found).</param>
+        /// <returns>A <see cref="List{T}"/> of IAttributes.</returns>
+        static List<IAttribute> GetLabInfo(IUnknownVector attributes, out IAttribute labInfo)
+        {
+            // Default labInfo to null
+            labInfo = null;
+
+            int size = attributes.Size();
+
+            List<IAttribute> list = new List<IAttribute>(size);
+            for (int i=0; i < size; i++)
+            {
+                IAttribute attribute = (IAttribute) attributes.At(i);
+
+                // Check if this attribute is a LabInfo attribute (if we haven't found
+                // one yet) and assign it
+                if (labInfo == null &&
+                    attribute.Name.Equals("LabInfo", StringComparison.OrdinalIgnoreCase))
+                {
+                    labInfo = attribute;
+                }
+
+                list.Add(attribute);
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Performs the mapping from tests to order grouping.
         /// </summary>
         /// <param name="attributes">A vector of attributes to map.</param>
         /// <param name="dbConnection">The database connection to use
         /// for querying.</param>
-        private List<IAttribute> MapOrders(IUnknownVector attributes,
+        /// <param name="labInfo">Temporary parameter for passing in the
+        /// LabInfo attribute, in the future this attribute should be a subattribute
+        /// of the test.</param>
+        List<IAttribute> MapOrders(IUnknownVector attributes, IAttribute labInfo,
             SqlCeConnection dbConnection)
         {
             // Get the source doc name from the first attribute
@@ -547,7 +585,8 @@ namespace Extract.LabResultsCustomComponents
 
             IAttribute dateAttribute = null;
             IAttribute timeAttribute = null;
-            IAttribute labInfoAttribute = null;
+            IAttribute labInfoAttribute = labInfo; // Temporary fix to get lab info
+            //IAttribute labInfoAttribute = null;
 
             // Get the date and time from the attributes
             List<IAttribute> temp;
@@ -569,14 +608,15 @@ namespace Extract.LabResultsCustomComponents
                 timeAttribute = temp[0];
             }
             temp = null;
-            if (nameToAttributes.TryGetValue("LABINFO", out temp))
-            {
-                // List should have at least 1 item, pick the first
-                ExtractException.Assert("ELI26522", "Attribute list should have at least 1"
-                    + " lab info object", temp.Count > 0);
+            // Temporarily commented out until lab info attributes are moved into the Test attribute
+            //if (nameToAttributes.TryGetValue("LABINFO", out temp))
+            //{
+            //    // List should have at least 1 item, pick the first
+            //    ExtractException.Assert("ELI26522", "Attribute list should have at least 1"
+            //        + " lab info object", temp.Count > 0);
 
-                labInfoAttribute = temp[0];
-            }
+            //    labInfoAttribute = temp[0];
+            //}
 
             List<IAttribute> mappedList = new List<IAttribute>();
             foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
@@ -688,7 +728,7 @@ namespace Extract.LabResultsCustomComponents
         /// Loads the data tables from the sql connection
         /// </summary>
         /// <param name="dbConnection">The database connection to use to load the data sets.</param>
-        private void LoadDataTables(SqlCeConnection dbConnection)
+        void LoadDataTables(SqlCeConnection dbConnection)
         {
             if (_order == null)
             {
@@ -727,7 +767,7 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="unmatchedTests">A list of unmatched test attributes.</param>
         /// <returns>A list of pairs of test attributes to test name.</returns>
-        private static List<LabTest> BuildUnmatchedTestList(
+        static List<LabTest> BuildUnmatchedTestList(
             List<IAttribute> unmatchedTests)
         {
             // Build a list of lab tests
@@ -751,7 +791,7 @@ namespace Extract.LabResultsCustomComponents
         /// from the <see cref="KeyValuePair{T,K}"/> mapped to its corresponding
         /// test code.</param>
         /// <returns>A pair containing the order code and a list of matched tests.</returns>
-        private KeyValuePair<string, List<LabTest>> FindBestOrder(
+        KeyValuePair<string, List<LabTest>> FindBestOrder(
             List<LabTest> unmatchedTests,
             out Dictionary<string, string> testNameToTestCode)
         {
@@ -940,7 +980,7 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="attributes">The vector of attributes to group.</param>
         /// <returns>The map of names to attributes.</returns>
-        private static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
+        static Dictionary<string, List<IAttribute>> GetMapOfNamesToAttributes(
             IUnknownVector attributes)
         {
             // Get an AFUtility object and use it to produce a StrToObject map for
@@ -980,7 +1020,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="orderCode">The order code to search for.</param>
         /// <param name="dbConnection">The database connection to use.</param>
         /// <returns>A pair containing the order name and epic code.</returns>
-        private static KeyValuePair<string, string> GetOrderNameAndEpicCodeFromOrderCode(string orderCode,
+        static KeyValuePair<string, string> GetOrderNameAndEpicCodeFromOrderCode(string orderCode,
             SqlCeConnection dbConnection)
         {
             string query = "SELECT [Name], [EpicCode] FROM [LabOrder] WHERE [Code] = '"
@@ -1010,7 +1050,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="testCode">The test code to search on.</param>
         /// <param name="dbConnection">The database connection to use.</param>
         /// <returns>The test name for the specified order code and test code.</returns>
-        private static string GetTestNameFromOrderAndTestCode(string orderCode, string testCode,
+        static string GetTestNameFromOrderAndTestCode(string orderCode, string testCode,
             SqlCeConnection dbConnection)
         {
             string query = "SELECT [Name] FROM [Test] WHERE [OrderCode] = '" + orderCode

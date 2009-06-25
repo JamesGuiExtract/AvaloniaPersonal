@@ -480,16 +480,23 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                _startPoint = value;
-
-                // Check if this highlight is attached to an image viewer
-                if (base.ImageViewer != null)
+                try
                 {
-                    // Recalculate its region
-                    CalculateRegion();
-                }
+                    _startPoint = value;
 
-                base.Dirty = true;
+                    // Check if this highlight is attached to an image viewer
+                    if (base.ImageViewer != null)
+                    {
+                        // Recalculate its region
+                        CalculateRegion();
+                    }
+
+                    base.Dirty = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26534", ex);
+                }
             }
         }
 
@@ -514,16 +521,23 @@ namespace Extract.Imaging.Forms
             }   
             set
             {
-                _endPoint = value;
-
-                // Check if this highlight is attached to an image viewer
-                if (base.ImageViewer != null)
+                try
                 {
-                    // Recalculate its region
-                    CalculateRegion();
-                }
+                    _endPoint = value;
 
-                base.Dirty = true;
+                    // Check if this highlight is attached to an image viewer
+                    if (base.ImageViewer != null)
+                    {
+                        // Recalculate its region
+                        CalculateRegion();
+                    }
+
+                    base.Dirty = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26535", ex);
+                }
             }
         }
 
@@ -546,16 +560,23 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                _height = value;
-
-                // Check if this highlight is attached to an image viewer
-                if (base.ImageViewer != null)
+                try
                 {
-                    // Recalculate its region
-                    CalculateRegion();
-                }
+                    _height = value;
 
-                base.Dirty = true;
+                    // Check if this highlight is attached to an image viewer
+                    if (base.ImageViewer != null)
+                    {
+                        // Recalculate its region
+                        CalculateRegion();
+                    }
+
+                    base.Dirty = true;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26536", ex);
+                }
             }
         }
 
@@ -1426,16 +1447,23 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                // Check if the region should be disposed
-                if (value == null && _region != null)
+                try
                 {
-                    // The region is no longer needed, now that the highlight 
-                    // is no longer associated with an image viewer.
-                    _region.Dispose();
-                    _region = null;
-                }
+                    // Check if the region should be disposed
+                    if (value == null && _region != null)
+                    {
+                        // The region is no longer needed, now that the highlight 
+                        // is no longer associated with an image viewer.
+                        _region.Dispose();
+                        _region = null;
+                    }
 
-                base.ImageViewer = value;
+                    base.ImageViewer = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26537", ex);
+                }
             }
         }
 
@@ -1739,6 +1767,8 @@ namespace Extract.Imaging.Forms
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -1773,6 +1803,8 @@ namespace Extract.Imaging.Forms
         /// Returns a hashcode for this <see cref="Highlight"/>.
         /// </summary>
         /// <returns>The hashcode for this <see cref="Highlight"/>.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override int GetHashCode()
         {
             return this.ToRasterZone().GetHashCode() ^ this.Id.GetHashCode()

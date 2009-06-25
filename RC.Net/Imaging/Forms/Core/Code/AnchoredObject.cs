@@ -159,11 +159,18 @@ namespace Extract.Imaging.Forms
         /// <see langword="false"/> if no events should be raised.</param>
         public override void Offset(Point offsetBy, bool raiseEvents)
         {
-            _anchorPoint.Offset(offsetBy);
-
-            if (raiseEvents)
+            try
             {
-                base.Dirty = true;
+                _anchorPoint.Offset(offsetBy);
+
+                if (raiseEvents)
+                {
+                    base.Dirty = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26530", ex);
             }
         }
 

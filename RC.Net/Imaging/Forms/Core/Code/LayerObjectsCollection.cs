@@ -267,40 +267,47 @@ namespace Extract.Imaging.Forms
         /// <event cref="LayerObjectAdded">Occurs for each successful <see cref="Add"/>.</event>
         public void Add(LayerObject layerObject)
         {
-            // Ensure the layerObject is not null
-            if (layerObject == null)
+            try
             {
-                throw new ExtractException("ELI21200", "LayerObject cannot be null.");
-            }
-
-            // If this is the selection collection, just set the selected property.
-            if (_isSelectionCollection)
-            {
-                if (!layerObject.Selected)
+                // Ensure the layerObject is not null
+                if (layerObject == null)
                 {
-                    // Note: the object will add itself to this collection
-                    layerObject.Selected = true;
-                    return;
+                    throw new ExtractException("ELI21200", "LayerObject cannot be null.");
                 }
+
+                // If this is the selection collection, just set the selected property.
+                if (_isSelectionCollection)
+                {
+                    if (!layerObject.Selected)
+                    {
+                        // Note: the object will add itself to this collection
+                        layerObject.Selected = true;
+                        return;
+                    }
+                }
+
+                // Add the layerObject to the collection.
+                _objects.Add(layerObject.Id, layerObject);
+
+                // Find the location where this layer object should be inserted into the sorted list.
+                // If positive, the index will indicate an equivalent object already in the collection.
+                // If negative, the bitwise completment will indicate the position of the first layer
+                // object that is greater than the object to add using LayerObject.CompareTo.
+                int index = _sortedCollection.BinarySearch(layerObject);
+
+                // Insert the new item at the appropriate location.
+                _sortedCollection.Insert((index < 0 ? ~index : index), layerObject);
+
+                // Add to the list of layer objects z-ordered list.
+                _objectsInZOrder.Add(layerObject);
+
+                // Raise the layerObject added event
+                OnLayerObjectAdded(new LayerObjectAddedEventArgs(layerObject));
             }
-
-            // Add the layerObject to the collection.
-            _objects.Add(layerObject.Id, layerObject);
-
-            // Find the location where this layer object should be inserted into the sorted list.
-            // If positive, the index will indicate an equivalent object already in the collection.
-            // If negative, the bitwise completment will indicate the position of the first layer
-            // object that is greater than the object to add using LayerObject.CompareTo.
-            int index = _sortedCollection.BinarySearch(layerObject);
-
-            // Insert the new item at the appropriate location.
-            _sortedCollection.Insert((index < 0 ? ~index : index), layerObject);
-
-            // Add to the list of layer objects z-ordered list.
-            _objectsInZOrder.Add(layerObject);
-
-            // Raise the layerObject added event
-            OnLayerObjectAdded(new LayerObjectAddedEventArgs(layerObject));
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26559", ex);
+            }
         }
 
         /// <summary>
@@ -434,17 +441,24 @@ namespace Extract.Imaging.Forms
         /// <event cref="LayerObjectDeleted">Occurs for each layerObject that is removed.</event>
         public void RemoveSelected()
         {
-            if (_selection != null)
+            try
             {
-                // Create a copy of the objects to remove
-                List<LayerObject> objects = new List<LayerObject>(_selection.Count);
-                objects.AddRange(_selection);
-
-                // Remove each layerObject individually
-                foreach (LayerObject layerObject in objects)
+                if (_selection != null)
                 {
-                    this.Remove(layerObject);
+                    // Create a copy of the objects to remove
+                    List<LayerObject> objects = new List<LayerObject>(_selection.Count);
+                    objects.AddRange(_selection);
+
+                    // Remove each layerObject individually
+                    foreach (LayerObject layerObject in objects)
+                    {
+                        this.Remove(layerObject);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26560", ex);
             }
         }
 
@@ -455,20 +469,27 @@ namespace Extract.Imaging.Forms
         /// <event cref="LayerObjectDeleted">Occurs for each layerObject that is removed.</event>
         public void RemoveSelected(int pageNumber)
         {
-            if (_selection != null)
+            try
             {
-                // Create a copy of the objects to remove
-                List<LayerObject> objects = new List<LayerObject>(_selection.Count);
-                objects.AddRange(_selection);
-
-                // Remove each layerObject individually
-                foreach (LayerObject layerObject in objects)
+                if (_selection != null)
                 {
-                    if (layerObject.PageNumber == pageNumber)
+                    // Create a copy of the objects to remove
+                    List<LayerObject> objects = new List<LayerObject>(_selection.Count);
+                    objects.AddRange(_selection);
+
+                    // Remove each layerObject individually
+                    foreach (LayerObject layerObject in objects)
                     {
-                        this.Remove(layerObject);
+                        if (layerObject.PageNumber == pageNumber)
+                        {
+                            this.Remove(layerObject);
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26561", ex);
             }
         }
 
@@ -478,16 +499,23 @@ namespace Extract.Imaging.Forms
         /// </summary>
         public void SelectAll()
         {
-            if (_selection != null)
+            try
             {
-                foreach (LayerObject layerObject in _objects.Values)
+                if (_selection != null)
                 {
-                    // Ensure the layer object is selectable before selecting it
-                    if (layerObject.Selectable && layerObject.Visible)
+                    foreach (LayerObject layerObject in _objects.Values)
                     {
-                        layerObject.Selected = true;
+                        // Ensure the layer object is selectable before selecting it
+                        if (layerObject.Selectable && layerObject.Visible)
+                        {
+                            layerObject.Selected = true;
+                        }
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26562", ex);
             }
         }
 
@@ -546,15 +574,22 @@ namespace Extract.Imaging.Forms
         /// if it doesn't exist.</returns>
         public LayerObject TryGetLayerObject(long id)
         {
-            // Attempt to retrieve 
-            LayerObject layerObject;
-            if (_objects.TryGetValue(id, out layerObject))
+            try
             {
-                return layerObject;
-            }
+                // Attempt to retrieve 
+                LayerObject layerObject;
+                if (_objects.TryGetValue(id, out layerObject))
+                {
+                    return layerObject;
+                }
 
-            // If we reached this point, the layer object was not found
-            return null;
+                // If we reached this point, the layer object was not found
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26563", ex);
+            }
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -382,30 +383,37 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/>.</param>
         public override void DrawGripHandles(Graphics graphics)
         {
-            // [IDSD:266]
-            // If the fill color is white, we need to "erase" the black outline before the dashed
-            // outline is drawn, otherwise the dashed line can't be seen.
-            if (_fillColor == RedactionColor.White)
+            try
             {
-                // Do nothing if not on the active page
-                if (base.PageNumber != base.ImageViewer.PageNumber)
+                // [IDSD:266]
+                // If the fill color is white, we need to "erase" the black outline before the dashed
+                // outline is drawn, otherwise the dashed line can't be seen.
+                if (_fillColor == RedactionColor.White)
                 {
-                    return;
+                    // Do nothing if not on the active page
+                    if (base.PageNumber != base.ImageViewer.PageNumber)
+                    {
+                        return;
+                    }
+
+                    // For each highlight in the redaction...
+                    foreach (Highlight highlight in this.Objects)
+                    {
+                        // "Erase" the black outline by drawing it white so a black dashed line can be
+                        // seen on top of it.
+                        Point[] vertices = highlight.GetVertices();
+                        this.ImageViewer.Transform.TransformPoints(vertices);
+                        graphics.DrawPolygon(Pens.White, vertices);
+                    }
                 }
 
-                // For each highlight in the redaction...
-                foreach (Highlight highlight in this.Objects)
-                {
-                    // "Erase" the black outline by drawing it white so a black dashed line can be
-                    // seen on top of it.
-                    Point[] vertices = highlight.GetVertices();
-                    this.ImageViewer.Transform.TransformPoints(vertices);
-                    graphics.DrawPolygon(Pens.White, vertices);
-                }
+                // Now the base class to proceed with DrawGripHandles as it normally would.
+                base.DrawGripHandles(graphics);
             }
-
-            // Now the base class to proceed with DrawGripHandles as it normally would.
-            base.DrawGripHandles(graphics);
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26564", ex);
+            }
         }
 
         /// <summary>
@@ -530,6 +538,8 @@ namespace Extract.Imaging.Forms
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
+        // Part of the IComparable interface, this should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)
