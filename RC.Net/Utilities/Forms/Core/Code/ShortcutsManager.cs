@@ -203,17 +203,24 @@ namespace Extract.Utilities.Forms
         /// <see cref="ShortcutHandler"/> associated with it.</returns>
         public bool ProcessKey(Keys key)
         {
-            // Check if there is a shortcut handler associated with this key
-            ShortcutHandler shortcutHandler;
-            if (_shortcuts.TryGetValue(key, out shortcutHandler))
+            try
             {
-                // Run the shortcut handler and return true
-                shortcutHandler();
-                return true;
-            }
+                // Check if there is a shortcut handler associated with this key
+                ShortcutHandler shortcutHandler;
+                if (_shortcuts.TryGetValue(key, out shortcutHandler))
+                {
+                    // Run the shortcut handler and return true
+                    shortcutHandler();
+                    return true;
+                }
 
-            // This key does not have a shortcut handler
-            return false;
+                // This key does not have a shortcut handler
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26500", ex);
+            }
         }
 
         /// <summary>
@@ -261,31 +268,38 @@ namespace Extract.Utilities.Forms
         /// an end user.</returns>
         public static string GetDisplayString(Keys[] keys)
         {
-            // Handle the trivial case of the empty display string
-            if (keys == null || keys.Length == 0)
+            try
             {
-                return "";
-            }
-
-            // Construct a list to hold the results
-            List<string> displayStrings = new List<string>(keys.Length);
-
-            // Get type converter for Keys object
-            TypeConverter converter = TypeDescriptor.GetConverter(typeof(Keys));
-
-            // Iterate through all the keys
-            for (int i = 0; i < keys.Length; i++)
-            {
-                // Add this display string, if it is not already added
-                string displayString = GetDisplayString(keys[i], converter);
-                if (!displayStrings.Contains(displayString))
+                // Handle the trivial case of the empty display string
+                if (keys == null || keys.Length == 0)
                 {
-                    displayStrings.Add(displayString);
+                    return "";
                 }
-            }
 
-            // Return the result as a comma-separated list
-            return String.Join(", ", displayStrings.ToArray());
+                // Construct a list to hold the results
+                List<string> displayStrings = new List<string>(keys.Length);
+
+                // Get type converter for Keys object
+                TypeConverter converter = TypeDescriptor.GetConverter(typeof(Keys));
+
+                // Iterate through all the keys
+                for (int i = 0; i < keys.Length; i++)
+                {
+                    // Add this display string, if it is not already added
+                    string displayString = GetDisplayString(keys[i], converter);
+                    if (!displayStrings.Contains(displayString))
+                    {
+                        displayStrings.Add(displayString);
+                    }
+                }
+
+                // Return the result as a comma-separated list
+                return String.Join(", ", displayStrings.ToArray());
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26499", ex);
+            }
         }
 
 

@@ -123,19 +123,27 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/> if configuration was unsuccessful.</returns>
         public bool RunConfiguration()
         {
-            // Allow the user to set the verification settings
-            using (VerificationSettingsDialog dialog = new VerificationSettingsDialog(_settings))
+            try
             {
-                bool result = dialog.ShowDialog() == DialogResult.OK;
-
-                // Store the result
-                if (result)
+                // Allow the user to set the verification settings
+                using (VerificationSettingsDialog dialog = new VerificationSettingsDialog(_settings))
                 {
-                    _settings = dialog.VerificationSettings;
-                    _dirty = true;
-                }
+                    bool result = dialog.ShowDialog() == DialogResult.OK;
 
-                return result;
+                    // Store the result
+                    if (result)
+                    {
+                        _settings = dialog.VerificationSettings;
+                        _dirty = true;
+                    }
+
+                    return result;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI26511",
+                    "Error running configuration!", ex);
             }
         }
 

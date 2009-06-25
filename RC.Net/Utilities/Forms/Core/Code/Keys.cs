@@ -34,97 +34,105 @@ namespace Extract.Utilities.Forms
         static public bool SendKeyToControl(int keyCode, bool shift, bool control, bool alt, 
             Control controlToActivate)
         {
-            string keyValue = "";
-
-            switch ((Keys)keyCode)
+            try
             {
-                // Attempt to map any special keys to the value needed by SendKeys.
-                case Keys.Back:     keyValue = "{BACKSPACE}"; break;
-                case Keys.Pause:    keyValue = "{BREAK}"; break;
-                case Keys.CapsLock: keyValue = "{CAPSLOCK}"; break;
-                case Keys.Delete:   keyValue = "{DELETE}"; break;
-                case Keys.Down:     keyValue = "{DOWN}"; break;
-                case Keys.End:      keyValue = "{END}"; break;
-                case Keys.Enter:    keyValue = "{ENTER}"; break;
-                case Keys.Escape:   keyValue = "{ESC}"; break;
-                case Keys.Help:     keyValue = "{HELP}"; break;
-                case Keys.Home:     keyValue = "{HOME}"; break;
-                case Keys.Insert:   keyValue = "{INSERT}"; break;
-                case Keys.Left:     keyValue = "{LEFT}"; break;
-                case Keys.NumLock:  keyValue = "{NUMLOCK}"; break;
-                case Keys.PageDown: keyValue = "{PGDN}"; break;
-                case Keys.PageUp:   keyValue = "{PGUP}"; break;
-                case Keys.PrintScreen: keyValue = "{PRTSC}"; break;
-                case Keys.Right:    keyValue = "{RIGHT}"; break;
-                case Keys.Scroll:   keyValue = "{SCROLLLOCK}"; break;
-                case Keys.Tab:      keyValue = "{TAB}"; break;
-                case Keys.Up:       keyValue = "{UP}"; break;
-                case Keys.F1:       keyValue = "{F1}"; break;
-                case Keys.F2:       keyValue = "{F2}"; break;
-                case Keys.F3:       keyValue = "{F3}"; break;
-                case Keys.F4:       keyValue = "{F4}"; break;
-                case Keys.F5:       keyValue = "{F5}"; break;
-                case Keys.F6:       keyValue = "{F6}"; break;
-                case Keys.F7:       keyValue = "{F7}"; break;
-                case Keys.F8:       keyValue = "{F8}"; break;
-                case Keys.F9:       keyValue = "{F9}"; break;
-                case Keys.F10:      keyValue = "{F10}"; break;
-                case Keys.F11:      keyValue = "{F11}"; break;
-                case Keys.F12:      keyValue = "{F12}"; break;
-                case Keys.F13:      keyValue = "{F13}"; break;
-                case Keys.F14:      keyValue = "{F14}"; break;
-                case Keys.F15:      keyValue = "{F15}"; break;
-                case Keys.F16:      keyValue = "{F16}"; break;
+                string keyValue = "";
 
-                // If the keystroke was not a special key recognized by SendKeys, attempt to map the
-                // keystroke as a normal input character.
-                default:
-                    {
-                        char? keyChar =
-                            NativeMethods.VirtualKeyToChar(keyCode);
+                switch ((Keys)keyCode)
+                {
+                    // Attempt to map any special keys to the value needed by SendKeys.
+                    case Keys.Back: keyValue = "{BACKSPACE}"; break;
+                    case Keys.Pause: keyValue = "{BREAK}"; break;
+                    case Keys.CapsLock: keyValue = "{CAPSLOCK}"; break;
+                    case Keys.Delete: keyValue = "{DELETE}"; break;
+                    case Keys.Down: keyValue = "{DOWN}"; break;
+                    case Keys.End: keyValue = "{END}"; break;
+                    case Keys.Enter: keyValue = "{ENTER}"; break;
+                    case Keys.Escape: keyValue = "{ESC}"; break;
+                    case Keys.Help: keyValue = "{HELP}"; break;
+                    case Keys.Home: keyValue = "{HOME}"; break;
+                    case Keys.Insert: keyValue = "{INSERT}"; break;
+                    case Keys.Left: keyValue = "{LEFT}"; break;
+                    case Keys.NumLock: keyValue = "{NUMLOCK}"; break;
+                    case Keys.PageDown: keyValue = "{PGDN}"; break;
+                    case Keys.PageUp: keyValue = "{PGUP}"; break;
+                    case Keys.PrintScreen: keyValue = "{PRTSC}"; break;
+                    case Keys.Right: keyValue = "{RIGHT}"; break;
+                    case Keys.Scroll: keyValue = "{SCROLLLOCK}"; break;
+                    case Keys.Tab: keyValue = "{TAB}"; break;
+                    case Keys.Up: keyValue = "{UP}"; break;
+                    case Keys.F1: keyValue = "{F1}"; break;
+                    case Keys.F2: keyValue = "{F2}"; break;
+                    case Keys.F3: keyValue = "{F3}"; break;
+                    case Keys.F4: keyValue = "{F4}"; break;
+                    case Keys.F5: keyValue = "{F5}"; break;
+                    case Keys.F6: keyValue = "{F6}"; break;
+                    case Keys.F7: keyValue = "{F7}"; break;
+                    case Keys.F8: keyValue = "{F8}"; break;
+                    case Keys.F9: keyValue = "{F9}"; break;
+                    case Keys.F10: keyValue = "{F10}"; break;
+                    case Keys.F11: keyValue = "{F11}"; break;
+                    case Keys.F12: keyValue = "{F12}"; break;
+                    case Keys.F13: keyValue = "{F13}"; break;
+                    case Keys.F14: keyValue = "{F14}"; break;
+                    case Keys.F15: keyValue = "{F15}"; break;
+                    case Keys.F16: keyValue = "{F16}"; break;
 
-                        // If the map was successful, set the string value for SendKeys.  Use the 
-                        // lower case value. (If shift is depressed, it will convert the char to
-                        // upper case on the receiving side).
-                        if (keyChar != null)
+                    // If the keystroke was not a special key recognized by SendKeys, attempt
+                    // to map the keystroke as a normal input character.
+                    default:
                         {
-                            keyValue += keyChar.Value;
-                            keyValue = keyValue.ToLower(CultureInfo.CurrentCulture);
+                            char? keyChar =
+                                NativeMethods.VirtualKeyToChar(keyCode);
+
+                            // If the map was successful, set the string value for SendKeys.  Use the 
+                            // lower case value. (If shift is depressed, it will convert the char to
+                            // upper case on the receiving side).
+                            if (keyChar != null)
+                            {
+                                keyValue += keyChar.Value;
+                                keyValue = keyValue.ToLower(CultureInfo.CurrentCulture);
+                            }
                         }
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(keyValue))
+                {
+                    // Apply modifier keys as specified.
+                    if (shift)
+                    {
+                        keyValue = "+" + keyValue;
                     }
-                    break;
-            }
 
-            if (!string.IsNullOrEmpty(keyValue))
+                    if (control)
+                    {
+                        keyValue = "^" + keyValue;
+                    }
+
+                    if (alt)
+                    {
+                        keyValue = "%" + keyValue;
+                    }
+
+                    // Select any specified control before sending the keys.
+                    if (controlToActivate != null)
+                    {
+                        controlToActivate.Select();
+                    }
+
+                    SendKeys.SendWait(keyValue);
+
+                    return true;
+                }
+
+                return false;
+
+            }
+            catch (Exception ex)
             {
-                // Apply modifier keys as specified.
-                if (shift)
-                {
-                    keyValue = "+" + keyValue;
-                }
-
-                if (control)
-                {
-                    keyValue = "^" + keyValue;
-                }
-
-                if (alt)
-                {
-                    keyValue = "%" + keyValue;
-                }
-
-                // Select any specified control before sending the keys.
-                if (controlToActivate != null)
-                {
-                    controlToActivate.Select();
-                }
-
-                SendKeys.SendWait(keyValue);
-
-                return true;
+                throw ExtractException.AsExtractException("ELI26497", ex);
             }
-
-            return false;
         }
     }
 }

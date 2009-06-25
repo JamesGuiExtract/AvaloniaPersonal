@@ -1090,25 +1090,32 @@ namespace Extract.ReportViewer
             }
             set
             {
-                // Check if the specified value is contained in the list
-                if (!_valueList.Contains(value))
+                try
                 {
-                    // If values are restricted to the list then throw exception
-                    if (!_allowOtherValues)
+                    // Check if the specified value is contained in the list
+                    if (!_valueList.Contains(value))
                     {
-                        ExtractException ee = new ExtractException("ELI23714",
-                            "Specified value is not contained in the list!");
-                        ee.AddDebugData("Value Specified", value, false);
-                        throw ee;
+                        // If values are restricted to the list then throw exception
+                        if (!_allowOtherValues)
+                        {
+                            ExtractException ee = new ExtractException("ELI23714",
+                                "Specified value is not contained in the list!");
+                            ee.AddDebugData("Value Specified", value, false);
+                            throw ee;
+                        }
+                        else
+                        {
+                            // Values are not restricted, update the list with new value
+                            _valueList.Add(value);
+                        }
                     }
-                    else
-                    {
-                        // Values are not restricted, update the list with new value
-                        _valueList.Add(value);
-                    }
-                }
 
-                base.ParameterValue = value;
+                    base.ParameterValue = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26506", ex);
+                }
             }
         }
 

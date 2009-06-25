@@ -189,32 +189,39 @@ namespace Extract.Utilities.Forms
             }
             set
             {
-                // If setting to a new value then need to change the text/image
-                // of the button based on the new display style
-                if (_displayStyle != value)
+                try
                 {
-                    _displayStyle = value;
-                    switch (_displayStyle)
+                    // If setting to a new value then need to change the text/image
+                    // of the button based on the new display style
+                    if (_displayStyle != value)
                     {
-                        case PathTagsButtonDisplayStyle.ImageOnly:
-                            this.Text = "";
-                            this.Image = Resources.SelectDocTagArrow.ToBitmap();
-                            break;
+                        _displayStyle = value;
+                        switch (_displayStyle)
+                        {
+                            case PathTagsButtonDisplayStyle.ImageOnly:
+                                this.Text = "";
+                                this.Image = Resources.SelectDocTagArrow.ToBitmap();
+                                break;
 
-                        case PathTagsButtonDisplayStyle.TextOnly:
-                            this.Text = _BUTTON_TEXT;
-                            this.Image = null;
-                            break;
+                            case PathTagsButtonDisplayStyle.TextOnly:
+                                this.Text = _BUTTON_TEXT;
+                                this.Image = null;
+                                break;
 
-                        case PathTagsButtonDisplayStyle.ImageAndText:
-                            this.Text = _BUTTON_TEXT;
-                            this.Image = Resources.SelectDocTagArrow.ToBitmap();
-                            break;
+                            case PathTagsButtonDisplayStyle.ImageAndText:
+                                this.Text = _BUTTON_TEXT;
+                                this.Image = Resources.SelectDocTagArrow.ToBitmap();
+                                break;
 
-                        default:
-                            ExtractException.ThrowLogicException("ELI26221");
-                            break;
+                            default:
+                                ExtractException.ThrowLogicException("ELI26221");
+                                break;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26498", ex);
                 }
             }
         }

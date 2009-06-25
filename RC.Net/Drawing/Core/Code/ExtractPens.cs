@@ -80,16 +80,23 @@ namespace Extract.Drawing
         /// <returns>A <see cref="Pen"/> that draws a solid line of the specified color.</returns>
         public static Pen GetPen(Color color)
         {
-            // Check if the pen has already been created
-            Pen pen;
-            if (!_pens.TryGetValue(color, out pen))
+            try
             {
-                // Create the pen
-                pen = new Pen(color);
-                _pens.Add(color, pen);
-            }
+                // Check if the pen has already been created
+                Pen pen;
+                if (!_pens.TryGetValue(color, out pen))
+                {
+                    // Create the pen
+                    pen = new Pen(color);
+                    _pens.Add(color, pen);
+                }
 
-            return pen;
+                return pen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26491", ex);
+            }
         }
 
         /// <summary>
@@ -99,17 +106,24 @@ namespace Extract.Drawing
         /// <returns>A dashed pen with a certain thickness from the specified color.</returns>
         public static Pen GetThickDashedPen(Color color)
         {
-            // Check if the pen has already been created
-            Pen dashedPen;
-            if (!_thickDashedPens.TryGetValue(color, out dashedPen))
+            try
             {
-                // Create the pen
-                dashedPen = new Pen(color, 2);
-                dashedPen.DashStyle = DashStyle.Dash;
-                _thickDashedPens.Add(color, dashedPen);
-            }
+                // Check if the pen has already been created
+                Pen dashedPen;
+                if (!_thickDashedPens.TryGetValue(color, out dashedPen))
+                {
+                    // Create the pen
+                    dashedPen = new Pen(color, 2);
+                    dashedPen.DashStyle = DashStyle.Dash;
+                    _thickDashedPens.Add(color, dashedPen);
+                }
 
-            return dashedPen;
+                return dashedPen;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26492", ex);
+            }
         }
 
         #endregion ExtractPens Properties

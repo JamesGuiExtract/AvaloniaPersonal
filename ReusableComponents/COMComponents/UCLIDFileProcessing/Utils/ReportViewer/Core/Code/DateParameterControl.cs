@@ -2,6 +2,7 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Data;
 using System.Globalization;
@@ -82,6 +83,8 @@ namespace Extract.ReportViewer
         /// <value>The current value in the parameter value date picker and also
         /// updates the underlying <see cref="DateParameter"/>.
         /// </value>
+        // This property is just setting a string, it should never throw an exception
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public DateTime ParameterValue
         {
             get
@@ -119,17 +122,24 @@ namespace Extract.ReportViewer
             }
             set
             {
-                _dateParameter = value;
+                try
+                {
+                    _dateParameter = value;
 
-                if (_dateParameter != null)
-                {
-                    _parameterName.Text = _dateParameter.ParameterName;
-                    _parameterValue.Value = _dateParameter.ParameterValue;
+                    if (_dateParameter != null)
+                    {
+                        _parameterName.Text = _dateParameter.ParameterName;
+                        _parameterValue.Value = _dateParameter.ParameterValue;
+                    }
+                    else
+                    {
+                        _parameterName.Text = "Parameter name";
+                        _parameterValue.Value = DateTime.Now;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _parameterName.Text = "Parameter name";
-                    _parameterValue.Value = DateTime.Now;
+                    throw ExtractException.AsExtractException("ELI26501", ex);
                 }
             }
         }

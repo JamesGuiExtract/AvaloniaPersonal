@@ -68,6 +68,9 @@ namespace Extract.Utilities.Parsers
         /// <summary>
         /// Property for setting the pattern to be matched.
         /// </summary>
+        // The set method here just sets a string value and clears the parser,
+        // this should never throw an exception.
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public string Pattern
         {
             get

@@ -2,6 +2,7 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Data;
 using System.Globalization;
@@ -95,6 +96,8 @@ namespace Extract.ReportViewer
         /// <returns>The value in the begin date picker control.</returns>
         /// <value>The value in the begin date picker control. Will also update
         /// the underlying <see cref="DateRangeParameter"/> value.</value>
+        // This property is just setting a date, it should never throw an exception
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public DateTime ParameterValueBegin
         {
             get
@@ -126,6 +129,8 @@ namespace Extract.ReportViewer
         /// <returns>The value in the end date picker control.</returns>
         /// <value>The value in the end date picker control. Will also update
         /// the underlying <see cref="DateRangeParameter"/> value.</value>
+        // This property is just setting a date, it should never throw an exception
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public DateTime ParameterValueEnd
         {
             get
@@ -163,30 +168,37 @@ namespace Extract.ReportViewer
             }
             set
             {
-                _dateRangeParameter = value;
-
-                if (_dateRangeParameter != null)
+                try
                 {
-                    _parameterName.Text = _dateRangeParameter.ParameterName;
-                    _rangeValues.SelectedIndex =
-                        _rangeValues.Items.IndexOf(
-                        DateRangeValueTypeHelper.GetHumanReadableString(
-                        _dateRangeParameter.ParameterValue));
+                    _dateRangeParameter = value;
 
-                    _parameterValueBegin.Value = _dateRangeParameter.Minimum;
-                    _parameterValueEnd.Value = _dateRangeParameter.Maximum;
+                    if (_dateRangeParameter != null)
+                    {
+                        _parameterName.Text = _dateRangeParameter.ParameterName;
+                        _rangeValues.SelectedIndex =
+                            _rangeValues.Items.IndexOf(
+                            DateRangeValueTypeHelper.GetHumanReadableString(
+                            _dateRangeParameter.ParameterValue));
 
-                    // Enable/disable the date time picker based on whether the range is
-                    // custom or not
-                    bool custom = _dateRangeParameter.ParameterValue == DateRangeValue.Custom;
-                    _parameterValueBegin.Enabled = custom;
-                    _parameterValueEnd.Enabled = custom;
+                        _parameterValueBegin.Value = _dateRangeParameter.Minimum;
+                        _parameterValueEnd.Value = _dateRangeParameter.Maximum;
+
+                        // Enable/disable the date time picker based on whether the range is
+                        // custom or not
+                        bool custom = _dateRangeParameter.ParameterValue == DateRangeValue.Custom;
+                        _parameterValueBegin.Enabled = custom;
+                        _parameterValueEnd.Enabled = custom;
+                    }
+                    else
+                    {
+                        _parameterName.Text = "Parameter name";
+                        _parameterValueBegin.Value = DateTime.Now;
+                        _parameterValueEnd.Value = _parameterValueBegin.Value;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    _parameterName.Text = "Parameter name";
-                    _parameterValueBegin.Value = DateTime.Now;
-                    _parameterValueEnd.Value = _parameterValueBegin.Value;
+                    throw ExtractException.AsExtractException("ELI26502", ex);
                 }
             }
         }

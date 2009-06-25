@@ -182,7 +182,7 @@ namespace Extract
         /// </exception>
         // Suppress the message for generated for creating an Exception object
         [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
-        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly", 
+        [SuppressMessage("Microsoft.Naming", "CA1704:IdentifiersShouldBeSpelledCorrectly",
             MessageId = "stringized")]
         public ExtractException(string eliCode, string message, string stringizedInnerException)
             : base(message, FromCppException("ELI21952", new Exception(stringizedInnerException)))
@@ -228,7 +228,7 @@ namespace Extract
             // Load the remaining data elements in the same order they were stored
             _eliCode = info.GetString("_eliCode");
             _stackTraceRecorded = info.GetBoolean("_stackTraceRecorded");
-            _stackTrace = (Stack<string>) info.GetValue("_stackTrace", typeof(Stack<string>));
+            _stackTrace = (Stack<string>)info.GetValue("_stackTrace", typeof(Stack<string>));
 
             // Lastly ensure the _thisLock object is initialized.
             // This piece was added based on the recommendations in:
@@ -249,20 +249,27 @@ namespace Extract
         /// <param name="info">The serialization info object</param>
         /// <param name="context">The streaming context</param>
         [SecurityPermission(SecurityAction.Demand, SerializationFormatter = true)]
-        public override void GetObjectData(SerializationInfo info, 
+        public override void GetObjectData(SerializationInfo info,
             StreamingContext context)
         {
-            ExtractException.Assert("ELI21183", "Serialization info cannot be null!", info != null);
+            try
+            {
+                ExtractException.Assert("ELI21183", "Serialization info cannot be null!", info != null);
 
-            // Order is important in writing and retrieving the stream data
-            // Call the base GetObjectData first
-            base.GetObjectData(info, context);
+                // Order is important in writing and retrieving the stream data
+                // Call the base GetObjectData first
+                base.GetObjectData(info, context);
 
-            // Add the local data values second
-            info.AddValue("_CURRENT_VERSION", _CURRENT_VERSION);
-            info.AddValue("_eliCode", _eliCode);
-            info.AddValue("_stackTraceRecorded", _stackTraceRecorded);
-            info.AddValue("_stackTrace", _stackTrace);
+                // Add the local data values second
+                info.AddValue("_CURRENT_VERSION", _CURRENT_VERSION);
+                info.AddValue("_eliCode", _eliCode);
+                info.AddValue("_stackTraceRecorded", _stackTraceRecorded);
+                info.AddValue("_stackTrace", _stackTrace);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26490", ex);
+            }
         }
 
         #endregion ISerializeable
@@ -283,7 +290,7 @@ namespace Extract
         }
 
         #endregion
-        
+
         #region Public methods
 
         /// <summary>
@@ -337,7 +344,7 @@ namespace Extract
                     uex.SaveTo(fileName, true);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 // Log exception that was caught.
                 NativeMethods.LogException("ELI21761", e.Message);
@@ -374,14 +381,14 @@ namespace Extract
                 // by all Extract Systems products.
                 uex.Display();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 // Display exception that should be displayed.
                 MessageBox.Show(ToString(), "Exception");
 
                 // Log the exception that caused a problem displaying with COMUCLIDException object.
                 NativeMethods.LogException("ELI22361", e.Message);
-                
+
                 // Log the ELI code and message of exception that was displayed.
                 NativeMethods.LogException(EliCode, Message);
             }
@@ -463,7 +470,7 @@ namespace Extract
         /// <para>NOTE: The stack trace is encrypted, and therefore this property will
         /// always return an empty string.</para>
         /// </summary>
-        public override string StackTrace 
+        public override string StackTrace
         {
             get
             {
@@ -487,7 +494,7 @@ namespace Extract
             // inner exceptions into a string.
             StringBuilder sb = new StringBuilder();
             WriteToStringBuilder(sb, 0);
-            
+
             // Return the computed string
             return sb.ToString();
         }
@@ -505,7 +512,7 @@ namespace Extract
         {
             try
             {
-                AddDebugData(debugDataName, (object) debugDataValue, encrypt);
+                AddDebugData(debugDataName, (object)debugDataValue, encrypt);
             }
             catch
             {
@@ -525,7 +532,7 @@ namespace Extract
         {
             try
             {
-                AddDebugData(debugDataName, (object) debugDataValue, encrypt);
+                AddDebugData(debugDataName, (object)debugDataValue, encrypt);
             }
             catch
             {
@@ -547,11 +554,11 @@ namespace Extract
             {
                 // Ensure the debug data is not null
                 if (debugDataValue == null)
-	            {
-                    AddDebugData(debugDataName, (object) debugDataValue, encrypt);
+                {
+                    AddDebugData(debugDataName, (object)debugDataValue, encrypt);
                     return;
-	            }
-                
+                }
+
                 // Get the type of this class
                 Type type = debugDataValue.GetType();
 
@@ -579,7 +586,7 @@ namespace Extract
                     {
                         // Add the value of this property
                         object value = property.GetValue(debugDataValue, null);
-                        AddDebugData(property.Name, (object) value, encrypt);
+                        AddDebugData(property.Name, (object)value, encrypt);
                     }
                     catch
                     {
@@ -608,9 +615,9 @@ namespace Extract
             {
                 // NOTE: Code could be added here to specially handle certain Control-derived 
                 // classes.
-                
+
                 // Add the name of this control
-                AddDebugData(debugDataName, 
+                AddDebugData(debugDataName,
                     (object)debugDataValue == null ? "null" : debugDataValue.Name, encrypt);
             }
             catch
@@ -618,7 +625,7 @@ namespace Extract
                 // Ignore all exceptions
             }
         }
-        
+
         /// <summary>
         /// Returns the exception as a stringized byte stram
         /// </summary>
@@ -703,9 +710,9 @@ namespace Extract
                 {
                     _stackTrace = new Stack<string>();
                 }
-                
+
                 // Parse the stack trace and update the internal stack trace variable.
-                string[] stackTraceEntries = stackTrace.Split(new char[] { '\r', '\n' }, 
+                string[] stackTraceEntries = stackTrace.Split(new char[] { '\r', '\n' },
                     StringSplitOptions.RemoveEmptyEntries);
                 foreach (string s in stackTraceEntries)
                 {
@@ -754,7 +761,7 @@ namespace Extract
         private UCLID_EXCEPTIONMGMTLib.COMUCLIDException AsCppException()
         {
             // Create a new COMUCLIDException object.
- 	        UCLID_EXCEPTIONMGMTLib.COMUCLIDException ue = 
+            UCLID_EXCEPTIONMGMTLib.COMUCLIDException ue =
                 new UCLID_EXCEPTIONMGMTLib.COMUCLIDException();
 
             // The COMUCLIDException should be created differently based on the existence of 
@@ -767,7 +774,7 @@ namespace Extract
             else if (InnerException.GetType() == typeof(ExtractException))
             {
                 // Create COMUCLIDException with an inner exception
-                ue.CreateWithInnerException(_eliCode, Message, 
+                ue.CreateWithInnerException(_eliCode, Message,
                     ((ExtractException)InnerException).AsCppException());
             }
             else
@@ -786,7 +793,7 @@ namespace Extract
                 {
                     ue.AddDebugInfo(de.Key.ToString(), de.Value.ToString());
                 }
-                
+
                 // Add stack trace data
                 if (_stackTrace != null)
                 {
@@ -930,7 +937,7 @@ namespace Extract
 
                         // Ensure the debug data name is unique
                         // [DotNetRCAndUtils #166]
-                        int i=1;
+                        int i = 1;
                         string uniqueDebugDataName = debugDataName;
                         while (this.Data.Contains(uniqueDebugDataName))
                         {
@@ -942,7 +949,7 @@ namespace Extract
                         // Add the debug data (encrypting if encrypt is true and debugDataValue
                         // is not null)
                         this.Data.Add(uniqueDebugDataName,
-                            ((encrypt && debugDataValue != null) ? 
+                            ((encrypt && debugDataValue != null) ?
                             _ENCRYPTED_PREFIX +
                             NativeMethods.EncryptString(dataValue.ToString())
                             : dataValue));
@@ -1013,7 +1020,7 @@ namespace Extract
         [SuppressMessage("Microsoft.Usage", "CA2201:DoNotRaiseReservedExceptionTypes")]
         private static ExtractException FromCppException(string eliCode, Exception e)
         {
-            UCLID_EXCEPTIONMGMTLib.COMUCLIDException uc = 
+            UCLID_EXCEPTIONMGMTLib.COMUCLIDException uc =
                 new UCLID_EXCEPTIONMGMTLib.COMUCLIDException();
             uc.CreateFromString(eliCode, e.Message);
 
@@ -1068,40 +1075,51 @@ namespace Extract
         /// Exception object.</returns>
         public static ExtractException AsExtractException(string eliCode, Exception ex)
         {
-            // Check if e is already an ExtractException object
-            ExtractException ee = ex as ExtractException;
-            if (ee != null)
+            try
             {
-                ee.AddDebugData("CatchELI", eliCode, false);
+                // Check if e is already an ExtractException object
+                ExtractException ee = ex as ExtractException;
+                if (ee != null)
+                {
+                    ee.AddDebugData("CatchELI", eliCode, false);
+                    return ee;
+                }
+
+                // Check if e is an Exception object that was created on the .NET side because
+                // a UCLIDException object was thrown from one of our C++/COM objects
+                if (ex.Message.StartsWith("15000000", StringComparison.Ordinal) ||
+                    ex.Message.StartsWith("1f000000", StringComparison.Ordinal))
+                {
+                    return FromCppException(eliCode, ex);
+                }
+
+                // At this time, we know that e is just a standard .NET Exception object.  We just
+                // need to check whether e has inner exceptions and return a ExtractException hierarchy
+                // representing the same hierarchy and data as e and its inner exceptions.
+                if (ex.InnerException == null)
+                {
+                    ExtractException ex2 = new ExtractException(eliCode, ex.Message);
+                    ex2.CopyInformationFrom(ex);
+                    return ex2;
+                }
+                else
+                {
+                    ExtractException exInner = AsExtractException("ELI21073", ex.InnerException);
+                    ExtractException ex2 = new ExtractException(eliCode, ex.Message, exInner);
+                    ex2.CopyInformationFrom(ex);
+                    return ex2;
+                }
+            }
+            catch
+            {
+                ExtractException ee = new ExtractException("ELI26489",
+                    "Failed converting to ExtractException");
+                ee.AddDebugData("Exception Message", ex.Message, true);
+
                 return ee;
             }
+        }
 
-            // Check if e is an Exception object that was created on the .NET side because
-            // a UCLIDException object was thrown from one of our C++/COM objects
-            if (ex.Message.StartsWith("15000000", StringComparison.Ordinal) ||
-                ex.Message.StartsWith("1f000000", StringComparison.Ordinal))
-            {
-                return FromCppException(eliCode, ex);
-            }
-
-            // At this time, we know that e is just a standard .NET Exception object.  We just
-            // need to check whether e has inner exceptions and return a ExtractException hierarchy
-            // representing the same hierarchy and data as e and its inner exceptions.
-            if (ex.InnerException == null)
-            {
-                ExtractException ex2 = new ExtractException(eliCode, ex.Message);
-                ex2.CopyInformationFrom(ex);
-                return ex2;
-            }
-            else
-            {
-                ExtractException exInner = AsExtractException("ELI21073", ex.InnerException);
-                ExtractException ex2 = new ExtractException(eliCode, ex.Message, exInner);
-                ex2.CopyInformationFrom(ex);
-                return ex2;
-            }
-        }     
-   
         /// <summary>
         /// Create an <see cref="ExtractException"/> that can be thrown from a COM visible method.
         /// </summary>
@@ -1241,6 +1259,9 @@ namespace Extract
         /// <exception cref="ExtractException">Thrown if <paramref name="condition"/>
         /// evaluates to false.
         /// </exception>
+        // This method throws an ExtractException if the condition is false. It has been
+        // checked and should not throw any other exceptions.
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public static void Assert(string eliCode, string message, bool condition,
             string debugDataName1, object debugDataValue1,
             string debugDataName2, object debugDataValue2,
@@ -1263,19 +1284,19 @@ namespace Extract
                 // Add the debug data (check for null or empty before adding the data)
                 if (!string.IsNullOrEmpty(debugDataName1))
                 {
-                    ee.AddDebugData(debugDataName1, (object) debugDataValue1, false);
+                    ee.AddDebugData(debugDataName1, (object)debugDataValue1, false);
 
                     if (!string.IsNullOrEmpty(debugDataName2))
                     {
-                        ee.AddDebugData(debugDataName2, (object) debugDataValue2, false);
+                        ee.AddDebugData(debugDataName2, (object)debugDataValue2, false);
 
                         if (!string.IsNullOrEmpty(debugDataName3))
                         {
-                            ee.AddDebugData(debugDataName3, (object) debugDataValue3, false);
+                            ee.AddDebugData(debugDataName3, (object)debugDataValue3, false);
 
                             if (!string.IsNullOrEmpty(debugDataName4))
                             {
-                                ee.AddDebugData(debugDataName4, (object) debugDataValue4, false);
+                                ee.AddDebugData(debugDataName4, (object)debugDataValue4, false);
                             }
                         }
                     }

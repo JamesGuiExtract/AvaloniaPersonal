@@ -191,17 +191,24 @@ namespace Extract.Utilities.Forms
             }
             set
             {
-                // Erase the previous selection
-                base.Invalidate(Rectangle.Round(this.AnchorPoint));
+                try
+                {
+                    // Erase the previous selection
+                    base.Invalidate(Rectangle.Round(this.AnchorPoint));
 
-                // Store the new selection
-                _anchorAlignment = value;
+                    // Store the new selection
+                    _anchorAlignment = value;
 
-                // Redraw the new selection
-                base.Invalidate(Rectangle.Round(this.AnchorPoint));
+                    // Redraw the new selection
+                    base.Invalidate(Rectangle.Round(this.AnchorPoint));
 
-                // Raise the AnchorAlignmentChanged event
-                OnAnchorAlignmentChanged(new AnchorAlignmentChangedEventArgs(_anchorAlignment));
+                    // Raise the AnchorAlignmentChanged event
+                    OnAnchorAlignmentChanged(new AnchorAlignmentChangedEventArgs(_anchorAlignment));
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26496", ex);
+                }
             }
         }
         

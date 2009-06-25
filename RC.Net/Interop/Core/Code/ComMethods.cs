@@ -19,12 +19,22 @@ namespace Extract.Interop
         /// <param name="guidCategory">The category <paramref name="type"/> implements.</param>
         public static void RegisterTypeInCategory(Type type, string guidCategory)
         {
-            using (RegistryKey registryKey = getCategoryKey(type))
+            try
             {
-                if (registryKey != null)
+                using (RegistryKey registryKey = getCategoryKey(type))
                 {
-                    registryKey.CreateSubKey(guidCategory);
+                    if (registryKey != null)
+                    {
+                        registryKey.CreateSubKey(guidCategory);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and then rethrow it
+                ExtractException ee = ExtractException.AsExtractException("ELI26509", ex);
+                ee.Log();
+                throw ee;
             }
         }
 
@@ -36,12 +46,22 @@ namespace Extract.Interop
         /// implement.</param>
         public static void UnregisterTypeInCategory(Type type, string guidCategory)
         {
-            using (RegistryKey registryKey = getCategoryKey(type))
+            try
             {
-                if (registryKey != null)
+                using (RegistryKey registryKey = getCategoryKey(type))
                 {
-                    registryKey.DeleteSubKey(guidCategory);
+                    if (registryKey != null)
+                    {
+                        registryKey.DeleteSubKey(guidCategory);
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and then rethrow it
+                ExtractException ee = ExtractException.AsExtractException("ELI26510", ex);
+                ee.Log();
+                throw ee;
             }
         }
 

@@ -2,6 +2,7 @@ using Extract.Licensing;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Data;
 using System.Globalization;
@@ -83,6 +84,8 @@ namespace Extract.ReportViewer
         /// <value>The current value in the parameter value edit box and also
         /// updates the underlying <see cref="NumberParameter"/>.
         /// </value>
+        // This property is just setting a double, it should never throw an exception
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public double ParameterValue
         {
             get
@@ -120,21 +123,28 @@ namespace Extract.ReportViewer
             }
             set
             {
-                _numberParameter = value;
+                try
+                {
+                    _numberParameter = value;
 
-                // Check if the value is not null
-                if (_numberParameter != null)
-                {
-                    // Update the label and edit box
-                    _parameterName.Text = _numberParameter.ParameterName;
-                    _parameterValue.Text =
-                        _numberParameter.ParameterValue.ToString(CultureInfo.CurrentCulture);
+                    // Check if the value is not null
+                    if (_numberParameter != null)
+                    {
+                        // Update the label and edit box
+                        _parameterName.Text = _numberParameter.ParameterName;
+                        _parameterValue.Text =
+                            _numberParameter.ParameterValue.ToString(CultureInfo.CurrentCulture);
+                    }
+                    else
+                    {
+                        // Update the label and edit box
+                        _parameterName.Text = "Parameter name";
+                        _parameterValue.Text = "";
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // Update the label and edit box
-                    _parameterName.Text = "Parameter name";
-                    _parameterValue.Text = "";
+                    throw ExtractException.AsExtractException("ELI26504", ex);
                 }
             }
         }

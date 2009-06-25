@@ -904,6 +904,14 @@ namespace Extract.ReportViewer
                     parameter.WriteToXml(xmlWriter);
                 }
             }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26503", ex);
+                ee.AddDebugData("XML File To Write", fileName, false);
+                ee.AddDebugData("Overwrite", overwrite, false);
+
+                throw ee;
+            }
             finally
             {
                 if (xmlWriter != null)

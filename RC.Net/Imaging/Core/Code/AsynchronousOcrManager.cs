@@ -756,26 +756,33 @@ namespace Extract.Imaging
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public SpatialString GetOcrSpatialString()
         {
-            SpatialString ocrOutput = null;
-            if (OcrFinished)
+            try
             {
-                // Get the stringized bytestream of the SpatialString object
-                string ocrOutputByteStream = OcrOutput;
-
-                if (!string.IsNullOrEmpty(ocrOutputByteStream))
+                SpatialString ocrOutput = null;
+                if (OcrFinished)
                 {
-                    // Get a MiscUtils object
-                    MiscUtils miscUtils = new MiscUtils();
+                    // Get the stringized bytestream of the SpatialString object
+                    string ocrOutputByteStream = OcrOutput;
 
-                    // Convert the stringized bytestream into a SpatialString
-                    ocrOutput = (SpatialString)
-                        miscUtils.GetObjectFromStringizedByteStream(ocrOutputByteStream);
+                    if (!string.IsNullOrEmpty(ocrOutputByteStream))
+                    {
+                        // Get a MiscUtils object
+                        MiscUtils miscUtils = new MiscUtils();
 
-                    return ocrOutput;
+                        // Convert the stringized bytestream into a SpatialString
+                        ocrOutput = (SpatialString)
+                            miscUtils.GetObjectFromStringizedByteStream(ocrOutputByteStream);
+
+                        return ocrOutput;
+                    }
                 }
-            }
 
-            return ocrOutput;
+                return ocrOutput;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26493", ex);
+            }
         }
 
         /// <summary>
@@ -785,16 +792,23 @@ namespace Extract.Imaging
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public string GetOcrText()
         {
-            // Get the SpatialString from the OCR output
-            SpatialString ocrOutput = GetOcrSpatialString();
-
-            string ocrText = "";
-            if (ocrOutput != null)
+            try
             {
-                ocrText = ocrOutput.String;
-            }
+                // Get the SpatialString from the OCR output
+                SpatialString ocrOutput = GetOcrSpatialString();
 
-            return ocrText;
+                string ocrText = "";
+                if (ocrOutput != null)
+                {
+                    ocrText = ocrOutput.String;
+                }
+
+                return ocrText;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26494", ex);
+            }
         }
 
 
@@ -816,6 +830,9 @@ namespace Extract.Imaging
         /// </summary>
         /// <value>The speed-accuracy tradeoff.</value>
         /// <returns>The speed-accuracy tradeoff.</returns>
+        // This property just gets and sets the tradeoff value, it should never
+        // throw an exception.
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public OcrTradeoff Tradeoff
         {
             get

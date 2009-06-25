@@ -124,29 +124,36 @@ namespace Extract.ReportViewer
             }
             set
             {
-                // Check if the new value is contained in the list of values
-                if (!_parameterValue.Items.Contains(value))
+                try
                 {
-                    if (_valueListParameter != null)
+                    // Check if the new value is contained in the list of values
+                    if (!_parameterValue.Items.Contains(value))
                     {
-                        _valueListParameter.ParameterValue = value;
-                        UpdateComboList();
+                        if (_valueListParameter != null)
+                        {
+                            _valueListParameter.ParameterValue = value;
+                            UpdateComboList();
+                        }
+                        else
+                        {
+                            _parameterValue.Items.Add(value);
+                        }
                     }
                     else
                     {
-                        _parameterValue.Items.Add(value);
+                        if (_valueListParameter != null)
+                        {
+                            _valueListParameter.ParameterValue = value;
+                        }
                     }
-                }
-                else
-                {
-                    if (_valueListParameter != null)
-                    {
-                        _valueListParameter.ParameterValue = value;
-                    }
-                }
 
-                // Update the currently selected item
-                _parameterValue.SelectedIndex = _parameterValue.Items.IndexOf(value);
+                    // Update the currently selected item
+                    _parameterValue.SelectedIndex = _parameterValue.Items.IndexOf(value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26507", ex);
+                }
             }
         }
 
@@ -163,26 +170,33 @@ namespace Extract.ReportViewer
             }
             set
             {
-                _valueListParameter = value;
-
-                // Udate the combo list
-                UpdateComboList();
-
-                // Set the appropriate parameter name
-                if (_valueListParameter != null)
+                try
                 {
-                    _parameterName.Text = _valueListParameter.ParameterName;
+                    _valueListParameter = value;
 
-                    // Adjust the drop down style
-                    _parameterValue.DropDownStyle = _valueListParameter.AllowOtherValues ?
-                        ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
+                    // Udate the combo list
+                    UpdateComboList();
+
+                    // Set the appropriate parameter name
+                    if (_valueListParameter != null)
+                    {
+                        _parameterName.Text = _valueListParameter.ParameterName;
+
+                        // Adjust the drop down style
+                        _parameterValue.DropDownStyle = _valueListParameter.AllowOtherValues ?
+                            ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
+                    }
+                    else
+                    {
+                        // No value list parameter associated with the control, reset items
+                        // to default state
+                        _parameterName.Text = "Parameter name";
+                        _parameterValue.DropDownStyle = ComboBoxStyle.DropDownList;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    // No value list parameter associated with the control, reset items
-                    // to default state
-                    _parameterName.Text = "Parameter name";
-                    _parameterValue.DropDownStyle = ComboBoxStyle.DropDownList;
+                    throw ExtractException.AsExtractException("ELI26508", ex);
                 }
             }
         }

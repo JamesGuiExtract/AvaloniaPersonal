@@ -74,23 +74,30 @@ namespace Extract.Utilities.Forms
         public static void ShowDuringFormCreation<TForm>(string resource, out TForm form) 
             where TForm : Form, new()
         {
-            // Create the splash screen
-            using (SplashScreen splashScreen = new SplashScreen(typeof(TForm), resource))
+            try
             {
-                // Display the splash screen
-                splashScreen.Show();
-
-                // Process the splash screen's show event
-                Application.DoEvents();
-
-                // Initialize the form
-                form = new TForm();
-
-                // Wait for the splash screen to finish
-                while (splashScreen.Visible)
+                // Create the splash screen
+                using (SplashScreen splashScreen = new SplashScreen(typeof(TForm), resource))
                 {
+                    // Display the splash screen
+                    splashScreen.Show();
+
+                    // Process the splash screen's show event
                     Application.DoEvents();
+
+                    // Initialize the form
+                    form = new TForm();
+
+                    // Wait for the splash screen to finish
+                    while (splashScreen.Visible)
+                    {
+                        Application.DoEvents();
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26505", ex);
             }
         }
 
