@@ -36,7 +36,3 @@ using System;
 // by using the '*' as shown below:
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-
-// All the types defined in this namespace are too low-level to be merged with another namespace
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes", 
-    Scope ="namespace", Target ="Extract")]
