@@ -36,41 +36,10 @@ namespace Extract.Utilities.Forms
     }
 
     /// <summary>
-    /// Provides data for the <see cref="PathTagsButton.TagSelected"/> event.
-    /// </summary>
-    public class TagSelectedEventArgs : EventArgs
-    {
-        /// <summary>
-        /// The tag that was selected.
-        /// </summary>
-        readonly string _tag;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TagSelectedEventArgs"/> class.
-        /// </summary>
-        /// <param name="tag">The tag that was selected.</param>
-        public TagSelectedEventArgs(string tag)
-        {
-            _tag = tag;
-        }
-
-        /// <summary>
-        /// Gets the tag that was selected.
-        /// </summary>
-        /// <returns>The tag that was selected.</returns>
-        public string Tag
-        {
-            get
-            {
-                return _tag;
-            }
-        }
-    }
-
-    /// <summary>
     /// Represents a button with a drop down that allows the user to select expandable path tags.
     /// </summary>
     [DefaultEvent("TagSelected")]
+    [DefaultProperty("PathTags")]
     public partial class PathTagsButton : Button
     {
         #region Constants
@@ -102,7 +71,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// The list of document tags to be displayed in the context menu drop down.
         /// </summary>
-        List<string> _docTags = new List<string>();
+        IPathTags _pathTags;
 
         /// <summary>
         /// The display style for this <see cref="PathTagsButton"/>. Default style is
@@ -125,21 +94,10 @@ namespace Extract.Utilities.Forms
 
         #region PathTagsButton Constructors
 
-        /// <overload>Initializes a new <see cref="PathTagsButton"/> class.</overload>
         /// <summary>
         /// Initializes a new <see cref="PathTagsButton"/> class.
         /// </summary>
         public PathTagsButton()
-            : this(true)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new <see cref="PathTagsButton"/> class.
-        /// </summary>
-        /// <param name="addSourceDoc">If <see langword="true"/> then
-        /// &lt;SourceDocName&gt; tag will be added to the document tags.</param>
-        public PathTagsButton(bool addSourceDoc)
         {
             try
             {
@@ -153,11 +111,6 @@ namespace Extract.Utilities.Forms
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23150",
                     _OBJECT_NAME);
-
-                if (addSourceDoc)
-                {
-                    _docTags.Add("<SourceDocName>");
-                }
 
                 InitializeComponent();
 
@@ -174,7 +127,31 @@ namespace Extract.Utilities.Forms
         #region Properties
 
         /// <summary>
-        /// Gets/sets the <see cref="PathTagsButtonDisplayStyle"/> for this button.
+        /// Gets or sets the path tags that are available for selection.
+        /// </summary>
+        /// <value>The path tags that are available for selection.</value>
+        /// <returns>The path tags that are available for selection.</returns>
+        [Category("Behavior")]
+        [Description("The path tags that are available for selection.")]
+        public IPathTags PathTags
+        {
+            get
+            {
+                if (_pathTags == null)
+                {
+                    _pathTags = new SourceDocumentPathTags();
+                }
+
+                return _pathTags;
+            }
+            set
+            {
+                _pathTags = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="PathTagsButtonDisplayStyle"/> for this button.
         /// </summary>
         /// <returns>The <see cref="PathTagsButtonDisplayStyle"/> for this button.</returns>
         /// <value>The <see cref="PathTagsButtonDisplayStyle"/> for this button.</value>
@@ -231,72 +208,6 @@ namespace Extract.Utilities.Forms
         #region PathTagsButton Methods
 
         /// <summary>
-        /// Resets the document tags list with the specified list. If <paramref name="tags"/>
-        /// is <see langword="null"/> then the document tags list will be cleared. If
-        /// <paramref name="tags"/> is not <see langword="null"/> then the document tag list
-        /// be reset to the specified tags.
-        /// </summary>
-        /// <param name="tags">The collection of tags to reset the document tags list
-        /// to. If <see langword="null"/> then the list will be cleared.</param>
-        public void ResetDocTags(IEnumerable<string> tags)
-        {
-            try
-            {
-                // First clear the list of doc tags
-                _docTags.Clear();
-
-                // If the new tags collection is not null, fill the doc tags list
-                // with the specified tags
-                if (tags != null)
-                {
-                    _docTags.AddRange(tags);
-                }
-
-                // If the context menu has been created, clear it so that it will be reset
-                // the next time the button is clicked
-                if (_dropDown != null)
-                {
-                    _dropDown.Dispose();
-                    _dropDown = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26212", ex);
-            }
-        }
-
-        /// <summary>
-        /// Adds the specified collection of strings to the document tags collection.
-        /// </summary>
-        /// <param name="tags">The tags to add to the collection of document tags. Must
-        /// not be <see langword="null"/>.</param>
-        /// <exception cref="ExtractException">If <paramref name="tags"/> is
-        /// <see langword="null"/>.</exception>
-        public void AddDocTags(IEnumerable<string> tags)
-        {
-            try
-            {
-                ExtractException.Assert("ELI26213", "Tags collection cannot be null!",
-                    tags != null);
-
-                _docTags.AddRange(tags);
-
-                // If the context menu has been created, clear it so that it will be reset
-                // the next time the button is clicked
-                if (_dropDown != null)
-                {
-                    _dropDown.Dispose();
-                    _dropDown = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI26214", ex);
-            }
-        }
-
-        /// <summary>
         /// Retrieves an array of the names of function tags.
         /// </summary>
         /// <returns>A array of the names of function tags.</returns>
@@ -330,6 +241,24 @@ namespace Extract.Utilities.Forms
 
             // Return the resulting array
             return functionTags.ToArray();
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="PathTags"/> property should be serialized.
+        /// </summary>
+        /// <returns><see langword="true"/> if the property has changed; <see langword="false"/>
+        /// if the property is its default value.</returns>
+        bool ShouldSerializePathTags()
+        {
+            return _pathTags != null && _pathTags.GetType() != typeof(SourceDocumentPathTags);
+        }
+
+        /// <summary>
+        /// Resets the <see cref="PathTags"/> property to its default value.
+        /// </summary>
+        void ResetPathTags()
+        {
+            _pathTags = null;
         }
 
         #endregion PathTagsButton Methods
@@ -396,13 +325,13 @@ namespace Extract.Utilities.Forms
                     ToolStripItemCollection items = _dropDown.Items;
 
                     // Add the doc tags
-                    foreach (string docTag in _docTags)
+                    foreach (string docTag in PathTags.Tags)
                     {
                         items.Add(new ToolStripMenuItem(docTag));
                     }
 
                     // Only add the separator if there was at least one doc tag
-                    if (_docTags.Count > 0)
+                    if (items.Count > 0)
                     {
                         items.Add(new ToolStripSeparator());
                     }
@@ -472,5 +401,37 @@ namespace Extract.Utilities.Forms
         }
 
         #endregion PathTagsButton Event Handlers
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="PathTagsButton.TagSelected"/> event.
+    /// </summary>
+    public class TagSelectedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The tag that was selected.
+        /// </summary>
+        readonly string _tag;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagSelectedEventArgs"/> class.
+        /// </summary>
+        /// <param name="tag">The tag that was selected.</param>
+        public TagSelectedEventArgs(string tag)
+        {
+            _tag = tag;
+        }
+
+        /// <summary>
+        /// Gets the tag that was selected.
+        /// </summary>
+        /// <returns>The tag that was selected.</returns>
+        public string Tag
+        {
+            get
+            {
+                return _tag;
+            }
+        }
     }
 }
