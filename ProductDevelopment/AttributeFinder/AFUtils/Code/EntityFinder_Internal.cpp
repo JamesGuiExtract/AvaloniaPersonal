@@ -2293,23 +2293,6 @@ string	CEntityFinder::trimLeadingNonsense(string strInput)
 			// Set flag
 			bStillTrimming = true;
 		}
-
-		// Trim these leading words
-		bStillTrimming |= trimLeadingWord( strInput, "TRUSTOR" );
-		bStillTrimming |= trimLeadingWord( strInput, "TO" );
-		bStillTrimming |= trimLeadingWord( strInput, "AND" );
-		bStillTrimming |= trimLeadingWord( strInput, "MADE" );
-		bStillTrimming |= trimLeadingWord( strInput, "BETWEEN" );
-		bStillTrimming |= trimLeadingWord( strInput, "FROM" );
-		bStillTrimming |= trimLeadingWord( strInput, "THE UNDERSIGNED" );
-		bStillTrimming |= trimLeadingWord( strInput, "WITH" );
-		bStillTrimming |= trimLeadingWord( strInput, "THROUGH" );
-		bStillTrimming |= trimLeadingWord( strInput, "THAT" );
-		bStillTrimming |= trimLeadingWord( strInput, "WE" );
-		bStillTrimming |= trimLeadingWord( strInput, "PAID BY" );
-		bStillTrimming |= trimLeadingWord( strInput, "I/WE" );
-		bStillTrimming |= trimLeadingWord( strInput, "I" );
-
 	}					// end while continuing through the trimming sequence
 
 	return strInput;
@@ -2327,6 +2310,7 @@ bool CEntityFinder::removeAddressText(ISpatialStringPtr ripText)
 	///////////////////////////////////////////////////////
 	// Search for Addresses with leading Address Indicators
 	///////////////////////////////////////////////////////
+	string	strNow = asString( ripText->String );
 
 	// Retrieve collection of Address Indicator items
 	IShallowCopyablePtr	ipAI = m_ipKeys->AddressIndicators;
@@ -2389,6 +2373,7 @@ bool CEntityFinder::removeAddressText(ISpatialStringPtr ripText)
 			break;
 		}
 	}
+	strNow = asString( ripText->String );
 
 	//////////////////////////////////////////////////////////
 	// Search for Addresses without leading Address Indicators
@@ -2443,6 +2428,39 @@ bool CEntityFinder::removeAddressText(ISpatialStringPtr ripText)
 					ripText->SetChar(lStartPos, ' ');
 				}
 			}
+
+			// Set flag
+			bFound = true;
+		}
+		else
+		{
+			break;
+		}
+	}
+	strNow = asString( ripText->String );
+
+	////////////////////////////////
+	// Search for trailing "Address"
+	////////////////////////////////
+	// Clear the collection of regular expressions
+	ipAddress->Clear();
+
+	// Add pattern for Address
+	_bstr_t bstrText = "\\bAddr.{0,2}s.{0,3}\\b";
+	ipAddress->PushBack( bstrText );
+
+	while (true)
+	{
+		long lStartPos = -1;
+		long lEndPos = -1;
+		ripText->FindFirstItemInRegExpVector( ipAddress, VARIANT_FALSE, VARIANT_FALSE,
+			0, m_ipParser, &lStartPos, &lEndPos );
+
+		// Text must be near the end of the string
+		if (lEndPos > -1 && ripText->Size - lEndPos < 10)
+		{
+			// Remove the Address text
+			ripText->Remove( lStartPos, lEndPos );
 
 			// Set flag
 			bFound = true;
