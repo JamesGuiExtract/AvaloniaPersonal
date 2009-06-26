@@ -470,3 +470,65 @@ Names|Priority Home Loans
 <TESTCASE>|Company Name with Metrobank|Madison Metrobank
 Names|Madison Metrobank
 .Company|Madison Metrobank
+
+<TESTCASE>|Company Name with Pizza|Glass Nickel Pizza
+Names|Glass Nickel Pizza
+.Company|Glass Nickel Pizza
+
+<TESTCASE>|Company Name with Videos|Lackluster Videos
+Names|Lackluster Videos
+.Company|Lackluster Videos
+
+<TESTCASE>|Company Name with Bakery|Good Food Bakery
+Names|Good Food Bakery
+.Company|Good Food Bakery
+
+<TESTCASE>|Company Name with Bake Shop|Sweet Street Bake Shop
+Names|Sweet Street Bake Shop
+.Company|Sweet Street Bake Shop
+
+<TESTCASE>|Company Name with Coffee|Caribou Coffee
+Names|Caribou Coffee
+.Company|Caribou Coffee
+
+<TESTCASE>|Company Name with Studios|Universal Studios
+Names|Universal Studios
+.Company|Universal Studios
+
+<TESTCASE>|Company Name with Daycare|Bumblebee Daycare
+Names|Bumblebee Daycare
+.Company|Bumblebee Daycare
+
+<TESTCASE>|Company Name with Auto Body and Paint|Quick Fix Auto Body and Paint
+Names|Quick Fix Auto Body and Paint
+.Company|Quick Fix Auto Body and Paint
+
+<TESTCASE>|Company Name with Cafe|Good Food Cafe
+Names|Good Food Cafe
+.Company|Good Food Cafe
+
+<TESTCASE>|Company Name with Academy|Happy Feet Dance Academy
+Names|Happy Feet Dance Academy
+.Company|Happy Feet Dance Academy
+
+<TESTCASE>|Company Name with Furnishings|Westside Furnishings
+Names|Westside Furnishings
+.Company|Westside Furnishings
+
+<TESTCASE>|Company Name with Salons|New Style Salons
+Names|New Style Salons
+.Company|New Style Salons
+
+<TESTCASE>|Company Name with Designs|New Style Designs
+Names|New Style Designs
+.Company|New Style Designs
+
+<TESTCASE>|Company Name with Scrapbooking|Sarah's Scrapbooking
+Names|Sarah's Scrapbooking
+.Company|Sarah's Scrapbooking
+
+<TESTCASE>|Company Name with Bookkeeping|By The Books Bookkeeping
+Names|By The Books Bookkeeping
+.Company|By The Books Bookkeeping
+
+
