@@ -50,3 +50,6 @@
 
 // Extract Trust and Trustee with appropriate sub-attributes
 <FILE>|NS_TrustTests.txt
+
+// Extract Entities and Discard Invalid Words
+<FILE>|NS_TrimTests.txt
