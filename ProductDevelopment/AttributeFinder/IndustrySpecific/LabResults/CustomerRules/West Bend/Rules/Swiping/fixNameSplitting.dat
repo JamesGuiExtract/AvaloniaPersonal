@@ -11,8 +11,6 @@
 ^\s+|\s+$%
 //reformat names in the form 'Last Suffix, First Middle' to 'First Middle Last, Suffix' so the builtin splitter handles them correctly
 ([a-z]+)\x20(M\.?D\.?|JR\.?|SR\.?|I{3}|IV|VI{0,4}|Ph\.?D\.?)\x20?[,.]\x20?([a-z]+)(?:\x20([A-Z][a-z]*))?%$3 $4 $1, $2
-//rearange names printed 'Last First' to 'Last, First' so the builtin splitter handles them correctly
-//^([a-z]+)\x20([a-z]+)$%$1, $2 //turned off b/c it can't tell the difference between 'First Last' and 'Last First'
 (?<=[a-z]{3,})\.%,
 \.(?=[a-z]{3,})%
 //reformat names in the form 'Last First MiddleInitial' to 'Last, First MiddleInitial'
@@ -27,3 +25,5 @@
 ^\s*([A-Za-z]{3,})\x20([A-Z])\s*$%$1, $2
 //interpret 'First MiddleInitial, Last' as 'First MiddleInitial. Last'
 ^\s*([a-z]+)\x20([a-z])\x20?,\x20?([a-z]+)\s*$%$1 $2. $3
+//rearange names printed 'Last First' to 'Last, First' so the builtin splitter handles them correctly
+(?<=^\s*[a-z]+)\x20(?=[a-z]+\s*$)%, 
