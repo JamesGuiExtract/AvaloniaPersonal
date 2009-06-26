@@ -134,6 +134,8 @@ Persons with Trailing Grantee|lower case John Doe and Jane Doe Grantee plus more
 
 Trailing Payable|lower case BAHAMAS NATIONAL BANK Payable To Xyz plus more|BAHAMAS NATIONAL BANK
 
+Trailing Return To|lower case BAHAMAS NATIONAL BANK, Return To BAHAMAS NATIONAL BANK|BAHAMAS NATIONAL BANK
+
 Persons with Phrase|John H. Smith residing at 123 and Mary Smith residing at 123, husband and wife with extra text|John H. Smith residing at 123 and Mary Smith residing at 123, husband and wife
 
 Person with Of|John H. Smith of Pittsburgh plus|John H. Smith
@@ -185,6 +187,10 @@ Embedded Address6|John Smith P.O. Box 123 Any WI 53777 and Mary Smith P.O. Box 1
 Embedded Address7|John Smith P.0. Box 123 Any WI 53777 and Mary Smith P.0. Box 123 Any WI 53777|John Smith ; and Mary Smith
 
 Embedded Address8|John Smith and Mary Smith, husband and wife, C/O 123 Main Any WI 53777|John Smith and Mary Smith, husband and wife
+
+Trailing Address1|John Smith and Mary Smith Address:|John Smith and Mary Smith
+
+Trailing Address2|John Smith and Mary Smith AddrgSs*|John Smith and Mary Smith
 
 // Add missing space
 Missing Space1|by JOHN SMITHand MARY SMITH or something|JOHN SMITH and MARY SMITH
