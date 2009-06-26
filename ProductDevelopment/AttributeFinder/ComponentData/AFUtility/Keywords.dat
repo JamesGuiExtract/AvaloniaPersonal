@@ -319,6 +319,7 @@
 \bOpenings\b
 \bPartners(?:hip)?\b
 \bPizza\b
+\bProducts\b
 \bProperties\b
 \bPublic\b
 \bReal(?:ty|ors?)\b
@@ -349,6 +350,7 @@
 // Investorsbank and Citifinancial
 Investorsbank
 Citifinancial
+Metrobank
 
 // Company names with dot com
 \b\w+\.com\b
@@ -395,6 +397,42 @@ Citifinancial
 \bits\s+successor\b
 
 
+//=================================================
+// Entity Trim Leading Phrases: [FlexIDSCore #3563]
+//   These are the words or phrases that should
+//   always be removed from the beginning of a 
+//   potential entity.  This collection is used 
+//   by "Find company or person(s)".
+//=================================================
+<EntityTrimLeadingPhrases>
+\bTRUSTOR\b
+\bTO\b
+\bAND\b
+\bMADE\b
+\bBETWEEN\b
+\bFROM\b
+\bTHE\s*UNDERSIGNED\b
+\bWITH\b
+\bTHROUGH\b
+\bTHAT\b
+\bWE\b
+\b(PAID\s*)?BY\b
+\bI/WE\b
+\bI\b
+\bGRANTEE\b
+
+
+//===============================================
+// Entity Trim Any Phrases: [FlexIDSCore #3563]
+//   These are the words or phrases that should
+//   always be removed before splitting a 
+//   potential entity.  This collection is used 
+//   by "Split name of company or person".
+//===============================================
+<EntityTrimAnyPhrases>
+\bABC123\b
+
+
 // Examples: "P.O. Box", "Organized"
 <EntityTrimTrailingPhrases>
 \bP(\.)?\s*(?:O|0)(\.)?\s+
@@ -421,6 +459,8 @@ Citifinancial
 \bIn\s*Favor\s*of\b
 // I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Satisfaction of Mortgage\Grantor\0150.tif.uss
 \bDated:?\b
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Assignment of Mortgage\Grantor\0047.tif.uss
+\bRETURN\s+TO\b
 
 // Examples: "spouse", "daughter"
 <PersonTrimIdentifiers>
@@ -536,6 +576,11 @@ Citifinancial
 \bDATED[\s\S]+\d+
 \bCONSIDERATION\b
 \bBENEFICIARY\b
+\bterms\s+of\s+the\s+note\b
+\bLOAN\s+DOCUMENTS\b
+\bADDRESS\b
+// I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\GrantorGranteeFinder\Images\Assignment of Mortgage\Grantee\0060.tif.uss
+\bCOLLATERAL\s+SECURITY\b
 
 // Examples: A Texas Corporation, A Federal Savings Bank
 ^[\s\S]{0,5}\bA\s+[\s\S]{0,15}CORPORATION\b
