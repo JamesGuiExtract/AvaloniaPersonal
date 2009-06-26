@@ -161,6 +161,41 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 		string strRight( strLocal.c_str() );
 		ipSpatial->CreateNonSpatialString(strRight.c_str(), "");
 
+		///////////////////////////////////////////////////////////////////
+		// Step 1B: More trimming of unwanted text from beginning of string
+		//          Using EntityTrimLeadingPhrases expressions
+		///////////////////////////////////////////////////////////////////
+		// Retrieve list of EntityTrimLeadingPhrases expressions
+		IVariantVectorPtr ipTrimLeading = m_ipKeys->GetKeywordCollection( 
+			_bstr_t( "EntityTrimLeadingPhrases" ) );
+		ASSERT_RESOURCE_ALLOCATION( "ELI26463", ipTrimLeading != NULL );
+
+		// Check string for Phrases
+		long	lTrimStart = -1;
+		long	lTrimEnd = -1;
+		bool	bFoundPhrase = true;
+		while (bFoundPhrase)
+		{
+			// Clear the flag so that search is only done once unless 
+			// trimming is done
+			bFoundPhrase = false;
+
+			// Check string for first Phrase, if any
+			ipSpatial->FindFirstItemInRegExpVector( ipTrimLeading, VARIANT_FALSE, VARIANT_FALSE, 
+				0, m_ipParser, &lTrimStart, &lTrimEnd );
+			if (lTrimStart != -1 && lTrimEnd != -1)
+			{
+				// A phrase for trimming was found, trim it if at or near the beginning of the text
+				if (lTrimStart < 4)
+				{
+					ipSpatial->Remove(lTrimStart, lTrimEnd);
+
+					// Set flag to keep searching
+					bFoundPhrase = true;
+				}
+			}
+		}
+
 		////////////////////////////////////
 		// Step 2A: Look for Trust Indicator
 		//          and trim as appropriate
@@ -190,6 +225,10 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 			// Save the endpoint
 			lKeywordStop = lMuniEnd;
 		}
+
+		// Update local strings
+		strLocal = asString(ipSpatial->String);
+		strRight = strLocal;
 
 		/////////////////////////////////////////
 		// Step 3A: Locate last person designator
@@ -468,7 +507,7 @@ STDMETHODIMP CEntityFinder::FindEntities(ISpatialString* pText)
 		//////////////////////////////////////////
 
 		// Do not trim parentheses as they will be handled later
-		strLocal = trim( strLocal, " ,.\"", " ,[]\"" );
+		strLocal = trim( strLocal, " :,.\"", " :,[]\"" );
 
 		/////////////////////////////////////////////
 		// Step 7B: Remove Entity trim phrases
