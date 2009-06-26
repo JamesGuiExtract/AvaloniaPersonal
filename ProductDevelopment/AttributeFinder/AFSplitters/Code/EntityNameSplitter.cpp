@@ -131,6 +131,41 @@ STDMETHODIMP CEntityNameSplitter::raw_SplitAttribute(IAttribute *pAttribute, IAF
 		ipEntity->Replace(" 0. "," O. ", VARIANT_FALSE, 0, m_ipRegExprParser);
 		ipEntity->Replace("°", "O", VARIANT_FALSE, 0, m_ipRegExprParser);
 
+		//////////////////////////////////////////////////
+		// Step 1B: Trim unwanted text from the string
+		//          Using EntityTrimAnyPhrases expressions
+		//////////////////////////////////////////////////
+		// Retrieve list of EntityTrimAnyPhrases expressions
+		IVariantVectorPtr ipTrimAny = m_ipKeys->GetKeywordCollection( 
+			_bstr_t( "EntityTrimAnyPhrases" ) );
+		ASSERT_RESOURCE_ALLOCATION( "ELI26466", ipTrimAny != NULL );
+
+		// Check string for Phrases
+		long lTrimStart = -1;
+		long lTrimEnd = -1;
+		bool bFoundPhrase = true;
+		while (bFoundPhrase)
+		{
+			// Clear the flag so that search is only done once unless 
+			// trimming is done
+			bFoundPhrase = false;
+
+			// Check string for first Phrase, if any
+			ipEntity->FindFirstItemInRegExpVector( ipTrimAny, VARIANT_FALSE, VARIANT_FALSE, 
+				0, m_ipRegExprParser, &lTrimStart, &lTrimEnd );
+			if (lTrimStart != -1 && lTrimEnd != -1)
+			{
+				// A phrase for trimming was found, trim it
+				ipEntity->Remove(lTrimStart, lTrimEnd);
+
+				// Set flag to keep searching
+				bFoundPhrase = true;
+			}
+		}
+
+		// Consolidate whitespace
+		ipEntity->ConsolidateChars( _bstr_t( " " ), VARIANT_FALSE );
+
 		///////////////////////////////////////////
 		// Step 2A: Check text for Trust Indicators
 		///////////////////////////////////////////
