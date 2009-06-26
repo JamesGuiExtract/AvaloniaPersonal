@@ -1,0 +1,25 @@
+//****************************************************************
+// This file will hold x number of lines. Each
+// line contains two columns: Tag and Value. They 
+// are separated by a pipe (|) sign.
+//
+// Valid tags include:
+//  <FILE> - indicates a file (with this format) to be processed
+//  <TESTCASE> - a test to be executed
+//     next token - label for test case
+//     last token - input string for Name Splitter test
+//  Text - precedes text of main Attribute
+//  .Sub - precedes text of first-level sub-Attribute
+//  ..Of - precedes text of second-level sub-Attribute
+//****************************************************************
+
+// Person Name Splitter tests
+// Test Type: Valid and Invalid Words in Entities
+// Purpose: Check Discard of Invalid Words
+
+<TESTCASE>|Name with ABC123|Mr. John Abc123 Smith
+Names|Mr. John Abc123 Smith
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
