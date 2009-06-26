@@ -216,3 +216,17 @@ Names|Mr. John Smith and Beneficiary
 ..Title|Mr.
 ..First|John
 ..Last|Smith
+
+<TESTCASE>|Name with Collateral Security|Mr. John Smith and Collateral Security
+Names|Mr. John Smith and Collateral Security
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith
+
+<TESTCASE>|Name with Terms of the Note|Mr. John Smith and Terms of the Note
+Names|Mr. John Smith and Terms of the Note
+.Person|Mr. John Smith
+..Title|Mr.
+..First|John
+..Last|Smith

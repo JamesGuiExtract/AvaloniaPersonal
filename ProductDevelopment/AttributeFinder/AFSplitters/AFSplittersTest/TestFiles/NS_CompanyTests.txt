@@ -454,3 +454,19 @@ Names|Great Lakes Savings and Loan Association
 <TESTCASE>|Company Name with Funding|LVNV Funding
 Names|LVNV Funding
 .Company|LVNV Funding
+
+<TESTCASE>|Company Name with Products|Singletary Concrete Products
+Names|Singletary Concrete Products
+.Company|Singletary Concrete Products
+
+<TESTCASE>|Company Name with Loan|Priority Home Loan
+Names|Priority Home Loan
+.Company|Priority Home Loan
+
+<TESTCASE>|Company Name with Loans|Priority Home Loans
+Names|Priority Home Loans
+.Company|Priority Home Loans
+
+<TESTCASE>|Company Name with Metrobank|Madison Metrobank
+Names|Madison Metrobank
+.Company|Madison Metrobank
