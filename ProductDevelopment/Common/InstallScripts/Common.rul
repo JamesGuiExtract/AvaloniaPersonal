@@ -17,7 +17,7 @@
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
-    #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition\v3.5\\Version"
+    #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
     #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
@@ -478,7 +478,6 @@ int nResult, svServiceState;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	MessageBox( REG_PATH_SQL_COMPACT_EDITION, MB_OK);
 	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) < 0) then
 		// Install SQL Compact Edition
 		szProgram = "msiexec";
