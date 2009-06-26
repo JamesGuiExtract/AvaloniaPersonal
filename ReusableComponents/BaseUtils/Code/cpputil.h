@@ -128,12 +128,12 @@ EXPORT_BaseUtils bool isVirtKeyCurrentlyPressed(int iVirtKey);
 // PURPOSE: To return a human readable string representing the specified windows error
 // REQUIRE: 
 // PROMISE: 
-EXPORT_BaseUtils const std::string getWindowsErrorString(DWORD nError);
+EXPORT_BaseUtils const string getWindowsErrorString(DWORD nError);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To return a human readable string using the specified formatting
 // REQUIRE: 
 // PROMISE: 
-EXPORT_BaseUtils const std::string getFormattedString(const char* szText, ...);
+EXPORT_BaseUtils const string getFormattedString(const char* szText, ...);
 //-------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------
@@ -273,64 +273,64 @@ EXPORT_BaseUtils void  getFilesInDir(vector<string>& rvecFiles,
 // REQUIRE: The drive letter must be mapped to one of the network drives, otherwise
 //			it will simply return the original string. For instance if 
 //			strLocalPath == "C:\WINNT\temp.txt", it returns "C:\WINNT\temp.txt"
-EXPORT_BaseUtils std::string getUNCPath(const std::string& strLocalPath);
+EXPORT_BaseUtils string getUNCPath(const string& strLocalPath);
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	Returns all sub folders's name under current folder.
 // REQUIRE: strParentFolder must be a fully qualified folder name
 // NOTE: The return sub folder names are not fully qualified.
 //		 Also, this function only returns the first level sub folders, i.e. no sub
 //		 folders under a sub folder of strParentFolder will be listed.
-EXPORT_BaseUtils std::vector<std::string> getSubFolderShortNames(const std::string& strParentFolder);
+EXPORT_BaseUtils vector<string> getSubFolderShortNames(const string& strParentFolder);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To throw an exception if strFileName represents a non existing file
 //			or folder name
-EXPORT_BaseUtils void validateFileOrFolderExistence(const std::string& strName);
+EXPORT_BaseUtils void validateFileOrFolderExistence(const string& strName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return false if strFileName represents a non existing file
 //			or folder name
-EXPORT_BaseUtils bool isFileOrFolderValid(const std::string& strName);
+EXPORT_BaseUtils bool isFileOrFolderValid(const string& strName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true if and only if strFileName represents an existing file that is
 //			readable.
-EXPORT_BaseUtils bool fileExistsAndIsReadable(const std::string& strName);
+EXPORT_BaseUtils bool fileExistsAndIsReadable(const string& strName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true iff strFileName represents an existing file that
 //			is read-only
-EXPORT_BaseUtils bool fileExistsAndIsReadOnly(const std::string& strFileName);
+EXPORT_BaseUtils bool fileExistsAndIsReadOnly(const string& strFileName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true if strName is a read only file or folder
 //			
-EXPORT_BaseUtils bool isFileReadOnly(const std::string& strName );
+EXPORT_BaseUtils bool isFileReadOnly(const string& strName );
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To throw an exception if strName is a read only file [p16 #2755]
 // REQUIRE: strName is a valid file
-EXPORT_BaseUtils void verifyFileIsWritable(const std::string& strName);
+EXPORT_BaseUtils void verifyFileIsWritable(const string& strName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true if strName is a PDF file
-EXPORT_BaseUtils bool isPDFFile(const std::string& strName);
+EXPORT_BaseUtils bool isPDFFile(const string& strName);
 //-------------------------------------------------------------------------------------------------
 // Takes a short path name (eg. C:\Progra~1\ABC) and converts it to a long 
 // path name (eg. C:\Program Files\ABC)
 // Return the length of the long path
-EXPORT_BaseUtils int getLongPathName(const std::string& strShortPathName,
-									 std::string& strLongPath);
+EXPORT_BaseUtils int getLongPathName(const string& strShortPathName,
+									 string& strLongPath);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true if strFileName is an absolute path to a folder
 // or file.  An absolute path is one that contains the colon character,
 // (such as in c:\temp\abc) or one that starts with two slashes 
 // (such as in \\rover\internal\a.txt).
 // NOTE: This function does not check for the existence of strFileName.
-EXPORT_BaseUtils bool isAbsolutePath(const std::string& strFileOrFolderName);
+EXPORT_BaseUtils bool isAbsolutePath(const string& strFileOrFolderName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the current directory as a string using windows GetCurrentDirectory function.
 //			The returned path will not contain a trailing slash.
-EXPORT_BaseUtils std::string getCurrentDirectory();
+EXPORT_BaseUtils string getCurrentDirectory();
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the file size in bytes
-EXPORT_BaseUtils ULONGLONG getSizeOfFile(const std::string& strFileName);
+EXPORT_BaseUtils ULONGLONG getSizeOfFile(const string& strFileName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the total file size in bytes
-EXPORT_BaseUtils ULONGLONG getSizeOfFiles(const std::vector<std::string>& vecFileNames);
+EXPORT_BaseUtils ULONGLONG getSizeOfFiles(const vector<string>& vecFileNames);
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	Returns true if the specified filename matches the name criteria, otherwise false
 //			The name criteria (strMatch) is a typical windows filename that can include wildcards
@@ -374,7 +374,7 @@ EXPORT_BaseUtils bool isValidFile(const string& strFile);
 //			return false)
 EXPORT_BaseUtils bool isValidFolder(const string& strFolder);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils bool isThreeDigitExtension(const std::string& strExt);
+EXPORT_BaseUtils bool isThreeDigitExtension(const string& strExt);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the file version
 // REQUIRE: strFileFullName must be fully qualified file name
@@ -439,15 +439,15 @@ EXPORT_BaseUtils void copyFile(const string &strSrcFileName, const string &strDs
 //			allows readonly file to be moved if bAllowReadonly = true
 // REQUIRE: 
 // PROMISE: 
-EXPORT_BaseUtils void moveFile(const std::string strSrcFileName, 
-							   const std::string strDstFileName,
+EXPORT_BaseUtils void moveFile(const string strSrcFileName, 
+							   const string strDstFileName,
 							   const bool bOverwrite = false,
 							   const bool bAllowReadonly = false);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To delete a file, will delete a readonly file if bAllowReadonly = true
 // REQUIRE: 
 // PROMISE: 
-EXPORT_BaseUtils void deleteFile(const std::string strFileName, const bool bAllowReadonly = false);
+EXPORT_BaseUtils void deleteFile(const string strFileName, const bool bAllowReadonly = false);
 
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To get the retry count and timeout from the registry keys.  These values are
@@ -463,16 +463,21 @@ EXPORT_BaseUtils void getFileAccessRetryCountAndTimeout(int& riRetryCount, int& 
 //			and waits between retries the number of seconds in key 
 //			HKLM\Software\Extract Systems\ReusableComponents\BaseUtils\FileAccessTimeout
 //			If the number of retries is exceeded an exception will be thrown
-EXPORT_BaseUtils void waitForFileAccess(const std::string& strFileName, int iAccess);
+EXPORT_BaseUtils void waitForFileAccess(const string& strFileName, int iAccess);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Waits for a file to be readable (performs an open file call as opposed
 //			to waitForFileAccess which merely performs an _access check)
-EXPORT_BaseUtils void waitForFileToBeReadable(const std::string& strFileName);
+//			If bLogException == true an exception will be logged if the file us unable to be
+//			read, if bLogException == false no exception will be logged. (No exception
+//			will be thrown for either case, this method is simply a way to provide the OS time
+//			to free a file for reading).
+EXPORT_BaseUtils void waitForFileToBeReadable(const string& strFileName,
+											  bool bLogException = true);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To set the attributes of a particular file.  If bThrowExceptionIfNotSuccess = true
 //			then will throw a UCLIDException if the operation fails, otherwise the error is
 //			ignored.
-EXPORT_BaseUtils void setFileAttributes(const std::string& strFileName, DWORD dwFileAttributes,
+EXPORT_BaseUtils void setFileAttributes(const string& strFileName, DWORD dwFileAttributes,
 										bool bThrowExceptionIfNotSuccess = true);
 
 //-------------------------------------------------------------------------------------------------
@@ -627,8 +632,8 @@ EXPORT_BaseUtils void replaceASCIICharWithHex(char zAsciiChar,
 // Example:	Input string: "They are %1 and %2. %% is a special character.", 
 //			Interpretations: {Tommy, Jerry}
 //			Return string: "They are Tommy and Jerry. % is a special character."
-EXPORT_BaseUtils std::string combine(const std::string& strInput,
-									 const std::vector<std::string>& vecInterpretations,
+EXPORT_BaseUtils string combine(const string& strInput,
+									 const vector<string>& vecInterpretations,
 									 const string& strSpecialCharacter = "%");
 //-------------------------------------------------------------------------------------------------
 // Replace strWordToBeReplaced in the input string that doesn't have any leading
@@ -642,16 +647,16 @@ EXPORT_BaseUtils void replaceWord(string& strInputText,
 								  bool bCaseSensitive);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Trims specified words from beginning of string. Returns true if anything was trimmed
-EXPORT_BaseUtils bool trimLeadingWord(std::string& strInput, 
+EXPORT_BaseUtils bool trimLeadingWord(string& strInput, 
 									  const string& strWord);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Will remove any low-order ASCII unprintable characters from strInput.
 //          Examples include: 0x1E as seen in P16 #1413
 //          Valid characters: { 0x09, 0x0A, 0x0D, 0x20, 0x21, ..., 0x7F }
-EXPORT_BaseUtils string removeUnprintableCharacters(const std::string& strInput);
+EXPORT_BaseUtils string removeUnprintableCharacters(const string& strInput);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the number of times cChar appears in strText
-EXPORT_BaseUtils unsigned long getCountOfSpecificCharInString(const std::string& strText, 
+EXPORT_BaseUtils unsigned long getCountOfSpecificCharInString(const string& strText, 
 															  char cChar);
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: Searches strInput for any character in strChars and replaces it with strReplace.
@@ -665,9 +670,9 @@ EXPORT_BaseUtils unsigned long getCountOfSpecificCharInString(const std::string&
 // PROMISE:	To return the consolidated string
 // NOTES:	For example, if input string is "ABBBCYYYYZC", strChars is "BYZ", and strReplace
 //			is 'X',	the returned string will be AXCXC.
-EXPORT_BaseUtils std::string replaceMultipleCharsWithOne(const std::string& strInput, 
-															 const std::string& strChars, 
-															 const std::string& strReplace,
+EXPORT_BaseUtils string replaceMultipleCharsWithOne(const string& strInput, 
+															 const string& strChars, 
+															 const string& strReplace,
 															 bool bCaseSensitive);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils void makeFirstCharToUpper(string& strInput);
@@ -782,7 +787,7 @@ void vectorPushBackIfNotContained(vector<T>& vec,
 }
 //-------------------------------------------------------------------------------------------------
 template <class T>
-void eraseFromVector(std::vector<T>& rVector, 
+void eraseFromVector(vector<T>& rVector, 
 					 const T& item)
 {
 	// try to find the item in the vector
@@ -818,8 +823,8 @@ EXPORT_BaseUtils void appendToFile(const string& strData,
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string getTextFileContentsAsString(const string& strTextFileName);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils void convertFileToListOfStrings(std::ifstream &file, 
-												 std::list<std::string> &lstFileContents);
+EXPORT_BaseUtils void convertFileToListOfStrings(ifstream &file, 
+												 list<string> &lstFileContents);
 
 //-------------------------------------------------------------------------------------------------
 // ********* Misc **********
@@ -830,7 +835,7 @@ EXPORT_BaseUtils void convertFileToListOfStrings(std::ifstream &file,
 //			full path to the current application), will be added as strings
 //			to the result vector.  Each of the strings will be made into
 //			uppercase if bMakeUpperCase == true;
-EXPORT_BaseUtils std::vector<std::string> getArgumentsAsVector(int argc, 
+EXPORT_BaseUtils vector<string> getArgumentsAsVector(int argc, 
 															   char *argv[], 
 															   bool bMakeUpperCase);
 //-------------------------------------------------------------------------------------------------
@@ -838,18 +843,18 @@ EXPORT_BaseUtils std::vector<std::string> getArgumentsAsVector(int argc,
 //			begins with strTextToFind.  If true is returned, then rnIndex will
 //			contain the earliest index at which there is a string in vecStrings 
 //			with strTextToFind as its prefix.
-EXPORT_BaseUtils bool vectorContainsStringWithPrefix(const std::vector<std::string>& vecStrings, 
-													 const std::string& strTextToFind,
+EXPORT_BaseUtils bool vectorContainsStringWithPrefix(const vector<string>& vecStrings, 
+													 const string& strTextToFind,
 													 long& rnIndex);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return true if strExt is a recognized image file extension.  
 // It does not matter whether strExt is of the format ".tif" or "tif" (the
 // leading period does not matter)
-EXPORT_BaseUtils bool isImageFileExtension(std::string strExt);
+EXPORT_BaseUtils bool isImageFileExtension(string strExt);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the file type if it is recognized based upon file extension, otherwise
 //			returns kFileUnknown
-EXPORT_BaseUtils EFileType getFileType(const std::string& strFileName);
+EXPORT_BaseUtils EFileType getFileType(const string& strFileName);
 //-------------------------------------------------------------------------------------------------
 // PROMISE:	returns true if the string in strName is a valid identifier i.e. _*[a-zA-Z][a-zA-Z0-9_]*
 //			 

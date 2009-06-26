@@ -1104,7 +1104,7 @@ void getFilesInDir(vector<string>& rvecFiles,
 	}
 }
 //--------------------------------------------------------------------------------------------------
-string getUNCPath(const std::string& strLocalPath)
+string getUNCPath(const string& strLocalPath)
 {
 	// if strLocalPath is already a valid UNC path, simply return it
 	if (PathIsUNC(strLocalPath.c_str()))
@@ -1231,7 +1231,7 @@ bool isFileOrFolderValid(const string& strName)
 	return bReturn;
 }
 //--------------------------------------------------------------------------------------------------
-bool fileExistsAndIsReadable(const std::string& strName)
+bool fileExistsAndIsReadable(const string& strName)
 {
 	// Use the C runtime function _access to determine if the file exists and is readable 
 	return (_access_s(strName.c_str(), giMODE_READ_ONLY) == 0);
@@ -1387,7 +1387,7 @@ bool isImageFileExtension(string strExt)
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-bool isThreeDigitExtension(const std::string& strExt)
+bool isThreeDigitExtension(const string& strExt)
 {
 	return (strExt.length() == 4 && strExt[0] == '.' &&
 		isDigitChar(strExt[1]) && isDigitChar(strExt[2]) &&
@@ -1445,7 +1445,7 @@ EFileType getFileType(const string& strFileName)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-ULONGLONG getSizeOfFile(const std::string& strFileName)
+ULONGLONG getSizeOfFile(const string& strFileName)
 {
 	try
 	{
@@ -1515,7 +1515,7 @@ ULONGLONG getSizeOfFile(const std::string& strFileName)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-ULONGLONG getSizeOfFiles(const std::vector<std::string>& vecFileNames)
+ULONGLONG getSizeOfFiles(const vector<string>& vecFileNames)
 {
 	unsigned long i = 0;
 	try
@@ -1682,7 +1682,7 @@ bool isValidFolder(const string& strFolder)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void copyFile(const std::string &strSrcFileName, const std::string &strDstFileName, 
+void copyFile(const string &strSrcFileName, const string &strDstFileName, 
 			  bool bUpdateFileSettings)
 {
 	try
@@ -1724,7 +1724,8 @@ void copyFile(const std::string &strSrcFileName, const std::string &strDstFileNa
 			iRetries++;
 			Sleep(iTimeout);
 		}
-		waitForFileToBeReadable(strDstFileName);
+		// Call wait for file with bLogException == false [LRCAU #5337]
+		waitForFileToBeReadable(strDstFileName, false);
 
 		// check if the file settings should be updated
 		if(bUpdateFileSettings)
@@ -1756,7 +1757,7 @@ void copyFile(const std::string &strSrcFileName, const std::string &strDstFileNa
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25513");
 }
 //--------------------------------------------------------------------------------------------------
-void moveFile(const std::string strSrcFileName, const std::string strDstFileName,
+void moveFile(const string strSrcFileName, const string strDstFileName,
 			  const bool bOverwrite, const bool bAllowReadonly)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI01882");
@@ -1839,7 +1840,8 @@ void moveFile(const std::string strSrcFileName, const std::string strDstFileName
 			Sleep(iTimeout);
 		}
 
-		waitForFileToBeReadable(strDstFileName);
+		// Call wait for file with bLogException == false [LRCAU #5337]
+		waitForFileToBeReadable(strDstFileName, false);
 		_lastCodePos = "40";
 
 		// If the attributes were changed then restore them
@@ -1851,7 +1853,7 @@ void moveFile(const std::string strSrcFileName, const std::string strDstFileName
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23610");
 }
 //--------------------------------------------------------------------------------------------------
-void deleteFile(const std::string strFileName, const bool bAllowReadonly)
+void deleteFile(const string strFileName, const bool bAllowReadonly)
 {
 	try
 	{
@@ -1897,7 +1899,7 @@ void deleteFile(const std::string strFileName, const bool bAllowReadonly)
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23611");
 }
 //--------------------------------------------------------------------------------------------------
-void convertFileToListOfStrings(std::ifstream &file, std::list<std::string> &lstFileContents)
+void convertFileToListOfStrings(ifstream &file, list<string> &lstFileContents)
 {
 	while (!file.eof())
 	{
@@ -1909,7 +1911,7 @@ void convertFileToListOfStrings(std::ifstream &file, std::list<std::string> &lst
 	}
 }
 //--------------------------------------------------------------------------------------------------
-void waitForFileAccess(const std::string& strFileName, int iAccess)
+void waitForFileAccess(const string& strFileName, int iAccess)
 {
 	// Static variables
 	int iTimeout = -1;
@@ -1954,7 +1956,7 @@ void waitForFileAccess(const std::string& strFileName, int iAccess)
 	while (!bRtnValue);
 }
 //--------------------------------------------------------------------------------------------------
-void waitForFileToBeReadable(const std::string& strFileName)
+void waitForFileToBeReadable(const string& strFileName, bool bLogException)
 {
 	// Static variables
 	int iTimeout = -1;
@@ -1980,16 +1982,20 @@ void waitForFileToBeReadable(const std::string& strFileName)
 		if (!bOpen)
 		{
 			// If retry count has been exceeded log exception
-			if ( iRetries > iRetryCount)
+			if (iRetries > iRetryCount)
 			{
-				// Have checked the access rights the required number of times so log exception
-				UCLIDException ue("ELI24024", "File cannot be opened for reading!");
-				ue.addDebugInfo("File Name", strFileName);
-				ue.addDebugInfo("Number of retries", iRetries);
+				if (bLogException)
+				{
+					// Have checked the access rights the required number of times so log exception
+					UCLIDException ue("ELI24024",
+						"Application Trace: File cannot be opened for reading.");
+					ue.addDebugInfo("File Name", strFileName);
+					ue.addDebugInfo("Number of retries", iRetries);
 
-				// Just log the exception since this function is to give OS time 
-				// to release the file.
-				ue.log();
+					// Just log the exception since this function is to give OS time 
+					// to release the file.
+					ue.log();
+				}
 				break;
 			}
 
