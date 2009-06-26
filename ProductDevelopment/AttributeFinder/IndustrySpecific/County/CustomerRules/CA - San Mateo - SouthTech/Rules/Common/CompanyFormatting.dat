@@ -1,0 +1,134 @@
+//remove ,\s*a\b.+\bcompany
+(.+\W+)\ba\b.*\bCo(?:mpany|orporation)?$;$1
+//remove N.A. and variants
+\W*\bN\.?\x20*A\b\W*$;
+//try removing ,National Association
+(\w+),\s*National\s*Association;$1
+//remove F.S.B
+\W*\bF\.?\x20*S\.?\x20*B\b\W*;
+//remove inc without comma
+//this seems problematic - commented out
+//(\w+)\s+\binc;$1
+\bU\.?\x20?S\b;U S 
+(.+\W+)\bL\.?\x20?P\b\W*$;$1LP
+(.+\W+)\bL\.?\x20?L\.?\x20?C\b\W*$;$1LLC
+^\s*The\s*Pastor\s*of\w*([\s\S]+\bChurch)(?:\bof\s+[\s\S]+);$1
+//specific for California
+.*STATE\W*OF\W*CALIFORNIA\W*EMPLOYMENT\W*DEVEL[\S\s]+;CALIFORNIA ST EMPL DEVEL
+DIVISION\W*OF\W*LABOR\W*STANDARDS\W*ENFORCEMENT;CALIFORNIA ST LABOR STANDARDS
+(.+\b\w{2,}\W+)Construction;$1CONSTR
+//\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000315500.005
+//expand abbreviation Nat to national
+^\W*\bNat\b(?=\W*City\W*Bank\W*(?:of(?:\W*\w+){0,2})?\W*$);National
+//\AtPac\CA - Stanislaus\Set003\Images\MODIFICATION OF TRUST DEED\20079000795600.006
+(.+\W+)Homeowner(?:\W*s)?\W*Association;$1HOA
+//fix JP Morgan
+^\W*J\W*P\W*Morgan\b;JP MORGAN
+//of America to America, abbreviated in next step
+(\w+\W+\w+\W+)\bof\b\W*AMERICA;$1AMERICA
+^(?![\s\S]*United\s*States)([\s\S]+\W+)AMERICA[SN]?\b;$1AM
+(.+\W+)Group\b;$1GRP
+(.+\W+)Management\b;$1MGMT
+(.+\W+)Market;$1MKT
+(.+\W+)Mort?gage\b;$1MTG
+(.+\W+)Security\b;$1SEC
+\bAssociation\b;ASSN
+//AtPac\CA - Stanislaus\Set003\Images\ASSIGNMENT OF MORTGAGE\20079004612700.002
+//require 2 word characters
+//Bank of to bank \AtPac\CA - Stanislaus\Set003\Images\ASSIGNMENT OF MORTGAGE\20079009108500.002
+//get rid of The Bank
+^The\W*Bank\b;BANK
+^(.*\bbank\b.*)\W*\bF\W*A\W*$;$1
+(.+\w{2,}\W+)Bank\b(?:\W*of\b)?;$1BK
+^\W*\bMERS\b\W*$;MORTGAGE ELECTRONIC REGISTN SYS INC
+(.+\W+)REGISTRATION;$1REGISTN
+(.+\W+)SECURITIES\b;$1SEC
+(.+\W+)AUXILIARY;$1AUX
+(.+\W+)DISTRIBUTING;$1DIST
+(.+\W+)Acceptance;$1ACCEPT
+(.+\W+)Finance\b;$1FIN
+(.+\W+)Financial\b;$1FINL
+(?:COUNTY\W*OF\b\W*(.+?)(?:County)?|(.+)\s+County)\W*DEPARTMENT\W*OF\W*CHILD\W*SUPPORT.+;$1 CO CHILD SUP
+\bCOUNTY\W*OF\b\W*(.+)(?:\bCounty);$1 CO
+\bCOUNTY\W*OF\b\W*(.+)(?:\bCounty)?;$1 CO
+(.+\W+)County;$1 CO
+//\bCounty\W*CO$;CO
+(.+\W+)Associates;$1ASSOC
+(.+\W+)(?:services|servicing)\b;$1SERV
+(.+\W+)Incorporated;$1INC
+(.+\W+)Compan(?:y|ies)\b(?:\W*of\b)?;$1CO
+(.+\W+)Corporation;$1CORP
+(.+\W+)PROPERTY;$1PROP
+//change after Trust Test
+(.+\W+)PROPERT(?:Y|IES);$1PROP
+(.+\W+)SOUTH\s*DAKOTA;$1 SD
+(.+\W+)CALIFORNIA;$1 CALIF
+(.+\W+)\bof\W*CALIF;$1 CALIF
+(.+\W+)North\s*Carolina;$1 N CAROLIN
+(.+\W+)Credit\s*Union;$1C U
+(.+\W+)Credit\b;$1CR
+(.+\W+)Partnerships;$1PTNSHP
+(.+\W+)Mutual\b;$1MUTL
+(.+\W+)State\b;$1 ST
+(.+\W+)Estate\b;$1 EST
+(.+\W+)Systems;$1SYS
+(.+\W+)Insurance;$1INS
+(.+\W+)Enterprises;$1ENT
+(.+\W+)Apartments;$1APT
+(.+\W+)Guarant(?:y|ee);$1GUAR
+(.+\W+)National\b;$1NATL
+(.+\W+)Employees;$1EMPL
+(.+\W+)Community;$1COMM
+(.+\W+)Savings;$1SAV
+(.+\W+)Central\b;$1CTRL
+(.+\W+)Counties\b;$1CO
+(.+\W+)Invest(?:ors|ments?)\b;$1INVEST
+(.+\W+)Center\b;$1CTR
+(.+\W+)Developments?\b;$1DEVEL
+(.+\W+)Builders;$1BLDR
+(.+\W+)Pacific\b;$1PAC
+(.+\W+)Title\b;$1TI
+(.+\W+)Reconveyance;$1RECON
+(.+\W+)Service;$1SERV
+(.+\W+)Commercial;$1COML
+(.+\W+)School\W*District\b;$1SCH DIST
+(.+\W+)Limited\b;$1LTD
+(.+\W+)Partnership\b;$1PTNSHP
+(.+\W+)Contractors;$1CONTR
+(.+\W+)Northern(?=\W+CA\b);$1N
+(.+\W+)business;$1BUS
+(.+\W+)administration;$1ADMIN
+(.+\W+)Irrigation\b;$1IRRIG
+(.+\W+)District\b;$1DIST
+(.+\W+)MAINTENANCE;$1MAINT
+(.+\W+)TRANSPORT;$1TRANSP
+(.*\w{2,}\W+)COLLECTION;$1COLL
+(.+\W+)BUREAU\b;$1BUR
+(.+\W+)Brothers;$1BROS
+(.+\W+)Partners\b;$1PTNR
+(.+\W+)Seniors\b;$1SR
+(.+\W+)Estates;$1EST
+(#)\s*(\d+);$1$2
+FRANCHISE\W*TAX\W*BOARD\W*$;FTB
+DIRECTOR\W*OF\W*THE\W*EMPLOYMENT\W*DEVEL\W*DEPARTMENT\W*;CALIFORNIA ST EMPL DEVEL
+//keep above trust stuff
+(.+\W+)\bTrust\W*Deed\b;$1T D
+//specific to trusts:
+\bTRUST\W*\d+[\s\S]*;TRUST
+^\W*(Home\W*Equity\W*)Asset\W*Trust\b;$1TRUST
+(.+\W+)Home\W*(?:Equity\W*)?(?:LOAN|ASSET)\W*TRUST\b;$1TRUST
+//Family, optional digits trust to Trust
+//Survivors\Set003\Images\QUITCLAIM DEED\20079000545500.004.uss
+(.+\W+)(?:Family\W*|Survivor(?:\W*s)?\W*)(?:\d+\W*)?\W*TRUST\b;$1TRUST
+//get rid of digits 
+(.+\W+)(?:\d+\W*)\W*TRUST\b;$1TRUST
+//check this carefully - test before and after
+(.+\W+TRUST)\b(?!\W*(?:Company|\bCO\b|\bINC\b|\bLLC\b))[\S\s]+;$1
+//mortgage abbreviated, also full in case abbrebiation missed
+(.+\W+)(?:Mortgage|MTG)\W*Loan\W*Trust;$1 TRUST
+(.+\W+)LoanS?\b;$1LN
+(.+\W+)FLCA\W*$;$1
+\bUnited\W*States\W*of\W*America\b;UNITED STATES AMERICA
+\band\b;&
+^THE\b\W*;
+^City\s+of\s+(\w[\s\S]+);$1 City of
