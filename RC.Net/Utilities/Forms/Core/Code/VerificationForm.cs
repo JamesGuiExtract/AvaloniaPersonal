@@ -55,7 +55,7 @@ namespace Extract.Utilities.Forms
         /// An event to indicate processing has been cancelled either via <see cref="Cancel"/>
         /// or <see cref="CloseForm"/>.
         /// </summary>
-        EventWaitHandle _cancelledEvent = new ManualResetEvent(false);
+        EventWaitHandle _canceledEvent = new ManualResetEvent(false);
 
         /// <summary>
         /// An event to indicate an exception was thrown from the <see cref="_form"/>.
@@ -80,12 +80,6 @@ namespace Extract.Utilities.Forms
         #region VerificationForm Delegates
 	
         /// <summary>
-        /// Delegate for a function that takes a single <see langword="string"/> as a parameter.
-        /// </summary>
-        /// <param name="value">The parameter for the delegate method.</param>
-        delegate void StringParameterDelegate(string value);
-
-        /// <summary>
         /// Delegate for a function that does not take any parameters.
         /// </summary>
         delegate void ParameterlessDelegate();
@@ -109,7 +103,6 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                // TODO: Fix memory leak. Wait handles are not disposed until finalization.
                 throw ExtractException.AsExtractException("ELI23791", ex);
             }
         }
@@ -128,7 +121,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                return _cancelledEvent.WaitOne(0, false);
+                return _canceledEvent.WaitOne(0, false);
             }
         }
 
@@ -140,18 +133,11 @@ namespace Extract.Utilities.Forms
         /// Ensures the specified config file has valid settings by attempting to initialize an
         /// instance of the DEP using them.
         /// </summary>
-        /// 
         public void ValidateForm()
         {
             try
             {
-                // Use the ValidationThread which simply initializes a DEP instance and returns.
-                Thread validationThread = new Thread(new ThreadStart(ValidationThread));
-
-                // [DataEntry:292] Some .Net control functionality such as clipboard and 
-                // auto-complete depends upon the STA threading model.
-                validationThread.SetApartmentState(ApartmentState.STA);
-                validationThread.Start();
+                Thread validationThread = CreateUserInterfaceThread(ValidationThread);
 
                 validationThread.Join();
 
@@ -165,10 +151,28 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
+        /// Creates and starts a thread with a single-threaded apartment.
+        /// </summary>
+        /// <param name="threadStart">A delegate that represents the functionality of the thread.
+        /// </param>
+        /// <returns>A thread with a single-threaded apartment.</returns>
+        static Thread CreateUserInterfaceThread(ThreadStart threadStart)
+        {
+            // Use the ValidationThread which simply initializes a DEP instance and returns.
+            Thread validationThread = new Thread(threadStart);
+
+            // [DataEntry:292] Some .Net control functionality such as clipboard and 
+            // auto-complete depends upon the STA threading model.
+            validationThread.SetApartmentState(ApartmentState.STA);
+            validationThread.Start();
+
+            return validationThread;
+        }
+
+        /// <summary>
         /// Creates a <see cref="_form"/> instance running in a separate thread
         /// that callers from all threads will share.
         /// </summary>
-        /// 
         public void ShowForm()
         {
             try
@@ -184,20 +188,15 @@ namespace Extract.Utilities.Forms
                 {
                     // Create and start the verification form thread if it doesn't already exist.
                     _closing = false;
-                    _cancelledEvent.Reset();
+                    _canceledEvent.Reset();
                     _exceptionThrownEvent.Reset();
                     _closedEvent.Reset();
 
-                    _uiThread = new Thread(new ThreadStart(VerificationApplicationThread));
-
-                    // [DataEntry:292] Some .Net control functionality such as clipboard and 
-                    // auto-complete depends upon the STA threading model.
-                    _uiThread.SetApartmentState(ApartmentState.STA);
-                    _uiThread.Start();
+                    _uiThread = CreateUserInterfaceThread(VerificationApplicationThread);
 
                     // Wait until the form is initialized (or an error interupts initialization) 
                     // before returning.
-                    WaitHandle[] waitHandles = new WaitHandle[] { _initializedEvent, _cancelledEvent, _exceptionThrownEvent };
+                    WaitHandle[] waitHandles = new WaitHandle[] { _initializedEvent, _canceledEvent, _exceptionThrownEvent };
 
                     WaitHandle.WaitAny(waitHandles);
 
@@ -233,13 +232,12 @@ namespace Extract.Utilities.Forms
                 // Ensure the verification form has been properly initialized.
                 EnsureInitialization();
 
-                // Call Open via BeginInvoke (Asynchronous call)
-                _form.BeginInvoke(new StringParameterDelegate(_form.Open),
-                    new object[] { fileName });
+                // Open the file
+                MainForm.Open(fileName);
 
                 // Wait until the document is either saved or the verification form is closed.
                 WaitHandle[] waitHandles =
-                    new WaitHandle[] { _fileVerified, _cancelledEvent, _exceptionThrownEvent };
+                    new WaitHandle[] { _fileVerified, _canceledEvent, _exceptionThrownEvent };
 
                 WaitHandle.WaitAny(waitHandles);
 
@@ -262,7 +260,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                _cancelledEvent.Set();
+                _canceledEvent.Set();
             }
             catch (Exception ex)
             {
@@ -334,10 +332,10 @@ namespace Extract.Utilities.Forms
                     _fileVerified.Close();
                     _fileVerified = null;
                 }
-                if (_cancelledEvent != null)
+                if (_canceledEvent != null)
                 {
-                    _cancelledEvent.Close();
-                    _cancelledEvent = null;
+                    _canceledEvent.Close();
+                    _canceledEvent = null;
                 }
                 if (_exceptionThrownEvent != null)
                 {
@@ -357,28 +355,6 @@ namespace Extract.Utilities.Forms
         #endregion IDisposable Members
 
         #region VerificationForm Event Handlers
-
-        /// <summary>
-        /// Handles the <see cref="IVerificationForm.ExceptionGenerated"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="IVerificationForm.ExceptionGenerated"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="IVerificationForm.ExceptionGenerated"/> event.</param>
-        void HandleExceptionGenerated(object sender, ExtractExceptionEventArgs e)
-        {
-            if (_lastException != null)
-            {
-                // If there was an previous exception that has not yet been thrown, log it so there
-                // will be a record of it.
-                _lastException.Log();
-            }
-
-            // Record the exception, then fire the _exceptionThrownEvent so any waiting threads move
-            // on.
-            _lastException = e.Exception;
-            _exceptionThrownEvent.Set();
-        }
 
         /// <summary>
         /// Handles the <see cref="IVerificationForm.FileVerified"/> event.
@@ -420,7 +396,7 @@ namespace Extract.Utilities.Forms
 
         #endregion VerificationForm Event Handlers
 
-        #region Private Methods
+        #region VerificationForm Private Properties
 
         /// <summary>
         /// Indicates whether or not the <see cref="_form"/> is initialzed and ready for use.
@@ -434,6 +410,37 @@ namespace Extract.Utilities.Forms
                 return _initializedEvent.WaitOne(0, false);
             }
         }
+
+        /// <summary>
+        /// Gets or sets the verification form.
+        /// </summary>
+        /// <value>The verification form.</value>
+        /// <returns>The verification form.</returns>
+        TForm MainForm
+        {
+            get
+            {
+                if (_form == null)
+                {
+                    _form = new TForm();
+                }
+
+                return _form;
+            }
+            set
+            {
+                if (_form != null)
+                {
+                    _form.Dispose();
+                }
+
+                _form = value;
+            }
+        }
+        
+        #endregion VerificationForm Private Properties
+
+        #region Private Methods
 
         /// <summary>
         /// Checks to be sure the verification form has been properly initialized. If initialization
@@ -511,12 +518,11 @@ namespace Extract.Utilities.Forms
                 verificationForm = new TForm();
 
                 // Register events
-                verificationForm.ExceptionGenerated += HandleExceptionGenerated;
                 verificationForm.Shown += HandleVerificationFormShown;
                 verificationForm.FileVerified += HandleFileVerified;
                 verificationForm.FormClosing += HandleFormClosing;
 
-                _form = verificationForm;
+                MainForm = verificationForm;
 
                 Application.Run(verificationForm);
             }
@@ -541,7 +547,7 @@ namespace Extract.Utilities.Forms
             }
             finally
             {
-                _cancelledEvent.Set();
+                _canceledEvent.Set();
 
                 if (verificationForm != null)
                 {
@@ -582,7 +588,7 @@ namespace Extract.Utilities.Forms
                     if (this.IsFormInitialized)
                     {
                         // Call Close via BeginInvoke (Asynchronous call)
-                        _form.BeginInvoke(new ParameterlessDelegate(_form.Close));
+                        MainForm.BeginInvoke(new ParameterlessDelegate(MainForm.Close));
                     }
 
                     _uiThread.Join();
@@ -615,7 +621,7 @@ namespace Extract.Utilities.Forms
                 // Ensure the form and thread are set to null so that they will be re-initialized
                 // on the next call to Init.
                 _uiThread = null;
-                _form = null;
+                MainForm = null;
                 _closedEvent.Set();
             }
         }
