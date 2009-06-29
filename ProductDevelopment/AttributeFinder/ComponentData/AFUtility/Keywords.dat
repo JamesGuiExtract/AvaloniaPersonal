@@ -145,11 +145,17 @@
 \bM\.?\x20?D\b\.?
 
 
-// Examples: "Husband and Wife", "An Individual"
+//===============================================
+// Person Desginators: 
+//   If any of these expressions are found 
+//   anywhere in the entity, the entity will be 
+//   split as a Person.
+//===============================================
+
 <PersonDesignators>
 // "a single person" and variations
 \b((as|an)\s+)?individual(s|ly)?\b
-\b((a(n|s)?|both|who\s+(is|are))\s+)?(single|unmarried|widow(er)?|(baron|feme)\s+sole)(\s+(person(s)?|individual|man|woman|men|women))?\b
+\b((a(n|s)?|both|who\s+(is|are))\s+)?(single|unmarried|widow(er)?|(baron|feme)\s+sole|adults?)(\s+(person(s)?|individual|man|woman|men|women))?\b
 
 // "Non Vested Spouse"
 \b(non\s+vested\s+spouse)\b
@@ -405,22 +411,22 @@ Metrobank
 //   by "Find company or person(s)".
 //=================================================
 <EntityTrimLeadingPhrases>
-\bTRUSTOR\b
-\bTO\b
 \bAND\b
-\bMADE\b
 \bBETWEEN\b
+\bFOR\b
 \bFROM\b
-\bTHE\s*UNDERSIGNED\b
-\bWITH\b
-\bTHROUGH\b
-\bTHAT\b
-\bWE\b
-\b(PAID\s*)?BY\b
-\bI/WE\b
-\bI\b
 \bGRANTEE\b
-
+\bI\b
+\bI/WE\b
+\bMADE\b
+\b(PAID\s*)?BY\b
+\bTHAT\b
+\bTHE\s*UNDERSIGNED\b
+\bTHROUGH\b
+\bTO\b
+\bTRUSTOR\b
+\bWE\b
+\bWITH\b
 
 //===============================================
 // Entity Trim Any Phrases: [FlexIDSCore #3563]
@@ -450,6 +456,7 @@ Metrobank
 
 \bA\s+[\s\S]{0,15}Corporation\b
 \b(City|County|State|Commonwealth)\s+of\b
+\bof\s.{5,25}(City|County|State|Commonwealth)
 
 \bunder\s+trust\b
 // k:\common\engineering\sample files\acs\tx - midland\set003\images\release of lien\00012944.tif.uss
@@ -550,6 +557,8 @@ Metrobank
 
 // Examples: 
 <InvalidEntities>
+\bDOLLARS?\b
+\bWITNESS(ETH)?\b
 \bGRANTOR\b
 \bGRANTOR'S\s+ADDRESS\b
 \bHIS\s+SUCCESSORS\b
@@ -640,6 +649,7 @@ Le|La|Mc|Mac|Von|Van(der)?|O'|St(\.)?|(?:(?:D|d)e(?:\s*(?:L|l|n)a?)?)
 \bTHE\b
 \bTO\b
 \bAND\b
+\bFOR\b
 
 
 // Examples: "City Of", "State Of", "County Of", "Abc Def County"
