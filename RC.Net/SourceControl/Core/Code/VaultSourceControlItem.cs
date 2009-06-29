@@ -1,9 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using VaultClientIntegrationLib;
-using System.Collections;
 using VaultClientOperationsLib;
+using VaultLib;
 
 namespace Extract.SourceControl
 {
@@ -47,6 +48,30 @@ namespace Extract.SourceControl
 
         #endregion VaultSourceControlItem Properties
 
+        #region VaultSourceControlItem Methods
+
+        /// <summary>
+        /// Creates a <see cref="ChangeSetItemColl"/> for the <see cref="VaultSourceControlItem"/>.
+        /// </summary>
+        /// <returns>A <see cref="ChangeSetItemColl"/> for the 
+        /// <see cref="VaultSourceControlItem"/>.</returns>
+        ChangeSetItemColl GetChangeSet()
+        {
+            // Get the working folder for this file
+            WorkingFolder workingFolder = Client.GetWorkingFolder(_file);
+
+            // Create the change set item
+            ChangeSetItem item = Client.MakeChangeSetItemForKnownChange(_file, workingFolder, false);
+
+            // Add the change set item to a new collection
+            ChangeSetItemColl changeSet = new ChangeSetItemColl(1);
+            changeSet.Add(item);
+
+            return changeSet;
+        }
+
+        #endregion VaultSourceControlItem Methods
+
         #region ISourceControlItem Members
 
         /// <summary>
@@ -71,12 +96,11 @@ namespace Extract.SourceControl
         /// </summary>
         public void CheckIn()
         {
-            // Since we already have VaultClientFile, it would be faster to go through 
-            // ClientInstance directly, but ProcessCommandCheckin does a lot of additional 
-            // processing (e.g. if no changes were made the check out is undone, ensures the 
-            // file is checked out to the current user). It's worth the hit for the extra work.
-            ServerOperations.ProcessCommandCheckin(new string[] { _file.FullPath },
-                UnchangedHandler.UndoCheckout, false, LocalCopyType.Leave, false);
+            bool result = Client.Commit(GetChangeSet(), false, false);
+            if (!result)
+            {
+                throw new InvalidOperationException("Commit failed: " + _file.FullPath);
+            }
         }
 
         /// <summary>

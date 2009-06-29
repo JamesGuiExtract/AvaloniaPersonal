@@ -152,6 +152,7 @@ namespace LICode
                     // reset the values of the current LI number and the LI string builder
                     datFile.LINum = -1;
                     datFile.builder = null;
+                    datFile.vssItem = null;
                 }
             }
         }
