@@ -161,7 +161,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public DataEntryApplicationForm() : this(_defaultConfigFile)
         {
-
         }
 
         /// <summary>
@@ -398,6 +397,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="fileName">The filename of the document to open.</param>
         public void Open(string fileName)
         {
+            if (InvokeRequired)
+            {
+                Invoke(new StringParameter(Open), new object[] { fileName });
+                return;
+            }
+
             try
             {
                 _imageViewer.OpenImage(fileName, false);
@@ -764,14 +769,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// This event indicates that the current document was saved
         /// </summary>
         public event EventHandler<EventArgs> FileVerified;
-
-        /// <summary>
-        /// Objects that register to receive events will be notified of exceptions that were
-        /// displayed as a result of an event for which there is no known direct caller.  For
-        /// example, if pressing the save button results in an exception saving data, the exception
-        /// displayed to the user will also be passed to any registered listener of this event.
-        /// </summary>
-        public event EventHandler<ExtractExceptionEventArgs> ExceptionGenerated;
 
         #endregion Events
 
@@ -1222,18 +1219,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Displays an exception and raises the ExceptionGenerated event.
+        /// Displays and throws an exception.
         /// </summary>
         /// <param name="ee">The <see cref="ExtractException"/> to display.</param>
-        private void DisplayCriticalException(ExtractException ee)
+        static void DisplayCriticalException(ExtractException ee)
         {
             ee.Display();
-
-            // Raise the ExceptionGenerated event.
-            if (this.ExceptionGenerated != null)
-            {
-                ExceptionGenerated(this, new ExtractExceptionEventArgs(ee));
-            }
+            throw ee;
         }
 
         /// <summary>
