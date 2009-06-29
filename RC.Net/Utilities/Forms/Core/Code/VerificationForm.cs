@@ -74,6 +74,11 @@ namespace Extract.Utilities.Forms
         /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
         /// </summary>
         volatile bool _closing;
+
+        /// <summary>
+        /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
+        /// </summary>
+        static object _lock = new object();
 		
 	    #endregion VerificationForm Fields
 
@@ -175,49 +180,52 @@ namespace Extract.Utilities.Forms
         /// </summary>
         public void ShowForm()
         {
-            try
+            lock (_lock)
             {
-                if (_closing)
+                try
                 {
-                    ExtractException.Assert("ELI24002",
-                        "Unable to access existing verification form.",
-                        _closedEvent.WaitOne(_THREAD_TIMEOUT, false));
-                }
+                    if (_closing)
+                    {
+                        ExtractException.Assert("ELI24002",
+                            "Unable to access existing verification form.",
+                            _closedEvent.WaitOne(_THREAD_TIMEOUT, false));
+                    }
 
-                if (_uiThread == null)
+                    if (_uiThread == null)
+                    {
+                        // Create and start the verification form thread if it doesn't already exist.
+                        _closing = false;
+                        _canceledEvent.Reset();
+                        _exceptionThrownEvent.Reset();
+                        _closedEvent.Reset();
+
+                        _uiThread = CreateUserInterfaceThread(VerificationApplicationThread);
+
+                        // Wait until the form is initialized (or an error interupts initialization) 
+                        // before returning.
+                        WaitHandle[] waitHandles = new WaitHandle[] { _initializedEvent, _canceledEvent, _exceptionThrownEvent };
+
+                        WaitHandle.WaitAny(waitHandles);
+
+                        // Notify any interested listeners of exceptions that were caught when showing
+                        // the verification form.
+                        HandleExceptions();
+                    }
+                    else
+                    {
+                        // If the verification thread already exists, simply check to see that it is 
+                        // properly initialized.
+                        EnsureInitialization();
+                    }
+                }
+                catch (Exception ex)
                 {
-                    // Create and start the verification form thread if it doesn't already exist.
-                    _closing = false;
-                    _canceledEvent.Reset();
-                    _exceptionThrownEvent.Reset();
-                    _closedEvent.Reset();
+                    // If there was a problem, end the verification form.  true so any further exceptions 
+                    // will be logged and not thrown
+                    EndVerificationApplicationThread(true);
 
-                    _uiThread = CreateUserInterfaceThread(VerificationApplicationThread);
-
-                    // Wait until the form is initialized (or an error interupts initialization) 
-                    // before returning.
-                    WaitHandle[] waitHandles = new WaitHandle[] { _initializedEvent, _canceledEvent, _exceptionThrownEvent };
-
-                    WaitHandle.WaitAny(waitHandles);
-
-                    // Notify any interested listeners of exceptions that were caught when showing
-                    // the verification form.
-                    HandleExceptions();
-                }
-                else
-                {
-                    // If the verification thread already exists, simply check to see that it is 
-                    // properly initialized.
-                    EnsureInitialization();
-                }
-            }
-            catch (Exception ex)
-            {
-                // If there was a problem, end the verification form.  true so any further exceptions 
-                // will be logged and not thrown
-                EndVerificationApplicationThread(true);
-
-                throw ExtractException.AsExtractException("ELI23977", ex);
+                    throw ExtractException.AsExtractException("ELI23977", ex);
+                } 
             }
         }
 
@@ -227,30 +235,48 @@ namespace Extract.Utilities.Forms
         /// <param name="fileName">Specifies the filename of the document image to open.</param>
         public void ShowDocument(string fileName)
         {
-            try
+            if (Canceled)
             {
-                // Ensure the verification form has been properly initialized.
-                EnsureInitialization();
-
-                // Open the file
-                MainForm.Open(fileName);
-
-                // Wait until the document is either saved or the verification form is closed.
-                WaitHandle[] waitHandles =
-                    new WaitHandle[] { _fileVerified, _canceledEvent, _exceptionThrownEvent };
-
-                WaitHandle.WaitAny(waitHandles);
-
-                // Notify any interested listeners of exceptions that were caught during the time
-                // the document was displayed or was being saved.
-                HandleExceptions();
+                return;
             }
-            catch (Exception ex)
+
+            lock (_lock)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
-                ee.AddDebugData("Filename", fileName, false);
-                throw ee;
+                try
+                {
+                    if (Canceled)
+                    {
+                        return;
+                    }
+
+                    // Ensure the verification form has been properly initialized.
+                    EnsureInitialization();
+
+                    // Open the file
+                    MainForm.Open(fileName);
+
+                    // Wait until the document is either saved or the verification form is closed.
+                    WaitHandle[] waitHandles =
+                        new WaitHandle[] { _fileVerified, _canceledEvent, _exceptionThrownEvent };
+
+                    WaitHandle.WaitAny(waitHandles);
+
+                    // Notify any interested listeners of exceptions that were caught during the time
+                    // the document was displayed or was being saved.
+                    HandleExceptions();
+                }
+                catch (Exception ex)
+                {
+                    ExtractException ee = ExtractException.AsExtractException("ELI23970", ex);
+                    ee.AddDebugData("Filename", fileName, false);
+                    throw ee;
+                } 
             }
+
+            // Sleep to allow other threads waiting on the _lock to proceed, otherwise
+            // this thread is likely to re-enter a _lock section before windows gives any
+            // waiting threads an opportunity to proceed.
+            Thread.Sleep(0);
         }
 
         /// <summary>
@@ -275,8 +301,11 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Close the verification form.  false so any exceptions ending the thread are thrown.
-                EndVerificationApplicationThread(false);
+                lock (_lock)
+                {
+                    // Close the verification form.  false so any exceptions ending the thread are thrown.
+                    EndVerificationApplicationThread(false);
+                }
             }
             catch (Exception ex)
             {

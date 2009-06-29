@@ -68,12 +68,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             new VerificationForm<DataEntryApplicationForm>();
 
         /// <summary>
-        /// Mutex object to prevent multiple threads from executing 
-        /// <see cref="IFileProcessingTask"/> methods at once.
-        /// </summary>
-        private static object _lock = new object();
-
-        /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
         /// IPersistStream interface. This is an int because that is the return type of 
         /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
@@ -287,14 +281,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                lock (_lock)
-                {
-                    DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
-                    DataEntryApplicationForm.DefaultStandAloneMode = false;
+                DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
+                DataEntryApplicationForm.DefaultStandAloneMode = false;
 
-                    // Ask the manager to create and display the data entry form.
-                    _dataEntryFormManager.ShowForm();
-                }
+                // Ask the manager to create and display the data entry form.
+                _dataEntryFormManager.ShowForm();
             }
             catch (Exception ex)
             {
@@ -325,23 +316,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                lock (_lock)
+                if (!bCancelRequested)
                 {
-                    if (!bCancelRequested && !_dataEntryFormManager.Canceled)
-                    {
-                        // As long as processing has not been cancelled, open the supplied document in the
-                        // data entry form.
-                        _dataEntryFormManager.ShowDocument(bstrFileFullName);
-                    }
+                    // As long as processing has not been cancelled, open the supplied document in the
+                    // data entry form.
+                    _dataEntryFormManager.ShowDocument(bstrFileFullName);
                 }
 
-                // Sleep to allow other threads waiting on the _lock to proceed, otherwise
-                // this thread is likely to re-enter a _lock section before windows gives any
-                // waiting threads an opportunity to proceed.
-                Thread.Sleep(0);
-
                 return (!bCancelRequested && !_dataEntryFormManager.Canceled);
-
             }
             catch (Exception ex)
             {
@@ -375,10 +357,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                lock (_lock)
-                {
-                    _dataEntryFormManager.CloseForm();
-                }
+                _dataEntryFormManager.CloseForm();
             }
             catch (Exception ex)
             {
