@@ -71,6 +71,7 @@
     <Compile Include="CustomizableMessageBoxManager.cs" />
     <Compile Include="CustomizableMessageBoxResult.cs" />
     <Compile Include="FormsMethods.cs" />
+    <Compile Include="IVerificationForm.cs" />
     <Compile Include="Inputbox.cs" />
     <Compile Include="InputBoxForm.cs">
       <SubType>Form</SubType>
@@ -107,6 +108,7 @@
     </Compile>
     <Compile Include="TemporaryCursor.cs" />
     <Compile Include="TemporaryWaitCursor.cs" />
+    <Compile Include="VerificationForm.cs" />
     <Compile Include="TimeoutResult.cs" />
   </ItemGroup>
   <ItemGroup>

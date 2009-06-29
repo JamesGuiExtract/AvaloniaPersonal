@@ -152,7 +152,6 @@
     </Compile>
     <Compile Include="ComClass.cs">
     </Compile>
-    <Compile Include="DataEntryApplicationFormManager.cs" />
     <Compile Include="DataEntryScrollPanel.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -64,8 +64,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see cref="DataEntryApplicationForm"/> instance and be able to route exceptions back to
         /// to the calling thread.
         /// </summary>
-        private static DataEntryApplicationFormManager _dataEntryFormManager =
-            new DataEntryApplicationFormManager();
+        private static VerificationForm<DataEntryApplicationForm> _dataEntryFormManager =
+            new VerificationForm<DataEntryApplicationForm>();
 
         /// <summary>
         /// Mutex object to prevent multiple threads from executing 
@@ -289,8 +289,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 lock (_lock)
                 {
+                    DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
+                    DataEntryApplicationForm.DefaultStandAloneMode = false;
+
                     // Ask the manager to create and display the data entry form.
-                    _dataEntryFormManager.ShowForm(_configFileName);
+                    _dataEntryFormManager.ShowForm();
                 }
             }
             catch (Exception ex)
@@ -324,7 +327,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 lock (_lock)
                 {
-                    if (!bCancelRequested && !_dataEntryFormManager.Cancelled)
+                    if (!bCancelRequested && !_dataEntryFormManager.Canceled)
                     {
                         // As long as processing has not been cancelled, open the supplied document in the
                         // data entry form.
@@ -337,7 +340,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // waiting threads an opportunity to proceed.
                 Thread.Sleep(0);
 
-                return (!bCancelRequested && !_dataEntryFormManager.Cancelled);
+                return (!bCancelRequested && !_dataEntryFormManager.Canceled);
 
             }
             catch (Exception ex)
@@ -567,9 +570,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 using (new TemporaryWaitCursor())
                 {
+                    DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
+                    DataEntryApplicationForm.DefaultStandAloneMode = false;
+
                     // Ask the manager to validate the DEP can be initialize using the specified
                     // config file
-                    _dataEntryFormManager.ValidateForm(_configFileName);
+                    _dataEntryFormManager.ValidateForm();
                 }
             }
             catch (Exception ex)

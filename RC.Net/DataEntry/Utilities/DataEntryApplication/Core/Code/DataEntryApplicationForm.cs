@@ -35,7 +35,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
     /// or allowing DEP controls to be populated via OCR "swipes" in the image viewer.</item>
     /// </list>
     /// </summary>
-    public partial class DataEntryApplicationForm : Form
+    public partial class DataEntryApplicationForm : Form, IVerificationForm
     {
         #region Constants
 
@@ -51,22 +51,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         #endregion Constants
 
-        #region Delegates
-
-        /// <summary>
-        /// Delegate for a function that takes a single <see langref="string"/> as a paramater.
-        /// </summary>
-        /// <param name="value">The parameter for the delegate method.</param>
-        private delegate void StringParameterDelegate(string value);
-
-        /// <summary>
-        /// Delegate for a function that does not take any parameters.
-        /// </summary>
-        private delegate void ParameterlessDelegate();
-
-        #endregion Delegates
-
         #region Fields
+
+        /// <summary>
+        /// The default configuration file to use.
+        /// </summary>
+        static string _defaultConfigFile;
+
+        /// <summary>
+        /// The <see cref="StandAloneMode"/> when the <see cref="DataEntryApplicationForm"/> is 
+        /// first created.
+        /// </summary>
+        static bool _defaultStandAloneMode = true;
 
         /// <summary>
         /// The data entry panel control host implementation to be used by the application.
@@ -78,7 +74,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// (<see langref="true"/>) or whether another application has launched 
         /// <see cref="DataEntryApplicationForm"/> via the COM interface (<see langref="false"/>).
         /// </summary>
-        private bool _standAloneMode = true;
+        private bool _standAloneMode = _defaultStandAloneMode;
 
         /// <summary>
         /// Indicates whether the form has finished loading.
@@ -159,6 +155,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #endregion Fields
 
         #region Constructors
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataEntryApplicationForm"/> class.
+        /// </summary>
+        public DataEntryApplicationForm() : this(_defaultConfigFile)
+        {
+
+        }
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryApplicationForm"/> class.
@@ -350,6 +354,40 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Gets or sets the default configuration file to use.
+        /// </summary>
+        /// <value>The default configuration file to use.</value>
+        /// <returns>The default configuration file to use.</returns>
+        public static string DefaultConfigurationFile
+        {
+            get
+            {
+                return _defaultConfigFile;
+            }
+            set
+            {
+                _defaultConfigFile = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the default <see cref="StandAloneMode"/>.
+        /// </summary>
+        /// <value>The default <see cref="StandAloneMode"/>.</value>
+        /// <returns>The default <see cref="StandAloneMode"/>.</returns>
+        public static bool DefaultStandAloneMode
+        {
+            get
+            {
+                return _defaultStandAloneMode;
+            }
+            set
+            {
+                _defaultStandAloneMode = value;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -358,7 +396,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// A thread-safe method that opens the specified document.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>
-        public void OpenDocument(string fileName)
+        public void Open(string fileName)
         {
             try
             {
@@ -725,7 +763,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// This event indicates that the current document was saved
         /// </summary>
-        public event EventHandler<EventArgs> DocumentSaved;
+        public event EventHandler<EventArgs> FileVerified;
 
         /// <summary>
         /// Objects that register to receive events will be notified of exceptions that were
@@ -1136,21 +1174,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // Request that the control host save its data.
             if (dataSaved)
             {
-                // If the control host was able to save the data, raise the DocumentSaved event.
-                OnSave();
+                // If the control host was able to save the data, raise the FileVerified event.
+                OnFileVerified(new EventArgs());
             }
 
             return dataSaved;
         }
 
         /// <summary>
-        /// Raises the <see cref="DocumentSaved"/> event.
+        /// Raises the <see cref="FileVerified"/> event.
         /// </summary>
-        private void OnSave()
+        /// <param name="e">The event data associated with the <see cref="FileVerified"/> 
+        /// event.</param>
+        protected virtual void OnFileVerified(EventArgs e)
         {
-            if (DocumentSaved != null)
+            if (FileVerified != null)
             {
-                DocumentSaved(this, new EventArgs());
+                FileVerified(this, e);
             }
         }
 
