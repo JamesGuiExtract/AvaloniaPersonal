@@ -1030,8 +1030,15 @@ namespace Extract.DataEntry
 
                         if (DataCanBeSaved())
                         {
+                            // Create a copy of the data to be saved so that attributes that should
+                            // not be persisted can be removed.
+                            ICopyableObject copyThis = (ICopyableObject)_attributes;
+                            IUnknownVector dataCopy = (IUnknownVector)copyThis.Clone();
+
+                            PruneNonPersistingAttributes(dataCopy);
+
                             // If all attributes passed validation, save the data.
-                            _attributes.SaveTo(_imageViewer.ImageFile + ".voa", true);
+                            dataCopy.SaveTo(_imageViewer.ImageFile + ".voa", true);
 
                             _dirty = false;
                         }
@@ -4279,6 +4286,31 @@ namespace Extract.DataEntry
             }
 
             return viewableAttributes;
+        }
+
+        /// <summary>
+        /// Removes all <see cref="IAttribute"/>s not marked as persistable from the provided
+        /// attribute hierarchy.
+        /// </summary>
+        /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
+        /// non-persistable attributes should be removed.</param>
+        private void PruneNonPersistingAttributes(IUnknownVector attributes)
+        {
+            int count = attributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                IAttribute attribute = (IAttribute)attributes.At(i);
+                if (AttributeStatusInfo.IsAttributePersistable(attribute))
+                {
+                    PruneNonPersistingAttributes(attribute.SubAttributes);
+                }
+                else
+                {
+                    attributes.Remove(i);
+                    count--;
+                    i--;
+                }
+            }
         }
 
         #endregion Private Members

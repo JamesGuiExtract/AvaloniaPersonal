@@ -707,6 +707,11 @@ namespace Extract.DataEntry
         /// </summary>
         private bool _tabStopRequired = true;
 
+        /// <summary>
+        /// Specifies whether the attribute should be persisted in output.
+        /// </summary>
+        private bool _persistAttribute = true;
+
         #endregion Fields
 
         #region Constructors
@@ -801,6 +806,26 @@ namespace Extract.DataEntry
             set
             {
                 _tabStopRequired = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the attribute should be persisted in output.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="IAttribute"/> should be persisted in
+        /// output; <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> will be persisted in
+        /// output; <see langword="false"/> otherwise.</returns>
+        public bool PersistAttribute
+        {
+            get
+            {
+                return _persistAttribute;
+            }
+
+            set
+            {
+                _persistAttribute = value;
             }
         }
 
@@ -997,12 +1022,8 @@ namespace Extract.DataEntry
         /// <param name="validationQuery">A query which will cause the validation list for the 
         /// validator associated with the attribute to be updated using values from other
         /// <see cref="IAttribute"/>'s and/or a database query.</param>
-        /// <returns><see langword="true"/> if the the call resulted in 
-        /// <see cref="AttributeStatusInfo"/> data being set or modified, or <see langword="false"/>
-        /// if the <see cref="IAttribute"/> already was configured with the specified parameters.
-        /// </returns>
         [ComVisible(false)]
-        public static bool Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
+        public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
             bool tabStopRequired, DataEntryValidator validator, string autoUpdateQuery,
             string validationQuery)
@@ -1013,50 +1034,71 @@ namespace Extract.DataEntry
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26134",
                     _OBJECT_NAME);
 
-                bool modified = false;
-
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
                 // Set/update the owningControl value if necessary.
                 if (statusInfo._owningControl != owningControl)
                 {
-                    modified = true;
                     statusInfo._owningControl = owningControl;
                 }
 
                 // Check to see if the display order should be set.
+                bool reorder = false;
                 if (displayOrder != null)
                 {
                     // Set/update the displayOrder value if necessary.
                     string fullDisplayOrder = DataEntryMethods.GetTabIndex((Control)owningControl) +
                         "." + ((int)displayOrder).ToString(CultureInfo.CurrentCulture);
 
+                    // If the displayOrder value has changed, sourceAttributes need to be reordered.
                     if (statusInfo._displayOrder != fullDisplayOrder)
                     {
-                        modified = true;
+                        reorder = true;
                         statusInfo._displayOrder = fullDisplayOrder;
                     }
+                }
+
+                // If the display order hasn't changed, but the attribute doesn't yet exist in
+                // sourceAttributes, reordering needs to happen so that it gets added.
+                if (!reorder)
+                {
+                    if (sourceAttributes.Size() == 0)
+                    {
+                        reorder = true;
+                    }
+                    else
+                    {
+                        int index = -1;
+                        sourceAttributes.FindByReference(attribute, 0, ref index);
+                        if (index < 0)
+                        {
+                            reorder = true;
+                        }
+                    }
+                }
+
+                if (reorder)
+                {
+                    DataEntryMethods.ReorderAttributes(sourceAttributes,
+                            DataEntryMethods.AttributeAsVector(attribute));
                 }
 
                 // Set/update the propogated status if necessary.
                 if (considerPropagated && !statusInfo._hasBeenPropagated)
                 {
-                    modified = true;
                     statusInfo._hasBeenPropagated = considerPropagated;
                 }
 
                 // Set/update the validator if necessary.
                 if (validator != null && statusInfo._validator != validator)
                 {
-                    modified = true;
                     statusInfo._validator = validator;
                 }
 
                 // Update the tabStopRequired if necessary
                 if (tabStopRequired != statusInfo._tabStopRequired)
                 {
-                    modified = true;
                     statusInfo._tabStopRequired = tabStopRequired;
                 }
 
@@ -1078,8 +1120,6 @@ namespace Extract.DataEntry
 
                 if (autoUpdateQuery != statusInfo._autoUpdateQuery)
                 {
-                    modified = true;
-
                     // Dispose of any previously existing auto-update trigger.
                     AutoUpdateTrigger existingAutoUpdateTrigger;
                     if (_autoUpdateTriggers.TryGetValue(attribute, out existingAutoUpdateTrigger))
@@ -1119,8 +1159,6 @@ namespace Extract.DataEntry
 
                 if (validationQuery != statusInfo._validationQuery)
                 {
-                    modified = true;
-
                     // Dispose of any previously existing validation trigger.
                     AutoUpdateTrigger existingValidationTrigger;
                     if (_validationTriggers.TryGetValue(attribute, out existingValidationTrigger))
@@ -1185,8 +1223,6 @@ namespace Extract.DataEntry
                 {
                     OnAttributeInitialized(attribute, sourceAttributes, owningControl);
                 }
-
-                return modified;
             }
             catch (Exception ex)
             {
@@ -1997,6 +2033,50 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Indicates whether the attribute will be persisted in output.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose persistence status is needed.
+        /// </param>
+        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> will be persisted in
+        /// output; <see langword="false"/> otherwise.</returns>
+        [ComVisible(false)]
+        public static bool IsAttributePersistable(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._persistAttribute;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26588", ex);
+            }
+        }
+        
+        /// <summary>
+        /// Specifies whether the attribute should be persisted in output.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose persistence status is to be
+        /// changed.</param>
+        /// <param name="persistAttribute"><see langword="true"/> if the <see cref="IAttribute"/>
+        /// should be persisted in output; <see langword="false"/> otherwise.</param>
+        [ComVisible(false)]
+        public static void SetAttributeAsPersistable(IAttribute attribute, bool persistAttribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._persistAttribute = persistAttribute;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26589", ex);
+            }
+        }
+
         /// <overloads>Obtains the full path of the <see cref="IAttribute"/> from the root of the
         /// hierarchy.</overloads>
         /// <summary>
@@ -2673,6 +2753,7 @@ namespace Extract.DataEntry
                 _validator = (source._validator == null) 
                     ? null : (DataEntryValidator)source._validator.Clone();
                 _tabStopRequired = source._tabStopRequired;
+                _persistAttribute = source._persistAttribute;
                 
                 // _raisingAttributeValueModified is intentionally not copied.
                 // Do not copy _autoUpdateQuery or _validationQuery since a query is specified to

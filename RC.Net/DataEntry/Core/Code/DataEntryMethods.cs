@@ -375,7 +375,6 @@ namespace Extract.DataEntry
                     sourceAttributes.RemoveValue((IAttribute)removedMatches.At(i));
                 }
 
-                bool reorderAttributes = false;
                 attributeCount = attributes.Size();
                 for (int i = 0; i < attributeCount; i++)
                 {
@@ -384,15 +383,9 @@ namespace Extract.DataEntry
 
                     // If the attribute did not already have the status info provided, trigger the 
                     // attributes in sourceAttributes to be reordered according to displayOrder.
-                    reorderAttributes |= AttributeStatusInfo.Initialize(attribute, sourceAttributes,
+                    AttributeStatusInfo.Initialize(attribute, sourceAttributes,
                         owningControl, displayOrder, considerPropagated, tabStopRequired, validator,
                         autoUpdateQuery, validationQuery);
-                }
-
-                // Re-order the sourceAttributes by displayOrder if needed.
-                if (reorderAttributes)
-                {
-                    ReorderAttributes(sourceAttributes, attributes);
                 }
 
                 return attributes;

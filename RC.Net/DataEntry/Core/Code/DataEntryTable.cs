@@ -295,7 +295,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the table is configured to generate column hints when
         /// possible; <see langword="false"/> if the table is not configured to generate column
         /// hints.</returns>
-        [Category("Data Entry Table")]        
+        [Category("Data Entry Table")]
         public new bool ColumnHintsEnabled
         {
             get
@@ -847,6 +847,10 @@ namespace Extract.DataEntry
                         _tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
                             "PlaceholderAttribute_" + base.Name, MultipleMatchSelectionMode.First, true,
                             _sourceAttributes, null, this, null, true, true, null, null, null);
+
+                        // Don't persist placeholder attributes in output.
+                        AttributeStatusInfo.SetAttributeAsPersistable(
+                            _tabOrderPlaceholderAttribute, false);
 
                         // Mark this attribute as viewable even thought it will not be used to store any
                         // useful data so that focus will be directed to it.
