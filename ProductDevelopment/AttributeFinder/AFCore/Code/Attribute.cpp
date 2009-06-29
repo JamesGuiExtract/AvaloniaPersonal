@@ -91,7 +91,7 @@ STDMETHODIMP CAttribute::get_Name(BSTR *pVal)
 	{
 		validateLicense();
 
-		*pVal = get_bstr_t(m_strAttributeName.c_str()).copy();
+		*pVal = _bstr_t(m_strAttributeName.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04140");
 

@@ -106,7 +106,7 @@ STDMETHODIMP CRuleExecutionEnv::GetCurrentRSDFileName(BSTR *pstrFileName)
 		stack<string>& rThisThreadRSDFileStack = getCurrentStack(true);
 
 		// the entry was found - return the corresponding string
-		*pstrFileName = get_bstr_t(rThisThreadRSDFileStack.top().c_str()).copy();
+		*pstrFileName = get_bstr_t(rThisThreadRSDFileStack.top()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07456")
 
@@ -126,7 +126,7 @@ STDMETHODIMP CRuleExecutionEnv::GetCurrentRSDFileDir(BSTR *pstrRSDFileDir)
 		// with the corresponding RSD file
 		string strRSDFile = rThisThreadRSDFileStack.top();
 		string strRSDFileDir = getDirectoryFromFullPath(strRSDFile);
-		*pstrRSDFileDir = get_bstr_t(strRSDFileDir.c_str()).copy();
+		*pstrRSDFileDir = get_bstr_t(strRSDFileDir).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI07457")
 
@@ -143,16 +143,16 @@ STDMETHODIMP CRuleExecutionEnv::IsRSDFileExecuting(BSTR strFileName,
 		// get a ***COPY*** of the current thread's RSD file stack
 		stack<string> rThisThreadRSDFileStack = getCurrentStack();
 
-		// get the input string as an STL string
-		string stdstrFileName = asString(strFileName);
+		// Get the file name as a const char*
+		const char* pszFileName = asString(strFileName).c_str();
 
 		// keep popping the stack to see if any of the entries
 		// match the input file
 		while (!rThisThreadRSDFileStack.empty())
 		{
 			// check the topmost entry in the stack
-			string strTopFile = rThisThreadRSDFileStack.top();
-			if (_strcmpi(strTopFile.c_str(), stdstrFileName.c_str()) == 0)
+			const char* pszFile = rThisThreadRSDFileStack.top().c_str();
+			if (_strcmpi(pszFile, pszFileName) == 0)
 			{
 				// we found a match
 				*pbValue = VARIANT_TRUE;

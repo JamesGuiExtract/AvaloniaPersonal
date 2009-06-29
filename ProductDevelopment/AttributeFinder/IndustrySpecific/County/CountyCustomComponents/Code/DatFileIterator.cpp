@@ -11,16 +11,15 @@ DatFileIterator::DatFileIterator(const string& strDatFileBaseFolder, const strin
 : FileIterator("")
 {
 	// Check if the corresponding dat file folder exists
-	string strDatFileFolder = strDatFileBaseFolder + "\\" + strDocType;
+	string strDatFileFolder = strDatFileBaseFolder + "\\" + strDocType + "\\";
 	m_bIsValidDirectory = isValidFolder(strDatFileFolder);
 	if (m_bIsValidDirectory)
 	{
 		// Auto encrypt the dat files
-		string strDatSearchPath = strDatFileFolder + "\\*.dat";
-		autoEncryptFiles(strDatSearchPath);
+		autoEncryptFiles(strDatFileFolder);
 
 		// Prepare to search for the etfs
-		reset(strDatSearchPath + ".etf");
+		reset(strDatFileFolder + "*.dat.etf");
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -41,14 +40,15 @@ string DatFileIterator::getFileName()
 	return fileName;
 }
 //-------------------------------------------------------------------------------------------------
-void DatFileIterator::autoEncryptFiles(const string& strSearchPath)
+void DatFileIterator::autoEncryptFiles(const string& strDatFilePath)
 {
 	// Search for dat files
-	FileIterator fileIter(strSearchPath);
+	FileIterator fileIter(strDatFilePath + "*.dat");
 	while (fileIter.moveNext())
 	{
 		// Auto encrypt the dat files
-		string fileName = fileIter.getFileName();
+		// Build full path of file name [FlexIDSCore #3571]
+		string fileName = strDatFilePath + fileIter.getFileName();
 		ULONGLONG nFileSize = fileIter.getFileSize();
 		if (nFileSize == 0)
 		{

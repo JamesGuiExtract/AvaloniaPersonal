@@ -17,7 +17,8 @@ public:
 
 private:
 
-	static void autoEncryptFiles(const string& strSearchPath);
+	// PURPOSE: To encrypt all *.dat files in the specified dat file path
+	static void autoEncryptFiles(const string& strDatFilePath);
 
 	bool m_bIsValidDirectory;
 };

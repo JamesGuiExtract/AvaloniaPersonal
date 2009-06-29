@@ -29,8 +29,6 @@ public:
 
 DECLARE_REGISTRY_RESOURCEID(IDR_AFUTILITY)
 
-DECLARE_CLASSFACTORY_SINGLETON(CAFUtility)
-
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CAFUtility)
@@ -156,8 +154,6 @@ private:
 	// Methods
 	//////////
 	//----------------------------------------------------------------------------------------------
-	UCLID_AFUTILSLib::IAFUtilityPtr getThisAsCOMPtr();
-	//----------------------------------------------------------------------------------------------
 	// at position nCurrentMatchPos stored in vecPatterns.  If so, 
 	// add the attribute to ripMatches, and remove attribute from 
 	// ripParentOfAttribute if bRemoveMatchFromParent==true.  An attribute
@@ -169,79 +165,55 @@ private:
 		long nCurrentMatchPos, IIUnknownVectorPtr& ripMatches, 
 		bool bRemoveMatchFromParent, 
 		bool& rbAttributeWasMatched);
-
+	//---------------------------------------------------------------------------------------------
 	void processAttributesForMatches( const vector<QueryPattern>& vecPatterns, 
 		const vector<QueryPattern>& vecNonSelectPatterns, 
 		long nCurrentMatchPos, IIUnknownVectorPtr& ripMatches, 
 		bool bRemoveMatchFromParent, IIUnknownVectorPtr& ripAttributes);
-
+	//---------------------------------------------------------------------------------------------
 	// process a query of the form "AttributeA/SubAttribute@TypeValue"
 	// and return a vector of query pattern objects
-	void getQueryPatterns(string strQuery, 
-		vector<QueryPattern>& rvecPatterns);
-
+	void getQueryPatterns(string strQuery, vector<QueryPattern>& rvecPatterns);
+	//---------------------------------------------------------------------------------------------
 	// Recursive method to return the parent of ipAttribute
 	IAttributePtr getParent(IAttributePtr ipTestParent, IAttributePtr ipAttribute);
-
-	// recursive method to remove ipAttribute
-	IAttributePtr remove(IAttributePtr ipTestParent, IAttributePtr ipAttribute);
-
+	//---------------------------------------------------------------------------------------------
 	// If there's a prefix for each rules file.
 	// ex. if prefix string is "WS_" then the file shall be prefixed with the string
 	string getRulesFilePrefix();
-
-	// cache of tag name/value read from the INI file
-	static map<string, string> ms_mapINIFileTagNameToValue;
-
-	IIUnknownVectorPtr getCandidateAttributes(IIUnknownVectorPtr ipAttributes, string strQuery, bool bRemoveMatches);
-
-	void splitQuery(string strQuery, vector<QueryPattern>& rvecPatterns, vector<QueryPattern>& rvecNonSelectPatterns);
-
+	//---------------------------------------------------------------------------------------------
+	IIUnknownVectorPtr getCandidateAttributes(IIUnknownVectorPtr ipAttributes, string strQuery,
+		bool bRemoveMatches);
+	//---------------------------------------------------------------------------------------------
+	void splitQuery(string strQuery, vector<QueryPattern>& rvecPatterns,
+		vector<QueryPattern>& rvecNonSelectPatterns);
+	//---------------------------------------------------------------------------------------------
 	// Whether or not to automatically use EncryptTextFile.exe to
 	// create .etf file
 	bool isAutoEncryptOn();
-
+	//---------------------------------------------------------------------------------------------
 	// Check license state
 	void validateLicense();
-
+	//---------------------------------------------------------------------------------------------
 	// Removes the specified attribute from the collection of attributes (no matter where
 	// in the collection it lives)
 	void removeAttribute(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
-
+	//---------------------------------------------------------------------------------------------
 	// Searches the collection of attributes and finds the parent attribute for the
 	// specified attribute.  If no parent attribute is found just returns NULL.
 	IAttributePtr getAttributeParent(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
-
-	/////////////
-	// Variables
-	/////////////
-
-	// Handles registry settings
-	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-
-	// pointer to the singleton instance of the Rule Execution
-	// Environment (REE) object
-	IRuleExecutionEnvPtr m_ipREE;
-
-	// pointer to the utility object that deals with encryption
-	IMiscUtilsPtr m_ipMiscUtils;
-
-	// a vector of all valid tags that can be expanded
-	static vector<string> ms_vecValidTags;
-
-	// Since multiple threads may be using AFUtils at the same time
-	// we will use this Mutex to prevent simultaneous
-	// access to the member data.  This is necessary.
-	static CMutex ms_mutex;
-
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Builds a string containing the data of the attribute
+	string buildAttributeString(const IAttributePtr& ipAttribute);
+	//---------------------------------------------------------------------------------------------
 	// methods to expand the various tags
 	// each of these methods can be called anytime.  They will expand
 	// the string after checking to see if the appropriate tag exists
-	void expandRSDFileDirTag(string& rstrInput, IAFDocumentPtr& ripDoc);
+	void expandRSDFileDirTag(string& rstrInput);
+	void expandComponentDataDirTag(string& rstrInput);
 	void expandRuleExecIDTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandSourceDocNameTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandDocTypeTag(string& rstrInput, IAFDocumentPtr& ripDoc);
-	void expandComponentDataDirTag(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandINIFileTags(string& rstrInput, IAFDocumentPtr& ripDoc);
 	void expandAFDocTags(string& rstrInput, IAFDocumentPtr& ripDoc);
 	//---------------------------------------------------------------------------------------------
@@ -251,37 +223,54 @@ private:
 	//			through the out parameter, and true is returned (to indicate that the value was
 	//			successfully found)
 	//			If strTagName is not found in the INI file, then false will be returned.
-	bool getTagValueFromINIFile(string strTagName, string& rstrTagValue);
+	bool getTagValueFromINIFile(const string& strTagName, string& rstrTagValue);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return all tag names in strInput.
 	//			The returned strings will include the < and > chars
-	void getTagNames(const string& strInput, 
-		vector<string>& rvecTagNames) const;
+	void getTagNames(const string& strInput, vector<string>& rvecTagNames) const;
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
 	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);
 	//---------------------------------------------------------------------------------------------
-
-	// method that returns the component data folder.
-	// This functionality has been moved to a c++ method instead of the
-	// COM exposed method because the expandComponentDataDirTag() method
-	// needs access to this information as well.
+	ISpatialStringPtr getReformattedName(const string& strFormat, IAttributePtr ipAttribute);
+	//---------------------------------------------------------------------------------------------
+	ISpatialStringPtr getVariableValue(const string& strVariable, IAttributePtr ipAttribute);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE:	To return a Variant vector containing the built in doc tags
+	IVariantVectorPtr getBuiltInTags();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE:	To return a Variant vector containing the INI file tags
+	IVariantVectorPtr getINIFileTags();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To fill the specified IIUnknownVector with attribtues read from the specified
+	//			EAV file.
+	void generateAttributesFromEAVFile(const string& strFileName,
+		const IIUnknownVectorPtr& ipVector);
+	//---------------------------------------------------------------------------------------------
+	void applyAttributeModifier(const IIUnknownVectorPtr& ipVector, const IAFDocumentPtr& ipAFDoc,
+		const IAttributeModifyingRulePtr& ipModifier, bool bRecursive);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To get the component data folder
 	void getComponentDataFolder(string& rFolder);
-
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To load attributes from an EAV file
 	void loadAttributesFromEavFile(IIUnknownVectorPtr ipAttributes, unsigned long ulCurrLevel, 
 		unsigned int& uiCurrLine, vector<string> vecLines);
 	unsigned int getAttributeLevel(string strName);
+	//---------------------------------------------------------------------------------------------
 	void removeDots(string& strName);
+	//---------------------------------------------------------------------------------------------
 
-	class FormatVariable
-	{
-	public:
-		ISpatialStringPtr m_ipValue;
-		ISpatialStringPtr m_ipType;
-		bool m_bExists;
-	};
+	/////////////
+	// Variables
+	/////////////
 
-	typedef map<string, vector<ISpatialStringPtr> > VariableMap;
-	ISpatialStringPtr getReformattedName(const string& strFormat, IAttributePtr ipAttribute);
-	ISpatialStringPtr getVariableValue(const string& strVariable, IAttributePtr ipAttribute);
+	// cache of tag name/value read from the INI file
+	static map<string, string> ms_mapINIFileTagNameToValue;
 
+	// Handles registry settings
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+
+	// pointer to the utility object that deals with encryption
+	IMiscUtilsPtr m_ipMiscUtils;
 };
