@@ -1399,7 +1399,8 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 
 		if (eCondition >= kClueList1 && eCondition <= kClueList4)
 		{
-			IndexToClueListInfo::iterator itClueLists = m_mapIndexToClueListInfo.find((EClueListIndex)eCondition);
+			IndexToClueListInfo::iterator itClueLists =
+				m_mapIndexToClueListInfo.find((EClueListIndex)eCondition);
 			if (itClueLists != m_mapIndexToClueListInfo.end())
 			{
 				itClueLists->second.m_bSearchThisList = true;
@@ -1423,12 +1424,13 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 		IndexToClueListInfo::iterator itClueLists = m_mapIndexToClueListInfo.begin();
 		for (; itClueLists != m_mapIndexToClueListInfo.end(); itClueLists++)
 		{
+			ClueListInfo &clueListInfo = itClueLists->second;
+
 			if (bSearchAll)
 			{
-				itClueLists->second.m_bSearchThisList = true;
+				clueListInfo.m_bSearchThisList = true;
 			}
 			
-			ClueListInfo &clueListInfo = itClueLists->second;
 			if (clueListInfo.m_bSearchThisList)
 			{
 				nNumOfClueListsSearched++;

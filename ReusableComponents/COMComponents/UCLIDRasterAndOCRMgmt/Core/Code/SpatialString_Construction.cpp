@@ -187,8 +187,12 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 		// Reset everything
 		reset(true, true);
 
+		// Set the page info map
+		m_ipPageInfoMap = pPageInfoMap;
+
 		// Calculate dimensions needed to generate the letter array
-		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(NULL);
+		// [FlexIDSCore #3555] - Pass page info map so that bounds are clipped by page dimensions
+		ILongRectanglePtr ipBounds = ipZone->GetRectangularBounds(m_ipPageInfoMap);
 		ASSERT_RESOURCE_ALLOCATION("ELI19908", ipBounds != NULL);
 
 		long nTop, nBottom, nLeft, nRight;
@@ -230,9 +234,6 @@ STDMETHODIMP CSpatialString::CreatePseudoSpatialString(IRasterZone *pZone, BSTR 
 
 		// Set the mode to spatial
 		m_eMode = kSpatialMode;
-
-		// Set the page info map
-		m_ipPageInfoMap = pPageInfoMap;
 
 		// Update the dirty flag
 		m_bDirty = true;

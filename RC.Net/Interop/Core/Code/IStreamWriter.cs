@@ -56,7 +56,7 @@ namespace Extract.Interop
                     _stream.Dispose();
                 }
 
-                throw new ExtractException("ELI26488", "Unable to create stream writer.", ex);
+                throw new ExtractException("ELI26597", "Unable to create stream writer.", ex);
             }
         }
 
