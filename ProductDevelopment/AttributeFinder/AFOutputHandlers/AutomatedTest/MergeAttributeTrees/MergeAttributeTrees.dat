@@ -7,7 +7,7 @@
 
 // Tests merging Test2/Test attributes where all will be merged into one
 // with empty Test2 attributes remaining (except for one which contains
-// a sub attribute called Tester
+// a sub attribute called Tester)
 <TESTCASE>;Test3.rsd;test3.tif.txt;;Test3.eav
 
 // Tests merging Test2/Test attributes where all will be merged into one
