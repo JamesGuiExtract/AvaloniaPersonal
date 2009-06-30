@@ -73,26 +73,19 @@ STDMETHODIMP CPadValue::raw_ModifyValue(IAttribute* pAttribute, IAFDocument* pOr
 		long nValueSize = ipValue->Size;
 		if ( nValueSize < m_nRequiredSize )
 		{
-			// Calculate the amount of padding needed
+			// Calculate the amount of padding needed and build the padding string
 			long nAmtToPad = m_nRequiredSize - nValueSize;
-			string strPadStr;
-			for ( int i = 0; i < nAmtToPad; i++ )
-			{
-				// Build the pad string
-				strPadStr += (char)m_nPaddingCharacter;
-			}
-			ISpatialStringPtr ipPadValue( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION("ELI09691", ipPadValue != NULL );
-			ipPadValue->CreateNonSpatialString(strPadStr.c_str(), "");
+			string strPadStr(nAmtToPad, (char)m_nPaddingCharacter);
+
 			if ( m_bPadLeft )
 			{
 				// Put the pad string at the beginning of the value
-				ipValue->Insert( 0, ipPadValue );
+				ipValue->InsertString(0, strPadStr.c_str());
 			}
 			else
 			{
 				// Append the pad string to the end of the value
-				ipValue->Append( ipPadValue );
+				ipValue->AppendString(strPadStr.c_str());
 			}
 		}
 	}

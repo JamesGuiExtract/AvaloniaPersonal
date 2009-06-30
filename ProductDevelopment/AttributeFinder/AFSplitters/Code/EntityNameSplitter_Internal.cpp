@@ -473,13 +473,8 @@ void CEntityNameSplitter::handleCompanySlash(ISpatialStringPtr &ripCompany)
 		{
 			ripCompany->Remove( lFound, lFound );
 
-			// Create " AKA " string for insertion
-			ISpatialStringPtr	ipTemp( CLSID_SpatialString );
-			ASSERT_RESOURCE_ALLOCATION( "ELI10494", ipTemp != NULL );
-			ipTemp->CreateNonSpatialString(" AKA ", "");
-
 			// Insert " AKA " in place of the slash
-			ripCompany->Insert( lFound, ipTemp );
+			ripCompany->InsertString(lFound, " AKA ");
 		}
 	}
 }
@@ -1872,11 +1867,6 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 	////////////////////////////////////////
 	// Replace alias strings with label text
 	////////////////////////////////////////
-	// Create "aka" SpatialString as default
-	ISpatialStringPtr ipAlias( CLSID_SpatialString );
-	ASSERT_RESOURCE_ALLOCATION( "ELI09437", ipAlias != NULL );
-	ipAlias->CreateNonSpatialString(m_ipKeys->GetPersonAliasLabel(kPersonAliasAKA), "");
-
 	// Search for AKA items
 	long	lAliasStartPos = -1;
 	long	lAliasEndPos = -1;
@@ -1892,7 +1882,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			ipText->Remove( lAliasStartPos, lAliasEndPos );
 
 			// Insert the single-word alias
-			ipText->Insert( lAliasStartPos, ipAlias );
+			ipText->InsertString(lAliasStartPos, m_ipKeys->GetPersonAliasLabel(kPersonAliasAKA));
 
 			// Update start position
 			if (ipText->Size > lAliasStartPos + 3)
@@ -1914,7 +1904,6 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 	// Search for FKA items
 	lCurrentStart = 0;
-	ipAlias->ReplaceAndDowngradeToNonSpatial(m_ipKeys->GetPersonAliasLabel(kPersonAliasFKA));
 	while (true)
 	{
 		// Do the search
@@ -1926,7 +1915,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			ipText->Remove( lAliasStartPos, lAliasEndPos );
 
 			// Insert the single-word alias
-			ipText->Insert( lAliasStartPos, ipAlias );
+			ipText->InsertString(lAliasStartPos, m_ipKeys->GetPersonAliasLabel(kPersonAliasFKA));
 
 			// Update start position
 			if (ipText->Size > lAliasStartPos + 3)
@@ -1948,7 +1937,6 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 
 	// Search for NKA items
 	lCurrentStart = 0;
-	ipAlias->ReplaceAndDowngradeToNonSpatial(m_ipKeys->GetPersonAliasLabel(kPersonAliasNKA));
 	while (true)
 	{
 		// Do the search
@@ -1961,7 +1949,7 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 			ipText->Remove( lAliasStartPos, lAliasEndPos );
 
 			// Insert the single-word alias
-			ipText->Insert( lAliasStartPos, ipAlias );
+			ipText->InsertString(lAliasStartPos, m_ipKeys->GetPersonAliasLabel(kPersonAliasNKA));
 
 			// Update start position
 			if (ipText->Size > lAliasStartPos + 3)
@@ -1984,8 +1972,8 @@ IIUnknownVectorPtr CEntityNameSplitter::getNamesFromWords(ISpatialStringPtr ipTe
 	/////////////////////////////////////////////////
 	// Get local string after Alias items replacement
 	/////////////////////////////////////////////////
-	string strText = asString( ipText->GetString() );
-	getWordsFromString( strText, ipMatches );
+	string strText = asString(ipText->String);
+	getWordsFromString(strText, ipMatches);
 
 	// Create the vector to hold stringized names
 	IIUnknownVectorPtr	ipNames( CLSID_IUnknownVector );

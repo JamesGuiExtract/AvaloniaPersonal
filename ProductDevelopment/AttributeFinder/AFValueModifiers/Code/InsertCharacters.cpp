@@ -257,7 +257,7 @@ STDMETHODIMP CInsertCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 		ISpatialStringPtr ipInputText = ipAttribute->GetValue();
 		ASSERT_RESOURCE_ALLOCATION( "ELI09284", ipInputText != NULL);
 
-		long nInputLength = ipInputText->String.length();
+		long nInputLength = (ipInputText->String).length();
 
 		// a 0-based actual insertion position
 		long nActualInsertPosition = m_nPositionToInsert-1;
@@ -313,13 +313,8 @@ STDMETHODIMP CInsertCharacters::raw_ModifyValue(IAttribute* pAttribute, IAFDocum
 			break;
 		}
 
-		// make a new spatial string for insertion
-		ISpatialStringPtr ipStrToInsert(CLSID_SpatialString);
-		ASSERT_RESOURCE_ALLOCATION("ELI06616", ipStrToInsert != NULL);
-		ipStrToInsert->CreateNonSpatialString(m_strCharsToInsert.c_str(), "");
-
-		// insert the new string at the specified position
-		ipInputText->Insert(nActualInsertPosition, ipStrToInsert);
+		// Insert the characters at the specified location
+		ipInputText->InsertString(nActualInsertPosition, m_strCharsToInsert.c_str());
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI04961");
 	

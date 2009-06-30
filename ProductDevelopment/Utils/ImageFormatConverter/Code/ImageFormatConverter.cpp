@@ -399,7 +399,7 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 //-------------------------------------------------------------------------------------------------
 void usage()
 {
-	string strUsage = "This application has 3 required arguments and 2 optional argument:\n";
+	string strUsage = "This application has 3 required arguments and 2 optional arguments:\n";
 		strUsage += "An input image file (.tif or .pdf) and \n"
 					"an output image file (.pdf or .tif) and \n"
 					"an output file type (/pdf, /tif or /jpg).\n\n"
@@ -411,7 +411,7 @@ void usage()
 					"of an exception log that will store any thrown exception.  Without \n"
 					"an exception log, any thrown exception will be displayed.\n\n";
 		strUsage += "Usage:\n";
-		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/ef <filename>]\n"
+		strUsage += "ImageFormatConverter.exe <strInput> <strOutput> <out_type> [/retain] [/ef <filename>]\n"
 					"where:\n"
 					"out_type is /pdf, /tif or /jpg,\n"
 					"<filename> is the fully-qualified path to an exception log.\n\n";

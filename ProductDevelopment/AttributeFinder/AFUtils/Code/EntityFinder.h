@@ -105,115 +105,114 @@ private:
 	//////////
 	// Methods
 	//////////
+	// Performs entity finding
+	void findEntities(const ISpatialStringPtr& ipText);
 	//----------------------------------------------------------------------------------------------
-	UCLID_AFUTILSLib::IEntityFinderPtr getThisAsCOMPtr();
-	//----------------------------------------------------------------------------------------------
-
 	// Returns left-hand portion of string after intelligent trimming of blank lines
 	string	doBlankLineTrimming(string strInput, long lKeywordEndPos, 
 		bool bFoundTrust);
-
+	//----------------------------------------------------------------------------------------------
 	// Returns upper-case substring having period delimiter
 	string	doCompanyPostProcessing(const string& strInput, long lSuffixStart, 
 		long lSuffixStop, bool bAliasFound);
-
+	//----------------------------------------------------------------------------------------------
 	// Returns right-hand portion of string without any leading parentheses
 	string	doGeneralTrimming(string strInput, bool bPersonFound);
-
+	//----------------------------------------------------------------------------------------------
 	// Trims string after TrustIndicator if followed by "DATED", or other TrustDates expression.
 	// Returns true if TrustIndicator found, false otherwise.
 	bool	doTrustTrimming(ISpatialStringPtr &ripSpatial);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks ipText starting at lStartPos for Company-related keywords.
 	// Alias information will be included as long as a subsequent Entity is found
 	bool	findCompanyEnd(ISpatialString *pText, long lStartPos, long *plSuffixStart, 
 		long *plSuffixEnd, long *plEndPos, bool *pbFoundSuffix, bool *pbFoundAlias);
-
+	//----------------------------------------------------------------------------------------------
 	// Searches strText from specified starting character for the first word containing either
 	// one or more upper-case characters OR all lower-case characters.  A word containing a 
 	// digit can be either accepted or rejected, as desired
 	// The word "of" is acceptable if bIsCompany == true
 	long	findFirstCaseWord(const string& strText, int iStartPos, bool bUpperCase, 
 		bool bAcceptDigit, bool bIsCompany);
-
+	//----------------------------------------------------------------------------------------------
 	// Searches strText from specified starting character for the first LC word that should 
 	// be trimmed.  "and" and "&" are accepted as separators between otherwise UC words.
 	// NOTE: Neither "and" nor "&" will be accepted as trailing LC words
 	// If bCompany == true, "of" is an acceptable separator
 	long	findFirstLowerCaseWordToTrim(const string& strText, int iStartPos, bool bIsCompany);
-
+	//----------------------------------------------------------------------------------------------
 	// Searches strText from lStart, checking to see if the next word is a valid
 	// separator.  Returns end position of separator, if found, otherwise -1.
 	long	findSeparatorWordEnd(const string& strText, long lStart, bool bIsCompany);
-
+	//----------------------------------------------------------------------------------------------
 	// Searches strText1 and strText2 to find a keyword phrase that crosses from one 
 	// to the other.
 	bool	foundKeywordPhraseOverlap(const string& strText1, const string& strText2);
-
+	//----------------------------------------------------------------------------------------------
 	// Provide long, involved Address pattern as string
 	string	getAddressSuffixPattern();
-
+	//----------------------------------------------------------------------------------------------
 	// Parses strText with whitespace.  Returns number of words found
 	long	getWordCount(const string& strText);
-
+	//----------------------------------------------------------------------------------------------
 	// Removes paired parentheses or square brackets.  Embedded text is retained if 
 	// it contains a Person Designator or Alias.  Otherwise, embedded text is removed
 	// Single parentheses or brackets are replaced with spaces.
 	void	handleParentheses(ISpatialStringPtr &ripText);
-
+	//----------------------------------------------------------------------------------------------
 	// Trims string after TRUST if finds TRUST DATED or TRUST DTD
 	string	handleTrustDated(string strInput);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks strText to see if it contains a date string
 	bool	hasDateText(const string& strText);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks strWord to see if it contains only punctuation characters
 	bool	hasOnlyPunctuation(const string& strWord);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks strWord to see if it has one or more upper-case characters.  Digit characters 
 	// can be accepted or rejected, as desired
 	bool	hasUpperCaseLetter(const string& strWord, bool bAcceptDigit);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks strWord to see if it contains only upper-case characters and periods
 	bool	isAbbreviation(const string& strWord);
-
+	//----------------------------------------------------------------------------------------------
 	// Checks to see if strText exactly matches a keyword phrase
 	//   i.e. PersonDesignator or PersonTrimIdentifier
 	bool	isKeywordPhrase(const string& strText);
-
+	//----------------------------------------------------------------------------------------------
 	// Logs initial and final strings to log file
 	void	logResults(string strInitial, string strFinal);
-
+	//----------------------------------------------------------------------------------------------
 	// Searches ipText looking for two or more upper case letters followed by "and " or 
 	// " and" followed by two or more upper case letters.  Returns the position at 
 	// which to add a space or -1 if not found
 	long	makeSpaceForAnd(ISpatialStringPtr ipText);
-
+	//----------------------------------------------------------------------------------------------
 	// Returns first character to be retained after trimming leading digits-only word(s)
 	// If return value is zero, no trimming is needed.
 	long	removeFirstDigitsWords(const string& strInput);
-
+	//----------------------------------------------------------------------------------------------
 	// look for consecutive strChars in the input string and eliminate rudundant ones
 	// for example, input string is "ABBBC" and strChars is "B", then "ABC" will be returned
 	string consolidateMultipleCharsIntoOne(const string& strInput, const string& strChars);
-
+	//----------------------------------------------------------------------------------------------
 	// Returns position at which to trim strInput.  Trim indications include:
 	//   lower-case word, punctuation, "DATED", "UNDER"
 	// If return value is zero, no trimming is needed.
 	// REQUIRES: lSearchStart > 0
-	long	trimAfterTrust(const string& strInput, long lSearchStart);
-
+	long trimAfterTrust(const string& strInput, long lSearchStart);
+	//----------------------------------------------------------------------------------------------
 	// Trims leading non-entity text including:
 	//   Non-alphanumeric characters
 	//   Lower-case words
 	//   Digits-only words
 	//   Various nonsense words and strings from next method
-	string	trimLeadingNonsense(string strInput);
-
+	string trimLeadingNonsense(string strInput);
+	//----------------------------------------------------------------------------------------------
 	// Removes any embedded Address from ripText.  Returns true if found, otherwise
 	// false.
-	bool	removeAddressText(ISpatialStringPtr ripText);
-
+	bool removeAddressText(const ISpatialStringPtr& ripText);
+	//----------------------------------------------------------------------------------------------
 	// Checks license state
 	void	validateLicense();
 };

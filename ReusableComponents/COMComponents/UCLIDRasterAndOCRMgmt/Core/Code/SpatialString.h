@@ -151,6 +151,7 @@ public:
 	STDMETHOD(GetOCRImageRasterZonesGroupedByConfidence)(IVariantVector* pVecOCRConfidenceBoundaries,
 		IVariantVector** ppZoneOCRConfidenceTiers, IIUnknownVector** ppRasterZones);
 	STDMETHOD(GetOCRImageBounds)(ILongRectangle** ppBounds);
+	STDMETHOD(InsertString)(long nPos, BSTR bstrText);
 
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown **pObject);

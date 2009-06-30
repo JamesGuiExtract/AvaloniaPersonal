@@ -541,6 +541,17 @@ STDMETHODIMP CSpatialString::AppendString(BSTR strTextToAppend)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CSpatialString::InsertString(long nPos, BSTR bstrText)
+{
+	try
+	{
+		validateLicense();
+
+		insertString(nPos, asString(bstrText));
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26594");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CSpatialString::FindFirstInstanceOfString(BSTR strSearchString, long nStartPos, 
 													   long *pMatchPos)
 {

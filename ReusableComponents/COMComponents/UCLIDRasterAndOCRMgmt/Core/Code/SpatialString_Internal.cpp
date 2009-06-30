@@ -265,6 +265,18 @@ void CSpatialString::insertString(long nPos, const string& strText)
 {
 	try
 	{
+		// Verify that nPos is a valid index
+		// If nPos < 0 or nPos is out of bounds on the string, throw an exception
+		if ( (nPos < 0) || 
+			(nPos > (long)m_strString.length()) )
+		{
+			// If nPos isn't valid, throw an exception
+			UCLIDException ue("ELI26593", "Index out of bounds!");
+			ue.addDebugInfo("Index", nPos);
+			ue.addDebugInfo("String length", m_strString.length());
+			throw ue;
+		}
+
 		if (m_eMode != kSpatialMode)
 		{
 			// Since the string is either hybrid or non-spatial, just update the text
