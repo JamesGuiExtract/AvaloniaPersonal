@@ -94,6 +94,14 @@ namespace Extract.SourceControl
             return new VaultSourceControlItem(path);
         }
 
+        /// <summary>
+        /// Refreshes the database connection
+        /// </summary>
+        public void RefreshConnection()
+        {
+            RepositoryUtil.Refresh();
+        }
+
         #endregion
     }
 }

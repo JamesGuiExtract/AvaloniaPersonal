@@ -61,6 +61,7 @@
     <Compile Include="LICodeHandler.cs" />
     <Compile Include="PasteLI.cs" />
     <Compile Include="ReplaceLI.cs" />
+    <Compile Include="RefreshSourceConnection.cs" />
     <Compile Include="SourceControlMethods.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,9 +83,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="C:\Documents and Settings\nathan_figueroa\My Documents\Visual Studio 2005\Addins\LICode - For Testing.AddIn">
-      <Link>LICode - For Testing.AddIn</Link>
-    </Content>
     <Content Include="LICode.AddIn" />
   </ItemGroup>
   <ItemGroup>

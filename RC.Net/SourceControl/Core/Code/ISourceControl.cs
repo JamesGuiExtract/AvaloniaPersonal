@@ -22,5 +22,10 @@ namespace Extract.SourceControl
         /// <param name="path">The repository path to the item.</param>
         /// <returns>The source control item at <paramref name="path"/>.</returns>
         ISourceControlItem GetItem(string path);
+
+        /// <summary>
+        /// Method for refreshing the source control connection
+        /// </summary>
+        void RefreshConnection();
     }
 }
