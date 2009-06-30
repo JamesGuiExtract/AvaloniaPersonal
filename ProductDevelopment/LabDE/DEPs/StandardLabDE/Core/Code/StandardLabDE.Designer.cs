@@ -59,6 +59,9 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientNameLabel = new System.Windows.Forms.Label();
             this._labResultPatientNameLabel = new System.Windows.Forms.Label();
             this._epicPatientNameTable = new Extract.DataEntry.DataEntryTable();
+            this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._epicPatientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._epicPatientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientNameTable = new Extract.DataEntry.DataEntryTable();
             this._patientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._patientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
@@ -77,9 +80,6 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianTable = new Extract.DataEntry.DataEntryTable();
-            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
             this._orderNumberLabel = new System.Windows.Forms.Label();
             this._orderNumber = new Extract.DataEntry.DataEntryTextBox();
@@ -92,9 +92,9 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
             this._resultStatusLabel = new System.Windows.Forms.Label();
-            this._epicPatientLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._epicPatientFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._epicPatientMiddleNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -592,6 +592,60 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientNameTable.SmartHintsEnabled = true;
             this._epicPatientNameTable.TabIndex = 11;
             // 
+            // _epicPatientLastNameColumn
+            // 
+            this._epicPatientLastNameColumn.AttributeName = "Last";
+            this._epicPatientLastNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._epicPatientLastNameColumn.AutoUpdateQuery = null;
+            this._epicPatientLastNameColumn.FormattingRuleFile = null;
+            this._epicPatientLastNameColumn.HeaderText = "Last Name";
+            this._epicPatientLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._epicPatientLastNameColumn.Name = "_epicPatientLastNameColumn";
+            this._epicPatientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._epicPatientLastNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._epicPatientLastNameColumn.TabStopRequired = true;
+            this._epicPatientLastNameColumn.UseComboBoxCells = false;
+            this._epicPatientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
+            this._epicPatientLastNameColumn.ValidationListFileName = null;
+            this._epicPatientLastNameColumn.ValidationPattern = "\\S";
+            this._epicPatientLastNameColumn.ValidationQuery = null;
+            // 
+            // _epicPatientFirstNameColumn
+            // 
+            this._epicPatientFirstNameColumn.AttributeName = "First";
+            this._epicPatientFirstNameColumn.AutoUpdateQuery = null;
+            this._epicPatientFirstNameColumn.FormattingRuleFile = null;
+            this._epicPatientFirstNameColumn.HeaderText = "First Name";
+            this._epicPatientFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._epicPatientFirstNameColumn.Name = "_epicPatientFirstNameColumn";
+            this._epicPatientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._epicPatientFirstNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._epicPatientFirstNameColumn.TabStopRequired = true;
+            this._epicPatientFirstNameColumn.UseComboBoxCells = false;
+            this._epicPatientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
+            this._epicPatientFirstNameColumn.ValidationListFileName = null;
+            this._epicPatientFirstNameColumn.ValidationPattern = "\\S";
+            this._epicPatientFirstNameColumn.ValidationQuery = null;
+            this._epicPatientFirstNameColumn.Width = 150;
+            // 
+            // _epicPatientMiddleNameColumn
+            // 
+            this._epicPatientMiddleNameColumn.AttributeName = "Middle";
+            this._epicPatientMiddleNameColumn.AutoUpdateQuery = null;
+            this._epicPatientMiddleNameColumn.FormattingRuleFile = null;
+            this._epicPatientMiddleNameColumn.HeaderText = "Middle Name";
+            this._epicPatientMiddleNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._epicPatientMiddleNameColumn.Name = "_epicPatientMiddleNameColumn";
+            this._epicPatientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._epicPatientMiddleNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._epicPatientMiddleNameColumn.TabStopRequired = true;
+            this._epicPatientMiddleNameColumn.UseComboBoxCells = false;
+            this._epicPatientMiddleNameColumn.ValidationErrorMessage = "Bad value";
+            this._epicPatientMiddleNameColumn.ValidationListFileName = null;
+            this._epicPatientMiddleNameColumn.ValidationPattern = null;
+            this._epicPatientMiddleNameColumn.ValidationQuery = null;
+            this._epicPatientMiddleNameColumn.Width = 150;
+            // 
             // _patientNameTable
             // 
             this._patientNameTable.AllowUserToAddRows = false;
@@ -907,60 +961,6 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianTable.SmartHintsEnabled = false;
             this._physicianTable.TabIndex = 2;
             // 
-            // _physicianLastNameColumn
-            // 
-            this._physicianLastNameColumn.AttributeName = "Last";
-            this._physicianLastNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._physicianLastNameColumn.FormattingRuleFile = null;
-            this._physicianLastNameColumn.HeaderText = "Last Name";
-            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
-            this._physicianLastNameColumn.TabStopRequired = true;
-            this._physicianLastNameColumn.UseComboBoxCells = false;
-            this._physicianLastNameColumn.ValidationErrorMessage = "";
-            this._physicianLastNameColumn.ValidationListFileName = null;
-            this._physicianLastNameColumn.ValidationPattern = null;
-            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
-            // 
-            // _physicianFirstNameColumn
-            // 
-            this._physicianFirstNameColumn.AttributeName = "First";
-            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._physicianFirstNameColumn.FormattingRuleFile = null;
-            this._physicianFirstNameColumn.HeaderText = "First Name";
-            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
-            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianFirstNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this._physicianFirstNameColumn.TabStopRequired = true;
-            this._physicianFirstNameColumn.UseComboBoxCells = false;
-            this._physicianFirstNameColumn.ValidationErrorMessage = "";
-            this._physicianFirstNameColumn.ValidationListFileName = null;
-            this._physicianFirstNameColumn.ValidationPattern = null;
-            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE \'{\'../Last}\' OR" +
-                "DER BY FirstName</SQL>";
-            this._physicianFirstNameColumn.Width = 200;
-            // 
-            // _physicianCode
-            // 
-            this._physicianCode.AttributeName = "Code";
-            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
-            this._physicianCode.FormattingRuleFile = null;
-            this._physicianCode.HeaderText = "Code";
-            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianCode.Name = "_physicianCode";
-            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianCode.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this._physicianCode.TabStopRequired = true;
-            this._physicianCode.UseComboBoxCells = false;
-            this._physicianCode.ValidationErrorMessage = "Bad value";
-            this._physicianCode.ValidationListFileName = null;
-            this._physicianCode.ValidationPattern = null;
-            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
-            this._physicianCode.Width = 75;
-            // 
             // _testDetailsGroupBox
             // 
             this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -1162,59 +1162,61 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatusLabel.TabIndex = 0;
             this._resultStatusLabel.Text = "Result Status";
             // 
-            // _epicPatientLastNameColumn
+            // _physicianLastNameColumn
             // 
-            this._epicPatientLastNameColumn.AttributeName = "Last";
-            this._epicPatientLastNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this._epicPatientLastNameColumn.AutoUpdateQuery = null;
-            this._epicPatientLastNameColumn.FormattingRuleFile = null;
-            this._epicPatientLastNameColumn.HeaderText = "Last Name";
-            this._epicPatientLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._epicPatientLastNameColumn.Name = "_epicPatientLastNameColumn";
-            this._epicPatientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientLastNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this._epicPatientLastNameColumn.TabStopRequired = true;
-            this._epicPatientLastNameColumn.UseComboBoxCells = false;
-            this._epicPatientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
-            this._epicPatientLastNameColumn.ValidationListFileName = null;
-            this._epicPatientLastNameColumn.ValidationPattern = "\\S";
-            this._epicPatientLastNameColumn.ValidationQuery = null;
+            this._physicianLastNameColumn.AttributeName = "Last";
+            this._physicianLastNameColumn.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianLastNameColumn.FormattingRuleFile = null;
+            this._physicianLastNameColumn.HeaderText = "Last Name";
+            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
+            this._physicianLastNameColumn.TabStopRequired = true;
+            this._physicianLastNameColumn.UseComboBoxCells = false;
+            this._physicianLastNameColumn.ValidationErrorMessage = "";
+            this._physicianLastNameColumn.ValidationListFileName = null;
+            this._physicianLastNameColumn.ValidationPattern = null;
+            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
             // 
-            // _epicPatientFirstNameColumn
+            // _physicianFirstNameColumn
             // 
-            this._epicPatientFirstNameColumn.AttributeName = "First";
-            this._epicPatientFirstNameColumn.AutoUpdateQuery = null;
-            this._epicPatientFirstNameColumn.FormattingRuleFile = null;
-            this._epicPatientFirstNameColumn.HeaderText = "First Name";
-            this._epicPatientFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._epicPatientFirstNameColumn.Name = "_epicPatientFirstNameColumn";
-            this._epicPatientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientFirstNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this._epicPatientFirstNameColumn.TabStopRequired = true;
-            this._epicPatientFirstNameColumn.UseComboBoxCells = false;
-            this._epicPatientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
-            this._epicPatientFirstNameColumn.ValidationListFileName = null;
-            this._epicPatientFirstNameColumn.ValidationPattern = "\\S";
-            this._epicPatientFirstNameColumn.ValidationQuery = null;
-            this._epicPatientFirstNameColumn.Width = 150;
+            this._physicianFirstNameColumn.AttributeName = "First";
+            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianFirstNameColumn.FormattingRuleFile = null;
+            this._physicianFirstNameColumn.HeaderText = "First Name";
+            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
+            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianFirstNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._physicianFirstNameColumn.TabStopRequired = true;
+            this._physicianFirstNameColumn.UseComboBoxCells = false;
+            this._physicianFirstNameColumn.ValidationErrorMessage = "";
+            this._physicianFirstNameColumn.ValidationListFileName = null;
+            this._physicianFirstNameColumn.ValidationPattern = null;
+            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE \'{\'../Last}\' OR" +
+                "DER BY FirstName</SQL>";
+            this._physicianFirstNameColumn.Width = 200;
             // 
-            // _epicPatientMiddleNameColumn
+            // _physicianCode
             // 
-            this._epicPatientMiddleNameColumn.AttributeName = "Middle";
-            this._epicPatientMiddleNameColumn.AutoUpdateQuery = null;
-            this._epicPatientMiddleNameColumn.FormattingRuleFile = null;
-            this._epicPatientMiddleNameColumn.HeaderText = "Middle Name";
-            this._epicPatientMiddleNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._epicPatientMiddleNameColumn.Name = "_epicPatientMiddleNameColumn";
-            this._epicPatientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientMiddleNameColumn.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
-            this._epicPatientMiddleNameColumn.TabStopRequired = true;
-            this._epicPatientMiddleNameColumn.UseComboBoxCells = false;
-            this._epicPatientMiddleNameColumn.ValidationErrorMessage = "Bad value";
-            this._epicPatientMiddleNameColumn.ValidationListFileName = null;
-            this._epicPatientMiddleNameColumn.ValidationPattern = null;
-            this._epicPatientMiddleNameColumn.ValidationQuery = null;
-            this._epicPatientMiddleNameColumn.Width = 150;
+            this._physicianCode.AttributeName = "Code";
+            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
+            this._physicianCode.FormattingRuleFile = null;
+            this._physicianCode.HeaderText = "Code";
+            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianCode.Name = "_physicianCode";
+            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianCode.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.Automatic;
+            this._physicianCode.TabStopRequired = true;
+            this._physicianCode.UseComboBoxCells = false;
+            this._physicianCode.ValidationErrorMessage = "Bad value";
+            this._physicianCode.ValidationListFileName = null;
+            this._physicianCode.ValidationPattern = null;
+            this._physicianCode.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
+                "SQL>";
+            this._physicianCode.Width = 75;
             // 
             // StandardLabDEPanel
             // 
@@ -1310,11 +1312,11 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianFirstNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianCodeColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianLastNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianFirstNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianCode;
         private Extract.DataEntry.DataEntryTableColumn _epicPatientLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _epicPatientFirstNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _epicPatientMiddleNameColumn;
+        private Extract.DataEntry.DataEntryTableColumn _physicianLastNameColumn;
+        private Extract.DataEntry.DataEntryTableColumn _physicianFirstNameColumn;
+        private Extract.DataEntry.DataEntryTableColumn _physicianCode;
     }
 }
