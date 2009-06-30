@@ -4,6 +4,7 @@ using System.Text;
 using System.Windows.Forms;
 using VaultClientIntegrationLib;
 using VaultClientNetLib;
+using System.Web.Services.Protocols;
 
 namespace Extract.SourceControl
 {
@@ -22,7 +23,11 @@ namespace Extract.SourceControl
             bool loggedIn = AttemptLogin(settings, false);
             if (!loggedIn)
             {
-                LogOnDialog dialog = new LogOnDialog(settings);
+                LogOnSettings storedSettings = new LogOnSettings(
+                    ServerOperations.client.LoginOptions.URL,
+                    ServerOperations.client.LoginOptions.User);
+
+                LogOnDialog dialog = new LogOnDialog(storedSettings);
                 while (!loggedIn)
                 {
                     if (dialog.ShowDialog() == DialogResult.OK)
@@ -54,7 +59,7 @@ namespace Extract.SourceControl
             }
             catch (Exception ex)
             {
-                if (!IsUsageException(ex))
+                if (!IsInvalidPasswordException(ex))
                 {
                     throw;
                 }
@@ -74,8 +79,16 @@ namespace Extract.SourceControl
 
         #region VaultSourceControl Methods
 
-        static bool IsUsageException(Exception ex)
+        static bool IsInvalidPasswordException(Exception ex)
         {
+            // Check for inner soap exception with FailNotValidLogin message
+            SoapException soapEx = ex.InnerException as SoapException;
+            if (ex != null)
+            {
+                return soapEx.Message.StartsWith("1000", StringComparison.Ordinal);
+            }
+
+            // If no session information stored it is a usage exception (ie. first time logging in)
             return ex.GetType().ToString().EndsWith("UsageException", StringComparison.Ordinal);
         }
 

@@ -104,7 +104,7 @@ namespace Extract.SourceControl
             base.OnLoad(e);
 
             _userNameTextBox.Text = _settings.UserName ?? "";
-            _passwordTextBox.Text = _settings.Password ?? "";
+            _passwordTextBox.Text = "";
             _serverTextBox.Text = _settings.Server ?? "";
         }
 
