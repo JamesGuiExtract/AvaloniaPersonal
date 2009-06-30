@@ -50,6 +50,34 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="EpicName">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FullText" minOccurs="1" type="xs:string" />
+                    <xs:element name="Last" minOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="First" minOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Middle" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
               <xs:element name="DOB" minOccurs="1">
                 <xs:complexType>
                   <xs:sequence>
@@ -85,7 +113,7 @@
           <xs:complexType>
             <xs:sequence>
               <xs:element name="FullText" minOccurs="1" type="xs:string" />
-              <xs:element name="Name" maxOccurs="unbounded">
+              <xs:element name="OrderingPhysicianName">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="FullText" type="xs:string" />
@@ -103,6 +131,13 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
+                    <xs:element name="Code">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
                     <xs:element name="Middle">
                       <xs:complexType>
                         <xs:sequence>
@@ -110,7 +145,28 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="Physician_Type">
+                    <xs:element name="Suffix" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="OtherPhysicianName" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FullText" type="xs:string" />
+                    <xs:element name="Last">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="First">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
@@ -118,6 +174,13 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="Code">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Middle">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
@@ -142,6 +205,13 @@
             <xs:sequence>
               <xs:element name="FullText" minOccurs="1" type="xs:string" />
               <xs:element name="Name" minOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FullText" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="OrderCode">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="FullText" type="xs:string" />
