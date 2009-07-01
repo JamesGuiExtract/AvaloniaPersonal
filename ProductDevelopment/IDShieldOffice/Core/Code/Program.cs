@@ -19,7 +19,7 @@ namespace IDShieldOffice
         /// The license string for the SandDock manager
         /// </summary>
         private static readonly string _SANDOCK_LICENSE_STRING =
-            @"1970|FmYPlfMJx5y4I4w2mqXzIDiFUPM=";
+            @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
 
         /// <summary>
         /// The full path to the user license utility.
