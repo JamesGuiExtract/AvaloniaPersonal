@@ -557,7 +557,7 @@ Metrobank
 
 // Examples: 
 <InvalidEntities>
-\bDOLLARS?\b
+\bDOLLARS\b
 \bWITNESS(ETH)?\b
 \bGRANTOR\b
 \bGRANTOR'S\s+ADDRESS\b
