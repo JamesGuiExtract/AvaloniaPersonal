@@ -1,5 +1,6 @@
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -42,7 +43,13 @@ namespace Extract.Redaction.Verification
         /// Settings for verification.
         /// </summary>
         VerificationSettings _settings;
-        
+
+        /// <summary>
+        /// The form to display for verifying documents.
+        /// </summary>
+        static readonly VerificationForm<VerificationTaskForm> _form = 
+            new VerificationForm<VerificationTaskForm>();
+
         #endregion VerificationTask Fields
 
         #region VerificationTask Constructors
@@ -52,6 +59,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public VerificationTask()
         {
+            _settings = new VerificationSettings();
         }
 
         /// <summary>
@@ -143,7 +151,7 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI26511",
-                    "Error running configuration!", ex);
+                    "Error running configuration.", ex);
             }
         }
 
@@ -170,7 +178,7 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion ICopyableObject Members
-
+        
         #region IFileProcessingTask Members
 
         /// <summary>
@@ -178,8 +186,15 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void Cancel()
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try
+            {
+                _form.Cancel();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26598",
+                    "Error canceling verification.", ex);
+            }
         }
 
         /// <summary>
@@ -187,8 +202,15 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void Close()
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try
+            {
+                _form.CloseForm();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26599",
+                    "Error closing verification.", ex);
+            }
         }
 
         /// <summary>
@@ -196,8 +218,15 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void Init()
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try
+            {
+                _form.ShowForm();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26600",
+                    "Error initializing verification.", ex);
+            }
         }
 
         /// <summary>
@@ -210,14 +239,28 @@ namespace Extract.Redaction.Verification
         /// </param>
         /// <param name="bCancelRequested"><see langword="true"/> if cancel was requested; 
         /// <see langword="false"/> otherwise.</param>
-        /// <returns><see langword="true"/> if all file processing should be cancelled; 
-        /// <see langword="false"/> if processing should continue.</returns>
+        /// <returns><see langword="true"/> if processing should continue; <see langword="false"/> 
+        /// if all file processing should be cancelled.</returns>
         [CLSCompliant(false)]
         public bool ProcessFile(string bstrFileFullName, FAMTagManager pFAMTM, 
             FileProcessingDB pDB, ProgressStatus pProgressStatus, bool bCancelRequested)
         {
-            // TODO
-            throw new NotImplementedException("The method or operation is not implemented.");
+            try
+            {
+                if (bCancelRequested)
+                {
+                    return false;
+                }
+
+                _form.ShowDocument(bstrFileFullName);
+
+                return !_form.Canceled;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26601",
+                    "Unable to verify document.", ex);
+            }
         }
 
         #endregion IFileProcessingTask Members
@@ -234,7 +277,7 @@ namespace Extract.Redaction.Verification
             return LicenseUtilities.IsLicensed(LicenseIdName.IDShieldVerificationObject);
         }
 
-        #endregion
+        #endregion ILicensedComponent Members
 
         #region IPersistStream Members
 
@@ -327,6 +370,6 @@ namespace Extract.Redaction.Verification
             size = HResult.NotImplemented;
         }
 
-        #endregion
+        #endregion IPersistStream Members
     }
 }

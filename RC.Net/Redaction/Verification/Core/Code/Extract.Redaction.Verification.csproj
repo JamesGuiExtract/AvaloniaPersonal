@@ -51,6 +51,86 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Utilities\Core\Code\obj\Debug\Extract.Utilities.dll</HintPath>
     </Reference>
+    <Reference Include="Leadtools, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Annotations, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Bmp, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Bmp.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Cal, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Cal.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Cmp, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Cmp.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Eps, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Eps.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Fax, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Fax.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Gif, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Gif.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Pcx, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Pcx.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Pdf, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Png, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Png.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Psd, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Psd.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Raw, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Raw.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Tif, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Tif.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Codecs.Wmf, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.Wmf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Kernel.Annotations, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Kernel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.Pdf, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Pdf.dll</HintPath>
+    </Reference>
+    <Reference Include="Leadtools.WinForms, Version=16.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="SandDock, Version=3.0.5.1, Culture=neutral, PublicKeyToken=75b7ec17dd7c14c3, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\APIs\Divelements\SandDock\bin\SandDock.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -67,6 +147,11 @@
     </Compile>
     <Compile Include="GeneralVerificationSettings.cs" />
     <Compile Include="MetadataSettings.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="VerificationSettings.cs" />
     <Compile Include="VerificationSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -76,6 +161,12 @@
     </Compile>
     <Compile Include="VerificationTask.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VerificationTaskForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VerificationTaskForm.Designer.cs">
+      <DependentUpon>VerificationTaskForm.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="ADODB">
@@ -112,6 +203,10 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj">
+      <Project>{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}</Project>
+      <Name>Extract.Imaging.Forms</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
       <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
       <Name>Extract.Interop</Name>
@@ -130,9 +225,19 @@
       <SubType>Designer</SubType>
       <DependentUpon>FeedbackSettingsDialog.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Properties\licenses.licx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <SubType>Designer</SubType>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Include="VerificationSettingsDialog.resx">
       <SubType>Designer</SubType>
       <DependentUpon>VerificationSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VerificationTaskForm.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>VerificationTaskForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -145,7 +250,7 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-"$(FrameworkDir)$(FrameworkVersion)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)\$(TargetName).tlb"
+"$(FrameworkDir)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)\$(TargetName).tlb"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
