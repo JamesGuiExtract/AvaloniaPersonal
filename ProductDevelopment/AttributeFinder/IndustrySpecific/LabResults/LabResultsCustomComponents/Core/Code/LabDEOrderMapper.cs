@@ -228,9 +228,13 @@ namespace Extract.LabResultsCustomComponents
                 List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo);
 
                 string connectionString = "Data Source=" + databaseFile;
+                IUnknownVector newAttributes = new IUnknownVector();
                 using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
                 {
-                    IUnknownVector newAttributes = new IUnknownVector();
+                    // Create an attribute sorter for sorting sub attributes
+                    ISortCompare attributeSorter =
+                                (ISortCompare) new SpatiallyCompareAttributesClass();
+
                     foreach (IAttribute attribute in attributes)
                     {
                         if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
@@ -239,6 +243,10 @@ namespace Extract.LabResultsCustomComponents
                                 MapOrders(attribute.SubAttributes, labInfo, dbConnection);
                             foreach (IAttribute newAttribute in mappedAttributes)
                             {
+                                // Sort the sub attributes spatially
+                                newAttribute.SubAttributes.Sort(attributeSorter);
+
+                                // Add the attribute to the vector
                                 newAttributes.PushBack(newAttribute);
                             }
                         }
@@ -248,12 +256,12 @@ namespace Extract.LabResultsCustomComponents
                             newAttributes.PushBack(attribute);
                         }
                     }
-
-                    // Clear the original attributes and set the attributes to the
-                    // newly mapped collection
-                    pAttributes.Clear();
-                    pAttributes.CopyFrom(newAttributes);
                 }
+
+                // Clear the original attributes and set the attributes to the
+                // newly mapped collection
+                pAttributes.Clear();
+                pAttributes.CopyFrom(newAttributes);
             }
             catch (Exception ex)
             {
