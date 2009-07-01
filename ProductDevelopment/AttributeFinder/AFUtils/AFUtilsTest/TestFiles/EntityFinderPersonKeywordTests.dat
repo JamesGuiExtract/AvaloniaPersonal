@@ -51,6 +51,8 @@ Person: A Feme Sole|John H. Smith, a Feme Sole with extra text|John H. Smith, a 
 
 Person: A Single Person|Peter Smith, a Single Person and Jane Jones, a single person with extra text|Peter Smith, a Single Person and Jane Jones, a single person
 
+Person: An Adult|to Jane L Smith, AN ADULT who resides|Jane L Smith, AN ADULT
+
 Person: Married To|Peter Smith, married to Jane Jones with extra text|Peter Smith, married to Jane Jones
 
 Person: Both Single|Peter Smith and Jane Jones, Both Single with extra text|Peter Smith and Jane Jones, Both Single
