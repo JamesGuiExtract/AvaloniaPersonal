@@ -10,8 +10,30 @@
 //-------------------------------------------------------------------------------------------------
 // CSpatiallyCompareAttributes
 //-------------------------------------------------------------------------------------------------
-CSpatiallyCompareAttributes::CSpatiallyCompareAttributes()
+CSpatiallyCompareAttributes::CSpatiallyCompareAttributes() : m_ipSortCompare(NULL)
 {
+	try
+	{
+		// Initialize the sort compare pointer
+		m_ipSortCompare.CreateInstance(CLSID_SpatiallyCompareStrings);
+		ASSERT_RESOURCE_ALLOCATION("ELI26621", m_ipSortCompare != NULL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26622");
+}
+//-------------------------------------------------------------------------------------------------
+HRESULT CSpatiallyCompareAttributes::FinalConstruct()
+{
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+void CSpatiallyCompareAttributes::FinalRelease()
+{
+	try
+	{
+		// Release COM objects before the object is destroyed
+		m_ipSortCompare = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26623");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -35,7 +57,8 @@ STDMETHODIMP CSpatiallyCompareAttributes::InterfaceSupportsErrorInfo(REFIID riid
 //-------------------------------------------------------------------------------------------------
 // ISortCompare
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSpatiallyCompareAttributes::raw_LessThan(IUnknown * pObj1, IUnknown * pObj2, VARIANT_BOOL * pbRetVal)
+STDMETHODIMP CSpatiallyCompareAttributes::raw_LessThan(IUnknown * pObj1, IUnknown * pObj2,
+													   VARIANT_BOOL * pbRetVal)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -43,21 +66,36 @@ STDMETHODIMP CSpatiallyCompareAttributes::raw_LessThan(IUnknown * pObj1, IUnknow
 	{
 		// Check license
 		validateLicense();
+
+		// Check the arguments
+		ASSERT_ARGUMENT("ELI26624", pbRetVal != NULL);
 		UCLID_AFCORELib::IAttributePtr ipA1(pObj1);
 		ASSERT_RESOURCE_ALLOCATION("ELI11277", ipA1 != NULL);
 		UCLID_AFCORELib::IAttributePtr ipA2(pObj2);
 		ASSERT_RESOURCE_ALLOCATION("ELI11278", ipA2 != NULL);
 
-		ISortComparePtr ipCompare(CLSID_SpatiallyCompareStrings);
-		ASSERT_RESOURCE_ALLOCATION("ELI11276", ipCompare != NULL);
+		// Get the spatial strings for the attributes
+		ISpatialStringPtr ipValue1 = ipA1->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI26625", ipValue1 != NULL);
+		ISpatialStringPtr ipValue2 = ipA2->Value;
+		ASSERT_RESOURCE_ALLOCATION("ELI26626", ipValue2 != NULL);
 
-		*pbRetVal = ipCompare->LessThan(ipA1->Value, ipA2->Value);
+		// Check the spatialness of the strings
+		bool bV1Spatial = asCppBool(ipValue1->HasSpatialInfo());
+		bool bV2Spatial = asCppBool(ipValue2->HasSpatialInfo());
+
+		if (bV1Spatial && bV2Spatial)
+		{
+			*pbRetVal = m_ipSortCompare->LessThan(ipValue1, ipValue2);
+		}
+		else
+		{
+			*pbRetVal = asVariantBool(bV1Spatial);
+		}
+
 		return S_OK;
-
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11279")
-
-	return S_OK;
 }
 
 //-------------------------------------------------------------------------------------------------

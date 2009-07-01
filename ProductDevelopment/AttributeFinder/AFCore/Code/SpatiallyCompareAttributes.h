@@ -21,6 +21,9 @@ DECLARE_REGISTRY_RESOURCEID(IDR_SPATIALLYCOMPAREATTRIBUTES)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
+	HRESULT FinalConstruct();
+	void FinalRelease();
+
 BEGIN_COM_MAP(CSpatiallyCompareAttributes)
 	COM_INTERFACE_ENTRY(ISpatiallyCompareAttributes)
 	COM_INTERFACE_ENTRY(ISupportErrorInfo)
@@ -42,6 +45,8 @@ public:
 
 private:
 	void validateLicense();
+
+	ISortComparePtr m_ipSortCompare;
 };
 
 #endif //__SPATIALLYCOMPAREATTRIBUTES_H_
