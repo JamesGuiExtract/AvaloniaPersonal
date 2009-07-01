@@ -438,7 +438,10 @@ private:
 	bool isExcluded(CPoint &rpoint);
 	
 	// Returns true if the specified point is within the bounds of the current page.
-	bool isPointOnPage(CPoint point);
+	// Checks the point relative to image bitmap boundaries:
+	// x range: 0 - (width-1)
+	// y range: 0 - (height-1)													
+	bool isPointOnPage(const CPoint& point);
 
 	// Returns true if rect1 lies above rect2. (used to sort the results of the rule).
 	static bool isAreaAbove(const CRect &rect1, const CRect &rect2);

@@ -908,165 +908,183 @@ CSplitRegionIntoContentAreas::PixelProcessor::~PixelProcessor()
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::PixelProcessor::process()
 {
-	// Simply don't do any processing if m_rect doesn't overlap the current page. 
-	if (!m_parent.ensureRectInPage(m_rect, false))
+	try
 	{
-		return;
-	}
-
-	// Keep track of whether the PixelProcessor has requested that processing be aborted.
-	bool bAbort = false;
-
-	// Cycle through each row of image data
-	for (int y = m_rect.top; y <= m_rect.bottom && !bAbort; y++)
-	{
-		int nPixelX = m_rect.left;
-		int nByte = m_rect.left / 8;
-		int nLastByte = m_rect.right / 8;
-
-		// Obtain a pointer to the raw image data.
-		UCHAR *pucImageRow = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
-		// Adjust the pointer to the row that contains the pixels we need.
-		pucImageRow += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
-
-		// Cycle through each byte in the row.
-		while (nByte <= nLastByte && !bAbort)
+		// Simply don't do any processing if m_rect doesn't overlap the current page. 
+		if (!m_parent.ensureRectInPage(m_rect, false))
 		{
-			// Obtain a pointer to the byte of raw image data we need.
-			UCHAR *pucImageByte = pucImageRow + nByte;
+			return;
+		}
 
-			// Use a bit mask to check each pixel (bit) within the byte taking care to not read
-			// bits to the left or right of m_rect.
-			int nBit = nPixelX % 8;
-			
-			while (nBit < 8)
+		// Keep track of whether the PixelProcessor has requested that processing be aborted.
+		bool bAbort = false;
+
+		// Cycle through each row of image data
+		for (int y = m_rect.top; y <= m_rect.bottom && !bAbort; y++)
+		{
+			int nPixelX = m_rect.left;
+			int nByte = m_rect.left / 8;
+			int nLastByte = m_rect.right / 8;
+
+			// Obtain a pointer to the raw image data.
+			UCHAR *pucImageRow = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
+			// Adjust the pointer to the row that contains the pixels we need.
+			pucImageRow += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
+
+			// Cycle through each byte in the row.
+			while (nByte <= nLastByte && !bAbort)
 			{
-				if (nPixelX > m_rect.right)
+				// Obtain a pointer to the byte of raw image data we need.
+				UCHAR *pucImageByte = pucImageRow + nByte;
+
+				// Use a bit mask to check each pixel (bit) within the byte taking care to not read
+				// bits to the left or right of m_rect.
+				int nBit = nPixelX % 8;
+
+				while (nBit < 8)
 				{
-					// We are now to the right of m_rect, go to the next row.
-					break;
-				}
-				
-				// Set a mask to read the correct pixel from the byte.
-				UCHAR ucMask = gucFIRST_BIT >> nBit;
-				if ((ucMask & *pucImageByte) != 0)
-				{
-					// This pixel is black; process it.
-					int nRes = processPixel(nPixelX, y);
-					if (nRes < 0)
+					if (nPixelX > m_rect.right)
 					{
-						// The processor has requested for processing to stop.
-						bAbort = true;
+						// We are now to the right of m_rect, go to the next row.
 						break;
 					}
 
-					if (nRes > 0)
+					// Set a mask to read the correct pixel from the byte.
+					UCHAR ucMask = gucFIRST_BIT >> nBit;
+					if ((ucMask & *pucImageByte) != 0)
 					{
-						// The processor has requested that nRes pixels should be skipped before
-						// processing continues.
-						nPixelX += nRes;
-
-						if (nPixelX / 8 != nByte)
+						// This pixel is black; process it.
+						int nRes = processPixel(nPixelX, y);
+						if (nRes < 0)
 						{
-							// Skipping ahead to a byte that follows this one
-							// (subtract one to account for the fact that nByte will be incremented)
-							nByte = nPixelX / 8 - 1;  
+							// The processor has requested for processing to stop.
+							bAbort = true;
 							break;
 						}
-						else
+
+						if (nRes > 0)
 						{
-							// Skipping ahead to a bit within this same byte.
-							nBit = nPixelX % 8;
-							continue;
+							// The processor has requested that nRes pixels should be skipped before
+							// processing continues.
+							nPixelX += nRes;
+
+							if (nPixelX / 8 != nByte)
+							{
+								// Skipping ahead to a byte that follows this one
+								// (subtract one to account for the fact that nByte
+								// will be incremented)
+								nByte = nPixelX / 8 - 1;  
+								break;
+							}
+							else
+							{
+								// Skipping ahead to a bit within this same byte.
+								nBit = nPixelX % 8;
+								continue;
+							}
 						}
 					}
+
+					nPixelX ++;
+					nBit ++;
 				}
 
-				nPixelX ++;
-				nBit ++;
+				nByte ++;
 			}
-
-			nByte ++;
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26602");
 }
 //--------------------------------------------------------------------------------------------------
 int CSplitRegionIntoContentAreas::PixelContentSearcher::processPixel(int x, int y)
 {
-	CPoint ptStart(x, y);
-
-	// Start by ensuring we are to process the specified pixel.
-	if (m_parent.isExcluded(ptStart))
+	try
 	{
-		// If ptStart was excluded, the point now indicates the next pixel not excluded.
-		// Indicate to the base class how many pixels to skip.
-		return ptStart.x - x;
-	}
-	else
-	{
-		// Create a rect of average character size that contains this point and is centered
-		// as best as possible on black pixels.
-		CRect rect(0, 0, 0, 0);
-		CRect rectToExclude = m_parent.centerAreaRegionOnBlack(ptStart, rect,
-			m_parent.m_rectCurrentPage);
-
-		CPoint rectCenter(rect.CenterPoint());
-
-		// Make sure the center position of this rect is okay to process an that the starting
-		// rect has enough pixels to be worth processing.
-		if (!m_parent.isExcluded(rectCenter) && 
-			m_parent.hasEnoughPixels(rect))
+		try
 		{
-			// Attempt to expand the area horizontally to the extent of the included content
-			if (m_parent.expandHorizontally(rect, m_rect))
+			CPoint ptStart(x, y);
+
+			// Start by ensuring we are to process the specified pixel.
+			if (m_parent.isExcluded(ptStart))
 			{
-				// Don't bother processing anything in this area in the future
-				m_parent.m_vecExcludedAreas.push_back(rect);
+				// If ptStart was excluded, the point now indicates the next pixel not excluded.
+				// Indicate to the base class how many pixels to skip.
+				return ptStart.x - x;
+			}
+			else
+			{
+				// Create a rect of average character size that contains this point and is centered
+				// as best as possible on black pixels.
+				CRect rect(0, 0, 0, 0);
+				CRect rectToExclude = m_parent.centerAreaRegionOnBlack(ptStart, rect,
+					m_parent.m_rectCurrentPage);
 
-				// Add the area to the list of candidate areas only if it is big enough
-				// Now that the area is expanded, now see if the center point lies within an
-				// existing area.  If so, don't add an area that will likely be a duplicate,
-				// just make sure the existing area is expanded to the same horizontal extent.
-				CPoint ptCenter = rect.CenterPoint();
-				bool bFoundExisting = false;
+				CPoint rectCenter(rect.CenterPoint());
 
-				for (size_t i = 0; i < m_parent.m_vecContentAreas.size(); i++)
+				// Make sure the center position of this rect is okay to process an that the starting
+				// rect has enough pixels to be worth processing.
+				if (!m_parent.isExcluded(rectCenter) && 
+					m_parent.hasEnoughPixels(rect))
 				{
-					if (m_parent.m_vecContentAreas[i].PtInRect(ptCenter))
+					// Attempt to expand the area horizontally to the extent of the included content
+					if (m_parent.expandHorizontally(rect, m_rect))
 					{
-						bFoundExisting = true;
+						// Don't bother processing anything in this area in the future
+						m_parent.m_vecExcludedAreas.push_back(rect);
 
-						// If the new area's center is within an existing area, combine the 
-						// two areas into one instead of adding a separate area.
-						m_parent.m_vecContentAreas[i].UnionRect(
-							&(m_parent.m_vecContentAreas[i]), &rect);
+						// Add the area to the list of candidate areas only if it is big enough
+						// Now that the area is expanded, now see if the center point lies within an
+						// existing area.  If so, don't add an area that will likely be a duplicate,
+						// just make sure the existing area is expanded to the same horizontal extent.
+						CPoint ptCenter = rect.CenterPoint();
+						bool bFoundExisting = false;
+
+						for (size_t i = 0; i < m_parent.m_vecContentAreas.size(); i++)
+						{
+							if (m_parent.m_vecContentAreas[i].PtInRect(ptCenter))
+							{
+								bFoundExisting = true;
+
+								// If the new area's center is within an existing area, combine the 
+								// two areas into one instead of adding a separate area.
+								m_parent.m_vecContentAreas[i].UnionRect(
+									&(m_parent.m_vecContentAreas[i]), &rect);
+							}
+						}
+
+						// Add the area to the result list if necessary.
+						if (!bFoundExisting)
+						{
+							m_parent.m_vecContentAreas.push_back(rect);
+						}
 					}
 				}
+				else
+				{	
+					// Keep track of pixels that no longer need to be processed and
+					// inform the base class of how many pixels can be skipped
+					if (rectToExclude.bottom >= y)
+					{
+						if (rectToExclude.bottom > y)
+						{
+							m_parent.m_vecExcludedAreas.push_back(rectToExclude);
+						}
 
-				// Add the area to the result list if necessary.
-				if (!bFoundExisting)
-				{
-					m_parent.m_vecContentAreas.push_back(rect);
+						return rectToExclude.right - x;
+					}
 				}
 			}
-		}
-		else
-		{	
-			// Keep track of pixels that no longer need to be processed and inform the base class
-			// of how many pixels can be skipped
-			if (rectToExclude.bottom >= y)
-			{
-				if (rectToExclude.bottom > y)
-				{
-					m_parent.m_vecExcludedAreas.push_back(rectToExclude);
-				}
 
-				return rectToExclude.right - x;
-			}
+			return 0;
 		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26603");
 	}
-
-	return 0;
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("X Coord", x);
+		ue.addDebugInfo("Y Coord", y);
+		throw ue;
+	}
 }
 //--------------------------------------------------------------------------------------------------
 int CSplitRegionIntoContentAreas::PixelCounter::processPixel(int x, int y)
@@ -1090,46 +1108,74 @@ int CSplitRegionIntoContentAreas::PixelAverager::processPixel(int x, int y)
 //--------------------------------------------------------------------------------------------------
 int CSplitRegionIntoContentAreas::PixelEdgeFinder::processPixel(int x, int y)
 {
-	// The specified pixel is from the the next pixels to be included/excluded from an area
-	CPoint ptPixel(x, y);
-
-	// Make sure this pixels is on the page.  If not, return -1 to stop processing now.
-	if (!m_parent.isPointOnPage(ptPixel))
+	try
 	{
-		return -1;
-	}
+		try
+		{
+			// The specified pixel is from the the next pixels to be included/excluded from an area
+			CPoint ptPixel(x, y);
 
-	// Make sure the previous pixel (opposite of the expansion direction), was also black.  If so
-	// consider this as content.
-	CPoint ptPreviousPixel = ptPixel - m_parent.m_sizeEdgeSearchDirection;
-	if (m_parent.m_apPageBitmap->isPixelBlack(ptPreviousPixel))
+			// Make sure this pixels is on the page.  If not, return -1 to stop processing now.
+			if (!m_parent.isPointOnPage(ptPixel))
+			{
+				return -1;
+			}
+
+			// Make sure the previous pixel (opposite of the expansion direction), was also black.
+			// If so consider this as content.
+			// [FlexIDSCore #3560] - Ensure the previous pixel is on the page
+			CPoint ptPreviousPixel = ptPixel - m_parent.m_sizeEdgeSearchDirection;
+			if (m_parent.isPointOnPage(ptPreviousPixel)
+				&& m_parent.m_apPageBitmap->isPixelBlack(ptPreviousPixel))
+			{
+				// Set the return value to indicate content was found
+				m_nPixelCount = 1;
+
+				// Return -1 to stop looking since we already found content.
+				return -1;
+			}
+
+			return 0;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26604");
+	}
+	catch(UCLIDException& ue)
 	{
-		// Set the return value to indicate content was found
-		m_nPixelCount = 1;
-
-		// Return -1 to stop looking since we already found content.
-		return -1;
+		ue.addDebugInfo("X Coord", x);
+		ue.addDebugInfo("Y Coord", y);
+		throw ue;
 	}
-
-	return 0;
 }
 //--------------------------------------------------------------------------------------------------
 int CSplitRegionIntoContentAreas::PixelEraser::processPixel(int x, int y)
 {
-	// Obtain a pointer to the raw image data.
-	UCHAR *pucImageData = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
-	// Adjust the pointer to the byte that contains the pixels we need.
-	pucImageData += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
-	pucImageData += x / 8;
+	try
+	{
+		try
+		{
+			// Obtain a pointer to the raw image data.
+			UCHAR *pucImageData = m_parent.m_apPageBitmap->m_hBitmap.Addr.Windows.pData;
+			// Adjust the pointer to the byte that contains the pixels we need.
+			pucImageData += y * m_parent.m_apPageBitmap->m_hBitmap.BytesPerLine;
+			pucImageData += x / 8;
 
-	// Set a mask to obtain the bit we need.
-	UCHAR ucMask = gucFIRST_BIT >> (x % 8);
+			// Set a mask to obtain the bit we need.
+			UCHAR ucMask = gucFIRST_BIT >> (x % 8);
 
-	// Flip the bit (since the pixel was black for processPixel to be called, we know we are
-	// flipping it to white).
-	*pucImageData = *pucImageData ^ ucMask;
+			// Flip the bit (since the pixel was black for processPixel to be called,
+			// we know we are flipping it to white).
+			*pucImageData = *pucImageData ^ ucMask;
 
-	return 0;
+			return 0;
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26605");
+	}
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("X Coord", x);
+		ue.addDebugInfo("Y Coord", y);
+		throw ue;
+	}
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1211,718 +1257,751 @@ CSplitRegionIntoContentAreas::ContentAreaInfo::ContentAreaInfo(const CRect &rect
 void CSplitRegionIntoContentAreas::addContentAreaAttributes(IAFDocumentPtr ipDoc, 
 															IAttributePtr ipAttribute)
 {
-	ASSERT_ARGUMENT("ELI22115", ipDoc != NULL);
-	ASSERT_ARGUMENT("ELI22116", ipAttribute != NULL);
-
-	// Checks the for the handwriting OCR license if m_bReOCRWithHandwriting is true.  If the
-	// license is neede but missing, and exception is logged and m_bReOCRWithHandwriting is set to 
-	// false.
-	validateHandwritingLicense();
-
-	ISpatialStringPtr ipValue = ipAttribute->Value;
-
-	// If this attribute doesn't have a value or the value doesn't have any spatial information,
-	// there is nothing to process.
-	if (ipValue == NULL || !asCppBool(ipValue->HasSpatialInfo()))
+	try
 	{
-		return;
-	}
+		ASSERT_ARGUMENT("ELI22115", ipDoc != NULL);
+		ASSERT_ARGUMENT("ELI22116", ipAttribute != NULL);
 
-	// Clear any existing results or excluded areas.
-	m_vecContentAreas.clear();
-	m_vecExcludedAreas.clear();
-	
-	IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
-	ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != NULL);
+		// Checks the for the handwriting OCR license if m_bReOCRWithHandwriting is true.  If the
+		// license is neede but missing, and exception is logged and m_bReOCRWithHandwriting is
+		// set to false.
+		validateHandwritingLicense();
 
-	ISpatialStringPtr ipDocText = ipDoc->Text;
-	ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
+		ISpatialStringPtr ipValue = ipAttribute->Value;
 
-	IIUnknownVectorPtr ipAttributeLines = ipValue->GetLines();
-	ASSERT_RESOURCE_ALLOCATION("ELI22228", ipAttributeLines != NULL);
-
-	// -----------------------------------------------------------------------------------
-	// Clone the spatial page info maps so that the rotations can be cleared (since all of
-	// the content regions that we will compute are tied to the displayed orientation of
-	// the image NOT the OCR'd orientation of the image). [FlexIDSCore #3527]
-	// -----------------------------------------------------------------------------------
-	// Get the spatial page infos
-	ILongToObjectMapPtr ipOriginalSpatialInfo = ipDocText->SpatialPageInfos;
-	ASSERT_RESOURCE_ALLOCATION("ELI25608", ipOriginalSpatialInfo != NULL);
-
-	// Create a new map to hold the copied page infos
-	ILongToObjectMapPtr ipCloneSpatialInfos(CLSID_LongToObjectMap);
-	ASSERT_RESOURCE_ALLOCATION("ELI25609", ipCloneSpatialInfos != NULL);
-
-	// Get the keys to the page infos so that we can clone them in a loop
-	IVariantVectorPtr ipKeys = ipOriginalSpatialInfo->GetKeys();
-	ASSERT_RESOURCE_ALLOCATION("ELI25610", ipKeys != NULL);
-
-	// Clone each spatial page info, clear the rotation, and store the cloned
-	// page info in the new map
-	long lSize = ipKeys->Size;
-	for (long i=0; i < lSize; i++)
-	{
-		// Get the current key
-		long lKey = ipKeys->Item[i].lVal;
-
-		// Get the spatial page info as a copyable object
-		ICopyableObjectPtr ipOldInfo = ipOriginalSpatialInfo->GetValue(lKey);
-		ASSERT_RESOURCE_ALLOCATION("ELI25611", ipOldInfo != NULL);
-
-		// Clone the spatial page info
-		ISpatialPageInfoPtr ipInfo = ipOldInfo->Clone();
-		ASSERT_RESOURCE_ALLOCATION("ELI25612", ipInfo != NULL);
-
-		// Clear the rotation and store the new copy in the map
-		ipInfo->Orientation = kRotNone;
-		ipCloneSpatialInfos->Set(lKey, ipInfo);
-	}
-
-	// Process the attribute line-by-line if there is more than 1 so that
-	// all pages of a given attribute are processed.
-	long nAttributeLineCount = ipAttributeLines->Size();
-	for (long i = 0; i < nAttributeLineCount; i++)
-	{
-		ISpatialStringPtr ipAttributeLine = ipAttributeLines->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI22112", ipAttributeLine != NULL);
-
-		// Skip this line if it is non-spatial [FlexIDSCore #3143]
-		if (ipAttributeLine->HasSpatialInfo() == VARIANT_FALSE)
+		// If this attribute doesn't have a value or the value doesn't have any spatial information,
+		// there is nothing to process.
+		if (ipValue == NULL || !asCppBool(ipValue->HasSpatialInfo()))
 		{
-			continue;
+			return;
 		}
 
-		long nPage = ipAttributeLine->GetFirstPageNumber();
+		// Clear any existing results or excluded areas.
+		m_vecContentAreas.clear();
+		m_vecExcludedAreas.clear();
 
-		// Load the bitmap for this page.
-		if (!loadPageBitmap(ipDoc, nPage))
+		IIUnknownVectorPtr ipSubAttributes = ipAttribute->SubAttributes;
+		ASSERT_RESOURCE_ALLOCATION("ELI22104", ipSubAttributes != NULL);
+
+		ISpatialStringPtr ipDocText = ipDoc->Text;
+		ASSERT_RESOURCE_ALLOCATION("ELI22114", ipDocText != NULL);
+
+		IIUnknownVectorPtr ipAttributeLines = ipValue->GetLines();
+		ASSERT_RESOURCE_ALLOCATION("ELI22228", ipAttributeLines != NULL);
+
+		// -----------------------------------------------------------------------------------
+		// Clone the spatial page info maps so that the rotations can be cleared (since all of
+		// the content regions that we will compute are tied to the displayed orientation of
+		// the image NOT the OCR'd orientation of the image). [FlexIDSCore #3527]
+		// -----------------------------------------------------------------------------------
+		// Get the spatial page infos
+		ILongToObjectMapPtr ipOriginalSpatialInfo = ipDocText->SpatialPageInfos;
+		ASSERT_RESOURCE_ALLOCATION("ELI25608", ipOriginalSpatialInfo != NULL);
+
+		// Create a new map to hold the copied page infos
+		ILongToObjectMapPtr ipCloneSpatialInfos(CLSID_LongToObjectMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI25609", ipCloneSpatialInfos != NULL);
+
+		// Get the keys to the page infos so that we can clone them in a loop
+		IVariantVectorPtr ipKeys = ipOriginalSpatialInfo->GetKeys();
+		ASSERT_RESOURCE_ALLOCATION("ELI25610", ipKeys != NULL);
+
+		// Clone each spatial page info, clear the rotation, and store the cloned
+		// page info in the new map
+		long lSize = ipKeys->Size;
+		for (long i=0; i < lSize; i++)
 		{
-			continue;
+			// Get the current key
+			long lKey = ipKeys->Item[i].lVal;
+
+			// Get the spatial page info as a copyable object
+			ICopyableObjectPtr ipOldInfo = ipOriginalSpatialInfo->GetValue(lKey);
+			ASSERT_RESOURCE_ALLOCATION("ELI25611", ipOldInfo != NULL);
+
+			// Clone the spatial page info
+			ISpatialPageInfoPtr ipInfo = ipOldInfo->Clone();
+			ASSERT_RESOURCE_ALLOCATION("ELI25612", ipInfo != NULL);
+
+			// Clear the rotation and store the new copy in the map
+			ipInfo->Orientation = kRotNone;
+			ipCloneSpatialInfos->Set(lKey, ipInfo);
 		}
 
-		// Get a spatial string searcher for the page
-		ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher(ipDoc, nPage);
-		if (ipSearcher)
+		// Process the attribute line-by-line if there is more than 1 so that
+		// all pages of a given attribute are processed.
+		long nAttributeLineCount = ipAttributeLines->Size();
+		for (long i = 0; i < nAttributeLineCount; i++)
 		{
-			// Search should include words on the boundary.  In the end, only part of such words will
-			// be included, but for now we want this text for clues on processing.
-			ipSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
+			ISpatialStringPtr ipAttributeLine = ipAttributeLines->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI22112", ipAttributeLine != NULL);
 
-			ILongRectanglePtr ipRect = ipAttributeLine->GetOriginalImageBounds();
-			ASSERT_RESOURCE_ALLOCATION("ELI22107", ipRect != NULL);
-
-			CRect rectRegion;
-			ipRect->GetBounds(&(rectRegion.left), &(rectRegion.top),
-				&(rectRegion.right), &(rectRegion.bottom));
-
-			// Pass VARIANT_FALSE so the rectangle does not get rotated before searching
-			ISpatialStringPtr ipText = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-			ASSERT_RESOURCE_ALLOCATION("ELI22101", ipText != NULL);
-
-			if (ipText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
+			// Skip this line if it is non-spatial [FlexIDSCore #3143]
+			if (ipAttributeLine->HasSpatialInfo() == VARIANT_FALSE)
 			{
-				// Set the average character height using the text in this region if possible
-				m_sizeAvgChar = getAvgCharSize(ipText->GetAverageCharWidth(), 
-											   ipText->GetAverageLineHeight());
-			}
-			else if (m_ipCurrentPageText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
-			{
-				// Otherwise attempt to set the average char size using the entire page's text.
-				m_sizeAvgChar = getAvgCharSize(m_ipCurrentPageText->GetAverageCharWidth(), 
-											   m_ipCurrentPageText->GetAverageLineHeight());
-			}
-			else 
-			{
-				// Not enough text in the region or page. Set m_sizeAvgChar to the default size.
-				m_sizeAvgChar.cx = 
-					(int) (gnDEFAULT_CHAR_WIDTH_IN * m_apPageBitmap->m_FileInfo.XResolution);
-				m_sizeAvgChar.cy = 
-					(int) (gnDEFAULT_CHAR_HEIGHT_IN * m_apPageBitmap->m_FileInfo.YResolution);
+				continue;
 			}
 
-			// Get a vector of the lines of text from the region.
-			IIUnknownVectorPtr ipLines = ipText->GetLines();
-			ASSERT_RESOURCE_ALLOCATION("ELI22229", ipLines != NULL);
+			long nPage = ipAttributeLine->GetFirstPageNumber();
 
-			// Split these lines so that lines that are separated by enough white-space are considered 
-			// separate lines.
-			splitLineFragments(ipLines);
-		
-			// Take each line and attempt to expand it to ensure it encapsulates all content, even 
-			// pixels that didn't OCR.
-			long nLineCount = ipLines->Size();
-			for (long i = 0; i < nLineCount; i++)
+			// Load the bitmap for this page.
+			if (!loadPageBitmap(ipDoc, nPage))
 			{
-				ISpatialStringPtr ipLine = ipLines->At(i);
-				ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != NULL);
+				continue;
+			}
 
-				ContentAreaInfo area(ipLine);
-				if (!area.IsRectNull())
+			// Get a spatial string searcher for the page
+			ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher(ipDoc, nPage);
+			if (ipSearcher)
+			{
+				// Search should include words on the boundary.  In the end, only part of such
+				// words will be included, but for now we want this text for clues on processing.
+				ipSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
+
+				ILongRectanglePtr ipRect = ipAttributeLine->GetOriginalImageBounds();
+				ASSERT_RESOURCE_ALLOCATION("ELI22107", ipRect != NULL);
+
+				CRect rectRegion;
+				ipRect->GetBounds(&(rectRegion.left), &(rectRegion.top),
+					&(rectRegion.right), &(rectRegion.bottom));
+
+				// Pass VARIANT_FALSE so the rectangle does not get rotated before searching
+				ISpatialStringPtr ipText = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+				ASSERT_RESOURCE_ALLOCATION("ELI22101", ipText != NULL);
+
+				if (ipText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
 				{
-					if (expandHorizontally(area, rectRegion))
-					{
-						// Don't bother processing anything in this area in the future
-						m_vecExcludedAreas.push_back(area);
+					// Set the average character height using the text in this region if possible
+					m_sizeAvgChar = getAvgCharSize(ipText->GetAverageCharWidth(), 
+						ipText->GetAverageLineHeight());
+				}
+				else if (m_ipCurrentPageText->Size > gnMIN_CHARS_NEEDED_FOR_SIZE)
+				{
+					// Otherwise attempt to set the average char size using the entire page's text.
+					m_sizeAvgChar = getAvgCharSize(m_ipCurrentPageText->GetAverageCharWidth(), 
+						m_ipCurrentPageText->GetAverageLineHeight());
+				}
+				else 
+				{
+					// Not enough text in the region or page. Set m_sizeAvgChar to the default size.
+					m_sizeAvgChar.cx = 
+						(int) (gnDEFAULT_CHAR_WIDTH_IN * m_apPageBitmap->m_FileInfo.XResolution);
+					m_sizeAvgChar.cy = 
+						(int) (gnDEFAULT_CHAR_HEIGHT_IN * m_apPageBitmap->m_FileInfo.YResolution);
+				}
 
-						// add it to the result candidates.
-						m_vecContentAreas.push_back(area);
+				// Get a vector of the lines of text from the region.
+				IIUnknownVectorPtr ipLines = ipText->GetLines();
+				ASSERT_RESOURCE_ALLOCATION("ELI22229", ipLines != NULL);
+
+				// Split these lines so that lines that are separated by enough white-space
+				// are considered separate lines.
+				splitLineFragments(ipLines);
+
+				// Take each line and attempt to expand it to ensure it encapsulates all content,
+				// even pixels that didn't OCR.
+				long nLineCount = ipLines->Size();
+				for (long i = 0; i < nLineCount; i++)
+				{
+					ISpatialStringPtr ipLine = ipLines->At(i);
+					ASSERT_RESOURCE_ALLOCATION("ELI22102", ipLine != NULL);
+
+					ContentAreaInfo area(ipLine);
+					if (!area.IsRectNull())
+					{
+						if (expandHorizontally(area, rectRegion))
+						{
+							// Don't bother processing anything in this area in the future
+							m_vecExcludedAreas.push_back(area);
+
+							// add it to the result candidates.
+							m_vecContentAreas.push_back(area);
+						}
 					}
 				}
-			}
 
-			// Now that we have attempted to expand all OCR'd text, search the pixels in the region
-			// for qualifying content areas that don't contain any OCR'd text.
-			processRegionPixels(rectRegion);
+				// Now that we have attempted to expand all OCR'd text, search the pixels in
+				// the region for qualifying content areas that don't contain any OCR'd text.
+				processRegionPixels(rectRegion);
 
-			// Create a new subattribute for each qualifying content area.
-			for each (ContentAreaInfo area in m_vecContentAreas)
-			{
-				IAttributePtr ipNewSubAttribute = createResult(ipDoc, nPage, area,
-					ipCloneSpatialInfos);
-				ASSERT_RESOURCE_ALLOCATION("ELI22230", ipNewSubAttribute != NULL);
+				// Create a new subattribute for each qualifying content area.
+				for each (ContentAreaInfo area in m_vecContentAreas)
+				{
+					IAttributePtr ipNewSubAttribute = createResult(ipDoc, nPage, area,
+						ipCloneSpatialInfos);
+					ASSERT_RESOURCE_ALLOCATION("ELI22230", ipNewSubAttribute != NULL);
 
-				ipSubAttributes->PushBack(ipNewSubAttribute);
+					ipSubAttributes->PushBack(ipNewSubAttribute);
+				}
 			}
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26606");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::splitLineFragments(IIUnknownVectorPtr ipLines)
 {
-	ASSERT_RESOURCE_ALLOCATION("ELI22178", ipLines != NULL);
-
-	IIUnknownVectorPtr ipReturnValue(CLSID_IUnknownVector);
-	ASSERT_RESOURCE_ALLOCATION("ELI22179", ipReturnValue != NULL);
-
-	// Cycle through each line and split it into multiple lines if appropriate.
-	long nLineCount = ipLines->Size();
-	for (int i = 0; i < nLineCount; i++)
+	try
 	{
-		ISpatialStringPtr ipLine = ipLines->At(i);
-		ASSERT_RESOURCE_ALLOCATION("ELI22180", ipLine != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI22178", ipLines != NULL);
 
-		// If this line doesn't have spatial info, there's nothing to do.
-		if (!asCppBool(ipLine->HasSpatialInfo()))
+		IIUnknownVectorPtr ipReturnValue(CLSID_IUnknownVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI22179", ipReturnValue != NULL);
+
+		// Cycle through each line and split it into multiple lines if appropriate.
+		long nLineCount = ipLines->Size();
+		for (int i = 0; i < nLineCount; i++)
 		{
-			continue;
-		}
+			ISpatialStringPtr ipLine = ipLines->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI22180", ipLine != NULL);
 
-		// Use GetSplitLines to try to split this line at whitespace gaps.
-		IIUnknownVectorPtr ipSplitLines = ipLine->GetSplitLines(gnMIN_CHAR_SEPARATION_OF_LINES);
-
-		// Sometimes the vertical positioning of characters in a "line" is off such that the
-		// characters really shouldn't be considered in the same line.  Attempt to find
-		// such cases.
-		int nSplitLineCount = ipSplitLines->Size();
-		for (int j = 0; j < nSplitLineCount; j++)
-		{
-			ISpatialStringPtr ipSplitLine = ipSplitLines->At(j);
-			ASSERT_RESOURCE_ALLOCATION("ELI22197", ipSplitLine != NULL);
-
-			CPPLetter* pLetters = NULL;
-			long nLetterCount = -1;
-			ipSplitLine->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
-			ASSERT_RESOURCE_ALLOCATION("ELI22198", pLetters != NULL);
-
-			// Cycle through each letter of the line and make sure it is vertically in-line
-			// with the others.
-			CRect rectBounds(0, 0, 0, 0);
-			for (long k = 0; k < nLetterCount; k++)
+			// If this line doesn't have spatial info, there's nothing to do.
+			if (!asCppBool(ipLine->HasSpatialInfo()))
 			{
-				const CPPLetter& letter = pLetters[k];
-				if (!letter.m_bIsSpatial)
-				{
-					continue;
-				}
+				continue;
+			}
 
-				CRect rectLetter(letter.m_usLeft, letter.m_usTop,
-					letter.m_usRight, letter.m_usBottom);
-				if (rectLetter.IsRectEmpty())
-				{
-					continue;
-				}
+			// Use GetSplitLines to try to split this line at whitespace gaps.
+			IIUnknownVectorPtr ipSplitLines = ipLine->GetSplitLines(gnMIN_CHAR_SEPARATION_OF_LINES);
 
-				if (rectBounds.IsRectNull())
+			// Sometimes the vertical positioning of characters in a "line" is off such that the
+			// characters really shouldn't be considered in the same line.  Attempt to find
+			// such cases.
+			int nSplitLineCount = ipSplitLines->Size();
+			for (int j = 0; j < nSplitLineCount; j++)
+			{
+				ISpatialStringPtr ipSplitLine = ipSplitLines->At(j);
+				ASSERT_RESOURCE_ALLOCATION("ELI22197", ipSplitLine != NULL);
+
+				CPPLetter* pLetters = NULL;
+				long nLetterCount = -1;
+				ipSplitLine->GetOCRImageLetterArray(&nLetterCount, (void**)&pLetters);
+				ASSERT_RESOURCE_ALLOCATION("ELI22198", pLetters != NULL);
+
+				// Cycle through each letter of the line and make sure it is vertically in-line
+				// with the others.
+				CRect rectBounds(0, 0, 0, 0);
+				for (long k = 0; k < nLetterCount; k++)
 				{
-					// rectBounds keeps running track of the line bounds.  If it isn't yet set,
-					// start with the current letter.
-					rectBounds = rectLetter;
-				}
-				else
-				{
-					// If this letter's bounds don't conform with the current bounds,
-					// spawn a new spatial string and add it to the result vector.
-					if (rectLetter.top > rectBounds.bottom || rectLetter.bottom < rectBounds.top)
+					const CPPLetter& letter = pLetters[k];
+					if (!letter.m_bIsSpatial)
 					{
-						ISpatialStringPtr ipBegin = ipSplitLine->GetSubString(0, k - 1);
-						ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != NULL);
-						ipReturnValue->PushBack(ipBegin);
-						
-						// Start over with the remaining characters in the line.
-						ipSplitLine = ipSplitLine->GetSubString(k, nLetterCount - 1);
-						ASSERT_RESOURCE_ALLOCATION("ELI22200", ipSplitLine != NULL);
-						nLetterCount -= k;
-						k = 1;
+						continue;
+					}
 
+					CRect rectLetter(letter.m_usLeft, letter.m_usTop,
+						letter.m_usRight, letter.m_usBottom);
+					if (rectLetter.IsRectEmpty())
+					{
+						continue;
+					}
+
+					if (rectBounds.IsRectNull())
+					{
+						// rectBounds keeps running track of the line bounds.  If it isn't yet set,
+						// start with the current letter.
 						rectBounds = rectLetter;
 					}
 					else
 					{
-						// Update the total bounds of the line thus far.
-						rectBounds.UnionRect(&rectLetter, &rectBounds);
+						// If this letter's bounds don't conform with the current bounds,
+						// spawn a new spatial string and add it to the result vector.
+						if (rectLetter.top > rectBounds.bottom
+							|| rectLetter.bottom < rectBounds.top)
+						{
+							ISpatialStringPtr ipBegin = ipSplitLine->GetSubString(0, k - 1);
+							ASSERT_RESOURCE_ALLOCATION("ELI22199", ipBegin != NULL);
+							ipReturnValue->PushBack(ipBegin);
+
+							// Start over with the remaining characters in the line.
+							ipSplitLine = ipSplitLine->GetSubString(k, nLetterCount - 1);
+							ASSERT_RESOURCE_ALLOCATION("ELI22200", ipSplitLine != NULL);
+							nLetterCount -= k;
+							k = 1;
+
+							rectBounds = rectLetter;
+						}
+						else
+						{
+							// Update the total bounds of the line thus far.
+							rectBounds.UnionRect(&rectLetter, &rectBounds);
+						}
 					}
 				}
+
+				ipReturnValue->PushBack(ipSplitLine);
 			}
-
-			ipReturnValue->PushBack(ipSplitLine);
 		}
-	}
 
-	// Reset ipLines with the return value we've accumulated.
-	ipLines->Clear();
-	ipLines->Append(ipReturnValue);
+		// Reset ipLines with the return value we've accumulated.
+		ipLines->Clear();
+		ipLines->Append(ipReturnValue);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26607");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::processRegionPixels(const CRect& rect)
 {
-	// Find all content areas based on pixels using PixelContentSearcher.  This will expand
-	// the areas horizontally during processing.
-	PixelContentSearcher pixelContentSearcher(this, rect);
-	pixelContentSearcher.process();
+	try
+	{
+		// Find all content areas based on pixels using PixelContentSearcher.  This will expand
+		// the areas horizontally during processing.
+		PixelContentSearcher pixelContentSearcher(this, rect);
+		pixelContentSearcher.process();
 
-	// Take these areas, expand them vertically, and handle any resulting overlap of area bounds.
-	expandAndMergeAreas();
+		// Take these areas, expand them vertically, and handle any resulting overlap of area bounds.
+		expandAndMergeAreas();
 
-	// Clean up the area bounds, ensure area qualifications, and eliminate duplicates, 
-	finalizeContentAreas(rect);
+		// Clean up the area bounds, ensure area qualifications, and eliminate duplicates, 
+		finalizeContentAreas(rect);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26608");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::expandAndMergeAreas()
 {
-	// Iterate through each area, attempting to expand it both up and down pixel-by-pixel. As the
-	// edge of content areas are found or they collide with other areas, adjust the area bounds 
-	// accordingly and stop expansion of these bounds until there are no more bounds processing.
-	bool bProcessing = true;
-	while (bProcessing)
+	try
 	{
-		// Set bProcessing to false until we find a border that still needs processing.
-		bProcessing = false;
+		// Iterate through each area, attempting to expand it both up and down pixel-by-pixel. As the
+		// edge of content areas are found or they collide with other areas, adjust the area bounds 
+		// accordingly and stop expansion of these bounds until there are no more bounds processing.
+		bool bProcessing = true;
+		while (bProcessing)
+		{
+			// Set bProcessing to false until we find a border that still needs processing.
+			bProcessing = false;
 
+			for (size_t i = 0; i < m_vecContentAreas.size(); i++)
+			{
+				// Delete any area with a NULL rectangle.
+				if (m_vecContentAreas[i].IsRectNull())
+				{
+					m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+					i--;
+					continue;
+				}
+
+				// A vector of new areas that need to be added as a result of two areas that 
+				// are found to be overlapping.
+				vector<ContentAreaInfo> vecAreasToAdd;
+
+				if (m_vecContentAreas[i].m_eTopBoundaryState == kNotFound)
+				{
+					// The top border needs expanding. Set bProcessing and m_sizeEdgeSearchDirection
+					// accordingly.
+					m_sizeEdgeSearchDirection.SetSize(0, -1);
+					bProcessing = true;
+
+					if (attemptMerge(m_vecContentAreas[i], true, vecAreasToAdd, true))
+					{
+						// This area was merged with another (the other is the one that will remain).
+						// We can safely remove the current area.
+						m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+						i--;
+						continue;
+					}
+					else if (m_vecContentAreas[i].m_eTopBoundaryState == kNotFound)
+					{
+						// If the area still needs expansion following the merge attempt, use
+						// PixelEdgeFinder to see if we can expand it up by a pixel.
+						CRect rectExpansionEdge(m_vecContentAreas[i].left, 
+							m_vecContentAreas[i].top - 1, 
+							m_vecContentAreas[i].right, 
+							m_vecContentAreas[i].top - 1);
+
+						PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
+						PixelEdgeFinder.process();
+						if (PixelEdgeFinder.m_nPixelCount == 0)
+						{
+							// There is no more content. The top border can be considered expanded.
+							m_vecContentAreas[i].m_eTopBoundaryState = kFound;
+						}
+						else
+						{
+							// Content was found, expand the area up a pixel.
+							m_vecContentAreas[i].top--;
+						}
+					}
+				}
+				else if (m_vecContentAreas[i].m_eBottomBoundaryState == kNotFound)
+				{
+					// The bottom border needs expanding. Set bProcessing and m_sizeEdgeSearchDirection
+					// accordingly.
+					m_sizeEdgeSearchDirection.SetSize(0, 1);
+					bProcessing = true;
+
+					if (attemptMerge(m_vecContentAreas[i], false, vecAreasToAdd, true))
+					{
+						// This area was merged with another (the other is the one that will remain).
+						// We can safely remove the current area.
+						m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+						i--;
+						continue;
+					}
+					else if (m_vecContentAreas[i].m_eBottomBoundaryState == kNotFound)
+					{
+						// If the area still needs expansion following the merge attempt, use
+						// PixelEdgeFinder to see if we can expand it down by a pixel.
+						CRect rectExpansionEdge(m_vecContentAreas[i].left, 
+							m_vecContentAreas[i].bottom + 1,
+							m_vecContentAreas[i].right, 
+							m_vecContentAreas[i].bottom + 1);
+
+						PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
+						PixelEdgeFinder.process();
+						if (PixelEdgeFinder.m_nPixelCount == 0)
+						{
+							// There is no more content. The bottom border can be considered expanded.
+							m_vecContentAreas[i].m_eBottomBoundaryState = kFound;
+						}
+						else
+						{
+							// Content was found, expand the area down a pixel.
+							m_vecContentAreas[i].bottom++;
+						}
+					}
+				}
+
+				// Add to the existing vector of candidate areas any new areas generated by the 
+				// attemptMerge calls.
+				if (!vecAreasToAdd.empty())
+				{
+					m_vecContentAreas.insert(m_vecContentAreas.end(), 
+						vecAreasToAdd.begin(), vecAreasToAdd.end());
+				}
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26609");
+}
+//--------------------------------------------------------------------------------------------------
+void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
+{
+	try
+	{
+		// Loop through each content area candidate to clean it up.
 		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
-			// Delete any area with a NULL rectangle.
-			if (m_vecContentAreas[i].IsRectNull())
+			// Any areas that don't intersect with the original region can be removed. Those that do
+			// intersect should be clipped to include just the intersection area.
+			if (m_vecContentAreas[i].IntersectRect(&m_vecContentAreas[i], &rectRegion) == FALSE)
 			{
 				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
 				i--;
 				continue;
 			}
 
-			// A vector of new areas that need to be added as a result of two areas that 
-			// are found to be overlapping.
-			vector<ContentAreaInfo> vecAreasToAdd;
+			// Trim off any excess white space that has resulted from merging/clipping.
+			shrinkToFit(m_vecContentAreas[i]);
 
-			if (m_vecContentAreas[i].m_eTopBoundaryState == kNotFound)
+			// If lines are involved with the area, adjust the areas accordingly.
+			makeFlushWithLines(m_vecContentAreas[i]);
+		}
+
+		// Merge any areas whose shared area is similar or that share similar y coordinates (in other 
+		// words, that appear to represent different fragments of the same line).
+		mergeAreas();
+
+		// Loop through each content area candidate to ensure it meets specified requirements to be
+		// kept.
+		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
+		{
+			if (!m_bIncludeGoodOCR && 
+				m_vecContentAreas[i].m_dOCRConfidence >= (double) m_nOCRThreshold / 100.0)
 			{
-				// The top border needs expanding. Set bProcessing and m_sizeEdgeSearchDirection
-				// accordingly.
-				m_sizeEdgeSearchDirection.SetSize(0, -1);
-				bProcessing = true;
-
-				if (attemptMerge(m_vecContentAreas[i], true, vecAreasToAdd, true))
-				{
-					// This area was merged with another (the other is the one that will remain).
-					// We can safely remove the current area.
-					m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-					i--;
-					continue;
-				}
-				else if (m_vecContentAreas[i].m_eTopBoundaryState == kNotFound)
-				{
-					// If the area still needs expansion following the merge attempt, use
-					// PixelEdgeFinder to see if we can expand it up by a pixel.
-					CRect rectExpansionEdge(m_vecContentAreas[i].left, 
-											m_vecContentAreas[i].top - 1, 
-											m_vecContentAreas[i].right, 
-											m_vecContentAreas[i].top - 1);
-
-					PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
-					PixelEdgeFinder.process();
-					if (PixelEdgeFinder.m_nPixelCount == 0)
-					{
-						// There is no more content. The top border can be considered expanded.
-						m_vecContentAreas[i].m_eTopBoundaryState = kFound;
-					}
-					else
-					{
-						// Content was found, expand the area up a pixel.
-						m_vecContentAreas[i].top--;
-					}
-				}
+				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+				i--;
+				continue;
 			}
-			else if (m_vecContentAreas[i].m_eBottomBoundaryState == kNotFound)
+			else if (!m_bIncludePoorOCR && 
+				m_vecContentAreas[i].m_dOCRConfidence < (double) m_nOCRThreshold / 100.0)
 			{
-				// The bottom border needs expanding. Set bProcessing and m_sizeEdgeSearchDirection
-				// accordingly.
-				m_sizeEdgeSearchDirection.SetSize(0, 1);
-				bProcessing = true;
-
-				if (attemptMerge(m_vecContentAreas[i], false, vecAreasToAdd, true))
-				{
-					// This area was merged with another (the other is the one that will remain).
-					// We can safely remove the current area.
-					m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-					i--;
-					continue;
-				}
-				else if (m_vecContentAreas[i].m_eBottomBoundaryState == kNotFound)
-				{
-					// If the area still needs expansion following the merge attempt, use
-					// PixelEdgeFinder to see if we can expand it down by a pixel.
-					CRect rectExpansionEdge(m_vecContentAreas[i].left, 
-											m_vecContentAreas[i].bottom + 1,
-											m_vecContentAreas[i].right, 
-											m_vecContentAreas[i].bottom + 1);
-
-					PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
-					PixelEdgeFinder.process();
-					if (PixelEdgeFinder.m_nPixelCount == 0)
-					{
-						// There is no more content. The bottom border can be considered expanded.
-						m_vecContentAreas[i].m_eBottomBoundaryState = kFound;
-					}
-					else
-					{
-						// Content was found, expand the area down a pixel.
-						m_vecContentAreas[i].bottom++;
-					}
-				}
+				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+				i--;
+				continue;
 			}
 
-			// Add to the existing vector of candidate areas any new areas generated by the 
-			// attemptMerge calls.
-			if (!vecAreasToAdd.empty())
+			// Make sure the area still meets size and pixel content requirements, remove those that 
+			// don't.
+			if (!hasEnoughPixels(m_vecContentAreas[i]) || !isBigEnough(m_vecContentAreas[i]))
 			{
-				m_vecContentAreas.insert(m_vecContentAreas.end(), 
-										 vecAreasToAdd.begin(), vecAreasToAdd.end());
+				m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
+				i--;
+				continue;
 			}
 		}
+
+		// Finally, sort the areas from top down.
+		sort(m_vecContentAreas.begin(), m_vecContentAreas.end(), isAreaAbove);
 	}
-}
-//--------------------------------------------------------------------------------------------------
-void CSplitRegionIntoContentAreas::finalizeContentAreas(const CRect& rectRegion)
-{
-	// Loop through each content area candidate to clean it up.
-	for (size_t i = 0; i < m_vecContentAreas.size(); i++)
-	{
-		// Any areas that don't intersect with the original region can be removed.  Those that do
-		// intersect should be clipped to include just the intersection area.
-		if (m_vecContentAreas[i].IntersectRect(&m_vecContentAreas[i], &rectRegion) == FALSE)
-		{
-			m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-			i--;
-			continue;
-		}
-
-		// Trim off any excess white space that has resulted from merging/clipping.
-		shrinkToFit(m_vecContentAreas[i]);
-
-		// If lines are involved with the area, adjust the areas accordingly.
-		makeFlushWithLines(m_vecContentAreas[i]);
-	}
-
-	// Merge any areas whose shared area is similar or that share similar y coordinates (in other 
-	// words, that appear to represent different fragments of the same line).
-	mergeAreas();
-
-	// Loop through each content area candidate to ensure it meets specified requirements to be
-	// kept.
-	for (size_t i = 0; i < m_vecContentAreas.size(); i++)
-	{
-		if (!m_bIncludeGoodOCR && 
-			m_vecContentAreas[i].m_dOCRConfidence >= (double) m_nOCRThreshold / 100.0)
-		{
-			m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-			i--;
-			continue;
-		}
-		else if (!m_bIncludePoorOCR && 
-			m_vecContentAreas[i].m_dOCRConfidence < (double) m_nOCRThreshold / 100.0)
-		{
-			m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-			i--;
-			continue;
-		}
-
-		// Make sure the area still meets size and pixel content requirements, remove those that 
-		// don't.
-		if (!hasEnoughPixels(m_vecContentAreas[i]) || !isBigEnough(m_vecContentAreas[i]))
-		{
-			m_vecContentAreas.erase(m_vecContentAreas.begin() + i);
-			i--;
-			continue;
-		}
-	}
-
-	// Finally, sort the areas from top down.
-	sort(m_vecContentAreas.begin(), m_vecContentAreas.end(), isAreaAbove);
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26610");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::mergeAreas()
 {
-	for (size_t i = 0; i < m_vecContentAreas.size(); i++)
+	try
 	{
-		ContentAreaInfo areaIPadded(m_vecContentAreas[i]);
-		areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
-
-		// Compare to all areas before this in the vector.
-		for (size_t j = 0; j < i; j++)
+		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
-			CRect rectIntersect;
-			if (rectIntersect.IntersectRect(&areaIPadded, &m_vecContentAreas[j]))
+			ContentAreaInfo areaIPadded(m_vecContentAreas[i]);
+			areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
+
+			// Compare to all areas before this in the vector.
+			for (size_t j = 0; j < i; j++)
 			{
-				// If these areas intersect, get the height and width of the intersection.
-				double dIntersectHeight = (double) rectIntersect.Height();
-				double dIntersectWidth = 0;
-				if (rectIntersect.IntersectRect(&m_vecContentAreas[i], &m_vecContentAreas[j]))
+				CRect rectIntersect;
+				if (rectIntersect.IntersectRect(&areaIPadded, &m_vecContentAreas[j]))
 				{
-					// Rect i was padded to ensure we merge areas level with each other but not 
-					// quite overlapping. Make sure not to include this padding width-wise.
-					dIntersectWidth = rectIntersect.Width();
-				}
-				double dIntersectionArea = dIntersectHeight * dIntersectWidth;
+					// If these areas intersect, get the height and width of the intersection.
+					double dIntersectHeight = (double) rectIntersect.Height();
+					double dIntersectWidth = 0;
+					if (rectIntersect.IntersectRect(&m_vecContentAreas[i], &m_vecContentAreas[j]))
+					{
+						// Rect i was padded to ensure we merge areas level with each other but not 
+						// quite overlapping. Make sure not to include this padding width-wise.
+						dIntersectWidth = rectIntersect.Width();
+					}
+					double dIntersectionArea = dIntersectHeight * dIntersectWidth;
 
-				// Calculate the veritcal overlap of the regions
-				double dHeightIOverlap = dIntersectHeight / (double) m_vecContentAreas[i].Height();
-				double dHeightJOverlap = dIntersectHeight / (double) m_vecContentAreas[j].Height();
+					// Calculate the veritcal overlap of the regions
+					double dHeightIOverlap = dIntersectHeight / (double) m_vecContentAreas[i].Height();
+					double dHeightJOverlap = dIntersectHeight / (double) m_vecContentAreas[j].Height();
 
-				bool bMerge = false;
+					bool bMerge = false;
 
-				if (m_vecContentAreas[i].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE ||
-					m_vecContentAreas[j].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE)
-				{
-					// If either area is based on confidently OCR'd text, only merge based on area if
-					// the intersection represents at least gdDUPLICATE_OVERLAP percent of both areas.
-					if (dIntersectionArea / m_vecContentAreas[i].getArea() > gdDUPLICATE_OVERLAP &&
+					if (m_vecContentAreas[i].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE ||
+						m_vecContentAreas[j].m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE)
+					{
+						// If either area is based on confidently OCR'd text, only merge based on area if
+						// the intersection represents at least gdDUPLICATE_OVERLAP percent of both areas.
+						if (dIntersectionArea / m_vecContentAreas[i].getArea() > gdDUPLICATE_OVERLAP &&
+							dIntersectionArea / m_vecContentAreas[j].getArea() > gdDUPLICATE_OVERLAP)
+						{
+							bMerge = true;
+						}
+					}
+					else if (dIntersectionArea / m_vecContentAreas[i].getArea() > gdDUPLICATE_OVERLAP ||
 						dIntersectionArea / m_vecContentAreas[j].getArea() > gdDUPLICATE_OVERLAP)
+					{
+						// If neither area is based on confidently OCR'd text, merge if the intersection 
+						// represents at least gdDUPLICATE_OVERLAP percent of either area.
+						bMerge = true;
+					}
+
+					// If area i shares mostly the same vertical positioning as area j and not based 
+					// on confidently OCR'd text, merge them as two pieces of the same line of content.
+					if (dHeightIOverlap > gdDUPLICATE_OVERLAP && 
+						m_vecContentAreas[i].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
 					{
 						bMerge = true;
 					}
-				}
-				else if (dIntersectionArea / m_vecContentAreas[i].getArea() > gdDUPLICATE_OVERLAP ||
-						 dIntersectionArea / m_vecContentAreas[j].getArea() > gdDUPLICATE_OVERLAP)
-				{
-					// If neither area is based on confidently OCR'd text, merge if the intersection 
-					// represents at least gdDUPLICATE_OVERLAP percent of either area.
-					bMerge = true;
-				}
 
-				// If area i shares mostly the same vertical positioning as area j and not based 
-				// on confidently OCR'd text, merge them as two pieces of the same line of content.
-				if (dHeightIOverlap > gdDUPLICATE_OVERLAP && 
-					m_vecContentAreas[i].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
-				{
-					bMerge = true;
-				}
+					// If area j shares mostly the same vertical positioning as area i and not based
+					// on confidently OCR'd text, merge them as two pieces of the same line of content.
+					if (dHeightJOverlap > gdDUPLICATE_OVERLAP && 
+						m_vecContentAreas[j].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+					{
+						bMerge = true;
+					}
 
-				// If area j shares mostly the same vertical positioning as area i and not based
-				// on confidently OCR'd text, merge them as two pieces of the same line of content.
-				if (dHeightJOverlap > gdDUPLICATE_OVERLAP && 
-					m_vecContentAreas[j].m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
-				{
-					bMerge = true;
-				}
+					// If both areas share mostly the same vertical spacing as the other, merge them
+					// regardless of whether either is based on confidently OCR'd text.
+					if (dHeightIOverlap > gdDUPLICATE_OVERLAP && dHeightJOverlap > gdDUPLICATE_OVERLAP)
+					{
+						bMerge = true;
+					}
 
-				// If both areas share mostly the same vertical spacing as the other, merge them
-				// regardless of whether either is based on confidently OCR'd text.
-				if (dHeightIOverlap > gdDUPLICATE_OVERLAP && dHeightJOverlap > gdDUPLICATE_OVERLAP)
-				{
-					bMerge = true;
-				}
+					if (bMerge)
+					{
+						// These areas qualify to be merged.  Set m_vecContentAreas[j] to the union
+						// of the two areas, and remove m_vecContentAreas[i]
+						m_vecContentAreas[i].UnionRect(&m_vecContentAreas[i], &m_vecContentAreas[j]);
+						m_vecContentAreas[i].m_dOCRConfidence = 
+							max(m_vecContentAreas[i].m_dOCRConfidence, m_vecContentAreas[j].m_dOCRConfidence);
 
-				if (bMerge)
-				{
-					// These areas qualify to be merged.  Set m_vecContentAreas[j] to the union
-					// of the two areas, and remove m_vecContentAreas[i]
-					m_vecContentAreas[i].UnionRect(&m_vecContentAreas[i], &m_vecContentAreas[j]);
-					m_vecContentAreas[i].m_dOCRConfidence = 
-						max(m_vecContentAreas[i].m_dOCRConfidence, m_vecContentAreas[j].m_dOCRConfidence);
+						// Recalculate the horizontally padded version of area i.
+						areaIPadded = m_vecContentAreas[i];
+						areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
 
-					// Recalculate the horizontally padded version of area i.
-					areaIPadded = m_vecContentAreas[i];
-					areaIPadded.InflateRect(gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx, 0);
+						// Remove the duplicate area j
+						m_vecContentAreas.erase(m_vecContentAreas.begin() + j);
 
-					// Remove the duplicate area j
-					m_vecContentAreas.erase(m_vecContentAreas.begin() + j);
-
-					// Reset counter i to force this area to be re-compared to all other zones
-					// now that it has been altered.
-					i -= 2;
-					j = 0;
-					break;
+						// Reset counter i to force this area to be re-compared to all other zones
+						// now that it has been altered.
+						i -= 2;
+						j = 0;
+						break;
+					}
 				}
 			}
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26611");
 }
 //--------------------------------------------------------------------------------------------------
 CRect CSplitRegionIntoContentAreas::centerAreaRegionOnBlack(CPoint ptStart, CRect &rrect, 
 															const CRect &rectClip, int nMaxRecursions/* = 3*/)
 {
-	if (rrect.IsRectNull())
+	try
 	{
-		ASSERT_ARGUMENT("ELI22232", ptStart != gptNULL);
+		if (rrect.IsRectNull())
+		{
+			ASSERT_ARGUMENT("ELI22232", ptStart != gptNULL);
 
-		// If searching based on a point, create rrect using ptStart as the center point.
-		rrect = CRect(ptStart, ptStart);
-		rrect.InflateRect(m_sizeAvgChar.cx / 2, m_sizeAvgChar.cy / 2);
+			// If searching based on a point, create rrect using ptStart as the center point.
+			rrect = CRect(ptStart, ptStart);
+			rrect.InflateRect(m_sizeAvgChar.cx / 2, m_sizeAvgChar.cy / 2);
+		}
+		else if (ptStart == gptNULL)
+		{
+			// Otherwise, initialize pString by using the center of rrect if necessary.
+			ptStart = rrect.CenterPoint();
+		}
+
+		// Keep track of the last position of rrect and whether we have gone offscale on either axis.
+		CRect rectLast(rrect);
+		bool bOffscaleX = false;
+		bool bOffscaleY = false;
+
+		// If we are allowed further recursions...
+		if (nMaxRecursions > 0)
+		{
+			nMaxRecursions--;
+
+			// Obtain the average x and y coordinates of the pixels in rrect.
+			PixelAverager pixelAverager(this, rrect);
+			pixelAverager.process();
+
+			if (pixelAverager.m_nPixelCount == 0)
+			{
+				// In the existing code, this shouldn't ever be reached. But in case a change is made
+				// such that it is reached, just return at this point since we can't center on black
+				// pixels if there are none.
+				return rrect;
+			}
+
+			long nxAvg = 0;
+			long nyAvg = 0;
+			nxAvg = pixelAverager.m_nXPixelValue / pixelAverager.m_nPixelCount;
+			nyAvg = pixelAverager.m_nYPixelValue / pixelAverager.m_nPixelCount;
+
+			// Shift rrect so that its center point is now at the average pixel positoin.
+			CPoint pointLastCenter = rrect.CenterPoint();
+			rrect.OffsetRect(nxAvg - pointLastCenter.x, nyAvg - pointLastCenter.y);
+
+			// Check to see if the new rrect is offscale either because ptStart is no longer in rrect
+			// or because rrect now extends outside of rectClip.  If so flag the problem, and move 
+			// rrect back onscale.
+			if (ptStart.x < rrect.left)
+			{
+				bOffscaleX = true;
+				rrect.OffsetRect(ptStart.x - rrect.left, 0);
+			}
+			else if (rrect.left < rectClip.left)
+			{
+				bOffscaleX = true;
+				rrect.OffsetRect(rectClip.left - rrect.left, 0);
+			}
+			else if (ptStart.x > rrect.right)
+			{
+				bOffscaleX = true;
+				rrect.OffsetRect(ptStart.x - rrect.right, 0);
+			}
+			else if (rrect.right > rectClip.right)
+			{
+				bOffscaleX = true;
+				rrect.OffsetRect(rectClip.right - rrect.right, 0);
+			}
+
+			if (ptStart.y < rrect.top)
+			{
+				bOffscaleY = true;
+				rrect.OffsetRect(0, ptStart.y - rrect.top);
+			}
+			else if (rrect.top < rectClip.top)
+			{
+				bOffscaleY = true;
+				rrect.OffsetRect(0, rectClip.top - rrect.top);
+			}
+			else if (ptStart.y > rrect.bottom)
+			{
+				bOffscaleY = true;
+				rrect.OffsetRect(0, ptStart.y - rrect.bottom);
+			}
+			else if (rrect.bottom > rectClip.bottom)
+			{
+				bOffscaleY = true;
+				rrect.OffsetRect(0, rectClip.bottom - rrect.bottom);
+			}
+		}
+
+		if (rrect != rectLast && (!bOffscaleX || !bOffscaleY))
+		{
+			// If rrect has moved and we are not offscale on both axis, recalculate based on the new
+			// rrect position.
+			return centerAreaRegionOnBlack(ptStart, rrect, rectClip, nMaxRecursions);
+		}
+		else
+		{
+			// If rrect hasn't moved, or it moved offscale on both axis, we have our final result.
+			// Calculate the rectangle that lies between the current center and original position and
+			// assume that for most/all we would arrive at this same position-- report this area
+			// for exclusion.
+			CRect rectToExclude(ptStart, rrect.CenterPoint());
+			rectToExclude.NormalizeRect();
+
+			return rectToExclude;
+		}
 	}
-	else if (ptStart == gptNULL)
-	{
-		// Otherwise, initialize pString by using the center of rrect if necessary.
-		ptStart = rrect.CenterPoint();
-	}
-
-	// Keep track of the last position of rrect and whether we have gone offscale on either axis.
-	CRect rectLast(rrect);
-	bool bOffscaleX = false;
-	bool bOffscaleY = false;
-
-	// If we are allowed further recursions...
-	if (nMaxRecursions > 0)
-	{
-		nMaxRecursions--;
-
-		// Obtain the average x and y coordinates of the pixels in rrect.
-		PixelAverager pixelAverager(this, rrect);
-		pixelAverager.process();
-
-		if (pixelAverager.m_nPixelCount == 0)
-		{
-			// In the existing code, this shouldn't ever be reached. But in case a change is made
-			// such that it is reached, just return at this point since we can't center on black
-			// pixels if there are none.
-			return rrect;
-		}
-
-		long nxAvg = 0;
-		long nyAvg = 0;
-		nxAvg = pixelAverager.m_nXPixelValue / pixelAverager.m_nPixelCount;
-		nyAvg = pixelAverager.m_nYPixelValue / pixelAverager.m_nPixelCount;
-
-		// Shift rrect so that its center point is now at the average pixel positoin.
-		CPoint pointLastCenter = rrect.CenterPoint();
-		rrect.OffsetRect(nxAvg - pointLastCenter.x, nyAvg - pointLastCenter.y);
-
-		// Check to see if the new rrect is offscale either because ptStart is no longer in rrect
-		// or because rrect now extends outside of rectClip.  If so flag the problem, and move 
-		// rrect back onscale.
-		if (ptStart.x < rrect.left)
-		{
-			bOffscaleX = true;
-			rrect.OffsetRect(ptStart.x - rrect.left, 0);
-		}
-		else if (rrect.left < rectClip.left)
-		{
-			bOffscaleX = true;
-			rrect.OffsetRect(rectClip.left - rrect.left, 0);
-		}
-		else if (ptStart.x > rrect.right)
-		{
-			bOffscaleX = true;
-			rrect.OffsetRect(ptStart.x - rrect.right, 0);
-		}
-		else if (rrect.right > rectClip.right)
-		{
-			bOffscaleX = true;
-			rrect.OffsetRect(rectClip.right - rrect.right, 0);
-		}
-
-		if (ptStart.y < rrect.top)
-		{
-			bOffscaleY = true;
-			rrect.OffsetRect(0, ptStart.y - rrect.top);
-		}
-		else if (rrect.top < rectClip.top)
-		{
-			bOffscaleY = true;
-			rrect.OffsetRect(0, rectClip.top - rrect.top);
-		}
-		else if (ptStart.y > rrect.bottom)
-		{
-			bOffscaleY = true;
-			rrect.OffsetRect(0, ptStart.y - rrect.bottom);
-		}
-		else if (rrect.bottom > rectClip.bottom)
-		{
-			bOffscaleY = true;
-			rrect.OffsetRect(0, rectClip.bottom - rrect.bottom);
-		}
-	}
-
-	if (rrect != rectLast && (!bOffscaleX || !bOffscaleY))
-	{
-		// If rrect has moved and we are not offscale on both axis, recalculate based on the new
-		// rrect position.
-		return centerAreaRegionOnBlack(ptStart, rrect, rectClip, nMaxRecursions);
-	}
-	else
-	{
-		// If rrect hasn't moved, or it moved offscale on both axis, we have our final result.
-		// Calculate the rectangle that lies between the current center and original position and
-		// assume that for most/all we would arrive at this same position-- report this area
-		// for exclusion.
-		CRect rectToExclude(ptStart, rrect.CenterPoint());
-		rectToExclude.NormalizeRect();
-		
-		return rectToExclude;
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26612");
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::expandHorizontally(CRect &rrect, const CRect &rectClip)
 {
-	// Before we try to expand rrect, shrink it to ensure its borders aren't including
-	// unnecessary white space.
-	shrinkToFit(rrect, kHorizontal);
-
-	if (rrect.IsRectEmpty())
+	try
 	{
-		// If the rrect is now empty, simply return false;
-		return false;
-	}
+		// Before we try to expand rrect, shrink it to ensure its borders aren't including
+		// unnecessary white space.
+		shrinkToFit(rrect, kHorizontal);
 
-	// The 3 steps to horizontal expansion:
-	// 1) Expand to the extents of pixel content using the orginal rrect value.
-	// 2) Recenter the expanded area vertically on the pixel y-axis average.
-	// 3) In case this put the area in line with more content on either side,
-	//    try again to expand it left and right.
-	for (int i = 0; i < 2; i++)
-	{
-		CRect rectExpansionArea(0, rrect.top, m_sizeAvgChar.cx, rrect.bottom);
-
-		int nExpansionCuttoff = gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx;
-
-		// Expand right
-		rectExpansionArea.OffsetRect(rrect.right - rectExpansionArea.right, 0);
-		expandArea(rrect, rectExpansionArea, CSize(1,0), nExpansionCuttoff, rectClip);
-
-		// Expand left
-		rectExpansionArea.OffsetRect(rrect.left - rectExpansionArea.left, 0);
-		expandArea(rrect, rectExpansionArea, CSize(-1,0), nExpansionCuttoff, rectClip);
-
-		if (i == 0)
+		if (rrect.IsRectEmpty())
 		{
-			// The first time around, re-center the content area vertically on the pixel
-			// in case the initial position was not well centered on the line.
-			centerAreaRegionOnBlack(gptNULL, rrect, 
-				CRect(rrect.left, m_rectCurrentPage.top, rrect.right, m_rectCurrentPage.bottom));
+			// If the rrect is now empty, simply return false;
+			return false;
 		}
 
-		shrinkToFit(rrect, kVertical);
-	}
+		// The 3 steps to horizontal expansion:
+		// 1) Expand to the extents of pixel content using the orginal rrect value.
+		// 2) Recenter the expanded area vertically on the pixel y-axis average.
+		// 3) In case this put the area in line with more content on either side,
+		//    try again to expand it left and right.
+		for (int i = 0; i < 2; i++)
+		{
+			CRect rectExpansionArea(0, rrect.top, m_sizeAvgChar.cx, rrect.bottom);
 
-	return !rrect.IsRectEmpty();
+			int nExpansionCuttoff = gnMIN_CHAR_SEPARATION_OF_LINES * m_sizeAvgChar.cx;
+
+			// Expand right
+			rectExpansionArea.OffsetRect(rrect.right - rectExpansionArea.right, 0);
+			expandArea(rrect, rectExpansionArea, CSize(1,0), nExpansionCuttoff, rectClip);
+
+			// Expand left
+			rectExpansionArea.OffsetRect(rrect.left - rectExpansionArea.left, 0);
+			expandArea(rrect, rectExpansionArea, CSize(-1,0), nExpansionCuttoff, rectClip);
+
+			if (i == 0)
+			{
+				// The first time around, re-center the content area vertically on the pixel
+				// in case the initial position was not well centered on the line.
+				centerAreaRegionOnBlack(gptNULL, rrect, 
+					CRect(rrect.left, m_rectCurrentPage.top, rrect.right, m_rectCurrentPage.bottom));
+			}
+
+			shrinkToFit(rrect, kVertical);
+		}
+
+		return !rrect.IsRectEmpty();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26613");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::expandArea(CRect &rrect, CRect rectExpansionArea,
@@ -1930,481 +2009,498 @@ void CSplitRegionIntoContentAreas::expandArea(CRect &rrect, CRect rectExpansionA
 											  int nExpansionCuttoff,
 											  const CRect &rectClip)
 {
-	// rectExpanded represents total potential expansion of the rrect, but not necessarily the 
-	// current state of the rect for which immediate pixel content must be found to "apply" the 
-	// current possible expansion.
-	CRect rectExpanded(rrect);
-	
-	// A one-pixel-wide rect (or line) representing the leading edge of the expansion area. 
-	CRect rectExpansionEdge(rectExpansionArea);
-	
-	if (sizeExpansionDirection == CSize(1, 0))
+	try
 	{
-		rectExpansionEdge.left = rrect.right;
-	}
-	else if (sizeExpansionDirection == CSize(-1, 0))
-	{
-		rectExpansionEdge.right = rrect.left;
-	}
-	else if (sizeExpansionDirection == CSize(0, 1))
-	{
-		rectExpansionEdge.top = rrect.bottom;
-	}
-	else if (sizeExpansionDirection == CSize(0, -1))
-	{
-		rectExpansionEdge.bottom = rrect.top;
-	}
-	else
-	{
-		THROW_LOGIC_ERROR_EXCEPTION("ELI22162");
-	}
+		// rectExpanded represents total potential expansion of the rrect, but not necessarily the 
+		// current state of the rect for which immediate pixel content must be found to "apply" the 
+		// current possible expansion.
+		CRect rectExpanded(rrect);
 
-	m_sizeEdgeSearchDirection = sizeExpansionDirection;
+		// A one-pixel-wide rect (or line) representing the leading edge of the expansion area. 
+		CRect rectExpansionEdge(rectExpansionArea);
 
-	// Calculate the pixel content of the original expansion area. In the loop below rather than
-	// re-calculating the pixel content of the entire expansion area each time it is shifted a
-	// pixel, instead the pixels at the front and back edge of the expansion area will be added and
-	// and subtracted from a running total to keep a moving total of pixels in the expansion area.
-	double dExpansionAreaArea =
-		(double)(rectExpansionArea.Width() * rectExpansionArea.Height());
-	PixelCounter origPixelCounter(this, rectExpansionArea);
-	origPixelCounter.process();
-	int nLastPixelCount = origPixelCounter.m_nPixelCount;
-
-	// Create a rect repesenting the pixels that are no longer part of the expansion area as of
-	// each iteration so they can be subtracted from the running total.
-	CRect rectExpansionAreaBack(rectExpansionEdge);
-	rectExpansionAreaBack -= CSize(sizeExpansionDirection.cx * (rectExpansionArea.Width() + 1),
-							   sizeExpansionDirection.cy * (rectExpansionArea.Height() + 1));
-
-	// Continue to loop until we have looped more than nExpansionCuttoff without finding pixels
-	// necessary to expand rrect.
-	for (int i = 1; i < nExpansionCuttoff; i++)
-	{	
-		// Shift all expansion retangles in the direction of expansion.
-		rectExpansionArea += m_sizeEdgeSearchDirection;
-		rectExpansionEdge += m_sizeEdgeSearchDirection;
-		rectExpansionAreaBack += m_sizeEdgeSearchDirection;
-		
-		// Expand the total potential expantion in the direction of the expansion
-		rectExpanded |= (rectExpanded + m_sizeEdgeSearchDirection);
-
-		if ((sizeExpansionDirection.cx == -1 && rectExpanded.left < rectClip.left) ||
-			(sizeExpansionDirection.cx == 1 && rectExpanded.right > rectClip.right) ||
-			(sizeExpansionDirection.cy == -1 && rectExpanded.top < rectClip.top) ||
-			(sizeExpansionDirection.cy == 1 && rectExpanded.bottom > rectClip.bottom))
+		if (sizeExpansionDirection == CSize(1, 0))
 		{
-			// If the expansion has extended outside of the clip rectangle,
-			// break off the expansion.
-			break;
+			rectExpansionEdge.left = rrect.right;
 		}
-		
-		// Subtract the new pixels that are no longer part of the expansion area
-		PixelCounter removedPixelCounter(this, rectExpansionAreaBack);
-		removedPixelCounter.process();
-
-		// Add the new pixels from the leading edge of the expansion area
-		PixelCounter addedPixelCounter(this, rectExpansionEdge);
-		addedPixelCounter.process();
-
-		// Update the total pixel count
-		int nNewPixelCount = nLastPixelCount + 
-							 addedPixelCounter.m_nPixelCount - 
-							 removedPixelCounter.m_nPixelCount;
-
-		nLastPixelCount = nNewPixelCount;
-
-		// Calculate the current percentage of black pixels.
-		double dPercent = (double) nNewPixelCount / dExpansionAreaArea;
-		
-		if (dPercent > gdMIN_PIXEL_PERCENT_OF_AREA)
+		else if (sizeExpansionDirection == CSize(-1, 0))
 		{
-			// If the area currently contain enough pixels, check to see if there is currently 
-			// pixel content along the leading edge.
-			PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
-			PixelEdgeFinder.process();
+			rectExpansionEdge.right = rrect.left;
+		}
+		else if (sizeExpansionDirection == CSize(0, 1))
+		{
+			rectExpansionEdge.top = rrect.bottom;
+		}
+		else if (sizeExpansionDirection == CSize(0, -1))
+		{
+			rectExpansionEdge.bottom = rrect.top;
+		}
+		else
+		{
+			THROW_LOGIC_ERROR_EXCEPTION("ELI22162");
+		}
 
-			if (PixelEdgeFinder.m_nPixelCount == 1)
+		m_sizeEdgeSearchDirection = sizeExpansionDirection;
+
+		// Calculate the pixel content of the original expansion area. In the loop below rather than
+		// re-calculating the pixel content of the entire expansion area each time it is shifted a
+		// pixel, instead the pixels at the front and back edge of the expansion area will be added and
+		// and subtracted from a running total to keep a moving total of pixels in the expansion area.
+		double dExpansionAreaArea =
+			(double)(rectExpansionArea.Width() * rectExpansionArea.Height());
+		PixelCounter origPixelCounter(this, rectExpansionArea);
+		origPixelCounter.process();
+		int nLastPixelCount = origPixelCounter.m_nPixelCount;
+
+		// Create a rect repesenting the pixels that are no longer part of the expansion area as of
+		// each iteration so they can be subtracted from the running total.
+		CRect rectExpansionAreaBack(rectExpansionEdge);
+		rectExpansionAreaBack -= CSize(sizeExpansionDirection.cx * (rectExpansionArea.Width() + 1),
+			sizeExpansionDirection.cy * (rectExpansionArea.Height() + 1));
+
+		// Continue to loop until we have looped more than nExpansionCuttoff without finding pixels
+		// necessary to expand rrect.
+		for (int i = 1; i < nExpansionCuttoff; i++)
+		{	
+			// Shift all expansion retangles in the direction of expansion.
+			rectExpansionArea += m_sizeEdgeSearchDirection;
+			rectExpansionEdge += m_sizeEdgeSearchDirection;
+			rectExpansionAreaBack += m_sizeEdgeSearchDirection;
+
+			// Expand the total potential expantion in the direction of the expansion
+			rectExpanded |= (rectExpanded + m_sizeEdgeSearchDirection);
+
+			if ((sizeExpansionDirection.cx == -1 && rectExpanded.left < rectClip.left) ||
+				(sizeExpansionDirection.cx == 1 && rectExpanded.right > rectClip.right) ||
+				(sizeExpansionDirection.cy == -1 && rectExpanded.top < rectClip.top) ||
+				(sizeExpansionDirection.cy == 1 && rectExpanded.bottom > rectClip.bottom))
 			{
-				// If there was pixel content found along the leading edge, expand the rect to the
-				// current possible expansion area and reset the counter.
-				rrect = rectExpanded;
-				i = 0;
+				// If the expansion has extended outside of the clip rectangle,
+				// break off the expansion.
+				break;
+			}
+
+			// Subtract the new pixels that are no longer part of the expansion area
+			PixelCounter removedPixelCounter(this, rectExpansionAreaBack);
+			removedPixelCounter.process();
+
+			// Add the new pixels from the leading edge of the expansion area
+			PixelCounter addedPixelCounter(this, rectExpansionEdge);
+			addedPixelCounter.process();
+
+			// Update the total pixel count
+			int nNewPixelCount = nLastPixelCount + 
+				addedPixelCounter.m_nPixelCount - 
+				removedPixelCounter.m_nPixelCount;
+
+			nLastPixelCount = nNewPixelCount;
+
+			// Calculate the current percentage of black pixels.
+			double dPercent = (double) nNewPixelCount / dExpansionAreaArea;
+
+			if (dPercent > gdMIN_PIXEL_PERCENT_OF_AREA)
+			{
+				// If the area currently contain enough pixels, check to see if there is currently 
+				// pixel content along the leading edge.
+				PixelEdgeFinder PixelEdgeFinder(this, rectExpansionEdge);
+				PixelEdgeFinder.process();
+
+				if (PixelEdgeFinder.m_nPixelCount == 1)
+				{
+					// If there was pixel content found along the leading edge, expand the rect
+					// to the current possible expansion area and reset the counter.
+					rrect = rectExpanded;
+					i = 0;
+				}
 			}
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26614");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::shrinkToFit(CRect &rrect, EOrientation orientation/* = kBoth*/)
 {
-	// Define a vector of pointers to the values of each of the edges of rrect.
-	vector<long *> vecEdges;
-	vecEdges.push_back(&(rrect.left));
-	vecEdges.push_back(&(rrect.right));
-	vecEdges.push_back(&(rrect.top));
-	vecEdges.push_back(&(rrect.bottom));
-
-	// Loop through edges appropriate for the current orientation.
-	for (int i = ((orientation == kVertical) ? 2 : 0);
-		 i < ((orientation == kHorizontal) ? 2 : 4);
-		 i++)
+	try
 	{
-		// Determine the value to add to the current edge to shrink it 
-		// (positive for left and top, negative for right and bottom)
-		int nDirection = (int) pow((double) -1, (double) i);
-		
-		// Create rect to represent the edge being shrunk.
-		CRect rectEdge;
+		// Define a vector of pointers to the values of each of the edges of rrect.
+		vector<long *> vecEdges;
+		vecEdges.push_back(&(rrect.left));
+		vecEdges.push_back(&(rrect.right));
+		vecEdges.push_back(&(rrect.top));
+		vecEdges.push_back(&(rrect.bottom));
 
-		if (i < 2)
+		// Loop through edges appropriate for the current orientation.
+		for (int i = ((orientation == kVertical) ? 2 : 0);
+			i < ((orientation == kHorizontal) ? 2 : 4);
+			i++)
 		{
-			// Set the search direction for the x-axis
-			m_sizeEdgeSearchDirection.SetSize(nDirection, 0);
+			// Determine the value to add to the current edge to shrink it 
+			// (positive for left and top, negative for right and bottom)
+			int nDirection = (int) pow((double) -1, (double) i);
 
-			// Set rectEdge to the left or right edge as appropriate
-			rectEdge.SetRect(*(vecEdges[i]), rrect.top, *(vecEdges[i]), rrect.bottom);
-		}
-		else
-		{
-			// Set the search direction for the y-axis
-			m_sizeEdgeSearchDirection.SetSize(0, nDirection);
+			// Create rect to represent the edge being shrunk.
+			CRect rectEdge;
 
-			// Set rectEdge to the top or bottom edge as appropriate
-			rectEdge.SetRect(rrect.left, *(vecEdges[i]), rrect.right, *(vecEdges[i]));
-		}
-
-		// Continue to move the edge inward until pixel content is no longer found
-		// (and rrect is not empty)
-		while (!rrect.IsRectEmpty())
-		{
-			rectEdge += m_sizeEdgeSearchDirection;
-
-			PixelEdgeFinder PixelEdgeFinder(this, rectEdge);
-			PixelEdgeFinder.process();
-
-			if (PixelEdgeFinder.m_nPixelCount == 1)
+			if (i < 2)
 			{
-				// Pixel content was found, the rrect is shrunk as much as possible on this edge.
-				break;
+				// Set the search direction for the x-axis
+				m_sizeEdgeSearchDirection.SetSize(nDirection, 0);
+
+				// Set rectEdge to the left or right edge as appropriate
+				rectEdge.SetRect(*(vecEdges[i]), rrect.top, *(vecEdges[i]), rrect.bottom);
+			}
+			else
+			{
+				// Set the search direction for the y-axis
+				m_sizeEdgeSearchDirection.SetSize(0, nDirection);
+
+				// Set rectEdge to the top or bottom edge as appropriate
+				rectEdge.SetRect(rrect.left, *(vecEdges[i]), rrect.right, *(vecEdges[i]));
 			}
 
-			// Pixel content was not found, move the current edge inward.
-			*(vecEdges[i]) += nDirection;
+			// Continue to move the edge inward until pixel content is no longer found
+			// (and rrect is not empty)
+			while (!rrect.IsRectEmpty())
+			{
+				rectEdge += m_sizeEdgeSearchDirection;
+
+				PixelEdgeFinder PixelEdgeFinder(this, rectEdge);
+				PixelEdgeFinder.process();
+
+				if (PixelEdgeFinder.m_nPixelCount == 1)
+				{
+					// Pixel content was found, the rrect is shrunk as much as possible on this edge.
+					break;
+				}
+
+				// Pixel content was not found, move the current edge inward.
+				*(vecEdges[i]) += nDirection;
+			}
 		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26615");
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::attemptMerge(ContentAreaInfo &area, bool bUp, 
 												vector<ContentAreaInfo> &rvecAreasToAdd,
 												bool bRecurse)
 {
-	// Cycle through each area looking for an overlapping area
-	for (size_t i = 0; i < m_vecContentAreas.size(); i++)
+	try
 	{
-		// Don't compare area to itself.
-		if (&area == &(m_vecContentAreas[i]))
+		// Cycle through each area looking for an overlapping area
+		for (size_t i = 0; i < m_vecContentAreas.size(); i++)
 		{
-			continue;
-		}
-
-		CRect rectIntersection;
-		if (rectIntersection.IntersectRect(&area, &m_vecContentAreas[i]))
-		{
-			// An overlapping area was found, make sure the the areas overlap completely
-			// along the x-axis before considering a merge.
-			int nNarrowestWidth = min(area.Width(), m_vecContentAreas[i].Width());
-
-			ContentAreaInfo &areaHigher(bUp ? m_vecContentAreas[i] : area);
-			ContentAreaInfo &areaLower(bUp ? area : m_vecContentAreas[i]);
-
-			if (rectIntersection.Width() == nNarrowestWidth &&
-				areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
-				areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
-				areaHigher.m_eBottomBoundaryState != kLocked &&
-				areaLower.m_eTopBoundaryState != kLocked)
+			// Don't compare area to itself.
+			if (&area == &(m_vecContentAreas[i]))
 			{
-				// The x-axis overlap is complete and neither area is based on confident OCR
-				// text or has a locked border... go ahead and combine the areas.
-				m_vecContentAreas[i].UnionRect(&area, &m_vecContentAreas[i]);
-				return true;
+				continue;
 			}
 
-			// Make sure the the zones are positioned in the correct order vertically before
-			// trying find a common boundary
-			if (rectIntersection.Width() > m_sizeAvgChar.cx && areaHigher.top < areaLower.top)
+			CRect rectIntersection;
+			if (rectIntersection.IntersectRect(&area, &m_vecContentAreas[i]))
 			{
-				// If one area has already locked the boundary and the one with the unlocked
-				// boundary isn't confidently OCR'd text, lock it as well.
-				if (bUp && 
-					areaHigher.m_eBottomBoundaryState == kLocked &&
-					areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+				// An overlapping area was found, make sure the the areas overlap completely
+				// along the x-axis before considering a merge.
+				int nNarrowestWidth = min(area.Width(), m_vecContentAreas[i].Width());
+
+				ContentAreaInfo &areaHigher(bUp ? m_vecContentAreas[i] : area);
+				ContentAreaInfo &areaLower(bUp ? area : m_vecContentAreas[i]);
+
+				if (rectIntersection.Width() == nNarrowestWidth &&
+					areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
+					areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE &&
+					areaHigher.m_eBottomBoundaryState != kLocked &&
+					areaLower.m_eTopBoundaryState != kLocked)
 				{
-					areaLower.m_eTopBoundaryState = kLocked;
-					continue;
+					// The x-axis overlap is complete and neither area is based on confident OCR
+					// text or has a locked border... go ahead and combine the areas.
+					m_vecContentAreas[i].UnionRect(&area, &m_vecContentAreas[i]);
+					return true;
 				}
-				else if (!bUp &&
-						 areaLower.m_eTopBoundaryState == kLocked &&
-						 areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
+
+				// Make sure the the zones are positioned in the correct order vertically before
+				// trying find a common boundary
+				if (rectIntersection.Width() > m_sizeAvgChar.cx && areaHigher.top < areaLower.top)
 				{
-					areaHigher.m_eBottomBoundaryState = kLocked;
-					continue;
-				}
-
-				// Determine if one area intersects with confidently OCR'd text from the other.
-				CRect rectOCRIntersection;
-				ContentAreaInfo *pConfidentArea = NULL;
-				ContentAreaInfo *pImpressionableArea = NULL;
-
-				if (areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
-					areaLower.m_dOCRConfidence < areaHigher.m_dOCRConfidence)
-				{
-					rectOCRIntersection = areaHigher.m_rectOriginal;
-					rectOCRIntersection.top = areaHigher.top;
-					rectOCRIntersection.bottom = areaHigher.bottom;
-
-					// If areaLower intersects confidently OCR'd text from areaHigher, have 
-					// confidence in areaHigher's boundary and consider areaLower's impressionable.
-					if (rectOCRIntersection.IntersectRect(&rectOCRIntersection, &areaLower))
+					// If one area has already locked the boundary and the one with the unlocked
+					// boundary isn't confidently OCR'd text, lock it as well.
+					if (bUp && 
+						areaHigher.m_eBottomBoundaryState == kLocked &&
+						areaLower.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
 					{
-						pConfidentArea = &areaHigher;
-						pImpressionableArea = &areaLower;
+						areaLower.m_eTopBoundaryState = kLocked;
+						continue;
 					}
-				}
-				else if (areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
-					areaHigher.m_dOCRConfidence < areaLower.m_dOCRConfidence)
-				{
-					rectOCRIntersection = areaLower.m_rectOriginal;
-					rectOCRIntersection.top = areaLower.top;
-					rectOCRIntersection.bottom = areaLower.bottom;
-
-					// If areaHigher intersects confidently OCR'd text from areaLower, have 
-					// confidence in areaLower's boundary and consider areaHigher's impressionable.
-					if (rectOCRIntersection.IntersectRect(&rectOCRIntersection, &areaHigher))
+					else if (!bUp &&
+						areaLower.m_eTopBoundaryState == kLocked &&
+						areaHigher.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE)
 					{
-						pConfidentArea = &areaLower;
-						pImpressionableArea = &areaHigher;
-					}
-				}
-
-				// If neither area's boundary is confident or impressionable, move on.
-				if (pConfidentArea == NULL || pImpressionableArea == NULL)
-				{
-					continue;
-				}
-
-				// Determine the needed elements of the confident and impressionable areas.
-				long nNewBoundary((pConfidentArea == &areaHigher) 
-									? areaHigher.m_rectOriginal.bottom
-									: areaLower.m_rectOriginal.top);
-				long &rnConfidentBoundary((pConfidentArea == &areaHigher) 
-											? areaHigher.bottom
-											: areaLower.top);
-				long &rnImpressionableBoundary((pImpressionableArea == &areaHigher) 
-												? areaHigher.bottom
-												: areaLower.top);
-				EBoundaryState &reConfidentBoundaryState((pConfidentArea == &areaHigher)
-															? areaHigher.m_eBottomBoundaryState
-															: areaLower.m_eTopBoundaryState);
-				EBoundaryState &reImpressionableBoundaryState((pImpressionableArea == &areaHigher)
-																? areaHigher.m_eBottomBoundaryState
-																: areaLower.m_eTopBoundaryState);
-
-				// If the impressionable area completely spans the confident area verically, create
-				// a new area on the other side of the confident area.
-				if (pImpressionableArea == &areaHigher &&
-					areaHigher.bottom > areaLower.bottom + m_sizeAvgChar.cy)
-				{
-					ContentAreaInfo newArea(*pImpressionableArea);
-					newArea.top = areaLower.bottom;
-					rvecAreasToAdd.push_back(newArea);
-				}		
-				else if (pImpressionableArea == &areaLower &&
-						 areaLower.top < areaHigher.top - m_sizeAvgChar.cy)
-				{
-					ContentAreaInfo newArea(*pImpressionableArea);
-					newArea.bottom = areaHigher.top;
-					rvecAreasToAdd.push_back(newArea);
-				}
-
-				// Adjust and lock the impressionable area's boundary.
-				reImpressionableBoundaryState = kLocked;
-				rnImpressionableBoundary = nNewBoundary;
-
-				if ((areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE && 
-					 areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE) || 
-					isBigEnough(*pImpressionableArea, true))
-				{
-					// If bRecurse == true and both areas are based on well OCR'd text or if the
-					// horizontal extent of the confident area is largely shared by the
-					// impressionable area and the impressionable area is not likely to thrown out
-					// because it is too short, lock the confident area's boundary too.  But first,
-					// attempt to merge it with all other areas to lock the boundary of any other
-					// overlapping impressionable areas.
-					if (bRecurse)
-					{
-						attemptMerge(*pConfidentArea, !bUp, rvecAreasToAdd, false);
+						areaHigher.m_eBottomBoundaryState = kLocked;
+						continue;
 					}
 
-					// If the area based on confidently OCR'd text extends sufficiently beyond the 
-					// left or right end of the intersection, create a new area that is a subset of
-					// the original confident area that will attempt to expand up or down alongside
-					// the found intersection.
-					if (pConfidentArea->left < rectIntersection.left - m_sizeAvgChar.cx)
+					// Determine if one area intersects with confidently OCR'd text from the other.
+					CRect rectOCRIntersection;
+					ContentAreaInfo *pConfidentArea = NULL;
+					ContentAreaInfo *pImpressionableArea = NULL;
+
+					if (areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
+						areaLower.m_dOCRConfidence < areaHigher.m_dOCRConfidence)
 					{
-						ContentAreaInfo newArea = *pConfidentArea;
-						newArea.m_dOCRConfidence = 0;
+						rectOCRIntersection = areaHigher.m_rectOriginal;
+						rectOCRIntersection.top = areaHigher.top;
+						rectOCRIntersection.bottom = areaHigher.bottom;
+
+						// If areaLower intersects confidently OCR'd text from areaHigher, have 
+						// confidence in areaHigher's boundary and consider areaLower's impressionable.
+						if (rectOCRIntersection.IntersectRect(&rectOCRIntersection, &areaLower))
+						{
+							pConfidentArea = &areaHigher;
+							pImpressionableArea = &areaLower;
+						}
+					}
+					else if (areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE &&
+						areaHigher.m_dOCRConfidence < areaLower.m_dOCRConfidence)
+					{
+						rectOCRIntersection = areaLower.m_rectOriginal;
+						rectOCRIntersection.top = areaLower.top;
+						rectOCRIntersection.bottom = areaLower.bottom;
+
+						// If areaHigher intersects confidently OCR'd text from areaLower, have 
+						// confidence in areaLower's boundary and consider areaHigher's impressionable.
+						if (rectOCRIntersection.IntersectRect(&rectOCRIntersection, &areaHigher))
+						{
+							pConfidentArea = &areaLower;
+							pImpressionableArea = &areaHigher;
+						}
+					}
+
+					// If neither area's boundary is confident or impressionable, move on.
+					if (pConfidentArea == NULL || pImpressionableArea == NULL)
+					{
+						continue;
+					}
+
+					// Determine the needed elements of the confident and impressionable areas.
+					long nNewBoundary((pConfidentArea == &areaHigher) 
+						? areaHigher.m_rectOriginal.bottom
+						: areaLower.m_rectOriginal.top);
+					long &rnConfidentBoundary((pConfidentArea == &areaHigher) 
+						? areaHigher.bottom
+						: areaLower.top);
+					long &rnImpressionableBoundary((pImpressionableArea == &areaHigher) 
+						? areaHigher.bottom
+						: areaLower.top);
+					EBoundaryState &reConfidentBoundaryState((pConfidentArea == &areaHigher)
+						? areaHigher.m_eBottomBoundaryState
+						: areaLower.m_eTopBoundaryState);
+					EBoundaryState &reImpressionableBoundaryState(
+						(pImpressionableArea == &areaHigher)
+						? areaHigher.m_eBottomBoundaryState
+						: areaLower.m_eTopBoundaryState);
+
+					// If the impressionable area completely spans the confident area verically, create
+					// a new area on the other side of the confident area.
+					if (pImpressionableArea == &areaHigher &&
+						areaHigher.bottom > areaLower.bottom + m_sizeAvgChar.cy)
+					{
+						ContentAreaInfo newArea(*pImpressionableArea);
+						newArea.top = areaLower.bottom;
+						rvecAreasToAdd.push_back(newArea);
+					}		
+					else if (pImpressionableArea == &areaLower &&
+						areaLower.top < areaHigher.top - m_sizeAvgChar.cy)
+					{
+						ContentAreaInfo newArea(*pImpressionableArea);
+						newArea.bottom = areaHigher.top;
+						rvecAreasToAdd.push_back(newArea);
+					}
+
+					// Adjust and lock the impressionable area's boundary.
+					reImpressionableBoundaryState = kLocked;
+					rnImpressionableBoundary = nNewBoundary;
+
+					if ((areaHigher.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE && 
+						areaLower.m_dOCRConfidence > gdCONFIDENT_OCR_TEXT_SCORE) || 
+						isBigEnough(*pImpressionableArea, true))
+					{
+						// If bRecurse == true and both areas are based on well OCR'd text or if the
+						// horizontal extent of the confident area is largely shared by the
+						// impressionable area and the impressionable area is not likely to thrown out
+						// because it is too short, lock the confident area's boundary too.  But first,
+						// attempt to merge it with all other areas to lock the boundary of any other
+						// overlapping impressionable areas.
+						if (bRecurse)
+						{
+							attemptMerge(*pConfidentArea, !bUp, rvecAreasToAdd, false);
+						}
+
+						// If the area based on confidently OCR'd text extends sufficiently beyond the 
+						// left or right end of the intersection, create a new area that is a subset of
+						// the original confident area that will attempt to expand up or down alongside
+						// the found intersection.
+						if (pConfidentArea->left < rectIntersection.left - m_sizeAvgChar.cx)
+						{
+							ContentAreaInfo newArea = *pConfidentArea;
+							newArea.m_dOCRConfidence = 0;
+							newArea.right = rectIntersection.left;
+							rvecAreasToAdd.push_back(newArea);
+						}
+						if (pConfidentArea->right > rectIntersection.right + m_sizeAvgChar.cx)
+						{
+							ContentAreaInfo newArea = *pConfidentArea;
+							newArea.m_dOCRConfidence = 0;
+							newArea.left = rectIntersection.right;
+							rvecAreasToAdd.push_back(newArea);
+						}
+
+						reConfidentBoundaryState = kLocked;
+						rnConfidentBoundary = nNewBoundary;
+					}
+
+					if (pImpressionableArea->left + m_sizeAvgChar.cx < rectIntersection.left)
+					{
+						// The truncated area extends sufficiently beyond the left end of the
+						// intersection; create a new candidate area.
+						ContentAreaInfo newArea(rectIntersection);
+						newArea.left = pImpressionableArea->left;
 						newArea.right = rectIntersection.left;
-						rvecAreasToAdd.push_back(newArea);
+						shrinkToFit(newArea);
+						if (hasEnoughPixels(newArea) && 
+							isBigEnough(newArea))
+						{
+							// The new candidate qualifies to be its own area. Consider its top
+							// and bottom boundaries already expanded.
+							newArea.m_eTopBoundaryState = kLocked;
+							newArea.m_eBottomBoundaryState = kLocked;
+							rvecAreasToAdd.push_back(newArea);
+						}
 					}
-					if (pConfidentArea->right > rectIntersection.right + m_sizeAvgChar.cx)
+					if (pImpressionableArea->right - m_sizeAvgChar.cx > rectIntersection.right)
 					{
-						ContentAreaInfo newArea = *pConfidentArea;
-						newArea.m_dOCRConfidence = 0;
+						// The impressionable area extends sufficiently beyond the right end of the
+						// intersection; create a new candidate area.
+						ContentAreaInfo newArea(rectIntersection);
+						newArea.right = pImpressionableArea->right;
 						newArea.left = rectIntersection.right;
-						rvecAreasToAdd.push_back(newArea);
-					}
-
-					reConfidentBoundaryState = kLocked;
-					rnConfidentBoundary = nNewBoundary;
+						shrinkToFit(newArea);
+						if (hasEnoughPixels(newArea) && 
+							isBigEnough(newArea))
+						{
+							// The new candidate qualifies to be its own area. Consider its top
+							// and bottom boundaries already expanded.
+							newArea.m_eTopBoundaryState = kLocked;
+							newArea.m_eBottomBoundaryState = kLocked;
+							rvecAreasToAdd.push_back(newArea);
+						}
+					}	
 				}
-				
-				if (pImpressionableArea->left + m_sizeAvgChar.cx < rectIntersection.left)
-				{
-					// The truncated area extends sufficiently beyond the left end of the
-					// intersection; create a new candidate area.
-					ContentAreaInfo newArea(rectIntersection);
-					newArea.left = pImpressionableArea->left;
-					newArea.right = rectIntersection.left;
-					shrinkToFit(newArea);
-					if (hasEnoughPixels(newArea) && 
-						isBigEnough(newArea))
-					{
-						// The new candidate qualifies to be its own area. Consider its top
-						// and bottom boundaries already expanded.
-						newArea.m_eTopBoundaryState = kLocked;
-						newArea.m_eBottomBoundaryState = kLocked;
-						rvecAreasToAdd.push_back(newArea);
-					}
-				}
-				if (pImpressionableArea->right - m_sizeAvgChar.cx > rectIntersection.right)
-				{
-					// The impressionable area extends sufficiently beyond the right end of the
-					// intersection; create a new candidate area.
-					ContentAreaInfo newArea(rectIntersection);
-					newArea.right = pImpressionableArea->right;
-					newArea.left = rectIntersection.right;
-					shrinkToFit(newArea);
-					if (hasEnoughPixels(newArea) && 
-						isBigEnough(newArea))
-					{
-						// The new candidate qualifies to be its own area. Consider its top
-						// and bottom boundaries already expanded.
-						newArea.m_eTopBoundaryState = kLocked;
-						newArea.m_eBottomBoundaryState = kLocked;
-						rvecAreasToAdd.push_back(newArea);
-					}
-				}	
 			}
 		}
-	}
 
-	return false;
+		return false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26616");
 }
 //--------------------------------------------------------------------------------------------------
 void CSplitRegionIntoContentAreas::makeFlushWithLines(ContentAreaInfo &area)
 {
-	// Cycle through each horizontal line looking for a line that defines the edge of this area
-	for each (LineRect line in m_vecHorizontalLines)
+	try
 	{
-		if (area.bottom + 1 == line.top || area.top - 1 == line.bottom)
+		// Cycle through each horizontal line looking for a line that defines the edge of this area
+		for each (LineRect line in m_vecHorizontalLines)
 		{
-			// We found a line that matches the top or bottom edge.  Make sure the line runs at
-			// least 50% of the width of the area.
-			int nOverlap = min(area.right, line.right) - max(area.left, line.left);
-			double dOverlapPercent = (double)nOverlap / area.Width();
-
-			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+			if (area.bottom + 1 == line.top || area.top - 1 == line.bottom)
 			{
-				// This line appears to define the edge of this area.  Align the area's edge with
-				// the center of the line.
-				if (area.bottom + 1 == line.top)
+				// We found a line that matches the top or bottom edge.  Make sure the line runs at
+				// least 50% of the width of the area.
+				int nOverlap = min(area.right, line.right) - max(area.left, line.left);
+				double dOverlapPercent = (double)nOverlap / area.Width();
+
+				if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
 				{
-					area.bottom = line.CenterPoint().y;
+					// This line appears to define the edge of this area.  Align the area's edge with
+					// the center of the line.
+					if (area.bottom + 1 == line.top)
+					{
+						area.bottom = line.CenterPoint().y;
+					}
+					else
+					{
+						area.top = line.CenterPoint().y;
+					}
 				}
-				else
+			}
+			else if (line.LinePosition() >= area.top + m_sizeAvgChar.cy &&
+				line.LinePosition() <= area.bottom - m_sizeAvgChar.cy)
+			{
+				// This line appears to split the current area with a sufficient amount of leftover on
+				// either side.  If the horizontal overlap is sufficient, allow this area to be divided
+				// in two along this line.
+				int nOverlap = min(area.right, line.right) - max(area.left, line.left);
+				double dOverlapPercent = (double)nOverlap / area.Width();
+
+				if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
 				{
-					area.top = line.CenterPoint().y;
+					CRect newArea(area.left, area.top, area.right, line.LinePosition());
+					shrinkToFit(newArea);
+					m_vecContentAreas.push_back(newArea);
+
+					area.top = line.LinePosition();
+					shrinkToFit(area);
 				}
 			}
 		}
-		else if (line.LinePosition() >= area.top + m_sizeAvgChar.cy &&
-				 line.LinePosition() <= area.bottom - m_sizeAvgChar.cy)
+
+		// Cycle through each vertical line looking for a line that defines the edge of this area
+		for each (LineRect line in m_vecVerticalLines)
 		{
-			// This line appears to split the current area with a sufficient amount of leftover on
-			// either side.  If the horizontal overlap is sufficient, allow this area to be divided
-			// in two along this line.
-			int nOverlap = min(area.right, line.right) - max(area.left, line.left);
-			double dOverlapPercent = (double)nOverlap / area.Width();
-
-			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+			if (area.right + 1 == line.left || area.left - 1 == line.right)
 			{
-				CRect newArea(area.left, area.top, area.right, line.LinePosition());
-				shrinkToFit(newArea);
-				m_vecContentAreas.push_back(newArea);
+				// We found a line that matches the left or right edge.  Make sure the line runs at
+				// least 50% of the height of the area.
+				int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
+				double dOverlapPercent = (double)nOverlap / area.Height();
 
-				area.top = line.LinePosition();
-				shrinkToFit(area);
+				if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+				{
+					// This line appears to define the edge of this area.  Align the area's edge with
+					// the center of the line.
+					if (area.right + 1 == line.left)
+					{
+						area.right = line.CenterPoint().x;
+					}
+					else
+					{
+						area.left = line.CenterPoint().x;
+					}
+				}
 			}
+			// The following code to allow an area to be divided by a vertical line seems to expose a bug in 
+			// the spatial string searcher on one of the documents (9519303_001.TIF). Commenting out for the
+			// time being.
+			//		else if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES) &&
+			//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES))
+			//		{
+			//			// This line appears to split the current area with a sufficient amount of leftover on
+			//			// either side.  If the vertical overlap is sufficient, allow this area to be be
+			//			// divded in two along this line.
+			//			int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
+			//			double dOverlapPercent = (double)nOverlap / area.Height();
+			//
+			//			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
+			//			{
+			//				CRect newArea(area.left, area.top, line.LinePosition(), area.bottom);
+			//				shrinkToFit(newArea);
+			//				m_vecContentAreas.push_back(newArea);
+			//
+			//				area.left = line.LinePosition();
+			//				shrinkToFit(area);
+			//			}
+			//		}
 		}
 	}
-
-	// Cycle through each vertical line looking for a line that defines the edge of this area
-	for each (LineRect line in m_vecVerticalLines)
-	{
-		if (area.right + 1 == line.left || area.left - 1 == line.right)
-		{
-			// We found a line that matches the left or right edge.  Make sure the line runs at
-			// least 50% of the height of the area.
-			int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
-			double dOverlapPercent = (double)nOverlap / area.Height();
-
-			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
-			{
-				// This line appears to define the edge of this area.  Align the area's edge with
-				// the center of the line.
-				if (area.right + 1 == line.left)
-				{
-					area.right = line.CenterPoint().x;
-				}
-				else
-				{
-					area.left = line.CenterPoint().x;
-				}
-			}
-		}
-// The following code to allow an area to be divided by a vertical line seems to expose a bug in 
-// the spatial string searcher on one of the documents (9519303_001.TIF). Commenting out for the
-// time being.
-//		else if (line.LinePosition() >= area.left + (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES) &&
-//				 line.LinePosition() <= area.right - (m_sizeAvgChar.cx * gnMIN_CHAR_SEPARATION_OF_LINES))
-//		{
-//			// This line appears to split the current area with a sufficient amount of leftover on
-//			// either side.  If the vertical overlap is sufficient, allow this area to be be
-//			// divded in two along this line.
-//			int nOverlap = min(area.bottom, line.bottom) - max(area.top, line.top);
-//			double dOverlapPercent = (double)nOverlap / area.Height();
-//
-//			if (dOverlapPercent > gdREQUIRED_LINE_OVERLAP)
-//			{
-//				CRect newArea(area.left, area.top, line.LinePosition(), area.bottom);
-//				shrinkToFit(newArea);
-//				m_vecContentAreas.push_back(newArea);
-//
-//				area.left = line.LinePosition();
-//				shrinkToFit(area);
-//			}
-//		}
-	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26617");
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::ensureRectInPage(CRect &rrect, bool bThrowException/* = true*/)
@@ -2427,10 +2523,12 @@ bool CSplitRegionIntoContentAreas::ensureRectInPage(CRect &rrect, bool bThrowExc
 	{
 		// rrect overlaps with the current page. Crop it so that it includes only the area
 		// that overlaps.
+		// [FlexIDSCore #3560] - Ensure the rect is (bounds - 1) for bottom and right
+		// as the image is stored in a 0 based array structure
 		rrect.SetRect(max(rrect.left, m_rectCurrentPage.left),
 					  max(rrect.top, m_rectCurrentPage.top),
-					  min(rrect.right, m_rectCurrentPage.right),
-					  min(rrect.bottom, m_rectCurrentPage.bottom));
+					  min(rrect.right, m_rectCurrentPage.right-1),
+					  min(rrect.bottom, m_rectCurrentPage.bottom-1));
 	}
 
 	return true;
@@ -2467,21 +2565,25 @@ bool CSplitRegionIntoContentAreas::isBigEnough(const ContentAreaInfo &area,
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::hasEnoughPixels(const CRect &rect)
 {	
-	// If the rect is empty, it doesn't have enough pixels.
-	if (rect.IsRectEmpty())
+	try
 	{
-		return false;
+		// If the rect is empty, it doesn't have enough pixels.
+		if (rect.IsRectEmpty())
+		{
+			return false;
+		}
+
+		// Count the pixels in this rect.
+		PixelCounter pixelCounter(this, rect);
+		pixelCounter.process();
+
+		// Calculate the percentage of the rect that has black pixels.
+		double dArea = (double)(rect.Width() * rect.Height());
+		double dPercent = (double) pixelCounter.m_nPixelCount / dArea;
+
+		return (dPercent > gdMIN_PIXEL_PERCENT_OF_AREA);
 	}
-
-	// Count the pixels in this rect.
-	PixelCounter pixelCounter(this, rect);
-	pixelCounter.process();
-
-	// Calculate the percentage of the rect that has black pixels.
-	double dArea = (double)(rect.Width() * rect.Height());
-	double dPercent = (double) pixelCounter.m_nPixelCount / dArea;
-
-	return (dPercent > gdMIN_PIXEL_PERCENT_OF_AREA);
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26618");
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::isExcluded(CPoint &rpoint)
@@ -2504,19 +2606,10 @@ bool CSplitRegionIntoContentAreas::isExcluded(CPoint &rpoint)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-bool CSplitRegionIntoContentAreas::isPointOnPage(CPoint point)
+bool CSplitRegionIntoContentAreas::isPointOnPage(const CPoint& point)
 {
-	if (point.x < 0 || point.x > m_rectCurrentPage.right ||
-		point.y < 0 || point.y > m_rectCurrentPage.bottom)
-	{
-		// This point is outside of the coordinates of the current page.
-		return false;
-	}
-	else
-	{
-		// This point is inside of the coordinates of the current page.
-		return true;
-	}
+	return point.x >= 0 && point.x < m_rectCurrentPage.right &&
+			point.y >= 0 && point.y < m_rectCurrentPage.bottom;
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::isAreaAbove(const CRect &rect1, const CRect &rect2)
@@ -2568,215 +2661,223 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 														 ContentAreaInfo area,
 														 ILongToObjectMapPtr ipSpatialInfos)
 {
-	// Determine the name of the source document.
-	ISpatialStringPtr ipDocText = ipDoc->Text;
-	ASSERT_RESOURCE_ALLOCATION("ELI22429", ipDocText != NULL);
-
-	string strSourceDocName = asString(ipDocText->SourceDocName);
-
-	// Pad the specified rect; this helps to obtain better OCR results of the area.
-	area.InflateRect(gnAREA_PADDING_SIZE, gnAREA_PADDING_SIZE);
-
-	// Crop the rect to ensure it is completely contained in the current page.
-	ensureRectInPage(area);
-
-	// Create a new ILongRectanglePtr based on this rect
-	ILongRectanglePtr ipRect(CLSID_LongRectangle);
-	ASSERT_RESOURCE_ALLOCATION("ELI22153", ipRect != NULL);
-
-	ipRect->SetBounds(area.left, area.top, area.right, area.bottom);
-
-	// Search for OCR'd text within this region.
-	ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher(ipDoc, nPage);
-	ASSERT_RESOURCE_ALLOCATION("ELI22182", ipSearcher != NULL);
-
-	ipSearcher->SetIncludeDataOnBoundary(VARIANT_FALSE);
-
-	ISpatialStringPtr ipValue = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
-	ASSERT_RESOURCE_ALLOCATION("ELI22183", ipValue != NULL);
-
-	// Create a raster zone representing the entire area of the area.
-	IRasterZonePtr ipNewRasterZone(CLSID_RasterZone);
-	ASSERT_RESOURCE_ALLOCATION("ELI22185", ipNewRasterZone != NULL);
-	ipNewRasterZone->CreateFromLongRectangle(ipRect, m_nCurrentPage);
-
-	// Create a ContentAreaInfo based on the found text in order to assess the OCR confidence
-	// of the text.
-	ContentAreaInfo result(ipValue);
-
-	// If OCR quality of the text this area is based off of or the OCR quality of text in the
-	// final area is poor, re-OCR the text using handwriting recognition if so specified.
-	if (m_bReOCRWithHandwriting && 
-		(area.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE ||
-		 result.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE))
+	try
 	{
-		try
+		// Determine the name of the source document.
+		ISpatialStringPtr ipDocText = ipDoc->Text;
+		ASSERT_RESOURCE_ALLOCATION("ELI22429", ipDocText != NULL);
+
+		string strSourceDocName = asString(ipDocText->SourceDocName);
+
+		// Pad the specified rect; this helps to obtain better OCR results of the area.
+		area.InflateRect(gnAREA_PADDING_SIZE, gnAREA_PADDING_SIZE);
+
+		// Crop the rect to ensure it is completely contained in the current page.
+		ensureRectInPage(area);
+
+		// Create a new ILongRectanglePtr based on this rect
+		ILongRectanglePtr ipRect(CLSID_LongRectangle);
+		ASSERT_RESOURCE_ALLOCATION("ELI22153", ipRect != NULL);
+
+		ipRect->SetBounds(area.left, area.top, area.right, area.bottom);
+
+		// Search for OCR'd text within this region.
+		ISpatialStringSearcherPtr ipSearcher = getSpatialStringSearcher(ipDoc, nPage);
+		ASSERT_RESOURCE_ALLOCATION("ELI22182", ipSearcher != NULL);
+
+		ipSearcher->SetIncludeDataOnBoundary(VARIANT_FALSE);
+
+		ISpatialStringPtr ipValue = ipSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
+		ASSERT_RESOURCE_ALLOCATION("ELI22183", ipValue != NULL);
+
+		// Create a raster zone representing the entire area of the area.
+		IRasterZonePtr ipNewRasterZone(CLSID_RasterZone);
+		ASSERT_RESOURCE_ALLOCATION("ELI22185", ipNewRasterZone != NULL);
+		ipNewRasterZone->CreateFromLongRectangle(ipRect, m_nCurrentPage);
+
+		// Create a ContentAreaInfo based on the found text in order to assess the OCR confidence
+		// of the text.
+		ContentAreaInfo result(ipValue);
+
+		// If OCR quality of the text this area is based off of or the OCR quality of text in the
+		// final area is poor, re-OCR the text using handwriting recognition if so specified.
+		if (m_bReOCRWithHandwriting && 
+			(area.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE ||
+			result.m_dOCRConfidence < gdCONFIDENT_OCR_TEXT_SCORE))
 		{
 			try
 			{
-				// Load the OCR engine and OCR this image region.
-				IOCREnginePtr ipOCREngine = getOCREngine();
-
-				// Re-OCR this image region from the original image (lines included)
-				ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
-					strSourceDocName.c_str(), nPage, nPage, ipRect, 0, kNoFilter, "", VARIANT_TRUE, 
-					VARIANT_TRUE, VARIANT_TRUE, NULL);
-
-				// Create a new area based on the OCR'd text to score the OCR confidence.
-				ContentAreaInfo areaReOCRd(ipZoneText);
-
-				// Update to use the handwritten result if confidence is higher.
-				if (areaReOCRd.m_dOCRConfidence > result.m_dOCRConfidence)
+				try
 				{
-					ipValue = ipZoneText;
+					// Load the OCR engine and OCR this image region.
+					IOCREnginePtr ipOCREngine = getOCREngine();
+
+					// Re-OCR this image region from the original image (lines included)
+					ISpatialStringPtr ipZoneText = ipOCREngine->RecognizeTextInImageZone(
+						strSourceDocName.c_str(), nPage, nPage, ipRect, 0, kNoFilter, "",
+						VARIANT_TRUE, VARIANT_TRUE, VARIANT_TRUE, NULL);
+
+					// Create a new area based on the OCR'd text to score the OCR confidence.
+					ContentAreaInfo areaReOCRd(ipZoneText);
+
+					// Update to use the handwritten result if confidence is higher.
+					if (areaReOCRd.m_dOCRConfidence > result.m_dOCRConfidence)
+					{
+						ipValue = ipZoneText;
+					}
 				}
+				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22335");
 			}
-			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI22335");
+			catch (UCLIDException &ue)
+			{
+				// In testing so far, re-OCR'ing the small image region appears more likely to 
+				// generate OCR exceptions such as all decompsition methods failed.  Since
+				// we are only trying to improve on a result we already have, don't consider
+				// this a critical problem; Just log it.
+				UCLIDException uexOuter("ELI22336", 
+					"Application trace: Failed to perform handwriting re-OCR attempt!", ue);
+				uexOuter.log();
+			}
 		}
-		catch (UCLIDException &ue)
+
+		// If a sub attribute containing the true attribute spatial info is requested, this
+		// variable will store it.
+		IAttributePtr ipSpatialStringSubAttribute = NULL;
+
+		// Check to see if the string value of the attribute is empty
+		string strValueText = asString(ipValue->String);
+		strValueText = trim(strValueText, "", " \r\n");
+		if (strValueText.empty() || !asCppBool(ipValue->HasSpatialInfo()))
 		{
-			// In testing so far, re-OCR'ing the small image region appears more likely to 
-			// generate OCR exceptions such as all decompsition methods failed.  Since
-			// we are only trying to improve on a result we already have, don't consider
-			// this a critical problem; Just log it.
-			UCLIDException uexOuter("ELI22336", 
-				"Application trace: Failed to perform handwriting re-OCR attempt!", ue);
-			uexOuter.log();
+			// If so, specify create a pseudo-spatial string with the default text instead.
+			ipValue->CreatePseudoSpatialString(ipNewRasterZone, m_strDefaultAttributeText.c_str(),
+				m_ipCurrentPageText->SourceDocName, ipSpatialInfos);
 		}
-	}
-
-	// If a sub attribute containing the true attribute spatial info is requested, this
-	// variable will store it.
-	IAttributePtr ipSpatialStringSubAttribute = NULL;
-
-	// Check to see if the string value of the attribute is empty
-	string strValueText = asString(ipValue->String);
-	strValueText = trim(strValueText, "", " \r\n");
-	if (strValueText.empty() || !asCppBool(ipValue->HasSpatialInfo()))
-	{
-		// If so, specify create a pseudo-spatial string with the default text instead.
-		ipValue->CreatePseudoSpatialString(ipNewRasterZone, m_strDefaultAttributeText.c_str(),
-			m_ipCurrentPageText->SourceDocName, ipSpatialInfos);
-	}
-	else
-	{
-		// Handle the case that the user has requested the original spatial information.
-		if (m_bIncludeOCRAsTrueSpatialString)
+		else
 		{
-			// Create the attribute to contain the spatial string
-			ipSpatialStringSubAttribute.CreateInstance(CLSID_Attribute);
-			ASSERT_RESOURCE_ALLOCATION("ELI22549", ipSpatialStringSubAttribute != NULL);
+			// Handle the case that the user has requested the original spatial information.
+			if (m_bIncludeOCRAsTrueSpatialString)
+			{
+				// Create the attribute to contain the spatial string
+				ipSpatialStringSubAttribute.CreateInstance(CLSID_Attribute);
+				ASSERT_RESOURCE_ALLOCATION("ELI22549", ipSpatialStringSubAttribute != NULL);
 
-			// Create and use a copy of the originally found value.
-			ICopyableObjectPtr ipCopyThis = ipValue;
-			ASSERT_RESOURCE_ALLOCATION("ELI22551", ipCopyThis);
+				// Create and use a copy of the originally found value.
+				ICopyableObjectPtr ipCopyThis = ipValue;
+				ASSERT_RESOURCE_ALLOCATION("ELI22551", ipCopyThis);
 
-			ISpatialStringPtr ipValueCopy = ipCopyThis->Clone();
-			ASSERT_RESOURCE_ALLOCATION("ELI22552", ipValueCopy);
+				ISpatialStringPtr ipValueCopy = ipCopyThis->Clone();
+				ASSERT_RESOURCE_ALLOCATION("ELI22552", ipValueCopy);
 
-			ipSpatialStringSubAttribute->Value = ipValueCopy;
-			ipSpatialStringSubAttribute->Name = gstrSPATIAL_STRING_ATTRIBUTE_NAME.c_str();
+				ipSpatialStringSubAttribute->Value = ipValueCopy;
+				ipSpatialStringSubAttribute->Name = gstrSPATIAL_STRING_ATTRIBUTE_NAME.c_str();
 
-			// Assign the type based on the character confidence of the text the area is based on.
-			ipSpatialStringSubAttribute->Type = 
-						 (area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
-						 ? m_strGoodOCRType.c_str()
-						 : m_strPoorOCRType.c_str();
+				// Assign the type based on the character confidence of the text the area is based on.
+				ipSpatialStringSubAttribute->Type = 
+					(area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
+					? m_strGoodOCRType.c_str()
+					: m_strPoorOCRType.c_str();
+			}
+
+			ipValue->Replace("\r\n", " ", VARIANT_FALSE, 0, NULL);
+
+			// Create the return result as a psuedo-spatial string-- a spatial string with
+			// the letters it contains spread evenly throughout the found region.
+			ipValue->CreatePseudoSpatialString(ipNewRasterZone, ipValue->String, 
+				m_ipCurrentPageText->SourceDocName, ipSpatialInfos);
 		}
 
-		ipValue->Replace("\r\n", " ", VARIANT_FALSE, 0, NULL);
+		// Create the new attribute and assign the newly created value.
+		IAttributePtr ipNewAttribute(CLSID_Attribute);
+		ASSERT_RESOURCE_ALLOCATION("ELI22184", ipNewAttribute != NULL);
 
-		// Create the return result as a psuedo-spatial string-- a spatial string with
-		// the letters it contains spread evenly throughout the found region.
-		ipValue->CreatePseudoSpatialString(ipNewRasterZone, ipValue->String, 
-			m_ipCurrentPageText->SourceDocName, ipSpatialInfos);
+		ipNewAttribute->Value = ipValue;
+		ipNewAttribute->Name = m_strAttributeName.c_str();
+
+		// Assign the type based on the character confidence of the text the area is based on.
+		ipNewAttribute->Type = (area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
+			? m_strGoodOCRType.c_str()
+			: m_strPoorOCRType.c_str();
+
+		// If an attribute containing the original spatial string result is available, add it
+		// as a sub-attribute.
+		if (ipSpatialStringSubAttribute != NULL)
+		{
+			IIUnknownVectorPtr ipSubAttributes = ipNewAttribute->SubAttributes;
+			ASSERT_RESOURCE_ALLOCATION("ELI22550", ipSubAttributes != NULL);
+
+			ipSubAttributes->PushBack(ipSpatialStringSubAttribute);
+		}
+
+		return ipNewAttribute;
 	}
-
-	// Create the new attribute and assign the newly created value.
-	IAttributePtr ipNewAttribute(CLSID_Attribute);
-	ASSERT_RESOURCE_ALLOCATION("ELI22184", ipNewAttribute != NULL);
-
-	ipNewAttribute->Value = ipValue;
-	ipNewAttribute->Name = m_strAttributeName.c_str();
-
-	// Assign the type based on the character confidence of the text the area is based on.
-	ipNewAttribute->Type = (area.m_dOCRConfidence >= (double) (m_nOCRThreshold / 100.0))
-						 ? m_strGoodOCRType.c_str()
-						 : m_strPoorOCRType.c_str();
-
-	// If an attribute containing the original spatial string result is available, add it
-	// as a sub-attribute.
-	if (ipSpatialStringSubAttribute != NULL)
-	{
-		IIUnknownVectorPtr ipSubAttributes = ipNewAttribute->SubAttributes;
-		ASSERT_RESOURCE_ALLOCATION("ELI22550", ipSubAttributes != NULL);
-
-		ipSubAttributes->PushBack(ipSpatialStringSubAttribute);
-	}
-
-	return ipNewAttribute;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26619");
 }
 //--------------------------------------------------------------------------------------------------
 bool CSplitRegionIntoContentAreas::loadPageBitmap(IAFDocumentPtr ipDoc, long nPage)
 {
-	// Call setCurrentPage which will reset m_apPageBitmap if this is a different page than for the
-	// last call.
-	ISpatialStringPtr ipPageText = setCurrentPage(ipDoc, nPage);
-
-	if (m_apPageBitmap.get() == NULL)
+	try
 	{
-		// If this page doesn't have any text, skip it. (It would be possible to handle it, but 
-		// its not worth the benefit at this point.
-		if (ipPageText == NULL || !asCppBool(ipPageText->HasSpatialInfo()))
+		// Call setCurrentPage which will reset m_apPageBitmap if this is a different page than for the
+		// last call.
+		ISpatialStringPtr ipPageText = setCurrentPage(ipDoc, nPage);
+
+		if (m_apPageBitmap.get() == NULL)
 		{
-			// Reset any previously loaded bitmap
-			m_apPageBitmap.reset();
-			
+			// If this page doesn't have any text, skip it. (It would be possible to handle it, but 
+			// its not worth the benefit at this point.
+			if (ipPageText == NULL || !asCppBool(ipPageText->HasSpatialInfo()))
+			{
+				// Reset any previously loaded bitmap
+				m_apPageBitmap.reset();
+
+				// Reset any existing line data and attempt to find lines on this page
+				m_vecHorizontalLines.clear();
+				m_vecVerticalLines.clear();
+
+				return false;
+			}
+
+			// The page bitmap needs to be loaded. Load the bitmap deskewed.
+			ISpatialPageInfoPtr ipPageInfo = ipPageText->GetPageInfo(nPage);
+			ASSERT_RESOURCE_ALLOCATION("ELI22125", ipPageInfo != NULL);
+
+			m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage, 
+				-ipPageInfo->Deskew));
+			ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != NULL);
+
+			m_rectCurrentPage.SetRect(0, 0, ipPageInfo->Width, ipPageInfo->Height);
+
 			// Reset any existing line data and attempt to find lines on this page
 			m_vecHorizontalLines.clear();
 			m_vecVerticalLines.clear();
 
-			return false;
-		}
-
-		// The page bitmap needs to be loaded. Load the bitmap deskewed.
-		ISpatialPageInfoPtr ipPageInfo = ipPageText->GetPageInfo(nPage);
-		ASSERT_RESOURCE_ALLOCATION("ELI22125", ipPageInfo != NULL);
-
-		m_apPageBitmap.reset(new LeadToolsBitmap(asString(ipPageText->SourceDocName), nPage, 
-			-ipPageInfo->Deskew));
-		ASSERT_RESOURCE_ALLOCATION("ELI22124", m_apPageBitmap.get() != NULL);
-
-		m_rectCurrentPage.SetRect(0, 0, ipPageInfo->Width, ipPageInfo->Height);
-
-		// Reset any existing line data and attempt to find lines on this page
-		m_vecHorizontalLines.clear();
-		m_vecVerticalLines.clear();
-		
-		if (m_bUseLines)
-		{
-			LeadToolsLineFinder ltLineFinder;
-			ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
-				LINEREMOVE_HORIZONTAL, m_vecHorizontalLines);
-			ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
-				LINEREMOVE_VERTICAL, m_vecVerticalLines);
-
-			// Erase the pixels from all lines found on the page.
-			for each (CRect rect in m_vecHorizontalLines)
+			if (m_bUseLines)
 			{
-				PixelEraser pixelEraser(this, rect);
-				pixelEraser.process();
-			}
+				LeadToolsLineFinder ltLineFinder;
+				ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
+					LINEREMOVE_HORIZONTAL, m_vecHorizontalLines);
+				ltLineFinder.findLines(&(m_apPageBitmap->m_hBitmap), 
+					LINEREMOVE_VERTICAL, m_vecVerticalLines);
 
-			for each (CRect rect in m_vecVerticalLines)
-			{
-				PixelEraser pixelEraser(this, rect);
-				pixelEraser.process();
+				// Erase the pixels from all lines found on the page.
+				for each (CRect rect in m_vecHorizontalLines)
+				{
+					PixelEraser pixelEraser(this, rect);
+					pixelEraser.process();
+				}
+
+				for each (CRect rect in m_vecVerticalLines)
+				{
+					PixelEraser pixelEraser(this, rect);
+					pixelEraser.process();
+				}
 			}
 		}
+
+		return true;
 	}
-
-	return true;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26620");
 }
 //--------------------------------------------------------------------------------------------------
 ISpatialStringSearcherPtr CSplitRegionIntoContentAreas::getSpatialStringSearcher(
