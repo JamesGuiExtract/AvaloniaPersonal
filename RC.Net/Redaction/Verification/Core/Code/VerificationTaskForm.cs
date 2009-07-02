@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -26,6 +27,13 @@ namespace Extract.Redaction.Verification
 
         #region VerificationTaskForm Fields
 
+        /// <summary>
+        /// The settings for verification.
+        /// </summary>
+        // Temporarily suppress this warning. Verification settings will be used in the future.
+        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
+        readonly VerificationSettings _settings;
+
         #endregion VerificationTaskForm Fields
 
         #region VerificationTaskForm Events
@@ -44,10 +52,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         // Don't fight with auto-generated code.
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        public VerificationTaskForm()
+        public VerificationTaskForm(VerificationSettings settings)
         {
             // License SandDock before creating the form
             SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+
+            _settings = settings;
 
             InitializeComponent();
         }

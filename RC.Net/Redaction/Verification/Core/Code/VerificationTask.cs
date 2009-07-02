@@ -106,6 +106,15 @@ namespace Extract.Redaction.Verification
         {
             _settings = task._settings;
         }
+
+        /// <summary>
+        /// Creates a <see cref="VerificationTaskForm"/> with the current settings.
+        /// </summary>
+        /// <returns>A <see cref="VerificationTaskForm"/> with the current settings.</returns>
+        IVerificationForm CreateVerificationTaskForm()
+        {
+            return new VerificationTaskForm(_settings);
+        }
         
         #endregion VerificationTask Methods
 
@@ -220,7 +229,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _form.ShowForm();
+                _form.ShowForm(CreateVerificationTaskForm);
             }
             catch (Exception ex)
             {

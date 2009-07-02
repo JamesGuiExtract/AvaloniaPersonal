@@ -8,10 +8,16 @@ using System.Windows.Forms;
 namespace Extract.Utilities.Forms
 {
     /// <summary>
+    /// Creates an <see cref="IVerificationForm"/>.
+    /// </summary>
+    /// <returns>An <see cref="IVerificationForm"/>.</returns>
+    public delegate IVerificationForm CreateForm();
+
+    /// <summary>
     /// Represents a <see cref="Form"/> that can verify documents in a multi-threaded environment.
     /// </summary>
     /// <typeparam name="TForm">The type of the <see cref="Form"/>.</typeparam>
-    public class VerificationForm<TForm> : IDisposable where TForm : Form, IVerificationForm, new()
+    public class VerificationForm<TForm> : IDisposable where TForm : Form, IVerificationForm
     {
         #region VerificationForm Constants
 	
@@ -138,11 +144,11 @@ namespace Extract.Utilities.Forms
         /// Ensures the specified config file has valid settings by attempting to initialize an
         /// instance of the DEP using them.
         /// </summary>
-        public void ValidateForm()
+        public void ValidateForm(CreateForm creator)
         {
             try
             {
-                Thread validationThread = CreateUserInterfaceThread(ValidationThread);
+                Thread validationThread = CreateUserInterfaceThread(ValidationThread, creator);
 
                 validationThread.Join();
 
@@ -160,25 +166,27 @@ namespace Extract.Utilities.Forms
         /// </summary>
         /// <param name="threadStart">A delegate that represents the functionality of the thread.
         /// </param>
+        /// <param name="creator">Creates the <see cref="IVerificationForm"/>.</param>
         /// <returns>A thread with a single-threaded apartment.</returns>
-        static Thread CreateUserInterfaceThread(ThreadStart threadStart)
+        static Thread CreateUserInterfaceThread(ParameterizedThreadStart threadStart, 
+            CreateForm creator)
         {
-            // Use the ValidationThread which simply initializes a DEP instance and returns.
-            Thread validationThread = new Thread(threadStart);
+            // Create thread
+            Thread thread = new Thread(threadStart);
 
             // [DataEntry:292] Some .Net control functionality such as clipboard and 
             // auto-complete depends upon the STA threading model.
-            validationThread.SetApartmentState(ApartmentState.STA);
-            validationThread.Start();
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start(creator);
 
-            return validationThread;
+            return thread;
         }
 
         /// <summary>
         /// Creates a <see cref="_form"/> instance running in a separate thread
         /// that callers from all threads will share.
         /// </summary>
-        public void ShowForm()
+        public void ShowForm(CreateForm creator)
         {
             lock (_lock)
             {
@@ -199,7 +207,8 @@ namespace Extract.Utilities.Forms
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
 
-                        _uiThread = CreateUserInterfaceThread(VerificationApplicationThread);
+                        _uiThread = 
+                            CreateUserInterfaceThread(VerificationApplicationThread, creator);
 
                         // Wait until the form is initialized (or an error interupts initialization) 
                         // before returning.
@@ -449,11 +458,6 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                if (_form == null)
-                {
-                    _form = new TForm();
-                }
-
                 return _form;
             }
             set
@@ -502,18 +506,15 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Creates a <typeparamref name="TForm"/> using the specified configuration file.
         /// </summary>
-        void ValidationThread()
+        void ValidationThread(object obj)
         {
             try
             {
-                // Prepare the application to display the verification form
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
+                CreateForm creator = (CreateForm)obj;
 
                 // Attempt to create an instance of verification form, then return.
-                using (new TForm())
-                {
-                }
+                TForm form = CreateTForm(creator);
+                form.Dispose();
             }
             catch (Exception ex)
             {
@@ -530,30 +531,19 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// Thread which creates and displays the verification form.
         /// </summary>
-        void VerificationApplicationThread()
+        void VerificationApplicationThread(object obj)
         {
-            // Make sure to keep track of the verification form in a separate variable from _form
-            // so that we can be sure to dispose of the form used by this thread even if 
-            // the creator of this thread has already cleared _form.
-            TForm verificationForm = null;
-
             try
             {
-                // Prepare the application to display the verification form
-                Application.EnableVisualStyles();
-                Application.SetCompatibleTextRenderingDefault(false);
-
                 // Create the verification form in FAM mode.
-                verificationForm = new TForm();
+                MainForm = CreateTForm((CreateForm) obj);
 
                 // Register events
-                verificationForm.Shown += HandleVerificationFormShown;
-                verificationForm.FileVerified += HandleFileVerified;
-                verificationForm.FormClosing += HandleFormClosing;
+                MainForm.Shown += HandleVerificationFormShown;
+                MainForm.FileVerified += HandleFileVerified;
+                MainForm.FormClosing += HandleFormClosing;
 
-                MainForm = verificationForm;
-
-                Application.Run(verificationForm);
+                Application.Run(MainForm);
             }
             catch (ThreadAbortException threadAbortException)
             {
@@ -578,11 +568,24 @@ namespace Extract.Utilities.Forms
             {
                 _canceledEvent.Set();
 
-                if (verificationForm != null)
-                {
-                    verificationForm.Dispose();
-                }
+                MainForm = null;
             }
+        }
+
+        /// <summary>
+        /// Creates a <typeparamref name="TForm"/> using the specified <see cref="CreateForm"/> 
+        /// delegate instance.
+        /// </summary>
+        /// <param name="creator">Used to create the <typeparamref name="TForm"/>.</param>
+        /// <returns>A <typeparamref name="TForm"/> using the specified <see cref="CreateForm"/> 
+        /// delegate instance.</returns>
+        static TForm CreateTForm(CreateForm creator)
+        {
+            // Prepare the application to display the verification form
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            return (TForm)creator();
         }
 
         /// <summary>
