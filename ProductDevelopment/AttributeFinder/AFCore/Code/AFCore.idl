@@ -30,7 +30,6 @@ library UCLID_AFCORELib
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb");
 	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb");
-	importlib("..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\UCLIDFileProcessing.tlb");
 	importlib("..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb");
 
 	/////////////////////////
