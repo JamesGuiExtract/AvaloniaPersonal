@@ -570,6 +570,31 @@ namespace Extract.DataEntry
 
                 // Add a new attribute for the specified row.
                 ApplyAttributeToRow(e.Row.Index - 1, null, null);
+
+                // Re-enter edit mode so that any changes to the validation list based on triggers
+                // are put into effect. 
+                base.EndEdit();
+
+                // If the value of the control is a standard char that won't cause a problem with
+                // SendKeys, refresh (clear) the value before restarting the edit, then resend the
+                // key again after the edit has started to trigger any relavant auto-complete list.
+                string value = base.CurrentCell.Value.ToString();
+                if (value == null || value.Length != 1 || value[0] < '0' || value[0] > 'z' ||
+                    value[0] == '^')
+                {
+                    value = "";
+                }
+                else
+                {
+                    base.CurrentCell.Value = "";
+                }
+
+                base.BeginEdit(false);
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    SendKeys.Send(value);
+                }
             }
             catch (Exception ex)
             {

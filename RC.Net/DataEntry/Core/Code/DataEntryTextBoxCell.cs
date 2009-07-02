@@ -224,13 +224,17 @@ namespace Extract.DataEntry
 
                 if (attribute != null)
                 {
-                    // If so, use the provided attribute.
-                    _attribute = attribute;
-
-                    if (attribute.Value.HasSpatialInfo())
+                    // [DataEntry:367]
+                    // Don't consider spatial info changed if an attribute is being applied for the
+                    // first time; this only happens during the initial load. Treating this case
+                    // as spatialInfoChanged will erroneously clear accepted text.
+                    if (_attribute != null && attribute.Value.HasSpatialInfo())
                     {
                         spatialInfoChanged = true;
                     }
+
+                    // If so, use the provided attribute.
+                    _attribute = attribute;                    
                 }
                 else
                 {
