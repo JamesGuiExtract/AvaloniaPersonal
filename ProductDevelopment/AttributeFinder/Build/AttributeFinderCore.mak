@@ -89,7 +89,8 @@ ObfuscateFiles: BuildAttributeFinderCore
 	dotfuscator.exe  /in:"$(BinariesFolder)\SQLServerInfo.exe" /mapout:"$(BinariesFolder)\Map\SQLServerInfo.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\ReportViewer.exe" /mapout:"$(BinariesFolder)\Map\ReportViewer.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.AttributeFinder.dll" /mapout:"$(BinariesFolder)\Map\Extract.AttributeFinder.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
-
+	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.Imaging.Forms.dll" /mapout:"$(BinariesFolder)\Map\mapExtract.Imaging.Forms.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	
 EncryptAndCopyComponentDataFiles: 
     @ECHO Copying the ComponentData subdirectories and files to installation directory...
     @rmdir "$(AFCoreInstallFilesRootDir)\ComponentData" /s /q
@@ -172,6 +173,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Forms.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Licensing.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Imaging.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
+	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Imaging.Forms.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Interop.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Redaction.Verification.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@COPY /v  "$(BinariesFolder)\Obfuscated\Extract.Utilities.Parsers.dll" "$(AFCoreInstallFilesRootDir)\DotNetGAC"
