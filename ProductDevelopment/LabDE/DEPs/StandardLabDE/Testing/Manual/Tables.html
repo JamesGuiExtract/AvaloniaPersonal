@@ -66,6 +66,15 @@
 			<li>Click on the starred row of the order table.
 			<li>Confirm that the dependent test table is disabled.
 		</ul>
+		<li><b>[DataEntry #404]</b> Extra test row after swiping into inserted row
+		<ul>
+			<li>Open a document and select an order (Order 1).
+			<li>Right-click in the test table and insert a row.
+			<li>Select a different order (Order 2), then select Order 1 again.
+			<li>Confirm that there are no extra rows in the table.
+			<li>Repeat the same test, but this time swipe/type some data into the inserted row
+			before navigating to Order 2. Confirm that there are still no extra rows in the test table.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Row Swiping</h3>
@@ -205,6 +214,40 @@
 				clipboard.
 				<li>DELETE can be used to clear the contents of a cell.
 			</ul>
+		</ul>
+		<li><b>[DataEntry #374]</b> Error after cutting and pasting rows
+		<ul>
+			<li>Open a document with more than one test.
+			<li>Right-click and cut a test row.
+			<li>Right-click in a different populated test row and select "Insert copied row(s)".
+			<li>Confirm that no exceptions are seen.
+			<li>Open a document that has several tests.
+			<li>Select and copy the first row of the test table.
+			<li>Select rows two and three and paste the first row into them.
+			<li>Select rows two and three again and paste the first row into them.
+			<li>Confirm that no exceptions are seen.
+			<li>Open a document that has an associated .voa file.
+			<li>Select an order with a valid name.
+			<li>Select all rows in the test table. Cut them.
+			<li>Paste those rows into the same table.
+			<li>In the order table, change the name of the order to a different valid order name.
+			<li>Confirm that no exceptions are seen.
+		</ul>
+		<li><b>[DataEntry #377]</b> Unexpected behavior when copying rows.
+		<ul>
+			<li>Select and copy the first populated row in a table.
+			<li>Select a cell within that row and edit the contents of the cell.
+			<li>Select the starred new row of the table and paste your copied row into it.
+			<li>Confirm that the newly pasted row shows the original contents of the copied row,
+			not the current contents.
+		</ul>
+		<li><b>[DataEntry #380]</b> Bug pasting test rows
+		<ul>
+			<li>Open a document that has a .voa file and information about at least four tests.
+			<li>Select and copy two rows from the test table.
+			<li>Select two other (already populated) rows and paste into them.
+			<li>Confirm that both the spatial and textual information of the rows you pasted
+			into matches that of the rows you copied.
 		</ul>
 	</ul>
 <p>
