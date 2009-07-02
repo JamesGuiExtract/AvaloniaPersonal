@@ -1608,13 +1608,22 @@ namespace Extract.DataEntry
                 IUnknownVector attributesToPaste = (IUnknownVector)
                     this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
 
-                // If the attributes are not from this table, rename them.
-                if (clipboardDataType != this.ClipboardDataType)
+                
+                int count = attributesToPaste.Size();
+                for (int i = 0; i < count; i++)
                 {
-                    int count = attributesToPaste.Size();
-                    for (int i = 0; i < count; i++)
+                    IAttribute attribute = (IAttribute)attributesToPaste.At(i);
+
+                    // [DataEntry:426]
+                    // Ensure the parent attribute is initialized before applying the attribute to
+                    // the row, otherwise the parentAttribute property will not be set correctly
+                    // for column attributes.
+                    AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
+                        false, null, null, null);
+
+                    // If the attributes are not from this table, rename them.
+                    if (clipboardDataType != this.ClipboardDataType)
                     {
-                        IAttribute attribute = (IAttribute)attributesToPaste.At(i);
                         attribute.Name = base.AttributeName;
                     }
                 }

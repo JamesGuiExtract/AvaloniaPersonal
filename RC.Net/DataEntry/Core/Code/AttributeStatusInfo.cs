@@ -1337,12 +1337,9 @@ namespace Extract.DataEntry
                     }
                     else
                     {
-                        if (!endOfEdit)
-                        {
-                            // If not the end of the edit raise an incremental modification event and
-                            // queue the value for an eventual non-incremental event.
-                            statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
-                        }
+                        // Raise an incremental modification event and queue the value for an
+                        // eventual non-incremental event.
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
 
                         if (!_attributesBeingModified.Contains(attribute))
                         {
