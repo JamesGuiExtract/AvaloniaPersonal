@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Design;
 using System.Text;
 using System.Windows.Forms;
@@ -111,6 +112,11 @@ namespace Extract.DataEntry
                 // Validate the license
                 LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24497",
                     _OBJECT_NAME);
+
+                // [DataEntry:407]
+                // The DataEntryTable cannot currently support sorting.  Initialize as NotSortable
+                // and hide the SortMode property.
+                base.SortMode = DataGridViewColumnSortMode.NotSortable;
 
                 UpdateCellTemplate();
             }
@@ -467,6 +473,30 @@ namespace Extract.DataEntry
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI26513", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// SortMode is not supported by <see cref="DataEntryTable"/>. Hide the base class property
+        /// as best as possible
+        /// </summary>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic")]
+        public new DataGridViewColumnSortMode SortMode
+        {
+            get
+            {
+                return DataGridViewColumnSortMode.NotSortable;
+            }
+
+            set
+            {
+                if (value != DataGridViewColumnSortMode.NotSortable)
+                {
+                    throw new ExtractException("ELI26630", "SortMode is not supported!");
                 }
             }
         }

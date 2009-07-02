@@ -441,15 +441,31 @@ namespace Extract.DataEntry
                 // Find the position of the insertBeforeAttribute in the attributeVector (if 
                 // specified) so that the new attribute can be added at the that position in the
                 // vector.
-                if (insertBeforeAttribute != null)
+                if (insertBeforeAttribute != null && insertBeforeAttribute != oldAttribute)
                 {
                     attributeVector.FindByReference(insertBeforeAttribute, 0, ref index);
                 }
 
                 // Add the attribute to attributeVector (at the specified index, if provided)
-                if (index != -1)
+                if (index >= 0)
                 {
-                    attributeVector.Insert(index, newAttribute);
+                    // Remove the attribute being added from the vector if it is not at the index
+                    // were we are trying to add it.
+                    int currentIndex = -1;
+                    if (attributeVector.Size() > 0)
+                    {
+                        attributeVector.FindByReference(newAttribute, 0, ref currentIndex);
+                        if (currentIndex >= 0 && currentIndex != index)
+                        {
+                            attributeVector.Remove(currentIndex);
+                        }
+                    }
+
+                    // As long as the attribute doesn't already exist at this index, insert it.
+                    if (currentIndex != index)
+                    {
+                        attributeVector.Insert(index, newAttribute);
+                    }
                 }
                 else
                 {

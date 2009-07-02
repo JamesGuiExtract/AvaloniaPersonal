@@ -1380,8 +1380,33 @@ namespace Extract.DataEntry
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
                 statusInfo.OnAttributeDeleted(attribute);
 
-                // Recursively process all child attributes that are deleted as a result.
-                ProcessDeletedAttributes(attribute.SubAttributes);
+                // Dispose of any auto-update trigger for the attribute.
+                AutoUpdateTrigger autoUpdateTrigger = null;
+                if (_autoUpdateTriggers.TryGetValue(attribute, out autoUpdateTrigger))
+                {
+                    _autoUpdateTriggers.Remove(attribute);
+
+                    autoUpdateTrigger.Dispose();
+                }
+
+                // Dispose of any validation trigger for the attribute.
+                AutoUpdateTrigger validationTrigger = null;
+                if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
+                {
+                    _validationTriggers.Remove(attribute);
+
+                    validationTrigger.Dispose();
+                }
+
+                IUnknownVector subAttributes = attribute.SubAttributes;
+                _subAttributesToParentMap.Remove(attribute.SubAttributes);
+
+                // Recursively process each sub-attribute and process it as well.
+                int count = subAttributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    DeleteAttribute((IAttribute)subAttributes.At(i));
+                }
             }
             catch (Exception ex)
             {
@@ -2532,50 +2557,6 @@ namespace Extract.DataEntry
             if (this.AttributeDeleted != null)
             {
                 AttributeDeleted(this, new AttributeDeletedEventArgs(attribute));
-            }
-        }
-
-        /// <summary>
-        /// Process all <see cref="IAttribute"/>s in the provided vector for deletion by releasing
-        /// all events and triggers associated with the attribute.
-        /// </summary>
-        /// <param name="deletedAttributes"></param>
-        private static void ProcessDeletedAttributes(IUnknownVector deletedAttributes)
-        {
-            ExtractException.Assert("ELI26131", "Null argument exception!",
-                deletedAttributes != null);
-
-            // Cycle through each deleted attribute.
-            int count = deletedAttributes.Size();
-            for (int i = 0; i < count; i++)
-            {
-                IAttribute attribute = (IAttribute)deletedAttributes.At(i);
-
-                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-                statusInfo.OnAttributeDeleted(attribute);
-
-                // Dispose of any auto-update trigger for the attribute.
-                AutoUpdateTrigger autoUpdateTrigger = null;
-                if (_autoUpdateTriggers.TryGetValue(attribute, out autoUpdateTrigger))
-                {
-                    _autoUpdateTriggers.Remove(attribute);
-
-                    autoUpdateTrigger.Dispose();
-                }
-
-                // Dispose of any validation trigger for the attribute.
-                AutoUpdateTrigger validationTrigger = null;
-                if (_validationTriggers.TryGetValue(attribute, out validationTrigger))
-                {
-                    _validationTriggers.Remove(attribute);
-
-                    validationTrigger.Dispose();
-                }
-
-                _subAttributesToParentMap.Remove(attribute.SubAttributes);
-
-                // Recursively process the attribute's descendents.
-                ProcessDeletedAttributes(attribute.SubAttributes);
             }
         }
 

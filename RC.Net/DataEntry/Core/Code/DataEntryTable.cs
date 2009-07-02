@@ -3,6 +3,7 @@ using Extract.Licensing;
 using System;
 using System.ComponentModel;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.ComponentModel.Design;
 using System.Drawing;
@@ -60,6 +61,12 @@ namespace Extract.DataEntry
         private int _minimumNumberOfRows;
 
         /// <summary>
+        /// Specifies names of attributes that can be mapped into this control by renaming them.
+        /// The purpose is to be able to copy data out of one control and paste it into another.
+        /// </summary>
+        private Collection<string> _compatibleAttributeNames = new Collection<string>();
+
+        /// <summary>
         /// Context MenuItem that allows a row to be inserted at the current location.
         /// </summary>
         ToolStripMenuItem _rowInsertMenuItem = new ToolStripMenuItem("Insert row");
@@ -101,11 +108,6 @@ namespace Extract.DataEntry
         /// focus leaves the control.  This attribute will not store any data useful as output.
         /// </summary>
         private IAttribute _tabOrderPlaceholderAttribute;
-
-        /// <summary>
-        /// A set of attributes mapped to row(s) in the table which have been copied.
-        /// </summary>
-        private IUnknownVector _copiedRowAttributes;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode.
@@ -327,6 +329,23 @@ namespace Extract.DataEntry
             set
             {
                 _minimumNumberOfRows = value;
+            }
+        }
+
+        /// <summary>
+        /// Specifies names of <see cref="IAttribute"/>s that can be mapped into this control by
+        /// renaming them. The purpose is to be able to copy data out of controls mapped to the
+        /// specified attribute names and paste it into this control.
+        /// </summary>
+        /// <value>The names of <see cref="IAttribute"/>s that may be mapped into this control via
+        /// a paste operation.</value>
+        [Category("Data Entry Table")] 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+        public Collection<string> CompatibleAttributeNames
+        {
+            get
+            {
+                return _compatibleAttributeNames;
             }
         }
 
@@ -653,7 +672,7 @@ namespace Extract.DataEntry
 
                         // Paste selected rows
                         case Keys.V:
-                            if (enableRowOptions && (_copiedRowAttributes != null))
+                            if (enableRowOptions && GetClipboardDataType() != null)
                             {
                                 PasteCopiedRows();
 
@@ -1099,15 +1118,19 @@ namespace Extract.DataEntry
                 // Check to see if row and/or row task options should be available based on
                 // the current table cell.
                 bool enableRowOptions = AllowRowTasks(hit.RowIndex, hit.ColumnIndex);
+                bool enablePasteOptions = false;
+                if (enableRowOptions && GetClipboardDataType() != null)
+                {
+                    enablePasteOptions = true;
+                }
 
                 // Enable/disable the context menu options as appropriate.
                 _rowInsertMenuItem.Enabled = enableRowOptions;
                 _rowDeleteMenuItem.Enabled = enableRowOptions;
                 _rowCopyMenuItem.Enabled = enableRowOptions;
                 _rowCutMenuItem.Enabled = enableRowOptions;
-                _rowPasteMenuItem.Enabled = enableRowOptions && (_copiedRowAttributes != null);
-                _rowInsertCopiedMenuItem.Enabled = 
-                    enableRowOptions && (_copiedRowAttributes != null);
+                _rowPasteMenuItem.Enabled = enablePasteOptions;
+                _rowInsertCopiedMenuItem.Enabled = enablePasteOptions;
             }
             catch (Exception ex)
             {
@@ -1122,18 +1145,57 @@ namespace Extract.DataEntry
         #region Private Members
 
         /// <summary>
-        /// Gets a <see langword="string"/> value to identify data on the clipboard that can be 
-        /// used by this table. Data will only be able to be shared between the same table as 
-        /// identified by control name and attribute name.
+        /// Gets a <see langword="string"/> value to identify data on the clipboard that was copied
+        /// by this control.
         /// </summary>
-        /// <returns>A <see langword="string"/> value to identify data on the clipboard that can be
-        /// used by this table.</returns>
+        /// <returns>A <see langword="string"/> value to identify data on the clipboard that was
+        /// copied from this control.</returns>
         private string ClipboardDataType
         {
             get
             {
-                return _OBJECT_NAME + base.Name + base.AttributeName;
+                return _OBJECT_NAME + base.AttributeName;
             }
+        }
+        
+        /// <summary>
+        /// Indicates the type of data on the clipboard as long as it is usable by this 
+        /// <see cref="DataEntryTable"/>.
+        /// </summary>
+        /// <returns>A <see langword="string"/> indicating the type of data on the clipboard
+        /// as long as it is usable by this <see cref="DataEntryTable"/>. If the data is not usable
+        /// by this table, <see langword="null"/> is returned.</returns>
+        private string GetClipboardDataType()
+        {
+            IDataObject data = Clipboard.GetDataObject();
+
+            if (data != null)
+            {
+                // Check for data from this table.
+                if (data.GetDataPresent(this.ClipboardDataType))
+                {
+                    return this.ClipboardDataType;
+                }
+                // Check for data from compatible tables.
+                else
+                {
+                    foreach (string compatibleAttribute in _compatibleAttributeNames)
+                    {
+                        if (data.GetDataPresent(_OBJECT_NAME + compatibleAttribute))
+                        {
+                            return _OBJECT_NAME + compatibleAttribute;
+                        }
+                    }
+                }
+
+                // Check for string data that can be processed with the row formatting rule.
+                if (_rowFormattingRule != null &&  data.GetDataPresent("System.String"))
+                {
+                    return "System.String";
+                }
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -1194,19 +1256,12 @@ namespace Extract.DataEntry
                 attribute = (IAttribute)new AttributeClass();
                 attribute.Name = base.AttributeName;
                 AttributeStatusInfo.Initialize(
-                    attribute, _sourceAttributes, this, 0, false, false, null, null, null);
+                    attribute, _sourceAttributes, this, null, false, false, null, null, null);
                 newAttributeCreated = true;
             }
 
-            // Swap out the existing attribute in the overall attribute heirarchy (either keeping 
-            // attribute ordering the same as it was or explicitly inserting it at the specified
-            // position).
+            // Keep track of any attribute we are replacing.
             IAttribute attributeToReplace = DataEntryTableBase.GetAttribute(base.Rows[rowIndex]);
-            if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
-                attributeToReplace, insertBeforeAttribute))
-            {
-                AttributeStatusInfo.DeleteAttribute(attributeToReplace);
-            }
 
             using (new SelectionProcessingSuppressor(this))
             {
@@ -1289,6 +1344,15 @@ namespace Extract.DataEntry
                 // table.
                 AttributeStatusInfo.Initialize(
                     attribute, _sourceAttributes, this, 0, false, false, null, null, null);
+            }
+
+            // Swap out the existing attribute in the overall attribute heirarchy (either keeping 
+            // attribute ordering the same as it was or explicitly inserting it at the specified
+            // position).
+            if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
+                attributeToReplace, insertBeforeAttribute))
+            {
+                AttributeStatusInfo.DeleteAttribute(attributeToReplace);
             }
 
             // If this control does not have any dependent controls, consider each row propagated.
@@ -1491,7 +1555,13 @@ namespace Extract.DataEntry
                 // "clipboard".
                 if (copiedAttributes.Size() > 0)
                 {
-                    _copiedRowAttributes = copiedAttributes;
+                    // Convert to a stringized byte stream so that the data can be preserved in the
+                    // clipboard (this also removes the need to clone attributes before adding).
+                    string stringizedAttributes =
+                        this.MiscUtils.GetObjectAsStringizedByteStream(copiedAttributes);
+
+                    // Add the copied attributes to the clipboard
+                    Clipboard.SetData(this.ClipboardDataType, stringizedAttributes);
                 }
             }
         }
@@ -1517,18 +1587,36 @@ namespace Extract.DataEntry
         /// </summary>
         private void PasteCopiedRows()
         {
-            if (_sourceAttributes != null && _copiedRowAttributes != null)
-            {
-                IUnknownVector attributesToPaste = (IUnknownVector)new IUnknownVectorClass();
+            IDataObject data = Clipboard.GetDataObject();
+            string clipboardDataType = GetClipboardDataType();
 
-                // The AttributeStatusInfo for each attribute needs to be re-initialized
-                // to set the owning control (which isn't persisted).
-                int count = _copiedRowAttributes.Size();
-                for (int i = 0; i < count; i++)
+            // If the data on the clipboard is a string, use the row formatting rule to parse the
+            // text into the row.
+            if (_rowFormattingRule != null && clipboardDataType == "System.String")
+            {
+                SpatialString spatialString = (SpatialString)new SpatialStringClass();
+                spatialString.CreateNonSpatialString((string)data.GetData(clipboardDataType), "");
+
+                ProcessRowSwipe(spatialString);
+            }
+            // Otherwise the data is attributes from this table or a compatible one.
+            else if (!string.IsNullOrEmpty(clipboardDataType))
+            {
+                // Retrieve the data from the clipboard and convert it back into an attribute vector.
+                string stringizedAttributes = (string)data.GetData(clipboardDataType);
+
+                IUnknownVector attributesToPaste = (IUnknownVector)
+                    this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
+
+                // If the attributes are not from this table, rename them.
+                if (clipboardDataType != this.ClipboardDataType)
                 {
-                    // Clone the attribute (the original may still exist elsewhere)
-                    ICopyableObject copyableAttribute = (ICopyableObject)_copiedRowAttributes.At(i);
-                    attributesToPaste.PushBack(copyableAttribute.Clone());
+                    int count = attributesToPaste.Size();
+                    for (int i = 0; i < count; i++)
+                    {
+                        IAttribute attribute = (IAttribute)attributesToPaste.At(i);
+                        attribute.Name = base.AttributeName;
+                    }
                 }
 
                 // Apply the attributes into the currently selected rows of the table.
@@ -1603,7 +1691,7 @@ namespace Extract.DataEntry
                             // Add a new row for the next attribute and add it to the
                             // destinationRows list.
                             int nextIndex = destinationRows[destinationRows.Count - 1].Index + 1;
-                            insertBeforeAttribute = 
+                            insertBeforeAttribute =
                                 DataEntryTableBase.GetAttribute(base.Rows[nextIndex]);
                             base.Rows.Insert(nextIndex, 1);
                             destinationRows.Add(base.Rows[nextIndex]);
