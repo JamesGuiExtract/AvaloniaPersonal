@@ -202,7 +202,7 @@ namespace Extract.Redaction.Verification
             this._metadataBrowseButton.DefaultFilterIndex = -1;
             this._metadataBrowseButton.FileFilter = null;
             this._metadataBrowseButton.FileOrFolderPath = null;
-            this._metadataBrowseButton.FolderBrowser = true;
+            this._metadataBrowseButton.FolderBrowser = false;
             this._metadataBrowseButton.Location = new System.Drawing.Point(335, 68);
             this._metadataBrowseButton.Name = "_metadataBrowseButton";
             this._metadataBrowseButton.Size = new System.Drawing.Size(27, 20);

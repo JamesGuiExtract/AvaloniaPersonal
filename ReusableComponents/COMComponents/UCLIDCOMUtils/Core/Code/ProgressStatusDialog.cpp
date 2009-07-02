@@ -42,10 +42,9 @@ HRESULT CProgressStatusDialog::FinalConstruct()
 {
 	try
 	{
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16253")
-
-	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
 void CProgressStatusDialog::FinalRelease()
@@ -141,11 +140,11 @@ STDMETHODIMP CProgressStatusDialog::ShowModelessDialog(HANDLE hWndParent, BSTR s
 		}
 
 		// Set the window title
-		getThisAsCOMPtr()->Title = strWindowTitle;
+		setTitle(asString(strWindowTitle));
 
 		// Set the progress status object
-		getThisAsCOMPtr()->ProgressStatusObject = 
-			(UCLID_COMUTILSLib::IProgressStatus*) pProgressStatus;
+		UCLID_COMUTILSLib::IProgressStatusPtr ipProgStatus(pProgressStatus);
+		setProgressStatusObject(ipProgStatus);
 
 		// By default, the create method does not show the dialog
 		// Show the MFC dialog
@@ -163,6 +162,8 @@ STDMETHODIMP CProgressStatusDialog::get_ProgressStatusObject(IProgressStatus **p
 {
 	try
 	{
+		ASSERT_ARGUMENT("ELI26634", pVal != NULL);
+
 		// Make sure the dialog box object exists
 		if (m_apProgressStatusMFCDlg.get() == NULL)
 		{
@@ -172,8 +173,9 @@ STDMETHODIMP CProgressStatusDialog::get_ProgressStatusObject(IProgressStatus **p
 		}
 
 		// Return a reference to the progress status object
-		CComQIPtr<IProgressStatus> ipProgressStatus = m_apProgressStatusMFCDlg->getProgressStatusObject();
-		*pVal = ipProgressStatus.Detach();
+		UCLID_COMUTILSLib::IProgressStatusPtr ipProgressStatus =
+			m_apProgressStatusMFCDlg->getProgressStatusObject();
+		*pVal = (IProgressStatus*) ipProgressStatus.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16248")
 
@@ -184,16 +186,8 @@ STDMETHODIMP CProgressStatusDialog::put_ProgressStatusObject(IProgressStatus *ne
 {
 	try
 	{
-		// Make sure the dialog box object exists
-		if (m_apProgressStatusMFCDlg.get() == NULL)
-		{
-			// This method should only be called after the ShowModelessDialog() call
-			// has been made.
-			throw UCLIDException("ELI16589", "Method called in wrong sequence!");
-		}
-
-		// Update the progress status object
-		m_apProgressStatusMFCDlg->setProgressStatusObject(newVal);
+		UCLID_COMUTILSLib::IProgressStatusPtr ipNewVal(newVal);
+		setProgressStatusObject(ipNewVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16249")
 
@@ -214,7 +208,7 @@ STDMETHODIMP CProgressStatusDialog::get_Title(BSTR *pVal)
 
 		// Return the window title
 		CString zTitle;
-		m_apProgressStatusMFCDlg->GetWindowTextA(zTitle);
+		m_apProgressStatusMFCDlg->GetWindowText(zTitle);
 		*pVal = _bstr_t((LPCTSTR) zTitle).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16250")
@@ -226,24 +220,7 @@ STDMETHODIMP CProgressStatusDialog::put_Title(BSTR newVal)
 {
 	try
 	{
-		// Make sure the dialog box object exists
-		if (m_apProgressStatusMFCDlg.get() == NULL)
-		{
-			// This method should only be called after the ShowModelessDialog() call
-			// has been made.
-			throw UCLIDException("ELI16590", "Method called in wrong sequence!");
-		}
-	
-		// If the user passed in an empty string for the title, use a default
-		// title string
-		string strTitle = asString(newVal);
-		if (strTitle.empty())
-		{
-			strTitle = gstrDEFAULT_WINDOW_TITLE;
-		}
-
-		// Update the dialog title
-		m_apProgressStatusMFCDlg->SetWindowText(strTitle.c_str());
+		setTitle(asString(newVal));
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16251")
 
@@ -273,16 +250,52 @@ STDMETHODIMP CProgressStatusDialog::Close()
 //--------------------------------------------------------------------------------------------------
 // Private methods
 //--------------------------------------------------------------------------------------------------
-UCLID_COMUTILSLib::IProgressStatusDialogPtr CProgressStatusDialog::getThisAsCOMPtr()
-{
-	UCLID_COMUTILSLib::IProgressStatusDialogPtr ipThis(this);
-	ASSERT_RESOURCE_ALLOCATION("ELI17773", ipThis != NULL);
-
-	return ipThis;
-}
-//--------------------------------------------------------------------------------------------------
 void CProgressStatusDialog::validateLicense()
 {
 	VALIDATE_LICENSE( gnEXTRACT_CORE_OBJECTS, "ELI16598", "ProgressStatusDialog" );
+}
+//-------------------------------------------------------------------------------------------------
+void CProgressStatusDialog::setProgressStatusObject(
+	const UCLID_COMUTILSLib::IProgressStatusPtr& ipVal)
+{
+	try
+	{
+		// Make sure the dialog box object exists
+		if (m_apProgressStatusMFCDlg.get() == NULL)
+		{
+			// This method should only be called after the ShowModelessDialog() call
+			// has been made.
+			throw UCLIDException("ELI16589", "Method called in wrong sequence!");
+		}
+
+		// Update the progress status object
+		m_apProgressStatusMFCDlg->setProgressStatusObject(ipVal);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26632");
+}
+//-------------------------------------------------------------------------------------------------
+void CProgressStatusDialog::setTitle(string strTitle)
+{
+	try
+	{
+		// Make sure the dialog box object exists
+		if (m_apProgressStatusMFCDlg.get() == NULL)
+		{
+			// This method should only be called after the ShowModelessDialog() call
+			// has been made.
+			throw UCLIDException("ELI16590", "Method called in wrong sequence!");
+		}
+	
+		// If the user passed in an empty string for the title, use a default
+		// title string
+		if (strTitle.empty())
+		{
+			strTitle = gstrDEFAULT_WINDOW_TITLE;
+		}
+
+		// Update the dialog title
+		m_apProgressStatusMFCDlg->SetWindowText(strTitle.c_str());
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26633");
 }
 //-------------------------------------------------------------------------------------------------

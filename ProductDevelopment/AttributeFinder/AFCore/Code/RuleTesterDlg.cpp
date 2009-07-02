@@ -449,22 +449,7 @@ void RuleTesterDlg::OnButtonExecute()
 		{
 			ipTempRuleSet = m_ipRuleSet;
 		}
-		/*
-		// NOTE: There is a resource problem/conflict with the commented out code below and 
-		// the RogueWave Grid.
 
-		// create the progress status object
-		IProgressStatusPtr ipProgressStatus(CLSID_ProgressStatus);
-		ASSERT_RESOURCE_ALLOCATION("ELI16909", ipProgressStatus != NULL);
-
-		// create the progress status dialog object
-		IProgressStatusDialogPtr ipProgressStatusDlg(CLSID_ProgressStatusDialog);
-		ASSERT_RESOURCE_ALLOCATION("ELI16910", ipProgressStatusDlg != NULL);
-
-		// show the progress status dialog
-		ipProgressStatusDlg->ShowModelessDialog((long)m_hWnd, 
-		"Progress status", ipProgressStatus, 3, 100, VARIANT_TRUE);	
-		*/	
 		// execute the search
 		IUnknownPtr ipUnknown = ipTempRuleSet;
 		_variant_t varRuleSet = (IUnknown *) ipUnknown;

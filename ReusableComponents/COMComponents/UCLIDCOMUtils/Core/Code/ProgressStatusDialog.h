@@ -7,6 +7,9 @@
 #include "ProgressStatusMFCDlg.h"
 
 #include <memory>
+#include <string>
+
+using namespace std;
 
 //--------------------------------------------------------------------------------------------------
 // CProgressStatusDialog
@@ -58,13 +61,15 @@ public:
 	STDMETHOD(Close)();
 
 private:
-	UCLID_COMUTILSLib::IProgressStatusDialogPtr getThisAsCOMPtr();
-
 	// The actual MFC progress status dialog pointer
 	std::auto_ptr<CProgressStatusMFCDlg> m_apProgressStatusMFCDlg;
 
 	// Check license
 	void validateLicense();
+
+	void setTitle(string strTitle);
+
+	void setProgressStatusObject(const UCLID_COMUTILSLib::IProgressStatusPtr& ipVal);
 };
 //--------------------------------------------------------------------------------------------------
 

@@ -18,7 +18,7 @@ HKCR
 			ForceRemove 'Programmable'
 			InprocServer32 = s '%MODULE%'
 			{
-				val ThreadingModel = s 'Free'
+				val ThreadingModel = s 'Both'
 			}
 			'TypeLib' = s '{FA0A706C-13A8-4BF8-8DC7-9F61DD5A8A14}'
 		}
