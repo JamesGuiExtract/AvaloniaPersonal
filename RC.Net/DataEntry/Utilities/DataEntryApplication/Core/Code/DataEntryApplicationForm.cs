@@ -42,126 +42,108 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryApplicationForm).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryApplicationForm).ToString();
 
         /// <summary>
         /// The number of pixels to pad around the DEP that is loaded.
         /// </summary>
-        private static readonly int _DATA_ENTRY_PANEL_PADDING = 3;
+        static readonly int _DATA_ENTRY_PANEL_PADDING = 3;
 
         #endregion Constants
 
         #region Fields
 
         /// <summary>
-        /// The default configuration file to use.
-        /// </summary>
-        static string _defaultConfigFile;
-
-        /// <summary>
-        /// The <see cref="StandAloneMode"/> when the <see cref="DataEntryApplicationForm"/> is 
-        /// first created.
-        /// </summary>
-        static bool _defaultStandAloneMode = true;
-
-        /// <summary>
         /// The data entry panel control host implementation to be used by the application.
         /// </summary>
-        private DataEntryControlHost _dataEntryControlHost;
+        DataEntryControlHost _dataEntryControlHost;
 
         /// <summary>
         /// Indicates whether the <see cref="DataEntryApplicationForm"/> is in standalone mode 
         /// (<see langref="true"/>) or whether another application has launched 
         /// <see cref="DataEntryApplicationForm"/> via the COM interface (<see langref="false"/>).
         /// </summary>
-        private bool _standAloneMode = _defaultStandAloneMode;
+        bool _standAloneMode = true;
 
         /// <summary>
         /// Indicates whether the form has finished loading.
         /// </summary>
-        private bool _isLoaded;
+        bool _isLoaded;
 
         /// <summary>
         /// The open file tool strip button.
         /// </summary>
-        private ToolStripItem _openFileToolStripButton;
+        ToolStripItem _openFileToolStripButton;
 
         /// <summary>
         /// The open file command
         /// </summary>
-        private ApplicationCommand _openFileCommand;
+        ApplicationCommand _openFileCommand;
 
         /// <summary>
         /// The close file command
         /// </summary>
-        private ApplicationCommand _closeFileCommand;
+        ApplicationCommand _closeFileCommand;
 
         /// <summary>
         /// The save file command
         /// </summary>
-        private ApplicationCommand _saveFileCommand;
+        ApplicationCommand _saveFileCommand;
 
         /// <summary>
         /// The goto next invalid item command.
         /// </summary>
-        private ApplicationCommand _gotoNextInvalidCommand;
+        ApplicationCommand _gotoNextInvalidCommand;
 
         /// <summary>
         /// The goto next unviewed item command.
         /// </summary>
-        private ApplicationCommand _gotoNextUnviewedCommand;
+        ApplicationCommand _gotoNextUnviewedCommand;
 
         /// <summary>
         /// The toggle highlight tool command.
         /// </summary>
-        private ApplicationCommand _toggleHighlightCommand;
+        ApplicationCommand _toggleHighlightCommand;
 
         /// <summary>
         /// The angular highlight tool command.
         /// </summary>
-        private ApplicationCommand _selectAngularHighlightCommand;
+        ApplicationCommand _selectAngularHighlightCommand;
 
         /// <summary>
         /// The rectangular highlight tool command.
         /// </summary>
-        private ApplicationCommand _selectRectangularHighlightCommand;
+        ApplicationCommand _selectRectangularHighlightCommand;
          
         /// <summary>
         /// The hide tooltips command.
         /// </summary>
-        private ApplicationCommand _hideToolTipsCommand;
+        ApplicationCommand _hideToolTipsCommand;
 
         /// <summary>
         /// The toggle show all data highlights command
         /// </summary>
-        private ApplicationCommand _toggleShowAllHighlightsCommand;
+        ApplicationCommand _toggleShowAllHighlightsCommand;
 
         /// <summary>
         /// The accept spatial info command
         /// </summary>
-        private ApplicationCommand _acceptSpatialInfoCommand;
+        ApplicationCommand _acceptSpatialInfoCommand;
 
         /// <summary>
         /// The remove spatial info command
         /// </summary>
-        private ApplicationCommand _removeSpatialInfoCommand;
+        ApplicationCommand _removeSpatialInfoCommand;
 
         /// <summary>
         /// The database connection to be used for any validation or auto-update queries requiring a
         /// database.
         /// </summary>
-        private DbConnection _dbConnection;
+        DbConnection _dbConnection;
 
         #endregion Fields
 
         #region Constructors
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DataEntryApplicationForm"/> class.
-        /// </summary>
-        public DataEntryApplicationForm() : this(_defaultConfigFile)
-        {
-        }
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryApplicationForm"/> class.
@@ -350,40 +332,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     ee.AddDebugData("StandAloneMode", value, false);
                     throw ee;
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the default configuration file to use.
-        /// </summary>
-        /// <value>The default configuration file to use.</value>
-        /// <returns>The default configuration file to use.</returns>
-        public static string DefaultConfigurationFile
-        {
-            get
-            {
-                return _defaultConfigFile;
-            }
-            set
-            {
-                _defaultConfigFile = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the default <see cref="StandAloneMode"/>.
-        /// </summary>
-        /// <value>The default <see cref="StandAloneMode"/>.</value>
-        /// <returns>The default <see cref="StandAloneMode"/>.</returns>
-        public static bool DefaultStandAloneMode
-        {
-            get
-            {
-                return _defaultStandAloneMode;
-            }
-            set
-            {
-                _defaultStandAloneMode = value;
             }
         }
 
@@ -779,7 +727,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleSaveControlClick(object sender, EventArgs e)
+        void HandleSaveControlClick(object sender, EventArgs e)
         {
             try
             {
@@ -799,7 +747,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             try
             {
@@ -853,7 +801,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The <see cref="ImageFileClosingEventArgs"/> containing the event data.
         /// </param>
-        private void HandleImageFileClosing(object sender, ImageFileClosingEventArgs e)
+        void HandleImageFileClosing(object sender, ImageFileClosingEventArgs e)
         {
             try
             {
@@ -877,7 +825,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleSwipingStateChanged(object sender, SwipingStateChangedEventArgs e)
+        void HandleSwipingStateChanged(object sender, SwipingStateChangedEventArgs e)
         {
             try
             {
@@ -910,7 +858,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="UnviewedItemsFoundEventArgs"/> instance containing the
         /// event data.</param>
-        private void HandleUnviewedItemsFound(object sender, UnviewedItemsFoundEventArgs e)
+        void HandleUnviewedItemsFound(object sender, UnviewedItemsFoundEventArgs e)
         {
             try
             {
@@ -932,7 +880,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="InvalidItemsFoundEventArgs"/> instance containing the
         /// event data.</param>
-        private void HandleInvalidItemsFound(object sender, InvalidItemsFoundEventArgs e)
+        void HandleInvalidItemsFound(object sender, InvalidItemsFoundEventArgs e)
         {
             try
             {
@@ -953,7 +901,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="ItemSelectionChangedEventArgs"/> instance containing the
         /// event data.</param>
-        private void HandleItemSelectionChanged(object sender, ItemSelectionChangedEventArgs e)
+        void HandleItemSelectionChanged(object sender, ItemSelectionChangedEventArgs e)
         {
             try
             {
@@ -977,7 +925,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleExitToolStripMenuItemClick(object sender, EventArgs e)
+        void HandleExitToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
@@ -996,7 +944,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleGoToNextUnviewedClick(object sender, EventArgs e)
+        void HandleGoToNextUnviewedClick(object sender, EventArgs e)
         {
             try
             {
@@ -1015,7 +963,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleGoToNextInvalidClick(object sender, EventArgs e)
+        void HandleGoToNextInvalidClick(object sender, EventArgs e)
         {
             try
             {
@@ -1035,7 +983,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleToggleShowAllHighlightsClick(object sender, EventArgs e)
+        void HandleToggleShowAllHighlightsClick(object sender, EventArgs e)
         {
             try
             {
@@ -1054,7 +1002,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleHideToolTipsClick(object sender, EventArgs e)
+        void HandleHideToolTipsClick(object sender, EventArgs e)
         {
             try
             {
@@ -1073,7 +1021,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleAcceptImageHighlightClick(object sender, EventArgs e)
+        void HandleAcceptImageHighlightClick(object sender, EventArgs e)
         {
             try
             {
@@ -1092,7 +1040,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleRemoveImageHighlightClick(object sender, EventArgs e)
+        void HandleRemoveImageHighlightClick(object sender, EventArgs e)
         {
             try
             {
@@ -1112,7 +1060,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The <see cref="ScrollEventArgs"/> that contains the event data.</param>
-        private void HandleScrollPanelScroll(object sender, ScrollEventArgs e)
+        void HandleScrollPanelScroll(object sender, ScrollEventArgs e)
         {
             _scrollPanel.AutoScrollPosition = new Point(_scrollPanel.AutoScrollPosition.X, e.NewValue);
         }
@@ -1123,7 +1071,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        private void HandleSplitterMoved(object sender, SplitterEventArgs e)
+        void HandleSplitterMoved(object sender, SplitterEventArgs e)
         {
             try
             {
@@ -1144,7 +1092,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Handles the case that save was selected from the file menu
         /// </summary>
-        private void SelectSave()
+        void SelectSave()
         {
             try
             {
@@ -1164,7 +1112,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <returns><see langword="true"/> if the document saved successfully, 
         /// <see langword="false"/> if it did not.</returns>
-        private bool Save()
+        bool Save()
         {
             bool dataSaved = _dataEntryControlHost.SaveData();
 
@@ -1197,7 +1145,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns><see langword="true"/> if it is okay to allow the document to be closed or
         /// <see langword="false"/> if it should not be closed either because the user elected to
         /// cancel the operation or they elected to save but the save was not successful.</returns>
-        private bool OkayToClose()
+        bool OkayToClose()
         {
             if (_imageViewer.IsImageAvailable && _dataEntryControlHost.Dirty)
             {
@@ -1235,7 +1183,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="assemblyFileName">The filename of the assembly to use.</param>
         /// <returns>A <see cref="DataEntryControlHost"/> instantiated from the specified assembly.
         /// </returns>
-        private static DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
+        static DataEntryControlHost CreateDataEntryControlHost(string assemblyFileName)
         {
             try
             {
@@ -1306,7 +1254,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see cref="DialogResult.No"/> if the user does not want to save, 
         /// <see cref="DialogResult.Cancel"/> if the user wishes to abort the operation that 
         /// triggered the prompt.</returns>
-        private DialogResult PromptForSave()
+        DialogResult PromptForSave()
         {
             return MessageBox.Show(this, "Data has not been saved, would you like to save now?",
                 "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
@@ -1317,7 +1265,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Toggles whether all data is currently highlighted in the <see cref="ImageViewer"/> or
         /// whether only the currently selected data is highlighted.
         /// </summary>
-        private void ToggleShowAllHighlights()
+        void ToggleShowAllHighlights()
         {
             bool showAllHighlights = !_dataEntryControlHost.ShowAllHighlights;
 
@@ -1336,7 +1284,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns><see langword="true"/> if connection information was provided in the
         /// config file and the connection was successfully opened, <see langword="false"/> if
         /// connection information was not provided and no connection was attempted.</returns>
-        private bool TryOpenDatabaseConnection()
+        bool TryOpenDatabaseConnection()
         {
             try
             {

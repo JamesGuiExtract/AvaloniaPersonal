@@ -44,7 +44,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The default filename that will appear in the FAM to describe the task the data entry
         /// application is fulfilling
         /// </summary>
-        private static readonly string _DEFAULT_FILE_ACTION_TASK_NAME = "Verify extracted data";
+        static readonly string _DEFAULT_FILE_ACTION_TASK_NAME = "Verify extracted data";
 
         /// <summary>
         /// The current version of this object.
@@ -53,7 +53,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <item>2: Added _configFileName</item>
         /// </list>
         /// </summary>
-        private static readonly int _CURRENT_VERSION = 2;
+        static readonly int _CURRENT_VERSION = 2;
 
         #endregion Constants
 
@@ -64,7 +64,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see cref="DataEntryApplicationForm"/> instance and be able to route exceptions back to
         /// to the calling thread.
         /// </summary>
-        private static VerificationForm<DataEntryApplicationForm> _dataEntryFormManager =
+        static VerificationForm<DataEntryApplicationForm> _dataEntryFormManager =
             new VerificationForm<DataEntryApplicationForm>();
 
         /// <summary>
@@ -73,12 +73,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
         /// <see cref="HResult.False"/>.
         /// </summary>
-        private int _dirty;
+        int _dirty;
 
         /// <summary>
         /// The name of the DataEntry configuration file to use for the DataEntryApplicationForm.
         /// </summary>
-        private string _configFileName;
+        string _configFileName;
 
         #endregion Fields
 
@@ -281,11 +281,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
-                DataEntryApplicationForm.DefaultStandAloneMode = false;
-
                 // Ask the manager to create and display the data entry form.
-                _dataEntryFormManager.ShowForm();
+                _dataEntryFormManager.ShowForm(CreateDataEntryForm);
             }
             catch (Exception ex)
             {
@@ -521,7 +518,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="type">The <see langword="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
-        private static void RegisterFunction(Type type)
+        static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractGuids.FileProcessors);
         }
@@ -533,9 +530,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="type">The <see langword="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
-        private static void UnregisterFunction(Type type)
+        static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileProcessors);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="DataEntryApplicationForm"/> using the current settings.
+        /// </summary>
+        /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
+        IVerificationForm CreateDataEntryForm()
+        {
+            DataEntryApplicationForm form = new DataEntryApplicationForm(_configFileName);
+            form.StandAloneMode = false;
+            return form;
         }
 
         /// <summary>
@@ -543,18 +551,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// to run as a <see cref="IFileProcessingTask"/>
         /// </summary>
         /// <throws><see cref="ExtractException"/> if the class is not properly configured.</throws>
-        private void ValidateSettings()
+        void ValidateSettings()
         {
             try
             {
                 using (new TemporaryWaitCursor())
                 {
-                    DataEntryApplicationForm.DefaultConfigurationFile = _configFileName;
-                    DataEntryApplicationForm.DefaultStandAloneMode = false;
-
                     // Ask the manager to validate the DEP can be initialize using the specified
                     // config file
-                    _dataEntryFormManager.ValidateForm();
+                    _dataEntryFormManager.ValidateForm(CreateDataEntryForm);
                 }
             }
             catch (Exception ex)
