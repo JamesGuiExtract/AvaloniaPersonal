@@ -25,5 +25,5 @@
 ^\s*([A-Za-z]{3,})\x20([A-Z])\s*$%$1, $2
 //interpret 'First MiddleInitial, Last' as 'First MiddleInitial. Last'
 ^\s*([a-z]+)\x20([a-z])\x20?,\x20?([a-z]+)\s*$%$1 $2. $3
-//rearange names printed 'Last First' to 'Last, First' so the builtin splitter handles them correctly
-(?<=^\s*[a-z]+)\x20(?=[a-z]+\s*$)%, 
+//rearange names printed 'Last First' to 'Last, First' so the builtin splitter handles them correctly--turned off
+//(?<=^\s*[a-z]+)\x20(?=[a-z]+\s*$)%, 
