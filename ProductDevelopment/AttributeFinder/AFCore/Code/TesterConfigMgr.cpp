@@ -28,20 +28,21 @@ const string TesterConfigMgr::SHOW_ONLY_VALID_ENTRIES = "ShowOnlyValidEntries";
 const string TesterConfigMgr::SPLITTER_POS_Y = "SplitterPositionY";
 const string TesterConfigMgr::TYPE_COLUMN_WIDTH = "TypeColumnWidth";
 const string TesterConfigMgr::LAST_FILE_SAVE_DIR = "LastFileSaveDirectory";
+const string TesterConfigMgr::AUTO_EXPAND_ATTRIBUTES = "AutoExpandAttributes";
 
 // Minimum width and height for the dialog
 const int	TesterConfigMgr::giRTDLG_MIN_WIDTH = 380;
 const int	TesterConfigMgr::giRTDLG_MIN_HEIGHT = 410;
 
 // Strings for Test Input combo box
-const std::string	TesterConfigMgr::gstrTEXTFROMIMAGEWINDOW	= "Most recently OCR'd text from Image Window";
-const std::string	TesterConfigMgr::gstrTEXTFROMFILE	= "Most recently processed text from file";
-const std::string	TesterConfigMgr::gstrMANUALTEXT		= "Text from manual input";
+const string	TesterConfigMgr::gstrTEXTFROMIMAGEWINDOW	= "Most recently OCR'd text from Image Window";
+const string	TesterConfigMgr::gstrTEXTFROMFILE	= "Most recently processed text from file";
+const string	TesterConfigMgr::gstrMANUALTEXT		= "Text from manual input";
 
 //-------------------------------------------------------------------------------------------------
 // TesterConfigMgr
 //-------------------------------------------------------------------------------------------------
-TesterConfigMgr::TesterConfigMgr(IConfigurationSettingsPersistenceMgr* pConfigMgr, const std::string& strSectionName)
+TesterConfigMgr::TesterConfigMgr(IConfigurationSettingsPersistenceMgr* pConfigMgr, const string& strSectionName)
 :m_pCfgMgr(pConfigMgr), m_strSectionFolderName(strSectionName)
 {
 }
@@ -423,5 +424,29 @@ string TesterConfigMgr::getLastFileSaveDirectory(void)
 void TesterConfigMgr::setLastFileSaveDirectory(const string& strFileDir)
 {
 	m_pCfgMgr->setKeyValue(m_strSectionFolderName, LAST_FILE_SAVE_DIR, strFileDir);
+}
+//-------------------------------------------------------------------------------------------------
+bool TesterConfigMgr::getAutoExpandAttributes()
+{
+	bool bAutoExpand = false;
+
+	if (!m_pCfgMgr->keyExists(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES))
+	{
+		m_pCfgMgr->createKey(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES, "0");
+	}
+	else
+	{
+		// Retrieve setting
+		string strAutoExpand = m_pCfgMgr->getKeyValue( m_strSectionFolderName,
+			AUTO_EXPAND_ATTRIBUTES);
+		bAutoExpand = strAutoExpand != "0";
+	}
+
+	return bAutoExpand;
+}
+//-------------------------------------------------------------------------------------------------
+void TesterConfigMgr::setAutoExpandAttributes(bool bAutoExpand)
+{
+	m_pCfgMgr->setKeyValue(m_strSectionFolderName, AUTO_EXPAND_ATTRIBUTES, bAutoExpand ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------

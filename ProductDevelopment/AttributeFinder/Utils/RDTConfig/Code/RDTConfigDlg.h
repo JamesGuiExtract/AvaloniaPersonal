@@ -6,6 +6,10 @@
 #include <IConfigurationSettingsPersistenceMgr.h>
 #include <MRUList.h>
 
+#include <string>
+
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CRDTConfigDlg dialog
 
@@ -30,6 +34,7 @@ public:
 	BOOL	m_bScrollLogger;
 	BOOL	m_bDisplaySRWPercent;
 	BOOL	m_bAutoOpenImage;
+	BOOL	m_bAutoExpandAttribute;
 	//}}AFX_DATA
 
 	// ClassWizard generated virtual function overrides
@@ -54,13 +59,6 @@ protected:
 	virtual void OnOK();
 	afx_msg void OnUpdatePrefix();
 	afx_msg void OnKillFocusPrefix();
-	afx_msg void OnCheckAutoencrypt();
-	afx_msg void OnCheckEfalog();
-	afx_msg void OnCheckEndslog();
-	afx_msg void OnCheckLoadonce();
-	afx_msg void OnCheckRuleidtag();
-	afx_msg void OnCheckScrolllogger();
-	afx_msg void OnCheckSRWPercent();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -70,16 +68,16 @@ private:
 	///////
 
 	// Handles Registry items
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pSettingsCfgMgr;
 
 	// Stores collection of most recently chosen DCC and DAT file prefixes
-	std::auto_ptr<MRUList>	ma_pRecentPrefixes;
+	auto_ptr<MRUList>	ma_pRecentPrefixes;
 
 	// Stores collection of most recently chosen Automated Testing root folders
-	std::auto_ptr<MRUList>	ma_pRecentRootFolders;
+	auto_ptr<MRUList>	ma_pRecentRootFolders;
 
 	// Stores collection of most recently chosen Component Data folders
-	std::auto_ptr<MRUList>	ma_pRecentDataFolders;
+	auto_ptr<MRUList>	ma_pRecentDataFolders;
 
 	// Flags to determine if editing is in progress in the Prefix combo box
 	bool	m_bEditingPrefix;
@@ -94,15 +92,15 @@ private:
 	void	addDefaultItems();
 
 	// Adds string to the specified MRU list
-	void	addStringToMRUList(std::auto_ptr<MRUList> &ma_pList, const std::string& strNew);
+	void	addStringToMRUList(auto_ptr<MRUList> &ma_pList, const string& strNew);
 
 	// Gets and sets AutoEncrypt registry entry
 	bool	getAutoEncrypt();
 	void	setAutoEncrypt(bool bNewSetting);
 
 	// Gets and sets ComponentData folder registry entry
-	std::string	getDataFolder();
-	void	setDataFolder(std::string strNewFolder);
+	string	getDataFolder();
+	void	setDataFolder(string strNewFolder);
 
 	// Gets and sets Entity Finder logging registry entry
 	bool	getEFALogging();
@@ -117,16 +115,16 @@ private:
 	void	setLoadOncePerSession(bool bNewSetting);
 
 	// Gets and sets DCC and DAT file prefix registry entry
-	std::string	getPrefix();
-	void	setPrefix(std::string strNewPrefix);
+	string	getPrefix();
+	void	setPrefix(string strNewPrefix);
 
 	// Gets and sets all registry entries
 	void	getRegistrySettings();
 	void	saveRegistrySettings();
 
 	// Gets and sets Automated Testing Root folder registry entry
-	std::string	getRootFolder();
-	void	setRootFolder(std::string strNewFolder);
+	string	getRootFolder();
+	void	setRootFolder(string strNewFolder);
 
 	// Gets and sets Store Rules Worked registry entry
 	bool	getRuleIDTag();
@@ -147,6 +145,10 @@ private:
 	bool	getAutoOpenImage();
 	void	setAutoOpenImage(bool bNewSetting);
 
+	// Gets and sets the auto expand attribute feature of the rule tester
+	bool	getAutoExpandAttributes();
+	void	setAutoExpandAttributes(bool bNewSetting);
+
 	// Return the string for the command line to use to diff the files. The user can specify
 	// any program they want to use, replacing the file names with the placeholders %1 and %2. 
 	// Validation is not done, if an invalid string is entered, the user can fix it by restoring defaults.
@@ -158,26 +160,28 @@ private:
 
 private:
 	// Registry keys for information persistence
-	static const std::string SETTINGS_SECTION;
-	static const std::string ENTITYFINDER_SECTION;
-	static const std::string GRANTORGRANTEE_SECTION;
-	static const std::string TESTING_SECTION;
-	static const std::string ENTITYNAMEDATASCORER_SECTION;
-	static const std::string SPOTRECOGNITION_SECTION;
-	static const std::string VOAVIEWER_SECTION;
+	static const string SETTINGS_SECTION;
+	static const string ENTITYFINDER_SECTION;
+	static const string GRANTORGRANTEE_SECTION;
+	static const string TESTING_SECTION;
+	static const string ENTITYNAMEDATASCORER_SECTION;
+	static const string SPOTRECOGNITION_SECTION;
+	static const string VOAVIEWER_SECTION;
+	static const string RULETESTER_SECTION;
 
-	static const std::string AUTOENCRYPT_KEY;
-	static const std::string LOADONCE_KEY;
-	static const std::string EFALOG_KEY;
-	static const std::string RULEIDTAG_KEY;
-	static const std::string PREFIX_KEY;
-	static const std::string ROOTFOLDER_KEY;
-	static const std::string DATAFOLDER_KEY;
-	static const std::string SCROLLLOGGER_KEY;
-	static const std::string ENDSLOG_KEY;
-	static const std::string DISPLAY_PERCENTAGE_KEY;
-	static const std::string DIFF_COMMAND_LINE_KEY;
-	static const std::string AUTOOPENIMAGE_KEY;
+	static const string AUTOENCRYPT_KEY;
+	static const string LOADONCE_KEY;
+	static const string EFALOG_KEY;
+	static const string RULEIDTAG_KEY;
+	static const string PREFIX_KEY;
+	static const string ROOTFOLDER_KEY;
+	static const string DATAFOLDER_KEY;
+	static const string SCROLLLOGGER_KEY;
+	static const string ENDSLOG_KEY;
+	static const string DISPLAY_PERCENTAGE_KEY;
+	static const string DIFF_COMMAND_LINE_KEY;
+	static const string AUTOOPENIMAGE_KEY;
+	static const string AUTOEXPANDATTRIBUTES_KEY;
 };
 
 //{{AFX_INSERT_LOCATION}}

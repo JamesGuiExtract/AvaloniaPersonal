@@ -29,6 +29,7 @@ const string CRDTConfigDlg::TESTING_SECTION = "\\TestingFramework\\Settings";
 const string CRDTConfigDlg::ENTITYNAMEDATASCORER_SECTION = "\\AttributeFinder\\AFDataScorers\\EntityNameDataScorer";
 const string CRDTConfigDlg::SPOTRECOGNITION_SECTION = "\\InputFunnel\\InputReceivers\\SpotRecIR";
 const string CRDTConfigDlg::VOAVIEWER_SECTION =  "\\AttributeFinder\\Utils\\EAVGenerator";
+const string CRDTConfigDlg::RULETESTER_SECTION = "\\AttributeFinder\\AFCore\\RuleTester";
 
 // Individual key names
 const string CRDTConfigDlg::AUTOENCRYPT_KEY = "AutoEncrypt";
@@ -43,6 +44,7 @@ const string CRDTConfigDlg::DIFF_COMMAND_LINE_KEY = "DiffCommandLine";
 const string CRDTConfigDlg::ENDSLOG_KEY = "LoggingEnabled";
 const string CRDTConfigDlg::DISPLAY_PERCENTAGE_KEY = "DisplayPercentageEnabled";
 const string CRDTConfigDlg::AUTOOPENIMAGE_KEY = "AutoOpenImage";
+const string CRDTConfigDlg::AUTOEXPANDATTRIBUTES_KEY = "AutoExpandAttributes";
 
 // Default values
 const string gstrEMPTY_DEFAULT = "<None>";
@@ -100,6 +102,7 @@ void CRDTConfigDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_SRW_PERCENT, m_bDisplaySRWPercent);
 	DDX_Check(pDX, IDC_CHECK_AUTOOPENIMAGE, m_bAutoOpenImage);
 	DDX_Text(pDX, IDC_EDIT_DIFF_COMMAND_LINE, m_zDiffCommandLine);
+	DDX_Check(pDX, IDC_CHECK_AUTOEXPAND, m_bAutoExpandAttribute);
 	//}}AFX_DATA_MAP
 }
 //-------------------------------------------------------------------------------------------------
@@ -243,19 +246,22 @@ void CRDTConfigDlg::OnBrowseRoot()
 void CRDTConfigDlg::OnDefaults() 
 {
 	// Auto-Encrypt is TRUE [FlexIDSCore #3543]
-	m_bAutoEncrypt = true;
+	m_bAutoEncrypt = TRUE;
 
 	// Load Once Per Session is TRUE
-	m_bLoadOnce = true;
+	m_bLoadOnce = TRUE;
 
 	// EFA Logging is FALSE
-	m_bEFALog = false;
+	m_bEFALog = FALSE;
 
 	// Store Rules Worked is FALSE
-	m_bRuleIDTag = false;
+	m_bRuleIDTag = FALSE;
 
 	// Display SRW Percentage is FALSE
-	m_bDisplaySRWPercent = false;
+	m_bDisplaySRWPercent = FALSE;
+
+	// Auto expand attributes is FALSE
+	m_bAutoExpandAttribute = FALSE;
 
 	// Set default for prefix
 	int iIndex = m_comboPrefix.FindString( -1, gstrEMPTY_DEFAULT.c_str() );
@@ -366,7 +372,7 @@ bool CRDTConfigDlg::getAutoEncrypt()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, AUTOENCRYPT_KEY ))
 	{
 		// Create key if not found, default to true [LRCAU #4926]
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, AUTOENCRYPT_KEY, asString( 1 ) );
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, AUTOENCRYPT_KEY, "1" );
 		return true;
 	}
 
@@ -394,7 +400,7 @@ bool CRDTConfigDlg::getDisplaySRWPercent()
 	{
 		// Create key if not found, default to false
 		ma_pSettingsCfgMgr->createKey( SPOTRECOGNITION_SECTION, DISPLAY_PERCENTAGE_KEY, 
-			asString( 0 ) );
+			"0" );
 		return false;
 	}
 
@@ -408,7 +414,7 @@ bool CRDTConfigDlg::getEFALogging()
 	if (!ma_pSettingsCfgMgr->keyExists( ENTITYFINDER_SECTION, EFALOG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( ENTITYFINDER_SECTION, EFALOG_KEY, asString( 0 ) );
+		ma_pSettingsCfgMgr->createKey( ENTITYFINDER_SECTION, EFALOG_KEY, "0" );
 		return false;
 	}
 
@@ -422,7 +428,7 @@ bool CRDTConfigDlg::getENDSLogging()
 	if (!ma_pSettingsCfgMgr->keyExists( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY, asString( 0 ) );
+		ma_pSettingsCfgMgr->createKey( ENTITYNAMEDATASCORER_SECTION, ENDSLOG_KEY, "0" );
 		return false;
 	}
 
@@ -436,7 +442,7 @@ bool CRDTConfigDlg::getLoadOncePerSession()
 	if (!ma_pSettingsCfgMgr->keyExists( SETTINGS_SECTION, LOADONCE_KEY ))
 	{
 		// Create key if not found, default to true
-		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, LOADONCE_KEY, asString( 1 ) );
+		ma_pSettingsCfgMgr->createKey( SETTINGS_SECTION, LOADONCE_KEY, "1" );
 		return true;
 	}
 
@@ -477,6 +483,8 @@ void CRDTConfigDlg::getRegistrySettings()
 	m_bDisplaySRWPercent = asMFCBool(getDisplaySRWPercent());
 
 	m_bAutoOpenImage = asMFCBool(getAutoOpenImage());
+
+	m_bAutoExpandAttribute = asMFCBool(getAutoExpandAttributes());
 
 	// Load MRU list items
 	loadMRUListItems();
@@ -578,7 +586,7 @@ bool CRDTConfigDlg::getRuleIDTag()
 	if (!ma_pSettingsCfgMgr->keyExists( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY, asString( 0 ) );
+		ma_pSettingsCfgMgr->createKey( GRANTORGRANTEE_SECTION, RULEIDTAG_KEY, "0" );
 		return false;
 	}
 
@@ -592,7 +600,7 @@ bool CRDTConfigDlg::getScrollLogger()
 	if (!ma_pSettingsCfgMgr->keyExists( TESTING_SECTION, SCROLLLOGGER_KEY ))
 	{
 		// Create key if not found, default to false
-		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, SCROLLLOGGER_KEY, asString( 0 ) );
+		ma_pSettingsCfgMgr->createKey( TESTING_SECTION, SCROLLLOGGER_KEY, "0" );
 		return false;
 	}
 
@@ -613,6 +621,18 @@ CString CRDTConfigDlg::getDiffCommandString()
 
 	// If a string already exists, return it
 	return ma_pSettingsCfgMgr->getKeyValue(TESTING_SECTION, DIFF_COMMAND_LINE_KEY).c_str();
+}
+//-------------------------------------------------------------------------------------------------
+bool CRDTConfigDlg::getAutoExpandAttributes()
+{
+	if (!ma_pSettingsCfgMgr->keyExists(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY))
+	{
+		ma_pSettingsCfgMgr->createKey(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY, "0");
+
+		return false;
+	}
+	
+	return ma_pSettingsCfgMgr->getKeyValue(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY) != "0";
 }
 //-------------------------------------------------------------------------------------------------
 void CRDTConfigDlg::loadMRUListItems()
@@ -705,6 +725,8 @@ void CRDTConfigDlg::saveRegistrySettings()
 	setDisplaySRWPercent(asCppBool(m_bDisplaySRWPercent));
 
 	setAutoOpenImage(asCppBool(m_bAutoOpenImage));
+
+	setAutoExpandAttributes(asCppBool(m_bAutoExpandAttribute));
 
 	////////////////////////////////////////////
 	// Write selected combobox items to registry
@@ -848,5 +870,11 @@ void CRDTConfigDlg::setDiffCommandString( CString zDiffString )
 	// Set the registry setting to the new key
 	ma_pSettingsCfgMgr->setKeyValue( TESTING_SECTION, DIFF_COMMAND_LINE_KEY,
 										(LPCTSTR)zDiffString);
+}
+//-------------------------------------------------------------------------------------------------
+void CRDTConfigDlg::setAutoExpandAttributes(bool bNewSetting)
+{
+	ma_pSettingsCfgMgr->setKeyValue(RULETESTER_SECTION, AUTOEXPANDATTRIBUTES_KEY,
+		bNewSetting ? "1" : "0");
 }
 //-------------------------------------------------------------------------------------------------

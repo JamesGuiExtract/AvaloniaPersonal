@@ -976,6 +976,9 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 	m_wndTreeList.m_tree.DeleteAllItems();
 	// Reset no highlight flag
 	m_bNoHighlight = false;
+
+	// Check whether the attributes should auto expand
+	bool bAutoExpand = ma_pCfgTesterMgr->getAutoExpandAttributes();
 	
 	// Define root-level Tree List item
 	HTREEITEM	hTop = NULL;
@@ -1088,6 +1091,12 @@ void RuleTesterDlg::updateList(UCLID_AFCORELib::IAFDocumentPtr ipAFDoc)
 
 			// Add any sub attributes
 			addSubAttributes( ipAttr, hTmp );
+
+			// If auto expand is true, expand the attribute
+			if (bAutoExpand)
+			{
+				m_wndTreeList.m_tree.Expand(hTmp, TVE_EXPAND);
+			}
 		}
 	}
 }
