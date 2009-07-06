@@ -41,7 +41,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Occurs when a file has completed verification.
         /// </summary>
-        public event EventHandler<EventArgs> FileVerified;
+        public event EventHandler<FileCompleteEventArgs> FileComplete;
 
         #endregion VerificationTaskForm Events
 
@@ -87,15 +87,15 @@ namespace Extract.Redaction.Verification
         #region VerificationTaskForm OnEvents
 
         /// <summary>
-        /// Raises the <see cref="FileVerified"/> event.
+        /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
-        /// <param name="e">The event data associated with the <see cref="FileVerified"/> 
+        /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
         /// event.</param>
-        protected virtual void OnFileVerified(EventArgs e)
+        protected virtual void OnFileComplete(FileCompleteEventArgs e)
         {
-            if (FileVerified != null)
+            if (FileComplete != null)
             {
-                FileVerified(this, e);
+                FileComplete(this, e);
             }
         }
 
@@ -114,7 +114,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileVerified(new EventArgs());
+                OnFileComplete(new FileCompleteEventArgs(false));
             }
             catch (Exception ex)
             {

@@ -1118,7 +1118,7 @@ namespace Extract.DataEntry
                 // Add a mapping for the attribute's subattributes for future reference.
                 _subAttributesToParentMap[attribute.SubAttributes] = attribute;
 
-                if (autoUpdateQuery != statusInfo._autoUpdateQuery)
+                if (autoUpdateQuery != null && autoUpdateQuery != statusInfo._autoUpdateQuery)
                 {
                     // Dispose of any previously existing auto-update trigger.
                     AutoUpdateTrigger existingAutoUpdateTrigger;
@@ -1157,7 +1157,7 @@ namespace Extract.DataEntry
                     }
                 }
 
-                if (validationQuery != statusInfo._validationQuery)
+                if (validationQuery != null && validationQuery != statusInfo._validationQuery)
                 {
                     // Dispose of any previously existing validation trigger.
                     AutoUpdateTrigger existingValidationTrigger;

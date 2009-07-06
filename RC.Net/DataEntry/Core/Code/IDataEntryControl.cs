@@ -261,6 +261,13 @@ namespace Extract.DataEntry
         /// in the UI.</param>
         void RefreshAttribute(IAttribute attribute);
 
+        /// <summary>
+        /// Any data that was cached should be cleared;  This is called when a document is unloaded.
+        /// If controls fail to clear COM objects, errors may result if that data is accessed when
+        /// a subsequent document is loaded.
+        /// </summary>
+        void ClearCachedData();
+
         #endregion Methods
 
         #region EventHandlers

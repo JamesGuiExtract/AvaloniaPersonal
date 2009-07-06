@@ -251,8 +251,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                             _splitContainer.SplitterDistance = _dataEntryControlHost.Size.Width +
                                 _DATA_ENTRY_PANEL_PADDING + _scrollPanel.AutoScrollMargin.Width;
                         }
+
                         _dataEntryControlHost.Anchor = AnchorStyles.Left | AnchorStyles.Top | 
                             AnchorStyles.Right;
+
+                        // The splitter should respect the minimum size of the DEP.
+                        _splitContainer.Panel1MinSize =
+                            _dataEntryControlHost.MinimumSize.Width +
+                            (2 * _DATA_ENTRY_PANEL_PADDING) + _scrollPanel.AutoScrollMargin.Width +
+                            SystemInformation.VerticalScrollBarWidth;
 
                         // Add the DEP to an auto-scroll pane to allow scrolling if the DEP is too
                         // long. (The scroll pane is sized to allow the full width of the DEP to 
@@ -485,7 +492,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 // Hide any visible toolTips
                 _hideToolTipsCommand = new ApplicationCommand(_imageViewer.Shortcuts,
-                    new Keys[] { Keys.Escape }, _dataEntryControlHost.RemoveToolTips,
+                    new Keys[] { Keys.Escape }, _dataEntryControlHost.ToggleHideTooltips,
                     new ToolStripItem[] { _hideToolTipsMenuItem }, false, true, false);
 
                 // Toggle show all data highlights
@@ -714,9 +721,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Events
 
         /// <summary>
-        /// This event indicates that the current document was saved
+        /// This event indicates that the current document is done processing.
         /// </summary>
-        public event EventHandler<EventArgs> FileVerified;
+        public event EventHandler<FileCompleteEventArgs> FileComplete;
 
         #endregion Events
 
@@ -731,7 +738,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                Save();
+                Save(false);
             }
             catch (Exception ex)
             {
@@ -1006,7 +1013,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                _dataEntryControlHost.RemoveToolTips();
+                _dataEntryControlHost.ToggleHideTooltips();
             }
             catch (Exception ex)
             {
@@ -1096,7 +1103,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                Save();
+                Save(false);
             }
             catch (Exception ex)
             {
@@ -1110,32 +1117,30 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// Handles the case that the user selected save from either the file menu, toolstrip
         /// button, or keyboard shortcut.
         /// </summary>
+        /// <param name="closing"><see langword="true"/> if the save is occuring because the user
+        /// is closing the document or application; <see langword="false"/> if the save is occuring
+        /// as an independent operation.</param>
         /// <returns><see langword="true"/> if the document saved successfully, 
         /// <see langword="false"/> if it did not.</returns>
-        bool Save()
+        bool Save(bool closing)
         {
             bool dataSaved = _dataEntryControlHost.SaveData();
 
-            // Request that the control host save its data.
-            if (dataSaved)
-            {
-                // If the control host was able to save the data, raise the FileVerified event.
-                OnFileVerified(new EventArgs());
-            }
+            OnFileComplete(new FileCompleteEventArgs(closing));
 
             return dataSaved;
         }
 
         /// <summary>
-        /// Raises the <see cref="FileVerified"/> event.
+        /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
-        /// <param name="e">The event data associated with the <see cref="FileVerified"/> 
+        /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
         /// event.</param>
-        protected virtual void OnFileVerified(EventArgs e)
+        protected virtual void OnFileComplete(FileCompleteEventArgs e)
         {
-            if (FileVerified != null)
+            if (FileComplete != null)
             {
-                FileVerified(this, e);
+                FileComplete(this, e);
             }
         }
 
@@ -1154,7 +1159,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     // If the user chose to save, continue with the close if the save was
                     // successful, abort the close if it was not.
-                    return Save();
+                    return Save(true);
                 }
                 else if (response == DialogResult.Cancel)
                 {
@@ -1234,6 +1239,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     highlightColors[0].MaxOcrConfidence = confidenceBoundary - 1;
                     controlHost.HighlightColors = highlightColors;
                 }
+
+                controlHost.ApplicationTitle = ConfigSettings.AppSettings.ApplicationTitle;
 
                 return controlHost;
             }

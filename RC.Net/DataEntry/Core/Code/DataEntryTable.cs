@@ -110,6 +110,20 @@ namespace Extract.DataEntry
         private IAttribute _tabOrderPlaceholderAttribute;
 
         /// <summary>
+        /// A cache of DataEntryTableRows that have been populated so that when parent control
+        /// propagates between different attributes, the propagated attribute does not need to be
+        /// re-initialized as long as it had previously been initialized.
+        /// </summary>
+        Dictionary<IUnknownVector, Dictionary<IAttribute, DataEntryTableRow>> _cachedRows =
+            new Dictionary<IUnknownVector, Dictionary<IAttribute, DataEntryTableRow>>();
+
+        /// <summary>
+        /// The cached rows that pertain to the currently propagated attributes from the table's
+        /// parent.
+        /// </summary>
+        Dictionary<IAttribute, DataEntryTableRow> _activeCachedRows;
+
+        /// <summary>
         /// Specifies whether the current instance is running in design mode.
         /// </summary>
         private bool _inDesignMode;
@@ -747,6 +761,7 @@ namespace Extract.DataEntry
 
                         _sourceAttributes.RemoveValue(attributeToRemove);
                         AttributeStatusInfo.DeleteAttribute(attributeToRemove);
+                        _activeCachedRows.Remove(attributeToRemove);
                     }
                 }
             }
@@ -838,6 +853,21 @@ namespace Extract.DataEntry
                 base.Enabled = (sourceAttributes != null);
 
                 _sourceAttributes = sourceAttributes;
+
+                // Retrieve the cached rows that correspond to sourceAttributes (if available).
+                if (sourceAttributes == null)
+                {
+                    _activeCachedRows = null;
+                }
+                else
+                {
+                    // If necessary, create a row cache for sourceAttributes.
+                    if (!_cachedRows.TryGetValue(sourceAttributes, out _activeCachedRows))
+                    {
+                        _activeCachedRows = new Dictionary<IAttribute, DataEntryTableRow>();
+                        _cachedRows[sourceAttributes] = _activeCachedRows;
+                    }
+                }
 
                 // Clear all existing entries from the table.
                 base.Rows.Clear();
@@ -998,6 +1028,24 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25445", ex);
+            }
+        }
+
+        /// <summary>
+        /// Any data that was cached should be cleared;  This is called when a document is unloaded.
+        /// If controls fail to clear COM objects, errors may result if that data is accessed when
+        /// a subsequent document is loaded.
+        /// </summary>
+        public override void ClearCachedData()
+        {
+            try
+            {
+                _cachedRows.Clear();
+                _activeCachedRows = null;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26631", ex);
             }
         }
 
@@ -1297,108 +1345,140 @@ namespace Extract.DataEntry
                 }
             }
 
-            // Map the attribute to the row itself.
-            ((DataEntryTableRow)base.Rows[rowIndex]).Attribute = attribute;
-            base.MapAttribute(attribute, base.Rows[rowIndex]);
-
-            bool parentAttributeIsMapped = false;
-
-            // Loop through each column to populate the values.
-            foreach (DataGridViewColumn column in base.Columns)
+            // If a row has already been cached for the attribute, simply swap out the current row
+            // for the cached row and re-map all attributes in the row.
+            DataEntryTableRow cachedRow = null;
+            if (_activeCachedRows.TryGetValue(attribute, out cachedRow))
             {
-                IAttribute subAttribute = null;
-                DataEntryTableColumn dataEntryTableColumn = column as DataEntryTableColumn;
+                base.Rows.RemoveAt(rowIndex);
+                base.Rows.Insert(rowIndex, cachedRow);
 
-                // If the column is a data entry column, we need to populate it as appropriate.
-                if (dataEntryTableColumn != null)
+                // Start by mapping the attribute to the row itself.
+                base.MapAttribute(attribute, base.Rows[rowIndex]);
+
+                // Remap each cell's attribute in the row (may cause the parent row's attribute to
+                // be remapped).
+                foreach (DataGridViewCell cell in cachedRow.Cells)
                 {
-                    IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)
-                        base.Rows[rowIndex].Cells[column.Index];
-
-                    if (dataEntryTableColumn.AttributeName == ".")
+                    IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+                    if (dataEntryCell != null)
                     {
-                        // "." indicates that the value of the row's attribute should be used in
-                        // this column.
-                        subAttribute = attribute;
-                        parentAttributeIsMapped = true;
-
-                        // It is important to call initialize here to ensure AttributeStatusInfo
-                        // raises the AttributeInitialized event for all attributes mapped into the
-                        // table.
-                        AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
-                            column.Index, false, dataEntryTableColumn.TabStopRequired,
-                            dataEntryCell.Validator, dataEntryTableColumn.AutoUpdateQuery,
-                            dataEntryTableColumn.ValidationQuery);
+                        base.MapAttribute(dataEntryCell.Attribute, dataEntryCell);
                     }
-                    else
-                    {
-                        // Select the appropriate subattribute to use and create an new (empty)
-                        // attribute if no such attribute can be found.
-                        subAttribute = DataEntryMethods.InitializeAttribute(
-                            dataEntryTableColumn.AttributeName,
-                            dataEntryTableColumn.MultipleMatchSelectionMode,
-                            true, attribute.SubAttributes, null, this, column.Index, true,
-                            dataEntryTableColumn.TabStopRequired, dataEntryCell.Validator, 
-                            dataEntryTableColumn.AutoUpdateQuery, dataEntryTableColumn.ValidationQuery);
-                    }
-
-                    // If the attribute being applied is a hint, it has been copied from elsewhere
-                    // and the hint shouldn't apply here-- remove the hint.
-                    if (AttributeStatusInfo.GetHintType(subAttribute) != HintType.None)
-                    {
-                        AttributeStatusInfo.SetHintType(subAttribute, HintType.None);
-                        AttributeStatusInfo.SetHintRasterZones(subAttribute, null);
-                    }
-
-                    // Map the column's attribute and set the attribute's validator. NOTE: This may 
-                    // be remapping the row's attribute; this is intentional so that 
-                    // PropagateAttribute will select the specified cell for the row's attribute.
-                    base.MapAttribute(subAttribute, dataEntryCell);
-
-                    // Apply the subAttribute as the cell's value.
-                    base.Rows[rowIndex].Cells[column.Index].Value = subAttribute;
                 }
             }
-
-            // If the value of the row's attribute itself is not displayed in one of the columns,
-            // consider the row's attribute as valid and viewed.
-            if (!parentAttributeIsMapped)
+            // If a cached row didn't exist for the incoming attribute, initialize it.
+            else
             {
-                // It is important to call initialize here to ensure AttributeStatusInfo
-                // raises the AttributeInitialized event for all attributes mapped into the
-                // table.
-                AttributeStatusInfo.Initialize(
-                    attribute, _sourceAttributes, this, 0, false, false, null, null, null);
-            }
+                // Map the attribute to the row itself.
+                ((DataEntryTableRow)base.Rows[rowIndex]).Attribute = attribute;
+                base.MapAttribute(attribute, base.Rows[rowIndex]);
 
-            // Swap out the existing attribute in the overall attribute heirarchy (either keeping 
-            // attribute ordering the same as it was or explicitly inserting it at the specified
-            // position).
-            if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
-                attributeToReplace, insertBeforeAttribute))
-            {
-                AttributeStatusInfo.DeleteAttribute(attributeToReplace);
-            }
+                bool parentAttributeIsMapped = false;
 
-            // If this control does not have any dependent controls, consider each row propagated.
-            if (!base.HasDependentControls)
-            {
-                AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
-            }
-
-            // If a new attribute was created for this row, ensure that it propagates all its
-            // sub-attributes to keep all status info's in the attribute heirarchy up-to-date.
-            if (newAttributeCreated)
-            {
-                // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
-                // attribute in _sourceAttributes.
-                if (_tabOrderPlaceholderAttribute != null)
+                // Loop through each column to populate the values.
+                foreach (DataGridViewColumn column in base.Columns)
                 {
-                    _sourceAttributes.RemoveValue(_tabOrderPlaceholderAttribute);
-                    _sourceAttributes.PushBack(_tabOrderPlaceholderAttribute);
+                    IAttribute subAttribute = null;
+                    DataEntryTableColumn dataEntryTableColumn = column as DataEntryTableColumn;
+
+                    // If the column is a data entry column, we need to populate it as appropriate.
+                    if (dataEntryTableColumn != null)
+                    {
+                        IDataEntryTableCell dataEntryCell = (IDataEntryTableCell)
+                            base.Rows[rowIndex].Cells[column.Index];
+
+                        if (dataEntryTableColumn.AttributeName == ".")
+                        {
+                            // "." indicates that the value of the row's attribute should be used in
+                            // this column.
+                            subAttribute = attribute;
+                            parentAttributeIsMapped = true;
+
+                            // It is important to call initialize here to ensure AttributeStatusInfo
+                            // raises the AttributeInitialized event for all attributes mapped into
+                            // the table.
+                            AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
+                                column.Index, false, dataEntryTableColumn.TabStopRequired,
+                                dataEntryCell.Validator, dataEntryTableColumn.AutoUpdateQuery,
+                                dataEntryTableColumn.ValidationQuery);
+                        }
+                        else
+                        {
+                            // Select the appropriate subattribute to use and create an new (empty)
+                            // attribute if no such attribute can be found.
+                            subAttribute = DataEntryMethods.InitializeAttribute(
+                                dataEntryTableColumn.AttributeName,
+                                dataEntryTableColumn.MultipleMatchSelectionMode,
+                                true, attribute.SubAttributes, null, this, column.Index, true,
+                                dataEntryTableColumn.TabStopRequired, dataEntryCell.Validator,
+                                dataEntryTableColumn.AutoUpdateQuery,
+                                dataEntryTableColumn.ValidationQuery);
+                        }
+
+                        // If the attribute being applied is a hint, it has been copied from elsewhere
+                        // and the hint shouldn't apply here-- remove the hint.
+                        if (AttributeStatusInfo.GetHintType(subAttribute) != HintType.None)
+                        {
+                            AttributeStatusInfo.SetHintType(subAttribute, HintType.None);
+                            AttributeStatusInfo.SetHintRasterZones(subAttribute, null);
+                        }
+
+                        // Map the column's attribute and set the attribute's validator. NOTE: This
+                        // may be remapping the row's attribute; this is intentional so that 
+                        // PropagateAttribute will select the specified cell for the row's attribute.
+                        base.MapAttribute(subAttribute, dataEntryCell);
+
+                        // Apply the subAttribute as the cell's value.
+                        base.Rows[rowIndex].Cells[column.Index].Value = subAttribute;
+                    }
                 }
 
-                ProcessSelectionChange();
+                // If the value of the row's attribute itself is not displayed in one of the columns,
+                // consider the row's attribute as valid and viewed.
+                if (!parentAttributeIsMapped)
+                {
+                    // It is important to call initialize here to ensure AttributeStatusInfo
+                    // raises the AttributeInitialized event for all attributes mapped into the
+                    // table.
+                    AttributeStatusInfo.Initialize(
+                        attribute, _sourceAttributes, this, 0, false, false, null, null, null);
+                }
+
+                // Swap out the existing attribute in the overall attribute heirarchy (either
+                // keeping attribute ordering the same as it was or explicitly inserting it at the
+                // specified position).
+                if (DataEntryMethods.InsertOrReplaceAttribute(_sourceAttributes, attribute,
+                    attributeToReplace, insertBeforeAttribute))
+                {
+                    AttributeStatusInfo.DeleteAttribute(attributeToReplace);
+                    _activeCachedRows.Remove(attributeToReplace);
+                }
+
+                // If this control does not have any dependent controls, consider each row
+                // propagated.
+                if (!base.HasDependentControls)
+                {
+                    AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
+                }
+
+                // If a new attribute was created for this row, ensure that it propagates all its
+                // sub-attributes to keep all status info's in the attribute heirarchy up-to-date.
+                if (newAttributeCreated)
+                {
+                    // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
+                    // attribute in _sourceAttributes.
+                    if (_tabOrderPlaceholderAttribute != null)
+                    {
+                        _sourceAttributes.RemoveValue(_tabOrderPlaceholderAttribute);
+                        _sourceAttributes.PushBack(_tabOrderPlaceholderAttribute);
+                    }
+
+                    ProcessSelectionChange();
+                }
+
+                // Cache the initialized attribute's row for later use.
+                _activeCachedRows[attribute] = (DataEntryTableRow)base.Rows[rowIndex];
             }
         }
 

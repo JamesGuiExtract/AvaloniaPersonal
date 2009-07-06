@@ -440,6 +440,11 @@ namespace Extract.DataEntry
         private Color _defaultHighlightColor = Color.LightGreen;
 
         /// <summary>
+        /// The title of the current DataEntry application.
+        /// </summary>
+        private string _applicationTitle;
+
+        /// <summary>
         /// The number of selected attributes with highlights that have been accepted by the user.
         /// </summary>
         private int _selectedAttributesWithAcceptedHighlights;
@@ -470,6 +475,11 @@ namespace Extract.DataEntry
         /// Indicates whether a swipe is currently being processed.
         /// </summary>
         private bool _processingSwipe;
+
+        /// <summary>
+        /// Indicates whether the results of the active swipe should be discarded.
+        /// </summary>
+        private bool _cancelingSwipe;
 
         /// <summary>
         /// A database available for use in validation or auto-update queries.
@@ -753,6 +763,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets the title of the current DataEntry application.
+        /// </summary>
+        /// <value>The title of the current DataEntry application.</value>
+        /// <returns>The title of the current DataEntry application.</returns>
+        public string ApplicationTitle
+        {
+            get
+            {
+                return _applicationTitle;
+            }
+
+            set
+            {
+                _applicationTitle = value;
+            }
+        }
+
+        /// <summary>
         /// Specifies the database connection to be used in data validation or auto-update queries.
         /// </summary>
         /// <value>The <see cref="DbConnection"/> to be used. (Can be <see langword="null"/> if one
@@ -956,7 +984,9 @@ namespace Extract.DataEntry
                     // Attempt to find and propagate the next unviewed attribute
                     if (GetNextUnviewedAttribute() == null)
                     {
-                        new ExtractException("ELI24648", "There are no unviewed items!").Display();
+                        MessageBox.Show(this, "There are no unviewed items.", _applicationTitle,
+                            MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
 
                         // If we failed to find any unviewed attributes, make sure 
                         // _unviewedAttributeCount is zero and raise the UnviewedItemsFound event to 
@@ -991,7 +1021,9 @@ namespace Extract.DataEntry
                 {
                     if (GetNextInvalidAttribute() == null)
                     {
-                        new ExtractException("ELI24680", "There are no invalid items!").Display();
+                        MessageBox.Show(this, "There are no invalid items.", _applicationTitle,
+                            MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
 
                         // If we failed to find any attributes with invalid data, make sure 
                         // _invalidAttributeCount is zero and raise the InvalidItemsFound event to 
@@ -1064,22 +1096,34 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Removes any tooltips that are currently visible.
+        /// Toggles whether or not tooltip(s) for the active <see cref="IAttribute"/> are currently
+        /// visible.
         /// </summary>
-        public void RemoveToolTips()
+        public void ToggleHideTooltips()
         {
             try
             {
-                // Remove all tooltips
-                List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
-                foreach (IAttribute attribute in tooltipAttributes)
+                if (!_temporarilyHidingTooltips)
                 {
-                    RemoveAttributeToolTip(attribute);
+                    // Remove all tooltips
+                    List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
+                    foreach (IAttribute attribute in tooltipAttributes)
+                    {
+                        RemoveAttributeToolTip(attribute);
+                    }
+
+                    // [DataEntry:307]
+                    // Keep tooltips from re-appearing too readily after pressing esc.
+                    _temporarilyHidingTooltips = true;
+
+                    _imageViewer.Invalidate();
                 }
+                else
+                {
+                    _temporarilyHidingTooltips = false;
 
-                _temporarilyHidingTooltips = true;
-
-                _imageViewer.Invalidate();
+                    DrawHighlights(false);
+                }
             }
             catch (Exception ex)
             {
@@ -1234,6 +1278,12 @@ namespace Extract.DataEntry
                     {
                         dataControl.SetAttributes(null);
                     }
+                }
+
+                // Clear any data the controls have cached.
+                foreach (IDataEntryControl dataControl in _dataControls)
+                {
+                    dataControl.ClearCachedData();
                 }
 
                 _selectedAttributesWithAcceptedHighlights = 0;
@@ -1830,6 +1880,18 @@ namespace Extract.DataEntry
         {
             try
             {
+                // [DataEntry:185]
+                // If a swipe was cancelled by pressing the right mouse button, discard the layer
+                // object, clear the cancel flag, and return.
+                if (_cancelingSwipe)
+                {
+                    _cancelingSwipe = false;
+
+                    _imageViewer.LayerObjects.Remove(e.LayerObject);
+                    e.LayerObject.Dispose();
+                    return;
+                }
+
                 if (_activeDataControl != null && _activeDataControl.SupportsSwiping)
                 {
                     Highlight highlight = e.LayerObject as Highlight;
@@ -2190,6 +2252,14 @@ namespace Extract.DataEntry
                         PropagateAttributes(attributesToPropagate, true);
                     }
                 }
+                else if (e.Button == MouseButtons.Right && _imageViewer.Capture && 
+                    (Control.MouseButtons & MouseButtons.Left) != 0)
+                {
+                    // [DataEntry:185], [DataEntry:310]
+                    // Allow the right mouse button to cancel the current swipe rather than allowing
+                    // the swipe to end as if the left mouse button had been released.
+                    _cancelingSwipe = true;
+                }
             }
             catch (Exception ex)
             {
@@ -2416,12 +2486,7 @@ namespace Extract.DataEntry
                     // this data entry control.
                     List<CompositeHighlightLayerObject> highlightList = null;
 
-                    // [DataEntry:307]
-                    // Keep tooltips from re-appearing too readily after pressing esc.
-                    if (!_temporarilyHidingTooltips)
-                    {
-                        _attributeHighlights.TryGetValue(attribute, out highlightList);
-                    }
+                    _attributeHighlights.TryGetValue(attribute, out highlightList);
 
                     // If the attribute has no highlights to display, move on
                     if (highlightList == null || highlightList.Count == 0)
@@ -2484,7 +2549,8 @@ namespace Extract.DataEntry
                     ShowErrorIcon(attribute, true);
 
                     // Display a tooltip if directed to by the control and if possible.
-                    if (AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
+                    if (!_temporarilyHidingTooltips &&
+                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
                         activeToolTipAttributes.Contains(attribute))
                     {
                         CreateAttributeToolTip(attribute);

@@ -730,6 +730,16 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Any data that was cached should be cleared;  This is called when a document is unloaded.
+        /// If controls fail to clear COM objects, errors may result if that data is accessed when
+        /// a subsequent document is loaded.
+        /// </summary>
+        public override void ClearCachedData()
+        {
+            // Nothing to do.
+        }
+
         #endregion IDataEntryControl Methods
 
         #region Private Members

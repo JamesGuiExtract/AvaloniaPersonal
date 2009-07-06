@@ -694,6 +694,15 @@ namespace Extract.DataEntry
         {
             try
             {
+                // If the current selection does not result in a propagated attribute when dependent
+                // controls are present (ie, selection across multiple rows), don't allow edit mode
+                // since that dependent triggers in the dependent controls wouldn't be updated.
+                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null)
+                {
+                    base.EndEdit();
+                    return;
+                }
+
                 IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
 
                 if (e.Control != null && dataEntryCell != null)
@@ -1372,6 +1381,13 @@ namespace Extract.DataEntry
         /// recognized text in the swiped image area.</param>
         /// <seealso cref="IDataEntryControl"/>
         public abstract void ProcessSwipedText(SpatialString swipedText);
+
+        /// <summary>
+        /// Any data that was cached should be cleared;  This is called when a document is unloaded.
+        /// If controls fail to clear COM objects, errors may result if that data is accessed when
+        /// a subsequent document is loaded.
+        /// </summary>
+        public abstract void ClearCachedData();
 
         #endregion Abstract IDataEntryControl Members
 
