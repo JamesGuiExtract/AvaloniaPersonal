@@ -165,7 +165,7 @@
 \bTerrace\b,TER
 \bSociety\b,SOC
 \bPortion\b,PTN
-\bPacific\b,PAC
+//\bPacific\b,PAC removed at customer's request
 \bOklahoma\b,OK
 \bIllinois\b,IL
 \bFinance\b,FIN
