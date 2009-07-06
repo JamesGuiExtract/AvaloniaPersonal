@@ -635,7 +635,7 @@ namespace Extract.Utilities.Forms
                     else
                     {
                         // [DataEntry:308, 254]
-                        // In response to attempting to close the verfication UI, the user may still
+                        // In response to attempting to close the verification UI, the user may still
                         // be presented with an opportunity to save. If the user initially cancelled
                         // the save prompt to make further adjustments, the UI will remain (despite 
                         // IsFormInitialized returning true). If any _fileComplete events are fired,
