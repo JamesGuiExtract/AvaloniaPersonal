@@ -355,6 +355,7 @@ namespace Extract.DataEntry
         /// </summary>
         public void ClearCachedData()
         {
+            // Nothing to do.
         }
 
         #endregion Unused IDataEntryControl Members

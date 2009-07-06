@@ -2630,9 +2630,12 @@ namespace Extract.DataEntry
 
                     // Show the hover attribute's highlight and error icon (if one exists).
                     ShowAttributeHighlights(_hoverAttribute, true);
-                   
-                    // The tooltip should also be displayed for the hover attribute.
-                    CreateAttributeToolTip(_hoverAttribute);
+
+                    if (!_temporarilyHidingTooltips)
+                    {
+                        // The tooltip should also be displayed for the hover attribute.
+                        CreateAttributeToolTip(_hoverAttribute);
+                    }
                 }
 
                 // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.

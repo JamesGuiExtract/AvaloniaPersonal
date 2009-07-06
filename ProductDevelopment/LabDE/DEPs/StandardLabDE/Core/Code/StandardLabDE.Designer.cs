@@ -426,7 +426,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testCode.AttributeName = "TestCode";
             this._testCode.AutoUpdateQuery = "<SQL>SELECT Test.Code FROM Test WHERE Test.Name = \'{\'..}\' AND Test.OrderCode = \'{" +
                 "\'../../OrderCode}\'</SQL>";
-            this._testCode.FillWeight = 35F;
+            this._testCode.FillWeight = 40F;
             this._testCode.FormattingRuleFile = null;
             this._testCode.HeaderText = "Code";
             this._testCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
@@ -444,7 +444,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             this._componentValue.AttributeName = "Value";
             this._componentValue.AutoUpdateQuery = null;
-            this._componentValue.FillWeight = 40F;
+            this._componentValue.FillWeight = 35F;
             this._componentValue.FormattingRuleFile = null;
             this._componentValue.HeaderText = "Value";
             this._componentValue.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;

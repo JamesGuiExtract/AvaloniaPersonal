@@ -426,15 +426,15 @@ namespace Extract.Utilities.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="Form.Closing"/> event.
+        /// Handles the <see cref="Form.Closed"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="Form.Closing"/> event.</param>
+        /// <see cref="Form.Closed"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="Form.Closing"/> event.</param>
-        void HandleFormClosing(object sender, FormClosingEventArgs e)
+        /// <see cref="Form.Closed"/> event.</param>
+        void HandleFormClosed(object sender, FormClosedEventArgs e)
         {
-            // Reset _initializedEvent to inidicate the form is no longer initialized
+            // Reset _initializedEvent to indicate the form is no longer initialized
             _initializedEvent.Reset();
         }
 
@@ -451,7 +451,7 @@ namespace Extract.Utilities.Forms
         {
             get
             {
-                return _initializedEvent.WaitOne(0, false);
+                return (_initializedEvent.WaitOne(0, false));
             }
         }
 
@@ -547,7 +547,7 @@ namespace Extract.Utilities.Forms
                 // Register events
                 MainForm.Shown += HandleVerificationFormShown;
                 MainForm.FileComplete += HandleFileComplete;
-                MainForm.FormClosing += HandleFormClosing;
+                MainForm.FormClosed += HandleFormClosed;
 
                 Application.Run(MainForm);
             }
@@ -620,11 +620,15 @@ namespace Extract.Utilities.Forms
                 _closing = true;
 
                 // Check if the UI thread needs to be taken down.
-                while (_uiThread.IsAlive)
+                while (_uiThread != null && _uiThread.IsAlive)
                 {
                     // Attempt to end the thread cleanly by closing the form if it still exists.
                     if (this.IsFormInitialized)
                     {
+                        // Indicate the the form is no longer initialized now that we have asked
+                        // it to close.
+                        _initializedEvent.Reset();
+
                         // Call Close via Invoke (Synchronous call)
                         MainForm.Invoke(new ParameterlessDelegate(MainForm.Close));
                     }
