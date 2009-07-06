@@ -36,7 +36,8 @@ LabDEInstallFiles =$(DataEntryInstallFiles)\LabDE\Files
 DataEntryInstallMediaDir=$(LabDEInstallRootDir)\DataEntry\Media\CD-ROM\DiskImages\DISK1
 LabDEInstallMediaDir=$(LabDEInstallRootDir)\LabDE\Media\CD-ROM\DiskImages\DISK1
 
-LabDERulesDir=$(AFRootDirectory)\IndustrySpecific\LabResults\CustomerRules\Demo2\Rules
+LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
+LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
 
 DataEntryApplicationDir=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
@@ -126,9 +127,11 @@ CreateDemo_LabDE:
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin"
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules"
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files"
 	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin"
 	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\StandardLabDE.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE"
 	@COPY "$(LabDEDir)\DEPs\StandardLabDE\ValidationFiles\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files"
+	@COPY "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files"
 	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules" /v /s /e /y
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
