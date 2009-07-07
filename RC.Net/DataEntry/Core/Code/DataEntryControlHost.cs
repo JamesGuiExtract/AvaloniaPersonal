@@ -1547,18 +1547,6 @@ namespace Extract.DataEntry
                         control.Enabled = imageIsAvailable;
                     }
 
-                    if (imageIsAvailable)
-                    {
-                        // Select the first control on the form.
-                        base.Focus();
-                        base.SelectNextControl(null, true, true, true, true);
-                    }
-                    else
-                    {
-                        // Clear any existing validation errors
-                        _errorProvider.Clear();
-                    }
-
                     // For as long as unpropagated attributes are found, propagate them and their 
                     // subattributes so that all attributes that can be are mapped into controls.
                     // This enables the entire attribute tree to be navigated forward and backward 
@@ -1599,7 +1587,11 @@ namespace Extract.DataEntry
 
                     DrawHighlights(true);
 
-                    OnItemSelectionChanged();
+                    // [DataEntry:432]
+                    // Some tasks (such as selecting the first control), must take place after the
+                    // ImageFileChanged event is complete. Use BeginInvoke to schedule
+                    // FinalizeDocumentLoad at the end of the current message queue.
+                    base.BeginInvoke(new ParameterlessDelegate(FinalizeDocumentLoad));
                 }
             }
             catch (Exception ex)
@@ -4380,6 +4372,32 @@ namespace Extract.DataEntry
                     i--;
                 }
             }
+        }
+
+        /// <summary>
+        /// Delegate for a function that does not take any parameters.
+        /// </summary>
+        delegate void ParameterlessDelegate();
+
+        /// <summary>
+        /// Preforms any operations that need to occur after ImageFileChanged has been called for
+        /// a newly loaded document.
+        /// </summary>
+        void FinalizeDocumentLoad()
+        {
+            if (_imageViewer.IsImageAvailable)
+            {
+                // Select the first control on the form.
+                base.Focus();
+                base.SelectNextControl(null, true, true, true, true);
+            }
+            else
+            {
+                // Clear any existing validation errors
+                _errorProvider.Clear();
+            }
+
+            OnItemSelectionChanged();
         }
 
         #endregion Private Members

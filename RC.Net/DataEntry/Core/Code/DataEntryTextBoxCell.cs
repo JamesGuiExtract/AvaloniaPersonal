@@ -278,12 +278,11 @@ namespace Extract.DataEntry
                 {
                     result = base.SetValue(rowIndex, _attribute.Value.String);
 
-                    if (base.DataGridView.Visible)
+                    if (base.DataGridView.Visible && base.Visible)
                     {
                         // [DataEntry:243]
-                        // If an attribute is being mapped into a cell, it is viewable.  Set viewable
-                        // now rather than later, otherwise HasBeenViewed will return false on the basis
-                        // that the attribute is not viewable.
+                        // Set viewable now rather than later, otherwise HasBeenViewed will return
+                        // false on the basis that the attribute is not viewable.
                         AttributeStatusInfo.MarkAsViewable(_attribute, true);
                     }
 

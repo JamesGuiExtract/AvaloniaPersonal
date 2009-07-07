@@ -1126,7 +1126,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             bool dataSaved = _dataEntryControlHost.SaveData();
 
-            OnFileComplete(new FileCompleteEventArgs(closing));
+            if (dataSaved)
+            {
+                OnFileComplete(new FileCompleteEventArgs(closing));
+            }
 
             return dataSaved;
         }

@@ -1713,18 +1713,11 @@ namespace Extract.DataEntry
                 IUnknownVector attributesToPaste = (IUnknownVector)
                     this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
 
-                
                 int count = attributesToPaste.Size();
                 for (int i = 0; i < count; i++)
                 {
                     IAttribute attribute = (IAttribute)attributesToPaste.At(i);
 
-                    // [DataEntry:426]
-                    // Ensure the parent attribute is initialized before applying the attribute to
-                    // the row, otherwise the parentAttribute property will not be set correctly
-                    // for column attributes.
-                    AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
-                        false, null, null, null);
 
                     // If the attributes are not from this table, rename them.
                     if (clipboardDataType != this.ClipboardDataType)
@@ -1811,8 +1804,20 @@ namespace Extract.DataEntry
                             destinationRows.Add(base.Rows[nextIndex]);
                         }
 
-                        ApplyAttributeToRow(destinationRows[rowsAdded].Index,
-                            (IAttribute)attributes.At(rowsAdded), insertBeforeAttribute);
+                        IAttribute attribute = (IAttribute)attributes.At(rowsAdded);
+
+                        // [DataEntry:426]
+                        // Ensure the parent attribute is initialized before applying the attribute
+                        // to the row, otherwise the parentAttribute property will not be set
+                        // correctly for column attributes. 
+                        if (AttributeStatusInfo.GetParentAttribute(attribute) == null)
+                        {
+                            AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null,
+                                false, false, null, null, null);
+                        }
+
+                        ApplyAttributeToRow(destinationRows[rowsAdded].Index, attribute,
+                            insertBeforeAttribute);
 
                         // If the attribute was added into the "new" row, the current entry in 
                         // destinationRows will now represent the new "new" row.  Therefore, adjust
