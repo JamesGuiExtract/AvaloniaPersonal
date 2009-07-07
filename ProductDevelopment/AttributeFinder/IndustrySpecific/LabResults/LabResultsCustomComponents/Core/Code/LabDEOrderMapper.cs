@@ -588,7 +588,7 @@ namespace Extract.LabResultsCustomComponents
                 else if (resultTime == null &&
                     attribute.Name.Equals("ResultTime", StringComparison.OrdinalIgnoreCase))
                 {
-                    resultDate = attribute;
+                    resultTime = attribute;
                 }
 
                 list.Add(attribute);

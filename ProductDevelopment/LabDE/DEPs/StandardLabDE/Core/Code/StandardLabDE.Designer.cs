@@ -78,13 +78,7 @@ namespace Extract.LabDE.StandardLabDE
             this._copyToPhysicianLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this._orderingPhysicianTable = new Extract.DataEntry.DataEntryTable();
-            this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianTable = new Extract.DataEntry.DataEntryTable();
-            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
             this._orderNumberLabel = new System.Windows.Forms.Label();
             this._orderNumber = new Extract.DataEntry.DataEntryTextBox();
@@ -97,6 +91,12 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
             this._resultStatusLabel = new System.Windows.Forms.Label();
+            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -921,62 +921,6 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianTable.SmartHintsEnabled = false;
             this._orderingPhysicianTable.TabIndex = 1;
             // 
-            // _orderingPhysicianFirstNameColumn
-            // 
-            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
-            this._orderingPhysicianFirstNameColumn.FormattingRuleFile = null;
-            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
-            this._orderingPhysicianFirstNameColumn.MinimumWidth = 75;
-            this._orderingPhysicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
-            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.TabStopRequired = true;
-            this._orderingPhysicianFirstNameColumn.UseComboBoxCells = false;
-            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianFirstNameColumn.ValidationListFileName = null;
-            this._orderingPhysicianFirstNameColumn.ValidationPattern = null;
-            this._orderingPhysicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE \'{\'../Last}\' OR" +
-                "DER BY FirstName</SQL>";
-            // 
-            // _orderingPhysicianLastNameColumn
-            // 
-            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._orderingPhysicianLastNameColumn.FormattingRuleFile = null;
-            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
-            this._orderingPhysicianLastNameColumn.MinimumWidth = 75;
-            this._orderingPhysicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.TabStopRequired = true;
-            this._orderingPhysicianLastNameColumn.UseComboBoxCells = false;
-            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
-            this._orderingPhysicianLastNameColumn.ValidationListFileName = null;
-            this._orderingPhysicianLastNameColumn.ValidationPattern = null;
-            this._orderingPhysicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
-            // 
-            // _orderingPhysicianCodeColumn
-            // 
-            this._orderingPhysicianCodeColumn.AttributeName = "Code";
-            this._orderingPhysicianCodeColumn.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
-            this._orderingPhysicianCodeColumn.FillWeight = 1F;
-            this._orderingPhysicianCodeColumn.FormattingRuleFile = null;
-            this._orderingPhysicianCodeColumn.HeaderText = "Code";
-            this._orderingPhysicianCodeColumn.MinimumWidth = 65;
-            this._orderingPhysicianCodeColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
-            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianCodeColumn.TabStopRequired = true;
-            this._orderingPhysicianCodeColumn.UseComboBoxCells = false;
-            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
-            this._orderingPhysicianCodeColumn.ValidationListFileName = null;
-            this._orderingPhysicianCodeColumn.ValidationPattern = null;
-            this._orderingPhysicianCodeColumn.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
-                "SQL>";
-            // 
             // _physicianTable
             // 
             this._physicianTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -1002,62 +946,6 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianTable.Size = new System.Drawing.Size(581, 90);
             this._physicianTable.SmartHintsEnabled = false;
             this._physicianTable.TabIndex = 2;
-            // 
-            // _physicianFirstNameColumn
-            // 
-            this._physicianFirstNameColumn.AttributeName = "First";
-            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._physicianFirstNameColumn.FillWeight = 75F;
-            this._physicianFirstNameColumn.FormattingRuleFile = null;
-            this._physicianFirstNameColumn.HeaderText = "First Name";
-            this._physicianFirstNameColumn.MinimumWidth = 75;
-            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
-            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianFirstNameColumn.TabStopRequired = true;
-            this._physicianFirstNameColumn.UseComboBoxCells = false;
-            this._physicianFirstNameColumn.ValidationErrorMessage = "";
-            this._physicianFirstNameColumn.ValidationListFileName = null;
-            this._physicianFirstNameColumn.ValidationPattern = null;
-            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician WHERE LastName LIKE \'{\'../Last}\' OR" +
-                "DER BY FirstName</SQL>";
-            // 
-            // _physicianLastNameColumn
-            // 
-            this._physicianLastNameColumn.AttributeName = "Last";
-            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
-            this._physicianLastNameColumn.FormattingRuleFile = null;
-            this._physicianLastNameColumn.HeaderText = "Last Name";
-            this._physicianLastNameColumn.MinimumWidth = 75;
-            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
-            this._physicianLastNameColumn.TabStopRequired = true;
-            this._physicianLastNameColumn.UseComboBoxCells = false;
-            this._physicianLastNameColumn.ValidationErrorMessage = "";
-            this._physicianLastNameColumn.ValidationListFileName = null;
-            this._physicianLastNameColumn.ValidationPattern = null;
-            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician ORDER BY LastName</SQL>";
-            // 
-            // _physicianCode
-            // 
-            this._physicianCode.AttributeName = "Code";
-            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
-            this._physicianCode.FillWeight = 1F;
-            this._physicianCode.FormattingRuleFile = null;
-            this._physicianCode.HeaderText = "Code";
-            this._physicianCode.MinimumWidth = 65;
-            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianCode.Name = "_physicianCode";
-            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianCode.TabStopRequired = true;
-            this._physicianCode.UseComboBoxCells = false;
-            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
-            this._physicianCode.ValidationListFileName = null;
-            this._physicianCode.ValidationPattern = null;
-            this._physicianCode.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
-                "SQL>";
             // 
             // _testDetailsGroupBox
             // 
@@ -1259,6 +1147,118 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatusLabel.Size = new System.Drawing.Size(70, 13);
             this._resultStatusLabel.TabIndex = 0;
             this._resultStatusLabel.Text = "Result Status";
+            // 
+            // _physicianFirstNameColumn
+            // 
+            this._physicianFirstNameColumn.AttributeName = "First";
+            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianFirstNameColumn.FillWeight = 75F;
+            this._physicianFirstNameColumn.FormattingRuleFile = null;
+            this._physicianFirstNameColumn.HeaderText = "First Name";
+            this._physicianFirstNameColumn.MinimumWidth = 75;
+            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
+            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianFirstNameColumn.TabStopRequired = true;
+            this._physicianFirstNameColumn.UseComboBoxCells = false;
+            this._physicianFirstNameColumn.ValidationErrorMessage = "";
+            this._physicianFirstNameColumn.ValidationListFileName = null;
+            this._physicianFirstNameColumn.ValidationPattern = null;
+            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician ORDER BY FirstName</SQL>";
+            // 
+            // _physicianLastNameColumn
+            // 
+            this._physicianLastNameColumn.AttributeName = "Last";
+            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianLastNameColumn.FormattingRuleFile = null;
+            this._physicianLastNameColumn.HeaderText = "Last Name";
+            this._physicianLastNameColumn.MinimumWidth = 75;
+            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
+            this._physicianLastNameColumn.TabStopRequired = true;
+            this._physicianLastNameColumn.UseComboBoxCells = false;
+            this._physicianLastNameColumn.ValidationErrorMessage = "";
+            this._physicianLastNameColumn.ValidationListFileName = null;
+            this._physicianLastNameColumn.ValidationPattern = null;
+            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE \'{\'../First}\' O" +
+                "RDER BY LastName</SQL>";
+            // 
+            // _physicianCode
+            // 
+            this._physicianCode.AttributeName = "Code";
+            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
+            this._physicianCode.FillWeight = 1F;
+            this._physicianCode.FormattingRuleFile = null;
+            this._physicianCode.HeaderText = "Code";
+            this._physicianCode.MinimumWidth = 65;
+            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianCode.Name = "_physicianCode";
+            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianCode.TabStopRequired = true;
+            this._physicianCode.UseComboBoxCells = false;
+            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
+            this._physicianCode.ValidationListFileName = null;
+            this._physicianCode.ValidationPattern = null;
+            this._physicianCode.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
+                "SQL>";
+            // 
+            // _orderingPhysicianFirstNameColumn
+            // 
+            this._orderingPhysicianFirstNameColumn.AttributeName = "First";
+            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
+            this._orderingPhysicianFirstNameColumn.FormattingRuleFile = null;
+            this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
+            this._orderingPhysicianFirstNameColumn.MinimumWidth = 75;
+            this._orderingPhysicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
+            this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianFirstNameColumn.TabStopRequired = true;
+            this._orderingPhysicianFirstNameColumn.UseComboBoxCells = false;
+            this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianFirstNameColumn.ValidationListFileName = null;
+            this._orderingPhysicianFirstNameColumn.ValidationPattern = null;
+            this._orderingPhysicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician ORDER BY FirstName</SQL>";
+            // 
+            // _orderingPhysicianLastNameColumn
+            // 
+            this._orderingPhysicianLastNameColumn.AttributeName = "Last";
+            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._orderingPhysicianLastNameColumn.FormattingRuleFile = null;
+            this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
+            this._orderingPhysicianLastNameColumn.MinimumWidth = 75;
+            this._orderingPhysicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
+            this._orderingPhysicianLastNameColumn.TabStopRequired = true;
+            this._orderingPhysicianLastNameColumn.UseComboBoxCells = false;
+            this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
+            this._orderingPhysicianLastNameColumn.ValidationListFileName = null;
+            this._orderingPhysicianLastNameColumn.ValidationPattern = null;
+            this._orderingPhysicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE \'{\'../First}\' O" +
+                "RDER BY LastName</SQL>";
+            // 
+            // _orderingPhysicianCodeColumn
+            // 
+            this._orderingPhysicianCodeColumn.AttributeName = "Code";
+            this._orderingPhysicianCodeColumn.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
+            this._orderingPhysicianCodeColumn.FillWeight = 1F;
+            this._orderingPhysicianCodeColumn.FormattingRuleFile = null;
+            this._orderingPhysicianCodeColumn.HeaderText = "Code";
+            this._orderingPhysicianCodeColumn.MinimumWidth = 65;
+            this._orderingPhysicianCodeColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
+            this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderingPhysicianCodeColumn.TabStopRequired = true;
+            this._orderingPhysicianCodeColumn.UseComboBoxCells = false;
+            this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
+            this._orderingPhysicianCodeColumn.ValidationListFileName = null;
+            this._orderingPhysicianCodeColumn.ValidationPattern = null;
+            this._orderingPhysicianCodeColumn.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
+                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
+                "SQL>";
             // 
             // StandardLabDEPanel
             // 
