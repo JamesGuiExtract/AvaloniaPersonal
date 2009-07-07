@@ -69,6 +69,7 @@ void SelectDBDialog::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(SelectDBDialog, CDialog)
 	ON_BN_CLICKED(IDCLOSE, &SelectDBDialog::OnBnClickedClose)
 	ON_CBN_KILLFOCUS(IDC_COMBO_SELECT_DB_SERVER, &SelectDBDialog::OnCbnKillfocusComboSelectDbServer)
+	ON_WM_CLOSE()
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -121,6 +122,22 @@ void SelectDBDialog::OnBnClickedClose()
 		EndDialog(IDCLOSE);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17464");
+}
+//-------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnCancel()
+{
+	// Stubbed in to prevent dialog closing on esc pressed
+}
+//-------------------------------------------------------------------------------------------------
+void SelectDBDialog::OnClose()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		EndDialog(IDCLOSE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26653");
 }
 //-------------------------------------------------------------------------------------------------
 void SelectDBDialog::OnOK()

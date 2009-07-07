@@ -33,6 +33,8 @@ protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
 	virtual BOOL OnInitDialog();
 	virtual void OnOK();
+	virtual void OnCancel(); // Stubbed in to prevent dialog from closing on esc
+	virtual void OnClose();
 
 	DECLARE_MESSAGE_MAP()
 public:
