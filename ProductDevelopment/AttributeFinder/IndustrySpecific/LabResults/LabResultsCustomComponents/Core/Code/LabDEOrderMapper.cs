@@ -1,4 +1,5 @@
 using Extract.Interop;
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -230,42 +231,50 @@ namespace Extract.LabResultsCustomComponents
                 List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo, out resultDate,
                     out resultTime);
 
-                string connectionString = "Data Source=" + databaseFile;
-                IUnknownVector newAttributes = new IUnknownVector();
-                using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
+                // Get a temporary file for the database connection to use
+                using (TemporaryFile tempFile = new TemporaryFile(".sdf"))
                 {
-                    // Create an attribute sorter for sorting sub attributes
-                    ISortCompare attributeSorter =
-                                (ISortCompare) new SpatiallyCompareAttributesClass();
+                    // Build the connection string
+                    string connectionString = "Data Source='" + databaseFile
+                        + "'; File Mode='read only'; Temp Path='" + tempFile.FileName + "';";
 
-                    foreach (IAttribute attribute in attributes)
+                    // Build a new vector of attributes that have been mapped to orders
+                    IUnknownVector newAttributes = new IUnknownVector();
+                    using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
                     {
-                        if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
-                        {
-                            List<IAttribute> mappedAttributes =
-                                MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
-                                    dbConnection);
-                            foreach (IAttribute newAttribute in mappedAttributes)
-                            {
-                                // Sort the sub attributes spatially
-                                newAttribute.SubAttributes.Sort(attributeSorter);
+                        // Create an attribute sorter for sorting sub attributes
+                        ISortCompare attributeSorter =
+                                    (ISortCompare)new SpatiallyCompareAttributesClass();
 
-                                // Add the attribute to the vector
-                                newAttributes.PushBack(newAttribute);
+                        foreach (IAttribute attribute in attributes)
+                        {
+                            if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
+                            {
+                                List<IAttribute> mappedAttributes =
+                                    MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
+                                        dbConnection);
+                                foreach (IAttribute newAttribute in mappedAttributes)
+                                {
+                                    // Sort the sub attributes spatially
+                                    newAttribute.SubAttributes.Sort(attributeSorter);
+
+                                    // Add the attribute to the vector
+                                    newAttributes.PushBack(newAttribute);
+                                }
+                            }
+                            else
+                            {
+                                // Not a test attribute, just copy it
+                                newAttributes.PushBack(attribute);
                             }
                         }
-                        else
-                        {
-                            // Not a test attribute, just copy it
-                            newAttributes.PushBack(attribute);
-                        }
                     }
-                }
 
-                // Clear the original attributes and set the attributes to the
-                // newly mapped collection
-                pAttributes.Clear();
-                pAttributes.CopyFrom(newAttributes);
+                    // Clear the original attributes and set the attributes to the
+                    // newly mapped collection
+                    pAttributes.Clear();
+                    pAttributes.CopyFrom(newAttributes);
+                }
             }
             catch (Exception ex)
             {
