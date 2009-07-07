@@ -225,7 +225,10 @@ namespace Extract.LabResultsCustomComponents
                 }
 
                 IAttribute labInfo = null;
-                List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo);
+                IAttribute resultDate = null;
+                IAttribute resultTime = null;
+                List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo, out resultDate,
+                    out resultTime);
 
                 string connectionString = "Data Source=" + databaseFile;
                 IUnknownVector newAttributes = new IUnknownVector();
@@ -240,7 +243,8 @@ namespace Extract.LabResultsCustomComponents
                         if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
                         {
                             List<IAttribute> mappedAttributes =
-                                MapOrders(attribute.SubAttributes, labInfo, dbConnection);
+                                MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
+                                    dbConnection);
                             foreach (IAttribute newAttribute in mappedAttributes)
                             {
                                 // Sort the sub attributes spatially
@@ -538,11 +542,16 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         /// <param name="attributes">The unknown vector of attributes to search.</param>
         /// <param name="labInfo">The lab info attribute (if found).</param>
+        /// <param name="resultDate">The result date attribute (if found).</param>
+        /// <param name="resultTime">The result time attribute (if found).</param>
         /// <returns>A <see cref="List{T}"/> of IAttributes.</returns>
-        static List<IAttribute> GetLabInfo(IUnknownVector attributes, out IAttribute labInfo)
+        static List<IAttribute> GetLabInfo(IUnknownVector attributes, out IAttribute labInfo,
+            out IAttribute resultDate, out IAttribute resultTime)
         {
             // Default labInfo to null
             labInfo = null;
+            resultDate = null;
+            resultTime = null;
 
             int size = attributes.Size();
 
@@ -557,6 +566,20 @@ namespace Extract.LabResultsCustomComponents
                     attribute.Name.Equals("LabInfo", StringComparison.OrdinalIgnoreCase))
                 {
                     labInfo = attribute;
+                }
+                // Check if this attribute is a ResultDate attribute (if we haven't found
+                // one yet) and assign it
+                else if (resultDate == null &&
+                    attribute.Name.Equals("ResultDate", StringComparison.OrdinalIgnoreCase))
+                {
+                    resultDate = attribute;
+                }
+                // Check if this attribute is a ResultTime attribute (if we haven't found
+                // one yet) and assign it
+                else if (resultTime == null &&
+                    attribute.Name.Equals("ResultTime", StringComparison.OrdinalIgnoreCase))
+                {
+                    resultDate = attribute;
                 }
 
                 list.Add(attribute);
@@ -574,8 +597,14 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="labInfo">Temporary parameter for passing in the
         /// LabInfo attribute, in the future this attribute should be a subattribute
         /// of the test.</param>
+        /// <param name="resultDate">Temporary parameter for passing in the
+        /// ResultDate attribute, in the future this attribute should be a subattribute
+        /// of the test.</param>
+        /// <param name="resultTime">Temporary parameter for passing in the
+        /// ResultTime attribute, in the future this attribute should be a subattribute
+        /// of the test.</param>
         List<IAttribute> MapOrders(IUnknownVector attributes, IAttribute labInfo,
-            SqlCeConnection dbConnection)
+            IAttribute resultDate, IAttribute resultTime, SqlCeConnection dbConnection)
         {
             // Get the source doc name from the first attribute
             string sourceDocName = "Unknown";
@@ -662,6 +691,14 @@ namespace Extract.LabResultsCustomComponents
                         if (labInfoAttribute != null)
                         {
                             vecMatched.PushBack(labInfoAttribute);
+                        }
+                        if (resultDate != null)
+                        {
+                            vecMatched.PushBack(resultDate);
+                        }
+                        if (resultTime != null)
+                        {
+                            vecMatched.PushBack(resultTime);
                         }
 
                         // Get the best match order for the remaining unmatched tests
