@@ -2,4 +2,6 @@
 //K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_11_2008013843.tif
 rule01=hereby^3~grant^5~to^6~Grantee^?Grantee^120~[the^3~following
 //WD_GRANTEE_16=conveys|convey|warrant|warrants^50~unto|[to]|[t0]^?Grantee^300~herein^30~grantee
+// 0069.tif;k:\common\engineering\sample files\atpac\ca - fresno\set003\images\deed\20049000000900.002.tif.uss
+WD_GRANTEE_38=GRANT(S)^5~[to]|[t0]^?Grantee^800~the following|REAL PROPERTY|community property
 [PATTERNS_END]
