@@ -338,7 +338,7 @@ void CDistanceConverter::testConverter()
 			{
 				ue.addDebugInfo("Case No", string(cstrNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (...)
@@ -347,7 +347,7 @@ void CDistanceConverter::testConverter()
 				uclidException.addDebugInfo("Case No", string(cstrNo));
 				uclidException.addDebugInfo("strForTest", strForTest);
 				string strError(uclidException.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			

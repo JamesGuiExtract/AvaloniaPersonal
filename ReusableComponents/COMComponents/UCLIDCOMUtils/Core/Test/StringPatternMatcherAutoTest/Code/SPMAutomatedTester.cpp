@@ -145,7 +145,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 				ue.addDebugInfo("Expected", tc.m_ipExpectedMatches->Size);
 				ue.addDebugInfo("Actual", ipResults->Size);
 				m_ipResultLogger->AddTestCaseException(
-					_bstr_t(ue.asStringizedByteStream().c_str()));
+					_bstr_t(ue.asStringizedByteStream().c_str()), VARIANT_FALSE);
 			}
 			else
 			{
@@ -193,7 +193,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 							ue.addDebugInfo("ActualValue", strActualValue);
 							bRet = VARIANT_FALSE;
 							m_ipResultLogger->AddTestCaseException(
-								_bstr_t(ue.asStringizedByteStream().c_str()));
+								_bstr_t(ue.asStringizedByteStream().c_str()), VARIANT_FALSE);
 						}
 					}
 					else
@@ -204,7 +204,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 						ue.addDebugInfo("ActualValue", (char *) _bstrActualMatchValue);
 						bRet = VARIANT_FALSE;
 						m_ipResultLogger->AddTestCaseException(
-							_bstr_t(ue.asStringizedByteStream().c_str()));
+							_bstr_t(ue.asStringizedByteStream().c_str()), VARIANT_FALSE);
 					}
 				}
 			}
@@ -242,7 +242,7 @@ STDMETHODIMP CSPMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 
 		m_ipResultLogger->EndTestCase(nNumFailedCases == 0 ? VARIANT_TRUE : VARIANT_FALSE);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI05971", m_ipResultLogger, bExceptionCaught)
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI05971", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE)
 
 	return S_OK;
 }

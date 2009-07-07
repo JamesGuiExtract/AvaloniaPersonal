@@ -280,7 +280,7 @@ STDMETHODIMP CEFMAutomatedTester::raw_RunAutomatedTests(IVariantVector* pParams,
 		delete[] pOutData3;
 
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07591", m_ipResultLogger, bExceptionCaught)
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07591", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE)
 
 	return S_OK;
 }

@@ -235,10 +235,10 @@ void CTestIntersection::processTestCase(const std::string& strLine)
 		bSuccess = testIntersection(vecTokens[2], vecTokens[3], vecTokens[4]);
 		bSuccess = testIntersection(vecTokens[3], vecTokens[2], vecTokens[4]) && bSuccess;
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI15203", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI15203", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //--------------------------------------------------------------------------------------------------
 IRasterZonePtr CTestIntersection::asRasterZone(const std::string& strRect)

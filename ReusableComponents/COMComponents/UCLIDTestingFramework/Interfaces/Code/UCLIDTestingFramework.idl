@@ -49,29 +49,57 @@ library UCLID_TESTINGFRAMEWORKINTERFACESLib
 	]
 	interface ITestResultLogger : IDispatch
 	{
+		//------------------------------------------------------------------------------------------
 		[id(1), helpstring("method StartTestHarness")] HRESULT StartTestHarness([in] BSTR strHarnessDescription);
+		//------------------------------------------------------------------------------------------
 		// strOutputFileName - is not a fully qualified file name. It only contains the output file name
 		// without any specific path point to it. It could be empty, which means that there is no output
 		// file to be created.
-		[id(2), helpstring("method StartComponentTest")] HRESULT StartComponentTest([in] BSTR strComponentDescription, [in] BSTR strOutputFileName);
-		[id(3), helpstring("method StartTestCase")] HRESULT StartTestCase([in] BSTR strTestCaseID, [in] BSTR strTestCaseDescription, [in] ETestCaseType eTestCaseType);
+		[id(2), helpstring("method StartComponentTest")] HRESULT StartComponentTest(
+			[in] BSTR strComponentDescription, [in] BSTR strOutputFileName);
+		//------------------------------------------------------------------------------------------
+		[id(3), helpstring("method StartTestCase")] HRESULT StartTestCase([in] BSTR strTestCaseID,
+			[in] BSTR strTestCaseDescription, [in] ETestCaseType eTestCaseType);
+		//------------------------------------------------------------------------------------------
 		[id(4), helpstring("method AddTestCaseNote")] HRESULT AddTestCaseNote([in] BSTR strTestCaseNote);
-		[id(5), helpstring("method AddTestCaseException")] HRESULT AddTestCaseException([in] BSTR strTestCaseException);
+		//------------------------------------------------------------------------------------------
+		// Adds an exception node to the test case and if vbFailTestCase == VARIANT_TRUE
+		// ends the test case marking it as failed.
+		[id(5), helpstring("method AddTestCaseException")] HRESULT AddTestCaseException(
+			[in] BSTR strTestCaseException, [in] VARIANT_BOOL vbFailTestCase);
+		//------------------------------------------------------------------------------------------
 		[id(6), helpstring("method EndTestCase")] HRESULT EndTestCase([in] VARIANT_BOOL bResult);
+		//------------------------------------------------------------------------------------------
 		[id(7), helpstring("method EndComponentTest")] HRESULT EndComponentTest();
+		//------------------------------------------------------------------------------------------
 		[id(8), helpstring("method EndTestHarness")] HRESULT EndTestHarness();
+		//------------------------------------------------------------------------------------------
 		// The detail text will be brought up in message box
 		[id(9), helpstring("method AddTestCaseDetailNote")] HRESULT AddTestCaseDetailNote([in] BSTR strTitle, [in] BSTR strTestCaseDetailNote);
+		//------------------------------------------------------------------------------------------
 		// The memo item, the memo text will be bought up in NotePad
 		[id(10), helpstring("method AddTestCaseMemo")] HRESULT AddTestCaseMemo([in] BSTR strTitle, [in] BSTR strTestCaseMemo);
+		//------------------------------------------------------------------------------------------
 		// The file item will be opened in the registered application when double-clicked on
 		[id(11), helpstring("method AddTestCaseMemo")] HRESULT AddTestCaseFile([in] BSTR strFileName);
+		//------------------------------------------------------------------------------------------
 		// If an exception occurs while executing a component test
 		[id(12), helpstring("method AddComponentTestException")] HRESULT AddComponentTestException([in] BSTR strComponentTestException);
+		//------------------------------------------------------------------------------------------
 		// Display the found and expected data side by side in the lower window with 2 labels.
-		[id(13), helpstring("method AddTestCaseCompareData")] HRESULT AddTestCaseCompareData(	[in] BSTR strTitle,
-																								[in] BSTR strLabel1, [in] BSTR strInput1,
-																								[in] BSTR strLabel2, [in] BSTR strInput2);
+		[id(13), helpstring("method AddTestCaseCompareData")] HRESULT AddTestCaseCompareData(
+			[in] BSTR strTitle, [in] BSTR strLabel1, [in] BSTR strInput1, [in] BSTR strLabel2,
+			[in] BSTR strInput2);
+		//------------------------------------------------------------------------------------------
+		// If VARIANT_FALSE then no entries will be added to the result logger for individual
+		// test cases (i.e. Calling StartTestCase will not cause a node to be added to the
+		// result logger dialog).  All statistics will still be calculated and the information
+		// will still be logged to the output file.
+		[propget, id(14), helpstring("property AddEntriesToTestLogger")]
+			HRESULT AddEntriesToTestLogger([out, retval] VARIANT_BOOL* pvbAddEntries);
+		[propput, id(14), helpstring("property AddEntriesToTestLogger")]
+			HRESULT AddEntriesToTestLogger([in] VARIANT_BOOL vbAddEntries);
+		//------------------------------------------------------------------------------------------
 	};
 	[
 		object,

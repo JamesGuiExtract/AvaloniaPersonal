@@ -140,10 +140,6 @@ private:
 	// Flags for statistic output settings
 	bool m_bOutputHybridStats;
 
-	// Flag to indicate whether the UI should be updated for every test or just
-	// for the final statistics
-	bool m_bOutputFinalStatsOnly;
-
 	// counters
 	unsigned long m_ulTotalExpectedRedactions, m_ulNumCorrectRedactions, 
 		m_ulNumFalsePositives, m_ulNumOverRedactions, m_ulNumUnderRedactions,

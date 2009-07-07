@@ -463,9 +463,9 @@ void CStringCSISTester::doTest(const string& strOperation, const stringCSIS& str
 		}
 
 		// Set vbRet to indicate success or failure
-		vbRet = ( bSuccess ) ? VARIANT_TRUE : VARIANT_FALSE;
+		vbRet = asVariantBool(bSuccess);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI15946", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI15946", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	// if an exception was caught the test case fails otherwise use the result
 	vbRet = bExceptionCaught ? VARIANT_FALSE : vbRet;

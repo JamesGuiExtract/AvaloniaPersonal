@@ -415,12 +415,11 @@ void CEntityNameDataScorerTester::doSingleTest( long nExpectedScore, std::string
 		// Set bSuccess to indicate results
 		bSuccess = (nCalculatedScore == nExpectedScore);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09111", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09111", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	VARIANT_BOOL bRet = bSuccess ? VARIANT_TRUE : VARIANT_FALSE;
 
-	m_ipResultLogger->EndTestCase( bRet );
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //-------------------------------------------------------------------------------------------------
 void CEntityNameDataScorerTester::doGroupTest( long nExpectedGroupScore, vector<std::string>& vecAttrValues )
@@ -484,11 +483,10 @@ void CEntityNameDataScorerTester::doGroupTest( long nExpectedGroupScore, vector<
 		// Set the results
 		bSuccess = (nCalculatedScore == nExpectedGroupScore);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09118", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09118", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	VARIANT_BOOL bRet = bSuccess ? VARIANT_TRUE : VARIANT_FALSE;
 
-	m_ipResultLogger->EndTestCase( bRet );
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //-------------------------------------------------------------------------------------------------

@@ -1071,7 +1071,7 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 			m_mapRuleCaptureInfo["NO_RULE"].m_vecTestCasesInfo.push_back(TestCaseData(strRSDFile, strInputTextFile, strEAVFile, strRuleID, kNoMatch));
 		}
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09205", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09205", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 	
 	// try catch block will catch the exceptions that occur in the processing of the expected 
 	// results.
@@ -1093,7 +1093,6 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 		// exception and not count the expected attributes
 		if ( m_ipCurrentAttributes == NULL )
 		{
-			
 			m_ipCurrentAttributes.CreateInstance(CLSID_IUnknownVector);
 			ASSERT_RESOURCE_ALLOCATION("ELI09206", m_ipCurrentAttributes != NULL );
 		}
@@ -1143,7 +1142,7 @@ void CGrantorGranteeTester::processTestCase(const string& strRSDFile,
 		}
 
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06326", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06326", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	// Check for success
 	bSuccess = bSuccess && !bExceptionCaught;

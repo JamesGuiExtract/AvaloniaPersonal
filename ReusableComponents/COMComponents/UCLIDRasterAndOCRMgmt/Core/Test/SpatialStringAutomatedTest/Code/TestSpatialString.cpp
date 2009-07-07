@@ -140,11 +140,10 @@ void CTestSpatialString::runTestCase2()
 		{
 			bSuccess = false;
 		}
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06696", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06696", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase4()
@@ -174,11 +173,10 @@ void CTestSpatialString::runTestCase4()
 		zTemp.Format("The expected size is : %d\r\n"
 			"The obtained size is : %d", nExpectedSize, nObtainedSize);
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06698", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06698", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase5()
@@ -214,11 +212,10 @@ void CTestSpatialString::runTestCase5()
 			"The obtained character is : %c", 
 			strTestStr.c_str(), cExpected, cObtained);
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06699", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06699", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase6()
@@ -275,11 +272,10 @@ void CTestSpatialString::runTestCase6()
 			"The obtained string is : %s", 
 			strOrigin.c_str(),strTestStr.c_str(), strTemp.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06700", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06700", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//****************
 	// Test - 2
@@ -331,11 +327,10 @@ void CTestSpatialString::runTestCase6()
 			"The obtained string is : %s", 
 			strOrigin.c_str(),strTestStr.c_str(), strTemp.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19323", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19323", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase7()
@@ -377,11 +372,10 @@ void CTestSpatialString::runTestCase7()
 		zTemp.Format("The expected string is : %s\r\n"
 			"The obtained string is : %s", strTestStr.c_str(), strTemp.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06702", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06702", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase8()
@@ -425,11 +419,10 @@ void CTestSpatialString::runTestCase8()
 			"The obtained string is : %s", 
 			strTestStr.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06709", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06709", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************
 	// Test 2
@@ -468,11 +461,10 @@ void CTestSpatialString::runTestCase8()
 			"The obtained string is : %s", 
 			strTestStr.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19325", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19325", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase9()
@@ -516,11 +508,10 @@ void CTestSpatialString::runTestCase9()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strTestStr.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06710", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06710", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//************
 	// Test 2
@@ -559,11 +550,10 @@ void CTestSpatialString::runTestCase9()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strTestStr.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19326", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19326", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase10()
@@ -610,12 +600,10 @@ void CTestSpatialString::runTestCase10()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strTestStr.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
-	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06711", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06711", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************************
 	// Test 2 - use no regular expression, case insensitive
@@ -668,11 +656,10 @@ void CTestSpatialString::runTestCase10()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strTestStr.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19327", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19327", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************************
 	// Test 3 - use regular expression, case sensitive
@@ -709,11 +696,10 @@ void CTestSpatialString::runTestCase10()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19328", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19328", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************************
 	// Test 4 - use regular expression, case sensitive
@@ -750,12 +736,10 @@ void CTestSpatialString::runTestCase10()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
-	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06937", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06937", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************************
 	// Test 5 - use none regular expression, 
@@ -794,11 +778,10 @@ void CTestSpatialString::runTestCase10()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06841", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06841", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************************
 	// Test 6 - use none regular expression, 
@@ -823,14 +806,14 @@ void CTestSpatialString::runTestCase10()
 
 		m_ipSpatialString->Replace("", "ABC", VARIANT_FALSE, 0, NULL);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06842", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06842", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 	
 	// in this case, it is supposed to throw an exception
 	bSuccess = bSuccess && bExceptionCaught;
 	m_ipResultLogger->AddTestCaseMemo("Result", 
 		get_bstr_t("An exception must be caught for this test case. Please make sure"
 		" this exception is throwing from Replace( ) method."));
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase11()
@@ -870,11 +853,10 @@ void CTestSpatialString::runTestCase11()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06712", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06712", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************
 	// Test 2 - Case insensitive
@@ -908,11 +890,10 @@ void CTestSpatialString::runTestCase11()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19329", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19329", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************
 	// Test 3 - Consolidate multiple characters
@@ -945,11 +926,10 @@ void CTestSpatialString::runTestCase11()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06901", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06901", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************
 	// Test 4 - No change
@@ -983,11 +963,10 @@ void CTestSpatialString::runTestCase11()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06902", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06902", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************
 	// Test 5 - No change
@@ -1021,11 +1000,10 @@ void CTestSpatialString::runTestCase11()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06903", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06903", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase12()
@@ -1066,11 +1044,10 @@ void CTestSpatialString::runTestCase12()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06907", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06907", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//*************************
 	// Test 2 - Consolidate multiple characters
@@ -1103,11 +1080,10 @@ void CTestSpatialString::runTestCase12()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06908", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06908", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase13()
@@ -1147,11 +1123,10 @@ void CTestSpatialString::runTestCase13()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06713", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06713", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//**************************
 	// Test 2 - Trimming trailing only
@@ -1184,11 +1159,10 @@ void CTestSpatialString::runTestCase13()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19330", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19330", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//**************************
 	// Test 3 - Trimming both ends
@@ -1221,11 +1195,10 @@ void CTestSpatialString::runTestCase13()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19331", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19331", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase14()
@@ -1285,11 +1258,10 @@ void CTestSpatialString::runTestCase14()
 		CString zTemp("");
 		zTemp.Format("The original string is : %s", strOrigin.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06714", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06714", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase15()
@@ -1324,11 +1296,10 @@ void CTestSpatialString::runTestCase15()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06715", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06715", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase16()
@@ -1363,11 +1334,10 @@ void CTestSpatialString::runTestCase16()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06716", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06716", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase17()
@@ -1402,11 +1372,10 @@ void CTestSpatialString::runTestCase17()
 			"The obtained string is : %s", 
 			strOrigin.c_str(), strExpected.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06717", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06717", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase18()
@@ -1467,12 +1436,13 @@ void CTestSpatialString::runTestCase18()
 			"The expected string is: %s\r\n"
 			"The obtained string is : %s", 
 			strOrigin.c_str(), c, strExpected.c_str(), strObtained.c_str());
+
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06830", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06830", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 	
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	//**********************
 	// Test - 2
@@ -1501,11 +1471,10 @@ void CTestSpatialString::runTestCase18()
 		CString zTemp("");
 		zTemp.Format("The result of checking IsSptial() = %s (supposed to be true)", strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06831", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06831", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//**********************
 	// Test - 3
@@ -1543,11 +1512,10 @@ void CTestSpatialString::runTestCase18()
 			"The sub string is : %s ==> HasSpatialInfo() = %s (supposed to be false)",
 			strOrigin.c_str(), c, strSubString.c_str(), strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06832", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06832", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//**********************
 	// Test - 4
@@ -1585,11 +1553,10 @@ void CTestSpatialString::runTestCase18()
 			"The sub string is : %s ==> HasSpatialInfo() = %s (supposed to be true)",
 			strOrigin.c_str(), c, strSubString.c_str(), strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06833", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06833", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//**********************
 	// Test - 5
@@ -1629,11 +1596,10 @@ void CTestSpatialString::runTestCase18()
 			strOrigin.c_str(), c, strAfterInsertion.c_str(), 
 			strAfterReplacement.c_str(), strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06834", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06834", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 
 	//**********************
@@ -1681,11 +1647,10 @@ void CTestSpatialString::runTestCase18()
 			strOrigin.c_str(), c, strAfterInsertion.c_str(), 
 			strAfterRemove.c_str(), strIsHybrid.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06835", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06835", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase19()
@@ -1756,11 +1721,10 @@ void CTestSpatialString::runTestCase19()
 			strOrigin.c_str(), c, strAfterInsertion.c_str(), 
 			strAfterConsolidate.c_str(), strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06839", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06839", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 void CTestSpatialString::runTestCase20()
@@ -1796,11 +1760,10 @@ void CTestSpatialString::runTestCase20()
 			"The obtained source document name is : %s",
 			strExpectedSourceFileName.c_str(), strObtainedSourceFileName.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06840", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06840", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	//******************
 	// Test - 2
@@ -1831,11 +1794,10 @@ void CTestSpatialString::runTestCase20()
 			"The obtained source document name is : %s",
 			strObtained.c_str(), strObtained.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
+
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19333", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19333", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -1984,11 +1946,9 @@ void CTestSpatialString::runTestCase21()
 		}
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zResultMemo));
 		
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07180", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07180", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	////////////////////////////////////////////
 	// Intialize for GetLines Test Case 21_2
@@ -2048,11 +2008,9 @@ void CTestSpatialString::runTestCase21()
 		}
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zResultMemo));
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07181", m_ipResultLogger, bExceptionCaught);
-
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07181", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	
 	/////////////////////////////////////////////
@@ -2113,11 +2071,9 @@ void CTestSpatialString::runTestCase21()
 		}
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zResultMemo));
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07182", m_ipResultLogger, bExceptionCaught);
-
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07182", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -2214,11 +2170,9 @@ void CTestSpatialString::runTestCase22()
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load SourceDoc", ipMultipleSpatialString->SourceDocName  );
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load Result", ipMultipleSpatialString->String );
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09075", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09075", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 
 	// Text case 22_2 Test Loading a single USS file with LoadFromMultipleFiles
@@ -2304,11 +2258,9 @@ void CTestSpatialString::runTestCase22()
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load SourceDoc", ipMultipleSpatialString->SourceDocName  );
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load Result", ipMultipleSpatialString->String );
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09078", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09078", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	// Test case 22_3 Load multiple txt files with LoadFromMultipleFiles
 	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_22_3"),
@@ -2355,12 +2307,9 @@ void CTestSpatialString::runTestCase22()
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load SourceDoc", ipMultipleSpatialString->SourceDocName  );
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load Result", ipMultipleSpatialString->String );
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09087", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
-
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09087", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 
 	// Test Loading a single txt file with LoadFromMultipleFiles
 	bSuccess = false;
@@ -2405,11 +2354,9 @@ void CTestSpatialString::runTestCase22()
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load SourceDoc", ipMultipleSpatialString->SourceDocName  );
 		m_ipResultLogger->AddTestCaseMemo("Multiple File Load Result", ipMultipleSpatialString->String );
 
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09090", m_ipResultLogger, bExceptionCaught);
-	
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI09090", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //--------------------------------------------------------------------------------------------------
 // added as per [p13 #4942] - 03/28/2008 - JDS
@@ -2503,11 +2450,10 @@ void CTestSpatialString::runTestCase23()
 		strResult += "\t" + asString(lWordCount) + " words";
 		
 		m_ipResultLogger->AddTestCaseMemo("Result", strResult.c_str());
-	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI20625", m_ipResultLogger, bExceptionCaught);
 
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI20625", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //--------------------------------------------------------------------------------------------------
 // Added based on [LegacyRCAndUtils #4976] - JDS - 05/14/2008
@@ -2549,11 +2495,10 @@ void CTestSpatialString::runTestCase24()
 
 			bSuccess = !asCppBool(ipTemp->IsMultiPage());
 		}
-	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI21192", m_ipResultLogger, bExceptionCaught);
 
-	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+	}
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI21192", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //--------------------------------------------------------------------------------------------------
 void CTestSpatialString::setTestFileFolder(IVariantVectorPtr ipParams, const std::string &strTCLFile)

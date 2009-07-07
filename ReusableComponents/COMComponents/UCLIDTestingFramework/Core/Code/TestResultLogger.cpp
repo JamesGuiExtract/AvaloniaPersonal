@@ -49,7 +49,7 @@ static const string gstrTEST_CASE_COMPARE = "TestCaseCompareData";
 // CTestResultLogger
 //-------------------------------------------------------------------------------------------------
 CTestResultLogger::CTestResultLogger()
-: m_pDlg(NULL), m_eCurrentTestCaseType(kInvalidTestCaseType)
+: m_pDlg(NULL), m_eCurrentTestCaseType(kInvalidTestCaseType), m_bAddEntriesInLogWindow(true)
 #ifdef INCLUDE_DB_SUPPORT
   ,m_tblTestHarness(&m_db), m_tblComponentTest(&m_db), m_tblTestCase(&m_db), 
   m_tblTestCaseNote(&m_db), m_tblTestCaseException(&m_db)
@@ -316,63 +316,7 @@ STDMETHODIMP CTestResultLogger::raw_StartTestCase(BSTR strTestCaseID, BSTR strTe
 		// Check licensing
 		validateLicense();
 
-		_bstr_t bstrTestCaseID(strTestCaseID);
-		_bstr_t bstrTestCaseDescription(strTestCaseDescription);
-		string stdstrTestCaseID = bstrTestCaseID;
-		string stdstrTestCaseDescription = bstrTestCaseDescription;
-		m_eCurrentTestCaseType = eTestCaseType;
-
-		// start the stop watch
-		m_testCaseStopWatch.reset();
-		m_testCaseStopWatch.start();
-
-#ifdef INCLUDE_DB_SUPPORT
-		if (m_bWriteToDB)
-		{
-			// create new record
-			CDaoRecordset rs(&m_db);
-			rs.Open(&m_tblTestCase);
-			rs.AddNew();
-
-			// set the field values
-			setStringFieldValue(rs, "Description", stdstrTestCaseDescription.c_str());
-			setNumberFieldValue(rs, "HarnessId", m_ulTestHarnessId);
-			setNumberFieldValue(rs, "ComponentTestId", m_ulComponentTestId);
-			setNumberFieldValue(rs, "Type", eTestCaseType);
-			setStringFieldValue(rs, "HRTestCaseId", stdstrTestCaseID.c_str());
-			setNumberFieldValue(rs, "StartTime", (long) time(NULL));
-			
-			// remember the id of this test case
-			m_ulTestCaseId = rs.GetFieldValue("TestCaseId").lVal;
-			
-			// save and close the recordset
-			rs.Update();
-			rs.Close();
-
-			string strTestCaseId = "[";
-			strTestCaseId += asString(m_ulTestCaseId);
-			strTestCaseId += "] ";
-			stdstrTestCaseDescription.insert(0, strTestCaseId);
-		}
-		else
-#endif
-		{
-			// start the test case
-			m_outputFile << getStartTag(gstrTEST_CASE) << endl;
-			
-			// write the ID tag
-			m_outputFile << getStartTag(gstrID) << endl;
-			writeHTMLText(stdstrTestCaseID);
-			m_outputFile << getEndTag(gstrID) << endl;
-			
-			// write the description
-			m_outputFile << getStartTag(gstrDESCRIPTION) << endl;
-			writeHTMLText(stdstrTestCaseDescription);
-			m_outputFile << getEndTag(gstrDESCRIPTION) << endl;
-		}
-
-		// update the UI
-		m_pDlg->startTestCase(stdstrTestCaseID, stdstrTestCaseDescription, eTestCaseType);
+		startTestCase(asString(strTestCaseID), asString(strTestCaseDescription), eTestCaseType);
 
 		return S_OK;
 	}
@@ -418,8 +362,11 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseNote(BSTR strTestCaseNote)
 			m_outputFile << getEndTag(gstrTEST_CASE_NOTE) << endl;
 		}
 
-		// update the UI
-		m_pDlg->addTestCaseNote(stdstrTestCaseNote);
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->addTestCaseNote(stdstrTestCaseNote);
+		}
 
 		return S_OK;
 	}
@@ -483,8 +430,11 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseDetailNote(BSTR strTitle, BSTR st
 			m_outputFile << getEndTag(gstrTEST_CASE_DETAIL_NOTE) << endl;
 		}
 
-		// update the UI
-		m_pDlg->addTestCaseDetailNote(stdstrTitle, stdstrTestCaseDetailNote);
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->addTestCaseDetailNote(stdstrTitle, stdstrTestCaseDetailNote);
+		}
 
 		return S_OK;
 	}
@@ -548,8 +498,11 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseMemo(BSTR strTitle, BSTR strTestC
 			m_outputFile << getEndTag(gstrTEST_CASE_MEMO) << endl;
 		}
 
-		// Add Compare Data to the tree and the dialog.
-		m_pDlg->addTestCaseMemo(stdstrTitle, stdstrTestCaseMemo);
+		if (m_bAddEntriesInLogWindow)
+		{
+			// Add Compare Data to the tree and the dialog.
+			m_pDlg->addTestCaseMemo(stdstrTitle, stdstrTestCaseMemo);
+		}
 
 		return S_OK;
 	}
@@ -598,15 +551,19 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseFile(BSTR strFileName)
 			m_outputFile << getEndTag(gstrTEST_CASE_FILE) << endl;
 		}
 
-		// update the UI
-		m_pDlg->addTestCaseFile(stdstrTestCaseFile);
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->addTestCaseFile(stdstrTestCaseFile);
+		}
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI06352")
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CTestResultLogger::raw_AddTestCaseException(BSTR strTestCaseException)
+STDMETHODIMP CTestResultLogger::raw_AddTestCaseException(BSTR strTestCaseException,
+														 VARIANT_BOOL vbFailTestCase)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
@@ -616,54 +573,7 @@ STDMETHODIMP CTestResultLogger::raw_AddTestCaseException(BSTR strTestCaseExcepti
 		// Check licensing
 		validateLicense();
 
-		_bstr_t bstrTestCaseException(strTestCaseException);
-		string stdstrTestCaseException = bstrTestCaseException;
-
-#ifdef INCLUDE_DB_SUPPORT
-		// create new record
-		if (m_bWriteToDB)
-		{
-			CDaoRecordset rs(&m_db);
-			rs.Open(&m_tblTestCaseException);
-			rs.AddNew();
-			
-			// set the field values
-			setNumberFieldValue(rs, "HarnessId", m_ulTestHarnessId);
-			setNumberFieldValue(rs, "ComponentTestId", m_ulComponentTestId);
-			setNumberFieldValue(rs, "TestCaseId", m_ulTestCaseId);
-			setStringFieldValue(rs, "ExceptionText", stdstrTestCaseException.c_str());
-			
-			// save and close the recordset
-			rs.Update();
-			rs.Close();
-		}
-		else
-#endif
-		{
-			// write the start tag for the exception
-			m_outputFile << getStartTag(gstrTEST_CASE_EXCEPTION) << endl;
-
-			// write the exception out in a human readable format
-			UCLIDException ue;
-			ue.createFromString("ELI08491", stdstrTestCaseException);
-			string strEx;
-			ue.asString(strEx);
-			convertCppStringToNormalString(strEx);
-			m_outputFile << getStartTag(gstrEXCEPTION_TEXT) << endl;
-			writeHTMLText(strEx);
-			m_outputFile << getEndTag(gstrEXCEPTION_TEXT) << endl;
-
-			// also write out the hex chars for easy reconstruction of the exception
-			m_outputFile << getStartTag(gstrEXCEPTION_HEX) << endl;
-			writeHTMLText(stdstrTestCaseException);
-			m_outputFile << getEndTag(gstrEXCEPTION_HEX) << endl;
-			
-			// write the end tag for the exception
-			m_outputFile << getEndTag(gstrTEST_CASE_EXCEPTION) << endl;
-		}
-
-		// update the UI
-		m_pDlg->addTestCaseException(stdstrTestCaseException);
+		addTestCaseException(asString(strTestCaseException), asCppBool(vbFailTestCase));
 
 		return S_OK;
 	}
@@ -700,71 +610,7 @@ STDMETHODIMP CTestResultLogger::raw_EndTestCase(VARIANT_BOOL bResult)
 		// Check licensing
 		validateLicense();
 
-#ifdef INCLUDE_DB_SUPPORT
-		// find the current test case record
-		if (m_bWriteToDB)
-		{
-			CDaoQueryDef query(&m_db);
-			char pszTemp[128];
-			sprintf_s(pszTemp, sizeof(pszTemp), "SELECT * FROM TestCase WHERE HarnessId=%d AND ComponentTestId=%d AND TestCaseId=%d", m_ulTestHarnessId, m_ulComponentTestId, m_ulTestCaseId);
-			query.Create("", pszTemp);
-			CDaoRecordset rs(&m_db);
-			rs.Open(&query);
-			rs.Edit();
-			
-			// update the end-time stamp
-			setNumberFieldValue(rs, "EndTime", (long) time(NULL));
-
-			// update the result field, which is of boolean type
-			VARIANT vPassed;
-			vPassed.bVal = (BYTE) bResult;
-			vPassed.vt = VT_UI1;
-			rs.SetFieldValue("Passed", vPassed);
-
-			// save and close the recordset
-			rs.Update();
-			rs.Close();
-		}
-		else
-#endif
-		{
-			// write the test case result
-			m_outputFile << getStartTag(gstrTEST_CASE_RESULT) << endl;
-			if (bResult == VARIANT_TRUE)
-			{
-				m_outputFile << "SUCCESS" << endl;
-			}
-			else
-			{
-				m_outputFile << "FAILURE" << endl;
-			}
-			m_outputFile << getEndTag(gstrTEST_CASE_RESULT) << endl;
-
-			// end the test case
-			m_outputFile << getEndTag(gstrTEST_CASE) << endl;
-		}
-
-		bool bPass = bResult == VARIANT_TRUE;
-
-		// only record stats if current test case status is either kAutomatedTestCase
-		// or kInteractiveTestCase
-		if (m_eCurrentTestCaseType == kInteractiveTestCase 
-			|| m_eCurrentTestCaseType == kAutomatedTestCase)
-		{
-			m_componentLevelStats.recordTestCaseStatus(bPass);
-		}
-
-		// stop the stop watch
-		m_testCaseStopWatch.stop();
-
-		// add test case note with the time it took to run this test case
-		string strText = "Test case processing time: ";
-		strText += asString(m_testCaseStopWatch.getElapsedTime());
-		strText += " seconds.";
-		m_pDlg->addTestCaseNote(strText);
-
-		// update the UI
-		m_pDlg->endTestCase(bPass);
+		endTestCase(asCppBool(bResult));
 
 		return S_OK;
 	}
@@ -812,22 +658,17 @@ STDMETHODIMP CTestResultLogger::raw_EndComponentTest()
 			m_outputFile.close();
 		}
 
-		// Create a testcase that will display end of component exceptions
-		ITestResultLoggerPtr ipThis(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI10573", ipThis != NULL);
-		
 		if(m_vecComponentTestExceptions.size() > 0)
 		{
-			ipThis->StartTestCase(_bstr_t(asString(m_vecComponentTestExceptions.size()).c_str()), 
-				_bstr_t("Component Test Exceptions"), 
-				kOtherTestCase);
-			
-			unsigned int i;
-			for(i = 0; i < m_vecComponentTestExceptions.size(); i++)
+			// Create a testcase that will display end of component exceptions
+			unsigned long lSize = m_vecComponentTestExceptions.size();
+			startTestCase(asString(lSize), "Component Test Exceptions", kOtherTestCase);
+
+			for(unsigned long i = 0; i < lSize; i++)
 			{
-				ipThis->AddTestCaseException(_bstr_t(m_vecComponentTestExceptions[i].c_str()));
+				addTestCaseException(m_vecComponentTestExceptions[i], false);
 			}
-			ipThis->EndTestCase(i == 0);
+			endTestCase(false);
 
 			m_vecComponentTestExceptions.clear();
 		}
@@ -877,6 +718,131 @@ STDMETHODIMP CTestResultLogger::raw_EndTestHarness()
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI02284")
+}
+//-------------------------------------------------------------------------------------------------
+HRESULT CTestResultLogger::raw_AddTestCaseCompareData (BSTR strTitle, BSTR strLabel1, BSTR strInput1, 
+													BSTR strLabel2, BSTR strInput2)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		// Check licensing
+		validateLicense();
+
+		_bstr_t bstrTitle(strTitle);
+		string stdstrTitle = bstrTitle;
+
+		_bstr_t bstrLabel1(strLabel1);
+		string stdstrLabel1 = bstrLabel1;
+		
+		_bstr_t bstrInput1(strInput1);
+		string stdstrInput1 = bstrInput1;
+
+		_bstr_t bstrLabel2(strLabel2);
+		string stdstrLabel2 = bstrLabel2;
+
+		_bstr_t bstrInput2(strInput2);
+		string stdstrInput2 = bstrInput2;
+		
+#ifdef INCLUDE_DB_SUPPORT
+		// write to database
+		if (m_bWriteToDB)
+		{
+			// create new record
+			CDaoRecordset rs(&m_db);
+			rs.Open(&m_tblTestCaseNote);
+			rs.AddNew();
+			
+			// set the field values
+			setNumberFieldValue(rs, "HarnessId", m_ulTestHarnessId);
+			setNumberFieldValue(rs, "ComponentTestId", m_ulComponentTestId);
+			setNumberFieldValue(rs, "TestCaseId", m_ulTestCaseId);
+
+			string strCompareData = stdstrLabel1 + string(" : ") + stdstrInput1
+						+ "\n\n" + stdstrLabel2 + " : " + stdstrInput2;
+			setStringFieldValue(rs, "NoteText", strCompareData.c_str());
+			
+			// save and close the recordset
+			rs.Update();
+			rs.Close();
+		}
+		else
+#endif
+		{
+			// write the start tag for the test case memo
+			m_outputFile << getStartTag(gstrTEST_CASE_COMPARE) << endl;
+
+			// write the label for the Title
+			m_outputFile << getStartTag(gstrTITLE) << endl;
+			writeHTMLText(stdstrTitle);
+			m_outputFile << getEndTag(gstrTITLE) << endl;
+
+			// write the label for the first entry
+			m_outputFile << getStartTag(gstrTITLE) << endl;
+			writeHTMLText(stdstrLabel1);
+			m_outputFile << getEndTag(gstrTITLE) << endl;
+
+			// write the first input (expected string)
+			m_outputFile << getStartTag(gstrDETAIL) << endl;
+			writeHTMLText(stdstrInput1);
+			m_outputFile << getEndTag(gstrDETAIL) << endl;
+
+			// write the label for the second entry
+			m_outputFile << getStartTag(gstrTITLE) << endl;
+			writeHTMLText(stdstrLabel2);
+			m_outputFile << getEndTag(gstrTITLE) << endl;
+
+			// write the second input (found string)
+			m_outputFile << getStartTag(gstrDETAIL) << endl;
+			writeHTMLText(stdstrInput2);
+			m_outputFile << getEndTag(gstrDETAIL) << endl;
+
+			// write the end tag for the test case memo
+			m_outputFile << getEndTag(gstrTEST_CASE_COMPARE) << endl;
+		}
+		// update the UI
+		m_pDlg->addTestCaseCompareData(stdstrTitle, stdstrLabel1, stdstrInput1,
+									   stdstrLabel2, stdstrInput2);
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19314")
+
+	return S_OK;
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTestResultLogger::get_AddEntriesToTestLogger(VARIANT_BOOL *pvbAddEntries)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI26635", pvbAddEntries != NULL);
+		validateLicense();
+
+		*pvbAddEntries = asVariantBool(m_bAddEntriesInLogWindow);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26636");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CTestResultLogger::put_AddEntriesToTestLogger(VARIANT_BOOL vbAddEntries)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
+
+	try
+	{
+		validateLicense();
+
+		m_bAddEntriesInLogWindow = asCppBool(vbAddEntries);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26637");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -1108,49 +1074,90 @@ void CTestResultLogger::validateLicense()
 	VALIDATE_LICENSE( gnRULE_WRITING_CORE_OBJECTS, "ELI07041", "Test Result Logger" );
 }
 //-------------------------------------------------------------------------------------------------
-HRESULT CTestResultLogger::raw_AddTestCaseCompareData (BSTR strTitle, BSTR strLabel1, BSTR strInput1, 
-													BSTR strLabel2, BSTR strInput2)
+void CTestResultLogger::startTestCase(const string& strTestCaseID,
+									  const string& strTestCaseDescription,
+									  ETestCaseType eTestCaseType)
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
-	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
-
 	try
 	{
-		// Check licensing
-		validateLicense();
+		// Set current test type
+		m_eCurrentTestCaseType = eTestCaseType;
 
-		_bstr_t bstrTitle(strTitle);
-		string stdstrTitle = bstrTitle;
+		// start the stop watch
+		m_testCaseStopWatch.reset();
+		m_testCaseStopWatch.start();
 
-		_bstr_t bstrLabel1(strLabel1);
-		string stdstrLabel1 = bstrLabel1;
-		
-		_bstr_t bstrInput1(strInput1);
-		string stdstrInput1 = bstrInput1;
-
-		_bstr_t bstrLabel2(strLabel2);
-		string stdstrLabel2 = bstrLabel2;
-
-		_bstr_t bstrInput2(strInput2);
-		string stdstrInput2 = bstrInput2;
-		
 #ifdef INCLUDE_DB_SUPPORT
-		// write to database
 		if (m_bWriteToDB)
 		{
 			// create new record
 			CDaoRecordset rs(&m_db);
-			rs.Open(&m_tblTestCaseNote);
+			rs.Open(&m_tblTestCase);
+			rs.AddNew();
+
+			// set the field values
+			setStringFieldValue(rs, "Description", stdstrTestCaseDescription.c_str());
+			setNumberFieldValue(rs, "HarnessId", m_ulTestHarnessId);
+			setNumberFieldValue(rs, "ComponentTestId", m_ulComponentTestId);
+			setNumberFieldValue(rs, "Type", eTestCaseType);
+			setStringFieldValue(rs, "HRTestCaseId", stdstrTestCaseID.c_str());
+			setNumberFieldValue(rs, "StartTime", (long) time(NULL));
+			
+			// remember the id of this test case
+			m_ulTestCaseId = rs.GetFieldValue("TestCaseId").lVal;
+			
+			// save and close the recordset
+			rs.Update();
+			rs.Close();
+
+			string strTestCaseId = "[";
+			strTestCaseId += asString(m_ulTestCaseId);
+			strTestCaseId += "] ";
+			stdstrTestCaseDescription.insert(0, strTestCaseId);
+		}
+		else
+#endif
+		{
+			// start the test case
+			m_outputFile << getStartTag(gstrTEST_CASE) << endl;
+			
+			// write the ID tag
+			m_outputFile << getStartTag(gstrID) << endl;
+			writeHTMLText(strTestCaseID);
+			m_outputFile << getEndTag(gstrID) << endl;
+			
+			// write the description
+			m_outputFile << getStartTag(gstrDESCRIPTION) << endl;
+			writeHTMLText(strTestCaseDescription);
+			m_outputFile << getEndTag(gstrDESCRIPTION) << endl;
+		}
+
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->startTestCase(strTestCaseID, strTestCaseDescription, eTestCaseType);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26645");
+}
+//-------------------------------------------------------------------------------------------------
+void CTestResultLogger::addTestCaseException(const string& strTestCaseException, bool bFailTestCase)
+{
+	try
+	{
+#ifdef INCLUDE_DB_SUPPORT
+		// create new record
+		if (m_bWriteToDB)
+		{
+			CDaoRecordset rs(&m_db);
+			rs.Open(&m_tblTestCaseException);
 			rs.AddNew();
 			
 			// set the field values
 			setNumberFieldValue(rs, "HarnessId", m_ulTestHarnessId);
 			setNumberFieldValue(rs, "ComponentTestId", m_ulComponentTestId);
 			setNumberFieldValue(rs, "TestCaseId", m_ulTestCaseId);
-
-			string strCompareData = stdstrLabel1 + string(" : ") + stdstrInput1
-						+ "\n\n" + stdstrLabel2 + " : " + stdstrInput2;
-			setStringFieldValue(rs, "NoteText", strCompareData.c_str());
+			setStringFieldValue(rs, "ExceptionText", stdstrTestCaseException.c_str());
 			
 			// save and close the recordset
 			rs.Update();
@@ -1159,44 +1166,114 @@ HRESULT CTestResultLogger::raw_AddTestCaseCompareData (BSTR strTitle, BSTR strLa
 		else
 #endif
 		{
-			// write the start tag for the test case memo
-			m_outputFile << getStartTag(gstrTEST_CASE_COMPARE) << endl;
+			// write the start tag for the exception
+			m_outputFile << getStartTag(gstrTEST_CASE_EXCEPTION) << endl;
 
-			// write the label for the Title
-			m_outputFile << getStartTag(gstrTITLE) << endl;
-			writeHTMLText(stdstrTitle);
-			m_outputFile << getEndTag(gstrTITLE) << endl;
+			// write the exception out in a human readable format
+			UCLIDException ue;
+			ue.createFromString("ELI08491", strTestCaseException);
+			string strEx;
+			ue.asString(strEx);
+			convertCppStringToNormalString(strEx);
+			m_outputFile << getStartTag(gstrEXCEPTION_TEXT) << endl;
+			writeHTMLText(strEx);
+			m_outputFile << getEndTag(gstrEXCEPTION_TEXT) << endl;
 
-			// write the label for the first entry
-			m_outputFile << getStartTag(gstrTITLE) << endl;
-			writeHTMLText(stdstrLabel1);
-			m_outputFile << getEndTag(gstrTITLE) << endl;
-
-			// write the first input (expected string)
-			m_outputFile << getStartTag(gstrDETAIL) << endl;
-			writeHTMLText(stdstrInput1);
-			m_outputFile << getEndTag(gstrDETAIL) << endl;
-
-			// write the label for the second entry
-			m_outputFile << getStartTag(gstrTITLE) << endl;
-			writeHTMLText(stdstrLabel2);
-			m_outputFile << getEndTag(gstrTITLE) << endl;
-
-			// write the second input (found string)
-			m_outputFile << getStartTag(gstrDETAIL) << endl;
-			writeHTMLText(stdstrInput2);
-			m_outputFile << getEndTag(gstrDETAIL) << endl;
-
-			// write the end tag for the test case memo
-			m_outputFile << getEndTag(gstrTEST_CASE_COMPARE) << endl;
+			// also write out the hex chars for easy reconstruction of the exception
+			m_outputFile << getStartTag(gstrEXCEPTION_HEX) << endl;
+			writeHTMLText(strTestCaseException);
+			m_outputFile << getEndTag(gstrEXCEPTION_HEX) << endl;
+			
+			// write the end tag for the exception
+			m_outputFile << getEndTag(gstrTEST_CASE_EXCEPTION) << endl;
 		}
-		// update the UI
-		m_pDlg->addTestCaseCompareData(stdstrTitle, stdstrLabel1, stdstrInput1,
-									   stdstrLabel2, stdstrInput2);
-		return S_OK;
-	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19314")
 
-	return S_OK;
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->addTestCaseException(strTestCaseException);
+		}
+
+		// Check for fail test case
+		if (bFailTestCase)
+		{
+			endTestCase(false);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26644");
+}
+//-------------------------------------------------------------------------------------------------
+void CTestResultLogger::endTestCase(bool bResult)
+{
+	try
+	{
+#ifdef INCLUDE_DB_SUPPORT
+		// find the current test case record
+		if (m_bWriteToDB)
+		{
+			CDaoQueryDef query(&m_db);
+			char pszTemp[128];
+			sprintf_s(pszTemp, sizeof(pszTemp), "SELECT * FROM TestCase WHERE HarnessId=%d AND ComponentTestId=%d AND TestCaseId=%d", m_ulTestHarnessId, m_ulComponentTestId, m_ulTestCaseId);
+			query.Create("", pszTemp);
+			CDaoRecordset rs(&m_db);
+			rs.Open(&query);
+			rs.Edit();
+			
+			// update the end-time stamp
+			setNumberFieldValue(rs, "EndTime", (long) time(NULL));
+
+			// update the result field, which is of boolean type
+			VARIANT vPassed;
+			vPassed.bVal = (BYTE) bResult;
+			vPassed.vt = VT_UI1;
+			rs.SetFieldValue("Passed", vPassed);
+
+			// save and close the recordset
+			rs.Update();
+			rs.Close();
+		}
+		else
+#endif
+		{
+			// write the test case result
+			m_outputFile << getStartTag(gstrTEST_CASE_RESULT) << endl;
+			if (bResult)
+			{
+				m_outputFile << "SUCCESS" << endl;
+			}
+			else
+			{
+				m_outputFile << "FAILURE" << endl;
+			}
+			m_outputFile << getEndTag(gstrTEST_CASE_RESULT) << endl;
+
+			// end the test case
+			m_outputFile << getEndTag(gstrTEST_CASE) << endl;
+		}
+
+		// only record stats if current test case status is either kAutomatedTestCase
+		// or kInteractiveTestCase
+		if (m_eCurrentTestCaseType == kInteractiveTestCase 
+			|| m_eCurrentTestCaseType == kAutomatedTestCase)
+		{
+			m_componentLevelStats.recordTestCaseStatus(bResult);
+		}
+
+		// stop the stop watch
+		m_testCaseStopWatch.stop();
+
+		if (m_bAddEntriesInLogWindow)
+		{
+			// add test case note with the time it took to run this test case
+			string strText = "Test case processing time: ";
+			strText += asString(m_testCaseStopWatch.getElapsedTime());
+			strText += " seconds.";
+			m_pDlg->addTestCaseNote(strText);
+
+			// update the UI
+			m_pDlg->endTestCase(bResult);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26646");
 }
 //-------------------------------------------------------------------------------------------------

@@ -98,10 +98,10 @@ void CTestSafeNetUtils::runTestCase1()
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11739", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11739", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	//Test the Pagination Counter
 	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_1_2"), get_bstr_t("Testing Counter Increment Pagination"), kAutomatedTestCase); 
@@ -125,10 +125,10 @@ void CTestSafeNetUtils::runTestCase1()
 		zTemp.Format("Expected Counter Value: 100\r\nCounter Value: %lu", dwTestResult );
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11746", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11746", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	//Test the Redaction Counter
 	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_1_3"), get_bstr_t("Testing Counter Increment Redaction"), kAutomatedTestCase); 
@@ -152,7 +152,7 @@ void CTestSafeNetUtils::runTestCase1()
 		zTemp.Format("Expected Counter Value: 100\r\nCounter Value: %lu", dwTestResult );
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11747", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11747", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
 	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
@@ -183,10 +183,10 @@ void CTestSafeNetUtils::runTestCase2()
 		zTemp.Format("Expected Counter Value: 0\r\nCounter Value: %lu", dwTestResult );
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11745", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11745", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	//Test the Pagination Counter
 	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_2_2"), get_bstr_t("Testing Counter Decrement Pagination"), kAutomatedTestCase); 
@@ -210,10 +210,10 @@ void CTestSafeNetUtils::runTestCase2()
 		zTemp.Format("Expected Counter Value: 0\r\nCounter Value: %lu", dwTestResult );
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11740", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11740", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	//Test the Redaction Counter
 	m_ipResultLogger->StartTestCase(get_bstr_t("TEST_2_3"), get_bstr_t("Testing Counter Decrement Redaction"), kAutomatedTestCase); 
@@ -237,7 +237,7 @@ void CTestSafeNetUtils::runTestCase2()
 		zTemp.Format("Expected Counter Value: 0\r\nCounter Value: %lu", dwTestResult );
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11741", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11741", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
 	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
@@ -432,7 +432,7 @@ void CTestSafeNetUtils::runTestCase3()
 			bSuccess = false;
 		}
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11744", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI11744", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
 	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
@@ -481,7 +481,7 @@ void CTestSafeNetUtils::runTestCase4()
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
 
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI18564", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI18564", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
 	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));

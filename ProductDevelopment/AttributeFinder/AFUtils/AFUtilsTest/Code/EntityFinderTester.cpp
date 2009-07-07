@@ -229,7 +229,7 @@ void CEntityFinderTester::doTest(std::string strLabel)
 	catch (UCLIDException& ue)
 	{
 		string strError( ue.asStringizedByteStream() );
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
+		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()), VARIANT_FALSE );
 		vbRet = VARIANT_FALSE;
 	}
 	// Handle a COM Error
@@ -247,7 +247,7 @@ void CEntityFinderTester::doTest(std::string strLabel)
 			ue.createFromString( "ELI06168", "COM exception caught!" );
 		}
 		string strError( ue.asStringizedByteStream() );
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
+		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()), VARIANT_FALSE );
 		vbRet = VARIANT_FALSE;
 	}
 	// Handle some other type of exception
@@ -255,7 +255,7 @@ void CEntityFinderTester::doTest(std::string strLabel)
 	{
 		UCLIDException uclidException( "ELI06169", "Unknown Exception caught." );
 		string strError( uclidException.asStringizedByteStream() );
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
+		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()), VARIANT_FALSE );
 		vbRet = VARIANT_FALSE;
 	}
 

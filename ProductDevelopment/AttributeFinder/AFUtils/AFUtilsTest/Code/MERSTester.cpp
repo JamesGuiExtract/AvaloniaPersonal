@@ -180,12 +180,10 @@ STDMETHODIMP CMERSTester::raw_RunAutomatedTests(IVariantVector* pParams, BSTR st
 				// compare the found attributes with the expected attributes
 				bSuccess = compareAttributes(ipFoundAttributes, ipExpectedAttributes);
 			}
-			CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19180", m_ipResultLogger, bExceptionCaught);
-			
-			VARIANT_BOOL bRet = (bSuccess && !bExceptionCaught) ? VARIANT_TRUE : VARIANT_FALSE;
+			CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI19180", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 			
 			// end the test case
-			m_ipResultLogger->EndTestCase(bRet);
+			m_ipResultLogger->EndTestCase(asVariantBool(bSuccess && !bExceptionCaught));
 
 			// increment the case number
 			nCaseNo++;

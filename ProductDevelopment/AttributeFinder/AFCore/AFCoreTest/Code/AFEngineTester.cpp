@@ -381,13 +381,13 @@ void CAFEngineTester::runTest(ETestType eTestType, const string& strRSDFile,
 		// process results
 		processResults(ipExpectedAttr, ipFoundAttr, bSuccess);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07215", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07215", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	// Check for success
 	bSuccess = bSuccess && !bExceptionCaught;
 	
 	// end the test case
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 
 	// if the caller didn't request recursion, just return;
 	if (!bRecurse)

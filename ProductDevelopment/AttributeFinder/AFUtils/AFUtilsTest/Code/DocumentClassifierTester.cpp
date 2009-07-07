@@ -684,13 +684,12 @@ bool CDocumentClassifierTester::processTestCase(const string& strInputFileName,
 		// with the expected values.
 		bSuccess = compareTags(strInputFileName, ipAFDoc, strExpectedDocType);
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06166", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06166", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 	
 	bSuccess = bSuccess && !bExceptionCaught;
-	VARIANT_BOOL bRet = bSuccess ? VARIANT_TRUE : VARIANT_FALSE;
 
 	// end the test case
-	m_ipResultLogger->EndTestCase(bRet);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 	
 	return bSuccess;
 }

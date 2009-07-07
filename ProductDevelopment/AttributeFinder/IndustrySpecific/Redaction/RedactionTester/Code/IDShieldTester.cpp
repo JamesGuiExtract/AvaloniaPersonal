@@ -256,6 +256,9 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 				throw UCLIDException("ELI15166", "Please set ResultLogger before proceeding.");
 			}
 
+			// Default to adding entries to the results logger
+			m_ipResultLogger->AddEntriesToTestLogger = VARIANT_TRUE;
+
 			// Create a persistence manager to get the overlap value from the registry
 			RegistryPersistenceMgr rpm( HKEY_CURRENT_USER, gstrMIN_OVERLAP_REGISTRY_KEY_PATH );
 
@@ -322,7 +325,6 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			m_bOutputHybridStats = false;
 			m_apRedactionTester.reset();
 			m_apVerificationTester.reset();
-			m_bOutputFinalStatsOnly = false;
 
 			IVariantVectorPtr ipParams(pParams);
 			ASSERT_RESOURCE_ALLOCATION("ELI15258", ipParams != NULL);
@@ -673,7 +675,8 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		}
 		else if (vecTokens[0] == "OutputFinalStatsOnly")
 		{
-			m_bOutputFinalStatsOnly = vecTokens[1] == "1";
+			// Set whether to display entries for each test case or not
+			m_ipResultLogger->AddEntriesToTestLogger = asVariantBool(vecTokens[1] != "1");
 		}
 		else
 		{
@@ -758,39 +761,37 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 		try
 		{
 			string strNoteFile = strImageFile + ".nte";
-			if (!m_bOutputFinalStatsOnly)
+
+			// Start the test case labeling it as the .dat file
+			m_ipResultLogger->StartTestCase(asString( iTestCaseNum ).c_str(), 
+				strCurrentDatFileName.c_str(), kAutomatedTestCase);
+
+			// Add the image file as an executable (via double click) note
+			m_ipResultLogger->AddTestCaseFile( strImageFile.c_str() );
+
+			// Add the file name note
+			m_ipResultLogger->AddTestCaseFile( strSourceDoc.c_str() );
+
+			// the expected VOA file must always be there
+			if (strExpectedVOAFile.empty())
 			{
-				// Start the test case labeling it as the .dat file
-				m_ipResultLogger->StartTestCase(asString( iTestCaseNum ).c_str(), 
-					strCurrentDatFileName.c_str(), kAutomatedTestCase);
-
-				// Add the image file as an executable (via double click) note
-				m_ipResultLogger->AddTestCaseFile( strImageFile.c_str() );
-
-				// Add the file name note
-				m_ipResultLogger->AddTestCaseFile( strSourceDoc.c_str() );
-
-				// the expected VOA file must always be there
-				if (strExpectedVOAFile.empty())
-				{
-					throw UCLIDException("ELI15246", "Expected VOA file must not be empty!");
-				}
-				else
-				{
-					m_ipResultLogger->AddTestCaseFile( strExpectedVOAFile.c_str() );
-				}
-
-				// the Found VOA file may or may not be defined.  If it is not defined, that means we have to 
-				// run the rules.
-				if (!strFoundVOAFile.empty())
-				{
-					m_ipResultLogger->AddTestCaseFile( strFoundVOAFile.c_str() );
-				}
-
-				// Add a note file. If this file exists in the directory and this test case 
-				// fails, the node will automatically collapse. 
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
+				throw UCLIDException("ELI15246", "Expected VOA file must not be empty!");
 			}
+			else
+			{
+				m_ipResultLogger->AddTestCaseFile( strExpectedVOAFile.c_str() );
+			}
+
+			// the Found VOA file may or may not be defined.  If it is not defined, that means we have to 
+			// run the rules.
+			if (!strFoundVOAFile.empty())
+			{
+				m_ipResultLogger->AddTestCaseFile( strFoundVOAFile.c_str() );
+			}
+
+			// Add a note file. If this file exists in the directory and this test case 
+			// fails, the node will automatically collapse. 
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
 
 			// If the expected file exists, load the data from it
 			IIUnknownVectorPtr ipExpectedAttributes(CLSID_IUnknownVector);
@@ -860,15 +861,12 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 					m_strOutputFileDirectory + gstrFILES_WITH_NO_FOUND_REDACTIONS );
 			}
 
-			if (!m_bOutputFinalStatsOnly)
-			{
-				// display found and expected attributes side by side
-				string strFoundAttr = m_ipAFUtility->GetAttributesAsString(ipFoundAttributes);
-				string strExpectedAttr = m_ipAFUtility->GetAttributesAsString(ipExpectedAttributes);
-				m_ipResultLogger->AddTestCaseCompareData("Text of Compared Spatial Strings", 
-					"Expected Attributes", strExpectedAttr.c_str(),
-					"Found Attributes", strFoundAttr.c_str());
-			}
+			// display found and expected attributes side by side
+			string strFoundAttr = m_ipAFUtility->GetAttributesAsString(ipFoundAttributes);
+			string strExpectedAttr = m_ipAFUtility->GetAttributesAsString(ipExpectedAttributes);
+			m_ipResultLogger->AddTestCaseCompareData("Text of Compared Spatial Strings", 
+				"Expected Attributes", strExpectedAttr.c_str(),
+				"Found Attributes", strFoundAttr.c_str());
 
 			countDocTypes(ipFoundAttributes, strImageFile, ipAFDoc, bCalculatedFoundValues);
 
@@ -876,45 +874,35 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			bool bResult = updateStatisticsAndDetermineTestCaseResult(ipExpectedAttributes, 
 				ipFoundAttributes, strImageFile);
 
-			if (!m_bOutputFinalStatsOnly)
+			// Append the text of the note at the end of the test case
+			string strNote = "";
+			if( isFileOrFolderValid( strNoteFile ))
 			{
-				// Append the text of the note at the end of the test case
-				string strNote = "";
-				if( isFileOrFolderValid( strNoteFile ))
-				{
-					strNote = ::getTextFileContentsAsString( strNoteFile );
-				}
-				if( !strNote.empty() )
-				{
-					// Chop off the end of the note if it extends past 120 characters. 
-					// The note file's text will be displayed in it's entirety as a detail note.
-					string strTitle = strNote;
-					if( strNote.size() > 120 )
-					{
-						strTitle.erase(120);
-						strTitle += "...";
-					}
-
-					// Add Test case detail with the note info
-					m_ipResultLogger->AddTestCaseDetailNote( get_bstr_t( strTitle.c_str() ),
-						get_bstr_t( strNote.c_str() ) ) ;
-				}
-
-				m_ipResultLogger->EndTestCase(bResult ? VARIANT_TRUE : VARIANT_FALSE);
+				strNote = ::getTextFileContentsAsString( strNoteFile );
 			}
+			if( !strNote.empty() )
+			{
+				// Chop off the end of the note if it extends past 120 characters. 
+				// The note file's text will be displayed in it's entirety as a detail note.
+				string strTitle = strNote;
+				if( strNote.size() > 120 )
+				{
+					strTitle.erase(120);
+					strTitle += "...";
+				}
+
+				// Add Test case detail with the note info
+				m_ipResultLogger->AddTestCaseDetailNote( get_bstr_t( strTitle.c_str() ),
+					get_bstr_t( strNote.c_str() ) ) ;
+			}
+
+			m_ipResultLogger->EndTestCase(bResult ? VARIANT_TRUE : VARIANT_FALSE);
 		}
 		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI15233");
 	}
 	catch(UCLIDException& ue)
 	{
-		if (!m_bOutputFinalStatsOnly)
-		{
-			m_ipResultLogger->AddTestCaseException(ue.asStringizedByteStream().c_str());
-		}
-		else
-		{
-			ue.log();
-		}
+		m_ipResultLogger->AddTestCaseException(ue.asStringizedByteStream().c_str(), VARIANT_TRUE);
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1079,12 +1067,9 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 	{
 		m_ulNumFilesWithOverlappingExpectedRedactions++;
 
-		if (!m_bOutputFinalStatsOnly)
-		{
-			string strNumOverLappingExpected = "Number of overlapping expected redactions: " +
-				asString(ulNumOverlappingExpected);
-			m_ipResultLogger->AddTestCaseNote(strNumOverLappingExpected.c_str());
-		}
+		string strNumOverLappingExpected = "Number of overlapping expected redactions: " +
+			asString(ulNumOverlappingExpected);
+		m_ipResultLogger->AddTestCaseNote(strNumOverLappingExpected.c_str());
 	}
 
 	// Ensure the redaction condition is refreshed
@@ -1124,11 +1109,8 @@ bool CIDShieldTester::analyzeDataForAutomatedRedaction(IIUnknownVectorPtr ipExpe
 		// clear the vector
 		m_ipTestOutputVOAVector->Clear();
 
-		if (!m_bOutputFinalStatsOnly)
-		{
-			// add a link to the output data
-			m_ipResultLogger->AddTestCaseFile(strTestOutputFile.c_str());
-		}
+		// add a link to the output data
+		m_ipResultLogger->AddTestCaseFile(strTestOutputFile.c_str());
 	}
 
 	// update total statistics
@@ -1749,11 +1731,8 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 
 		const string strDocType = "Unclassified";
 
-		if (!m_bOutputFinalStatsOnly)
-		{
-			// Add the Unclassified Doc Type to the test logger as a test case note
-			m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
-		}
+		// Add the Unclassified Doc Type to the test logger as a test case note
+		m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
 
 		// If the unclassified doc type does not yet exist, enter it into the table
 		if (m_mapDocTypeCount.find(strDocType) == m_mapDocTypeCount.end())
@@ -1781,11 +1760,8 @@ void CIDShieldTester::countDocTypes(IIUnknownVectorPtr ipFoundAttributes, const 
 			// Get the string of the doc type
 			string strDocType = asString(ipSpatial->String);
 
-			if (!m_bOutputFinalStatsOnly)
-			{
-				// Add the Doc Type to the test logger as a test case note
-				m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
-			}
+			// Add the Doc Type to the test logger as a test case note
+			m_ipResultLogger->AddTestCaseNote( strDocType.c_str() );
 
 			// If this doc type does not yet exist, enter it into the table
 			if (m_mapDocTypeCount.find(strDocType) == m_mapDocTypeCount.end())

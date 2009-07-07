@@ -174,7 +174,6 @@ CAutomatedRuleSetTester::CAutomatedRuleSetTester()
   m_ipCurrentAttributes( CLSID_IUnknownVector ),
   m_bCaseSensitive(true),
   m_bEAVMustExist(false),
-  m_bOutputFinalStats(false),
   m_ipFAMTagManager(CLSID_FAMTagManager)
 {
 	try
@@ -232,6 +231,9 @@ STDMETHODIMP CAutomatedRuleSetTester::raw_RunAutomatedTests(IVariantVector* pPar
 			{
 				throw UCLIDException("ELI06120", "Please set ResultLogger before proceeding.");
 			}
+
+			// Default to displaying entries for each test case
+			m_ipResultLogger->AddEntriesToTestLogger = VARIANT_TRUE;
 
 			std::string strTCLFilename = asString(strTCLFile);
 
@@ -664,15 +666,12 @@ bool CAutomatedRuleSetTester::compareAttributes(IIUnknownVectorPtr ipFoundAttrib
 		string strExpectedAttributes = getAttributesCompareString(ipExpectedAttributes);
 		string strFoundAttributes = getAttributesCompareString(ipFoundAttributes);
 
-		if (!m_bOutputFinalStats)
-		{
-			//Add Compare Attributes to the tree and the testlogger window
-			m_ipResultLogger->AddTestCaseCompareData("Compare Attributes",
-													 "Expected Attributes",
-													 strExpectedAttributes.c_str(),
-													 "Found Attributes",
-													 strFoundAttributes.c_str());
-		}
+		//Add Compare Attributes to the tree and the testlogger window
+		m_ipResultLogger->AddTestCaseCompareData("Compare Attributes",
+												 "Expected Attributes",
+												 strExpectedAttributes.c_str(),
+												 "Found Attributes",
+												 strFoundAttributes.c_str());
 	}
 	else
 	{
@@ -1040,15 +1039,16 @@ void CAutomatedRuleSetTester::interpretLine(const string& strLineText,
 				
 				if (strValue == "TRUE")
 				{
-					m_bOutputFinalStats = true;
+					m_ipResultLogger->AddEntriesToTestLogger = VARIANT_FALSE;
 				}
 				else if (strValue == "FALSE")
 				{
-					m_bOutputFinalStats = false;
+					m_ipResultLogger->AddEntriesToTestLogger = VARIANT_TRUE;
 				}
 				else
 				{
-					UCLIDException ue("ELI25274", "Invalid Value for OUTPUTFINALSTATSONLY setting.");
+					UCLIDException ue("ELI25274",
+						"Invalid Value for OUTPUT_FINAL_STATS_ONLY setting.");
 					ue.addDebugInfo("Value", strValue);
 					throw ue;
 				}
@@ -1109,15 +1109,7 @@ void CAutomatedRuleSetTester::processDatFile(const string& strDatFileName,
 		}
 		catch(UCLIDException& ue)
 		{
-			// Check for outputting final stats only
-			if (m_bOutputFinalStats)
-			{
-				ue.log();
-			}
-			else
-			{
-				m_ipResultLogger->AddComponentTestException(get_bstr_t(ue.asStringizedByteStream()));
-			}
+			m_ipResultLogger->AddComponentTestException(get_bstr_t(ue.asStringizedByteStream()));
 		}
 		nCaseNo++;
 	}
@@ -1142,31 +1134,28 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 	{
 		try
 		{	
-			if (!m_bOutputFinalStats)
-			{
-				// Initiate a test case
-				m_ipResultLogger->StartTestCase(get_bstr_t(strTestCaseNo.c_str()),
-					get_bstr_t(strTestCaseTitle.c_str()), kAutomatedTestCase); 	
+			// Initiate a test case
+			m_ipResultLogger->StartTestCase(get_bstr_t(strTestCaseNo.c_str()),
+				get_bstr_t(strTestCaseTitle.c_str()), kAutomatedTestCase); 	
 
-				// Add note for RSD file plus input filename
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strRSDFile.c_str()));
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strInputTextFile.c_str()));
+			// Add note for RSD file plus input filename
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strRSDFile.c_str()));
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strInputTextFile.c_str()));
 
-				string strFolderName = ::getDirectoryFromFullPath(strInputTextFile.c_str()) + "\\";
-				string strImageFileName = ::getFileNameWithoutExtension(strInputTextFile);
+			string strFolderName = ::getDirectoryFromFullPath(strInputTextFile.c_str()) + "\\";
+			string strImageFileName = ::getFileNameWithoutExtension(strInputTextFile);
 
-				// Add note for image File
-				string strImageFileWithPath = strFolderName + strImageFileName;
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strImageFileWithPath.c_str()));
+			// Add note for image File
+			string strImageFileWithPath = strFolderName + strImageFileName;
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strImageFileWithPath.c_str()));
 
-				// Add note for EAV File
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strEAVFile.c_str()));
+			// Add note for EAV File
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strEAVFile.c_str()));
 
-				// Add note for .nte file
-				string strEAVFileDir = ::getDirectoryFromFullPath( strEAVFile.c_str()) + "\\";
-				strNoteFile = strEAVFileDir + strImageFileName + ".nte";
-				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
-			}
+			// Add note for .nte file
+			string strEAVFileDir = ::getDirectoryFromFullPath( strEAVFile.c_str()) + "\\";
+			strNoteFile = strEAVFileDir + strImageFileName + ".nte";
+			m_ipResultLogger->AddTestCaseFile(get_bstr_t(strNoteFile.c_str()));
 
 			// make sure current Attributes Vector is empty
 			m_ipCurrentAttributes->Clear();
@@ -1183,32 +1172,26 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 					get_bstr_t(strInputTextFile.c_str()), -1, get_bstr_t(strRSDFile.c_str()), 
 					NULL, VARIANT_FALSE);
 
-				if (!m_bOutputFinalStats)
+				// add document classification information
+				string strDocType = getDocumentClassificationInfo(ipAFDoc);
+				if (!strDocType.empty())
 				{
-					// add document classification information
-					string strDocType = getDocumentClassificationInfo(ipAFDoc);
-					if (!strDocType.empty())
-					{
-						// add a note for document classification information
-						m_ipResultLogger->AddTestCaseNote(get_bstr_t(strDocType.c_str()));
-					}
+					// add a note for document classification information
+					m_ipResultLogger->AddTestCaseNote(get_bstr_t(strDocType.c_str()));
+				}
 
-					// add rule id that worked
-					string strRuleID = getRuleID(ipAFDoc);
-					if (!strRuleID.empty())
-					{
-						strRuleID = "Rule that captures the attributes : " + strRuleID;
-						m_ipResultLogger->AddTestCaseNote(get_bstr_t(strRuleID.c_str()));
-					}
+				// add rule id that worked
+				string strRuleID = getRuleID(ipAFDoc);
+				if (!strRuleID.empty())
+				{
+					strRuleID = "Rule that captures the attributes : " + strRuleID;
+					m_ipResultLogger->AddTestCaseNote(get_bstr_t(strRuleID.c_str()));
 				}
 			}
 			else
 			{
-				if (!m_bOutputFinalStats)
-				{
-					// Add note for VOA File
-					m_ipResultLogger->AddTestCaseFile(get_bstr_t(strVOAFile.c_str()));
-				}
+				// Add note for VOA File
+				m_ipResultLogger->AddTestCaseFile(get_bstr_t(strVOAFile.c_str()));
 
 				// VOA file exists so load the expected attributes from the voa file
 				m_ipCurrentAttributes = getExpectedAttributes(strVOAFile);
@@ -1220,14 +1203,7 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 	catch(UCLIDException& uex)
 	{
 		bExceptionCaught = true;
-		if (m_bOutputFinalStats)
-		{
-			uex.log();
-		}
-		else
-		{
-			m_ipResultLogger->AddTestCaseException(_bstr_t(uex.asStringizedByteStream().c_str()));
-		}
+		m_ipResultLogger->AddTestCaseException(_bstr_t(uex.asStringizedByteStream().c_str()), VARIANT_FALSE);
 	}
 
 	// Try catch block to catch exceptions if calculating the results
@@ -1266,14 +1242,11 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 				// Create string containing Expected Attributes
 				string strExpectedAttributes = getAttributesCompareString(ipExpectedAttributes);
 
-				if (!m_bOutputFinalStats)
-				{
-					// Add Test Case Memo for Expected Attributes
-					m_ipResultLogger->AddTestCaseCompareData( "Compare Attributes",
-						get_bstr_t( "Expected Attributes" ),
-						get_bstr_t(strExpectedAttributes),
-						"No Found Attributes", " ");
-				}
+				// Add Test Case Memo for Expected Attributes
+				m_ipResultLogger->AddTestCaseCompareData( "Compare Attributes",
+					get_bstr_t( "Expected Attributes" ),
+					get_bstr_t(strExpectedAttributes),
+					"No Found Attributes", " ");
 
 				// Create and throw exception
 				UCLIDException uclidException("ELI04767", "No Found Attributes.");
@@ -1293,44 +1266,34 @@ void CAutomatedRuleSetTester::processTestCase(const string& strRSDFile,
 	catch(UCLIDException& uex)
 	{
 		bExceptionCaught = true;
-		if (m_bOutputFinalStats)
-		{
-			uex.log();
-		}
-		else
-		{
-			m_ipResultLogger->AddTestCaseException(_bstr_t(uex.asStringizedByteStream().c_str()));
-		}
+		m_ipResultLogger->AddTestCaseException(_bstr_t(uex.asStringizedByteStream().c_str()), VARIANT_FALSE);
 	}
 
 	//Display contents of existing NTE file
-	if (!m_bOutputFinalStats)
+	string strNote("");
+	if (isValidFile(strNoteFile))
 	{
-		string strNote("");
-		if (isValidFile(strNoteFile))
-		{
-			strNote = ::getTextFileContentsAsString(strNoteFile);
-		}
-		if ( !strNote.empty())
-		{
-			string strTitle = strNote;
-			if ( strNote.size() > 120 )
-			{
-				strTitle.erase(120);
-				strTitle += "...";
-			}
-			// Add Test Case Detail Note with Provided Information
-			m_ipResultLogger->AddTestCaseDetailNote( 
-				get_bstr_t(strTitle.c_str()), 
-				get_bstr_t(strNote.c_str()) );
-		}
-
-		// Get test result
-		bSuccess = bSuccess && !bExceptionCaught;
-
-		// end the test case
-		m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
+		strNote = ::getTextFileContentsAsString(strNoteFile);
 	}
+	if ( !strNote.empty())
+	{
+		string strTitle = strNote;
+		if ( strNote.size() > 120 )
+		{
+			strTitle.erase(120);
+			strTitle += "...";
+		}
+		// Add Test Case Detail Note with Provided Information
+		m_ipResultLogger->AddTestCaseDetailNote( 
+			get_bstr_t(strTitle.c_str()), 
+			get_bstr_t(strNote.c_str()) );
+	}
+
+	// Get test result
+	bSuccess = bSuccess && !bExceptionCaught;
+
+	// end the test case
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //-------------------------------------------------------------------------------------------------
 void CAutomatedRuleSetTester::processTestFolder(const string& strRSDFile,

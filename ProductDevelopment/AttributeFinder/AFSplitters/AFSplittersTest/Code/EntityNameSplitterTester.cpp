@@ -300,12 +300,10 @@ bool CEntityNameSplitterTester::checkTestResults(IAttributePtr ipTest, IAttribut
 void CEntityNameSplitterTester::doTest(std::string strLabel, IAttributePtr ipTest, 
 									   IAttributePtr ipExpected)
 {
-	// Default to success
-	VARIANT_BOOL	vbRet = VARIANT_TRUE;
-
 	// Start the test case
 	m_ipResultLogger->StartTestCase( _bstr_t(strLabel.c_str()), _bstr_t("Test Entity Name Splitter"), kAutomatedTestCase );
 
+	bool bExceptionCaught = false;
 	try
 	{
 		ASSERT_ARGUMENT("ELI20477", ipTest != NULL);
@@ -331,56 +329,10 @@ void CEntityNameSplitterTester::doTest(std::string strLabel, IAttributePtr ipTes
 			throw uexOuter;
 		}
 
-		// Check the results
-		if (!checkTestResults( ipTest, ipExpected ))
-		{
-			// Set failure flag
-			vbRet = VARIANT_FALSE;
-		}
+		// Check the test results and end the test case
+		m_ipResultLogger->EndTestCase(asVariantBool(checkTestResults(ipTest, ipExpected)));
 	}
-	// Handle a UCLID Exception
-	catch (UCLIDException& ue)
-	{
-		// Add test case exception and set failure flag
-		string strError( ue.asStringizedByteStream() );
-
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
-		vbRet = VARIANT_FALSE;
-	}
-	// Handle a COM Error
-	catch (_com_error& e)
-	{
-		// Add test case exception and set failure flag
-		UCLIDException ue;
-		_bstr_t _bstrDescription = e.Description();
-		char *pszDescription = _bstrDescription;
-		
-		if (pszDescription)
-		{
-			ue.createFromString( "ELI06486", pszDescription );
-		}
-		else
-		{
-			ue.createFromString( "ELI06487", "COM exception caught!" );
-		}
-
-		string strError( ue.asStringizedByteStream() );
-
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
-		vbRet = VARIANT_FALSE;
-	}
-	// Handle some other type of exception
-	catch (...)
-	{
-		// Add test case exception and set failure flag
-		UCLIDException uclidException( "ELI06488", "Unknown Exception caught." );
-		string strError( uclidException.asStringizedByteStream() );
-		m_ipResultLogger->AddTestCaseException( _bstr_t(strError.c_str()) );
-		vbRet = VARIANT_FALSE;
-	}
-
-	// End the test case
-	m_ipResultLogger->EndTestCase( vbRet );
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI26640", m_ipResultLogger, bExceptionCaught, VARIANT_TRUE);
 }
 //-------------------------------------------------------------------------------------------------
 IAttributePtr CEntityNameSplitterTester::getAttribute(std::ifstream &ifs)

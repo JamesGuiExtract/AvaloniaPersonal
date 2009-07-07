@@ -198,9 +198,9 @@ void CAFUtilityTester::test1()
 			}
 		}
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06987", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI06987", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 
 	bSuccess = bSuccess && !bExceptionCaught;
-	m_ipResultLogger->EndTestCase(bSuccess ? VARIANT_TRUE : VARIANT_FALSE);
+	m_ipResultLogger->EndTestCase(asVariantBool(bSuccess));
 }
 //-------------------------------------------------------------------------------------------------

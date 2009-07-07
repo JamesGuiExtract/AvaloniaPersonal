@@ -137,7 +137,7 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 			{
 				ue.addDebugInfo("Case No", string(zCaseNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (_com_error& e)
@@ -155,7 +155,7 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 				}
 				ue.addDebugInfo("Case No", string(zCaseNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (...)
@@ -164,7 +164,7 @@ STDMETHODIMP CLegalDescFinderTester::raw_RunAutomatedTests(IVariantVector* pPara
 				uclidException.addDebugInfo("Case No", string(zCaseNo));
 				uclidException.addDebugInfo("Line Text", strLine);
 				string strError(uclidException.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 

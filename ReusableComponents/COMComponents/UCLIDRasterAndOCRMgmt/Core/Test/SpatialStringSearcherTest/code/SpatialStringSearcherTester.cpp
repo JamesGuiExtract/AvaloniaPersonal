@@ -292,18 +292,13 @@ void CSpatialStringSearcherTester::processTestCase(std::vector<std::string>& vec
 			bSuccess = true;
 		}
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07972", m_ipResultLogger, bExceptionCaught);
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI07972", m_ipResultLogger, bExceptionCaught, VARIANT_FALSE);
 	
 	
-	VARIANT_BOOL bRet = VARIANT_FALSE;
-	if (bSuccess && !bExceptionCaught)
-	{
-		bRet = VARIANT_TRUE;
-	}
+	VARIANT_BOOL bRet = asVariantBool(bSuccess && !bExceptionCaught);
 
 	m_ipResultLogger->EndTestCase(bRet); 
 	m_lCurrTestCase++;
-	
 }
 //-------------------------------------------------------------------------------------------------
 void CSpatialStringSearcherTester::processSet(std::vector<std::string>& vecTokens, const std::string& strDatFile)

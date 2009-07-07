@@ -73,7 +73,7 @@ void InteractiveTestDlg::OnAddException()
 	if (dlg.DoModal() == IDOK)
 	{
 		_bstr_t bstrException = dlg.m_zInput;
-		m_ipResultLogger->AddTestCaseException(bstrException);
+		m_ipResultLogger->AddTestCaseException(bstrException, VARIANT_FALSE);
 	}
 }
 

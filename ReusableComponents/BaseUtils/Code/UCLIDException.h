@@ -1251,10 +1251,11 @@ private:
 // PURPOSE: To provide an easy way to catch any exception and send to the test result logger
 //			that is part of the UCLID Core Testing Framework.
 // REQUIRE: rbExceptionCaught is of bool type, and has been initialized to false.
+//			bFailTest is of VARIANT_BOOL type
 // PROMISE: If an exception is caught, this macro will catch different types of exceptions, 
 //			convert them into UCLIDExceptions, add the test case exception to the test result 
 //			logger, and set the rbExceptionCaught boolean variable to true.
-#define CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION(strELICode, pTestResultLogger, rbExceptionCaught) \
+#define CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION(strELICode, pTestResultLogger, rbExceptionCaught, vbFailTest) \
 	catch (_com_error& err) \
 	{ \
 		UCLIDException ue; \
@@ -1272,7 +1273,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (COleDispatchException *pEx) \
 	{ \
@@ -1286,7 +1287,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (COleDispatchException& ex) \
 	{ \
@@ -1299,7 +1300,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (COleException& ex) \
 	{ \
@@ -1314,7 +1315,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (CException* pEx) \
 	{ \
@@ -1329,7 +1330,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (UCLIDException& ue) \
 	{ \
@@ -1339,7 +1340,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	} \
 	catch (...) \
 	{ \
@@ -1350,7 +1351,7 @@ private:
 			ue.addDebugInfo(_lastCodePos); \
 		} \
 		rbExceptionCaught = true; \
-		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str())); \
+		pTestResultLogger->AddTestCaseException(_bstr_t(ue.asStringizedByteStream().c_str()), vbFailTest); \
 	}
 
 //--------------------------------------------------------------------------------------------------
