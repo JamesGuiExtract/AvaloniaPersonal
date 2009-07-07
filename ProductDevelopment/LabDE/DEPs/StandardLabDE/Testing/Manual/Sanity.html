@@ -166,7 +166,7 @@
 <p>
 	<LI><h3>File Action Manager</h3>
 	<ul>
-		<LI>Confirm that a <b>Verify indexed documents</b> task is available as a file 
+		<LI>Confirm that a <b>Verify extracted data</b> task is available as a file 
 		processing task.
 		<LI><b>[DataEntry #249, #358]</b> Confirm that <b>Configure</b> button allows specification 
 		of a <b>.config</b> file.
@@ -199,39 +199,39 @@
 		<LI><b>OCR confidence</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Street</b> cell in the <b>Laboratory - Address</b> table.
-			<LI>Confirm that in the <b>N7950</b> text that the <b>9</b> and the <b>0</b> 
-			have a red background indicating lower OCR confidence.
-			<LI>Swipe <b>N7950 Town Hall</b> to replace the Street Address.
-			<LI>Confirm that the text OCRs correctly.
-			<LI>Confirm that now only the <b>0</b> has a red background indicating 
+			<LI>Select the first <b>BASIC METABOLIC PANEL</b> row in the <b>Orders</b> table.
+			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
+			a red background indicating lower OCR confidence.
+			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
+			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
+			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> have red backgrounds indicating 
 			lower OCR confidence.
-			<LI>Manually edit the <b>Street</b> cell such that <b>N7950</b> becomes <b>N7960</b>.
+			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes <b>Carbon Monoxide</b>.
 			<ul>
-				<LI>Confirm that the tooltip changes to <b>N7960 Town Hall</b>.
+				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
 			</ul>
-			<LI>Re-swipe <b>N7950 Town Hall</b> to replace the Street Address.
-			<LI>Confirm that the text OCRs correctly.
-			<LI>Confirm that the <b>0</b> again has a red background indicating 
-			lower OCR confidence.
+			<LI>Re-swipe <b>Carbon Dioxide</b> to replace the Order Name.
+			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
+			<LI>Confirm that the word <b>Carbon</b> again has a red background indicating 
+			lower OCR confidence. <b>Dioxide</b> may also be in red at this time.
 		</ul>
 <p>
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Laboratory Address</b> table.
+			<LI>Select the <b>Orders</b> table.
 			<LI>Confirm that selecting each individual row of the address table provides the 
 			appropriate highlight and hint.
 			<LI>Confirm that selecting multiple rows of the address table in various 
 			combinations provides the appropriate highlights but without any hints.
 <p>
 			<LI>Select one of the <b>Basic Metabolic Panel</b> cells in the 
-			<b>Completed Tests</b> table.
+			<b>Orders</b> table.
 			<LI>Confirm that the <b>Basic Metabolic Panel</b> text is highlighted 
 			and that a hint is also displayed.
 			<LI>Select an entire <b>Basic Metabolic Panel</b> row in the 
-			<b>Completed Tests</b> table.
+			<b>Orders</b> table.
 			<ul>
 				<LI>Confirm that all of the test results for the <b>Panel</b> are 
 				highlighted and that no hint is displayed.
@@ -244,7 +244,7 @@
 			Details</b> table.
 			<LI>Confirm that a <b>direct</b> hint is provided under the 
 			<b>OUT OF RANGE</b> column.
-			<LI>Select one of the empty <b>Comment</b> cells in the <b>Selected Test 
+			<LI>Select one of the empty <b>Comment</b> cells in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that an <b>indirect</b> hint is provided with dotted line boxes 
 			around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
@@ -289,7 +289,7 @@
 	<ul>
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
 		<LI>Select the <b>Basic Metabolic Panel</b>.
-		<LI>Select the empty row at the bottom of the <b>Selected Test Details</b>.
+		<LI>Select the empty row at the bottom of the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
 		<ul>
 			<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Test 
@@ -303,12 +303,12 @@
 		</ul>
 <p>
 		<LI>Open image <b>191.tif</b> from Demo_LabDE.
-		<LI>Select the empty row at the bottom of <b>Completed Tests</b>.
+		<LI>Select the empty row at the bottom of the <b>Orders</b> table.
 		<LI>Use the rectangular highlight tool to swipe the entire <b>TUMOR MARKER 
 		STUDIES</b> test and data including the collection date and time.
 		<ul>
 			<LI>Confirm that a new <b>TUMOR MARKER STUDIES</b> test appears in the 
-			<b>Completed Tests</b> table.
+			<b>Orders</b> table.
 			<LI>Confirm that test information is provided for <b>TOTAL PSA</b>, 
 			<b>FREE PSA</b>, and <b>% FREE PSA</b>.
 			<LI>Confirm that highlights and hints are provided.
@@ -384,7 +384,7 @@
 			<b>Chemistry - Blood</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that <b>Test</b> data is only present for <b>Creatinine</b>, 
 			<b>eGFR for African Americans</b> and <b>eGFR for Non-African Americans</b>.
@@ -399,11 +399,11 @@
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<LI>Confirm that <b>Orders</b> are present for 
 			<b>HEMATOLOGY</b> and <b>DIFFERENTIAL (AUTOMATED)</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that <b>HEMATOLOGY</b> test data is present for <b>10</b> tests.
 			<LI>Confirm that <b>DIFFERENTIAL (AUTOMATED)</b> test data is present 
@@ -422,7 +422,7 @@
 			<b>Other</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is not present.
+			<LI>Confirm that <b>Selected Order Details</b> data is not present.
 			<LI>Confirm that <b>Test</b> data is only present for <b>GLUCOSE</b> 
 			and <b>HEMOGLOBIN</b>.
 		</ul>
@@ -436,11 +436,11 @@
 			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
-			<LI>Confirm that two <b>Completed Tests</b> are present for 
+			<LI>Confirm that two <b>Orders</b> are present for 
 			<b>Basic Metabolic Panel</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for the first <b>Basic Metabolic Panel</b> is present 
 			for <b>9</b> tests.
@@ -472,11 +472,11 @@
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<LI>Confirm that <b>Orders</b> are present for 
 			<b>TUMOR MARKER STUDIES</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that <b>Test</b> data is present for <b>TOTAL PSA</b>, <b>FREE PSA</b> 
 			and <b>% FREE PSA</b>.
@@ -493,7 +493,7 @@
 			<b>Hemogram with Differential</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data is present for <b>20 of 21</b> tests.
 			<LI>Confirm that test data was not found for the <b>Hct</b> test.
@@ -511,11 +511,11 @@
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<LI>Confirm that <b>Orders</b> are present for 
 			<b>CHEMISTRY</b> and <b>ELECTROLYTES/BLOOD GASES</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that <b>CHEMISTRY</b> test data is present for <b>6</b> of 
 			<b>6</b> tests.
@@ -535,11 +535,11 @@
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<LI>Confirm that <b>Orders</b> are present for 
 			<b>LIPID PANEL</b> and <b>Other</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for the <b>LIPID PANEL</b> is present 
 			for <b>5</b> tests.
@@ -556,11 +556,11 @@
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>NT, CLIE</b> physician is incorrect.
 			<LI>Confirm that the <b>Laboratory</b> data is complete and correct.
-			<LI>Confirm that <b>Completed Tests</b> are present for two 
+			<LI>Confirm that <b>Orders</b> are present for two 
 			<b>COMP METABOLIC PNL</b> plus <b>Other</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Components</b>.
 			<LI>Confirm that test data for the first <b>COMP METABOLIC PNL</b> is present 
 			for <b>20</b> tests plus <b>3</b> tests underneath a <b>LIPID PANEL 
@@ -583,7 +583,7 @@
 			<b>URINE MACROSCOPIC</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data is present for <b>12</b> of <b>12</b> tests.
 			<LI>Confirm that all found data is valid.
@@ -598,11 +598,11 @@
 			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for <b>Thyroid Stimulating 
+			<LI>Confirm that <b>Orders</b> are present for <b>Thyroid Stimulating 
 			Hormone</b> and <b>Free T4</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for <b>Thyroid Stimulating Hormone</b> is present 
 			for <b>1</b> test.
@@ -618,7 +618,7 @@
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for 
+			<LI>Confirm that <b>Orders</b> are present for 
 			<b>HEMATOLOGY</b> (twice), <b>INDICES DATA</b> (twice), <b>DIFFERENTIAL 
 			(AUTOMATED)</b> (twice, not four times), <b>COAGULATION</b>, <b>CHEMISTRY</b> 
 			(six, not fourteen times), <b>LIPID STUDIES</b> (once, not twice), 
@@ -628,7 +628,7 @@
 			in footnotes is generally not expected to be reported as test data.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is only present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
 			<b>Result Date</b> and <b>Result Time</b> for the <b>Other</b> test.
 			<LI><b>HEMATOLOGY</b> test data
 			<ul>
@@ -701,11 +701,11 @@
 			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
-			<LI>Confirm that <b>Completed Tests</b> are present for <b>Glucose, Blood</b>, 
+			<LI>Confirm that <b>Orders</b> are present for <b>Glucose, Blood</b>, 
 			<b>HGB A1C, Hemoglobin A1C</b>, and <b>CBC, Complete Blood Count</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is not present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is not present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for <b>Glucose, Blood</b> is present 
 			for <b>1</b> test and all found data is valid.
@@ -729,7 +729,7 @@
 			<LI>Confirm that one <b>Completed Test</b> is present for <b>CBC</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for <b>CBC</b> is present 
 			for <b>20</b> tests.
@@ -746,10 +746,10 @@
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete and correct except 
 			for <b>Phone</b> and <b>Lab ID</b>.
-			<LI>Confirm that two <b>Completed Tests</b> are present for <b>Other</b>.
+			<LI>Confirm that two <b>Orders</b> are present for <b>Other</b>.
 			<LI>Confirm that each test has data for <b>Collection Date</b> and 
 			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Test Details</b> data is not present for 
+			<LI>Confirm that <b>Selected Order Details</b> data is not present for 
 			<b>Result Date</b> and <b>Result Time</b>.
 			<LI>Confirm that test data for the first <b>Other</b> is present 
 			for <b>TSH</b> and <b>FT4</b> tests.
