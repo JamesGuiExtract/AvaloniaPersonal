@@ -124,25 +124,25 @@ CreateLabDEInstallCD: BuildLabDEInstall
 	
 CreateDemo_LabDE:
 	@ECHO Creating LabDE Demo Folder...
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files"
-	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files"
-	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Bin"
-	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\StandardLabDE.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE"
-	@COPY "$(LabDEDir)\DEPs\StandardLabDE\ValidationFiles\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Validation Files"
-	@COPY "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Database Files"
-	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules" /v /s /e /y
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Validation Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Validation Files"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
+	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin"
+	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\StandardLabDE.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\"
+	@COPY "$(LabDEDir)\DEPs\StandardLabDE\ValidationFiles\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Validation Files"
+	@COPY "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
+	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules" /v /s /e /y
 	@ECHO Encrypting LabDE Demo Rules...
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dat"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.rsd"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.dcc"
-	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\*.spm"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\vssver.scc"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\Demo Solution\*.dat"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\Demo Solution\*.rsd"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\Demo Solution\*.dcc"
+	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\Demo Solution\*.spm"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Rules\Demo Solution\vssver.scc"
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
 
