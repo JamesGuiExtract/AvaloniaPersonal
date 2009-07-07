@@ -1672,6 +1672,7 @@
 		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_TO_COMMON_SCRIPT_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
+		<row><td>PATH_TO_COREPOINT_INSTALL</td><td>\\jake\Applications\CorePoint Integration Engine</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOT_NET_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>
@@ -1921,6 +1922,9 @@
 		<row><td>SetupFile10</td><td>CBUSetup.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_KEY_INSTALL&gt;\CBUSetup.exe</td></row>
 		<row><td>SetupFile11</td><td>SSCERuntime-ENU-x64.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL_COMPACT_EDITION&gt;\SSCERuntime-ENU-x64.msi</td></row>
 		<row><td>SetupFile12</td><td>SSCERuntime-ENU-x86.msi</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_SQL_COMPACT_EDITION&gt;\SSCERuntime-ENU-x86.msi</td></row>
+		<row><td>SetupFile13</td><td>Corepoint-Health-Setup-4.0.0.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_COREPOINT_INSTALL&gt;\Corepoint-Health-Setup-4.0.0.exe</td></row>
+		<row><td>SetupFile14</td><td>XP_2003_MSMQ.ini</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\XP_2003_MSMQ.ini</td></row>
+		<row><td>SetupFile15</td><td>NeoEnableXML.dll</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_COREPOINT_INSTALL&gt;\NeoEnableXML.dll</td></row>
 		<row><td>SetupFile2</td><td>setup.bmp</td><td/><td>0</td><td>1</td><td>&lt;ISPROJECTDIR&gt;\support files\setup.bmp</td></row>
 		<row><td>SetupFile3</td><td>UninstallInlite.bat</td><td/><td>0</td><td>0</td><td>&lt;ISPROJECTDIR&gt;\support files\UninstallInlite.bat</td></row>
 		<row><td>SetupFile4</td><td>ClearImageEUK_5_7_3.exe</td><td/><td>0</td><td>0</td><td>&lt;PATH_TO_INLITE_INSTALL&gt;\ClearImageEUK_5_7_3.exe</td></row>

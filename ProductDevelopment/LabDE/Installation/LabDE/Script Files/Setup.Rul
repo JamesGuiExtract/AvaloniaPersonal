@@ -21,9 +21,11 @@
                                  
                                  
 #define PATH_TO_REGASM WINDIR ^ "Microsoft.NET\\Framework\\v2.0.50727\\RegAsm.exe"
-
+#define CORE_POINT_CLIENT_GUID "{5DAD3198-6D64-46FA-961C-FBB76B722F4A}"
 
 prototype RegisterDataEntryApp();
+prototype InstallCorePoint();
+prototype UnInstallCorePoint();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           
@@ -165,14 +167,18 @@ function OnFirstUIAfter()
     STRING szTitle, szMsg1, szMsg2, szRegAllCmdLine, szCmd;
     BOOL bOpt1, bOpt2;    
 begin
-   	// Rename the uex file
-   	RenameUEXFile();
+	if (gbInstalled) then
+   		InstallCorePoint();
+
+	   	// Rename the uex file
+ 	  	RenameUEXFile();
                                                                                                                               
-    // Register Dlls
-	szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
-	szCmd = "cmd";
-	LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
-    RegisterDataEntryApp();   
+	    // Register Dlls
+		szRegAllCmdLine = "\"" + PROGRAMFILES + EXTRACT_DIR + "\\RegisterAll.bat\"";
+		szCmd = "cmd";
+		LaunchAppAndWait( szRegAllCmdLine, "", LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+    	RegisterDataEntryApp();   
+    endif;
     
     Disable(STATUSEX);
 
@@ -203,4 +209,73 @@ begin
 
 	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.LabResultsCustomComponents.dll" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
+end;
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallCorePoint
+//
+//  Purpose: This function installs the CorePoint Runtime.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallCorePoint()
+STRING szProgram, szCmdLine, strUninstallKey;
+int nResult, svServiceState;
+begin
+	SdShowMsg("Setup is Installing CorePoint Integration Engine", TRUE);
+
+	// Need to install msmq which depends on the OS Version
+	if ( SYSINFO.nOSMajor = 5 ) then
+		szProgram = "sysocmgr";
+		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
+		//MessageBox( szCmdLine, MB_OK);
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	elseif (SYSINFO.nOSMajor = 6 ) then
+		szProgram = "ocsetup";
+		// If it is server the arguments need to be different
+		if ( SYSINFO. nOSProductType = VER_NT_SERVER ) then
+			szCmdLine = "MSMQ-Server /passive /quiet";	
+		else
+			szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet";
+		endif;
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	endif;
+	
+	// Install Crystal Reports
+	szProgram = SUPPORTDIR ^ "Corepoint-Health-Setup-4.0.0.exe";
+	szCmdLine = " /S /v/qn";
+	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	  
+	// Create the path for the uninstall key
+	strUninstallKey = REG_PATH_UNINSTALL ^ CORE_POINT_CLIENT_GUID;
+	                                        
+	// If key exists get the version
+	if (RegDBKeyExist(strUninstallKey) = 1 ) then
+		CopyFile( SUPPORTDIR ^ "NeoEnableXML.dll", PROGRAMFILES ^ "Shared Components\\NeoEnableXML.dll");
+	endif;
+	
+	SdShowMsg("Setup is Installing CorePoint Integration Engine", FALSE);
+end;
+        
+        
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallCorePoint
+//
+//  Purpose: This function uninstalls the CorePoint Integration Engine.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function UnInstallCorePoint()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin
+		// Ask user if they wish to unintall CorePoint
+	nResult = MessageBox("Do you wish to uninstall CorePoint Integration Engine?" + 
+		"\r\nOther installed applications may use this and uninstalling " + 
+		" will cause those applications to work incorrectly." , MB_YESNO );
+
+	if (nResult = IDYES) then
+	    UninstallApplication(CORE_POINT_CLIENT_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+  	endif;
 end;
