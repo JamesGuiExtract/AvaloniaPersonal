@@ -1557,7 +1557,7 @@ namespace Extract.DataEntry
 
                 // Use the value of the found attribute only if the found attribute has a non-empty
                 // value.
-                if (!string.IsNullOrEmpty(attribute.Value.String))
+                if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))
                 {
                     swipedText = attribute.Value;
                 }

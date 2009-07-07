@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE SUBSTRING('{'../LabAddress/Address1}',1,10) + '%' AND City LIKE SUBSTRING('{'../LabAddress/City}',1,5) + '%' AND Zip LIKE SUBSTRING('{'../LabAddress/ZipCode}',1,5) + '%'&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE SUBSTRING('{'../Address/Address1}',1,10) + '%' AND City LIKE SUBSTRING('{'../Address/City}',1,5) + '%' AND Zip LIKE SUBSTRING('{'../Address/ZipCode}',1,5) + '%'&lt;/SQL&gt;</value>
   </data>
   <metadata name="_testName.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

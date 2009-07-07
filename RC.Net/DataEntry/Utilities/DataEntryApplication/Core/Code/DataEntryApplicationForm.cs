@@ -1126,6 +1126,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             bool dataSaved = _dataEntryControlHost.SaveData();
 
+            // If dataSaved == false, the user canceled the save.  Don't complete the current
+            // document in that case.
             if (dataSaved)
             {
                 OnFileComplete(new FileCompleteEventArgs(closing));

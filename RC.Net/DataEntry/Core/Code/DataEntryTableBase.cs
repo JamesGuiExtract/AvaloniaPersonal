@@ -697,7 +697,8 @@ namespace Extract.DataEntry
                 // If the current selection does not result in a propagated attribute when dependent
                 // controls are present (ie, selection across multiple rows), don't allow edit mode
                 // since that dependent triggers in the dependent controls wouldn't be updated.
-                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null)
+                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
+                    base.CurrentRow.Index != base.NewRowIndex)
                 {
                     base.EndEdit();
                     return;
