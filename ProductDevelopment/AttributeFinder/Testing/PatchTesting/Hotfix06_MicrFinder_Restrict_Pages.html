@@ -1,0 +1,81 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 06 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 06 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Old Republic
+   	<LI><b>SCRs:</b> FlexIDSCore #3522, #3523
+   	<LI><b>Issue:</b> Running the original MICR Finder rules on Old Republic images required 
+	approximately 90 minutes per document.  The major part of this time is spent searching image 
+	pages for checks.  The hotfix allows the MICR Finder to run on individual pages so that 
+	existence of meaningful clues will trigger the MICR Finder.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Capture rates and quad-core processing times for 7.0.0.39 without hot fix 06</b>
+	<ul>
+		<li><u>Old Republic Title - RedactionDemo - Set003</u>
+	       	<ul>
+			<li>Automated redaction capture rate: ____________________
+			<li>Number of documents processed: ____________________
+			<li>Average processing time per document: ____________________
+	       	</ul>
+<p>
+		<li><u>St Johns - Set002</u>
+	       	<ul>
+			<li>Automated redaction capture rate: ____________________
+			<li>Number of documents processed: ____________________
+			<li>Average processing time per document: ____________________
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Capture rates and quad-core processing times for 7.0.0.39 with hot fix 06</b>
+	<ul>
+		<li><u>Old Republic Title - RedactionDemo - Set003</u>
+	       	<ul>
+			<li>Automated redaction capture rate: ____________________
+			<li>Number of documents processed: ____________________
+			<li>Average processing time per document: ____________________
+	       	</ul>
+<p>
+		<li><u>St Johns - Set002</u>
+	       	<ul>
+			<li>Automated redaction capture rate: ____________________
+			<li>Number of documents processed: ____________________
+			<li>Average processing time per document: ____________________
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Sanity Test</b>
+       	<ul>
+  	   	<LI>Operating system: ____________________
+  	   	<LI>Test machine: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+  	   	<LI>Notes: ____________________
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Automated Testing</b>
+       	<ul>
+  	   	<LI>Automated Tests : AFCore.tcl
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
