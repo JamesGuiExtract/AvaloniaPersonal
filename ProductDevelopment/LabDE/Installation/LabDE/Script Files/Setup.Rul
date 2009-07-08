@@ -24,8 +24,8 @@
 #define CORE_POINT_CLIENT_GUID "{5DAD3198-6D64-46FA-961C-FBB76B722F4A}"
 
 prototype RegisterDataEntryApp();
-prototype InstallCorePoint();
-prototype UnInstallCorePoint();
+prototype InstallCorepoint();
+prototype UnInstallCorepoint();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           
@@ -168,7 +168,8 @@ function OnFirstUIAfter()
     BOOL bOpt1, bOpt2;    
 begin
 	if (gbInstalled) then
-   		InstallCorePoint();
+		// Removed Corepoint install because not sure if silent install works properley
+   		//InstallCorepoint();
 
 	   	// Rename the uex file
  	  	RenameUEXFile();
@@ -214,16 +215,16 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: InstallCorePoint
+// Function: InstallCorepoint
 //
-//  Purpose: This function installs the CorePoint Runtime.
+//  Purpose: This function installs the Corepoint Runtime.
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
-function InstallCorePoint()
+function InstallCorepoint()
 STRING szProgram, szCmdLine, strUninstallKey;
 int nResult, svServiceState;
 begin
-	SdShowMsg("Setup is Installing CorePoint Integration Engine", TRUE);
+	SdShowMsg("Setup is Installing Corepoint Integration Engine", TRUE);
 
 	// Need to install msmq which depends on the OS Version
 	if ( SYSINFO.nOSMajor = 5 ) then
@@ -255,23 +256,23 @@ begin
 		CopyFile( SUPPORTDIR ^ "NeoEnableXML.dll", PROGRAMFILES ^ "Corepoint Health\\Shared Components\\NeoEnableXML.dll");
 	endif;
 	
-	SdShowMsg("Setup is Installing CorePoint Integration Engine", FALSE);
+	SdShowMsg("Setup is Installing Corepoint Integration Engine", FALSE);
 end;
         
         
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: UninstallCorePoint
+// Function: UninstallCorepoint
 //
-//  Purpose: This function uninstalls the CorePoint Integration Engine.
+//  Purpose: This function uninstalls the Corepoint Integration Engine.
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
-function UnInstallCorePoint()
+function UnInstallCorepoint()
 STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin
-		// Ask user if they wish to unintall CorePoint
-	nResult = MessageBox("Do you wish to uninstall CorePoint Integration Engine?" + 
+		// Ask user if they wish to unintall Corepoint
+	nResult = MessageBox("Do you wish to uninstall Corepoint Integration Engine?" + 
 		"\r\nOther installed applications may use this and uninstalling " + 
 		" will cause those applications to work incorrectly." , MB_YESNO );
 
