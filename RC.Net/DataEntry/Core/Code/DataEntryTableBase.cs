@@ -60,6 +60,11 @@ namespace Extract.DataEntry
         private Color _color;
 
         /// <summary>
+        /// Specifies whether the control should remain disabled at all times.
+        /// </summary>
+        private bool _disabled;
+
+        /// <summary>
         /// Specifies whether the table will attempt to generate a hint using the intersection of 
         /// the row and column occupied by the specified attribute.
         /// </summary>
@@ -497,7 +502,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (dataEntryCell.Validator == null || dataEntryCell.Attribute == null)
+                if (dataEntryCell.Validator == null || dataEntryCell.Attribute == null ||
+                    AttributeStatusInfo.GetOwningControl(dataEntryCell.Attribute).Disabled)
                 {
                     // Nothing to do.
                     return;
@@ -1045,6 +1051,29 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether the control should remain disabled at all times.
+        /// <para><b>Note</b></para>
+        /// If disabled, mapped data will not be validated.
+        /// </summary>
+        /// <value><see langword="true"/> if the control should remain disabled,
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if the control will remain disabled,
+        /// <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Control")]
+        public bool Disabled
+        {
+            get
+            {
+                return _disabled;
+            }
+
+            set
+            {
+                _disabled = value;
+            }
+        }
+
+        /// <summary>
         /// Handles the case that the current selection in the table has changed so that the 
         /// background color of the cell can be changed to the "active" or "inactive" color
         /// as appropriate.
@@ -1307,7 +1336,7 @@ namespace Extract.DataEntry
                 // propagated.
                 if (e.Attributes != null && e.Attributes.Size() == 1)
                 {
-                    base.Enabled = true;
+                    base.Enabled = !_disabled;
 
                     // Mark the attribute as propagated.
                     IAttribute parentAttribute = (IAttribute)e.Attributes.At(0);

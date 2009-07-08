@@ -665,7 +665,9 @@ namespace Extract.DataEntry
                 // [DataEntry:298]
                 // If the table isn't assigned any data, disable it since any data entered would
                 // not be mapped into the attribute hierarchy.
-                base.Enabled = (sourceAttributes != null);
+                // Also, prevent it from being enabled if explicitly disabled via the
+                // IDataEntryControl interface.
+                base.Enabled = (sourceAttributes != null && !base.Disabled);
 
                 _sourceAttributes = sourceAttributes;
 
@@ -686,6 +688,12 @@ namespace Extract.DataEntry
 
                 // Use the primarily mapped attribute map the attribute for each row.
                 ApplyAttribute();
+
+                // Selecting all cells makes table look more "disabled".
+                if (base.Disabled)
+                {
+                    base.SelectAll();
+                }
 
                 // Update the swiping state based on the current selection.
                 OnSwipingStateChanged();

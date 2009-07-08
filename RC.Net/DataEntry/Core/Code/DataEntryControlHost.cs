@@ -445,6 +445,11 @@ namespace Extract.DataEntry
         private string _applicationTitle;
 
         /// <summary>
+        /// A list of names of DataEntry controls that should remain disabled at all times.
+        /// </summary>
+        private List<string> _disabledControls = new List<string>();
+
+        /// <summary>
         /// The number of selected attributes with highlights that have been accepted by the user.
         /// </summary>
         private int _selectedAttributesWithAcceptedHighlights;
@@ -777,6 +782,53 @@ namespace Extract.DataEntry
             set
             {
                 _applicationTitle = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s that
+        /// should remain disabled at all times.
+        /// </summary>
+        /// <value>A comma separated list of names of <see cref="IDataEntryControl"/>s.</value>
+        /// <returns>A comma separated list of names of <see cref="IDataEntryControl"/>s.</returns>
+        public string DisabledControls
+        {
+            get
+            {
+                try
+                {
+                    string disabledControls = "";
+
+                    foreach (string disabledControl in _disabledControls)
+                    {
+                        if (!string.IsNullOrEmpty(disabledControls))
+                        {
+                            disabledControls += ",";
+                        }
+
+                        disabledControls += disabledControl;
+                    }
+
+                    return disabledControls;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26655", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _disabledControls.Clear();
+                    _disabledControls.AddRange(
+                        value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26656", ex);
+                }
             }
         }
 
@@ -1532,7 +1584,7 @@ namespace Extract.DataEntry
                         }
                     }
 
-                    // Deactivate all data controls.
+                    // Enable/Disable all data controls per imageIsAvailable
                     foreach (IDataEntryControl dataControl in _dataControls)
                     {
                         // Remove activate status from the active control.
@@ -1544,7 +1596,8 @@ namespace Extract.DataEntry
                         // Set the enabled status of every data control depending on the 
                         // availability of data.
                         Control control = (Control)dataControl;
-                        control.Enabled = imageIsAvailable;
+
+                        control.Enabled = imageIsAvailable && !dataControl.Disabled;
                     }
 
                     // For as long as unpropagated attributes are found, propagate them and their 
@@ -2320,6 +2373,11 @@ namespace Extract.DataEntry
 
                     // Disable all data controls until an image is available.
                     control.Enabled = false;
+
+                    if (_disabledControls.Contains(control.Name))
+                    {
+                        dataControl.Disabled = true;
+                    }
                 }
             }
         }

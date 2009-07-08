@@ -157,9 +157,15 @@ namespace Extract.DataEntry
         private Dictionary<string, string> _validationListValues;
 
         /// <summary>
+        /// Specifies whether a value that matches a validation list item case-insensitively but
+        /// not case-sensitively will be changed to match the validation list value.
+        /// </summary>
+        private bool _correctCase = true;
+
+        /// <summary>
         /// The error message that should be displayed upon validation failure.
         /// </summary>
-        private string _validationErrorMessage = "Bad value";
+        private string _validationErrorMessage = "Invalid value";
 
         #endregion Fields
 
@@ -300,6 +306,27 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether a value that matches a validation list item case-insensitively but
+        /// not case-sensitively will be changed to match the validation list value.
+        /// </summary>
+        /// <value><see langword="true"/> if values should be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches should be left as-is.</value>
+        /// <returns><see langword="true"/> if values will be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches will be left as-is.</returns>
+        public bool CorrectCase
+        {
+            get
+            {
+                return _correctCase;
+            }
+
+            set
+            {
+                _correctCase = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or set the error message that should be displayed upon validation failure. 
         /// If unspecified, a default of "Bad value" will be used.
         /// </summary>
@@ -414,7 +441,7 @@ namespace Extract.DataEntry
                             dataIsValid = false;
                         }
                     }
-                    else if (listValue != value)
+                    else if (_correctCase && listValue != value)
                     {
                         // If there is a validation list configured and the text box's data matches an
                         // item in the list, but no case-sensitively, change the casing to match
@@ -577,6 +604,7 @@ namespace Extract.DataEntry
                 {
                     SetValidationListValues(source.GetValidationListValues());
                 }
+                _correctCase = source._correctCase;
             }
             catch (Exception ex)
             {

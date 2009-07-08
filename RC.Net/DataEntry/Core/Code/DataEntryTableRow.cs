@@ -390,6 +390,28 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether a value that matches a validation list item case-insensitively but
+        /// not case-sensitively will be changed to match the validation list value.
+        /// </summary>
+        /// <value><see langword="true"/> if values should be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches should be left as-is.</value>
+        /// <returns><see langword="true"/> if values will be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches will be left as-is.</returns>
+        [Category("Data Entry Table Row")]
+        public bool ValidationCorrectsCase
+        {
+            get
+            {
+                return _validator.CorrectCase;
+            }
+
+            set
+            {
+                _validator.CorrectCase = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or set the error message that should be presented to the user upon validation 
         /// failure. If unspecified, a default of "Bad value" will be used.
         /// </summary>
@@ -524,6 +546,7 @@ namespace Extract.DataEntry
                 row.UseComboBoxCells = this.UseComboBoxCells;
                 row.AutoUpdateQuery = this.AutoUpdateQuery;
                 row.TabStopRequired = this.TabStopRequired;
+                row.ValidationCorrectsCase = this.ValidationCorrectsCase;
 
                 return row;
             }

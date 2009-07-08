@@ -60,6 +60,11 @@ namespace Extract.DataEntry
         private bool _supportsSwiping = true;
 
         /// <summary>
+        /// Specifies whether the control should remain disabled at all times.
+        /// </summary>
+        private bool _disabled;
+
+        /// <summary>
         /// The attribute mapped to this control.
         /// </summary>
         private IAttribute _attribute;
@@ -359,6 +364,28 @@ namespace Extract.DataEntry
             set
             {
                 _validationQuery = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether a value that matches a validation list item case-insensitively but
+        /// not case-sensitively will be changed to match the validation list value.
+        /// </summary>
+        /// <value><see langword="true"/> if values should be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches should be left as-is.</value>
+        /// <returns><see langword="true"/> if values will be modified to match the case of list items,
+        /// <see langword="false"/> if case-insensitive matches will be left as-is.</returns>
+        [Category("Data Entry Text Box")]
+        public bool ValidationCorrectsCase
+        {
+            get
+            {
+                return _validator.CorrectCase;
+            }
+
+            set
+            {
+                _validator.CorrectCase = value;
             }
         }
 
@@ -665,6 +692,29 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether the control should remain disabled at all times.
+        /// <para><b>Note</b></para>
+        /// If disabled, mapped data will not be validated.
+        /// </summary>
+        /// <value><see langword="true"/> if the control should remain disabled,
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if the control will remain disabled,
+        /// <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Control")]
+        public bool Disabled
+        {
+            get
+            {
+                return _disabled;
+            }
+
+            set
+            {
+                _disabled = value;
+            }
+        }
+
         #endregion IDataEntryControl Properties
 
         #region IDataEntryControl Methods
@@ -689,7 +739,9 @@ namespace Extract.DataEntry
                 // [DataEntry:298]
                 // If the text box has nothing to propagate, disable it since any data entered
                 // would not be mapped into the attribute hierarchy.
-                base.Enabled = (sourceAttributes != null);
+                // Also, prevent it from being enabled if explicitly disabled via the
+                // IDataEntryControl interface.
+                base.Enabled = (sourceAttributes != null && !_disabled);
 
                 if (sourceAttributes == null)
                 {
@@ -946,7 +998,7 @@ namespace Extract.DataEntry
                 // propagated.
                 if (e.Attributes != null && e.Attributes.Size() == 1)
                 {
-                    base.Enabled = true;
+                    base.Enabled = !_disabled;
 
                     // This is a dependent child to the sender. Re-map this control using the
                     // updated attribute's children.
@@ -1090,8 +1142,8 @@ namespace Extract.DataEntry
         /// otherwise.</returns>
         private bool Validate(bool correctCase)
         {
-            // If there is no mapped attribute, the data cannot be invalid.
-            if (_attribute == null)
+            // If there is no mapped attribute or the control is disabled, the data cannot be invalid.
+            if (_disabled || _attribute == null)
             {
                 return true;
             }

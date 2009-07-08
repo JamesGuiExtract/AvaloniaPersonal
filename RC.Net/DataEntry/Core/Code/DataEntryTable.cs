@@ -731,6 +731,30 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Releases all unmanaged resources used by the <see cref="DataEntryTable"/>.
+        /// </summary>
+        /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+        /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (components != null)
+                {
+                    components.Dispose();
+                }
+
+                // Dispose of managed objects
+                ClearCachedData();
+            }
+
+            // Dispose of unmanaged resources
+
+            // Dispose of base class
+            base.Dispose(disposing);
+        }
+
         #endregion Overrides
 
         #region Event Handlers
@@ -850,7 +874,9 @@ namespace Extract.DataEntry
                 // [DataEntry:298]
                 // If the table isn't assigned any data, disable it since any data entered would
                 // not be mapped into the attribute hierarchy.
-                base.Enabled = (sourceAttributes != null);
+                // Also, prevent it from being enabled if explicitly disabled via the
+                // IDataEntryControl interface.
+                base.Enabled = (sourceAttributes != null && !base.Disabled);
 
                 _sourceAttributes = sourceAttributes;
 
@@ -935,6 +961,12 @@ namespace Extract.DataEntry
                 // Since the spatial information for this cell has likely changed, spatial hints need 
                 // to be updated.
                 base.UpdateHints();
+
+                // Selecting all cells makes table look more "disabled".
+                if (base.Disabled)
+                {
+                    base.SelectAll();
+                }
 
                 // Highlights the specified attributes in the image viewer and propagates the 
                 // current selection to dependent controls (if appropriate)
@@ -1040,8 +1072,28 @@ namespace Extract.DataEntry
         {
             try
             {
+                // Ensure all rows are removed from the table before disposing of the cached rows.
+                base.Rows.Clear();
+
+                // Dispose of all cached rows.
+                foreach (Dictionary<IAttribute, DataEntryTableRow> cachedSet in _cachedRows.Values)
+                {
+                    foreach (DataEntryTableRow row in cachedSet.Values)
+                    {
+                        row.Dispose();
+                    }
+                }
                 _cachedRows.Clear();
+
                 _activeCachedRows = null;
+
+                // [DataEntry:378]
+                // Prevent copying and pasting table data between different documents.
+                string clipboardDataType = GetClipboardDataType();
+                if (!string.IsNullOrEmpty(clipboardDataType) && clipboardDataType != "System.String")
+                {
+                    Clipboard.Clear();
+                }
             }
             catch (Exception ex)
             {

@@ -1717,6 +1717,14 @@ namespace Extract.DataEntry
 
                 if (statusInfo._isViewable != isViewable)
                 {
+                    // Don't allow any attribute that belongs to a disabled data entry control to
+                    // be marked as viewable since the value will not be selectable or editable.
+                    if (isViewable &&
+                        statusInfo._owningControl != null && statusInfo._owningControl.Disabled)
+                    {
+                        return true;
+                    }
+
                     statusInfo._isViewable = isViewable;
 
                     // If the attribute was not previously viewable, it would not have been

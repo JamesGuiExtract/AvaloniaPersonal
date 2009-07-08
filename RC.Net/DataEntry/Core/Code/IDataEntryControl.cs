@@ -194,6 +194,17 @@ namespace Extract.DataEntry
             set;
         }
 
+        /// <summary>
+        /// Gets or sets whether the control should remain disabled at all times.
+        /// <para><b>Note</b></para>
+        /// Disabled controls will not perform validation on mapped data.
+        /// </summary>
+        bool Disabled
+        {
+            get;
+            set;
+        }
+
         #endregion Properties
 
         #region Methods

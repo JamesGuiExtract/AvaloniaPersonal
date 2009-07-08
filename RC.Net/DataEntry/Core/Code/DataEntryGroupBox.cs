@@ -322,6 +322,28 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// <see cref="DataEntryGroupBox"/> does not disabled status; the value of this property
+        /// will always be <see langword="false"/>.
+        /// </summary>
+        [Category("Data Entry Control")]
+        public bool Disabled
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    throw new ExtractException("ELI26654",
+                        "DataEntryGroup box does not support being disabled!");
+                }
+            }
+        }
+
+        /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
         /// </summary>
         /// <param name="setActive">Unused.</param>

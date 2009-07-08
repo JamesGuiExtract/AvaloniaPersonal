@@ -1246,6 +1246,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 controlHost.ApplicationTitle = ConfigSettings.AppSettings.ApplicationTitle;
+                controlHost.DisabledControls = ConfigSettings.AppSettings.DisabledControls;
 
                 return controlHost;
             }
