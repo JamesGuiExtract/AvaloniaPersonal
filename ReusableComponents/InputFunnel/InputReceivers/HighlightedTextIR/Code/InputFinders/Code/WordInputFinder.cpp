@@ -186,7 +186,7 @@ void CWordInputFinder::automatedTest1()
 		ue.addDebugInfo("Test No", "TestWordIF_1");
 		string strError("");
 		ue.asString(strError);
-		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 		bRet = VARIANT_FALSE;
 	}
 	catch (...)
@@ -195,7 +195,7 @@ void CWordInputFinder::automatedTest1()
 		uclidException.addDebugInfo("Test No", "TestWordIF_1");
 		string strError("");
 		uclidException.asString(strError);
-		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 		bRet = VARIANT_FALSE;
 	}
 	

@@ -116,7 +116,7 @@ void CTestAbstractMeasurement::testAngle()
 			{
 				ue.addDebugInfo("Case No", string(cstrNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (...)
@@ -125,7 +125,7 @@ void CTestAbstractMeasurement::testAngle()
 				uclidException.addDebugInfo("Case No", string(cstrNo));
 				uclidException.addDebugInfo("strForTest", strForTest);
 				string strError(uclidException.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			
@@ -168,7 +168,7 @@ void CTestAbstractMeasurement::testBearing()
 			{
 				ue.addDebugInfo("Case No", string(cstrNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (...)
@@ -177,7 +177,7 @@ void CTestAbstractMeasurement::testBearing()
 				uclidException.addDebugInfo("Case No", string(cstrNo));
 				uclidException.addDebugInfo("strForTest", strForTest);
 				string strError(uclidException.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			
@@ -227,7 +227,7 @@ void CTestAbstractMeasurement::testDistance()
 			{
 				ue.addDebugInfo("Case No", string(cstrNo));
 				string strError(ue.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			catch (...)
@@ -236,7 +236,7 @@ void CTestAbstractMeasurement::testDistance()
 				uclidException.addDebugInfo("Case No", string(cstrNo));
 				uclidException.addDebugInfo("strForTest", strForTest);
 				string strError(uclidException.asStringizedByteStream());
-				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+				m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 				bRet = VARIANT_FALSE;
 			}
 			

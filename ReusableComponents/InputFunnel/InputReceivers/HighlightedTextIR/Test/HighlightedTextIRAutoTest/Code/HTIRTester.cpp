@@ -86,7 +86,7 @@ STDMETHODIMP CHTIRTester::raw_RunAutomatedTests(IVariantVector* pParams, BSTR st
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI12337", m_ipLogger, bExceptionCaught)
+	CATCH_ALL_AND_ADD_TEST_CASE_EXCEPTION("ELI12337", m_ipLogger, bExceptionCaught, VARIANT_FALSE)
 
 	return S_OK;
 }

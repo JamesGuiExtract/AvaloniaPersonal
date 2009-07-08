@@ -226,7 +226,7 @@ void CMCRTextInputFinder::automatedTest1()
 		ue.addDebugInfo("Test No", "TestMCRTextIF_1");
 		string strError("");
 		ue.asString(strError);
-		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 		bRet = VARIANT_FALSE;
 	}
 	catch (...)
@@ -235,7 +235,7 @@ void CMCRTextInputFinder::automatedTest1()
 		uclidException.addDebugInfo("Test No", "TestMCRTextIF_1");
 		string strError("");
 		uclidException.asString(strError);
-		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()));
+		m_ipResultLogger->AddTestCaseException(_bstr_t(strError.c_str()), VARIANT_FALSE);
 		bRet = VARIANT_FALSE;
 	}
 	
