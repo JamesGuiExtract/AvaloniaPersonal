@@ -129,7 +129,7 @@ CreateDemo_LabDE:
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration"
 	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
 	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin"
-	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\StandardLabDE.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\"
+	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\"
 	@COPY "$(LabDEDir)\DEPs\StandardLabDE\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration"
 	@COPY "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
 	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules" /v /s /e /y
