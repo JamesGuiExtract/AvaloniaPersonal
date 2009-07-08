@@ -338,10 +338,31 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
+              <xs:element name="EpicCode" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="FullText" type="xs:string" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
         <xs:element ref="LabInfo" minOccurs="0" />
+        <xs:element name="ResultDate">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ResultTime">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -385,27 +406,6 @@
       <xs:sequence>
         <xs:element name="FullText" minOccurs="1" type="xs:string" />
         <xs:element ref="Address" minOccurs="0" />
-        <xs:element name="Lab_Number" minOccurs="0">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="FullText" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="Name" minOccurs="0">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="FullText" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="Phone_Number" minOccurs="0">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="FullText" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
         <xs:element name="LabIdentifier" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
@@ -414,6 +414,27 @@
           </xs:complexType>
         </xs:element>
         <xs:element name="LabCode" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Name">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Lab_Number" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Phone_Number" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="FullText" type="xs:string" />
