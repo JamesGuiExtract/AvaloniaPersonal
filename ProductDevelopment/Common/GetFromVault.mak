@@ -21,7 +21,7 @@ LabDEDir=$(PDRootDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
 
 Get=vault GETLABEL 
-GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY)
+GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
 
 GetPDCommonFiles:
 	@ECHO Getting Common folder for $(ProductVersion)
