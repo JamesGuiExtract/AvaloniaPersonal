@@ -322,8 +322,8 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// <see cref="DataEntryGroupBox"/> does not disabled status; the value of this property
-        /// will always be <see langword="false"/>.
+        /// <see cref="DataEntryGroupBox"/> does not support disabled status; the value of this
+        /// property will always be <see langword="false"/>.
         /// </summary>
         [Category("Data Entry Control")]
         public bool Disabled

@@ -444,7 +444,7 @@ namespace Extract.DataEntry
                     else if (_correctCase && listValue != value)
                     {
                         // If there is a validation list configured and the text box's data matches an
-                        // item in the list, but no case-sensitively, change the casing to match
+                        // item in the list, but not case-sensitively, change the casing to match
                         // the list item.
                         value = listValue;
                     }

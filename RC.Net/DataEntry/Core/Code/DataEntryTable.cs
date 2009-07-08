@@ -740,12 +740,12 @@ namespace Extract.DataEntry
         {
             if (disposing)
             {
+                // Dispose of managed objects
                 if (components != null)
                 {
                     components.Dispose();
                 }
 
-                // Dispose of managed objects
                 ClearCachedData();
             }
 
