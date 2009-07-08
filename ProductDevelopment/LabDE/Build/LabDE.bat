@@ -11,9 +11,9 @@ IF "%BUILD_FROM_SVN%"=="YES" (
 	"C:\Program Files\CollabNet Subversion\svn.exe" export "%SVN_REPOSITORY%/tags/%~1/Engineering/ProductDevelopment/LabDE/Build" .\ --force
 ) ELSE (
 	CD ..\..\Common
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" %1
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0\..\..\Common" "$/Engineering/ProductDevelopment/Common" "%~1"
 	CD ..\LabDE\Build
-	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0" "$/Engineering/ProductDevelopment/LabDE/Build" %1
+	vault GETLABEL -server %VAULT_SERVER% -repository %VAULT_REPOSITORY% -nonworkingfolder "%~p0" "$/Engineering/ProductDevelopment/LabDE/Build" "%~1"
 )
 
 Rem Remove previous build directory if it exists
