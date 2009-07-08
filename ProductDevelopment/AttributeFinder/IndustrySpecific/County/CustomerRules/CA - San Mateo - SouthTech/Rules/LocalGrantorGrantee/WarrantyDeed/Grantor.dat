@@ -17,6 +17,10 @@ rule07=pursuant^9~sale^5~California^3~Revenue^8~Taxation^3~Code^3~Section^12~\r\
 rule08=without^9~consideration^12~received^9~therefore|therefor]^?Grantor^120~[grant^3~to]
 //K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_12_2008014506.tif
 rule09=hereby^3~acknowledged^?Grantor^160~[as^3~to^3~an^3~undivided^40~interest^3~and]^?SecondGrantor^120~[as^3~to^3~an^3~undivided^80~hereby^3~grant
+
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_15_2008015873.tif
+rule10=hereby^3~acknowledged^?Grantor10^150~[a|[an^3~married|narried|unmarried|unnarried|single
+
 //K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_11_2008014214.tif.uss
 WD_Grantor_03=[The]^3~undersigned^3~Grantor^?Grantor^80~[a^10~married^10~man
 

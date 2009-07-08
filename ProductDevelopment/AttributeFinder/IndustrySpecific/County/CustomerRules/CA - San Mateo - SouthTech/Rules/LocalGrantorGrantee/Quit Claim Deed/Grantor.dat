@@ -60,4 +60,8 @@ LocalQcdGrantor11=grantee^5~herein]^?Grantor^80~[hereby^3~REMISE
 LocalQcdGrantor13=\r\nquitclaim\r\n^?Grantor^160~[does^3~hereby^3~quit^5~claim
 //K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_11_2008014357.tif
 rule01=trustee^5~quit^3~claim^3~deed]^?Grantor^160~hereby^3~transfers
+
+//K:\Common\Engineering\Sample Files\SouthTech\CA - San Mateo\Set001\Images\DEED\FEB_15_2008016254.tif
+rule02=conveyance transfers^6~grantor^100~trust^?Grantor0201^50~[and]^?Grantor0202^50~husband^6~wife
+
 [PATTERNS_END]
