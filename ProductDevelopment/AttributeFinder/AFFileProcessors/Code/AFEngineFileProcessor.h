@@ -9,6 +9,8 @@
 #include "..\..\..\..\ReusableComponents\COMComponents\UCLIDFileProcessing\Code\FPCategories.h"
 #include "..\..\AFCore\Code\RuleSetLoader.h"
 
+using namespace std;
+
 /////////////////////////////////////////////////////////////////////////////
 // CAFEngineFileProcessor
 class ATL_NO_VTABLE CAFEngineFileProcessor : 
@@ -102,7 +104,7 @@ private:
 	/////////////
 	
 	// this is the rule set file name for file processing only
-	std::string m_strRuleFileNameForFileProcessing;
+	string m_strRuleFileNameForFileProcessing;
 
 	// read the uss file if exist
 	bool m_bReadUSSFileIfExist;
@@ -112,7 +114,7 @@ private:
 
 	EOCRPagesType m_eOCRPagesType;
 
-	std::string m_strSpecificPages;
+	string m_strSpecificPages;
 
 	IOCRUtilsPtr m_ipOCRUtils;
 	IOCREnginePtr m_ipOCREngine;
@@ -132,7 +134,7 @@ private:
 
 	// Returns m_ipRuleSet, after initializing it if necessary
 	// The ruleset will also be loaded using the m_strRuleFileName if it hasn't been already
-	IRuleSetPtr getRuleSet();
+	IRuleSetPtr getRuleSet(const string& strRulesFile);
 
 	IOCREnginePtr getOCREngine();
 	IOCRUtilsPtr getOCRUtils();

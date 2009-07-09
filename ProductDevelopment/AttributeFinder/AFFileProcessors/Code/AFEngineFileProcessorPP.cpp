@@ -1,6 +1,7 @@
 // AFEngineFileProcessorPP.cpp : Implementation of CAFEngineFileProcessorPP
 #include "stdafx.h"
 #include "AFFileProcessors.h"
+#include "AFFileProcessorsUtils.h"
 #include "AFEngineFileProcessorPP.h"
 #include "Common.h"
 
@@ -119,6 +120,9 @@ LRESULT CAFEngineFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 		m_radioAllPages = GetDlgItem(IDC_RADIO_OCR_ALL);
 		m_radioSpecificPages = GetDlgItem(IDC_RADIO_OCR_SPECIFIED);
 		m_editSpecificPages = GetDlgItem(IDC_EDIT_PAGES);
+		m_btnRuleFileSelectTag.SubclassDlgItem(IDC_BTN_DOCTAGS_AFE, CWnd::FromHandle(m_hWnd));
+		m_btnRuleFileSelectTag.SetIcon(::LoadIcon(_Module.m_hInstResource,
+			MAKEINTRESOURCE(IDI_ICON_SELECT_DOC_TAG)));
 
 		UCLID_AFFILEPROCESSORSLib::IAFEngineFileProcessorPtr ipAFEFileProc = m_ppUnk[0];
 		if (ipAFEFileProc)
@@ -225,6 +229,29 @@ LRESULT CAFEngineFileProcessorPP::OnClickedRadioSpecificPages(WORD wNotifyCode, 
 		m_editSpecificPages.SetSel(0, -1);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI10290");
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------
+LRESULT CAFEngineFileProcessorPP::OnClickedBtnRulesFileDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL &bHandled)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Get the rectangle for the doc tag button
+		RECT rect;
+		m_btnRuleFileSelectTag.GetWindowRect(&rect);
+
+		// Get the doc tag choice
+		string strChoice = CAFFileProcessorsUtils::ChooseDocTag(hWndCtl, rect.right, rect.top);
+		if (strChoice != "")
+		{
+			// Replace the selection
+			m_editRuleFileName.ReplaceSel(strChoice.c_str(), TRUE);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26657");
 
 	return 0;
 }

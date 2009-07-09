@@ -1206,12 +1206,13 @@ vector<string> getSubFolderShortNames(const string& strParentFolder)
 	return vecSubFolderNames;
 }
 //--------------------------------------------------------------------------------------------------
-void validateFileOrFolderExistence(const string& strName)
+void validateFileOrFolderExistence(const string& strName, const string& strELICode)
 {
 	if (_access_s(strName.c_str(), giMODE_FILE_EXISTS) != 0)
 	{
 		// if the test file doesn't exist
-		UCLIDException uclidException("ELI06002", "Specified file or folder can't be found.");
+		UCLIDException uclidException(strELICode.empty() ? "ELI06002" : strELICode,
+			"Specified file or folder can't be found.");
 		uclidException.addDebugInfo("File/Folder name", strName);
 		uclidException.addWin32ErrorInfo();
 		throw uclidException;

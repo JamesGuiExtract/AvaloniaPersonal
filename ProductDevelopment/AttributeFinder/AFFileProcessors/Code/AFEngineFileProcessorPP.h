@@ -4,6 +4,8 @@
 
 #include "resource.h"       // main symbols
 
+#include <ImageButtonWithStyle.h>
+
 EXTERN_C const CLSID CLSID_AFEngineFileProcessorPP;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -37,6 +39,9 @@ BEGIN_MSG_MAP(CAFEngineFileProcessorPP)
 	COMMAND_HANDLER(IDC_CHK_CREATE_USS, BN_CLICKED, OnClickedCheckCreateUSS)
 	COMMAND_HANDLER(IDC_RADIO_OCR_ALL, BN_CLICKED, OnClickedRadioAllPages)
 	COMMAND_HANDLER(IDC_RADIO_OCR_SPECIFIED, BN_CLICKED, OnClickedRadioSpecificPages)
+	COMMAND_HANDLER(IDC_BTN_DOCTAGS_AFE, BN_CLICKED, OnClickedBtnRulesFileDocTags)
+	// REFLECT_NOTIFICATIONS needed by ImageButtonWithSytle
+	REFLECT_NOTIFICATIONS()
 END_MSG_MAP()
 
 // IPropertyPage
@@ -48,6 +53,7 @@ END_MSG_MAP()
 // Windows Message Handlers
 	LRESULT OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
 	LRESULT OnClickedBtnBrowse(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
+	LRESULT OnClickedBtnRulesFileDocTags(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedCheckCreateUSS(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioAllPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
 	LRESULT OnClickedRadioSpecificPages(WORD wNotifyCode, WORD wID, HWND hWndCtl, BOOL& bHandled);
@@ -58,6 +64,7 @@ private:
 	// Variables
 	/////////////
 	ATLControls::CEdit m_editRuleFileName;
+	CImageButtonWithStyle m_btnRuleFileSelectTag;
 	ATLControls::CButton m_chkReadUSS;
 	ATLControls::CButton m_chkCreateUSS;
 	ATLControls::CButton m_radioAllPages;

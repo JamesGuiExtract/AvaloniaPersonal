@@ -282,9 +282,11 @@ EXPORT_BaseUtils string getUNCPath(const string& strLocalPath);
 //		 folders under a sub folder of strParentFolder will be listed.
 EXPORT_BaseUtils vector<string> getSubFolderShortNames(const string& strParentFolder);
 //-------------------------------------------------------------------------------------------------
-// PROMISE: To throw an exception if strFileName represents a non existing file
-//			or folder name
-EXPORT_BaseUtils void validateFileOrFolderExistence(const string& strName);
+// PROMISE: To throw an exception if strName represents a non existing file
+//			or folder name. If strELICode is specified, this will be used as the
+//			ELI code in the exception thrown if strName does not exist.
+EXPORT_BaseUtils void validateFileOrFolderExistence(const string& strName,
+													const string& strELICode = "");
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return false if strFileName represents a non existing file
 //			or folder name

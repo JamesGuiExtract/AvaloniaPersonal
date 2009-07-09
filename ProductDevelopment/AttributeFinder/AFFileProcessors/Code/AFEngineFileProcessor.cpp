@@ -89,6 +89,8 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		// Check license
 		validateLicense();
 
+		IFAMTagManagerPtr ipTagManager(pTagManager);
+		ASSERT_ARGUMENT("ELI26658", ipTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17934", strFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17935", pbSuccessfulCompletion != NULL);
 		
@@ -96,10 +98,17 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		string strInputFile = asString(strFileFullName);
 		ASSERT_ARGUMENT("ELI17936", strInputFile.empty() == false);
 
+		// Expand the tags for the rules file
+		string strRulesFile = asString(
+			ipTagManager->ExpandTags(m_strRuleFileNameForFileProcessing.c_str(),
+			strInputFile.c_str()));
+
 		// Default to successful completion
 		*pbSuccessfulCompletion = VARIANT_TRUE;
 
-		::validateFileOrFolderExistence(strInputFile);
+		// Validate the input file and the rules file
+		validateFileOrFolderExistence(strInputFile, "ELI26659");
+		validateFileOrFolderExistence(strRulesFile, "ELI26660");
 
 		// By default, the file to be processed is the input file name
 		string strFileToBeProcessed(strInputFile);
@@ -222,7 +231,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		// The rule set is saved in this object so that it can be passed in to AFEngine
 		// and so that it need not be loaded each time this method is called.
 		IRuleSetPtr ipRules( NULL );
-		ipRules = getRuleSet();
+		ipRules = getRuleSet(strRulesFile);
 
 		IUnknownPtr ipUnknown = ipRules;
 		_variant_t _varRuleSet = (IUnknown *) ipUnknown;
@@ -340,7 +349,7 @@ STDMETHODIMP CAFEngineFileProcessor::get_RuleSetFileName(BSTR *pVal)
 	{
 		validateLicense();
 
-		*pVal = get_bstr_t(m_strRuleFileNameForFileProcessing.c_str()).copy();
+		*pVal = _bstr_t(m_strRuleFileNameForFileProcessing.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09010")
 
@@ -355,11 +364,8 @@ STDMETHODIMP CAFEngineFileProcessor::put_RuleSetFileName(BSTR newVal)
 	{
 		validateLicense();
 
-		string strFileName = asString(newVal);
-		// file must exist
-		::validateFileOrFolderExistence(strFileName);
-
-		m_strRuleFileNameForFileProcessing = strFileName;
+		// Set the file name (only validate file name when processing [FlexIDSCore #3575])
+		m_strRuleFileNameForFileProcessing = asString(newVal);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI09011")
 
@@ -404,7 +410,7 @@ STDMETHODIMP CAFEngineFileProcessor::get_OCRCertainPages(BSTR *strSpecificPages)
 	{
 		validateLicense();
 
-		*strSpecificPages = _bstr_t(m_strSpecificPages.c_str()).copy();
+		*strSpecificPages = _bstr_t(m_strSpecificPages.c_str()).Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI10294")
 
@@ -698,9 +704,9 @@ void CAFEngineFileProcessor::validateLicense()
 					"Attribute Finder Engine File Processor" );
 }
 //-------------------------------------------------------------------------------------------------
-IRuleSetPtr CAFEngineFileProcessor::getRuleSet()
+IRuleSetPtr CAFEngineFileProcessor::getRuleSet(const string& strRulesFile)
 {
-	m_ipRuleSet.loadObjectFromFile(m_strRuleFileNameForFileProcessing);
+	m_ipRuleSet.loadObjectFromFile(strRulesFile);
 
 	return m_ipRuleSet.m_obj;
 }

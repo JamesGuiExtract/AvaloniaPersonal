@@ -34,14 +34,15 @@
 #define IDC_BTN_XML_FILE_DOC_TAGS		222
 #define IDC_BTN_BROWSE_XML_FILE			223
 #define IDC_BTN_CONFIGURE_XML_OUTPUT	224
+#define IDC_BTN_DOCTAGS_AFE				225
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        225
+#define _APS_NEXT_RESOURCE_VALUE        226
 #define _APS_NEXT_COMMAND_VALUE         32768
-#define _APS_NEXT_CONTROL_VALUE         225
+#define _APS_NEXT_CONTROL_VALUE         226
 #define _APS_NEXT_SYMED_VALUE           117
 #endif
 #endif
