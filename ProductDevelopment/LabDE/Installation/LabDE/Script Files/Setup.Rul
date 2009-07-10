@@ -169,7 +169,7 @@ function OnFirstUIAfter()
 begin
 	if (gbInstalled) then
 		// Removed Corepoint install because not sure if silent install works properley
-   		//InstallCorepoint();
+   		InstallCorepoint();
 
 	   	// Rename the uex file
  	  	RenameUEXFile();
@@ -245,7 +245,10 @@ begin
 	
 	// Install Crystal Reports
 	szProgram = SUPPORTDIR ^ "Corepoint-Health-Setup-4.0.0.exe";
-	szCmdLine = " /S /v/qn";
+	szCmdLine = " /S /v\"ALLUSERS=1 ADDLOCAL=HiddenFeatures,InstallDirRegMarker," +
+		"IntegrationEngine,MessageProcessingGears,RfmdbGear,CorepointHealthSolutions," +
+		"CommunicationGears,EngineDocumentation,FileGear,FtpGear,HttpPostGear,"+
+		"NeoReport,ReleaseNotes,SharedComObjects,TcpIpKeepAlive /qn\"";
 	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	  
 	// Create the path for the uninstall key
