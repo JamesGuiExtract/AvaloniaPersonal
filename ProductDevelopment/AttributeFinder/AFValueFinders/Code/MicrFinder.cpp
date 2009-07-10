@@ -4,16 +4,17 @@
 #include "MicrFinder.h"
 #include "..\\..\\AFCore\\Code\\Common.h"
 
-#include <InliteNamedMutexConstants.h>
-#include <UCLIDException.h>
-#include <LicenseMgmt.h>
-#include <cpputil.h>
-#include <ComUtils.h>
-#include <ComponentLicenseIDs.h>
-#include <PdfInputOutputMgr.h>
-#include <Misc.h>
-#include <RegistryPersistenceMgr.h>
 #include <Common.h>
+#include <ComponentLicenseIDs.h>
+#include <ComUtils.h>
+#include <cpputil.h>
+#include <InliteNamedMutexConstants.h>
+#include <LicenseMgmt.h>
+#include <MathUtil.h>
+#include <Misc.h>
+#include <PdfInputOutputMgr.h>
+#include <RegistryPersistenceMgr.h>
+#include <UCLIDException.h>
 
 #include <vector>
 
@@ -441,6 +442,9 @@ RECT getOtherRoutingSearchZone(const vector<MicrLine>& vecLines, const MicrZone&
 		}
 	}
 
+	// Rotate the area based on the MICR line rotation [FlexIDSCore #3525]
+	rotateRectangle(rectArea, micrPage.m_lWidth, micrPage.m_lHeight, micrZone.m_nRotation);
+	
 	return rectArea;
 }
 
@@ -1508,6 +1512,7 @@ IIUnknownVectorPtr CMicrFinder::buildAttributesFromPages(const map<long, MicrPag
 
 						ISpatialStringPtr ipSSTemp =
 							ipSS->GetSpecifiedPages(mapIt->first, mapIt->first);
+
 						// Ensure the substring is spatial
 						if (ipSSTemp != NULL && ipSSTemp->HasSpatialInfo() == VARIANT_TRUE)
 						{
@@ -1599,8 +1604,8 @@ IAttributePtr CMicrFinder::findOtherRoutingNumber(ISpatialStringPtr ipSpatialStr
 		ipSSSearcher->InitSpatialStringSearcher(ipSpatialString);
 		ipSSSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
 
-		// Get a substring from the spatial string searcher
-		ISpatialStringPtr ipSS = ipSSSearcher->GetDataInRegion(ipRect, VARIANT_TRUE);
+		// Get a substring from the spatial string searcher (do not rotate the rectangle)
+		ISpatialStringPtr ipSS = ipSSSearcher->GetDataInRegion(ipRect, VARIANT_FALSE);
 
 		// Look for the other routing number if:
 		// 1. The spatial string is not null

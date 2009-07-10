@@ -1,8 +1,8 @@
-
-#ifndef MATH_UTIL_HPP
-#define MATH_UTIL_HPP
+#pragma once
 
 #include "BaseUtils.h"
+
+#include <windows.h>
 
 class EXPORT_BaseUtils MathVars
 {
@@ -31,6 +31,7 @@ public:
 		double m_dOldZeroValue;
 	};
 };
+
 //-------------------------------------------------------------------------------------------------
 // PURPOSE: To convert from degrees to radians
 //
@@ -48,4 +49,9 @@ EXPORT_BaseUtils inline double convertRadiansToDegrees(const double& rdRadians)
 	return ( (rdRadians * 180.0) / MathVars::PI );
 }
 //-------------------------------------------------------------------------------------------------
-#endif //MATH_UTIL_HPP
+// PURPOSE: To rotate the specified rectangle by the specified number of degrees.
+// REQUIRE: Degrees must be in increments of 90 and can range from -270 to 360
+EXPORT_BaseUtils void rotateRectangle(long& rnLeft, long& rnTop, long& rnRight, long& rnBottom,
+									  long nXLimit, long nYLimit, long nAngleInDegrees);
+EXPORT_BaseUtils void rotateRectangle(RECT& rRect, long nXLimit, long nYLimit, long nAngleInDegrees);
+//-------------------------------------------------------------------------------------------------

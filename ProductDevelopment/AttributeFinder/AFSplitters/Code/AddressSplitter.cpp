@@ -1184,6 +1184,12 @@ long CAddressSplitter::evaluateStringForAddress(std::string strTest, long *plSta
 	string		strWord;
 	ITokenPtr	ipToken;
 
+	// If string is empty, just return [FlexIDSCore #3576]
+	if (strTest.empty())
+	{
+		return lCount;
+	}
+
 	// Create ISpatialString object for searches
 	ISpatialStringPtr	ipLine( CLSID_SpatialString );
 	ASSERT_RESOURCE_ALLOCATION( "ELI07209", ipLine != NULL );
@@ -1196,6 +1202,12 @@ long CAddressSplitter::evaluateStringForAddress(std::string strTest, long *plSta
 	// "Tokenize" the string, i.e. find the first "word"	
 	m_ipParser->Pattern = "\\S+";
 	IIUnknownVectorPtr ipMatches = m_ipParser->Find( ipLine->String, VARIANT_TRUE, VARIANT_FALSE );
+
+	// If no match found just return [FlexIDSCore #3576]
+	if (ipMatches->Size() == 0)
+	{
+		return lCount;
+	}
 
 	// Extract the token as a string
 	ipToken = ITokenPtr( IObjectPairPtr( ipMatches->At( 0 ) )->Object1 );

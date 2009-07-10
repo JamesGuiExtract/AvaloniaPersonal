@@ -4,6 +4,7 @@
 #include "LongRectangle.h"
 
 #include <UCLIDException.h>
+#include <MathUtil.h>
 
 //-------------------------------------------------------------------------------------------------
 CLongRectangle::CLongRectangle()
@@ -213,64 +214,8 @@ STDMETHODIMP CLongRectangle::Rotate(long nXLimit, long nYLimit, long nAngleInDeg
 
 	try
 	{
-		// Store original settings
-		long lOrigTop    = m_nTop;
-		long lOrigLeft   = m_nLeft;
-		long lOrigBottom = m_nBottom;
-		long lOrigRight  = m_nRight;
-
-		// Validate nAngleInDegrees
-		switch (nAngleInDegrees)
-		{
-		case 0:
-		case 360:
-			// No rotation is needed
-			break;
-
-		case 90:
-		case -270:
-			// Rotate the rectangle 90-degrees clockwise
-			m_nTop = lOrigLeft;
-			m_nLeft = nYLimit - lOrigBottom;
-			m_nRight = nYLimit - lOrigTop;
-			m_nBottom = lOrigRight;
-			break;
-
-		case 180:
-		case -180:
-			// Turn the rectangle upside down
-			m_nTop = nYLimit - lOrigBottom;
-			m_nLeft = nXLimit - lOrigRight;
-			m_nRight = nXLimit - lOrigLeft;
-			m_nBottom = nYLimit - lOrigTop;
-			break;
-
-		case 270:
-		case -90:
-			// Rotate the rectangle 90-degrees counterclockwise
-			m_nTop = nXLimit - lOrigRight;
-			m_nLeft = lOrigTop;
-			m_nRight = lOrigBottom;
-			m_nBottom = nXLimit - lOrigLeft;
-			break;
-
-		default:
-			UCLIDException ue("ELI16737", "Invalid rotation angle for Long Rectangle!");
-			ue.addDebugInfo("Angle", nAngleInDegrees);
-			throw ue;
-		}
-
-		// Check that bounds are >= 0
-		if (m_nTop < 0 || m_nLeft < 0 || m_nBottom < 0 || m_nRight < 0)
-		{
-			UCLIDException ue("ELI16742", "Invalid bounds for Long Rectangle after rotation!");
-			ue.addDebugInfo("Angle", nAngleInDegrees);
-			ue.addDebugInfo("New Top", m_nTop);
-			ue.addDebugInfo("New Left", m_nLeft);
-			ue.addDebugInfo("New Bottom", m_nBottom);
-			ue.addDebugInfo("New Right", m_nRight);
-			throw ue;
-		}
+		// Rotate the rectangle by the specified angle
+		rotateRectangle(m_nLeft, m_nTop, m_nRight, m_nBottom, nXLimit, nYLimit, nAngleInDegrees);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI16736");
 
