@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Extract.SourceControl
@@ -27,5 +28,22 @@ namespace Extract.SourceControl
         /// Method for refreshing the source control connection
         /// </summary>
         void RefreshConnection();
+
+        /// <summary>
+        /// Gets the physical directory to which the repository root is bound.
+        /// </summary>
+        /// <returns>The physical directory to which the repository root is bound.</returns>
+        // This accesses the source control server, so is better suited as a method.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        string GetRootDirectory();
+
+        /// <summary>
+        /// Gets the changes made by the currently logged in user within the specified time range.
+        /// </summary>
+        /// <param name="startDate">The start date of the changes.</param>
+        /// <param name="endDate">The end date of the changes.</param>
+        /// <returns>The changes made by the currently logged in user after 
+        /// <paramref name="startDate"/> and before <paramref name="endDate"/>.</returns>
+        IEnumerable<IHistoryItem> GetUserHistoryItems(DateTime startDate, DateTime endDate);
     }
 }
