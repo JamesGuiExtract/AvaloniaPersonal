@@ -1,7 +1,7 @@
-using System;
 using EnvDTE;
 using EnvDTE80;
 using Extract.VisualStudio.AddIns;
+using System;
 using System.Windows.Forms;
 
 namespace LICode
@@ -9,7 +9,7 @@ namespace LICode
     /// <summary>
     /// Represents a command that inserts a location identifier code.
     /// </summary>
-    public class ReplaceLI : ICommandAction
+    public class ReplaceLI : ICommand
     {
         #region ReplaceLI Fields
 
@@ -61,10 +61,24 @@ namespace LICode
 
         #endregion ReplaceLI Methods
 
-        #region ICommandAction Members
+        #region ICommand Members
 
         /// <summary>
-        /// Performs the action of the command.
+        /// Gets the name of the command prefixed with one or more categories separated by periods.
+        /// </summary>
+        /// <returns>The name of the command prefixed with one or more categories separated by 
+        /// periods.
+        /// </returns>
+        public string Name
+        {
+            get
+            {
+                return "ReplaceLI";
+            }
+        }
+
+        /// <summary>
+        /// Performs the action of the settings.
         /// </summary>
         public void Execute()
         {
@@ -103,6 +117,20 @@ namespace LICode
                 // Ensure that some text has been selected
                 return !string.IsNullOrEmpty(selection.Text);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the user interface settings for the command.
+        /// </summary>
+        /// <returns>The user interface settings for the command.</returns>
+        public CommandUISettings GetUISettings()
+        {
+            CommandUISettings settings = new CommandUISettings(Name);
+
+            settings.IsOnCodeWindowMenu = true;
+            settings.ToolTip = "Replace LI";
+
+            return settings;
         }
 
         #endregion

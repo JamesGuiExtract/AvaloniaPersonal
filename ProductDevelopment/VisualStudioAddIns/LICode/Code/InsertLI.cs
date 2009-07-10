@@ -1,20 +1,21 @@
-using System;
+using EnvDTE;
 using EnvDTE80;
 using Extract.VisualStudio.AddIns;
+using System;
 using System.Windows.Forms;
-using EnvDTE;
 
 namespace LICode
 {
     /// <summary>
     /// Represents a command that inserts a location identifier code.
     /// </summary>
-    public class InsertLI : ICommandAction
+    public class InsertLI : ICommand
     {
         #region InsertLI Fields
 
         readonly DTE2 _dte;
         readonly LIType _liType;
+        readonly string _name;
 
         #endregion InsertLI Fields
 
@@ -27,6 +28,7 @@ namespace LICode
         {
             _dte = dte;
             _liType = liType;
+            _name = "Insert" + GetPrefix(liType);
         }
 
         #endregion InsertLI Constructors
@@ -56,12 +58,37 @@ namespace LICode
             }
         }
 
+        /// <summary>
+        /// Returns the prefix associated with the location identifier type.
+        /// </summary>
+        /// <param name="liType">The prefix associated with the location identifier type.
+        /// </param>
+        /// <returns></returns>
+        static string GetPrefix(LIType liType)
+        {
+            return liType == LIType.Method ? "MLI" : "ELI";
+        }
+
         #endregion InsertLI Methods
 
-        #region ICommandAction Members
+        #region ICommand Members
 
         /// <summary>
-        /// Performs the action of the command.
+        /// Gets the name of the command prefixed with one or more categories separated by periods.
+        /// </summary>
+        /// <returns>The name of the command prefixed with one or more categories separated by 
+        /// periods.
+        /// </returns>
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+        }
+
+        /// <summary>
+        /// Performs the action of the settings.
         /// </summary>
         public void Execute()
         {
@@ -89,6 +116,23 @@ namespace LICode
             {
                 return _dte.ActiveDocument != null;
             }
+        }
+
+        /// <summary>
+        /// Retrieves the user interface settings for the command.
+        /// </summary>
+        /// <returns>The user interface settings for the command.</returns>
+        public CommandUISettings GetUISettings()
+        {
+            string shortcutKey = _liType == LIType.Exception ? "E" : "M";
+
+            CommandUISettings settings = new CommandUISettings(Name);
+
+            settings.IsOnCodeWindowMenu = true;
+            settings.ToolTip = Name;
+            settings.Bindings = "Text Editor::Shift+Alt+" + shortcutKey;
+
+            return settings;
         }
 
         #endregion

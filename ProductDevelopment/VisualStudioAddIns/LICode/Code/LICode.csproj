@@ -61,7 +61,6 @@
     <Compile Include="LICodeHandler.cs" />
     <Compile Include="PasteLI.cs" />
     <Compile Include="ReplaceLI.cs" />
-    <Compile Include="RefreshSourceConnection.cs" />
     <Compile Include="SourceControlMethods.cs" />
   </ItemGroup>
   <ItemGroup>

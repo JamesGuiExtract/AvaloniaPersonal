@@ -56,7 +56,6 @@ namespace LICode
         /// <summary>
         /// Opens the source control database for the current Visual Studio session.
         /// </summary>
-        /// 
         /// <returns>The source control database for the current Visual Studio session.</returns>
         public static ISourceControl OpenSourceControlDatabase()
         {
