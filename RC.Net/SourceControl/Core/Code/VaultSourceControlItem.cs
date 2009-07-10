@@ -108,7 +108,7 @@ namespace Extract.SourceControl
         /// </summary>
         public void CheckOut()
         {
-            if (Client.CheckOut(_file, 2, "") == null)
+            if (Client.CheckOut(_file, VaultCheckOutType.Exclusive, "") == null)
             {
                 throw new InvalidOperationException("Could not check out file: " + _file.FullPath);
             }
