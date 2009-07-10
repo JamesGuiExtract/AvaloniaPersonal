@@ -6,7 +6,7 @@
 <SETTING>;AutomatedConditionQuantifier=any
 <SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
 
-<SETTING>;DocTypesToVerify=Affidavit of Death|Certificate of Death|Discharge from Active Duty|Power of Attorney|Special
+<SETTING>;DocTypesToVerify=Affidavit of Death|Certificate of Death|Discharge from Active Duty|Special
 
 //Hybrid Stats
 //<SETTING>;VerificationConditionQuantifier=any
