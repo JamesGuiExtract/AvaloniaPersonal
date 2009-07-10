@@ -21,7 +21,7 @@ namespace Extract.VisualStudio.AddIns
 
         AddIn _addIn;
         string _typeName;
-        Dictionary<string, CommandSettings> _addInCommands = new Dictionary<string, CommandSettings>();
+        Dictionary<string, ICommand> _addInCommands = new Dictionary<string, ICommand>();
         DTE2 _dte;
         VisualStudioUI _ui;
 
@@ -55,7 +55,7 @@ namespace Extract.VisualStudio.AddIns
 
         /// <summary>
         /// Called when the add-in is loaded for the very first time. It is only called once. The 
-        /// add-in is responsible for creating <see cref="CommandSettings"/> structures that 
+        /// add-in is responsible for creating <see cref="CommandUISettings"/> structures that 
         /// describe the UI and then calling <see cref="AddCommand"/> to create them.
         /// </summary>
         /// <param name="dte">The design time extensions object.</param>
@@ -63,12 +63,12 @@ namespace Extract.VisualStudio.AddIns
 
         /// <summary>
         /// Should be called from within <see cref="Initialize"/> to specify a new command to add 
-        /// to the user interface.
+        /// to the Visual Studio environment.
         /// </summary>
-        /// <param name="settings">The settings for the command to add to the user interface.</param>
-        protected void AddCommand(CommandSettings settings)
+        /// <param name="command">The command to add to the Visual Studio environment.</param>
+        protected void AddCommand(ICommand command)
         {
-            _addInCommands.Add(settings.Name, settings);
+            _addInCommands.Add(command.Name, command);
         }
 
         /// <summary>
@@ -80,8 +80,10 @@ namespace Extract.VisualStudio.AddIns
             CommandBar addinToolbar = null;
             CommandBar codeWindowContextMenu = null;
 
-            foreach (CommandSettings settings in _addInCommands.Values)
+            foreach (ICommand iCommand in _addInCommands.Values)
             {
+                CommandUISettings settings = iCommand.GetUISettings();
+
                 Command command = _ui.AddCommand(_addIn, settings);
 
                 if (settings.Bindings != null)
@@ -130,7 +132,7 @@ namespace Extract.VisualStudio.AddIns
             return popup == null ? _ui.AddMenu(AddInName) : popup.CommandBar;
         }
 
-        CommandSettings GetSettingsFromName(string name)
+        ICommand GetCommandFromName(string name)
         {
             // Commands are prefixed with type name
             if (name.StartsWith(_typeName, StringComparison.Ordinal) && 
@@ -138,7 +140,7 @@ namespace Extract.VisualStudio.AddIns
             {
                 // This is the correct prefix, check if the command is present
                 string actionName = name.Substring(_typeName.Length + 1);
-                CommandSettings settings;
+                ICommand settings;
                 if (_addInCommands.TryGetValue(actionName, out settings))
                 {
                     return settings;
@@ -257,11 +259,11 @@ namespace Extract.VisualStudio.AddIns
         {
             if (neededText == vsCommandStatusTextWanted.vsCommandStatusTextWantedNone)
             {
-                CommandSettings settings = GetSettingsFromName(cmdName);
-                if (settings != null)
+                ICommand command = GetCommandFromName(cmdName);
+                if (command != null)
                 {
                     statusOption = vsCommandStatus.vsCommandStatusSupported;
-                    if (settings.Action.Enabled)
+                    if (command.Enabled)
                     {
                         statusOption |= vsCommandStatus.vsCommandStatusEnabled;
                     }
@@ -289,10 +291,10 @@ namespace Extract.VisualStudio.AddIns
             handled = false;
             if (executeOption == vsCommandExecOption.vsCommandExecOptionDoDefault)
             {
-                CommandSettings settings = GetSettingsFromName(cmdName);
-                if (settings != null)
+                ICommand command = GetCommandFromName(cmdName);
+                if (command != null)
                 {
-                    settings.Action.Execute();
+                    command.Execute();
                     handled = true;
                 }
                 else

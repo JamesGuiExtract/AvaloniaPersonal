@@ -3,14 +3,13 @@
 namespace Extract.VisualStudio.AddIns
 {
     /// <summary>
-    /// Represents the settings associated with a command and its user interface.
+    /// Represents the user interface of a command.
     /// </summary>
-    public class CommandSettings
+    public class CommandUISettings
     {
-        #region CommandSettings Fields
+        #region CommandUISettings Fields
 
         readonly string _name;
-        readonly ICommandAction _action;
         readonly string _category;
         string _toolTip;
         string _bindings;
@@ -18,20 +17,18 @@ namespace Extract.VisualStudio.AddIns
         bool _isOnToolBar;
         bool _isOnCodeWindowMenu;
 
-        #endregion CommandSettings Fields
+        #endregion CommandUISettings Fields
 
-        #region CommandSettings Constructors
+        #region CommandUISettings Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommandSettings"/> class.
+        /// Initializes a new instance of the <see cref="CommandUISettings"/> class.
         /// </summary>
         /// <param name="fullName">The name of the command prefixed with one or more categories
         /// separated by periods.</param>
-        /// <param name="action">The action to perform when the command is executed.</param>
-        public CommandSettings(string fullName, ICommandAction action)
+        public CommandUISettings(string fullName)
         {
             _name = fullName;
-            _action = action;
             _category = "";
             int i = fullName.LastIndexOf('.');
             if (i >= 0)
@@ -42,9 +39,9 @@ namespace Extract.VisualStudio.AddIns
             _toolTip = _name;
         }
 
-        #endregion CommandSettings Constructors
+        #endregion CommandUISettings Constructors
 
-        #region CommandSettings Properties
+        #region CommandUISettings Properties
 
         /// <summary>
         /// Gets the name of the command prefixed with one or more categories
@@ -58,18 +55,6 @@ namespace Extract.VisualStudio.AddIns
             get
             {
                 return _name;
-            }
-        }
-
-        /// <summary>
-        /// Gets the action that the command performs.
-        /// </summary>
-        /// <value>The action that the command performs.</value>
-        public ICommandAction Action
-        {
-            get
-            {
-                return _action;
             }
         }
 
@@ -182,6 +167,6 @@ namespace Extract.VisualStudio.AddIns
             }
         }
 
-        #endregion CommandSettings Properties
+        #endregion CommandUISettings Properties
     };
 }

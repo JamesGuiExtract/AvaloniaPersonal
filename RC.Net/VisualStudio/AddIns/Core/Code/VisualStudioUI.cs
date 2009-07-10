@@ -140,7 +140,7 @@ namespace Extract.VisualStudio.AddIns
         /// <param name="addIn">The add-in to which the command corresponds.</param>
         /// <param name="settings">The settings for the command.</param>
         /// <returns>The newly added command.</returns>
-        public Command AddCommand(AddIn addIn, CommandSettings settings)
+        public Command AddCommand(AddIn addIn, CommandUISettings settings)
         {
             object[] contextGUIDS = new object[] { };
             return Commands.AddNamedCommand2(addIn, settings.Name, settings.ToolTip, settings.ToolTip, 
