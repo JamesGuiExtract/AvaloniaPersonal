@@ -204,7 +204,7 @@
 				<LI>Open image <b>151.tif</b> from Demo_LabDE.
 				<LI>Select the <b>Result Date</b> for the first Completed Test.
 				<LI>Swipe in a new <b>Result Date</b>.
-				<LI>Type the <b>F10</b> key to ghighlight all attributes.
+				<LI>Type the <b>F10</b> key to highlight all attributes.
 				<LI>Select a different <b>Completed Test</b>.
 				<LI>Type <b>Alt+G</b> and select the highlight for the previously 
 				swiped <b>Result Date</b>.
@@ -249,6 +249,14 @@
 				<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
 				<LI>Confirm that each and every <b>Tab</b> is handled correctly 
 				by advancing to the next appropriate field.
+			</ul>
+<p>
+			<li><b>[DataEntry #363]</b> Autocomplete in starred rows
+			<ul>
+				<li>Select the <b>Name</b> cell in the starred row of the order table.
+				<li>Press "<b>C</b>".
+				<li>Confirm that the autocomplete provides a list of possible entries
+				beginning with "C".
 			</ul>
 		</ul>
 	</ul>
@@ -313,6 +321,16 @@
 			<li>Confirm that you tab through the fields in order from top to bottom and left
 			to right.
 		</ul>
+<p>
+		<li><b>[DataEntry #426]</b> Tab order breaks
+		<ul>
+			<li>Open a document with an ordering physician.
+			<li>Copy the entire row from the <b>ordering</b> physician table.
+			<li>Paste the row into the <b>CopyTo:</b> physician table.
+			<li>Select the <b>Last name</b> field of the <b>ordering</b> physician and start
+			tabbing.
+			<li>Confirm that the tab order is correct.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Other</h3>
@@ -324,8 +342,20 @@
 			<li>Confirm that CTRL + mouse wheel can be used to zoom.
 			<li>Confirm that the mouse wheel can be used to scroll. Note that this
 			functionality may not have been implemented yet.
-	</ul>
+		</ul>
 <p>
+		<li><b>[DataEntry #424]</b> Current cell cannot be set to an invisible cell.
+		<ul>
+			<li>Open a document. Select a populated <b>Order name</b> cell.
+			<li>Press tab.
+			<li>Confirm that focus moves to the Order code cell and that no exception is logged.
+<p>
+			<li>Open a document. View every cell.
+			<li>Confirm that <b>Go to next unviewed</b> is disabled and that no exceptions are
+			logged if <b>F4</b> is pressed.
+		</ul>
+<p>
+	</ul>
 	<li><h3>TBD</h3>
 	<ul>
 	</ul>

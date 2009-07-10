@@ -61,20 +61,14 @@
 			<LI>Confirm that the <b>Selected Test Details</b> data has been cleared.
 		</ul>
 <p>
-		<li><b>[DataEntry #298]</b> Unexpected attributes
+		<li><b>[DataEntry #433]</b> Select the starred row of the <b>Order</b> table.
 		<ul>
-			<li>Click on the starred row of the order table.
-			<li>Confirm that the dependent test table is disabled.
+			<li>Confirm that it is possible to enter data into the row using the keyboard.
 		</ul>
-		<li><b>[DataEntry #404]</b> Extra test row after swiping into inserted row
-		<ul>
-			<li>Open a document and select an order (Order 1).
-			<li>Right-click in the test table and insert a row.
-			<li>Select a different order (Order 2), then select Order 1 again.
-			<li>Confirm that there are no extra rows in the table.
-			<li>Repeat the same test, but this time swipe/type some data into the inserted row
-			before navigating to Order 2. Confirm that there are still no extra rows in the test table.
-		</ul>
+		<li><b>[DataEntry #407]</b> Confirm that tables cannot be sorted by column.
+<p>
+		
+
 	</ul>
 <p>
 	<LI><h3>Row Swiping</h3>
@@ -119,6 +113,16 @@
 			<LI><b>[DataEntry #192]</b> Confirm that the new data appears in both 
 			the <b>Completed Tests</b> and <b>Selected Test Details</b> tables.
 		</ul>
+<p>
+		<li><b>[DataEntry #404]</b> Extra test row after swiping into inserted row
+		<ul>
+			<li>Open a document and select an order (Order 1).
+			<li>Right-click in the test table and insert a row.
+			<li>Select a different order (Order 2), then select Order 1 again.
+			<li>Confirm that there are no extra rows in the table.
+			<li>Repeat the same test, but this time swipe/type some data into the inserted row
+			before navigating to Order 2. Confirm that there are still no extra rows in the test table.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Cell Swiping</h3>
@@ -154,6 +158,14 @@
 			<LI>Swipe <b>Client Information</b> from the upper left corner.
 			<LI>Confirm that the recognized text appears in the cell as expected.
 			<LI>Confirm that the highlight appears as expected.
+		</ul>
+<p>
+		<li><b>[DataEntry #384]</b> Object reference not set.
+		<ul>
+			<li>Open a document. Select a <b>Collection date</b> cell from the order table.
+			<li>Swipe a blank area of the document so that there are no OCR results.
+			<li>Confirm that no exception is seen.
+			<li>Repeat this test with a <b>Collection time</b> cell.
 		</ul>
 	</ul>
 <p>
@@ -221,11 +233,13 @@
 			<li>Right-click and cut a test row.
 			<li>Right-click in a different populated test row and select "Insert copied row(s)".
 			<li>Confirm that no exceptions are seen.
+			<p>
 			<li>Open a document that has several tests.
 			<li>Select and copy the first row of the test table.
 			<li>Select rows two and three and paste the first row into them.
 			<li>Select rows two and three again and paste the first row into them.
 			<li>Confirm that no exceptions are seen.
+			<p>
 			<li>Open a document that has an associated .voa file.
 			<li>Select an order with a valid name.
 			<li>Select all rows in the test table. Cut them.
@@ -241,6 +255,12 @@
 			<li>Confirm that the newly pasted row shows the original contents of the copied row,
 			not the current contents.
 		</ul>
+		<li><b>[DataEntry #378]</b> Disallow copy/pasting between documents
+		<ul>
+			<li>Start processing a document in FAM mode. Copy a populated row from a table.
+			<li>Save the document. In the next document, confirm that it is not possible to
+			paste the copied row.
+		</ul>
 		<li><b>[DataEntry #380]</b> Bug pasting test rows
 		<ul>
 			<li>Open a document that has a .voa file and information about at least four tests.
@@ -248,6 +268,23 @@
 			<li>Select two other (already populated) rows and paste into them.
 			<li>Confirm that both the spatial and textual information of the rows you pasted
 			into matches that of the rows you copied.
+		</ul>
+		<li><b>[DataEntry #422]</b> Pasting data into rows
+		<ul>
+			<li>Copy the text "Firstname Middlename Lastname, Jr." (or another name) into the
+			clipboard.
+			<li>Select a row from a physician or patient name table.
+			<li>Paste into the row.
+			<li>Confirm that the name is split appropriately.
+		</ul>
+		<li><b>[DataEntry #445]</b> Multiple ordering physicians
+		<ul>
+			<li>Copy two or more rows of physicians from the <b>CopyTo:</b> table.
+			<li>Right-click in the row header of the ordering physician table and select "Paste
+			copied row(s)".
+			<li>Save the document.
+			<li>Reopen the same document and confirm that there is only one row in the ordering
+			physician table.
 		</ul>
 	</ul>
 <p>
@@ -332,6 +369,17 @@
 			the text in the cell. 
 			<LI>Select an empty table cell. 
 			<LI>Confirm that subsequent keystrokes immediately appear in the cell. 
+		</ul>
+<p>
+		<li><b>[DataEntry #276]</b> Resizing columns
+		<ul>
+			<li>Confirm that columns of tables can be resized in an intuitive way.
+		</ul>
+<p>
+		<li><b>[DataEntry #298]</b> Unexpected attributes
+		<ul>
+			<li>Click on the starred row of the order table.
+			<li>Confirm that the dependent test table is disabled.
 		</ul>
 <p>
 		<LI><b>[Data Entry #307]</b> Reappearance of hidden tooltips

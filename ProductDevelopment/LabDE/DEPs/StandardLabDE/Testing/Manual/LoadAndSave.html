@@ -97,6 +97,25 @@
 			<li>Confirm that an <b>Invalid value</b> exception is displayed.
 			<LI>Close the exception and confirm that the FAM closes.
 		</ul>
+<p>
+		<li><b>[DataEntry #308]</b> Files fail after stopping processing.
+		<ul>
+			<li>Start processing.
+			<li>Change data.
+			<li><b>In the FAM</b>, stop processing.
+			<li>When the confirmation dialog comes up, select <b>Cancel</b>.
+			<li>Save the changes in the document.
+			<li>Confirm that the data entry UI closes and that no file is failed.
+<p>
+			<li>Start processing.
+			<li>Change data.
+			<li><b>In the verification UI</b>, click on the red X or select <b>Stop Processing</b>
+			from the File menu.
+			<li>When the confirmation dialog comes up, select <b>Cancel</b>.
+			<li>Save changes to the document.
+			<li>Confirm that processing continues as usual.
+		</ul>
+<p>
 	</ul>
 <p>
 	<LI><h3>Load &amp; Save : stand-alone mode</h3>
@@ -159,6 +178,13 @@
 		<LI>Reset verification status to <b>Pending</b>.
 		<LI>Re-verify the image.
 		<LI>Confirm that the swiped data is still present and the new highlight is provided.
+<p>
+		<li><b>[DataEntry #432]</b> Can't navigate with keyboard immediately after save.
+		<ul>
+			<li>Open a document in FAM mode. Save it.
+			<li>When the next document appears, confirm that focus begins in the appropriate field
+			that the keyboard can be used to enter data and navigate.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Handling Invalid / Unviewed Data : stand-alone mode</h3>
@@ -201,10 +227,28 @@
 		<li>Click the <b>Save</b> button, confirm that no prompt about unviewed data 
 		is presented.
 		<LI>Confirm that the changed data is saved with the new date in the VOA file.
+<p>
+		<li><b>[DataEntry #435]</b> Attempting to save completes processing.
+		<ul>
+			<li>Start processing in FAM mode.
+			<li>Ensure that there is invalid data in the current document. Attempt to save.
+			<li>Confirm that a dialog is displayed informing you that there is invalid data.
+			<li>Confirm that the document remains in processing and no new document is
+			provided for verification.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
 	<ul>
+		<li><b>[DataEntry #210, #281]</b>Corrupted VOA files
+		<ul>
+			<li>Open, process, and save a document.
+			<li>Close the document and exit LabDE.
+			<li>Confirm that the document can be opened without error in <b>FAM</b> mode.
+			<li>Confirm that the document can be opened without error in <b>standalone</b> mode.
+			<li>Confirm that the associated VOA file can be opened without error in the <b>VOA
+			file viewer</b>.
+		</ul>
 		<LI><b>[DataEntry #259]</b> Hints turn in to spatial data after save
 		<ul>
 			<LI>Open image <b>003.tif</b> from Demo_LabDE.

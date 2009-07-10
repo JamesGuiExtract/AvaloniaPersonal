@@ -52,6 +52,37 @@
 		and the <b>task bar</b>.
 		<LI>Exercise LabDE in <b>FAM</b> mode.
 		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b>.
+<p>
+		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		folder so that <b>DisabledControls</b> is set to the name(s) of one or more
+		controls (examples might include "_epicPatientNameTable", "_patientRecordNum", 
+		or "_orderNumber").
+		<li>Exercise LabDE in <b>stand-alone</b> mode.
+		<li>Confirm that the specified controls are disabled.
+		<li>Exercise LabDE in <b>FAM</b> mode.
+		<li>Confirm that the specified controls are disabled.
+<p>
+		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		folder so that <b>HighlightConfidenceBoundary</b> is set to a number between
+		0 and 100.
+		<li>Exercise LabDE in <b>stand-alone</b> mode.
+		<li>Confirm that the highlight colors reflect the boundary specified in the 
+		.config file.
+		<li>Exercise LabDE in <b>FAM</b> mode.
+		<li>Confirm that the highlight colors reflect the boundary specified in the
+		.config file.
+<p>
+		<li>Find or create a second .sdf database file and place it in an appropriate
+		location.
+		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		folder so that <b>LocalDataSource</b> is set to the relative path to the
+		second database.
+		<li>Exercise LabDE in <b>stand-alone</b> mode.
+		<li>Confirm that the validation and auto-complete lists reflect the second
+		database.
+		<li>Exercise LabDE in <b>FAM</b> mode.
+		<li>Confirm that the validation and auto-complete lists reflect the second
+		database.
 	</ul>
 <p>
 	<LI><h3>Window Position</h3>
@@ -59,7 +90,17 @@
 		<li>Stand-alone mode
 		<ul>
 			<li>Exercise LabDE in <b>stand-alone</b> mode.
-			<li>Modify window size and position. 
+			<li>Modify window size and position.
+			<ul>
+				<li><b>[DataEntry #313]</b> Confirm that the DEP is required to be wide
+				enough that all fields are visible.
+				<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
+				<ul>
+					<li>Click and drag the divider between the DEP and the Image Viewer to
+					adjust their sizes.
+					<li>Confirm that the various controls in the DEP resize appropriately.
+				</ul>
+			</ul>
 			<li>Exit <b>LabDE</b>. 
 			<li>Re-open LabDE in <b>stand-alone</b> mode.
 			<li>Confirm that window size and position are persistent.
@@ -67,18 +108,22 @@
 			<li>Exit <b>LabDE</b>. 
 			<li>Re-open LabDE in <b>stand-alone</b> mode.
 			<li>Confirm that the scrollbar position is persistent.
-			<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
-			<ul>
-				<li>Click and drag the divider between the DEP and the Image Viewer to
-				adjust their sizes.
-				<li>Confirm that the various controls in the DEP resize appropriately.
-			</ul>
 		</ul>
 <p>
 		<li>FAM mode
 		<ul>
 			<li>Exercise LabDE in <b>FAM</b> mode.
-			<li>Modify window size and position. 
+			<li>Modify window size and position.
+			<ul>
+				<li><b>[DataEntry #313]</b> Confirm that the DEP is required to be wide
+				enough that all fields are visible.
+				<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
+				<ul>
+					<li>Click and drag the divider between the DEP and the Image Viewer to
+					adjust their sizes.
+					<li>Confirm that the various controls in the DEP resize appropriately.
+				</ul>
+			</ul>
 			<li>Stop processing. 
 			<li>Re-open LabDE in <b>FAM</b> mode.
 			<li>Confirm that window size and position are persistent.
@@ -86,12 +131,6 @@
 			<li>Stop processing. 
 			<li>Re-open LabDE in <b>FAM</b> mode.
 			<li>Confirm that the scrollbar position is persistent.
-			<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
-			<ul>
-				<li>Click and drag the divider between the DEP and the Image Viewer to
-				adjust their sizes.
-				<li>Confirm that the various controls in the DEP resize appropriately.
-			</ul>
 		</ul>
 	</ul>
 <p>

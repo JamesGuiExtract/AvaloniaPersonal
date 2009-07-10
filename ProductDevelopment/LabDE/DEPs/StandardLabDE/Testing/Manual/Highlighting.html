@@ -276,6 +276,19 @@
 				<LI>Confirm that the resulting tooltip is displayed with the same angle 
 				as the recognized lines of text.
 			</ul>
+<p>
+			<li><b>[DataEntry #411]</b> Confirm that pressing <b>Escape</b> or selecting <b>Temporarily
+			hide tooltips</b> toggles between tooltips being visible or hidden.
+<p>
+			<li><b>[DataEntry #428]</b> Disappearing  highlights.
+			<ul>
+				<li>Highlight an entire row. Make not of all tests under the order highlighted in the image. 
+				<li>Press <b>Escape</b> to hide the tooltips.
+				<li>Select the <b>Review and select</b> tool.
+				<li>Mouse over one of the highlights.
+				<li>Confirm that the appropriate tooltip appears and that highlights remain visible as
+				appropriate.
+			</ul>
 		</ul>
 <p>
 		<LI><b>Tooltips and manual updates</b>
@@ -368,6 +381,13 @@
 		includes fragments of text on other lines.
 		<LI>Confirm that the highlight collapses to just the text that was OCR'd from 
 		the highlighted region.
+		<li><b>[DataEntry #185]</b> Allow a swipe to be cancelled
+		<ul>
+			<li>Use the rectangular highlight tool to begin a swipe. Before releasing the
+			left mouse button, press the right mouse button.
+			<li>Confirm that the swipe is cancelled and that there is no change in the 
+			spatial or textual information of the selected field.
+		</ul>
 <p>
 		<LI>Open image <b>003.tif</b> from Demo_LabDE.
 		<LI>Rotate the image and confirm that the existing highlights rotate properly.
@@ -382,6 +402,13 @@
 		<LI>Confirm that the highlight collapses to just the text that was OCR'd from 
 		the highlighted region.
 		<LI>Confirm that the angle of the highlight is maintained.
+		<li><b>[DataEntry #185]</b> Allow a swipe to be cancelled
+		<ul>
+			<li>Use the rectangular highlight tool to begin a swipe. Before releasing the
+			left mouse button, press the right mouse buttong.
+			<li>Confirm that the swipe is cancelled and that there is no change in the
+			spatial or textual information of the selected field.
+		</ul>
 <p>
 		<LI>Open image <b>003.tif</b> from Demo_LabDE.
 		<LI>Rotate the image and confirm that the existing highlights rotate properly.
@@ -407,6 +434,17 @@
 			<li>Confirm that the tooltip is always drawn at an appropriate angle.
 			<li>Repeat this exercise several times.  The <b>352</b> folder noted above 
 			includes a screenshot of an inappropriate tooltip.
+		</ul>
+<p>
+		<li><b>[DataEntry #367]</b> Saving accepted OCR confidence
+		<ul>
+			<li>Open a document.
+			<li>Select some highlights and use <b>Accept highlight</b> or <b>CTRL + T</b>
+			to accept the highlight. Note that when a highlight is accepted, it should turn
+			green.
+			<li>View all highlights and note which are green.
+			<li>Close and reopen the document.
+			<li>Confirm that the accepted highlights are still green.
 		</ul>
 	</ul>
 </UL>
