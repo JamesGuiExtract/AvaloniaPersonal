@@ -120,6 +120,7 @@ CreateLabDEInstallCD: BuildLabDEInstall
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Install" MKDIR "$(LabDEBleedingEdgeDir)\Install"
     @XCOPY "$(LabDEInstallMediaDir)\*.*" "$(LabDEBleedingEdgeDir)\Install" /v /s /e /y
     $(VerifyDir) "$(LabDEInstallMediaDir)" "$(LabDEBleedingEdgeDir)\Install"
+	@COPY / v "$(LabDEInstallFiles)\InstallHelp\*.*" "$(LabDEBleedingEdgeDir)\Install"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Install\vssver.scc"
 	
 CreateDemo_LabDE:

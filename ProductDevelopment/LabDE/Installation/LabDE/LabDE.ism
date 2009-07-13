@@ -313,7 +313,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>DefaultComponent</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>INSTALLDIR</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -364,7 +364,6 @@
 	<table name="CreateFolder">
 		<col key="yes" def="s72">Directory_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>INSTALLDIR</td><td>DefaultComponent</td></row>
 	</table>
 
 	<table name="CustomAction">
@@ -1123,7 +1122,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
-		<row><td>DefaultFeature</td><td>DefaultComponent</td></row>
+		<row><td>DefaultFeature</td><td>Help</td></row>
 	</table>
 
 	<table name="File">
@@ -1138,6 +1137,7 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1349,7 +1349,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>DefaultComponent</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -1677,6 +1677,7 @@
 		<row><td>PATH_TO_DOT_NET_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_KEY_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\InliteKeyInstall</td><td/><td>2</td></row>
+		<row><td>PATH_TO_LABDE_HELP_FILES</td><td>P:\DataEntry\LabDE\Files\Help</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_COMPACT_EDITION</td><td>P:\AttributeFinder\RequiredInstalls\SQLCompact Edition</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SQL_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2005</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
@@ -3619,16 +3620,16 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="L255">FileName</col>
 		<col def="s72">DirProperty</col>
 		<col def="i2">InstallMode</col>
-		<row><td>NewShortcut10</td><td>DefaultComponent</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut11</td><td>DefaultComponent</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut2</td><td>DefaultComponent</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut3</td><td>DefaultComponent</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut4</td><td>DefaultComponent</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut5</td><td>DefaultComponent</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut6</td><td>DefaultComponent</td><td/><td>newfolder2</td><td>2</td></row>
-		<row><td>NewShortcut7</td><td>DefaultComponent</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut8</td><td>DefaultComponent</td><td/><td>newfolder1</td><td>2</td></row>
-		<row><td>NewShortcut9</td><td>DefaultComponent</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut10</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut11</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut2</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut3</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut4</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut5</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut6</td><td>Help</td><td/><td>newfolder2</td><td>2</td></row>
+		<row><td>NewShortcut7</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut8</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
+		<row><td>NewShortcut9</td><td>Help</td><td/><td>newfolder1</td><td>2</td></row>
 	</table>
 
 	<table name="RemoveIniFile">
@@ -3714,16 +3715,16 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col def="S255">ISComments</col>
 		<col def="S255">ISShortcutName</col>
 		<col def="I4">ISAttributes</col>
-		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING12##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING13##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut2</td><td>newfolder2</td><td>##ID_STRING4##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\Misc\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut3</td><td>newfolder2</td><td>##ID_STRING5##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING6##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut5</td><td>newfolder2</td><td>##ID_STRING7##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut6</td><td>newfolder2</td><td>##ID_STRING8##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut7</td><td>newfolder1</td><td>##ID_STRING9##</td><td>DefaultComponent</td><td>[LABDE_HELP]LabDE.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING10##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]processfiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
-		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING11##</td><td>DefaultComponent</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut10</td><td>newfolder1</td><td>##ID_STRING12##</td><td>Help</td><td>[COMMON_COMPONENTS]UserLicense.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut11</td><td>newfolder1</td><td>##ID_STRING13##</td><td>Help</td><td>[COMMON_COMPONENTS]USBLicenseKeyManager.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut2</td><td>newfolder2</td><td>##ID_STRING4##</td><td>Help</td><td>[COMMON_COMPONENTS]UEXViewer.exe</td><td>"[CommonAppDataFolder]Extract Systems\LogFiles\Misc\ExtractException.UEX"</td><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut3</td><td>newfolder2</td><td>##ID_STRING5##</td><td>Help</td><td>[COMMON_COMPONENTS]VOAFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut4</td><td>newfolder2</td><td>##ID_STRING6##</td><td>Help</td><td>[COMMON_COMPONENTS]USSFileViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut5</td><td>newfolder2</td><td>##ID_STRING7##</td><td>Help</td><td>[COMMON_COMPONENTS]RuleTester.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut6</td><td>newfolder2</td><td>##ID_STRING8##</td><td>Help</td><td>[COMMON_COMPONENTS]ImageViewer.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut7</td><td>newfolder1</td><td>##ID_STRING9##</td><td>Help</td><td>[LABDE_HELP]LabDE.chm</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut8</td><td>newfolder1</td><td>##ID_STRING10##</td><td>Help</td><td>[COMMON_COMPONENTS]processfiles.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
+		<row><td>NewShortcut9</td><td>newfolder1</td><td>##ID_STRING11##</td><td>Help</td><td>[COMMON_COMPONENTS]FAMDBAdmin.exe</td><td/><td/><td/><td/><td/><td>1</td><td/><td/><td/><td/><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="Signature">
