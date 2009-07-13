@@ -43,7 +43,7 @@ public:
 	STDMETHOD(PushRSDFileName)(/*[in]*/ BSTR strFileName, 
 		/*[out, retval]*/ long *pnStackSize);
 	STDMETHOD(PopRSDFileName)(/*[out, retval]*/ long *pnStackSize);
-	STDMETHOD(IsRSDFileExecuting)(/*[in]*/ BSTR strFileName, 
+	STDMETHOD(IsRSDFileExecuting)(/*[in]*/ BSTR bstrFileName, 
 		/*[out, retval]*/ VARIANT_BOOL *pbValue);
 
 private:

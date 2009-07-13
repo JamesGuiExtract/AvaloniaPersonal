@@ -133,7 +133,7 @@ STDMETHODIMP CRuleExecutionEnv::GetCurrentRSDFileDir(BSTR *pstrRSDFileDir)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRuleExecutionEnv::IsRSDFileExecuting(BSTR strFileName,
+STDMETHODIMP CRuleExecutionEnv::IsRSDFileExecuting(BSTR bstrFileName,
 												   VARIANT_BOOL *pbValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -144,7 +144,8 @@ STDMETHODIMP CRuleExecutionEnv::IsRSDFileExecuting(BSTR strFileName,
 		stack<string> rThisThreadRSDFileStack = getCurrentStack();
 
 		// Get the file name as a const char*
-		const char* pszFileName = asString(strFileName).c_str();
+		string strFileName = asString(bstrFileName);
+		const char* pszFileName = strFileName.c_str();
 
 		// keep popping the stack to see if any of the entries
 		// match the input file
