@@ -1,7 +1,34 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+//<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//ruletester2
+//<SETTING>;QueryForVerification=HCData|MCData|Clues
+//|Affidavit of Death|Certificate of Death|Discharge from Active Duty|Power of Attorney|Special
 
+<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
 
-//uncomment as verification progresses
-<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set002\RandomSubset\;;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+//Old Stats
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
 
+//Hybrid Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=only any
+//<SETTING>;AutomatedCondition=HCData
+//<SETTING>;OutputHybridStats=1
+
+//<SETTING>;DocTypesToVerify=Mortgage|Abstract of Judgment|Certificate of Death
+<SETTING>;OutputFinalStatsOnly=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\BON\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\CAN\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\COV\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\LEA\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\MAR\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\MIN\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\MIS\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\MTG\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\OAT\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - St Bernard\Set001\Random10000Subset\OFF\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
