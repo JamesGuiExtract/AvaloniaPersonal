@@ -2779,11 +2779,13 @@ IAttributePtr CSplitRegionIntoContentAreas::createResult(IAFDocumentPtr ipDoc, l
 					: m_strPoorOCRType.c_str();
 			}
 
-			ipValue->Replace("\r\n", " ", VARIANT_FALSE, 0, NULL);
+			// Replace the new lines with spaces on the text itself
+			// [FlexIDSCore #3436]
+			replaceVariable(strValueText, "\r\n", " ");
 
 			// Create the return result as a psuedo-spatial string-- a spatial string with
 			// the letters it contains spread evenly throughout the found region.
-			ipValue->CreatePseudoSpatialString(ipNewRasterZone, ipValue->String, 
+			ipValue->CreatePseudoSpatialString(ipNewRasterZone, strValueText.c_str(), 
 				m_ipCurrentPageText->SourceDocName, ipSpatialInfos);
 		}
 
