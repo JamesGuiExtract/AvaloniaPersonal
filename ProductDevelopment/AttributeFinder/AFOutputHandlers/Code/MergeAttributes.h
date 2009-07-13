@@ -163,7 +163,7 @@ private:
 	// A cache of spatial page infos with skew and orientation removed so that bounding rectangles
 	// of merged values (which are returned in terms of literal page coordinates and not the page
 	// info) appear at the correct location.
-	ILongToObjectMapPtr m_ipStandardizedSpatialPageInfos;
+	map<long, ISpatialPageInfoPtr> m_mapSpatialInfos;
 
 	// An AFUtility instance to execute attribute queries.
 	IAFUtilityPtr m_ipAFUtility;
