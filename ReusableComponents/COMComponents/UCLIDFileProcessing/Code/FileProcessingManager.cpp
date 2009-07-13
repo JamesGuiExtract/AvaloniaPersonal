@@ -1071,6 +1071,8 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 		{
 			// Log the info that processing is starting processing
 			UCLIDException ue("ELI15680", "File Action Manager has started processing!");
+			ue.addDebugInfo("FPS File",
+				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
 		}
 		break;
@@ -1078,6 +1080,8 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 		{
 			// Log the info that processing is beginning to stop processing
 			UCLIDException ue("ELI15679", "The user has stopped File Action Manager processing!");
+			ue.addDebugInfo("FPS File",
+				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
 		}
 		break;
@@ -1085,6 +1089,8 @@ void CFileProcessingManager::logStatusInfo(EStartStopStatus eStatus)
 		{
 			// Log the info that processing has stopped processing
 			UCLIDException ue("ELI15678", "File Action Manager has stopped processing!");
+			ue.addDebugInfo("FPS File",
+				m_strFPSFileName.empty() ? "<Not Saved>" : m_strFPSFileName);
 			ue.log();
 		}
 		break;
