@@ -110,12 +110,17 @@ namespace Extract.LabResultsCustomComponents
         /// The default filename that will appear in the FAM to describe the task the data entry
         /// application is fulfilling
         /// </summary>
-        private static readonly string _DEFAULT_OUTPUT_HANDLER_NAME = "LabDE order mapper";
+        static readonly string _DEFAULT_OUTPUT_HANDLER_NAME = "LabDE order mapper";
 
         /// <summary>
         /// The current version for this object.
         /// </summary>
-        private static readonly int _CURRENT_VERSION = 1;
+        static readonly int _CURRENT_VERSION = 1;
+
+        /// <summary>
+        /// The number of times to retry if failed connecting to the database file.
+        /// </summary>
+        static readonly int _DB_CONNECTION_RETRIES = 5;
 
         #endregion Constants
 
@@ -124,28 +129,28 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// The name of the database file to use for order mapping.
         /// </summary>
-        private string _databaseFile;
+        string _databaseFile;
 
         /// <summary>
         /// Flag to indicate whether this object is dirty or not.
         /// </summary>
-        private bool _dirty;
+        bool _dirty;
 
         /// <summary>
         /// A <see cref="DataTable"/> containing the order table from the specified database.
         /// </summary>
-        private DataTable _order;
+        DataTable _order;
 
         /// <summary>
         /// A <see cref="DataTable"/> containing the test table from the specified database.
         /// </summary>
-        private DataTable _test;
+        DataTable _test;
 
         /// <summary>
         /// A <see cref="DataTable"/> containing the alternate test name table from the specified
         /// database.
         /// </summary>
-        private DataTable _alternateTestName;
+        DataTable _alternateTestName;
 
         #endregion Fields
 
@@ -210,6 +215,7 @@ namespace Extract.LabResultsCustomComponents
         public void ProcessOutput(IUnknownVector pAttributes, AFDocument pDoc,
             ProgressStatus pProgressStatus)
         {
+            SqlCeConnection dbConnection = null;
             try
             {
                 // Expand the tags in the database file name
@@ -238,37 +244,70 @@ namespace Extract.LabResultsCustomComponents
                     string connectionString = "Data Source='" + databaseFile
                         + "'; File Mode='read only'; Temp Path='" + tempFile.FileName + "';";
 
-                    // Build a new vector of attributes that have been mapped to orders
-                    IUnknownVector newAttributes = new IUnknownVector();
-                    using (SqlCeConnection dbConnection = new SqlCeConnection(connectionString))
+                    // Try to open the database connection, if there is a sqlce exception,
+                    // just increment retry count, sleep, and try again
+                    int retryCount = 0;
+                    Exception tempEx = null;
+                    while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
                     {
-                        // Create an attribute sorter for sorting sub attributes
-                        ISortCompare attributeSorter =
-                                    (ISortCompare)new SpatiallyCompareAttributesClass();
-
-                        foreach (IAttribute attribute in attributes)
+                        try
                         {
-                            if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
-                            {
-                                List<IAttribute> mappedAttributes =
-                                    MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
-                                        dbConnection);
-                                foreach (IAttribute newAttribute in mappedAttributes)
-                                {
-                                    // Sort the sub attributes spatially
-                                    newAttribute.SubAttributes.Sort(attributeSorter);
-
-                                    // Add the attribute to the vector
-                                    newAttributes.PushBack(newAttribute);
-                                }
-                            }
-                            else
-                            {
-                                // Not a test attribute, just copy it
-                                newAttributes.PushBack(attribute);
-                            }
+                            dbConnection = new SqlCeConnection(connectionString);
+                        }
+                        catch (SqlCeException ex)
+                        {
+                            tempEx = ex;
+                            retryCount++;
+                            System.Threading.Thread.Sleep(100);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw ExtractException.AsExtractException("ELI26651", ex);
                         }
                     }
+
+                    // If all the retries failed and the connection is still null, throw an exception
+                    if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
+                    {
+                        ExtractException ee = new ExtractException("ELI26652",
+                            "Unable to open database connection!", tempEx);
+                        ee.AddDebugData("Retries", retryCount, false);
+                        throw ee;
+                    }
+
+                    // Build a new vector of attributes that have been mapped to orders
+                    IUnknownVector newAttributes = new IUnknownVector();
+
+                    // Create an attribute sorter for sorting sub attributes
+                    ISortCompare attributeSorter =
+                                (ISortCompare)new SpatiallyCompareAttributesClass();
+
+                    foreach (IAttribute attribute in attributes)
+                    {
+                        if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
+                        {
+                            List<IAttribute> mappedAttributes =
+                                MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
+                                    dbConnection);
+                            foreach (IAttribute newAttribute in mappedAttributes)
+                            {
+                                // Sort the sub attributes spatially
+                                newAttribute.SubAttributes.Sort(attributeSorter);
+
+                                // Add the attribute to the vector
+                                newAttributes.PushBack(newAttribute);
+                            }
+                        }
+                        else
+                        {
+                            // Not a test attribute, just copy it
+                            newAttributes.PushBack(attribute);
+                        }
+                    }
+                    
+                    // Finished with database so close connection
+                    dbConnection.Dispose();
+                    dbConnection = null;
 
                     // Clear the original attributes and set the attributes to the
                     // newly mapped collection
@@ -279,6 +318,14 @@ namespace Extract.LabResultsCustomComponents
             catch (Exception ex)
             {
                 throw ExtractException.CreateComVisible("ELI26171", "Unable to handle output.", ex);
+            }
+            finally
+            {
+                if (dbConnection != null)
+                {
+                    dbConnection.Dispose();
+                    dbConnection = null;
+                }
             }
         }
 
@@ -527,7 +574,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="type">The <see langword="type"/> being registered.</param>
         [ComRegisterFunction]
         [ComVisible(false)]
-        private static void RegisterFunction(Type type)
+        static void RegisterFunction(Type type)
         {
             ComMethods.RegisterTypeInCategory(type, ExtractGuids.OutputHandlers);
         }
@@ -539,7 +586,7 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="type">The <see langword="type"/> being unregistered.</param>
         [ComUnregisterFunction]
         [ComVisible(false)]
-        private static void UnregisterFunction(Type type)
+        static void UnregisterFunction(Type type)
         {
             ComMethods.UnregisterTypeInCategory(type, ExtractGuids.OutputHandlers);
         }
@@ -876,10 +923,11 @@ namespace Extract.LabResultsCustomComponents
                 {
                     string testCode = (string)test["Code"];
                     string testName = (string)test["Name"];
+                    int testID = (int)test["ID"];
 
                     // Get the alternate test names for this test
-                    DataRow[] alternateName = _alternateTestName.Select("OrderCode = '"
-                        + orderCode + "' AND TestCode = '" + testCode + "'");
+                    DataRow[] alternateName = _alternateTestName.Select("TestID = "
+                        + testID.ToString(CultureInfo.InvariantCulture));
 
                     // Check for test match (default to false)
                     bool testMatched = false;
@@ -953,10 +1001,11 @@ namespace Extract.LabResultsCustomComponents
                     {
                         string testCode = (string)test["Code"];
                         string testName = (string)test["Name"];
+                        int testID = (int)test["ID"];
 
                         // Get the alternate test names for this test
-                        DataRow[] alternateName = _alternateTestName.Select("OrderCode = '"
-                            + orderCode + "' AND TestCode = '" + testCode + "'");
+                        DataRow[] alternateName = _alternateTestName.Select("TestID = "
+                            + testID.ToString(CultureInfo.InvariantCulture));
 
                         // See if this test matches one of the unmatched tests
                         foreach (LabTest labTest in unmatchedCopy)
