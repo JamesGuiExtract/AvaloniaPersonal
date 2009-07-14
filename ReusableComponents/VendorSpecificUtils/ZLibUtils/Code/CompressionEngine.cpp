@@ -143,7 +143,7 @@ void CompressionEngine::decompressFile(const std::string& strInputFile,
 	{
 		if (!gzip.ReadBuffer((void **) &pszBuffer, nSize))
 		{
-			UCLIDException ue("ELI06752", "Unable to compress data!");
+			UCLIDException ue("ELI06752", "Unable to decompress data!");
 			ue.addDebugInfo("File", strInputFile);
 			ue.addDebugInfo("nSize", nSize);
 			throw ue;
