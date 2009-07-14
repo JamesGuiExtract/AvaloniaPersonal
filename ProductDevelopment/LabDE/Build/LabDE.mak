@@ -35,6 +35,7 @@ DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
 LabDEInstallFiles =$(DataEntryInstallFiles)\LabDE\Files
 DataEntryInstallMediaDir=$(LabDEInstallRootDir)\DataEntry\Media\CD-ROM\DiskImages\DISK1
 LabDEInstallMediaDir=$(LabDEInstallRootDir)\LabDE\Media\CD-ROM\DiskImages\DISK1
+LabDEObfuscationFilesArchive=$(DataEntryInstallFiles)\LabDE\Archive\ObfuscationFiles\$(LabDEVersion)
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
@@ -96,6 +97,8 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@XCOPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(LabDEObfuscationFilesArchive)" /Y/E
+	@XCOPY  "$(BinariesFolder)\Map\*.xml" "$(LabDEObfuscationFilesArchive)" /Y/E
 
 BuildDataEntryMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder BuildLabDEApplication
     @ECHO Building Extract Systems DataEntry Merge Module...
