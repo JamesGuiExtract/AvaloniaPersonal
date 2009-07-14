@@ -1,9 +1,3 @@
-//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-//<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-//ruletester2
-//<SETTING>;QueryForVerification=HCData|MCData|Clues
-//|Affidavit of Death|Certificate of Death|Discharge from Active Duty|Power of Attorney|Special
-
 <SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
 
 //Old Stats
