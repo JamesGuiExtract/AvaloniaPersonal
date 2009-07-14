@@ -1,0 +1,352 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.0.30 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.0.30 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #2636, #3543]</b> RDT Config
+	       	<ul>
+	      		<li>Run the application.  
+			<li>Confirm that a checkbox exists for <b>Automatically expand attributes 
+			in Rule Tester</b>.
+	      		<li>Confirm that the setting is persistent.
+	      		<li>Confirm that <b>Restore defaults</b> turns the setting off.
+	      		<li>Confirm that with use, the Rule Tester automatically provides 
+			expanded attributes.
+<p>
+	      		<li>Confirm that <b>Restore defaults</b> turns on the setting for 
+			<b>Automatically re-encrypt out-of-date ETF files</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #2655, #3557, #3559]</b> Output To XML
+	       	<ul>
+	      		<li>Create an RSD file that contains an <b>Output to XML</b> output handler.  
+			Confirm that <b>Include schema name in output</b> is unchecked.
+	      		<li>Save the RSD file.
+	      		<li>Reload the same RSD file.
+	      		<li>Configure the output handler.
+	      		<li>Change nothing and click <b>OK</b>.
+	      		<li>Confirm that an <b>Unspecified schema name</b> error message is not displayed.
+<p>
+	      		<li>Confirm that <b>Remove spatial information in output</b> is available 
+			in the property page.
+	      		<li>Confirm that the setting is persistent.
+	      		<li>Confirm that with the option <b>off</b>, spatial information is provided 
+			in the XML file.
+	      		<li>Confirm that with the option <b>on</b>, spatial information is not provided 
+			in the XML file.
+<p>
+	      		<li>Create an RSD file that contains an <b>Output to XML</b> output handler.  
+			Select <b>Version 1</b> format.
+	      		<li>Save the RSD file.
+	      		<li>Reload the same RSD file.
+	      		<li>Configure the output handler.
+	      		<li>Confirm that the checkboxes associated with <b>Version 2</b> format are 
+			not enabled.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3165, #3545, #3555]</b> Locate Image Region
+	       	<ul>
+	      		<li>Exercise <b>test.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3165</b>.
+			<ul>
+		      		<li>Confirm that the <b>AllBecauseNoRegion</b> attribute is found.
+		      		<li>Confirm that the <b>AllBecauseInvalidRegion</b> attribute is found.
+		      		<li>Confirm that the <b>NoneBecauseNoRegion</b> attribute is not found.
+		      		<li>Confirm that the <b>NoneBecauseInvalidRegion</b> attribute is not found.
+			</ul>
+<p>
+	      		<li>Exercise <b>example.rsd</b> from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3545</b>.
+			<ul>
+		      		<li>Confirm that <b>no</b> attributes are found.
+			</ul>
+<p>
+	      		<li>Exercise <b>test.rsd</b> and the sample image 
+			from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3555</b>.
+			<ul>
+		      		<li>Confirm that the <b>Locate Image Region</b> rule uses <b>top of page 
+				containing clues</b> as the top boundary.
+		      		<li>Confirm that attributes are found and that no exception is thrown.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3473]</b> Thread exited with exception
+	       	<ul>
+	      		<li>Exercise the <b>Hotfix #03</b> checklist.  It is not necessary to reproduce 
+			the errors with a stock 7.0.0.39 build.
+	      		<li>Confirm that the software works as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3525]</b> MICR Finder
+	       	<ul>
+	      		<li>Exercise <b>rectangleexception.rsd</b> and the sample image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
+	      		<li>Confirm that no <b>Invalid bounds for Long Rectangle after rotation!</b> 
+			exception is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3528]</b> Incorrect Test Harness statistics
+	       	<ul>
+	      		<li>Exercise the Automated Rule Set Tester with <b>OUTPUT_FINAL_STATS_ONLY=TRUE</b>.
+	      		<li>Confirm that <b>Total test cases executed</b> is non-zero.
+	      		<li>Confirm that <b>Total elapsed time</b> is non-zero.
+	      		<li>Confirm that an appropriate XML output file is created.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3538]</b> Translate to closest value in list
+	       	<ul>
+	      		<li>Test <b>Chemistry-Urine</b>.
+		       	<ul>
+		      		<li>Add <b>Chemistry</b> and <b>Chemistry - Urine</b> to the list.
+		      		<li>Confirm that <b>Chemistry - Urine</b> is the final result.
+		       	</ul>
+<p>
+	      		<li>Test <b>C-Reactive Protein Iligh Sensitivity</b>.
+		       	<ul>
+		      		<li>Add <b>C-Reactive Protein</b> and <b>C-Reactive Protein High 
+				Sensitivity</b> to the list.
+		      		<li>Confirm that <b>C-Reactive Protein High Sensitivity</b> is 
+				the final result.
+		       	</ul>
+<p>
+	      		<li>Test <b>VITAMIN D, 1,25 (OH)2 TOTAL</b>.
+		       	<ul>
+		      		<li>Add <b>VITAMIN D, 1,25 (OH)2</b> and <b>VITAMIN D, 1,25 (OH)2, 
+				TOTAL</b> to the list.
+		      		<li>Confirm that <b>VITAMIN D, 1,25 (OH)2, TOTAL</b> is the 
+				final result.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3540]</b> Date Time Splitter
+	       	<ul>
+	      		<li>Configure the <b>Date Time Splitter</b>.
+	      		<li>Confirm that the edit box for <b>On Or After Year</b> requires 4 digits.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3542]</b> Oversize exception
+	       	<ul>
+	      		<li>Exercise the DAT and TCL file 
+			from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3542</b>.
+	      		<li>Confirm that processing finishes without any <b>Unable to get 
+			next file</b> exceptions.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3547, #3548]</b> Redacted images with incorrect page count
+	       	<ul>
+	      		<li>Prepare a redaction test with a significant number of sensitive images that each 
+			contain 20 or more pages.
+	      		<li>Confirm that during the writing of the the redacted output image, 
+			<b>&lt;OutputName&gt;.tmp</b> is created.
+	      		<li>Confirm that <b>&lt;OutputName&gt;.tmp</b> is renamed to <b>&lt;OutputName&gt;</b>.
+			<li>Confirm that if <b>ELI09202, Could not save image.</b> is seen in the exception 
+			log, then <b>&lt;OutputName&gt;</b> does not exist.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3553, #3560]</b> Split region into content areas
+	       	<ul>
+	      		<li>Exercise the COC image and RSD file 
+			from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3553</b>.
+	      		<li>Confirm that content areas are returned.
+<p>
+	      		<li>Exercise the LEA image and RSD file 
+			from <b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3553</b>.
+	      		<li>Confirm that content areas are returned.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3554]</b> Rule Set Editor
+	       	<ul>
+			<li>Run the <b>Rule Set Editor</b>.
+	      		<li>Select a <b>document preprocessor</b> and choose <b>&lt;None&gt;</b>.
+	      		<li>Confirm that no exception is thrown.
+	      		<li>Select an <b>output handler</b> and choose <b>&lt;None&gt;</b>.
+	      		<li>Confirm that no exception is thrown.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3558]</b> Convert VOA to XML
+	       	<ul>
+			<li>Run the <b>File Action Manager</b>.
+	      		<li>Select a <b>Convert VOA to XML</b> task.
+	      		<li>Confirm that UI behavior for configuration and persistence is correct.
+	      		<li>Confirm that the following output configurations work as expected.
+		       	<ul>
+		      		<li>Version 1 XML
+		      		<li>Version 2 XML with attribute names
+		      		<li>Version 2 XML without attribute names
+		      		<li>Version 2 XML without spatial information
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3561, #3565]</b> Merge attribute trees
+	       	<ul>
+			<li>Run the <b>Rule Set Editor</b>.
+	      		<li>Select a <b>Convert VOA to XML</b> task.
+	      		<li>Confirm that UI behavior for configuration and persistence is correct.
+	      		<li>Confirm that the relevant <b>automated tests</b> work without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3575]</b> Execute rules and document tags
+	       	<ul>
+			<li>Run the <b>File Action Manager</b>.
+	      		<li>Select an <b>Execute rules</b> task.
+	      		<li>Confirm that a <b>document tags</b> button is provided.
+	      		<li>Confirm that UI behavior for configuration and persistence is correct.
+	      		<li>Confirm that the document tags work as expected.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3576]</b> Address Splitter
+	       	<ul>
+	      		<li>Exercise <b>addresssplittererror.rsd</b> and the sample image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3576</b>.
+	      		<li>Confirm that no <b>The IUnknown vector is empty!</b> 
+			exception is seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #329]</b> Verify redactions
+	       	<ul>
+			<li>Run the <b>File Action Manager</b>.
+	      		<li>Select a <b>Verify redactions two</b> task.
+	      		<li>Configure the task and confirm that a <b>Verify redactions settings</b> 
+			dialog appears.
+	      		<li>Confirm that UI behavior for configuration and persistence is correct.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4325]</b> DB Admin and ESC
+	       	<ul>
+	      		<li>Run <b>DB Admin</b>.  Press the <b>ESC</b> key
+	      		<li>Confirm that the application does not exit.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #4716]</b> Spatial String - Get Bounds and rotated images
+	       	<ul>
+	      		<li>Exercise the <b>Spatial String</b> automated tests.
+	      		<li>Review any failures and confirm that none are related to getting Spatial 
+			String bounds in a rotated image.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5281]</b> Batch file to lock database for testing
+	       	<ul>
+	      		<li>Confirm presence of 
+			<b>.\ReusableComponents\COMComponents\UCLIDFileProcessing\AutomatedTests\lockDB.bat</b>.
+	      		<li>Exercise the batch file with command-line arguments for <b>server</b> 
+			and <b>database</b>.
+	      		<li>Confirm that the database is locked.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5318]</b> Image Format Converter
+	       	<ul>
+	      		<li>Execute <b>ImageFormatConverter.exe /?</b>.
+	      		<li>Confirm that a usage message is displayed.
+	      		<li>Confirm that <b>two optional arguments</b> text is displayed.
+	      		<li>Confirm that the <b>/retain</b> option is documented.
+	      		<li>Confirm that both items are present in the help file.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5319]</b> Email File
+	       	<ul>
+	      		<li>Execute <b>EmailFile.exe /?</b>.
+	      		<li>Confirm that a usage message is displayed.
+	      		<li>Confirm that <b>If this application is run and the SMTP server has not been 
+			set up, the UI for entering the SMTP server will be displayed</b> text is displayed.
+	      		<li>Confirm that the help file is also correct.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5326, #5327, #5328, #5329, #5331]</b> Locate Image Region
+	       	<ul>
+	      		<li>Exercise the <b>Locate Image Region</b> automated tests.
+	      		<li>Confirm that all tests pass.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5333]</b> Address Finder
+	       	<ul>
+	      		<li>Exercise the <b>Address Finder</b> automated tests.
+	      		<li>Confirm that all tests pass.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5334]</b> Grantor-Grantee Finder
+	       	<ul>
+	      		<li>Exercise the <b>Address Finder</b> automated tests.
+	      		<li>Confirm that most or all of the tests pass.
+	      		<li>Confirm that an exception is not thrown during configuration.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5338]</b> ESConvertUSSToTXT support for specified USB counter
+	       	<ul>
+	      		<li>Exercise the <b>Hotfix #04</b> checklist.  It is not necessary to reproduce 
+			the errors with a stock 7.0.0.39 build.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5339, #5340, #5341, #5342, #5346, #5347, #5348]</b> Image 
+		Viewer command-line and scripting support
+	       	<ul>
+	      		<li>Exercise the <b>Hotfix #05</b> checklist.
+	      		<li>Exercise the <b>Hotfix #05 Part B</b> checklist.
+	      		<li>Exercise the <b>Hotfix #05 Part C</b> checklist.
+	      		<li>Confirm proper behavior and appearance of the go to page edit box.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5350]</b> Logging FAM Stop time
+	       	<ul>
+	      		<li>Start a lengthy processing task in the FAM.
+	      		<li>Confirm that clicking the <b>Progress details</b> button provides 
+			detailed progress status as expected.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
