@@ -183,15 +183,20 @@ BOOL CSRIRImageViewerApp::InitInstance()
 			strTemp += __argv[i];
 		}
 
+		// Build the absolute path to the file [LRCAU #5343]
+		strFileName = buildAbsolutePath(strTemp);
+
 		// if the args all put together represent a valid filename,
 		// then assume that the caller just wants to open the file
-		if (isValidFile(strTemp))
+		if (isValidFile(strFileName))
 		{
 			bFileNameSpecified = true;
-			strFileName = strTemp;
 		}
 		else
 		{
+			// Set the file name back to empty string
+			strFileName = "";
+
 			// if appropriate command line arguments have been provided
 			// register or unregister TIF file related settings
 			// as appropriate, and return
