@@ -1,0 +1,170 @@
+(?ix)
+(?#####################################################################################
+  #	Don't look for dates if preceeded by Social Security Number clues
+  #
+  #####################################################################################
+)  
+
+(?<!
+	(?:
+		(?:
+			\b
+			(?<error>){2}
+			(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>
+			S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^o]|[^o](?=o)))*?(?<match>
+			o)|(?<-error>)[^o]?)|((?<match>o)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^c]|[^c](?=c)))*?(?<match>
+			c)|(?<-error>)[^c]?)|((?<match>c)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>
+			i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>
+			a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^l]|[^l](?=l)))*?(?<match>
+			l)|(?<-error>)[^l]?)|((?<match>l)|(?<-error>)))
+			\b
+		)
+		|
+		(?:
+			\b
+			(?<error>){2}
+			(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>
+			S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^e]|[^e](?=e)))*?(?<match>
+			e)|(?<-error>)[^e]?)|((?<match>e)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^c]|[^c](?=c)))*?(?<match>
+			c)|(?<-error>)[^c]?)|((?<match>c)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^u]|[^u](?=u)))*?(?<match>
+			u)|(?<-error>)[^u]?)|((?<match>u)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^r]|[^r](?=r)))*?(?<match>
+			r)|(?<-error>)[^r]?)|((?<match>r)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>
+			i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^t]|[^t](?=t)))*?(?<match>
+			t)|(?<-error>)[^t]?)|((?<match>t)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^y]|[^y](?=y)))*?(?<match>
+			y)|(?<-error>)[^y]?)|((?<match>y)|(?<-error>)))	
+			\b
+		)
+		|
+	
+		SS(?:\x20?N|\#)
+	)
+	[\s\S]{0,100}
+)
+\b
+(?:
+	(?#####################################################################################
+	  # Semi robust dates eg. '6/7/2009', 'July 6, 2009', '06.07.09', '06-7-09', 6 07 2009
+	  #   Checks numbers to see that they make sense. The year must be 1900-2099. Months
+	  # must be 1-12 and days must be 1-31 -- does not account for the number of days in a 
+	  # given month: Feb 31 2009 would be considered valid.
+	  # 
+	  # 
+	  #####################################################################################
+	)
+	(?:
+		(?:
+			0?[1-9]
+			|
+			[12][0-2])[-\x20\/\.]
+			(?:
+				0?[1-9]
+				|
+				1[0-9]
+				|
+				2[0-9]
+				|
+				3[01]
+			)
+			[-\x20\/\.]
+			(?:
+				19
+				|
+				20
+			)?
+			\d{2}
+			|
+			\b
+			(?:
+			Jan(?:uary)?
+			|
+			Feb(?:ruary)?
+			|
+			Mar(?:ch)?
+			|
+			Apr(?:il)
+			|
+			May
+			|
+			June?
+			|
+			July?
+			|
+			Aug(?:ust)?
+			|
+			Sep(?:tember)?
+			|
+			Oct(?:ober)?
+			|
+			Nov(?:ember)?
+			|
+			Dec(?:ember)?
+		)
+		[.\x20]{0,4}
+		(?:
+			0?[1-9]
+			|
+			1[0-9]
+			|
+			2[0-9]
+			|
+			3[01]
+		)
+		[,\x20]{0,4}
+		(?:
+			19
+			|
+			20
+		)?
+		\d{2}
+	)
+	|
+	(?#####################################################################################
+	  # European style dates eg. '07 July 2009' or '7 July 09'
+	  #
+	  #####################################################################################
+	)
+	(?:
+		(?:
+			0?[1-9]
+			|
+			[1-2][0-9]
+			|
+			3[01]
+		)
+		[-\x20\/\.]
+		(?:
+		Jan(?:uary)?
+		|
+		Feb(?:ruary)?
+		|
+		Mar(?:ch)?
+		|
+		Apr(?:il)
+		|
+		May
+		|
+		June?
+		|
+		July?
+		|
+		Aug(?:ust)?
+		|
+		Sep(?:tember)?
+		|
+		Oct(?:ober)?
+		|
+		Nov(?:ember)?
+		|
+		Dec(?:ember)?
+		)
+		[-\x20,]
+		(?:
+			19
+			|
+			20
+		)?
+		\d{2}
+	)
+
+)
+\b
