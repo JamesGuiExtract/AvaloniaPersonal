@@ -1,0 +1,5 @@
+61\s*[GC]R[O0]U
+61[\s\S]{3,7}NAME
+^82\D{2}
+82\W*ATTENDING
+82[\s\S]{7,15}PHYS
