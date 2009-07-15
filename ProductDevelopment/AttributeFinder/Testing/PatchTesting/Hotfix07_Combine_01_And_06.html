@@ -1,0 +1,92 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 07 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 07 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> St Johns
+   	<LI><b>SCRs:</b> FlexIDSCore #3522, #3523, LegacyRCAndUtils #5248
+   	<LI><b>Issue:</b> Hotfix #06 is not compatible with Hotfix #01 for use by 
+	St Johns.  Hotfix #07 will combine #01 and #06.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Hot fix #01 tests</b>
+	<ul>
+		<LI><b>Exercise problematic images</b>
+		<ul>
+			<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5248</b> image files.
+			<li>Exercise automated redaction using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+			<li>Exercise verification using the St Johns rules.  Confirm that 
+			acceptable output files are generated.
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Exercise related utilities</b>
+		<ul>
+			<li>Exercise the <b>Image Format Converter</b> portion of the <b>Miscellaneous 
+			Utilities</b> checklist.
+			<li>Exercise <b>RedactFromXml.exe</b>.  Confirm that 
+			acceptable output files are generated.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Hot fix #06 tests</b>
+	<ul>
+		<LI><b>Capture rates and quad-core processing times for 7.0.0.39 with only hot fix 01</b>
+		<ul>
+			<li><u>St Johns - Set002</u>
+		       	<ul>
+				<li>Automated redaction capture rate: ____________________
+				<li>Number of documents processed: ____________________
+				<li>Average processing time per document: ____________________
+		       	</ul>
+	       	</ul>
+   		</LI>
+<p>
+		<LI><b>Capture rates and quad-core processing times for 7.0.0.39 with hot fix 07</b>
+		<ul>
+			<li><u>St Johns - Set002</u>
+		       	<ul>
+				<li>Automated redaction capture rate: ____________________
+				<li>Number of documents processed: ____________________
+				<li>Average processing time per document: ____________________
+		       	</ul>
+	       	</ul>
+   		</LI>
+       	</ul>
+	</LI>
+<p>
+	<LI><b>Sanity Test</b>
+       	<ul>
+  	   	<LI>Operating system: ____________________
+  	   	<LI>Test machine: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+  	   	<LI>Notes: ____________________
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Automated Testing</b>
+       	<ul>
+  	   	<LI>Automated Tests : AFCore.tcl
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
