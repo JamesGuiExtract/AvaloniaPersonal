@@ -1375,14 +1375,12 @@ namespace Extract.DataEntry
                     _OBJECT_NAME);
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-                statusInfo.OnAttributeDeleted(attribute);
 
                 // Dispose of any auto-update trigger for the attribute.
                 AutoUpdateTrigger autoUpdateTrigger = null;
                 if (_autoUpdateTriggers.TryGetValue(attribute, out autoUpdateTrigger))
                 {
                     _autoUpdateTriggers.Remove(attribute);
-
                     autoUpdateTrigger.Dispose();
                 }
 
@@ -1402,8 +1400,25 @@ namespace Extract.DataEntry
                 int count = subAttributes.Size();
                 for (int i = 0; i < count; i++)
                 {
-                    DeleteAttribute((IAttribute)subAttributes.At(i));
+                    // Since each attribute will be removed from subAttributes when DeleteAttributes
+                    // is called, always delete from the first index since the vector will be one
+                    // smaller with each iteration.
+                    DeleteAttribute((IAttribute)subAttributes.At(0));
                 }
+
+                // Remove the attribute from the overall attribute heirarchy.
+                if (statusInfo._parentAttribute != null)
+                {
+                    statusInfo._parentAttribute.SubAttributes.RemoveValue(attribute);
+                }
+                else
+                {
+                    _attributes.RemoveValue(attribute);
+                }
+
+                // Raise the AttributeDeleted event last otherwise it can cause the hosts' count
+                // of invalid and unviewed attributes to be off.
+                statusInfo.OnAttributeDeleted(attribute);
             }
             catch (Exception ex)
             {

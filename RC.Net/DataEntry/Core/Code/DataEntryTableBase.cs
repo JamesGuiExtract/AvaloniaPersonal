@@ -27,17 +27,17 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryTableBase).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryTableBase).ToString();
 
         /// <summary>
         /// The color that should be used to indicate table's current selection when the table is
         /// not the active data control.</summary>
-        private static readonly Color _INACTIVE_SELECTION_COLOR = Color.LightGray;
+        static readonly Color _INACTIVE_SELECTION_COLOR = Color.LightGray;
 
         /// <summary>
         /// The value associated with a window's key down message.
         /// </summary>
-        private const int _WM_KEYDOWN = 0x100;
+        const int _WM_KEYDOWN = 0x100;
 
         #endregion Constants
 
@@ -46,117 +46,132 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name used to identify the <see cref="IAttribute"/> to be associated with the table.
         /// </summary>
-        private string _attributeName;
+        string _attributeName;
 
         /// <summary>
         /// Used to specify the data entry control which is mapped to the parent of the attribute(s) 
         /// to which the current table is to be mapped.
         /// </summary>
-        private IDataEntryControl _parentDataEntryControl;
+        IDataEntryControl _parentDataEntryControl;
 
         /// <summary>
         /// Specifies the color which should be used to indicate active status.
         /// </summary>
-        private Color _color;
+        Color _color;
 
         /// <summary>
         /// Specifies whether the control should remain disabled at all times.
         /// </summary>
-        private bool _disabled;
+        bool _disabled;
 
         /// <summary>
         /// Specifies whether the table will attempt to generate a hint using the intersection of 
         /// the row and column occupied by the specified attribute.
         /// </summary>
-        private bool _smartHintsEnabled = true;
+        bool _smartHintsEnabled = true;
 
         /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other
         /// attributes sharing the same row.
         /// </summary>
-        private bool _rowHintsEnabled = true;
+        bool _rowHintsEnabled = true;
 
         /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other 
         /// attributes sharing the same column.
         /// </summary>
-        private bool _columnHintsEnabled = true;
+        bool _columnHintsEnabled = true;
 
         /// <summary>
         /// Used to generate "smart" hints for attributes missing spatial info.
         /// </summary>
-        private SpatialHintGenerator _spatialHintGenerator = new SpatialHintGenerator();
+        SpatialHintGenerator _spatialHintGenerator = new SpatialHintGenerator();
 
         /// <summary>
         /// Indicates whether the spatial information has changed such that hints need to be
         /// recalculated.
         /// </summary>
-        private bool _hintsAreDirty;
+        bool _hintsAreDirty;
 
         /// <summary>
         /// Indicates whether the table is currently active.
         /// </summary>
-        private bool _isActive;
+        bool _isActive;
 
         /// <summary>
         /// Keeps track of which table element is mapped to each attribute represented in the table.
         /// </summary>
-        private Dictionary<IAttribute, object> _attributeMap =
-            new Dictionary<IAttribute, object>();
+        Dictionary<IAttribute, object> _attributeMap = new Dictionary<IAttribute, object>();
 
         /// <summary>
         /// The attribute that is currently propagated by this table (if any)
         /// </summary>
-        private IAttribute _currentlyPropagatedAttribute;
+        IAttribute _currentlyPropagatedAttribute;
 
         /// <summary>
         /// A reference count of the methods that have requested to temporarily prevent processing
         /// of selection changes so that one or more programatic selection changes can be made 
         /// before the table is in its intended state and ready to process selection events.
         /// </summary>
-        private int _suppressSelectionProcessingReferenceCount;
+        int _suppressSelectionProcessingReferenceCount;
+
+        /// <summary>
+        /// Indicates whether data is currently being dragged over the table.
+        /// </summary>
+        bool _dragOverInProgress;
 
         /// <summary>
         /// The control currently being used to update the data in the active cell.
         /// </summary>
-        private Control _editingControl;
+        Control _editingControl;
 
         /// <summary>
         /// A regular style font to indicate viewed fields.
         /// </summary>
-        private Font _regularFont;
+        Font _regularFont;
 
         /// <summary>
         /// A bold style font to indicate unviewed fields.
         /// </summary>
-        private Font _boldFont;
-
+        Font _boldFont;
         /// <summary>
         /// The style to use for cells currently being edited.
         /// </summary>
-        private DataGridViewCellStyle _editModeCellStyle;
+        DataGridViewCellStyle _editModeCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have been viewed in the active table.
         /// </summary>
-        private DataGridViewCellStyle _regularActiveCellStyle;
+        DataGridViewCellStyle _regularActiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have been viewed and are not in the
         /// active table.
         /// </summary>
-        private DataGridViewCellStyle _regularInactiveCellStyle;
+        DataGridViewCellStyle _regularInactiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have not been viewed in the active table.
         /// </summary>
-        private DataGridViewCellStyle _boldActiveCellStyle;
+        DataGridViewCellStyle _boldActiveCellStyle;
 
         /// <summary>
         /// The style to use for selected cells whose fields have not been viewed and are not in the
         /// active table.
         /// </summary>
-        private DataGridViewCellStyle _boldInactiveCellStyle;
+        DataGridViewCellStyle _boldInactiveCellStyle;
+
+        /// <summary>
+        /// The style to use for selected cells whose contents have been viewed and that are
+        /// currently being dragged.
+        /// </summary>
+        DataGridViewCellStyle _regularDraggedCellStyle;
+
+        /// <summary>
+        /// The style to use for selected cells whose contents have not been viewed and that are
+        /// currently being dragged.
+        /// </summary>
+        DataGridViewCellStyle _boldDraggedCellStyle;
 
         #endregion Fields
 
@@ -166,7 +181,7 @@ namespace Extract.DataEntry
         /// Signature to use for invoking methods that accept one <see cref="EventArgs"/> parameter.
         /// </summary>
         /// <param name="e">An <see cref="EventArgs"/> parameter.</param>
-        private delegate void EventArgsDelegate(EventArgs e);
+        delegate void EventArgsDelegate(EventArgs e);
 
         #endregion
 
@@ -181,12 +196,12 @@ namespace Extract.DataEntry
             /// <summary>
             /// The <see cref="DataEntryTable"/> whose SelectionChanged handling is to be suppressed.
             /// </summary>
-            private DataEntryTableBase _dataEntryTable;
+            DataEntryTableBase _dataEntryTable;
 
             /// <summary>
             /// Indicates whether or not the object instance has been disposed.
             /// </summary>
-            private bool _disposed;
+            bool _disposed;
 
             /// <summary>
             /// Initializes a new <see cref="SelectionProcessingSuppressor"/> instance.
@@ -313,6 +328,24 @@ namespace Extract.DataEntry
                 _boldInactiveCellStyle.Font = _boldFont;
                 _boldInactiveCellStyle.SelectionForeColor = Color.Black;
                 _boldInactiveCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+
+                // The style to use for selected cells whose contents have been viewed and that are
+                // currently being dragged. The inactive selection color is used for the background
+                // to delineate the dragged cells.
+                _regularDraggedCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _regularDraggedCellStyle.Font = _regularFont;
+                _regularDraggedCellStyle.SelectionForeColor = Color.Black;
+                _regularDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
+                _regularDraggedCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+
+                // The style to use for selected cells whose contents have not been viewed and that
+                // are currently being dragged. The inactive selection color is used for the
+                // background to delineate the dragged cells.
+                _boldDraggedCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _boldDraggedCellStyle.Font = _boldFont;
+                _boldDraggedCellStyle.SelectionForeColor = Color.Black;
+                _boldDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
+                _boldDraggedCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
 
                 // Use a DataEntryTableRow instance as the row template.
                 base.RowTemplate = new DataEntryTableRow();
@@ -477,6 +510,19 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets whether data is currently being dragged over the table.
+        /// </summary>
+        /// <returns><see langword="true"/> if data is currently being dragged over the table;
+        /// <see langword="false"/> otherwise.</returns>
+        protected bool DragOverInProgress
+        {
+            get
+            {
+                return _dragOverInProgress;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -585,7 +631,11 @@ namespace Extract.DataEntry
                     bool hasBeenViewed =
                         AttributeStatusInfo.HasBeenViewed(dataEntryCell.Attribute, false);
 
-                    if (_isActive)
+                    if (dataEntryCell.IsBeingDragged)
+                    {
+                        style = hasBeenViewed ? _regularDraggedCellStyle : _boldDraggedCellStyle;
+                    }
+                    else if (_isActive)
                     {
                         style = hasBeenViewed ? _regularActiveCellStyle : _boldActiveCellStyle;
                     }
@@ -622,6 +672,14 @@ namespace Extract.DataEntry
         {
             try
             {
+                // If the cell is a data entry cell with a valid attribute, use the other overload.
+                IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+                if (dataEntryCell != null && dataEntryCell.Attribute != null)
+                {
+                    UpdateCellStyle(dataEntryCell);
+                    return;
+                }
+
                 DataGridViewCellStyle style;
 
                 // Check if we need edit mode style.
@@ -695,8 +753,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="DataGridViewEditingControlShowingEventArgs"/> that
         /// contains the event data.</param>
-        private void HandleEditingControlShowing(object sender, 
-            DataGridViewEditingControlShowingEventArgs e)
+        void HandleEditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
         {
             try
             {
@@ -994,6 +1051,69 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="Control.DragEnter"/> event.
+        /// </summary>
+        /// <param name="drgevent">The <see cref="DragEventArgs"/> associated with the event.
+        /// </param>
+        protected override void OnDragEnter(DragEventArgs drgevent)
+        {
+            try
+            {
+                _dragOverInProgress = true;
+
+                base.OnDragEnter(drgevent);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26666", ex);
+                ee.AddDebugData("Event Data", drgevent, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.DragEnter"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="EventArgs"/> associated with the event.
+        /// </param>
+        protected override void OnDragLeave(EventArgs e)
+        {
+            try
+            {
+                _dragOverInProgress = false;
+
+                base.OnDragLeave(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26670", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.DragDrop"/> event.
+        /// </summary>
+        /// <param name="drgevent">The <see cref="DragEventArgs"/> associated with the event.
+        /// </param>
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            try
+            {
+                _dragOverInProgress = false;
+
+                base.OnDragDrop(drgevent);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26706", ex);
+                ee.AddDebugData("Event Data", drgevent, false);
+                ee.Display();
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Members
@@ -1025,6 +1145,13 @@ namespace Extract.DataEntry
         public event EventHandler<SwipingStateChangedEventArgs> SwipingStateChanged;
 
         /// <summary>
+        /// Raised whenever data is being dragged to query dependent controls on whether they would
+        /// be able to handle the dragged data if it was dropped.
+        /// </summary>
+        /// <seealso cref="IDataEntryControl"/>
+        public event EventHandler<QueryDraggedDataSupportedEventArgs> QueryDraggedDataSupported;
+
+        /// <summary>
         /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
         /// <see cref="IAttribute"/>(s) to which the current table is to be mapped.  The specified 
         /// <see cref="IDataEntryControl"/> must be contained in the same 
@@ -1037,7 +1164,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>.</returns>
         /// <seealso cref="IDataEntryControl"/>
         [Category("Data Entry Control")]
-        public IDataEntryControl ParentDataEntryControl
+        public virtual IDataEntryControl ParentDataEntryControl
         {
             get
             {
@@ -1465,14 +1592,17 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Only mark a cell is viewed if it is the only selected cell and that cell is a
+                // Only mark a cell is viewed if  it is the only selected cell and that cell is a
                 // IDataEntryTableCell.
                 if (_isActive && base.SelectedCells.Count == 1)
                 {
                     IDataEntryTableCell cell = base.SelectedCells[0] as IDataEntryTableCell;
                     if (cell != null && cell.Attribute != null)
                     {
-                        AttributeStatusInfo.MarkAsViewed(cell.Attribute, true);
+                        if (!_dragOverInProgress)
+                        {
+                            AttributeStatusInfo.MarkAsViewed(cell.Attribute, true);
+                        }
 
                         UpdateCellStyle(cell);
                     }
@@ -1555,6 +1685,23 @@ namespace Extract.DataEntry
             if (this.SwipingStateChanged != null)
             {
                 SwipingStateChanged(this, new SwipingStateChangedEventArgs(this.SupportsSwiping));
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="QueryDraggedDataSupported"/> supported event to query dependent
+        /// controls on whether they would be able to handle the dragged data if it was dropped.
+        /// The initial Effect parameter of DragEventArgs should be set to
+        /// <see cref="DragDropEffects.None"/> before this method is called. If any dependent
+        /// controls are able to handle dropped data, the Effect parameter will be updated with the
+        /// drop options currently supported by one or more dependent controls.
+        /// </summary>
+        /// <param name="e">The <see cref="DragEventArgs"/> associated with the drag event.</param>
+        protected void OnQueryDraggedDataSupported(DragEventArgs e)
+        {
+            if (this.QueryDraggedDataSupported != null)
+            {
+                QueryDraggedDataSupported(this, new QueryDraggedDataSupportedEventArgs(e));
             }
         }
 
@@ -1711,7 +1858,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleCellTextChanged(object sender, EventArgs e)
+        void HandleCellTextChanged(object sender, EventArgs e)
         {
             try
             {
@@ -1741,7 +1888,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleCellSelectedIndexChanged(object sender, EventArgs e)
+        void HandleCellSelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -1773,7 +1920,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="CellSpatialInfoChangedEventArgs"/> that contains the event
         /// data.</param>
-        private void HandleCellSpatialInfoChanged(object sender, CellSpatialInfoChangedEventArgs e)
+        void HandleCellSpatialInfoChanged(object sender, CellSpatialInfoChangedEventArgs e)
         {
             try
             {
@@ -1801,7 +1948,7 @@ namespace Extract.DataEntry
         /// <see cref="Extract.Imaging.RasterZone"/>(s) are needed.</param>
         /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s that describe the specified
         /// <see cref="IAttribute"/>'s location.</returns>
-        private static List<Extract.Imaging.RasterZone> GetAttributeRasterZones(IAttribute attribute)
+        static List<Extract.Imaging.RasterZone> GetAttributeRasterZones(IAttribute attribute)
         {
             // Initialize the return value.
             List<Extract.Imaging.RasterZone> zones = new List<Extract.Imaging.RasterZone>();
@@ -1837,7 +1984,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>s sharing the same row are needed.</param>
         /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same row.</returns>
-        private List<Extract.Imaging.RasterZone> GetRowRasterZones(DataGridViewCell targetCell)
+        List<Extract.Imaging.RasterZone> GetRowRasterZones(DataGridViewCell targetCell)
         {
             List<Extract.Imaging.RasterZone> rowZones =
                 new List<Extract.Imaging.RasterZone>(base.Columns.Count - 1);
@@ -1881,7 +2028,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>s sharing the same column are needed.</param>
         /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same column.</returns>
-        private List<Extract.Imaging.RasterZone> GetColumnRasterZones(DataGridViewCell targetCell)
+        List<Extract.Imaging.RasterZone> GetColumnRasterZones(DataGridViewCell targetCell)
         {
             List<Extract.Imaging.RasterZone> columnZones =
                 new List<Extract.Imaging.RasterZone>(base.Rows.Count - 1);

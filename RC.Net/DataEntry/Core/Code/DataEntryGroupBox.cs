@@ -298,6 +298,18 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// This event is not raised by <see cref="DataEntryGroupBox"/>.
+        /// </summary>
+        public event EventHandler<QueryDraggedDataSupportedEventArgs> QueryDraggedDataSupported
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryControl interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not support swiping; the value of this property
         /// will always be <see langword="false"/>.
         /// </summary>

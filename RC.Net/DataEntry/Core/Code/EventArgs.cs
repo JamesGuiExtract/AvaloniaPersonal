@@ -1,11 +1,131 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
 
 namespace Extract.DataEntry
 {
+    /// <summary>
+    /// Provides the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s
+    /// that represent the spatial info to be associated with an 
+    /// <see cref="IDataEntryControl.AttributesSelected"/> event.
+    /// </summary>
+    public class AttributesSelectedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated
+        /// with the <see cref="IDataEntryControl.AttributesSelected"/> event.
+        /// </summary>
+        private readonly IUnknownVector _attributes;
+
+        /// <summary>
+        /// Indicates whether the firing control is to be associated only with the spatial info of
+        /// the specific attributes provided, or whether it should be associated with the spatial
+        /// info of all descendent attributes as well.
+        /// </summary>
+        private readonly bool _includeSubAttributes;
+
+        /// <summary>
+        /// Indicates whether tooltips should be displayed for the attribute(s)
+        /// </summary>
+        private readonly bool _displayToolTips;
+
+        /// <summary>
+        /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
+        /// whose spatial information is to be associated with the <see cref="IDataEntryControl"/>.
+        /// </param>
+        /// <param name="includeSubAttributes">If <see langword="true"/>, the sender is to be
+        /// associated with the spatial info of the supplied attributes as well as all descendents 
+        /// of those <see cref="IAttribute"/>s. If <see langword="false"/>  the sender is to be
+        /// associated with the spatial info of only the supplied <see cref="IAttribute"/>s 
+        /// themselves.</param>
+        /// <param name="displayToolTips"><see langword="true"/> if tooltips should be displayed
+        /// for the <see paramref="attributes"/>.</param>
+        public AttributesSelectedEventArgs(IUnknownVector attributes, bool includeSubAttributes,
+            bool displayToolTips)
+        {
+            _attributes = attributes;
+            _includeSubAttributes = includeSubAttributes;
+            _displayToolTips = displayToolTips;
+        }
+
+        /// <summary>
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated 
+        /// with the <see cref="IDataEntryControl.AttributesSelected"/> event.
+        /// </summary>
+        public IUnknownVector Attributes
+        {
+            get
+            {
+                return _attributes;
+            }
+        }
+
+        /// <summary>
+        /// If <see langword="true"/>, the sender is to be associated with the spatial info of the 
+        /// supplied attributes as well as all descendents of those <see cref="IAttribute"/>s. If 
+        /// <see langword="false"/>  the sender is to be associated with the spatial info of only
+        /// the supplied <see cref="IAttribute"/>s themselves.
+        /// </summary>
+        public bool IncludeSubAttributes
+        {
+            get
+            {
+                return _includeSubAttributes;
+            }
+        }
+
+        /// <summary>
+        /// <see langword="true"/> if tooltips should be displayed for the <see cref="Attributes"/>.
+        /// </summary>
+        public bool DisplayToolTips
+        {
+            get
+            {
+                return _displayToolTips;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Provides the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
+    /// associated with an <see cref="IDataEntryControl.PropagateAttributes"/> event.
+    /// </summary>
+    public class PropagateAttributesEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the
+        /// <see cref="IDataEntryControl.PropagateAttributes"/> event.
+        /// </summary>
+        private readonly IUnknownVector _attributes;
+
+        /// <summary>
+        /// Initializes a new <see cref="PropagateAttributesEventArgs"/> instance.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s 
+        /// associated with the <see cref="IDataEntryControl.PropagateAttributes"/> event.</param>
+        public PropagateAttributesEventArgs(IUnknownVector attributes)
+        {
+            _attributes = attributes;
+        }
+
+        /// <summary>
+        /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the
+        /// <see cref="IDataEntryControl.PropagateAttributes"/> event.
+        /// </summary>
+        public IUnknownVector Attributes
+        {
+            get
+            {
+                return _attributes;
+            }
+        }
+    }
+
     /// <summary>
     /// Argument for a <see cref="DataEntryControlHost.SwipingStateChanged"/> or 
     /// <see cref="IDataEntryControl.SwipingStateChanged"/> event used to specify that swiping
@@ -40,6 +160,44 @@ namespace Extract.DataEntry
             get
             {
                 return _enabled;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Argument for a <see cref="IDataEntryControl.QueryDraggedDataSupported"/> event.
+    /// </summary>
+    public class QueryDraggedDataSupportedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The <see cref="DragEventArgs"/> associated with drag event for which the
+        /// <see cref="IDataEntryControl.QueryDraggedDataSupported"/> event is being raised.
+        /// </summary>
+        readonly DragEventArgs _dragDropEventArgs;
+
+        /// <summary>
+        /// Initialized a new <see cref="QueryDraggedDataSupportedEventArgs"/> instance.
+        /// </summary>
+        /// <param name="dragDropEventArgs">The <see cref="DragEventArgs"/> associated with
+        /// drag event for which the <see cref="IDataEntryControl.QueryDraggedDataSupported"/>
+        /// event is being raised.</param>
+        public QueryDraggedDataSupportedEventArgs(DragEventArgs dragDropEventArgs)
+        {
+            _dragDropEventArgs = dragDropEventArgs;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DragEventArgs"/> associated with drag event for which the
+        /// <see cref="IDataEntryControl.QueryDraggedDataSupported"/> event is being raised.
+        /// </summary>
+        /// <returns>The <see cref="DragEventArgs"/> associated with drag event for which the
+        /// <see cref="IDataEntryControl.QueryDraggedDataSupported"/> event is being raised.
+        /// </returns>
+        public DragEventArgs DragDropEventArgs
+        {
+            get
+            {
+                return _dragDropEventArgs;
             }
         }
     }

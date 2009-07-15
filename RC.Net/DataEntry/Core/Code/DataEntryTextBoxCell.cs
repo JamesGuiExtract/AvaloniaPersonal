@@ -42,6 +42,11 @@ namespace Extract.DataEntry
         /// </summary>
         private DataEntryTableBase _dataEntryTable;
 
+        /// <summary>
+        /// Indicates whether the cell is being dragged as part of a drag and drop operation.
+        /// </summary>
+        private bool _isBeingDragged;
+
         #endregion Fields
 
         #region Constructors
@@ -136,6 +141,26 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/> has changed.
         /// </summary>
         public event EventHandler<CellSpatialInfoChangedEventArgs> CellSpatialInfoChanged;
+
+        /// <summary>
+        /// Gets or sets whether the cell is being dragged as part of a drag and drop operation.
+        /// </summary>
+        /// <value>Sets whether the cell is being dragged as part of a drag and drop operation.
+        /// </value>
+        /// <returns>Gets whether the cell is being dragged as part of a drag and drop operation.
+        /// </returns>
+        public bool IsBeingDragged
+        {
+            get
+            {
+                return _isBeingDragged;
+            }
+
+            set
+            {
+                _isBeingDragged = value;
+            }
+        }
 
         #endregion IDataEntryTableCell Members
 

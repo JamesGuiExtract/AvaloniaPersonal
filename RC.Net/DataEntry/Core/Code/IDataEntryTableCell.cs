@@ -39,5 +39,10 @@ namespace Extract.DataEntry
         /// changed.
         /// </summary>
         event EventHandler<CellSpatialInfoChangedEventArgs> CellSpatialInfoChanged;
+
+        /// <summary>
+        /// Gets or sets whether the cell is being dragged as part of a drag and drop operation.
+        /// </summary>
+        bool IsBeingDragged { get; set; }
     }
 }

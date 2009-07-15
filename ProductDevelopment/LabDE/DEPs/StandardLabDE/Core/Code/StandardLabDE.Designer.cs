@@ -39,6 +39,11 @@ namespace Extract.LabDE.StandardLabDE
             this._laboratoryIdentifier = new Extract.DataEntry.DataEntryComboBox();
             this._labInfoPassThrough = new Extract.DataEntry.DataEntryTextBox();
             this._laboratoryTestTable = new Extract.DataEntry.DataEntryTable();
+            this._testName = new Extract.DataEntry.DataEntryTableColumn();
+            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
+            this._testID = new Extract.DataEntry.DataEntryTableColumn();
+            this._componentDate = new Extract.DataEntry.DataEntryTableColumn();
+            this._laboratoryTestTime = new Extract.DataEntry.DataEntryTableColumn();
             this._labIDLabel = new System.Windows.Forms.Label();
             this._labID = new Extract.DataEntry.DataEntryTextBox();
             this._labAddress = new Extract.DataEntry.DataEntryTwoColumnTable();
@@ -92,11 +97,6 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
             this._resultStatusLabel = new System.Windows.Forms.Label();
-            this._testName = new Extract.DataEntry.DataEntryTableColumn();
-            this._orderCode = new Extract.DataEntry.DataEntryTableColumn();
-            this._testID = new Extract.DataEntry.DataEntryTableColumn();
-            this._componentDate = new Extract.DataEntry.DataEntryTableColumn();
-            this._laboratoryTestTime = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -169,6 +169,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _laboratoryTestTable
             // 
+            this._laboratoryTestTable.AllowDrop = true;
             this._laboratoryTestTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._laboratoryTestTable.AttributeName = "Test";
@@ -194,6 +195,95 @@ namespace Extract.LabDE.StandardLabDE
             this._laboratoryTestTable.Size = new System.Drawing.Size(581, 132);
             this._laboratoryTestTable.SmartHintsEnabled = true;
             this._laboratoryTestTable.TabIndex = 1;
+            // 
+            // _testName
+            // 
+            this._testName.AttributeName = "Name";
+            this._testName.AutoUpdateQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode = \'{\'../EpicOrderCode}\'</SQL>";
+            this._testName.FormattingRuleFile = null;
+            this._testName.HeaderText = "Order Name";
+            this._testName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._testName.Name = "_testName";
+            this._testName.TabStopRequired = true;
+            this._testName.UseComboBoxCells = false;
+            this._testName.ValidationCorrectsCase = true;
+            this._testName.ValidationErrorMessage = "Order name is not recognized.";
+            this._testName.ValidationListFileName = null;
+            this._testName.ValidationPattern = null;
+            this._testName.ValidationQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY Name</SQL>";
+            // 
+            // _orderCode
+            // 
+            this._orderCode.AttributeName = "OrderCode";
+            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
+            this._orderCode.FillWeight = 1F;
+            this._orderCode.FormattingRuleFile = null;
+            this._orderCode.HeaderText = "Order Code";
+            this._orderCode.MinimumWidth = 100;
+            this._orderCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._orderCode.Name = "_orderCode";
+            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._orderCode.TabStopRequired = true;
+            this._orderCode.UseComboBoxCells = false;
+            this._orderCode.ValidationCorrectsCase = true;
+            this._orderCode.ValidationErrorMessage = "Bad value";
+            this._orderCode.ValidationListFileName = null;
+            this._orderCode.ValidationPattern = null;
+            this._orderCode.ValidationQuery = null;
+            this._orderCode.Visible = false;
+            // 
+            // _testID
+            // 
+            this._testID.AttributeName = "EpicOrderCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
+            this._testID.FillWeight = 1F;
+            this._testID.FormattingRuleFile = null;
+            this._testID.HeaderText = "Epic Code";
+            this._testID.MinimumWidth = 80;
+            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._testID.Name = "_testID";
+            this._testID.TabStopRequired = true;
+            this._testID.UseComboBoxCells = false;
+            this._testID.ValidationCorrectsCase = true;
+            this._testID.ValidationErrorMessage = "Order code is not recognized.";
+            this._testID.ValidationListFileName = null;
+            this._testID.ValidationPattern = null;
+            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
+                "SQL>";
+            // 
+            // _componentDate
+            // 
+            this._componentDate.AttributeName = "CollectionDate";
+            this._componentDate.AutoUpdateQuery = null;
+            this._componentDate.FillWeight = 50F;
+            this._componentDate.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
+            this._componentDate.HeaderText = "Collection Date";
+            this._componentDate.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._componentDate.Name = "_componentDate";
+            this._componentDate.TabStopRequired = true;
+            this._componentDate.UseComboBoxCells = false;
+            this._componentDate.ValidationCorrectsCase = true;
+            this._componentDate.ValidationErrorMessage = "Collection date must be formatted MM/DD/YYYY";
+            this._componentDate.ValidationListFileName = null;
+            this._componentDate.ValidationPattern = "^\\d{1,2}/\\d{1,2}/\\d{4}$";
+            this._componentDate.ValidationQuery = null;
+            // 
+            // _laboratoryTestTime
+            // 
+            this._laboratoryTestTime.AttributeName = "CollectionTime";
+            this._laboratoryTestTime.AutoUpdateQuery = null;
+            this._laboratoryTestTime.FillWeight = 50F;
+            this._laboratoryTestTime.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
+            this._laboratoryTestTime.HeaderText = "Collection Time";
+            this._laboratoryTestTime.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._laboratoryTestTime.Name = "_laboratoryTestTime";
+            this._laboratoryTestTime.TabStopRequired = true;
+            this._laboratoryTestTime.UseComboBoxCells = false;
+            this._laboratoryTestTime.ValidationCorrectsCase = true;
+            this._laboratoryTestTime.ValidationErrorMessage = "Collection time must be formatted HH:MM";
+            this._laboratoryTestTime.ValidationListFileName = null;
+            this._laboratoryTestTime.ValidationPattern = "^\\d{1,2}:\\d{2}$";
+            this._laboratoryTestTime.ValidationQuery = null;
             // 
             // _labIDLabel
             // 
@@ -305,6 +395,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _testComponentTable
             // 
+            this._testComponentTable.AllowDrop = true;
             this._testComponentTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._testComponentTable.AttributeName = "Component";
@@ -503,6 +594,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _epicPatientNameTable
             // 
+            this._epicPatientNameTable.AllowDrop = true;
             this._epicPatientNameTable.AllowUserToAddRows = false;
             this._epicPatientNameTable.AllowUserToDeleteRows = false;
             this._epicPatientNameTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -608,6 +700,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _patientNameTable
             // 
+            this._patientNameTable.AllowDrop = true;
             this._patientNameTable.AllowUserToAddRows = false;
             this._patientNameTable.AllowUserToDeleteRows = false;
             this._patientNameTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -849,6 +942,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _orderingPhysicianTable
             // 
+            this._orderingPhysicianTable.AllowDrop = true;
             this._orderingPhysicianTable.AllowUserToAddRows = false;
             this._orderingPhysicianTable.AllowUserToDeleteRows = false;
             this._orderingPhysicianTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -937,6 +1031,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _physicianTable
             // 
+            this._physicianTable.AllowDrop = true;
             this._physicianTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._physicianTable.AttributeName = "OtherPhysicianName";
@@ -1231,95 +1326,6 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatusLabel.Size = new System.Drawing.Size(70, 13);
             this._resultStatusLabel.TabIndex = 0;
             this._resultStatusLabel.Text = "Result Status";
-            // 
-            // _testName
-            // 
-            this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode = \'{\'../EpicOrderCode}\'</SQL>";
-            this._testName.FormattingRuleFile = null;
-            this._testName.HeaderText = "Order Name";
-            this._testName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._testName.Name = "_testName";
-            this._testName.TabStopRequired = true;
-            this._testName.UseComboBoxCells = false;
-            this._testName.ValidationCorrectsCase = true;
-            this._testName.ValidationErrorMessage = "Order name is not recognized.";
-            this._testName.ValidationListFileName = null;
-            this._testName.ValidationPattern = null;
-            this._testName.ValidationQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY Name</SQL>";
-            // 
-            // _orderCode
-            // 
-            this._orderCode.AttributeName = "OrderCode";
-            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
-            this._orderCode.FillWeight = 1F;
-            this._orderCode.FormattingRuleFile = null;
-            this._orderCode.HeaderText = "Order Code";
-            this._orderCode.MinimumWidth = 100;
-            this._orderCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._orderCode.Name = "_orderCode";
-            this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderCode.TabStopRequired = true;
-            this._orderCode.UseComboBoxCells = false;
-            this._orderCode.ValidationCorrectsCase = true;
-            this._orderCode.ValidationErrorMessage = "Bad value";
-            this._orderCode.ValidationListFileName = null;
-            this._orderCode.ValidationPattern = null;
-            this._orderCode.ValidationQuery = null;
-            this._orderCode.Visible = false;
-            // 
-            // _testID
-            // 
-            this._testID.AttributeName = "EpicOrderCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
-            this._testID.FillWeight = 1F;
-            this._testID.FormattingRuleFile = null;
-            this._testID.HeaderText = "Epic Code";
-            this._testID.MinimumWidth = 80;
-            this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._testID.Name = "_testID";
-            this._testID.TabStopRequired = true;
-            this._testID.UseComboBoxCells = false;
-            this._testID.ValidationCorrectsCase = true;
-            this._testID.ValidationErrorMessage = "Order code is not recognized.";
-            this._testID.ValidationListFileName = null;
-            this._testID.ValidationPattern = null;
-            this._testID.ValidationQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE EpicCode IS NOT NULL ORDER BY EpicCode</" +
-                "SQL>";
-            // 
-            // _componentDate
-            // 
-            this._componentDate.AttributeName = "CollectionDate";
-            this._componentDate.AutoUpdateQuery = null;
-            this._componentDate.FillWeight = 50F;
-            this._componentDate.FormattingRuleFile = "Rules\\Swiping\\CollectionDate.rsd.etf";
-            this._componentDate.HeaderText = "Collection Date";
-            this._componentDate.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._componentDate.Name = "_componentDate";
-            this._componentDate.TabStopRequired = true;
-            this._componentDate.UseComboBoxCells = false;
-            this._componentDate.ValidationCorrectsCase = true;
-            this._componentDate.ValidationErrorMessage = "Collection date must be formatted MM/DD/YYYY";
-            this._componentDate.ValidationListFileName = null;
-            this._componentDate.ValidationPattern = "^\\d{1,2}/\\d{1,2}/\\d{4}$";
-            this._componentDate.ValidationQuery = null;
-            // 
-            // _laboratoryTestTime
-            // 
-            this._laboratoryTestTime.AttributeName = "CollectionTime";
-            this._laboratoryTestTime.AutoUpdateQuery = null;
-            this._laboratoryTestTime.FillWeight = 50F;
-            this._laboratoryTestTime.FormattingRuleFile = "Rules\\Swiping\\CollectionTime.rsd.etf";
-            this._laboratoryTestTime.HeaderText = "Collection Time";
-            this._laboratoryTestTime.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._laboratoryTestTime.Name = "_laboratoryTestTime";
-            this._laboratoryTestTime.TabStopRequired = true;
-            this._laboratoryTestTime.UseComboBoxCells = false;
-            this._laboratoryTestTime.ValidationCorrectsCase = true;
-            this._laboratoryTestTime.ValidationErrorMessage = "Collection time must be formatted HH:MM";
-            this._laboratoryTestTime.ValidationListFileName = null;
-            this._laboratoryTestTime.ValidationPattern = "^\\d{1,2}:\\d{2}$";
-            this._laboratoryTestTime.ValidationQuery = null;
             // 
             // StandardLabDEPanel
             // 

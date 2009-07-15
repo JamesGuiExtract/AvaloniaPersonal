@@ -27,7 +27,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryTable).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryTable).ToString();
 
         #endregion Constants
 
@@ -36,35 +36,35 @@ namespace Extract.DataEntry
         /// <summary>
         /// Indicates whether swiping should be allowed when an individual cell is selected.
         /// </summary>
-        private bool _cellSwipingEnabled;
+        bool _cellSwipingEnabled;
 
         /// <summary>
         /// Indicates whether swiping should be allowed when a complete row is selected.
         /// </summary>
-        private bool _rowSwipingEnabled;
+        bool _rowSwipingEnabled;
 
         /// <summary>
         /// The filename of the rule file to be used to parse swiped data into rows.
         /// </summary>
-        private string _rowFormattingRuleFileName;
+        string _rowFormattingRuleFileName;
 
         /// <summary>
         /// The formatting rule to be used when processing text from imaging swipes for a row at a 
         /// time.
         /// </summary>
-        private IRuleSet _rowFormattingRule;
+        IRuleSet _rowFormattingRule;
 
         /// <summary>
         /// Specifies the minimum number of rows a DataEntryTable must have.  If the specified
         /// number of attributes are not found, new, blank ones are created as necessary.
         /// </summary>
-        private int _minimumNumberOfRows;
+        int _minimumNumberOfRows;
 
         /// <summary>
         /// Specifies names of attributes that can be mapped into this control by renaming them.
         /// The purpose is to be able to copy data out of one control and paste it into another.
         /// </summary>
-        private Collection<string> _compatibleAttributeNames = new Collection<string>();
+        Collection<string> _compatibleAttributeNames = new Collection<string>();
 
         /// <summary>
         /// Context MenuItem that allows a row to be inserted at the current location.
@@ -101,13 +101,13 @@ namespace Extract.DataEntry
         /// <summary>
         /// The domain of attributes to which this control's attribute(s) belong.
         /// </summary>
-        private IUnknownVector _sourceAttributes;
+        IUnknownVector _sourceAttributes;
 
         /// <summary>
         /// An attribute used to direct focus to the first cell of the "new" row of the table before
         /// focus leaves the control.  This attribute will not store any data useful as output.
         /// </summary>
-        private IAttribute _tabOrderPlaceholderAttribute;
+        IAttribute _tabOrderPlaceholderAttribute;
 
         /// <summary>
         /// A cache of DataEntryTableRows that have been populated so that when parent control
@@ -124,9 +124,20 @@ namespace Extract.DataEntry
         Dictionary<IAttribute, DataEntryTableRow> _activeCachedRows;
 
         /// <summary>
+        /// Any rows that are currently being dragged.
+        /// </summary>
+        List<DataEntryTableRow> _draggedRows;
+
+        /// <summary>
+        /// Whether the <see cref="Control.MouseDown"/> event is currently being suppressed in
+        /// order to maintain row selection for drag and drop operations.
+        /// </summary>
+        bool _suppressingMouseDown;
+
+        /// <summary>
         /// Specifies whether the current instance is running in design mode.
         /// </summary>
-        private bool _inDesignMode;
+        bool _inDesignMode;
 
         /// <summary>
         /// A lazily instantiated <see cref="MiscUtils"/> instance to use for converting 
@@ -366,6 +377,51 @@ namespace Extract.DataEntry
         #endregion Properties
 
         #region Overrides
+
+        /// <summary>
+        /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
+        /// <see cref="IAttribute"/>(s) to which the current table is to be mapped.  The specified 
+        /// <see cref="IDataEntryControl"/> must be contained in the same 
+        /// <see cref="DataEntryControlHost"/> as this table.</summary>
+        /// <value>The <see cref="IDataEntryControl"/> that is to act as the parent for this
+        /// control's data or <see langword="null"/> if this control is to be mapped to a root-level 
+        /// <see cref="IAttribute"/>.</value>
+        /// <returns>The <see cref="IDataEntryControl"/> that acts as the parent for this control's
+        /// data or <see langword="null"/> if this control is mapped to a root-level 
+        /// <see cref="IAttribute"/>.</returns>
+        /// <seealso cref="IDataEntryControl"/>
+        [Category("Data Entry Control")]
+        public override IDataEntryControl ParentDataEntryControl
+        {
+            get
+            {
+                return base.ParentDataEntryControl;
+            }
+
+            set
+            {
+                if (value != base.ParentDataEntryControl)
+                {
+                    // Unregister the last parent control from any drag and drop events.
+                    if (base.AllowDrop && base.ParentDataEntryControl != null)
+                    {
+                        base.ParentDataEntryControl.QueryDraggedDataSupported -=
+                            HandleQueryDraggedDataSupported;
+                        ((Control)base.ParentDataEntryControl).DragDrop -= HandleParentDragDrop;
+                    }
+
+                    // Register the new parent control for any drag and drop events if AllowDrop is
+                    // true.
+                    if (base.AllowDrop && value != null)
+                    {
+                        value.QueryDraggedDataSupported += HandleQueryDraggedDataSupported;
+                        ((Control)value).DragDrop += HandleParentDragDrop;
+                    }
+                }
+
+                base.ParentDataEntryControl = value;
+            }
+        }
 
         /// <summary>
         /// Raises the <see cref="Control.HandleCreated"/> event in order to verify that the table
@@ -711,9 +767,9 @@ namespace Extract.DataEntry
 
                         // Paste selected rows
                         case Keys.V:
-                            if (enableRowOptions && GetClipboardDataType() != null)
+                            if (enableRowOptions && GetDataType(Clipboard.GetDataObject()) != null)
                             {
-                                PasteCopiedRows();
+                                PasteRowData(Clipboard.GetDataObject());
 
                                 e.Handled = true;
                             }
@@ -729,6 +785,266 @@ namespace Extract.DataEntry
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
             }
+        }
+
+        /// <summary>
+        /// Raises or delays the <see cref="Control.MouseDown"/> event depending on the current
+        /// selection state of the table. If one or more rows are currently selected, the
+        /// <see cref="Control.MouseDown"/> event may be postponed until the mouse button is
+        /// released.
+        /// </summary>
+        /// <param name="e">The <see cref="MouseEventArgs"/> associated with the event.</param>
+        protected override void OnMouseDown(MouseEventArgs e)
+        {
+            try
+            {
+                _suppressingMouseDown = false;
+                HitTestInfo hit = base.HitTest(e.X, e.Y);
+
+                // If row operations are supported for the current selection and shift or control
+                // keys are not pressed, suppress the MouseDown event until the mouse button is
+                // released to maintain the current selection for any potential drag and drop
+                // operation. unless the shift or control modifiers are being used.
+                if ((Control.ModifierKeys & Keys.Shift) == 0 &&
+                    (Control.ModifierKeys & Keys.Control) == 0 &&
+                    AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
+                {
+                    _suppressingMouseDown = true;
+                }
+                else
+                {
+                    base.OnMouseDown(e);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26695", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.MouseUp"/> event. If a <see cref="Control.MouseDown"/>
+        /// event has been postponed, it will be raised first.
+        /// </summary>
+        /// <param name="e">The <see cref="MouseEventArgs"/> associated with the event(s).</param>
+        protected override void OnMouseUp(MouseEventArgs e)
+        {
+            try
+            {
+                if (_suppressingMouseDown)
+                {
+                    _suppressingMouseDown = false;
+
+                    base.OnMouseDown(e);
+                }
+
+                base.OnMouseUp(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26696", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.MouseMove"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="MouseEventArgs"/> associated with the event.</param>
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            try
+            {
+                // If a drag event is not currently in progress, the left mouse button is down and
+                // row tasks are allowed given the current selection, begin a drag and drop
+                // operation.
+                if (!base.DragOverInProgress && (Control.MouseButtons & MouseButtons.Left) != 0)
+                {
+                    HitTestInfo hit = base.HitTest(e.X, e.Y);
+
+                    if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
+                    {
+                        DoRowDragDrop();
+                    }
+                }
+
+                base.OnMouseMove(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26667", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.DragOver"/> event.
+        /// </summary>
+        /// <param name="drgevent">The <see cref="DragEventArgs"/> associated with the event.
+        /// </param>
+        protected override void OnDragOver(DragEventArgs drgevent)
+        {
+            try
+            {
+                // Initialize the currently supported drag/drop action to none.
+                drgevent.Effect = DragDropEffects.None;
+
+                // Determine if a drop is supported for the data being dragged.
+                string dataType = GetDataType(drgevent.Data);
+
+                // If the dragged data is compatible with the rows of this table.
+                if (dataType != null)
+                {
+                    Point location = base.PointToClient(new Point(drgevent.X, drgevent.Y));
+                    HitTestInfo hit = base.HitTest(location.X, location.Y);
+
+                    // If row tasks are allowed given the current selection.
+                    if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
+                    {
+                        // Give focus to the table if a drop is supported.
+                        if (!base.Focused)
+                        {
+                            base.Focus();
+                        }
+
+                        // Started with all allowed operations from the drag source.
+                        drgevent.Effect = drgevent.AllowedEffect;
+
+                        // If dragging into the same control and table
+                        if (_draggedRows != null && _activeCachedRows != null &&
+                            _activeCachedRows.ContainsValue(_draggedRows[0]))
+                        {
+                            // Don't allow rows to be dragged onto themselves.
+                            if (_draggedRows.Contains((DataEntryTableRow)base.CurrentRow))
+                            {
+                                drgevent.Effect &= DragDropEffects.None;
+                            }
+                            // If the new row is selected, allow the source to be duplicated into it.
+                            else if (base.CurrentRow.Index == base.NewRowIndex)
+                            {
+                                drgevent.Effect &= DragDropEffects.Copy;
+                            }
+                            // Otherwise, allow the data to be moved to the drag position.
+                            else
+                            {
+                                drgevent.Effect &= DragDropEffects.Move;
+                            }
+                        }
+                        // If dragging into the same control, but a different table the data should
+                        // be moved to that table.
+                        else if (_draggedRows != null)
+                        {
+                            drgevent.Effect &= DragDropEffects.Move;
+                        }
+                    }
+                }
+                // If the dragged data is not compatible with this table, but is compatible with a
+                // dependent control.
+                else
+                {
+                    Point location = base.PointToClient(new Point(drgevent.X, drgevent.Y));
+                    HitTestInfo hit = base.HitTest(location.X, location.Y);
+
+                    // If row tasks are allowed given the current selection.
+                    if (AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
+                    {
+                        OnQueryDraggedDataSupported(drgevent);
+                    }
+                }
+
+                // Ensure no drop operations have been specified that aren't allowed.
+                drgevent.Effect &= drgevent.AllowedEffect;
+
+                // If both copy and move are supported, use move instead of copy.
+                if (drgevent.Effect == (DragDropEffects.Copy | DragDropEffects.Move))
+                {
+                    drgevent.Effect = DragDropEffects.Move;
+                }
+
+                base.OnDragOver(drgevent);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26668", ex);
+                ee.AddDebugData("Event Data", drgevent, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.DragDrop"/> event.
+        /// </summary>
+        /// <param name="drgevent">The <see cref="DragEventArgs"/> associated with the event.
+        /// </param>
+        protected override void OnDragDrop(DragEventArgs drgevent)
+        {
+            try
+            {
+                // If this table supports the data type being dragged
+                if (GetDataType(drgevent.Data) != null)
+                {
+                    // When dropping data into a compatible table control that allows rows to be
+                    // added, insert it before the selected row, not over top of it.
+                    if (base.AllowUserToAddRows)
+                    { 
+                        InsertNewRow();
+                    }
+
+                    // Paste the dropped data in.
+                    PasteRowData(drgevent.Data);
+
+                    base.Focus();
+                }
+                // If a dependent control has indicated it supports the dragged data and the new
+                // row is currently selected.
+                else if (drgevent.Effect != DragDropEffects.None &&
+                    base.CurrentCell.RowIndex == base.NewRowIndex)
+                {
+                    // Create a new entry for the data that will be propagated to dependent controls.
+                    InsertNewRow();
+
+                    base.Focus();
+                }
+
+                base.OnDragDrop(drgevent);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26666", ex);
+                ee.AddDebugData("Event Data", drgevent, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ScrollableControl.Scroll"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="ScrollEventArgs"/> associated with the event.</param>
+        protected override void OnScroll(ScrollEventArgs e)
+        {
+            try
+            {
+                // If a drag and drop operation is in progress, prevent the table from being
+                // scrolled as the results are usually undesireable.
+                if (base.DragOverInProgress)
+                {
+                    e.NewValue = e.OldValue;
+                }
+
+                base.OnScroll(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26694", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+
+            base.OnScroll(e);
         }
 
         /// <summary>
@@ -766,7 +1082,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="CollectionChangeEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleRowsCollectionChanged(object sender, CollectionChangeEventArgs e)
+        void HandleRowsCollectionChanged(object sender, CollectionChangeEventArgs e)
         {
             try
             {
@@ -774,16 +1090,12 @@ namespace Extract.DataEntry
                 {
                     // Remove the row's attribute from _sourceAttributes and raise the 
                     // AttributesDeleted event.
-                    // IMPORTANT: Remove the attribute from _sourceAttributes before calling 
-                    // DeleteAttribute since the control host may attempt to verify the attribute
-                    // is missing (as part of a check invalid or unviewed items)
                     IAttribute attributeToRemove = DataEntryTableBase.GetAttribute(e.Element);
                     if (attributeToRemove != null)
                     {
                         ExtractException.Assert("ELI26142", "Uninitialized data!",
                             _sourceAttributes != null);
 
-                        _sourceAttributes.RemoveValue(attributeToRemove);
                         AttributeStatusInfo.DeleteAttribute(attributeToRemove);
                         _activeCachedRows.Remove(attributeToRemove);
                     }
@@ -1089,8 +1401,8 @@ namespace Extract.DataEntry
 
                 // [DataEntry:378]
                 // Prevent copying and pasting table data between different documents.
-                string clipboardDataType = GetClipboardDataType();
-                if (!string.IsNullOrEmpty(clipboardDataType) && clipboardDataType != "System.String")
+                string rowDataType = GetDataType(Clipboard.GetDataObject());
+                if (!string.IsNullOrEmpty(rowDataType) && rowDataType != "System.String")
                 {
                     Clipboard.Clear();
                 }
@@ -1104,6 +1416,91 @@ namespace Extract.DataEntry
         #endregion IDataEntryControl Methods
 
         #region Event Handlers
+
+        /// <summary>
+        /// When data is being dragged over a parent data control, handles the
+        /// <see cref="IDataEntryControl.QueryDraggedDataSupported"/> event to indicate to the
+        /// parent control whether this table would be able to use the data if it were dropped.
+        /// </summary>
+        /// <param name="sender">The control that sent the event.</param>
+        /// <param name="e">A <see cref="QueryDraggedDataSupportedEventArgs"/> that contains the
+        /// event data.</param>
+        /// <seealso cref="IDataEntryControl"/>
+        void HandleQueryDraggedDataSupported(object sender, QueryDraggedDataSupportedEventArgs e)
+        {
+            try
+            {
+                // If the dragged data matches this tables row data type and either new rows
+                // can be added to the table or there is only one possible row the data could go.
+                // (Don't use any compatible type since that data should be handled by either
+                // the parent or the control associated with the data type).
+                if (GetDataType(e.DragDropEventArgs.Data) == this.RowDataType &&
+                    (base.AllowUserToAddRows || base.Rows.Count == 0))
+                {
+                    // As long as this table is from the same table from which the data was
+                    // dragged, support the data being moved into active table.
+                    if (_draggedRows == null || _activeCachedRows == null ||
+                        !_activeCachedRows.ContainsKey(_draggedRows[0].Attribute))
+                    {
+                        e.DragDropEventArgs.Effect |= DragDropEffects.Move;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26665", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that data was dropped into a parent data entry control.
+        /// </summary>
+        /// <param name="sender">The control that sent the event.</param>
+        /// <param name="e">A <see cref="DragEventArgs"/> that contains the event data.</param>
+        void HandleParentDragDrop(object sender, DragEventArgs e)
+        {
+            try
+            {
+                // If the dropped data is the data type used by this table's rows.
+                // (Don't use any compatible type since that data should be handled by either
+                // the parent or the control associated with the data type).
+                if (GetDataType(e.Data) == this.RowDataType)
+                {
+                    if (base.AllowUserToAddRows)
+                    {
+                        // Highlight the table's new row.
+                        base.ClearSelection(-1, base.NewRowIndex, true);
+                        base.CurrentCell = base.Rows[base.NewRowIndex].Cells[0];
+
+                        // Paste the dropped data in.
+                        PasteRowData(e.Data);
+
+                        base.Focus();
+                    }
+                    // If rows are not allowed to be added, but there is only a single attribute
+                    // it seems pretty clear the that this attribute should be replaced.
+                    else if (base.Rows.Count == 1)
+                    {
+                        // Highlight the table's one and only row.
+                        base.ClearSelection(-1, 0, true);
+                        base.CurrentCell = base.Rows[0].Cells[0];
+
+                        // Paste the dropped data in.
+                        PasteRowData(e.Data);
+
+                        base.Focus();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26671", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
 
         /// <summary>
         /// Handles the case the the user requested to insert a new row.
@@ -1194,7 +1591,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                PasteCopiedRows();
+                PasteRowData(Clipboard.GetDataObject());
             }
             catch (Exception ex)
             {
@@ -1215,7 +1612,7 @@ namespace Extract.DataEntry
             {
                 InsertNewRow();
 
-                PasteCopiedRows();
+                PasteRowData(Clipboard.GetDataObject());
             }
             catch (Exception ex)
             {
@@ -1232,7 +1629,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="CancelEventArgs"/> that contains the event data.</param>
-        private void HandleContextMenuOpening(object sender, CancelEventArgs e)
+        void HandleContextMenuOpening(object sender, CancelEventArgs e)
         {
             try
             {
@@ -1244,7 +1641,7 @@ namespace Extract.DataEntry
                 // the current table cell.
                 bool enableRowOptions = AllowRowTasks(hit.RowIndex, hit.ColumnIndex);
                 bool enablePasteOptions = false;
-                if (enableRowOptions && GetClipboardDataType() != null)
+                if (enableRowOptions && GetDataType(Clipboard.GetDataObject()) != null)
                 {
                     enablePasteOptions = true;
                 }
@@ -1275,7 +1672,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>A <see langword="string"/> value to identify data on the clipboard that was
         /// copied from this control.</returns>
-        private string ClipboardDataType
+        string RowDataType
         {
             get
             {
@@ -1287,26 +1684,26 @@ namespace Extract.DataEntry
         /// Indicates the type of data on the clipboard as long as it is usable by this 
         /// <see cref="DataEntryTable"/>.
         /// </summary>
+        /// <param name="dataObject">The <see cref="IDataObject"/> instance whose data type is to
+        /// be checked for compatibility.</param>
         /// <returns>A <see langword="string"/> indicating the type of data on the clipboard
         /// as long as it is usable by this <see cref="DataEntryTable"/>. If the data is not usable
         /// by this table, <see langword="null"/> is returned.</returns>
-        private string GetClipboardDataType()
+        string GetDataType(IDataObject dataObject)
         {
-            IDataObject data = Clipboard.GetDataObject();
-
-            if (data != null)
+            if (dataObject != null)
             {
                 // Check for data from this table.
-                if (data.GetDataPresent(this.ClipboardDataType))
+                if (dataObject.GetDataPresent(this.RowDataType))
                 {
-                    return this.ClipboardDataType;
+                    return this.RowDataType;
                 }
                 // Check for data from compatible tables.
                 else
                 {
                     foreach (string compatibleAttribute in _compatibleAttributeNames)
                     {
-                        if (data.GetDataPresent(_OBJECT_NAME + compatibleAttribute))
+                        if (dataObject.GetDataPresent(_OBJECT_NAME + compatibleAttribute))
                         {
                             return _OBJECT_NAME + compatibleAttribute;
                         }
@@ -1314,7 +1711,7 @@ namespace Extract.DataEntry
                 }
 
                 // Check for string data that can be processed with the row formatting rule.
-                if (_rowFormattingRule != null &&  data.GetDataPresent("System.String"))
+                if (_rowFormattingRule != null && dataObject.GetDataPresent("System.String"))
                 {
                     return "System.String";
                 }
@@ -1324,11 +1721,153 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Performs a drag and drop operation using the currently selected cells as the data
+        /// source for the operation.
+        /// </summary>
+        void DoRowDragDrop()
+        {
+            try
+            {
+                IDataObject rowDataObject = null;
+                string rowData = GetSelectedRowData();
+
+                // Row data is available from the current selection.
+                if (!string.IsNullOrEmpty(rowData))
+                {
+                    // Create a dataObject containing the rows' data.
+                    rowDataObject = new DataObject(this.RowDataType, rowData);
+                   
+                    // Maintain an internal list of the rows being dragged.
+                    _draggedRows = new List<DataEntryTableRow>();
+                    foreach (DataGridViewRow row in base.SelectedRows)
+                    {
+                        if (row.Index != base.NewRowIndex)
+                        {
+                            _draggedRows.Add((DataEntryTableRow)row);
+
+                            // Update the style of each row being dragged.
+                            foreach (DataGridViewCell cell in row.Cells)
+                            {
+                                ((IDataEntryTableCell)cell).IsBeingDragged = true;
+                                UpdateCellStyle(cell);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    // TODO: Add support for drag/drop of cells in the future.
+                    return;
+                }
+
+                DragDropEffects allowedEffects = base.AllowUserToDeleteRows ?
+                    (DragDropEffects.Move | DragDropEffects.Copy) : DragDropEffects.Copy;
+
+                // Begin the drag-and-drop operation.
+                DragDropEffects operationPerformed = base.DoDragDrop(rowDataObject, allowedEffects);
+
+                // After the drag-and-drop has ended (whether or not the data was dropped), remove
+                // the special style applied to the dragged rows.
+                foreach (DataGridViewRow row in _draggedRows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        ((IDataEntryTableCell)cell).IsBeingDragged = false;
+                        UpdateCellStyle(cell);
+                    }
+                }
+
+                // If the rows were moved to a different location, they need to be removed from this
+                // table.
+                if (_draggedRows != null && (operationPerformed & DragDropEffects.Move) != 0)
+                {
+                    RemoveDraggedRows();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26674", ex);
+            }
+            finally
+            {
+                _draggedRows = null;
+            }
+        }
+
+        /// <summary>
+        /// Removes the rows that were dragged from the table.
+        /// </summary>
+        void RemoveDraggedRows()
+        {
+            // Find the cached set of rows the dragged data came from.
+            foreach (Dictionary<IAttribute, DataEntryTableRow> cachedSet in
+                _cachedRows.Values)
+            {
+                if (cachedSet.ContainsKey(_draggedRows[0].Attribute))
+                {
+                    // Preserve the row selection that existed prior to removing the rows.
+                    DataGridViewRow[] selectedRows = new DataGridViewRow[base.SelectedRows.Count];
+                    base.SelectedRows.CopyTo(selectedRows, 0);
+                    List<DataGridViewRow> initialSelectedRows =
+                        new List<DataGridViewRow>(selectedRows);
+
+                    // Remove each row
+                    foreach (DataEntryTableRow draggedRow in _draggedRows)
+                    {
+                        // If the dragged rows are in the table currently displayed, simply
+                        // removing the row will trigger all necessary actions.
+                        if (cachedSet == _activeCachedRows)
+                        {
+                            base.Rows.Remove(draggedRow);
+                        }
+                        // If the rows are from a table not currently displayed,
+                        // DeleteAttribute needs to be called and the cached row set needs
+                        // to be updated.
+                        else
+                        {
+                            AttributeStatusInfo.DeleteAttribute(draggedRow.Attribute);
+                            DataEntryTableRow row = cachedSet[draggedRow.Attribute];
+                            cachedSet.Remove(draggedRow.Attribute);
+                            row.Dispose();
+                        }
+                    }
+
+                    // Restore the initial row selection as long as the selection does not
+                    // include the source drag rows.
+                    if (cachedSet == _activeCachedRows && initialSelectedRows.Count > 0)
+                    {
+                        using (new SelectionProcessingSuppressor(this))
+                        {
+                            DataGridViewRow lastSelectedRow = null;
+
+                            base.ClearSelection();
+                            foreach (DataGridViewRow row in initialSelectedRows)
+                            {
+                                if (!_draggedRows.Contains(row as DataEntryTableRow))
+                                {
+                                    row.Selected = true;
+                                    lastSelectedRow = row;
+                                }
+                            }
+
+                            if (lastSelectedRow != null)
+                            {
+                                base.CurrentCell = lastSelectedRow.Cells[0];
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets a lazily instantiate <see cref="MiscUtils"/> instance to use for converting 
         /// <see cref="IPersistStream"/> implementations to/from a stringized byte stream.
         /// </summary>
         /// <returns>A <see cref="MiscUtils"/> instance.</returns>
-        private MiscUtils MiscUtils
+        MiscUtils MiscUtils
         {
             get
             {
@@ -1351,7 +1890,7 @@ namespace Extract.DataEntry
         /// 0 if row1's index is the same as row2's
         /// Greater than 0 if row1's index is greater than row2's
         /// </returns>
-        private static int CompareRowsByIndex(DataGridViewRow row1, DataGridViewRow row2)
+        static int CompareRowsByIndex(DataGridViewRow row1, DataGridViewRow row2)
         {
             return (row1.Index - row2.Index);
         }
@@ -1368,7 +1907,7 @@ namespace Extract.DataEntry
         /// kept at the location of the attribute if it is replacing or at the end of the vector
         /// if it is a new attribute. This value is ignored (assumed <see langword="null"/>) if the 
         /// provided attribute is being applied into the "new" row.</param>
-        private void ApplyAttributeToRow(int rowIndex, IAttribute attribute,
+        void ApplyAttributeToRow(int rowIndex, IAttribute attribute,
             IAttribute insertBeforeAttribute)
         {
             ExtractException.Assert("ELI26143", "Uninitialized data!", _sourceAttributes != null);
@@ -1554,7 +2093,7 @@ namespace Extract.DataEntry
         /// </list>
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
-        private void ProcessRowSwipe(SpatialString swipedText)
+        void ProcessRowSwipe(SpatialString swipedText)
         {
             // Row selecton mode. The swipe can only be applied via the results of
             // a row formatting rule.
@@ -1577,7 +2116,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
         /// <throws><see cref="ExtractException"/> if more than one cell is selected.</throws>
-        private void ProcessCellSwipe(SpatialString swipedText)
+        void ProcessCellSwipe(SpatialString swipedText)
         {
             ExtractException.Assert("ELI24239",
                         "Cell swiping is supported only for one cell at a time!", 
@@ -1646,7 +2185,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Inserts a new row into the table before the current row.
         /// </summary>
-        private void InsertNewRow()
+        void InsertNewRow()
         {
             if (_sourceAttributes != null)
             {
@@ -1669,7 +2208,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Deletes the currently selected row(s).
         /// </summary>
-        private void DeleteSelectedRows()
+        void DeleteSelectedRows()
         {
             // Delete each row in the current selection.
             foreach (DataGridViewRow row in base.SelectedRows)
@@ -1684,7 +2223,25 @@ namespace Extract.DataEntry
         /// <summary>
         /// Copies the currently selected row(s) to the clipboard
         /// </summary>
-        private void CopySelectedRows()
+        void CopySelectedRows()
+        {
+            string rowData = GetSelectedRowData();
+
+            // If at least one row was copied, add the copied attributes to the internal
+            // "clipboard".
+            if (rowData != null)
+            {
+                // Add the copied attributes to the clipboard
+                Clipboard.SetData(this.RowDataType, rowData);
+            }
+        }
+
+        /// <summary>
+        /// Gets the data from the currently selected rows as a stringized byte stream.
+        /// </summary>
+        /// <returns>A stringized byte stream representing the <see cref="IAttribute"/>s for each
+        /// of the currently selected rows.</returns>
+        string GetSelectedRowData()
         {
             if (_sourceAttributes != null)
             {
@@ -1708,19 +2265,16 @@ namespace Extract.DataEntry
                     copiedAttributes.PushBack(row.Attribute);
                 }
 
-                // If at least one row was copied, add the copied attributes to the internal
-                // "clipboard".
+                // If at least one row with data was selected, return its data.
                 if (copiedAttributes.Size() > 0)
                 {
                     // Convert to a stringized byte stream so that the data can be preserved in the
                     // clipboard (this also removes the need to clone attributes before adding).
-                    string stringizedAttributes =
-                        this.MiscUtils.GetObjectAsStringizedByteStream(copiedAttributes);
-
-                    // Add the copied attributes to the clipboard
-                    Clipboard.SetData(this.ClipboardDataType, stringizedAttributes);
+                    return this.MiscUtils.GetObjectAsStringizedByteStream(copiedAttributes);
                 }
             }
+
+            return null;
         }
 
         /// <summary>
@@ -1742,25 +2296,26 @@ namespace Extract.DataEntry
         /// they will remain.</bullet>
         /// </list>
         /// </summary>
-        private void PasteCopiedRows()
+        /// <param name="dataObject">The <see cref="IDataObject"/> containing the data to be pasted
+        /// into the currently selected row(s).</param>
+        void PasteRowData(IDataObject dataObject)
         {
-            IDataObject data = Clipboard.GetDataObject();
-            string clipboardDataType = GetClipboardDataType();
+            string dataType = GetDataType(dataObject);
 
             // If the data on the clipboard is a string, use the row formatting rule to parse the
             // text into the row.
-            if (_rowFormattingRule != null && clipboardDataType == "System.String")
+            if (_rowFormattingRule != null && dataType == "System.String")
             {
                 SpatialString spatialString = (SpatialString)new SpatialStringClass();
-                spatialString.CreateNonSpatialString((string)data.GetData(clipboardDataType), "");
+                spatialString.CreateNonSpatialString((string)dataObject.GetData(dataType), "");
 
                 ProcessRowSwipe(spatialString);
             }
             // Otherwise the data is attributes from this table or a compatible one.
-            else if (!string.IsNullOrEmpty(clipboardDataType))
+            else if (!string.IsNullOrEmpty(dataType))
             {
                 // Retrieve the data from the clipboard and convert it back into an attribute vector.
-                string stringizedAttributes = (string)data.GetData(clipboardDataType);
+                string stringizedAttributes = (string)dataObject.GetData(dataType);
 
                 IUnknownVector attributesToPaste = (IUnknownVector)
                     this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
@@ -1770,9 +2325,8 @@ namespace Extract.DataEntry
                 {
                     IAttribute attribute = (IAttribute)attributesToPaste.At(i);
 
-
                     // If the attributes are not from this table, rename them.
-                    if (clipboardDataType != this.ClipboardDataType)
+                    if (dataType != this.RowDataType)
                     {
                         attribute.Name = base.AttributeName;
                     }
@@ -1804,7 +2358,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">An <see cref="IUnknownVector"/> of 
         /// <see cref="IAttribute"/>s to be applied </param>
-        private void ApplyAttributesToSelectedRows(IUnknownVector attributes)
+        void ApplyAttributesToSelectedRows(IUnknownVector attributes)
         {
             try
             {
@@ -1938,7 +2492,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if general row tasks should be available for execution; 
         /// <see langword="false"/> otherwise.
         /// </returns>
-        private bool AllowRowTasks(int originRowIndex, int originColumnIndex)
+        bool AllowRowTasks(int originRowIndex, int originColumnIndex)
         {
             // If the table is not currently mapped, row tasks are not allowed.
             if (_sourceAttributes == null)
