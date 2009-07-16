@@ -99,5 +99,24 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI24917", ex);
             }
         }
+
+        /// <summary>
+        /// Copies the elements of <paramref name="source"/> to a new array.
+        /// </summary>
+        /// <typeparam name="T">The type of elements in <paramref name="source"/>.</typeparam>
+        /// <param name="source">The object to convert to an array.</param>
+        /// <returns>An array containing the elements of <paramref name="source"/>.</returns>
+        public static T[] ToArray<T>(IEnumerable<T> source)
+        {
+            try
+            {
+                List<T> list = new List<T>(source);
+                return list.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26708", ex);
+            }
+        }
     }
 }
