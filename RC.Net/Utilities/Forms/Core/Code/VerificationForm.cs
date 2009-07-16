@@ -55,7 +55,7 @@ namespace Extract.Utilities.Forms
         /// <summary>
         /// An event to indicate a document is done processing.
         /// </summary>
-        EventWaitHandle _fileComplete = new AutoResetEvent(false);
+        EventWaitHandle _fileCompletedEvent = new AutoResetEvent(false);
 
         /// <summary>
         /// An event to indicate processing has been cancelled either via <see cref="Cancel"/>
@@ -203,7 +203,7 @@ namespace Extract.Utilities.Forms
                     {
                         // Create and start the verification form thread if it doesn't already exist.
                         _closing = false;
-                        _fileComplete.Reset();
+                        _fileCompletedEvent.Reset();
                         _canceledEvent.Reset();
                         _exceptionThrownEvent.Reset();
                         _closedEvent.Reset();
@@ -211,15 +211,9 @@ namespace Extract.Utilities.Forms
                         _uiThread = 
                             CreateUserInterfaceThread(VerificationApplicationThread, creator);
 
-                        // Wait until the form is initialized (or an error interupts initialization) 
+                        // Wait until the form is initialized (or an error interrupts initialization) 
                         // before returning.
-                        WaitHandle[] waitHandles = new WaitHandle[] { _initializedEvent, _canceledEvent, _exceptionThrownEvent };
-
-                        WaitHandle.WaitAny(waitHandles);
-
-                        // Notify any interested listeners of exceptions that were caught when showing
-                        // the verification form.
-                        HandleExceptions();
+                        WaitForEvent(_initializedEvent);
                     }
                     else
                     {
@@ -266,14 +260,7 @@ namespace Extract.Utilities.Forms
                     MainForm.Open(fileName);
 
                     // Wait until the document is either saved or the verification form is closed.
-                    WaitHandle[] waitHandles =
-                        new WaitHandle[] { _fileComplete, _canceledEvent, _exceptionThrownEvent };
-
-                    WaitHandle.WaitAny(waitHandles);
-
-                    // Notify any interested listeners of exceptions that were caught during the time
-                    // the document was displayed or was being saved.
-                    HandleExceptions();
+                    WaitForEvent(_fileCompletedEvent);
                 }
                 catch (Exception ex)
                 {
@@ -287,6 +274,23 @@ namespace Extract.Utilities.Forms
             // this thread is likely to re-enter a _lock section before windows gives any
             // waiting threads an opportunity to proceed.
             Thread.Sleep(0);
+        }
+
+        /// <summary>
+        /// Waits for the specified event to be signaled or for user cancellation or for an error 
+        /// condition.
+        /// </summary>
+        /// <param name="waitHandle">The wait handle of the event for which to wait.</param>
+        void WaitForEvent(EventWaitHandle waitHandle)
+        {
+            // Wait for the specified handle, cancellation, or exception
+            WaitHandle[] waitHandles =
+                new WaitHandle[] { waitHandle, _canceledEvent, _exceptionThrownEvent };
+
+            WaitHandle.WaitAny(waitHandles);
+
+            // Throw any caught exceptions
+            HandleExceptions();
         }
 
         /// <summary>
@@ -366,10 +370,10 @@ namespace Extract.Utilities.Forms
                     _initializedEvent.Close();
                     _initializedEvent = null;
                 }
-                if (_fileComplete != null)
+                if (_fileCompletedEvent != null)
                 {
-                    _fileComplete.Close();
-                    _fileComplete = null;
+                    _fileCompletedEvent.Close();
+                    _fileCompletedEvent = null;
                 }
                 if (_canceledEvent != null)
                 {
@@ -409,7 +413,7 @@ namespace Extract.Utilities.Forms
                 _canceledEvent.Set();
             }
 
-            _fileComplete.Set();
+            _fileCompletedEvent.Set();
         }
 
         /// <summary>
@@ -443,15 +447,28 @@ namespace Extract.Utilities.Forms
         #region VerificationForm Private Properties
 
         /// <summary>
+        /// Gets or sets whether the current file has been signaled for completion.
+        /// </summary>
+        /// <returns><see langword="true"/> if the current file is signaled as complete;
+        /// <see langword="false"/> if the current file is not signaled as complete.</returns>
+        public bool Completed
+        {
+            get
+            {
+                return _fileCompletedEvent.WaitOne(0, false);
+            }
+        }
+
+        /// <summary>
         /// Indicates whether or not the <see cref="_form"/> is initialzed and ready for use.
         /// </summary>
         /// <returns><see langword="true"/> if <see cref="_form"/> is intialized, 
         /// <see langword="false"/> if it is not.</returns>
-        bool IsFormInitialized
+        bool Initialized
         {
             get
             {
-                return (_initializedEvent.WaitOne(0, false));
+                return _initializedEvent.WaitOne(0, false);
             }
         }
 
@@ -524,13 +541,7 @@ namespace Extract.Utilities.Forms
             }
             catch (Exception ex)
             {
-                if (_lastException != null)
-                {
-                    _lastException.Log();
-                }
-
-                _lastException = ExtractException.AsExtractException("ELI26225", ex);
-                _exceptionThrownEvent.Set();
+                StoreException(ex);
             }
         }
 
@@ -562,13 +573,7 @@ namespace Extract.Utilities.Forms
             {
                 _initializedEvent.Reset();
 
-                if (_lastException != null)
-                {
-                    _lastException.Log();
-                }
-
-                _lastException = ExtractException.AsExtractException("ELI23988", ex);
-                _exceptionThrownEvent.Set();
+                StoreException(ex);
             }
             finally
             {
@@ -592,6 +597,22 @@ namespace Extract.Utilities.Forms
             Application.SetCompatibleTextRenderingDefault(false);
 
             return (TForm)creator();
+        }
+
+        /// <summary>
+        /// Stores the specified exception in <see cref="_lastException"/> so it can be thrown by
+        /// the calling thread.
+        /// </summary>
+        /// <param name="ex">The exception to store.</param>
+        void StoreException(Exception ex)
+        {
+            if (_lastException != null)
+            {
+                _lastException.Log();
+            }
+
+            _lastException = ExtractException.AsExtractException("ELI23988", ex);
+            _exceptionThrownEvent.Set();
         }
 
         /// <summary>
@@ -623,7 +644,14 @@ namespace Extract.Utilities.Forms
                 while (_uiThread != null && _uiThread.IsAlive)
                 {
                     // Attempt to end the thread cleanly by closing the form if it still exists.
-                    if (this.IsFormInitialized)
+                    // [DataEntry:308, 254]
+                    // In response to attempting to close the verification UI, the user may still
+                    // be presented with an opportunity to save. If the user initially canceled
+                    // the save prompt to make further adjustments, the UI will remain (despite 
+                    // Initialized returning true). If any _fileCompletedEvent events are fired,
+                    // re-attempt to close the UI.
+                    // This code will probably need to be re-worked with #254.
+                    if (Initialized || Completed)
                     {
                         // Indicate the the form is no longer initialized now that we have asked
                         // it to close.
@@ -631,20 +659,6 @@ namespace Extract.Utilities.Forms
 
                         // Call Close via Invoke (Synchronous call)
                         MainForm.Invoke(new ParameterlessDelegate(MainForm.Close));
-                    }
-                    else
-                    {
-                        // [DataEntry:308, 254]
-                        // In response to attempting to close the verification UI, the user may still
-                        // be presented with an opportunity to save. If the user initially cancelled
-                        // the save prompt to make further adjustments, the UI will remain (despite 
-                        // IsFormInitialized returning true). If any _fileComplete events are fired,
-                        // re-attempt to close the UI.
-                        // This code will probably need to be re-worked with #254.
-                        if (_fileComplete.WaitOne(0, false))
-                        {
-                            MainForm.Invoke(new ParameterlessDelegate(MainForm.Close));
-                        }
                     }
 
                     Thread.Sleep(100);
