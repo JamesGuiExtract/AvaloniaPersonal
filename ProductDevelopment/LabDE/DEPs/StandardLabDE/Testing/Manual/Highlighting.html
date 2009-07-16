@@ -16,11 +16,14 @@
 	<ul>
 		<LI><b>Highlights on skewed images</b>
 		<ul>
-			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that <b>Patient Info</b> 
-			and <b>Test Results</b> are slightly skewed.
-			<LI>Zoom in to various fields and confirm that the associated highlights 
-			match the image skew.
-			<LI>Confirm that the hint <b>does not</b> follow the skew.
+			<li><b>[DataEntry #225]</b> Tooltips and skew
+			<ul>
+				<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that <b>Patient Info</b> 
+				and <b>Test Results</b> are slightly skewed.
+				<LI>Zoom in to various fields and confirm that the associated highlights 
+				match the image skew.
+				<LI>Confirm that the hint <b>does not</b> follow the skew.
+			</ul>
 <p>
 			<LI>Select the <b>Patient Information - Name</b> field.
 			<LI>Zoom in to the <b>eGFR Interpretive Guidelines:</b> section of the text. 
@@ -51,22 +54,22 @@
 		<LI><b>Highlights and OCR confidence</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Street</b> cell in the <b>Laboratory - Address</b> table.
-			<LI>Confirm that in the <b>N7950</b> text that the <b>9</b> and the <b>0</b> 
-			have a red background indicating lower OCR confidence.
-			<LI>Swipe <b>N7950 Town Hall</b> to replace the Street Address.
-			<LI>Confirm that the text OCRs correctly.
-			<LI>Confirm that now only the <b>0</b> has a red background indicating 
+			<LI>Select the first <b>BASIC METABOLIC PANEL</b> row in the <b>Orders</b> table.
+			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
+			a red background indicating lower OCR confidence.
+			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
+			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
+			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> have red backgrounds indicating 
 			lower OCR confidence.
-			<LI>Manually edit the <b>Street</b> cell such that <b>N7950</b> becomes <b>N7960</b>.
+			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes <b>Carbon Monoxide</b>.
 			<ul>
-				<LI>Confirm that the tooltip changes to <b>N7960 Town Hall</b>.
+				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
 			</ul>
-			<LI>Re-swipe <b>N7950 Town Hall</b> to replace the Street Address.
-			<LI>Confirm that the text OCRs correctly.
-			<LI>Confirm that the <b>0</b> again has a red background indicating 
-			lower OCR confidence.
+			<LI>Re-swipe <b>Carbon Dioxide</b> to replace the Order Name.
+			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
+			<LI>Confirm that the word <b>Carbon</b> again has a red background indicating 
+			lower OCR confidence. <b>Dioxide</b> may also be in red at this time.
 			<li><b>[DataEntry #297]</b> Confidence highlight threshold should be configurable
 			<ul>
 				<li>Open a document that has a .voa file.
@@ -82,12 +85,12 @@
 		<LI><b>Highlights across pages</b>
 		<ul>
 			<LI>Open image <b>352.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>COMP METABOLIC PNL</b> row.
+			<LI>Select the first <b>COMPREHENSIVE PANEL</b> row.
 			<LI>Confirm that the entire set of highlights and hints is visible on 
 			<b>page 1</b>.
-			<LI>Select the second <b>COMP METABOLIC PNL</b> row.
+			<LI>Select the <b>LIPID PANEL</b> row.
 			<LI>Confirm that the document stays on <b>page 1</b> and that just the 
-			<b>COMP METABOLIC PNL</b> text is highlighted.
+			<b>LIPID PANEL</b> text is highlighted.
 			<LI>Change to <b>page 2</b>.
 			<LI>Confirm that the entire set of highlights and hints is visible on 
 			<b>page 2</b>.
@@ -96,21 +99,22 @@
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Laboratory Address</b> table.
+			<LI>Select the <b>Orders</b> table.
 			<LI>Confirm that selecting each individual row of the address table provides the 
 			appropriate highlight and hint.
 			<LI>Confirm that selecting multiple rows of the address table in various 
 			combinations provides the appropriate highlights but without any hints.
 <p>
-			<LI>Select one of the <b>Basic Metabolic Panel</b> cells in the 
-			<b>Completed Tests</b> table.
-			<LI>Confirm that the <b>Basic Metabolic Panel</b> text is highlighted 
+			<li>Select the <b>UnknownOrder</b> cell in the bottom row.
+			<LI>Select the <b>Carbon Dioxide</b> cell in the 
+			<b>Selected Order Details</b> table.
+			<LI>Confirm that the <b>Carbon Dioxide</b> text is highlighted 
 			and that a hint is also displayed.
-			<LI>Select an entire <b>Basic Metabolic Panel</b> row in the 
-			<b>Completed Tests</b> table.
+			<LI>Select the entire <b>Carbon Dioxide</b> row in the 
+			<b>Selected Order Details</b> table.
 			<ul>
-				<LI>Confirm that all of the test results for the <b>Panel</b> are 
-				highlighted and that no hint is displayed.
+				<LI>Confirm that all of the test results for the <b>Order</b> are 
+				highlighted and that hints are displayed.
 				<LI>Confirm that both <b>Red</b> and <b>Green</b> highlights are 
 				visible for individual characters.
 				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
@@ -126,10 +130,10 @@
 			around the <b>TEST NAME</b>, <b>IN RANGE</b> or <b>OUT OF RANGE</b>, 
 			<b>UNITS</b> and <b>REFERENCE RANGE</b> columns.
 <p>
-			<LI>Select the entire <b>Potassium</b> row from the test details in the first 
-			<b>Basic Metabolic Panel</b>.
+			<LI>Select the entire <b>Potassium</b> row from the test details in the 
+			<b>Potassium</b> order.
 			<LI>Right-click and select <b>Copy row(s)</b>.
-			<LI>Select the second <b>Basic Metabolic Panel</b>.
+			<LI>Select the <b>UnknownOrder</b> order.
 			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
 			<ul>
 				<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
@@ -137,20 +141,20 @@
 				<LI>Confirm that selecting individual cells displays proper highlights 
 				and tooltips. 
 				<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
-				proper highlights and no tooltips. 
+				proper highlights and tooltips. 
 			</ul>
-			<LI>Select <b>multiple</b> rows from the test details in the first 
-			<b>Basic Metabolic Panel</b>.
+			<LI>Select <b>multiple</b> rows from the test details in the  
+			<b>UnknownOrder</b> order.
 			<LI>Right-click and select <b>Copy row(s)</b>.
-			<LI>Select the second <b>Basic Metabolic Panel</b>.
+			<LI>Select the <b>Potassium</b> order.
 			<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
 			<ul>
-				<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
+				<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Order
 				Details</b> table.
 				<LI>Confirm that selecting individual cells displays proper highlights 
 				and tooltips. 
-				<LI>Confirm that selecting the entire rows displays 
-				proper highlights and no tooltips. 
+				<LI>Confirm that selecting individual rows display
+				proper highlights and tooltips. 
 			</ul>
 		</ul>
 	</ul>
@@ -190,6 +194,7 @@
 				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
 				<LI>Confirm that <b>all</b> found data and hints are highlighted.
 			</ul>
+<!-- Deprecated
 			<LI>Select an item from <b>Laboratory</b>.
 			<ul>
 				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
@@ -199,7 +204,8 @@
 				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
 				<LI>Confirm that <b>all</b> found data and hints are highlighted.
 			</ul>
-			<LI>Select an item from <b>Completed Tests</b>.
+-->			
+			<LI>Select an item from <b>Orders</b>.
 			<ul>
 				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
 				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
@@ -235,7 +241,7 @@
 			<li><b>[DataEntry #238]</b> Tables revert to single cell selection
 			<ul>
 				<li>Load a document.
-				<li>Select an entire populated row in the test table.
+				<li>Select an entire populated row in the Selected Order Details table.
 				<li>Confirm that all data in the test is highlighted.
 				<li>Turn on "Highlight all data."
 				<li>Confirm that the entire row of the table is still selected.
@@ -259,13 +265,6 @@
 			<LI>Confirm that the tooltip is displayed above the swipe.
 			<li><b>[DataEntry #224]</b> Confirm that the font size for tooltips is consistent.
 <p>
-			<li><b>[DataEntry #225]</b> Tooltips and skew
-			<ul>
-				<li>Open a skewed document, such as the one attached to the SCR.
-				<li>Swipe some data.
-				<li>Confirm that the tooltips are displayed relative to the image skew.
-			</ul>
-<p>
 			<li><b>[DataEntry #332]</b> Tooltips from angled swipes not positioned correctly
 			<ul>
 				<LI>Open image <b>221.tif</b> from Demo_LabDE.
@@ -282,12 +281,11 @@
 <p>
 			<li><b>[DataEntry #428]</b> Disappearing  highlights.
 			<ul>
-				<li>Highlight an entire row. Make not of all tests under the order highlighted in the image. 
+				<li>Selet an entire order row. Note that all tests under the order are highlighted in the image. 
 				<li>Press <b>Escape</b> to hide the tooltips.
 				<li>Select the <b>Review and select</b> tool.
 				<li>Mouse over one of the highlights.
-				<li>Confirm that the appropriate tooltip appears and that highlights remain visible as
-				appropriate.
+				<li>Confirm highlights remain visible.
 			</ul>
 		</ul>
 <p>
@@ -339,7 +337,7 @@
 			<LI>Note the position of the black mark located approximately 40% of the way 
 			down the page on the right side.
 			<LI>Rotate the image.
-			<LI>Confirm that tooltips are always displayed right-side up.
+			<LI>Confirm that tooltips are always displayed right-side up with respect to their text.
 			<LI>Select a field suitable for general text input.
 			<LI>Swipe the previously located black mark.  An upper-case <b>I</b> is 
 			expected.
