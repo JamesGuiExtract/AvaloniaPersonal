@@ -585,6 +585,21 @@ namespace Extract.DataEntry
                 }
 
                 base.OnKeyDown(e);
+
+                // [DataEntry:443]
+                // When an auto-complete list entry is selected (whether via clicking on an item or
+                // pressing enter) an enter key press will be registered. If an auto-complete list
+                // is active, an enter key press was registered, all text is selected an the text
+                // leads off with a space, trim off the space that is very likely the special space
+                // that was added for all entries in the auto-complete list.
+                if (e.KeyCode == Keys.Return && base.AutoCompleteCustomSource != null &&
+                    base.AutoCompleteCustomSource.Count > 0 && !string.IsNullOrEmpty(this.Text) &&
+                    this.Text.Length > 1 && base.SelectionLength == this.Text.Length &&
+                    this.Text[0] == ' ')
+                {
+                    this.Text = this.Text.Substring(1);
+                    base.SelectAll();
+                }
             }
             catch (Exception ex)
             {
@@ -1186,16 +1201,17 @@ namespace Extract.DataEntry
         /// Items property, the items from the validation list (if
         /// provided) will be used to populate the combo box.
         /// </summary>
-        /// <param name="correctCase">If <see langword="true"/> and a 
+        /// <param name="correctValue">If <see langword="true"/> and a 
         /// <see cref="ValidationListFileName"/> has been configured, if the 
-        /// <see cref="DataEntryComboBox"/>'s value matches a value in the supplied list  
-        /// case-insensitively but not case-sensitively, the value will be modified to match 
-        /// the casing in the supplied list.</param>
+        /// <see cref="DataEntryTextBox"/>'s value matches a value in the supplied list  
+        /// case-insensitively but not case-sensitively or the value is different only due to
+        /// leading or trailing spaces, the value will be modified to match the value in the
+        /// supplied list.</param>
         /// <returns>If throwException is <see langword="false"/> the method will return
         /// <see langword="true"/> if the control either has no validation requirements or 
         /// the data it contains meets the requirements or <see langword="false"/>
         /// otherwise.</returns>
-        private bool Validate(bool correctCase)
+        private bool Validate(bool correctValue)
         {
             // If there is no mapped attribute or the control is disabled, the data cannot be invalid.
             if (_disabled || _attribute == null)
@@ -1208,9 +1224,9 @@ namespace Extract.DataEntry
             // Test to see if the data is valid.
             bool dataIsValid = _validator.Validate(ref value, _attribute, false);
 
-            // If the data is valid, correctCase is true, and the validator updated the value with
+            // If the data is valid, correctValue is true, and the validator updated the value with
             // new casing, apply the updated value to both the control and underlying attribute.
-            if (dataIsValid && correctCase && value != this.Text)
+            if (dataIsValid && correctValue && value != this.Text)
             {
                 this.Text = value;
                 AttributeStatusInfo.SetValue(_attribute, value, false, false);
@@ -1257,8 +1273,19 @@ namespace Extract.DataEntry
                 // Auto-complete is supported unless the DropDownStyle is DropDownList
                 if (base.DropDownStyle != ComboBoxStyle.DropDownList)
                 {
+                    // [DataEntry:443]
+                    // Add each item from the validation list to the auto-complete list twice, once
+                    // as it is in the validation list, and the second time with a leading space.
+                    // This way, a user can press space in an empty cell to see all possible values.
+                    string[] autoCompleteList = new string[validationListValues.Length * 2];
+                    for (int i = 0; i < validationListValues.Length; i++)
+                    {
+                        autoCompleteList[i] = " " + validationListValues[i];
+                    }
+                    validationListValues.CopyTo(autoCompleteList, validationListValues.Length);
+
                     base.AutoCompleteCustomSource.Clear();
-                    base.AutoCompleteCustomSource.AddRange(validationListValues);
+                    base.AutoCompleteCustomSource.AddRange(autoCompleteList);
                 }
 
                 base.Items.Clear();

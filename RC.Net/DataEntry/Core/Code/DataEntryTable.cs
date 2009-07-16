@@ -28,6 +28,11 @@ namespace Extract.DataEntry
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DataEntryTable).ToString();
+        
+        /// <summary>
+        /// Characters that cannot be sent using SendKeys because they have special meaning.
+        /// </summary>
+        static char[] _specialSendKeysChars = { '^', '%', '(', ')', '+' };
 
         #endregion Constants
 
@@ -649,8 +654,8 @@ namespace Extract.DataEntry
                 // SendKeys, refresh (clear) the value before restarting the edit, then resend the
                 // key again after the edit has started to trigger any relavant auto-complete list.
                 string value = base.CurrentCell.Value.ToString();
-                if (value == null || value.Length != 1 || value[0] < '0' || value[0] > 'z' ||
-                    value[0] == '^')
+                if (value == null || value.Length != 1 || value[0] < ' ' || value[0] > 'z' ||
+                    Array.IndexOf(_specialSendKeysChars, value[0]) >= 0)
                 {
                     value = "";
                 }

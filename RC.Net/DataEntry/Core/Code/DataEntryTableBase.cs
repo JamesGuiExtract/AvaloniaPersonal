@@ -802,11 +802,23 @@ namespace Extract.DataEntry
                             string[] validationListValues = validator.GetValidationListValues();
                             if (validationListValues != null)
                             {
+                                // [DataEntry:443]
+                                // Add each item from the validation list to the auto-complete list
+                                // twice, once as it is in the validation list, and the second time
+                                // with a leading space. This way, a user can press space in an
+                                // empty cell to see all possible values.
+                                string[] autoCompleteList = new string[validationListValues.Length * 2];
+                                for (int i = 0; i < validationListValues.Length; i++)
+                                {
+                                    autoCompleteList[i] = " " + validationListValues[i];
+                                }
+                                validationListValues.CopyTo(autoCompleteList, 
+                                    validationListValues.Length);
+
                                 textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
                                 textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
                                 textEditingControl.AutoCompleteCustomSource.Clear();
-                                textEditingControl.AutoCompleteCustomSource.AddRange(
-                                    validationListValues);
+                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
                             }
                             else
                             {

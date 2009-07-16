@@ -287,6 +287,14 @@ namespace Extract.DataEntry
                         // If the provided value is null, convert it to an empty string.
                         string stringValue = (value == null) ? "" : value.ToString();
 
+                        // Ensure any leading spaces are trimmed off-- controls will use leading
+                        // spaces in auto-complete lists to allow all possible entries to be
+                        // displayed, but the space should not remain in the final value.
+                        if (stringValue.Length > 1 && stringValue[0] == ' ')
+                        {
+                            stringValue = stringValue.Substring(1);
+                        }
+
                         // Add CRLFs back so that the replacement value used for display is never
                         // actually stored.
                         stringValue =

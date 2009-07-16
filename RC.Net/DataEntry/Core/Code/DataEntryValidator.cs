@@ -422,7 +422,8 @@ namespace Extract.DataEntry
                 // If there is a specified validation list, check it.
                 else if (_validationListValues != null)
                 {
-                    string valueUpper = value.Trim().ToUpper(CultureInfo.CurrentCulture);
+                    string valueTrimmed = value.Trim();
+                    string valueUpper = valueTrimmed.ToUpper(CultureInfo.CurrentCulture);
                     string listValue;
                     bool valueIsInList = _validationListValues.TryGetValue(valueUpper, out listValue);
 
@@ -447,6 +448,14 @@ namespace Extract.DataEntry
                         // item in the list, but not case-sensitively, change the casing to match
                         // the list item.
                         value = listValue;
+                    }
+                    else if (value != valueTrimmed)
+                    {
+                        // Always trim the entries whether or not CorrectCase is enabled.  This
+                        // ensures that if controls add copies of the list entries with leading
+                        // spaces to enable all auto-complete entries to be displayed that the spaces
+                        // are removed in the final value.
+                        value = valueTrimmed;
                     }
                 }
 
