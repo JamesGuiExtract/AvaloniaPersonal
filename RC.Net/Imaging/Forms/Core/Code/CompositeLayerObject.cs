@@ -905,8 +905,6 @@ namespace Extract.Imaging.Forms
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
-        // This is part of the IComparable interface and should not throw any exceptions
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)

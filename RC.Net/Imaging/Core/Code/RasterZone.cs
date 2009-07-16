@@ -710,8 +710,6 @@ namespace Extract.Imaging
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
-        // This is part of the IComparable interface, it should not throw an exception.
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)
@@ -746,8 +744,6 @@ namespace Extract.Imaging
         /// Returns a hashcode for this <see cref="RasterZone"/>.
         /// </summary>
         /// <returns>The hashcode for this <see cref="RasterZone"/>.</returns>
-        // This is part of the IComparable interface, it should not throw an exception.
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override int GetHashCode()
         {
             return (_start.GetHashCode() ^ _end.GetHashCode() ^ _height ^ _pageNumber);

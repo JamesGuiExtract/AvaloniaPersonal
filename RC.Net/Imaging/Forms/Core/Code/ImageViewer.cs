@@ -284,8 +284,6 @@ namespace Extract.Imaging.Forms
         /// <param name="other">The <see cref="ZoomInfo"/> object to compare.</param>
         /// <returns><see langword="true"/> if <paramref name="other"/> describes the same zoom 
         /// setting as this <see cref="ZoomInfo"/>; <see langword="false"/> if they differ.</returns>
-        // Part of the IComparable interface, this should not throw any exceptions
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public bool Equals(ZoomInfo other)
         {
             return _fitMode == other._fitMode &&

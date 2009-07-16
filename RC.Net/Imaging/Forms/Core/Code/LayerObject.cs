@@ -1650,8 +1650,6 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObject"/>.</param>
         /// <returns>An <see cref="int"/> that indicates the relative order of the
         /// <see cref="LayerObject"/> objects that are being compared.</returns>
-        // Part of the IComparable interface, this should not throw any exceptions
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public virtual int CompareTo(LayerObject other)
         {
             // Check the page number of this object
@@ -1723,8 +1721,6 @@ namespace Extract.Imaging.Forms
         /// <param name="obj">The <see cref="object"/> to compare with.</param>
         /// <returns><see langword="true"/> if the objects are equal and
         /// <see langword="false"/> otherwise.</returns>
-        // Part of the IComparable interface, this should not throw any exceptions
-        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override bool Equals(object obj)
         {
             if (obj == null)
