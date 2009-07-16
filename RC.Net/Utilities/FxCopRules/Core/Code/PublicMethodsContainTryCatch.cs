@@ -11,6 +11,23 @@ namespace Extract.Utilities.FxCopRules
     /// </summary>
     public class PublicMethodsContainTryCatch : BaseIntrospectionRule
     {
+        #region Constants
+
+        /// <summary>
+        /// Methods that are exempt from this rule (since exceptions should never throw from them)
+        /// </summary>
+        static readonly string[] _METHODS_TO_SKIP = new string[]
+        {
+            // Note: It is important that these are alphabetized, because a binary search is used.
+            "CompareTo",
+            "Dispose",
+            "Equals",
+            "GetHashCode",
+            "ToString"
+        };
+
+        #endregion Constants
+
         #region Constructors
 
         /// <summary>
@@ -50,7 +67,9 @@ namespace Extract.Utilities.FxCopRules
         [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public override ProblemCollection Check(Member member)
         {
-            if (member.NodeType == NodeType.Property)
+            // Skip properties and constructors
+            if (member.NodeType == NodeType.Property || 
+                member.NodeType == NodeType.InstanceInitializer)
             {
                 return this.Problems;
             }
@@ -58,10 +77,7 @@ namespace Extract.Utilities.FxCopRules
             // Only need to check public methods (do not check constructors, methods called Dispose,
             // property getters, or operator overloads)
             Method method = member as Method;
-            if (method != null && method.IsPublic && member.NodeType != NodeType.InstanceInitializer
-                && !method.Name.Name.Equals("dispose", StringComparison.OrdinalIgnoreCase)
-                && !method.Name.Name.StartsWith("get_", StringComparison.OrdinalIgnoreCase)
-                && !method.Name.Name.StartsWith("op_", StringComparison.OrdinalIgnoreCase))
+            if (MethodRequiresTryCatch(method))
             {
                 // Get the instructions collection
                 InstructionCollection instructions = method.Instructions;
@@ -90,11 +106,73 @@ namespace Extract.Utilities.FxCopRules
                 {
                     this.Problems.Add(new Problem(this.GetResolution(), method.SourceContext));
                 }
-
             }
 
             // Return the problem collection
             return this.Problems;
+        }
+
+        /// <summary>
+        /// Determines whether a try catch should be required for a method of this type.
+        /// </summary>
+        /// <param name="method">The method to check.</param>
+        /// <returns><see langword="true"/> if <paramref name="method"/> should contain a try catch
+        /// block; <see langword="false"/> if try catch block is unnecessary.</returns>
+        static bool MethodRequiresTryCatch(Method method)
+        {
+            // Must be a method
+            if (method == null)
+            {
+                return false;
+            }
+
+            // Only public methods require try catch
+            if (!method.IsPublic)
+            {
+                return false;
+            }
+
+            // Skip event accessors (They shouldn't throw exceptions)
+            if (method.DeclaringMember is EventNode)
+            {
+                return false;
+            }
+
+            // Skip methods that shouldn't throw exceptions.
+            string methodName = method.Name.Name;
+            if (!MethodShouldThrow(methodName))
+            {
+                return false;
+            }
+
+            // Skip property getters (They shouldn't throw exceptions)
+            if (methodName.StartsWith("get_", StringComparison.Ordinal))
+	        {
+        		return false;
+	        }
+
+            // The explicit cast operator is the only operator that should throw exceptions
+            if (methodName.StartsWith("op_", StringComparison.Ordinal) &&
+                !methodName.Equals("op_Explicit", StringComparison.Ordinal))
+	        {
+                return false;
+	        }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Determines whether a method with the specified name should throw exceptions.
+        /// </summary>
+        /// <param name="methodName">The name of the method.</param>
+        /// <returns><see langword="true"/> if <paramref name="methodName"/> is not one of the 
+        /// excluded method names in <see cref="_METHODS_TO_SKIP"/>; <see langword="false"/> if 
+        /// <paramref name="methodName"/> is a method that should never throw exceptions.</returns>
+        static bool MethodShouldThrow(string methodName)
+        {
+            int index =
+                Array.BinarySearch<string>(_METHODS_TO_SKIP, methodName, StringComparer.Ordinal);
+            return index < 0;
         }
 
         #endregion Overrides
