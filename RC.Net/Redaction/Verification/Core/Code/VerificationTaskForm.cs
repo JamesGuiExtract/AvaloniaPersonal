@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
@@ -5,6 +6,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
@@ -30,7 +32,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The settings for verification.
         /// </summary>
-        // Temporarily suppress this warning. Verification settings will be used in the future.
+        // TODO: Don't forget to remove suppress message.
+        // Temporarily suppress this warning. Verification codes will be used in the future.
         [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly VerificationSettings _settings;
 
@@ -64,10 +67,6 @@ namespace Extract.Redaction.Verification
 
         #endregion VerificationTaskForm Constructors
 
-        #region VerificationTaskForm Methods
-
-        #endregion VerificationTaskForm Methods
-
         #region VerificationTaskForm Overrides
 
         /// <summary>
@@ -79,7 +78,34 @@ namespace Extract.Redaction.Verification
         {
             base.OnLoad(e);
 
-            _imageViewer.EstablishConnections(this);
+            try
+            {
+                _imageViewer.EstablishConnections(this);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI26715", ex);
+            }
+        }
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// otherwise, <see langword="false"/>.</returns>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Allow the image viewer to handle keyboard input for shortcuts.
+            if (_imageViewer.Shortcuts.ProcessKey(keyData))
+            {
+                return true;
+            }
+
+            // This key was not processed, bubble it up to the base class.
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         #endregion VerificationTaskForm Overrides
@@ -119,6 +145,48 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26628", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleApplyExemptionToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                _redactionGridView.PromptForExemptions();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26710", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleLastExemptionToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                _redactionGridView.ApplyLastExemptions();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26711", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
