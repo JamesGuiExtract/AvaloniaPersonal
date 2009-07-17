@@ -1,5 +1,17 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData
+<SETTING>;AutomatedConditionQuantifier=only any
+//only any
+<SETTING>;AutomatedCondition=HCData
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=MCData|LCData|Clues
+//|Clues|LCData testing with supposed customer configuration
+<SETTING>;OutputHybridStats=1
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;OUTPUT_FINAL_STATS_ONLY=TRUE
+<SETTING>;OutputFinalStatsOnly=1
+//<SETTING>;CreateTestOutputVOAFiles=1
+
 
 
 //DD214s
