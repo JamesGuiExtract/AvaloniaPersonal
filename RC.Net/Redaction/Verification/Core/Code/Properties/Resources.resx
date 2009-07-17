@@ -117,4 +117,26 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="Exemption" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Exemption.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="LastExemption" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\LastExemption.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NextDocument" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NextDocument.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="NextRedaction" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NextRedaction.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PreviousDocument" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PreviousDocument.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="PreviousRedaction" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\PreviousRedaction.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="VerifyOptions" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\VerifyOptions.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

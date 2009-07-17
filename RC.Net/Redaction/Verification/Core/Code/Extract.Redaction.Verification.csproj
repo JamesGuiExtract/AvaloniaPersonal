@@ -265,6 +265,27 @@
       <DependentUpon>VerificationTaskForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Exemption.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\LastExemption.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NextDocument.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\NextRedaction.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PreviousDocument.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PreviousRedaction.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VerifyOptions.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -275,7 +296,7 @@
   -->
   <PropertyGroup>
     <PostBuildEvent>CommonDebugPostBuild.bat "$(TargetPath)"
-"$(FrameworkDir)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)\$(TargetName).tlb"
+"$(FrameworkDir)"\Regasm.exe "$(TargetPath)" /tlb:"$(ProjectDir)$(TargetName).tlb"
 </PostBuildEvent>
   </PropertyGroup>
 </Project>

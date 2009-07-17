@@ -44,7 +44,9 @@ const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
 
 // globals and statics
 map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
- 
+
+CMutex CAFUtility::ms_mutex;
+
 //-------------------------------------------------------------------------------------------------
 // CAFUtility
 //-------------------------------------------------------------------------------------------------
@@ -157,6 +159,8 @@ STDMETHODIMP CAFUtility::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
 	{
 		validateLicense();
 
+		CSingleLock lg(&ms_mutex, TRUE);
+
 		// get the component data folder and return it
 		string strFolder;
 		getComponentDataFolder(strFolder);
@@ -175,6 +179,8 @@ STDMETHODIMP CAFUtility::GetPrefixedFileName(BSTR strNonPrefixFullPath, BSTR* ps
 	try
 	{
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Get local copy of string
 		string	strNonPrefixFile = asString(strNonPrefixFullPath);
@@ -228,6 +234,8 @@ STDMETHODIMP CAFUtility::GetLoadFilePerSession(VARIANT_BOOL *pbSetting)
 		// Check license state
 		validateLicense();
 
+		CSingleLock lg(&ms_mutex, TRUE);
+
 		// Check for key existence
 		if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION ))
 		{
@@ -258,6 +266,8 @@ STDMETHODIMP CAFUtility::SetAutoEncrypt(VARIANT_BOOL bAutoEncryptOn)
 	try
 	{
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Store the setting
 		ma_pUserCfgMgr->setKeyValue( gstrAF_REG_SETTINGS_FOLDER, 
@@ -349,6 +359,7 @@ STDMETHODIMP CAFUtility::GetAttributesAsString(IIUnknownVector *pAttributes, BST
 
 			strAttributeString = buildAttributeString(ipAttribute);
 		}
+
 		// For all other attributes, append a new line and then the attribute
 		for (long n=1; n<nSize; n++)
 		{
@@ -377,6 +388,8 @@ STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstr
 	{
 		validateLicense();
 
+		CSingleLock lg(&ms_mutex, TRUE);
+
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI07464", ipDoc != NULL);
@@ -404,6 +417,8 @@ STDMETHODIMP CAFUtility::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbValue
 		ASSERT_ARGUMENT("ELI26574", pbValue != NULL);
 
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the input as a STL string
 		string stdstrInput = asString(strInput);
@@ -434,6 +449,8 @@ STDMETHODIMP CAFUtility::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *
 	try
 	{
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the input as a STL string
 		string stdstrInput = asString(strInput);
@@ -621,6 +638,8 @@ STDMETHODIMP CAFUtility::GetBuiltInTags(IVariantVector** ppTags)
 
 		validateLicense();
 
+		CSingleLock lg(&ms_mutex, TRUE);
+
 		IVariantVectorPtr ipVec = getBuiltInTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI11773", ipVec != NULL);
 
@@ -638,6 +657,8 @@ STDMETHODIMP CAFUtility::GetINIFileTags(IVariantVector** ppTags)
 	try
 	{	
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		IVariantVectorPtr ipVec = getINIFileTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != NULL);
@@ -658,6 +679,8 @@ STDMETHODIMP CAFUtility::GetAllTags(IVariantVector** ppTags)
 		ASSERT_ARGUMENT("ELI26585", ppTags != NULL);
 
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Get the built in tags
 		IVariantVectorPtr ipVec1 = getBuiltInTags();
@@ -684,6 +707,8 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 
 	try
 	{	
+		CSingleLock lg(&ms_mutex, TRUE);
+
 		// Check if the registry setting exists
 		if (ma_pUserCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY))
 		{
@@ -711,6 +736,8 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 	try
 	{
 		validateLicense();
+
+		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
@@ -1229,35 +1256,23 @@ void CAFUtility::getComponentDataFolder(string& rFolder)
 	rFolder = ls_strComponentDataFolder;
 }
 //-------------------------------------------------------------------------------------------------
-unsigned int CAFUtility::getAttributeLevel(string strName)
+unsigned int CAFUtility::getAttributeLevel(const string& strName)
 {
-	unsigned int ui;
-	for (ui = 0; ui < strName.length(); ui++)
-	{
-		if (strName.at(ui) != '.')
-		{
-			break;
-		}
-	}
-	return ui;
+	return strName.find_first_not_of(".");
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::removeDots(string& strName)
+void CAFUtility::removeDots(string& rstrName)
 {
-	while(strName.length() > 0)
+	// Find the first non '.' character
+	size_t pos = rstrName.find_first_not_of(".");
+
+	if (pos != 0)
 	{
-		if (strName.at(0) == '.')
-		{
-			strName.erase(strName.begin());
-		}
-		else
-		{
-			break;
-		}
+		rstrName.erase(0, pos);
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CAFUtility::loadAttributesFromEavFile(IIUnknownVectorPtr ipAttributes, 
+void CAFUtility::loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttributes, 
 										   unsigned long ulCurrLevel, 
 										   unsigned int& uiCurrLine, vector<string> vecLines)
 {
@@ -1318,7 +1333,8 @@ void CAFUtility::loadAttributesFromEavFile(IIUnknownVectorPtr ipAttributes,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat, IAttributePtr ipAttribute)
+ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
+												 const IAttributePtr& ipAttribute)
 {
 	ISpatialStringPtr ipNewName(CLSID_SpatialString);
 	ASSERT_RESOURCE_ALLOCATION("ELI19187", ipNewName != NULL);
@@ -1433,7 +1449,8 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat, IAttri
 	return ipNewName;
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable, IAttributePtr ipAttribute)
+ISpatialStringPtr CAFUtility::getVariableValue(const string& strVariable,
+											   const IAttributePtr& ipAttribute)
 {
 	// TODO: check the cache
 	bool bFound = false;

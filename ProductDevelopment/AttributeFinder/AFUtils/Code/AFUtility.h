@@ -29,6 +29,8 @@ public:
 
 DECLARE_REGISTRY_RESOURCEID(IDR_AFUTILITY)
 
+DECLARE_CLASSFACTORY_SINGLETON(CAFUtility)
+
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 BEGIN_COM_MAP(CAFUtility)
@@ -169,23 +171,23 @@ private:
 	void processAttributesForMatches( const vector<QueryPattern>& vecPatterns, 
 		const vector<QueryPattern>& vecNonSelectPatterns, 
 		long nCurrentMatchPos, IIUnknownVectorPtr& ripMatches, 
-		bool bRemoveMatchFromParent, IIUnknownVectorPtr& ripAttributes);
+		bool bRemoveMatchFromParent, const IIUnknownVectorPtr& ripAttributes);
 	//---------------------------------------------------------------------------------------------
 	// process a query of the form "AttributeA/SubAttribute@TypeValue"
 	// and return a vector of query pattern objects
 	void getQueryPatterns(string strQuery, vector<QueryPattern>& rvecPatterns);
 	//---------------------------------------------------------------------------------------------
 	// Recursive method to return the parent of ipAttribute
-	IAttributePtr getParent(IAttributePtr ipTestParent, IAttributePtr ipAttribute);
+	IAttributePtr getParent(const IAttributePtr& ipTestParent, const IAttributePtr& ipAttribute);
 	//---------------------------------------------------------------------------------------------
 	// If there's a prefix for each rules file.
 	// ex. if prefix string is "WS_" then the file shall be prefixed with the string
 	string getRulesFilePrefix();
 	//---------------------------------------------------------------------------------------------
-	IIUnknownVectorPtr getCandidateAttributes(IIUnknownVectorPtr ipAttributes, string strQuery,
-		bool bRemoveMatches);
+	IIUnknownVectorPtr getCandidateAttributes(const IIUnknownVectorPtr& ipAttributes,
+		const string& strQuery, bool bRemoveMatches);
 	//---------------------------------------------------------------------------------------------
-	void splitQuery(string strQuery, vector<QueryPattern>& rvecPatterns,
+	void splitQuery(const string& strQuery, vector<QueryPattern>& rvecPatterns,
 		vector<QueryPattern>& rvecNonSelectPatterns);
 	//---------------------------------------------------------------------------------------------
 	// Whether or not to automatically use EncryptTextFile.exe to
@@ -197,11 +199,12 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// Removes the specified attribute from the collection of attributes (no matter where
 	// in the collection it lives)
-	void removeAttribute(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
+	void removeAttribute(const IIUnknownVectorPtr& ipAttributes, const IAttributePtr& ipAttribute);
 	//---------------------------------------------------------------------------------------------
 	// Searches the collection of attributes and finds the parent attribute for the
 	// specified attribute.  If no parent attribute is found just returns NULL.
-	IAttributePtr getAttributeParent(IIUnknownVectorPtr ipAttributes, IAttributePtr ipAttribute);
+	IAttributePtr getAttributeParent(const IIUnknownVectorPtr& ipAttributes,
+		const IAttributePtr& ipAttribute);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Builds a string containing the data of the attribute
 	string buildAttributeString(const IAttributePtr& ipAttribute);
@@ -232,9 +235,9 @@ private:
 	// PURPOSE:	To expand the tags in the specified string (note rstrInput will be modified)
 	void expandTags(string& rstrInput, IAFDocumentPtr ipDoc);
 	//---------------------------------------------------------------------------------------------
-	ISpatialStringPtr getReformattedName(const string& strFormat, IAttributePtr ipAttribute);
+	ISpatialStringPtr getReformattedName(const string& strFormat, const IAttributePtr& ipAttribute);
 	//---------------------------------------------------------------------------------------------
-	ISpatialStringPtr getVariableValue(const string& strVariable, IAttributePtr ipAttribute);
+	ISpatialStringPtr getVariableValue(const string& strVariable, const IAttributePtr& ipAttribute);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE:	To return a Variant vector containing the built in doc tags
 	IVariantVectorPtr getBuiltInTags();
@@ -254,11 +257,12 @@ private:
 	void getComponentDataFolder(string& rFolder);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To load attributes from an EAV file
-	void loadAttributesFromEavFile(IIUnknownVectorPtr ipAttributes, unsigned long ulCurrLevel, 
+	void loadAttributesFromEavFile(const IIUnknownVectorPtr& ipAttributes, unsigned long ulCurrLevel, 
 		unsigned int& uiCurrLine, vector<string> vecLines);
-	unsigned int getAttributeLevel(string strName);
 	//---------------------------------------------------------------------------------------------
-	void removeDots(string& strName);
+	unsigned int getAttributeLevel(const string& strName);
+	//---------------------------------------------------------------------------------------------
+	void removeDots(string& rstrName);
 	//---------------------------------------------------------------------------------------------
 
 	/////////////
@@ -273,4 +277,7 @@ private:
 
 	// pointer to the utility object that deals with encryption
 	IMiscUtilsPtr m_ipMiscUtils;
+
+	// Mutex for accessing public methods
+	static CMutex ms_mutex;
 };

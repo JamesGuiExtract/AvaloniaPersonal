@@ -59,5 +59,54 @@ namespace Extract.Redaction.Verification.Properties {
                 resourceCulture = value;
             }
         }
+        
+        internal static System.Drawing.Bitmap Exemption {
+            get {
+                object obj = ResourceManager.GetObject("Exemption", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap LastExemption {
+            get {
+                object obj = ResourceManager.GetObject("LastExemption", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap NextDocument {
+            get {
+                object obj = ResourceManager.GetObject("NextDocument", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap NextRedaction {
+            get {
+                object obj = ResourceManager.GetObject("NextRedaction", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap PreviousDocument {
+            get {
+                object obj = ResourceManager.GetObject("PreviousDocument", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap PreviousRedaction {
+            get {
+                object obj = ResourceManager.GetObject("PreviousRedaction", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        internal static System.Drawing.Bitmap VerifyOptions {
+            get {
+                object obj = ResourceManager.GetObject("VerifyOptions", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }
