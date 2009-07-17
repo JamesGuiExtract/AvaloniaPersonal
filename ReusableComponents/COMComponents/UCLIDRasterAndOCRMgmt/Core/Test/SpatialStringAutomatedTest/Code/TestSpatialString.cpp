@@ -1567,8 +1567,8 @@ void CTestSpatialString::runTestCase18()
 		kAutomatedTestCase); 
 	// description for this test case
 	m_ipResultLogger->AddTestCaseMemo(get_bstr_t("Description"),
-		get_bstr_t("Inserting a SpatialString with IsSpatial turned on into "
-		"a SpatialString with IsSpatial off."));
+		get_bstr_t("Inserting a SpatialString with IsSpatial turned off into "
+		"a SpatialString with IsSpatial turned on."));
 
 	bExceptionCaught = false;
 	bSuccess = true;
@@ -1582,17 +1582,17 @@ void CTestSpatialString::runTestCase18()
 
 		// check if the sub string still retains the IsSpatial from original string
 		bool bIsSpatial = (m_ipSpatialString->GetMode() == kSpatialMode);
-		if (bIsSpatial)
+		if (!bIsSpatial)
 		{
 			bSuccess = false;
 		}
 
-		string strIsSpatial = bSuccess ? "false" : "true";
+		string strIsSpatial = bSuccess ? "true" : "false";
 		CString zTemp("");
 		zTemp.Format("The original string with IsSpatial turned off is : %s\r\n"
 			"The inserted spatial string with IsSpatial turned on is : %c\r\n"
 			"The string after insertion is : %s\r\n"
-			"The string after replacement is : %s ==> GetMode() == kSpatialMode = %s (supposed to be false)",
+			"The string after replacement is : %s ==> GetMode() == kSpatialMode = %s (supposed to be true)",
 			strOrigin.c_str(), c, strAfterInsertion.c_str(), 
 			strAfterReplacement.c_str(), strIsSpatial.c_str());
 		m_ipResultLogger->AddTestCaseMemo("Result", get_bstr_t(zTemp));
