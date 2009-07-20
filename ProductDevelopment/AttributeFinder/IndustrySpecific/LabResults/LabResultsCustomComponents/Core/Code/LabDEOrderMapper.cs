@@ -137,14 +137,19 @@ namespace Extract.LabResultsCustomComponents
         bool _dirty;
 
         /// <summary>
-        /// A <see cref="DataTable"/> containing the order table from the specified database.
+        /// A <see cref="DataTable"/> containing the lab order table from the specified database.
         /// </summary>
-        DataTable _order;
+        DataTable _labOrder;
 
         /// <summary>
-        /// A <see cref="DataTable"/> containing the test table from the specified database.
+        /// A <see cref="DataTable"/> containing the lab order test table from the specified database.
         /// </summary>
-        DataTable _test;
+        DataTable _labOrderTest;
+
+        /// <summary>
+        /// A <see cref="DataTable"/> containing the lab test table from the specified database.
+        /// </summary>
+        DataTable _labTest;
 
         /// <summary>
         /// A <see cref="DataTable"/> containing the alternate test name table from the specified
@@ -231,12 +236,6 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
-                IAttribute labInfo = null;
-                IAttribute resultDate = null;
-                IAttribute resultTime = null;
-                List<IAttribute> attributes = GetLabInfo(pAttributes, out labInfo, out resultDate,
-                    out resultTime);
-
                 // Get a temporary file for the database connection to use
                 using (TemporaryFile tempFile = new TemporaryFile(".sdf"))
                 {
@@ -282,13 +281,14 @@ namespace Extract.LabResultsCustomComponents
                     ISortCompare attributeSorter =
                                 (ISortCompare)new SpatiallyCompareAttributesClass();
 
-                    foreach (IAttribute attribute in attributes)
+                    int size = pAttributes.Size();
+                    for (int i=0; i < size; i++)
                     {
+                        IAttribute attribute = (IAttribute) pAttributes.At(i);
                         if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
                         {
                             List<IAttribute> mappedAttributes =
-                                MapOrders(attribute.SubAttributes, labInfo, resultDate, resultTime,
-                                    dbConnection);
+                                MapOrders(attribute.SubAttributes, dbConnection);
                             foreach (IAttribute newAttribute in mappedAttributes)
                             {
                                 // Sort the sub attributes spatially
@@ -592,75 +592,12 @@ namespace Extract.LabResultsCustomComponents
         }
 
         /// <summary>
-        /// Searches the attribute collection for the LabInfo attribute and stores that
-        /// as an out parameter.  Returns the entire attribute collection as a
-        /// <see cref="List{T}"/> of IAttributes.
-        /// </summary>
-        /// <param name="attributes">The unknown vector of attributes to search.</param>
-        /// <param name="labInfo">The lab info attribute (if found).</param>
-        /// <param name="resultDate">The result date attribute (if found).</param>
-        /// <param name="resultTime">The result time attribute (if found).</param>
-        /// <returns>A <see cref="List{T}"/> of IAttributes.</returns>
-        static List<IAttribute> GetLabInfo(IUnknownVector attributes, out IAttribute labInfo,
-            out IAttribute resultDate, out IAttribute resultTime)
-        {
-            // Default labInfo to null
-            labInfo = null;
-            resultDate = null;
-            resultTime = null;
-
-            int size = attributes.Size();
-
-            List<IAttribute> list = new List<IAttribute>(size);
-            for (int i=0; i < size; i++)
-            {
-                IAttribute attribute = (IAttribute) attributes.At(i);
-
-                // Check if this attribute is a LabInfo attribute (if we haven't found
-                // one yet) and assign it
-                if (labInfo == null &&
-                    attribute.Name.Equals("LabInfo", StringComparison.OrdinalIgnoreCase))
-                {
-                    labInfo = attribute;
-                }
-                // Check if this attribute is a ResultDate attribute (if we haven't found
-                // one yet) and assign it
-                else if (resultDate == null &&
-                    attribute.Name.Equals("ResultDate", StringComparison.OrdinalIgnoreCase))
-                {
-                    resultDate = attribute;
-                }
-                // Check if this attribute is a ResultTime attribute (if we haven't found
-                // one yet) and assign it
-                else if (resultTime == null &&
-                    attribute.Name.Equals("ResultTime", StringComparison.OrdinalIgnoreCase))
-                {
-                    resultTime = attribute;
-                }
-
-                list.Add(attribute);
-            }
-
-            return list;
-        }
-
-        /// <summary>
         /// Performs the mapping from tests to order grouping.
         /// </summary>
         /// <param name="attributes">A vector of attributes to map.</param>
         /// <param name="dbConnection">The database connection to use
         /// for querying.</param>
-        /// <param name="labInfo">Temporary parameter for passing in the
-        /// LabInfo attribute, in the future this attribute should be a subattribute
-        /// of the test.</param>
-        /// <param name="resultDate">Temporary parameter for passing in the
-        /// ResultDate attribute, in the future this attribute should be a subattribute
-        /// of the test.</param>
-        /// <param name="resultTime">Temporary parameter for passing in the
-        /// ResultTime attribute, in the future this attribute should be a subattribute
-        /// of the test.</param>
-        List<IAttribute> MapOrders(IUnknownVector attributes, IAttribute labInfo,
-            IAttribute resultDate, IAttribute resultTime, SqlCeConnection dbConnection)
+        List<IAttribute> MapOrders(IUnknownVector attributes, SqlCeConnection dbConnection)
         {
             // Get the source doc name from the first attribute
             string sourceDocName = "Unknown";
@@ -675,41 +612,6 @@ namespace Extract.LabResultsCustomComponents
             // Get a map of names to attributes from the attribute collection
             Dictionary<string, List<IAttribute>> nameToAttributes =
                 GetMapOfNamesToAttributes(attributes);
-
-            IAttribute dateAttribute = null;
-            IAttribute timeAttribute = null;
-            IAttribute labInfoAttribute = labInfo; // Temporary fix to get lab info
-            //IAttribute labInfoAttribute = null;
-
-            // Get the date and time from the attributes
-            List<IAttribute> temp;
-            if (nameToAttributes.TryGetValue("COLLECTIONDATE", out temp))
-            {
-                // List should have at least 1 item, pick the first
-                ExtractException.Assert("ELI26231", "Attribute list should have at least 1"
-                    + " collection date.", temp.Count > 0);
-
-                dateAttribute = temp[0];
-            }
-            temp = null;
-            if (nameToAttributes.TryGetValue("COLLECTIONTIME", out temp))
-            {
-                // List should have at least 1 item, pick the first
-                ExtractException.Assert("ELI26232", "Attribute list should have at least 1"
-                    + " collection time.", temp.Count > 0);
-
-                timeAttribute = temp[0];
-            }
-            temp = null;
-            // Temporarily commented out until lab info attributes are moved into the Test attribute
-            //if (nameToAttributes.TryGetValue("LABINFO", out temp))
-            //{
-            //    // List should have at least 1 item, pick the first
-            //    ExtractException.Assert("ELI26522", "Attribute list should have at least 1"
-            //        + " lab info object", temp.Count > 0);
-
-            //    labInfoAttribute = temp[0];
-            //}
 
             List<IAttribute> mappedList = new List<IAttribute>();
             foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
@@ -735,28 +637,6 @@ namespace Extract.LabResultsCustomComponents
                         orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
                         vecMatched.PushBack(orderGrouping);
 
-                        // Add the date, time, and lab info attribute (if available)
-                        if (dateAttribute != null)
-                        {
-                            vecMatched.PushBack(dateAttribute);
-                        }
-                        if (timeAttribute != null)
-                        {
-                            vecMatched.PushBack(timeAttribute);
-                        }
-                        if (labInfoAttribute != null)
-                        {
-                            vecMatched.PushBack(labInfoAttribute);
-                        }
-                        if (resultDate != null)
-                        {
-                            vecMatched.PushBack(resultDate);
-                        }
-                        if (resultTime != null)
-                        {
-                            vecMatched.PushBack(resultTime);
-                        }
-
                         // Get the best match order for the remaining unmatched tests
                         Dictionary<string, string> testNamesToCodes;
                         KeyValuePair<string, List<LabTest>> matchedTests =
@@ -779,8 +659,8 @@ namespace Extract.LabResultsCustomComponents
                                 if (testNamesToCodes.TryGetValue(matches.Name, out testCode))
                                 {
                                     SpatialString value = matches.Attribute.Value;
-                                    value.Replace(matches.Name, GetTestNameFromOrderAndTestCode(
-                                        orderCode, testCode, dbConnection), false, 1, null);
+                                    value.Replace(matches.Name, GetTestNameFromTestCode(
+                                        testCode, dbConnection), false, 1, null);
                                 }
 
                                 // Add the test to the vector
@@ -831,24 +711,34 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="dbConnection">The database connection to use to load the data sets.</param>
         void LoadDataTables(SqlCeConnection dbConnection)
         {
-            if (_order == null)
+            if (_labOrder == null)
             {
                 using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
                     "SELECT * FROM [LabOrder]", dbConnection))
                 {
-                    _order = new DataTable();
-                    _order.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_order);
+                    _labOrder = new DataTable();
+                    _labOrder.Locale = CultureInfo.InvariantCulture;
+                    adapter.Fill(_labOrder);
                 }
             }
-            if (_test == null)
+            if (_labOrderTest == null)
             {
                 using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                    "SELECT * FROM [Test]", dbConnection))
+                    "SELECT * FROM [LabOrderTest]", dbConnection))
                 {
-                    _test = new DataTable();
-                    _test.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_test);
+                    _labOrderTest = new DataTable();
+                    _labOrderTest.Locale = CultureInfo.InvariantCulture;
+                    adapter.Fill(_labOrderTest);
+                }
+            }
+            if (_labTest == null)
+            {
+                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
+                    "SELECT * FROM [LabTest]", dbConnection))
+                {
+                    _labTest = new DataTable();
+                    _labTest.Locale = CultureInfo.InvariantCulture;
+                    adapter.Fill(_labTest);
                 }
             }
             if (_alternateTestName == null)
@@ -908,7 +798,7 @@ namespace Extract.LabResultsCustomComponents
 
             // Loop through each order and try to find the best match for the collection
             // of unmatched tests
-            foreach (DataRow orderRow in _order.Rows)
+            foreach (DataRow orderRow in _labOrder.Rows)
             {
                 Dictionary<string, string> nameToCode = new Dictionary<string,string>();
                 List<LabTest> unmatchedCopy = new List<LabTest>(unmatchedTests);
@@ -916,18 +806,19 @@ namespace Extract.LabResultsCustomComponents
 
                 // Attempt to match all mandatory tests
                 string orderCode = (string)orderRow["Code"];
-                DataRow[] tests = _test.Select("OrderCode = '" + orderCode + "'"
+                DataRow[] tests = _labOrderTest.Select("OrderCode = '" + orderCode + "'"
                     + "AND Mandatory = 1");
                 bool allMandatoryMatch = true;
                 foreach (DataRow test in tests)
                 {
-                    string testCode = (string)test["Code"];
-                    string testName = (string)test["Name"];
-                    int testID = (int)test["ID"];
+                    // Get the test code and test name
+                    string testCode = (string)test["TestCode"];
+                    DataRow temp = _labTest.Select("TestCode = '" + testCode)[0];
+                    string testName = (string)temp["OfficialName"];
 
                     // Get the alternate test names for this test
-                    DataRow[] alternateName = _alternateTestName.Select("TestID = "
-                        + testID.ToString(CultureInfo.InvariantCulture));
+                    DataRow[] alternateName = _alternateTestName.Select("TestCode = "
+                        + testCode);
 
                     // Check for test match (default to false)
                     bool testMatched = false;
@@ -995,17 +886,17 @@ namespace Extract.LabResultsCustomComponents
                 if (allMandatoryMatch)
                 {
                     // Now look for additional matching test
-                    DataRow[] nonMandatory = _test.Select("OrderCode = '" + orderCode + "'"
+                    DataRow[] nonMandatory = _labOrderTest.Select("OrderCode = '" + orderCode + "'"
                         + "AND Mandatory = 0");
                     foreach (DataRow test in nonMandatory)
                     {
                         string testCode = (string)test["Code"];
-                        string testName = (string)test["Name"];
-                        int testID = (int)test["ID"];
+                        DataRow temp = _labTest.Select("TestCode = '" + testCode)[0];
+                        string testName = (string)temp["OfficialName"];
 
                         // Get the alternate test names for this test
-                        DataRow[] alternateName = _alternateTestName.Select("TestID = "
-                            + testID.ToString(CultureInfo.InvariantCulture));
+                        DataRow[] alternateName = _alternateTestName.Select("TestCode = "
+                            + testCode);
 
                         // See if this test matches one of the unmatched tests
                         foreach (LabTest labTest in unmatchedCopy)
@@ -1153,11 +1044,10 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="testCode">The test code to search on.</param>
         /// <param name="dbConnection">The database connection to use.</param>
         /// <returns>The test name for the specified order code and test code.</returns>
-        static string GetTestNameFromOrderAndTestCode(string orderCode, string testCode,
-            SqlCeConnection dbConnection)
+        static string GetTestNameFromTestCode(string testCode, SqlCeConnection dbConnection)
         {
-            string query = "SELECT [Name] FROM [Test] WHERE [OrderCode] = '" + orderCode
-                + "' AND [Code] = '" + testCode + "'";
+            string query = "SELECT [OfficialName] FROM [LabTest] WHERE [TestCode] = '" + testCode
+                + "'";
 
             using (SqlCeDataAdapter dataAdapter = new SqlCeDataAdapter(query, dbConnection))
             {
@@ -1168,8 +1058,7 @@ namespace Extract.LabResultsCustomComponents
 
                     // Should only be 1 row, so just return the top row
                     ExtractException.Assert("ELI26234", "Could not find test name!",
-                        dt.Rows.Count == 1, "Order Code", orderCode ?? "null",
-                        "Test Code", testCode ?? "null");
+                        dt.Rows.Count == 1, "TestCode", testCode ?? "null");
                     return (string)dt.Rows[0][0];
                 }
             }
@@ -1199,15 +1088,20 @@ namespace Extract.LabResultsCustomComponents
             if (disposing)
             {
                 // Dispose of managed objects
-                if (_order != null)
+                if (_labOrder != null)
                 {
-                    _order.Dispose();
-                    _order = null;
+                    _labOrder.Dispose();
+                    _labOrder = null;
                 }
-                if (_test != null)
+                if (_labOrderTest != null)
                 {
-                    _test.Dispose();
-                    _test = null;
+                    _labOrderTest.Dispose();
+                    _labOrderTest = null;
+                }
+                if (_labTest != null)
+                {
+                    _labTest.Dispose();
+                    _labTest = null;
                 }
                 if (_alternateTestName != null)
                 {
