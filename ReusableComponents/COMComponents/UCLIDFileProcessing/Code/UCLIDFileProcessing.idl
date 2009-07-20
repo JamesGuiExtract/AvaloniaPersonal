@@ -150,9 +150,16 @@ library UCLID_FILEPROCESSINGLib
 		//					sub-levels of progress information.
 		//				bCancelRequested - VARIANT_TRUE if the user has requested cancellation.  Similar to
 		//					the Cancel method (below), it is not required that the FileProcessingTask
-		//					act upon this request. However, if the task needs to honor cancellation
+		//					act upon this request. However, if the task is capable of honoring cancellation
 		//					requests, it should respond to a value of VARIANT_TRUE by not starting processing
-		//					and immediately returning VARIANT_FALSE			
+		//					and immediately returning VARIANT_FALSE
+		//					NOTE: As of 07/20/2009, all non-UI tasks happen to be non-cancellable and all
+		//					UI tasks happen to be cancellable.  As of now, only the UI tasks check the value of
+		//					bCancelRequested.  Since the non-UI tasks are not cancellable (as of now), they
+		//					don't check this flag, and as a result, we get a guarantee (for now) that if all tasks in
+		//					the FPS file are non-cancellable tasks, we get a "run all tasks" or "run no tasks"
+		//					guarantee for a particular SourceDocName, like a database transaction which is either 
+		//					committed or rolled back.
 		// NOTE:		See note about IFileProcessingTask multithreading above
 		[id(12), helpstring("method ProcessFile")] HRESULT ProcessFile([in] BSTR bstrFileFullName, 
 			[in] IFAMTagManager* pFAMTM, [in] IFileProcessingDB *pDB, 
