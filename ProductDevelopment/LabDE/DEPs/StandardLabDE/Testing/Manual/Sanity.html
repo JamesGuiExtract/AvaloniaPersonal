@@ -179,6 +179,14 @@
 		<LI>Stop processing from the <b>red X</b> on the title bar in the Data Entry Application. 
 		Confirm that the active document is closed and that its status returns to <b>Pending</b>.
 <p>
+		<LI><b>Server-side processing</b>
+		<ul>
+			<LI>Make a local copy of the TIF images from Advance Health Set002 and/or Set003.
+			<LI>Process the images using the rules installed with <b>Demo_LabDE</b>.
+			<LI>Confirm that USS and VOA files are created.
+			<LI>Confirm that no unexpected behavior is seen.
+		</ul>
+<p>
 		<LI><b>[DataEntry #187]</b> Right-click in a row header
 		<ul>
 			<LI>For an active image, select an entire row from the test details.
@@ -204,9 +212,10 @@
 			a red background indicating lower OCR confidence.
 			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
 			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> have red backgrounds indicating 
-			lower OCR confidence.
-			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes <b>Carbon Monoxide</b>.
+			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> 
+			have red backgrounds indicating lower OCR confidence.
+			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> 
+			becomes <b>Carbon Monoxide</b>.
 			<ul>
 				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
@@ -335,7 +344,7 @@
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
 			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
-			proper highlights and no tooltips. 
+			proper highlights and all tooltips. 
 		</ul>
 		<LI>Select <b>multiple</b> rows from the test details in the first 
 		<b>Basic Metabolic Panel</b>.
@@ -348,19 +357,21 @@
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
 			<LI>Confirm that selecting the entire rows displays 
-			proper highlights and no tooltips. 
+			proper highlights and all tooltips. 
 		</ul>
 	</ul>
 <p>
 	<LI><h3>Demo_LabDE</h3>
 	<ul>
-		<LI><b>Test Setup</b>
+		<LI><b>Test Setup for first-stage verification</b>
 		<ul>
 			<LI>Delete any existing VOA files.
 			<LI>Queue and process the images using the FAM.  
 			<LI>Confirm that no exceptions are noted.
-			<LI>Prepare to <b>Verify indexed data</b> for some of the images.
-			<LI>Prepare to <b>Manually index</b> some of the images.
+			<LI>Prepare to <b>Verify extracted data</b> for some of the images.
+			<LI>Configure the <b>Verify extracted data</b> task to use 
+			<b>StandardLabDE_AH_Phase1.config</b>.
+<p>
 			<li><b>[DataEntry #296, #417]</b>
 			<ul>
 				<li>As you verify the following documents, confirm via "Show all highlights"
@@ -370,105 +381,193 @@
 				<b>.PlaceholderAttribute__testComponentTable</b> or
 				<b>PlaceholderAttribute__laboratoryTestTable</b> attributes.
 			</ul>
-
 		</ul>
 <p>
 		<LI><b>003.tif</b>
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid.
-			<LI>Confirm that one <b>Physician</b> is present.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
+			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
+			complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
+			<LI>Confirm that one <b>CopyTo: Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
-			<LI>Confirm that one <b>Completed Test</b> is present for 
-			<b>Chemistry - Blood</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that <b>Test</b> data is only present for <b>Creatinine</b>, 
-			<b>eGFR for African Americans</b> and <b>eGFR for Non-African Americans</b>.
+			<LI>Confirm that one <b>Order</b> is present for 
+			<b>CREATININE</b>.
+			<LI>CREATININE
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that order data is present for <b>CREATININE</b>, 
+				<b>GFR AFRICAN AMERICAN</b> and <b>GFR, ESTIMATE</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for each test.
+			</ul>
 		</ul>
 <p>
 		<LI><b>004.tif</b>
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
-			except for <b>Gender</b>.
-			<LI>Confirm that two <b>Physicians</b> are present.
-			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
-			and <b>Lab ID</b>.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>HEMATOLOGY</b> and <b>DIFFERENTIAL (AUTOMATED)</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that <b>HEMATOLOGY</b> test data is present for <b>10</b> tests.
-			<LI>Confirm that <b>DIFFERENTIAL (AUTOMATED)</b> test data is present 
-			for <b>10</b> tests.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
+			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
+			complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
+			<LI>Confirm that <b>Date of Birth</b> is present.
+			<LI><b>[DataEntry #469]</b> Confirm that <b>Gender</b> is missing and 
+			therefore set to <b>U</b>.
+			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
+			<LI>Confirm that two <b>CopyTo: Physicians</b> are present.
+			<LI>Confirm that one <b>Order</b> is present for 
+			<b>CBC</b>.
+			<LI>CBC
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that order data is present for <b>20</b> tests.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for each test.
+			</ul>
 		</ul>
 <p>
 		<LI><b>057.tif</b>
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that the <b>Laboratory</b> data is complete and valid.
-			<LI>Confirm that one <b>Completed Test</b> is present for 
-			<b>Other</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is not present.
-			<LI>Confirm that <b>Test</b> data is only present for <b>GLUCOSE</b> 
-			and <b>HEMOGLOBIN</b>.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
+			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
+			complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
+			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
+			<LI>Confirm that one <b>CopyTo: Physician</b> is present.
+			<LI>Confirm that <b>Orders</b> are present for 
+			<b>GLUCOSE</b> and <b>UnknownOrder</b>.
+			<LI>GLUCOSE
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>GLUCOSE</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>UnknownOrder
+			<ul>
+				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
+				<LI>Confirm that <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>HEMOGLOBIN</b>.
+				<LI>Confirm that the <b>Code</b> column is empty and invalid.
+			</ul>
 		</ul>
 <p>
 		<LI><b>151.tif</b>
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Patient Information</b> data is complete 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
-			<LI>Confirm that two <b>Orders</b> are present for 
-			<b>Basic Metabolic Panel</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for the first <b>Basic Metabolic Panel</b> is present 
-			for <b>9</b> tests.
-			<LI>Confirm that test data for the first <b>Basic Metabolic Panel</b> was not found  
-			for <b>Sodium</b>.
-			<LI>Confirm that test data for the second <b>Basic Metabolic Panel</b> is present 
-			for <b>Calcium</b>.
-<p>
-			<LI>Confirm that a validation icon is present for the 
-			<b>Patient Information - Date of Birth</b> field.
-			<LI>Select the field.
-			<LI>Confirm that the appropriate text is highlighted.
-			<LI>Manually modify the text to be a valid date (i.e. 1/1/2008).
-			<LI>Confirm that the tooltip is still displayed above the original text and 
-			that it is modified with each character typed.
-			<LI>Confirm that the validation icon is present until a valid date is 
-			completely entered.
-			<LI>Swipe a different date from the document.
-			<LI>Confirm that a tooltip is displayed above the swiped text.
-			<LI>Confirm that a validation icon is no longer present.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
+			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
+			complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
+			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
+			<LI>Confirm that one <b>CopyTo: Physician</b> is present.
+			<LI>Confirm that <b>Orders</b> are present for 
+			<b>CALCIUM</b>, <b>CHLORIDE</b>, <b>CREATININE</b>, <b>GLUCOSE</b>, 
+			<b>POTASSIUM</b> and <b>UnknownOrder</b>.
+			<LI>CALCIUM
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>CALCIUM</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>CHLORIDE
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>CHLORIDE</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>CREATININE
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>CREATININE</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>GLUCOSE
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>GLUCOSE</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>POTASSIUM
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>POTASSIUM</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>UnknownOrder
+			<ul>
+				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
+				<LI>Confirm that <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>Carbon Dioxide</b>, 
+				<b>Anion Gap</b>, <b>Blood Urea Nitrogen</b>, <b>Glomerular Filtration Rate</b>, 
+				and <b>BUN/Creat Ratio</b>.
+				<LI>Confirm that the <b>Code</b> column is empty and invalid.
+			</ul>
 		</ul>
 <p>
 		<LI><b>191.tif</b>
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
 			except for <b>Gender</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
@@ -486,7 +585,11 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
 			<LI>Confirm that one <b>Completed Test</b> is present for 
@@ -506,8 +609,12 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
 			except for <b>Gender</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
@@ -530,8 +637,12 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete 
 			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
@@ -551,8 +662,12 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete 
 			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>NT, CLIE</b> physician is incorrect.
 			<LI>Confirm that the <b>Laboratory</b> data is complete and correct.
@@ -576,7 +691,11 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
 			<LI>Confirm that one <b>Completed Test</b> is present for 
@@ -593,8 +712,12 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete 
 			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that the <b>Date of Birth</b> data is present but invalid. 
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
@@ -614,7 +737,11 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Phone</b> 
 			and <b>Lab ID</b>.
@@ -698,7 +825,11 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that two <b>Physicians</b> are present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete except for <b>Lab ID</b>.
 			<LI>Confirm that <b>Orders</b> are present for <b>Glucose, Blood</b>, 
@@ -721,8 +852,12 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
 			<LI>Confirm that the <b>Patient Information</b> data is complete 
 			except for <b>Medical Record #</b>.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
 			<LI>Confirm that one <b>Physician</b> is present.
 			<LI>Confirm that the <b>Laboratory</b> data is complete and correct except 
 			for <b>Lab ID</b>.
@@ -741,21 +876,57 @@
 		<ul>
 			<LI>Open the image.
 			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Patient Information</b> data is complete 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that the <b>Laboratory</b> data is complete and correct except 
-			for <b>Phone</b> and <b>Lab ID</b>.
-			<LI>Confirm that two <b>Orders</b> are present for <b>Other</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for the first <b>Other</b> is present 
-			for <b>TSH</b> and <b>FT4</b> tests.
-			<LI>Confirm that test data for the second <b>Other</b> is present 
-			for <b>TSH</b> and <b>FREE T3</b> tests.
-			<LI>Confirm that all found data is valid.
+			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
+			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
+			complete and valid.
+			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
+			empty and disabled.
+			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
+			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
+			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
+			<LI>Confirm that one <b>CopyTo: Physician</b> is present.  Note that Dr. Raman 
+			may not be present in the Physician database.
+			<LI>Confirm that <b>Orders</b> are present for <b>TSH W/ REFLEX IF ABN</b> 
+			and <b>UnknownOrder</b>.
+			<LI>TSH W/ REFLEX IF ABN
+			<ul>
+				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>TSH</b>.
+				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
+			</ul>
+			<LI>UnknownOrder
+			<ul>
+				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
+				<LI>Confirm that <b>Collection Date</b> and 
+				<b>Collection Time</b> are present.
+				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
+				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
+				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
+				<LI>Confirm that test data is present for <b>FT4</b> and <b>FREE T3</b>.
+				<LI>Confirm that the <b>Code</b> columns are empty and invalid.
+			</ul>
+		</ul>
+<p>
+		<LI><b>Test Setup for second-stage verification</b>
+		<ul>
+			<LI>Prepare to <b>Verify extracted data</b> for the images.
+			<LI>Configure the <b>Verify extracted data</b> task to use 
+			<b>StandardLabDE.config</b>.
+		</ul>
+<p>
+		<LI><b>Second-stage verification</b>
+		<ul>
+			<LI>Process the images using the FAM.  
+			<LI>Confirm that <b>Patient Information - From EpicCare</b>, <b>Medical 
+			Record #</b> and <b>Order Number</b> fields are enabled and required for each file.
+			<LI>Fill in these fields and save results for each file.
+			<LI>Confirm that no exceptions are noted.
+			<LI>Confirm that output files are created in the 
+			<b>.\Demo_LabDE\Outbound XML Messages</b> folder.
 		</ul>
 	</ul>
 <p>
