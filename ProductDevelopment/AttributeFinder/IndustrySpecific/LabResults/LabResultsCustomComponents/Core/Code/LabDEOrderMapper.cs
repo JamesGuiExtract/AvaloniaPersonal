@@ -806,19 +806,19 @@ namespace Extract.LabResultsCustomComponents
 
                 // Attempt to match all mandatory tests
                 string orderCode = (string)orderRow["Code"];
-                DataRow[] tests = _labOrderTest.Select("OrderCode = '" + orderCode + "'"
-                    + "AND Mandatory = 1");
+                DataRow[] tests = _labOrderTest.Select("OrderCode = '" + orderCode
+                    + "' AND Mandatory = 1");
                 bool allMandatoryMatch = true;
                 foreach (DataRow test in tests)
                 {
                     // Get the test code and test name
                     string testCode = (string)test["TestCode"];
-                    DataRow temp = _labTest.Select("TestCode = '" + testCode)[0];
+                    DataRow temp = _labTest.Select("TestCode = '" + testCode + "'")[0];
                     string testName = (string)temp["OfficialName"];
 
                     // Get the alternate test names for this test
-                    DataRow[] alternateName = _alternateTestName.Select("TestCode = "
-                        + testCode);
+                    DataRow[] alternateName = _alternateTestName.Select("TestCode = '"
+                        + testCode + "'");
 
                     // Check for test match (default to false)
                     bool testMatched = false;
@@ -886,17 +886,17 @@ namespace Extract.LabResultsCustomComponents
                 if (allMandatoryMatch)
                 {
                     // Now look for additional matching test
-                    DataRow[] nonMandatory = _labOrderTest.Select("OrderCode = '" + orderCode + "'"
-                        + "AND Mandatory = 0");
+                    DataRow[] nonMandatory = _labOrderTest.Select("OrderCode = '" + orderCode
+                        + "' AND Mandatory = 0");
                     foreach (DataRow test in nonMandatory)
                     {
-                        string testCode = (string)test["Code"];
-                        DataRow temp = _labTest.Select("TestCode = '" + testCode)[0];
+                        string testCode = (string)test["TestCode"];
+                        DataRow temp = _labTest.Select("TestCode = '" + testCode + "'")[0];
                         string testName = (string)temp["OfficialName"];
 
                         // Get the alternate test names for this test
-                        DataRow[] alternateName = _alternateTestName.Select("TestCode = "
-                            + testCode);
+                        DataRow[] alternateName = _alternateTestName.Select("TestCode = '"
+                            + testCode + "'");
 
                         // See if this test matches one of the unmatched tests
                         foreach (LabTest labTest in unmatchedCopy)
@@ -1040,7 +1040,6 @@ namespace Extract.LabResultsCustomComponents
         /// <summary>
         /// Gets the test name from the database based on the specified order code and test code.
         /// </summary>
-        /// <param name="orderCode">The order code to search on.</param>
         /// <param name="testCode">The test code to search on.</param>
         /// <param name="dbConnection">The database connection to use.</param>
         /// <returns>The test name for the specified order code and test code.</returns>
