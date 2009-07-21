@@ -878,7 +878,7 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI26150", ex);
                 if (dbCommand != null)
                 {
-                    ee.AddDebugData("Query", dbCommand.CommandText ?? "", false);
+                    ee.AddDebugData("Query", dbCommand.CommandText, false);
                 }
                 throw ee;
             }

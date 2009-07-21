@@ -567,7 +567,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                 if (!_standAloneMode)
                 {
-                    // If running in FAM mode, when a document is not loaded, indicated that the UI is
+                    // If running in FAM mode, when a document is not loaded, indicate that the UI is
                     // waiting for the next document.
                     _exitToolStripMenuItem.Enabled = false;
                 }
