@@ -297,6 +297,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="bstrFileFullName">A <see langword="string"/> that specifies the file being
         /// processed.</param>
+        /// <param name="nFileID">The ID of the file being processed.</param>
+        /// <param name="nActionID">The ID of the action being processed.</param>
         /// <param name="pFAMTM">The <see cref="FAMTagManager"/> to use if needed.</param>
         /// <param name="pDB">The <see cref="FileProcessingDB"/> in use.</param>
         /// <param name="pProgressStatus">A <see cref="ProgressStatus"/> object to update progress
@@ -308,8 +310,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see langword="false"/> if processing of the document was cancelled by the user.
         /// </returns>
         [CLSCompliant(false)]
-        public bool ProcessFile(string bstrFileFullName, FAMTagManager pFAMTM, FileProcessingDB pDB,
-            ProgressStatus pProgressStatus, bool bCancelRequested)
+        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID, int nActionID,
+            FAMTagManager pFAMTM, FileProcessingDB pDB, ProgressStatus pProgressStatus, bool bCancelRequested)
         {
             try
             {
@@ -320,7 +322,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     _dataEntryFormManager.ShowDocument(bstrFileFullName);
                 }
 
-                return (!bCancelRequested && !_dataEntryFormManager.Canceled);
+                return (bCancelRequested || _dataEntryFormManager.Canceled) ?
+                    EFileProcessingResult.kProcessingCancelled : EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
             {

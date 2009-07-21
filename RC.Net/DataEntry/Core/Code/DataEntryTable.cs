@@ -405,26 +405,33 @@ namespace Extract.DataEntry
 
             set
             {
-                if (value != base.ParentDataEntryControl)
+                try
                 {
-                    // Unregister the last parent control from any drag and drop events.
-                    if (base.AllowDrop && base.ParentDataEntryControl != null)
+                    if (value != base.ParentDataEntryControl)
                     {
-                        base.ParentDataEntryControl.QueryDraggedDataSupported -=
-                            HandleQueryDraggedDataSupported;
-                        ((Control)base.ParentDataEntryControl).DragDrop -= HandleParentDragDrop;
+                        // Unregister the last parent control from any drag and drop events.
+                        if (base.AllowDrop && base.ParentDataEntryControl != null)
+                        {
+                            base.ParentDataEntryControl.QueryDraggedDataSupported -=
+                                HandleQueryDraggedDataSupported;
+                            ((Control)base.ParentDataEntryControl).DragDrop -= HandleParentDragDrop;
+                        }
+
+                        // Register the new parent control for any drag and drop events if AllowDrop is
+                        // true.
+                        if (base.AllowDrop && value != null)
+                        {
+                            value.QueryDraggedDataSupported += HandleQueryDraggedDataSupported;
+                            ((Control)value).DragDrop += HandleParentDragDrop;
+                        }
                     }
 
-                    // Register the new parent control for any drag and drop events if AllowDrop is
-                    // true.
-                    if (base.AllowDrop && value != null)
-                    {
-                        value.QueryDraggedDataSupported += HandleQueryDraggedDataSupported;
-                        ((Control)value).DragDrop += HandleParentDragDrop;
-                    }
+                    base.ParentDataEntryControl = value;
                 }
-
-                base.ParentDataEntryControl = value;
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26784", ex);
+                }
             }
         }
 
