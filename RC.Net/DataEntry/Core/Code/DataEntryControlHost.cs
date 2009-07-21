@@ -216,7 +216,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The default font size to be used for tooltips.
         /// </summary>
-        private const float _TOOLTIP_FONT_SIZE = 15F;
+        private const float _TOOLTIP_FONT_SIZE = 13F;
 
         /// <summary>
         /// The font family used to display data.

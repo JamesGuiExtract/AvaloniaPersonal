@@ -4,6 +4,7 @@ using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Data.SqlServerCe;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -56,6 +57,11 @@ namespace Extract.DataEntry
     public static class DataEntryMethods
     {
         #region Constants
+
+        /// <summary>
+        /// The name of the object to be used in the validate license calls.
+        /// </summary>
+        private static readonly string _OBJECT_NAME = typeof(DataEntryMethods).ToString();
 
         /// <summary>
         /// [DataEntry:273]
@@ -695,70 +701,120 @@ namespace Extract.DataEntry
             }
         }
 
+        // TODO: Create CreateDBCommand overrides for all database types to be supported.
+
         /// <summary>
-        /// Executes an SQL query against the specified compact SQL connection and returns the
+        /// Generates a <see cref="DbCommand"/> based on the specified query, parameters and database
+        /// connection.
+        /// </summary>
+        /// <param name="sqlCEConnection">The <see cref="SqlCeConnection"/> for which the command is
+        /// to apply.</param>
+        /// <param name="query">The <see cref="DbCommand"/>'s <see cref="DbCommand.CommandText"/>
+        /// value.</param>
+        /// <param name="parameters">A <see cref="Dictionary{T, T}"/> of parameter names and values
+        /// that need to be parameterized for the command if specified, <see langword="null"/> if
+        /// parameters are not being used. Note that if parameters are being used, the parameter
+        /// names must have already been inserted into <see paramref="query"/>.</param>
+        /// <returns>The generated <see cref="DbCommand"/>.</returns>
+        public static DbCommand CreateDBCommand(SqlCeConnection sqlCEConnection, string query,
+            Dictionary<string, string> parameters)
+        {
+            try
+            {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26727",
+                    _OBJECT_NAME);
+
+                ExtractException.Assert("ELI26731", "Null argument exception!",
+                    sqlCEConnection != null);
+                ExtractException.Assert("ELI26732", "Null argument exception!",
+                    !string.IsNullOrEmpty(query));
+
+                SqlCeCommand sqlCeCommand = new SqlCeCommand(query, sqlCEConnection);
+
+                // If parameters are being used, specify them.
+                if (parameters != null)
+                {
+                    foreach (KeyValuePair<string, string> parameter in parameters)
+                    {
+                        sqlCeCommand.Parameters.AddWithValue(parameter.Key, parameter.Value);
+                    }
+                }
+
+                return sqlCeCommand;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26730", ex);
+                ee.AddDebugData("Query", query, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Executes a query against the specified database connection and returns the
         /// result as a string.
         /// </summary>
-        /// <param name="dbConnection">The database connection to be queried.</param>
-        /// <param name="query">The query to be applied.</param>
+        /// <param name="dbCommand">The <see cref="DbCommand"/> defining the query to be applied.
+        /// </param>
         /// <param name="rowSeparator">The string used to separate multiple row results. (Will not
         /// be included in any result of less than 2 rows).  If <see langword="null"/>, no result
         /// will be returned unless there is exactly 1 matching row.</param>
         /// <param name="columnSeparator">The string used to separate multiple column results.
         /// (Will not be included in any result with less than 2 columns)</param>
-        public static string ExecuteSqlQuery(DbConnection dbConnection, string query,
-            string rowSeparator, string columnSeparator)
+        public static string ExecuteDBQuery(DbCommand dbCommand, string rowSeparator,
+            string columnSeparator)
         {
             try
             {
-                ExtractException.Assert("ELI26151", "Null argument exception!", dbConnection != null);
-                ExtractException.Assert("ELI26152", "Null argument exception!",
-                    !string.IsNullOrEmpty(query));
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26758",
+                    _OBJECT_NAME);
 
-                using (DbCommand sqlQuery = dbConnection.CreateCommand())
+                ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
+
+                using (DbDataReader sqlReader = dbCommand.ExecuteReader())
                 {
-                    sqlQuery.CommandText = query;
+                    StringBuilder result = new StringBuilder();
 
-                    using (DbDataReader sqlReader = sqlQuery.ExecuteReader())
+                    // Loop throw each row of the results.
+                    while (sqlReader.Read())
                     {
-                        StringBuilder result = new StringBuilder();
-
-                        // Loop throw each row of the results.
-                        while (sqlReader.Read())
+                        // If not the first row result, append the row separator
+                        if (result.Length > 0)
                         {
-                            // If not the first row result, append the row separator
-                            if (result.Length > 0)
+                            // If more than one row was found, do not return any value if
+                            // rowSeparator is null.
+                            if (rowSeparator == null)
                             {
-                                // If more than one row was found, do not return any value if
-                                // rowSeparator is null.
-                                if (rowSeparator == null)
-                                {
-                                    return "";
-                                }
-
-                                result.Append(rowSeparator);
+                                return "";
                             }
 
-                            for (int i = 0; i < sqlReader.FieldCount; i++)
-                            {
-                                // If not the first column result, append the column separator
-                                if (i > 0)
-                                {
-                                    result.Append(columnSeparator);
-                                }
-
-                                result.Append(sqlReader.GetString(i));
-                            }
+                            result.Append(rowSeparator);
                         }
 
-                        return result.ToString();
+                        for (int i = 0; i < sqlReader.FieldCount; i++)
+                        {
+                            // If not the first column result, append the column separator
+                            if (i > 0)
+                            {
+                                result.Append(columnSeparator);
+                            }
+
+                            result.Append(sqlReader.GetString(i));
+                        }
                     }
+
+                    return result.ToString();
                 }
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26150", ex);
-                ee.AddDebugData("Query", query, false);
+                if (dbCommand != null)
+                {
+                    ee.AddDebugData("Query", dbCommand.CommandText ?? "", false);
+                }
                 throw ee;
             }
         }

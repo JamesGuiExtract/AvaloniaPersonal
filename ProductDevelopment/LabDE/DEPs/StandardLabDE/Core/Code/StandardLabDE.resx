@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE SUBSTRING('{'../Address/Address1}',1,10) + '%' AND City LIKE SUBSTRING('{'../Address/City}',1,5) + '%' AND Zip LIKE SUBSTRING('{'../Address/ZipCode}',1,5) + '%'&lt;/SQL&gt;</value>
+    <value>&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE SUBSTRING(&lt;Attribute&gt;../Address/Address1&lt;/Attribute&gt;,1,10) + '%' AND City LIKE SUBSTRING(&lt;Attribute&gt;../Address/City&lt;/Attribute&gt;,1,5) + '%' AND Zip LIKE SUBSTRING(&lt;Attribute&gt;../Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;</value>
   </data>
   <metadata name="_testName.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -132,9 +132,22 @@
   <metadata name="_componentName.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_componentName.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; AND LabTest.TestCode = &lt;Attribute&gt;TestCode&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest, AlternateTestName, LabOrderTest WHERE LabTest.TestCode = AlternateTestName.TestCode AND LabTest.TestCode = LabOrderTest.TestCode AND LabOrderTest.OrderCode = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; AND AlternateTestName.Name = &lt;Attribute&gt;.&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;</value>
+  </data>
+  <data name="_componentName.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT LabTest.OfficialName FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = &lt;Attribute&gt;../OrderCode&lt;/Attribute&gt; ORDER BY LabTest.OfficialName&lt;/SQL&gt;</value>
+  </data>
   <metadata name="_testCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_testCode.AutoUpdateQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = &lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt; AND OfficialName = &lt;Attribute&gt;..&lt;/Attribute&gt;&lt;/SQL&gt;</value>
+  </data>
+  <data name="_testCode.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT LabTest.TestCode FROM LabTest INNER JOIN LabOrderTest On LabTest.TestCode = LabOrderTest.TestCode WHERE LabOrderTest.OrderCode = &lt;Attribute&gt;../../OrderCode&lt;/Attribute&gt; ORDER BY LabTest.TestCode&lt;/SQL&gt;</value>
+  </data>
   <metadata name="_componentValue.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -180,6 +193,9 @@
   <metadata name="_orderingPhysicianCodeColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_orderingPhysicianCodeColumn.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;, 1, 20) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;, 1, 20) + '%' ORDER BY Code&lt;/SQL&gt;</value>
+  </data>
   <metadata name="_physicianFirstNameColumn.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
@@ -189,4 +205,7 @@
   <metadata name="_physicianCode.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
   </metadata>
+  <data name="_physicianCode.ValidationQuery" xml:space="preserve">
+    <value>&lt;SQL&gt;SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(&lt;Attribute&gt;../Last&lt;/Attribute&gt;, 1, 20) + '%' AND FirstName LIKE SUBSTRING(&lt;Attribute&gt;../First&lt;/Attribute&gt;, 1, 20) + '%' ORDER BY Code&lt;/SQL&gt;</value>
+  </data>
 </root>

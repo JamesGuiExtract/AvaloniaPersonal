@@ -441,6 +441,7 @@ namespace Extract.DataEntry
         /// <returns>A query which will cause value to automatically be updated using values
         /// from other <see cref="IAttribute"/>'s and/or a database query.</returns>
         [Category("Data Entry Text Box")]
+        [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
         public string AutoUpdateQuery
         {
             get

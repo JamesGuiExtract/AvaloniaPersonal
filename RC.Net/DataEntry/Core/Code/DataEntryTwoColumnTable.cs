@@ -676,6 +676,8 @@ namespace Extract.DataEntry
                     // If no data is being assigned, clear the existing attribute mappings and do not
                     // attempt to map a new attribute.
                     base.ClearAttributeMappings();
+
+                    _attribute = null;
                 }
                 else
                 {

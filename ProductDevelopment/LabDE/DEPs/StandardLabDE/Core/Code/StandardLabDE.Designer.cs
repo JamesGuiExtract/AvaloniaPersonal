@@ -199,7 +199,8 @@ namespace Extract.LabDE.StandardLabDE
             // _testName
             // 
             this._testName.AttributeName = "Name";
-            this._testName.AutoUpdateQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode = \'{\'../EpicOrderCode}\'</SQL>";
+            this._testName.AutoUpdateQuery = "<SQL>SELECT Name FROM LabOrder WHERE EpicCode = <Attribute>../EpicCode</Attribute" +
+                "></SQL>";
             this._testName.FormattingRuleFile = null;
             this._testName.HeaderText = "Order Name";
             this._testName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
@@ -215,7 +216,7 @@ namespace Extract.LabDE.StandardLabDE
             // _orderCode
             // 
             this._orderCode.AttributeName = "OrderCode";
-            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
+            this._orderCode.AutoUpdateQuery = "<SQL>SELECT Code FROM LabOrder WHERE Name = <Attribute>../Name</Attribute></SQL>";
             this._orderCode.FillWeight = 1F;
             this._orderCode.FormattingRuleFile = null;
             this._orderCode.HeaderText = "Order Code";
@@ -234,8 +235,9 @@ namespace Extract.LabDE.StandardLabDE
             // 
             // _testID
             // 
-            this._testID.AttributeName = "EpicOrderCode";
-            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = \'{\'../Name}\'</SQL>";
+            this._testID.AttributeName = "EpicCode";
+            this._testID.AutoUpdateQuery = "<SQL>SELECT EpicCode FROM LabOrder WHERE Name = <Attribute>../Name</Attribute></S" +
+                "QL>";
             this._testID.FillWeight = 1F;
             this._testID.FormattingRuleFile = null;
             this._testID.HeaderText = "Epic Code";
@@ -301,8 +303,8 @@ namespace Extract.LabDE.StandardLabDE
             this._labID.AttributeName = "LabCode";
             this._labID.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._labID.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._labID.AutoUpdateQuery = "<SQL>SELECT LabCode FROM LabAddresses WHERE LabName = \'{\'../LabIdentifier}\'</SQL>" +
-                "";
+            this._labID.AutoUpdateQuery = "<SQL>SELECT LabCode FROM LabAddresses WHERE LabName = <Attribute>../LabIdentifier" +
+                "</Attribute></SQL>";
             this._labID.Disabled = false;
             this._labID.FormattingRuleFile = null;
             this._labID.Location = new System.Drawing.Point(457, 70);
@@ -334,7 +336,9 @@ namespace Extract.LabDE.StandardLabDE
             this._labAddress.ParentDataEntryControl = this._labInfoPassThrough;
             this._labAddress.RowHeadersWidth = 86;
             dataEntryTableRow1.AttributeName = "Address1";
-            dataEntryTableRow1.AutoUpdateQuery = "<SQL>SELECT Address1 FROM LabAddresses WHERE LabCode = \'{../../LabCode}\'</SQL>";
+            dataEntryTableRow1.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../../LabInfo/Address/Address1</Attribute></Q" +
+                "uery>\r\n<Query><SQL>SELECT Address1 FROM LabAddresses WHERE LabCode = <Attribute>" +
+                "../../LabCode</Attribute></SQL></Query>";
             dataEntryTableRow1.FormattingRuleFile = null;
             dataEntryTableRow1.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow1.Name = "Street";
@@ -346,7 +350,9 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow1.ValidationPattern = null;
             dataEntryTableRow1.ValidationQuery = null;
             dataEntryTableRow2.AttributeName = "City";
-            dataEntryTableRow2.AutoUpdateQuery = "<SQL>SELECT City FROM LabAddresses WHERE LabCode = \'{../../LabCode}\'</SQL>";
+            dataEntryTableRow2.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../../LabInfo/Address/City</Attribute></Query" +
+                ">\r\n<Query><SQL>SELECT City FROM LabAddresses WHERE LabCode = <Attribute>../../La" +
+                "bCode</Attribute></SQL></Query>";
             dataEntryTableRow2.FormattingRuleFile = null;
             dataEntryTableRow2.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow2.Name = "City";
@@ -358,7 +364,9 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow2.ValidationPattern = null;
             dataEntryTableRow2.ValidationQuery = null;
             dataEntryTableRow3.AttributeName = "State";
-            dataEntryTableRow3.AutoUpdateQuery = "<SQL>SELECT State FROM LabAddresses WHERE LabCode = \'{../../LabCode}\'</SQL>";
+            dataEntryTableRow3.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../../LabInfo/Address/State</Attribute></Quer" +
+                "y>\r\n<Query><SQL>SELECT State FROM LabAddresses WHERE LabCode = <Attribute>../../" +
+                "LabCode</Attribute></SQL></Query>";
             dataEntryTableRow3.FormattingRuleFile = null;
             dataEntryTableRow3.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow3.Name = "State";
@@ -370,7 +378,9 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow3.ValidationPattern = null;
             dataEntryTableRow3.ValidationQuery = null;
             dataEntryTableRow4.AttributeName = "ZipCode";
-            dataEntryTableRow4.AutoUpdateQuery = "<SQL>SELECT Zip FROM LabAddresses WHERE LabCode = \'{../../LabCode}\'</SQL>";
+            dataEntryTableRow4.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../../LabInfo/Address/ZipCode</Attribute></Qu" +
+                "ery>\r\n<Query><SQL>SELECT Zip FROM LabAddresses WHERE LabCode = <Attribute>../../" +
+                "LabCode</Attribute></SQL></Query>";
             dataEntryTableRow4.FormattingRuleFile = null;
             dataEntryTableRow4.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow4.Name = "Zip";
@@ -427,8 +437,7 @@ namespace Extract.LabDE.StandardLabDE
             // _componentName
             // 
             this._componentName.AttributeName = ".";
-            this._componentName.AutoUpdateQuery = "<SQL>SELECT Test.Name FROM Test WHERE Test.Code = \'{\'TestCode}\' AND Test.OrderCod" +
-                "e = \'{\'../OrderCode}\'</SQL>";
+            this._componentName.AutoUpdateQuery = resources.GetString("_componentName.AutoUpdateQuery");
             this._componentName.FormattingRuleFile = null;
             this._componentName.HeaderText = "Test Name";
             this._componentName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
@@ -439,14 +448,12 @@ namespace Extract.LabDE.StandardLabDE
             this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
             this._componentName.ValidationListFileName = null;
             this._componentName.ValidationPattern = null;
-            this._componentName.ValidationQuery = "<SQL>SELECT Test.Name FROM Test WHERE Test.OrderCode = \'{\'../OrderCode}\' ORDER BY" +
-                " Test.Name</SQL>";
+            this._componentName.ValidationQuery = resources.GetString("_componentName.ValidationQuery");
             // 
             // _testCode
             // 
             this._testCode.AttributeName = "TestCode";
-            this._testCode.AutoUpdateQuery = "<SQL>SELECT Test.Code FROM Test WHERE Test.Name = \'{\'..}\' AND Test.OrderCode = \'{" +
-                "\'../../OrderCode}\'</SQL>";
+            this._testCode.AutoUpdateQuery = resources.GetString("_testCode.AutoUpdateQuery");
             this._testCode.FillWeight = 40F;
             this._testCode.FormattingRuleFile = null;
             this._testCode.HeaderText = "Code";
@@ -459,8 +466,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
             this._testCode.ValidationListFileName = null;
             this._testCode.ValidationPattern = null;
-            this._testCode.ValidationQuery = "<SQL>SELECT Test.Code FROM Test WHERE Test.OrderCode = \'{\'../../OrderCode}\' ORDER" +
-                " BY Test.Code</SQL>";
+            this._testCode.ValidationQuery = resources.GetString("_testCode.ValidationQuery");
             // 
             // _componentValue
             // 
@@ -973,7 +979,8 @@ namespace Extract.LabDE.StandardLabDE
             // _orderingPhysicianFirstNameColumn
             // 
             this._orderingPhysicianFirstNameColumn.AttributeName = "First";
-            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._orderingPhysicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
+                "/SQL>";
             this._orderingPhysicianFirstNameColumn.FillWeight = 75F;
             this._orderingPhysicianFirstNameColumn.FormattingRuleFile = null;
             this._orderingPhysicianFirstNameColumn.HeaderText = "First Name";
@@ -992,7 +999,8 @@ namespace Extract.LabDE.StandardLabDE
             // _orderingPhysicianLastNameColumn
             // 
             this._orderingPhysicianLastNameColumn.AttributeName = "Last";
-            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._orderingPhysicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT LastName FROM Physician WHERE Code = <Attribute>../Code</Attribute></" +
+                "SQL>";
             this._orderingPhysicianLastNameColumn.FormattingRuleFile = null;
             this._orderingPhysicianLastNameColumn.HeaderText = "Last Name";
             this._orderingPhysicianLastNameColumn.MinimumWidth = 75;
@@ -1004,14 +1012,15 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
             this._orderingPhysicianLastNameColumn.ValidationListFileName = null;
             this._orderingPhysicianLastNameColumn.ValidationPattern = null;
-            this._orderingPhysicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE \'{\'../First}\' O" +
-                "RDER BY LastName</SQL>";
+            this._orderingPhysicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE <Attribute>../F" +
+                "irst</Attribute> ORDER BY LastName</SQL>";
             // 
             // _orderingPhysicianCodeColumn
             // 
             this._orderingPhysicianCodeColumn.AttributeName = "Code";
-            this._orderingPhysicianCodeColumn.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
+            this._orderingPhysicianCodeColumn.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../Last<" +
+                "/Attribute>, 1, 20) + \'%\' AND FirstName LIKE SUBSTRING(<Attribute>../First</Attr" +
+                "ibute>, 1, 20) + \'%\'</SQL>";
             this._orderingPhysicianCodeColumn.FillWeight = 1F;
             this._orderingPhysicianCodeColumn.FormattingRuleFile = null;
             this._orderingPhysicianCodeColumn.HeaderText = "Code";
@@ -1025,9 +1034,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
             this._orderingPhysicianCodeColumn.ValidationListFileName = null;
             this._orderingPhysicianCodeColumn.ValidationPattern = null;
-            this._orderingPhysicianCodeColumn.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
-                "SQL>";
+            this._orderingPhysicianCodeColumn.ValidationQuery = resources.GetString("_orderingPhysicianCodeColumn.ValidationQuery");
             // 
             // _physicianTable
             // 
@@ -1060,7 +1067,8 @@ namespace Extract.LabDE.StandardLabDE
             // _physicianFirstNameColumn
             // 
             this._physicianFirstNameColumn.AttributeName = "First";
-            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
+                "/SQL>";
             this._physicianFirstNameColumn.FillWeight = 75F;
             this._physicianFirstNameColumn.FormattingRuleFile = null;
             this._physicianFirstNameColumn.HeaderText = "First Name";
@@ -1079,7 +1087,8 @@ namespace Extract.LabDE.StandardLabDE
             // _physicianLastNameColumn
             // 
             this._physicianLastNameColumn.AttributeName = "Last";
-            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = \'{\'../Code}\'</SQL>";
+            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
+                "/SQL>";
             this._physicianLastNameColumn.FormattingRuleFile = null;
             this._physicianLastNameColumn.HeaderText = "Last Name";
             this._physicianLastNameColumn.MinimumWidth = 75;
@@ -1091,14 +1100,15 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianLastNameColumn.ValidationErrorMessage = "";
             this._physicianLastNameColumn.ValidationListFileName = null;
             this._physicianLastNameColumn.ValidationPattern = null;
-            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE \'{\'../First}\' O" +
-                "RDER BY LastName</SQL>";
+            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE <Attribute>../F" +
+                "irst</Attribute> ORDER BY LastName</SQL>";
             // 
             // _physicianCode
             // 
             this._physicianCode.AttributeName = "Code";
-            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\'</SQL>";
+            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../Last<" +
+                "/Attribute>, 1, 20) + \'%\' AND FirstName LIKE SUBSTRING(<Attribute>../First</Attr" +
+                "ibute>, 1, 20) + \'%\'</SQL>";
             this._physicianCode.FillWeight = 1F;
             this._physicianCode.FormattingRuleFile = null;
             this._physicianCode.HeaderText = "Code";
@@ -1112,9 +1122,7 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
             this._physicianCode.ValidationListFileName = null;
             this._physicianCode.ValidationPattern = null;
-            this._physicianCode.ValidationQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(\'{\'../Last}\', 1, 20" +
-                ") + \'%\' AND FirstName LIKE SUBSTRING(\'{\'../First}\', 1, 20) + \'%\' ORDER BY Code</" +
-                "SQL>";
+            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
             // 
             // _testDetailsGroupBox
             // 
@@ -1225,7 +1233,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testResultTime.AttributeName = "ResultTime";
             this._testResultTime.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._testResultTime.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._testResultTime.AutoUpdateQuery = null;
+            this._testResultTime.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../ResultTime</Attribute></Query>";
             this._testResultTime.Disabled = false;
             this._testResultTime.FormattingRuleFile = "Rules\\Swiping\\ResultTime.rsd.etf";
             this._testResultTime.Location = new System.Drawing.Point(421, 32);
@@ -1258,7 +1266,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testResultDate.AttributeName = "ResultDate";
             this._testResultDate.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._testResultDate.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._testResultDate.AutoUpdateQuery = null;
+            this._testResultDate.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../ResultDate</Attribute></Query>";
             this._testResultDate.Disabled = false;
             this._testResultDate.FormattingRuleFile = "Rules\\Swiping\\ResultDate.rsd.etf";
             this._testResultDate.Location = new System.Drawing.Point(227, 32);
@@ -1418,6 +1426,11 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _physicianFirstNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _physicianLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _physicianCode;
+        private Extract.DataEntry.DataEntryTableColumn _testName;
+        private Extract.DataEntry.DataEntryTableColumn _orderCode;
+        private Extract.DataEntry.DataEntryTableColumn _testID;
+        private Extract.DataEntry.DataEntryTableColumn _componentDate;
+        private Extract.DataEntry.DataEntryTableColumn _laboratoryTestTime;
         private Extract.DataEntry.DataEntryTableColumn _componentName;
         private Extract.DataEntry.DataEntryTableColumn _testCode;
         private Extract.DataEntry.DataEntryTableColumn _componentValue;
@@ -1425,10 +1438,5 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _componentRefRange;
         private Extract.DataEntry.DataEntryTableColumn _componentFlag;
         private Extract.DataEntry.DataEntryTableColumn _componentComment;
-        private Extract.DataEntry.DataEntryTableColumn _testName;
-        private Extract.DataEntry.DataEntryTableColumn _orderCode;
-        private Extract.DataEntry.DataEntryTableColumn _testID;
-        private Extract.DataEntry.DataEntryTableColumn _componentDate;
-        private Extract.DataEntry.DataEntryTableColumn _laboratoryTestTime;
     }
 }

@@ -11,6 +11,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -48,6 +49,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The number of pixels to pad around the DEP that is loaded.
         /// </summary>
         static readonly int _DATA_ENTRY_PANEL_PADDING = 3;
+
+        /// <summary>
+        /// The value associated with a window's system command message.
+        /// </summary>
+        const int _WM_SYSCOMMAND = 0x112;
+
+        /// <summary>
+        /// The value associated with a window's close system command message.
+        /// </summary>
+        static readonly IntPtr _SC_CLOSE = (IntPtr)0xF060;
 
         #endregion Constants
 
@@ -330,6 +341,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _exitToolStripMenuItem.Text = _standAloneMode ? "Exit" : "Stop Processing";
+
+                        _imageViewer.DefaultStatusMessage =
+                            _standAloneMode ? "" : "Waiting for next document...";
                     }
                 }
                 catch (Exception ex)
@@ -551,6 +565,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     this.WindowState = FormWindowState.Maximized;
                 }
 
+                if (!_standAloneMode)
+                {
+                    // If running in FAM mode, when a document is not loaded, indicated that the UI is
+                    // waiting for the next document.
+                    _exitToolStripMenuItem.Enabled = false;
+                }
+
                 _isLoaded = true;
             }
             catch (Exception ex)
@@ -654,6 +675,37 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 ExtractException.Display("ELI24060", ex);
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Processes windows messages.
+        /// </summary>
+        /// <param name="m">The Windows <see cref="Message"/> to process.</param>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        protected override void WndProc(ref Message m)
+        {
+            try
+            {
+                // If a document is not loaded, the DataEntryApplicationForm has no way of informing
+                // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
+                // when a document is not loaded.
+                if (!_standAloneMode && !_imageViewer.IsImageAvailable && 
+                    m.Msg == _WM_SYSCOMMAND && m.WParam == _SC_CLOSE)
+                {
+                    MessageBox.Show(this, "If you are intending to stop processing, " +
+                        "press the stop button in the File Action Manager.",
+                        ConfigSettings.AppSettings.ApplicationTitle, MessageBoxButtons.OK,
+                        MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
+
+                    return;
+                }
+
+                base.WndProc(ref m);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI26764", ex);
             }
         }
 
@@ -765,6 +817,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
+
+                // If a document is not loaded, the DataEntryApplicationForm has no way of informing
+                // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
+                // when a document is not loaded.
+                _exitToolStripMenuItem.Enabled = (_standAloneMode || _imageViewer.IsImageAvailable);
 
                 if (!_imageViewer.IsImageAvailable)
                 {
@@ -1130,6 +1187,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // document in that case.
             if (dataSaved)
             {
+                // If running in FAM mode, close the document until the next one is loaded so it is
+                // clear that the last document has been committed.
+                if (!_standAloneMode)
+                {
+                    _imageViewer.CloseImage();
+                }
+
                 OnFileComplete(new FileCompleteEventArgs(closing));
             }
 
