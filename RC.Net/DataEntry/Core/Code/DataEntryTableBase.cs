@@ -1117,6 +1117,11 @@ namespace Extract.DataEntry
                 _dragOverInProgress = false;
 
                 base.OnDragDrop(drgevent);
+
+                // [DataEntry:490-492]
+                // Update attribute selection to redisplay the tooltip and to make the DEP aware of
+                // the new selection.
+                ProcessSelectionChange();
             }
             catch (Exception ex)
             {

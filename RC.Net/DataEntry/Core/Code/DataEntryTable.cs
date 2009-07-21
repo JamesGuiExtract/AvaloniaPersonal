@@ -574,7 +574,9 @@ namespace Extract.DataEntry
                 // Notify listeners that the spatial info to be associated with the table has
                 // changed (include all subattributes to the row(s)'s attribute(s) in the 
                 // spatial info).
-                OnAttributesSelected(selectedAttributes, true, selectedAttributes.Size() == 1);
+                // [DataEntry:491] Don't show tooltips during a drag & drop.
+                OnAttributesSelected(selectedAttributes, true,  selectedAttributes.Size() == 1 &&
+                    !base.DragOverInProgress);
             }
             else if (base.SelectedCells.Count > 0)
             {
@@ -622,7 +624,9 @@ namespace Extract.DataEntry
                 // Include all the attributes for the specifically selected cells in the 
                 // spatial info, not any children of those attributes. Show tooltips only
                 // if one attribute is selected.
-                OnAttributesSelected(selectedAttributes, false, selectedRowAttributes.Size() == 1);
+                // [DataEntry:491] Don't show tooltips during a drag & drop.
+                OnAttributesSelected(selectedAttributes, false, selectedRowAttributes.Size() == 1 &&
+                    !base.DragOverInProgress);
             }
             else
             {
@@ -1002,7 +1006,7 @@ namespace Extract.DataEntry
                     // When dropping data into a compatible table control that allows rows to be
                     // added, insert it before the selected row, not over top of it.
                     if (base.AllowUserToAddRows)
-                    { 
+                    {
                         InsertNewRow();
                     }
 
@@ -1795,6 +1799,11 @@ namespace Extract.DataEntry
                 {
                     RemoveDraggedRows();
                 }
+
+                // [DataEntry:490-492]
+                // Update attribute selection to redisplay the tooltip and to make the DEP aware of
+                // the new selection.
+                ProcessSelectionChange();
             }
             catch (Exception ex)
             {
