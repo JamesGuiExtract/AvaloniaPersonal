@@ -117,61 +117,133 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <metadata name="dataGridToolStripContainer.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="splitContainer1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="label1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_menuStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>17, 54</value>
+  </metadata>
+  <metadata name="_exemptionsToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>502, 17</value>
+  </metadata>
   <metadata name="_basicDataGridToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>331, 17</value>
+  </metadata>
+  <metadata name="toolStripSeparator1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator7.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator8.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator7.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator8.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
   </metadata>
   <assembly alias="System.Drawing" name="System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <data name="_saveToolStripButton.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         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
-        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
+        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
 </value>
   </data>
-  <metadata name="_exemptionsToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>502, 17</value>
+  <metadata name="toolStripSeparator1.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator2.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator3.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="dockContainer.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
   </metadata>
   <metadata name="_sandDockManager.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>661, 17</value>
   </metadata>
+  <metadata name="imageViewerToolStripContainer.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_viewCommandsToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>989, 17</value>
+  </metadata>
+  <metadata name="toolStripSeparator5.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator6.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="_pageNavigationToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>810, 17</value>
+  </metadata>
   <metadata name="_basicImageViewerToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>138, 17</value>
   </metadata>
-  <metadata name="_pageNavigationToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>17, 54</value>
+  <metadata name="toolStripSeparator4.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
   </metadata>
-  <metadata name="_viewCommandsToolStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>196, 54</value>
+  <metadata name="toolStripSeparator5.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator6.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
+  <metadata name="toolStripSeparator4.GenerateMember" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
   </metadata>
 </root>
