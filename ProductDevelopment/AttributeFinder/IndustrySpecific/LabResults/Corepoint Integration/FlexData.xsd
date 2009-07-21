@@ -225,7 +225,7 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="EpicOrderCode" minOccurs="1">
+              <xs:element minOccurs="1" name="EpicCode">
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="FullText" type="xs:string" />
@@ -338,31 +338,40 @@
                   </xs:sequence>
                 </xs:complexType>
               </xs:element>
-              <xs:element name="EpicCode" minOccurs="0">
-                <xs:complexType>
-                  <xs:sequence>
-                    <xs:element name="FullText" type="xs:string" />
-                  </xs:sequence>
-                </xs:complexType>
-              </xs:element>
             </xs:sequence>
           </xs:complexType>
         </xs:element>
         <xs:element ref="LabInfo" minOccurs="0" />
-        <xs:element name="ResultDate">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="FullText" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
-        <xs:element name="ResultTime">
-          <xs:complexType>
-            <xs:sequence>
-              <xs:element name="FullText" type="xs:string" />
-            </xs:sequence>
-          </xs:complexType>
-        </xs:element>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="ResultDate">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="FullText" type="xs:string" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="ResultTime">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="FullText" type="xs:string" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CollectionDate">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="FullText" type="xs:string" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+          <xs:element name="CollectionTime">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="FullText" type="xs:string" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
       </xs:sequence>
     </xs:complexType>
   </xs:element>
@@ -420,7 +429,7 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
-        <xs:element name="Name">
+        <xs:element name="Name" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
               <xs:element name="FullText" type="xs:string" />
