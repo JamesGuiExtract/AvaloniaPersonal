@@ -13,12 +13,10 @@
 // CFileProcessingTaskExecutor
 //--------------------------------------------------------------------------------------------------
 CFileProcessingTaskExecutor::CFileProcessingTaskExecutor() :
-	m_ipFileProcessingTasks(NULL),
 	m_ipCurrentTask(NULL),
 	m_bInitialized(false),
 	m_ipDB(NULL),
-	m_ipFAMTagManager(NULL),
-	m_ipMiscUtils(NULL)
+	m_ipFAMTagManager(NULL)
 {
 }
 //--------------------------------------------------------------------------------------------------
@@ -26,12 +24,6 @@ CFileProcessingTaskExecutor::~CFileProcessingTaskExecutor()
 {
 	try
 	{
-		// Release member interface pointers (just a precaution)
-		m_ipFileProcessingTasks = NULL;
-		m_ipCurrentTask = NULL;
-		m_ipDB = NULL;
-		m_ipFAMTagManager = NULL;
-		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI17687");
 }
@@ -43,6 +35,15 @@ HRESULT CFileProcessingTaskExecutor::FinalConstruct()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingTaskExecutor::FinalRelease()
 {
+	try
+	{
+		// Release member interface pointers (just a precaution)
+		m_vecProcessingTasks.clear(); // This vector holds interface pointers
+		m_ipCurrentTask = NULL;
+		m_ipDB = NULL;
+		m_ipFAMTagManager = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26736");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -60,55 +61,26 @@ STDMETHODIMP CFileProcessingTaskExecutor::Init(IIUnknownVector *pFileProcessingT
 		// Check license
 		validateLicense();
 
-		// Ensure we are not already initialized
-		if (m_bInitialized)
-		{
-			UCLIDException ue("ELI17879", "Internal error: Task executor has already been initialized!");
-			throw ue;
-		}
+		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
+		ASSERT_ARGUMENT("ELI26780", ipFileProcessingTasks != NULL);
 
-		// Clear any previous cancel request
-		m_eventCancelRequested.reset();
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_ARGUMENT("ELI26781", ipDB != NULL);
 
-		m_ipFileProcessingTasks = pFileProcessingTasks;
-		ASSERT_ARGUMENT("ELI17698", m_ipFileProcessingTasks != NULL);
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
+		ASSERT_ARGUMENT("ELI26782", ipFAMTagManager != NULL);
 
-		m_ipDB = pDB;
-		ASSERT_ARGUMENT("ELI17700", m_ipDB != NULL);
-
-		m_ipFAMTagManager = pFAMTagManager;
-		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != NULL);
-
-		int nTaskCount = m_ipFileProcessingTasks->Size();
-
-		// Initialize each enabled FileProcessingTask
-		for (int i = 0; i < nTaskCount ; i++)
-		{
-			// Retrieve specified file processor Object With Description
-			IObjectWithDescriptionPtr ipObject(m_ipFileProcessingTasks->At(i));
-			ASSERT_RESOURCE_ALLOCATION("ELI17848", ipObject != NULL);
-
-			// Retrieve this file processor
-			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
-			ASSERT_RESOURCE_ALLOCATION("ELI17849", ipFileProc != NULL);
-
-			// Only initialize the processing task if it is enabled
-			if (asCppBool(ipObject->Enabled))
-			{
-				ipFileProc->Init();
-			}
-		}
-
-		m_bInitialized = true;
+		// Call the init method
+		init(ipFileProcessingTasks, ipDB, ipFAMTagManager);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17844");
 
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName,  
-	IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested, 
-	VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName, long nFileID,
+	long nActionID, IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested, 
+	EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -124,152 +96,14 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName,
 		// Assert required arguments
 		ASSERT_ARGUMENT("ELI17706", bstrSourceDocName != NULL);
 		ASSERT_ARGUMENT("ELI17877", !asString(bstrSourceDocName).empty());
-		ASSERT_ARGUMENT("ELI17704", pbSuccessfulCompletion != NULL);
-
-		// Initialize to true... set false once we encounter a file processing task that doesn't complete
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		ASSERT_ARGUMENT("ELI17704", pResult != NULL);
 
 		// ProgressStatus not required... don't use if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
-		if (ipProgressStatus)
-		{
-			// Initialize the progress bar appropriately
-			int nEnabledTaskCount = getMiscUtils()->CountEnabledObjectsIn(m_ipFileProcessingTasks);
-			ipProgressStatus->InitProgressStatus("Initializing tasks...", 0, nEnabledTaskCount, VARIANT_TRUE);
-		}
-
-		int nTaskCount = m_ipFileProcessingTasks->Size();
-
-		// Exercise each File processor
-		for (int nCurrentTask = 0; nCurrentTask < nTaskCount; nCurrentTask++)
-		{
-			// Retrieve specified file processor Object With Description
-			IObjectWithDescriptionPtr ipObject(m_ipFileProcessingTasks->At(nCurrentTask));
-			ASSERT_RESOURCE_ALLOCATION("ELI17691", ipObject != NULL);
-
-			// Only process the file if the task is enabled
-			if (asCppBool(ipObject->Enabled))
-			{
-				// Get the task number and task description
-				string strCurrentTaskName = "task #";
-				strCurrentTaskName += asString(nCurrentTask + 1);
-				strCurrentTaskName += " (";
-				strCurrentTaskName += asString(ipObject->Description);
-				strCurrentTaskName += ")";
-
-				try
-				{
-					try
-					{
-						// Update the text associated with the ProgressStatus to use 
-						// the current task's description
-						if (ipProgressStatus)
-						{
-							string strStatusMessage = "Executing " + strCurrentTaskName;
-							ipProgressStatus->StartNextItemGroup(strStatusMessage.c_str(), 1);
-						}
-
-						// Create a pointer to the Sub-ProgressStatus object, depending 
-						// upon whether the caller requested progress information
-						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
-							NULL : ipProgressStatus->SubProgressStatus;
-
-						// Ensure that in the case of an error that m_ipCurrentTask will be restored to NULL
-						ValueRestorer<UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr> restorer(m_ipCurrentTask, NULL);
-
-						// Retrieve this file processor; use separate scope to limit m_mutexCurrentTask lock to this call
-						{
-							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-							CSingleLock lock(&m_mutexCurrentTask, TRUE);
-							m_ipCurrentTask = ipObject->Object;
-							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != NULL);
-						}
-
-						// Was cancel request either passed in or received via a call to Cancel?
-						bool bCancelRequested = (asCppBool(vbCancelRequested) || m_eventCancelRequested.isSignaled());
-
-						VARIANT_BOOL vbSuccessfulCompletion = m_ipCurrentTask->ProcessFile(
-								bstrSourceDocName, 
-								(UCLID_FILEPROCESSINGLib::IFAMTagManager*) m_ipFAMTagManager, 
-								(UCLID_FILEPROCESSINGLib::IFileProcessingDB*) m_ipDB,
-								ipSubProgressStatus, asVariantBool(bCancelRequested));
-
-						// Task is no longer running; indicate such
-						{
-							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-							CSingleLock lock(&m_mutexCurrentTask, TRUE);
-							m_ipCurrentTask = NULL;
-						}
-
-						// Check success flag
-						if (!asCppBool(vbSuccessfulCompletion))
-						{
-							// Processing didn't complete.
-							// Log the fact that processing was cancelled
-							string strMsg = "Processing cancelled while performing ";
-							if (strCurrentTaskName.empty())
-							{
-								// Use the task # as part of the error string.
-								strMsg += "task #";
-								strMsg += asString(nCurrentTask + 1); // use 1-based index for the user
-							}
-							else
-							{
-								// Use the task name as part of the error string.
-								strMsg += strCurrentTaskName;
-							}
-							strMsg += "!";
-
-							// Add the history record and debug information, then log the exception
-							UCLIDException ue("ELI17862",strMsg);
-							ue.addDebugInfo("File", asString(bstrSourceDocName));
-							ue.addDebugInfo("Task", strCurrentTaskName);
-							ue.log();
-
-							// Return false to indicate that the file was not processed.
-							*pbSuccessfulCompletion = VARIANT_FALSE;
-							
-							return S_OK;
-						}
-					}
-					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17694");
-				}
-				catch ( UCLIDException &ue )
-				{
-					// Rethrow the exception as com error
-					string strMsg = "Unable to execute ";
-					if (strCurrentTaskName.empty())
-					{
-						// Use the task # as part of the error string.
-						strMsg += "task #";
-						strMsg += asString(nCurrentTask + 1); // use 1-based index for the user
-					}
-					else
-					{
-						// Use the task name as part of the error string.
-						strMsg += strCurrentTaskName;
-					}
-					strMsg += "!";
-
-					// Add the history record and debug information before rethrowing the exception.
-					UCLIDException uexOuter("ELI17697",strMsg, ue);
-					uexOuter.addDebugInfo("File", asString(bstrSourceDocName));
-					uexOuter.addDebugInfo("Task", strCurrentTaskName);
-
-					throw uexOuter;
-				}
-			}
-		}
-		
-		// Completed task list successfully; return true
-		*pbSuccessfulCompletion = VARIANT_TRUE;
-
-		// Update progress bar to indicate completion
-		if (ipProgressStatus)
-		{
-			ipProgressStatus->CompleteCurrentItemGroup();
-		}
+		// Process the file and set the return value
+		*pResult = processFile(asString(bstrSourceDocName), nFileID, nActionID, ipProgressStatus,
+			asCppBool(vbCancelRequested));
 
 		return S_OK;
 	}
@@ -279,9 +113,10 @@ STDMETHODIMP CFileProcessingTaskExecutor::ProcessFile(BSTR bstrSourceDocName,
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocName, 
-	IIUnknownVector *pFileProcessingTasks, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, 
+	IIUnknownVector *pFileProcessingTasks, long nFileID, long nActionID,
+	IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, 
 	IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, 
-	VARIANT_BOOL *pbSuccessfulCompletion)
+	EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -293,33 +128,34 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 		validateLicense();
 
 		// Verify required arguments
-		ASSERT_ARGUMENT("ELI17863", pFileProcessingTasks != NULL);
-		ASSERT_ARGUMENT("ELI17864", pDB != NULL);
-		ASSERT_ARGUMENT("ELI17865", pFAMTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17866", pbSuccessfulCompletion != NULL);
+		IIUnknownVectorPtr ipFileProcessingTasks(pFileProcessingTasks);
+		ASSERT_ARGUMENT("ELI17863", ipFileProcessingTasks != NULL);
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_ARGUMENT("ELI17864", ipDB != NULL);
+		UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr ipFAMTagManager(pFAMTagManager);
+		ASSERT_ARGUMENT("ELI17865", ipFAMTagManager != NULL);
+		ASSERT_ARGUMENT("ELI17866", pResult != NULL);
 
 		// ProgressStatus not required.  Won't be used if NULL
 		IProgressStatusPtr ipProgressStatus(pProgressStatus);
 
 		// Initialize the processing tasks
-		getThisAsCOMPtr()->Init(pFileProcessingTasks, (UCLID_FILEPROCESSINGLib::IFileProcessingDB *) pDB, 
-			(UCLID_FILEPROCESSINGLib::IFAMTagManager *) pFAMTagManager);
+		init(ipFileProcessingTasks, ipDB, ipFAMTagManager);
 		
 		// Process the tasks
 		try
 		{
-			*pbSuccessfulCompletion = getThisAsCOMPtr()->ProcessFile(bstrSourceDocName, 
-				ipProgressStatus, bCancelRequested);
+			*pResult = processFile(asString(bstrSourceDocName), nFileID, nActionID, ipProgressStatus,
+				asCppBool(bCancelRequested));
 		}
 		catch (...)
 		{
 			// Guarantee that Close is called if Init has been called
-			getThisAsCOMPtr()->Close();
-			throw;
+			close();
 		}
 
 		// Close the processing tasks
-		getThisAsCOMPtr()->Close();
+		close();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19447");
 
@@ -338,7 +174,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::Cancel()
 		m_eventCancelRequested.signal();
 
 		// Call Cancel for the currently executing task (if it exists)
-		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipCurrentTask = getThisAsCOMPtr()->GetCurrentTask();
+		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipCurrentTask = getCurrentTask();
 		
 		// If there is no current task, no need to call cancel (and not an exception condition)
 		if (ipCurrentTask)
@@ -362,30 +198,8 @@ STDMETHODIMP CFileProcessingTaskExecutor::Close()
 		// Check license
 		validateLicense();
 
-		verifyInitialization();
-
-		// Set initialized flag to false immediately; cannot guarantee initialization beyond this point
-		m_bInitialized = false;
-
-		int nTaskCount = m_ipFileProcessingTasks->Size();
-
-		// Close each FileProcessingTask
-		for (int i = 0; i < nTaskCount ; i++)
-		{
-			// Retrieve specified file processor Object With Description
-			IObjectWithDescriptionPtr ipObject(m_ipFileProcessingTasks->At(i));
-			ASSERT_RESOURCE_ALLOCATION("ELI19449", ipObject != NULL);
-
-			// Retrieve this file processor
-			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
-			ASSERT_RESOURCE_ALLOCATION("ELI19450", ipFileProc != NULL);
-
-			// Only close the processing task if it is enabled
-			if (asCppBool(ipObject->Enabled))
-			{
-				ipFileProc->Close();
-			}
-		}
+		// Call the close method
+		close();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19448");
 
@@ -403,19 +217,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::GetCurrentTask(IFileProcessingTask **p
 
 		ASSERT_ARGUMENT("ELI17859", ppCurrentTask != NULL);
 
-		// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
-		CSingleLock lock(&m_mutexCurrentTask, TRUE);
-
-		// Provide the currently executing task (if there is one)
-		if (m_ipCurrentTask)
-		{
-			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipShallowCopy = m_ipCurrentTask;
-			*ppCurrentTask = (IFileProcessingTask *) ipShallowCopy.Detach();
-		}
-		else
-		{
-			*ppCurrentTask = NULL;
-		}
+		*ppCurrentTask = (IFileProcessingTask*) getCurrentTask().Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17716");
 
@@ -500,7 +302,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::raw_IsLicensed(VARIANT_BOOL *pbValue)
 void CFileProcessingTaskExecutor::verifyInitialization()
 {
 	// Verify the task array is valid
-	if (!m_ipFileProcessingTasks)
+	if (m_vecProcessingTasks.empty())
 	{
 		UCLIDException ue("ELI17856", "Internal error: Task executor has invalid task list!");
 		throw ue;
@@ -514,22 +316,256 @@ void CFileProcessingTaskExecutor::verifyInitialization()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-IMiscUtilsPtr CFileProcessingTaskExecutor::getMiscUtils()
+EFileProcessingResult CFileProcessingTaskExecutor::processFile(
+	const string& strSourceDocName, long nFileID, long nActionID,
+	const IProgressStatusPtr& ipProgressStatus, bool bCancelRequested)
 {
-	if (m_ipMiscUtils == NULL)
+	try
 	{
-		m_ipMiscUtils.CreateInstance(CLSID_MiscUtils);
-		ASSERT_RESOURCE_ALLOCATION("ELI16570", m_ipMiscUtils != NULL );
+		// Progress status can be null, initialize if it exists
+		if (ipProgressStatus)
+		{
+			// Initialize the progress bar appropriately
+			long nEnabledTaskCount = countEnabledTasks();
+			ipProgressStatus->InitProgressStatus("Initializing tasks...", 0, nEnabledTaskCount, VARIANT_TRUE);
+		}
+
+		// Get task list count
+		long nTaskCount = m_vecProcessingTasks.size();
+
+		// Exercise each File processor
+		for (long nCurrentTask = 0; nCurrentTask < nTaskCount; nCurrentTask++)
+		{
+			ProcessingTask& task = m_vecProcessingTasks[nCurrentTask];
+
+			// Only process the file if the task is enabled
+			if (task.Enabled)
+			{
+				// Get the task number and task description
+				string strCurrentTaskName = "task #";
+				strCurrentTaskName += asString(nCurrentTask + 1);
+				strCurrentTaskName += " (";
+				strCurrentTaskName += task.Description;
+				strCurrentTaskName += ")";
+
+				try
+				{
+					try
+					{
+						// Update the text associated with the ProgressStatus to use 
+						// the current task's description
+						if (ipProgressStatus)
+						{
+							string strStatusMessage = "Executing " + strCurrentTaskName;
+							ipProgressStatus->StartNextItemGroup(strStatusMessage.c_str(), 1);
+						}
+
+						// Create a pointer to the Sub-ProgressStatus object, depending 
+						// upon whether the caller requested progress information
+						IProgressStatusPtr ipSubProgressStatus = (ipProgressStatus == NULL) ? 
+							NULL : ipProgressStatus->SubProgressStatus;
+
+						// Ensure that in the case of an error that m_ipCurrentTask will be restored to NULL
+						ValueRestorer<UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr> restorer(m_ipCurrentTask, NULL);
+
+						// Retrieve this file processor; use separate scope to limit m_mutexCurrentTask lock to this call
+						{
+							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
+							CSingleLock lock(&m_mutexCurrentTask, TRUE);
+							m_ipCurrentTask = task.Task;
+							ASSERT_RESOURCE_ALLOCATION("ELI17692", m_ipCurrentTask != NULL);
+						}
+
+						// Was cancel request either passed in or received via a call to Cancel?
+						bool bCancel = (bCancelRequested || m_eventCancelRequested.isSignaled());
+
+						UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult =
+							m_ipCurrentTask->ProcessFile(strSourceDocName.c_str(), nFileID,
+							nActionID, m_ipFAMTagManager, m_ipDB, ipSubProgressStatus,
+							asVariantBool(bCancel));
+
+						// Task is no longer running; indicate such
+						{
+							// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
+							CSingleLock lock(&m_mutexCurrentTask, TRUE);
+							m_ipCurrentTask = NULL;
+						}
+
+						// Check success flag
+						if (eResult == kProcessingCancelled)
+						{
+							// Processing didn't complete.
+							// Log the fact that processing was cancelled
+							string strMsg = "Processing cancelled while performing ";
+							if (strCurrentTaskName.empty())
+							{
+								// Use the task # as part of the error string.
+								strMsg += "task #";
+								strMsg += asString(nCurrentTask + 1); // use 1-based index for the user
+							}
+							else
+							{
+								// Use the task name as part of the error string.
+								strMsg += strCurrentTaskName;
+							}
+							strMsg += "!";
+
+							// Add the history record and debug information, then log the exception
+							UCLIDException ue("ELI17862",strMsg);
+							ue.addDebugInfo("File", strSourceDocName);
+							ue.addDebugInfo("Task", strCurrentTaskName);
+							ue.log();
+
+							// Return processing cancelled
+							return kProcessingCancelled;
+						}
+					}
+					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17694");
+				}
+				catch ( UCLIDException &ue )
+				{
+					// Rethrow the exception as com error
+					string strMsg = "Unable to execute ";
+					if (strCurrentTaskName.empty())
+					{
+						// Use the task # as part of the error string.
+						strMsg += "task #";
+						strMsg += asString(nCurrentTask + 1); // use 1-based index for the user
+					}
+					else
+					{
+						// Use the task name as part of the error string.
+						strMsg += strCurrentTaskName;
+					}
+					strMsg += "!";
+
+					// Add the history record and debug information before rethrowing the exception.
+					UCLIDException uexOuter("ELI17697",strMsg, ue);
+					uexOuter.addDebugInfo("File", strSourceDocName);
+					uexOuter.addDebugInfo("Task", strCurrentTaskName);
+
+					throw uexOuter;
+				}
+			}
+		}
+		
+		// Update progress bar to indicate completion
+		if (ipProgressStatus)
+		{
+			ipProgressStatus->CompleteCurrentItemGroup();
+		}
+
+		// Return successful completion
+		return kProcessingSuccessful;
 	}
-	
-	return m_ipMiscUtils;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26724");
 }
 //-------------------------------------------------------------------------------------------------
-UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr CFileProcessingTaskExecutor::getThisAsCOMPtr()
+void CFileProcessingTaskExecutor::init(const IIUnknownVectorPtr& ipFileProcessingTasks,
+									   const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
+									   const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager)
 {
-	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr ipThis = this;
-	ASSERT_RESOURCE_ALLOCATION("ELI17851", ipThis != NULL);
-	return ipThis;
+	try
+	{
+		// Ensure we are not already initialized
+		if (m_bInitialized)
+		{
+			UCLIDException ue("ELI17879", "Internal error: Task executor has already been initialized!");
+			throw ue;
+		}
+
+		// Clear any previous cancel request
+		m_eventCancelRequested.reset();
+
+		// Check arguments
+		ASSERT_ARGUMENT("ELI17698", ipFileProcessingTasks != NULL);
+		m_ipDB = ipDB;
+		ASSERT_ARGUMENT("ELI17700", m_ipDB != NULL);
+		m_ipFAMTagManager = ipFAMTagManager;
+		ASSERT_ARGUMENT("ELI17702", m_ipFAMTagManager != NULL);
+
+		// Build the collection of tasks and initialize each enabled FileProcessingTask
+		int nTaskCount = ipFileProcessingTasks->Size();
+		m_vecProcessingTasks.reserve(nTaskCount);
+		for (int i = 0; i < nTaskCount ; i++)
+		{
+			// Retrieve specified file processor Object With Description
+			IObjectWithDescriptionPtr ipObject(ipFileProcessingTasks->At(i));
+			ASSERT_RESOURCE_ALLOCATION("ELI17848", ipObject != NULL);
+
+			// Retrieve this file processor
+			UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr ipFileProc(ipObject->Object);
+			ASSERT_RESOURCE_ALLOCATION("ELI17849", ipFileProc != NULL);
+
+			ProcessingTask task(ipFileProc, asString(ipObject->Description),
+				asCppBool(ipObject->Enabled));
+
+			// Only initialize the processing task if it is enabled
+			if (task.Enabled)
+			{
+				ipFileProc->Init();
+			}
+
+			// Add the task to the vector
+			m_vecProcessingTasks.push_back(task);
+		}
+
+		m_bInitialized = true;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26725");
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingTaskExecutor::close()
+{
+	try
+	{
+		verifyInitialization();
+
+		// Set initialized flag to false immediately; cannot guarantee initialization beyond this point
+		m_bInitialized = false;
+
+		// Close each FileProcessingTask
+		for (vector<ProcessingTask>::iterator it = m_vecProcessingTasks.begin();
+			it != m_vecProcessingTasks.end(); it++)
+		{
+			// Only close the processing task if it is enabled
+			if (it->Enabled)
+			{
+				it->Task->Close();
+			}
+		}
+		
+		// Clear the vector
+		m_vecProcessingTasks.clear();
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26783");
+}
+//-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr CFileProcessingTaskExecutor::getCurrentTask()
+{
+	try
+	{
+		// Lock access to m_ipCurrentTask to ensure it can't be read/written at the same time
+		CSingleLock lock(&m_mutexCurrentTask, TRUE);
+
+		return m_ipCurrentTask;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26737");
+}
+//-------------------------------------------------------------------------------------------------
+long CFileProcessingTaskExecutor::countEnabledTasks()
+{
+	long nCount = 0;
+	for(vector<ProcessingTask>::iterator it = m_vecProcessingTasks.begin();
+		it != m_vecProcessingTasks.end(); it++)
+	{
+		if (it->Enabled)
+		{
+			nCount++;
+		}
+	}
+
+	return nCount;
 }
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingTaskExecutor::validateLicense()
@@ -539,4 +575,3 @@ void CFileProcessingTaskExecutor::validateLicense()
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI17690", "File Processing Task Executor");
 }
 //-------------------------------------------------------------------------------------------------
-

@@ -3,14 +3,14 @@
 #pragma once
 #include "resource.h"       // main symbols
 #include "UCLIDFileProcessing.h"
+
 #include <string>
 
+using namespace std;
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
-
-
 
 // CFileRecord
 
@@ -56,12 +56,17 @@ public:
 	STDMETHOD(put_FileSize)(LONGLONG newVal);
 	STDMETHOD(get_Pages)(LONG* pVal);
 	STDMETHOD(put_Pages)(LONG newVal);
+	STDMETHOD(get_ActionID)(LONG* pVal);
+	STDMETHOD(put_ActionID)(LONG newVal);
+	STDMETHOD(GetFileData)(LONG* pFileID, LONG* pActionID, BSTR* pbstrFileName,
+		LONGLONG* pllFileSize, LONG* plPages);
 
 private:
 
 	// Variables
 	long m_lFileID;
-	std::string m_strName;
+	long m_lActionID;
+	string m_strName;
 	long long m_llFileSize;
 	long m_lPages;
 };

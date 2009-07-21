@@ -5,7 +5,10 @@
 #include "UCLIDFileProcessing.h"
 #include "Win32Event.h"
 
+#include <UCLIDException.h>
+
 #include <string>
+#include <vector>
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -38,11 +41,13 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 // IFileProcessingTaskExecutor
 	STDMETHOD(Init)(IIUnknownVector *pFileProcessingTasks, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager);
-	STDMETHOD(ProcessFile)(BSTR bstrSourceDocName, IProgressStatus *pProgressStatus, 
-		VARIANT_BOOL vbCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion);
+	STDMETHOD(ProcessFile)(BSTR bstrSourceDocName, long nFileID, long nActionID,
+		IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested,
+		EFileProcessingResult* pResult);
 	STDMETHOD(InitProcessClose)(BSTR bstrSourceDocName, IIUnknownVector *pFileProcessingTasks, 
-		IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion);
+		long nFileID, long nActionID, IFileProcessingDB *pDB, IFAMTagManager *pFAMTagManager,
+		IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested,
+		EFileProcessingResult* pResult);
 	STDMETHOD(Cancel)();
 	STDMETHOD(Close)();
 	STDMETHOD(GetCurrentTask)(IFileProcessingTask ** ppCurrentTask);
@@ -56,6 +61,39 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 
 private:
 	///////////
+	// Helper class
+	///////////
+	// Represents a File processing task (decomposed from IObjectWithDescription)
+	class ProcessingTask
+	{
+	public:
+		// The task
+		UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr Task;
+
+		// The description
+		string Description;
+
+		// Whether the task is enabled or not
+		bool Enabled;
+
+		ProcessingTask(const UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr& ipTask,
+			const string& strDescription, bool bEnabled) : Task(ipTask),
+			Description(strDescription), Enabled(bEnabled)
+		{
+		}
+
+		~ProcessingTask()
+		{
+			try
+			{
+				// Clear the task
+				Task = NULL;
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26768");
+		}
+	};
+
+	///////////
 	//Variables
 	//////////
 	
@@ -64,7 +102,7 @@ private:
 	CMutex m_mutexCurrentTask;
 
 	// List of tasks that will be used to process a file
-	IIUnknownVectorPtr m_ipFileProcessingTasks;
+	vector<ProcessingTask> m_vecProcessingTasks;
 
 	// The task that is currently executing.  NULL if no task is executing.  NULL does not nessasarily mean all tasks
 	// are done processing, it just means that ProcessFile is not currently executing on any of the tasks
@@ -79,9 +117,6 @@ private:
 	// Indicates that a valid task list was provided and Init was called on every enabled task
 	bool m_bInitialized;
 
-	// Used for CountEnabledObjectsIn
-	IMiscUtilsPtr m_ipMiscUtils;
-
 	//////////
 	//Methods
 	/////////
@@ -89,9 +124,24 @@ private:
 	// Verify a valid processing task list exists and has been initialized
 	void CFileProcessingTaskExecutor::verifyInitialization();
 		
-	// Get utility object (used for enabled object count);
-	IMiscUtilsPtr CFileProcessingTaskExecutor::getMiscUtils();
-
-	UCLID_FILEPROCESSINGLib::IFileProcessingTaskExecutorPtr getThisAsCOMPtr();
 	void validateLicense();
+
+	// Internal ProcessFile method
+	EFileProcessingResult processFile(const string& strSourceDocName,
+		long nFileID, long nActionID, const IProgressStatusPtr& ipProgressStatus,
+		bool bCancelRequested);
+
+	// Internal Init method
+	void init(const IIUnknownVectorPtr& ipFileProcessingTasks,
+		const UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr& ipDB,
+		const UCLID_FILEPROCESSINGLib::IFAMTagManagerPtr& ipFAMTagManager);
+
+	// Internal GetCurrentTask method
+	UCLID_FILEPROCESSINGLib::IFileProcessingTaskPtr getCurrentTask();
+
+	// Internal Close method
+	void close();
+
+	// Returns the count of enabled file processing tasks
+	long countEnabledTasks();
 };

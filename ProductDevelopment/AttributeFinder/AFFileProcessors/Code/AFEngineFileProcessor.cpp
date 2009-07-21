@@ -78,9 +78,9 @@ STDMETHODIMP CAFEngineFileProcessor::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, 
+STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName, long nFileID, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-	VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -92,7 +92,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		IFAMTagManagerPtr ipTagManager(pTagManager);
 		ASSERT_ARGUMENT("ELI26658", ipTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17934", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17935", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17935", pResult != NULL);
 		
 		// Input file for processing
 		string strInputFile = asString(strFileFullName);
@@ -104,7 +104,7 @@ STDMETHODIMP CAFEngineFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 			strInputFile.c_str()));
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		// Validate the input file and the rules file
 		validateFileOrFolderExistence(strInputFile, "ELI26659");

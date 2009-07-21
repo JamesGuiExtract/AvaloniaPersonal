@@ -248,9 +248,9 @@ STDMETHODIMP CConditionalTask::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR strFileFullName, IFAMTagManager *pTagManager, 
-		IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, 
-		VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -259,14 +259,14 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR strFileFullName, IFAMTagMana
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17906", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17907", asString(strFileFullName).empty() == false);
+		ASSERT_ARGUMENT("ELI17906", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17907", asString(bstrFileFullName).empty() == false);
 		ASSERT_ARGUMENT("ELI17908", pTagManager != NULL);
 		ASSERT_ARGUMENT("ELI17909", pDB != NULL);
-		ASSERT_ARGUMENT("ELI17910", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17910", pResult != NULL);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		// Retrieve the FAM Condition from the Object-With-Description
 		IFAMConditionPtr ipFAMCondition = m_ipFAMCondition->Object;
@@ -290,7 +290,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR strFileFullName, IFAMTagMana
 		}
 
 		// Exercise the FAM Condition
-		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(strFileFullName, pDB, 
+		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(bstrFileFullName, pDB, 
 										get_bstr_t(""), pTagManager));
 
 		// Kick off progress status for task execution
@@ -308,14 +308,16 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR strFileFullName, IFAMTagMana
 		if (bConditionSatisfied)
 		{
 			// Execute true tasks
-			*pbSuccessfulCompletion = m_ipFAMTaskExecutor->InitProcessClose(strFileFullName, 
-				m_ipTasksForTrue, pDB, pTagManager, ipSubProgressStatus, bCancelRequested);
+			*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
+				m_ipTasksForTrue, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+				bCancelRequested);
 		}
 		else
 		{
 			// Execute false tasks
-			*pbSuccessfulCompletion = m_ipFAMTaskExecutor->InitProcessClose(strFileFullName, 
-				m_ipTasksForFalse, pDB, pTagManager, ipSubProgressStatus, bCancelRequested);
+			*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
+				m_ipTasksForFalse, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+				bCancelRequested);
 		}
 
 		// Updated progress status to indicate completion

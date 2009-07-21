@@ -80,9 +80,9 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -91,7 +91,7 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR strFileFullName,
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI24785", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI24785", pResult != NULL);
 
 		// Get the FAM DB
 		IFileProcessingDBPtr ipFAMDB(pDB);
@@ -102,10 +102,10 @@ STDMETHODIMP CFilterIDShieldDataFileTask::raw_ProcessFile(BSTR strFileFullName,
 		ASSERT_RESOURCE_ALLOCATION("ELI24787", ipFamTagManager != NULL);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		// Get source doc
-		string strSourceDoc = asString(strFileFullName);
+		string strSourceDoc = asString(bstrFileFullName);
 		ASSERT_ARGUMENT("ELI24788", !strSourceDoc.empty());
 
 		// Get the VOA file to read and ensure it exists

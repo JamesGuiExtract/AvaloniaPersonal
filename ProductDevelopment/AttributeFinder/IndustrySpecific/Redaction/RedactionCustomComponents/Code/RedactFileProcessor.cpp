@@ -102,9 +102,9 @@ STDMETHODIMP CRedactFileProcessor::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 	INIT_EXCEPTION_AND_TRACING("MLI00529");
@@ -122,8 +122,8 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 
 		IFileProcessingDBPtr ipFAMDB(pDB);
 		ASSERT_ARGUMENT("ELI19080", ipFAMDB != NULL);
-		ASSERT_ARGUMENT("ELI17928", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17929", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17928", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17929", pResult != NULL);
 
 		// Create an smart FAM Tag Pointer
 		IFAMTagManagerPtr ipFAMTagManager = pTagManager;
@@ -131,29 +131,29 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		_lastCodePos = "30";
 
 		// input file for processing
-		string strInputFile = asString( strFileFullName );
+		string strInputFile = asString( bstrFileFullName );
 		ASSERT_ARGUMENT("ELI17930", strInputFile.empty() == false);
 
 		_lastCodePos = "40";
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		_lastCodePos = "50";
 
 		// check if file was uss and if so get image name by removing the .uss
-		string strExt = getExtensionFromFullPath( strInputFile.c_str(), true);
+		string strExt = getExtensionFromFullPath( strInputFile, true);
 		string strImageName = strInputFile;
 		if ( strExt == ".uss")
 		{
 			_lastCodePos = "60";
-			strImageName = getFileNameWithoutExtension(strInputFile.c_str(), false );
+			strImageName = getFileNameWithoutExtension(strInputFile, false );
 			strImageName = getAbsoluteFileName(strInputFile, strImageName );
 		}
 		else if ( strExt == ".voa")
 		{
 			_lastCodePos = "70";
-			strImageName = getFileNameWithoutExtension(strInputFile.c_str(), false );
+			strImageName = getFileNameWithoutExtension(strInputFile, false );
 			strImageName = getAbsoluteFileName(strInputFile, strImageName );
 		}
 		else if ( m_bReadFromUSS )
@@ -390,17 +390,14 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		_lastCodePos = "430";
 
 		// Set the FAMDB pointer
-		getIDShieldDBPtr()->FAMDB = ipFAMDB;
-
-		// get the FAM file ID
-		long lFileID = getIDShieldDBPtr()->GetFileID(strFileFullName);
-		_lastCodePos = "440";
+		UCLID_REDACTIONCUSTOMCOMPONENTSLib::IIDShieldProductDBMgrPtr ipIDSDB = getIDShieldDBPtr();
+		ipIDSDB->FAMDB = ipFAMDB;
 
 		// Stop the stop watch
 		swProcessingTime.stop();
 
 		// Add the IDShieldData record to the database
-		getIDShieldDBPtr()->AddIDShieldData(lFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
+		ipIDSDB->AddIDShieldData(nFileID, VARIANT_FALSE, swProcessingTime.getElapsedTime(), 
 			idsData.m_lNumHCDataFound, idsData.m_lNumMCDataFound, idsData.m_lNumLCDataFound, 
 			idsData.m_lNumCluesFound, idsData.m_lTotalRedactions, idsData.m_lTotalManualRedactions);
 	}

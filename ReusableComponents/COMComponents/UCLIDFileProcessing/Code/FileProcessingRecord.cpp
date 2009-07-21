@@ -13,11 +13,11 @@
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const std::string gstrFILE_PROCESSING_REG_PATH		= gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing";
+const string gstrFILE_PROCESSING_REG_PATH		= gstrCOM_COMPONENTS_REG_PATH + "\\UCLIDFileProcessing";
 
-const std::string gstrFPRECORD_FOLDER				= "\\FileProcessingRecord";
-const std::string gstrDISPLAY_PROGRESS_STATUS_KEY	= "DisplayProgressStatus";
-const std::string gstrDEFAULT_PROGRESS_STATUS		= "1";
+const string gstrFPRECORD_FOLDER				= "\\FileProcessingRecord";
+const string gstrDISPLAY_PROGRESS_STATUS_KEY	= "DisplayProgressStatus";
+const string gstrDEFAULT_PROGRESS_STATUS		= "1";
 
 const long FileProcessingRecord::NO_ID = 0; 
 
@@ -27,8 +27,8 @@ FileProcessingRecord::FileProcessingRecord()
 	reset();
 }
 //-------------------------------------------------------------------------------------------------
-FileProcessingRecord::FileProcessingRecord(UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRcd,
-									   const std::string& strMachine)
+FileProcessingRecord::FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRcd,
+									   const string& strMachine)
 {
 	reset();
 	m_strMachine = strMachine.empty() ? getComputerName() : strMachine;
@@ -38,10 +38,7 @@ FileProcessingRecord::FileProcessingRecord(UCLID_FILEPROCESSINGLib::IFileRecordP
 	m_stopWatchErrorTask.reset();
 
 	// Set the File Record
-	m_ipFileRcd = ipFileRcd;
-
-	// TODO: Remove the this code when all uses of m_strFile are replaced with calls to getFileName()
-	m_strFile = asString(m_ipFileRcd->Name);
+	m_lfrFileRcd.setRecord(ipFileRcd);
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingRecord::FileProcessingRecord(const FileProcessingRecord& task)
@@ -64,11 +61,8 @@ void FileProcessingRecord::reset()
 	m_strErrorTaskException = "";
 	m_stopWatch.reset();
 	m_stopWatchErrorTask.reset();
-	m_ipFileRcd = NULL;
+	m_lfrFileRcd.reset();
 	m_ipProgressStatus = NULL;
-
-	// TODO: Remove the this code when all uses of m_strFile are replaced with calls to getFileName()
-	m_strFile = "";
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::copyFrom(const FileProcessingRecord& task)
@@ -79,18 +73,8 @@ void FileProcessingRecord::copyFrom(const FileProcessingRecord& task)
 	m_stopWatchErrorTask = task.m_stopWatchErrorTask;
 	m_strException = task.m_strException;
 	m_strErrorTaskException = task.m_strErrorTaskException;
-	m_ipFileRcd = task.m_ipFileRcd;
+	m_lfrFileRcd = task.m_lfrFileRcd;
 	m_ipProgressStatus = task.m_ipProgressStatus;
-
-	// TODO: Remove the this code when all uses of m_strFile are replaced with calls to getFileName()
-	if ( m_ipFileRcd != NULL )
-	{
-		m_strFile = asString(m_ipFileRcd->Name);
-	}
-	else
-	{
-		m_strFile = "";
-	}
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingRecord::markAsStarted()
@@ -161,7 +145,7 @@ void FileProcessingRecord::markAsPending()
 	m_eStatus = kRecordPending;
 }
 //-------------------------------------------------------------------------------------------------
-void FileProcessingRecord::markAsFailed(const std::string& strException)
+void FileProcessingRecord::markAsFailed(const string& strException)
 {
 	m_stopWatch.stop();
 	m_strException = strException;
@@ -184,7 +168,7 @@ void FileProcessingRecord::markAsNone()
 	m_eStatus = kRecordNone;
 }
 //---------------------------------------------------------------------------------------------
-void FileProcessingRecord::markAsProcessingError(const std::string& strException)
+void FileProcessingRecord::markAsProcessingError(const string& strException)
 {
 	m_stopWatch.stop();
 	m_strException = strException;
@@ -205,7 +189,7 @@ void FileProcessingRecord::notifyErrorTaskCompleted()
 	m_stopWatch.stop();
 }
 //---------------------------------------------------------------------------------------------
-void FileProcessingRecord::notifyErrorTaskFailed(const std::string& strException)
+void FileProcessingRecord::notifyErrorTaskFailed(const string& strException)
 {
 	// m_stopWatch will include the time elapsed while running m_stopWatchErrorTask
 	m_stopWatchErrorTask.stop();
@@ -234,43 +218,54 @@ CTime FileProcessingRecord::getErrorTaskStartTime() const
 	return m_stopWatchErrorTask.getBeginTime();
 }
 //-------------------------------------------------------------------------------------------------
-std::string FileProcessingRecord::getFileName() const
+string FileProcessingRecord::getFileName() const
 {
-	if ( m_ipFileRcd == NULL)
+	if (m_lfrFileRcd.FileRecord == NULL)
 	{
 		UCLIDException ue("ELI14211", "File record is not set.");
 		throw ue;
 	}
-	return asString(m_ipFileRcd->Name);
+	return m_lfrFileRcd.FileName;
 }
 //-------------------------------------------------------------------------------------------------
-unsigned long FileProcessingRecord::getFileID() const
+long FileProcessingRecord::getFileID() const
 {
-	if ( m_ipFileRcd == NULL )
+	if (m_lfrFileRcd.FileRecord == NULL)
 	{
 		UCLIDException ue("ELI14212", "File record is not set.");
 		throw ue;
 	}
-	return (unsigned long) m_ipFileRcd->FileID;
+	return m_lfrFileRcd.FileID;
+}
+//-------------------------------------------------------------------------------------------------
+long FileProcessingRecord::getActionID() const
+{
+	if (m_lfrFileRcd.FileRecord == NULL)
+	{
+		UCLIDException ue("ELI26738", "File record is not set.");
+		throw ue;
+	}
+
+	return m_lfrFileRcd.ActionID;
 }
 //-------------------------------------------------------------------------------------------------
 long long FileProcessingRecord::getFileSize() const
 {
-	if ( m_ipFileRcd == NULL )
+	if (m_lfrFileRcd.FileRecord == NULL)
 	{
 		UCLIDException ue("ELI14252", "File record is not set.");
 		throw ue;
 	}
-	return m_ipFileRcd->FileSize;
+	return m_lfrFileRcd.FileSize;
 }
 //-------------------------------------------------------------------------------------------------
 long FileProcessingRecord::getNumberOfPages() const
 {
-	if ( m_ipFileRcd == NULL )
+	if (m_lfrFileRcd.FileRecord == NULL)
 	{
 		UCLIDException ue("ELI14253", "File record is not set.");
 		throw ue;
 	}
-	return m_ipFileRcd->Pages;
+	return m_lfrFileRcd.NumberOfPages;
 }
 //-------------------------------------------------------------------------------------------------

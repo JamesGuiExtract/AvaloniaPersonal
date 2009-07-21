@@ -363,38 +363,50 @@ void CFileProcessingDB::addFileActionStateTransition ( ADODB::_ConnectionPtr ipC
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getFileID(ADODB::_ConnectionPtr ipConnection, string& rstrFileName)
 {
-	return getKeyID(ipConnection, gstrFAM_FILE, "FileName", rstrFileName, false);
+	try
+	{
+		return getKeyID(ipConnection, gstrFAM_FILE, "FileName", rstrFileName, false);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26720");
 }
 //--------------------------------------------------------------------------------------------------
 long CFileProcessingDB::getActionID( ADODB::_ConnectionPtr ipConnection, string& rstrActionName )
 {
-	return getKeyID(ipConnection, gstrACTION, "ASCName", rstrActionName, false);
+	try
+	{
+		return getKeyID(ipConnection, gstrACTION, "ASCName", rstrActionName, false);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26721");
 }
 //--------------------------------------------------------------------------------------------------
 string CFileProcessingDB::getActionName( ADODB::_ConnectionPtr ipConnection, long nActionID )
 {
-	_RecordsetPtr ipAction( __uuidof( Recordset ));
-	ASSERT_RESOURCE_ALLOCATION("ELI14046", ipAction != NULL );
-
-	// Oepn Action table
-	ipAction->Open( "Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
-		adLockReadOnly, adCmdTableDirect );
-
-	// Setup criteria to find
-	string strCriteria = "ID = " + asString(nActionID);
-
-	// search for the given action ID
-	ipAction->Find( strCriteria.c_str(), 0, adSearchForward );
-	if ( ipAction->adoEOF )
+	try
 	{
-		// Action ID was not found
-		UCLIDException ue ("ELI14047", "Action ID was not found." );
-		ue.addDebugInfo( "Action ID", nActionID);
-		throw ue;
-	}
+		_RecordsetPtr ipAction( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI14046", ipAction != NULL );
 
-	// return the found Action name
-	return getStringField( ipAction->Fields, "ASCName" );
+		// Oepn Action table
+		ipAction->Open( "Action", _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockReadOnly, adCmdTableDirect );
+
+		// Setup criteria to find
+		string strCriteria = "ID = " + asString(nActionID);
+
+		// search for the given action ID
+		ipAction->Find( strCriteria.c_str(), 0, adSearchForward );
+		if ( ipAction->adoEOF )
+		{
+			// Action ID was not found
+			UCLIDException ue ("ELI14047", "Action ID was not found." );
+			ue.addDebugInfo( "Action ID", nActionID);
+			throw ue;
+		}
+
+		// return the found Action name
+		return getStringField( ipAction->Fields, "ASCName" );
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26722");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection,

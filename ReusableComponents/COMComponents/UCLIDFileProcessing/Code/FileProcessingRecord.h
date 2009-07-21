@@ -1,8 +1,14 @@
 
 #pragma once
 
-#include <string>
+#include <COMUtils.h>
 #include <StopWatch.h>
+#include <UCLIDException.h>
+
+#include <string>
+
+using namespace std;
+
 //-------------------------------------------------------------------------------------------------
 enum ERecordStatus
 {
@@ -26,8 +32,8 @@ public:
 	// ctor to initialize new task with the status of eTaskInProgress
 	// This ctor will automatically populate m_strMachineName, m_eStatus
 	// and m_strStartTime
-	FileProcessingRecord(UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRcd,
-		const std::string& strMachine = "");
+	FileProcessingRecord(const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRcd,
+		const string& strMachine = "");
 	//---------------------------------------------------------------------------------------------
 	// copy ctor and assignment operator
 	FileProcessingRecord(const FileProcessingRecord& task);
@@ -53,13 +59,16 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To change status to failed, compute task duration,
 	// and to record the specified exception
-	void markAsFailed(const std::string& strException);
+	void markAsFailed(const string& strException);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To change status to none.
 	void markAsNone();
 	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To change status to skipped.
+	void markAsSkipped();
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To change status to processing error.
-	void markAsProcessingError(const std::string& strException);
+	void markAsProcessingError(const string& strException);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To start stopwatches while error task executes (does not change file status)
 	void notifyRunningErrorTask();
@@ -69,7 +78,7 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To stop stopwatches and add a new exception entry concerning the failure
 	// executing the error task. (does not change file status)
-	void notifyErrorTaskFailed(const std::string& strException);
+	void notifyErrorTaskFailed(const string& strException);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the number of seconds elapsed during the execution
 	// of this task (regardless of whether the task completed successfully or not)
@@ -86,15 +95,19 @@ public:
 	CTime getErrorTaskStartTime() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the filename from the IFileRecord member variable
-	//			if the m_ipFileRcd is NULL and exception will be thrown
-	std::string getFileName() const;
+	//			if the m_ipFileRcd is NULL an exception will be thrown
+	string getFileName() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the FileID for the record from the IFileRecord member variable
-	//			if the m_ipFileRcd is NULL and exception will be thrown
-	unsigned long getFileID() const;
+	//			if the m_ipFileRcd is NULL an exception will be thrown
+	long getFileID() const;
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the ActionID for the record from the IFileRecord member variable
+	//			if the m_ipFileRcd is NULL an exception will be thrown
+	long getActionID() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the File size of the file 
-	//			if the m_ipFileRcd is NULL and exception will be thrown
+	//			if the m_ipFileRcd is NULL an exception will be thrown
 	long long getFileSize() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the # of pages for the file
@@ -105,6 +118,70 @@ public:
 	static const long NO_ID;
 
 private:
+	//---------------------------------------------------------------------------------------------
+	// Helper class
+	//---------------------------------------------------------------------------------------------
+	class LocalFileRecord
+	{
+	public:
+		// Holds a copy of the file record object
+		UCLID_FILEPROCESSINGLib::IFileRecordPtr FileRecord;
+		string FileName;
+		long FileID;
+		long ActionID;
+		long long FileSize;
+		long NumberOfPages;
+
+		LocalFileRecord() : FileRecord(NULL), FileName(""), FileID(-1), ActionID(-1),
+			FileSize(-1), NumberOfPages(-1)
+		{
+		}
+
+		~LocalFileRecord()
+		{
+			try
+			{
+				// Reset the record object
+				FileRecord = NULL;
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26750");
+		}
+
+		void setRecord(const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipRecord)
+		{
+			try
+			{
+				ASSERT_ARGUMENT("ELI26742", ipRecord != NULL);
+
+				// Get the data from the ipRecord object
+				_bstr_t bstrFileName;
+				ipRecord->GetFileData(&FileID, &ActionID, bstrFileName.GetAddress(),
+					&FileSize, &NumberOfPages);
+
+				// Convert bstr to string
+				FileName = asString(bstrFileName);
+
+				// Store the record
+				FileRecord = ipRecord;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26743");
+		}
+
+		void reset()
+		{
+			try
+			{
+				FileName = "";
+				FileID = -1;
+				ActionID = -1;
+				FileSize = -1;
+				NumberOfPages = -1;
+				FileRecord = NULL;
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26751");
+		}
+	};
+
 	// the UI class must be able to access all these member variables
 	friend class FileProcessingDlg;
 	friend class FileProcessingDlgStatusPage;
@@ -115,15 +192,12 @@ private:
 	friend class FPRecordManager;
 	friend class CFileProcessingMgmtRole;
 
-	// TODO: Remove this member when all uses of are replaced with calls to getFileName()
-	std::string m_strFile;
-	
 	ERecordStatus m_eStatus;
-	std::string m_strMachine;
-	std::string m_strException;
+	string m_strMachine;
+	string m_strException;
 
 	// A separate exception for the case that we failed while executing an error task
-	std::string m_strErrorTaskException;
+	string m_strErrorTaskException;
 
 	StopWatch m_stopWatch;
 
@@ -131,8 +205,8 @@ private:
 	// will be a subset of m_stopWatch's duration
 	StopWatch m_stopWatchErrorTask;
 
-	// Pointer to the File record that contains the ID, FileName, Pages and FileSize of this file
-	UCLID_FILEPROCESSINGLib::IFileRecordPtr m_ipFileRcd;
+	// Local file record
+	LocalFileRecord m_lfrFileRcd;
 
 	// Pointer to the ProgressStatus associated with the file record.
 	// Note that this ProgressStatus is at the level of "Currently running task #x of y".

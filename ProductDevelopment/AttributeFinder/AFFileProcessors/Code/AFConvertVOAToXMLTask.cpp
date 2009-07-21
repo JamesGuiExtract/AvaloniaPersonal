@@ -74,9 +74,9 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName, 
+STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName, long nFileID, long nActionID,
 	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-	VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -84,7 +84,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName,
 	{
 		IFAMTagManagerPtr ipTagManager(pTagManager);
 		ASSERT_ARGUMENT("ELI26287", ipTagManager != NULL);
-		ASSERT_ARGUMENT("ELI26255", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI26255", pResult != NULL);
 
 		// Input file for processing
 		string strSourceDoc = asString(strFileFullName);
@@ -97,7 +97,7 @@ STDMETHODIMP CAFConvertVOAToXMLTask::raw_ProcessFile(BSTR strFileFullName,
 		_bstr_t bstrVoaFile = ipTagManager->ExpandTags(m_strVOAFile.c_str(), strSourceDoc.c_str());
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		// Create a vector to hold the attributes and load them from the VOA file
 		IIUnknownVectorPtr ipAttributes(CLSID_IUnknownVector);

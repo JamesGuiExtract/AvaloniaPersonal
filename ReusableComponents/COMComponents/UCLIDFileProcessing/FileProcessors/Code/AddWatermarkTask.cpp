@@ -331,9 +331,9 @@ STDMETHODIMP CAddWatermarkTask::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, 
-		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, 
-		VARIANT_BOOL vbCancelRequested, VARIANT_BOOL *pvbSuccessfulCompletion)
+STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -345,7 +345,7 @@ STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName,
 		// check for NULL parameters
 		ASSERT_ARGUMENT("ELI19938", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI19939", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI19940", pvbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI19940", pResult != NULL);
 
 		// get the source doc name
 		string strSourceDoc = asString(bstrFileFullName);
@@ -365,7 +365,7 @@ STDMETHODIMP CAddWatermarkTask::raw_ProcessFile(BSTR bstrFileFullName,
 			m_dVerticalPercentage, m_lPageToStamp);
 
 		// completed successfully
-		*pvbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19941")
 

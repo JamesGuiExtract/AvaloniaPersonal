@@ -598,42 +598,33 @@ void FPRecordManager::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipF
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::setActionID(long nActionID)
 {
-	// set the actionID member and just return if 0
-	m_nActionID = nActionID;
-	if (m_nActionID == 0)
+	try
 	{
-		return;
-	}
-
-	// Check for no defined database
-	if ( m_ipFPMDB == NULL )
-	{
-		UCLIDException ue("ELI14110", "The database has not been set.");
-		throw ue;
-	}
-
-	// Get all of the actions from the database
-	IStrToStrMapPtr ipActions = m_ipFPMDB->GetActions();
-	long nNumActions = ipActions->Size;
-
-	// Find the Action ID and set the action name member
-	for ( long i = 0; i < nNumActions; i++ )
-	{
-		CComBSTR bstrKey, bstrValue;
-		ipActions->GetKeyValue(i, &bstrKey, &bstrValue);
-		if ( asLong(asString(bstrValue)) == nActionID )
+		// set the actionID member and just return if 0
+		m_nActionID = nActionID;
+		if (m_nActionID == 0)
 		{
-			// set the action name member
-			m_strAction = asString(bstrKey);
 			return;
 		}
-	}
 
-	// ActionID was not found
-	m_strAction = "";
-	UCLIDException ue("ELI14111", "ActionID was not found in Database!" );
-	ue.addDebugInfo("ActionID", nActionID);
-	throw ue;
+		// Check for no defined database
+		if ( m_ipFPMDB == NULL )
+		{
+			UCLIDException ue("ELI14110", "The database has not been set.");
+			throw ue;
+		}
+
+		// Get the action name from the database (will throw exception
+		// if the action ID is not found in the databse)
+		m_strAction = asString(m_ipFPMDB->GetActionName(m_nActionID));
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26723");
+}
+//-------------------------------------------------------------------------------------------------
+long FPRecordManager::getActionID()
+{
+	// Return the current action ID
+	return m_nActionID;
 }
 //-------------------------------------------------------------------------------------------------
 bool FPRecordManager::getTask(long nTaskID, FileProcessingRecord& task)

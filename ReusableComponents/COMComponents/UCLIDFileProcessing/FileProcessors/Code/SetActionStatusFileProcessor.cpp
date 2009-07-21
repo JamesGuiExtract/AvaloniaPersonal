@@ -174,9 +174,9 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB,
+	IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -185,29 +185,16 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR strFileFullName
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17924", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17925", asString(strFileFullName).empty() == false);
-		ASSERT_ARGUMENT("ELI17927", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17924", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17925", asString(bstrFileFullName).empty() == false);
+		ASSERT_ARGUMENT("ELI17927", pResult != NULL);
 		
 		// wrap the database pointer in a smart pointer object
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_RESOURCE_ALLOCATION("ELI15146", ipDB != NULL);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
-
-		long nFileID = -1;
-		try
-		{
-			// Get the file ID, if an exception is thrown then the file does not
-			// exist in the database
-			nFileID = ipDB->GetFileID(strFileFullName);
-		}
-		catch(...)
-		{
-			// File does not exist, set file ID to -1
-			nFileID = -1;
-		}
+		*pResult = kProcessingSuccessful;
 
 		EActionStatus ePrevStatus = kActionUnattempted;
 
@@ -217,7 +204,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR strFileFullName
 			// Call AddFile() to set the new status.  This will force the status to 
 			// the new status unless the status is processing
 			VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-			ipDB->AddFile(strFileFullName, m_strActionName.c_str(), 
+			ipDB->AddFile(bstrFileFullName, m_strActionName.c_str(), 
 				VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, &bAlreadyExists, &ePrevStatus);
 		}
 		else

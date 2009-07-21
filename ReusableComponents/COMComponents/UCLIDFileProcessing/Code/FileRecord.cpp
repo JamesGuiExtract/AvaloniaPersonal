@@ -139,3 +139,57 @@ STDMETHODIMP CFileRecord::put_Pages(LONG newVal)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::get_ActionID(LONG* pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI26739", pVal != NULL);
+
+		*pVal = m_lActionID;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26740");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::put_ActionID(LONG newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_lActionID = newVal;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26741");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::GetFileData(LONG *pFileID, LONG *pActionID, BSTR *pbstrFileName,
+									  LONGLONG *pllFileSize, LONG *plPages)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check the arguments
+		ASSERT_ARGUMENT("ELI26744", pFileID != NULL);
+		ASSERT_ARGUMENT("ELI26745", pActionID != NULL);
+		ASSERT_ARGUMENT("ELI26746", pbstrFileName != NULL);
+		ASSERT_ARGUMENT("ELI26747", pllFileSize != NULL);
+		ASSERT_ARGUMENT("ELI26748", plPages != NULL);
+
+		// Copy the values
+		*pFileID = m_lFileID;
+		*pActionID = m_lActionID;
+		*pbstrFileName = _bstr_t(m_strName.c_str()).Detach();
+		*pllFileSize = m_llFileSize;
+		*plPages = m_lPages;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26749");
+}
+//-------------------------------------------------------------------------------------------------

@@ -135,9 +135,9 @@ STDMETHODIMP COCRFileProcessor::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COCRFileProcessor::raw_ProcessFile(BSTR strFileFullName, IFAMTagManager *pTagManager, 
-		IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, VARIANT_BOOL bCancelRequested, 
-		VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP COCRFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -146,13 +146,13 @@ STDMETHODIMP COCRFileProcessor::raw_ProcessFile(BSTR strFileFullName, IFAMTagMan
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17920", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17923", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17920", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17923", pResult != NULL);
 
-		string strImageFileName = asString(strFileFullName);
+		string strImageFileName = asString(bstrFileFullName);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
 		// verify the file existence
 		::validateFileOrFolderExistence(strImageFileName);

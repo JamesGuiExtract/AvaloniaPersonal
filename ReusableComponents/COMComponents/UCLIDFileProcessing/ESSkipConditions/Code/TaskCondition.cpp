@@ -132,7 +132,8 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 	{
 		string strSourceFileName = asString(bstrFile);
 		ASSERT_ARGUMENT("ELI20079", !strSourceFileName.empty());
-		ASSERT_ARGUMENT("ELI20080", pFPDB != NULL);
+		IFileProcessingDBPtr ipFPDB(pFPDB);
+		ASSERT_ARGUMENT("ELI20080", ipFPDB != NULL);
 		ASSERT_ARGUMENT("ELI20082", pFAMTM != NULL);
 		ASSERT_ARGUMENT("ELI20083", pRetVal != NULL);
 
@@ -155,14 +156,19 @@ STDMETHODIMP CTaskCondition::raw_FileMatchesFAMCondition(BSTR bstrFile, IFilePro
 		ipTaskOWD->Object = m_ipTask;
 		ipTasks->PushBack(ipTaskOWD);
 
+		// Get the file and action ID's
+		long nFileID = ipFPDB->GetFileID(bstrFile);
+		long nActionID = ipFPDB->GetActionID(bstrAction);
+
 		try
 		{
 			try
 			{
 				// Execute the task.
 				// The condition is satisfied if the task completed without exception or cancellation
-				*pRetVal = m_ipFAMTaskExecutor->InitProcessClose(
-					bstrFile, ipTasks, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
+				EFileProcessingResult eResult = m_ipFAMTaskExecutor->InitProcessClose(
+					bstrFile, ipTasks, nFileID, nActionID, pFPDB, pFAMTM, NULL, VARIANT_FALSE);
+				*pRetVal = asVariantBool(eResult == kProcessingSuccessful);
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20162");
 		}

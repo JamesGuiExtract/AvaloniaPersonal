@@ -767,7 +767,7 @@ void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
 	
 	// update the folder column
 	m_currentFilesList.SetItemText(iNewItemIndex, giLIST1_FOLDER_COLUMN, 
-		getDirectoryFromFullPath(task.m_strFile).c_str());
+		getDirectoryFromFullPath(task.getFileName()).c_str());
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::moveTaskFromCurrentToComplete(long nFileID)
@@ -790,7 +790,7 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToComplete(long nFileID)
 
 	// update the folder column
 	m_completedFilesList.SetItemText(iNewItemIndex, giLIST2_FOLDER_COLUMN, 
-		getDirectoryFromFullPath(task.m_strFile).c_str());
+		getDirectoryFromFullPath(task.getFileName()).c_str());
 
 	// update internal stats
 	updateStatisticsVariablesWithTaskInfo(nFileID);
@@ -821,7 +821,7 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 
 	// update the folder column
 	m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FOLDER_COLUMN, 
-		getDirectoryFromFullPath(task.m_strFile).c_str());
+		getDirectoryFromFullPath(task.getFileName()).c_str());
 
 	// Check for exception while executing error task
 	if (!task.m_strErrorTaskException.empty())
@@ -840,7 +840,7 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 
 		// update the folder column
 		m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FOLDER_COLUMN, 
-			getDirectoryFromFullPath(task.m_strFile).c_str());
+			getDirectoryFromFullPath(task.getFileName()).c_str());
 	}
 
 	// update internal stats
@@ -898,7 +898,7 @@ long FileProcessingDlgStatusPage::appendNewRecord(CListCtrl& rListCtrl,
 
 	// update the filename column
 	rListCtrl.SetItemText(iNewItemIndex, giALL_LISTS_FILE_NAME_COLUMN, 
-		getFileNameFromFullPath(task.m_strFile).c_str());
+		getFileNameFromFullPath(task.getFileName()).c_str());
 
 	// update the pages column
 	rListCtrl.SetItemText(iNewItemIndex, giALL_LISTS_NUM_PAGES_COLUMN, 

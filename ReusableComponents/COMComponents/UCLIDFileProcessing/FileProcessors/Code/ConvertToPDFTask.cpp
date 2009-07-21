@@ -187,9 +187,9 @@ STDMETHODIMP CConvertToPDFTask::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, IFAMTagManager *pTagManager, 
-		IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, VARIANT_BOOL vbCancelRequested, 
-		VARIANT_BOOL *pvbSuccessfulCompletion)
+STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -201,7 +201,7 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, IFAMTagMa
 		// check for NULL parameters
 		ASSERT_ARGUMENT("ELI18752", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI18753", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI18754", pvbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI18754", pResult != NULL);
 
 		// get the source doc name
 		string strSourceDoc = asString(bstrFileFullName);
@@ -226,7 +226,7 @@ STDMETHODIMP CConvertToPDFTask::raw_ProcessFile(BSTR bstrFileFullName, IFAMTagMa
 		runExtractEXE(m_strConvertToPDFEXE, strArgs, INFINITE);
 
 		// completed successfully
-		*pvbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18755")
 

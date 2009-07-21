@@ -111,6 +111,11 @@ public:
 	STDMETHOD(AsStatusString)(EActionStatus eaStatus, BSTR *pbstrStatusString);
 	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus *peaStatus);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
+	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
+	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID);
+	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
+	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
+	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

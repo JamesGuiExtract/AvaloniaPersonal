@@ -1247,7 +1247,7 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 	{
 		// add the thread ID to the debug info
 		ue.addDebugInfo("ThreadId", GetCurrentThreadId());
-		ue.addDebugInfo("Top level File", task.m_strFile);
+		ue.addDebugInfo("Top level File", task.getFileName());
 
 		// Mark task as failed prior to running any error tasks so that we don't overwrite
 		// a change that may be made by the error task
@@ -1279,11 +1279,11 @@ bool CFileProcessingMgmtRole::startFileProcessingChain(FileProcessingRecord& tas
 		}
 
 		// Attempt to process the file
-		_bstr_t _bstrFileName = task.getFileName().c_str();
-		VARIANT_BOOL vbSuccessfulCompletion = ipExecutor->ProcessFile(
-			_bstrFileName, task.m_ipProgressStatus, VARIANT_FALSE);
+		UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->ProcessFile(
+			task.getFileName().c_str(), task.getFileID(), task.getActionID(),
+			task.m_ipProgressStatus, VARIANT_FALSE);
 
-		return asCppBool(vbSuccessfulCompletion);
+		return eResult == kProcessingSuccessful;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10909");
 }
@@ -1303,7 +1303,7 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 		if (m_bLogErrorDetails)
 		{
 			// Resolve document tags in path to log file
-			string strLogFile = CFileProcessingUtils::ExpandTagsAndTFE(getFAMTagManager(), m_strErrorLogFile, task.m_strFile);
+			string strLogFile = CFileProcessingUtils::ExpandTagsAndTFE(getFAMTagManager(), m_strErrorLogFile, task.getFileName());
 
 			// Check log file extension
 			string strExt = getExtensionFromFullPath( strLogFile, true );
@@ -1349,15 +1349,16 @@ void CFileProcessingMgmtRole::handleProcessingError(FileProcessingRecord &task,
 				ipErrorTaskList->PushBack(getErrorHandlingTask());
 
 				// Run the task
-				VARIANT_BOOL bSuccessfulCompletion = ipExecutor->InitProcessClose(
-					get_bstr_t(task.m_strFile), ipErrorTaskList, getFPMDB(), getFAMTagManager(), 
+				UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->InitProcessClose(
+					get_bstr_t(task.getFileName()), ipErrorTaskList, task.getFileID(),
+					task.getActionID(), getFPMDB(), getFAMTagManager(), 
 					task.m_ipProgressStatus, VARIANT_FALSE);
 
 				// Log a cancellation during error task execution
-				if (asCppBool(bSuccessfulCompletion) == false)
+				if (eResult == kProcessingCancelled)
 				{
 					UCLIDException ue("ELI18060","Processing cancelled while executing error task!");
-					ue.addDebugInfo("File", task.m_strFile);
+					ue.addDebugInfo("File", task.getFileName());
 					ue.addDebugInfo("Task", asString(getErrorHandlingTask()->Description));
 					ue.log();
 				}

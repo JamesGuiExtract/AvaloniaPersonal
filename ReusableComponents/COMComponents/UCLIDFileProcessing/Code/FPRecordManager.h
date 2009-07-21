@@ -104,6 +104,9 @@ public:
 	//			this method will get the Action name from the DB
 	void setActionID(long nActionID );
 	//---------------------------------------------------------------------------------------------
+	// PROMISE: To return the ID of the action being processed.
+	long getActionID();
+	//---------------------------------------------------------------------------------------------
 	// PROMISE: To set the KeepProcessingAsAdded flag so when the Record Manager 
 	//			will keep trying to get more files from the database indefinitely
 	//			if it is set to false when no file obtained from the DB pop

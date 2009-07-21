@@ -1035,9 +1035,9 @@ STDMETHODIMP CRedactionVerificationUI::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+	long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1049,11 +1049,11 @@ STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR strFileFullName,
 		// Check license
  		validateLicense();
 
-		ASSERT_ARGUMENT("ELI17931", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17932", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17931", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17932", pResult != NULL);
 
 		// Default to user cancelling
-		*pbSuccessfulCompletion = VARIANT_FALSE;
+		*pResult = kProcessingCancelled;
 
 		if (asCppBool(bCancelRequested))
 		{
@@ -1064,12 +1064,12 @@ STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR strFileFullName,
 		if (ms_nInitializationCount == 0)
 		{
 			UCLIDException ue("ELI17832", "Processing failure: Redaction Verification UI task has not been initialized!");
-			ue.addDebugInfo("Source Filename", asString(strFileFullName));
+			ue.addDebugInfo("Source Filename", asString(bstrFileFullName));
 			throw ue;
 		}
 
 		// Local input file for processing
-		string strInputFile = asString(strFileFullName);
+		string strInputFile = asString(bstrFileFullName);
 
 		// Create a smart FAM Tag Manager pointer
 		IFAMTagManagerPtr ipFAMTagManager = pTagManager;
@@ -1107,7 +1107,7 @@ STDMETHODIMP CRedactionVerificationUI::raw_ProcessFile(BSTR strFileFullName,
 		}
 
 		// If we reached this point, processing was successful
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI11243")
 

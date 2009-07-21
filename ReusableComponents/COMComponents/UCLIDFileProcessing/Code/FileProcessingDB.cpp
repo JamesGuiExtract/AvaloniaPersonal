@@ -2188,6 +2188,121 @@ STDMETHODIMP CFileProcessingDB::GetFileID(BSTR bstrFileName, long *pnFileID)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetActionName(long nActionID, BSTR *pbstrActionName)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI26769", pbstrActionName != NULL);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Get the action name from the database
+		string strActionName = getActionName(ipConnection, nActionID);
+
+		// Return the action name
+		*pbstrActionName = _bstr_t(strActionName.c_str()).Detach();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26770");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26771");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26778");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26779");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetFileActionComment(long nFileID, long nActionID, BSTR bstrComment)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26772");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26773");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFileActionComment(long nFileID, long nActionID,
+													 BSTR* pbstrComment)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26774");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26775");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActionID)
+{
+	try
+	{
+		AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26776");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26777");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

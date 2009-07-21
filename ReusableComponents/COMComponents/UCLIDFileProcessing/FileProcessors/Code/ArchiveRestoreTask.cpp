@@ -369,9 +369,9 @@ STDMETHODIMP CArchiveRestoreTask::raw_Init()
 	return S_OK;
 }
 //--------------------------------------------------------------------------------------------------
-STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, 
-		IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus, 
-		VARIANT_BOOL vbCancelRequested, VARIANT_BOOL *pvbSuccessfulCompletion)
+STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -384,10 +384,10 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName,
 		// check for NULL parameters
 		ASSERT_ARGUMENT("ELI24578", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI24579", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI24580", pvbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI24580", pResult != NULL);
 
 		// Default to successful completion
-		*pvbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 		_lastCodePos = "10";
 
 		// Check whether this is an archive operation or a restore

@@ -127,9 +127,9 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID,
+    long nActionID, IFAMTagManager *pTagManager, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -138,25 +138,25 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		// Check license
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17914", strFileFullName != NULL);
-		ASSERT_ARGUMENT("ELI17904", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI17903", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17914", bstrFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17904", pTagManager != NULL);
+		ASSERT_ARGUMENT("ELI17903", pResult != NULL);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
-		std::string strSourceDocName = asString(strFileFullName);
+		std::string strSourceDocName = asString(bstrFileFullName);
 		ASSERT_ARGUMENT("ELI17915", strSourceDocName.empty() == false);
 
 		// Call ExpandTagsAndTFE() to expand tags and functions
-		std::string strExSrc = CFileProcessorsUtils::ExpandTagsAndTFE(pFAMTM, m_strSrc, strSourceDocName);
+		std::string strExSrc = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strSrc, strSourceDocName);
 
 		switch (m_eOperation)
 		{
 		case kCMDOperationMoveFile:
 			{
 				// Call ExpandTagsAndTFE() to expand tags and functions
-				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pFAMTM, m_strDst, strSourceDocName);
+				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);
 
 				// Check destination folder
 				handleDirectory( strExDst );
@@ -197,7 +197,7 @@ STDMETHODIMP CCopyMoveDeleteFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 		case kCMDOperationCopyFile:
 			{
 				// Call ExpandTagsAndTFE() to expand tags and functions
-				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pFAMTM, m_strDst, strSourceDocName);  
+				std::string strExDst = CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strDst, strSourceDocName);  
 
 				// Check destination folder
 				handleDirectory( strExDst );

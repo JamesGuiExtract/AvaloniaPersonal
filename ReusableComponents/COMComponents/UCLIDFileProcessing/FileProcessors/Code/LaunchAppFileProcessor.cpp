@@ -122,9 +122,9 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_Init()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR strFileFullName, 
-		IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
-		VARIANT_BOOL bCancelRequested, VARIANT_BOOL *pbSuccessfulCompletion)
+STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long nFileID, long nActionID,
+	IFAMTagManager *pFAMTM, IFileProcessingDB *pDB, IProgressStatus *pProgressStatus,
+	VARIANT_BOOL bCancelRequested, EFileProcessingResult *pResult)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -132,14 +132,14 @@ STDMETHODIMP CLaunchAppFileProcessor::raw_ProcessFile(BSTR strFileFullName,
 	{
 		validateLicense();
 		
-		ASSERT_ARGUMENT("ELI17916", strFileFullName != NULL);
+		ASSERT_ARGUMENT("ELI17916", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17918", pFAMTM != NULL);
-		ASSERT_ARGUMENT("ELI17919", pbSuccessfulCompletion != NULL);
+		ASSERT_ARGUMENT("ELI17919", pResult != NULL);
 
 		// Default to successful completion
-		*pbSuccessfulCompletion = VARIANT_TRUE;
+		*pResult = kProcessingSuccessful;
 
-		string strSourceDocName = asString(strFileFullName);
+		string strSourceDocName = asString(bstrFileFullName);
 		ASSERT_ARGUMENT("ELI17917", strSourceDocName.empty() == false);
 
 		// Call ExpandTagsAndTFE() to expand tags and functions
