@@ -139,5 +139,60 @@ namespace Extract.Utilities
                 throw ExtractException.AsExtractException("ELI22651", ex);
             }
         }
+
+        /// <summary>
+        /// Converts a string that was made user-displayable by <see cref="ConvertLiteralToDisplay"/> 
+        /// to its literal string form.
+        /// </summary>
+        /// <param name="display">A string in user-displayable form.</param>
+        /// <returns>The literal string form of <paramref name="display"/>.</returns>
+        public static string ConvertDisplayToLiteral(string display)
+        {
+            try
+            {
+                string result = display.Replace(@"\a", "\a"); // Bell (alert)
+                result = result.Replace(@"\b", "\b");         // Backspace
+                result = result.Replace(@"\f", "\f");         // Formfeed
+                result = result.Replace(@"\n", "\n");         // New line
+                result = result.Replace(@"\r", "\r");         // Carriage return
+                result = result.Replace(@"\t", "\t");         // Tab
+                result = result.Replace(@"\v", "\v");         // Vertical tab
+                return result.Replace(@"\\", "\\");           // Literal backslash
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26787",
+                    "Unable to convert display string to literal string.", ex);
+                ee.AddDebugData("Display string", display, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Converts a literal string to a user-displayable form.
+        /// </summary>
+        /// <param name="literal">A string to convert to user-displayable form.</param>
+        /// <returns><paramref name="literal"/> in user-displayable form.</returns>
+        public static string ConvertLiteralToDisplay(string literal)
+        {
+            try
+            {
+                string result = literal.Replace("\\", @"\\"); // Literal backslash
+                result = result.Replace("\v", @"\v");         // Vertical tab
+                result = result.Replace("\t", @"\t");         // Tab
+                result = result.Replace("\r", @"\r");         // Carriage return
+                result = result.Replace("\n", @"\n");         // New line
+                result = result.Replace("\f", @"\f");         // Formfeed
+                result = result.Replace("\b", @"\b");         // Backspace
+                return result.Replace("\a", @"\a");           // Bell (alert)
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26786",
+                    "Unable to convert literal string to display string.", ex);
+                ee.AddDebugData("Literal string", literal, false);
+                throw ee;
+            }
+        }
     }
 }
