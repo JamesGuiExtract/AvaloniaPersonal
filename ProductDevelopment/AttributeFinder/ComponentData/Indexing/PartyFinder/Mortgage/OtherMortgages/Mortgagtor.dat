@@ -33,7 +33,7 @@
 	# ... followed by "BY" or "BETWEEN" ...
 	#--------------------------------------------
 	)
-	(?:BY\b|\bBY|BETW|TWEEN)
+	(?:BY\b|\bBY|BETW|TWEEN|Mortgagor\s?is)
 	
 	(?#
 	#--------------------------------------------
