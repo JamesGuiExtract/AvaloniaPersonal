@@ -1,3 +1,4 @@
+using Extract.Imaging.Forms;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -6,6 +7,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
@@ -66,6 +68,21 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion VerificationTaskForm Constructors
+
+        #region VerificationTaskForm Methods
+
+        /// <summary>
+        /// Gets the voa file for the currently open image.
+        /// </summary>
+        /// <returns>The voa file for the currently open image.</returns>
+        string GetVoaFileName()
+        {
+            // TODO: Use the path tags settings to determine the voa file
+            // The fps file directory is not yet bubbling down to the VerificationTaskForm.
+            return _imageViewer.ImageFile + ".voa";
+        }
+
+        #endregion VerificationTaskForm Methods
 
         #region VerificationTaskForm Overrides
 
@@ -157,6 +174,27 @@ namespace Extract.Redaction.Verification
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleSaveAndCommitToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                OnFileComplete(new FileCompleteEventArgs(false));
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26785", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
         void HandleApplyExemptionToolStripButtonClick(object sender, EventArgs e)
         {
             try
@@ -187,6 +225,34 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26711", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ImageViewer.ImageFileChanged"/> event.</param>
+        void HandleImageViewerImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        {
+            try
+            {
+                if (_imageViewer.IsImageAvailable)
+                {
+                    string voaFile = GetVoaFileName();
+                    if (File.Exists(voaFile))
+                    {
+                        _redactionGridView.LoadFrom(voaFile);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26760", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }

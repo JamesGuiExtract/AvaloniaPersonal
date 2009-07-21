@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
@@ -7,8 +8,12 @@ using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_COMUTILSLib;
+
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction.Verification
 {
@@ -77,9 +82,9 @@ namespace Extract.Redaction.Verification
         #region RedactionGridView Properties
 
         /// <summary>
-        /// Gets the selected row of the <see cref="RedactionGridView"/>.
+        /// Gets the selected rows of the <see cref="RedactionGridView"/>.
         /// </summary>
-        /// <returns>The selected row of the <see cref="RedactionGridView"/>.</returns>
+        /// <returns>The selected rows of the <see cref="RedactionGridView"/>.</returns>
         IEnumerable<RedactionGridViewRow> SelectedRows
         {
             get
@@ -131,14 +136,26 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                RedactionGridViewRow row = new RedactionGridViewRow(layerObject, text, category, type);
-                _redactions.Add(row);
+                Add( new RedactionGridViewRow(layerObject, text, category, type) );
             }
             catch (Exception ex)
             {
                 throw new ExtractException("ELI26716",
-                    "An unexpected error occurred.", ex);
+                    "Unable to add layer object.", ex);
             }
+        }
+
+        /// <summary>
+        /// Adds the specified row to the <see cref="RedactionGridView"/>.
+        /// </summary>
+        /// <param name="row">The row to add.</param>
+        void Add(RedactionGridViewRow row)
+        {
+            if (!_typeColumn.Items.Contains(row.RedactionType))
+            {
+                _typeColumn.Items.Add(row.RedactionType);
+            }
+            _redactions.Add(row);
         }
 
         /// <summary>
@@ -152,9 +169,13 @@ namespace Extract.Redaction.Verification
                 // Find the layer object and remove it.
                 for (int i = 0; i < _redactions.Count; i++)
                 {
-                    if (_redactions[i].LayerObject.Id == layerObject.Id)
+                    RedactionGridViewRow row = _redactions[i];
+                    if (row.TryRemoveLayerObject(layerObject))
                     {
-                        _redactions.RemoveAt(i);
+                        if (row.LayerObjectCount == 0)
+                        {
+                            _redactions.RemoveAt(i);
+                        }
                         return;
                     }
                 }
@@ -294,6 +315,49 @@ namespace Extract.Redaction.Verification
         public void ApplyLastExemptions()
         {
             ApplyExemptionsToSelected(_lastApplied);
+        }
+
+        /// <summary>
+        /// Loads the rows of the <see cref="RedactionGridView"/> based on the specified vector of 
+        /// attributes file.
+        /// </summary>
+        /// <param name="fileName">A file containing a vector of attributes.</param>
+        public void LoadFrom(string fileName)
+        {
+            try
+            {
+                // As layer objects are added to the image viewer, don't handle the event.
+                // Otherwise two rows will be added for each attribute.
+                _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+
+                // Iterate over the attributes
+                foreach (ComAttribute attribute in AttributesFile.ReadAll(fileName))
+                {
+                    // Add a row for each attribute
+                    RedactionGridViewRow row = 
+                        RedactionGridViewRow.FromAttribute(attribute, _imageViewer);
+                    if (row != null)
+                    {
+                        Add(row);
+
+                        foreach (LayerObject layerObject in row.LayerObjects)
+                        {
+                            _imageViewer.LayerObjects.Add(layerObject);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26761",
+                    "Unable to load VOA file.", ex);
+                ee.AddDebugData("Voa file", fileName, false);
+                throw ee;
+            }
+            finally
+            {
+                _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+            }
         }
 
         #endregion RedactionGridView Methods
