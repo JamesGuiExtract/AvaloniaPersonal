@@ -894,9 +894,9 @@ namespace Extract.LabDE.StandardLabDE
             this._patientRecordNum.TabIndex = 4;
             this._patientRecordNum.TabStopRequired = true;
             this._patientRecordNum.ValidationCorrectsCase = true;
-            this._patientRecordNum.ValidationErrorMessage = "";
+            this._patientRecordNum.ValidationErrorMessage = "Medical record number must be specified";
             this._patientRecordNum.ValidationListFileName = null;
-            this._patientRecordNum.ValidationPattern = null;
+            this._patientRecordNum.ValidationPattern = "\\S";
             this._patientRecordNum.ValidationQuery = null;
             // 
             // _patientMRLabel

@@ -71,11 +71,6 @@ namespace Extract.DataEntry
         private IAttribute _attribute;
 
         /// <summary>
-        /// The domain of attributes to which this control's attribute belongs.
-        /// </summary>
-        private IUnknownVector _sourceAttributes;
-
-        /// <summary>
         /// The filename of the rule file to be used to parse swiped data.
         /// </summary>
         private string _formattingRuleFileName;
@@ -847,8 +842,6 @@ namespace Extract.DataEntry
                     }
                 }
 
-                _sourceAttributes = sourceAttributes;
-
                 // Update text value of this control and raise the events that need to be raised
                 // in conjunction with an attribute change.
                 OnAttributeChanged();
@@ -971,56 +964,31 @@ namespace Extract.DataEntry
 
                 if (_formattingRule != null)
                 {
-                    // Format the data into attribute(s) using the rule.
-                    IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(
-                        _formattingRule, swipedText);
+                    // Find the appropriate attribute (if there is one) from the rule's output.
+                    IAttribute attribute = DataEntryMethods.RunFormattingRule(
+                        _formattingRule, swipedText, _attributeName, _multipleMatchSelectionMode);
 
-                    if (formattedData.Size() > 0)
+                    if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))
                     {
-                        // Find the appropriate attribute (if there is one) from the rule's output.
-                        IAttribute attribute = DataEntryMethods.InitializeAttribute(_attributeName,
-                            _multipleMatchSelectionMode, !string.IsNullOrEmpty(_attributeName),
-                            formattedData, null, this, 0, false, _tabStopRequired, _validator, 
-                            _autoUpdateQuery, _validationQuery);
-
-                        // [DataEntry:251] Swap out the existing attribute in the overall attribute
-                        // heirarchy (keeping attribute ordering the same as it was).
-                        if (DataEntryMethods.InsertOrReplaceAttribute(
-                            _sourceAttributes, attribute, _attribute, null))
-                        {
-                            AttributeStatusInfo.DeleteAttribute(_attribute);
-                        }
-
-                        _attribute = attribute;
-
-                        // [DataEntry:258] The new attribute needs to be marked as viewable.
-                        AttributeStatusInfo.MarkAsViewable(_attribute, true);
-
-                        // [DataEntry:327] If this control is active, ensure the attribute is marked as viewed.
-                        if (_isActive)
-                        {
-                            AttributeStatusInfo.MarkAsViewed(_attribute, true);
-                        }
+                        // Use the resulting attribute's value if one was found.
+                        AttributeStatusInfo.SetValue(_attribute, attribute.Value, false, true);
                     }
                     else
                     {
                         // If the rules did not find anything, go ahead and use the swiped text
                         // as the attribute value.
-                        _attribute.Value = swipedText;
-
-                        // Consider the attribute un-accepted after a swipe.
-                        AttributeStatusInfo.AcceptValue(_attribute, false);
+                        AttributeStatusInfo.SetValue(_attribute, swipedText, false, true);
                     }
                 }
                 else
                 {
                     // If there is no formatting rule specified, simply assign the swiped text
                     // as the current attribute's value.
-                    _attribute.Value = swipedText;
-
-                    // Consider the attribute un-accepted after a swipe.
-                    AttributeStatusInfo.AcceptValue(_attribute, false);
+                    AttributeStatusInfo.SetValue(_attribute, swipedText, false, true);
                 }
+
+                // Consider the attribute un-accepted after a swipe.
+                AttributeStatusInfo.AcceptValue(_attribute, false);
 
                 // Update text value of this control and raise the events that need to be raised
                 // in conjunction with an attribute change.

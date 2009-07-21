@@ -2103,7 +2103,7 @@ namespace Extract.DataEntry
             // Row selecton mode. The swipe can only be applied via the results of
             // a row formatting rule.
             IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(_rowFormattingRule,
-                swipedText);
+                swipedText, base.AttributeName);
 
             // Find all attributes which apply to this control.
             IUnknownVector formattedAttributes = DataEntryMethods.InitializeAttributes(
@@ -2140,17 +2140,15 @@ namespace Extract.DataEntry
             // Process the swiped text with a formatting rule (if available).
             if (dataEntryColumn.FormattingRule != null)
             {
-                IUnknownVector formattedData =
-                    DataEntryMethods.RunFormattingRule(dataEntryColumn.FormattingRule, swipedText);
-
-                // Determine the attribute name to use to find the result
-                string attributeName = (dataEntryColumn.AttributeName == ".") 
+                // Select the attribute name to look for from the rule results. (Could be based on
+                // a sub-attribute name or the name of the table's primary attribute).
+                string attributeName = (dataEntryColumn.AttributeName == ".")
                     ? base.AttributeName : dataEntryColumn.AttributeName;
 
-                IAttribute attribute = DataEntryMethods.InitializeAttribute(attributeName,
-                    dataEntryColumn.MultipleMatchSelectionMode, false, formattedData, null, this,
-                    null, true, false, null, null, null);
-
+                IAttribute attribute = DataEntryMethods.RunFormattingRule(
+                    dataEntryColumn.FormattingRule, swipedText, attributeName,
+                    dataEntryColumn.MultipleMatchSelectionMode);
+                
                 // Use the value of the found attribute only if the found attribute has a non-empty
                 // value.
                 if (attribute != null && !string.IsNullOrEmpty(attribute.Value.String))

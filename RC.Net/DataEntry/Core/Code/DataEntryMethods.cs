@@ -520,6 +520,59 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <overloads>Processes the supplied text with the supplied formatting rule.</overloads>
+        /// <summary>
+        /// Creates an <see cref="IAttribute"/> using the supplied text and formatting rule.
+        /// </summary>
+        /// <param name="rule">The <see cref="IRuleSet"/> to use to process the supplied text.
+        /// Must not be <see langword="null"/>.
+        /// </param>
+        /// <param name="inputText">The <see cref="SpatialString"/> to process with the supplied
+        /// rule.</param>
+        /// <param name="attributeName">The name of the attribute for which the rule should be run.
+        /// Can be <see langword="null"/> to choose from <see cref="IAttribute"/>s of all names.
+        /// </param>
+        /// <param name="selectionMode">The <see cref="MultipleMatchSelectionMode"/> used to choose
+        /// from multiple results. <see cref="MultipleMatchSelectionMode.All"/> is not a valid
+        /// option for this call.</param>
+        /// <returns>An single <see cref="IAttribute"/> found using the formatting rule or
+        /// <see langword="null"/> if no <see cref="IAttribute"/> meeting the qualifications was
+        /// found.
+        /// </returns>
+        internal static IAttribute RunFormattingRule(IRuleSet rule, SpatialString inputText,
+            string attributeName, MultipleMatchSelectionMode selectionMode)
+        {
+            try
+            {
+                ExtractException.Assert("ELI26765", "Rule was not specified!", rule != null);
+                ExtractException.Assert("ELI26766", "Invalid selection mode!",
+                    selectionMode != MultipleMatchSelectionMode.All);
+
+                IUnknownVector results = RunFormattingRule(rule, inputText, attributeName);
+
+                // Choose the appropriate resulting attribute based on selectionMode
+                int resultsCount = results.Size();
+                if (resultsCount > 0)
+                {
+                    if (resultsCount == 1 || selectionMode == MultipleMatchSelectionMode.First)
+                    {
+                        return (IAttribute)results.At(0);
+                    }
+                    else if (selectionMode == MultipleMatchSelectionMode.Last)
+                    {
+                        return (IAttribute)results.At(resultsCount - 1);
+                    }
+                }
+
+                // No attribute could be found using the supplied parameters.
+                return null;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26767", ex);
+            }
+        }
+
         /// <summary>
         /// Processes the supplied text with the supplied formatting rule.
         /// </summary>
@@ -528,9 +581,13 @@ namespace Extract.DataEntry
         /// </param>
         /// <param name="inputText">The <see cref="SpatialString"/> to process with the supplied
         /// rule.</param>
+        /// <param name="attributeName">The name of the attribute for which the rule should be run.
+        /// Can be <see langword="null"/> to choose from <see cref="IAttribute"/>s of all names.
+        /// </param>
         /// <returns>The result of running the formatting rule on the supplied text. 
         /// </returns>
-        internal static IUnknownVector RunFormattingRule(IRuleSet rule, SpatialString inputText)
+        internal static IUnknownVector RunFormattingRule(IRuleSet rule, SpatialString inputText,
+            string attributeName)
         {
             try
             {
@@ -541,8 +598,16 @@ namespace Extract.DataEntry
                 AFDocumentClass afDoc = new AFDocumentClass();
                 afDoc.Text = inputText;
 
+                // Prepare a variant vector to specify the desired attribute name.
+                VariantVector attributeNames = null;
+                if (!string.IsNullOrEmpty(attributeName))
+                {
+                    attributeNames = (VariantVector)new VariantVectorClass();
+                    attributeNames.PushBack(attributeName);
+                }
+
                 // Format the data into attribute(s) using the rule.
-                return rule.ExecuteRulesOnText(afDoc, null, null);
+                return rule.ExecuteRulesOnText(afDoc, attributeNames, null);
             }
             catch (Exception ex)
             {

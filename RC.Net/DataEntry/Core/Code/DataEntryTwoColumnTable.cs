@@ -764,12 +764,8 @@ namespace Extract.DataEntry
             ExtractException.Assert("ELI26144", "Uninitialized data!",
                 _sourceAttributes != null && _attribute != null);
 
-            IUnknownVector formattedData = DataEntryMethods.RunFormattingRule(
-                _tableFormattingRule, swipedText);
-
-            IAttribute newAttribute = DataEntryMethods.InitializeAttribute(base.AttributeName,
-                _multipleMatchSelectionMode, false, formattedData, null, this, 0, false, true, 
-                null, null, null);
+            IAttribute newAttribute = DataEntryMethods.RunFormattingRule(
+                _tableFormattingRule, swipedText, base.AttributeName, _multipleMatchSelectionMode);
 
             // If a qualifying attribute was found in the rule's results, apply it.
             if (newAttribute != null)
@@ -830,17 +826,14 @@ namespace Extract.DataEntry
             // Process the swiped text with a formatting rule (if available).
             if (selectedRow.FormattingRule != null)
             {
-                IUnknownVector formattedData =
-                    DataEntryMethods.RunFormattingRule(selectedRow.FormattingRule, swipedText);
-
                 // Select the attribute name to look for from the rule results. (Could be based on
                 // a sub-attribute name or the name of the table's primary attribute).
-                string attributeName = (selectedRow.AttributeName == ".") 
+                string attributeName = (selectedRow.AttributeName == ".")
                     ? base.AttributeName : selectedRow.AttributeName;
 
-                IAttribute attribute = DataEntryMethods.InitializeAttribute(attributeName,
-                    selectedRow.MultipleMatchSelectionMode, false, formattedData, null, this,
-                    0, true, true, null, null, null);
+                IAttribute attribute = DataEntryMethods.RunFormattingRule(
+                    selectedRow.FormattingRule, swipedText, attributeName,
+                    selectedRow.MultipleMatchSelectionMode);
 
                 // Use the value of the found attribute only if the found attribute has a non-empty
                 // value.
