@@ -613,6 +613,29 @@ namespace Extract.LabResultsCustomComponents
             Dictionary<string, List<IAttribute>> nameToAttributes =
                 GetMapOfNamesToAttributes(attributes);
 
+            IAttribute dateAttribute = null;
+            IAttribute timeAttribute = null;
+
+            // Get the date and time from the attributes
+            List<IAttribute> temp;
+            if (nameToAttributes.TryGetValue("COLLECTIONDATE", out temp))
+            {
+                // List should have at least 1 item, pick the first
+                ExtractException.Assert("ELI26231", "Attribute list should have at least 1"
+                    + " collection date.", temp.Count > 0);
+
+                dateAttribute = temp[0];
+            }
+            temp = null;
+            if (nameToAttributes.TryGetValue("COLLECTIONTIME", out temp))
+            {
+                // List should have at least 1 item, pick the first
+                ExtractException.Assert("ELI26232", "Attribute list should have at least 1"
+                    + " collection time.", temp.Count > 0);
+
+                timeAttribute = temp[0];
+            }
+
             List<IAttribute> mappedList = new List<IAttribute>();
             foreach (KeyValuePair<string, List<IAttribute>> pair in nameToAttributes)
             {
@@ -636,6 +659,16 @@ namespace Extract.LabResultsCustomComponents
                         orderGrouping.Name = "Order";
                         orderGrouping.Value.CreateNonSpatialString("UnknownOrder", sourceDocName);
                         vecMatched.PushBack(orderGrouping);
+
+                        // Add the date, time
+                        if (dateAttribute != null)
+                        {
+                            vecMatched.PushBack(dateAttribute);
+                        }
+                        if (timeAttribute != null)
+                        {
+                            vecMatched.PushBack(timeAttribute);
+                        }
 
                         // Get the best match order for the remaining unmatched tests
                         Dictionary<string, string> testNamesToCodes;
