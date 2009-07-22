@@ -17,8 +17,9 @@ const unsigned int gnSIMPLE_RULE_WRITING_PASSWORDS		= 2;
 // - ID Shield for Laserfiche 1.0				2000
 // - ID Shield Office 1.0						2000
 // - FLEX Index and ID Shield 7.0				3000
+// - LabDE 1.0									4000
 //-------------------------------------------------------------------------------------------------
-const unsigned int gnBASE_OFFSET						= 3000;
+const unsigned int gnBASE_OFFSET						= 4000;
 
 //-------------------------------------------------------------------------------------------------
 // Constants for core objects
@@ -118,6 +119,9 @@ const unsigned int gnIDSHIELD_RULE_WRITING_OBJECTS		= gnBASE_OFFSET + 26;
 // customers.
 const unsigned int gnFLEXINDEX_RULE_WRITING_OBJECTS		= gnBASE_OFFSET + 27;
 
+// This item is for objects that are specific to LabDE.
+const unsigned int gnLABDE_CORE_OBJECTS					= gnBASE_OFFSET + 28;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants for individual objects
@@ -148,6 +152,9 @@ const unsigned int gnRUN_RULES_OBJECT					= gnBASE_OFFSET + 48;
 
 // Special ID for ID Shield Office application.
 const unsigned int gnID_SHIELD_OFFICE_OBJECT			= gnBASE_OFFSET + 49;
+
+// Special ID for the LabDE verification interface.
+const unsigned int gnLABDE_VERIFICATION_UI_OBJECT		= gnBASE_OFFSET + 50;
 
 
 //-------------------------------------------------------------------------------------------------
