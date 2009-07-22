@@ -26,7 +26,8 @@ AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
 LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(LabDEVersion)
 
-AFCoreInstallFilesRootDir=P:\AttributeFinder\CoreInstallation\Files
+AFInstallRootDir=P:\AttributeFinder
+AFCoreInstallFilesRootDir=$(AFInstallRootDir)\CoreInstallation\Files
 
 LabDEDir=$(PDRootDir)\LabDE
 LabDEInstallRootDir=$(LabDEDir)\Installation
@@ -130,25 +131,27 @@ CreateLabDEInstallCD: BuildLabDEInstall
 	
 CreateDemo_LabDE:
 	@ECHO Creating LabDE Demo Folder...
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration"
-	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
-	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Bin"
-	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\"
-	@COPY /v "$(LabResultsDir)\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Corepoint Integration"
-	@COPY /v "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Database Files"
-	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules" /v /s /e /y
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
+	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
+	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
+	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
+	@COPY /v "$(LabResultsDir)\Demo2\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\"
+	@COPY /v "$(LabResultsDir)\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
+	@COPY /v "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
+	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" /v /s /e /y
 	@ECHO Encrypting LabDE Demo Rules...
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dat"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.rsd"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.dcc"
-	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\*.spm"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Demo Solution\Rules\vssver.scc"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dcc" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.spm" 1 1 "$(BinariesFolder)\EncryptFile.exe"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dat"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.rsd"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dcc"
+	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.spm"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\vssver.scc"
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
 
