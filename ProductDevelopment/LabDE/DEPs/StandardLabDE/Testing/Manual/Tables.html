@@ -33,7 +33,7 @@
 		</ul>
 		<LI>Select both the <b>GLUCOSE</b> cell and the <b>HGB</b> cell.
 		<ul>
-			<LI>Confirm that <b>both</b> headers are highlighted.
+<!--			<LI>Confirm that <b>both</b> headers are highlighted.	-->
 			<LI>Confirm that the collection date and time are <b>not</b> highlighted. 
 			<LI>Confirm that the individual tests are <b>not</b> highlighted and that 
 			hints are <b>not</b> visible.
@@ -41,7 +41,7 @@
 		</ul>
 		<LI>Select the entire <b>HGB</b> row from <b>Orders</b>.
 		<ul>
-			<LI>Confirm that the <b>HGB</b> header is highlighted.
+<!--			<LI>Confirm that the <b>HGB</b> header is highlighted.	-->
 			<LI>Confirm that the collection date and time are highlighted. 
 			<LI>Confirm that the individual tests are highlighted and that 
 			hints are visible for missing data. 
@@ -49,7 +49,7 @@
 		</ul>
 		<LI>Select both the <b>GLUCOSE</b> row and the <b>HGB</b> row.
 		<ul>
-			<LI>Confirm that <b>both</b> headers are highlighted.
+<!--			<LI>Confirm that <b>both</b> headers are highlighted.	-->
 			<LI>Confirm that the collection date and time are highlighted. 
 			<LI>Confirm that the individual tests are highlighted and that 
 			hints are visible.
@@ -76,7 +76,7 @@
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
 		<LI>Select one entire row from the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
-		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Test 
+		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected row.
 		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
 		that the appropriate highlights and hints are visible in the image.
@@ -84,14 +84,14 @@
 		<LI>Select a different entire row from the <b>Selected Order Details</b>.
 		<LI>Use the rectangular highlight tool to Swipe <b>two or more</b> rows 
 		of test data.
-		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Test 
+		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected row.
 		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
 		that the appropriate highlights and hints are visible in the image.
 <p>
 		<LI>Select multiple entire rows from the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
-		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Test 
+		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected rows.
 		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
 		that the appropriate highlights and hints are visible in the image.
@@ -99,7 +99,7 @@
 		<LI>Select multiple entire rows from the <b>Selected Order Details</b>.
 		<LI>Use the rectangular highlight tool to Swipe <b>two or more</b> rows 
 		of test data.
-		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Test 
+		<LI>Confirm that the <b>swiped</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected rows.
 		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
 		that the appropriate highlights and hints are visible in the image.
@@ -116,12 +116,12 @@
 <p>
 		<li><b>[DataEntry #404]</b> Extra test row after swiping into inserted row
 		<ul>
-			<li>Open a document and select an order (Order 1).
-			<li>Right-click in the test table and insert a row.
-			<li>Select a different order (Order 2), then select Order 1 again.
+			<li>Open a 057.tif from Demo_LabDE and select the <b>GLUCOSE</b> order.
+			<li>Right-click in the <b>Selected Order Details</b> table and insert a row.
+			<li>Select the <b>HGB</b> order then select <b>GLUCOSE</b> again.
 			<li>Confirm that there are no extra rows in the table.
 			<li>Repeat the same test, but this time swipe/type some data into the inserted row
-			before navigating to Order 2. Confirm that there are still no extra rows in the test table.
+			before navigating to <b>HGB</b>. Confirm that there are still no extra rows in the test table.
 		</ul>
 	</ul>
 <p>
@@ -130,7 +130,7 @@
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
 		<LI>Select one entire row from the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
-		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Test 
+		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected row.
 		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
 		that the appropriate highlights and hints are visible in the image.
@@ -138,14 +138,14 @@
 		<LI><b>[DataEntry #309]</b> Swiping and Ctrl + Letter
 		<ul>
 			<LI>Start swiping something into a field.
-			<LI>Click <b>Ctrl+S</b> once.
+			<LI>Press <b>Ctrl+S</b> once.
 			<LI>Confirm that the highlight that is being drawn does not disappear.
 		</ul>
 <p>
 		<LI><b>[DataEntry #335]</b> Swiping and Tabs
 		<ul>
 			<LI>Swipe something into a field.
-			<LI>Click <b>Tab</b> once.
+			<LI>Press <b>Tab</b> once.
 			<LI>Confirm that the active cell is only one step past the swiped cell.
 		</ul>
 <p>
@@ -172,26 +172,25 @@
 	<LI><h3>Copy and Paste from tables</h3>
 	<ul>
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
-		<LI>Select the entire <b>Potassium</b> row from the test details in the first 
-		<b>Basic Metabolic Panel</b>.
+		<LI>Select the entire <b>POTASSIUM</b> row from the <b>Selected Order Details</b> for the  
+		<b>POTASSIUM</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
-		<LI>Select the second <b>Basic Metabolic Panel</b>.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<LI>Select another order</b>.
+		<LI>Right-click the empty <b>Selected Order Details</b> details row and select <b>Paste copied row(s)</b>.
 		<ul>
-			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
+			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
 			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
 			proper highlights and no tooltips. 
 		</ul>
-		<LI>Select <b>multiple</b> rows from the test details in the first 
-		<b>Basic Metabolic Panel</b>.
+		<LI>Select <b>multiple</b> rows from the Selected Order Details in the <b>POTASSIUM</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
-		<LI>Select the second <b>Basic Metabolic Panel</b>.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<LI>Select another order.
+		<LI>Right-click the empty Selected Order Details row and select <b>Paste copied row(s)</b>.
 		<ul>
-			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
+			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
@@ -291,26 +290,26 @@
 	<LI><h3>Context menu for tables</h3>
 	<ul>
 		<LI>Open image <b>004.tif</b> from Demo_LabDE.
-		<LI>Select the entire <b>Potassium</b> row from the test details in the first 
+		<LI>Select the entire <b>Potassium</b> row from the Selected Order Details in the first 
 		<b>Basic Metabolic Panel</b>.
 		<LI>Right-click and select <b>Copy row(s)</b>.
 		<LI>Select the second <b>Basic Metabolic Panel</b>.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<LI>Right-click the empty Selected Order Details row and select <b>Paste copied row(s)</b>.
 		<ul>
-			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Test 
+			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
 			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
 			proper highlights and no tooltips. 
 		</ul>
-		<LI>Select <b>multiple</b> rows from the test details in the first 
+		<LI>Select <b>multiple</b> rows from the Selected Order Details in the first 
 		<b>Basic Metabolic Panel</b>.
 		<LI>Right-click and select <b>Copy row(s)</b>.
 		<LI>Select the second <b>Basic Metabolic Panel</b>.
-		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
+		<LI>Right-click the empty Selected Order Details row and select <b>Paste copied row(s)</b>.
 		<ul>
-			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
+			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that selecting individual cells displays proper highlights 
 			and tooltips. 
