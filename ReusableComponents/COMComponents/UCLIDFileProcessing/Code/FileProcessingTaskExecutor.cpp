@@ -152,6 +152,7 @@ STDMETHODIMP CFileProcessingTaskExecutor::InitProcessClose(BSTR bstrSourceDocNam
 		{
 			// Guarantee that Close is called if Init has been called
 			close();
+			throw;
 		}
 
 		// Close the processing tasks
