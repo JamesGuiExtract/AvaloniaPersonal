@@ -236,84 +236,79 @@ namespace Extract.LabResultsCustomComponents
                     throw ee;
                 }
 
-                // Get a temporary file for the database connection to use
-                using (TemporaryFile tempFile = new TemporaryFile(".sdf"))
+                // Build the connection string
+                string connectionString = "Data Source='" + databaseFile + "';";
+
+                // Try to open the database connection, if there is a sqlce exception,
+                // just increment retry count, sleep, and try again
+                int retryCount = 0;
+                Exception tempEx = null;
+                while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
                 {
-                    // Build the connection string
-                    string connectionString = "Data Source='" + databaseFile
-                        + "'; File Mode='read only'; Temp Path='" + tempFile.FileName + "';";
-
-                    // Try to open the database connection, if there is a sqlce exception,
-                    // just increment retry count, sleep, and try again
-                    int retryCount = 0;
-                    Exception tempEx = null;
-                    while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
+                    try
                     {
-                        try
-                        {
-                            dbConnection = new SqlCeConnection(connectionString);
-                        }
-                        catch (SqlCeException ex)
-                        {
-                            tempEx = ex;
-                            retryCount++;
-                            System.Threading.Thread.Sleep(100);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw ExtractException.AsExtractException("ELI26651", ex);
-                        }
+                        dbConnection = new SqlCeConnection(connectionString);
                     }
-
-                    // If all the retries failed and the connection is still null, throw an exception
-                    if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
+                    catch (SqlCeException ex)
                     {
-                        ExtractException ee = new ExtractException("ELI26652",
-                            "Unable to open database connection!", tempEx);
-                        ee.AddDebugData("Retries", retryCount, false);
-                        throw ee;
+                        tempEx = ex;
+                        retryCount++;
+                        System.Threading.Thread.Sleep(100);
                     }
-
-                    // Build a new vector of attributes that have been mapped to orders
-                    IUnknownVector newAttributes = new IUnknownVector();
-
-                    // Create an attribute sorter for sorting sub attributes
-                    ISortCompare attributeSorter =
-                                (ISortCompare)new SpatiallyCompareAttributesClass();
-
-                    int size = pAttributes.Size();
-                    for (int i=0; i < size; i++)
+                    catch (Exception ex)
                     {
-                        IAttribute attribute = (IAttribute) pAttributes.At(i);
-                        if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
-                        {
-                            List<IAttribute> mappedAttributes =
-                                MapOrders(attribute.SubAttributes, dbConnection);
-                            foreach (IAttribute newAttribute in mappedAttributes)
-                            {
-                                // Sort the sub attributes spatially
-                                newAttribute.SubAttributes.Sort(attributeSorter);
-
-                                // Add the attribute to the vector
-                                newAttributes.PushBack(newAttribute);
-                            }
-                        }
-                        else
-                        {
-                            // Not a test attribute, just copy it
-                            newAttributes.PushBack(attribute);
-                        }
+                        throw ExtractException.AsExtractException("ELI26651", ex);
                     }
-                    
-                    // Finished with database so close connection
-                    dbConnection.Dispose();
-                    dbConnection = null;
-
-                    // Clear the original attributes and set the attributes to the
-                    // newly mapped collection
-                    pAttributes.Clear();
-                    pAttributes.CopyFrom(newAttributes);
                 }
+
+                // If all the retries failed and the connection is still null, throw an exception
+                if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
+                {
+                    ExtractException ee = new ExtractException("ELI26652",
+                        "Unable to open database connection!", tempEx);
+                    ee.AddDebugData("Retries", retryCount, false);
+                    throw ee;
+                }
+
+                // Build a new vector of attributes that have been mapped to orders
+                IUnknownVector newAttributes = new IUnknownVector();
+
+                // Create an attribute sorter for sorting sub attributes
+                ISortCompare attributeSorter =
+                            (ISortCompare)new SpatiallyCompareAttributesClass();
+
+                int size = pAttributes.Size();
+                for (int i = 0; i < size; i++)
+                {
+                    IAttribute attribute = (IAttribute)pAttributes.At(i);
+                    if (attribute.Name.Equals("Test", StringComparison.OrdinalIgnoreCase))
+                    {
+                        List<IAttribute> mappedAttributes =
+                            MapOrders(attribute.SubAttributes, dbConnection);
+                        foreach (IAttribute newAttribute in mappedAttributes)
+                        {
+                            // Sort the sub attributes spatially
+                            newAttribute.SubAttributes.Sort(attributeSorter);
+
+                            // Add the attribute to the vector
+                            newAttributes.PushBack(newAttribute);
+                        }
+                    }
+                    else
+                    {
+                        // Not a test attribute, just copy it
+                        newAttributes.PushBack(attribute);
+                    }
+                }
+
+                // Finished with database so close connection
+                dbConnection.Dispose();
+                dbConnection = null;
+
+                // Clear the original attributes and set the attributes to the
+                // newly mapped collection
+                pAttributes.Clear();
+                pAttributes.CopyFrom(newAttributes);
             }
             catch (Exception ex)
             {
