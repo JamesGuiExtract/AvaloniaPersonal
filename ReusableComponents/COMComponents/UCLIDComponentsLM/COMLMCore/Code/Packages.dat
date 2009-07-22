@@ -24,6 +24,7 @@
 //   ID Shield for Laserfiche 1.0           2000
 //   ID Shield Office 1.0                   2000
 //   FLEX Index & ID Shield 7.0             3000
+//   LabDE 1.0                              4000
 //
 // TODO: remove private license for ObjSelectorUI and ObjPropertiesDlg
 // and implemented standard ID based licensing.
@@ -36,38 +37,39 @@
 ///////////
 // Core IDs
 ///////////
-!ExtractCore,3001
-!InputFunnelCore,3002:3070:$ExtractCore
-!FlexIndexAndIDShieldCore,3003:3076:$RuleWritingCore
-!FlexIndex,3004:$FlexIndexAndIDShieldCore
-!IDShield,3005:$FlexIndexAndIDShieldCore
-!IcoMapCore,3007:$InputFunnelCore
+!ExtractCore,4001
+!InputFunnelCore,4002:4070:$ExtractCore
+!FlexIndexAndIDShieldCore,4003:4076:$RuleWritingCore
+!FlexIndex,4004:$FlexIndexAndIDShieldCore
+!IDShield,4005:$FlexIndexAndIDShieldCore
+!IcoMapCore,4007:$InputFunnelCore
 
-// NOT !IcoMapForArcGIS,3008:$IcoMapCore because IcoMapCore is licensed separately
-!IcoMapForArcGIS,3008
+// NOT !IcoMapForArcGIS,4008:$IcoMapCore because IcoMapCore is licensed separately
+!IcoMapForArcGIS,4008
 
 // RDT = special components + FlexServer + IDShieldServer + IDShieldClient + RuleSetEditor
-!RuleDevelopmentToolkit,3006:$FlexServer:$IDShield:3026:3027:3044:3045:3046:3077:3081
+!RuleDevelopmentToolkit,4006:$FlexServer:$IDShield:4026:4027:4044:4045:4046:4077:4081
 
 // Laserfiche = IDShieldServer + IDShieldClient + Laserfiche_Integration
-!LaserficheVerification,$IDShield:3044:3045:3101
-!LaserficheDesktop,$IDShield:3044:3045:$LaserficheVerification:3102
-!LaserficheServer,$IDShield:3044:3045:$LaserficheVerification:$LaserficheDesktop:3103
+!LaserficheVerification,$IDShield:4044:4045:4101
+!LaserficheDesktop,$IDShield:4044:4045:$LaserficheVerification:4102
+!LaserficheServer,$IDShield:4044:4045:$LaserficheVerification:$LaserficheDesktop:4103
 
 // ID Shield Office = IDShieldOffice + OCROnClient + ExtractCore
 // plus built-in support for AntiAliasing + PDF Read/Write + Annotations
-!IDShieldOffice,$ExtractCore:3022:3049:3070:3073:3076
+!IDShieldOffice,$ExtractCore:4022:4049:4070:4073:4076
 
 ////////////////////
 // Functionality IDs
 ////////////////////
-!OCROnServer,3021
-!OCROnClient,3022
-!FlexShieldServerCore,3025:3047:3048:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
-!FlexServer,3023:$FlexShieldServerCore:$FlexIndex
-!RuleWritingCore,3024:$InputFunnelCore
-// Removed 05/23/08 - WEL
-//!SimpleRules,3024:$InputFunnelCore
+!OCROnServer,4021
+!OCROnClient,4022
+!FlexShieldServerCore,4025:4047:4048:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
+!FlexServer,4023:$FlexShieldServerCore:$FlexIndex
+!RuleWritingCore,4024:$InputFunnelCore
+!LabDECore,4028
+!LabDEServer,4050:$LabDECore:$FlexServer
+!LabDEClient,4050:$LabDECore:$FlexIndex:$OCROnClient
 
 
 FLEX Index,0
@@ -75,18 +77,21 @@ FLEX Index,0
 -    Server/SDK,$FlexServer
 
 ID Shield,0
--    Client (Verify redactions only),$IDShield:3045:3047
--    Server (OCR + run rules + auto-redact),$IDShield:3044:3045:$FlexShieldServerCore
+-    Client (Verify redactions only),$IDShield:4045:4047
+-    Server (OCR + run rules + auto-redact),$IDShield:4044:4045:$FlexShieldServerCore
+
+LabDE,0
+-    Client (Verify data),$LabDEClient
+-    Server,$LabDEServer
 
 FLEX Index / ID Shield Utilities,0
--    Create Searchable PDF, 3079
-//-    Disable USB Counters (locked to PC),3072
--    Disable USB Key Serial Numbers,3071
--    Handwriting Recognition,3078
--    Image Cleanup Engine,3077
--    MICR Finding Engine,3081
--    PDF Read+Write,3073
-//-    Rotated Images and Image Window Annotation,3076
+-    Create Searchable PDF, 4079
+//-    Disable USB Counters (locked to PC),4072
+-    Disable USB Key Serial Numbers,4071
+-    Handwriting Recognition,4078
+-    Image Cleanup Engine,4077
+-    MICR Finding Engine,4081
+-    PDF Read+Write,4073
 
 ID Shield Office 1.0,0
 -    ID Shield Office,$IDShieldOffice
@@ -99,14 +104,12 @@ ID Shield for Laserfiche,0
 IcoMap for ArcGIS,0
 -    IcoMap 4.2,$IcoMapForArcGIS
 -    IcoMap Tester,$IcoMapCore
-//-    IcoMap Core 4.2 (internal use),$IcoMapCore:$OCROnClient:3070:3073
--    Grid Generator,3075
--    Query Feature Tool,3074
+//-    IcoMap Core 4.2 (internal use),$IcoMapCore:$OCROnClient:4070:4073
+-    Grid Generator,4075
+-    Query Feature Tool,4074
 
 Other,0
--    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:3027:3046:$OCROnClient
--    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:3026:3046:$OCROnClient
--    Rule Development Toolkit,$RuleDevelopmentToolkit:3078
--    Scansoft OEM OCR,3080
-// Removed 05/23/08 - WEL
-//-    Simple Rule Writing,$SimpleRules:3046:$OCROnClient
+-    FLEX Index Rule Writing (Simple Rules passwords!),$RuleWritingCore:4027:4046:$OCROnClient
+-    ID Shield Rule Writing (Simple Rules passwords!),$RuleWritingCore:4026:4046:$OCROnClient
+-    Rule Development Toolkit,$RuleDevelopmentToolkit:4078:$LabDEServer
+-    Scansoft OEM OCR,4080
