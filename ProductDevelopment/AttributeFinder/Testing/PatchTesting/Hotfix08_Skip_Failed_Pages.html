@@ -1,0 +1,92 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 08 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 08 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> St Johns
+   	<LI><b>SCRs:</b> LegacyRCAndUtils #5370
+   	<LI><b>Issue:</b> Certain large customer images contain one or mroe pages that fail to OCR.  
+	Instead of automatically failing these images it would be nice to be able to skip the failed 
+	pages.  There should be a minimum percentage of good pages in a file.  There should be a 
+	maximum number of allowed bad pages in a file.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Install the hotfix and confirm that <b>SSOCR2.exe</b> has an updated timestamp.
+		<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> 
+		image files.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>Baseline behavior</b>
+		<ul>
+			<li>OCR each of the image files.
+	       		<ul>
+				<li>Confirm that each image file fails.
+				<li>Confirm that an exception is logged for each failure with debug 
+				data that includes the page number of the failed page.
+	       		</ul>
+			<li>Confirm that the following registry keys exist under 
+			<b>HKCU\Software\Extract Systems\ReusableComponents\OCREngine\SSOCR</b>.
+	       		<ul>
+				<li><b>SkipPageOnFailure</b> set to <b>0</b>.
+				<li><b>MaxOcrPageFailurePercentage</b> set to <b>25</b>.
+				<li><b>MaxOcrPageFailureNumber</b> set to <b>10</b>.
+	       		</ul>
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Skipping failed files</b>
+		<ul>
+			<li>Set the <b>SkipPageOnFailure</b> registry entry to <b>1</b>.
+			<li>Re-OCR each of the image files.
+	       		<ul>
+				<li><b>OneBadPageInFour.tif</b> still fails to OCR.
+				<li><b>OneBadPageInFive.tif</b> now passes OCR.
+				<li><b>ThreeBadPagesInTwenty.tif</b> now passes OCR.
+				<li><b>TwelveBadPagesInFifty.tif</b> still fails to OCR.
+<p>
+				<li>Confirm that an <b>Application Trace:</b> exception is logged 
+				for each passed image with debug data that includes the page 
+				number(s) of the failed page(s).
+	       		</ul>
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Sanity Test</b>
+       	<ul>
+  	   	<LI>Operating system: ____________________
+  	   	<LI>Test machine: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+  	   	<LI>Notes: ____________________
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Automated Testing</b>
+       	<ul>
+  	   	<LI>Automated Tests : AFCore.tcl
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
