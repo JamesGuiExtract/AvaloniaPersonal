@@ -1193,142 +1193,140 @@ vector<int> CSelectPageRegion::getActualPageNumbers(int nLastPageNumber,
 //-------------------------------------------------------------------------------------------------
 ISpatialStringPtr CSelectPageRegion::getIndividualPageContent(ISpatialStringPtr ipOriginPage)
 {
-	// if no restriction is defined, assume that inclusion/exclusion has
-	// already been taken care of by the caller
-	if (!isRestrictionDefined())
+	try
 	{
-		// just return the original string
-		return ipOriginPage;
-	}
-
-	if (m_ipSpatialStringSearcher == NULL)
-	{
-		m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
-		ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != NULL);
-		m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
-		m_ipSpatialStringSearcher->SetBoundaryResolution(kCharacter);
-	}
-
-	m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
-
-	ISpatialStringPtr ipResult(NULL);
-
-	long nWidth = -1;
-	long nHeight = -1;
-
-	// Get the width and height of the page using the page info
-	// this will give us the real page boundaries as they relate to letter positions
-	long nPageNum = ipOriginPage->GetFirstPageNumber();
-	ISpatialPageInfoPtr ipPageInfo = ipOriginPage->GetPageInfo(nPageNum);
-	if(ipPageInfo == NULL)
-	{
-		UCLIDException ue("ELI10502", "Unable to obtain spatial page info.");
-		ue.addDebugInfo("Page Number", nPageNum);
-		throw ue;
-	}
-	nWidth = ipPageInfo->Width;
-	nHeight = ipPageInfo->Height;
-
-	// get current page's boundary
-	ILongRectanglePtr ipRect( CLSID_LongRectangle );
-	ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != NULL);
-	ipRect->Top = 0;
-	ipRect->Left = 0;
-	ipRect->Right = nWidth;
-	ipRect->Bottom = nHeight;
-
-	// if left and right boundaries are defined
-	if (m_nHorizontalStartPercentage >= 0 && m_nHorizontalEndPercentage >= 0)
-	{
-		// record the left most boundary
-		long nLeft = 0;
-		ipRect->Left = nLeft + 
-			(long)floor((double)nWidth * (double)m_nHorizontalStartPercentage/100.0 + 0.5);
-		ipRect->Right = nLeft + 
-			(long)floor((double)nWidth * (double)m_nHorizontalEndPercentage/100.0 + 0.5);
-	}
-
-	// if top and bottom boundaries are defined
-	if (m_nVerticalStartPercentage >= 0 && m_nVerticalEndPercentage >= 0)
-	{
-		// record top most boundary
-		long nTop = 0;
-		ipRect->Top = nTop + 
-			(long)floor((double)nHeight * (double)m_nVerticalStartPercentage/100.0 + 0.5);
-		ipRect->Bottom = nTop + 
-			(long)floor((double)nHeight * (double)m_nVerticalEndPercentage/100.0 + 0.5);
-	}
-
-	// Get extension of source file
-	string strPath = asString( ipOriginPage->GetSourceDocName() );
-	string strExt = getExtensionFromFullPath( strPath.c_str() );
-
-	// calculate the region
-	if (m_bIncludeRegion)
-	{
-		// Search the previously OCR'd text
-		if (!m_bOCRSelectedRegion)
+		// if no restriction is defined, assume that inclusion/exclusion has
+		// already been taken care of by the caller
+		if (!isRestrictionDefined())
 		{
-			// Rotate the rectangle per OCR results
-			ipResult = m_ipSpatialStringSearcher->GetDataInRegion( ipRect, VARIANT_TRUE );
+			// just return the original string
+			return ipOriginPage;
 		}
-		// Do new OCR after rotation
-		else
+
+		if (m_ipSpatialStringSearcher == NULL)
 		{
-			// Handle 0 degree rotation in special way
-			int nActualRotation = m_nRegionRotation;
-			if (nActualRotation == 0)
+			m_ipSpatialStringSearcher.CreateInstance(CLSID_SpatialStringSearcher);
+			ASSERT_RESOURCE_ALLOCATION("ELI08022", m_ipSpatialStringSearcher != NULL);
+			m_ipSpatialStringSearcher->SetIncludeDataOnBoundary(VARIANT_TRUE);
+			m_ipSpatialStringSearcher->SetBoundaryResolution(kCharacter);
+		}
+
+		m_ipSpatialStringSearcher->InitSpatialStringSearcher(ipOriginPage);
+
+		ISpatialStringPtr ipResult(NULL);
+
+		long nWidth = -1;
+		long nHeight = -1;
+
+		// Get the width and height of the page using the page info
+		// this will give us the real page boundaries as they relate to letter positions
+		long nPageNum = ipOriginPage->GetFirstPageNumber();
+		ISpatialPageInfoPtr ipPageInfo = ipOriginPage->GetPageInfo(nPageNum);
+		if(ipPageInfo == NULL)
+		{
+			UCLIDException ue("ELI10502", "Unable to obtain spatial page info.");
+			ue.addDebugInfo("Page Number", nPageNum);
+			throw ue;
+		}
+
+		// Get the width and height of the page
+		ipPageInfo->GetWidthAndHeight(&nWidth, &nHeight);
+
+		// get current page's boundary
+		ILongRectanglePtr ipRect( CLSID_LongRectangle );
+		ASSERT_RESOURCE_ALLOCATION("ELI08021", ipRect != NULL);
+		ipRect->SetBounds(0, 0, nWidth, nHeight);
+
+		// if left and right boundaries are defined
+		if (m_nHorizontalStartPercentage >= 0 && m_nHorizontalEndPercentage >= 0)
+		{
+			// record the left most boundary
+			ipRect->Left = (long)floor((double)nWidth * (double)m_nHorizontalStartPercentage/100.0 + 0.5);
+			ipRect->Right = (long)floor((double)nWidth * (double)m_nHorizontalEndPercentage/100.0 + 0.5);
+		}
+
+		// if top and bottom boundaries are defined
+		if (m_nVerticalStartPercentage >= 0 && m_nVerticalEndPercentage >= 0)
+		{
+			// record top most boundary
+			ipRect->Top = (long)floor((double)nHeight * (double)m_nVerticalStartPercentage/100.0 + 0.5);
+			ipRect->Bottom = (long)floor((double)nHeight * (double)m_nVerticalEndPercentage/100.0 + 0.5);
+		}
+
+		// Get extension of source file
+		string strPath = asString( ipOriginPage->SourceDocName );
+		string strExt = getExtensionFromFullPath( strPath.c_str() );
+
+		// calculate the region
+		if (m_bIncludeRegion)
+		{
+			// Search the previously OCR'd text
+			if (!m_bOCRSelectedRegion)
 			{
-				// RecognizeTextInImageZone() interprets 
-				//		  0 = automatic rotation
-				//		360 = no rotation
-				nActualRotation = 360;
+				// Rotate the rectangle per OCR results
+				ipResult = m_ipSpatialStringSearcher->GetDataInRegion( ipRect, VARIANT_TRUE );
 			}
+			// Do new OCR after rotation
+			else
+			{
+				// Handle 0 degree rotation in special way
+				int nActualRotation = m_nRegionRotation;
+				if (nActualRotation == 0)
+				{
+					// RecognizeTextInImageZone() interprets 
+					//		  0 = automatic rotation
+					//		360 = no rotation
+					nActualRotation = 360;
+				}
 
-			// Get the text from specified area after rotation
-			ipResult = getOCREngine()->RecognizeTextInImageZone(ipOriginPage->GetSourceDocName(), 
-				nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
-				VARIANT_FALSE, VARIANT_TRUE, NULL );
-			ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
-		}
-	}
-	else
-	{
-		// Search the previously OCR'd text
-		if (!m_bOCRSelectedRegion)
-		{
-			ipResult = m_ipSpatialStringSearcher->GetDataOutOfRegion(ipRect);
+				// Get the text from specified area after rotation
+				ipResult = getOCREngine()->RecognizeTextInImageZone(strPath.c_str(), 
+					nPageNum, nPageNum, ipRect, nActualRotation, kNoFilter, "", VARIANT_FALSE, 
+					VARIANT_FALSE, VARIANT_TRUE, NULL );
+				ASSERT_RESOURCE_ALLOCATION( "ELI12698", ipResult != NULL );
+			}
 		}
 		else
 		{
-			// Whiten the specified zone on this page - to a temporary file
-			TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
-			string strTempFileName2 = tmpFile2.getName();
-			string strSource = asString( ipOriginPage->GetSourceDocName() );
-			fillImageArea(strSource.c_str(), strTempFileName2.c_str(), ipRect->Left, ipRect->Top, 
-				ipRect->Right, ipRect->Bottom, nPageNum, RGB(255,255,255), true, false);
-
-			// Handle 0 degree rotation in special way
-			int nActualRotation = m_nRegionRotation;
-			if (nActualRotation == 0)
+			// Search the previously OCR'd text
+			if (!m_bOCRSelectedRegion)
 			{
-				// RecognizeTextInImageZone() interprets 
-				//		  0 = automatic rotation
-				//		360 = no rotation
-				nActualRotation = 360;
+				ipResult = m_ipSpatialStringSearcher->GetDataOutOfRegion(ipRect);
 			}
+			else
+			{
+				// Whiten the specified zone on this page - to a temporary file
+				TemporaryFileName tmpFile2( NULL, strExt.c_str(), true );
+				string strTempFileName2 = tmpFile2.getName();
+				string strSource = asString( ipOriginPage->GetSourceDocName() );
+				long nLeft(-1), nTop(-1), nRight(-1), nBottom(-1);
+				ipRect->GetBounds(&nLeft, &nTop, &nRight, &nBottom);
+				fillImageArea(strSource.c_str(), strTempFileName2.c_str(), nLeft, nTop, 
+					nRight, nBottom, nPageNum, RGB(255,255,255), true, false);
 
-			// Get the text from entire remaining area
-			ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, -1, 
-				NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
-				NULL);
+				// Handle 0 degree rotation in special way
+				int nActualRotation = m_nRegionRotation;
+				if (nActualRotation == 0)
+				{
+					// RecognizeTextInImageZone() interprets 
+					//		  0 = automatic rotation
+					//		360 = no rotation
+					nActualRotation = 360;
+				}
 
-			// Assign original filename to Spatial String
-			ipResult->SourceDocName = ipOriginPage->GetSourceDocName();
+				// Get the text from entire remaining area
+				ipResult = getOCREngine()->RecognizeTextInImageZone(strTempFileName2.c_str(), 1, -1, 
+					NULL, nActualRotation, kNoFilter, "", VARIANT_FALSE, VARIANT_FALSE, VARIANT_TRUE, 
+					NULL);
+
+				// Assign original filename to Spatial String
+				ipResult->SourceDocName = strPath.c_str();
+			}
 		}
-	}
 
-	return ipResult;
+		return ipResult;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26878");
 }
 //-------------------------------------------------------------------------------------------------
 IOCREnginePtr CSelectPageRegion::getOCREngine()

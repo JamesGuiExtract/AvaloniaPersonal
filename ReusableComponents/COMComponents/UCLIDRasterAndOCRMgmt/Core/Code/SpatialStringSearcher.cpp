@@ -770,8 +770,13 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 	UCLID_RASTERANDOCRMGMTLib::ISpatialPageInfoPtr ipInfo = m_ipSpatialString->GetPageInfo(nPageNum);
 	ASSERT_RESOURCE_ALLOCATION("ELI16740", ipInfo != NULL);
 
+	// Get the page info
+	UCLID_RASTERANDOCRMGMTLib::EOrientation eOrientation;
+	long nWidth(-1), nHeight(-1);
+	double dDeskew(0.0);
+	ipInfo->GetPageInfo(&nWidth, &nHeight, &eOrientation, &dDeskew);
+
 	// Rotate the rectangle based on orientation of SpatialString data member
-	UCLID_RASTERANDOCRMGMTLib::EOrientation eOrientation = ipInfo->Orientation;
 	switch (eOrientation)
 	{
 	case kRotNone:
@@ -780,19 +785,17 @@ void CSpatialStringSearcher::rotateRectangle(ILongRectanglePtr ipRect)
 
 	case kRotLeft:
 		// Rotate the rectangle 90 degrees counterclockwise
-		// Swap the width and height [FlexIDSCore #3525]
-		ipRect->Rotate( ipInfo->Height, ipInfo->Width, -90 );
+		ipRect->Rotate( nWidth, nHeight, -90 );
 		break;
 
 	case kRotDown:
 		// Rotate the rectangle 180 degrees
-		ipRect->Rotate( ipInfo->Width, ipInfo->Height, 180 );
+		ipRect->Rotate( nWidth, nHeight, 180 );
 		break;
 
 	case kRotRight:
 		// Rotate the rectangle 90 degrees clockwise
-		// Swap the width and height [FlexIDSCore #3525]
-		ipRect->Rotate( ipInfo->Height, ipInfo->Width, 90 );
+		ipRect->Rotate( nWidth, nHeight, 90 );
 		break;
 
 	default:
