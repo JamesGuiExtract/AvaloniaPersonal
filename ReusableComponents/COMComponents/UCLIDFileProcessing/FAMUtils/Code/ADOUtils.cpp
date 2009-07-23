@@ -11,14 +11,14 @@ using namespace ADODB;
 using namespace std;
 
 // Constants for Connection String
-static const std::string& gstrSERVER = "Server";
-static const std::string& gstrDATABASE = "Database";
+static const string& gstrSERVER = "Server";
+static const string& gstrDATABASE = "Database";
 
 // Settings that don't change if included in the connection string
-static const std::string& gstrPROVIDER = "Provider=SQLNCLI";
-static const std::string& gstrINTEGRATED_SECURITY = "Integrated Security=SSPI";
-static const std::string& gstrDATA_TYPE_COMPATIBILITY = "DataTypeCompatibility=80";
-static const std::string& gstrMARS_CONNECTION = "MARS Connection=True";
+static const string& gstrPROVIDER = "Provider=SQLNCLI";
+static const string& gstrINTEGRATED_SECURITY = "Integrated Security=SSPI";
+static const string& gstrDATA_TYPE_COMPATIBILITY = "DataTypeCompatibility=80";
+static const string& gstrMARS_CONNECTION = "MARS Connection=True";
 
 static const string& gstrDATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 
@@ -26,7 +26,7 @@ static const string& gstrDATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S";
 static const string gstrGET_SQL_SERVER_TIME = "SELECT GETDATE() as CurrDateTime";
 
 //-------------------------------------------------------------------------------------------------
-long getLongField( FieldsPtr ipFields, const std::string& strFieldName )
+long getLongField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -64,7 +64,7 @@ long getLongField( FieldsPtr ipFields, const std::string& strFieldName )
 	}
 }
 //-------------------------------------------------------------------------------------------------
-long long getLongLongField( FieldsPtr ipFields, const std::string& strFieldName )
+long long getLongLongField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -109,7 +109,7 @@ long long getLongLongField( FieldsPtr ipFields, const std::string& strFieldName 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-std::string getStringField( FieldsPtr ipFields, const std::string& strFieldName )
+string getStringField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -147,7 +147,7 @@ std::string getStringField( FieldsPtr ipFields, const std::string& strFieldName 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void setLongField( FieldsPtr ipFields, const std::string& strFieldName, const long nValue )
+void setLongField( const FieldsPtr& ipFields, const string& strFieldName, const long nValue )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -178,7 +178,7 @@ void setLongField( FieldsPtr ipFields, const std::string& strFieldName, const lo
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void setLongLongField( FieldsPtr ipFields, const std::string& strFieldName, const long long llValue )
+void setLongLongField( const FieldsPtr& ipFields, const string& strFieldName, const long long llValue )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -210,7 +210,7 @@ void setLongLongField( FieldsPtr ipFields, const std::string& strFieldName, cons
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void setStringField( FieldsPtr ipFields, const std::string& strFieldName, const std::string& strValue , bool bEmptyStrAsNull )
+void setStringField( const FieldsPtr& ipFields, const string& strFieldName, const string& strValue , bool bEmptyStrAsNull )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -250,7 +250,7 @@ void setStringField( FieldsPtr ipFields, const std::string& strFieldName, const 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-CTime getTimeDateField(ADODB::FieldsPtr ipFields, const std::string& strFieldName )
+CTime getTimeDateField(const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -296,7 +296,7 @@ CTime getTimeDateField(ADODB::FieldsPtr ipFields, const std::string& strFieldNam
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void setTimeDateField( ADODB::FieldsPtr ipFields, const std::string& strFieldName, const CTime timeDate)
+void setTimeDateField( const FieldsPtr& ipFields, const string& strFieldName, const CTime timeDate)
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -327,7 +327,7 @@ void setTimeDateField( ADODB::FieldsPtr ipFields, const std::string& strFieldNam
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void setDoubleField( ADODB::FieldsPtr ipFields, const std::string& strFieldName, const double& dValue )
+void setDoubleField( const FieldsPtr& ipFields, const string& strFieldName, const double& dValue )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -358,7 +358,7 @@ void setDoubleField( ADODB::FieldsPtr ipFields, const std::string& strFieldName,
 	}
 }
 //-------------------------------------------------------------------------------------------------
-double getDoubleField( ADODB::FieldsPtr ipFields, const std::string& strFieldName )
+double getDoubleField( const FieldsPtr& ipFields, const string& strFieldName )
 {
 	// Use double try catch so that the field name can be added to the debug info
 	try
@@ -399,7 +399,7 @@ double getDoubleField( ADODB::FieldsPtr ipFields, const std::string& strFieldNam
 	}
 }
 //-------------------------------------------------------------------------------------------------
-long getLastTableID( ADODB::_ConnectionPtr ipDBConnection, std::string strTableName )
+long getLastTableID( const _ConnectionPtr& ipDBConnection, string strTableName )
 {
 	ASSERT_ARGUMENT("ELI18816", ipDBConnection != NULL);
 
@@ -416,7 +416,7 @@ long getLastTableID( ADODB::_ConnectionPtr ipDBConnection, std::string strTableN
 	return (long) getLongLongField( ipRSet->Fields, "CurrentID" );
 }
 //-------------------------------------------------------------------------------------------------
-string getSQLServerDateTime( ADODB::_ConnectionPtr ipDBConnection )
+string getSQLServerDateTime( const _ConnectionPtr& ipDBConnection )
 {
 	ASSERT_ARGUMENT("ELI18817", ipDBConnection != NULL);
 
@@ -445,7 +445,7 @@ string getSQLServerDateTime( ADODB::_ConnectionPtr ipDBConnection )
 	return asString(vtTimeStr.bstrVal);;
 }
 //-------------------------------------------------------------------------------------------------
-std::string createConnectionString(const std::string& strServer, const std::string& strDatabase)
+string createConnectionString(const string& strServer, const string& strDatabase)
 {
 	ASSERT_ARGUMENT("ELI17471", !strServer.empty());
 	ASSERT_ARGUMENT("ELI17472", !strDatabase.empty());
@@ -469,7 +469,7 @@ std::string createConnectionString(const std::string& strServer, const std::stri
 	return strConnectionString;
 }
 //-------------------------------------------------------------------------------------------------
-long executeCmdQuery(ADODB::_ConnectionPtr ipDBConnection, const string& strSQLQuery, bool bDisplayExceptions)
+long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQuery, bool bDisplayExceptions)
 {
 	ASSERT_ARGUMENT("ELI18818", ipDBConnection != NULL);
 
@@ -499,7 +499,7 @@ long executeCmdQuery(ADODB::_ConnectionPtr ipDBConnection, const string& strSQLQ
 	return vtRecordsAffected.lVal;
 }
 //-------------------------------------------------------------------------------------------------
-long getKeyID(ADODB::_ConnectionPtr ipDBConnection, const std::string& strTable, const std::string& strKeyCol, std::string& rstrKey, bool bAddKey)
+long getKeyID(const _ConnectionPtr& ipDBConnection, const string& strTable, const string& strKeyCol, string& rstrKey, bool bAddKey)
 {
 	ASSERT_ARGUMENT("ELI18775", ipDBConnection != NULL);
 
@@ -550,7 +550,7 @@ long getKeyID(ADODB::_ConnectionPtr ipDBConnection, const std::string& strTable,
 	return lID;
 }
 //-------------------------------------------------------------------------------------------------
-void dropConstraint(ADODB::_ConnectionPtr ipDBConnection, const std::string& strTableName, const std::string& strConstraint)
+void dropConstraint(const _ConnectionPtr& ipDBConnection, const string& strTableName, const string& strConstraint)
 {
 	ASSERT_ARGUMENT("ELI18819", ipDBConnection != NULL);
 
@@ -561,7 +561,7 @@ void dropConstraint(ADODB::_ConnectionPtr ipDBConnection, const std::string& str
 	executeCmdQuery(ipDBConnection, strDropSQL, true);
 }
 //-------------------------------------------------------------------------------------------------
-void dropFKContraintsOnTables(ADODB::_ConnectionPtr ipDBConnection, const vector<string>& vecTables)
+void dropFKContraintsOnTables(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables)
 {
 	ASSERT_ARGUMENT("ELI18820", ipDBConnection != NULL);
 
@@ -590,7 +590,7 @@ void dropFKContraintsOnTables(ADODB::_ConnectionPtr ipDBConnection, const vector
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void dropTablesInVector(ADODB::_ConnectionPtr ipDBConnection, const vector<string>& vecTables)
+void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const vector<string>& vecTables)
 {
 	ASSERT_ARGUMENT("ELI18821", ipDBConnection != NULL);
 	
@@ -629,7 +629,7 @@ void dropTablesInVector(ADODB::_ConnectionPtr ipDBConnection, const vector<strin
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool doesTableExist(ADODB::_ConnectionPtr ipDBConnection, std::string strTable)
+bool doesTableExist(const _ConnectionPtr& ipDBConnection, string strTable)
 {
 	// Get the tables that exist in the database
 	_RecordsetPtr ipTables = ipDBConnection->OpenSchema(adSchemaTables);
@@ -655,7 +655,7 @@ bool doesTableExist(ADODB::_ConnectionPtr ipDBConnection, std::string strTable)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------
-void executeVectorOfSQL(ADODB::_ConnectionPtr ipDBConnection, const vector<string>& vecQueries )
+void executeVectorOfSQL(const _ConnectionPtr& ipDBConnection, const vector<string>& vecQueries )
 {	
 	ASSERT_ARGUMENT("ELI18822", ipDBConnection != NULL);
 
@@ -675,7 +675,7 @@ void executeVectorOfSQL(ADODB::_ConnectionPtr ipDBConnection, const vector<strin
 	}
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void copyExistingFields(ADODB::FieldsPtr ipSource, ADODB::FieldsPtr ipDest, bool bCopyID)
+FAMUTILS_API void copyExistingFields(const FieldsPtr& ipSource, const FieldsPtr& ipDest, bool bCopyID)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI00031");
 
@@ -696,6 +696,7 @@ FAMUTILS_API void copyExistingFields(ADODB::FieldsPtr ipSource, ADODB::FieldsPtr
 		for ( long n = 0; n < nSourceCount; n++ )
 		{
 			_lastCodePos = "30-" + asString(n);
+
 			// Get field with that index
 			FieldPtr ipSourceField = ipSource->Item[variant_t(n)];
 			ASSERT_RESOURCE_ALLOCATION("ELI20029", ipSourceField != NULL);
@@ -704,35 +705,26 @@ FAMUTILS_API void copyExistingFields(ADODB::FieldsPtr ipSource, ADODB::FieldsPtr
 			string strSourceFieldName = asString(ipSourceField->Name);
 			_lastCodePos = "40";
 
-			// Step through dest fields until the end or a field is found 
-			// with the same name
-			for (long nCurr = 0; nCurr < nDestCount; nCurr++)
+			// if bCopyID is true all fields should be copied if false
+			// then only the fields that are not named "ID"
+			if (bCopyID || strSourceFieldName != "ID")
 			{
-				_lastCodePos = "50-"  + asString(n) + asString(nCurr);
-
-				// Get the current field
-				FieldPtr ipDestField = ipDest->Item[_variant_t(nCurr)];
-				ASSERT_RESOURCE_ALLOCATION("ELI20027", ipDestField != NULL);
-
-				// get the destination field name
-				string strDestFieldName = asString(ipDestField->Name);
-				_lastCodePos = "60";
-
-				// If the dest name is same as the source field
-				if (strDestFieldName == strSourceFieldName)
+				// Attempt to get the destination field
+				FieldPtr ipDestField = NULL;
+				try
 				{
-					// if bCopyID is true all fields should be copied
-					// if false then only the fields that are not named
-					// "ID"
-					if (bCopyID || strDestFieldName != "ID")
-					{
-						// copy the value
-						ipDestField->Value = ipSourceField->Value ;
-					}
-					_lastCodePos = "70";
+					ipDestField = ipDest->Item[strSourceFieldName.c_str()];
+				}
+				catch(...)
+				{
+					// Field was not found, just eat the exception
+				}
 
-					// match was found so go to next source field
-					break;
+				// Only copy to the destination field if it exists
+				if (ipDestField != NULL)
+				{
+					// Copy the source value into the destination
+					ipDestField->Value = ipSourceField->Value;
 				}
 			}
 			_lastCodePos = "80";
@@ -741,7 +733,7 @@ FAMUTILS_API void copyExistingFields(ADODB::FieldsPtr ipSource, ADODB::FieldsPtr
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20154");
 }
 //-------------------------------------------------------------------------------------------------
-FieldPtr getNamedField(ADODB::FieldsPtr ipFields, const string& strFieldName)
+FieldPtr getNamedField(const FieldsPtr& ipFields, const string& strFieldName)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI00032");
 
@@ -750,39 +742,21 @@ FieldPtr getNamedField(ADODB::FieldsPtr ipFields, const string& strFieldName)
 		ASSERT_ARGUMENT("ELI20052", ipFields != NULL);
 		ASSERT_ARGUMENT("ELI20053", !strFieldName.empty());
 
-		// Get the Field count
-		long nFieldsCount = ipFields->Count;
-		_lastCodePos = "10";
-
-		// Step through all of the fields
-		for ( long n = 0; n < nFieldsCount; n++ )
+		// Attempt to get the names field, if it does not exist, just return NULL
+		try
 		{
-			_lastCodePos = "20" + asString(n);
-
-			// Get field with that index
-			FieldPtr ipField = ipFields->Item[variant_t(n)];
-			ASSERT_RESOURCE_ALLOCATION("ELI20118", ipField != NULL);
-
-			// Get the field name
-			string strName = asString(ipField->Name);
-			_lastCodePos = "30-" + strName;
-
-			// Check if the name is the one to find		
-			if (strName == strFieldName)
-			{
-				// Found the field so return it
-				return ipField;
-			}
-			_lastCodePos = "40";
+			FieldPtr ipField = ipFields->Item[strFieldName.c_str()];
+			return ipField;
+		}
+		catch(...)
+		{
+			return NULL;
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20155");
-
-	// Field was not found so return NULL
-	return NULL;
 }
 //-------------------------------------------------------------------------------------------------
-FAMUTILS_API void copyIDValue(ADODB::_ConnectionPtr ipDestDB, ADODB::FieldsPtr ipDestFields, 
+FAMUTILS_API void copyIDValue(const _ConnectionPtr& ipDestDB, const FieldsPtr& ipDestFields, 
 							  const string& strKeyTable, const string& strKeyCol,
 							  string strKeyValue, bool bAddKey)
 {

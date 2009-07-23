@@ -68,6 +68,32 @@ public:
 	STDMETHOD(put_NumBytesComplete)(/*[in]*/ LONGLONG newVal);
 	STDMETHOD(get_NumBytesFailed)(/*[out, retval]*/ LONGLONG *pVal);
 	STDMETHOD(put_NumBytesFailed)(/*[in]*/ LONGLONG newVal);
+	STDMETHOD(get_NumDocumentsSkipped)(long *pVal);
+	STDMETHOD(put_NumDocumentsSkipped)(long newVal);
+	STDMETHOD(get_NumPagesSkipped)(long* pVal);
+	STDMETHOD(put_NumPagesSkipped)(long newVal);
+	STDMETHOD(get_NumBytesSkipped)(LONGLONG* pVal);
+	STDMETHOD(put_NumBytesSkipped)(LONGLONG newVal);
+	STDMETHOD(GetAllStatistics)(long *plNumDocs, long* plNumDocsComplete, long* plNumDocsFailed,
+		long* plNumDocsSkipped, long* plNumPages, long* plNumPagesComplete, long* plNumPagesFailed,
+		long* plNumPagesSkipped, LONGLONG* pllNumBytes, LONGLONG* pllNumBytesComplete,
+		LONGLONG* pllNumBytesFailed, LONGLONG* pllNumBytesSkipped);
+	STDMETHOD(SetAllStatistics)(long lNumDocs, long lNumDocsComplete, long lNumDocsFailed,
+		long lNumDocsSkipped, long lNumPages, long lNumPagesComplete, long lNumPagesFailed,
+		long lNumPagesSkipped, LONGLONG llNumBytes, LONGLONG llNumBytesComplete,
+		LONGLONG llNumBytesFailed, LONGLONG llNumBytesSkipped);
+	STDMETHOD(GetTotals)(long* plNumDocs, long* plNumPages, LONGLONG* pllNumBytes);
+	STDMETHOD(SetTotals)(long lNumDocs, long lNumPages, LONGLONG llNumBytes);
+	STDMETHOD(GetComplete)(long* plNumDocsComplete, long* plNumPagesComplete,
+		LONGLONG* pllNumBytesComplete);
+	STDMETHOD(SetComplete)(long lNumDocsComplete, long lNumPagesComplete,
+		LONGLONG llNumBytesComplete);
+	STDMETHOD(GetFailed)(long* plNumDocsFailed, long* plNumPagesFailed,
+		LONGLONG* pllNumBytesFailed);
+	STDMETHOD(SetFailed)(long lNumDocsFailed, long lNumPagesFailed, LONGLONG llNumBytesFailed);
+	STDMETHOD(GetSkipped)(long* plNumDocsSkipped, long* plNumPagesSkipped,
+		LONGLONG* pllNumBytesSkipped);
+	STDMETHOD(SetSkipped)(long lNumDocsSkipped, long lNumPagesSkipped, LONGLONG llNumBytesSkipped);
 	
 	// ICopyableObject Methods
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
@@ -77,12 +103,15 @@ private:
 	long m_nNumDocuments;
 	long m_nNumDocumentsComplete;
 	long m_nNumDocumentsFailed;
+	long m_nNumDocumentsSkipped;
 	long m_nNumPages;
 	long m_nNumPagesComplete;
 	long m_nNumPagesFailed;
+	long m_nNumPagesSkipped;
 	long long m_llNumBytes;
 	long long m_llNumBytesComplete;
 	long long m_llNumBytesFailed;
+	long long m_llNumBytesSkipped;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ActionStatistics), CActionStatistics)

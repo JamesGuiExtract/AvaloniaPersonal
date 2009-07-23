@@ -432,6 +432,11 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 					// Notify the DB that the file failed to process
 					m_ipFPMDB->NotifyFileFailed(nTaskID, m_strAction.c_str(), task.m_strException.c_str());
 				}
+				else if ( eNewStatus == kRecordSkipped )
+				{
+					_lastCodePos = "225";
+					m_ipFPMDB->NotifyFileSkipped(nTaskID, task.getActionID());
+				}
 
 				_lastCodePos = "230";
 				if (m_bRestrictNumStoredRecords && m_queFinishedTasks.size() > (unsigned long) m_nMaxStoredRecords)

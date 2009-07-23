@@ -16,11 +16,12 @@ const int giUNATTEMPTED_COLUMN = 1;
 const int giPENDING_COLUMN = 2;
 const int giPROCESSING_COLUMN = 3;
 const int giCOMPLETED_COLUMN = 4;
-const int giFAILED_COLUMN = 5;
-const int giTOTALS_COLUMN = 6;
+const int giSKIPPED_COLUMN = 5;
+const int giFAILED_COLUMN = 6;
+const int giTOTALS_COLUMN = 7;
 
 // constants for the summary list control setup
-const int giNUMBER_OF_COLUMNS = 7;
+const int giNUMBER_OF_COLUMNS = 8;
 const int giMIN_SIZE_COLUMN = 80;
 
 // constants for the labels in the summary list control
@@ -29,6 +30,7 @@ const string gstrUNATTEMPTED_LABEL = "Unattempted";
 const string gstrPENDING_LABEL = "Pending";
 const string gstrPROCESSING_LABEL = "Processing";
 const string gstrCOMPLETED_LABEL = "Complete";
+const string gstrSKIPPED_LABEL = "Skipped";
 const string gstrFAILED_LABEL = "Failed";
 const string gstrTOTALS_LABEL = "Total";
 
@@ -239,6 +241,7 @@ void CFAMDBAdminSummaryDlg::prepareListControl()
 	m_listActions.InsertColumn(giPENDING_COLUMN, gstrPENDING_LABEL.c_str(), LVCFMT_LEFT, 25);
 	m_listActions.InsertColumn(giPROCESSING_COLUMN, gstrPROCESSING_LABEL.c_str(), LVCFMT_LEFT, 25);
 	m_listActions.InsertColumn(giCOMPLETED_COLUMN, gstrCOMPLETED_LABEL.c_str(), LVCFMT_LEFT, 25);
+	m_listActions.InsertColumn(giSKIPPED_COLUMN, gstrSKIPPED_LABEL.c_str(), LVCFMT_LEFT, 25);
 	m_listActions.InsertColumn(giFAILED_COLUMN, gstrFAILED_LABEL.c_str(), LVCFMT_LEFT, 25);
 	m_listActions.InsertColumn(giTOTALS_COLUMN, gstrTOTALS_LABEL.c_str(), LVCFMT_LEFT, 25);
 }
@@ -313,6 +316,7 @@ void CFAMDBAdminSummaryDlg::populatePage()
 		long lPending = 0;
 		long lProcessing = 0;
 		long lCompleted = 0;
+		long lSkipped = 0;
 		long lFailed = 0;
 
 		// check that there is at least 1 record
@@ -340,6 +344,10 @@ void CFAMDBAdminSummaryDlg::populatePage()
 				lCompleted = lCount;
 				break;
 
+			case kActionSkipped:
+				lSkipped = lCount;
+				break;
+
 			case kActionFailed:
 				lFailed = lCount;
 				break;
@@ -361,12 +369,14 @@ void CFAMDBAdminSummaryDlg::populatePage()
 			commaFormatNumber((long long) lProcessing).c_str());
 		m_listActions.SetItemText(nItem, giCOMPLETED_COLUMN,
 			commaFormatNumber((long long) lCompleted).c_str());
+		m_listActions.SetItemText(nItem, giSKIPPED_COLUMN,
+			commaFormatNumber((long long) lSkipped).c_str());
 		m_listActions.SetItemText(nItem, giFAILED_COLUMN,
 			commaFormatNumber((long long) lFailed).c_str());
 
 		// fill in the total column (sum of all files except Unattempted)
 		m_listActions.SetItemText(nItem, giTOTALS_COLUMN,
-			commaFormatNumber((long long) (lPending+lProcessing+lCompleted+lFailed)).c_str());
+			commaFormatNumber((long long) (lPending+lProcessing+lCompleted+lSkipped+lFailed)).c_str());
 	}
 
 	// query database for total number of files in the FAMFile table

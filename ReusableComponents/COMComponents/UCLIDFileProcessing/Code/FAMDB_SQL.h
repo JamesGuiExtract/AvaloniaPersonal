@@ -38,12 +38,15 @@ static const string gstrCREATE_ACTION_STATISTICS_TABLE = "CREATE TABLE [ActionSt
 	"[NumDocuments] [int] NOT NULL CONSTRAINT [DF_Statistics_TotalDocuments]  DEFAULT ((0)),"
 	"[NumDocumentsComplete] [int] NOT NULL CONSTRAINT [DF_Statistics_ProcessedDocuments]  DEFAULT ((0)),"
 	"[NumDocumentsFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumDocumentsFailed]  DEFAULT ((0)),"
+	"[NumDocumentsSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumDocumentsSkipped] DEFAULT ((0)),"
 	"[NumPages] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPages]  DEFAULT ((0)),"
 	"[NumPagesComplete] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesComplete]  DEFAULT ((0)),"
 	"[NumPagesFailed] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesFailed]  DEFAULT ((0)),"
+	"[NumPagesSkipped] [int] NOT NULL CONSTRAINT [DF_ActionStatistics_NumPagesSkipped]  DEFAULT ((0)),"
 	"[NumBytes] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytes]  DEFAULT ((0)),"
 	"[NumBytesComplete] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesComplete]  DEFAULT ((0)),"
-	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesFailed]  DEFAULT ((0)))";
+	"[NumBytesFailed] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesFailed]  DEFAULT ((0)),"
+	"[NumBytesSkipped] [bigint] NOT NULL CONSTRAINT [DF_ActionStatistics_NumBytesSkipped]  DEFAULT ((0)))";
 
 static const string gstrCREATE_FILE_ACTION_STATE_TRANSITION_TABLE  ="CREATE TABLE [FileActionStateTransition]("
 	"[ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_FileActionStateTransition] PRIMARY KEY CLUSTERED,"
@@ -85,12 +88,34 @@ static const string gstrCREATE_FAM_USER_TABLE = "CREATE TABLE [FAMUser]("
 	"CONSTRAINT [PK_FAMUser] PRIMARY KEY CLUSTERED ([ID] ASC), "
 	"CONSTRAINT [IX_UserName] UNIQUE NONCLUSTERED ([UserName] ASC))";
 
+static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [FileActionComment] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL, "
+	"[UserName] [nvarchar](50) NULL, "
+	"[FileID] [int] NULL, "
+	"[ActionID] [int] NULL, "
+	"[Comment] [ntext] NULL, "
+	"[DateTimeStamp] [datetime] NULL, "
+	"CONSTRAINT [PK_FAMFileActionComment] PRIMARY KEY CLUSTERED ([ID] ASC))";
+
+static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFile] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL, "
+	"[UserName] [nvarchar](50) NULL, "
+	"[FileID] [int] NULL, "
+	"[ActionID] [int] NULL, "
+	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_FileName] "
 	"ON [FAMFile]([FileName] ASC)";
 
 static const string gstrCREATE_QUEUE_EVENT_INDEX = "CREATE NONCLUSTERED INDEX [IX_FileID] "
 	"ON [QueueEvent]([FileID])";
+
+static const string gstrCREATE_FILE_ACTION_COMMENT_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_File_Action_Comment] ON [FileActionComment]([FileID], [ActionID])";
+
+static const string gstrCREATE_SKIPPED_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_Skipped_File] ON [SkippedFile]([FileID], [ActionID])";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -157,6 +182,34 @@ static const string gstrADD_QUEUE_EVENT_FAM_USER_FK =
 	"ALTER TABLE [QueueEvent] "
 	"WITH CHECK ADD CONSTRAINT [FK_QueueEvent_FAMUser] FOREIGN KEY([FAMUserID]) "
 	"REFERENCES [FAMUser] ([ID])";
+
+static const string gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK =
+	"ALTER TABLE [FileActionComment] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionComment_FAMFILE] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_ACTION_COMMENT_ACTION_FK = 
+	"ALTER TABLE [FileActionComment]  "
+	"WITH CHECK ADD CONSTRAINT [FK_FileActionComment_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_SKIPPED_FILE_FAM_FILE_FK =
+	"ALTER TABLE [SkippedFile] "
+	"WITH CHECK ADD CONSTRAINT [FK_SkippedFile_FAMFILE] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_SKIPPED_FILE_ACTION_FK = 
+	"ALTER TABLE [SkippedFile]  "
+	"WITH CHECK ADD CONSTRAINT [FK_SkippedFile_Action] FOREIGN KEY([ActionID]) "
+	"REFERENCES [Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
 
 // Query for obtaining the current db lock record with the time it has been locked
 static const string gstrDB_LOCK_QUERY = 

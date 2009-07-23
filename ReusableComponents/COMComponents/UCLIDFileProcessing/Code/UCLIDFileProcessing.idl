@@ -365,6 +365,38 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(8), helpstring("property NumBytesComplete")] HRESULT NumBytesComplete([in] LONGLONG newVal);
 		[propget, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([out, retval] LONGLONG *pVal);
 		[propput, id(9), helpstring("property NumBytesFailed")] HRESULT NumBytesFailed([in] LONGLONG newVal);
+		[propget, id(10), helpstring("property NumDocumentsSkipped")] HRESULT NumDocumentsSkipped([out, retval] long *pVal);
+		[propput, id(10), helpstring("property NumDocumentsSkipped")] HRESULT NumDocumentsSkipped([in] long newVal);
+		[propget, id(11), helpstring("property NumPagesSkipped")] HRESULT NumPagesSkipped([out, retval] long *pVal);
+		[propput, id(11), helpstring("property NumPagesSkipped")] HRESULT NumPagesSkipped([in] long newVal);
+		[propget, id(12), helpstring("property NumBytesSkipped")] HRESULT NumBytesSkipped([out, retval] LONGLONG *pVal);
+		[propput, id(12), helpstring("property NumBytesSkipped")] HRESULT NumBytesSkipped([in] LONGLONG newVal);
+		[id(13), helpstring("method GetAllStatistics")] HRESULT GetAllStatistics([out] long* plNumDocuments,
+			[out] long* plNumDocsCompleted, [out] long* plNumDocsFailed, [out] long* plNumDocsSkipped,
+			[out] long* plNumPages, [out] long* plNumPagesCompleted, [out] long* plNumPagesFailed,
+			[out] long* plNumPagesSkipped, [out] LONGLONG* pllNumBytes, [out] LONGLONG* pllNumBytesCompleted,
+			[out] LONGLONG* pllNumBytesFailed, [out] LONGLONG* pllNumBytesSkipped);
+		[id(14), helpstring("method SetAllStatistics")] HRESULT SetAllStatistics([in] long lNumDocuments,
+			[in] long lNumDocsCompleted, [in] long lNumDocsFailed, [in] long lNumDocsSkipped,
+			[in] long lNumPages, [in] long lNumPagesCompleted, [in] long lNumPagesFailed,
+			[in] long lNumPagesSkipped, [in] LONGLONG llNumBytes, [in] LONGLONG llNumBytesCompleted,
+			[in] LONGLONG llNumBytesFailed, [in] LONGLONG llNumBytesSkipped);
+		[id(15), helpstring("method GetTotals")] HRESULT GetTotals([out] long* plNumDocuments,
+			[out] long* plNumPages, [out] LONGLONG* pllNumBytes);
+		[id(16), helpstring("method SetTotals")] HRESULT SetTotals([in] long lNumDocuments,
+			[in] long lNumPages, [in] LONGLONG llNumBytes);
+		[id(17), helpstring("method GetComplete")] HRESULT GetComplete([out] long* plNumDocsComplete,
+			[out] long* plNumPagesComplete, [out] LONGLONG* pllNumBytesComplete);
+		[id(18), helpstring("method SetComplete")] HRESULT SetComplete([in] long lNumDocsComplete,
+			[in] long lNumPagesComplete, [in] LONGLONG llNumBytesComplete);
+		[id(19), helpstring("method GetFailed")] HRESULT GetFailed([out] long* plNumDocsFailed,
+			[out] long* plNumPagesFailed, [out] LONGLONG* pllNumBytesFailed);
+		[id(20), helpstring("method SetFailed")] HRESULT SetFailed([in] long lNumDocsFailed,
+			[in] long lNumPagesFailed, [in] LONGLONG llNumBytesFailed);
+		[id(21), helpstring("method GetSkipped")] HRESULT GetSkipped([out] long* plNumDocsSkipped,
+			[out] long* plNumPagesSkipped, [out] LONGLONG* pllNumBytesSkipped);
+		[id(22), helpstring("method SetSkipped")] HRESULT SetSkipped([in] long lNumDocsSkipped,
+			[in] long lNumPagesSkipped, [in] LONGLONG llNumBytesSkipped);
 	};
 
 	[
@@ -389,6 +421,9 @@ library UCLID_FILEPROCESSINGLib
 		[id(6), helpstring("method GetFileData")] HRESULT GetFileData(
 			[out] LONG* plFileID, [out] LONG* plActionID, [out] BSTR* pbstrFileName,
 			[out] LONGLONG* pllFileSize, [out] LONG* plPages);
+		[id(7), helpstring("method SetFileData")] HRESULT SetFileData(
+			[in] LONG lFileID, [in] LONG lActionID, [in] BSTR bstrFileName,
+			[in] LONGLONG llFileSize, [in] LONG lPages);
 	};
 
 	[

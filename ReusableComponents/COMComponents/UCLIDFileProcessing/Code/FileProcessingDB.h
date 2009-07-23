@@ -15,6 +15,8 @@
 #include <map>
 #include <vector>
 
+using namespace std;
+
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
 #endif
@@ -138,26 +140,26 @@ private:
 	void postStatusUpdateNotification(EDatabaseWrapperObjectStatus eStatus);
 
 	// map to keep the stats for each of the Action
-	std::map<long, UCLID_FILEPROCESSINGLib::IActionStatisticsPtr> m_mapActionIDtoStats;
+	map<long, UCLID_FILEPROCESSINGLib::IActionStatisticsPtr> m_mapActionIDtoStats;
 
 	// Member variable that contains the last read schema version. 0 indicates no version
 	int m_iDBSchemaVersion;
 
 	// This contains the UniqueProcess Identifier (UPI)
-	std::string m_strUPI;
+	string m_strUPI;
 
 	// Flag indicating that this instance has the lock on the DB
 	bool m_bDBLocked;
 
 	// Machine username
-	std::string m_strFAMUserName;
+	string m_strFAMUserName;
 
 	// Used to hold the FAMUserID of m_strFAMUserName in the database
 	// this value is set to 0 if the database connection info changes
 	long m_lFAMUserID;
 	
 	// Machine name
-	std::string m_strMachineName;
+	string m_strMachineName;
 
 	// Used to hold the MachineID of m_strMachineName in the databse
 	// this value is set to 0 if the database connection info changes
@@ -171,19 +173,19 @@ private:
 	FileProcessingConfigMgr m_regFPCfgMgr;
 
 	// This string should always contain the current status string
-	std::string m_strCurrentConnectionStatus;
+	string m_strCurrentConnectionStatus;
 
 	// The database server to connect to
-	std::string m_strDatabaseServer;
+	string m_strDatabaseServer;
 
 	// The database to connect to
-	std::string m_strDatabaseName;
+	string m_strDatabaseName;
 
 	// Saves the last set server name in the current process
-	static std::string ms_strCurrServerName;
+	static string ms_strCurrServerName;
 
 	// Saves the last set Database name in the current process
-	static std::string ms_strCurrDBName;
+	static string ms_strCurrDBName;
 
 	// Contains the timeout for query execution
 	int m_iCommandTimeout;
@@ -214,15 +216,15 @@ private:
 	
 	// PROMISE:	To return the EActionStatus code for the string 
 	//			representation( "U", "P", "R", "F", or "C" ) given
-	EActionStatus asEActionStatus ( const std::string& strStatus );
+	EActionStatus asEActionStatus ( const string& strStatus );
 
 	// PROMISE:	To return the string representation of the given EActionStatus
-	std::string asStatusString ( EActionStatus eStatus );
+	string asStatusString ( EActionStatus eStatus );
 
 	// PROMISE:	To add a single record to the QueueEvent table in the database with the given data
 	//			using the connection provided
 	void addQueueEventRecord( ADODB::_ConnectionPtr ipConnection, long nFileID, 
-		std::string strFileName, std::string strQueueEventCode );
+		string strFileName, string strQueueEventCode );
 
 	// PROMISE: To add a single record to the FileActionStateTransition table with the given data
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -233,8 +235,8 @@ private:
 	//			strException	- Contains the exception string if this transitioning to a failed state
 	//			strComment		- Comment for the added records
 	void addFileActionStateTransition ( ADODB::_ConnectionPtr ipConnection, long nFileID, 
-		long nActionID, const std::string &strFromState, const std::string &strToState, 
-		const std::string &strException, const std::string &strComment );
+		long nActionID, const string &strFromState, const string &strToState, 
+		const string &strException, const string &strComment );
 
 	// PROMISE:	To add multiple ActionStateTransition table records that are represented be the given data.
 	// ARGS:	ipConnection	- Connection object to use to update the tables
@@ -246,20 +248,20 @@ private:
 	//							  be used so that only one current action state is selected
 	//			strTopClause	- Top clause to specifiy the number of records that meet the where clause condition that should
 	//							  have records added to the ActionStateTransition table
-	void addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection, std::string &rstrAction, 
-		const std::string &strToState, const std::string &strException, const std::string &strComment, 
-		const std::string &strWhereClause, const std::string &strTopClause );
+	void addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection, string &rstrAction, 
+		const string &strToState, const string &strException, const string &strComment, 
+		const string &strWhereClause, const string &strTopClause );
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match
 	//			the action name stored in the database using the connection object provided.
-	long getActionID( ADODB::_ConnectionPtr ipConnection, std::string& rstrActionName );
+	long getActionID( ADODB::_ConnectionPtr ipConnection, string& rstrActionName );
 
 	// PROMISE: To return the Action name for the given ID using the connection object provided;
-	std::string getActionName(ADODB::_ConnectionPtr ipConnection, long nActionID);
+	string getActionName(ADODB::_ConnectionPtr ipConnection, long nActionID);
 
 	// PROMISE: To return the ID from the FAMFile table for the given File name and
 	// modify strFileName to match the file name stored in the database using the connection provided.
-	long getFileID(ADODB::_ConnectionPtr ipConnection, std::string& rstrFileName);
+	long getFileID(ADODB::_ConnectionPtr ipConnection, string& rstrFileName);
 
 	// PROMISE: To return the m_ipDBConnection opened database connection for the current thread.
 	ADODB::_ConnectionPtr getDBConnection();
@@ -269,8 +271,9 @@ private:
 
 	// PROMISE:	 To set the given File's action state for the action given by strAction to the 
 	//			state in strState and returns the old state using the connection object provided.
-	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID, 
-		std::string strAction, std::string strState, std::string strException );
+	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
+		string strAction, const string& strState, const string& strException,
+		long nActionID = -1);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
@@ -290,14 +293,14 @@ private:
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
 	//			using the connection provided.
-	void copyActionStatus( ADODB::_ConnectionPtr ipConnection, std::string strFrom, 
-		std::string strTo, bool bAddTransRecords);
+	void copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
+		string strTo, bool bAddTransRecords);
 
 	// PROMISE:	To add action related columns and indexes to the FPMFile table
-	void addActionColumn(std::string strAction);
+	void addActionColumn(string strAction);
 
 	// PROMISE: To remove action related columns and indexes from the FPMFile table
-	void removeActionColumn(std::string strAction);
+	void removeActionColumn(string strAction);
 
 	// PROMISE: To update totals in the ActionStatistics table using the connection provided
 	//			The FileSize and Pages from the ipNewRecord are added to the eToStatus's totals and
@@ -330,14 +333,14 @@ private:
 	// Looks up the username: admin in the Login table
 	// if no record return empty string
 	// if there is a record returns the stored password
-	std::string getEncryptedAdminPWFromDB();
+	string getEncryptedAdminPWFromDB();
 
 	// Encrypts the provided user name + password string
 	// and stores the result in the Login table
-	void encryptAndStoreUserNamePassword(const std::string strUserNameAndPassword);
+	void encryptAndStoreUserNamePassword(const string strUserNameAndPassword);
 
 	// Returns the result of encrypting the input string
-	std::string getEncryptedString(const std::string strInput);
+	string getEncryptedString(const string strInput);
 
 	// Throws and exception if the DBSchemaVersion in the DB is different from the current DBSchemaVersion
 	void validateDBSchemaVersion();
@@ -346,16 +349,16 @@ private:
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr getThisAsCOMPtr();
 
 	// Checks the strPassword value agains the password from the database
-	bool isAdminPasswordValid(const std::string& strPassword);
+	bool isAdminPasswordValid(const string& strPassword);
 
 	// Checks for blank database and if it is blank will clear the database to set it up
 	void initializeIfBlankDB();
 
 	// Fills the rvecTables vector with the Extract Tables
-	void getExpectedTables(std::vector<std::string>& rvecTables);
+	void getExpectedTables(vector<string>& rvecTables);
 
 	// Returns true if the given strTable is in the vector of expected tables
-	bool isExtractTable(const std::string& strTable);
+	bool isExtractTable(const string& strTable);
 
 	// Drops all of the foreign key constraints for the base Extract tables
 	void dropAllFKConstraints();
@@ -394,6 +397,19 @@ private:
 	// timeout it was still not possible to create the connection object false will be returned,
 	// otherwise true will be returned.
 	bool reConnectDatabase();
+
+	// Adds a record to the skipped file table
+	void addSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID, long nActionID);
+
+	// Removes a record from the skipped file table
+	void removeSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID,
+		long nActionID);
+
+	// Internal reset DB connection function
+	void resetDBConnection();
+
+	// Internal clear DB function
+	void clear();
 
 	void validateLicense();
 };

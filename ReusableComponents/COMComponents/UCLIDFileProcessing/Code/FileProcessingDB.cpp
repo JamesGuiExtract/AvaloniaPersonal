@@ -212,7 +212,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction( BSTR strAction,  long * pnID)
 			adLockOptimistic, adCmdText );
 
 		// Check to see if action exists
-		if ( !ipActionSet->adoEOF )
+		if ( ipActionSet->adoEOF == VARIANT_FALSE )
 		{
 			// Build error string (P13 #3931)
 			CString zText;
@@ -290,7 +290,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
 		ipActionSet->Find(strFind.c_str(), 0, adSearchForward);
 
 		// if action was found
-		if ( !ipActionSet->adoEOF )
+		if ( ipActionSet->adoEOF == VARIANT_FALSE )
 		{
 			// Get the action name from the database
 			strActionName = getStringField(ipActionSet->Fields, "ASCName");
@@ -347,13 +347,17 @@ STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
 		ASSERT_RESOURCE_ALLOCATION("ELI13529", ipActions != NULL );
 
 		// Step through all records
-		while ( !ipActionSet->adoEOF )
+		while ( ipActionSet->adoEOF == VARIANT_FALSE )
 		{
+			// Get the fields from the action set
+			FieldsPtr ipFields = ipActionSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26871", ipFields != NULL);
+
 			// get the action name
-			string strActionName = getStringField(ipActionSet->Fields, "ASCName");
+			string strActionName = getStringField(ipFields, "ASCName");
 
 			// get the action ID
-			long lID = getLongField( ipActionSet->Fields, "ID");
+			long lID = getLongField(ipFields, "ID");
 			string strID = asString(lID);
 
 			// Put the values in the StrToStrMap
@@ -481,8 +485,10 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 
 		_lastCodePos = "50";
 
+		string strNewStatus = asStatusString(eNewStatus);
+
 		// If no records were returned a new record should be added to the FAMFile
-		if ( ipFileSet->BOF )
+		if ( ipFileSet->BOF == VARIANT_TRUE )
 		{
 			// The filename is not in the table
 			*pbAlreadyExists = VARIANT_FALSE;
@@ -490,11 +496,15 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 			// Add new record
 			ipFileSet->AddNew();
 
+			// Get the fields from the file set
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26872", ipFields != NULL);
+
 			// Set the fields from the new file record
-			setFieldsFromFileRecord(ipFileSet->Fields, ipNewFileRecord);
+			setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
 			// set the initial Action state to pending
-			setStringField( ipFileSet->Fields, strActionCol, asStatusString(eNewStatus) );
+			setStringField( ipFields, strActionCol, strNewStatus );
 
 			_lastCodePos = "60";
 
@@ -520,9 +530,13 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 			// The file name is in the database
 			*pbAlreadyExists = VARIANT_TRUE;
 
+			// Get the fields from the file set
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26873", ipFields != NULL);
+
 			// Get the file record from the fields
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
-			ipOldRecord = getFileRecordFromFields(ipFileSet->Fields);
+			ipOldRecord = getFileRecordFromFields(ipFields);
 
 			// Set the Current file Records ID
 			nID = ipOldRecord->FileID;
@@ -530,7 +544,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 			_lastCodePos = "100";
 
 			// Get the last action status to return
-			string strStatus = getStringField(ipFileSet->Fields, strActionCol );
+			string strStatus = getStringField(ipFields, strActionCol );
 
 			// Set the Previous status return var
 			*pPrevStatus = asEActionStatus( strStatus );
@@ -554,10 +568,10 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 				}
 
 				// set the fields to the new file Record
-				setFieldsFromFileRecord(ipFileSet->Fields, ipNewFileRecord);
+				setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
 				// set the Action state to the new status
-				setStringField(ipFileSet->Fields, strActionCol, asStatusString(eNewStatus) );
+				setStringField(ipFields, strActionCol, strNewStatus );
 
 				_lastCodePos = "110";
 
@@ -576,7 +590,7 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 					if (m_bUpdateFASTTable)
 					{
 						addFileActionStateTransition(ipConnection, nID, nActionID, strStatus.c_str(), 
-							asStatusString(eNewStatus), "", "" );
+							strNewStatus, "", "" );
 					}
 
 					_lastCodePos = "140";
@@ -660,11 +674,15 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 		long nActionID = getActionID(ipConnection, strActionName);
 
 		// If file exists this should not be at end of file
-		if ( !ipFileSet->adoEOF )
+		if ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
+			// Get the fields from the file set
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26874", ipFields != NULL);
+
 			// Get the old Record from the fields
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
-			ipOldRecord = getFileRecordFromFields(ipFileSet->Fields);
+			ipOldRecord = getFileRecordFromFields(ipFields);
 
 			// Action Column to change
 			string strActionCol = "ASC_" + strActionName;
@@ -673,13 +691,13 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 			long nFileID = ipOldRecord->FileID;
 
 			// Get the Previous file state
-			string strActionState = getStringField( ipFileSet->Fields, strActionCol );
+			string strActionState = getStringField( ipFields, strActionCol );
 
 			// only change the state if the current state is pending
 			if ( strActionState == "P" )
 			{
 				// change state to unattempted
-				setStringField( ipFileSet->Fields, strActionCol, "U" );
+				setStringField( ipFields, strActionCol, "U" );
 
 				ipFileSet->Update();
 
@@ -858,7 +876,7 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 		// Action Column to update
 		string strActionCol = "ASC_" + strActionName;
 		// if the file exists should not be at the end of the file
-		if ( !ipFileSet->adoEOF )
+		if ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
 			// Set return value to the current Action Status
 			string strStatus = getStringField( ipFileSet->Fields, strActionCol );
@@ -1106,7 +1124,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			adLockReadOnly, adCmdText );
 
 		// Fill the ipFiles collection
-		while ( !ipFileSet->adoEOF )
+		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord;
 
@@ -1366,30 +1384,8 @@ STDMETHODIMP CFileProcessingDB::Clear()
 		// Validate the license
 		validateLicense();
 	
-		CSingleLock lock(&m_mutex, TRUE );
-
-		// Begin a transaction
-		TransactionGuard tg(getDBConnection());
-
-		// Drop the tables
-		dropTables();
-
-		// Add the tables back
-		addTables();
-
-		// Setup the tables that require initial values
-		initializeTableValues();
-
-		tg.CommitTrans();
-
-		// Add the Product specific db after the base tables have been committed
-		addProductSpecificDB();
-
-		// Reset the database connection
-		getThisAsCOMPtr()->ResetDBConnection();
-
-		// Shrink the database
-		executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+		// Call the internal clear
+		clear();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI14088");
 
@@ -1450,7 +1446,7 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		long nNumRecords = 0;
 
 		// Fill the ipFiles collection
-		while ( !ipFileSet->adoEOF )
+		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
 			// Get the FileName
 			string strFile = getStringField( ipFileSet->Fields, "FileName" );
@@ -1546,63 +1542,13 @@ STDMETHODIMP CFileProcessingDB::ResetDBConnection()
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	
-	INIT_EXCEPTION_AND_TRACING("MLI00017");
-
 	try
 	{
 		// Validate the license
 		validateLicense();
 
-		_lastCodePos = "10";
-
-		CSingleLock lock(&m_mutex, TRUE );
-		
-		_lastCodePos = "20";
-		
-		// Initilize count for MLI Code iteration count
-		long nCount = 0;
-		map<DWORD, ADODB::_ConnectionPtr>::iterator it;
-		for ( it = m_mapThreadIDtoDBConnections.begin(); it != m_mapThreadIDtoDBConnections.end(); it++)
-		{
-
-			// Do the close within a try catch because an exception on the close could just mean the connection is in a bad state and
-			// recreating and opening will put it in a good state
-			try
-			{
-				ADODB::_ConnectionPtr ipDBConnection = it->second;
-				_lastCodePos = "25-" + asString(nCount);
-
-				// This will close the existing connection if not already closed
-				if ( ipDBConnection != NULL && ipDBConnection->State != adStateClosed )
-				{
-					_lastCodePos = "30";
-
-					ipDBConnection->Close();
-				}
-			}
-			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15000")
-		}
-
-		// Clear all of the connections in all of the threads
-		m_mapThreadIDtoDBConnections.clear();
-		_lastCodePos = "35";
-
-		// Reset the Current connection status to not connected
-		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
-
-		_lastCodePos = "40";
-
-		// If there is a non empty server and database name get a connection and validate
-		if (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty())
-		{
-			// This will create a new connection for this thread and initialize the schema
-			getDBConnection();
-
-			_lastCodePos = "50";
-
-			// Validate the schema
-			validateDBSchemaVersion();
-		}
+		// Call the internal reset db connection
+		resetDBConnection();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19507")
 
@@ -1907,7 +1853,7 @@ STDMETHODIMP CFileProcessingDB::CreateNewDB(BSTR bstrNewDBName)
 		ipDBConnection->Close();
 
 		// Clear the new database to set up the tables
-		getThisAsCOMPtr()->Clear();
+		clear();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17469");
 	
@@ -1926,7 +1872,7 @@ STDMETHODIMP CFileProcessingDB::ConnectLastUsedDBThisProcess()
 		m_strDatabaseServer = ms_strCurrServerName;
 		m_strDatabaseName  = ms_strCurrDBName;
 
-		getThisAsCOMPtr()->ResetDBConnection();
+		resetDBConnection();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI17842");
 
@@ -1967,7 +1913,7 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 			adLockOptimistic, adCmdText ); 
 
 		// Check if setting record exist
-		if (ipDBInfoSet->adoEOF)
+		if (ipDBInfoSet->adoEOF == VARIANT_TRUE)
 		{
 			// Setting does not exist so add it
 			ipDBInfoSet->AddNew();
@@ -2019,7 +1965,7 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbs
 			adLockReadOnly, adCmdText ); 
 
 		// Check if any data returned
-		if (!ipDBInfoSet->adoEOF)
+		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
 		{
 			// Return the setting value
 			*pbstrSettingValue = get_bstr_t(getStringField(ipDBInfoSet->Fields, "Value")).Detach();
@@ -2236,6 +2182,14 @@ STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
 		
 		BEGIN_CONNECTION_RETRY();
 
+		ipConnection = getDBConnection();
+
+		// Get the action name
+		string strActionName = getActionName(ipConnection, nActionID);
+
+		// Set the file state to skipped
+		setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID);
+
 		END_CONNECTION_RETRY(ipConnection, "ELI26778");
 
 		return S_OK;
@@ -2251,10 +2205,84 @@ STDMETHODIMP CFileProcessingDB::SetFileActionComment(long nFileID, long nActionI
 
 		validateLicense();
 
+		// Get the comment
+		string strComment = asString(bstrComment);
+		replaceVariable(strComment, "'", "''");
+
+		// Get the current user name
+		string strUserName = getCurrentUserName();
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
 		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		string strCommentSQL = "SELECT * FROM FileActionComment WHERE FileID = "
+			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
+
+		_RecordsetPtr ipCommentSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26788", ipCommentSet != NULL);
+
+		ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+			adLockOptimistic, adCmdText);
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// If no records returned then there is no comment for this pair currently
+		// add the new comment to the table (do not add empty comments)
+		if (ipCommentSet->BOF == VARIANT_TRUE)
+		{
+			if (!strComment.empty())
+			{
+				ipCommentSet->AddNew();
+
+				// Get the fields pointer
+				FieldsPtr ipFields = ipCommentSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI26789", ipFields != NULL);
+
+				// Set the fields from the provided data
+				setStringField(ipFields, "UserName", strUserName);
+				setLongField(ipFields, "FileID", nFileID);
+				setLongField(ipFields, "ActionID", nActionID);
+				setStringField(ipFields, "Comment", strComment);
+				setStringField(ipFields, "DateTimeStamp", getSQLServerDateTime(ipConnection));
+
+				ipCommentSet->Update();
+			}
+		}
+		// Record already exists, update the comment , date time stamp, and user name
+		// (if comment is empty, delete the row)
+		else
+		{
+			if (strComment.empty())
+			{
+				ipCommentSet->Delete(adAffectCurrent);
+			}
+			else
+			{
+				FieldsPtr ipFields = ipCommentSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI26790", ipFields != NULL);
+
+				setStringField(ipFields, "UserName", strUserName);
+				setStringField(ipFields, "Comment", strComment);
+				setStringField(ipFields, "DateTimeStamp", getSQLServerDateTime(ipConnection));
+			}
+
+			// Update the table
+			ipCommentSet->Update();
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI26772");
 
@@ -2272,12 +2300,43 @@ STDMETHODIMP CFileProcessingDB::GetFileActionComment(long nFileID, long nActionI
 
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI26792", pbstrComment != NULL);
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
+		// Default the comment to empty string
+		string strComment = "";
+
 		BEGIN_CONNECTION_RETRY();
 
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		string strCommentSQL = "SELECT * FROM FileActionComment WHERE FileID = "
+			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
+
+		_RecordsetPtr ipCommentSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26793", ipCommentSet != NULL);
+
+		ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+			adLockOptimistic, adCmdText);
+
+		// Only need to get the comment if one exists
+		if (ipCommentSet->BOF == VARIANT_FALSE)
+		{
+			strComment = getStringField(ipCommentSet->Fields, "Comment");
+		}
+
 		END_CONNECTION_RETRY(ipConnection, "ELI26774");
+
+		// Set the return value
+		*pbstrComment = _bstr_t(strComment.c_str()).Detach();
 
 		return S_OK;
 	}
@@ -2296,6 +2355,37 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
 		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		string strCommentSQL = "SELECT * FROM FileActionComment WHERE FileID = "
+			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
+
+		_RecordsetPtr ipCommentSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26794", ipCommentSet != NULL);
+
+		ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
+			adLockOptimistic, adCmdText);
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Only need to delete the row if it exists
+		if (ipCommentSet->BOF == VARIANT_FALSE)
+		{
+			// Delete the row and update the table
+			ipCommentSet->Delete(adAffectCurrent);
+			ipCommentSet->Update();
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
 
 		END_CONNECTION_RETRY(ipConnection, "ELI26776");
 

@@ -193,6 +193,7 @@ private:
 	long m_nNumCompletedProcessing;
 	long m_nNumFailed;
 	long m_nNumPending;
+	long m_nNumSkipped;
 	long m_nNumCurrentlyProcessing;
 	long m_nNumTotalDocs;
 

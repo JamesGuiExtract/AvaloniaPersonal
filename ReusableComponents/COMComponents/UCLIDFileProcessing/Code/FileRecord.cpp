@@ -10,7 +10,12 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 // CFileRecord
 //-------------------------------------------------------------------------------------------------
-CFileRecord::CFileRecord()
+CFileRecord::CFileRecord() :
+m_strName(""),
+m_lActionID(0),
+m_lFileID(0),
+m_llFileSize(0),
+m_lPages(0)
 {
 }
 
@@ -167,7 +172,7 @@ STDMETHODIMP CFileRecord::put_ActionID(LONG newVal)
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26741");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileRecord::GetFileData(LONG *pFileID, LONG *pActionID, BSTR *pbstrFileName,
+STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pbstrFileName,
 									  LONGLONG *pllFileSize, LONG *plPages)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -175,18 +180,37 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *pFileID, LONG *pActionID, BSTR *pbst
 	try
 	{
 		// Check the arguments
-		ASSERT_ARGUMENT("ELI26744", pFileID != NULL);
-		ASSERT_ARGUMENT("ELI26745", pActionID != NULL);
+		ASSERT_ARGUMENT("ELI26744", plFileID != NULL);
+		ASSERT_ARGUMENT("ELI26745", plActionID != NULL);
 		ASSERT_ARGUMENT("ELI26746", pbstrFileName != NULL);
 		ASSERT_ARGUMENT("ELI26747", pllFileSize != NULL);
 		ASSERT_ARGUMENT("ELI26748", plPages != NULL);
 
 		// Copy the values
-		*pFileID = m_lFileID;
-		*pActionID = m_lActionID;
+		*plFileID = m_lFileID;
+		*plActionID = m_lActionID;
 		*pbstrFileName = _bstr_t(m_strName.c_str()).Detach();
 		*pllFileSize = m_llFileSize;
 		*plPages = m_lPages;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26749");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFileName,
+									  LONGLONG llFileSize, LONG lPages)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Copy the values
+		m_lFileID = lFileID;
+		m_lActionID = lActionID;
+		m_strName = asString(bstrFileName);
+		m_llFileSize = llFileSize;
+		m_lPages = lPages;
 
 		return S_OK;
 	}

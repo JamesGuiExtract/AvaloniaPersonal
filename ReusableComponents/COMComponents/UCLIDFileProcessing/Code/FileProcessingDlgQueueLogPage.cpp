@@ -657,6 +657,9 @@ std::string FileProcessingDlgQueueLogPage::getStatus( UCLID_FILEPROCESSINGLib::E
 
 		case kActionFailed:
 			return "Failed";
+
+		case kActionSkipped:
+			return "Skipped";
 	}
 
 	// we should never reach here

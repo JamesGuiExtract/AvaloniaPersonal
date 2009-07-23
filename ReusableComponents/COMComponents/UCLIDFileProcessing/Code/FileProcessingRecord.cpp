@@ -175,6 +175,22 @@ void FileProcessingRecord::markAsProcessingError(const string& strException)
 	m_eStatus = kRecordProcessingError;
 }
 //---------------------------------------------------------------------------------------------
+void FileProcessingRecord::markAsSkipped()
+{
+	m_stopWatch.stop();
+	m_eStatus = kRecordSkipped;
+
+	// Partial fix to P16#2457 (see notes of that record)
+	// There may be thousands of records shown in the completed-files-list, depending upon the 
+	// setting configured by the user in the options dialog.
+	// We don't want a progress status object to be stored for each of those records as it just
+	// takes up more memory and OS handles (each COM object consumes one OS handle).
+	
+	// Since this record has completed processing, the progress status object is not useful
+	// anyway.  Just release the associated memory.
+	m_ipProgressStatus = NULL;
+}
+//---------------------------------------------------------------------------------------------
 void FileProcessingRecord::notifyRunningErrorTask()
 {
 	// m_stopWatch will include the time elapsed while running m_stopWatchErrorTask 

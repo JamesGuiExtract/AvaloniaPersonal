@@ -226,7 +226,8 @@ private:
 	//		enabled file processors beginning at the index nFileProcNum.
 	//		2) A return value of false means that the file was not processed because the user
 	//		requested the processing to stop.
-	bool startFileProcessingChain(FileProcessingRecord& task, ProcessingThreadData* pThreadData);
+	EFileProcessingResult startFileProcessingChain(FileProcessingRecord& task,
+		ProcessingThreadData* pThreadData);
 
 	// Handles logging of error details if this option is enabled.
 	// Handles execution of the error-handling task if this option is enabled.

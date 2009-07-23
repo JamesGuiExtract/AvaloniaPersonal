@@ -40,14 +40,15 @@ const int giAUTO_SAVE_FREQUENCY = 60 * 1000;
 const string gstrFILE_PROCESSING_SPECIFICATION_EXT = ".fps";
 
 // ID's of status bar indicator panes
-const long gnDB_CONNECTION_STATUS_PANE_ID = 6;
-const long gnFAILED_COUNTS_STATUS_PANE_ID = 5;
+const long gnDB_CONNECTION_STATUS_PANE_ID = 7;
+const long gnFAILED_COUNTS_STATUS_PANE_ID = 6;
+const long gnSKIPPED_COUNTS_STATUS_PANE_ID = 5;
 const long gnPENDING_COUNTS_STATUS_PANE_ID = 4;
 const long gnPROCESSING_COUNTS_STATUS_PANE_ID = 3;
 const long gnCOMPLETED_COUNTS_STATUS_PANE_ID = 2;
 const long gnTOTAL_COUNTS_STATUS_PANE_ID = 1;
 const long gnSTATUS_TEXT_STATUS_PANE_ID = 0;
-const long gnNUM_STATUS_PANES = 7;
+const long gnNUM_STATUS_PANES = 8;
 
 // widths of status bar indicator panes
 const long gnDB_CONNECTION_STATUS_PANE_WIDTH = 73;
@@ -55,7 +56,8 @@ const long gnFAILED_COUNTS_STATUS_PANE_WIDTH = 100;					// NOTE: ALL THESE WIDTH
 const long gnPENDING_COUNTS_STATUS_PANE_WIDTH = 108;				// BEEN HAND-TWEAKED SO THAT
 const long gnPROCESSING_COUNTS_STATUS_PANE_WIDTH = 123;				// THE NUMBER 88,888,888 FITS
 const long gnCOMPLETED_COUNTS_STATUS_PANE_WIDTH = 123;				// COMFORTABLY IN THE FIELD TO THE
-const long gnTOTAL_COUNTS_STATUS_PANE_WIDTH = 95;					// RIGHT OF THE LABEL OF THE FIELD.
+const long gnSKIPPED_COUNTS_STATUS_PANE_WIDTH = 108;				// RIGHT OF THE LABEL OF THE FIELD.
+const long gnTOTAL_COUNTS_STATUS_PANE_WIDTH = 95;
 
 // Use of XP Themes causes a visual artifact updating the connection
 // status icon if padding is not added to the righthand side [P13:4707]
@@ -66,6 +68,7 @@ const string gstrCOMPLETED_STATUS_PANE_LABEL = "Completed:";
 const string gstrPROCESSING_STATUS_PANE_LABEL = "Processing:";
 const string gstrFAILED_STATUS_PANE_LABEL = "Failed:";
 const string gstrPENDING_STATUS_PANE_LABEL = "Pending:";
+const string gstrSKIPPED_STATUS_PANE_LABEL = "Skipped:";
 const string gstrTOTAL_STATUS_PANE_LABEL = "Total:";
 
 // other constants associated with the status bar
@@ -94,6 +97,7 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_nNumCompletedProcessing(0),
  m_nNumFailed(0),
  m_nNumPending(0),
+ m_nNumSkipped(0),
  m_nNumCurrentlyProcessing(0),
  m_nNumTotalDocs(0),
  m_bStoppedManually(false),
@@ -899,8 +903,9 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 			m_nNumCompletedProcessing = ipActionStatsNew->NumDocumentsComplete;
 			m_nNumFailed = ipActionStatsNew->NumDocumentsFailed;
 			m_nNumTotalDocs = ipActionStatsNew->NumDocuments;
-			m_nNumPending = ipActionStatsNew->NumDocuments - (m_nNumFailed + m_nNumCompletedProcessing +
-																m_nNumCurrentlyProcessing);
+			m_nNumSkipped = ipActionStatsNew->NumDocumentsSkipped;
+			m_nNumPending = m_nNumTotalDocs- (m_nNumFailed + m_nNumCompletedProcessing
+												+ m_nNumCurrentlyProcessing + m_nNumSkipped);
 
 			if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)
 			{
@@ -1861,7 +1866,8 @@ void FileProcessingDlg::doResize()
 		int statusPaneWidths[gnNUM_STATUS_PANES];
 		statusPaneWidths[gnDB_CONNECTION_STATUS_PANE_ID] = rectStatusBar.Width() - gnSTATUSBAR_RIGHTHAND_PADDING;
 		statusPaneWidths[gnFAILED_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnDB_CONNECTION_STATUS_PANE_ID] - gnDB_CONNECTION_STATUS_PANE_WIDTH;
-		statusPaneWidths[gnPENDING_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnFAILED_COUNTS_STATUS_PANE_ID] - gnFAILED_COUNTS_STATUS_PANE_WIDTH;
+		statusPaneWidths[gnSKIPPED_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnFAILED_COUNTS_STATUS_PANE_ID] - gnFAILED_COUNTS_STATUS_PANE_WIDTH;
+		statusPaneWidths[gnPENDING_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnSKIPPED_COUNTS_STATUS_PANE_ID] - gnSKIPPED_COUNTS_STATUS_PANE_WIDTH;
 		statusPaneWidths[gnPROCESSING_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnPENDING_COUNTS_STATUS_PANE_ID] - gnPENDING_COUNTS_STATUS_PANE_WIDTH;
 		statusPaneWidths[gnCOMPLETED_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnPROCESSING_COUNTS_STATUS_PANE_ID] - gnPROCESSING_COUNTS_STATUS_PANE_WIDTH;
 		statusPaneWidths[gnTOTAL_COUNTS_STATUS_PANE_ID] = statusPaneWidths[gnCOMPLETED_COUNTS_STATUS_PANE_ID] - gnCOMPLETED_COUNTS_STATUS_PANE_WIDTH;
@@ -1882,7 +1888,7 @@ void FileProcessingDlg::updateUI()
 	m_propDatabasePage.updateLastUsedDBButton();
 
 	CString zStatusText, zCompletedProcessing, zCurrentlyProcessing,
-			zFailed, zPending, zTotal;
+			zFailed, zPending, zSkipped, zTotal;
 	if(m_bRunning)
 	{
 		if(m_nNumCurrentlyProcessing <= 0)
@@ -1937,6 +1943,8 @@ void FileProcessingDlg::updateUI()
 			commaFormatNumber( (LONGLONG)m_nNumCurrentlyProcessing ).c_str() );
 		zFailed.Format( "%s %s", gstrFAILED_STATUS_PANE_LABEL.c_str(),
 			commaFormatNumber( (LONGLONG)m_nNumFailed ).c_str() );
+		zSkipped.Format( "%s %s", gstrSKIPPED_STATUS_PANE_LABEL.c_str(),
+			commaFormatNumber( (LONGLONG)m_nNumSkipped ).c_str() );
 		zPending.Format( "%s %s", gstrPENDING_STATUS_PANE_LABEL.c_str(),
 			commaFormatNumber( (LONGLONG)m_nNumPending ).c_str() );
 		zTotal.Format( "%s %s", gstrTOTAL_STATUS_PANE_LABEL.c_str(), 
@@ -1949,6 +1957,7 @@ void FileProcessingDlg::updateUI()
 		zCurrentlyProcessing.Format( "%s", gstrPROCESSING_STATUS_PANE_LABEL.c_str() );
 		zFailed.Format( "%s", gstrFAILED_STATUS_PANE_LABEL.c_str() );
 		zPending.Format( "%s", gstrPENDING_STATUS_PANE_LABEL.c_str() );
+		zSkipped.Format( "%s", gstrSKIPPED_STATUS_PANE_LABEL.c_str() );
 		zTotal.Format( "%s", gstrTOTAL_STATUS_PANE_LABEL.c_str() );
 	}
 
@@ -1956,8 +1965,9 @@ void FileProcessingDlg::updateUI()
 	m_statusBar.SetText(zStatusText, gnSTATUS_TEXT_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zCompletedProcessing, gnCOMPLETED_COUNTS_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zCurrentlyProcessing, gnPROCESSING_COUNTS_STATUS_PANE_ID, 0);
-	m_statusBar.SetText(zFailed, gnFAILED_COUNTS_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zPending, gnPENDING_COUNTS_STATUS_PANE_ID, 0);
+	m_statusBar.SetText(zSkipped, gnSKIPPED_COUNTS_STATUS_PANE_ID, 0);
+	m_statusBar.SetText(zFailed, gnFAILED_COUNTS_STATUS_PANE_ID, 0);
 	m_statusBar.SetText(zTotal, gnTOTAL_COUNTS_STATUS_PANE_ID, 0);
 }
 //-------------------------------------------------------------------------------------------------

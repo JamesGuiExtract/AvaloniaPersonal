@@ -28,7 +28,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const int giMIN_WINDOW_WIDTH = 650;
+const int giMIN_WINDOW_WIDTH = 700;
 const int giMIN_WINDOW_HEIGHT = 320;
 const string gstrFILE_ACTION_MANAGER_FILENAME = "ProcessFiles.exe";
 const string gstrREPORT_VIEWER_EXE = "ReportViewer.exe";

@@ -58,8 +58,10 @@ public:
 	STDMETHOD(put_Pages)(LONG newVal);
 	STDMETHOD(get_ActionID)(LONG* pVal);
 	STDMETHOD(put_ActionID)(LONG newVal);
-	STDMETHOD(GetFileData)(LONG* pFileID, LONG* pActionID, BSTR* pbstrFileName,
+	STDMETHOD(GetFileData)(LONG* plFileID, LONG* plActionID, BSTR* pbstrFileName,
 		LONGLONG* pllFileSize, LONG* plPages);
+	STDMETHOD(SetFileData)(LONG lFileID, LONG lActionID, BSTR bstrFileName,
+		LONGLONG llFileSize, LONG lPages);
 
 private:
 

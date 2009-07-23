@@ -1230,10 +1230,14 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 
 			// Attempt executing the tasks on the current file and mark
 			// the current file as either completed or pending.
-			bool bProcessed = startFileProcessingChain(task, pThreadData);
-			if (bProcessed)
+			EFileProcessingResult eResult = startFileProcessingChain(task, pThreadData);
+			if (eResult == kProcessingSuccessful)
 			{
 				task.markAsCompleted();
+			}
+			else if (eResult == kProcessingSkipped)
+			{
+				task.markAsSkipped();
 			}
 			else
 			{
@@ -1261,7 +1265,7 @@ void CFileProcessingMgmtRole::processTask(FileProcessingRecord& task,
 	m_pRecordMgr->updateTask(task);
 }
 //-------------------------------------------------------------------------------------------------
-bool CFileProcessingMgmtRole::startFileProcessingChain(FileProcessingRecord& task, 
+EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProcessingRecord& task, 
 													   ProcessingThreadData* pThreadData)
 {
 	try
@@ -1275,15 +1279,15 @@ bool CFileProcessingMgmtRole::startFileProcessingChain(FileProcessingRecord& tas
 		// If m_bProcessing is false it means processing has been stopped.
 		if (!m_bProcessing)
 		{
-			return false;
+			return kProcessingCancelled;
 		}
 
 		// Attempt to process the file
-		UCLID_FILEPROCESSINGLib::EFileProcessingResult eResult = ipExecutor->ProcessFile(
+		EFileProcessingResult eResult = (EFileProcessingResult) ipExecutor->ProcessFile(
 			task.getFileName().c_str(), task.getFileID(), task.getActionID(),
 			task.m_ipProgressStatus, VARIANT_FALSE);
 
-		return eResult == kProcessingSuccessful;
+		return eResult;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI10909");
 }

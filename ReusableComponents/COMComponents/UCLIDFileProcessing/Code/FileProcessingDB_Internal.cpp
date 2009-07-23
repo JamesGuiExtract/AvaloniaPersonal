@@ -26,7 +26,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 8;
+const long glFAMDBSchemaVersion = 9;
 
 // Table names
 static const string gstrACTION = "Action";
@@ -41,6 +41,8 @@ static const string gstrQUEUE_EVENT = "QueueEvent";
 static const string gstrQUEUE_EVENT_CODE = "QueueEventCode";
 static const string gstrMACHINE = "Machine";
 static const string gstrFAM_USER = "FAMUser";
+static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
+static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -105,8 +107,13 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 }
 //--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID, 
-													string strAction, string strState, string strException )
+													string strAction, const string& strState,
+													const string& strException,
+													long nActionID)
 {
+	ASSERT_ARGUMENT("ELI26796", ipConnection != NULL);
+	ASSERT_ARGUMENT("ELI26795", !strAction.empty() || nActionID != -1);
+
 	EActionStatus easRtn = kActionUnattempted;
 
 	// Set up the select query to selec the file to change
@@ -126,31 +133,41 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 	// begin a transaction
 	TransactionGuard tg(ipConnection);
 
-	// Get the action ID and update the strAction to stored value
-	long nActionID = getActionID(ipConnection, strAction);
-
+	// Update action ID/Action name
+	if (!strAction.empty() && nActionID == -1)
+	{
+		nActionID = getActionID(ipConnection, strAction);
+	}
+	else if (strAction.empty() && nActionID != -1)
+	{
+		strAction = getActionName(ipConnection, nActionID);
+	}
+	
 	// Action Column to update
 	string strActionCol = "ASC_" + strAction;
 
 	// Find the file if it exists
-	if ( !ipFileSet->adoEOF )
+	if ( ipFileSet->adoEOF == VARIANT_FALSE )
 	{
+		FieldsPtr ipFileSetFields = ipFileSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI26867", ipFileSetFields != NULL);
+
 		// Get the previous state
-		string strPrevStatus = getStringField(ipFileSet->Fields, strActionCol ); 
+		string strPrevStatus = getStringField(ipFileSetFields, strActionCol ); 
 		easRtn = asEActionStatus ( strPrevStatus );
 
 		// Get the current record
 		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipCurrRecord;
-		ipCurrRecord = getFileRecordFromFields(ipFileSet->Fields);
+		ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
 
 		// set the new state
-		setStringField( ipFileSet->Fields, strActionCol, strState );
+		setStringField( ipFileSetFields, strActionCol, strState );
 
 		// Update the file record
 		ipFileSet->Update();
 
 		// if the old status does not equal the new status add transition records
-		if ( easRtn != asEActionStatus(strState) )
+		if ( strPrevStatus != strState )
 		{
 			// update the statistics
 			updateStats(ipConnection, nActionID, easRtn, asEActionStatus(strState), ipCurrRecord, ipCurrRecord);
@@ -158,8 +175,20 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 			// Only update FileActionStateTransition table if required
 			if (m_bUpdateFASTTable)
 			{
-				addFileActionStateTransition( ipConnection, nFileID, nActionID, asStatusString(easRtn), 
+				addFileActionStateTransition( ipConnection, nFileID, nActionID, strPrevStatus, 
 					strState, strException, "" );
+			}
+
+			// These are order dependent
+			if (strPrevStatus == "S")
+			{
+				// Remove skipped file record
+				removeSkipFileRecord(ipConnection, nFileID, nActionID);
+			}
+			if (strState == "S")
+			{
+				// Add a record to the skipped table
+				addSkipFileRecord(ipConnection, nFileID, nActionID);
 			}
 		}
 		// commit the changes to the database
@@ -200,6 +229,10 @@ EActionStatus CFileProcessingDB::asEActionStatus  ( const string& strStatus )
 	{
 		easRtn = kActionUnattempted;
 	}
+	else if ( strStatus == "S" )
+	{
+		easRtn = kActionSkipped;
+	}
 	else
 	{
 		THROW_LOGIC_ERROR_EXCEPTION("ELI13552");
@@ -221,6 +254,8 @@ string CFileProcessingDB::asStatusString ( EActionStatus eStatus )
 		return "C";
 	case kActionFailed:
 		return "F";
+	case kActionSkipped:
+		return "S";
 	default:
 		THROW_LOGIC_ERROR_EXCEPTION("ELI13562");
 	}
@@ -254,21 +289,24 @@ void CFileProcessingDB::addQueueEventRecord( ADODB::_ConnectionPtr ipConnection,
 			ipQueueEventSet->AddNew();
 			_lastCodePos = "30";
 
+			FieldsPtr ipFields = ipQueueEventSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26875", ipFields != NULL);
+
 			//  add the field values to the new record
-			setLongField( ipQueueEventSet->Fields, "FileID",  nFileID );
+			setLongField( ipFields, "FileID",  nFileID );
 			_lastCodePos = "40";
 
-			setStringField( ipQueueEventSet->Fields, "DateTimeStamp", 
+			setStringField( ipFields, "DateTimeStamp", 
 				getSQLServerDateTime(ipConnection) );
 			_lastCodePos = "50";
 			
-			setStringField( ipQueueEventSet->Fields, "QueueEventCode", strQueueEventCode );
+			setStringField( ipFields, "QueueEventCode", strQueueEventCode );
 			_lastCodePos = "60";
 
-			setLongField( ipQueueEventSet->Fields, "FAMUserID", getFAMUserID(ipConnection));
+			setLongField( ipFields, "FAMUserID", getFAMUserID(ipConnection));
 			_lastCodePos = "70";
 
-			setLongField( ipQueueEventSet->Fields, "MachineID", getMachineID(ipConnection));
+			setLongField( ipFields, "MachineID", getMachineID(ipConnection));
 			_lastCodePos = "80";
 
 			// File should exist for these options
@@ -282,7 +320,7 @@ void CFileProcessingDB::addQueueEventRecord( ADODB::_ConnectionPtr ipConnection,
 				_lastCodePos = "80_20";
 
 				string strFileModifyTime = fileTime.Format("%m/%d/%y %I:%M:%S %p");
-				setStringField(	ipQueueEventSet->Fields, "FileModifyTime", strFileModifyTime );
+				setStringField(	ipFields, "FileModifyTime", strFileModifyTime );
 				_lastCodePos = "80_30";
 
 				// Get the file size
@@ -291,7 +329,7 @@ void CFileProcessingDB::addQueueEventRecord( ADODB::_ConnectionPtr ipConnection,
 				_lastCodePos = "80_40";
 
 				// Set the file size in the table
-				setLongLongField( ipQueueEventSet->Fields, "FileSizeInBytes", llFileSize );
+				setLongLongField( ipFields, "FileSizeInBytes", llFileSize );
 				_lastCodePos = "80_50";
 			}
 			// Update the QueueEvent table
@@ -338,24 +376,27 @@ void CFileProcessingDB::addFileActionStateTransition ( ADODB::_ConnectionPtr ipC
 	// Add a new record
 	ipActionTransitionSet->AddNew();
 
+	// Get the fields pointer
+	FieldsPtr ipFields = ipActionTransitionSet->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI26868", ipFields != NULL);
+
 	// set the records fields
-	setLongField( ipActionTransitionSet->Fields, "FileID", nFileID );
-	setLongField( ipActionTransitionSet->Fields, "ActionID", nActionID );
-	setStringField( ipActionTransitionSet->Fields, "ASC_From", strFromState );
-	setStringField( ipActionTransitionSet->Fields, "ASC_To", strToState );
-	setStringField( ipActionTransitionSet->Fields, "DateTimeStamp", 
-		getSQLServerDateTime(ipConnection));
-	setLongField( ipActionTransitionSet->Fields, "FAMUserID", getFAMUserID(ipConnection));
-	setLongField( ipActionTransitionSet->Fields, "MachineID", getMachineID(ipConnection));
+	setLongField( ipFields, "FileID", nFileID );
+	setLongField( ipFields, "ActionID", nActionID );
+	setStringField( ipFields, "ASC_From", strFromState );
+	setStringField( ipFields, "ASC_To", strToState );
+	setStringField( ipFields, "DateTimeStamp", getSQLServerDateTime(ipConnection));
+	setLongField( ipFields, "FAMUserID", getFAMUserID(ipConnection));
+	setLongField( ipFields, "MachineID", getMachineID(ipConnection));
 
 	// if a transition to failed add the exception
 	if ( strToState == "F" )
 	{
-		setStringField( ipActionTransitionSet->Fields, "Exception", strException, true );
+		setStringField( ipFields, "Exception", strException, true );
 	}
 	
 	// save Comment
-	setStringField( ipActionTransitionSet->Fields, "Comment", strComment, true );
+	setStringField( ipFields, "Comment", strComment, true );
 
 	// update the table
 	ipActionTransitionSet->Update();
@@ -395,7 +436,7 @@ string CFileProcessingDB::getActionName( ADODB::_ConnectionPtr ipConnection, lon
 
 		// search for the given action ID
 		ipAction->Find( strCriteria.c_str(), 0, adSearchForward );
-		if ( ipAction->adoEOF )
+		if ( ipAction->adoEOF == VARIANT_TRUE )
 		{
 			// Action ID was not found
 			UCLIDException ue ("ELI14047", "Action ID was not found." );
@@ -602,14 +643,26 @@ void CFileProcessingDB::reCalculateStats( ADODB::_ConnectionPtr ipConnection, lo
 	ipActionStats->Open( strSelectStat.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 		adOpenDynamic, adLockOptimistic, adCmdText );
 
+	FieldsPtr ipActionFields = NULL;
+
 	// If no records in the data set then will need create a new record
-	if ( ipActionStats->adoEOF )
+	if ( ipActionStats->adoEOF == VARIANT_TRUE )
 	{
 		// Create new record
 		ipActionStats->AddNew();
 
+		// Get the fields from the new record
+		ipActionFields = ipActionStats->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI26865", ipActionFields != NULL);
+
 		//  Set Action ID
-		setLongField( ipActionStats->Fields, "ActionID", nActionID );
+		setLongField( ipActionFields, "ActionID", nActionID );
+	}
+	else
+	{
+		// Get the action fields
+		ipActionFields = ipActionStats->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI26866", ipActionFields != NULL);
 	}
 
 	// Initialize totals
@@ -625,33 +678,53 @@ void CFileProcessingDB::reCalculateStats( ADODB::_ConnectionPtr ipConnection, lo
 	long lNumPagesCompleted = 0;
 	long long llNumBytesCompleted = 0;
 
-	// Go thru each of the records in the Calculation set
-	while (!ipCalcStatsSet->adoEOF)
-	{
-		// Get the action state
-		string strActionState = getStringField( ipCalcStatsSet->Fields, strActionColName ); 
+	long lNumDocsSkipped = 0;
+	long lNumPagesSkipped = 0;
+	long long llNumBytesSkipped = 0;
 
-		// Set the sums to the appropriate statistics property
-		if ( strActionState == "F" )
+	// Go thru each of the records in the Calculation set
+	while (ipCalcStatsSet->adoEOF == VARIANT_FALSE)
+	{
+		// Get the fields from the calc stat set
+		FieldsPtr ipCalcFields = ipCalcStatsSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI26864", ipCalcFields != NULL);
+
+		// Get the action state
+		string strActionState = getStringField( ipCalcFields, strActionColName ); 
+
+		if (strActionState != "U")
 		{
-			// Set Failed totals
-			lNumDocsFailed = getLongField( ipCalcStatsSet->Fields, "NumDocs" );
-			lNumPagesFailed = getLongField( ipCalcStatsSet->Fields, "SumOfPages" );
-			llNumBytesFailed = getLongLongField( ipCalcStatsSet->Fields, "SumOfFileSize" );
-		}
-		else if ( strActionState == "C" )
-		{
-			// Set Completed totals
-			lNumDocsCompleted = getLongField( ipCalcStatsSet->Fields, "NumDocs" );
-			lNumPagesCompleted = getLongField( ipCalcStatsSet->Fields, "SumOfPages" );
-			llNumBytesCompleted = getLongLongField( ipCalcStatsSet->Fields, "SumOfFileSize" );
-		}
-		if ( strActionState != "U" )
-		{
+			long lNumDocs = getLongField( ipCalcFields, "NumDocs" );
+			long lNumPages = getLongField( ipCalcFields, "SumOfPages" );
+			long long llNumBytes = getLongLongField( ipCalcFields, "SumOfFileSize" );
+
+			// Set the sums to the appropriate statistics property
+			if ( strActionState == "F" )
+			{
+				// Set Failed totals
+				lNumDocsFailed = lNumDocs;
+				lNumPagesFailed = lNumPages;
+				llNumBytesFailed = llNumBytes;
+			}
+			else if ( strActionState == "C" )
+			{
+				// Set Completed totals
+				lNumDocsCompleted = lNumDocs;
+				lNumPagesCompleted = lNumPages;
+				llNumBytesCompleted = llNumBytes;
+			}
+			else if (strActionState == "S")
+			{
+				// Set Skipped totals
+				lNumDocsSkipped = lNumDocs;
+				lNumPagesSkipped = lNumPages;
+				llNumBytesSkipped = llNumBytes;
+			}
+
 			// All values are added to the Totals
-			lTotalDocs += getLongField( ipCalcStatsSet->Fields, "NumDocs" );
-			lTotalPages += getLongField( ipCalcStatsSet->Fields, "SumOfPages" );
-			llTotalBytes += getLongLongField( ipCalcStatsSet->Fields, "SumOfFileSize" );
+			lTotalDocs += lNumDocs;
+			lTotalPages += lNumPages;
+			llTotalBytes += llNumBytes;
 		}
 
 		// Move to next record
@@ -659,19 +732,24 @@ void CFileProcessingDB::reCalculateStats( ADODB::_ConnectionPtr ipConnection, lo
 	}
 
 	// Set Failed totals
-	setLongField( ipActionStats->Fields, "NumDocumentsFailed", lNumDocsFailed );
-	setLongField( ipActionStats->Fields, "NumPagesFailed", lNumPagesFailed );
-	setLongLongField( ipActionStats->Fields, "NumBytesFailed", llNumBytesFailed );
+	setLongField( ipActionFields, "NumDocumentsFailed", lNumDocsFailed );
+	setLongField( ipActionFields, "NumPagesFailed", lNumPagesFailed );
+	setLongLongField( ipActionFields, "NumBytesFailed", llNumBytesFailed );
 
 	// Set Completed totals
-	setLongField( ipActionStats->Fields, "NumDocumentsComplete", lNumDocsCompleted );
-	setLongField( ipActionStats->Fields, "NumPagesComplete", lNumPagesCompleted );
-	setLongLongField( ipActionStats->Fields, "NumBytesComplete", llNumBytesCompleted );
+	setLongField( ipActionFields, "NumDocumentsComplete", lNumDocsCompleted );
+	setLongField( ipActionFields, "NumPagesComplete", lNumPagesCompleted );
+	setLongLongField( ipActionFields, "NumBytesComplete", llNumBytesCompleted );
+
+	// Set Skipped totals
+	setLongField( ipActionFields, "NumDocumentsSkipped", lNumDocsSkipped );
+	setLongField( ipActionFields, "NumPagesSkipped", lNumPagesSkipped );
+	setLongLongField( ipActionFields, "NumBytesSkipped", llNumBytesSkipped );
 
 	// Save totals in the ActionStatistics table
-	setLongField( ipActionStats->Fields, "NumDocuments", lTotalDocs );
-	setLongField( ipActionStats->Fields, "NumPages", lTotalPages );
-	setLongLongField( ipActionStats->Fields, "NumBytes", llTotalBytes );
+	setLongField( ipActionFields, "NumDocuments", lTotalDocs );
+	setLongField( ipActionFields, "NumPages", lTotalPages );
+	setLongLongField( ipActionFields, "NumBytes", llTotalBytes );
 
 	// Update the record
 	ipActionStats->Update();
@@ -679,7 +757,6 @@ void CFileProcessingDB::reCalculateStats( ADODB::_ConnectionPtr ipConnection, lo
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::dropTables()
 {
-
 	// First remove all Product Specific stuff
 	removeProductSpecificDB();
 
@@ -714,6 +791,10 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_INDEX);
 		vecQueries.push_back(gstrCREATE_MACHINE_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_USER_TABLE);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE);
+		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
+		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -733,6 +814,10 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_FILE_ACTION_STATE_TRANSITION_ACTION_STATE_FROM_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_MACHINE_FK);
 		vecQueries.push_back(gstrADD_QUEUE_EVENT_FAM_USER_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK);
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK);
+		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -759,6 +844,9 @@ void CFileProcessingDB::initializeTableValues()
 
 	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
 		"VALUES('U', 'Unattempted')");
+
+	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+		"VALUES('S', 'Skipped')");
 
 	// Add Valid Queue event codes the QueueEventCode table
 	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
@@ -895,6 +983,22 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 		ue.addDebugInfo("ActionID", nActionID);
 		throw ue;
 	}
+
+	// Attempt to get the file data
+	LONGLONG llOldFileSize(-1), llNewFileSize(-1);
+	long lOldPages(-1), lNewPages(-1), lTempFileID(-1), lTempActionID(-1);
+	_bstr_t bstrTemp;
+	if (ipOldRecord != NULL)
+	{
+		ipOldRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
+			&llOldFileSize, &lOldPages);
+	}
+	if (ipNewRecord != NULL)
+	{
+		ipNewRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
+			&llNewFileSize, &lNewPages);
+	}
+
 	// Nothing to do if the "from" status == the "to" status
 	if (eFromStatus == eToStatus)
 	{
@@ -902,8 +1006,8 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 		// Otherwise if the FileSize and the number Pages are the same there is nothing to do
 		if (eFromStatus == kActionUnattempted ||
 			(ipNewRecord != NULL && ipOldRecord != NULL &&
-			ipNewRecord->FileSize == ipOldRecord->FileSize && 
-			ipNewRecord->Pages == ipOldRecord->Pages))
+			llNewFileSize == llOldFileSize && 
+			lNewPages == lOldPages))
 		{
 			return;
 		}
@@ -924,46 +1028,89 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 	switch (eToStatus )
 	{
 	case kActionFailed:
-		// Make sure the ipNewRecord is not NULL
-		ASSERT_ARGUMENT("ELI17046", ipNewRecord != NULL);
-		ipActionStats->NumDocumentsFailed = ipActionStats->NumDocumentsFailed + 1;
-		ipActionStats->NumPagesFailed = ipActionStats->NumPagesFailed + ipNewRecord->Pages;
-		ipActionStats->NumBytesFailed = ipActionStats->NumBytesFailed + ipNewRecord->FileSize;
-		break;
+		{
+			// Make sure the ipNewRecord is not NULL
+			ASSERT_ARGUMENT("ELI17046", ipNewRecord != NULL);
+			long lNumDocsFailed(0), lNumPagesFailed(0);
+			LONGLONG llNumBytesFailed(0);
+			ipActionStats->GetFailed(&lNumDocsFailed, &lNumPagesFailed, &llNumBytesFailed);
+			ipActionStats->SetFailed(lNumDocsFailed+1, lNumPagesFailed + lNewPages,
+				llNumBytesFailed + llNewFileSize);
+			break;
+		}
+
 	case kActionCompleted:
-		// Make sure the ipNewRecord is not NULL
-		ASSERT_ARGUMENT("ELI17048", ipNewRecord != NULL);
-		ipActionStats->NumDocumentsComplete = ipActionStats->NumDocumentsComplete + 1;
-		ipActionStats->NumPagesComplete = ipActionStats->NumPagesComplete + ipNewRecord->Pages;
-		ipActionStats->NumBytesComplete = ipActionStats->NumBytesComplete + ipNewRecord->FileSize;
-		break;
+		{
+			// Make sure the ipNewRecord is not NULL
+			ASSERT_ARGUMENT("ELI17048", ipNewRecord != NULL);
+			long lNumDocsComplete(0), lNumPagesComplete(0);
+			LONGLONG llNumBytesComplete(0);
+			ipActionStats->GetComplete(&lNumDocsComplete, &lNumPagesComplete, &llNumBytesComplete);
+			ipActionStats->SetComplete(lNumDocsComplete+1, lNumPagesComplete + lNewPages,
+				llNumBytesComplete + llNewFileSize);
+			break;
+		}
+
+	case kActionSkipped:
+		{
+			// Make sure the ipNewRecord is not NULL
+			ASSERT_ARGUMENT("ELI26803", ipNewRecord != NULL);
+			long lNumDocsSkipped(0), lNumPagesSkipped(0);
+			LONGLONG llNumBytesSkipped(0);
+			ipActionStats->GetSkipped(&lNumDocsSkipped, &lNumPagesSkipped, &llNumBytesSkipped);
+			ipActionStats->SetSkipped(lNumDocsSkipped+1, lNumPagesSkipped + lNewPages,
+				llNumBytesSkipped + llNewFileSize);
+			break;
+		}
 	}
 	// Add the new counts to the totals if the to status is not unattempted
 	if ( eToStatus != kActionUnattempted )
 	{
 		// Make sure the ipNewRecord is not NULL
 		ASSERT_ARGUMENT("ELI17050", ipNewRecord != NULL);
-		ipActionStats->NumDocuments = ipActionStats->NumDocuments + 1;
-		ipActionStats->NumPages = ipActionStats->NumPages + ipNewRecord->Pages;
-		ipActionStats->NumBytes = ipActionStats->NumBytes + ipNewRecord->FileSize;
+		long lNumDocsTotal(0), lNumPagesTotal(0);
+		LONGLONG llNumBytesTotal(0);
+		ipActionStats->GetTotals(&lNumDocsTotal, &lNumPagesTotal, &llNumBytesTotal);
+		ipActionStats->SetTotals(lNumDocsTotal+1, lNumPagesTotal + lNewPages,
+			llNumBytesTotal + llNewFileSize);
 	}
 
 	switch (eFromStatus)
 	{
 	case kActionFailed:
-		// Make sure the ipOldRecord is not NULL
-		ASSERT_ARGUMENT("ELI17052", ipOldRecord != NULL);
-		ipActionStats->NumDocumentsFailed = ipActionStats->NumDocumentsFailed - 1;
-		ipActionStats->NumPagesFailed = ipActionStats->NumPagesFailed - ipOldRecord->Pages;
-		ipActionStats->NumBytesFailed = ipActionStats->NumBytesFailed - ipOldRecord->FileSize;
-		break;
+		{
+			// Make sure the ipOldRecord is not NULL
+			ASSERT_ARGUMENT("ELI17052", ipOldRecord != NULL);
+			long lNumDocsFailed(0), lNumPagesFailed(0);
+			LONGLONG llNumBytesFailed(0);
+			ipActionStats->GetFailed(&lNumDocsFailed, &lNumPagesFailed, &llNumBytesFailed);
+			ipActionStats->SetFailed(lNumDocsFailed+1, lNumPagesFailed - lOldPages,
+				llNumBytesFailed - llOldFileSize);
+			break;
+		}
+
 	case kActionCompleted:
-		// Make sure the ipOldRecord is not NULL
-		ASSERT_ARGUMENT("ELI17053", ipOldRecord != NULL);
-		ipActionStats->NumDocumentsComplete = ipActionStats->NumDocumentsComplete - 1;
-		ipActionStats->NumPagesComplete = ipActionStats->NumPagesComplete - ipOldRecord->Pages;
-		ipActionStats->NumBytesComplete = ipActionStats->NumBytesComplete - ipOldRecord->FileSize;
-		break;
+		{
+			// Make sure the ipOldRecord is not NULL
+			long lNumDocsComplete(0), lNumPagesComplete(0);
+			LONGLONG llNumBytesComplete(0);
+			ipActionStats->GetComplete(&lNumDocsComplete, &lNumPagesComplete, &llNumBytesComplete);
+			ipActionStats->SetComplete(lNumDocsComplete+1, lNumPagesComplete - lOldPages,
+				llNumBytesComplete - llOldFileSize);
+			break;
+		}
+
+	case kActionSkipped:
+		{
+			// Make sure the ipOldRecord is not NULL
+			ASSERT_ARGUMENT("ELI17053", ipOldRecord != NULL);
+			long lNumDocsSkipped(0), lNumPagesSkipped(0);
+			LONGLONG llNumBytesSkipped(0);
+			ipActionStats->GetSkipped(&lNumDocsSkipped, &lNumPagesSkipped, &llNumBytesSkipped);
+			ipActionStats->SetSkipped(lNumDocsSkipped+1, lNumPagesSkipped - lOldPages,
+				llNumBytesSkipped - llOldFileSize);
+			break;
+		}
 	}
 
 	// Remove the counts form the totals if the from status is not unattempted
@@ -971,9 +1118,11 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 	{
 		// Make sure the ipOldRecord is not NULL
 		ASSERT_ARGUMENT("ELI17055", ipOldRecord != NULL);
-		ipActionStats->NumDocuments = ipActionStats->NumDocuments - 1;
-		ipActionStats->NumPages = ipActionStats->NumPages - ipOldRecord->Pages;
-		ipActionStats->NumBytes = ipActionStats->NumBytes - ipOldRecord->FileSize;
+		long lNumDocsTotal(0), lNumPagesTotal(0);
+		LONGLONG llNumBytesTotal(0);
+		ipActionStats->GetTotals(&lNumDocsTotal, &lNumPagesTotal, &llNumBytesTotal);
+		ipActionStats->SetTotals(lNumDocsTotal-1, lNumPagesTotal - lOldPages,
+			llNumBytesTotal - llOldFileSize);
 	}
 
 	// Save the stats
@@ -995,36 +1144,45 @@ bool CFileProcessingDB::loadStats( ADODB::_ConnectionPtr ipConnection, long nAct
 		adLockOptimistic, adCmdText );
 
 	bool bRecalculated = false;
-	if ( ipActionStatSet->adoEOF )
+	if ( ipActionStatSet->adoEOF == VARIANT_TRUE )
 	{
 		reCalculateStats(ipConnection, nActionID);
 		bRecalculated = true;
 		ipActionStatSet->Requery(adOptionUnspecified);
 	}
-	if ( ipActionStatSet->adoEOF )
+	if ( ipActionStatSet->adoEOF == VARIANT_TRUE )
 	{
 		UCLIDException ue("ELI14100", "Unable to load statistics.");
 		ue.addDebugInfo("ActionID", nActionID);
 		throw ue;
 	}
 
+	// Get the fields from the action stat set
+	FieldsPtr ipFields = ipActionStatSet->Fields;
+	ASSERT_RESOURCE_ALLOCATION("ELI26863", ipFields != NULL);
+
 	// Create an ActionStatistics pointer to return the values
 	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats(CLSID_ActionStatistics);
 	ASSERT_RESOURCE_ALLOCATION("ELI14101", ipActionStats != NULL );
 
+	// Get all the data from the recordset
+	long lNumDocsFailed =  getLongField(ipFields, "NumDocumentsFailed" );
+	long lNumPagesFailed = getLongField(ipFields, "NumPagesFailed" );
+	LONGLONG llNumBytesFailed = getLongLongField(ipFields, "NumBytesFailed" );
+	long lNumDocsSkipped =  getLongField(ipFields, "NumDocumentsSkipped" );
+	long lNumPagesSkipped = getLongField( ipFields, "NumPagesSkipped" );
+	LONGLONG llNumBytesSkipped = getLongLongField( ipFields, "NumBytesSkipped" );
+	long lNumDocsComplete = getLongField( ipFields, "NumDocumentsComplete" );
+	long lNumPagesComplete = getLongField( ipFields, "NumPagesComplete" );
+	LONGLONG llNumBytesComplete = getLongLongField( ipFields, "NumBytesComplete" );
+	long lNumDocs = getLongField( ipFields, "NumDocuments" );
+	long lNumPages = getLongField( ipFields, "NumPages" );
+	LONGLONG llNumBytes = getLongLongField( ipFields, "NumBytes" );
+
 	// Transfer the data from the recordset to the ActionStatisticsPtr
-	ipActionStats->NumDocumentsFailed =  getLongField(ipActionStatSet->Fields, 
-		"NumDocumentsFailed" );
-	ipActionStats->NumPagesFailed = getLongField( ipActionStatSet->Fields, "NumPagesFailed" );
-	ipActionStats->NumBytesFailed = getLongLongField( ipActionStatSet->Fields, "NumBytesFailed" );
-	ipActionStats->NumDocumentsComplete = getLongField( ipActionStatSet->Fields, 
-		"NumDocumentsComplete" );
-	ipActionStats->NumPagesComplete = getLongField( ipActionStatSet->Fields, "NumPagesComplete" );
-	ipActionStats->NumBytesComplete = getLongLongField( ipActionStatSet->Fields, 
-		"NumBytesComplete" );
-	ipActionStats->NumDocuments = getLongField( ipActionStatSet->Fields, "NumDocuments" );
-	ipActionStats->NumPages = getLongField( ipActionStatSet->Fields, "NumPages" );
-	ipActionStats->NumBytes = getLongLongField( ipActionStatSet->Fields, "NumBytes" );
+	ipActionStats->SetAllStatistics(lNumDocs, lNumDocsComplete, lNumDocsFailed, lNumDocsSkipped,
+		lNumPages, lNumPagesComplete, lNumPagesFailed, lNumPagesSkipped, llNumBytes,
+		llNumBytesComplete, llNumBytesFailed, llNumBytesSkipped);
 
 	// save the stats back to the map
 	m_mapActionIDtoStats[nActionID] = ipActionStats;
@@ -1052,26 +1210,49 @@ void CFileProcessingDB::saveStats( ADODB::_ConnectionPtr ipConnection, long nAct
 		throw ue;
 	}
 
-	// Create an ActionStatistics pointer to return the values
-	UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
-	ipActionStats = m_mapActionIDtoStats[nActionID];
+	if (ipActionStatSet->adoEOF == VARIANT_FALSE)
+	{
+		// Create an ActionStatistics pointer to return the values
+		UCLID_FILEPROCESSINGLib::IActionStatisticsPtr ipActionStats;
+		ipActionStats = m_mapActionIDtoStats[nActionID];
 
-	variant_t vtllVal;
+		// Get all the statistics
+		long lNumDocs(-1), lNumDocsComplete(-1), lNumDocsFailed(-1), lNumDocsSkipped(-1),
+			lNumPages(-1), lNumPagesComplete(-1), lNumPagesFailed(-1), lNumPagesSkipped(-1);
+		LONGLONG llNumBytes(-1), llNumBytesComplete(-1), llNumBytesFailed(-1), llNumBytesSkipped(-1);
+		ipActionStats->GetAllStatistics(&lNumDocs, &lNumDocsComplete, &lNumDocsFailed,
+			&lNumDocsSkipped, &lNumPages, &lNumPagesComplete, &lNumPagesFailed, &lNumPagesSkipped,
+			&llNumBytes, &llNumBytesComplete, &llNumBytesFailed, &llNumBytesSkipped);
 
-	// Transfer the data from the recordset to the ActionStatisticsPtr
-	setLongField(ipActionStatSet->Fields, "NumDocumentsFailed", ipActionStats->NumDocumentsFailed);
-	setLongField( ipActionStatSet->Fields, "NumPagesFailed", ipActionStats->NumPagesFailed );
-	setLongLongField( ipActionStatSet->Fields, "NumBytesFailed", ipActionStats->NumBytesFailed );
-	setLongField( ipActionStatSet->Fields, "NumDocumentsComplete", 
-		ipActionStats->NumDocumentsComplete );
-	setLongField( ipActionStatSet->Fields, "NumPagesComplete", ipActionStats->NumPagesComplete );
-	setLongLongField(ipActionStatSet->Fields, "NumBytesComplete", ipActionStats->NumBytesComplete);
-	setLongField( ipActionStatSet->Fields, "NumDocuments", ipActionStats->NumDocuments );
-	setLongField( ipActionStatSet->Fields, "NumPages", ipActionStats->NumPages );
-	setLongLongField( ipActionStatSet->Fields, "NumBytes", ipActionStats->NumBytes );
-	ipActionStatSet->Update();
+		// Get the fields from the action stat set
+		FieldsPtr ipFields = ipActionStatSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI26877", ipFields != NULL);
 
-	m_mapActionIDtoStats[nActionID] = ipActionStats;
+		// Transfer the data from the ActionStatisticsPtr to the recordset 
+		setLongField(ipFields, "NumDocumentsFailed", lNumDocsFailed);
+		setLongField( ipFields, "NumPagesFailed", lNumPagesFailed );
+		setLongLongField( ipFields, "NumBytesFailed", llNumBytesFailed );
+		setLongField( ipFields, "NumDocumentsComplete", lNumDocsComplete );
+		setLongField( ipFields, "NumPagesComplete", lNumPagesComplete );
+		setLongLongField(ipFields, "NumBytesComplete", llNumBytesComplete);
+		setLongField(ipFields, "NumDocumentsSkipped", lNumDocsSkipped);
+		setLongField( ipFields, "NumPagesSkipped", lNumPagesSkipped );
+		setLongLongField( ipFields, "NumBytesSkipped", llNumBytesSkipped );
+		setLongField( ipFields, "NumDocuments", lNumDocs );
+		setLongField( ipFields, "NumPages", lNumPages );
+		setLongLongField( ipFields, "NumBytes", llNumBytes );
+
+		// Update the action statistics
+		ipActionStatSet->Update();
+
+		m_mapActionIDtoStats[nActionID] = ipActionStats;
+	}
+	else
+	{
+		UCLIDException uex("ELI26876", "Action statistics do not exist for this action!");
+		uex.addDebugInfo("Action ID", nActionID);
+		throw uex;
+	}
 }
 //--------------------------------------------------------------------------------------------------
 int CFileProcessingDB::getDBSchemaVersion()
@@ -1153,7 +1334,7 @@ void CFileProcessingDB::lockDB(ADODB::_ConnectionPtr ipConnection)
 
 				// If there is an existing record check to see if the time to see if the lock
 				// has been on for more than the lock timeout
-				if ( !ipLockTable->adoEOF )
+				if ( ipLockTable->adoEOF == VARIANT_FALSE )
 				{
 					// Get the time locked value from the record 
 					long nSecondsLocked = getLongField(ipLockTable->Fields, "TimeLocked"); 
@@ -1249,7 +1430,7 @@ string CFileProcessingDB::getEncryptedAdminPWFromDB()
 		adOpenStatic, adLockReadOnly, adCmdText );
 
 	// admin user was in the DB if not at the end of file
-	if ( !ipLoginSet->adoEOF )
+	if ( ipLoginSet->adoEOF == VARIANT_FALSE )
 	{
 		// Return the encrypted password that is stored in the DB
 		string strEncryptedPW = getStringField( ipLoginSet->Fields, "Password" );
@@ -1281,7 +1462,7 @@ void CFileProcessingDB::encryptAndStoreUserNamePassword(const string strUserName
 		adOpenDynamic, adLockPessimistic, adCmdText );
 
 	// User not in DB if at the end of file
-	if (ipLoginSet->adoEOF)
+	if (ipLoginSet->adoEOF == VARIANT_TRUE)
 	{
 		// Insert a new record
 		ipLoginSet->AddNew();
@@ -1340,17 +1521,10 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 	ASSERT_RESOURCE_ALLOCATION("ELI17027", ipFileRecord != NULL );
 	
-	// Get the fileID to return
-	ipFileRecord->FileID = getLongField(ipFields, "ID" );
-
-	// Get the file size saved in the file record
-	ipFileRecord->FileSize = getLongLongField(ipFields, "FileSize");
-
-	// Get the number of pages saved in the file record
-	ipFileRecord->Pages = getLongField(ipFields, "Pages");
-
-	// Set the Name 
-	ipFileRecord->Name = getStringField(ipFields, "FileName" ).c_str();
+	// Set the file data from the fields collection (set ActionID to 0)
+	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
+		getStringField(ipFields, "FileName").c_str(), getLongLongField(ipFields, "FileSize"),
+		getLongField(ipFields, "Pages"));
 
 	return ipFileRecord;
 }
@@ -1364,14 +1538,21 @@ void CFileProcessingDB::setFieldsFromFileRecord(ADODB::FieldsPtr ipFields,
 	// Make sure the ipFileRecord object is not NULL
 	ASSERT_ARGUMENT("ELI17032", ipFileRecord != NULL);
 	
+	// Get the file data
+	long lFileID(-1), lActionID(-1), lNumPages(-1);
+	LONGLONG llFileSize(-1);
+	_bstr_t bstrFileName;
+	ipFileRecord->GetFileData(&lFileID, &lActionID, bstrFileName.GetAddress(),
+		&llFileSize, &lNumPages);
+
 	// set the file name field
-	setStringField(ipFields, "FileName", asString(ipFileRecord->Name));
+	setStringField(ipFields, "FileName", asString(bstrFileName));
 
 	// Set the file Size
-	setLongLongField(ipFields, "FileSize", ipFileRecord->FileSize);
+	setLongLongField(ipFields, "FileSize", llFileSize);
 
 	// Set the number of pages
-	setLongField(ipFields, "Pages", ipFileRecord->Pages);
+	setLongField(ipFields, "Pages", lNumPages);
 }
 //--------------------------------------------------------------------------------------------------
 bool  CFileProcessingDB::isAdminPasswordValid(const string& strPassword)
@@ -1443,7 +1624,7 @@ void CFileProcessingDB::initializeIfBlankDB()
 	// If blank flag is set clear the database
 	if (bBlank)
 	{
-		getThisAsCOMPtr()->Clear();
+		clear();
 	}
 }
 //--------------------------------------------------------------------------------------------------
@@ -1462,6 +1643,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrQUEUE_EVENT_CODE);
 	vecTables.push_back(gstrMACHINE);
 	vecTables.push_back(gstrFAM_USER);
+	vecTables.push_back(gstrFAM_FILE_ACTION_COMMENT);
+	vecTables.push_back(gstrFAM_SKIPPED_FILE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)
@@ -1745,7 +1928,7 @@ bool CFileProcessingDB::reConnectDatabase()
 			try
 			{
 				// Reset all database connections since if one is in a bad state all will be.				
-				getThisAsCOMPtr()->ResetDBConnection();
+				resetDBConnection();
 
 				// Exception logged to indicate the retry was successful.
 				UCLIDException ueConnected("ELI23614", "Connection retry successful.");
@@ -1779,5 +1962,173 @@ bool CFileProcessingDB::reConnectDatabase()
 	while ( !bNoMoreRetries );
 
 	return false;
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnection,
+										  long nFileID, long nActionID)
+{
+	try
+	{
+		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
+			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
+
+		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26788", ipSkippedSet != NULL);
+
+		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenDynamic, adLockOptimistic, adCmdText);
+
+		// Ensure no records returned
+		if (ipSkippedSet->BOF == VARIANT_FALSE)
+		{
+			UCLIDException uex("ELI26806", "File has already been skipped for this action!");
+			uex.addDebugInfo("Action ID", nActionID);
+			uex.addDebugInfo("File ID", nFileID);
+			throw uex;
+		}
+		else
+		{
+			string strUserName = getCurrentUserName();
+
+			// Add a new row
+			ipSkippedSet->AddNew();
+
+			// Get the fields pointer
+			FieldsPtr ipFields = ipSkippedSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26807", ipFields != NULL);
+
+			// Set the fields from the provided data
+			setStringField(ipFields, "UserName", strUserName);
+			setLongField(ipFields, "FileID", nFileID);
+			setLongField(ipFields, "ActionID", nActionID);
+
+			// Update the row
+			ipSkippedSet->Update();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26804");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::removeSkipFileRecord(const ADODB::_ConnectionPtr &ipConnection,
+											 long nFileID, long nActionID)
+{
+	try
+	{
+		string strSkippedSQL = "SELECT * FROM SkippedFile WHERE FileID = "
+			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
+
+		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26788", ipSkippedSet != NULL);
+
+		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenDynamic, adLockOptimistic, adCmdText);
+
+		// Ensure a record is found
+		if (ipSkippedSet->BOF == VARIANT_TRUE)
+		{
+			UCLIDException uex("ELI26806", "File is not in skipped state for this action!");
+			uex.addDebugInfo("Action ID", nActionID);
+			uex.addDebugInfo("File ID", nFileID);
+			throw uex;
+		}
+		else
+		{
+			// Delete the row
+			ipSkippedSet->Delete(adAffectCurrent);
+			ipSkippedSet->Update();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26805");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::resetDBConnection()
+{
+	INIT_EXCEPTION_AND_TRACING("MLI03268");
+	try
+	{
+		_lastCodePos = "10";
+
+		CSingleLock lock(&m_mutex, TRUE );
+		
+		_lastCodePos = "20";
+		
+		// Initilize count for MLI Code iteration count
+		long nCount = 0;
+		map<DWORD, ADODB::_ConnectionPtr>::iterator it;
+		for ( it = m_mapThreadIDtoDBConnections.begin(); it != m_mapThreadIDtoDBConnections.end(); it++)
+		{
+
+			// Do the close within a try catch because an exception on the close could just mean the connection is in a bad state and
+			// recreating and opening will put it in a good state
+			try
+			{
+				ADODB::_ConnectionPtr ipDBConnection = it->second;
+				_lastCodePos = "25-" + asString(nCount);
+
+				// This will close the existing connection if not already closed
+				if ( ipDBConnection != NULL && ipDBConnection->State != adStateClosed )
+				{
+					_lastCodePos = "30";
+
+					ipDBConnection->Close();
+				}
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI15000")
+		}
+
+		// Clear all of the connections in all of the threads
+		m_mapThreadIDtoDBConnections.clear();
+		_lastCodePos = "35";
+
+		// Reset the Current connection status to not connected
+		m_strCurrentConnectionStatus = gstrNOT_CONNECTED;
+
+		_lastCodePos = "40";
+
+		// If there is a non empty server and database name get a connection and validate
+		if (!m_strDatabaseServer.empty() && !m_strDatabaseName.empty())
+		{
+			// This will create a new connection for this thread and initialize the schema
+			getDBConnection();
+
+			_lastCodePos = "50";
+
+			// Validate the schema
+			validateDBSchemaVersion();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26869");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::clear()
+{
+	try
+	{
+		CSingleLock lock(&m_mutex, TRUE );
+
+		// Begin a transaction
+		TransactionGuard tg(getDBConnection());
+
+		// Drop the tables
+		dropTables();
+
+		// Add the tables back
+		addTables();
+
+		// Setup the tables that require initial values
+		initializeTableValues();
+
+		tg.CommitTrans();
+
+		// Add the Product specific db after the base tables have been committed
+		addProductSpecificDB();
+
+		// Reset the database connection
+		resetDBConnection();
+
+		// Shrink the database
+		executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
 }
 //--------------------------------------------------------------------------------------------------
