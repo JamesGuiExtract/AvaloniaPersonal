@@ -21,7 +21,7 @@
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
-// These ID's are defined int FAMUtils
+// These ID's are defined in FAMUtils
 #define IDC_BUTTON_DB_NAME_BROWSE       1000
 #define IDC_EDIT_DB_SERVER              1001
 #define IDC_EDIT_DB_NAME                1002
@@ -72,6 +72,7 @@
 #define ID_RUN_REPORT_OK                2037
 #define IDC_CHECK_RETAIN_ACTIONS        2038
 #define IDC_CAPTION                     2039
+#define IDC_CMB_FILE_SKIPPED_USER		2040
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -96,7 +97,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        135
 #define _APS_NEXT_COMMAND_VALUE         32790
-#define _APS_NEXT_CONTROL_VALUE         2040
+#define _APS_NEXT_CONTROL_VALUE         2041
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

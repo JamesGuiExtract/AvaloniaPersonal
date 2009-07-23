@@ -1973,7 +1973,7 @@ void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnect
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26788", ipSkippedSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26884", ipSkippedSet != NULL);
 
 		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenDynamic, adLockOptimistic, adCmdText);
@@ -2018,7 +2018,7 @@ void CFileProcessingDB::removeSkipFileRecord(const ADODB::_ConnectionPtr &ipConn
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
 		_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26788", ipSkippedSet != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI26885", ipSkippedSet != NULL);
 
 		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenDynamic, adLockOptimistic, adCmdText);
@@ -2026,7 +2026,7 @@ void CFileProcessingDB::removeSkipFileRecord(const ADODB::_ConnectionPtr &ipConn
 		// Ensure a record is found
 		if (ipSkippedSet->BOF == VARIANT_TRUE)
 		{
-			UCLIDException uex("ELI26806", "File is not in skipped state for this action!");
+			UCLIDException uex("ELI26886", "File is not in skipped state for this action!");
 			uex.addDebugInfo("Action ID", nActionID);
 			uex.addDebugInfo("File ID", nFileID);
 			throw uex;

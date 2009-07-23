@@ -31,6 +31,7 @@ public:
 	CButton m_radioStatusFromAction;
 	CComboBox m_comboNewStatus;
 	CComboBox m_comboStatusFromAction;
+	CComboBox m_comboSkippedUser;
 	//}}AFX_DATA
 
 // Overrides
@@ -50,6 +51,7 @@ protected:
 	afx_msg void OnClickedRadioFilesStatus();
 	afx_msg void OnClickedRadioNewStatus();
 	afx_msg void OnClickedRadioStatusOfAction();
+	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnClickedOK();
 	afx_msg void OnClickedApply();
 	//}}AFX_MSG
@@ -73,6 +75,10 @@ private:
 	//          user-specified value. Displays a modal dialog, confirming the user's changes.
 	//          Closes the dialog if bCloseDialog is true, otherwise the dialog remains open.
 	void applyActionStatusChanges(bool bCloseDialog);
+
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To fill in the by user combo box for selecting files skipped by a particular user
+	void fillSkippedUsers();
 
 	// Update controls
 	void updateControls();

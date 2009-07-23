@@ -214,6 +214,6 @@ STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFil
 
 		return S_OK;
 	}
-	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26749");
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26883");
 }
 //-------------------------------------------------------------------------------------------------

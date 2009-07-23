@@ -8,6 +8,7 @@
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <ComUtils.h>
+#include <ADOUtils.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -42,6 +43,7 @@ void CSetActionStatusDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_STATUS_OF_ACTION, m_radioStatusFromAction);
 	DDX_Control(pDX, IDC_CMB_NEW_STATUS, m_comboNewStatus);
 	DDX_Control(pDX, IDC_CMB_STATUS_OF_ACTION, m_comboStatusFromAction);
+	DDX_Control(pDX, IDC_CMB_FILE_SKIPPED_USER, m_comboSkippedUser);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSetActionStatusDlg, CDialog)
@@ -53,6 +55,7 @@ BEGIN_MESSAGE_MAP(CSetActionStatusDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_STATUS_OF_ACTION, &CSetActionStatusDlg::OnClickedRadioStatusOfAction)
 	ON_BN_CLICKED(IDOK, &CSetActionStatusDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_BTN_APPLY_ACTION_STATUS, &CSetActionStatusDlg::OnClickedApply)
+	ON_CBN_SELCHANGE(IDC_CMB_FILE_STATUS, &CSetActionStatusDlg::OnFilesUnderStatusChange)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -71,14 +74,16 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		CWaitCursor wait;
 
 		// Read all actions from the DB
-		IStrToStrMapPtr pMapActions = m_ipFAMDB->GetActions();
+		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
+		ASSERT_RESOURCE_ALLOCATION("ELI26879", ipMapActions != NULL);
 
 		// Insert actions into combo boxes
-		for (int i = 0; i < pMapActions->Size; i++)
+		long lSize = ipMapActions->Size;
+		for (long i = 0; i < lSize; i++)
 		{
 			// Get one action's name and ID inside the database
 			_bstr_t bstrKey, bstrValue;
-			pMapActions->GetKeyValue(i, &bstrKey.GetBSTR(), &bstrValue.GetBSTR());
+			ipMapActions->GetKeyValue(i, bstrKey.GetAddress(), bstrValue.GetAddress());
 			string strAction = asString(bstrKey);
 			DWORD nID = asUnsignedLong(asString(bstrValue));
 
@@ -101,6 +106,9 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		// Set the status items into combo boxes
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboFilesUnderStatus);
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboNewStatus);
+
+		// Fill in the skipped user combo box
+		fillSkippedUsers();
 
 		// Set the initial status to Pending
 		m_comboFilesUnderStatus.SetCurSel(1);
@@ -201,6 +209,18 @@ void CSetActionStatusDlg::OnClickedApply()
 		applyActionStatusChanges(false);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI17618");
+}
+//-------------------------------------------------------------------------------------------------
+void CSetActionStatusDlg::OnFilesUnderStatusChange()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Update the controls
+		updateControls();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26882");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -317,6 +337,7 @@ void CSetActionStatusDlg::updateControls()
 			// "All files for which" radio button
 			m_comboFilesUnderAction.EnableWindow(FALSE);
 			m_comboFilesUnderStatus.EnableWindow(FALSE);
+			m_comboSkippedUser.EnableWindow(FALSE);
 
 			// Enable the status of action radio button
 			m_radioStatusFromAction.EnableWindow(TRUE);
@@ -326,6 +347,10 @@ void CSetActionStatusDlg::updateControls()
 			// Enable the action and status combo boxes from which to select files
 			m_comboFilesUnderAction.EnableWindow(TRUE);
 			m_comboFilesUnderStatus.EnableWindow(TRUE);
+
+			// Enable the user combo box if the files under status is "Skipped"
+			m_comboSkippedUser.EnableWindow(
+				asMFCBool(m_comboFilesUnderStatus.GetCurSel() == kActionSkipped));
 
 			// Disable the status of action radio button and combo box
 			m_radioStatusFromAction.EnableWindow(FALSE);
@@ -357,5 +382,30 @@ void CSetActionStatusDlg::updateControls()
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14904");
+}
+//-------------------------------------------------------------------------------------------------
+void CSetActionStatusDlg::fillSkippedUsers()
+{
+	try
+	{
+		m_comboSkippedUser.AddString("<any user>");
+
+		string strSQL = "SELECT DISTINCT [UserName] FROM [SkippedFile] ORDER BY [UserName]";
+
+		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery(strSQL.c_str());
+		ASSERT_RESOURCE_ALLOCATION("ELI26881", ipRecords != NULL);
+
+		// Loop through each result and add the user names to the vector
+		while (ipRecords->adoEOF == VARIANT_FALSE)
+		{
+			// Get the user name and add it to the combo box
+			string strName = getStringField(ipRecords->Fields, "UserName");
+			m_comboSkippedUser.AddString(strName.c_str());
+
+			// Increment counter and move to next record
+			ipRecords->MoveNext();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26880");
 }
 //-------------------------------------------------------------------------------------------------

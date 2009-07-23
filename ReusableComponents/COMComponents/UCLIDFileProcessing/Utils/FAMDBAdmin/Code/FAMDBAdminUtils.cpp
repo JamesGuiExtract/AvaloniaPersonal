@@ -29,5 +29,6 @@ void CFAMDBAdminUtils::addStatusInComboBox(CComboBox& comboStatus)
 	comboStatus.InsertString(2, "Processing");
 	comboStatus.InsertString(3, "Completed");
 	comboStatus.InsertString(4, "Failed");
+	comboStatus.InsertString(5, "Skipped");
 }
 //--------------------------------------------------------------------------------------------------
