@@ -1,0 +1,89 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.0 Beta 2 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.0 Beta 2 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a Beta 2 
+	release candidate is to explicitly exercise these recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #305, #490, #491, #492]</b> Drag and Drop of Table Rows
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Confirm that one or more test rows can be dragged to a different location 
+		within the same table.
+		<li>Confirm that one or more test rows can be dragged to a compatible table 
+		(i.e. between Physician tables).
+		<li>Confirm that one or more test rows can be dragged to a different parent 
+		attribute (i.e. across Orders).
+		<li>Confirm that tooltips are not displayed during a drag & drop operation.
+		<li>Examine the tooltips of the affected rows after drag & drop and confirm that 
+		the correct tooltips are associated with each element.
+		<li>Examine tab order of cells after drag & drop and confirm that the tab 
+		order is correct.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #451]</b> Order Mapper and Multi-threaded FAM
+	<ul>
+		<li>Exercise the Demo_LabDE rules for multiple images within a multithreaded 
+		FAM instance.
+		<li>Confirm that Order Mapper results are as expected with no unexpected exceptions.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #471]</b> Medical Record Number is Required
+       	<ul>
+  	   	<LI>Exercise second-stage verification.
+  	   	<LI>Confirm that an output VOA file cannot be saved without a valid 
+		<b>Medical Record Number</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #473]</b> LabDE Help File
+       	<ul>
+  	   	<LI>Confirm that a Help file is presented to the user when accessed from the 
+		Start menu.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #474]</b> Delete RSD and DAT Files
+       	<ul>
+  	   	<LI>Review the Demo_LabDE Rules folder.
+  	   	<LI>Confirm that all relevant files are encrypted.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #482]</b> FAM Auto-close After Last Document
+       	<ul>
+  	   	<LI>Verify several documents.
+  	   	<LI>Confirm that the FAM closes automatically after results are saved for the 
+		last document.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #494]</b> Collection Date and Collection Time
+       	<ul>
+  	   	<LI>Verify several documents.
+  	   	<LI>Confirm that <b>Collection Date</b> results are available from the rules.
+  	   	<LI>Confirm that <b>Collection Time</b> results are available from the rules.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
