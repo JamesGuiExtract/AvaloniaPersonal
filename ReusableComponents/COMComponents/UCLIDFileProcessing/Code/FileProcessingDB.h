@@ -240,7 +240,8 @@ private:
 
 	// PROMISE:	To add multiple ActionStateTransition table records that are represented be the given data.
 	// ARGS:	ipConnection	- Connection object to use to update the tables
-	//			rstrAction		- The action whos state is changing
+	//			strAction		- The action whos state is changing
+	//			nActionID		- The id of the action that is changing
 	//			strToState		- The new state for the action
 	//			strException	- Contains the exception string if this transitioning to a failed state
 	//			strComment		- Comment for the added records
@@ -248,8 +249,8 @@ private:
 	//							  be used so that only one current action state is selected
 	//			strTopClause	- Top clause to specifiy the number of records that meet the where clause condition that should
 	//							  have records added to the ActionStateTransition table
-	void addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection, string &rstrAction, 
-		const string &strToState, const string &strException, const string &strComment, 
+	void addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection, const string &strAction,
+		long nActionID, const string &strToState, const string &strException, const string &strComment, 
 		const string &strWhereClause, const string &strTopClause );
 
 	// PROMISE:	To return the ID from the Action table from the given Action Name and modify strActionName to match

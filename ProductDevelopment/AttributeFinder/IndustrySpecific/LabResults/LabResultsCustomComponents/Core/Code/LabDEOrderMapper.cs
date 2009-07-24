@@ -1,4 +1,5 @@
 using Extract.Interop;
+using Extract.Licensing;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFUTILSLib;
+using UCLID_COMLMLib;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
 
@@ -102,7 +104,7 @@ namespace Extract.LabResultsCustomComponents
     [ProgId("Extract.DataEntry.LabDE.LabDEOrderMapper")]
     [ComVisible(true)]
     public class LabDEOrderMapper : IOutputHandler, ICopyableObject, ICategorizedComponent,
-        IPersistStream, IConfigurableObject, IMustBeConfiguredObject, IDisposable
+        IPersistStream, IConfigurableObject, IMustBeConfiguredObject, ILicensedComponent, IDisposable
     {
         #region Constants
 
@@ -198,10 +200,18 @@ namespace Extract.LabResultsCustomComponents
         {
             get
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26887",
+                    _DEFAULT_OUTPUT_HANDLER_NAME);
+
                 return _databaseFile;
             }
             set
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26895",
+                    _DEFAULT_OUTPUT_HANDLER_NAME);
+
                 _databaseFile = value;
                 _dirty = true;
             }
@@ -223,6 +233,10 @@ namespace Extract.LabResultsCustomComponents
             SqlCeConnection dbConnection = null;
             try
             {
+                // Validate the license
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26889",
+                    _DEFAULT_OUTPUT_HANDLER_NAME);
+
                 // Expand the tags in the database file name
                 AFUtility afUtility = new AFUtility();
                 string databaseFile = afUtility.ExpandTagsAndFunctions(_databaseFile, pDoc);
@@ -511,6 +525,9 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects,
+                    "ELI26902", _DEFAULT_OUTPUT_HANDLER_NAME);
+
                 // Display the configuration form
                 using (LabDEOrderMapperConfigurationForm configureForm =
                     new LabDEOrderMapperConfigurationForm(_databaseFile))
@@ -559,6 +576,28 @@ namespace Extract.LabResultsCustomComponents
         }
 
         #endregion
+
+        #region ILicensedComponent Members
+
+        /// <summary>
+        /// Returns <see langword="true"/> if this component is licensed and
+        /// <see langword="false"/> if it is not licensed.
+        /// </summary>
+        /// <returns>Whether this component is licensed or not.</returns>
+        public bool IsLicensed()
+        {
+            try
+            {
+                return LicenseUtilities.IsLicensed(LicenseIdName.LabdeCoreObjects);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI26903",
+                    "Unable to determine license status.", ex);
+            }
+        }
+
+        #endregion ILicensedComponent Members
 
         #region Private Methods
 

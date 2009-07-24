@@ -212,6 +212,7 @@ void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOl
 			break;
 
 		case kRecordPending:
+		case kRecordSkipped:
 		case kRecordNone:
 			removeTaskFromCurrentList(nFileId);
 			break;
@@ -265,6 +266,28 @@ void FileProcessingDlgStatusPage::onStatusChange(long nFileId, ERecordStatus eOl
 		
 		default:
 			// from Failed we can expect to transition to pending
+			// if the file is resupplied with the force processing option
+			bUnexpectedTransition = true;
+			break;
+		}
+		break;
+
+	case kRecordSkipped:
+		switch(eNewStatus)
+		{
+		case kRecordNone:
+			// This change is sent by the FPRecordManager, nothing to do here
+			break;
+
+		case kRecordPending:
+			// don't need to do anything since there is no list of skipped files
+			break;
+
+		case kRecordProcessingError:
+			break;
+
+		default:
+			// From Skipped we can expect transition to pending
 			// if the file is resupplied with the force processing option
 			bUnexpectedTransition = true;
 			break;

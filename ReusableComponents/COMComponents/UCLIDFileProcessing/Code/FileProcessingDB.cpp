@@ -906,6 +906,14 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		// Check License
 		validateLicense();
 
+		// if the from status is the same as the to status and the Action ids are the same,
+		// there is nothing to do
+		if ( eFromStatus == eToStatus && nToActionID == nFromActionID)
+		{
+			// nothing to do
+			return S_OK;
+		}
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -923,12 +931,6 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		string strToAction = getActionName(ipConnection, nToActionID);
 		string strFromAction = getActionName(ipConnection, nFromActionID);
 
-		// if the from status is the same as the to status and the Action ids are the same, there is nothing to do
-		if ( eFromStatus == eToStatus && nToActionID == nFromActionID)
-		{
-			// nothing to do
-			return S_OK;
-		}
 		// Changing an Action status to failed should only be done on an individual file bases
 		if ( eToStatus == kActionFailed )
 		{
@@ -953,7 +955,8 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		TransactionGuard tg(ipConnection);
 
 		// must add the transition records first
-		addASTransFromSelect( ipConnection, strToAction, asStatusString( eToStatus ), "", "", strWhere, "" );
+		addASTransFromSelect( ipConnection, strToAction, nToActionID, asStatusString( eToStatus ),
+			"", "", strWhere, "" );
 
 		// Update status in the FAMFile records and set the NumRecordsModified return value
 		*pnNumRecordsModified = executeCmdQuery(ipConnection, strUpdateSQL);
@@ -1022,7 +1025,8 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 		TransactionGuard tg(ipConnection);
 
 		// Add the transition records
-		addASTransFromSelect( ipConnection, strActionName, asStatusString( eStatus ), "", "", strWhere, "" );
+		addASTransFromSelect( ipConnection, strActionName, nActionID, asStatusString( eStatus ),
+			"", "", strWhere, "" );
 
 		// Update the FAMFiles table
 		executeCmdQuery(ipConnection, strUpdateSQL);
@@ -1138,7 +1142,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			ipFileSet->MoveNext();
 		}
 		// Add transition records for the state change to Processing
-		addASTransFromSelect( ipConnection, strActionName, "R", "", "", strWhere, strTop );
+		addASTransFromSelect( ipConnection, strActionName, nActionID, "R", "", "", strWhere, strTop );
 
 		// Update the status of the selected FAMFiles records
 		executeCmdQuery(ipConnection, strUpdateSQL);
@@ -1203,7 +1207,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFolder( BSTR strFolder, BSTR strAction )
 		TransactionGuard tg(ipConnection);
 
 		// add transition records to the databse
-		addASTransFromSelect( ipConnection, strActionName, "U", "", "", strWhere, "" );
+		addASTransFromSelect( ipConnection, strActionName, nActionID, "U", "", "", strWhere, "" );
 
 		// Only update the QueueEvent table if update is enabled
 		if (m_bUpdateQueueEventTable)

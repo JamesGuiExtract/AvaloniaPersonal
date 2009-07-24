@@ -173,9 +173,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Validate the license
-                // TODO: New license ID?
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI23668",
-                    _OBJECT_NAME);
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                    "ELI23668", _OBJECT_NAME);
 
                 // Initialize the configuration settings.
                 ConfigSettings.Initialize(configFileName);

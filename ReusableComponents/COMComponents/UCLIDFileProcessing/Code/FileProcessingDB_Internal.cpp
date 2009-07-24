@@ -451,9 +451,9 @@ string CFileProcessingDB::getActionName( ADODB::_ConnectionPtr ipConnection, lon
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addASTransFromSelect ( ADODB::_ConnectionPtr ipConnection,
-											  string &rstrAction, const string &strToState, 
-											  const string &strException, const string &strComment, 
-											  const string &strWhereClause, 
+											  const string &strAction, long nActionID,
+											  const string &strToState, const string &strException,
+											  const string &strComment, const string &strWhereClause, 
 											  const string &strTopClause )
 {
 	if (!m_bUpdateFASTTable)
@@ -461,11 +461,8 @@ void CFileProcessingDB::addASTransFromSelect ( ADODB::_ConnectionPtr ipConnectio
 		return;
 	}
 
-	// Get the action ID and update the strActionName to stored value
-	long nActionID = getActionID(ipConnection, rstrAction);
-
 	// Action Column to change
-	string strActionCol = "ASC_" + rstrAction;
+	string strActionCol = "ASC_" + strAction;
 
 	// Create the from string
 	string strFrom = " FROM FAMFile " + strWhereClause;
