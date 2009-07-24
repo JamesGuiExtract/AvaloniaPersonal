@@ -142,6 +142,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                    "ELI26890", _COMPONENT_DESCRIPTION);
+
                 // Allow the user to set the verification settings
                 using (VerificationSettingsDialog dialog = new VerificationSettingsDialog(_settings))
                 {
@@ -197,6 +201,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                    "ELI26893", _COMPONENT_DESCRIPTION);
+
                 _form.Cancel();
             }
             catch (Exception ex)
@@ -213,6 +221,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                    "ELI26901", _COMPONENT_DESCRIPTION);
+
                 _form.CloseForm();
             }
             catch (Exception ex)
@@ -229,6 +241,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                    "ELI26891", _COMPONENT_DESCRIPTION);
+
                 _form.ShowForm(CreateVerificationTaskForm);
             }
             catch (Exception ex)
@@ -258,6 +274,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                // Validate license
+                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
+                    "ELI26894", _COMPONENT_DESCRIPTION);
+
                 if (bCancelRequested)
                 {
                     return EFileProcessingResult.kProcessingCancelled;
