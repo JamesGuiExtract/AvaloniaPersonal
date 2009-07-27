@@ -1,0 +1,11 @@
+(?:
+  phase
+|
+  survey
+|
+  boundary
+|
+  exhibit
+|
+  legal\W*description
+)

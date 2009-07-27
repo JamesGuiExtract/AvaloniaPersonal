@@ -1,0 +1,48 @@
+(?:
+  (?:p.y|\b(?:.?ay|p.?y|pa.?)\b|\b\w{0,3}y\b)[\s\S]{0,6}(?:to|\b(t.|.o)\b)[\s\S]{0,6}(?:th.|\b(?:.?he|t.?e|th.?)\b)[\s\S]{0,6}(?:.rd.r|.?rder|o.?der|or.?er|ord.?r|orde.?|\b(?:.rder|o.der|or.er|ord.r|orde.)\b)
+|
+  (?:p.y|\b(?:.?ay|p.?y|pa.?)\b|\b\w{0,3}y\b)[\s\S]{0,6}(?:to|\b(t.|.o)\b)(?:.{0,10}[\r\n]+){0,2}.*
+  (?:.rd.r|.?rder|o.?der|or.?er|ord.?r|orde.?|\b(?:.rder|o.der|or.er|ord.r|orde.)\b)\W*(?:o.|.f)
+|
+  ^Pay.*[\r\n]+order\s*of
+|
+  ^.{0,2}(?:Pa.|P.y|.ay)\x20*to\x20*the
+|
+  TO\W*THE\W*ORDER\W*OF
+|
+  (?:.SCR.W|.?SCROW|E.?CROW|ES.?ROW|ESC.?OW|ESCR.?W|ESCRO.?|\b(?:ESC.{2,4}|.{1,2}SCRO.{1,2}|.{2,4}ROW)\b)\W*
+  (?:TR.ST|.?RUST|T.?UST|TR.?ST|TRU.?T|TRUS.?|\b(?:.RUST|T.UST|TR.ST|TRU.T|TRUS.)\b)\W*
+  (?:R.C..PT|.?ECEIPT|R.?CEIPT|RE.?EIPT|REC.?IPT|RECE.?PT|RECEI.?T|RECEIP.?|\b(?:REC.{4,5}|.{1,2}ECEIP.{1,2}|.{3,4}EIPT)\b)
+|
+  ^.{0,5}(?:C.sh..r|.?ashier|C.?shier|Ca.?hier|Cas.?ier|Cash.?er|Cashi.?r|Cashie.?)
+  [\s\S]{0,5}(?:Ch.ck|.?heck|C.?eck|Ch.?ck|Che.?k|Chec.?|\b(?:.heck|C.eck|Ch.ck|Che.k|Chec.)\b)
+//|
+//  (?!.*[a-z]{5}.*)^.*(?:1:.{5,}[I1l]:|[I1l]:.{5,}1:).*$
+//|
+//  .*1:(?:.*?\d).*:(?:.*?\d)
+|
+  and\W*\d+/\d+(?:.*[\r\n]+){0,2}.*(?:D.LL.RS|.?OLLARS|D.?LLARS|DO.?LARS|DOL.?ARS|DOLL.?RS|DOLLA.?S|DOLLAR.?|\b(?:DOL.{4,5}|.{1,2}OLLAR.{1,2}|.{3,4}LARS)\b)
+|
+  ^(?:D.LL.RS|.?OLLARS|D.?LLARS|DO.?LARS|DOL.?ARS|DOLL.?RS|DOLLA.?S|DOLLAR.?)$
+|
+  \b(?-i:MEMO)\s*__
+|
+  (?-i:A\x20*C\x20*H\x20*R\x20*/\x20*T)
+|
+  ^\d{4,}\x201:\d
+|
+  (?-i:(?:.?OLORED|C.?LORED|CO.?ORED|COL.?RED|COLO.?ED|COLOR.?D|COLORE.?)
+  \W*(?:B.CKGR..ND|.?ACKGROUND|B.?CKGROUND|BA.?KGROUND|BAC.?GROUND|BACK.?ROUND|BACKG.?OUND|BACKGR.?UND|BACKGRO.?ND|BACKGROU.?D|BACKGROUN.?|\b(?:BACKG.{4,6}|.{1,3}CKGROU.{1,3}|.{4,6}ROUND)\b))
+|
+  (?-i:(?:.ACK|B.CK|BA.K|BAC.)\W*(?:O.|.F)\W*(?:.HE|T.E|TH.)\W*(?:.HECK|C.ECK|CH.CK|CHE.K|CHEC.))
+|
+  (?:D.C.M.NT|.?OCUMENT|D.?CUMENT|DO.?UMENT|DOC.?MENT|DOCU.?ENT|DOCUM.?NT|DOCUME.?T|DOCUMEN.?|\b(?:DOCU.{3,5}|.{1,3}CUME.{1,3}|.{3,5}MENT)\b)\W*(?:C.NT..NS|.?ONTAINS|C.?NTAINS|CO.?TAINS|CON.?AINS|CONT.?INS|CONTA.?NS|CONTAI.?S|CONTAIN.?|\b(?:CONT.{3,5}|.{1,3}NTAI.{1,3}|.{3,5}AINS)\b)\W*(?:(?:.ICRO|M.CRO|MI.RO|MIC.O|MICR.)|.{1,3}CROPRI.{1,3}|.{4,6}PRINT)
+|
+  (?-i:(?:.?OLORED|C.?LORED|CO.?ORED|COL.?RED|COLO.?ED|COLOR.?D|COLORE.?)\W*(?:.ACE|F.CE|FA.E|FAC.))
+|
+  (?-i:(?:C.NT..NS|.?ONTAINS|C.?NTAINS|CO.?TAINS|CON.?AINS|CONT.?INS|CONTA.?NS|CONTAI.?S|CONTAIN.?|\b(?:CONT.{3,5}|.{1,3}NTAI.{1,3}|.{3,5}AINS)\b)[\s\S]{1,5}(?:W.T.RM.RK|.?ATERMARK|W.?TERMARK|WA.?ERMARK|WAT.?RMARK|WATE.?MARK|WATER.?ARK|WATERM.?RK|WATERMA.?K|WATERMAR.?|\b(?:WATE.{5,6}|.{1,3}TERMA.{1,3}|.{4,5}RMARK)\b))
+|
+  (?:\*\x20?){4}\d+\.\d\d\b
+|
+  (?:AND|&)\W+\S+\W+CENT\b
+)
