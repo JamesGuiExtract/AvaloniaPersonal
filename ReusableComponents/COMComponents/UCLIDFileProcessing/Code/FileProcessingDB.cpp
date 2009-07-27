@@ -771,7 +771,7 @@ STDMETHODIMP CFileProcessingDB::NotifyFileFailed( long nFileID,  BSTR strAction,
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
 
-		// change the given files state to Failed 
+		// change the given files state to Failed
 		setFileActionState( ipConnection, nFileID, asString(strAction), "F", asString(strException) );
 
 		END_CONNECTION_RETRY(ipConnection, "ELI23530");
@@ -897,7 +897,8 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  EActionStatus eFromStatus,  
-														  long nToActionID, EActionStatus eToStatus,  long * pnNumRecordsModified)
+														  long nToActionID, EActionStatus eToStatus,
+														  BSTR bstrSkippedFromUserName, long * pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -906,9 +907,19 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		// Check License
 		validateLicense();
 
-		// if the from status is the same as the to status and the Action ids are the same,
-		// there is nothing to do
-		if ( eFromStatus == eToStatus && nToActionID == nFromActionID)
+		// Changing an Action status to failed should only be done on an individual file bases
+		if ( eToStatus == kActionFailed )
+		{
+			UCLIDException ue ("ELI13603", "Cannot change status Failed.");
+			throw ue;
+		}
+
+		// If the to status is not skipped, the from status is the same as the to status
+		// and the Action ids are the same, there is nothing to do
+		// If setting skipped status the skipped file table needs to be updated
+		if ( eToStatus != kActionSkipped
+			&& eFromStatus == eToStatus
+			&& nToActionID == nFromActionID)
 		{
 			// nothing to do
 			return S_OK;
@@ -931,35 +942,58 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		string strToAction = getActionName(ipConnection, nToActionID);
 		string strFromAction = getActionName(ipConnection, nFromActionID);
 
-		// Changing an Action status to failed should only be done on an individual file bases
-		if ( eToStatus == kActionFailed )
-		{
-			UCLIDException ue ("ELI13603", "Cannot change status Failed.");
-			throw ue;
-		}
 		// Action Column to change
 		string strFromActionCol = "ASC_" + strFromAction;
 		string strToActionCol = "ASC_" + strToAction;
 
-		// set up the condition
-		string strWhere;
-		strWhere = " WHERE (" + strFromActionCol + " = '" + asStatusString(eFromStatus ) + "')";
-
-		string strFrom;
-		strFrom = "FROM FAMFile " + strWhere;
-
-		// Create the SQL query to update the action stat in the FAMFile
-		string strUpdateSQL = "UPDATE FAMFile SET " + strToActionCol + " = '" + asStatusString(eToStatus) + "' " + strFrom;
-
-		// Begin a transactino
+		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		// must add the transition records first
-		addASTransFromSelect( ipConnection, strToAction, nToActionID, asStatusString( eToStatus ),
-			"", "", strWhere, "" );
+		// Get a vector of FileIDS to modify
+		vector<long> vecFileIDs;
 
-		// Update status in the FAMFile records and set the NumRecordsModified return value
-		*pnNumRecordsModified = executeCmdQuery(ipConnection, strUpdateSQL);
+		// From status is skipped, get all files skipped by specified user
+		if (eFromStatus == kActionSkipped)
+		{
+			getFilesSkippedByUser(vecFileIDs, nFromActionID, asString(bstrSkippedFromUserName),
+				ipConnection);
+		}
+		// From status is not skipped, get all files that match
+		else
+		{
+			string strSQL = "SELECT [ID] FROM FAMFile WHERE (" + strFromActionCol + " = '"
+				+ asStatusString(eFromStatus ) + "')";
+
+			// Get a recordset to fill with the File IDs
+			_RecordsetPtr ipFileSet(__uuidof(Recordset));
+			ASSERT_RESOURCE_ALLOCATION("ELI26913", ipFileSet != NULL);
+
+			// Open the recordset
+			ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+			// Modify each files status (count the number of records modified)
+			while(ipFileSet->adoEOF == VARIANT_FALSE)
+			{
+				vecFileIDs.push_back(getLongField(ipFileSet->Fields, "ID"));
+
+				ipFileSet->MoveNext();
+			}
+		}
+
+		// Get the to status as a string
+		string strToStatus = asStatusString(eToStatus);
+
+		// For each FileID, set the file action state
+		for (vector<long>::iterator it = vecFileIDs.begin(); it != vecFileIDs.end(); it++)
+		{
+			// This will update the FAST table as well as the skipped file table for
+			// records that are moving to/from skipped status
+			setFileActionState(ipConnection, *it, strToAction, strToStatus, "", nToActionID, false);
+		}
+
+		// Set the return value
+		*pnNumRecordsModified = vecFileIDs.size();
 
 		// update the stats
 		reCalculateStats(ipConnection, nToActionID);
@@ -1023,6 +1057,26 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
+
+		// Get the action ID as as string
+		string strActionID = asString(nActionID);
+
+		// Remove any records from the skipped file table that where skipped for this action
+		string strDeleteSkippedSQL = "DELETE FROM [SkippedFile] WHERE ActionID = " + strActionID;
+		executeCmdQuery(ipConnection, strDeleteSkippedSQL);
+
+		// If setting files to skipped, need to add skipped record for each file
+		if (eStatus == kActionSkipped)
+		{
+			// Get the current user name
+			string strUserName = getCurrentUserName();
+
+			// Add all files to the skipped table for this action
+			string strSQL = "INSERT INTO [SkippedFile] ([FileID], [ActionID], [UserName]) "
+				"(SELECT [ID], " + strActionID + " AS ActionID, '" + strUserName
+				+ "' AS UserName FROM [FAMFile])";
+			executeCmdQuery(ipConnection, strSQL);
+		}
 
 		// Add the transition records
 		addASTransFromSelect( ipConnection, strActionName, nActionID, asStatusString( eStatus ),

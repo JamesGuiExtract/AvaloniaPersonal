@@ -17,6 +17,11 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 //-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+static const CString gzANY_USER = "<any user>";
+
+//-------------------------------------------------------------------------------------------------
 // CSetActionStatusDlg dialog
 //-------------------------------------------------------------------------------------------------
 CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB)
@@ -106,9 +111,6 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 		// Set the status items into combo boxes
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboFilesUnderStatus);
 		CFAMDBAdminUtils::addStatusInComboBox(m_comboNewStatus);
-
-		// Fill in the skipped user combo box
-		fillSkippedUsers();
 
 		// Set the initial status to Pending
 		m_comboFilesUnderStatus.SetCurSel(1);
@@ -297,10 +299,29 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				int iStatusID = m_comboNewStatus.GetCurSel();
 				UCLID_FILEPROCESSINGLib::EActionStatus eNewStatus = 
 					(UCLID_FILEPROCESSINGLib::EActionStatus)(iStatusID);
+				uex.addDebugInfo("Action To Status",
+					asString(m_ipFAMDB->AsStatusString(eNewStatus)));
+
+
+				// If going from the skipped status check user name list
+				CString zUser = "";
+				if (eFromStatus == kActionSkipped)
+				{
+					// Get the user name from the combo box
+					m_comboSkippedUser.GetWindowText(zUser);
+					uex.addDebugInfo("Skipped By User", (LPCTSTR) zUser);
+
+					// If user is any user set user string to ""
+					if (zUser == gzANY_USER)
+					{
+						// Set status for all skipped files
+						zUser = "";
+					}
+				}
 
 				// Call SearchAndModifyFileStatus() to set the new status for the selected action
-				m_ipFAMDB->SearchAndModifyFileStatus(lFromActionID, eFromStatus, lToActionID, eNewStatus);
-				uex.addDebugInfo("Action To Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
+				m_ipFAMDB->SearchAndModifyFileStatus(lFromActionID, eFromStatus,
+					lToActionID, eNewStatus, (LPCTSTR) zUser);
 			}
 			else
 			{
@@ -349,8 +370,17 @@ void CSetActionStatusDlg::updateControls()
 			m_comboFilesUnderStatus.EnableWindow(TRUE);
 
 			// Enable the user combo box if the files under status is "Skipped"
-			m_comboSkippedUser.EnableWindow(
-				asMFCBool(m_comboFilesUnderStatus.GetCurSel() == kActionSkipped));
+			if (m_comboFilesUnderStatus.GetCurSel() == kActionSkipped)
+			{
+				m_comboSkippedUser.EnableWindow(TRUE);
+
+				// Update the skipped user list
+				fillSkippedUsers();
+			}
+			else
+			{
+				m_comboSkippedUser.EnableWindow(FALSE);
+			}
 
 			// Disable the status of action radio button and combo box
 			m_radioStatusFromAction.EnableWindow(FALSE);
@@ -388,10 +418,16 @@ void CSetActionStatusDlg::fillSkippedUsers()
 {
 	try
 	{
-		m_comboSkippedUser.AddString("<any user>");
+		// Clear current entries from the Combo box
+		m_comboSkippedUser.ResetContent();
 
+		// Add the any user string to the combo box
+		m_comboSkippedUser.AddString(gzANY_USER);
+
+		// Query to get the users from the DB
 		string strSQL = "SELECT DISTINCT [UserName] FROM [SkippedFile] ORDER BY [UserName]";
 
+		// Get the user list from the database
 		ADODB::_RecordsetPtr ipRecords = m_ipFAMDB->GetResultsForQuery(strSQL.c_str());
 		ASSERT_RESOURCE_ALLOCATION("ELI26881", ipRecords != NULL);
 
@@ -405,6 +441,9 @@ void CSetActionStatusDlg::fillSkippedUsers()
 			// Increment counter and move to next record
 			ipRecords->MoveNext();
 		}
+
+		// Set first item as current
+		m_comboSkippedUser.SetCurSel(0);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26880");
 }

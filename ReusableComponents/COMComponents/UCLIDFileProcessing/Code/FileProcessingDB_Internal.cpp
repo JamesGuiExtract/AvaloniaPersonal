@@ -17,6 +17,7 @@
 #include <StopWatch.h>
 
 #include <string>
+#include <memory>
 
 using namespace std;
 using namespace ADODB;
@@ -109,100 +110,117 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
-													long nActionID)
+													long nActionID, bool bLockDB)
 {
-	ASSERT_ARGUMENT("ELI26796", ipConnection != NULL);
-	ASSERT_ARGUMENT("ELI26795", !strAction.empty() || nActionID != -1);
-
-	EActionStatus easRtn = kActionUnattempted;
-
-	// Set up the select query to selec the file to change
-	string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
-
-	// Lock the database for this instance
-	LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
-
-	// Make sure the DB Schema is the expected version
-	validateDBSchemaVersion();
-
-	_RecordsetPtr ipFileSet( __uuidof( Recordset ));
-	ASSERT_RESOURCE_ALLOCATION("ELI13542", ipFileSet != NULL );
-	ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-		adOpenDynamic, adLockOptimistic, adCmdText );
-	
-	// begin a transaction
-	TransactionGuard tg(ipConnection);
-
-	// Update action ID/Action name
-	if (!strAction.empty() && nActionID == -1)
+	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
+	auto_ptr<TransactionGuard> apTG;
+	try
 	{
-		nActionID = getActionID(ipConnection, strAction);
-	}
-	else if (strAction.empty() && nActionID != -1)
-	{
-		strAction = getActionName(ipConnection, nActionID);
-	}
-	
-	// Action Column to update
-	string strActionCol = "ASC_" + strAction;
+		ASSERT_ARGUMENT("ELI26796", ipConnection != NULL);
+		ASSERT_ARGUMENT("ELI26795", !strAction.empty() || nActionID != -1);
 
-	// Find the file if it exists
-	if ( ipFileSet->adoEOF == VARIANT_FALSE )
-	{
-		FieldsPtr ipFileSetFields = ipFileSet->Fields;
-		ASSERT_RESOURCE_ALLOCATION("ELI26867", ipFileSetFields != NULL);
+		EActionStatus easRtn = kActionUnattempted;
 
-		// Get the previous state
-		string strPrevStatus = getStringField(ipFileSetFields, strActionCol ); 
-		easRtn = asEActionStatus ( strPrevStatus );
+		// Set up the select query to selec the file to change
+		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
 
-		// Get the current record
-		UCLID_FILEPROCESSINGLib::IFileRecordPtr ipCurrRecord;
-		ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
-
-		// set the new state
-		setStringField( ipFileSetFields, strActionCol, strState );
-
-		// Update the file record
-		ipFileSet->Update();
-
-		// if the old status does not equal the new status add transition records
-		if ( strPrevStatus != strState )
+		if (bLockDB)
 		{
-			// update the statistics
-			updateStats(ipConnection, nActionID, easRtn, asEActionStatus(strState), ipCurrRecord, ipCurrRecord);
+			// Lock the database for this instance
+			apDBlg.reset(
+				new LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>(getThisAsCOMPtr()));
+		}
 
-			// Only update FileActionStateTransition table if required
-			if (m_bUpdateFASTTable)
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI13542", ipFileSet != NULL );
+		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+			adOpenDynamic, adLockOptimistic, adCmdText );
+
+		if (bLockDB)
+		{
+			// Begin a transaction
+			apTG.reset(new TransactionGuard(ipConnection));
+		}
+
+		// Update action ID/Action name
+		if (!strAction.empty() && nActionID == -1)
+		{
+			nActionID = getActionID(ipConnection, strAction);
+		}
+		else if (strAction.empty() && nActionID != -1)
+		{
+			strAction = getActionName(ipConnection, nActionID);
+		}
+
+		// Action Column to update
+		string strActionCol = "ASC_" + strAction;
+
+		// Find the file if it exists
+		if ( ipFileSet->adoEOF == VARIANT_FALSE )
+		{
+			FieldsPtr ipFileSetFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI26867", ipFileSetFields != NULL);
+
+			// Get the previous state
+			string strPrevStatus = getStringField(ipFileSetFields, strActionCol ); 
+			easRtn = asEActionStatus ( strPrevStatus );
+
+			// Get the current record
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipCurrRecord;
+			ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
+
+			// set the new state
+			setStringField( ipFileSetFields, strActionCol, strState );
+
+			// Update the file record
+			ipFileSet->Update();
+
+			// if the old status does not equal the new status add transition records
+			if ( strPrevStatus != strState )
 			{
-				addFileActionStateTransition( ipConnection, nFileID, nActionID, strPrevStatus, 
-					strState, strException, "" );
+				// update the statistics
+				updateStats(ipConnection, nActionID, easRtn, asEActionStatus(strState), ipCurrRecord, ipCurrRecord);
+
+				// Only update FileActionStateTransition table if required
+				if (m_bUpdateFASTTable)
+				{
+					addFileActionStateTransition( ipConnection, nFileID, nActionID, strPrevStatus, 
+						strState, strException, "" );
+				}
+
+				// These are order dependent
+				if (strPrevStatus == "S")
+				{
+					// Remove skipped file record
+					removeSkipFileRecord(ipConnection, nFileID, nActionID);
+				}
+				if (strState == "S")
+				{
+					// Add a record to the skipped table
+					addSkipFileRecord(ipConnection, nFileID, nActionID);
+				}
 			}
 
-			// These are order dependent
-			if (strPrevStatus == "S")
+			// If there is a transaction guard then commit the transaction
+			if (apTG.get() != NULL)
 			{
-				// Remove skipped file record
-				removeSkipFileRecord(ipConnection, nFileID, nActionID);
-			}
-			if (strState == "S")
-			{
-				// Add a record to the skipped table
-				addSkipFileRecord(ipConnection, nFileID, nActionID);
+				apTG->CommitTrans();
 			}
 		}
-		// commit the changes to the database
-		tg.CommitTrans();
-	}
-	else
-	{
-		// No file with the given id
-		UCLIDException ue("ELI13543", "File ID was not found." );
-		ue.addDebugInfo ( "File ID", nFileID );
-		throw ue;
-	}
+		else
+		{
+			// No file with the given id
+			UCLIDException ue("ELI13543", "File ID was not found." );
+			ue.addDebugInfo ( "File ID", nFileID );
+			throw ue;
+		}
 
-	return easRtn;
+		return easRtn;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26912");
 }
 //--------------------------------------------------------------------------------------------------
 EActionStatus CFileProcessingDB::asEActionStatus  ( const string& strStatus )
@@ -2127,5 +2145,48 @@ void CFileProcessingDB::clear()
 		executeCmdQuery(getDBConnection(), gstrSHRINK_DATABASE);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26870");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
+													  string strUserName,
+													  const ADODB::_ConnectionPtr& ipConnection)
+{
+	try
+	{
+		// Clear the vector
+		rvecSkippedFileIDs.clear();
+
+		string strSQL = "SELECT [FileID] FROM [SkippedFile] WHERE [ActionID] = "
+			+ asString(nActionID);
+		if (!strUserName.empty())
+		{
+			// Escape any single quotes
+			replaceVariable(strUserName, "'", "''");
+			strSQL += " AND [UserName] = '" + strUserName + "'";
+		}
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Recordset to contain the files to process
+		_RecordsetPtr ipFileIDSet(__uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI26909", ipFileIDSet != NULL );
+
+		// get the recordset with skipped file ID's
+		ipFileIDSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Loop through the result set adding the file ID's to the vector
+		while (ipFileIDSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the file ID and add it to the vector
+			long nFileID = getLongField(ipFileIDSet->Fields, "FileID");
+			rvecSkippedFileIDs.push_back(nFileID);
+
+			// Move to the next record
+			ipFileIDSet->MoveNext();
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26907");
 }
 //--------------------------------------------------------------------------------------------------

@@ -82,7 +82,7 @@ public:
 	STDMETHOD(SetFileStatusToUnattempted)( long nFileID,  BSTR strAction);
 	STDMETHOD(GetFileStatus)( long nFileID,  BSTR strAction,  EActionStatus * pStatus);
 	STDMETHOD(SearchAndModifyFileStatus)( long nFromActionID,  EActionStatus eFromStatus,  
-		long nToActionID, EActionStatus eToStatus,  long * pnNumRecordsModified);
+		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long * pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)( BSTR strAction,  EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)( long nID,  BSTR strAction,  EActionStatus eStatus,  EActionStatus * poldStatus);
 	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles,  IIUnknownVector * * pvecFileRecords);
@@ -272,9 +272,13 @@ private:
 
 	// PROMISE:	 To set the given File's action state for the action given by strAction to the 
 	//			state in strState and returns the old state using the connection object provided.
+	// NOTE:	If bLockDB == false then the outer scope must lock the DB and declare a transaction
+	//			guard, if bLockDB == true then this method will lock the DB and declare a
+	//			transaction guard (in this case the outer scope MUST NOT lock the DB or begin
+	//			a transaction)
 	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1);
+		long nActionID = -1, bool bLockDB = true);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
@@ -411,6 +415,11 @@ private:
 
 	// Internal clear DB function
 	void clear();
+
+	// Fills a vector with the FileIDs of files skipped by a specific user (or skipped by
+	// all users if strUserName is "")
+	void getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
+		string strUserName, const ADODB::_ConnectionPtr& ipConnection);
 
 	void validateLicense();
 };

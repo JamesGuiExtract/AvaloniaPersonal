@@ -508,8 +508,10 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To find all of the records that have the status of eFromStatus in the nFromActionID action and change
 		//			the status of the nToActionID action to eToStatus and update the FileActionStateTransistion table.
-		[id(11), helpstring("method SearchAndModifyFileStatus")] HRESULT SearchAndModifyFileStatus([in] long nFromActionID, 
-			[in] EActionStatus eFromStatus, [in] long  nToActionID, [in] EActionStatus eToStatus, [out, retval] long *pnNumRecordsModified);
+		[id(11), helpstring("method SearchAndModifyFileStatus")] HRESULT SearchAndModifyFileStatus(
+			[in] long nFromActionID, [in] EActionStatus eFromStatus, [in] long  nToActionID,
+			[in] EActionStatus eToStatus, [in] BSTR bstrSkippedFromUserName,
+			[out, retval] long *pnNumRecordsModified);
 
 		[id(12), helpstring("method SetStatusForAllFiles")] HRESULT SetStatusForAllFiles([in] BSTR strAction, 
 			[in] EActionStatus eStatus);
@@ -667,7 +669,6 @@ library UCLID_FILEPROCESSINGLib
 		[id(49), helpstring("method ClearFileActionComment")] HRESULT ClearFileActionComment(
 			[in] long nFileID, [in] long nActionID);
 		// -----------------------------------------------------------------------------------------------
-
 	};
 
 	[
