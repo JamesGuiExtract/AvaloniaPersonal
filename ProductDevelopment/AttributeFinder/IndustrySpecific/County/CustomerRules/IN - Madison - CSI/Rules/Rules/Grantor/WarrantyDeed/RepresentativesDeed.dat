@@ -1,0 +1,24 @@
+[VARS_BEGIN]
+
+Numbers=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+
+[PATTERNS_BEGIN]
+
+RP_Grantor001=PERSONAL^3~REPRESENTATIVE'S^3~DEED^?Grantor^200~estate^15~pending
+
+RP_Grantor002=PERSONAL^3~REPRESENTATIVE'S^3~DEED^?Grantor^200~deceased
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000376779.TIF
+RP_Grantor003=CO^3~GUARDIANS^4~DEED^?Grantor^200~Guardianship
+
+//K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377459.TIF
+RP_Grantor004=CO^3~PERSONAL^4~REPRESENTATIVE^5~DEED^20~THIS^3~INDENTURE^3~WITNESSETH^?Grantor^250~deceased
+
+[PATTERNS_END]
+
+
+
+
