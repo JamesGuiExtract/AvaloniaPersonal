@@ -1,1 +1,1 @@
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Quit_Claim_Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantor.voa;K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\EAV\Quit_Claim_Deed\$FileNoExtOf(<SourceDocName>).eav
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Quit_Claim_Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantor.voa;K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

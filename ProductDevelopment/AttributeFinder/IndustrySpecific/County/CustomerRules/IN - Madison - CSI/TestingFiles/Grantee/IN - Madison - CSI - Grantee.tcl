@@ -19,11 +19,11 @@ UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Quit_Claim_Deed.d
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Assignment_of_Rents.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Federal_Tax_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Mechanics_Lien.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Sewer_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Satisfaction_of_Judgment.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Satisfaction_of_Mortgage.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Sewer_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Sheriffs_Deed.dat
-UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Storm_Sewer_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Subordination_Agreement.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Substitution_of_Trustee.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Unclassified.dat
