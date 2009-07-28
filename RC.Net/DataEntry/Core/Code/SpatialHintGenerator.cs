@@ -318,11 +318,11 @@ namespace Extract.DataEntry
                 List<RasterZone> pageZones = pagesOfZones[page];
 
                 // Get a hint range that applies horizontally.
-                float horizontalOverlap;
+                double horizontalOverlap;
                 HintRange? horizontalHintRange = GetHintRange(pageZones, true, out horizontalOverlap);
 
                 // Get a hint range that applies vertically.
-                float verticalOverlap;
+                double verticalOverlap;
                 HintRange? verticalHintRange = GetHintRange(pageZones, false, out verticalOverlap);
 
                 // Create the RowOrColumnHint.
@@ -374,8 +374,8 @@ namespace Extract.DataEntry
         /// <returns>The <see cref="HintRange"/> instance that applies to the specified 
         /// <see cref="RasterZone"/> in the specified dimension or <see langword="null"/> if a hint
         /// range can not be generated using the provided <see cref="RasterZone"/>s.</returns>
-        private static HintRange? GetHintRange(List<RasterZone> zones, bool horizontal, 
-            out float averageOverlap)
+        public static HintRange? GetHintRange(List<RasterZone> zones, bool horizontal, 
+            out double averageOverlap)
         {
             // Initialize a new HintRange instance and the averageOverlap
             HintRange hintRange = new HintRange();
@@ -431,7 +431,7 @@ namespace Extract.DataEntry
             int[] startPosition = new int[zones.Count];
             int[] endPosition = new int[zones.Count];
 
-            // Create a transform matrix for GetStart and GetEnd  to rotate the hint coordinates back into image coordinates.
+            // Create a transform matrix for GetStart and GetEnd to rotate the hint coordinates back into image coordinates.
             using (Matrix transform = new Matrix())
             {
                 transform.Rotate((float)-averageOrientation);   
@@ -488,8 +488,15 @@ namespace Extract.DataEntry
                 }
             }
 
-            // Calculate the average amount of overlap in the zones.
-            averageOverlap = ((float)totalOverlap / (float)totalLength);
+            if (totalLength == 0)
+            {
+                averageOverlap = 0;
+            }
+            else
+            {
+                // Calculate the average amount of overlap in the zones.
+                averageOverlap = ((double)totalOverlap / (double)totalLength);
+            }
 
             return hintRange;
         }

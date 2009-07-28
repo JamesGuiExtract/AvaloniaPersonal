@@ -21,7 +21,10 @@ using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_AFOUTPUTHANDLERSLib;
 using UCLID_COMUTILSLib;
-using UCLID_RASTERANDOCRMGMTLib;
+
+using ComRasterZone = UCLID_RASTERANDOCRMGMTLib.RasterZone;
+using SpatialString = UCLID_RASTERANDOCRMGMTLib.SpatialString;
+using ESpatialStringMode = UCLID_RASTERANDOCRMGMTLib.ESpatialStringMode;
 
 namespace Extract.DataEntry
 {
@@ -252,8 +255,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of each attribute's tooltips
         /// </summary>
-        private Dictionary<IAttribute, List<TextLayerObject>> _attributeToolTips =
-            new Dictionary<IAttribute, List<TextLayerObject>>();
+        private Dictionary<IAttribute, ToolTip> _attributeToolTips =
+            new Dictionary<IAttribute, ToolTip>();
 
         /// <summary>
         /// A dictionary to keep track of each attribute's error icons
@@ -304,6 +307,11 @@ namespace Extract.DataEntry
         /// hovering over.
         /// </summary>
         IAttribute _hoverAttribute;
+
+        /// <summary>
+        /// The <see cref="ToolTip"/> associated with the active _hoverAttribute.
+        /// </summary>
+        ToolTip _hoverToolTip;
 
         /// <summary>
         /// A list of all data controls contained in this control host.
@@ -1157,11 +1165,17 @@ namespace Extract.DataEntry
             {
                 if (!_temporarilyHidingTooltips)
                 {
-                    // Remove all tooltips
+                    // Remove tooltips for all selected attributes
                     List<IAttribute> tooltipAttributes = new List<IAttribute>(_attributeToolTips.Keys);
                     foreach (IAttribute attribute in tooltipAttributes)
                     {
                         RemoveAttributeToolTip(attribute);
+                    }
+
+                    // Remove the hoverAttribute's tooltip.
+                    if (_hoverAttribute != null && _hoverToolTip != null)
+                    {
+                        RemoveAttributeToolTip(_hoverAttribute);
                     }
 
                     // [DataEntry:307]
@@ -1312,6 +1326,12 @@ namespace Extract.DataEntry
                     highlight.Dispose();
                 }
                 _highlightAttributes.Clear();
+
+                if (_hoverToolTip != null)
+                {
+                    _hoverToolTip.Dispose();
+                    _hoverToolTip = null;
+                }
 
                 // Reset the other attribute mapping fields.
                 _controlAttributes.Clear();
@@ -1498,6 +1518,18 @@ namespace Extract.DataEntry
                 {
                     _toolTipFont.Dispose();
                     _toolTipFont = null;
+                }
+
+                foreach(ToolTip toolTip in _attributeToolTips.Values)
+                {
+                    toolTip.Dispose();
+                }
+                _attributeToolTips.Clear();
+
+                if (_hoverToolTip != null)
+                {
+                    _hoverToolTip.Dispose();
+                    _hoverToolTip = null;
                 }
             }
 
@@ -2251,6 +2283,7 @@ namespace Extract.DataEntry
                         if (_highlightAttributes.TryGetValue(highlight, out attribute) &&
                             attribute == _hoverAttribute)
                         {
+                            RemoveAttributeToolTip(_hoverAttribute);
                             _hoverAttribute = null;
                             DrawHighlights(false);
                         }
@@ -2603,7 +2636,7 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
                         activeToolTipAttributes.Contains(attribute))
                     {
-                        CreateAttributeToolTip(attribute);
+                        ShowAttributeToolTip(attribute);
                     }
                     // Otherwise, ensure any previous tooltip for the attribute is removed.
                     else
@@ -2653,14 +2686,6 @@ namespace Extract.DataEntry
                             unifiedBounds[highlight.PageNumber] = Rectangle.Union(
                                 unifiedBounds[highlight.PageNumber], errorIcon.GetBounds());
                         }
-
-                        // Combine the highlight bounds with the tooltip bounds (if present).
-                        TextLayerObject toolTip = GetToolTipOnPage(attribute, highlight.PageNumber);
-                        if (toolTip != null)
-                        {
-                            unifiedBounds[highlight.PageNumber] = Rectangle.Union(
-                                unifiedBounds[highlight.PageNumber], toolTip.GetBounds());
-                        }
                     }
                 }
 
@@ -2683,37 +2708,12 @@ namespace Extract.DataEntry
 
                     if (!_temporarilyHidingTooltips)
                     {
-                        // The tooltip should also be displayed for the hover attribute.
-                        CreateAttributeToolTip(_hoverAttribute);
-                    }
-                }
+                        // The tooltip should also be displayed for the hover attribute, but don't
+                        // position it along with the tooltips for currently selected attributes.
+                        RemoveAttributeToolTip(_hoverAttribute);
+                        _hoverToolTip = new ToolTip(this, _hoverAttribute, true, null);
 
-                // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
-                if (ensureActiveAttributeVisible &&
-                    (pageToShow != -1 || firstPageOfHighlights != -1))
-                {
-                    if (pageToShow == -1)
-                    {
-                        pageToShow = firstPageOfHighlights;
-                    }
-
-                    _imageViewer.SetPageNumber(pageToShow, false, true);
-
-                    Rectangle viewRectangle = _imageViewer.GetTransformedRectangle(
-                            _imageViewer.GetVisibleImageArea(), true);
-
-                    // Ensure the area of both the highlight and any associated tooltip is visible.
-                    if (!viewRectangle.Contains(unifiedBounds[pageToShow]))
-                    {
-                        // Create a temporary highlight object to use for the CenterOnLayerObject
-                        // call.
-                        Extract.Imaging.RasterZone rasterZone = new Extract.Imaging.RasterZone(
-                            unifiedBounds[pageToShow], pageToShow);
-                        Highlight temporaryHighlight = new Highlight(_imageViewer, "", rasterZone);
-
-                        _imageViewer.CenterOnLayerObject(temporaryHighlight, true);
-
-                        temporaryHighlight.Dispose();
+                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject);
                     }
                 }
             }
@@ -2754,12 +2754,42 @@ namespace Extract.DataEntry
                 }
             }
 
-            // Move the tooltips to the top of the z-order so that nothing is drawn on top of them.
-            foreach (List<TextLayerObject> toolTips in _attributeToolTips.Values)
+            // Move to the appropriate page of the document.
+            if (ensureActiveAttributeVisible &&
+                (pageToShow != -1 || firstPageOfHighlights != -1))
             {
-                foreach (TextLayerObject toolTip in toolTips)
+                pageToShow = firstPageOfHighlights;
+
+                _imageViewer.SetPageNumber(pageToShow, false, true);
+            }
+
+            // Create & position tooltips for the currently selected attribute(s).
+            PositionToolTips();
+
+            // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
+            if (ensureActiveAttributeVisible && pageToShow != -1)
+            {
+                foreach (KeyValuePair<IAttribute, ToolTip> attributeTooltip in _attributeToolTips)
                 {
-                    _imageViewer.LayerObjects.MoveToTop(toolTip);
+                    unifiedBounds[pageToShow] = Rectangle.Union(unifiedBounds[pageToShow],
+                        attributeTooltip.Value.TextLayerObject.GetBounds());
+                }
+
+                Rectangle viewRectangle = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true);
+
+                // Ensure the area of both the highlight and any associated tooltip is visible.
+                if (!viewRectangle.Contains(unifiedBounds[pageToShow]))
+                {
+                    // Create a temporary highlight object to use for the CenterOnLayerObject
+                    // call.
+                    // TODO: Create a more efficient way of centering on an image region.
+                    RasterZone rasterZone = new RasterZone(unifiedBounds[pageToShow], pageToShow);
+                    Highlight temporaryHighlight = new Highlight(_imageViewer, "", rasterZone);
+
+                    _imageViewer.CenterOnLayerObject(temporaryHighlight, true);
+
+                    temporaryHighlight.Dispose();
                 }
             }
 
@@ -3270,7 +3300,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Returns a list of all <see cref="Extract.Imaging.RasterZone"/>s associated with the 
+        /// Returns a list of all <see cref="RasterZone"/>s associated with the 
         /// provided set of <see cref="IAttribute"/>s (including all descendents of the supplied 
         /// <see cref="IAttribute"/>s if needed).
         /// </summary>
@@ -3278,12 +3308,12 @@ namespace Extract.DataEntry
         /// to be returned. Must not be <see langword="null"/>.
         /// </param>
         /// <returns>A list of raster zones from the supplied <see cref="IAttribute"/>s.</returns>
-        private static List<Extract.Imaging.RasterZone> GetRasterZones(IUnknownVector attributes)
+        private static List<RasterZone> GetRasterZones(IUnknownVector attributes)
         {
             ExtractException.Assert("ELI25177", "Null argument exception!", attributes != null);
 
             // Create a list in which to compile the results.
-            List<Extract.Imaging.RasterZone> rasterZones = new List<Extract.Imaging.RasterZone>();
+            List<RasterZone> rasterZones = new List<RasterZone>();
 
             // Loop through each attribute and compile the raster zones from each.
             int attributeCount = attributes.Size();
@@ -3304,16 +3334,15 @@ namespace Extract.DataEntry
                 IUnknownVector comRasterZones = attribute.Value.GetOriginalImageRasterZones();
                 int rasterZoneCount = comRasterZones.Size();
 
-                // Convert each raster zone to an Extract.Imaging.RasterZone and add it to the
-                // result list.
+                // Convert each raster zone to a RasterZone and add it to the result list.
                 for (int j = 0; j < rasterZoneCount; j++)
                 {
-                    UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
-                        comRasterZones.At(j) as UCLID_RASTERANDOCRMGMTLib.RasterZone;
+                    ComRasterZone comRasterZone =
+                        comRasterZones.At(j) as ComRasterZone;
 
                     if (comRasterZone != null)
                     {
-                        rasterZones.Add(new Extract.Imaging.RasterZone(comRasterZone));
+                        rasterZones.Add(new RasterZone(comRasterZone));
                     }
                 }
             }
@@ -3365,7 +3394,7 @@ namespace Extract.DataEntry
 
             VariantVector zoneConfidenceTiers = null;
             IUnknownVector comRasterZones = null;
-            List<Extract.Imaging.RasterZone> rasterZones = null;
+            List<RasterZone> rasterZones = null;
 
             // For spatial attributes whose text has not been manually edited, use confidence tiers
             // to color code the highlights using OCR confidence.
@@ -3385,30 +3414,29 @@ namespace Extract.DataEntry
             // For hints, get the raster zones from the AttributeStatusInfo.
             else
             {
-                rasterZones = new List<Extract.Imaging.RasterZone>(
+                rasterZones = new List<RasterZone>(
                     AttributeStatusInfo.GetHintRasterZones(attribute));
             }
 
             // Convert the COM raster zones to Extract.Imaging.RasterZones
             if (comRasterZones != null)
             {
-                rasterZones = new List<Extract.Imaging.RasterZone>();
+                rasterZones = new List<RasterZone>();
 
                 int rasterZoneCount = comRasterZones.Size();
                 for (int i = 0; i < rasterZoneCount; i++)
                 {
-                    UCLID_RASTERANDOCRMGMTLib.RasterZone comRasterZone =
-                        comRasterZones.At(i) as UCLID_RASTERANDOCRMGMTLib.RasterZone;
+                    ComRasterZone comRasterZone = comRasterZones.At(i) as ComRasterZone;
 
                     ExtractException.Assert("ELI25682", "Failed to retrieve raster zone!", 
                         comRasterZone != null);
 
-                    rasterZones.Add(new Extract.Imaging.RasterZone(comRasterZone));
+                    rasterZones.Add(new RasterZone(comRasterZone));
                 }
             }
             
-            Dictionary<int, List<Extract.Imaging.RasterZone>> highlightZones =
-                new Dictionary<int, List<Extract.Imaging.RasterZone>>();
+            Dictionary<int, List<RasterZone>> highlightZones =
+                new Dictionary<int, List<RasterZone>>();
 
             // Loop through the raster zones and group them by page & confidence tier.
             for (int i = 0;  i < rasterZones.Count; i ++)
@@ -3433,7 +3461,7 @@ namespace Extract.DataEntry
 
                 if (!highlightZones.ContainsKey(key))
                 {
-                    highlightZones[key] = new List<Extract.Imaging.RasterZone>();
+                    highlightZones[key] = new List<RasterZone>();
                 }
 
                 // Add the current raster zone to the dictionary.
@@ -3490,132 +3518,181 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// If possible, creates a <see cref="TextLayerObject"/> which acts as a tooltip to display
-        /// the text of the supplied <see cref="IAttribute"/>.  Space permitting, the tooltip will
-        /// be placed above the supplied <see cref="IAttribute"/> (aligned left).  However, the
-        /// tooltip may be shifted left or moved below the image region associated with the supplied
-        /// <see cref="IAttribute"/> if it will not otherwise fit on the page.
+        /// Shows a tooltip for the specified <see cref="IAttribute"/>.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which a tooltip should be
-        /// created. Must not be <see langword="null"/>.</param>
-        private void CreateAttributeToolTip(IAttribute attribute)
+        /// created.</param>
+        private void ShowAttributeToolTip(IAttribute attribute)
         {
-            ExtractException.Assert("ELI25171", "Null argument exception!", attribute != null);
-
-            // Remove any existing tooltip.
             RemoveAttributeToolTip(attribute);
 
-            // If the attribute doesn't have any text value, a tooltip cannot be created.
-            if (string.IsNullOrEmpty(attribute.Value.String))
+            if (!string.IsNullOrEmpty(attribute.Value.String))
             {
-                return;
+                _attributeToolTips[attribute] = null;
+            }
+        }
+
+        /// <summary>
+        /// Creates and positions tooltips for attributes designated to have tooltips.
+        /// </summary>
+        private void PositionToolTips()
+        {
+            // Loop through all attributes designated to receive a tooltip. Compile the bounding
+            // rectangles of all the attributes on the current page that have spatial info and
+            // keep track of the attributes that don't.
+            List<IAttribute> attributesNotNeedingTooltips = new List<IAttribute>();
+            Dictionary<IAttribute, RasterZone> attributeBoundingZones =
+                new Dictionary<IAttribute, RasterZone>();
+            foreach (IAttribute attribute in _attributeToolTips.Keys)
+            {
+                if (attribute.Value.HasSpatialInfo())
+                {
+                    SpatialString valueOnPage = attribute.Value.GetSpecifiedPages(
+                        _imageViewer.PageNumber, _imageViewer.PageNumber);
+
+                    if (valueOnPage != null && valueOnPage.HasSpatialInfo())
+                    {
+                        LongRectangle rectangle = valueOnPage.GetOCRImageBounds();
+                        int left = 0, top = 0, right = 0, bottom = 0;
+                        rectangle.GetBounds(ref left, ref top, ref right, ref bottom);
+
+                        attributeBoundingZones[attribute] =
+                            new RasterZone(Rectangle.FromLTRB(left, top, right, bottom),
+                                _imageViewer.PageNumber);
+
+                        continue;
+                    }
+                }
+
+                attributesNotNeedingTooltips.Add(attribute);
             }
 
-            // Group the attribute's highlight's raster zones by page.
-            Dictionary<int, List<Extract.Imaging.RasterZone>> rasterZonesByPage =
-                new Dictionary<int, List<Extract.Imaging.RasterZone>>();
-
-            List<CompositeHighlightLayerObject> highlights;
-            if (_attributeHighlights.TryGetValue(attribute, out highlights))
+            // Clear the tooltip designation for attributes without spatial info on the current page.
+            foreach (IAttribute attribute in attributesNotNeedingTooltips)
             {
-                foreach (CompositeHighlightLayerObject highlight in highlights)
-                {
-                    if (!rasterZonesByPage.ContainsKey(highlight.PageNumber))
-                    {
-                        rasterZonesByPage[highlight.PageNumber] =
-                            new List<Extract.Imaging.RasterZone>();
-                    }
+                RemoveAttributeToolTip(attribute);
+            }
 
-                    rasterZonesByPage[highlight.PageNumber].AddRange(highlight.GetRasterZones());
+            if (attributeBoundingZones.Count > 0)
+            {
+                // Determine whether the attributes appear to be arranged horizontally or vertically.
+                bool horizontal =
+                    HasHorizontalOrientation(new List<RasterZone>(attributeBoundingZones.Values));
+                Dictionary<IAttribute, ToolTip> newAttributeToolTips =
+                    new Dictionary<IAttribute, ToolTip>();
+
+                // Create the tooltips
+                foreach (IAttribute attribute in _attributeToolTips.Keys)
+                {
+                    newAttributeToolTips[attribute] = new ToolTip(this, attribute,
+                        horizontal, attributeBoundingZones[attribute].GetRectangularBounds());
+                }
+
+                // Position the tooltips.
+                ToolTip.PositionToolTips(new List<ToolTip>(newAttributeToolTips.Values));
+
+                if (_hoverToolTip != null)
+                {
+                    _imageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
+                }
+
+                // Update _attributeToolTips with a version containing the created tooltips.
+                _attributeToolTips = newAttributeToolTips;
+            }
+        }
+        
+        /// <summary>
+        /// Determines whether the specified <see cref="RasterZone"/>s are arranged horizontally
+        /// or vertically.
+        /// </summary>
+        /// <param name="rasterZones">The <see cref="RasterZone"/>s to check for arrangement.</param>
+        /// <returns><see langword="true"/> if the zones appear to be arranged horizontally or it is not
+        /// clear which way they are arranged, <see langword="false"/> if the zones appear to be
+        /// arranged vertically.</returns>
+        private static bool HasHorizontalOrientation(List<RasterZone> rasterZones)
+        {
+            // If there are not multiple raster zones, default to horizontal.
+            if (rasterZones.Count < 2)
+            {
+                return true;
+            }
+
+            // Default to horizontal.
+            bool horizontal = true;
+
+            // Find the horizontal overlap in the raster zones.
+            double horizontalOverlap = 0;
+            SpatialHintGenerator.GetHintRange(rasterZones, true, out horizontalOverlap);
+
+            if (horizontalOverlap > 0.1)
+            {
+                // If it appears there is horizontal overlap (indicating a vertical arrangement),
+                // test to see if there is more horizontal overlap than vertical overlap.
+                double verticalOverlap = 0;
+                SpatialHintGenerator.GetHintRange(rasterZones, false, out verticalOverlap);
+
+                if (horizontalOverlap > verticalOverlap)
+                {
+                    // More horizontal overlap = vertically arranged zones.
+                    horizontal = false;
                 }
             }
-            
-            // Create a tooltip for each page on which the attribute is present.
-            foreach (int page in rasterZonesByPage.Keys)
+
+            return horizontal;
+        }
+
+        /// <overloads>Retrieves the <see cref="RasterZone"/>s of the specified
+        /// <see cref="IAttribute"/>(s) highlights grouped by page.</overloads>
+        /// <summary>
+        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>
+        /// highlights grouped by page.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose highlight 
+        /// <see cref="RasterZone"/>s will be returned.</param>
+        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attribute"/> grouped by
+        /// page.</returns>
+        internal Dictionary<int, List<RasterZone>> 
+            GetAttributeRasterZonesByPage(IAttribute attribute)
+        {
+            return GetAttributeRasterZonesByPage(new IAttribute[] { attribute });
+        }
+
+        /// <summary>
+        /// Retrieves the <see cref="RasterZone"/>s of the specified <see cref="IAttribute"/>s'
+        /// highlights grouped by page.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose highlight
+        /// <see cref="RasterZone"/>s will be returned.</param>
+        /// <returns>The <see cref="RasterZone"/>s of the <see paramref="attributes"/>' highlights
+        /// grouped by page.</returns>
+        internal Dictionary<int, List<RasterZone>>
+            GetAttributeRasterZonesByPage(IEnumerable<IAttribute> attributes)
+        {
+            Dictionary<int, List<RasterZone>> rasterZonesByPage =
+                new Dictionary<int,List<RasterZone>>();
+
+            // Loop through each attribute
+            foreach (IAttribute attribute in attributes)
             {
-                List<Extract.Imaging.RasterZone> rasterZones = rasterZonesByPage[page];
-
-                // Use the full text of the attribute, not just the text on this page.
-                string toolTipText = attribute.Value.String;
-
-                // Calculate the initial anchorpoint for the tooltip above the highlight
-                double tooltipRotation;
-                Point tooltipAnchorPoint = GetAnchorPoint(rasterZones, AnchorAlignment.LeftTop, 0, 
-                    out tooltipRotation);
-
-                // Create the tooltip
-                TextLayerObject toolTip = new TextLayerObject(_imageViewer, page,
-                    "ToolTip", toolTipText, _toolTipFont, tooltipAnchorPoint, AnchorAlignment.LeftBottom,
-                    Color.Yellow, Color.Black, (float)tooltipRotation);
-
-                // Normalize the coordinates of the tooltip bounds and image viewer to vertical in order
-                // to determine if the tooltip position needs to be altered to keep it onpage.
-                PointF rotationPoint = new PointF(0, 0);
-                Rectangle toolTipBounds = GeometryMethods.RotateRectangle(
-                    toolTip.GetBounds(), _imageViewer.Orientation, rotationPoint);
-                Rectangle imageBounds = GeometryMethods.RotateRectangle(
-                    new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight),
-                    _imageViewer.Orientation, rotationPoint);
-
-                // If the tooltip extends off the top of the page, try creating one beneath the
-                // attribute instead.
-                if (toolTipBounds.Top < imageBounds.Top)
+                // Try to find the highlight(s) that have been associated with the attribute.
+                List<CompositeHighlightLayerObject> highlights;
+                if (_attributeHighlights.TryGetValue(attribute, out highlights))
                 {
-                    // Dispose of the original tooltip before re-creating
-                    toolTip.Dispose();
-                    toolTip = null;
-
-                    // Calculate an anchor point below the highlight
-                    tooltipAnchorPoint = GetAnchorPoint(rasterZones, AnchorAlignment.LeftBottom,
-                        180, out tooltipRotation);
-
-                    // Create the new tooltip
-                    toolTip = new TextLayerObject(_imageViewer, page, "ToolTip", toolTipText,
-                        _toolTipFont, tooltipAnchorPoint, AnchorAlignment.LeftTop,
-                        Color.Yellow, Color.Black, (float)tooltipRotation);
-
-                    // Re-obtain normalized bounds for the new tooltip.
-                    toolTipBounds = GeometryMethods.RotateRectangle(
-                        toolTip.GetBounds(), _imageViewer.Orientation, rotationPoint);
-                }
-
-                // If the tooltip extends off the right side of the page, shift it left to keep it
-                // onpage.
-                if (toolTipBounds.Right > imageBounds.Right)
-                {
-                    Point[] offset = new Point[1];
-
-                    // If the tooltip is wider than the page, start it at the left edge of the page.
-                    if (toolTipBounds.Width > imageBounds.Width)
+                    // Add the raster zones of each highlight to the appropriate page in the
+                    // dictionary return value.
+                    foreach (CompositeHighlightLayerObject highlight in highlights)
                     {
-                        offset[0] = new Point(-toolTipBounds.Left, 0);
-                    }
-                    // Otherwise, align the right side with the right edge of the page.
-                    else
-                    {
-                        offset[0] =
-                            new Point(imageBounds.Right - toolTipBounds.Right, 0);
-                    }
+                        if (!rasterZonesByPage.ContainsKey(highlight.PageNumber))
+                        {
+                            rasterZonesByPage[highlight.PageNumber] = new List<RasterZone>();
+                        }
 
-                    // The offset needs to be rotated back to be in relation to the tooltip rotation.
-                    using (Matrix transform = new Matrix())
-                    {
-                        transform.Rotate((float)tooltipRotation);
-                        transform.TransformVectors(offset);
-                        toolTip.Offset(offset[0], false);
+                        rasterZonesByPage[highlight.PageNumber].AddRange(highlight.GetRasterZones());
                     }
                 }
-
-                toolTip.Selectable = false;
-                toolTip.Visible = true;
-                _imageViewer.LayerObjects.Add(toolTip);
-
-                if (!_attributeToolTips.ContainsKey(attribute))
-                {
-                    _attributeToolTips[attribute] = new List<TextLayerObject>();
-                }
-                _attributeToolTips[attribute].Add(toolTip);
             }
+
+            return rasterZonesByPage;
         }
 
         /// <summary>
@@ -3642,28 +3719,13 @@ namespace Extract.DataEntry
             }
 
             // Groups the attribute's raster zones by page.
-            Dictionary<int, List<Extract.Imaging.RasterZone>> rasterZonesByPage =
-                new Dictionary<int, List<Extract.Imaging.RasterZone>>();
-
-            List<CompositeHighlightLayerObject> highlights;
-            if (_attributeHighlights.TryGetValue(attribute, out highlights))
-            {
-                foreach (CompositeHighlightLayerObject highlight in highlights)
-                {
-                    if (!rasterZonesByPage.ContainsKey(highlight.PageNumber))
-                    {
-                        rasterZonesByPage[highlight.PageNumber] =
-                            new List<Extract.Imaging.RasterZone>();
-                    }
-
-                    rasterZonesByPage[highlight.PageNumber].AddRange(highlight.GetRasterZones());
-                }
-            }
+            Dictionary<int, List<RasterZone>> rasterZonesByPage =
+                GetAttributeRasterZonesByPage(attribute);
 
             // Create an error icon for each page on which the attribute is present.
             foreach (int page in rasterZonesByPage.Keys)
             {
-                List<Extract.Imaging.RasterZone> rasterZones = rasterZonesByPage[page];
+                List<RasterZone> rasterZones = rasterZonesByPage[page];
 
                 // The anchor point for the error icon should be to the right of attribute.
                 double errorIconRotation;
@@ -3682,7 +3744,7 @@ namespace Extract.DataEntry
 
                 // NOTE: For now I think the cases where the error icon would extend off-page are so
                 // rare that it's not worth handling. But this would be where such a check should
-                // be made (see CreateAttributeToolTip).
+                // be made (see ShowAttributeToolTip).
 
                 if (!_attributeErrorIcons.ContainsKey(attribute))
                 {
@@ -3695,9 +3757,9 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Finds an anchor point to use to attach an <see cref="AnchoredObject"/> to the specified
-        /// list of <see cref="Extract.Imaging.RasterZone"/>s.
+        /// list of <see cref="RasterZone"/>s.
         /// </summary>
-        /// <param name="rasterZones">The list of <see cref="Extract.Imaging.RasterZone"/>s for
+        /// <param name="rasterZones">The list of <see cref="RasterZone"/>s for
         /// which and anchor point is needed.</param>
         /// <param name="anchorAlignment">The point location along a bounding box of all supplied
         /// zones on which the anchor point should be based.  The bounding box will be relative to
@@ -3714,8 +3776,8 @@ namespace Extract.DataEntry
         /// <returns>A <see cref="Point"/> to use as the anchor for an <see cref="AnchoredObject"/>.
         /// </returns>
         private static Point GetAnchorPoint(
-            List<Extract.Imaging.RasterZone> rasterZones, AnchorAlignment anchorAlignment,
-            double anchorOffsetAngle, out double anchoredObjectRotation)
+            List<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
+            out double anchoredObjectRotation)
         {
             // Keep track of the average height of all raster zones as well as all start and end
             // points.
@@ -4055,14 +4117,27 @@ namespace Extract.DataEntry
         {
             ExtractException.Assert("ELI25176", "Null argument exception!", attribute != null);
 
-            List<TextLayerObject> toolTips;
-            if (_attributeToolTips.TryGetValue(attribute, out toolTips))
+            // Check if the attribute is the _hoverAttribute and remove the _hoverToolTip if so.
+            if (attribute != null && attribute == _hoverAttribute && _hoverToolTip != null)
             {
-                foreach (TextLayerObject toolTip in toolTips)
+                if (_imageViewer.LayerObjects.Contains(_hoverToolTip.TextLayerObject))
                 {
-                    if (_imageViewer.LayerObjects.Contains(toolTip))
+                    _imageViewer.LayerObjects.Remove(_hoverToolTip.TextLayerObject);
+                }
+                _hoverToolTip.Dispose();
+                _hoverToolTip = null;
+            }
+
+            // Check if the attribute is one of the attributes displaying a tooltip; remove and
+            // dispose of the tooltip if so.
+            ToolTip toolTip;
+            if (_attributeToolTips.TryGetValue(attribute, out toolTip))
+            {
+                if (toolTip != null)
+                {
+                    if (_imageViewer.LayerObjects.Contains(toolTip.TextLayerObject))
                     {
-                        _imageViewer.LayerObjects.Remove(toolTip);
+                        _imageViewer.LayerObjects.Remove(toolTip.TextLayerObject);
                     }
 
                     toolTip.Dispose();
@@ -4135,31 +4210,6 @@ namespace Extract.DataEntry
                     if (page == errorIcon.PageNumber)
                     {
                         return errorIcon;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Returns the tooltip for the specified <see cref="IAttribute"/> on the specified
-        /// page. (if such a tooltip exists)
-        /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose tooltip is requested.</param>
-        /// <param name="page">The page number of the desired tooltip.</param>
-        /// <returns>The <see cref="TextLayerObject"/> displaying the requested tooltip or
-        /// <see langword="null"/> if no such tooltip exists.</returns>
-        private TextLayerObject GetToolTipOnPage(IAttribute attribute, int page)
-        {
-            List<TextLayerObject> toolTips;
-            if (_attributeToolTips.TryGetValue(attribute, out toolTips))
-            {
-                foreach (TextLayerObject toolTip in toolTips)
-                {
-                    if (page == toolTip.PageNumber)
-                    {
-                        return toolTip;
                     }
                 }
             }

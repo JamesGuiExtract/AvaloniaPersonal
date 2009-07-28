@@ -213,6 +213,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="DataEntryMethods.cs" />
     <Compile Include="DataEntryValidator.cs" />
+    <Compile Include="ToolTip.cs">
+      <DependentUpon>DataEntryControlHost.cs</DependentUpon>
+      <SubType>UserControl</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\Core\Code\Extract.csproj">

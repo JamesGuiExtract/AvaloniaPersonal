@@ -1,11 +1,11 @@
 using Extract.Interop;
 using Extract.Licensing;
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.ComponentModel;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -1799,6 +1799,39 @@ namespace Extract.DataEntry
                 {
                     RemoveDraggedRows();
                 }
+                else if (_draggedRows != null && operationPerformed == 0)
+                {
+                    // Restore row selection to the dragged rows if no drag operation ended up being
+                    // performed.
+                    if (_activeCachedRows != null &&
+                        _activeCachedRows.ContainsKey(_draggedRows[0].Attribute))
+                    {
+                        using (new SelectionProcessingSuppressor(this))
+                        {
+                            DataGridViewRow lastSelectedRow = null;
+
+                            base.ClearSelection();
+                            foreach (DataGridViewRow row in _draggedRows)
+                            {
+                                lastSelectedRow = row;
+                            }
+                            
+                            // Select the currentCell before selecting the rows otherwise the row
+                            // selection(s) may be undone.
+                            if (lastSelectedRow != null)
+                            {
+                                base.CurrentCell = lastSelectedRow.Cells[0];
+                            }
+
+                            foreach (DataGridViewRow row in _draggedRows)
+                            {
+                                row.Selected = true;
+                            }
+                        }
+
+                        base.Focus();
+                    }
+                }
 
                 // [DataEntry:490-492]
                 // Update attribute selection to redisplay the tooltip and to make the DEP aware of
@@ -1864,16 +1897,22 @@ namespace Extract.DataEntry
                             base.ClearSelection();
                             foreach (DataGridViewRow row in initialSelectedRows)
                             {
-                                if (!_draggedRows.Contains(row as DataEntryTableRow))
-                                {
-                                    row.Selected = true;
-                                    lastSelectedRow = row;
-                                }
+                                lastSelectedRow = row;
                             }
 
+                            // Select the currentCell before selecting the rows otherwise the row
+                            // selection(s) may be undone.
                             if (lastSelectedRow != null)
                             {
                                 base.CurrentCell = lastSelectedRow.Cells[0];
+                            }
+
+                            foreach (DataGridViewRow row in initialSelectedRows)
+                            {
+                                if (!_draggedRows.Contains(row as DataEntryTableRow))
+                                {
+                                    row.Selected = true;
+                                }
                             }
                         }
                     }
