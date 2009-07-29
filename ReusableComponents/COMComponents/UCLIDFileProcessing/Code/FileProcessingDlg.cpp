@@ -108,6 +108,7 @@ FileProcessingDlg::FileProcessingDlg(UCLID_FILEPROCESSINGLib::IFileProcessingMan
  m_bDBConnectionReady(true),
  m_apDatabaseStatusIconUpdater(NULL),
  m_bStatsOnlyRunning(false),
+ m_bProcessingSkippedFiles(false),
  m_bPaused(false)
 {
 	try
@@ -356,6 +357,8 @@ void FileProcessingDlg::OnBtnRun()
 			return;
 		}
 
+		UCLID_FILEPROCESSINGLib::IFileProcessingManagerPtr ipFPM = getFPM();
+
 		// sometimes, the processing may cause the program the crash.  This
 		// can happen if one or more of the components are poorly written.
 		// The user may not have saved the FAM...save the FAM settings in
@@ -366,7 +369,7 @@ void FileProcessingDlg::OnBtnRun()
 	
 		if ( m_pFRM != NULL)
 		{
-			getFPM()->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()),
+			ipFPM->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()),
 				VARIANT_FALSE);
 		}
 
@@ -377,6 +380,11 @@ void FileProcessingDlg::OnBtnRun()
 
 		// Get the index of the current page
 		int iActiveIndex = m_propSheet.GetActiveIndex();
+
+		// Check whether we are processing skipped files or not
+		UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipRole = ipFPM->FileProcessingMgmtRole;
+		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != NULL);
+		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
 
 		// If the current tab is not one of the log tab or the statistics tab
 		if (iActiveIndex != iQueueLogIndex && iActiveIndex != iProcLogIndex
@@ -455,7 +463,7 @@ void FileProcessingDlg::OnBtnRun()
 		// the menus should still be updated and the exception rethrown
 		try
 		{
-			getFPM()->StartProcessing();
+			ipFPM->StartProcessing();
 		}
 		catch(...)
 		{
@@ -467,7 +475,7 @@ void FileProcessingDlg::OnBtnRun()
 		// update the UI
 		updateMenuAndToolbar();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08926")
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI08926");
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlg::OnBtnPause() 
@@ -904,8 +912,21 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 			m_nNumFailed = ipActionStatsNew->NumDocumentsFailed;
 			m_nNumTotalDocs = ipActionStatsNew->NumDocuments;
 			m_nNumSkipped = ipActionStatsNew->NumDocumentsSkipped;
-			m_nNumPending = m_nNumTotalDocs- (m_nNumFailed + m_nNumCompletedProcessing
-												+ m_nNumCurrentlyProcessing + m_nNumSkipped);
+			
+			// Check for skipped file processing
+			// TODO: The stats for pending and skipped are not currently correct when processing
+			//		 skipped files
+			if (m_bProcessingSkippedFiles)
+			{
+				m_nNumSkipped += m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
+					+ m_nNumCurrentlyProcessing + m_nNumSkipped);
+				m_nNumPending = 0;
+			}
+			else
+			{
+				m_nNumPending = m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
+					+ m_nNumCurrentlyProcessing + m_nNumSkipped);
+			}
 
 			if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)
 			{
@@ -1744,8 +1765,10 @@ void FileProcessingDlg::createPropertyPages()
 	CRect rectPropSheet;
 	m_propSheet.GetWindowRect(&rectPropSheet);
 	ScreenToClient(&rectPropSheet);
-	m_sizeMinimumPropPage.cx = rectPropSheet.Width();
-	m_sizeMinimumPropPage.cy = rectPropSheet.Height();
+
+	// Set minimum size (this is the minimum size for the processing tab
+	// to fit all of the settings on the screen)
+	m_sizeMinimumPropPage.SetSize(620, 350);
 	
 	// Set the FPM pointer for the prop pages
 	m_propActionPage.setFPMgr(m_pFileProcMgr);

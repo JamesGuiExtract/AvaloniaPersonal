@@ -102,6 +102,10 @@ public:
 	STDMETHOD(put_ExecuteErrorTask)(VARIANT_BOOL newVal);
 	STDMETHOD(get_ErrorTask)(IObjectWithDescription * *pVal);
 	STDMETHOD(put_ErrorTask)(IObjectWithDescription * newVal);
+	STDMETHOD(get_ProcessSkippedFiles)(VARIANT_BOOL* pbVal);
+	STDMETHOD(put_ProcessSkippedFiles)(VARIANT_BOOL bNewVal);
+	STDMETHOD(get_SkippedForAnyUser)(VARIANT_BOOL* pbVal);
+	STDMETHOD(put_SkippedForAnyUser)(VARIANT_BOOL bNewVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -196,6 +200,10 @@ private:
 
 	// Execute this task if an error occurs ( depending on the built-in Enabled flag )
 	IObjectWithDescriptionPtr m_ipErrorTask;
+
+	// Settings for processing skipped files
+	bool m_bProcessSkippedFiles;
+	bool m_bSkippedForAnyUser;
 
 	///////////
 	// Methods

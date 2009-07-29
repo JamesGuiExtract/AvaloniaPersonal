@@ -181,6 +181,9 @@ private:
 	// is pressed
 	bool m_bPaused;
 
+	// Indicates whether processing is currently processing skipped files or not
+	bool m_bProcessingSkippedFiles;
+
 	// The file processing manager does the actual file processing
 	UCLID_FILEPROCESSINGLib::IFileProcessingManager* m_pFileProcMgr;
 

@@ -835,6 +835,35 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted( long nFileID,  BSTR 
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAction,
+													   VARIANT_BOOL bUpdateSkippedFileTable)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check License
+		validateLicense();
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Change the given files state to Skipped
+		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "", -1, true,
+			asCppBool(bUpdateSkippedFileTable));
+
+		END_CONNECTION_RETRY(ipConnection, "ELI26938");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26939");
+}
+//-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  EActionStatus * pStatus)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1124,7 +1153,10 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile( long nID,  BSTR strAction,  EA
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13572");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFiles,  IIUnknownVector * * pvecFileRecords)
+STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFiles, 
+												  VARIANT_BOOL bGetSkippedFiles,
+												  BSTR bstrSkippedForUserName,
+												  IIUnknownVector * * pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -1156,12 +1188,32 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		// Action Column to change
 		string strActionCol = "ASC_" + strActionName;
 
-		string strWhere = "WHERE (" + strActionCol + " = 'P')";
-		string strFrom = "FROM FAMFile " + strWhere;
+		string strWhere = "";
+		string strFrom = "FROM FAMFile ";
 		string strTop = "TOP (" + asString( nMaxFiles ) + " ) ";
+		if (bGetSkippedFiles == VARIANT_TRUE)
+		{
+			strWhere = " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID "
+				"WHERE ( SkippedFile.ActionID = " + asString(nActionID)
+				+ " AND FAMFile." + strActionCol + " = 'S'";
 
+			string strUserName = asString(bstrSkippedForUserName);
+			if(!strUserName.empty())
+			{
+				replaceVariable(strUserName, "'", "''");
+				string strUserAnd = " AND SkippedFile.UserName = '" + strUserName + "'";
+				strWhere += strUserAnd;
+			}
+			strWhere += " )";
+		}
+		else
+		{
+			strWhere = "WHERE (" + strActionCol + " = 'P')";
+		}
+		strFrom += strWhere;
+			
 		// create query to select top records;
-		string strSelectSQL = "SELECT " + strTop + " ID, FileName, Pages, FileSize " + strFrom;
+		string strSelectSQL = "SELECT " + strTop + " FAMFile.ID, FileName, Pages, FileSize " + strFrom;
 
 		// Create the query to update the status to processing
 		string strUpdateSQL = "UPDATE " + strTop + " FAMFile SET " + strActionCol + " = 'R' " + strFrom;
@@ -1191,6 +1243,13 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 
 			// Put record in list of records to return
 			ipFiles->PushBack(ipFileRecord);
+
+			// If moving from skipped status then need to update the statistics table as well
+			if (bGetSkippedFiles == VARIANT_TRUE)
+			{
+				updateStats(ipConnection, nActionID, kActionSkipped, kActionProcessing, ipFileRecord,
+					ipFileRecord);
+			}
 
 			// move to the next record in the recordset
 			ipFileSet->MoveNext();

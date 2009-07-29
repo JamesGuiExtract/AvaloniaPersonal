@@ -110,7 +110,8 @@ void CFileProcessingDB::postStatusUpdateNotification(EDatabaseWrapperObjectStatu
 EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID, 
 													string strAction, const string& strState,
 													const string& strException,
-													long nActionID, bool bLockDB)
+													long nActionID, bool bLockDB,
+													bool bUpdateSkippedTable)
 {
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
 	auto_ptr<TransactionGuard> apTG;
@@ -191,16 +192,17 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 						strState, strException, "" );
 				}
 
-				// These are order dependent
-				if (strPrevStatus == "S")
+				if (bUpdateSkippedTable)
 				{
+					// These are order dependent
 					// Remove skipped file record
 					removeSkipFileRecord(ipConnection, nFileID, nActionID);
-				}
-				if (strState == "S")
-				{
-					// Add a record to the skipped table
-					addSkipFileRecord(ipConnection, nFileID, nActionID);
+
+					if (strState == "S")
+					{
+						// Add a record to the skipped table
+						addSkipFileRecord(ipConnection, nFileID, nActionID);
+					}
 				}
 			}
 
@@ -474,39 +476,43 @@ void CFileProcessingDB::addASTransFromSelect ( ADODB::_ConnectionPtr ipConnectio
 											  const string &strComment, const string &strWhereClause, 
 											  const string &strTopClause )
 {
-	if (!m_bUpdateFASTTable)
+	try
 	{
-		return;
+		if (!m_bUpdateFASTTable)
+		{
+			return;
+		}
+
+		// Action Column to change
+		string strActionCol = "ASC_" + strAction;
+
+		// Create the from string
+		string strFrom = " FROM FAMFile " + strWhereClause;
+
+		// if the strException string is empty NULL should be added to the db
+		string strNewException = (strException.empty()) ? "NULL": "'" + strException + "'";
+
+		// if the strComment is empty the NULL should be added to the database
+		string strNewComment = (strComment.empty()) ? "NULL": "'" + strComment + "'";
+
+		// create the insert string
+		string strInsertTrans = "INSERT INTO FileActionStateTransition ( FileID, ActionID, ASC_From, "
+			"ASC_To, DateTimeStamp, Exception, Comment, FAMUserID, MachineID) ";
+		strInsertTrans += "SELECT " + strTopClause + " FAMFile.ID, " + 
+			asString(nActionID) + " as ActionID, " + 
+			strActionCol + " as ASC_From, '" + 
+			strToState + 
+			"' as ASC_To, GetDate() as DateTimeStamp, " + 
+			strNewException + ", " +
+			strNewComment + ", " +
+			asString(getFAMUserID(ipConnection)) + ", " +
+			asString(getMachineID(ipConnection)) + " " + 		
+			strFrom;
+
+		// Insert the records
+		executeCmdQuery(ipConnection, strInsertTrans);
 	}
-
-	// Action Column to change
-	string strActionCol = "ASC_" + strAction;
-
-	// Create the from string
-	string strFrom = " FROM FAMFile " + strWhereClause;
-
-	// if the strException string is empty NULL should be added to the db
-	string strNewException = (strException.empty()) ? "NULL": "'" + strException + "'";
-
-	// if the strComment is empty the NULL should be added to the database
-	string strNewComment = (strComment.empty()) ? "NULL": "'" + strComment + "'";
-
-	// create the insert string
-	string strInsertTrans = "INSERT INTO FileActionStateTransition ( FileID, ActionID, ASC_From, "
-		"ASC_To, DateTimeStamp, Exception, Comment, FAMUserID, MachineID) ";
-	strInsertTrans += "SELECT " + strTopClause + " ID, " + 
-		asString(nActionID) + " as ActionID, " + 
-		strActionCol + " as ASC_From, '" + 
-		strToState + 
-		"' as ASC_To, GetDate() as DateTimeStamp, " + 
-		strNewException + ", " +
-		strNewComment + ", " +
-		asString(getFAMUserID(ipConnection)) + ", " +
-		asString(getMachineID(ipConnection)) + " " + 		
-		strFrom;
-
-	// Insert the records
-	executeCmdQuery(ipConnection, strInsertTrans);
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26937");
 }
 //--------------------------------------------------------------------------------------------------
 ADODB::_ConnectionPtr  CFileProcessingDB::getDBConnection()
@@ -1010,8 +1016,17 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 	}
 	if (ipNewRecord != NULL)
 	{
-		ipNewRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
-			&llNewFileSize, &lNewPages);
+		// If the records are the same, just copy the data that was already retrieved
+		if (ipNewRecord == ipOldRecord)
+		{
+			llNewFileSize = llOldFileSize;
+			lNewPages = lOldPages;
+		}
+		else
+		{
+			ipNewRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
+				&llNewFileSize, &lNewPages);
+		}
 	}
 
 	// Nothing to do if the "from" status == the "to" status
@@ -1099,7 +1114,7 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 			long lNumDocsFailed(0), lNumPagesFailed(0);
 			LONGLONG llNumBytesFailed(0);
 			ipActionStats->GetFailed(&lNumDocsFailed, &lNumPagesFailed, &llNumBytesFailed);
-			ipActionStats->SetFailed(lNumDocsFailed+1, lNumPagesFailed - lOldPages,
+			ipActionStats->SetFailed(lNumDocsFailed-1, lNumPagesFailed - lOldPages,
 				llNumBytesFailed - llOldFileSize);
 			break;
 		}
@@ -1110,7 +1125,7 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 			long lNumDocsComplete(0), lNumPagesComplete(0);
 			LONGLONG llNumBytesComplete(0);
 			ipActionStats->GetComplete(&lNumDocsComplete, &lNumPagesComplete, &llNumBytesComplete);
-			ipActionStats->SetComplete(lNumDocsComplete+1, lNumPagesComplete - lOldPages,
+			ipActionStats->SetComplete(lNumDocsComplete-1, lNumPagesComplete - lOldPages,
 				llNumBytesComplete - llOldFileSize);
 			break;
 		}
@@ -1122,7 +1137,7 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 			long lNumDocsSkipped(0), lNumPagesSkipped(0);
 			LONGLONG llNumBytesSkipped(0);
 			ipActionStats->GetSkipped(&lNumDocsSkipped, &lNumPagesSkipped, &llNumBytesSkipped);
-			ipActionStats->SetSkipped(lNumDocsSkipped+1, lNumPagesSkipped - lOldPages,
+			ipActionStats->SetSkipped(lNumDocsSkipped-1, lNumPagesSkipped - lOldPages,
 				llNumBytesSkipped - llOldFileSize);
 			break;
 		}
@@ -2038,15 +2053,8 @@ void CFileProcessingDB::removeSkipFileRecord(const ADODB::_ConnectionPtr &ipConn
 		ipSkippedSet->Open(strSkippedSQL.c_str(), _variant_t((IDispatch*)ipConnection, true),
 			adOpenDynamic, adLockOptimistic, adCmdText);
 
-		// Ensure a record is found
-		if (ipSkippedSet->BOF == VARIANT_TRUE)
-		{
-			UCLIDException uex("ELI26886", "File is not in skipped state for this action!");
-			uex.addDebugInfo("Action ID", nActionID);
-			uex.addDebugInfo("File ID", nFileID);
-			throw uex;
-		}
-		else
+		// Only delete the record if it is found
+		if (ipSkippedSet->BOF == VARIANT_FALSE)
 		{
 			// Delete the row
 			ipSkippedSet->Delete(adAffectCurrent);

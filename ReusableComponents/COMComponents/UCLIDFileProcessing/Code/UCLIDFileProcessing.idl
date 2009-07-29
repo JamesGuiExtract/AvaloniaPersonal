@@ -530,10 +530,17 @@ library UCLID_FILEPROCESSINGLib
 		// Methods to determine the next files to process
 		// -----------------------------------------------------------------------------------------------
 		// PROMISE:	To return up to nMaxFiles records where the specified action has a status of 'P'
+		//			for bGetSkippedFiles == VARIANT_FALSE or 'S' for bGetSkippedFiles == VARIANT_TRUE
 		//			For all records returned, the status for the action will be set to 'R' before this
-		//			method call returns.
+		//			method call returns. If bGetSkippedFiles == VARIANT_TRUE then bstrSkippedForUserName
+		//			will be used to determine which skipped files to process. If bstrSkippedForUserName
+		//			is NULL or "" then any skipped files for the specified action will be returned
+		//			(up to nMaxFiles), if bstrSkippedForUserName is not NULL or "" then will only
+		//			return files that have been skipped for the specified action by the specified
+		//			user (up to nMaxFiles).
 		[id(14), helpstring("method GetFilesToProcess")] HRESULT GetFilesToProcess([in] BSTR strAction, 
-			[in] long nMaxFiles, [out, retval] IIUnknownVector* *pvecFileRecords);
+			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
+			[in] BSTR bstrSkippedForUserName, [out, retval] IIUnknownVector* *pvecFileRecords);
 
 		// -----------------------------------------------------------------------------------------------
 		// Properties to set for opening the database
@@ -668,7 +675,14 @@ library UCLID_FILEPROCESSINGLib
 		// -----------------------------------------------------------------------------------------------
 		[id(49), helpstring("method ClearFileActionComment")] HRESULT ClearFileActionComment(
 			[in] long nFileID, [in] long nActionID);
+
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To set the specified file to skipped status for the specified action. If
+		//			vbUpdateSkippedFileTable == VARIANT_FALSE then the skipped file table will
+		//			not be updated for the particular record, otherwise the skipped file table
+		//			will be updated.
+		[id(50), helpstring("method SetFileStatusToSkipped")] HRESULT SetFileStatusToSkipped(
+			[in] long nFileID, [in] BSTR bstrAction, [in] VARIANT_BOOL vbUpdateSkippedFileTable);
 	};
 
 	[
@@ -848,6 +862,21 @@ library UCLID_FILEPROCESSINGLib
 		//			( see FileProcessingTasks ) fails.
 		[propget, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([out, retval] IObjectWithDescription* *pVal);
 		[propput, id(10), helpstring("property ErrorTask")] HRESULT ErrorTask([in] IObjectWithDescription * newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the processing management role to process files that are in skipped status
+		[propget, id(11), helpstring("property ProcessSkippedFiles")] HRESULT ProcessSkippedFiles(
+			[out, retval] VARIANT_BOOL* pbVal);
+		[propput, id(11), helpstring("property ProcessSkippedFiles")] HRESULT ProcessSkippedFiles(
+			[in] VARIANT_BOOL bNewVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To set the scope of the file processing when processing skipped files
+		//			(when ProcessSkippedFiles == VARIANT_TRUE). If VARIANT_TRUE	all skipped files
+		//			for the current action will be processed, if VARIANT_FALSE only files skipped
+		//			by the current user for the current action will be processed.
+		[propget, id(12), helpstring("property SkippedForAnyUser")] HRESULT SkippedForAnyUser(
+			[out, retval] VARIANT_BOOL* pbVal);
+		[propput, id(12), helpstring("property SkippedForAnyUser")] HRESULT SkippedForAnyUser(
+			[in] VARIANT_BOOL bNewVal);
 		//-----------------------------------------------------------------------------------------
 	};
 

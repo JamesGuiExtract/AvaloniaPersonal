@@ -158,6 +158,11 @@
 #define IDC_BUTTON_EXCEPTION_DETAILS    345
 #define IDC_BUTTON_QUEUE_EXCEPTION_DETAILS 346
 #define IDC_STATIC_STATS_THIS_RUN		347
+#define IDC_STATIC_FPSCOPE_GROUP		348
+#define IDC_RADIO_PROCESS_ALL_FILES_PRIORITY	349
+#define IDC_RADIO_PROCESS_SKIPPED_FILES	350
+#define IDC_COMBO_SKIPPED_SCOPE			351
+#define IDC_STATIC_SKIPPED				352
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
 // These ID's are defined int FAMUtils

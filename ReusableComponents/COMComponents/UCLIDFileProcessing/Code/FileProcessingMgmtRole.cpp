@@ -15,7 +15,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 3;
+const unsigned long gnCurrentVersion = 4;
 
 // Strings associated with logging errors to a text file
 const string gstrERROR_SUMMARY_HEADER = "****Error Summary****";
@@ -209,6 +209,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrAct
 			// clear all the records in the file processing record manager
 			// (i.e. clear the queue of files to process)
 			m_pRecordMgr->clear(true);
+
+			// Set whether processing skipped files or not
+			m_pRecordMgr->setProcessSkippedFiles(m_bProcessSkippedFiles);
+			m_pRecordMgr->setSkippedForCurrentUser(!m_bSkippedForAnyUser);
 
 			// Set the KeepProcssingAsAdded for the record manager
 			// but only if it is ok to stop when queue is empty
@@ -795,6 +799,80 @@ STDMETHODIMP CFileProcessingMgmtRole::put_ErrorTask(IObjectWithDescription *newV
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_ProcessSkippedFiles(VARIANT_BOOL *pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI26916", pbVal != NULL);
+
+		// Get the skipped files value
+		*pbVal = asVariantBool(m_bProcessSkippedFiles);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26917");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_ProcessSkippedFiles(VARIANT_BOOL bNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Update skipped files value
+		m_bProcessSkippedFiles = asCppBool(bNewVal);
+
+		// Set dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26918");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::get_SkippedForAnyUser(VARIANT_BOOL* pbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI26919", pbVal != NULL);
+
+		// Get the skipped user name
+		*pbVal = asVariantBool(m_bSkippedForAnyUser);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26920");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingMgmtRole::put_SkippedForAnyUser(VARIANT_BOOL bNewVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Update the skipped user name
+		m_bSkippedForAnyUser = asCppBool(bNewVal);
+
+		// Set dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26921");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -848,6 +926,8 @@ STDMETHODIMP CFileProcessingMgmtRole::IsDirty(void)
 //-------------------------------------------------------------------------------------------------
 // Version 3:
 //   Added persistence for error logging items and error handling items
+// Version 4:
+//	 Added persistence for skipped file processing
 STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -902,6 +982,16 @@ STDMETHODIMP CFileProcessingMgmtRole::Load(IStream *pStream)
 			{
 				dataReader >> m_strErrorLogFile;
 			}
+		}
+
+		// Skipped file processing data
+		if (nDataVersion > 3)
+		{
+			// Read in the process skipped files data
+			dataReader >> m_bProcessSkippedFiles;
+
+			// Read in skipped for any user value
+			dataReader >> m_bSkippedForAnyUser;
 		}
 
 		// Error handling task
@@ -965,6 +1055,10 @@ STDMETHODIMP CFileProcessingMgmtRole::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			dataWriter << m_strErrorLogFile;
 		}
+
+		// Write the processing scope (pending files or skipped files)
+		dataWriter << m_bProcessSkippedFiles;
+		dataWriter << m_bSkippedForAnyUser;
 
 		// Write these items to the byte stream
 		dataWriter.flushToByteStream();
@@ -1442,6 +1536,9 @@ void CFileProcessingMgmtRole::clear()
 	// Clear the checkbox for the Processing tabs and the dirty flag
 	m_bEnabled = false;
 	m_bDirty = false;
+
+	m_bProcessSkippedFiles = false;
+	m_bSkippedForAnyUser = false;
 }
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingMgmtRole::getFPMDB()

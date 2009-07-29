@@ -121,6 +121,14 @@ public:
 	// of files processed. if > 0 then only nNumberOfFiles will be returned from the
 	// pop method
 	void setNumberOfFilesToProcess(long nNumberOfFiles);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To set processing to process files in skipped status if bSkippedFiles == true
+	void setProcessSkippedFiles(bool bSkippedFiles = true);
+	//---------------------------------------------------------------------------------------------
+	// PROMISE: To set skipped file processing to only process files skipped by the
+	//			current user if bSkippedForCurrentUser == true, and process files skipped
+	//			by any user if bSkippedForCurrentUser == false
+	void setSkippedForCurrentUser(bool bSkippedForCurrentUser = true);
 
 private:
 
@@ -192,6 +200,11 @@ private:
 	// Value contains the number of files processed in the current run if m_nNumberOfFilesToProcess
 	// is > 0 otherwise this value is not updated.
 	long m_nNumberOfFilesProcessed;
+
+	// Values for determining if processing pending files or skipped files and if processing
+	// skipped files whether to process those skipped by all users or just current user
+	bool m_bProcessSkippedFiles;
+	bool m_bSkippedFilesForCurrentUser;
 
 	////////////////
 	// Methods

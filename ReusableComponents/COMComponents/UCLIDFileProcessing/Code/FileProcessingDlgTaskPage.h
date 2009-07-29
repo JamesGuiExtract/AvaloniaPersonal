@@ -67,6 +67,9 @@ public:
 	BOOL	m_bExecuteErrorTask;
 	CString	m_zErrorTaskDescription;
 	CButton	m_btnSelectErrorTask;
+	CButton m_radioProcessAll;
+	CButton m_radioProcessSkipped;
+	CComboBox m_comboSkipped;
 	//}}AFX_DATA
 
 // Overrides
@@ -110,6 +113,8 @@ protected:
 	afx_msg void OnCheckExecuteErrorTask();
 	afx_msg void OnBtnAddErrorTask();
 	afx_msg void OnStnDblClkEditExecuteTask();
+	afx_msg void OnBtnProcessAllOrSkipped();
+	afx_msg void OnComboSkippedChange();
 	//}}AFX_MSG
 	
 	DECLARE_MESSAGE_MAP()

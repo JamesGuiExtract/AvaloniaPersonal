@@ -20,7 +20,9 @@ FPRecordManager::FPRecordManager()
   m_strAction(""),
   m_nActionID(0),
   m_ipFPMDB(NULL),
-  m_bKeepProcessingAsAdded(true)
+  m_bKeepProcessingAsAdded(true),
+  m_bProcessSkippedFiles(false),
+  m_bSkippedFilesForCurrentUser(true)
 {
 	try
 	{
@@ -84,11 +86,21 @@ void FPRecordManager::discardProcessingQueue()
 	// For all of the remaining files re-mark them as pending in the database
 	CSingleLock lockGuard(&m_objLock, TRUE);
 
+	_bstr_t bstrAction = m_strAction.c_str();
+
 	// For all of the remaining files remark them as pending in the database
 	for each ( long l in m_queTaskIds)
 	{
-		// Return the state of the file to pending in the database
-		m_ipFPMDB->SetFileStatusToPending( l, m_strAction.c_str());
+		if (m_bProcessSkippedFiles)
+		{
+			// Return the state of the file to skipped in the database
+			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, VARIANT_FALSE);
+		}
+		else
+		{
+			// Return the state of the file to pending in the database
+			m_ipFPMDB->SetFileStatusToPending( l, bstrAction);
+		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -290,6 +302,16 @@ std::string FPRecordManager::statusAsString(const ERecordStatus& eStatus)
 
 	// Return empty string if not any of the above
 	return "Unknown";
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::setProcessSkippedFiles(bool bSkippedFiles)
+{
+	m_bProcessSkippedFiles = bSkippedFiles;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::setSkippedForCurrentUser(bool bSkippedForCurrentUser)
+{
+	m_bSkippedFilesForCurrentUser = bSkippedForCurrentUser;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -565,9 +587,14 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 {
 	ASSERT_ARGUMENT("ELI14004", m_ipFPMDB != NULL);
-	IIUnknownVectorPtr ipFileList;
+
 	// Get the list of file records
-	ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), nNumToLoad);
+	string strSkippedUser = 
+		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
+	IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), nNumToLoad,
+		asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+
+	// Attempt to create a task for each file record and add it to the queue
 	long nNumFiles = ipFileList->Size();
 	long nNumFilesAddedToQ = 0;
 	for ( long n = 0; n < nNumFiles; n++ )
@@ -579,7 +606,7 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 		FileProcessingRecord fpTask( ipRecord );
 		
 		// put the new task in the queue
-		// if the queue has been discarded, all remaining files in the list need to have ther
+		// if the queue has been discarded, all remaining files in the list need to have their
 		// status reset in the database
 		if (push(fpTask) == false)
 		{

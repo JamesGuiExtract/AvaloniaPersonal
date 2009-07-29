@@ -490,7 +490,7 @@ long executeCmdQuery(const _ConnectionPtr& ipDBConnection, const string& strSQLQ
 		if (!bDisplayExceptions)
 		{
 			// Rethrow the exception
-			throw;
+			throw ue;
 		}
 		// Display exception
 		ue.display();

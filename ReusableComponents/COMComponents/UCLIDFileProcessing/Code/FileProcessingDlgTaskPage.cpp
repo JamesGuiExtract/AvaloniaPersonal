@@ -37,6 +37,9 @@ DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 // Width of Run column
 const long	glENABLED_WIDTH = 50;
 
+// Index of "Anyone" from the skipped file scope combo box
+const int giCOMBO_INDEX_ANYONE = 1;
+
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgTaskPage property page
 //-------------------------------------------------------------------------------------------------
@@ -114,6 +117,9 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_EXECUTE_TASK, m_bExecuteErrorTask);
 	DDX_Text(pDX, IDC_EDIT_EXECUTE_TASK, m_zErrorTaskDescription);
 	DDX_Control(pDX, IDC_BTN_SELECT_ERROR_TASK, m_btnSelectErrorTask);
+	DDX_Control(pDX, IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, m_radioProcessAll);
+	DDX_Control(pDX, IDC_RADIO_PROCESS_SKIPPED_FILES, m_radioProcessSkipped);
+	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
 	//}}AFX_DATA_MAP 
 }
 //-------------------------------------------------------------------------------------------------
@@ -137,7 +143,6 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_BROWSE_LOG, OnBtnBrowseErrorLog)
 	ON_BN_CLICKED(IDC_CHECK_EXECUTE_TASK, OnCheckExecuteErrorTask)
 	ON_BN_CLICKED(IDC_BTN_SELECT_ERROR_TASK, OnBtnAddErrorTask)
-	//}}AFX_MSG_MAP
 	ON_NOTIFY(UDN_DELTAPOS, IDC_SPIN_THREADS, &FileProcessingDlgTaskPage::OnDeltaposSpinThreads)
 	ON_NOTIFY(NM_DBLCLK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMDblclkListFp)
 	ON_NOTIFY(NM_RCLICK, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnNMRclickListFp)
@@ -148,6 +153,10 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgTaskPage, CPropertyPage)
 	ON_NOTIFY(LVN_ITEMCHANGED, IDC_LIST_FP, &FileProcessingDlgTaskPage::OnLvnItemchangedListFp)
 	ON_EN_CHANGE(IDC_EDIT_THREADS, &FileProcessingDlgTaskPage::OnEnChangeEditThreads)
 	ON_STN_DBLCLK(IDC_EDIT_EXECUTE_TASK, &FileProcessingDlgTaskPage::OnStnDblClkEditExecuteTask)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
+	ON_BN_CLICKED(IDC_RADIO_PROCESS_SKIPPED_FILES, &FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped)
+	ON_CBN_SELCHANGE(IDC_COMBO_SKIPPED_SCOPE, &FileProcessingDlgTaskPage::OnComboSkippedChange)
+	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -198,6 +207,11 @@ BOOL FileProcessingDlgTaskPage::OnInitDialog()
 		// Load icon for Doc Tag selection
 		m_btnErrorSelectTag.SetIcon( ::LoadIcon( _Module.m_hInstResource, 
 			MAKEINTRESOURCE( IDI_ICON_SELECT_DOC_TAG ) ) );
+
+		// Set the item list for the skipped combo box
+		m_comboSkipped.AddString("I");
+		m_comboSkipped.AddString("Anyone");
+		m_comboSkipped.SetCurSel(0);
 
 		// Set radio buttons and update button states
 		refresh();
@@ -664,6 +678,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		CRect rectAddButton, rectUpButton, rectDeleteButton, rectModifyButton;
 		CRect rectErrorGrp, rectCheckLogError, rectEditErrorLog, rectCheckExecuteTask, rectEditExecuteTask, 
 			rectDocTag, rectBrowse, rectSelect;
+		CRect rectProcessScopeGrp, rectProcessAll, rectProcessSkipped, rectComboSkippedScope, rectSkippedText;
 		CRect rectContinuousGrp, rectKeepProc, rectStopProc;
 		CRect rectThreadGrp, rectMaxThreadOption, rectThreadOption, rectEditThreads, rectThreadTxt, rectSpinBtn;
 
@@ -698,6 +713,18 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		ScreenToClient(&rectEditExecuteTask);
 		getDlgItemWindowRect(IDC_BTN_SELECT_ERROR_TASK, rectSelect);
 		ScreenToClient(&rectSelect);
+
+		// Get positions of the Process Scope group items
+		getDlgItemWindowRect(IDC_STATIC_FPSCOPE_GROUP, rectProcessScopeGrp);
+		ScreenToClient(&rectProcessScopeGrp);
+		getDlgItemWindowRect(IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, rectProcessAll);
+		ScreenToClient(&rectProcessAll);
+		getDlgItemWindowRect(IDC_RADIO_PROCESS_SKIPPED_FILES, rectProcessSkipped);
+		ScreenToClient(&rectProcessSkipped);
+		getDlgItemWindowRect(IDC_COMBO_SKIPPED_SCOPE, rectComboSkippedScope);
+		ScreenToClient(&rectComboSkippedScope);
+		getDlgItemWindowRect(IDC_STATIC_SKIPPED, rectSkippedText);
+		ScreenToClient(&rectSkippedText);
 
 		// Get positions of Continuous Processing group items
 		getDlgItemWindowRect(IDC_STATIC_CONTINUOUS_GROUP, rectContinuousGrp);
@@ -740,7 +767,7 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 			nLen4 = rectErrorGrp.top - rectList.bottom;
 
 			// distance between group box and first contained control
-			nLen5 = rectKeepProc.top - rectContinuousGrp.top;
+			nLen5 = rectProcessAll.top - rectProcessScopeGrp.top;
 
 			nAddButtonWidth = rectAddButton.Width();
 			nUpWidth = rectUpButton.Width();
@@ -770,45 +797,80 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectUpButton.right = rectDownButton.left - nLen2;
 		rectUpButton.left = rectUpButton.right - nUpWidth;
 
-		// Resize Threads group items
-		int nGroupHeight = rectThreadGrp.Height();
-		rectThreadGrp.bottom = rectDlg.bottom - nLen4;
-		rectThreadGrp.top = rectThreadGrp.bottom - nGroupHeight;
-		rectThreadGrp.right = rectList.right;
+		// Resize Continuous Processing group items
+		int nWidth = rectThreadGrp.Width();
+		int nGroupHeight = rectContinuousGrp.Height();
+		rectContinuousGrp.bottom = rectDlg.bottom - nLen4;
+		rectContinuousGrp.top = rectContinuousGrp.bottom - nGroupHeight;
+		rectContinuousGrp.right = rectList.right - (nWidth + nLen4);
 
-		int nHeight = rectMaxThreadOption.Height();
-		int nSpace = rectThreadOption.top - rectMaxThreadOption.bottom;
+		int nHeight = rectKeepProc.Height();
+		int nSpace = rectStopProc.top - rectKeepProc.bottom;
+		rectKeepProc.top = rectContinuousGrp.top + nLen5;
+		rectKeepProc.bottom = rectKeepProc.top + nHeight;
+		rectStopProc.top = rectKeepProc.bottom + nSpace;
+		rectStopProc.bottom = rectStopProc.top + nHeight;
+
+		// Resize Threads group items
+		int nShiftRight = rectList.right - rectThreadGrp.right;
+		nGroupHeight = rectThreadGrp.Height();
+		rectThreadGrp.bottom = rectContinuousGrp.bottom;
+		rectThreadGrp.top = rectContinuousGrp.top;
+		rectThreadGrp.right = rectList.right;
+		rectThreadGrp.left = rectThreadGrp.right - nWidth;
+
+		nHeight = rectMaxThreadOption.Height();
+		nSpace = rectThreadOption.top - rectMaxThreadOption.bottom;
+		rectMaxThreadOption.OffsetRect(nShiftRight, 0);
 		rectMaxThreadOption.top = rectThreadGrp.top + nLen5;
 		rectMaxThreadOption.bottom = rectMaxThreadOption.top + nHeight;
 
 		nHeight = rectThreadOption.Height();
 		rectThreadOption.top = rectMaxThreadOption.bottom + nSpace;
 		rectThreadOption.bottom = rectThreadOption.top + nHeight;
+		rectThreadOption.OffsetRect(nShiftRight, 0);
 		nHeight = rectThreadTxt.Height();
 		rectThreadTxt.top = rectThreadOption.top;
 		rectThreadTxt.bottom = rectThreadOption.top + nHeight;
+		rectThreadTxt.OffsetRect(nShiftRight, 0);
 
 		nHeight = rectEditThreads.Height();
 		rectEditThreads.top = rectThreadTxt.top + rectThreadTxt.Height()/2 - nHeight/2;
 		rectEditThreads.bottom = rectEditThreads.top + nHeight;
+		rectEditThreads.OffsetRect(nShiftRight, 0);
 		nSpace = rectSpinBtn.Width();
 		rectSpinBtn.left = rectEditThreads.right;
 		rectSpinBtn.right = rectSpinBtn.left + nSpace;
 		rectSpinBtn.top = rectEditThreads.top;
 		rectSpinBtn.bottom = rectEditThreads.bottom;
 
-		// Resize Continuous Processing group items
-		nGroupHeight = rectContinuousGrp.Height();
-		rectContinuousGrp.bottom = rectThreadGrp.top - nLen4;
-		rectContinuousGrp.top = rectContinuousGrp.bottom - nGroupHeight;
-		rectContinuousGrp.right =  rectList.right;
+		// Resize processing scope group items
+		nGroupHeight = rectProcessScopeGrp.Height();
+		rectProcessScopeGrp.bottom = rectThreadGrp.top - nLen4;
+		rectProcessScopeGrp.top = rectProcessScopeGrp.bottom - nGroupHeight;
+		rectProcessScopeGrp.right = rectList.right;
 
-		nHeight = rectKeepProc.Height();
-		nSpace = rectStopProc.top - rectKeepProc.bottom;
-		rectKeepProc.top = rectContinuousGrp.top + nLen5;
-		rectKeepProc.bottom = rectKeepProc.top + nHeight;
-		rectStopProc.top = rectKeepProc.bottom + nSpace;
-		rectStopProc.bottom = rectStopProc.top + nHeight;
+		nHeight = rectProcessAll.Height();
+		nSpace = rectProcessSkipped.top - rectProcessAll.bottom;
+		rectProcessAll.top = rectProcessScopeGrp.top + nLen5;
+		rectProcessAll.bottom = rectProcessAll.top + nHeight;
+		rectProcessSkipped.top = rectProcessAll.bottom + nSpace;
+		rectProcessSkipped.bottom = rectProcessSkipped.top + nHeight;
+		rectSkippedText.top = rectProcessSkipped.top;
+		rectSkippedText.bottom = rectSkippedText.top + nHeight;
+		
+		// Move the combo box
+		nHeight = rectComboSkippedScope.Height();
+		nWidth = rectComboSkippedScope.Width();
+		rectComboSkippedScope.top = rectProcessSkipped.top + rectProcessSkipped.Height()/2 - nHeight/2;
+		rectComboSkippedScope.bottom = rectComboSkippedScope.top + nHeight;
+		rectComboSkippedScope.left = rectProcessSkipped.right + nSpace;
+		rectComboSkippedScope.right = rectComboSkippedScope.left + nWidth;
+
+		// Move the skipped text now that the combo box has been moved
+		nWidth = rectSkippedText.Width();
+		rectSkippedText.left = rectComboSkippedScope.right + nSpace;
+		rectSkippedText.right = rectSkippedText.left + nWidth;
  
 		// Resize Error group items
 		// Width of the line used for the group box
@@ -818,11 +880,10 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		nSpace = rectEditErrorLog.top - rectErrorGrp.top;
 		int nSpace2 = rectCheckExecuteTask.top - rectErrorGrp.top;
 		int nSpace3 = rectSelect.top - rectErrorGrp.top;
-		rectErrorGrp.bottom = rectContinuousGrp.top - nLen4;
+		rectErrorGrp.bottom = rectProcessScopeGrp.top - nLen4;
 		rectErrorGrp.top = rectErrorGrp.bottom - nGroupHeight;
 		rectErrorGrp.right =  rectList.right;
 
-		int nWidth;
 		nHeight = rectCheckLogError.Height();
 		rectCheckLogError.top = rectErrorGrp.top + nLen5;
 		rectCheckLogError.bottom = rectCheckLogError.top + nHeight;
@@ -865,35 +926,42 @@ void FileProcessingDlgTaskPage::OnSize(UINT nType, int cx, int cy)
 		rectList.bottom = rectErrorGrp.top - nLen4;
 
 		// Move list and buttons
-		GetDlgItem(IDC_LIST_FP)->MoveWindow(&rectList);
-		GetDlgItem(IDC_BTN_ADD)->MoveWindow(&rectAddButton);
-		GetDlgItem(IDC_BTN_REMOVE)->MoveWindow(&rectDeleteButton);
-		GetDlgItem(IDC_BTN_MODIFY)->MoveWindow(&rectModifyButton);
-		GetDlgItem(IDC_BTN_DOWN)->MoveWindow(&rectDownButton);
-		GetDlgItem(IDC_BTN_UP)->MoveWindow(&rectUpButton);
+		m_fileProcessorList.MoveWindow(&rectList);
+		m_btnAdd.MoveWindow(&rectAddButton);
+		m_btnRemove.MoveWindow(&rectDeleteButton);
+		m_btnModify.MoveWindow(&rectModifyButton);
+		m_btnDown.MoveWindow(&rectDownButton);
+		m_btnUp.MoveWindow(&rectUpButton);
 
 		// Move Error group items
 		GetDlgItem(IDC_STATIC_ERROR_GROUP)->MoveWindow(&rectErrorGrp);
-		GetDlgItem(IDC_CHECK_LOG_ERROR_DETAILS)->MoveWindow(&rectCheckLogError);
-		GetDlgItem(IDC_EDIT_ERROR_LOG)->MoveWindow(&rectEditErrorLog);
-		GetDlgItem(IDC_BTN_SELECT_DOC_TAG)->MoveWindow(&rectDocTag);
-		GetDlgItem(IDC_BTN_BROWSE_LOG)->MoveWindow(&rectBrowse);
-		GetDlgItem(IDC_CHECK_EXECUTE_TASK)->MoveWindow(&rectCheckExecuteTask);
+		m_btnLogErrorDetails.MoveWindow(&rectCheckLogError);
+		m_editErrorLog.MoveWindow(&rectEditErrorLog);
+		m_btnErrorSelectTag.MoveWindow(&rectDocTag);
+		m_btnBrowseErrorLog.MoveWindow(&rectBrowse);
+		m_btnExecuteErrorTask.MoveWindow(&rectCheckExecuteTask);
+		m_btnSelectErrorTask.MoveWindow(&rectSelect);
 		GetDlgItem(IDC_EDIT_EXECUTE_TASK)->MoveWindow(&rectEditExecuteTask);
-		GetDlgItem(IDC_BTN_SELECT_ERROR_TASK)->MoveWindow(&rectSelect);
+
+		// Move processing scope group items
+		GetDlgItem(IDC_STATIC_FPSCOPE_GROUP)->MoveWindow(&rectProcessScopeGrp);
+		m_radioProcessAll.MoveWindow(&rectProcessAll);
+		m_radioProcessSkipped.MoveWindow(&rectProcessSkipped);
+		m_comboSkipped.MoveWindow(&rectComboSkippedScope);
+		GetDlgItem(IDC_STATIC_SKIPPED)->MoveWindow(&rectSkippedText);
 
 		// Move Continuous Processing group items
 		GetDlgItem(IDC_STATIC_CONTINUOUS_GROUP)->MoveWindow(&rectContinuousGrp);
-		GetDlgItem(IDC_RADIO_KEEP_PROCESSING_FILES)->MoveWindow(&rectKeepProc);
-		GetDlgItem(IDC_RADIO_STOP_PROCESSING_FILES)->MoveWindow(&rectStopProc);
+		m_btnKeepProcessingWithEmptyQueue.MoveWindow(&rectKeepProc);
+		m_btnStopProcessingWithEmptyQueue.MoveWindow(&rectStopProc);
 
 		// Move Thread group items
 		GetDlgItem(IDC_STATIC_THREAD_GROUP)->MoveWindow(&rectThreadGrp);
-		GetDlgItem(IDC_RADIO_MAX_THREADS)->MoveWindow(&rectMaxThreadOption);
-		GetDlgItem(IDC_RADIO_THREADS)->MoveWindow(&rectThreadOption);
-		GetDlgItem(IDC_EDIT_THREADS)->MoveWindow(&rectEditThreads);
+		m_btnMaxThreads.MoveWindow(&rectMaxThreadOption);
+		m_btnNumThreads.MoveWindow(&rectThreadOption);
+		m_editThreads.MoveWindow(&rectEditThreads);
 		GetDlgItem(IDC_STATIC_THREADS)->MoveWindow(&rectThreadTxt);
-		GetDlgItem(IDC_SPIN_THREADS)->MoveWindow(&rectSpinBtn);
+		m_SpinThreads.MoveWindow(&rectSpinBtn);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13509")
 }
@@ -1428,6 +1496,42 @@ void FileProcessingDlgTaskPage::OnEnChangeEditThreads()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15356");
 }
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnBtnProcessAllOrSkipped()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		if (m_radioProcessAll.GetCheck() == BST_CHECKED)
+		{
+			getFPMgmtRole()->ProcessSkippedFiles = VARIANT_FALSE;
+		}
+		else
+		{
+			// Set the mgmt role
+			UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
+			ipMgmtRole->ProcessSkippedFiles = VARIANT_TRUE;
+			ipMgmtRole->SkippedForAnyUser =
+				asVariantBool(m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE);
+		}
+
+		setButtonStates();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26922");
+}
+//-------------------------------------------------------------------------------------------------
+void FileProcessingDlgTaskPage::OnComboSkippedChange()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		getFPMgmtRole()->SkippedForAnyUser =
+			asVariantBool(m_comboSkipped.GetCurSel() == giCOMBO_INDEX_ANYONE);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26923");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Public methods
@@ -1438,16 +1542,19 @@ void FileProcessingDlgTaskPage::refresh()
 	m_fileProcessorList.DeleteAllItems();
 
 	// Add each File Processor to the list
-	long nSize = getFileProcessorsData()->Size();
+	IIUnknownVectorPtr ipFPData = getFileProcessorsData();
+	long nSize = ipFPData->Size();
 	int i;
 	for (i = 0; i < nSize; i++)
 	{
 		// Add each File Processor to the list
-		addFileProcessor( getFileProcessorsData()->At(i) );
+		addFileProcessor( ipFPData->At(i) );
 	}
 
+	UCLID_FILEPROCESSINGLib::IFileProcessingMgmtRolePtr ipMgmtRole = getFPMgmtRole();
+
 	// Retrieve number of desired threads
-	long lCount = getFPMgmtRole()->NumThreads;
+	long lCount = ipMgmtRole->NumThreads;
 
 	// Handle max count case
 	if (lCount == 0)
@@ -1474,7 +1581,7 @@ void FileProcessingDlgTaskPage::refresh()
 	}
 
 	// Get the CompleteOnNoRcdFromDB flag
-	bool bCompleteOnNoRcdFromDB = getFPMgmtRole()->KeepProcessingAsAdded == VARIANT_FALSE;
+	bool bCompleteOnNoRcdFromDB = ipMgmtRole->KeepProcessingAsAdded == VARIANT_FALSE;
 	if (bCompleteOnNoRcdFromDB)
 	{
 		// Select the Stop Processing button
@@ -1489,15 +1596,21 @@ void FileProcessingDlgTaskPage::refresh()
 	}
 
 	// Update error log items
-	m_bLogErrorDetails = asMFCBool( getFPMgmtRole()->LogErrorDetails );
-	m_zErrorLog = asString( getFPMgmtRole()->ErrorLogName ).c_str();
+	m_bLogErrorDetails = asMFCBool( ipMgmtRole->LogErrorDetails );
+	m_zErrorLog = asString( ipMgmtRole->ErrorLogName ).c_str();
 
 	// Update error task items
-	m_bExecuteErrorTask = asMFCBool( getFPMgmtRole()->ExecuteErrorTask );
+	m_bExecuteErrorTask = asMFCBool( ipMgmtRole->ExecuteErrorTask );
 
-	IObjectWithDescriptionPtr ipTask = getFPMgmtRole()->ErrorTask;
+	IObjectWithDescriptionPtr ipTask = ipMgmtRole->ErrorTask;
 	ASSERT_RESOURCE_ALLOCATION("ELI16093", ipTask != NULL);
 	m_zErrorTaskDescription = asString( ipTask->Description ).c_str();
+
+	// Get the processing scope and update radio buttons
+	bool bProcessSkipped = asCppBool(ipMgmtRole->ProcessSkippedFiles);
+	m_radioProcessAll.SetCheck(asBSTChecked(!bProcessSkipped));
+	m_radioProcessSkipped.SetCheck(asBSTChecked(bProcessSkipped));
+	m_comboSkipped.SetCurSel(ipMgmtRole->SkippedForAnyUser == VARIANT_FALSE ? 0 : 1);
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgTaskPage::setFPMgr(UCLID_FILEPROCESSINGLib::IFileProcessingManager* pFPMgr)
@@ -1823,12 +1936,15 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	GetDlgItem(IDC_STATIC_THREADS)->EnableWindow( TRUE );
 
 	// Enable / disable controls for logging error details
-	GetDlgItem(IDC_EDIT_ERROR_LOG)->EnableWindow( m_bLogErrorDetails );
-	GetDlgItem(IDC_BTN_SELECT_DOC_TAG)->EnableWindow( m_bLogErrorDetails );
-	GetDlgItem(IDC_BTN_BROWSE_LOG)->EnableWindow( m_bLogErrorDetails );
+	m_editErrorLog.EnableWindow(m_bLogErrorDetails);
+	m_btnLogErrorDetails.EnableWindow(m_bLogErrorDetails);
+	m_btnBrowseErrorLog.EnableWindow(m_bLogErrorDetails);
 
 	// Can always check/uncheck error task
 	m_btnExecuteErrorTask.EnableWindow(TRUE);
+
+	// Enable the combo box for skipped files if process skipped files is checked
+	m_comboSkipped.EnableWindow(asMFCBool(m_radioProcessSkipped.GetCheck() == BST_CHECKED));
 
 	// Enable / disable error task controls
 	GetDlgItem(IDC_EDIT_EXECUTE_TASK)->EnableWindow(m_bExecuteErrorTask);

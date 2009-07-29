@@ -80,12 +80,14 @@ public:
 	STDMETHOD(NotifyFileFailed)( long nFileID,  BSTR strAction,  BSTR strException);
 	STDMETHOD(SetFileStatusToPending)( long nFileID,  BSTR strAction);
 	STDMETHOD(SetFileStatusToUnattempted)( long nFileID,  BSTR strAction);
+	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, VARIANT_BOOL vbUpdateSkippedFileTable);
 	STDMETHOD(GetFileStatus)( long nFileID,  BSTR strAction,  EActionStatus * pStatus);
 	STDMETHOD(SearchAndModifyFileStatus)( long nFromActionID,  EActionStatus eFromStatus,  
 		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long * pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)( BSTR strAction,  EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)( long nID,  BSTR strAction,  EActionStatus eStatus,  EActionStatus * poldStatus);
-	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles,  IIUnknownVector * * pvecFileRecords);
+	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
+		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
 	STDMETHOD(GetStats)(/*[in]*/ long nActionID, /*[out, retval]*/ IActionStatistics* *pStats);
 	STDMETHOD(Clear)();
 	STDMETHOD(CopyActionStatusFromAction)( /*[in]*/ long  nFromAction, /*[in]*/ long nToAction );
@@ -278,7 +280,7 @@ private:
 	//			a transaction)
 	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1, bool bLockDB = true);
+		long nActionID = -1, bool bLockDB = true, bool bUpdateSkippedTable = true);
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
