@@ -494,7 +494,7 @@
 <p>
 		<li><b>[LegacyRC #4745]</b> Confirm that the image files in the following 
 		folder convert to searchable PDF without error.  
-		I:\Common\Testing\PVCS_Testing\P13\4745
+		I:\Common\Testing\PVCS_Testing\LegacyRC\4745
    	</ul> 
 <p>
 	<li><b>Copy, Move or Delete File</b></li>
@@ -738,13 +738,13 @@
 <p>
 		<li><b>[LegacyRC #4335]</b> Confirm that a warning message is displayed when opening 
 		an FPS file with a version 5.0 <b>OCR document</b> task.  A suitable FPS file can 
-		be found in the following folder.  I:\Common\Testing\PVCS_Testing\P13\4335.
+		be found in the following folder.  I:\Common\Testing\PVCS_Testing\LegacyRC\4335.
 		K:\Common\Engineering\Sample Files\ACS\MI - Macomb\Set006\Images\A\B00133AAO7R.TIF
 		<li><b>[LegacyRC #3659]</b> Confirm that the image files in the following 
 		folder OCR without error.  
-		I:\Common\Testing\PVCS_Testing\P13\3659
+		I:\Common\Testing\PVCS_Testing\LegacyRC\3659
 		<li><b>[LegacyRC #4399]</b> Create an FPS file to supply and process a file for OCR.
-		Use the file in I:\Common\Testing\PVCS_Testing\P13\4399.  Confirm that the file 
+		Use the file in I:\Common\Testing\PVCS_Testing\LegacyRC\4399.  Confirm that the file 
 		successfully OCRs.
 <p>
 		<li><b>[LegacyRC #4368, #4369]</b> Create an FPS file to supply and process some files for OCR.
@@ -760,22 +760,49 @@
 			<b>Processing Log</b> tab.
 		</ul>
 		<li><b>[LegacyRC #4398]</b> Create an FPS file to supply and process a file for OCR.
-		Use the file in I:\Common\Testing\PVCS_Testing\P13\4398.  Confirm that the file 
+		Use the file in I:\Common\Testing\PVCS_Testing\LegacyRC\4398.  Confirm that the file 
 		fails to OCR and is moved to the <b>Failed</b> grid on the Processing Log tab.
 		Note that this task takes a long time.
 		<li><b>[LegacyRC #4845]</b> Confirm that the image files in the following 
-		folder OCR without error.  I:\Common\Testing\PVCS_Testing\P13\4845
+		folder OCR without error.  I:\Common\Testing\PVCS_Testing\LegacyRC\4845
 		<li><b>[LegacyRC #4832]</b> Process the files in the list file attached to the SCR.  
 		Confirm that the files OCR without error.
 		<li><b>[LegacyRC #4830]</b> Confirm that the image files in the following 
-		folder provide meaningful OCR output.  I:\Common\Testing\PVCS_Testing\P13\4830
+		folder provide meaningful OCR output.  I:\Common\Testing\PVCS_Testing\LegacyRC\4830
 		<li><b>[FlexIDSCore #3242]</b> FAM crashes when uss files are queued and OCRed
 		<ul>
 			<li>Create an FPS file to supply and process <b>USS</b> files for OCR.
 			<li>Confirm that a useful error message is presented and that the FAM does not crash.
 			<li>Repeat the exercise as the SCR reports that the crash does not occur every time.
 		</ul>
-</ul> 
+<p>
+		<li><b>[LegacyRC #5370]</b> Skipping pages that fail OCR
+		<ul>
+			<li>Make a local copy of the <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> 
+			image files.
+			<li>Add the following registry keys under 
+			<b>HKCU\Software\Extract Systems\ReusableComponents\OCREngine\SSOCR</b>.
+	       		<ul>
+				<li><b>SkipPageOnFailure</b> set to <b>0</b>.
+				<li><b>MaxOcrPageFailurePercentage</b> set to <b>25</b>.
+				<li><b>MaxOcrPageFailureNumber</b> set to <b>10</b>.
+	       		</ul>
+			<li>OCR the images and confirm that each image file fails.
+			<li>Confirm that an exception is logged for each failure with debug 
+			data that includes the page number of the failed page.
+			<li>Set the <b>SkipPageOnFailure</b> registry entry to <b>1</b>.
+			<li>Re-OCR each of the image files.
+	       		<ul>
+				<li><b>OneBadPageInThree.tif</b> still fails to OCR.
+				<li><b>OneBadPageInFive.tif</b> now passes OCR.
+				<li><b>ThreeBadPagesInTwenty.tif</b> now passes OCR.
+				<li><b>TwelveBadPagesInFifty.tif</b> still fails to OCR.
+				<li>Confirm that an <b>Application Trace:</b> exception is logged 
+				for each passed image with debug data that includes the page 
+				number(s) of the failed page(s).
+	       		</ul>
+		</ul>
+</ul>
 <p>
 	<li><b>Set File Action Status In Database</b></li>
    	<ul> 
