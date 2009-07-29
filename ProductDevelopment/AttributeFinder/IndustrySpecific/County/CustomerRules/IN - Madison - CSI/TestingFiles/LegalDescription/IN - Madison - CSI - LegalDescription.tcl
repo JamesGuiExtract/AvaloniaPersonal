@@ -1,3 +1,13 @@
+//top 80%
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Assignment_of_Mortgage.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Mortgage_Deed_of_Trust.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Quit_Claim_Deed.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Sewer_Lien.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Satisfaction_of_Mortgage.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Sewer_Lien.dat
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Warranty_Deed.dat
+//bottom 20%
+/*
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_Misc.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_Misc.Affidavit_Heirship.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_of_Death.dat
@@ -19,12 +29,11 @@ UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Quit_Claim_Deed.d
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Assignment_of_Rents.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Federal_Tax_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Mechanics_Lien.dat
-UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Release_of_Sewer_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Satisfaction_of_Judgment.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Satisfaction_of_Mortgage.dat
-UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Sewer_Lien.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Sheriffs_Deed.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Subordination_Agreement.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Substitution_of_Trustee.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Unclassified.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Warranty_Deed.dat
+*/
