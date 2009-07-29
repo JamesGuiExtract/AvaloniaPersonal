@@ -14,7 +14,6 @@
 
 <h2>NOTE: Additional test cases can be found in the IcoMapESRI/Testing/ITC folder.</h2>
 
-<h2>NOTE: Items prefaced with an asterisk indicate functionality that is not yet complete.</h2>
 <hr>
 
 <ol>
@@ -233,7 +232,7 @@
 		    properly aligned with the text.</li> 
 	</ul>
 <p>
-   	<li><b>*[FlexIDSCore #2994]</b> Right-to-left highlighting
+   	<li><b>[FlexIDSCore #2994]</b> Right-to-left highlighting
 	<ul>
 		<li>Open an image file with the Image Viewer.
 		<li>Use the rectangular highlight tool to highlight some text swiping from 
@@ -308,7 +307,7 @@
 		image downward.</li> 
 	</ul>
 <p>
-	<li><b>*[LegacyRC #5032]</b> Ignore shortcut keys during click + drag</li>   
+	<li><b>[LegacyRC #5032]</b> Ignore shortcut keys during click + drag</li>   
 	<ul>
 		<li>Open a multi-page image.</li> 
 		<li>Select one of the highlight tools.</li> 
@@ -353,7 +352,7 @@ County\Set002\probate\Backfile\RandomSubset\EST330933-1124763-20010222-I0018152.
 	</ul>
 	<li><b>[LegacyRCAndUtils #5102]</b> Unable to open PDF - Unable to initialize PDF engine</li>
 	<ul>
-		<li>Modify the <b>GS_LIB</b>.</li>
+		<li>Use <b>regedit</b> to modify the <b>GS_LIB</b> registry key, which is located under <i>HKEY_CURRENT_USER\SOFTWARE\LEAD Technologies, Inc.\Pdf</i>, to point to different folder.</li>
 		<li>Confirm that the <b>Image Viewer</b> can still open PDF images.</li>
 		<li>Restore the original setting for the <b>GS_LIB</b> environment variable.</li>
 	</ul>
