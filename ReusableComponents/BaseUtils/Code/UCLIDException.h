@@ -232,6 +232,11 @@ public:
 	//			will be added as debug information to this exception, with the "LastCodePos"
 	//			keyname.
 	void addDebugInfo(const LastCodePosition& lastCodePos);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To associate an additional exception as debug information.
+	// PARAMS:  strKeyName: A unique name (within all debug keys associated with this exception object)
+	//          ue: The UCLIDException to add.
+	void addDebugInfo(const string& strKeyName, const UCLIDException& ue);
 	//----------------------------------------------------------------------------------------------		
 	// PURPOSE: To associate an additional resolution to help fix the problem that caused this 
 	//			exception to be raised.

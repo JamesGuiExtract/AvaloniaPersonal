@@ -527,6 +527,39 @@ void UCLIDException::addDebugInfo(const LastCodePosition& lastCodePos)
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI20294");
 }
 //-------------------------------------------------------------------------------------------------
+void UCLIDException::addDebugInfo(const string& strKeyName, const UCLIDException& ue)
+{
+	try
+	{
+		try
+		{
+			// Add as debug info all history entries from ue
+			for (const UCLIDException *pException = &ue; pException != NULL; 
+				pException = pException->getInnerException())
+			{
+				string strException = pException->getTopELI() + " " + pException->getTopText();
+				addDebugInfo(strKeyName, strException);
+
+				// Copy all the debug info from pException into this exception
+				vector<NamedValueTypePair> vecDebugInfo = pException->getDebugVector();
+				for each (NamedValueTypePair debugEntry in vecDebugInfo)
+				{
+					addDebugInfo(debugEntry.GetName(), debugEntry.GetPair());
+				}
+			}
+		}
+		catch (...)
+		{
+			// Log the exception that was added
+			UCLIDException ex("ELI26944", "Unable to add exception as debug info.", ue);
+			ex.log();
+
+			throw;
+		}
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI26942");
+}
+//-------------------------------------------------------------------------------------------------
 const vector<NamedValueTypePair>& UCLIDException::getDebugVector() const
 {
 	// Return a reference to the Debug info vector

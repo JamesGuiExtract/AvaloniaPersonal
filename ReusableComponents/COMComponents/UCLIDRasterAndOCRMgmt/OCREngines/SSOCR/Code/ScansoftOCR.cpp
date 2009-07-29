@@ -760,19 +760,7 @@ ISpatialStringPtr CScansoftOCR::recognizeText(BSTR strImageFileName, IVariantVec
 			}
 
 			// Add as debug info all history entries from ue
-			for (const UCLIDException *pException = &ue; pException != NULL; 
-				pException = pException->getInnerException())
-			{
-				string strException = pException->getTopELI() + " " + pException->getTopText();
-				apAggregateException->addDebugInfo("Exception History", strException);
-
-				// Copy all the debuy info from ue into the outer aggregate exception.
-				vector<NamedValueTypePair> vecDebugInfo = pException->getDebugVector();
-				for each (NamedValueTypePair debugEntry in vecDebugInfo)
-				{
-					apAggregateException->addDebugInfo(debugEntry.GetName(), debugEntry.GetPair());
-				}
-			}
+			apAggregateException->addDebugInfo("Exception History", ue);
 
 			// kill the OCR engine before retrying
 			killOCREngine();
