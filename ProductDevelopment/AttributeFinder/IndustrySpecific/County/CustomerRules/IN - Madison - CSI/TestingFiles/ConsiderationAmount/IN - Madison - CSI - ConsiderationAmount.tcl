@@ -1,3 +1,7 @@
+//top 80
+UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - ConsiderationAmount.dat
+
+/*
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_Misc.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_Misc.Affidavit_Heirship.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Affidavit_of_Death.dat
@@ -28,3 +32,4 @@ UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Subordination_Agr
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Substitution_of_Trustee.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Unclassified.dat
 UCLIDAFCoreTest.AutomatedRuleSetTester.1;;IN - Madison - CSI - Warranty_Deed.dat
+*/
