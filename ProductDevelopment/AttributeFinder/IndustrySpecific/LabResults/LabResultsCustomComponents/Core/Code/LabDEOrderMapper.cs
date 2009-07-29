@@ -201,7 +201,7 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26887",
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26887",
                     _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 return _databaseFile;
@@ -209,7 +209,7 @@ namespace Extract.LabResultsCustomComponents
             set
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26895",
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26895",
                     _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 _databaseFile = value;
@@ -234,7 +234,7 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects, "ELI26889",
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26889",
                     _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 // Expand the tags in the database file name
@@ -525,7 +525,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeCoreObjects,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects,
                     "ELI26902", _DEFAULT_OUTPUT_HANDLER_NAME);
 
                 // Display the configuration form
@@ -588,7 +588,7 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                return LicenseUtilities.IsLicensed(LicenseIdName.LabdeCoreObjects);
+                return LicenseUtilities.IsLicensed(LicenseIdName.LabDECoreObjects);
             }
             catch (Exception ex)
             {

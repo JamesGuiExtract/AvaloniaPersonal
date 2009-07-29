@@ -173,7 +173,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI23668", _OBJECT_NAME);
 
                 // Initialize the configuration settings.

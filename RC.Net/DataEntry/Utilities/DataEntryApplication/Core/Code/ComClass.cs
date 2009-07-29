@@ -237,7 +237,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                return LicenseUtilities.IsLicensed(LicenseIdName.LabdeVerificationUIObject);
+                return LicenseUtilities.IsLicensed(LicenseIdName.LabDEVerificationUIObject);
             }
             catch (Exception ex)
             {
@@ -281,7 +281,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 // Ask the manager to create and display the data entry form.
@@ -319,7 +319,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26897", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 if (!bCancelRequested)
@@ -349,7 +349,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26898", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 _dataEntryFormManager.Cancel();
@@ -369,7 +369,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26899", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 _dataEntryFormManager.CloseForm();
@@ -444,7 +444,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabdeVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26900", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 // Create a new configuration form to display the configurable settings to the user.
