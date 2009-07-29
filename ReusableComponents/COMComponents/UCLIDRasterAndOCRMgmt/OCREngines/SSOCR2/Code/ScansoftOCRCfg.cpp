@@ -18,6 +18,9 @@ const string& gstrSTR_DISPLAY_FILTER_CHARS = "DisplayFilterChars";
 const string& gstrSHOW_PROGRESS_DIALOG = "ShowProgressDlg";
 const string& gstrTIMEOUT = "Timeout";
 const string& gstrZONE_ORDERING = "ZoneOrdering";
+const string& gstrSKIP_PAGE_ON_FAILURE = "SkipPageOnFailure";
+const string& gstrMAX_OCR_PAGE_FAILURE_PERCENTAGE = "MaxOcrPageFailurePercentage";
+const string& gstrMAX_OCR_PAGE_FAILURE_NUMBER = "MaxOcrPageFailureNumber";
 
 //-------------------------------------------------------------------------------------------------
 ScansoftOCRCfg::ScansoftOCRCfg()
@@ -145,5 +148,35 @@ bool ScansoftOCRCfg::getZoneOrdering()
 	}
 
 	return m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER, gstrZONE_ORDERING) != "0";
+}
+//-------------------------------------------------------------------------------------------------
+bool ScansoftOCRCfg::getSkipPageOnFailure()
+{
+	if (!m_pCfgMgr->keyExists(gstrROOT_REGISTRY_FOLDER, gstrSKIP_PAGE_ON_FAILURE))
+	{
+		m_pCfgMgr->setKeyValue(gstrROOT_REGISTRY_FOLDER, gstrSKIP_PAGE_ON_FAILURE, "0");
+	}
+
+	return m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER, gstrSKIP_PAGE_ON_FAILURE) != "0";
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long ScansoftOCRCfg::getMaxOcrPageFailurePercentage()
+{
+	if (!m_pCfgMgr->keyExists(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_PERCENTAGE))
+	{
+		m_pCfgMgr->setKeyValue(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_PERCENTAGE, "25");
+	}
+
+	return asUnsignedLong(m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_PERCENTAGE));
+}
+//-------------------------------------------------------------------------------------------------
+unsigned long ScansoftOCRCfg::getMaxOcrPageFailureNumber()
+{
+	if (!m_pCfgMgr->keyExists(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_NUMBER))
+	{
+		m_pCfgMgr->setKeyValue(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_NUMBER, "10");
+	}
+
+	return asUnsignedLong(m_pCfgMgr->getKeyValue(gstrROOT_REGISTRY_FOLDER, gstrMAX_OCR_PAGE_FAILURE_NUMBER));
 }
 //-------------------------------------------------------------------------------------------------

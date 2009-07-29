@@ -123,6 +123,24 @@ private:
 	// the accuracy/speed tradeoff setting for recognition.
 	// set from the registry.
 	RMTRADEOFF m_eTradeoff;
+	
+	// true if failed pages should be skipped; false if failed pages should fail the document.
+	bool m_bSkipPageOnFailure;
+
+	// The maximum percentage of pages that can fail without failing the document.
+	unsigned long m_uiMaxOcrPageFailurePercentage;
+
+	// The maximum number of pages that can fail without failing the document.
+	unsigned long m_uiMaxOcrPageFailureNumber;
+
+	// The number of decomposition methods to try. Must be 2 or 3.
+	unsigned long m_uiDecompositionMethods;
+
+	// The page numbers of failed pages.
+	vector<int> m_vecFailedPages;
+
+	// The sequence of decomposition methods to try.
+	IMG_DECOMP m_decompositionMethods[3];
 
 	// type of recognized characters to return
     EFilterCharacters m_eFilter;
@@ -144,7 +162,7 @@ private:
 	EDisplayCharsType m_eDisplayFilterCharsType;	
 
 	// For retrieving configuration settings
-	std::auto_ptr<ScansoftOCRCfg> m_apCfg;
+	auto_ptr<ScansoftOCRCfg> m_apCfg;
 
 	static string ms_strLastDisplayedFilterChars;
 
@@ -164,7 +182,7 @@ private:
 
 	// retains the currently OCRing page number and page index
 	static long ms_lCurrentPageNumber;
-	static long ms_lCurrentPageIndex;
+	static unsigned int ms_uiCurrentPageIndex;
 
 	// these are for controlling the timeout thread
 	// when this (auto reset)event is signaled
@@ -189,7 +207,15 @@ private:
 	/////////////
 	void validateLicense();
 
-	void setDecompositionMethod(EPageDecompositionMethod eDecompMethod);
+
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Sets the decomposition method to use based on the specified index.
+	void setDecompositionMethodIndex(unsigned int index);
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Sets the sequence of decomposition methods to use based on the specified initial
+	//          decomposition method.
+	// PARAMS:  eDecompMethod - The initial decomposition method in the decomposition sequence
+	void setDecompositionSequence(EPageDecompositionMethod eDecompMethod);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Sets the speed-accuracy tradeoff
 	// PARAMS: eTradeOff -
@@ -274,19 +300,19 @@ private:
 	//			page number will be set to nPageNum. lVerticalDPI will be used to determine each 
 	//          letter object's font size. bReturnUnrecognized will return all detected characters
 	//          if true, or only recognized characters if false.
-	void addRecognizedLettersToVector(std::vector<CPPLetter>* pvecLetters, long nPageNum, 
+	void addRecognizedLettersToVector(vector<CPPLetter>* pvecLetters, long nPageNum, 
 		long lVerticalDPI, bool bReturnUnrecognized);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To return true if either the string or letter have some contents.
 	//			If ipLetters is NULL, then strText's contents are checked.  Otherwise,
 	//			ipLetters's contents are checked.
-	bool hasContent(const std::string& strText, const std::vector<CPPLetter>* pvecLetters);
+	bool hasContent(const string& strText, const vector<CPPLetter>* pvecLetters);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE: To append ipLettersToAppend to ripLetters (if ripLetters != NULL) or
 	//			to append strTextToAppend to rstrText (if ripLetters == NULL)
-	void appendContent(std::string& rstrText, std::vector<CPPLetter>* pvecLetters,
-		const std::string& strTextToAppend, 
-		const std::vector<CPPLetter>* pvecLettersToAppend);
+	void appendContent(string& rstrText, vector<CPPLetter>* pvecLetters,
+		const string& strTextToAppend, 
+		const vector<CPPLetter>* pvecLettersToAppend);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Sets the end of zone and end of paragraph information of the last character in 
 	//          pvecPageLetters to that of pletterScanSoft. 
@@ -307,10 +333,10 @@ private:
 	// REQUIRE: ipLetters points to a valid IIUnknownVector of ILetter objects
 	// PROMISE: To write information about strText and ipLetters to a file called
 	//			SSOCR.log in the directory where this DLL exists.
-	void logDebugInfo(const std::string& strText, std::vector<CPPLetter>* pvecLetters);
+	void logDebugInfo(const string& strText, vector<CPPLetter>* pvecLetters);
 	//---------------------------------------------------------------------------------------------
 	// internal function called by logDebugInfo()
-	std::string getDebugRepresentation(char cChar);
+	string getDebugRepresentation(char cChar);
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: to recieve progress updates from RecAPI
 	static RECERR __stdcall ProgressMon(LPPROGRESSMONITOR mon, void* pContext);
@@ -388,12 +414,12 @@ private:
 	//--------------------------------------------------------------------------------------------
 	// These methods are basically called directly by their COM counterparts.
 	bool supportsTrainingFiles();
-	void loadTrainingFile(std::string strTrainingFileName);
+	void loadTrainingFile(string strTrainingFileName);
 	//---------------------------------------------------------------------------------------------
 	// Used by to set up RecAPI initially
 	void init();
 	void initEngineAndLicense();
-	std::string getThisDLLFolder();
+	string getThisDLLFolder();
 	//---------------------------------------------------------------------------------------------
 	// this thread runs in the background ensuring that no operation takes to long it does this 
 	// by monitoring progress updates in RecApi if too much time goes by between progress updates

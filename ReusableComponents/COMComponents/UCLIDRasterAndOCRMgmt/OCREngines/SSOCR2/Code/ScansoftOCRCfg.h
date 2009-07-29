@@ -6,9 +6,9 @@
 #include <IConfigurationSettingsPersistenceMgr.h>
 
 #include <memory>
-#include <vector>
 #include <string>
 
+using namespace std;
 
 class ScansoftOCRCfg
 {
@@ -39,9 +39,19 @@ public:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns zone ordering key as set in the registry. If the zone ordering key does not 
 	//          exist, one will be created with a default value and that value will be returned.
-	bool ScansoftOCRCfg::getZoneOrdering();
+	bool getZoneOrdering();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the true if pages should be skipped if they fail; false if the whole 
+	//          document should fail when a page fails.
+	bool getSkipPageOnFailure();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the maximum percentage of pages that can fail without failing the document.
+	unsigned long getMaxOcrPageFailurePercentage();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the maximum number of pages that can fail without failing the document.
+	unsigned long getMaxOcrPageFailureNumber();
 	
 private:
 	// pointer to the persistence manager for registry access
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> m_pCfgMgr;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> m_pCfgMgr;
 };
