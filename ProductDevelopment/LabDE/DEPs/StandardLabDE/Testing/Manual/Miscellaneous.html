@@ -19,7 +19,7 @@
 			<LI>Open image <b>003.tif</b> from Demo_LabDE.
 			<LI>Resize the DEP such that the table of test names is not completely 
 			visible.
-			<LI>Select a <b>Component Name</b> cell.
+			<LI>Select a <b>Test Name</b> cell.
 			<LI>Confirm that the table does not automatically scroll into view.
 		</ul>
 		<LI><b>[DataEntry #200]</b> Scroll to top for new document
@@ -51,7 +51,7 @@
 			<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
 			<ul>
 				<LI>Open image <b>003.tif</b> from Demo_LabDE.
-				<LI>Select the <b>Laboratory Name</b> field.
+				<LI>Select a <b>Patient Name</b> cell.
 				<LI>Carefully swipe <b>Community Memorial</b>.
 				<LI>Confirm that newline characters are replaced by spaces in the swiped text.
 			</ul>
@@ -59,7 +59,7 @@
 			<LI><b>[DataEntry #278]</b> Tab loop after swiping
 			<ul>
 				<LI>Open image <b>004.tif</b> from Demo_LabDE.
-				<LI>Select the first <b>Completed Test</b>.
+				<LI>Select the first <b>Order</b>.
 				<LI>Select the <b>Result Date</b> field.
 				<LI>Swipe a different date from the image.
 				<LI>Click the <b>Tab</b> key to step through elements of the selected test.
@@ -70,7 +70,7 @@
 			<li><b>[DataEntry #288]</b> Smarter cell selection after swiping new data
 			<ul>
 				<li>Open a document.
-				<li>Select the the Name cell of the starred row of the test table.
+				<li>Select the the <b>Name</b> cell of the starred row of the test table.
 				<li>Swipe some text.
 				<li>Confirm that a new test row is created with the name that you swiped.
 				<li>Confirm that the newly-swiped Name cell is still selected.
@@ -108,6 +108,16 @@
 				<li>Select the starred row of the test table.
 				<li>Swipe one or more test rows with the angular highlight tool.
 				<li>Confirm that no exception is thrown.
+			</ul>
+<p>
+			<li><b>[DataEntry #398, #525]</b> Name swiping rules
+			<ul>
+				<li>Select a <b>Patient name</b> row.
+				<li>Swipe in a valid name.
+				<li>Confirm that the name is split into first, middle, and last.
+				<li>Select a <b>Physician name</b> row.
+				<li>Swipe in a valid name.
+				<li>Confirm that the name is split appropriately.
 			</ul>
 		</ul>
 <p>
@@ -215,14 +225,20 @@
 			<ul>
 				<li>For cells and text boxes for which validation lists have been specified,
 				confirm that auto-complete values are displayed.
-				<li>As of build 1.0.1.15, validation lists have been supplied for these fields:
+				<li>As of build 1.0.1.35, validation lists have been supplied for these fields:
 				<ul>
-					<li>Lab code
-					<li>Order name
-					<li>Order code
-					<li>Test name
-					<li>Test code
-					<li>Units
+					<li>Ordering Physician - First Name
+					<li>Ordering Physician - Last Name
+					<li>Ordering Physician - Code
+					<li>CopyTo Physician - First Name
+					<li>CopyTo Physician - Last Name
+					<li>CopyTo Physician - Code
+					<li>Orders - Order Name
+					<li>Orders - Epic Code
+					<li>Selected Order Details - Lab Name
+					<li>Selected Order Details - Lab Code
+					<li>Selected Order Details - Test Name
+					<li>Selected Order Details - Code
 				</ul>
 			</ul>
 <p>
@@ -249,6 +265,16 @@
 				<LI>Alternate clicking in the image viewer and pressing <b>Tab</b>.
 				<LI>Confirm that each and every <b>Tab</b> is handled correctly 
 				by advancing to the next appropriate field.
+			</ul>
+<p>
+			<li><b>[DataEntry #359, #360]</b> Autoupdate Queries
+			<ul>
+				<li>Add a new row to the <b>Order</b> table. Enter an invalid name
+				in the <b>Order name</b> cell.
+				<li>Add a new test to that order. Enter "<b>Hemoglobin</b>" in the 
+				<b>Test name</b> cell.
+				<li>Select the <b>Order name</b> cell and change the name to "<b>CBC</b>".
+				<li>Confirm that the test name updates itself to "<b>HGB</b>".
 			</ul>
 <p>
 			<li><b>[DataEntry #363]</b> Autocomplete in starred rows

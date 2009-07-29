@@ -39,13 +39,6 @@
 		</ul>
 <p>
 		<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
-		folder so that <b>FileProcessingTaskName</b> is set to a unique 
-		file processing task.
-		<LI>Click on <b>Check for new components</b> in the FAM.
-		<LI>Confirm that the specified file processing task can be selected 
-		in the <b>FAM</b>.
-<p>
-		<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
 		folder so that <b>ApplicationTitle</b> is set to a unique string.
 		<LI>Exercise LabDE in <b>stand-alone</b> mode.
 		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> 
@@ -104,10 +97,6 @@
 			<li>Exit <b>LabDE</b>. 
 			<li>Re-open LabDE in <b>stand-alone</b> mode.
 			<li>Confirm that window size and position are persistent.
-			<li>Modify the scrollbar position in the <b>Image Viewer</b>.
-			<li>Exit <b>LabDE</b>. 
-			<li>Re-open LabDE in <b>stand-alone</b> mode.
-			<li>Confirm that the scrollbar position is persistent.
 		</ul>
 <p>
 		<li>FAM mode
@@ -127,10 +116,6 @@
 			<li>Stop processing. 
 			<li>Re-open LabDE in <b>FAM</b> mode.
 			<li>Confirm that window size and position are persistent.
-			<li>Modify the scrollbar position in the <b>Image Viewer</b>.
-			<li>Stop processing. 
-			<li>Re-open LabDE in <b>FAM</b> mode.
-			<li>Confirm that the scrollbar position is persistent.
 		</ul>
 	</ul>
 <p>
@@ -188,6 +173,8 @@
 			<li><b>[DataEntry #199]</b> Confirm that the <b>Go to next unviewed item</b>
 			menu item, toolbar button, and F4 shortcut are enabled when and only when
 			there are unviewed items.
+			<li><b>[DataEntry #410]</b> Confirm that pressing <b>F4</b> when there are
+			no unviewed items does not log an exception.
 			<li><b>[DataEntry #197]</b> Confirm that empty cells are skipped.
 			<li>Confirm that <b>View - Go To Item - Next invalid</b> navigates to 
 			an invalid item.
@@ -271,7 +258,7 @@
 			<li>Confirm that <b>Ctrl+O</b> displays the File - Open dialog with an image open.
 			<li>Confirm that <b>Ctrl+F4</b> closes an open image.
 			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
-			may be presented if invalid data is present.
+			may be presented if invalid data are present.
 			<li>Confirm that <b>Ctrl+P</b> does not display the File - Print dialog with 
 			no image open.
 			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog with an image open.
@@ -323,7 +310,7 @@
 		<ul>
 			<li>Confirm that <b>Ctrl+F4</b> stops processing.
 			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
-			may be presented if invalid data is present.
+			may be presented if invalid data are present.
 			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog.
 <p>
 			<li>Confirm that <b>Alt+P</b> sets Fit-To-Page mode.
@@ -363,20 +350,25 @@
 		<li><b>Result Status</b>
 		<ul>
 			<li>Confirm that text cannot be swiped into the combo box.
-			<li>Confirm that typing <b>O</b> or <b>R</b> into the combo box 
-			changes the setting to <b>Original</b> or <b>Reviewed</b>, respectively.
+			<li>Confirm that typing <b>C</b>, <b>F</b>, <b>P</b>, or <b>R</b> into the
+			combo box changes the setting to <b>Complete</b>, <b>Final</b>, <b>Preliminary</b>,
+			or <b>Reviewed</b>, respectively.
 		</ul>
 <p>
 		<li><b>Patient Information</b>
 		<ul>
-			<li>Confirm that text can be swiped into the <b>Name</b> edit box.
-			<li>Confirm that text can be typed into the <b>Name</b> edit box.
-			<li>Confirm that a validation icon is displayed if only one word is 
-			provided in the <b>Name</b> edit box.
+			<li>Confirm that the <b>Patient Name</b> table contains columns for <b>First
+			Name</b>, <b>Middle Name</b>, <b>Last Name</b>, and <b>Suffix</b>.
+			<li>Confirm that text can be swiped into the <b>Patient Name</b> table.
+			<li>Confirm that text can be typed into cells of the <b>Patient Name</b> table.
+			<li>Confirm that a name copied to the clipboard can be pasted into a row of the
+			<b>Patient Name</b> table.
+			<li>Confirm that a validation icon is displayed if the <b>First</b> or <b>Last</b>
+			name cells are empty.
 			<li>Confirm that text can be swiped into the <b>Medical Record #</b> edit box.
 			<li>Confirm that text can be typed into the <b>Medical Record #</b> edit box.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Medical Record #</b> edit box is empty.
+			<li>Confirm that a validation icon is displayed if the <b>Medical Record #</b>
+			edit box is empty.
 			<li>Confirm that text can be swiped into the <b>Date of Birth</b> edit box.
 			<li>Confirm that text can be typed into the <b>Date of Birth</b> edit box.
 			<li>Confirm that a validation icon is displayed in the DEP if an invalid date is 
@@ -393,83 +385,72 @@
 <p>
 		<li><b>Physicians</b>
 		<ul>
-			<li>Confirm that text can be swiped into the <b>Name</b> cell.
-			<li>Confirm that text can be typed into the <b>Name</b> cell.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Name</b> cell is empty.
-			<li>Confirm that text can be swiped into the <b>Type</b> cell.
-			<li>Confirm that text can be typed into the <b>Type</b> cell.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Type</b> cell is empty.
-			<li>Confirm that text can be swiped into the <b>Name</b> cell for 
-			the starred row.
-			<li>Confirm that text can be typed into the <b>Name</b> cell for 
-			the starred row.
-			<li>Confirm that entering text into the <b>Name</b> cell for 
-			the starred row creates a new starred row.
-			<li>Confirm that text can be swiped into the <b>Type</b> cell for 
-			the starred row.
-			<li>Confirm that text can be typed into the <b>Type</b> cell for 
-			the starred row.
-			<li>Confirm that entering text into the <b>Type</b> cell for 
-			the starred row creates a new starred row.
+			<li>Confirm that the <b>Physician</b> tables contain columns for <b>First Name</b>,
+			<b>Last Name</b>, and <b>Code</b>.
+			<li>Confirm that text can be swiped into the <b>Ordering Physician</b> table.
+			<li>Confirm that text can be typed into the <b>Ordering Physician</b> table.
+			<li>Confirm that a name copied to the clipboard can be pasted into a row of the
+			<b>Ordering Physician</b> table.
+			<li>Confirm that a validation icon is displayed if an initialized row is not
+			populated with valid data.
+			<li>Confirm that text can be swiped into the <b>Copy To: Physician</b> table.
+			<li>Confirm that text can be typed into the <b>Copy To: Physician</b> table.
+			<li>Confirm that a name copied to the clipboard can be pasted into a row of the
+			<b>Copy To: Physician</b> table.
+			<li>Confirm that a validation icon is displayed if an initialized row is not
+			populated with valid data.
+			<li>Confirm that text can be swiped into the <b>First Name</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that text can be typed into the <b>First Name</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that entering text into the <b>First Name</b> cell for 
+			the starred row creates a new starred row in the <b>Copy To: Physician</b>
+			table.
+			<li>Confirm that text can be swiped into the <b>Last Name</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that text can be typed into the <b>Last Name</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that entering text into the <b>Last Name</b> cell for 
+			the starred row creates a new starred row in the <b>Copy To: Physician</b>
+			table.
+			<li>Confirm that text can be swiped into the <b>Code</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that text can be typed into the <b>Code</b> cell for 
+			the starred row of the <b>Copy To: Physician</b> table.
+			<li>Confirm that entering text into the <b>Code</b> cell for 
+			the starred row creates a new starred row in the <b>Copy To: Physician</b>
+			table.
 		</ul>
 <p>
-		<li><b>Laboratory</b>
+		<li><b>Orders</b>
 		<ul>
-			<li>Confirm that text can be swiped into the <b>Laboratory</b> edit box.
-			<li>Confirm that text can be typed into the <b>Laboratory</b> edit box.
-			<li>Confirm that a validation icon is displayed if the 
-			<b>Laboratory</b> edit box is empty.
-			<li>Confirm that text can be swiped into the <b>Street</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be typed into the <b>Street</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be swiped into the <b>City</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be typed into the <b>City</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be swiped into the <b>State</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be typed into the <b>State</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be swiped into the <b>Zip</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that text can be typed into the <b>Zip</b> cell of the 
-			<b>Address</b> table.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>any or all</b> of the cells are empty.
-			<li>Confirm that text can be swiped into the <b>Phone</b> edit box.
-			<li>Confirm that text can be typed into the <b>Phone</b> edit box.
-			<li>Confirm that a validation icon is displayed if an invalid phone 
-			number is provided in the <b>Phone</b> edit box.
-			<li>Confirm that text can be swiped into the <b>Lab ID</b> edit box.
-			<li>Confirm that text can be typed into the <b>Lab ID</b> edit box.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Lab ID</b> edit box is empty.
-		</ul>
-<p>
-		<li><b>Completed Tests</b>
-		<ul>
-			<li>Confirm that text can be swiped into the <b>Laboratory Test 
-			Results</b> cell.
-			<li>Confirm that text can be typed into the <b>Laboratory Test 
-			Results</b> cell.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Laboratory Test Results</b> cell is empty.
+			<li>Confirm that text can be swiped into the <b>Order Name</b> cell.
+			<li>Confirm that text can be typed into the <b>Order Name</b> cell.
+			<li>Confirm that a validation icon is displayed if the <b>Order Name</b> 
+			cell is empty or invalid.
+			<li>Confirm that text can be swiped into the <b>Epic Code</b> cell.
+			<li>Confirm that text can be typed into the <b>Epic Code</b> cell.
+			<li>Confirm that a validation icon is displayed if the <b>Epic Code</b> 
+			cell is empty or invalid.
 			<li>Confirm that text can be swiped into the <b>Collection Date</b> cell.
 			<li>Confirm that text can be typed into the <b>Collection Date</b> cell.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Collection Date</b> cell is empty.
+			<li>Confirm that a validation icon is displayed if the <b>Collection Date</b>
+			cell is empty.
 			<li>Confirm that text can be swiped into the <b>Collection Time</b> cell.
 			<li>Confirm that text can be typed into the <b>Collection Time</b> cell.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Collection Time</b> cell is empty.
-			<li>Confirm that text can be swiped into the <b>Laboratory Test Results</b> 
+			<li>Confirm that a validation icon is displayed if the <b>Collection Time</b>
+			cell is empty.
+			<li>Confirm that text can be swiped into the <b>Order Name</b> 
 			cell for the starred row.
-			<li>Confirm that text can be typed into the <b>Laboratory Test Results</b> 
+			<li>Confirm that text can be typed into the <b>Order Name</b> 
 			cell for the starred row.
-			<li>Confirm that entering text into the <b>Laboratory Test Results</b> 
+			<li>Confirm that entering text into the <b>Order Name</b> 
+			cell for the starred row creates a new starred row.
+			<li>Confirm that text can be swiped into the <b>Epic Code</b> 
+			cell for the starred row.
+			<li>Confirm that text can be typed into the <b>Epic Code</b> 
+			cell for the starred row.
+			<li>Confirm that entering text into the <b>Epic Code</b> 
 			cell for the starred row creates a new starred row.
 			<li>Confirm that text can be swiped into the <b>Collection Date</b> 
 			cell for the starred row.
@@ -483,14 +464,13 @@
 			cell for the starred row.
 			<li>Confirm that entering text into the <b>Collection Time</b> cell for 
 			the starred row creates a new starred row.
-			<li>Confirm that clearing text out of the cells in the <b>Completed 
-			Tests</b> table retains the information in the <b>Selected Test Details</b> 
-			table.
-			<li>Confirm that deleting all rows from the <b>Completed Tests</b> table 
-			removes the information in the <b>Selected Test Details</b> table.
+			<li>Confirm that clearing text out of the cells in the <b>Orders</b> table
+			retains the information in the <b>Selected Order Details</b> table.
+			<li>Confirm that deleting all rows from the <b>Orders</b> table 
+			removes the information in the <b>Selected Order Details</b> table.
 		</ul>
 <p>
-		<li><b>Selected Test Details</b>
+		<li><b>Selected Order Details</b>
 		<ul>
 			<li>Confirm that text can be swiped into the <b>Result Date</b> edit box.
 			<li><b>[DataEntry #258]</b> Confirm that the swiped highlight is visible.
@@ -506,14 +486,18 @@
 			is provided in the <b>Result Time</b> edit box.
 			<li>Confirm that a validation icon is not displayed if the 
 			<b>Result Time</b> edit box is empty.
-			<li>Confirm that text can be swiped into the <b>Order Code</b> edit box.
-			<li>Confirm that text can be typed into the <b>Order Code</b> edit box.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Order Code</b> edit box is empty.
 			<li>Confirm that text can be swiped into the <b>Order Number</b> edit box.
 			<li>Confirm that text can be typed into the <b>Order Number</b> edit box.
-			<li>Confirm that a validation icon is not displayed even if the 
-			<b>Order Number</b> edit box is empty.
+			<li>Confirm that a validation icon is displayed if the <b>Order Number</b>
+			edit box is empty.
+			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
+			available lab names.
+			<li>Confirm that text can be swiped into the <b>Lab Code</b> edit box.
+			<li>Confirm that text can be typed into the <b>Lab Code</b> edit box.
+			<li>Confirm that a validation icon is displayed if the <b>Lab Code</b> edit
+			box is empty.
+			<li>Confirm that selected a <b>Lab Name</b> automatically updates the <b>Lab
+			Code</b> field and vice-versa.
 			<li>Confirm that text can be swiped into the <b>Comment</b> edit box.
 			<li>Confirm that text can be typed into the <b>Comment</b> edit box.
 			<li>Confirm that a validation icon is not displayed even if the 
@@ -521,10 +505,10 @@
 			<li>Confirm that entering lots of text into the <b>Comment</b> edit box 
 			enables the vertical scrollbar.
 <p>
-			<li>Confirm that text can be swiped into the <b>Component Name</b> cell.
-			<li>Confirm that text can be typed into the <b>Component Name</b> cell.
+			<li>Confirm that text can be swiped into the <b>Test Name</b> cell.
+			<li>Confirm that text can be typed into the <b>Test Name</b> cell.
 			<li>Confirm that a validation icon is displayed if the 
-			<b>Component Name</b> cell is empty.
+			<b>Test Name</b> cell is empty.
 			<li>Confirm that text can be swiped into the <b>Value</b> cell.
 			<li>Confirm that text can be typed into the <b>Value</b> cell.
 			<li>Confirm that a validation icon is displayed if the 
@@ -545,11 +529,11 @@
 			<li>Confirm that text can be typed into the <b>Comment</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 
 			<b>Comment</b> cell is empty.
-			<li>Confirm that text can be swiped into the <b>Component Name</b> 
+			<li>Confirm that text can be swiped into the <b>Test Name</b> 
 			cell for the starred row.
-			<li>Confirm that text can be typed into the <b>Component Name</b> 
+			<li>Confirm that text can be typed into the <b>Test Name</b> 
 			cell for the starred row.
-			<li>Confirm that entering text into the <b>Component Name</b> 
+			<li>Confirm that entering text into the <b>Test Name</b> 
 			cell for the starred row creates a new starred row.
 			<li>Confirm that text can be swiped into the <b>Value</b> 
 			cell for the starred row.
@@ -581,6 +565,11 @@
 			cell for the starred row.
 			<li>Confirm that entering text into the <b>Comment</b> 
 			cell for the starred row creates a new starred row.
+			<li><b>[DataEntry #305]</b> Confirm that by clicking on a row header, it is possible
+			to drag the row and drop it in a new position in the same order.
+			<li><b>[DataEntry #305]</b> Confirm that by clicking on a row header, it is possible
+			to drag the row and drop it into a different order.
+			<li><b>[DataEntry #491]</b> Confirm that tooltips are disabled during drag operations.
 		</ul>
 	</ul>
 </UL>
