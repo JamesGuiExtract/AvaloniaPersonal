@@ -21,6 +21,7 @@ using System.Runtime.Remoting;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.DataEntry.Utilities.DataEntryApplication
 {
@@ -48,7 +49,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// The number of pixels to pad around the DEP that is loaded.
         /// </summary>
-        static readonly int _DATA_ENTRY_PANEL_PADDING = 3;
+        const int _DATA_ENTRY_PANEL_PADDING = 3;
 
         /// <summary>
         /// The value associated with a window's system command message.
@@ -82,6 +83,27 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         bool _isLoaded;
 
         /// <summary>
+        /// Indicates whether an image is being closed programmatically rather than via a user
+        /// action.
+        /// </summary>
+        bool _forcingClose;
+
+        /// <summary>
+        /// The <see cref="FileProcessingDB"/> in use.
+        /// </summary>
+        FileProcessingDB _fileProcessingDB;
+
+        /// <summary>
+        /// The ID of the file being processed.
+        /// </summary>
+        int _fileID;
+
+        /// <summary>
+        /// The ID of the action being processed.
+        /// </summary>
+        int _actionID;
+
+        /// <summary>
         /// The open file tool strip button.
         /// </summary>
         ToolStripItem _openFileToolStripButton;
@@ -97,9 +119,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         ApplicationCommand _closeFileCommand;
 
         /// <summary>
-        /// The save file command
+        /// The save and commit file command
         /// </summary>
-        ApplicationCommand _saveFileCommand;
+        ApplicationCommand _saveAndCommitFileCommand;
 
         /// <summary>
         /// The goto next invalid item command.
@@ -340,6 +362,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         }
 
                         _exitToolStripMenuItem.Text = _standAloneMode ? "Exit" : "Stop Processing";
+                        _saveAndCommitMenuItem.Text = _standAloneMode ? "&Save" : "&Save and Commit";
+                        _saveAndCommitButton.Text = _standAloneMode ? "Save" : "Save and Commit";
+                        _saveAndCommitButton.ToolTipText = _standAloneMode ? "Save" : "Save and Commit";
+
+                        _toolStripSeparator1.Visible = _standAloneMode;
+                        _skipProcessingMenuItem.Visible = !_standAloneMode;
+                        _saveMenuItem.Visible = !_standAloneMode;
 
                         _imageViewer.DefaultStatusMessage =
                             _standAloneMode ? "" : "Waiting for next document...";
@@ -363,16 +392,35 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// A thread-safe method that opens the specified document.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>
-        public void Open(string fileName)
+        /// <param name="fileID">The ID of the file being processed.</param>
+        /// <param name="actionID">The ID of the action being processed.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        public void Open(string fileName, int fileID, int actionID, FAMTagManager tagManager,
+            FileProcessingDB fileProcessingDB)
         {
             if (InvokeRequired)
             {
-                Invoke(new StringParameter(Open), new object[] { fileName });
+                Invoke(new VerificationFormOpenDelegate(Open),
+                    new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                 return;
             }
 
             try
             {
+                ExtractException.Assert("ELI26940", "Null argument exception!",
+                    fileProcessingDB != null);
+
+                _fileProcessingDB = fileProcessingDB;
+                _fileID = fileID;
+                _actionID = actionID;
+
+                // TODO: [LegacyRCAndUtils:5382] 
+                // We are not currently receiving a valid action ID, so the comment cannot be
+                // retrieved from the database.
+                _dataEntryControlHost.Comment =
+                    _fileProcessingDB.GetFileActionComment(_fileID, _actionID);
+
                 _imageViewer.OpenImage(fileName, false);
             }
             catch (Exception ex)
@@ -415,9 +463,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     false, _standAloneMode, _standAloneMode);
 
                 // Save
-                _saveFileCommand = new ApplicationCommand(_imageViewer.Shortcuts,
-                    new Keys[] { Keys.S | Keys.Control }, SelectSave,
-                    new ToolStripItem[] { _saveToolStripButton, _saveToolStripMenuItem },
+                _saveAndCommitFileCommand = new ApplicationCommand(_imageViewer.Shortcuts,
+                    new Keys[] { Keys.S | Keys.Control }, SaveAndCommit,
+                    new ToolStripItem[] { _saveAndCommitButton, _saveAndCommitMenuItem },
                     false, true, false);
 
                 // Print an image
@@ -534,8 +582,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _dataEntryControlHost.InvalidItemsFound += HandleInvalidItemsFound;
                 _dataEntryControlHost.UnviewedItemsFound += HandleUnviewedItemsFound;
                 _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
-                _saveToolStripMenuItem.Click += HandleSaveControlClick;
-                _saveToolStripButton.Click += HandleSaveControlClick;
+                _saveAndCommitMenuItem.Click += HandleSaveAndCommitClick;
+                _saveAndCommitButton.Click += HandleSaveAndCommitClick;
+                _saveMenuItem.Click += HandleSaveClick;
+                _skipProcessingMenuItem.Click += HandleSkipFileClick;
                 _exitToolStripMenuItem.Click += HandleExitToolStripMenuItemClick;
                 _nextUnviewedToolStripButton.Click += HandleGoToNextUnviewedClick;
                 _nextUnviewedToolStripMenuItem.Click += HandleGoToNextUnviewedClick;
@@ -717,17 +767,20 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Check for unsaved data and cancel the close if necessary.
-                if (OkayToClose())
+                if (!_forcingClose)
                 {
-                    // Clear data to give the host a chance to clear any static COM objects that will
-                    // not be accessible from a different thread due to the single apartment threading
-                    // model.
-                    _dataEntryControlHost.ClearData();
-                }
-                else
-                {
-                    e.Cancel = true;
+                    // Check for unsaved data and cancel the close if necessary.
+                    if (AttemptSave(false) == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                        // Clear data to give the host a chance to clear any static COM objects that will
+                        // not be accessible from a different thread due to the single apartment threading
+                        // model.
+                        _dataEntryControlHost.ClearData();
+                    }
                 }
 
                 base.OnClosing(e);
@@ -781,15 +834,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Event Handlers
 
         /// <summary>
-        /// Handles the case that the user requested that the data be saved (output).
+        /// Handles the case that the user requested that the data be saved and commited.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">The event data associated with the event.</param>
-        void HandleSaveControlClick(object sender, EventArgs e)
+        void HandleSaveAndCommitClick(object sender, EventArgs e)
         {
             try
             {
-                Save(false);
+                SaveAndCommit();
             }
             catch (Exception ex)
             {
@@ -797,6 +850,75 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     "Failed to output document data!", ex);
                 ee.AddDebugData("Event data", e, false);
                 DisplayCriticalException(ee);
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the user requested that the data be saved (but not committed).
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleSaveClick(object sender, EventArgs e)
+        {
+            try
+            {
+                SaveData(false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26948",
+                    "Failed to output document data!", ex);
+                ee.AddDebugData("Event data", e, false);
+                DisplayCriticalException(ee);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="validateData"></param>
+        /// <returns></returns>
+        private bool SaveData(bool validateData)
+        {
+            bool saved = _dataEntryControlHost.SaveData(validateData);
+
+            if (saved && !_standAloneMode)
+            {
+                _fileProcessingDB.SetFileActionComment(_fileID, _actionID,
+                        _dataEntryControlHost.Comment);
+            }
+
+            return saved;
+        }
+
+        /// <summary>
+        /// Handles the case that the user requested to skip the current document
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleSkipFileClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (AttemptSave(false) != DialogResult.Cancel)
+                {
+                    _forcingClose = true;
+
+                    _imageViewer.CloseImage();
+
+                    OnFileComplete(EFileProcessingResult.kProcessingSkipped);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26943",
+                    "Failed to output document data!", ex);
+                ee.AddDebugData("Event data", e, false);
+                DisplayCriticalException(ee);
+            }
+            finally
+            {
+                _forcingClose = false;
             }
         }
 
@@ -811,11 +933,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Saving or closing the document or hiding of tooltips should be allowed as long as
                 // a document is available.
-                _saveFileCommand.Enabled = _imageViewer.IsImageAvailable;
+                _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
                 _closeFileCommand.Enabled = _imageViewer.IsImageAvailable;
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
+
+                if (!StandAloneMode)
+                {
+                    _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                }
+                _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
 
                 // If a document is not loaded, the DataEntryApplicationForm has no way of informing
                 // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
@@ -868,10 +996,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Check for unsaved data and cancel the close if necessary.
-                if (!OkayToClose())
+                if (!_forcingClose)
                 {
-                    e.Cancel = true;
+                    // Check for unsaved data and cancel the close if necessary.
+                    if (AttemptSave(false) == DialogResult.Cancel)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                        OnFileComplete(EFileProcessingResult.kProcessingCancelled);
+                    }
                 }
             }
             catch (Exception ex)
@@ -1153,90 +1288,89 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         #region Private Members
 
         /// <summary>
-        /// Handles the case that save was selected from the file menu
-        /// </summary>
-        void SelectSave()
-        {
-            try
-            {
-                Save(false);
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = new ExtractException("ELI24061",
-                    "Failed to output document data!", ex);
-                DisplayCriticalException(ee);
-            }
-        }
-
-        /// <summary>
-        /// Handles the case that the user selected save from either the file menu, toolstrip
-        /// button, or keyboard shortcut.
-        /// </summary>
-        /// <param name="closing"><see langword="true"/> if the save is occuring because the user
-        /// is closing the document or application; <see langword="false"/> if the save is occuring
-        /// as an independent operation.</param>
-        /// <returns><see langword="true"/> if the document saved successfully, 
-        /// <see langword="false"/> if it did not.</returns>
-        bool Save(bool closing)
-        {
-            bool dataSaved = _dataEntryControlHost.SaveData();
-
-            // If dataSaved == false, the user canceled the save.  Don't complete the current
-            // document in that case.
-            if (dataSaved)
-            {
-                // If running in FAM mode, close the document until the next one is loaded so it is
-                // clear that the last document has been committed.
-                if (!_standAloneMode)
-                {
-                    _imageViewer.CloseImage();
-                }
-
-                OnFileComplete(new FileCompleteEventArgs(closing));
-            }
-
-            return dataSaved;
-        }
-
-        /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
-        /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
-        /// event.</param>
-        protected virtual void OnFileComplete(FileCompleteEventArgs e)
+        /// <param name="fileProcessingResult">Specifies under what circumstances
+        /// verification of the file completed.</param>
+        protected virtual void OnFileComplete(EFileProcessingResult fileProcessingResult)
         {
             if (FileComplete != null)
             {
-                FileComplete(this, e);
+                FileComplete(this, new FileCompleteEventArgs(fileProcessingResult));
+            }
+        }
+
+        /// <summary>
+        /// Saves and commits current file in FAM (!_standAloneMode).
+        /// </summary>
+        void SaveAndCommit()
+        {
+            try
+            {
+                // Treat SaveAndCommit like "Save" for stand-alone mode.
+                if (_standAloneMode)
+                {
+                    SaveData(false);
+                }
+                // AttemptSave will return Cancel if there was invalid data in the DEP.
+                else if (AttemptSave(true) != DialogResult.Cancel)
+                {
+                    // If running in FAM mode, close the document until the next one is loaded so it
+                    // is clear that the last document has been committed.
+                    
+                    _forcingClose = true;
+
+                    _imageViewer.CloseImage();
+
+                    OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26945", ex);
+            }
+            finally
+            {
+                _forcingClose = false;
             }
         }
 
         /// <summary>
         /// Checks for unsaved data and prompts the user to save as necessary.
         /// </summary>
-        /// <returns><see langword="true"/> if it is okay to allow the document to be closed or
-        /// <see langword="false"/> if it should not be closed either because the user elected to
-        /// cancel the operation or they elected to save but the save was not successful.</returns>
-        bool OkayToClose()
+        /// <param name="commitData"><see langword="true"/> if data is being committed and therefore
+        /// it should be validated in the DEP or <see langword="false"/> if the purpose is to give
+        /// the user a chance to save the data without commiting in which case the user will be
+        /// prompted whether to save or not.</param>
+        /// <returns><see cref="DialogResult.Yes"/> if the document was successfully saved, 
+        /// <see cref="DialogResult.No"/> if the user elected not to save or
+        /// <see cref="DialogResult.Cancel"/> if the user elected to cancel the operation which
+        /// triggered the save attempt or the data in the DEP failed validation for a commit.
+        /// </returns>
+        DialogResult AttemptSave(bool commitData)
         {
-            if (_imageViewer.IsImageAvailable && _dataEntryControlHost.Dirty)
+            DialogResult response = DialogResult.Yes;
+
+            if (_imageViewer.IsImageAvailable && (commitData || _dataEntryControlHost.Dirty))
             {
-                DialogResult response = PromptForSave();
-                if (response == DialogResult.Yes)
+                // Prompt if the data is not being commited.
+                if (!commitData)
                 {
-                    // If the user chose to save, continue with the close if the save was
-                    // successful, abort the close if it was not.
-                    return Save(true);
+                    response = MessageBox.Show(this,
+                        "Data has not been saved, would you like to save now?",
+                        "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
+                        MessageBoxDefaultButton.Button1, 0);
                 }
-                else if (response == DialogResult.Cancel)
+
+                // If commiting data or the user elected to save, attempt the save.
+                if (response == DialogResult.Yes && !SaveData(commitData))
                 {
-                    // The user chose to cancel the close operation.
-                    return false;
+                    // Return cancel if the data in the DEP failed validation.
+                    response = DialogResult.Cancel;
                 }
             }
 
-            return true;
+            return response;
         }
 
         /// <summary>
@@ -1320,21 +1454,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ee.AddDebugData("Assembly Name", assemblyFileName, false);
                 throw ee;
             }
-        }
-
-        /// <summary>
-        /// Prompts the user that the current data has not been saved and gives them the
-        /// option to save the data, not save and continue, or cancel.
-        /// </summary>
-        /// <returns><see cref="DialogResult.Yes"/> if the user wishes to save, 
-        /// <see cref="DialogResult.No"/> if the user does not want to save, 
-        /// <see cref="DialogResult.Cancel"/> if the user wishes to abort the operation that 
-        /// triggered the prompt.</returns>
-        DialogResult PromptForSave()
-        {
-            return MessageBox.Show(this, "Data has not been saved, would you like to save now?",
-                "Data Not Saved", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question,
-                MessageBoxDefaultButton.Button1, 0);
         }
 
         /// <summary>

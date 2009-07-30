@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Utilities.Forms
 {
@@ -11,12 +12,14 @@ namespace Extract.Utilities.Forms
     /// Creates an <see cref="IVerificationForm"/>.
     /// </summary>
     /// <returns>An <see cref="IVerificationForm"/>.</returns>
+    [CLSCompliant(false)]
     public delegate IVerificationForm CreateForm();
 
     /// <summary>
     /// Represents a <see cref="Form"/> that can verify documents in a multi-threaded environment.
     /// </summary>
     /// <typeparam name="TForm">The type of the <see cref="Form"/>.</typeparam>
+    [CLSCompliant(false)]
     public class VerificationForm<TForm> : IDisposable where TForm : Form, IVerificationForm
     {
         #region VerificationForm Constants
@@ -80,6 +83,11 @@ namespace Extract.Utilities.Forms
         /// <see cref="ShowForm"/> needs to wait for the previous form to finish closing.
         /// </summary>
         volatile bool _closing;
+
+        /// <summary>
+        /// The processing result of the file being shown.
+        /// </summary>
+        EFileProcessingResult _fileProcessingResult;
 
         /// <summary>
         /// Used to protect access to <see cref="VerificationForm{TForm}"/>.
@@ -237,30 +245,54 @@ namespace Extract.Utilities.Forms
         /// Displays the document image specified.
         /// </summary>
         /// <param name="fileName">Specifies the filename of the document image to open.</param>
-        public void ShowDocument(string fileName)
+        /// <param name="fileID">The ID of the file being processed.</param>
+        /// <param name="actionID">The ID of the action being processed.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        /// <returns><see cref="EFileProcessingResult.kProcessingSuccessful"/> if verification of the
+        /// document completed successfully, <see cref="EFileProcessingResult.kProcessingCancelled"/>
+        /// if verification of the document was cancelled by the user or
+        /// <see cref="EFileProcessingResult.kProcessingSkipped"/> if processing of the current file
+        /// was skipped, but the user wishes to continue viewing subsequent documents.
+        /// </returns>
+        [CLSCompliant(false)]
+        public EFileProcessingResult ShowDocument(string fileName, int fileID, int actionID,
+            FAMTagManager tagManager, FileProcessingDB fileProcessingDB)
         {
-            if (Canceled)
+            if (this.Canceled)
             {
-                return;
+                return EFileProcessingResult.kProcessingCancelled;
             }
+
+            EFileProcessingResult fileProcessingResult;
 
             lock (_lock)
             {
                 try
                 {
-                    if (Canceled)
+                    if (this.Canceled)
                     {
-                        return;
+                        return EFileProcessingResult.kProcessingCancelled;
                     }
 
                     // Ensure the verification form has been properly initialized.
                     EnsureInitialization();
 
                     // Open the file
-                    MainForm.Open(fileName);
+                    MainForm.Open(fileName, fileID, actionID, tagManager, fileProcessingDB);
 
                     // Wait until the document is either saved or the verification form is closed.
                     WaitForEvent(_fileCompletedEvent);
+
+                    if (this.Canceled)
+                    {
+                        return EFileProcessingResult.kProcessingCancelled;
+                    }
+
+                    // The file processing result needs to be noted before exiting the locked block,
+                    // but we need to exit the lock block before returning so that Sleep is called
+                    // to prevent one or more files from becoming stuck on other threads.
+                    fileProcessingResult = _fileProcessingResult;
                 }
                 catch (Exception ex)
                 {
@@ -274,6 +306,8 @@ namespace Extract.Utilities.Forms
             // this thread is likely to re-enter a _lock section before windows gives any
             // waiting threads an opportunity to proceed.
             Thread.Sleep(0);
+
+            return fileProcessingResult;
         }
 
         /// <summary>
@@ -408,12 +442,16 @@ namespace Extract.Utilities.Forms
         /// <see cref="IVerificationForm.FileComplete"/> event.</param>
         void HandleFileComplete(object sender, FileCompleteEventArgs e)
         {
-            if (e.CancelRequested)
+            _fileProcessingResult = e.FileProcessingResult;
+
+            if (e.FileProcessingResult == EFileProcessingResult.kProcessingCancelled)
             {
                 _canceledEvent.Set();
             }
-
-            _fileCompletedEvent.Set();
+            else
+            {
+                _fileCompletedEvent.Set();
+            }
         }
 
         /// <summary>

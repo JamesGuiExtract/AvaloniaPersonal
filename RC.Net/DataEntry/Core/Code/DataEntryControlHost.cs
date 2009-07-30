@@ -89,12 +89,12 @@ namespace Extract.DataEntry
         /// The upper limit of OCR confidence associated with a character to be highlighted in the
         /// image viewer that should be highlighted with this color.
         /// </summary>
-        private int _maxOcrConfidence;
+        int _maxOcrConfidence;
 
         /// <summary>
         /// The color the highlight should be.
         /// </summary>
-        private Color _color;
+        Color _color;
 
         #endregion Fields
 
@@ -172,65 +172,66 @@ namespace Extract.DataEntry
     /// <para><b>Note:</b></para>
     /// Only one control host per image viewer is supported .
     /// </summary>
-    public partial class DataEntryControlHost : UserControl, IImageViewerControl, IMessageFilter
+    public partial class DataEntryControlHost : UserControl, IImageViewerControl,
+        IMessageFilter
     {
         #region Constants
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryControlHost).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryControlHost).ToString();
 
         /// <summary>
         /// The value associated with a window's key down message.
         /// </summary>
-        private const int _WM_KEYDOWN = 0x100;
+        const int _WM_KEYDOWN = 0x100;
 
         /// <summary>
         /// The value associated with a window's key up message.
         /// </summary>
-        private const int _WM_KEYUP = 0x101;
+        const int _WM_KEYUP = 0x101;
 
         /// <summary>
         /// The value associated with a window's left mouse button down message.
         /// </summary>
-        private const int _WM_LBUTTONDOWN = 0x0201;
+        const int _WM_LBUTTONDOWN = 0x0201;
 
         /// <summary>
         /// The value associated with a window's left mouse button up message.
         /// </summary>
-        private const int _WM_LBUTTONUP = 0x0202;
+        const int _WM_LBUTTONUP = 0x0202;
 
         /// <summary>
         /// The value associated with a window's right mouse button down message.
         /// </summary>
-        private const int _WM_RBUTTONDOWN = 0x0204;
+        const int _WM_RBUTTONDOWN = 0x0204;
 
         /// <summary>
         /// The value associated with a window's right mouse button up message.
         /// </summary>
-        private const int _WM_RBUTTONUP = 0x0205;
+        const int _WM_RBUTTONUP = 0x0205;
 
         /// <summary>
         /// The value associated with a window's mouse wheel message.
         /// </summary>
-        private const int _WM_MOUSEWHEEL = 0x020A;
+        const int _WM_MOUSEWHEEL = 0x020A;
 
         /// <summary>
         /// The default font size to be used for tooltips.
         /// </summary>
-        private const float _TOOLTIP_FONT_SIZE = 13F;
+        const float _TOOLTIP_FONT_SIZE = 13F;
 
         /// <summary>
         /// The font family used to display data.
         /// </summary>
-        private static readonly string _DATA_FONT_FAMILY = "Verdana";
+        static readonly string _DATA_FONT_FAMILY = "Verdana";
 
         /// <summary>
         /// The width/height in inches of the icon to be shown in the image viewer to indicate
         /// invalid data.
         /// </summary>
-        private const double _ERROR_ICON_SIZE = 0.15;
+        const double _ERROR_ICON_SIZE = 0.15;
 
         #endregion Constants
 
@@ -239,36 +240,36 @@ namespace Extract.DataEntry
         /// <summary>
         /// The image viewer with which to display documents.
         /// </summary>
-        private ImageViewer _imageViewer;
+        ImageViewer _imageViewer;
 
         /// <summary>
         /// The vector of attributes associated with any currently open document.
         /// </summary>
-        private IUnknownVector _attributes = (IUnknownVector)new IUnknownVectorClass();
+        IUnknownVector _attributes = (IUnknownVector)new IUnknownVectorClass();
 
         /// <summary>
         /// A dictionary to keep track of the highlights associated with each attribute.
         /// </summary>
-        private Dictionary<IAttribute, List<CompositeHighlightLayerObject>> _attributeHighlights =
+        Dictionary<IAttribute, List<CompositeHighlightLayerObject>> _attributeHighlights =
             new Dictionary<IAttribute, List<CompositeHighlightLayerObject>>();
 
         /// <summary>
         /// A dictionary to keep track of each attribute's tooltips
         /// </summary>
-        private Dictionary<IAttribute, ToolTip> _attributeToolTips =
+        Dictionary<IAttribute, ToolTip> _attributeToolTips =
             new Dictionary<IAttribute, ToolTip>();
 
         /// <summary>
         /// A dictionary to keep track of each attribute's error icons
         /// </summary>
-        private Dictionary<IAttribute, List<ImageLayerObject>> _attributeErrorIcons =
+        Dictionary<IAttribute, List<ImageLayerObject>> _attributeErrorIcons =
             new Dictionary<IAttribute, List<ImageLayerObject>>();
 
         /// <summary>
         /// The size the error icons should be on each page (determined via a combination of
         /// _ERROR_ICON_SIZE and the DPI of the page.
         /// </summary>
-        private Dictionary<int, Size> _errorIconSizes = new Dictionary<int, Size>();
+        Dictionary<int, Size> _errorIconSizes = new Dictionary<int, Size>();
 
         /// <summary>
         /// A dictionary to keep track of the attribute each highlight is related to.
@@ -288,19 +289,19 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of each control's active attributes.
         /// </summary>
-        private Dictionary<IDataEntryControl, List<IAttribute>> _controlAttributes =
+        Dictionary<IDataEntryControl, List<IAttribute>> _controlAttributes =
             new Dictionary<IDataEntryControl, List<IAttribute>>();
 
         /// <summary>
         /// A dictionary to keep track of each control's attributes that have tooltips.
         /// </summary>
-        private Dictionary<IDataEntryControl, List<IAttribute>> _controlToolTipAttributes =
+        Dictionary<IDataEntryControl, List<IAttribute>> _controlToolTipAttributes =
             new Dictionary<IDataEntryControl, List<IAttribute>>();
 
         /// <summary>
         /// Indicates if the user has temporarily hid all tooltips.
         /// </summary>
-        private bool _temporarilyHidingTooltips;
+        bool _temporarilyHidingTooltips;
 
         /// <summary>
         /// The attribute that corresponds to a highlight that the selection tool is currently
@@ -316,193 +317,203 @@ namespace Extract.DataEntry
         /// <summary>
         /// A list of all data controls contained in this control host.
         /// </summary>
-        private List<IDataEntryControl> _dataControls = new List<IDataEntryControl>();
+        List<IDataEntryControl> _dataControls = new List<IDataEntryControl>();
+
+        /// <summary>
+        /// A list of all controls on the DEP which do not implement IDataEntryControl.
+        /// </summary>
+        List<Control> _nonDataControls = new List<Control>();
 
         /// <summary>
         /// A list of the controls mapped to root-level attributes. (to which the control host needs
         /// to provide attributes)
         /// </summary>
-        private List<IDataEntryControl> _rootLevelControls = new List<IDataEntryControl>();
+        List<IDataEntryControl> _rootLevelControls = new List<IDataEntryControl>();
 
         /// <summary>
         /// A flag used to indicate that the current document image is changing so that highlight
         /// drawing can be suspended while all the controls refresh their spatial information.
         /// </summary>
-        private bool _changingImage;
+        bool _changingImage;
 
         /// <summary>
         /// The current "active" data entry.  This is the last data entry control to have received
         /// input focus (but doesn't necessarily mean the control currently has input focus).
         /// </summary>
-        private IDataEntryControl _activeDataControl;
+        IDataEntryControl _activeDataControl;
 
         /// <summary>
         /// Keeps track of the last active cursor tool so that the highlight cursor tools can be
         /// automatically re-enabled after focus passes through control that doesn't support
         /// swiping.
         /// </summary>
-        private CursorTool _lastCursorTool = CursorTool.None;
+        CursorTool _lastCursorTool = CursorTool.None;
 
         /// <summary>
         /// The OCR manager to be used to recognize text from image swipes.
         /// </summary>
-        private SynchronousOcrManager _ocrManager;
+        SynchronousOcrManager _ocrManager;
 
         /// <summary>
         /// The font to use to draw toolTip text.
         /// </summary>
-        private Font _toolTipFont;
+        Font _toolTipFont;
 
         /// <summary>
         /// To manage tab orders keep track of when focus had belonged to a control outside of the 
         /// control host, but is now returning to a control within the control host
         /// </summary>
-        private bool _regainingFocus;
+        bool _regainingFocus;
 
         /// <summary>
         /// To manage tab order when the control host is regaining focus, keep track of whether the 
         /// shift key is down.
         /// </summary>
-        private bool _shiftKeyDown;
+        bool _shiftKeyDown;
 
         /// <summary>
         /// Inidicates when a manual focus change is taking place (tab key was pressed or a
         /// highlight was selected in the image viewer).
         /// </summary>
-        private bool _manualFocusEvent;
+        bool _manualFocusEvent;
 
         /// <summary>
         /// To manage tab order when the control host is regaining focus, keep track of any data
         /// entry control which should receive focus as the result of a mouse click.
         /// </summary>
-        private IDataEntryControl _clickedDataEntryControl;
+        IDataEntryControl _clickedDataEntryControl;
 
         /// <summary>
         /// The ErrorProvider data entry controls should used to display data validation errors
         /// (unless the control needs a specialized error provider).
         /// </summary>
-        private ErrorProvider _errorProvider = new ErrorProvider();
+        ErrorProvider _errorProvider = new ErrorProvider();
 
         /// <summary>
         /// The number of unviewed attributes known to exist.
         /// </summary>
-        private int _unviewedAttributeCount;
+        int _unviewedAttributeCount;
 
         /// <summary>
         /// The number of attributes with invalid data known to exist.
         /// </summary>
-        private int _invalidAttributeCount;
+        int _invalidAttributeCount;
 
         /// <summary>
         /// Indicates whether data had been modified since the last load or save.
         /// </summary>
-        private bool _dirty;
+        bool _dirty;
 
         /// <summary>
         /// Indicates whether all highlights are currently being displayed (true) or if only the
         /// highlights that relate to the selection in the DEP are being displayed (false).
         /// </summary>
-        private bool _showingAllHighlights;
+        bool _showingAllHighlights;
 
 
         /// <summary>
         /// Specifies whether the data entry controls and image viewer are currently being
         /// prevented from updating.
         /// </summary>
-        private bool _controlUpdatesLocked;
+        bool _controlUpdatesLocked;
 
         /// <summary>
         /// Indicates whether all data must be viewed before saving and, if not, whether a prompt
         /// will be displayed before allowing unviewed data to be saved.
         /// </summary>
-        private UnviewedDataSaveMode _unviewedDataSaveMode = UnviewedDataSaveMode.Allow;
+        UnviewedDataSaveMode _unviewedDataSaveMode = UnviewedDataSaveMode.Allow;
 
         /// <summary>
         /// Indicates whether all data must conform to validation rules before saving and, if not,
         /// whether a prompt will be displayed before allowing invalid data to be saved.
         /// </summary>
-        private InvalidDataSaveMode _invalidDataSaveMode = InvalidDataSaveMode.Disallow;
+        InvalidDataSaveMode _invalidDataSaveMode = InvalidDataSaveMode.Disallow;
 
         /// <summary>
         /// Keeps track of whether the highlights associated with the active control need to be
         /// refreshed.
         /// </summary>
-        private bool _refreshActiveControlHighlights;
+        bool _refreshActiveControlHighlights;
 
         /// <summary>
         /// One or more colors to use to highlight data in the image viewer or indicate the active
         /// status of data in a control.
         /// </summary>
-        private HighlightColor[] _highlightColors;
+        HighlightColor[] _highlightColors;
 
         /// <summary>
         /// The boundaries between tiers of OCR confidence in _highlightColors.
         /// </summary>
-        private VariantVector _confidenceBoundaries;
+        VariantVector _confidenceBoundaries;
 
         /// <summary>
         /// The default color to use for highlighting data in the image viewer or to indicate the
         /// active status of data in a control. This will be the same color as the top tier color
         /// in _highlightColors.
         /// </summary>
-        private Color _defaultHighlightColor = Color.LightGreen;
+        Color _defaultHighlightColor = Color.LightGreen;
 
         /// <summary>
         /// The title of the current DataEntry application.
         /// </summary>
-        private string _applicationTitle;
+        string _applicationTitle;
 
         /// <summary>
         /// A list of names of DataEntry controls that should remain disabled at all times.
         /// </summary>
-        private List<string> _disabledControls = new List<string>();
+        List<string> _disabledControls = new List<string>();
 
         /// <summary>
         /// The number of selected attributes with highlights that have been accepted by the user.
         /// </summary>
-        private int _selectedAttributesWithAcceptedHighlights;
+        int _selectedAttributesWithAcceptedHighlights;
 
         /// <summary>
         /// The number of selected attributes with unaccepted highlights.
         /// </summary>
-        private int _selectedAttributesWithUnacceptedHighlights;
+        int _selectedAttributesWithUnacceptedHighlights;
 
         /// <summary>
         /// The number of selected attributes without spatial information but that have a direct
         /// hint indicating where the data may be (if present).
         /// </summary>
-        private int _selectedAttributesWithDirectHints;
+        int _selectedAttributesWithDirectHints;
 
         /// <summary>
         /// The number of selected attributes without spatial information but that have an indirect
         /// hint indicating data related field.
         /// </summary>
-        private int _selectedAttributesWithIndirectHints;
+        int _selectedAttributesWithIndirectHints;
 
         /// <summary>
         /// The number of selected attributes without spatial information or hints.
         /// </summary>
-        private int _selectedAttributesWithoutHighlights;
+        int _selectedAttributesWithoutHighlights;
 
         /// <summary>
         /// Indicates whether a swipe is currently being processed.
         /// </summary>
-        private bool _processingSwipe;
+        bool _processingSwipe;
 
         /// <summary>
         /// Indicates whether the results of the active swipe should be discarded.
         /// </summary>
-        private bool _cancelingSwipe;
+        bool _cancelingSwipe;
 
         /// <summary>
         /// A database available for use in validation or auto-update queries.
         /// </summary>
-        private DbConnection _dbConnection;
+        DbConnection _dbConnection;
 
         /// <summary>
         /// Indicates if the host is in design mode or not.
         /// </summary>
-        private bool _inDesignMode;
+        bool _inDesignMode;
+
+        /// <summary>
+        /// The DEP's comment if the Comment property is not overriden (which it should be).
+        /// </summary>
+        string _comment;
 
         #endregion Fields
 
@@ -780,6 +791,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <value>The title of the current DataEntry application.</value>
         /// <returns>The title of the current DataEntry application.</returns>
+        [Category("Data Entry Control Host")]
         public string ApplicationTitle
         {
             get
@@ -799,6 +811,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <value>A comma separated list of names of <see cref="IDataEntryControl"/>s.</value>
         /// <returns>A comma separated list of names of <see cref="IDataEntryControl"/>s.</returns>
+        [Category("Data Entry Control Host")]
         public string DisabledControls
         {
             get
@@ -841,12 +854,36 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// The comment associated with the DEP.
+        /// <para><b>NOTE:</b></para>
+        /// This property should be overriden if the verification task needs to support comments
+        /// so that the Comment property is associated with the control in which comments are
+        /// entered.
+        /// </summary>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public virtual string Comment
+        {
+            get
+            {
+                return _comment;
+            }
+
+            set
+            {
+                _comment = value;
+            }
+        }
+
+        /// <summary>
         /// Specifies the database connection to be used in data validation or auto-update queries.
         /// </summary>
         /// <value>The <see cref="DbConnection"/> to be used. (Can be <see langword="null"/> if one
         /// is not required by the DEP).</value>
         /// <returns>The <see cref="DbConnection"/> in use or <see langword="null"/> if none
         /// has been specified.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public DbConnection DatabaseConnection
         {
             get
@@ -861,6 +898,18 @@ namespace Extract.DataEntry
         }
 
         #endregion Properties
+
+        #region Methods
+
+        /// <summary>
+        /// 
+        /// </summary>
+        protected virtual void OnDataChanged()
+        {
+            _dirty = true;
+        }
+
+        #endregion Methods
 
         #region IImageViewerControl Members
 
@@ -1105,10 +1154,13 @@ namespace Extract.DataEntry
         /// validate that the data it contains conforms to any validation rules that have been 
         /// applied to it. If so, the vector of attributes as it currently stands is output.
         /// </summary>
+        /// <param name="validateData"><see langword="true"/> if the save should only be performed
+        /// if all data in the DEP passes validation, <see langword="false"/> if data should be
+        /// saved even if there is invalid data.</param>
         /// <returns><see langword="true"/> if the document's data was successfully saved.
         /// <see langword="false"/> if the data was not saved (such as when data fails validation).
         /// </returns>
-        public bool SaveData()
+        public bool SaveData(bool validateData)
         {
             try
             {
@@ -1120,7 +1172,7 @@ namespace Extract.DataEntry
                         // non-incremental value modified event can be raised.
                         AttributeStatusInfo.EndEdit();
 
-                        if (DataCanBeSaved())
+                        if (!validateData || DataCanBeSaved())
                         {
                             // Create a copy of the data to be saved so that attributes that should
                             // not be persisted can be removed.
@@ -1548,7 +1600,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="ImageFileChangedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
+        void HandleImageFileChanged(object sender, ImageFileChangedEventArgs e)
         {
             // Set flag to indicate that a document change is in progress so that highlights
             // are not redrawn as the spatial info of the controls are updated.
@@ -1632,6 +1684,12 @@ namespace Extract.DataEntry
                         control.Enabled = imageIsAvailable && !dataControl.Disabled;
                     }
 
+                    // Enable/Disable all non-data controls per imageIsAvailable
+                    foreach (Control control in _nonDataControls)
+                    {
+                        control.Enabled = imageIsAvailable;
+                    }
+
                     // For as long as unpropagated attributes are found, propagate them and their 
                     // subattributes so that all attributes that can be are mapped into controls.
                     // This enables the entire attribute tree to be navigated forward and backward 
@@ -1712,7 +1770,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="CursorToolChangedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
+        void HandleCursorToolChanged(object sender, CursorToolChangedEventArgs e)
         {
             try
             {
@@ -1732,7 +1790,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleControlGotFocus(object sender, EventArgs e)
+        void HandleControlGotFocus(object sender, EventArgs e)
         {
             try
             {
@@ -1827,7 +1885,7 @@ namespace Extract.DataEntry
         /// <param name="e">A <see cref="AttributesSelectedEventArgs"/> that contains the event
         /// data.</param>
         /// <seealso cref="IDataEntryControl"/>
-        private void HandleAttributesSelected(object sender, AttributesSelectedEventArgs e)
+        void HandleAttributesSelected(object sender, AttributesSelectedEventArgs e)
         {
             try
             {
@@ -1872,11 +1930,11 @@ namespace Extract.DataEntry
         /// <param name="e">An <see cref="AttributeValueModifiedEventArgs"/> that contains the
         /// event data.
         /// </param>
-        private void HandleAttributeValueModified(object sender, AttributeValueModifiedEventArgs e)
+        void HandleAttributeValueModified(object sender, AttributeValueModifiedEventArgs e)
         {
             try
             {
-                _dirty = true;
+                OnDataChanged();
 
                 // Update the attribute's highlights if the modification is not happening during 
                 // image loading, and the update is coming from the active data control.
@@ -1928,11 +1986,11 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="AttributeDeletedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleAttributeDeleted(object sender, AttributeDeletedEventArgs e)
+        void HandleAttributeDeleted(object sender, AttributeDeletedEventArgs e)
         {
             try
             {
-                _dirty = true;
+                OnDataChanged();
 
                 // A refresh of highlights is needed now that attributes have been deleted.
                 _refreshActiveControlHighlights = true;
@@ -1953,7 +2011,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="LayerObjectAddedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
         {
             try
             {
@@ -1978,7 +2036,7 @@ namespace Extract.DataEntry
                         _processingSwipe = true;
 
                         // [DataEntry:269] Swipes should trigger document to be marked as dirty.
-                        _dirty = true;
+                        OnDataChanged();
 
                         // TODO: Filter out swipes that are too small to limit unnecessary exceptions
 
@@ -2054,7 +2112,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="SwipingStateChangedEventArgs"/> that indicates whether 
         /// swiping is being enabled or disabled.</param>
-        private void HandleSwipingStateChanged(object sender, SwipingStateChangedEventArgs e)
+        void HandleSwipingStateChanged(object sender, SwipingStateChangedEventArgs e)
         {
             try
             {
@@ -2077,11 +2135,11 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="AttributeInitializedEventArgs"/> that contains the event
         /// data.</param>
-        private void HandleAttributeInitialized(object sender, AttributeInitializedEventArgs e)
+        void HandleAttributeInitialized(object sender, AttributeInitializedEventArgs e)
         {
             try
             {
-                _dirty = true;
+                OnDataChanged();
 
                 if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false))
                 {
@@ -2119,7 +2177,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="ViewedStateChangedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleViewedStateChanged(object sender,
+        void HandleViewedStateChanged(object sender,
             ViewedStateChangedEventArgs e)
         {
             try
@@ -2148,7 +2206,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="ValidationStateChangedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleValidationStateChanged(object sender,
+        void HandleValidationStateChanged(object sender,
             ValidationStateChangedEventArgs e)
         {
             try
@@ -2182,7 +2240,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="PreviewKeyDownEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleImageViewerPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        void HandleImageViewerPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
             try
             {
@@ -2220,7 +2278,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="LayerObjectEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleSelectionToolEnteredLayerObject(object sender, LayerObjectEventArgs e)
+        void HandleSelectionToolEnteredLayerObject(object sender, LayerObjectEventArgs e)
         {
             try
             {
@@ -2264,7 +2322,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="LayerObjectEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleSelectionToolLeftLayerObject(object sender, LayerObjectEventArgs e)
+        void HandleSelectionToolLeftLayerObject(object sender, LayerObjectEventArgs e)
         {
             try
             {
@@ -2304,7 +2362,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="MouseEventArgs"/> that contains the event data.</param>
-        private void HandleImageViewerMouseDown(object sender, MouseEventArgs e)
+        void HandleImageViewerMouseDown(object sender, MouseEventArgs e)
         {
             try
             {
@@ -2360,7 +2418,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="parentControl">The control for which <see cref="IDataEntryControl"/>s
         /// should be registered.</param>
-        private void RegisterDataEntryControls(Control parentControl)
+        void RegisterDataEntryControls(Control parentControl)
         {
             // Loop recursively through all contained controls looking for controls that implement
             // the IDataEntryControl interface
@@ -2371,7 +2429,11 @@ namespace Extract.DataEntry
 
                 // Check to see if this control is an IDataEntryControl itself.
                 IDataEntryControl dataControl = control as IDataEntryControl;
-                if (dataControl != null)
+                if (dataControl == null)
+                {
+                    _nonDataControls.Add(control);
+                }
+                else
                 {
                     // Set the font of data controls to the _DATA_FONT_FAMILY.
                     control.Font = new Font(_DATA_FONT_FAMILY, base.Font.Size);
@@ -2419,7 +2481,7 @@ namespace Extract.DataEntry
         /// Unregisters the <see cref="DataEntryControlHost"/> from <see cref="IDataEntryControl"/>
         /// events.
         /// </summary>
-        private void UnregisterDataEntryControls()
+        void UnregisterDataEntryControls()
         {
             try
             {
@@ -2442,7 +2504,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="e">A <see cref="SwipingStateChangedEventArgs"/> describing whether or not
         /// swiping is to be enabled.</param>
-        private void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
+        void OnSwipingStateChanged(SwipingStateChangedEventArgs e)
         {
             if (e.SwipingEnabled && _imageViewer.CursorTool == CursorTool.None && 
                 _imageViewer.IsImageAvailable)
@@ -2472,7 +2534,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Raises the <see cref="ItemSelectionChanged"/> event.
         /// </summary>
-        private void OnItemSelectionChanged()
+        void OnItemSelectionChanged()
         {
             if (this.ItemSelectionChanged != null)
             {
@@ -2490,7 +2552,7 @@ namespace Extract.DataEntry
         /// <param name="unviewedItemsFound"><see langword="true"/> if unviewed 
         /// <see cref="IAttribute"/>s are now known to exist, <see langword="false"/> if it is
         /// now known that all <see cref="IAttribute"/>s have been viewed.</param>
-        private void OnUnviewedItemsFound(bool unviewedItemsFound)
+        void OnUnviewedItemsFound(bool unviewedItemsFound)
         {
             if (this.UnviewedItemsFound != null)
             {
@@ -2504,7 +2566,7 @@ namespace Extract.DataEntry
         /// <param name="invalidItemsFound"><see langword="true"/> if <see cref="IAttribute"/>s
         /// with invalid data are now known to exist, <see langword="false"/> if it is
         /// now known that all <see cref="IAttribute"/>s contain valid data.</param>
-        private void OnInvalidItemsFound(bool invalidItemsFound)
+        void OnInvalidItemsFound(bool invalidItemsFound)
         {
             if (this.InvalidItemsFound != null)
             {
@@ -2520,7 +2582,7 @@ namespace Extract.DataEntry
         /// the document currently in view will be adjusted to ensure all active attribute(s) and
         /// their associated tooltip is visible.  If <see langword="false"/> the view will be
         /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
-        private void DrawHighlights(bool ensureActiveAttributeVisible)
+        void DrawHighlights(bool ensureActiveAttributeVisible)
         {
             // To avoid unnecessary drawing, wait until we are done loading a document before
             // attempting to display any layer objects.
@@ -2812,7 +2874,7 @@ namespace Extract.DataEntry
         /// should be selected in their respective controls and the target attribute should be
         /// active. If <see langword="false"/>, the data is only propagated behind the scenes 
         /// (which causes the attributes' data to be validated).</param>
-        private static IAttribute PropagateAttributes(Stack<IAttribute> attributes, bool select)
+        static IAttribute PropagateAttributes(Stack<IAttribute> attributes, bool select)
         {
             if (attributes.Count == 0)
             {
@@ -2869,7 +2931,7 @@ namespace Extract.DataEntry
         /// <returns>A Stack of <see cref="IAttribute"/>s describing the currently active
         /// <see cref="IAttribute"/> or <see langword="null"/> if there is no active attribute.
         /// </returns>
-        private Stack<IAttribute> ActiveAttributeGenealogy()
+        Stack<IAttribute> ActiveAttributeGenealogy()
         {
             if (_activeDataControl != null)
             {
@@ -2892,7 +2954,7 @@ namespace Extract.DataEntry
         /// from which the first attribute in display order should be found.</param>
         /// <returns>The <see cref="IAttribute"/> containing the lowest 
         /// <see cref="AttributeStatusInfo.DisplayOrder"/>.</returns>
-        private static IAttribute GetFirstAttribute(List<IAttribute> attributes)
+        static IAttribute GetFirstAttribute(List<IAttribute> attributes)
         {
             string firstDisplayOrder = "";
             IAttribute firstAttribute = null;
@@ -2928,7 +2990,7 @@ namespace Extract.DataEntry
         /// <returns>A genealogy of <see cref="IAttribute"/>s with each attribute further down the
         /// the stack being a descendent to the previous <see cref="IAttribute"/> in the stack; the
         /// last entry being the specified <see cref="IAttribute"/>.</returns>
-        private static Stack<IAttribute> GetAttributeGenealogy(IAttribute attribute)
+        static Stack<IAttribute> GetAttributeGenealogy(IAttribute attribute)
         {
             Stack<IAttribute> attributeGenealogy = new Stack<IAttribute>();
 
@@ -2955,7 +3017,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The first <see cref="IAttribute"/> that has not been viewed, or 
         /// <see langword="null"/> if no unviewed <see cref="IAttribute"/>s were found.</returns>
-        private IAttribute GetNextUnviewedAttribute()
+        IAttribute GetNextUnviewedAttribute()
         {
             // Look for any attributes whose data failed validation.
             Stack<IAttribute> unviewedAttributeGenealogy =
@@ -2978,7 +3040,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The first <see cref="IAttribute"/> that failed validation, or 
         /// <see langword="null"/> if no invalid <see cref="IAttribute"/>s were found.</returns>
-        private IAttribute GetNextInvalidAttribute()
+        IAttribute GetNextInvalidAttribute()
         {
             // Toggle the enabled status of the active control to force editing to end and 
             // validation to occur for any field that is currently being edited.
@@ -3025,7 +3087,7 @@ namespace Extract.DataEntry
         /// <returns>The <see cref="IDataEntryControl"/> that should receive active status.
         /// <see langword="null"/> if no such <see cref="IDataEntryControl"/> was found.
         /// </returns>
-        private IDataEntryControl FindClickedDataEntryControl(Message m)
+        IDataEntryControl FindClickedDataEntryControl(Message m)
         {
             ExtractException.Assert("ELI24760", "Unexpected message!",
                 m != null && (m.Msg == _WM_LBUTTONDOWN || m.Msg == _WM_RBUTTONDOWN));
@@ -3089,7 +3151,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="increment"><see langword="true"/> to increment
         /// _unviewedAttributeCount <see langword="false"/> to decrement it.</param>
-        private void UpdateUnviewedCount(bool increment)
+        void UpdateUnviewedCount(bool increment)
         {
             if (_changingImage)
             {
@@ -3143,7 +3205,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="increment"><see langword="true"/> to increment
         /// _invalidAttributeCount <see langword="false"/> to decrement it.</param>
-        private void UpdateInvalidCount(bool increment)
+        void UpdateInvalidCount(bool increment)
         {
             if (_changingImage)
             {
@@ -3196,7 +3258,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The number of unviewed items in the current <see cref="IAttribute"/> heirarchy.
         /// </returns>
-        private int CountUnviewedItems()
+        int CountUnviewedItems()
         {
             Stack<IAttribute> startingPoint = null;
             Stack<IAttribute> nextUnviewedAttributeGenealogy = null;
@@ -3228,7 +3290,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns>The number of invalid items in the current <see cref="IAttribute"/> heirarchy.
         /// </returns>
-        private int CountInvalidItems()
+        int CountInvalidItems()
         {
             Stack<IAttribute> startingPoint = null;
             Stack<IAttribute> nextInvalidAttributeGenealogy = null;
@@ -3261,7 +3323,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="deletedAttributes">The <see cref="IAttribute"/>s that have been
         /// deleted. Must not be <see langword="null"/>.</param>
-        private void ProcessDeletedAttributes(IUnknownVector deletedAttributes)
+        void ProcessDeletedAttributes(IUnknownVector deletedAttributes)
         {
             ExtractException.Assert("ELI25178", "Null argument exception!", 
                 deletedAttributes != null);
@@ -3308,7 +3370,7 @@ namespace Extract.DataEntry
         /// to be returned. Must not be <see langword="null"/>.
         /// </param>
         /// <returns>A list of raster zones from the supplied <see cref="IAttribute"/>s.</returns>
-        private static List<RasterZone> GetRasterZones(IUnknownVector attributes)
+        static List<RasterZone> GetRasterZones(IUnknownVector attributes)
         {
             ExtractException.Assert("ELI25177", "Null argument exception!", attributes != null);
 
@@ -3360,7 +3422,7 @@ namespace Extract.DataEntry
         /// <param name="makeVisible"><see langword="true"/> if the highlight should be initialized
         /// as visible, <see langword="false"/> to create the highlight as not visible. (unless a
         /// highlight it is replacing is already visible)</param>
-        private void SetAttributeHighlight(IAttribute attribute, bool makeVisible)
+        void SetAttributeHighlight(IAttribute attribute, bool makeVisible)
         {
             ExtractException.Assert("ELI25173", "Null argument exception!", attribute != null);
 
@@ -3522,7 +3584,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> for which a tooltip should be
         /// created.</param>
-        private void ShowAttributeToolTip(IAttribute attribute)
+        void ShowAttributeToolTip(IAttribute attribute)
         {
             RemoveAttributeToolTip(attribute);
 
@@ -3535,7 +3597,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Creates and positions tooltips for attributes designated to have tooltips.
         /// </summary>
-        private void PositionToolTips()
+        void PositionToolTips()
         {
             // Loop through all attributes designated to receive a tooltip. Compile the bounding
             // rectangles of all the attributes on the current page that have spatial info and
@@ -3609,7 +3671,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the zones appear to be arranged horizontally or it is not
         /// clear which way they are arranged, <see langword="false"/> if the zones appear to be
         /// arranged vertically.</returns>
-        private static bool HasHorizontalOrientation(List<RasterZone> rasterZones)
+        static bool HasHorizontalOrientation(List<RasterZone> rasterZones)
         {
             // If there are not multiple raster zones, default to horizontal.
             if (rasterZones.Count < 2)
@@ -3703,7 +3765,7 @@ namespace Extract.DataEntry
         /// potentially be associated with. Must not be <see langword="null"/>.</param>
         /// <param name="makeVisible"><see langword="true"/> to make the icon visible right away or
         /// <see langword="false"/> if the icon should be invisible initially.</param>
-        private void CreateAttributeErrorIcon(IAttribute attribute, bool makeVisible)
+        void CreateAttributeErrorIcon(IAttribute attribute, bool makeVisible)
         {
             ExtractException.Assert("ELI25699", "Null argument exception!", attribute != null);
 
@@ -3775,7 +3837,7 @@ namespace Extract.DataEntry
         /// improve the appearance of the associated <see cref="AnchoredObject"/>.</param>
         /// <returns>A <see cref="Point"/> to use as the anchor for an <see cref="AnchoredObject"/>.
         /// </returns>
-        private static Point GetAnchorPoint(
+        static Point GetAnchorPoint(
             List<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
             out double anchoredObjectRotation)
         {
@@ -3921,7 +3983,7 @@ namespace Extract.DataEntry
         /// <param name="displayToolTips"><see langword="true"/> to display tooltips for all
         /// specified <see cref="IAttribute"/>s that are owned by the specfied
         /// <see paramref="dataControl"/>.</param>
-        private void UpdateControlAttributes(IDataEntryControl dataControl,
+        void UpdateControlAttributes(IDataEntryControl dataControl,
             IUnknownVector attributes, bool includeSubAttributes, bool displayToolTips)
         {
             ExtractException.Assert("ELI25169", "Null argument exception!", dataControl != null);
@@ -4027,7 +4089,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Updates the highlights for the currently active <see cref="IAttribute"/>(s).
         /// </summary>
-        private void RefreshActiveControlHighlights()
+        void RefreshActiveControlHighlights()
         {
             if (_activeDataControl != null)
             {
@@ -4075,7 +4137,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> that should have its highlight
         /// removed. Must not be <see langword="null"/>.</param>
-        private void RemoveAttributeHighlight(IAttribute attribute)
+        void RemoveAttributeHighlight(IAttribute attribute)
         {
             ExtractException.Assert("ELI25175", "Null argument exception!", attribute != null);
 
@@ -4113,7 +4175,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> that should have
         /// its associated tooltip removed. Must not be <see langword="null"/>.</param>
-        private void RemoveAttributeToolTip(IAttribute attribute)
+        void RemoveAttributeToolTip(IAttribute attribute)
         {
             ExtractException.Assert("ELI25176", "Null argument exception!", attribute != null);
 
@@ -4152,7 +4214,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> that should have its associated 
         /// error icon removed. Must not be <see langword="null"/>.</param>
-        private void RemoveAttributeErrorIcon(IAttribute attribute)
+        void RemoveAttributeErrorIcon(IAttribute attribute)
         {
             ExtractException.Assert("ELI25702", "Null argument exception!", attribute != null);
 
@@ -4180,7 +4242,7 @@ namespace Extract.DataEntry
         /// or hidden</param>
         /// <param name="show"><see langword="true"/> to display the error icon,
         /// <see langword="false"/> to hide it.</param>
-        private void ShowErrorIcon(IAttribute attribute, bool show)
+        void ShowErrorIcon(IAttribute attribute, bool show)
         {
             List<ImageLayerObject> errorIcons;
             if (_attributeErrorIcons.TryGetValue(attribute, out errorIcons))
@@ -4200,7 +4262,7 @@ namespace Extract.DataEntry
         /// <param name="page">The page number of the desired error icon.</param>
         /// <returns>The <see cref="ImageLayerObject"/> displaying the requested error icon or
         /// <see langword="null"/> if no such error icon exists.</returns>
-        private ImageLayerObject GetErrorIconOnPage(IAttribute attribute, int page)
+        ImageLayerObject GetErrorIconOnPage(IAttribute attribute, int page)
         {
             List<ImageLayerObject> errorIcons;
             if (_attributeErrorIcons.TryGetValue(attribute, out errorIcons))
@@ -4224,7 +4286,7 @@ namespace Extract.DataEntry
         /// <param name="attribute">The <see cref="IAttribute"/> to show or hide.</param>
         /// <param name="show"><see langword="true"/> to show the highlight; <see langword="false"/>
         /// to hide it.</param>
-        private void ShowAttributeHighlights(IAttribute attribute, bool show)
+        void ShowAttributeHighlights(IAttribute attribute, bool show)
         {
             ShowErrorIcon(attribute, show);
 
@@ -4246,7 +4308,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns><see langword="true"/> if data can be saved, <see langword="false"/> if the
         /// data cannot be saved at this time.</returns>
-        private bool DataCanBeSaved()
+        bool DataCanBeSaved()
         {
             // Keep track of the currently selected attribute and whether selection is changed by
             // this method so that the selection can be restored at the end of this method.
@@ -4382,7 +4444,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="lockUpdates"><see langword="true"/> to lock all controls from updating
         /// or <see langword="false"/> to release the lock and allow updates again.</param>
-        private void LockControlUpdates(bool lockUpdates)
+        void LockControlUpdates(bool lockUpdates)
         {
             if (lockUpdates == _controlUpdatesLocked)
             {
@@ -4428,7 +4490,7 @@ namespace Extract.DataEntry
         /// in which the returned <see cref="IAttribute"/>(s) must exist.</param>
         /// <returns>The viewable <see cref="IAttribute"/>s in the specified
         /// <see cref="IDataEntryControl"/>.</returns>
-        private IEnumerable<IAttribute> GetViewableAttributesInControl(IDataEntryControl dataEntryControl,
+        IEnumerable<IAttribute> GetViewableAttributesInControl(IDataEntryControl dataEntryControl,
             IUnknownVector attributes)
         {
             ExtractException.Assert("ELI25356", "Null argument exception!", dataEntryControl != null);
@@ -4463,7 +4525,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="attributes">The hierarchy of <see cref="IAttribute"/>s from which
         /// non-persistable attributes should be removed.</param>
-        private void PruneNonPersistingAttributes(IUnknownVector attributes)
+        void PruneNonPersistingAttributes(IUnknownVector attributes)
         {
             int count = attributes.Size();
             for (int i = 0; i < count; i++)

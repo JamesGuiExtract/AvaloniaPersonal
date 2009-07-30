@@ -309,12 +309,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <param name="bCancelRequested">If <see langword="true"/>, the user has requested that
         /// processing be cancelled. In this case, the provided document will not be processed.
         /// </param>
-        /// <returns><see langword="true"/> if processing of the document completed successfully.
-        /// <see langword="false"/> if processing of the document was cancelled by the user.
+        /// <returns><see cref="EFileProcessingResult.kProcessingSuccessful"/> if verification of the
+        /// document completed successfully, <see cref="EFileProcessingResult.kProcessingCancelled"/>
+        /// if verification of the document was cancelled by the user or
+        /// <see cref="EFileProcessingResult.kProcessingSkipped"/> if processing of the current file
+        /// was skipped, but the user wishes to continue viewing subsequent documents.
         /// </returns>
         [CLSCompliant(false)]
-        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID, int nActionID,
-            FAMTagManager pFAMTM, FileProcessingDB pDB, ProgressStatus pProgressStatus, bool bCancelRequested)
+        public EFileProcessingResult ProcessFile(string bstrFileFullName, int nFileID,
+            int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
+            ProgressStatus pProgressStatus, bool bCancelRequested)
         {
             try
             {
@@ -322,15 +326,23 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
                     "ELI26897", _DEFAULT_FILE_ACTION_TASK_NAME);
 
-                if (!bCancelRequested)
+                EFileProcessingResult processingResult;
+
+                if (bCancelRequested)
+                {
+                    // If a cancel has been requested, since this task is cancelable, don't attempt
+                    // verification, just return kProcessingCancelled.
+                    processingResult = EFileProcessingResult.kProcessingCancelled;
+                }
+                else
                 {
                     // As long as processing has not been cancelled, open the supplied document in the
                     // data entry form.
-                    _dataEntryFormManager.ShowDocument(bstrFileFullName);
+                    processingResult = _dataEntryFormManager.ShowDocument(bstrFileFullName,
+                        nFileID, nActionID, pFAMTM, pDB);
                 }
 
-                return (bCancelRequested || _dataEntryFormManager.Canceled) ?
-                    EFileProcessingResult.kProcessingCancelled : EFileProcessingResult.kProcessingSuccessful;
+                return processingResult;
             }
             catch (Exception ex)
             {

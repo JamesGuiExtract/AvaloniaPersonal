@@ -35,5 +35,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-// Mark as CLS compliant
-[assembly: CLSCompliant(true)]
+// Mark as not CLS compliant. (since this assembly will be practically unusable without 
+// CLS-incompliant methods)
+[assembly: CLSCompliant(false)]

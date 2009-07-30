@@ -97,6 +97,8 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox = new System.Windows.Forms.GroupBox();
             this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
             this._resultStatusLabel = new System.Windows.Forms.Label();
+            this._operatorCommentLabel = new System.Windows.Forms.Label();
+            this._operatorComments = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -571,7 +573,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientInfoGroupBox.Controls.Add(this._patientRecordNum);
             this._patientInfoGroupBox.Controls.Add(this._patientMRLabel);
             this._patientInfoGroupBox.Disabled = false;
-            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 54);
+            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 79);
             this._patientInfoGroupBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
             this._patientInfoGroupBox.ParentDataEntryControl = null;
@@ -919,7 +921,7 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianInfoGroupBox.Controls.Add(this._orderingPhysicianTable);
             this._physicianInfoGroupBox.Controls.Add(this._physicianTable);
             this._physicianInfoGroupBox.Disabled = false;
-            this._physicianInfoGroupBox.Location = new System.Drawing.Point(0, 252);
+            this._physicianInfoGroupBox.Location = new System.Drawing.Point(0, 277);
             this._physicianInfoGroupBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._physicianInfoGroupBox.Name = "_physicianInfoGroupBox";
             this._physicianInfoGroupBox.ParentDataEntryControl = null;
@@ -1142,7 +1144,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testDetailsGroupBox.Controls.Add(this._resultDateLabel);
             this._testDetailsGroupBox.Controls.Add(this._testResultDate);
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
-            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 621);
+            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 641);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
             this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 393);
             this._testDetailsGroupBox.TabIndex = 5;
@@ -1288,7 +1290,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
-            this._testsGroupBox.Location = new System.Drawing.Point(0, 451);
+            this._testsGroupBox.Location = new System.Drawing.Point(0, 476);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(593, 159);
             this._testsGroupBox.TabIndex = 5;
@@ -1335,9 +1337,31 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatusLabel.TabIndex = 0;
             this._resultStatusLabel.Text = "Result Status";
             // 
+            // _operatorCommentLabel
+            // 
+            this._operatorCommentLabel.AutoSize = true;
+            this._operatorCommentLabel.Location = new System.Drawing.Point(6, 11);
+            this._operatorCommentLabel.Name = "_operatorCommentLabel";
+            this._operatorCommentLabel.Size = new System.Drawing.Size(146, 13);
+            this._operatorCommentLabel.TabIndex = 6;
+            this._operatorCommentLabel.Text = "Comments (for operator\'s use)";
+            // 
+            // _operatorComments
+            // 
+            this._operatorComments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._operatorComments.Enabled = false;
+            this._operatorComments.Location = new System.Drawing.Point(7, 27);
+            this._operatorComments.Multiline = true;
+            this._operatorComments.Name = "_operatorComments";
+            this._operatorComments.Size = new System.Drawing.Size(371, 46);
+            this._operatorComments.TabIndex = 7;
+            // 
             // StandardLabDEPanel
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.Controls.Add(this._operatorComments);
+            this.Controls.Add(this._operatorCommentLabel);
             this.Controls.Add(this._labAddress);
             this.Controls.Add(this._resultStatusLabel);
             this.Controls.Add(this._resultStatus);
@@ -1354,7 +1378,7 @@ namespace Extract.LabDE.StandardLabDE
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "StandardLabDEPanel";
-            this.Size = new System.Drawing.Size(593, 1014);
+            this.Size = new System.Drawing.Size(593, 1034);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
@@ -1438,5 +1462,7 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _componentRefRange;
         private Extract.DataEntry.DataEntryTableColumn _componentFlag;
         private Extract.DataEntry.DataEntryTableColumn _componentComment;
+        private System.Windows.Forms.Label _operatorCommentLabel;
+        private System.Windows.Forms.TextBox _operatorComments;
     }
 }
