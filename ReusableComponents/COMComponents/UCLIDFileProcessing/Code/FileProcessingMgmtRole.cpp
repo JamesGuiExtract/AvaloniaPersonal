@@ -182,20 +182,17 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrAct
 			// store the pointer to the DB so that subsequent calls to getFPDB() will work correctly
 			m_pDB = pDB;
 
-			// Get the action's ID from name
-			DWORD dwActionID = getActionID(asString(bstrAction));
+			// remember the action name
+			m_strAction = asString(bstrAction);
 
 			// Set action ID to the record manager
-			m_pRecordMgr->setActionID(dwActionID);
+			m_pRecordMgr->setActionID(getActionID(m_strAction));
 
 			// Signal Not Paused event so that processing will continue
 			m_eventResume.signal();
 
 			// store the pointer to the TagManager so that subsequent calls to getFPMTagManager() will work
 			m_pFAMTagManager = pTagManager;
-
-			// remember the action name
-			m_strAction = asString(bstrAction);
 
 			// remember the handle of the UI so that messages can be sent to it
 			m_hWndOfUI = (HWND) hWndOfUI;
@@ -1378,7 +1375,7 @@ EFileProcessingResult CFileProcessingMgmtRole::startFileProcessingChain(FileProc
 
 		// Attempt to process the file
 		EFileProcessingResult eResult = (EFileProcessingResult) ipExecutor->ProcessFile(
-			task.getFileName().c_str(), task.getFileID(), task.getActionID(),
+			task.getFileName().c_str(), task.getFileID(), m_pRecordMgr->getActionID(),
 			task.m_ipProgressStatus, VARIANT_FALSE);
 
 		return eResult;
@@ -1522,6 +1519,9 @@ void CFileProcessingMgmtRole::clear()
 	// Reset the number of threads
 	m_nNumThreads = 0;
 
+	// Reset the action name
+	m_strAction = "";
+
 	// Clear the continuous processing flags
 	m_bKeepProcessingAsAdded = false;
 	m_bOkToStopWhenQueueIsEmpty = false;
@@ -1621,7 +1621,7 @@ IIUnknownVectorPtr CFileProcessingMgmtRole::copyFileProcessingTasks(IIUnknownVec
 	return ipNewProcessors;
 }
 //--------------------------------------------------------------------------------------------------
-DWORD CFileProcessingMgmtRole::getActionID(const std::string & strAct)
+DWORD CFileProcessingMgmtRole::getActionID(const string & strAct)
 {
 	// Initialize action ID
 	DWORD dwActionID = 0;

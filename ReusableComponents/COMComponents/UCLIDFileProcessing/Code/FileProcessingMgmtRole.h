@@ -11,6 +11,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 class CFileProcessingMgmtRole;
 
 //-------------------------------------------------------------------------------------------------
@@ -148,7 +150,7 @@ private:
 	long m_nNumThreads;
 
 	// vector of thread data objects containing data for each of the processing threads
-	std::vector<ProcessingThreadData *> m_vecProcessingThreadData;
+	vector<ProcessingThreadData *> m_vecProcessingThreadData;
 
 	// a flag to indicate whether the file Processing role is enabled or not
 	bool m_bEnabled;
@@ -192,11 +194,11 @@ private:
 	bool m_bOkToStopWhenQueueIsEmpty;
 
 	// Action Name being processed
-	std::string m_strAction;
+	string m_strAction;
 
 	// Log error details to this file
 	bool m_bLogErrorDetails;
-	std::string m_strErrorLogFile;
+	string m_strErrorLogFile;
 
 	// Execute this task if an error occurs ( depending on the built-in Enabled flag )
 	IObjectWithDescriptionPtr m_ipErrorTask;
@@ -269,7 +271,7 @@ private:
 	IIUnknownVectorPtr copyFileProcessingTasks(IIUnknownVectorPtr ipFileProcessingTasks);
 
 	// Return the action ID from name, return 0 if the name doesn't exist in DB
-	DWORD getActionID(const std::string & strAct);
+	DWORD getActionID(const string & strAct);
 	
 	// A method to return the count of enabled file processors in a IIUnknownVector of 
 	// IObjectWithDescription of IFileProcessingTask objects

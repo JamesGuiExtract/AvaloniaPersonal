@@ -457,7 +457,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 				else if ( eNewStatus == kRecordSkipped )
 				{
 					_lastCodePos = "225";
-					m_ipFPMDB->NotifyFileSkipped(nTaskID, task.getActionID());
+					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID);
 				}
 
 				_lastCodePos = "230";
