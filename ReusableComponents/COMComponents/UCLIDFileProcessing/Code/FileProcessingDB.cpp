@@ -1189,7 +1189,6 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		string strActionCol = "ASC_" + strActionName;
 
 		string strWhere = "";
-		string strFrom = "FROM FAMFile ";
 		string strTop = "TOP (" + asString( nMaxFiles ) + " ) ";
 		if (bGetSkippedFiles == VARIANT_TRUE)
 		{
@@ -1210,7 +1209,7 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		{
 			strWhere = "WHERE (" + strActionCol + " = 'P')";
 		}
-		strFrom += strWhere;
+		string strFrom = "FROM FAMFile " + strWhere;
 			
 		// create query to select top records;
 		string strSelectSQL = "SELECT " + strTop + " FAMFile.ID, FileName, Pages, FileSize " + strFrom;
@@ -1243,13 +1242,6 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 
 			// Put record in list of records to return
 			ipFiles->PushBack(ipFileRecord);
-
-			// If moving from skipped status then need to update the statistics table as well
-			if (bGetSkippedFiles == VARIANT_TRUE)
-			{
-				updateStats(ipConnection, nActionID, kActionSkipped, kActionProcessing, ipFileRecord,
-					ipFileRecord);
-			}
 
 			// move to the next record in the recordset
 			ipFileSet->MoveNext();

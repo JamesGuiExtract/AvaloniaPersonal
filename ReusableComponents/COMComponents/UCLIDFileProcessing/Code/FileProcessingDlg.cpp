@@ -913,19 +913,19 @@ LRESULT FileProcessingDlg::OnStatsUpdateMessage(WPARAM wParam, LPARAM lParam)
 			m_nNumTotalDocs = ipActionStatsNew->NumDocuments;
 			m_nNumSkipped = ipActionStatsNew->NumDocumentsSkipped;
 			
+			m_nNumPending = m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
+				+ m_nNumSkipped);
+
 			// Check for skipped file processing
-			// TODO: The stats for pending and skipped are not currently correct when processing
-			//		 skipped files
 			if (m_bProcessingSkippedFiles)
 			{
-				m_nNumSkipped += m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
-					+ m_nNumCurrentlyProcessing + m_nNumSkipped);
-				m_nNumPending = 0;
+				// Deduct the number currently processing from the skipped file count
+				m_nNumSkipped -= m_nNumCurrentlyProcessing;
 			}
 			else
 			{
-				m_nNumPending = m_nNumTotalDocs - (m_nNumFailed + m_nNumCompletedProcessing
-					+ m_nNumCurrentlyProcessing + m_nNumSkipped);
+				// Deduct the number currently processing from the pending file count
+				m_nNumPending -= m_nNumCurrentlyProcessing;
 			}
 
 			if (m_nNumInitialCompleted == gnUNINITIALIZED || m_nNumInitialFailed == gnUNINITIALIZED)

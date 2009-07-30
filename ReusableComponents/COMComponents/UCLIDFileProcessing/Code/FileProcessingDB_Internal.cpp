@@ -183,7 +183,28 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 			if ( strPrevStatus != strState )
 			{
 				// update the statistics
-				updateStats(ipConnection, nActionID, easRtn, asEActionStatus(strState), ipCurrRecord, ipCurrRecord);
+				EActionStatus easStatsFrom = easRtn;
+				if (easRtn == kActionProcessing)
+				{
+					// If moving from processing, check for record in skipped file table
+					string strTempSQL = "SELECT [ID] FROM [SkippedFile] WHERE ([FileID] = "
+						+ asString(nFileID) + " AND [ActionID] = " + asString(nActionID) + ")";
+
+					// Get the record set
+					_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
+					ASSERT_RESOURCE_ALLOCATION("ELI26949", ipSkippedSet != NULL);
+					ipSkippedSet->Open(strTempSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+						adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+					// If there is a record in the skipped table, call update stats with
+					// Skipped as the previous state
+					if (ipSkippedSet->adoEOF == VARIANT_FALSE)
+					{
+						easStatsFrom = kActionSkipped;
+					}
+				}
+				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strState),
+					ipCurrRecord, ipCurrRecord);
 
 				// Only update FileActionStateTransition table if required
 				if (m_bUpdateFASTTable)
@@ -194,10 +215,10 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 
 				if (bUpdateSkippedTable)
 				{
-					// These are order dependent
-					// Remove skipped file record
+					// These calls are order dependent.
+					// Remove the skipped record (if any) and add a new
+					// skipped file record if the new state is skipped
 					removeSkipFileRecord(ipConnection, nFileID, nActionID);
-
 					if (strState == "S")
 					{
 						// Add a record to the skipped table
