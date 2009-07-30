@@ -12,6 +12,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
+using UCLID_FILEPROCESSINGLib;
 
 namespace Extract.Redaction.Verification
 {
@@ -132,13 +133,13 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
-        /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
-        /// event.</param>
-        protected virtual void OnFileComplete(FileCompleteEventArgs e)
+        /// <param name="fileProcessingResult">Specifies under what circumstances
+        /// verification of the file completed.</param>
+        protected virtual void OnFileComplete(EFileProcessingResult fileProcessingResult)
         {
             if (FileComplete != null)
             {
-                FileComplete(this, e);
+                FileComplete(this, new FileCompleteEventArgs(fileProcessingResult));
             }
         }
 
@@ -157,7 +158,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileComplete(new FileCompleteEventArgs(false));
+                OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
             }
             catch (Exception ex)
             {
@@ -178,7 +179,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileComplete(new FileCompleteEventArgs(false));
+                OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
             }
             catch (Exception ex)
             {
@@ -266,13 +267,19 @@ namespace Extract.Redaction.Verification
         /// A thread-safe method that opens a document for verification.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>
-        public void Open(string fileName)
+        /// <param name="fileID">The ID of the file being processed.</param>
+        /// <param name="actionID">The ID of the action being processed.</param>
+        /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
+        /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
+        public void Open(string fileName, int fileID, int actionID, FAMTagManager tagManager,
+            FileProcessingDB fileProcessingDB)
         {
             try
             {
                 if (InvokeRequired)
                 {
-                    Invoke(new StringParameter(Open), new object[] { fileName });
+                    Invoke(new VerificationFormOpenDelegate(Open),
+                        new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                     return;
                 }
 
