@@ -393,11 +393,13 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 						}
 
 						// Check success flag
-						if (eResult == kProcessingCancelled)
+						if (eResult == kProcessingCancelled || eResult == kProcessingSkipped)
 						{
 							// Processing didn't complete.
-							// Log the fact that processing was cancelled
-							string strMsg = "Processing cancelled while performing ";
+							// Log the fact that processing was cancelled or skipped
+							string strMsg = "Application Trace: Processing ";
+							strMsg += (eResult == kProcessingCancelled ? "cancelled " : "skipped ");
+							strMsg += "while performing ";
 							if (strCurrentTaskName.empty())
 							{
 								// Use the task # as part of the error string.
@@ -409,16 +411,18 @@ EFileProcessingResult CFileProcessingTaskExecutor::processFile(
 								// Use the task name as part of the error string.
 								strMsg += strCurrentTaskName;
 							}
-							strMsg += "!";
+							strMsg += ".";
 
 							// Add the history record and debug information, then log the exception
 							UCLIDException ue("ELI17862",strMsg);
 							ue.addDebugInfo("File", strSourceDocName);
 							ue.addDebugInfo("Task", strCurrentTaskName);
+							ue.addDebugInfo("User Name", getCurrentUserName());
 							ue.log();
 
-							// Return processing cancelled
-							return kProcessingCancelled;
+							// Return processing cancelled or skipped
+							return eResult == kProcessingCancelled
+								? kProcessingCancelled : kProcessingSkipped;
 						}
 					}
 					CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI17694");
