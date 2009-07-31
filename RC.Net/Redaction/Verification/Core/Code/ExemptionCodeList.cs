@@ -171,6 +171,52 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Creates an exemption code list from the specified category and codes.
+        /// </summary>
+        /// <param name="category">The exemption code category.</param>
+        /// <param name="codes">A comma separated list of exemption codes and other text.</param>
+        /// <param name="masterCodes">The master list of valid exemption categories and codes.
+        /// </param>
+        /// <returns>An exemption code list of <paramref name="codes"/> in 
+        /// <paramref name="category"/>.</returns>
+        public static ExemptionCodeList Parse(string category, string codes, 
+            MasterExemptionCodeList masterCodes)
+        {
+            try
+            {
+                List<string> exemptions = new List<string>(codes.Split(
+                        new string[] { ", " }, StringSplitOptions.RemoveEmptyEntries));
+
+                StringBuilder otherText = new StringBuilder();
+                for (int i = 0; i < exemptions.Count; i++)
+                {
+                    string code = exemptions[i];
+                    if (!masterCodes.HasCode(category, code))
+                    {
+                        if (otherText.Length > 0)
+                        {
+                            otherText.Append(", ");
+                        }
+                        otherText.Append(code);
+
+                        exemptions.RemoveAt(i);
+                        i--;
+                    }
+                }
+
+                return new ExemptionCodeList(category, exemptions.ToArray(), otherText.ToString());
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26935",
+                    "Unable to parse exemption code list.", ex);
+                ee.AddDebugData("Category", category, false);
+                ee.AddDebugData("Codes", codes, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
         /// Determines whether the two arrays contain the same strings irrespective of order.
         /// </summary>
         /// <param name="left">An array of strings.</param>
