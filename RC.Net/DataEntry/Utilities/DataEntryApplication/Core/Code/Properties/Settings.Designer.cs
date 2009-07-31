@@ -34,15 +34,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("LabDE")]
-        public string ApplicationTitle {
-            get {
-                return ((string)(this["ApplicationTitle"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
         public string HighlightConfidenceBoundary {
             get {
@@ -84,6 +75,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication.Properties {
         public string DisabledControls {
             get {
                 return ((string)(this["DisabledControls"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string DisabledValidationControls {
+            get {
+                return ((string)(this["DisabledValidationControls"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string HelpFile {
+            get {
+                return ((string)(this["HelpFile"]));
             }
         }
     }

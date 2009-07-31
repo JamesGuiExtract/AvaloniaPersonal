@@ -20,6 +20,26 @@ namespace Extract.Utilities
             "C6D3EB7D-5DB9-4FC7-BEAD-0DBA39DBDB4B");
 
         /// <summary>
+        /// Either "C:\Program Files\Extract Systems" or "C:\Program Files (x86)\Extract Systems"
+        /// depending on the OS.
+        /// </summary>
+        private static readonly string _EXTRACT_SYSTEMS_PATH =
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+               "Extract Systems");
+
+        /// <summary>
+        /// Gets the full path to the Extract Systems program files directory.
+        /// </summary>
+        /// <returns>The full path to the Extract Systems program files directory.</returns>
+        public static string ExtractSystemsPath
+        {
+            get
+            {
+                return _EXTRACT_SYSTEMS_PATH;
+            }
+        }
+
+        /// <summary>
         /// Generates a file in the users TEMP folder with an extension of ".tmp".
         /// <para><b>Note:</b></para>
         /// The caller is responsible for deleting the temporary file. After

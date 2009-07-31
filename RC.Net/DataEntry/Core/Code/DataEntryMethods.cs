@@ -758,6 +758,8 @@ namespace Extract.DataEntry
         {
             try
             {
+                pathName = pathName.Replace("[PFESFolder]", FileSystemMethods.ExtractSystemsPath);
+
                 return FileSystemMethods.GetAbsolutePath(pathName, _solutionRootDirectory);
             }
             catch (Exception ex)
@@ -787,7 +789,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26727",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26727",
                     _OBJECT_NAME);
 
                 ExtractException.Assert("ELI26731", "Null argument exception!",
@@ -833,7 +835,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26758",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26758",
                     _OBJECT_NAME);
 
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);

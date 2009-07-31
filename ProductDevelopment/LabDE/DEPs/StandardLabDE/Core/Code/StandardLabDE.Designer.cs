@@ -99,6 +99,9 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatusLabel = new System.Windows.Forms.Label();
             this._operatorCommentLabel = new System.Windows.Forms.Label();
             this._operatorComments = new System.Windows.Forms.TextBox();
+            this._filenameLabel = new System.Windows.Forms.Label();
+            this._filename = new Extract.DataEntry.DataEntryTextBox();
+            this._copyButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -573,12 +576,12 @@ namespace Extract.LabDE.StandardLabDE
             this._patientInfoGroupBox.Controls.Add(this._patientRecordNum);
             this._patientInfoGroupBox.Controls.Add(this._patientMRLabel);
             this._patientInfoGroupBox.Disabled = false;
-            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 79);
+            this._patientInfoGroupBox.Location = new System.Drawing.Point(0, 124);
             this._patientInfoGroupBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
             this._patientInfoGroupBox.ParentDataEntryControl = null;
             this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 192);
-            this._patientInfoGroupBox.TabIndex = 2;
+            this._patientInfoGroupBox.TabIndex = 3;
             this._patientInfoGroupBox.TabStop = false;
             this._patientInfoGroupBox.Text = "Patient Information";
             // 
@@ -921,12 +924,12 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianInfoGroupBox.Controls.Add(this._orderingPhysicianTable);
             this._physicianInfoGroupBox.Controls.Add(this._physicianTable);
             this._physicianInfoGroupBox.Disabled = false;
-            this._physicianInfoGroupBox.Location = new System.Drawing.Point(0, 277);
+            this._physicianInfoGroupBox.Location = new System.Drawing.Point(0, 322);
             this._physicianInfoGroupBox.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._physicianInfoGroupBox.Name = "_physicianInfoGroupBox";
             this._physicianInfoGroupBox.ParentDataEntryControl = null;
             this._physicianInfoGroupBox.Size = new System.Drawing.Size(593, 193);
-            this._physicianInfoGroupBox.TabIndex = 3;
+            this._physicianInfoGroupBox.TabIndex = 4;
             this._physicianInfoGroupBox.TabStop = false;
             this._physicianInfoGroupBox.Text = "Physicians";
             // 
@@ -1144,10 +1147,10 @@ namespace Extract.LabDE.StandardLabDE
             this._testDetailsGroupBox.Controls.Add(this._resultDateLabel);
             this._testDetailsGroupBox.Controls.Add(this._testResultDate);
             this._testDetailsGroupBox.Controls.Add(this._testComponentTable);
-            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 641);
+            this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 686);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
             this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 393);
-            this._testDetailsGroupBox.TabIndex = 5;
+            this._testDetailsGroupBox.TabIndex = 6;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
             // 
@@ -1290,7 +1293,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._testsGroupBox.Controls.Add(this._laboratoryTestTable);
-            this._testsGroupBox.Location = new System.Drawing.Point(0, 476);
+            this._testsGroupBox.Location = new System.Drawing.Point(0, 521);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(593, 159);
             this._testsGroupBox.TabIndex = 5;
@@ -1357,9 +1360,63 @@ namespace Extract.LabDE.StandardLabDE
             this._operatorComments.Size = new System.Drawing.Size(371, 46);
             this._operatorComments.TabIndex = 7;
             // 
+            // _filenameLabel
+            // 
+            this._filenameLabel.AutoSize = true;
+            this._filenameLabel.Location = new System.Drawing.Point(6, 80);
+            this._filenameLabel.Name = "_filenameLabel";
+            this._filenameLabel.Size = new System.Drawing.Size(49, 13);
+            this._filenameLabel.TabIndex = 8;
+            this._filenameLabel.Text = "Image path";
+            // 
+            // _filename
+            // 
+            this._filename.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
+            this._filename.AttributeName = "Filename";
+            this._filename.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._filename.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this._filename.AutoUpdateQuery = "<SourceDocName/>";
+            this._filename.BackColor = System.Drawing.SystemColors.Control;
+            this._filename.Disabled = true;
+            this._filename.ForeColor = System.Drawing.Color.Black;
+            this._filename.FormattingRuleFile = null;
+            this._filename.Location = new System.Drawing.Point(7, 96);
+            this._filename.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._filename.Name = "_filename";
+            this._filename.ParentDataEntryControl = null;
+            this._filename.Size = new System.Drawing.Size(509, 20);
+            this._filename.SupportsSwiping = false;
+            this._filename.TabIndex = 2;
+            this._filename.TabStop = false;
+            this._filename.TabStopRequired = true;
+            this._filename.ValidationCorrectsCase = true;
+            this._filename.ValidationErrorMessage = "";
+            this._filename.ValidationListFileName = null;
+            this._filename.ValidationPattern = null;
+            this._filename.ValidationQuery = null;
+            // 
+            // _copyButton
+            // 
+            this._copyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._copyButton.Location = new System.Drawing.Point(522, 94);
+            this._copyButton.Name = "_copyButton";
+            this._copyButton.Size = new System.Drawing.Size(55, 23);
+            this._copyButton.TabIndex = 10;
+            this._copyButton.Text = "Copy";
+            this._copyButton.UseVisualStyleBackColor = true;
+            // 
             // StandardLabDEPanel
             // 
+            this.AboutLogo = global::Extract.LabDE.StandardLabDE.Properties.Resources._labDELogo;
+            this.ApplicationDescription = "A powerful productivity tool for your lab, hospital or clinic.";
+            this.ApplicationTitle = "LabDE";
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.BackColor = System.Drawing.SystemColors.Control;
+            this.CommentControl = this._operatorComments;
+            this.Controls.Add(this._copyButton);
+            this.Controls.Add(this._filename);
+            this.Controls.Add(this._filenameLabel);
             this.Controls.Add(this._operatorComments);
             this.Controls.Add(this._operatorCommentLabel);
             this.Controls.Add(this._labAddress);
@@ -1378,7 +1435,7 @@ namespace Extract.LabDE.StandardLabDE
         highlightColor2};
             this.MinimumSize = new System.Drawing.Size(500, 0);
             this.Name = "StandardLabDEPanel";
-            this.Size = new System.Drawing.Size(593, 1034);
+            this.Size = new System.Drawing.Size(593, 1079);
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).EndInit();
@@ -1464,5 +1521,8 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _componentComment;
         private System.Windows.Forms.Label _operatorCommentLabel;
         private System.Windows.Forms.TextBox _operatorComments;
+        private System.Windows.Forms.Label _filenameLabel;
+        private Extract.DataEntry.DataEntryTextBox _filename;
+        private System.Windows.Forms.Button _copyButton;
     }
 }

@@ -23,6 +23,11 @@ namespace Extract.DataEntry
         private static string _ATTRIBUTE_NODE = "Attribute";
 
         /// <summary>
+        /// The name of a query element which should be resolved using the current source doc name.
+        /// </summary>
+        private static string _SOURCEDOCNAME_NODE = "SourceDocName";
+
+        /// <summary>
         /// The name of an element attribute specifying whether the result should be parameterized
         /// if it is used in an SQL query.
         /// </summary>
@@ -167,6 +172,83 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// An <see cref="IQueryNode"/> to be resolved using the current source doc name.
+        /// </summary>
+        private class SourceDocNameQueryNode : IQueryNode
+        {
+            /// <summary>
+            /// Specifies whether the query node should be parameterized if it is used
+            /// in an <see cref="SqlQueryNode"/>.
+            /// </summary>
+            protected bool _parameterize;
+
+            /// <summary>
+            /// Initializes a new <see cref="SourceDocNameQueryNode"/> instance.
+            /// </summary>
+            public SourceDocNameQueryNode()
+            {
+            }
+
+            /// <summary>
+            /// Gets or sets whether the query node should be should be parameterized if it is used
+            /// in an <see cref="SqlQueryNode"/>.
+            /// </summary>
+            /// <value><see langword="true"/> if the query's result should be parameterized when
+            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
+            /// query's result should be used as literal text.</value>
+            /// <returns><see langword="true"/> if the query's result will be parameterized when
+            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
+            /// query's result will be used as literal text.</returns>
+            public bool Parameterize
+            {
+                get
+                {
+                    return _parameterize;
+                }
+
+                set
+                {
+                    _parameterize = value;
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query node is completely resolved (all required triggers have been
+            /// registered) and can be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> if all triggers are registered and the query node can
+            /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
+            /// the query node can be evaluated.</returns>
+            public bool IsResolved
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
+            /// </summary>
+            /// <param name="statusInfo">Not used by <see cref="SourceDocNameQueryNode"/>.</param>
+            /// <returns><see langword="false"/> since <see cref="SourceDocNameQueryNode"/>
+            /// instances do not support trigger attributes.</returns>
+            public bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
+            {
+                return false;
+            }
+
+            /// <summary>
+            /// Evaluates the query using the current source doc name.
+            /// </summary>
+            /// <returns>The current source doc name</returns>
+            public string Evaluate()
+            {
+                return AttributeStatusInfo.SourceDocName;
+            }
+        }
+
+        /// <summary>
         /// An <see cref="IQueryNode"/> that is comprised of one or more child
         /// <see cref="IQueryNode"/>s.
         /// </summary>
@@ -240,28 +322,38 @@ namespace Extract.DataEntry
                     else if (childNode.NodeType == XmlNodeType.Element)
                     {
                         XmlElement childElement = ((XmlElement)childNode);
-                        ComplexQueryNode childQueryNode = null;
 
-                        // Create the element as an SQL node?
-                        if (string.Compare(childElement.Name, _SQL_NODE,
-                            StringComparison.CurrentCultureIgnoreCase) == 0)
+                        // Check for SourceDocName (which is not a ComplexQueryNode). 
+                        if (childElement.Name.Equals(_SOURCEDOCNAME_NODE, 
+                                StringComparison.OrdinalIgnoreCase))
                         {
-                            childQueryNode = new SqlQueryNode();
+                            _childNodes.Add(new SourceDocNameQueryNode());
                         }
-                        // Create the element as an Attribute node?
-                        else if (string.Compare(childElement.Name, _ATTRIBUTE_NODE,
-                            StringComparison.CurrentCultureIgnoreCase) == 0)
+                        else
                         {
-                            childQueryNode = new AttributeQueryNode();
+                            ComplexQueryNode childQueryNode = null;
+
+                            // Create the element as an SQL node?
+                            if (childElement.Name.Equals(_SQL_NODE,
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                childQueryNode = new SqlQueryNode();
+                            }
+                            // Create the element as an Attribute node?
+                            else if (childElement.Name.Equals(_ATTRIBUTE_NODE,
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                childQueryNode = new AttributeQueryNode();
+                            }
+
+                            ExtractException.Assert("ELI26726", "Failed parsing auto-update query!",
+                                childQueryNode != null);
+
+                            // Load the node.
+                            childQueryNode.LoadFromXml(childNode, _trigger, rootQuery);
+
+                            _childNodes.Add(childQueryNode);
                         }
-
-                        ExtractException.Assert("ELI26726", "Failed parsing auto-update query!",
-                            childQueryNode != null);
-
-                        // Load the node.
-                        childQueryNode.LoadFromXml(childNode, _trigger, rootQuery);
-
-                        _childNodes.Add(childQueryNode);
                     }
                 }
             }

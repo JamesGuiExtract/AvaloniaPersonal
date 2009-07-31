@@ -119,7 +119,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24486",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24486",
                     _OBJECT_NAME);
             }
             catch (Exception ex)

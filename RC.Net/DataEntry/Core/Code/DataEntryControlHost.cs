@@ -464,6 +464,11 @@ namespace Extract.DataEntry
         List<string> _disabledControls = new List<string>();
 
         /// <summary>
+        /// A list of names of DataEntry controls in which data validation should be disabled.
+        /// </summary>
+        List<string> _disabledValidationControls = new List<string>();
+
+        /// <summary>
         /// The number of selected attributes with highlights that have been accepted by the user.
         /// </summary>
         int _selectedAttributesWithAcceptedHighlights;
@@ -511,9 +516,19 @@ namespace Extract.DataEntry
         bool _inDesignMode;
 
         /// <summary>
-        /// The DEP's comment if the Comment property is not overriden (which it should be).
+        /// A description of the current DataEntry application.
         /// </summary>
-        string _comment;
+        string _applicationDescription;
+
+        /// <summary>
+        /// The logo for of the current DataEntry application.
+        /// </summary>
+        Image _aboutLogo;
+
+        /// <summary>
+        /// A control that should be used to display change the file comment for a FAM task.
+        /// </summary>
+        Control _commentControl;
 
         #endregion Fields
 
@@ -536,8 +551,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                // TODO: New license ID?
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI23666",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI23666",
                     _OBJECT_NAME);
 
                 InitializeComponent();
@@ -787,25 +801,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets the title of the current DataEntry application.
-        /// </summary>
-        /// <value>The title of the current DataEntry application.</value>
-        /// <returns>The title of the current DataEntry application.</returns>
-        [Category("Data Entry Control Host")]
-        public string ApplicationTitle
-        {
-            get
-            {
-                return _applicationTitle;
-            }
-
-            set
-            {
-                _applicationTitle = value;
-            }
-        }
-
-        /// <summary>
         /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s that
         /// should remain disabled at all times.
         /// </summary>
@@ -853,6 +848,159 @@ namespace Extract.DataEntry
             }
         }
 
+        
+        /// <summary>
+        /// Gets or sets a comma separated list of names of <see cref="IDataEntryControl"/>s on
+        /// which validation should be disabled.
+        /// <para><b>Note</b></para>
+        /// If data validation is disabled, while a mapped <see cref="IAttribute"/> will never be 
+        /// flagged as invalid, it will still take advantage of the ability of validation lists to
+        /// generate auto-complete lists, populate combo boxes and to trim and correct-case of
+        /// values.
+        /// </summary>
+        /// <value>A comma separated list of names of <see cref="IDataEntryControl"/>s.</value>
+        /// <returns>A comma separated list of names of <see cref="IDataEntryControl"/>s.</returns>
+        [Category("Data Entry Control Host")]
+        public string DisabledValidationControls
+        {
+            get
+            {
+                try
+                {
+                    string disabledValidationControls = "";
+
+                    foreach (string disabledValidationControl in _disabledValidationControls)
+                    {
+                        if (!string.IsNullOrEmpty(disabledValidationControl))
+                        {
+                            disabledValidationControls += ",";
+                        }
+
+                        disabledValidationControls += disabledValidationControl;
+                    }
+
+                    return disabledValidationControls;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26965", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _disabledValidationControls.Clear();
+                    _disabledValidationControls.AddRange(
+                        value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26966", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The logo for of the current DataEntry application.
+        /// </summary>
+        /// <value>An <see cref="Image"/> of the logo for of the current application.</value>
+        /// <returns>An <see cref="Image"/> of the logo for of the current application.</returns>
+        [Category("Data Entry Control Host")]
+        public virtual Image AboutLogo
+        {
+            get
+            {
+                return _aboutLogo;
+            }
+
+            set
+            {
+                _aboutLogo = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets <see cref="Control"/> that should be used to display change the file
+        /// comment for a FAM task.
+        /// </summary>
+        /// <value>A <see cref="Control"/> that should be used to display change the file comment
+        /// for a FAM task.</value>
+        /// <returns>A <see cref="Control"/> that should be used to display change the file comment
+        /// for a FAM task.</returns>
+        [Category("Data Entry Control Host")]
+        public Control CommentControl
+        {
+            get
+            {
+                return _commentControl;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_commentControl != value)
+                    {
+                        if (_commentControl != null)
+                        {
+                            _commentControl.TextChanged -= HandleCommentTextChanged;
+                        }
+
+                        _commentControl = value;
+
+                        if (_commentControl != null)
+                        {
+                            _commentControl.TextChanged += HandleCommentTextChanged;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI26969", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the title of the current DataEntry application.
+        /// </summary>
+        /// <value>The title of the current DataEntry application.</value>
+        /// <returns>The title of the current DataEntry application.</returns>
+        [Category("Data Entry Control Host")]
+        public string ApplicationTitle
+        {
+            get
+            {
+                return _applicationTitle;
+            }
+
+            set
+            {
+                _applicationTitle = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a description of the current DataEntry application.
+        /// </summary>
+        /// <value>A description of the current DataEntry application.</value>
+        /// <returns>A description of the current DataEntry application.</returns>
+        [Category("Data Entry Control Host")]
+        public string ApplicationDescription
+        {
+            get
+            {
+                return _applicationDescription;
+            }
+
+            set
+            {
+                _applicationDescription = value;
+            }
+        }
+
         /// <summary>
         /// The comment associated with the DEP.
         /// <para><b>NOTE:</b></para>
@@ -866,12 +1014,15 @@ namespace Extract.DataEntry
         {
             get
             {
-                return _comment;
+                return (_commentControl == null) ? "" : _commentControl.Text;
             }
 
             set
             {
-                _comment = value;
+                if (_commentControl != null)
+                {
+                    _commentControl.Text = value;
+                }
             }
         }
 
@@ -1438,7 +1589,7 @@ namespace Extract.DataEntry
 
                 // AttributeStatusInfo cannot persist any data from one document to the next as it can
                 // cause COM threading exceptions in FAM mode. Unload its data now.
-                AttributeStatusInfo.ResetData(null, null);
+                AttributeStatusInfo.ResetData(null, null, null);
             }
             catch (Exception ex)
             {
@@ -1641,7 +1792,7 @@ namespace Extract.DataEntry
                         }
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(_attributes, _dbConnection);
+                        AttributeStatusInfo.ResetData(dataFilename, _attributes, _dbConnection);
 
                         // Enable or disable swiping as appropriate.
                         bool swipingEnabled = _activeDataControl != null &&
@@ -2141,6 +2292,20 @@ namespace Extract.DataEntry
             {
                 OnDataChanged();
 
+                // Disable validation on any controls in the _disabledValidationControls list.
+                Control control = e.DataEntryControl as Control;
+                if (_disabledValidationControls.Contains(control.Name))
+                {
+                    AttributeStatusInfo.EnableValidation(e.Attribute, false);
+
+                    // If the data was already marked as invalid, mark it as valid.
+                    if (!AttributeStatusInfo.IsDataValid(e.Attribute))
+                    {
+                        AttributeStatusInfo.MarkDataAsValid(e.Attribute, true);
+                        e.DataEntryControl.RefreshAttribute(e.Attribute);
+                    }
+                }
+
                 if (!AttributeStatusInfo.HasBeenViewed(e.Attribute, false))
                 {
                     UpdateUnviewedCount(true);
@@ -2400,6 +2565,25 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI25415", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the comment control's text has changed.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleCommentTextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                OnDataChanged();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26968", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
             }

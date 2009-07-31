@@ -283,7 +283,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24495",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24495",
                     _OBJECT_NAME);
 
                 // Initialize the various cell styles (modifying existing cell styles on-the-fly

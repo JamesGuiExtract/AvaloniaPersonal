@@ -186,7 +186,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24492",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24492",
                     _OBJECT_NAME);
             }
             catch (Exception ex)
@@ -393,6 +393,9 @@ namespace Extract.DataEntry
                 bool dataIsValid = (attribute.Value == null && string.IsNullOrEmpty(value)) ||
                                    (attribute.Value != null && attribute.Value.String == value);
 
+                // Check to see if data validation is enabled.
+                bool validationEnabled = AttributeStatusInfo.IsValidationEnabled(attribute);
+
                 if (!dataIsValid)
                 {
                     if (throwException)
@@ -404,7 +407,8 @@ namespace Extract.DataEntry
                     }
                 }
                 // If there is a specified validation pattern, check it.
-                else if (_validationRegex != null && !_validationRegex.IsMatch(value))
+                else if (validationEnabled && _validationRegex != null &&
+                    !_validationRegex.IsMatch(value))
                 {
                     if (throwException)
                     {
@@ -419,7 +423,8 @@ namespace Extract.DataEntry
                         dataIsValid = false;
                     }
                 }
-                // If there is a specified validation list, check it.
+                // If there is a specified validation list, check it. Do this even if validation is
+                // disabled to take advantage of trimming and case-correction.
                 else if (_validationListValues != null)
                 {
                     string valueTrimmed = value.Trim();
@@ -429,17 +434,21 @@ namespace Extract.DataEntry
 
                     if (!valueIsInList)
                     {
-                        if (throwException)
+                        if (validationEnabled)
                         {
-                            DataEntryValidationException ee = new DataEntryValidationException("ELI24282",
-                                "Invalid value: " + _validationErrorMessage,
-                                AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
-                            ee.AddDebugData("Validation List", this.ValidationListFileName, false);
-                            throw ee;
-                        }
-                        else
-                        {
-                            dataIsValid = false;
+                            if (throwException)
+                            {
+                                DataEntryValidationException ee = new DataEntryValidationException(
+                                    "ELI24282", "Invalid value: " + _validationErrorMessage,
+                                    AttributeStatusInfo.GetStatusInfo(attribute).OwningControl);
+                                ee.AddDebugData("Validation List", this.ValidationListFileName,
+                                    false);
+                                throw ee;
+                            }
+                            else
+                            {
+                                dataIsValid = false;
+                            }
                         }
                     }
                     else if (_correctCase && listValue != value)

@@ -5,9 +5,6 @@
     <Setting Name="DataEntryPanelFileName" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Extract.DataEntry.Utilities.SampleDataEntryPanel1.dll</Value>
     </Setting>
-    <Setting Name="ApplicationTitle" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">LabDE</Value>
-    </Setting>
     <Setting Name="HighlightConfidenceBoundary" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
@@ -21,6 +18,12 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DisabledControls" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="DisabledValidationControls" Type="System.String" Scope="Application">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="HelpFile" Type="System.String" Scope="Application">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>

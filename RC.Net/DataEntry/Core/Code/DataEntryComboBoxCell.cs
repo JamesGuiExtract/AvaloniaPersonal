@@ -66,7 +66,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24488",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24488",
                     _OBJECT_NAME);
 
                 _dataEntryTable = base.DataGridView as DataEntryTableBase;

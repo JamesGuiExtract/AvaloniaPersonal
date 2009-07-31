@@ -20,7 +20,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             {
                 // Load licenses and validate
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI23678",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI23678",
                     Application.ProductName);
                 
                 Application.EnableVisualStyles();

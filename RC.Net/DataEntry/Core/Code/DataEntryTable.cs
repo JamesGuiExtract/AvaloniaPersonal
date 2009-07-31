@@ -172,7 +172,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24490",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24490",
                     _OBJECT_NAME);
 
                 InitializeComponent();
@@ -1030,7 +1030,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26666", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI26967", ex);
                 ee.AddDebugData("Event Data", drgevent, false);
                 ee.Display();
             }
@@ -1902,7 +1902,8 @@ namespace Extract.DataEntry
 
                             // Select the currentCell before selecting the rows otherwise the row
                             // selection(s) may be undone.
-                            if (lastSelectedRow != null)
+                            if (lastSelectedRow != null &&
+                                !_draggedRows.Contains(lastSelectedRow as DataEntryTableRow))
                             {
                                 base.CurrentCell = lastSelectedRow.Cells[0];
                             }

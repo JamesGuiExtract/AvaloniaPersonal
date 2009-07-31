@@ -253,8 +253,8 @@ namespace Extract.DataEntry
                 try
                 {
                     // Validate the license
-                    LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26132",
-                        _OBJECT_NAME);
+                    LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
+                        "ELI26132", _OBJECT_NAME);
 
                     // Create a node in charge of scanning the root-level attributes.
                     AttributeScanner rootScanNode = new AttributeScanner(attributes, accessorMethod,
@@ -555,6 +555,11 @@ namespace Extract.DataEntry
         #region Fields
 
         /// <summary>
+        /// The filename of the currently open document.
+        /// </summary>
+        private static string _sourceDocName;
+
+        /// <summary>
         /// The active attribute hierarchy.
         /// </summary>
         private static IUnknownVector _attributes;
@@ -646,6 +651,12 @@ namespace Extract.DataEntry
         private bool _dataIsValid = true;
 
         /// <summary>
+        /// <see langword="true"/> if data validation should be performed on the attribute,
+        /// <see langword="false"/> if the attribute should always be considered valid.
+        /// </summary>
+        private bool _validationEnabled = true;
+
+        /// <summary>
         /// A string that allows attributes to be sorted by compared to other display order values.
         /// </summary>
         private string _displayOrder;
@@ -733,7 +744,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI24485",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24485",
                     _OBJECT_NAME);
             }
             catch (Exception ex)
@@ -909,7 +920,20 @@ namespace Extract.DataEntry
 
         #endregion Properties
 
-        #region Static Methods
+        #region Static Members
+
+        /// <summary>
+        /// Gets the filename of the currently open document.
+        /// </summary>
+        /// <returns>The filename of the currently open document.</returns>
+        [ComVisible(false)]
+        public static string SourceDocName
+        {
+            get
+            {
+                return _sourceDocName;
+            }
+        }
 
         /// <summary>
         /// Returns the <see cref="AttributeStatusInfo"/> object associated with the provided
@@ -926,7 +950,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26109",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26109",
                     _OBJECT_NAME);
 
                 AttributeStatusInfo statusInfo;
@@ -957,18 +981,21 @@ namespace Extract.DataEntry
         /// <see langword="null"/> every time a document is closed (or <see cref="IAttribute"/>s are
         /// otherwise unloaded).
         /// </summary>
+        /// <param name="sourceDocName">The name of the currently open document.</param>
         /// <param name="attributes">The active <see cref="IAttribute"/> hierarchy.</param>
         /// <param name="dbConnection">A compact SQL database available for use in validation or
         /// auto-update queries. (Can be <see langword="null"/> if not required).</param>
         [ComVisible(false)]
-        public static void ResetData(IUnknownVector attributes, DbConnection dbConnection)
+        public static void ResetData(string sourceDocName, IUnknownVector attributes,
+            DbConnection dbConnection)
         {
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26133",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26133",
                     _OBJECT_NAME);
 
+                _sourceDocName = sourceDocName;
                 _attributes = attributes;
                 _dbConnection = dbConnection;
                 _statusInfoMap.Clear();
@@ -1031,7 +1058,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26134",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26134",
                     _OBJECT_NAME);
 
                 // Create a new statusInfo instance (or retrieve an existing one).
@@ -1308,7 +1335,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26135",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26135",
                     _OBJECT_NAME);
 
                 // Don't do anything if the specified value matches the existing value.
@@ -1371,7 +1398,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26136",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26136",
                     _OBJECT_NAME);
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
@@ -1644,6 +1671,49 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI24919", ex);
+            }
+        }
+
+        /// <summary>
+        /// Enables or disables data validation on the specified attribute.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> for which the data validation
+        /// should be enabled or disabled.</param>
+        /// <param name="enable"><see langword="true"/> if the data validation should be enabled;
+        /// <see langword="false"/> otherwise.</param>
+        [ComVisible(false)]
+        public static void EnableValidation(IAttribute attribute, bool enable)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                statusInfo._validationEnabled = enable;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26963", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether data validation is enabled on the specified <see cref="IAttribute"/>.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to be checked.</param>
+        /// <returns><see langword="true"/> if data validation is enabled <see langword="false"/>
+        /// if it is not.</returns>
+        [ComVisible(false)]
+        public static bool IsValidationEnabled(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                return statusInfo._validationEnabled;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI26964", ex);
             }
         }
 
@@ -2136,7 +2206,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26138",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26138",
                     _OBJECT_NAME);
 
                 // If the specified attribute is null, just return blank.
@@ -2178,7 +2248,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexCoreObjects, "ELI26139",
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26139",
                     _OBJECT_NAME);
 
                 // Tokenize the query and process each element in order.
@@ -2351,7 +2421,7 @@ namespace Extract.DataEntry
             }  
         }
 
-        #endregion Static Methods
+        #endregion Static Members
 
         #region Events
 

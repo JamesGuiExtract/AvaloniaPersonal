@@ -226,6 +226,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     this.DataEntryControlHost.DatabaseConnection = _dbConnection;
                 }
+
+                _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &Help...";
+                _aboutMenuItem.Text = "&About " + this.DataEntryControlHost.ApplicationTitle + "...";
             }
             catch (Exception ex)
             {
@@ -446,7 +449,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 base.OnLoad(e);
 
                 // Set the application name
-                base.Text = ConfigSettings.AppSettings.ApplicationTitle;
+                base.Text = _dataEntryControlHost.ApplicationTitle;
 
                 // Establish shortcut keys
 
@@ -597,6 +600,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _acceptImageHighlightMenuItem.Click += HandleAcceptImageHighlightClick;
                 _removeImageHighlightMenuItem.Click += HandleRemoveImageHighlightClick;
                 _splitContainer.SplitterMoved += HandleSplitterMoved;
+                _aboutMenuItem.Click += HandleAboutMenuItemClick;
+                _appHelpMenuItem.Click += HandleHelpMenuItemClick;
 
                 // [DataEntry:195] Open the form with the position and size set per the registry 
                 // settings. Do this regardless of whether the window will be maximized so that it
@@ -744,7 +749,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     MessageBox.Show(this, "If you are intending to stop processing, " +
                         "press the stop button in the File Action Manager.",
-                        ConfigSettings.AppSettings.ApplicationTitle, MessageBoxButtons.OK,
+                        _dataEntryControlHost.ApplicationTitle, MessageBoxButtons.OK,
                         MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, 0);
 
                     return;
@@ -878,7 +883,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         /// <param name="validateData"></param>
         /// <returns></returns>
-        private bool SaveData(bool validateData)
+        bool SaveData(bool validateData)
         {
             bool saved = _dataEntryControlHost.SaveData(validateData);
 
@@ -964,7 +969,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Set the application title to reflect the name of the open document.
-                base.Text = ConfigSettings.AppSettings.ApplicationTitle;
+                base.Text = _dataEntryControlHost.ApplicationTitle;
                 if (_imageViewer.IsImageAvailable)
                 {
                     base.Text += " - " + Path.GetFileName(_imageViewer.ImageFile);
@@ -1283,6 +1288,52 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event for the help menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the <see cref="ToolStripItem.Click"/> event.
+        /// </param>
+        /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
+        /// event.</param>
+        void HandleHelpMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                Help.ShowHelp(this, 
+                    DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.HelpFile));
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26958", "The help file is not available!", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event for the about menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the <see cref="ToolStripItem.Click"/> event.
+        /// </param>
+        /// <param name="e">The event data associated with the <see cref="ToolStripItem.Click"/> 
+        /// event.</param>
+        void HandleAboutMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Show the about dialog
+                using (AboutForm aboutForm =
+                    new AboutForm(_dataEntryControlHost.ApplicationTitle,
+                        _dataEntryControlHost.ApplicationDescription,
+                        _dataEntryControlHost.AboutLogo))
+                {
+                    aboutForm.ShowDialog();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI26957", ex);
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -1442,8 +1493,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     controlHost.HighlightColors = highlightColors;
                 }
 
-                controlHost.ApplicationTitle = ConfigSettings.AppSettings.ApplicationTitle;
                 controlHost.DisabledControls = ConfigSettings.AppSettings.DisabledControls;
+                controlHost.DisabledValidationControls =
+                    ConfigSettings.AppSettings.DisabledValidationControls;
 
                 return controlHost;
             }
