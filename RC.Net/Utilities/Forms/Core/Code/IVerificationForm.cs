@@ -52,7 +52,7 @@ namespace Extract.Utilities.Forms
     /// <param name="tagManager">The <see cref="FAMTagManager"/> to use if needed.</param>
     /// <param name="fileProcessingDB">The <see cref="FileProcessingDB"/> in use.</param>
     [CLSCompliant(false)]
-    public delegate void VerificationFormOpenDelegate(string fileName, int fileID, int actionID,
+    public delegate void VerificationFormOpen(string fileName, int fileID, int actionID,
         FAMTagManager tagManager, FileProcessingDB fileProcessingDB);
 
     /// <summary>

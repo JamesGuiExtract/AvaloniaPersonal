@@ -401,7 +401,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             if (InvokeRequired)
             {
-                Invoke(new VerificationFormOpenDelegate(Open),
+                Invoke(new VerificationFormOpen(Open),
                     new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                 return;
             }
