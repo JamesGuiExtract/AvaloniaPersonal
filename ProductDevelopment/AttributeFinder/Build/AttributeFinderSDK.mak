@@ -126,7 +126,10 @@ CreateFlexDataEntryInstallDir:
 	
 CreateDemoShieldInstall:
 	@ECHO Copying Required installs
-	@XCOPY "$(AFRequiredInstallsDir)\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)" /v /s /e /y
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 2.0 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 2.0 Framework"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005"
+	@XCOPY "$(AFRequiredInstallsDir)\DotNet 2.0 Framework\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 2.0 Framework" /v /s /e /y
+	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2005\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005" /v /s /e /y
 	@ECHO Copying DemoShield Files
 	@IF NOT EXIST "$(FlexIndexInstallDir)" MKDIR "$(FlexIndexInstallDir)"
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FlexIndexInstallDir)" /v /s /e /y

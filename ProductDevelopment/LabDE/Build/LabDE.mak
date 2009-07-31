@@ -28,6 +28,7 @@ LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(LabDEVersion)
 
 AFInstallRootDir=P:\AttributeFinder
 AFCoreInstallFilesRootDir=$(AFInstallRootDir)\CoreInstallation\Files
+DemoShieldRunFilesDir=$(AFInstallRootDir)\DemoShieldFiles
 
 LabDEDir=$(PDRootDir)\LabDE
 LabDEInstallRootDir=$(LabDEDir)\Installation
@@ -37,6 +38,7 @@ LabDEInstallFiles =$(DataEntryInstallFiles)\LabDE\Files
 DataEntryInstallMediaDir=$(LabDEInstallRootDir)\DataEntry\Media\CD-ROM\DiskImages\DISK1
 LabDEInstallMediaDir=$(LabDEInstallRootDir)\LabDE\Media\CD-ROM\DiskImages\DISK1
 LabDEObfuscationFilesArchive=$(DataEntryInstallFiles)\LabDE\Archive\ObfuscationFiles\$(LabDEVersion)
+LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
@@ -119,22 +121,37 @@ BuildLabDEInstall: CopyFilesForLabDEInstall
     @ECHO Building Extract Systems DataEntry Merge Module...
 	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Dotnet
 	$(SetProductVerScript) "$(LabDEInstallRootDir)\LabDE\LabDE.ism" "$(LabDEVersion)"
-    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\\LabDE\LabDE.ism"
+    @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(LabDEInstallRootDir)\LabDE\LabDE.ism"
 
 CreateLabDEInstallCD: BuildLabDEInstall
 	@ECHO Copying DataEntry Install files ...
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Install" MKDIR "$(LabDEBleedingEdgeDir)\Install"
-    @XCOPY "$(LabDEInstallMediaDir)\*.*" "$(LabDEBleedingEdgeDir)\Install" /v /s /e /y
-    $(VerifyDir) "$(LabDEInstallMediaDir)" "$(LabDEBleedingEdgeDir)\Install"
-	@COPY / v "$(LabDEInstallFiles)\InstallHelp\*.*" "$(LabDEBleedingEdgeDir)\Install"
-    @DeleteFiles "$(LabDEBleedingEdgeDir)\Install\vssver.scc"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\LabDE" MKDIR "$(LabDEBleedingEdgeDir)\LabDE"
+    @XCOPY "$(LabDEInstallMediaDir)\*.*" "$(LabDEBleedingEdgeDir)\LabDE" /v /s /e /y
+    $(VerifyDir) "$(LabDEInstallMediaDir)" "$(LabDEBleedingEdgeDir)\LabDE"
+	@COPY / v "$(LabDEInstallFiles)\InstallHelp\*.*" "$(LabDEBleedingEdgeDir)\LabDE"
+    @DeleteFiles "$(LabDEBleedingEdgeDir)\LabDE\vssver.scc"
+
+CopyLMFolderToInstall:
+	@ECHO Creating License Manager Install...
+	@CD "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Build"
+    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" ProductInstallFolder="$(LabDEBleedingEdgeDir)"  CopyLMInstallToProductInstallFolder
 	
-CreateDemo_LabDE:
-	@ECHO Creating LabDE Demo Folder...
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules"
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
-	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
+CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD 
+	@ECHO Copying Required installs
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework" MKDIR "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\SQLServerExpress2005" MKDIR "$(LabDEBleedingEdgeDir)\SQLServerExpress2005"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine" MKDIR "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine"
+	@XCOPY "$(AFInstallRootDir)\RequiredInstalls\DotNet 3.5 Framework\*.*" "$(LabDEBleedingEdgeDir)\DotNet 3.5 Framework" /v /s /e /y
+	@XCOPY "$(AFInstallRootDir)\RequiredInstalls\SQLServerExpress2005\*.*" "$(LabDEBleedingEdgeDir)\SQLServerExpress2005" /v /s /e /y
+	@XCOPY "$(DataEntryInstallFiles)\RequiredInstalls\Corepoint Integration Engine\*.*" "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine" /v /s /e /y
+	@ECHO Copying DemoShield Files
+	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
+	@IF NOT EXIST "$(LabDEInstallDir)" MKDIR "$(LabDEInstallDir)"
+	@COPY "$(LabDEInstallRootDir)\LabDEInstall\Launch.ini" "$(LabDEInstallDir)"
+	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
+
+CreateDemo_LabDE: 
+	@ECHO Copying Demo_LabDE files...
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
 	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
@@ -155,7 +172,7 @@ CreateDemo_LabDE:
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
 
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule CreateLabDEInstallCD BuildLabDEApplication CopyComponentVersionFile CreateDemo_LabDE
+DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CopyComponentVersionFile CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T

@@ -26,6 +26,7 @@
 prototype RegisterDataEntryApp();
 prototype InstallCorepoint();
 prototype UnInstallCorepoint();
+prototype InstallMSMQ();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           
@@ -88,44 +89,9 @@ Dlg_SdAskDestPath:
     nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
     if (nResult = BACK) goto Dlg_SdLicense;
 
-Dlg_SetupType:
-    szTitle = "";
-    szMsg   = "";
-    nResult = SetupType(szTitle, szMsg, "", nSetupType, 0);
-    if (nResult = BACK) then
-        goto Dlg_SdAskDestPath;
-    else
-        nSetupType = nResult;
-        if (nSetupType != CUSTOM) then
-            nvSize = 0;
-            FeatureCompareSizeRequired(MEDIA, INSTALLDIR, nvSize);
-            // if there's no enough space for installation
-            if (nvSize != 0) then      
-            	MessageBox(szSdStr_NotEnoughSpace, WARNING);
-                goto Dlg_SetupType;
-            endif;
-            bCustom = FALSE;
-        else
-            bCustom = TRUE;
-        endif;
-    endif;    
-
-Dlg_SdFeatureTree: 
-    szTitle    = "";
-    szMsg      = "";
-    if (nSetupType = CUSTOM) then
-        nResult = SdFeatureTree(szTitle, szMsg, INSTALLDIR, "", 2);
-        if (nResult = BACK) goto Dlg_SetupType;  
-    endif;
-
-
 Dlg_SdStartCopy:	
     if (nResult = BACK) then
-        if (!bCustom) then
-            goto Dlg_SetupType;    
-    	else
-            goto Dlg_SdFeatureTree;
-    	endif;                         
+        goto Dlg_SdAskDestPath;
     endif;
 
     // setup default status
@@ -169,7 +135,8 @@ function OnFirstUIAfter()
 begin
 	if (gbInstalled) then
 		// Removed Corepoint install because not sure if silent install works properley
-   		InstallCorepoint();
+   		//InstallCorepoint();
+   		InstallMSMQ();
 
 	   	// Rename the uex file
  	  	RenameUEXFile();
@@ -202,17 +169,49 @@ end;
 function RegisterDataEntryApp()
 	STRING strPathForDataEntryApplication;
 begin
-	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "DataEntryApplication.exe" + "\"";
+	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.DataEntry.dll" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 
-	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.DataEntry.dll" + "\"";
+	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "DataEntryApplication.exe" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 
 	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.LabResultsCustomComponents.dll" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 end;
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: InstallMSMQ
+//
+//  Purpose: This function sets up MSMQ
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function InstallMSMQ()
+STRING szProgram, szCmdLine, strUninstallKey;
+int nResult, svServiceState;
+begin
+	SdShowMsg("Setup is Configuring MSMQ", TRUE);
 
+	// Need to install msmq which depends on the OS Version
+	if ( SYSINFO.nOSMajor = 5 ) then
+		szProgram = "sysocmgr";
+		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
+		//MessageBox( szCmdLine, MB_OK);
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
+	elseif (SYSINFO.nOSMajor = 6 ) then
+		szProgram = "ocsetup";
+		// If it is server the arguments need to be different
+		if ( SYSINFO. nOSProductType = VER_NT_SERVER ) then
+			szCmdLine = "MSMQ-Server /passive /quiet";	
+		else
+			szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet";
+		endif;
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	endif;
+	
+	SdShowMsg("Setup is Configuring MSMQ", FALSE);
+end;
+             
 ///////////////////////////////////////////////////////////////////////////////
 //
 // Function: InstallCorepoint

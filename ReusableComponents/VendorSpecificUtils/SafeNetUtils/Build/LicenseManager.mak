@@ -72,6 +72,21 @@ BuildExtractLMInstall:CopyFilesToExtractLMInstall
 	@SET PATH=%windir%;%windir%\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;%VAULT_DIR%\win32;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\Nuance_16\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\LeadTools_16\Bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\RogueWave\bin;%BUILD_VSS_ROOT%\Engineering\ReusableComponents\APIs\SafeNetUltraPro\Bin;%DevEnvDir%;%VCPP_DIR%\BIN;%VS_COMMON%\Tools;%VS_COMMON%\Tools\bin;%VCPP_DIR%\PlatformSDK\bin;C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;%VCPP_DIR%\VCPackages
 	$(SetProductVerScript) "$(ExtractLMInstallRootDir)\Extract Systems LM.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(ExtractLMInstallRootDir)\Extract Systems LM.ism"
+	
+CopyLMInstallToProductInstallFolder:
+#This label requires the ProductInstallFolder macro to be defined
+	@ECHO Copying LM Install to $(ProductInstallFolder) Directory...
+    @IF NOT EXIST "$(ProductInstallFolder)" MKDIR "$(ProductInstallFolder)"
+    @XCOPY "$(ExtractLMInstallMediaDir)\*.*" "$(ProductInstallFolder)" /v /s /e /y
+    $(VerifyDir) "$(ExtractLMInstallMediaDir)" "$(ProductInstallFolder)"
+	@COPY /v "$(LMInstallFilesRootDir)\64BitDrivers\*.*" "$(ProductInstallFolder)"
+    @DeleteFiles "$(ProductInstallFolder)\vssver.scc"
+    @ECHO.
+    @DATE /T
+    @TIME /T
+    @ECHO.
+    @ECHO Flex Index License Manager Build process completed.
+    @ECHO.
 
 CreateFlexLMInstall: BuildExtractLMInstall
 	@ECHO Copying LM Install to Flex Index Release Directory...

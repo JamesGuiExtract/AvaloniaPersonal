@@ -1,4 +1,4 @@
-END-USER LICENSE AGREEMENT FOR Extract Systems FlexIndex
+END-USER LICENSE AGREEMENT FOR Extract Systems LabDE
 
 IMPORTANT-READ CAREFULLY
 
@@ -8,15 +8,15 @@ BY CLICKING "I AGREE" OR BY OTHERWISE INSTALLING, COPYING, OR OTHERWISE USING TH
 
 Copyright laws and international copyright treaties, as well as other intellectual property laws and treaties protect the Software Product. The Software Product is licensed, not sold.
 
-1. GRANT OF LICENSE. This EULA grants you the following limited, non-exclusive rights: In consideration of payment of the license fee, which is a portion of the price you paid, and subject to your compliance with the terms of this EULA, Extract, as Licensor, grants to you, unless otherwise described in a written agreement, the Licensee, a non-exclusive and non-transferable right to use this copy of the Software Product for the number of 'Image Pages' you have licensed. Each "Image Page" is a right to use the Software Product to process and redact a single image page. If a single file contains multiple image pages, this file will count as the number of Image Pages contained in the file.  
+1. GRANT OF LICENSE. This EULA grants you the following limited, non-exclusive rights: In consideration of payment of the license fee, which is a portion of the price you paid, and subject to your compliance with the terms of this EULA, Extract, as Licensor, grants to you, unless otherwise described in a written agreement, the Licensee, a non-exclusive and non-transferable right to use this copy of the Software Product for the number of 'Image Pages' you have licensed. Each "Image Page" is a right to use the Software Product to process a single image page. If a single file contains multiple image pages, this file will count as the number of Image Pages contained in the file.
 
 2. SOFTWARE OWNERSHIP & COPYRIGHT. As the Licensee, you own the disks (if received) on which your copy of the Software Product is recorded or fixed. Extract or its suppliers shall retain all right, title, copyright, trade secrets, patents, trademarks and other proprietary rights in and to the Software Product (including, but not limited to, any images, photographs, animations, video, audio, music, text, and applications incorporated into the Software Product), and all subsequent copies and any derivative works of the Software Product, regardless of origin, and regardless of the media or form on or in which the original copies may exist. Copyright laws and international treaty provisions protect the Software Product. Therefore, you must treat the Software Product like any other copyrighted material, except that you may make copies as only provided in this EULA. The license granted herein is not a sale of the Software Product. Licensee does not acquire any rights, express or implied, in the Software Product or any copies or derivative works thereof, other than those specified in this EULA, and all rights not expressly granted to Licensee herein are reserved to Extract.
 
 3. OTHER RESTRICTIONS. 
 
-A. Use Within the Enterprise. Subject to Licensee's continued compliance with the other terms and conditions of this EULA, and provided that Licensee's usage does not exceed the number of Image Pages licensed, Licensee may (i) physically transfer the Software Product from one computer to another computer upon completion of a software transfer form. 
+A. Use Within the Enterprise. Subject to Licensee's continued compliance with the other terms and conditions of this EULA, and provided that Licensee's usage does not exceed the number of Image Pages licensed, Licensee may (i) physically transfer the Software Product from one computer to another computer upon completion of a software transfer form.  Transfer may not be made to an unrelated company or to related a company (including but not limited to parent company, sister company, joint venture, etc). 
 
-B. No Transfer or Assignment. Licensee shall not assign, rent, lease, sell, sublicense, or otherwise transfer this EULA or the Software Product to another party outside the licensed enterprise without prior written consent of Extract; provided, however, that Licensee's employees may use the Software Product on computers owned by any of Licensee's customers, provided that the total number of Image Pages used is within the number licensed hereunder. Any party authorized by Extract to receive the Software Product must agree to be bound by the terms and conditions of this EULA.  
+B. No Transfer or Assignment. Licensee shall not assign, rent, lease, sell, sublicense, or otherwise transfer this EULA or the Software Product to another party outside the licensed enterprise without prior written consent of Extract. Any party authorized by Extract to receive the Software Product must agree to be bound by the terms and conditions of this EULA.  
 
 C. Modifications/Reverse Engineering. Licensee agrees that it will not, and it will not permit others to, modify, adapt, translate, reverse engineer, decompile, disassemble, or create derivative works based on the Software Product, otherwise alter the Software Product, or attempt to discover its source code (to the extent such source code is not provided by Extract). 
 
@@ -48,7 +48,7 @@ B Definitions. The US Government acknowledges the Software Product is "Restricte
 
 C. Acknowledgment of Government Rights. The U.S. Government acknowledges that: (i) if the Software Product is supplied to the Department of Defense (DoD), the Software is classified as "Commercial Computer Software" and the US Government is acquiring only "restricted rights" in the Software Product as that term is defined in Clause 252.227-7013(c)(1) of the DFARS; and (ii) if the Software Product is supplied to any unit or agency of the United States Government other than the DoD, the US Government's rights in the Software Product will be defined in Clause 52.227-19(c)(2) of the FAR.  Restricted Rights Legend-Use, duplication or disclosure by the US Government is subject to restrictions set forth in the subparagraph (c)(1)(ii) of the "Rights in Technical Data and Computer Software" clause at DFARS 252.227-7013.
 
-Copyright (c) 2003-2008 Extract Systems LLC
+Copyright (c) 2003-2009 Extract Systems LLC
 Unpublished -All Rights Reserved under the copyright laws of the United States
 
 Extract Systems, LLC

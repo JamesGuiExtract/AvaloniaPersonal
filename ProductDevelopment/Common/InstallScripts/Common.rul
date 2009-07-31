@@ -31,6 +31,7 @@
     #define INLITE_INSTALLER_EXE "ClearImageEUK_5_7_3.exe"
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
+    #define SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE "{0EACBFA9-5D4F-4D7E-8FB2-5C9E66FB6632}"
 //////////////////// installation declarations ///////////////////
 
     // In order to have your InstallScript function executed as a custom
@@ -473,7 +474,7 @@ end;
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
 function InstallSQLCE()
-STRING szProgram, szCmdLine;
+STRING szProgram, szCmdLine, strUninstallKey;
 int nResult, svServiceState;
 begin
 	// Change the root for the registry
@@ -496,4 +497,14 @@ begin
 		//endif;
 	endif;
 
+	// Create the path for the uninstall key
+	strUninstallKey = REG_PATH_UNINSTALL ^ SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE;
+	                                        
+	if (RegDBKeyExist(strUninstallKey) < 0 ) then
+		szProgram = "msiexec"; 
+		szCmdLine = " /i " + SUPPORTDIR ^ "\\SqlCeEditorSetup.msi /passive";
+		SdShowMsg("Setup is Installing SQL Compact Edition Editor", TRUE);
+		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
+		SdShowMsg("Setup is Installing SQL Compact Edition Editor", FALSE);
+	endif;
 end;
