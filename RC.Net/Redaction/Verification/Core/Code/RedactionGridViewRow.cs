@@ -56,6 +56,24 @@ namespace Extract.Redaction.Verification
         /// </summary>
         ExemptionCodeList _exemptions;
 
+        /// <summary>
+        /// <see langword="true"/> if <see cref="_layerObjects"/> has been modified; 
+        /// <see langword="false"/> if it has not been modified.
+        /// </summary>
+        bool _layerObjectsDirty;
+
+        /// <summary>
+        /// <see langword="true"/> if <see cref="_type"/> has been modified; 
+        /// <see langword="false"/> if it has not been modified.
+        /// </summary>
+        bool _typeDirty;
+
+        /// <summary>
+        /// <see langword="true"/> if <see cref="_exemptions"/> has been modified; 
+        /// <see langword="false"/> if it has not been modified.
+        /// </summary>
+        bool _exemptionsDirty;
+
         #endregion RedactionGridViewRow Fields
 
         #region RedactionGridViewRow Constructors
@@ -65,7 +83,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public RedactionGridViewRow(LayerObject layerObject, string text, string category,
             string type)
-            : this(new LayerObject[] { layerObject }, text, category, type, null)
+            : this(new LayerObject[] { layerObject }, text, category, type, null, null)
         {
 
         }
@@ -74,7 +92,7 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
         public RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, 
-            string category, string type) : this(layerObjects, text, category, type, null)
+            string category, string type) : this(layerObjects, text, category, type, null, null)
         {
         }
 
@@ -82,7 +100,7 @@ namespace Extract.Redaction.Verification
         /// Initializes a new instance of the <see cref="RedactionGridViewRow"/> class.
         /// </summary>
         RedactionGridViewRow(IEnumerable<LayerObject> layerObjects, string text, string category, 
-            string type, ComAttribute attribute)
+            string type, ComAttribute attribute, ExemptionCodeList exemptions)
         {
             _attribute = attribute;
             _layerObjects = new List<LayerObject>(layerObjects);
@@ -90,32 +108,12 @@ namespace Extract.Redaction.Verification
             _category = category;
             _type = type;
             _firstPage = GetFirstPageNumber();
-            _exemptions = new ExemptionCodeList();
+            _exemptions = exemptions;
         }
 
         #endregion RedactionGridViewRow Constructors
 
         #region RedactionGridViewRow Properties
-
-        /// <summary>
-        /// Gets or sets the attribute associated with the <see cref="RedactionGridViewRow"/>.
-        /// </summary>
-        /// <value>The attribute associated with the <see cref="RedactionGridViewRow"/>.</value>
-        /// <returns>The attribute associated with the <see cref="RedactionGridViewRow"/>.</returns>
-        [CLSCompliant(false)]
-        public ComAttribute Attribute
-        {
-            get
-            {
-                // TODO: If dirty, recreate attribute
-
-                return _attribute;
-            }
-            set
-            {
-                _attribute = value;
-            }
-        }
 
         /// <summary>
         /// Gets the layer objects associated with the <see cref="RedactionGridViewRow"/>.
@@ -179,7 +177,22 @@ namespace Extract.Redaction.Verification
             }
             set
             {
-                _type = value;
+                try
+                {
+                    if (_type != value)
+                    {
+                        _type = value;
+
+                        _typeDirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException ee = new ExtractException("ELI26925",
+                        "Unable to set redaction type.", ex);
+                    ee.AddDebugData("Type", value, false);
+                    throw ee;
+                }
             }
         }
 
@@ -207,17 +220,70 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _exemptions;
+                return _exemptions ?? new ExemptionCodeList();
             }
             set
             {
-                _exemptions = value;
+                if (_exemptions != value)
+	            {
+		            _exemptions = value;
+
+                    _exemptionsDirty = true;
+	            }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the layer objects associated with the row have changed.
+        /// </summary>
+        /// <value><see langword="true"/> if the layer objects have changed;
+        /// <see langword="false"/> if they haven't changed.</value>
+        /// <returns><see langword="true"/> if the layer objects have changed;
+        /// <see langword="false"/> if they haven't changed.</returns>
+        public bool LayerObjectsDirty
+        {
+            get
+            {
+                return _layerObjectsDirty;
+            }
+            set
+            {
+                _layerObjectsDirty = value;
             }
         }
 
         #endregion RedactionGridViewRow Properties
 
         #region RedactionGridViewRow Methods
+
+        /// <summary>
+        /// Determines whether the specified layer object is associated with the 
+        /// <see cref="RedactionGridViewRow"/>.
+        /// </summary>
+        /// <param name="layerObject">The layer object to check.</param>
+        /// <returns><see langword="true"/> if <paramref name="layerObject"/> is associated with 
+        /// the <see cref="RedactionGridViewRow"/>; <see langword="false"/> if it is not 
+        /// associated with the layer object.</returns>
+        public bool ContainsLayerObject(LayerObject layerObject)
+        {
+            try
+            {
+                foreach (LayerObject current in _layerObjects)
+                {
+                    if (current.Id == layerObject.Id)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26953",
+                    "Unable to determine if layer object is associated with grid row.", ex);
+            }
+        }
 
         /// <summary>
         /// Attempts to remove the specified layer object. Returns <see langword="false"/> on 
@@ -246,6 +312,8 @@ namespace Extract.Redaction.Verification
                             _firstPage = GetFirstPageNumber();
                         }
 
+                        _layerObjectsDirty = true;
+
                         return true;
                     }
                 }
@@ -258,6 +326,7 @@ namespace Extract.Redaction.Verification
             // The layer object didn't exist, return false
             return false;
         }
+
         /// <summary>
         /// Creates a <see cref="RedactionGridViewRow"/> with information from the specified 
         /// attribute.
@@ -265,12 +334,13 @@ namespace Extract.Redaction.Verification
         /// <param name="attribute">The attribute from which to create a 
         /// <see cref="RedactionGridViewRow"/>.</param>
         /// <param name="imageViewer">The image viewer on which layer objects should be added.</param>
+        /// <param name="masterCodes">The master list of valid exemption codes and categories.</param>
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
         /// <paramref name="attribute"/> or <see langword="null"/> if the attribute does not 
         /// contain spatial information.</returns>
         [CLSCompliant(false)]
-        public static RedactionGridViewRow FromAttribute(ComAttribute attribute, 
-            ImageViewer imageViewer)
+        public static RedactionGridViewRow FromComAttribute(ComAttribute attribute, 
+            ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
         {
             try
             {
@@ -286,14 +356,208 @@ namespace Extract.Redaction.Verification
                 string text = StringMethods.ConvertLiteralToDisplay(value.String);
                 string category = attribute.Name;
                 string type = attribute.Type;
+                ExemptionCodeList exemptions = GetExemptionsFromComAttribute(attribute, masterCodes);
 
-                return new RedactionGridViewRow(layerObjects, text, category, type, attribute);
+                return new RedactionGridViewRow(layerObjects, text, category, type, attribute, exemptions);
             }
             catch (Exception ex)
             {
                 throw new ExtractException("ELI26759",
                     "Unable to create grid row for attribute.", ex);
             }
+        }
+
+        /// <summary>
+        /// Gets the exemption code list from an exemption codes attribute.
+        /// </summary>
+        /// <param name="attribute">An exemption codes attribute.</param>
+        /// <param name="masterCodes">The master collection of valid exemption codes.</param>
+        /// <returns>The exemption code list created from <paramref name="attribute"/>.</returns>
+        static ExemptionCodeList GetExemptionsFromComAttribute(ComAttribute attribute,
+            MasterExemptionCodeList masterCodes)
+        {
+            ComAttribute exemptionsAttribute = GetExemptionsComAttribute(attribute.SubAttributes);
+            if (exemptionsAttribute == null)
+            {
+                return null;
+            }
+
+            string category = exemptionsAttribute.Type;
+            string codes = exemptionsAttribute.Value.String;
+
+            return ExemptionCodeList.Parse(category, codes, masterCodes);
+        }
+
+        /// <summary>
+        /// Creates a COM attribute from the <see cref="RedactionGridViewRow"/>.
+        /// </summary>
+        /// <returns>A COM attribute created from the <see cref="RedactionGridViewRow"/>.</returns>
+        [CLSCompliant(false)]
+        public ComAttribute ToComAttribute(string sourceDocName, LongToObjectMap pageInfoMap)
+        {
+            try
+            {
+                if (_attribute == null)
+                {
+                    // Create the spatial string
+                    SpatialString value = GetSpatialString(sourceDocName, pageInfoMap);
+
+                    // Create the attribute
+                    ComAttribute attribute = new ComAttribute();
+                    attribute.Value = value;
+                    attribute.Name = _category;
+                    attribute.Type = _type;
+                    
+                    // Set exemptions
+                    SetExemptions(attribute, sourceDocName);
+
+                    _attribute = attribute;
+                }
+                else
+                {
+                    if (_layerObjectsDirty)
+                    {
+                        _attribute.Value = GetSpatialString(sourceDocName, pageInfoMap);
+                    }
+                    if (_typeDirty)
+                    {
+                        _attribute.Type = _type;
+                    }
+                    if (_exemptionsDirty)
+                    {
+                        // Set exemptions
+                        SetExemptions(_attribute, sourceDocName);
+                    }
+                }
+
+                _layerObjectsDirty = false;
+                _typeDirty = false;
+                _exemptionsDirty = false;
+
+                return _attribute;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI26924",
+                    "Unable to create attribute from redaction grid row.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Creates a spatial string from the <see cref="RedactionGridViewRow"/>.
+        /// </summary>
+        /// <param name="sourceDocName">The source document name of the spatial string.</param>
+        /// <param name="pageInfoMap">The map of pages to spatial information for the string.</param>
+        /// <returns>A spatial string created from the <see cref="RedactionGridViewRow"/>.</returns>
+        SpatialString GetSpatialString(string sourceDocName, LongToObjectMap pageInfoMap)
+        {
+            // Gets the raster zones and text for the attribute
+            IUnknownVector rasterZones = GetRasterZones();
+            string text = StringMethods.ConvertDisplayToLiteral(_text);
+
+            // Create the spatial string
+            SpatialString value = new SpatialString();
+            value.CreateHybridString(rasterZones, text, sourceDocName, pageInfoMap);
+            return value;
+        }
+
+        /// <summary>
+        /// Gets the raster zones of <see cref="_layerObjects"/>.
+        /// </summary>
+        /// <returns>The raster zones of <see cref="_layerObjects"/>.</returns>
+        IUnknownVector GetRasterZones()
+        {
+            // Iterate through the layer objects
+            IUnknownVector vector = new IUnknownVector();
+            foreach (LayerObject layerObject in _layerObjects)
+            {
+                RedactionLayerObject redaction = layerObject as RedactionLayerObject;
+                if (redaction != null)
+                {
+                    // Append the raster zones of the redaction layer object
+                    foreach (RasterZone zone in redaction.GetRasterZones())
+                    {
+                        vector.PushBack(zone.ToComRasterZone());
+                    }
+                }
+            }
+
+            return vector;
+        }
+
+        /// <summary>
+        /// Sets the exemption codes for the specified COM attribute.
+        /// </summary>
+        /// <param name="attribute">The COM attribute to assign exemption codes.</param>
+        /// <param name="sourceDocName">The name of the source document.</param>
+        void SetExemptions(ComAttribute attribute, string sourceDocName)
+        {
+            // If there are no exemption codes to assign, just remove the exemption codes attribute.
+            if (_exemptions.IsEmpty)
+            {
+                RemoveExemptionsComAttribute(attribute);
+                return;
+            }
+
+            // Get the attribute's exemption codes attribute
+            IUnknownVector subattributes = attribute.SubAttributes;
+            ComAttribute exemptionsAttribute = GetExemptionsComAttribute(subattributes);
+            if (exemptionsAttribute == null)
+            {
+                // Append a new exemption codes COM attribute
+                exemptionsAttribute = new ComAttribute();
+                exemptionsAttribute.Name = "ExemptionCodes";
+                subattributes.PushBack(exemptionsAttribute);
+            }
+            
+            // Set the exemption codes
+            SpatialString value = new SpatialString();
+            value.CreateNonSpatialString(_exemptions.ToString(), sourceDocName);
+            exemptionsAttribute.Value = value;
+            exemptionsAttribute.Type = _exemptions.Category;
+        }
+
+        /// <summary>
+        /// Removes exemption codes from the specified COM attribute.
+        /// </summary>
+        /// <param name="attribute">The COM attribute from which to remove exemption codes.</param>
+        static void RemoveExemptionsComAttribute(ComAttribute attribute)
+        {
+            IUnknownVector subattributes = attribute.SubAttributes;
+            int count = subattributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                ComAttribute subattribute = (ComAttribute) subattributes.At(i);
+                if (subattribute.Name == "ExemptionCodes")
+                {
+                    subattributes.Remove(i);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the exemption codes attribute from a vector of attributes.
+        /// </summary>
+        /// <param name="attributes">The attributes to check.</param>
+        /// <returns>The exemption code attribute if it is one of the <paramref name="attributes"/>;
+        /// otherwise returns <see langword="null"/>.</returns>
+        static ComAttribute GetExemptionsComAttribute(IUnknownVector attributes)
+        {
+            if (attributes != null)
+            {
+                int count = attributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    ComAttribute subattribute = (ComAttribute)attributes.At(i);
+                    if (subattribute.Name == "ExemptionCodes")
+                    {
+                        return subattribute;
+                    }
+                }
+            }
+
+            return null;
         }
 
         /// <summary>

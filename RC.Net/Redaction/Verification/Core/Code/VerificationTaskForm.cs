@@ -19,6 +19,7 @@ namespace Extract.Redaction.Verification
     /// <summary>
     /// Represents a dialog that allows the user to verify redactions.
     /// </summary>
+    [CLSCompliant(false)]
     public partial class VerificationTaskForm : Form, IVerificationForm
     {
         #region VerificationTaskForm Constants
@@ -81,6 +82,16 @@ namespace Extract.Redaction.Verification
             // TODO: Use the path tags settings to determine the voa file
             // The fps file directory is not yet bubbling down to the VerificationTaskForm.
             return _imageViewer.ImageFile + ".voa";
+        }
+        
+        /// <summary>
+        /// Saves and commits the currently open image file.
+        /// </summary>
+        void Save()
+        {
+            _redactionGridView.SaveTo(GetVoaFileName());
+
+            OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
         }
 
         #endregion VerificationTaskForm Methods
@@ -158,7 +169,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                Save();
             }
             catch (Exception ex)
             {
@@ -179,7 +190,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+                Save();
             }
             catch (Exception ex)
             {
@@ -244,6 +255,8 @@ namespace Extract.Redaction.Verification
             {
                 if (_imageViewer.IsImageAvailable)
                 {
+                    _currentDocumentTextBox.Text = _imageViewer.ImageFile;
+
                     string voaFile = GetVoaFileName();
                     if (File.Exists(voaFile))
                     {
@@ -278,7 +291,7 @@ namespace Extract.Redaction.Verification
             {
                 if (InvokeRequired)
                 {
-                    Invoke(new VerificationFormOpenDelegate(Open),
+                    Invoke(new VerificationFormOpen(Open),
                         new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                     return;
                 }

@@ -14,6 +14,8 @@ using System.Windows.Forms;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
+using EOrientation = UCLID_RASTERANDOCRMGMTLib.EOrientation;
+using SpatialPageInfo = UCLID_RASTERANDOCRMGMTLib.SpatialPageInfo;
 
 namespace Extract.Redaction.Verification
 {
@@ -59,6 +61,11 @@ namespace Extract.Redaction.Verification
         /// been applied.
         /// </summary>
         ExemptionCodeList _lastApplied;
+
+        /// <summary>
+        /// The master list of valid exemption categories and codes.
+        /// </summary>
+        MasterExemptionCodeList _masterCodes;
 
         #endregion RedactionGridView Fields
 
@@ -107,7 +114,7 @@ namespace Extract.Redaction.Verification
                 // Create the exemption codes if necessary
                 if (_exemptionsDialog == null)
                 {
-                    _exemptionsDialog = new ExemptionCodeListDialog(GetMasterCodes());
+                    _exemptionsDialog = new ExemptionCodeListDialog(MasterCodes);
                 }
 
                 // Set the last applied exemption code if necessary
@@ -118,6 +125,25 @@ namespace Extract.Redaction.Verification
                 }
 
                 return _exemptionsDialog;
+            }
+        }
+
+        /// <summary>
+        /// Gets the master list of valid exemption categories and codes.
+        /// </summary>
+        /// <returns>The master list of valid exemption categories and codes.</returns>
+        MasterExemptionCodeList MasterCodes
+        {
+            get
+            {
+                // Lazy instantiation
+                if (_masterCodes == null)
+                {
+                    string directory = FileSystemMethods.GetAbsolutePath(_EXEMPTION_DIRECTORY);
+                    _masterCodes = new MasterExemptionCodeList(directory);
+                }
+
+                return _masterCodes;
             }
         }
 
@@ -200,16 +226,6 @@ namespace Extract.Redaction.Verification
         bool IsExemptionColumn(int index)
         {
             return _exemptionsColumn.Index == index;
-        }
-
-        /// <summary>
-        /// Gets the master collection of exemption categories and codes.
-        /// </summary>
-        /// <returns></returns>
-        static MasterExemptionCodeList GetMasterCodes()
-        {
-            string directory = FileSystemMethods.GetAbsolutePath(_EXEMPTION_DIRECTORY);
-            return new MasterExemptionCodeList(directory);
         }
 
         /// <summary>
@@ -335,7 +351,7 @@ namespace Extract.Redaction.Verification
                 {
                     // Add a row for each attribute
                     RedactionGridViewRow row = 
-                        RedactionGridViewRow.FromAttribute(attribute, _imageViewer);
+                        RedactionGridViewRow.FromComAttribute(attribute, _imageViewer, MasterCodes);
                     if (row != null)
                     {
                         Add(row);
@@ -357,6 +373,73 @@ namespace Extract.Redaction.Verification
             finally
             {
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+            }
+        }
+
+        /// <summary>
+        /// Saves the rows of the <see cref="RedactionGridView"/> to the specified vector of 
+        /// attributes file.
+        /// </summary>
+        /// <param name="fileName">A file to contain a vector of attributes.</param>
+        public void SaveTo(string fileName)
+        {
+            try
+            {
+                // Get the image information
+                string sourceDocName = _imageViewer.ImageFile;
+                LongToObjectMap pageInfoMap = GetPageInfoMap();
+
+                // Create an attribute for each row
+                IUnknownVector attributes = new IUnknownVector();
+                foreach (RedactionGridViewRow row in _redactions)
+                {
+                    ComAttribute attribute = row.ToComAttribute(sourceDocName, pageInfoMap);
+                    attributes.PushBack(attribute);
+                }
+
+                // Save the attributes
+                attributes.SaveTo(fileName, false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26950",
+                    "Unable to save VOA file.", ex);
+                ee.AddDebugData("Voa file", fileName, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Gets the page info map for the currently open image.
+        /// </summary>
+        /// <returns>The page info map for the currently open image.</returns>
+        LongToObjectMap GetPageInfoMap()
+        {
+            int page = _imageViewer.PageNumber;
+            try
+            {
+                // Iterate over each page of the image.
+                LongToObjectMap pageInfoMap = new LongToObjectMap();
+                for (int i = 1; i <= _imageViewer.PageCount; i++)
+                {
+                    _imageViewer.SetPageNumber(i, false, false);
+
+                    // Create the spatial page info for this page
+                    SpatialPageInfo pageInfo = new SpatialPageInfo();
+                    int width = _imageViewer.ImageWidth;
+                    int height = _imageViewer.ImageHeight;
+                    pageInfo.SetPageInfo(width, height, EOrientation.kRotNone, 0);
+
+                    // Add it to the map
+                    pageInfoMap.Set(i, pageInfo);
+                }
+
+                return pageInfoMap;
+            }
+            finally
+            {
+                // Restore the original page number
+                _imageViewer.SetPageNumber(page, false, false);
             }
         }
 
@@ -428,6 +511,40 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.LayerObjectChanged"/> event.</param>
+        void HandleLayerObjectChanged(object sender, LayerObjectChangedEventArgs e)
+        {
+            try
+            {
+                // Find the row that contains the layer object and set it to dirty.
+                foreach (RedactionGridViewRow row in _redactions)
+                {
+                    if (row.ContainsLayerObject(e.LayerObject))
+                    {
+                        row.LayerObjectsDirty = true;
+                        return;
+                    }
+                }
+
+                // The layer object wasn't found. Complain.
+                ExtractException ee = new ExtractException("ELI26952", "Layer object not found.");
+                ee.AddDebugData("Id", e.LayerObject.Id, false);
+                throw ee;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI26951", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="DataGridView.CellDoubleClick"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -481,6 +598,7 @@ namespace Extract.Redaction.Verification
                         _imageViewer.ImageFileChanged -= HandleImageFileChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
+                        _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
                     }
 
                     // Store the new image viewer
@@ -492,6 +610,7 @@ namespace Extract.Redaction.Verification
                         _imageViewer.ImageFileChanged += HandleImageFileChanged;
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                        _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
                     }
                 }
                 catch (Exception ex)
