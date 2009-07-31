@@ -170,6 +170,37 @@ namespace Extract.Redaction.Verification
             return attribute.Value;
         }
 
+        /// <summary>
+        /// Determines whether the specified code belongs to this category.
+        /// </summary>
+        /// <param name="code">The code to check for containment.</param>
+        /// <returns><see langword="true"/> if the specified <paramref name="code"/> is in this 
+        /// category; <see langword="false"/> if the specified <paramref name="code"/> is not in 
+        /// this category.</returns>
+        public bool HasCode(string code)
+        {
+            try
+            {
+                foreach (ExemptionCode exemption in _codes)
+                {
+                    if (exemption.Name == code)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26934",
+                    "Unable to find exemption code in category.", ex);
+                ee.AddDebugData("Code", code, false);
+                ee.AddDebugData("Category", _abbreviation, false);
+                throw ee;
+            }
+        }
+
         #endregion ExemptionCategory Methods
     }
 }

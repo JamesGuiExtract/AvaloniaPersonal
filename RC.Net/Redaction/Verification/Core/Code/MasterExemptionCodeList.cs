@@ -196,6 +196,41 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified category and code combination is valid.
+        /// </summary>
+        /// <param name="abbreviation">The abbreviation of the category to check.</param>
+        /// <param name="code">The code to check for containment.</param>
+        /// <returns><see langword="true"/> if <paramref name="code"/> is in 
+        /// <paramref name="abbreviation"/>; <see langword="false"/> if 
+        /// <paramref name="abbreviation"/> does not correspond to a valid category or if 
+        /// <paramref name="code"/> is not in <paramref name="abbreviation"/>.</returns>
+        public bool HasCode(string abbreviation, string code)
+        {
+            try
+            {
+                // Iterate over each category
+                foreach (KeyValuePair<string, ExemptionCategory> nameToCategory in _nameToCategory)
+                {
+                    // If the abbreviated name matches, return whether it contains the code
+                    if (nameToCategory.Value.Abbreviation == abbreviation)
+                    {
+                        return nameToCategory.Value.HasCode(code);
+                    }
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI26936",
+                    "Unable to get exemption code from category.", ex);
+                ee.AddDebugData("Code", code, false);
+                ee.AddDebugData("Category", abbreviation, false);
+                throw ee;
+            }
+        }
+
         #endregion MasterExemptionCodeList Methods
     }
 }
