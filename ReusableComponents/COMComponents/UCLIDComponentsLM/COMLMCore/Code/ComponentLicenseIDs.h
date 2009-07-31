@@ -122,6 +122,9 @@ const unsigned int gnFLEXINDEX_RULE_WRITING_OBJECTS		= gnBASE_OFFSET + 27;
 // This item is for objects that are specific to LabDE.
 const unsigned int gnLABDE_CORE_OBJECTS					= gnBASE_OFFSET + 28;
 
+// This item is for general-purpose Data Entry components.
+const unsigned int gnDATA_ENTRY_CORE_COMPONENTS			= gnBASE_OFFSET + 29;
+
 
 //-------------------------------------------------------------------------------------------------
 // Constants for individual objects

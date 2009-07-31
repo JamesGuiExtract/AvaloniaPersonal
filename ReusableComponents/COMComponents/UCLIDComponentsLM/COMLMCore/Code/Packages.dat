@@ -67,7 +67,8 @@
 !FlexShieldServerCore,4025:4047:4048:$OCROnServer:$FlexIndexAndIDShieldCore:$OCROnClient
 !FlexServer,4023:$FlexShieldServerCore:$FlexIndex
 !RuleWritingCore,4024:$InputFunnelCore
-!LabDECore,4028
+!DataEntryCore,4029
+!LabDECore,4028:$DataEntryCore
 !LabDEServer,4050:$LabDECore:$FlexServer
 !LabDEClient,4050:$LabDECore:$FlexIndex:$OCROnClient
 

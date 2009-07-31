@@ -39,6 +39,7 @@
 4026,IDShield_Rule_Writing_Objects
 4027,FlexIndex_Rule_Writing_Objects
 4028,LabDE_Core_Objects
+4029,DataEntry_Core_Components
 
 // IDs for special individual components
 4043,Pagination_FileProcessor_Object
