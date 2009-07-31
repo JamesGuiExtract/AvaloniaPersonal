@@ -694,22 +694,29 @@ namespace Extract.Imaging.Forms
         /// <param name="pageNumber">The page number of <paramref name="image"/>.</param>
         void AddImageDebugInfo(ExtractException ee, RasterImage image, int pageNumber)
         {
-            ee.AddDebugData("Image file name", _imageFile, false);
-            ee.AddDebugData("Current page", pageNumber, false);
-
-            // Add info about current image if available
-            if (base.Image != null)
+            try
             {
-                ee.AddDebugData("Total pages", base.Image.PageCount, false);
-                ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
+                ee.AddDebugData("Image file name", _imageFile, false);
+                ee.AddDebugData("Current page", pageNumber, false);
+
+                // Add info about current image if available
+                if (base.Image != null)
+                {
+                    ee.AddDebugData("Total pages", base.Image.PageCount, false);
+                    ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
+                }
+
+                // Add info about image parameter if available
+                if (image != null)
+                {
+                    ee.AddDebugData("Current bpp", image.BitsPerPixel, false);
+                    ee.AddDebugData("Page width", image.Width, false);
+                    ee.AddDebugData("Page height", image.Height, false);
+                }
             }
-
-            // Add info about image parameter if available
-            if (image != null)
+            catch (Exception ex)
             {
-                ee.AddDebugData("Current bpp", image.BitsPerPixel, false);
-                ee.AddDebugData("Page width", image.Width, false);
-                ee.AddDebugData("Page height", image.Height, false);
+                ExtractException.Log("ELI26955", ex);
             }
         }
 
