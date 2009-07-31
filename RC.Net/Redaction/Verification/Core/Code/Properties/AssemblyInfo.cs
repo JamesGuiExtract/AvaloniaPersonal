@@ -37,5 +37,5 @@ using System.Resources;
 [assembly: AssemblyFileVersion("1.0.0.0")]
 [assembly: NeutralResourcesLanguageAttribute("en-US")]
 
-// Mark assembly as not CLS compliant.
-[assembly: CLSCompliant(false)]
+// Mark assembly as CLS compliant.
+[assembly: CLSCompliant(true)]
