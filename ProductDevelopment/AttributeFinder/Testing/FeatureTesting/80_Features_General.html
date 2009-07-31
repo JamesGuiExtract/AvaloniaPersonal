@@ -1,0 +1,141 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 8.0 Feature Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 8.0 Feature Testing - General<br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h2>Run As Windows Service</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> The goal for this feature is to allow the FAM to be used in a Windows 
+		service mode.  7.0.0.39 use of SrvAny.exe simply kills the underlying executable when the 
+		service is stopped.  This feature will allow the currently processing file to finish 
+		gracefully.  This implementation will <b>not</b> separate the file processing engine 
+		from the user interface.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Skip Pages That Fail OCR</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5370 
+  	   	<LI><b>Details:</b> 7.0.0.39 functionality fails a document if a single page fails to 
+		OCR. This feature allows a failed file to be skipped.  Registry entries control whether 
+		or not this feature is active, the maximum percentage of failed pages allowed before 
+		failing the document (default = 25), and the maximum number of failed pages allowed 
+		before failing the document (default = 10).
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b> Joanna, 7.0.0.39 + Hotfix #08, 07/28/2009
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Exercise the <b>OCR document</b> task using the 
+			<b>I:\Common\Testing\PVCS_Testing\LegacyRC\5370</b> images.
+	      		<li>Confirm that each image fails when <b>SkipPageOnFailure = 0</b>. 
+	      		<li>Confirm that appropriate results are seen when <b>SkipPageOnFailure = 1</b>. 
+	      		<li>Confirm that appropriate exceptions (indicating skipped pages) are logged. 
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Select Files Dialog</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> LegacyRC #5387
+  	   	<LI><b>Details:</b> Create a Select Files dialog for use by Manually set action status and 
+		Export file lists.  Include the ability to handle Skipped status.  Include the ability to 
+		handle any or all of the following tags.  Include the ability to further select a random 
+		percentage of the above scope.  See the detailed <b>8.0 Req-Design - Random file selection 
+		functionality</b> notes posted by Arvind on 7/28/09.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the property page UI works as expected.
+	      		<li>Confirm that selecting Skipped files works correctly for a specific user.
+	      		<li>Confirm that selecting Skipped files works correctly for any user.
+	      		<li>Confirm that selecting files works correctly for any of the following tags.
+	      		<li>Confirm that selecting files works correctly for all of the following tags.
+	      		<li>Confirm that each of the main options works correctly when constrained 
+			by a random percentage.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Automatic Detection/Correction Of Stuck Files</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Installation of SQL Server 2008</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3604
+  	   	<LI><b>Details:</b> The DemoShield installation app currently installs SQL Server 2005. 
+		For 8.0, SQL Server 2008 should be installed.
+  	   	<LI><b>Main Checklists Updated:</b> Yes
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the installation page includes SQL Server 2008 Express.
+	      		<li>Confirm that the installation page includes SQL Server Management Studio 2008.
+	      		<li>Confirm installation works properly on each supported operating system.
+	      		<li>Exercise a <b>Sanity Test</b> and an <b>Endurance Test</b> using 
+			SQL Server 2008.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Endurance Test With Two Million Documents</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> N/A
+  	   	<LI><b>Details:</b> Exercise the <b>Large-scale</b> Endurance test checklist for ID Shield.
+  	   	<LI><b>Main Checklists Updated:</b> N/A
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Use the existing <b>Endurance Test</b> checklist.
+	      		<li>Use the new spreadsheet for tracking machine-level performance.
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Support User-Configurable File Processing Priority</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Support FAM Processing During Specified Times Of Day Or Week</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+</OL>
+</BODY>
+</HTML>
