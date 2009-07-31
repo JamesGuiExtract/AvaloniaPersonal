@@ -595,9 +595,7 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                _color = value;
-
-                base.Dirty = true;
+                SetColor(value, true);
             }
         }
 
@@ -1303,6 +1301,23 @@ namespace Extract.Imaging.Forms
             {
                 // Recalculate its region
                 CalculateRegion();
+            }
+        }
+
+        /// <summary>
+        /// Sets the <see cref="Color"/> without raising any events.
+        /// </summary>
+        /// <param name="color">The color to set the <see cref="Highlight"/>.</param>
+        /// <param name="markAsDirty"><see langword="true"/> to set the dirty flag to 
+        /// <see langword="true"/>; <see langword="false"/> to leave the dirty flag unchanged.
+        /// </param>
+        internal void SetColor(Color color, bool markAsDirty)
+        {
+            _color = color;
+
+            if (markAsDirty)
+            {
+                base.Dirty = true;
             }
         }
 

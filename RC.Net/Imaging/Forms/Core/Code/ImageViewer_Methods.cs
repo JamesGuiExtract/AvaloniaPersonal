@@ -546,6 +546,7 @@ namespace Extract.Imaging.Forms
                         GC.Collect();
                         GC.WaitForPendingFinalizers();
 
+                        // TODO: This isn't disposed after last failure...
                         // Reclone the page and convert as necessary
                         page = base.Image.Clone();
                     }
@@ -556,11 +557,7 @@ namespace Extract.Imaging.Forms
                         ExtractException ee = new ExtractException("ELI23377",
                             "Device context created successfully after retry");
                         ee.AddDebugData("Retries attempted", retries, false);
-                        ee.AddDebugData("Image file name", _imageFile, false);
-                        ee.AddDebugData("Current page", i, false);
-                        ee.AddDebugData("Total pages", base.Image.PageCount, false);
-                        ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
-                        ee.AddDebugData("Current bpp", page.BitsPerPixel, false);
+                        AddImageDebugInfo(ee, page, i);
                         ee.Log();
                     }
                     else if(hdc == IntPtr.Zero)
@@ -568,14 +565,10 @@ namespace Extract.Imaging.Forms
                         // Throw an exception
                         ExtractException ee = new ExtractException("ELI23378",
                             "Unabled to create device context");
-                        ee.AddDebugData("Image file name", _imageFile, false);
-                        ee.AddDebugData("Current page", i, false);
-                        ee.AddDebugData("Total pages", base.Image.PageCount, false);
-                        ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
-                        ee.AddDebugData("Current bpp", page.BitsPerPixel, false);
-                        ee.AddDebugData("Current memory false", GC.GetTotalMemory(false), false);
-                        ee.AddDebugData("Current memory true", GC.GetTotalMemory(true), false);
-                        ee.AddDebugData("Retry Count", _SAVE_RETRY_COUNT, false);
+                        AddImageDebugInfo(ee, page, i);
+                        ee.AddDebugData("Memory before reclaim", GC.GetTotalMemory(false), false);
+                        ee.AddDebugData("Memory after reclaim", GC.GetTotalMemory(true), false);
+                        ee.AddDebugData("Retry count", _SAVE_RETRY_COUNT, false);
                         throw ee;
                     }
 
@@ -694,9 +687,36 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets a ColorResolutionCommand to convert an image to 16 bpp.
+        /// Adds additional debug information about an image.
         /// </summary>
-        /// <returns></returns>
+        /// <param name="ee">The exception to which to add debug information.</param>
+        /// <param name="image">The image for which to add debug information.</param>
+        /// <param name="pageNumber">The page number of <paramref name="image"/>.</param>
+        void AddImageDebugInfo(ExtractException ee, RasterImage image, int pageNumber)
+        {
+            ee.AddDebugData("Image file name", _imageFile, false);
+            ee.AddDebugData("Current page", pageNumber, false);
+
+            // Add info about current image if available
+            if (base.Image != null)
+            {
+                ee.AddDebugData("Total pages", base.Image.PageCount, false);
+                ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
+            }
+
+            // Add info about image parameter if available
+            if (image != null)
+            {
+                ee.AddDebugData("Current bpp", image.BitsPerPixel, false);
+                ee.AddDebugData("Page width", image.Width, false);
+                ee.AddDebugData("Page height", image.Height, false);
+            }
+        }
+
+        /// <summary>
+        /// Gets a command to convert an image to 16 bpp.
+        /// </summary>
+        /// <returns>A command to convert an image to 16 bpp.</returns>
         private static ColorResolutionCommand GetSixteenBppConverter()
         {
             ColorResolutionCommand command = new ColorResolutionCommand();

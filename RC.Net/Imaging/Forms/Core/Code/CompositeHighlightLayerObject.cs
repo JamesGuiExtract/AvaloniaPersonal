@@ -201,13 +201,7 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    _color = value;
-
-                    // Update the highlights
-                    foreach (Highlight highlight in base.Objects)
-                    {
-                        highlight.Color = _color;
-                    }
+                    SetColor(value, true);
                 }
                 catch (Exception ex)
                 {
@@ -427,6 +421,30 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI23067", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sets the color of the <see cref="CompositeHighlightLayerObject"/>.
+        /// </summary>
+        /// <param name="color">The color to set the <see cref="CompositeHighlightLayerObject"/>.
+        /// </param>
+        /// <param name="markAsDirty"><see langword="true"/> to set the dirty flag to 
+        /// <see langword="true"/>; <see langword="false"/> to leave the dirty flag unchanged.
+        /// </param>
+        protected void SetColor(Color color, bool markAsDirty)
+        {
+            _color = color;
+
+            // Update the highlights
+            foreach (Highlight highlight in base.Objects)
+            {
+                highlight.SetColor(_color, markAsDirty);
+            }
+
+            if (markAsDirty)
+            {
+                base.Dirty = true;
             }
         }
 

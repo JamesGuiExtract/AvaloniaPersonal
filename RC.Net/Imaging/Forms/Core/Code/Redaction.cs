@@ -184,7 +184,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                this.FillColor = fillColor;
+                SetFillColor(fillColor, false);
             }
             catch (Exception ex)
             {
@@ -220,7 +220,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                this.FillColor = fillColor;
+                SetFillColor(fillColor, false);
             }
             catch (Exception ex)
             {
@@ -258,7 +258,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                this.FillColor = fillColor;
+                SetFillColor(fillColor, false);
             }
             catch (Exception ex)
             {
@@ -419,23 +419,18 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Sets the fill color of the <see cref="Redaction"/>.
         /// </summary>
-        /// <param name="color">The fill color of the <see cref="Redaction"/>.</param>
-        /// <param name="setDirtyFlag"><see langword="true"/> if the dirty flag should be set to 
+        /// <param name="fillColor">The fill color of the <see cref="Redaction"/>.</param>
+        /// <param name="markAsDirty"><see langword="true"/> if the dirty flag should be set to 
         /// <see langword="true"/>; <see langword="false"/> if the dirty flag should not be 
         /// changed.</param>
-        void SetFillColor(RedactionColor color, bool setDirtyFlag)
+        void SetFillColor(RedactionColor fillColor, bool markAsDirty)
         {
-            // Update the fill color and 
-            _fillColor = color;
+            // Update the fill color
+            _fillColor = fillColor;
 
             // Set the appropriate highlight color
-            base.Color = _fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT;
-
-            // Set the dirty flag if necessary
-            if (setDirtyFlag)
-            {
-                base.Dirty = true;
-            }
+            Color color = _fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT;
+            base.SetColor(color, markAsDirty);
         }
 
         #endregion Redaction Methods

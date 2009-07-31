@@ -1462,7 +1462,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Sets the current page.
         /// </summary>
-        /// <param name="pageNumber">The page number to be visible.</param>
+        /// <param name="pageNumber">The one-based page number to be visible.</param>
         /// <param name="updateZoom">Whether to update the zoom setting.</param>
         /// <param name="raisePageChanged">Whether to raise the page changed event.</param>
         public void SetPageNumber(int pageNumber, bool updateZoom, bool raisePageChanged)
