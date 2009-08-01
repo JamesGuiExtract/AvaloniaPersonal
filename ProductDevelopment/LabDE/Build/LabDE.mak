@@ -134,7 +134,7 @@ CreateLabDEInstallCD: BuildLabDEInstall
 CopyLMFolderToInstall:
 	@ECHO Creating License Manager Install...
 	@CD "$(ReusableComponentsRootDirectory)\VendorSpecificUtils\SafeNetUtils\Build"
-    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" ProductInstallFolder="$(LabDEBleedingEdgeDir)"  CopyLMInstallToProductInstallFolder
+    @nmake /F LicenseManager.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" ProductInstallFolder="$(LabDEBleedingEdgeDir)\Extract Systems LM"  CopyLMInstallToProductInstallFolder
 	
 CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD 
 	@ECHO Copying Required installs
@@ -145,8 +145,8 @@ CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD
 	@XCOPY "$(AFInstallRootDir)\RequiredInstalls\SQLServerExpress2005\*.*" "$(LabDEBleedingEdgeDir)\SQLServerExpress2005" /v /s /e /y
 	@XCOPY "$(DataEntryInstallFiles)\RequiredInstalls\Corepoint Integration Engine\*.*" "$(LabDEBleedingEdgeDir)\Corepoint Integration Engine" /v /s /e /y
 	@ECHO Copying DemoShield Files
-	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
 	@IF NOT EXIST "$(LabDEInstallDir)" MKDIR "$(LabDEInstallDir)"
+	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\Launch.ini" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
 
