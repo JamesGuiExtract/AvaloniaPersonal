@@ -228,7 +228,7 @@ begin
 	// Need to install msmq which depends on the OS Version
 	if ( SYSINFO.nOSMajor = 5 ) then
 		szProgram = "sysocmgr";
-		szCmdLine = "/i:" + WINDIR ^ "sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
+		szCmdLine = "/i:" + WINDIR ^ "inf\sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
 		//MessageBox( szCmdLine, MB_OK);
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
 	elseif (SYSINFO.nOSMajor = 6 ) then

@@ -152,6 +152,10 @@ CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD
 
 CreateDemo_LabDE: 
 	@ECHO Copying Demo_LabDE files...
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\$(SolutionFolder)\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\$(SolutionFolder)\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules"
+    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\$(SolutionFolder)\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
+	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\$(SolutionFolder)\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
 	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
