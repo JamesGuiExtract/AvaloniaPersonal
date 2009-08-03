@@ -1,0 +1,190 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.0.39 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.0.39 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>Licensing</b> - Need new license file for FLEX Index 7.1
+	       	<ul>
+	      		<li>Create an RDT license from the <b>FLEX Index 7.0</b> folder.
+	      		<li>Confirm that the installed applications (FAM, DB Admin, Rule Tester) 
+			complain about not being licensed.
+	      		<li>Create an RDT license from the <b>Current</b> folder.
+	      		<li>Confirm that the installed applications (FAM, DB Admin, Rule Tester) 
+			are now licensed.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3436]</b> Split Into Content Areas
+	       	<ul>
+	      		<li>Exercise <b>test.rsd</b> and the sample image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3436</b>.
+	      		<li>Confirm that both the found attributes and the found sub-attributes 
+			properly highlight the entirety of the sensitive data.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3525]</b> MICR Finder
+	       	<ul>
+	      		<li>Exercise <b>rectangleexception.rsd</b> and the sample image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3525</b>.
+	      		<li>Confirm that no <b>Invalid bounds for Long Rectangle after rotation!</b> 
+			exception is seen.
+<p>
+	      		<li>Exercise <b>bounds.rsd</b> and the various images from 
+			<b>I:\Common\Testing\Rotated_Images</b>.
+	      		<li>Confirm that no <b>Invalid bounds for Long Rectangle after rotation!</b> 
+			exceptions are seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3570, #3586]</b> Verify Redactions Two
+	       	<ul>
+	      		<li>Confirm that this task is available from the FAM after installation.  It 
+			may be necessary to <b>Check for new components</b>.
+	      		<li>Confirm that the toolbar includes a complete set of compatible icons, 
+			especially Next document, Previous document, Add exemption, Add last exemption, 
+			and Options. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3579]</b> FAM Lockup
+	       	<ul>
+	      		<li>Exercise the following memory leak tests and confirm that processing 
+			does not lock up.
+		       	<ul>
+			       	<li>Date Time Splitter - Test 1
+			       	<li>Regular Expression Value Finder - Test 1
+			       	<li>Convert VOA To XML - Test 1 (if available)
+			       	<li>Lab Results Order Mapper - Test 1 (if available)
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3580]</b> Merge Attributes
+	       	<ul>
+	      		<li>Exercise <b>runtest.rsd</b> and the image from 
+			<b>I:\Common\Testing\PVCS_Testing\FlexIDSCore\3580</b>.
+	      		<li>Confirm that no <b>Internal logic error!</b> 
+			exceptions are seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3581]</b> FPS File Logged With Start And Stop
+	       	<ul>
+			<li>Process some files with the <b>FAM</b>.
+	      		<li>Review the exception log.
+	      		<li>Confirm that the item logged when processing starts includes the FPS 
+			filename.
+	      		<li>Confirm that the item logged when processing stops includes the FPS 
+			filename.
+	       	</ul>
+<p>
+  	   	<LI><b>[DotNet #329]</b> Verify redactions
+	       	<ul>
+			<li>Run the <b>File Action Manager</b>.
+	      		<li>Select and exercise the <b>Verify redactions two</b> task.
+			<ul>
+	      			<li>Confirm that VOA input files are read and displayed properly.
+	      			<li>Confirm that verification results are written to the VOA output files 
+				properly.
+	      			<li>Confirm that exemption codes can be applied during verification.
+	      			<li>Confirm that applied exemption codes are persistent.
+	      			<li>Confirm that a <b>Comment</b> field is available.  This will be used 
+				with skipping but isn't finished yet.
+			</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5343]</b> Image Viewer and Relative Path
+	       	<ul>
+	      		<li>Exercise <b>"C:\Program Files\Extract 
+			Systems\CommonComponents\ImageViewer.exe" 003.tif</b> from a command window in a 
+			folder that contains 003.tif.
+	      		<li>Confirm that the image opens successfully.
+	      		<li>Confirm that <b>Recognize text and process</b> successfully OCRs the image.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5354]</b> Spatial String - Automated Test
+	       	<ul>
+	      		<li>Exercise the <b>Spatial String</b> automated tests.
+	      		<li>Confirm that all tests pass.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5362 - #5369, #5371 - #5386]</b> Skip Processing
+	       	<ul>
+	      		<li>The only task that currently supports skipping processing is <b>Verify 
+			indexed data</b>.
+	      		<li>Exercise <b>DB Admin</b> with regards to skipped files and confirm 
+			expected behavior.
+		       	<ul>
+		      		<li>Summary tab
+		      		<li>Set file action status
+		       	</ul>
+	      		<li>Exercise <b>File Action Manager</b> with regards to skipped files and confirm 
+			expected behavior.
+		       	<ul>
+		      		<li>Status bar
+		      		<li>Processing Setup tab selecting files that <b>the current user</b> skipped.
+		      		<li>Processing Setup tab selecting files that <b>any user</b> skipped.
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5370]</b> Skip Failed Pages From OCR
+	       	<ul>
+	      		<li>Exercise the <b>Hotfix #08</b> checklist.
+	      		<li>Note that logged exceptions may be a little different for <b>Version 7.1</b>.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
