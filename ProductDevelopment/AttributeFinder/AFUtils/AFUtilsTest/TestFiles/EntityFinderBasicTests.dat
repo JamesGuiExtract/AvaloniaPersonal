@@ -143,7 +143,7 @@ Person with Of|John H. Smith of Pittsburgh plus|John H. Smith
 Company with Of|First National Bank of Pittsburgh plus|First National Bank of Pittsburgh
 
 // Trim internal parentheses
-Company with Internal Parentheses1|lower case (For Recording) Bahamas National Bank plus more|Bahamas National Bank
+Company with Internal Parentheses1|lower case (Recording) Bahamas National Bank plus more|Bahamas National Bank
 
 Company with Internal Parentheses2|lower case Bahamas National Bank (For Recording) plus more|Bahamas National Bank
 
