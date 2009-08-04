@@ -408,10 +408,9 @@ void RuleTesterDlg::OnButtonExecute()
 		// here because we don't want the internal dirty flag to be
 		// effected by this SaveTo() call.
 
-		if (!asCppBool(m_ipRuleSet->IsEncrypted) && m_pFRM != NULL)
+		if (m_pFRM != NULL && m_ipRuleSet->CanSave == VARIANT_TRUE)
 		{
-			m_ipRuleSet->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()),
-				VARIANT_FALSE);
+			m_ipRuleSet->SaveTo(get_bstr_t(m_pFRM->getRecoveryFileName().c_str()), VARIANT_FALSE);
 		}
 
 		// make a copy of the input text in case the string will be
