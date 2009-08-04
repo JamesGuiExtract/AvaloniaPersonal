@@ -170,11 +170,14 @@ void CRuleSetEditor::OnFileExport()
 			return;
 		}
 
+		// Validate that the rule set is unencrypted and licensed to be saved
+		validateRuleSetCanBeSaved();
+
 		// Create a copy of the current rule set
 		ICopyableObjectPtr ipCopyableObject = m_ipRuleSet;
 		if (ipCopyableObject == NULL)
 		{
-			throw UCLIDException( "ELI05061", "Rule Set does not support copying!" );
+			throw UCLIDException( "ELI05061", "Rule Set does not support copying." );
 		}
 		UCLID_AFCORELib::IRuleSetPtr ipExportRuleSet = ipCopyableObject->Clone();
 
@@ -213,6 +216,9 @@ void CRuleSetEditor::OnFileSave()
 
 	try
 	{	
+		// Validate that the rule set is unencrypted and licensed to be saved
+		validateRuleSetCanBeSaved();
+
 		if (m_strCurrentFileName.empty())
 		{
 			// if current rule set hasn't been saved yet.
@@ -225,7 +231,7 @@ void CRuleSetEditor::OnFileSave()
 			{
 				if (bFileReadOnly)
 				{
-					UCLIDException ue( "ELI09214", "File is read only!" );
+					UCLIDException ue( "ELI09214", "File is read only." );
 					ue.addDebugInfo("FileName", m_strCurrentFileName );
 					throw ue;
 				}
@@ -251,7 +257,10 @@ void CRuleSetEditor::OnFileSaveas()
 	TemporaryResourceOverride resourceOverride( _Module.m_hInstResource );
 
 	try
-	{	
+	{
+		// Validate that the rule set is unencrypted and licensed to be saved
+		validateRuleSetCanBeSaved();
+
 		// ask user to select file to save to
 		CFileDialogEx fileDlg(FALSE, ".rsd", NULL, OFN_ENABLESIZING | OFN_EXPLORER | 
 			OFN_HIDEREADONLY | OFN_PATHMUSTEXIST | OFN_OVERWRITEPROMPT,
@@ -342,7 +351,7 @@ void CRuleSetEditor::OnToolsCheck()
 		ICategoryManagerPtr ipCatMgr(CLSID_CategoryManager);
 		if (ipCatMgr == NULL)
 		{
-			throw UCLIDException("ELI04327", "Unable to create instance of CategoryManager!");
+			throw UCLIDException("ELI04327", "Unable to create instance of CategoryManager.");
 		}
 
 		// create a vector of all categories we care about.
@@ -403,7 +412,7 @@ void CRuleSetEditor::OnToolsTest()
 	{
 		if (!asCppBool(::IsWindow(m_apRuleTesterDlg->m_hWnd)))
 		{
-			throw UCLIDException ("ELI18588", "Rule Tester has not been initialized!");
+			throw UCLIDException ("ELI18588", "Rule Tester has not been initialized.");
 		}
 
 		m_apRuleTesterDlg->ShowWindow(SW_SHOW);
@@ -482,7 +491,7 @@ void CRuleSetEditor::OnBtnAddAttribute()
 				m_comboAttr.SetCurSel(m_comboAttr.FindStringExact(-1, zInput));
 				
 				// throw exception indicating that attribute already exists
-				UCLIDException ue("ELI04497", "Specified attribute has already been added to list!");
+				UCLIDException ue("ELI04497", "Specified attribute has already been added to list.");
 				ue.addDebugInfo("Attribute name", (LPCTSTR)zInput);
 				throw ue;
 			}
@@ -536,7 +545,7 @@ void CRuleSetEditor::OnBtnDeleteAttribute()
 			int		iResult;
 			zPrompt.Format( "Are you sure that attribute '%s' should be deleted?", 
 				zAttribute );
-			iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+			iResult = MessageBox( LPCTSTR(zPrompt), "Confirm Delete", 
 				MB_YESNO | MB_ICONQUESTION );
 
 			// Act on response
@@ -563,7 +572,7 @@ void CRuleSetEditor::OnBtnDeleteAttribute()
 					CString	zText;
 					m_comboAttr.GetLBText( iIndex, zText );
 					_bstr_t	bstrText;
-					bstrText = get_bstr_t(zText.operator LPCTSTR());
+					bstrText = get_bstr_t(LPCTSTR(zText));
 
 					// get access to the attribute find info associated with
 					// the currently selected attribute.
@@ -649,13 +658,13 @@ void CRuleSetEditor::OnSelchangeComboAttributes()
 	int iIndex = m_comboAttr.GetCurSel();
 	CString	zAttribute;
 	m_comboAttr.GetLBText( iIndex, zAttribute );
-	_bstr_t	bstrAttribute( zAttribute.operator LPCTSTR() );
+	_bstr_t	bstrAttribute = LPCTSTR(zAttribute);
 
 	// let the Rule Tester dialog know that the current attribute has changed
 	m_apRuleTesterDlg->setCurrentAttributeName((LPCTSTR) zAttribute);
 
 	// Get AttributeFindInfo object for this attribute
-	m_ipInfo = m_ipAttributeNameToInfoMap->GetValue( bstrAttribute );
+	m_ipInfo = m_ipAttributeNameToInfoMap->GetValue((const char *) bstrAttribute );
 
 	// Refresh display based on this Attribute
 	refreshUIFromAttribute();
@@ -800,8 +809,8 @@ void CRuleSetEditor::OnBtnAddRule()
 		// Set the prompt text
 		CString	zPrompt;
 		zPrompt.Format( "Select rule to find value for attribute '%s'", zAttribute );
-		string	strPrompt( zPrompt.operator LPCTSTR() );
-		dlg.SetPromptText( strPrompt );
+		string strPrompt = (LPCTSTR)zPrompt;
+		dlg.SetPromptText(strPrompt);
 
 		// Display the modal dialog
 		int iReturn = dlg.DoModal();
@@ -837,7 +846,7 @@ void CRuleSetEditor::OnBtnAddRule()
 
 				// Add description text
 				m_listRules.SetItemText( nCurrentSelectedIndex, m_iDESC_LIST_COLUMN, 
-					zDescription.operator LPCTSTR() );
+					LPCTSTR(zDescription) );
 
 				// Default enabled state to true
 				m_listRules.SetCheck( nCurrentSelectedIndex, TRUE );
@@ -851,7 +860,7 @@ void CRuleSetEditor::OnBtnAddRule()
 				{
 					// Create and throw exception
 					throw UCLIDException("ELI04590", 
-						"Unable to retrieve Attribute Rules!");
+						"Unable to retrieve Attribute Rules.");
 				}
 
 				// Insert the new Rule
@@ -924,7 +933,7 @@ void CRuleSetEditor::OnBtnDeleteRule()
 		}
 
 		// Present MessageBox
-		iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+		iResult = MessageBox( LPCTSTR(zPrompt), "Confirm Delete", 
 			MB_YESNO | MB_ICONQUESTION );
 
 		// Act on response
@@ -997,7 +1006,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 			if (ipCopyableObject == NULL)
 			{
 				throw UCLIDException( "ELI04715", 
-					"Attribute Rule does not support copying!" );
+					"Attribute Rule does not support copying." );
 			}
 
 			UCLID_AFCORELib::IAttributeRulePtr	ipNewRule = 
@@ -1006,7 +1015,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04592", 
-					"Unable to retrieve Attribute Rule!");
+					"Unable to retrieve Attribute Rule.");
 			}
 
 			// Use Add Rule dialog 
@@ -1015,8 +1024,8 @@ void CRuleSetEditor::OnBtnConfigureRule()
 			// Set the prompt text
 			CString	zPrompt;
 			zPrompt.Format( "Select rule to find value for attribute '%s'", zAttribute );
-			string	strPrompt( zPrompt.operator LPCTSTR() );
-			dlg.SetPromptText( strPrompt );
+			string strPrompt = (LPCTSTR)zPrompt;
+			dlg.SetPromptText(strPrompt);
 
 			// Check result from modal dialog
 			if (dlg.DoModal() == IDOK)
@@ -1029,7 +1038,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 				{
 					// Update the description text
 					m_listRules.SetItemText( iIndex, m_iDESC_LIST_COLUMN, 
-						zDescription.operator LPCTSTR() );
+						LPCTSTR(zDescription) );
 
 					//////////////////////////
 					// Update the Rules vector
@@ -1040,7 +1049,7 @@ void CRuleSetEditor::OnBtnConfigureRule()
 					{
 						// Create and throw exception
 						throw UCLIDException("ELI04593", 
-							"Unable to retrieve Attribute Rules!");
+							"Unable to retrieve Attribute Rules.");
 					}
 
 					// Store the updated Rule
@@ -1102,7 +1111,7 @@ void CRuleSetEditor::OnBtnRuleUp()
 
 			// Restore the description
 			m_listRules.SetItemText( iIndex - 1, m_iDESC_LIST_COLUMN, 
-				zDescription.operator LPCTSTR() );
+				LPCTSTR(zDescription) );
 
 			//////////////////////////
 			// Update the Rules vector
@@ -1113,7 +1122,7 @@ void CRuleSetEditor::OnBtnRuleUp()
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04594", 
-					"Unable to retrieve Attribute Rules!");
+					"Unable to retrieve Attribute Rules.");
 			}
 
 			// Swap the rules
@@ -1168,7 +1177,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 
 			// Restore the description
 			m_listRules.SetItemText( iIndex + 1, m_iDESC_LIST_COLUMN, 
-				zDescription.operator LPCTSTR() );
+				LPCTSTR(zDescription) );
 
 			//////////////////////////
 			// Update the Rules vector
@@ -1179,7 +1188,7 @@ void CRuleSetEditor::OnBtnRuleDown()
 			{
 				// Create and throw exception
 				throw UCLIDException("ELI04595", 
-					"Unable to retrieve Attribute Rules!");
+					"Unable to retrieve Attribute Rules.");
 			}
 
 			// Swap the rules
@@ -1876,9 +1885,8 @@ void CRuleSetEditor::OnTimer(UINT nIDEvent)
 	try
 	{
 		// if we received a timer event to perform an auto-save, do the auto-save
-		// as long as the currently loaded ruleset is not encrypted
-		if (nIDEvent == giAUTO_SAVE_TIMERID && 
-			m_ipRuleSet->IsEncrypted == VARIANT_FALSE)
+		// as long as the currently loaded ruleset is not encrypted and is licensed to save
+		if (nIDEvent == giAUTO_SAVE_TIMERID && m_ipRuleSet->CanSave == VARIANT_TRUE)
 		{
 			// NOTE: we are passing VARIANT_TRUE as the second argument
 			// here because we don't want the internal dirty flag to be
@@ -1964,21 +1972,20 @@ void CRuleSetEditor::OnSelectMRUMenu(UINT nID)
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI09654")
 }
 //--------------------------------------------------------------------------------------------------
-void CRuleSetEditor::OnFileCounters() 
+void CRuleSetEditor::OnFileProperties() 
 {
 	AFX_MANAGE_STATE(AfxGetModuleState());
 	TemporaryResourceOverride resourceOverride(_Module.m_hInstResource);
 
 	try
 	{	
-		CRuleSetPropertiesDlg dlgCounters(m_ipRuleSet);
+		CRuleSetPropertiesDlg dialog(m_ipRuleSet);
 		
-		if ( dlgCounters.DoModal() == IDOK )
+		if (dialog.DoModal() == IDOK)
 		{
 			// update the status bar as the user may have changed settings
 			setStatusBarText();
 		}
-
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11332")
 	

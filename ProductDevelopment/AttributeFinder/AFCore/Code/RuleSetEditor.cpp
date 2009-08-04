@@ -240,7 +240,7 @@ BEGIN_MESSAGE_MAP(CRuleSetEditor, CDialog)
 	ON_BN_CLICKED(IDC_BTN_SELECTOH, OnBtnSelectOutputHandler)
 	ON_NOTIFY(NM_RCLICK, IDC_EDIT_OH, OnRclickHandlerText)
 	ON_WM_SIZE()
-	ON_COMMAND(ID_FILE_PROPERTIES, OnFileCounters)
+	ON_COMMAND(ID_FILE_PROPERTIES, OnFileProperties)
 	//}}AFX_MSG_MAP
 	ON_COMMAND_RANGE(ID_MRU_FILE1, ID_MRU_FILE5, OnSelectMRUMenu)
 	ON_BN_CLICKED(IDC_CHECK_DOCUMENT_PP, &CRuleSetEditor::OnBnClickedCheckDocumentPp)
@@ -320,7 +320,7 @@ void CRuleSetEditor::importFromFile(const string& strFileName)
 		m_comboAttr.GetLBText( j, zAttribute );
 
 		// Add this attribute to the vector
-		vecAttributes.push_back( string( zAttribute.operator LPCTSTR() ) );
+		vecAttributes.push_back( string( LPCTSTR(zAttribute) ) );
 	}
 
 	// Create a temporary ruleset object
@@ -359,11 +359,11 @@ void CRuleSetEditor::importFromFile(const string& strFileName)
 			_bstr_t bstrName = ipKeys->GetItem( i );
 
 			// Check for an attribute with the specified name already in the map
-			if (m_ipAttributeNameToInfoMap->Contains( bstrName ))
+			if (m_ipAttributeNameToInfoMap->Contains(bstrName))
 			{
 				// Throw exception indicating that attribute already exists
-				UCLIDException ue( "ELI05018", "Specified attribute is already in the list!" );
-				ue.addDebugInfo( "Attribute name", bstrName.operator const char *() );
+				UCLIDException ue( "ELI05018", "Specified attribute is already in the list." );
+				ue.addDebugInfo("Attribute name", (const char *) bstrName);
 				throw ue;
 			}
 
@@ -372,10 +372,10 @@ void CRuleSetEditor::importFromFile(const string& strFileName)
 			ASSERT_RESOURCE_ALLOCATION( "ELI05019", ipInfo != NULL );
 
 			// Add the Name and Info pair to the map
-			m_ipAttributeNameToInfoMap->Set( bstrName, ipInfo );
+			m_ipAttributeNameToInfoMap->Set(bstrName, ipInfo);
 
 			// Add the Attribute Name to the combo box
-			int iIndex = m_comboAttr.AddString( bstrName.operator const char *() );
+			int iIndex = m_comboAttr.AddString(bstrName);
 		}
 
 		// Refresh the UI
@@ -704,7 +704,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 		if (ipRules == NULL)
 		{
 			// Create and throw exception
-			throw UCLIDException("ELI04584", "Unable to retrieve Attribute Rules!");
+			throw UCLIDException("ELI04584", "Unable to retrieve Attribute Rules.");
 		}
 
 		// Add each item from vector to list
@@ -724,8 +724,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 
 				// Add the item to the list
 				m_listRules.InsertItem( i, "" );
-				m_listRules.SetItemText( i, m_iDESC_LIST_COLUMN, 
-					bstrDescription.operator const char *() );
+				m_listRules.SetItemText( i, m_iDESC_LIST_COLUMN, (const char *)bstrDescription);
 
 				m_listRules.SetCheck(i, vbEnabled == VARIANT_TRUE);
 			}
@@ -744,7 +743,7 @@ void CRuleSetEditor::refreshUIFromAttribute()
 
 		// Update Input Validator description
 		_bstr_t	bstrIVDesc = ipIV->Description;
-		m_zIVDescription = bstrIVDesc.operator const char *();
+		m_zIVDescription = (const char *)bstrIVDesc;
 
 		// Set the IV checkbox
 		// Make sure that there is an input validator present
@@ -920,13 +919,13 @@ void CRuleSetEditor::refreshUIFromRuleSet()
 
 		CString	zAttribute;
 		m_comboAttr.GetLBText( 0, zAttribute );
-		_bstr_t	bstrAttribute( zAttribute.operator LPCTSTR() );
+		_bstr_t	bstrAttribute = LPCTSTR(zAttribute);
 
 		// let the Rule Tester dialog know what the current attribute is
 		m_apRuleTesterDlg->setCurrentAttributeName((LPCTSTR) zAttribute);
 
 		// Get AttributeFindInfo object for this attribute
-		m_ipInfo = m_ipAttributeNameToInfoMap->GetValue( bstrAttribute );
+		m_ipInfo = m_ipAttributeNameToInfoMap->GetValue((const char *) bstrAttribute);
 	}
 	else
 	{
@@ -1135,7 +1134,7 @@ void CRuleSetEditor::deleteMarkedRules()
 	if (ipRules == NULL)
 	{
 		// Throw exception, unable to retrieve Attribute Rules
-		throw UCLIDException( "ELI05571", "Unable to retrieve Attribute Rules!" );
+		throw UCLIDException( "ELI05571", "Unable to retrieve Attribute Rules." );
 	}
 
 	// Step backwards through list
@@ -1233,7 +1232,7 @@ void CRuleSetEditor::addFileToMRUList(const string& strFileToBeAdded)
 	
 	refreshFileMRU();
 }
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::removeFileFromMRUList(const string& strFileToBeRemoved)
 {
 	// remove the bad file from MRU List
@@ -1243,7 +1242,7 @@ void CRuleSetEditor::removeFileFromMRUList(const string& strFileToBeRemoved)
 
 	refreshFileMRU();
 }
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::setStatusBarText()
 {
 	string strSelectedCounters = "";
@@ -1320,7 +1319,7 @@ void CRuleSetEditor::setStatusBarText()
 		refreshUIFromRuleSet();
 
 		// Create and throw exception - invalid combination
-		UCLIDException ue( "ELI21502", "Invalid USB counter and licensing combination!" );
+		UCLIDException ue( "ELI21502", "Invalid USB counter and licensing combination." );
 		ue.addDebugInfo( "Selected Counters", strSelectedCounters );
 		ue.addDebugInfo( "FLEX Index Rule Writing", LicenseManagement::sGetInstance().isLicensed( 
 			gnFLEXINDEX_RULE_WRITING_OBJECTS ) ? "1" : "0" );
@@ -1368,7 +1367,7 @@ void CRuleSetEditor::setStatusBarText()
 	m_statusBar.SetPaneInfo(m_statusBar.CommandToIndex(ID_INDICATOR_INTERNAL_USE_ONLY), 
 		ID_INDICATOR_INTERNAL_USE_ONLY, SBPS_NORMAL, iWidth );
 }
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
 void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescription* pObject, 
 						BOOL &bCheckBoxState, UINT uiCheckBoxID, CString &zEditControlText)
 {
@@ -1415,4 +1414,17 @@ void CRuleSetEditor::updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescri
 	// refresh screen
 	UpdateData(FALSE);
 }
-//--------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------
+void CRuleSetEditor::validateRuleSetCanBeSaved()
+{
+	if (m_ipRuleSet->CanSave == VARIANT_FALSE)
+	{
+		if (m_ipRuleSet->IsEncrypted == VARIANT_TRUE)
+		{
+			throw UCLIDException("ELI27024", "Cannot save encrypted rule set.");
+		}
+
+		throw UCLIDException("ELI27025", "Must select USB counters to save rule set.");
+	}
+}
+//-------------------------------------------------------------------------------------------------

@@ -18,9 +18,12 @@
 #include "resource.h"
 #include "afxwin.h"
 
-#include <string>
-#include <memory>
 #include <FileRecoveryManager.h>
+
+#include <memory>
+#include <string>
+
+using namespace std;
 
 // forward declarations
 class RuleTesterDlg;
@@ -47,7 +50,7 @@ class CRuleSetEditor : public CDialog
 
 // Construction
 public:
-	CRuleSetEditor(const std::string& strFileName = "", const std::string& strProductRootDir = "", CWnd* pParent = NULL);
+	CRuleSetEditor(const string& strFileName = "", const string& strProductRootDir = "", CWnd* pParent = NULL);
 
 // Dialog Data
 	//{{AFX_DATA(CRuleSetEditor)
@@ -141,7 +144,7 @@ protected:
 	afx_msg void OnBtnSelectOutputHandler();
 	afx_msg void OnRclickHandlerText(NMHDR* pNMHDR, LRESULT* pResult);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	afx_msg void OnFileCounters();
+	afx_msg void OnFileProperties();
 	afx_msg void OnBnClickedCheckDocumentPp();
 	afx_msg void OnBnClickedCheckInputValidator();
 	afx_msg void OnBnClickedCheckAttSplitter();
@@ -175,17 +178,17 @@ private:
 	UCLID_AFCORELib::IAttributeFindInfoPtr m_ipInfo;
 
 	// the name of the last file opened
-	std::string m_strLastFileOpened;
+	string m_strLastFileOpened;
 
 	// the file name for currently opened file
-	std::string m_strCurrentFileName;
+	string m_strCurrentFileName;
 
 	IClipboardObjectManagerPtr m_ipClipboardMgr;
 
 	// object that manages file recovery related functionality
 	FileRecoveryManager m_FRM;
 
-	std::auto_ptr<RuleTesterDlg> m_apRuleTesterDlg;
+	auto_ptr<RuleTesterDlg> m_apRuleTesterDlg;
 
 	// Which control owns the context menu
 	EEditorControlSelected	m_eContextMenuCtrl;
@@ -194,10 +197,10 @@ private:
 	int m_iDESC_LIST_COLUMN;
 
 	// Expected path to Test Harness executable
-	std::string	m_strTestHarnessPath;
+	string	m_strTestHarnessPath;
 
 	// Expected path to SDK Root
-	std::string	m_strBinFolder;
+	string	m_strBinFolder;
 
 	// parent that creates rule set editor
 	CWnd *m_pParentWnd;
@@ -208,8 +211,8 @@ private:
 	CStatusBar m_statusBar;
 
 	// persistent manager
-	std::auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
-	std::auto_ptr<MRUList> ma_pMRUList;
+	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
+	auto_ptr<MRUList> ma_pMRUList;
 
 	//////////
 	// Methods
@@ -255,11 +258,11 @@ private:
 	//			prompt user to save changes to current ruleset if appropriate.
 	//			If strFileName == "", will prompt user to select filename with
 	//			the standard file-open dialog box.
-	void openFile(std::string strFileName);
+	void openFile(string strFileName);
 
 	// PURPOSE: Allow the user to select and import attributes 
 	// from the specified file
-	void importFromFile(const std::string& strFileName);
+	void importFromFile(const string& strFileName);
 
 	// Deletes Attribute rules that have been marked for deletion via SetItemData
 	void deleteMarkedRules();
@@ -275,10 +278,10 @@ private:
 	void processDroppedFile(char *pszFile);
 
 	// add a file to the top of the MRU list
-	void addFileToMRUList(const std::string& strFileToBeAdded);
+	void addFileToMRUList(const string& strFileToBeAdded);
 
 	// remove the file from MRU list
-	void removeFileFromMRUList(const std::string& strFileToBeRemoved);
+	void removeFileFromMRUList(const string& strFileToBeRemoved);
 
 	// Refresh the menu with the current MRU list
 	void refreshFileMRU();
@@ -296,5 +299,7 @@ private:
 	void updateCheckBoxAndEditControlBasedOnObject(IObjectWithDescription* pObject, 
 		BOOL &bCheckBoxState, UINT uiCheckBoxID, CString &zEditControlText);	
 
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Throws an exception if the rule set is not licensed or is encrypted and cannot be saved
+	void validateRuleSetCanBeSaved();
 };
-
