@@ -1237,7 +1237,7 @@ namespace Extract.DataEntry
                     // Attempt to find mapped attribute(s) from the provided vector.  
                     IUnknownVector mappedAttributes = DataEntryMethods.InitializeAttributes(
                         base.AttributeName, MultipleMatchSelectionMode.All, _sourceAttributes, null,
-                        this, null, false, false, null, null, null);
+                        this, null, false, null, null, null, null);
 
                     // Create arrays to store the attributes associated with each row & cell.
                     int count = mappedAttributes.Size();
@@ -1273,8 +1273,9 @@ namespace Extract.DataEntry
                     {
                         // If there is a "new" row, initialize the _tabOrderPlaceholderAttribute.
                         _tabOrderPlaceholderAttribute = DataEntryMethods.InitializeAttribute(
-                            "PlaceholderAttribute_" + base.Name, MultipleMatchSelectionMode.First, true,
-                            _sourceAttributes, null, this, null, true, true, null, null, null);
+                            "PlaceholderAttribute_" + base.Name, MultipleMatchSelectionMode.First,
+                            true, _sourceAttributes, null, this, null, true, TabStopMode.Always,
+                            null, null, null);
 
                         // Don't persist placeholder attributes in output.
                         AttributeStatusInfo.SetAttributeAsPersistable(
@@ -1980,8 +1981,8 @@ namespace Extract.DataEntry
             {
                 attribute = (IAttribute)new AttributeClass();
                 attribute.Name = base.AttributeName;
-                AttributeStatusInfo.Initialize(
-                    attribute, _sourceAttributes, this, null, false, false, null, null, null);
+                AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null, false,
+                    null, null, null, null);
                 newAttributeCreated = true;
             }
 
@@ -2051,7 +2052,7 @@ namespace Extract.DataEntry
                             // raises the AttributeInitialized event for all attributes mapped into
                             // the table.
                             AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this,
-                                column.Index, false, dataEntryTableColumn.TabStopRequired,
+                                column.Index, false, dataEntryTableColumn.TabStopMode,
                                 dataEntryCell.Validator, dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
                         }
@@ -2063,7 +2064,7 @@ namespace Extract.DataEntry
                                 dataEntryTableColumn.AttributeName,
                                 dataEntryTableColumn.MultipleMatchSelectionMode,
                                 true, attribute.SubAttributes, null, this, column.Index, true,
-                                dataEntryTableColumn.TabStopRequired, dataEntryCell.Validator,
+                                dataEntryTableColumn.TabStopMode, dataEntryCell.Validator,
                                 dataEntryTableColumn.AutoUpdateQuery,
                                 dataEntryTableColumn.ValidationQuery);
                         }
@@ -2093,8 +2094,8 @@ namespace Extract.DataEntry
                     // It is important to call initialize here to ensure AttributeStatusInfo
                     // raises the AttributeInitialized event for all attributes mapped into the
                     // table.
-                    AttributeStatusInfo.Initialize(
-                        attribute, _sourceAttributes, this, 0, false, false, null, null, null);
+                    AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, 0, false,
+                        TabStopMode.Never, null, null, null);
                 }
 
                 // Swap out the existing attribute in the overall attribute heirarchy (either
@@ -2164,7 +2165,7 @@ namespace Extract.DataEntry
             // Find all attributes which apply to this control.
             IUnknownVector formattedAttributes = DataEntryMethods.InitializeAttributes(
                 base.AttributeName, MultipleMatchSelectionMode.All, formattedData, null, this, null,
-                false, false, null, null, null);
+                false, null, null, null, null);
 
             // Apply the found attributes into the currently selected rows of the table.
             ApplyAttributesToSelectedRows(formattedAttributes);
@@ -2478,7 +2479,7 @@ namespace Extract.DataEntry
                         if (AttributeStatusInfo.GetParentAttribute(attribute) == null)
                         {
                             AttributeStatusInfo.Initialize(attribute, _sourceAttributes, this, null,
-                                false, false, null, null, null);
+                                false, null, null, null, null);
                         }
 
                         ApplyAttributeToRow(destinationRows[rowsAdded].Index, attribute,

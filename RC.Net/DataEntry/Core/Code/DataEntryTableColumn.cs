@@ -64,10 +64,9 @@ namespace Extract.DataEntry
         private string _autoUpdateQuery;
 
         /// <summary>
-        /// Specifies whether tab should always stop on the column or whether it can be skipped
-        /// if empty and valid.
+        /// Specifies under what circumstances the column's attributes should serve as a tab stop.
         /// </summary>
-        private bool _tabStopRequired = true;
+        private TabStopMode _tabStopMode = TabStopMode.Always;
 
         /// <summary>
         /// A query which will cause the validation list to be updated using the values from other
@@ -447,24 +446,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether tab should always stop on this column or whether it can be skipped
-        /// if the next cell is empty and valid.
+        /// Specifies under what circumstances the <see cref="DataEntryTableColumn"/>'s
+        /// <see cref="IAttribute"/>s should serve as a tab stop.
         /// </summary>
-        /// <value><see langword="true"/> if the column should always be a tabstop,
-        /// <see langword="false"/> if the column can be skipped if empty and valid</value>
-        /// <returns><see langword="true"/> if the column is always be a tabstop,
-        /// <see langword="false"/> if the column will be skipped if empty and valid</returns>
+        /// <value>A <see cref="TabStopMode"/> value indicating when the attributes should serve as a
+        /// tab stop.</value>
+        /// <returns>A <see cref="TabStopMode"/> value indicating when the attributes will serve as a
+        /// tab stop.</returns>
         [Category("Data Entry Table Column")]
-        public bool TabStopRequired
+        public TabStopMode TabStopMode
         {
             get
             {
-                return _tabStopRequired;
+                return _tabStopMode;
             }
 
             set
             {
-                _tabStopRequired = value;
+                _tabStopMode = value;
             }
         }
 
@@ -548,7 +547,7 @@ namespace Extract.DataEntry
                 column.ValidationErrorMessage = this.ValidationErrorMessage;
                 column.UseComboBoxCells = this.UseComboBoxCells;
                 column.AutoUpdateQuery = this.AutoUpdateQuery;
-                column.TabStopRequired = this.TabStopRequired;
+                column.TabStopMode = this.TabStopMode;
                 column.ValidationCorrectsCase = this.ValidationCorrectsCase;
 
                 return column;

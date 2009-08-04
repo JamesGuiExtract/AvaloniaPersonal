@@ -1174,6 +1174,13 @@ namespace Extract.DataEntry
                             // new attribute selection rather than overriding it.
                             _manualFocusEvent = true;
 
+                            // Notify AttributeStatusInfo that the current edit is over.
+                            // This will also be called as part of a focus change event, but it needs
+                            // to be done here first so that any auto-updating that needs to occur
+                            // occurs prior to finding the next tab stop since the next tab stop may
+                            // depend on an auto-update.
+                            AttributeStatusInfo.EndEdit();
+
                             Stack<IAttribute> nextTabStopAttribute =
                                 AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
                                     ActiveAttributeGenealogy(), !_shiftKeyDown);
@@ -1792,7 +1799,7 @@ namespace Extract.DataEntry
                         }
 
                         // Notify AttributeStatusInfo of the new attribute hierarchy
-                        AttributeStatusInfo.ResetData(dataFilename, _attributes, _dbConnection);
+                        AttributeStatusInfo.ResetData(e.FileName, _attributes, _dbConnection);
 
                         // Enable or disable swiping as appropriate.
                         bool swipingEnabled = _activeDataControl != null &&

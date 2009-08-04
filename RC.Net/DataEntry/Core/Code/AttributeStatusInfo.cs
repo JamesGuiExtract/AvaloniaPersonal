@@ -46,6 +46,35 @@ namespace Extract.DataEntry
     }
 
     /// <summary>
+    /// Specifies under what circumstances an <see cref="IAttribute"/> should be included in the tab
+    /// order.
+    /// </summary>
+    public enum TabStopMode
+    {
+        /// <summary>
+        /// The <see cref="IAttribute"/> should always be in the tab order (assuming it is viewable).
+        /// </summary>
+        Always,
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> should only be included in the tab order if it is populated
+        /// with a non-empty value or its data is marked as invalid.
+        /// </summary>
+        OnlyWhenPopulatedOrInvalid,
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> should only be included in the tab order if its data is
+        /// marked as invalid (regardless of whether the value is non-empty).
+        /// </summary>
+        OnlyWhenInvalid,
+
+        /// <summary>
+        /// The <see cref="IAttribute"/> should never be included in the tab order.
+        /// </summary>
+        Never
+    }
+
+    /// <summary>
     /// An object that represents the current state of a particular <see cref="IAttribute"/>
     /// This includes whether the attribute's data has been validated, fully propagated and whether it
     /// has been viewed by the user. The object is intended to occupy the 
@@ -713,10 +742,9 @@ namespace Extract.DataEntry
         private string _fullPath;
         
         /// <summary>
-        /// Specifies whether tab should always stop on the attribute or whether it can be skipped
-        /// if empty and valid.
+        /// Specifies under what circumstances the attribute should serve as a tab stop.
         /// </summary>
-        private bool _tabStopRequired = true;
+        private TabStopMode _tabStopMode = TabStopMode.Always;
 
         /// <summary>
         /// Specifies whether the attribute should be persisted in output.
@@ -800,23 +828,23 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether tab should always stop on the attribute or whether it can be skipped
-        /// if empty and valid.
+        /// Specifies under what circumstances the <see cref="IAttribute"/> should serve as a tab
+        /// stop.
         /// </summary>
-        /// <value><see langword="true"/> if the <see cref="IAttribute"/> should always be a tabstop,
-        /// <see langword="false"/> if the attribute can be skipped if empty and valid.</value>
-        /// <returns><see langword="true"/> if the <see cref="IAttribute"/> is always be a tabstop,
-        /// <see langword="false"/> if the attribute will be skipped if empty and valid.</returns>
-        public bool TabStopRequired
+        /// <value>A <see cref="TabStopMode"/> value indicating when the attribute should serve as a
+        /// tab stop.</value>
+        /// <returns>A <see cref="TabStopMode"/> value indicating when the attribute will serve as a
+        /// tab stop.</returns>
+        public TabStopMode TabStopMode
         {
             get
             {
-                return _tabStopRequired;
+                return _tabStopMode;
             }
 
             set
             {
-                _tabStopRequired = value;
+                _tabStopMode = value;
             }
         }
 
@@ -1038,11 +1066,11 @@ namespace Extract.DataEntry
         /// <param name="considerPropagated"><see langword="true"/> to consider the 
         /// <see cref="IAttribute"/> already propagated; <see langword="false"/> otherwise.</param>
         /// <param name="validator">An object to be used to validate the data contained in the
-        /// <see cref="IAttribute"/>.  Can be <see langword="null"/> to keep the existing validator
+        /// <see cref="IAttribute"/>. Can be <see langword="null"/> to keep the existing validator
         /// or if data validation is not required.</param>
-        /// <param name="tabStopRequired"><see langword="true"/> if the <see cref="IAttribute"/> 
-        /// should always be a tabstop, <see langword="false"/> if the attribute can be skipped if
-        /// empty and valid.</param>
+        /// <param name="tabStopMode">A <see cref="TabStopMode"/> value indicatng under what
+        /// circumstances the attribute should serve as a tab stop. Can be <see langword="null"/> to
+        /// keep the existing tabStopMode settin.</param>
         /// <param name="autoUpdateQuery">A query which will cause the <see cref="IAttribute"/>'s
         /// value to automatically be updated using values from other <see cref="IAttribute"/>s
         /// and/or a database query.</param>
@@ -1052,7 +1080,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
-            bool tabStopRequired, DataEntryValidator validator, string autoUpdateQuery,
+            TabStopMode? tabStopMode, DataEntryValidator validator, string autoUpdateQuery,
             string validationQuery)
         {
             try
@@ -1123,10 +1151,18 @@ namespace Extract.DataEntry
                     statusInfo._validator = validator;
                 }
 
-                // Update the tabStopRequired if necessary
-                if (tabStopRequired != statusInfo._tabStopRequired)
+                // Update the tabStopMode if necessary
+                if (tabStopMode != null && tabStopMode.Value != statusInfo._tabStopMode)
                 {
-                    statusInfo._tabStopRequired = tabStopRequired;
+                    statusInfo._tabStopMode = tabStopMode.Value;
+
+                    if (tabStopMode == TabStopMode.OnlyWhenInvalid)
+                    {
+                        // If an attribute will be skipped in the tab order unless invalid, mark
+                        // it as viewed. Otherwise tabbing through all fields in a document will
+                        // leave fields using OnlyWhenInvalid mode as unread. 
+                        statusInfo._hasBeenViewed = true;
+                    }
                 }
 
                 // If an entry doesn't exist in _subAttributesToParentMap for this attribute's
@@ -2531,10 +2567,43 @@ namespace Extract.DataEntry
         private static bool ConfirmIsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
-            bool isTabStop = statusInfo._isViewable && statusInfo._owningControl != null &&
-                (statusInfo._tabStopRequired || !statusInfo._dataIsValid ||
-                 !string.IsNullOrEmpty(attribute.Value.String));
+            // Default the attribute as not being a tab stop.
+            bool isTabStop = false;
 
+            // The attribute can only be a tab stop if it is viewable and mapped to a control.
+            if (statusInfo._isViewable && statusInfo._owningControl != null)
+            {
+                switch (statusInfo.TabStopMode)
+                {
+                    case TabStopMode.Always:
+                        {
+                            isTabStop = true;
+                        }
+                        break;
+
+                    case TabStopMode.OnlyWhenPopulatedOrInvalid:
+                        {
+                            if (!string.IsNullOrEmpty(attribute.Value.String) ||
+                                !statusInfo._dataIsValid)
+                            {
+                                isTabStop = true;
+                            }
+                        }
+                        break;
+
+                    case TabStopMode.OnlyWhenInvalid:
+                        {
+                            if (!statusInfo._dataIsValid)
+                            {
+                                isTabStop = true;
+                            }
+                        }
+                        break;
+
+                    // In the case of TabStopMode.Never, isTabStop will remain false.
+                }
+            }
+            
             return (isTabStop == value);
         }
 
@@ -2823,7 +2892,7 @@ namespace Extract.DataEntry
                 _fullPath = source._fullPath;
                 _validator = (source._validator == null) 
                     ? null : (DataEntryValidator)source._validator.Clone();
-                _tabStopRequired = source._tabStopRequired;
+                _tabStopMode = source._tabStopMode;
                 _persistAttribute = source._persistAttribute;
                 
                 // _raisingAttributeValueModified is intentionally not copied.

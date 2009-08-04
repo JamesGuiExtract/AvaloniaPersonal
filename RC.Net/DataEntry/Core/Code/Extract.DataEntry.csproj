@@ -148,6 +148,12 @@
     <Compile Include="DataEntryControlHost.Designer.cs">
       <DependentUpon>DataEntryControlHost.cs</DependentUpon>
     </Compile>
+    <Compile Include="DataEntryCopyButton.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="DataEntryCopyButton.Designer.cs">
+      <DependentUpon>DataEntryCopyButton.cs</DependentUpon>
+    </Compile>
     <Compile Include="DataEntryGroupBox.cs">
       <SubType>Component</SubType>
     </Compile>

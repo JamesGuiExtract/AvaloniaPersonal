@@ -685,7 +685,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(base.AttributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(base.AttributeName),
-                        sourceAttributes, null, this, 0, false, true, null, null, null);
+                        sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
                 }
 
                 // Use the primarily mapped attribute map the attribute for each row.
@@ -790,7 +790,7 @@ namespace Extract.DataEntry
 
                 // Initialize the newly swiped attribute's status information.
                 AttributeStatusInfo.Initialize(newAttribute, _sourceAttributes, this, 0, false,
-                    true, null, null, null);
+                   TabStopMode.Never, null, null, null);
 
                 // Use the primarily mapped attribute map the attribute for each row.
                 ApplyAttribute();
@@ -901,7 +901,7 @@ namespace Extract.DataEntry
                     // "." indicates that the parent attribute should be used in this row.
                     row.Cells[0].Value = _attribute;
                     AttributeStatusInfo.Initialize(_attribute, _sourceAttributes, this, row.Index,
-                        false, row.TabStopRequired, dataEntryCell.Validator, row.AutoUpdateQuery,
+                        false, row.TabStopMode, dataEntryCell.Validator, row.AutoUpdateQuery,
                         row.ValidationQuery);
                 }
                 else
@@ -909,7 +909,7 @@ namespace Extract.DataEntry
                     // Attempts to map an appropriate sub-attribute to the row.
                     row.Cells[0].Value = DataEntryMethods.InitializeAttribute(row.AttributeName,
                         row.MultipleMatchSelectionMode, true, _attribute.SubAttributes, null,
-                        this, row.Index, true, row.TabStopRequired, dataEntryCell.Validator,
+                        this, row.Index, true, row.TabStopMode, dataEntryCell.Validator,
                         row.AutoUpdateQuery, row.ValidationQuery);
                 }
 

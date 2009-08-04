@@ -73,10 +73,9 @@ namespace Extract.DataEntry
         private string _autoUpdateQuery;
 
         /// <summary>
-        /// Specifies whether tab should always stop on the row or whether it can be skipped
-        /// if empty and valid.
+        /// Specifies under what circumstances the row's attributes should serve as a tab stop.
         /// </summary>
-        private bool _tabStopRequired = true;
+        private TabStopMode _tabStopMode = TabStopMode.Always;
 
         /// <summary>
         /// A query which will cause the validation list to be updated using the values from other
@@ -477,24 +476,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether tab should always stop on this row or whether it can be skipped
-        /// if the next cell is empty and valid.
+        /// Specifies under what circumstances the <see cref="DataEntryTableRow"/>'s
+        /// <see cref="IAttribute"/>s should serve as a tab stop.
         /// </summary>
-        /// <value><see langword="true"/> if the row should always be a tabstop,
-        /// <see langword="false"/> if the row can be skipped if empty and valid</value>
-        /// <returns><see langword="true"/> if the row is always be a tabstop,
-        /// <see langword="false"/> if the row will be skipped if empty and valid</returns>
+        /// <value>A <see cref="TabStopMode"/> value indicating when the attributes should serve as a
+        /// tab stop.</value>
+        /// <returns>A <see cref="TabStopMode"/> value indicating when the attributes will serve as a
+        /// tab stop.</returns>
         [Category("Data Entry Table Row")]
-        public bool TabStopRequired
+        public TabStopMode TabStopMode
         {
             get
             {
-                return _tabStopRequired;
+                return _tabStopMode;
             }
 
             set
             {
-                _tabStopRequired = value;
+                _tabStopMode = value;
             }
         }
 
@@ -546,7 +545,7 @@ namespace Extract.DataEntry
                 row.ValidationErrorMessage = this.ValidationErrorMessage;
                 row.UseComboBoxCells = this.UseComboBoxCells;
                 row.AutoUpdateQuery = this.AutoUpdateQuery;
-                row.TabStopRequired = this.TabStopRequired;
+                row.TabStopMode = this.TabStopMode;
                 row.ValidationCorrectsCase = this.ValidationCorrectsCase;
 
                 return row;

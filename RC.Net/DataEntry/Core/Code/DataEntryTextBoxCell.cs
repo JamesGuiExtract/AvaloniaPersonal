@@ -319,6 +319,13 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.MarkAsViewable(_attribute, true);
                     }
 
+                    // If a control is read-only, consider the attribute as viewed since it is
+                    // unlikely to matter if a field that can't be changed was viewed.
+                    if (base.DataGridView.ReadOnly || base.ReadOnly)
+                    {
+                        AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                    }
+
                     _dataEntryTable.UpdateCellStyle((IDataEntryTableCell)this);
                 }
                 else

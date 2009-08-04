@@ -82,9 +82,6 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._orderingPhysicianCodeColumn = new Extract.DataEntry.DataEntryTableColumn();
             this._physicianTable = new Extract.DataEntry.DataEntryTable();
-            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
-            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             this._testDetailsGroupBox = new System.Windows.Forms.GroupBox();
             this._orderNumberLabel = new System.Windows.Forms.Label();
             this._orderNumber = new Extract.DataEntry.DataEntryTextBox();
@@ -101,7 +98,13 @@ namespace Extract.LabDE.StandardLabDE
             this._operatorComments = new System.Windows.Forms.TextBox();
             this._filenameLabel = new System.Windows.Forms.Label();
             this._filename = new Extract.DataEntry.DataEntryTextBox();
-            this._copyButton = new System.Windows.Forms.Button();
+            this._copyButton = new Extract.DataEntry.DataEntryCopyButton();
+            this.dataGridViewColumn1 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn2 = new System.Windows.Forms.DataGridViewColumn();
+            this.dataGridViewColumn3 = new System.Windows.Forms.DataGridViewColumn();
+            this._physicianFirstNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianLastNameColumn = new Extract.DataEntry.DataEntryTableColumn();
+            this._physicianCode = new Extract.DataEntry.DataEntryTableColumn();
             ((System.ComponentModel.ISupportInitialize)(this._laboratoryTestTable)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._labAddress)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this._testComponentTable)).BeginInit();
@@ -142,7 +145,7 @@ namespace Extract.LabDE.StandardLabDE
             this._laboratoryIdentifier.Size = new System.Drawing.Size(447, 21);
             this._laboratoryIdentifier.SupportsSwiping = false;
             this._laboratoryIdentifier.TabIndex = 1;
-            this._laboratoryIdentifier.TabStopRequired = true;
+            this._laboratoryIdentifier.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._laboratoryIdentifier.ValidationCorrectsCase = true;
             this._laboratoryIdentifier.ValidationErrorMessage = "Lab identifier is missing or invalid.";
             this._laboratoryIdentifier.ValidationListFileName = null;
@@ -164,7 +167,7 @@ namespace Extract.LabDE.StandardLabDE
             this._labInfoPassThrough.Size = new System.Drawing.Size(16, 20);
             this._labInfoPassThrough.SupportsSwiping = false;
             this._labInfoPassThrough.TabIndex = 5;
-            this._labInfoPassThrough.TabStopRequired = true;
+            this._labInfoPassThrough.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._labInfoPassThrough.ValidationCorrectsCase = true;
             this._labInfoPassThrough.ValidationErrorMessage = "";
             this._labInfoPassThrough.ValidationListFileName = null;
@@ -210,7 +213,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testName.HeaderText = "Order Name";
             this._testName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._testName.Name = "_testName";
-            this._testName.TabStopRequired = true;
+            this._testName.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._testName.UseComboBoxCells = false;
             this._testName.ValidationCorrectsCase = true;
             this._testName.ValidationErrorMessage = "Order name is not recognized.";
@@ -229,7 +232,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._orderCode.Name = "_orderCode";
             this._orderCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderCode.TabStopRequired = true;
+            this._orderCode.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._orderCode.UseComboBoxCells = false;
             this._orderCode.ValidationCorrectsCase = true;
             this._orderCode.ValidationErrorMessage = "Bad value";
@@ -249,7 +252,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testID.MinimumWidth = 80;
             this._testID.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._testID.Name = "_testID";
-            this._testID.TabStopRequired = true;
+            this._testID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._testID.UseComboBoxCells = false;
             this._testID.ValidationCorrectsCase = true;
             this._testID.ValidationErrorMessage = "Order code is not recognized.";
@@ -267,7 +270,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentDate.HeaderText = "Collection Date";
             this._componentDate.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentDate.Name = "_componentDate";
-            this._componentDate.TabStopRequired = true;
+            this._componentDate.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentDate.UseComboBoxCells = false;
             this._componentDate.ValidationCorrectsCase = true;
             this._componentDate.ValidationErrorMessage = "Collection date must be formatted MM/DD/YYYY";
@@ -284,7 +287,7 @@ namespace Extract.LabDE.StandardLabDE
             this._laboratoryTestTime.HeaderText = "Collection Time";
             this._laboratoryTestTime.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._laboratoryTestTime.Name = "_laboratoryTestTime";
-            this._laboratoryTestTime.TabStopRequired = true;
+            this._laboratoryTestTime.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._laboratoryTestTime.UseComboBoxCells = false;
             this._laboratoryTestTime.ValidationCorrectsCase = true;
             this._laboratoryTestTime.ValidationErrorMessage = "Collection time must be formatted HH:MM";
@@ -319,7 +322,7 @@ namespace Extract.LabDE.StandardLabDE
             this._labID.Size = new System.Drawing.Size(117, 20);
             this._labID.SupportsSwiping = true;
             this._labID.TabIndex = 2;
-            this._labID.TabStopRequired = true;
+            this._labID.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._labID.ValidationCorrectsCase = true;
             this._labID.ValidationErrorMessage = "Unknown laboratory ID";
             this._labID.ValidationListFileName = "";
@@ -347,7 +350,7 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow1.FormattingRuleFile = null;
             dataEntryTableRow1.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow1.Name = "Street";
-            dataEntryTableRow1.TabStopRequired = true;
+            dataEntryTableRow1.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             dataEntryTableRow1.UseComboBoxCells = false;
             dataEntryTableRow1.ValidationCorrectsCase = true;
             dataEntryTableRow1.ValidationErrorMessage = "Bad value";
@@ -361,7 +364,7 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow2.FormattingRuleFile = null;
             dataEntryTableRow2.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow2.Name = "City";
-            dataEntryTableRow2.TabStopRequired = true;
+            dataEntryTableRow2.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             dataEntryTableRow2.UseComboBoxCells = false;
             dataEntryTableRow2.ValidationCorrectsCase = true;
             dataEntryTableRow2.ValidationErrorMessage = "Bad value";
@@ -375,7 +378,7 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow3.FormattingRuleFile = null;
             dataEntryTableRow3.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow3.Name = "State";
-            dataEntryTableRow3.TabStopRequired = true;
+            dataEntryTableRow3.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             dataEntryTableRow3.UseComboBoxCells = false;
             dataEntryTableRow3.ValidationCorrectsCase = true;
             dataEntryTableRow3.ValidationErrorMessage = "";
@@ -389,7 +392,7 @@ namespace Extract.LabDE.StandardLabDE
             dataEntryTableRow4.FormattingRuleFile = null;
             dataEntryTableRow4.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             dataEntryTableRow4.Name = "Zip";
-            dataEntryTableRow4.TabStopRequired = true;
+            dataEntryTableRow4.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             dataEntryTableRow4.UseComboBoxCells = false;
             dataEntryTableRow4.ValidationCorrectsCase = true;
             dataEntryTableRow4.ValidationErrorMessage = "";
@@ -447,7 +450,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentName.HeaderText = "Test Name";
             this._componentName.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentName.Name = "_componentName";
-            this._componentName.TabStopRequired = true;
+            this._componentName.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentName.UseComboBoxCells = false;
             this._componentName.ValidationCorrectsCase = true;
             this._componentName.ValidationErrorMessage = "Test name is invalid for the current order";
@@ -465,7 +468,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._testCode.Name = "_testCode";
             this._testCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._testCode.TabStopRequired = true;
+            this._testCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._testCode.UseComboBoxCells = false;
             this._testCode.ValidationCorrectsCase = true;
             this._testCode.ValidationErrorMessage = "Test code is invalid for the current order.";
@@ -482,7 +485,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentValue.HeaderText = "Value";
             this._componentValue.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentValue.Name = "_componentValue";
-            this._componentValue.TabStopRequired = true;
+            this._componentValue.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentValue.UseComboBoxCells = false;
             this._componentValue.ValidationCorrectsCase = true;
             this._componentValue.ValidationErrorMessage = "Test value must be specified.";
@@ -499,7 +502,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentUnits.HeaderText = "Units";
             this._componentUnits.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentUnits.Name = "_componentUnits";
-            this._componentUnits.TabStopRequired = true;
+            this._componentUnits.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentUnits.UseComboBoxCells = false;
             this._componentUnits.ValidationCorrectsCase = false;
             this._componentUnits.ValidationErrorMessage = "Unrecognized unit designation.";
@@ -516,7 +519,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentRefRange.HeaderText = "Ref. Range";
             this._componentRefRange.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentRefRange.Name = "_componentRefRange";
-            this._componentRefRange.TabStopRequired = true;
+            this._componentRefRange.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentRefRange.UseComboBoxCells = false;
             this._componentRefRange.ValidationCorrectsCase = true;
             this._componentRefRange.ValidationErrorMessage = "Value is not allowed.";
@@ -534,7 +537,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentFlag.MinimumWidth = 45;
             this._componentFlag.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentFlag.Name = "_componentFlag";
-            this._componentFlag.TabStopRequired = true;
+            this._componentFlag.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._componentFlag.UseComboBoxCells = true;
             this._componentFlag.ValidationCorrectsCase = true;
             this._componentFlag.ValidationErrorMessage = "Unrecognized Flag";
@@ -552,7 +555,7 @@ namespace Extract.LabDE.StandardLabDE
             this._componentComment.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._componentComment.Name = "_componentComment";
             this._componentComment.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._componentComment.TabStopRequired = false;
+            this._componentComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._componentComment.UseComboBoxCells = false;
             this._componentComment.ValidationCorrectsCase = true;
             this._componentComment.ValidationErrorMessage = "Bad value";
@@ -581,7 +584,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientInfoGroupBox.Name = "_patientInfoGroupBox";
             this._patientInfoGroupBox.ParentDataEntryControl = null;
             this._patientInfoGroupBox.Size = new System.Drawing.Size(593, 192);
-            this._patientInfoGroupBox.TabIndex = 3;
+            this._patientInfoGroupBox.TabIndex = 4;
             this._patientInfoGroupBox.TabStop = false;
             this._patientInfoGroupBox.Text = "Patient Information";
             // 
@@ -645,7 +648,7 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._epicPatientFirstNameColumn.Name = "_epicPatientFirstNameColumn";
             this._epicPatientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientFirstNameColumn.TabStopRequired = true;
+            this._epicPatientFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._epicPatientFirstNameColumn.UseComboBoxCells = false;
             this._epicPatientFirstNameColumn.ValidationCorrectsCase = true;
             this._epicPatientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
@@ -664,7 +667,7 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientMiddleNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._epicPatientMiddleNameColumn.Name = "_epicPatientMiddleNameColumn";
             this._epicPatientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientMiddleNameColumn.TabStopRequired = true;
+            this._epicPatientMiddleNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._epicPatientMiddleNameColumn.UseComboBoxCells = false;
             this._epicPatientMiddleNameColumn.ValidationCorrectsCase = true;
             this._epicPatientMiddleNameColumn.ValidationErrorMessage = "Bad value";
@@ -682,7 +685,7 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._epicPatientLastNameColumn.Name = "_epicPatientLastNameColumn";
             this._epicPatientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientLastNameColumn.TabStopRequired = true;
+            this._epicPatientLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._epicPatientLastNameColumn.UseComboBoxCells = false;
             this._epicPatientLastNameColumn.ValidationCorrectsCase = true;
             this._epicPatientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
@@ -701,7 +704,7 @@ namespace Extract.LabDE.StandardLabDE
             this._epicPatientSuffixColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._epicPatientSuffixColumn.Name = "_epicPatientSuffixColumn";
             this._epicPatientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._epicPatientSuffixColumn.TabStopRequired = true;
+            this._epicPatientSuffixColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._epicPatientSuffixColumn.UseComboBoxCells = false;
             this._epicPatientSuffixColumn.ValidationCorrectsCase = true;
             this._epicPatientSuffixColumn.ValidationErrorMessage = "";
@@ -751,7 +754,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientFirstNameColumn.Name = "_patientFirstNameColumn";
             this._patientFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientFirstNameColumn.TabStopRequired = true;
+            this._patientFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientFirstNameColumn.UseComboBoxCells = false;
             this._patientFirstNameColumn.ValidationCorrectsCase = true;
             this._patientFirstNameColumn.ValidationErrorMessage = "Patient first name must be specified";
@@ -770,7 +773,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientMiddleNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientMiddleNameColumn.Name = "_patientMiddleNameColumn";
             this._patientMiddleNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientMiddleNameColumn.TabStopRequired = true;
+            this._patientMiddleNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientMiddleNameColumn.UseComboBoxCells = false;
             this._patientMiddleNameColumn.ValidationCorrectsCase = true;
             this._patientMiddleNameColumn.ValidationErrorMessage = "Bad value";
@@ -788,7 +791,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientLastNameColumn.Name = "_patientLastNameColumn";
             this._patientLastNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientLastNameColumn.TabStopRequired = true;
+            this._patientLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientLastNameColumn.UseComboBoxCells = false;
             this._patientLastNameColumn.ValidationCorrectsCase = true;
             this._patientLastNameColumn.ValidationErrorMessage = "Patient last name must be specified.";
@@ -807,7 +810,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientSuffixColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._patientSuffixColumn.Name = "_patientSuffixColumn";
             this._patientSuffixColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._patientSuffixColumn.TabStopRequired = true;
+            this._patientSuffixColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientSuffixColumn.UseComboBoxCells = false;
             this._patientSuffixColumn.ValidationCorrectsCase = true;
             this._patientSuffixColumn.ValidationErrorMessage = "";
@@ -841,7 +844,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientGender.Size = new System.Drawing.Size(54, 21);
             this._patientGender.SupportsSwiping = true;
             this._patientGender.TabIndex = 3;
-            this._patientGender.TabStopRequired = true;
+            this._patientGender.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientGender.ValidationCorrectsCase = true;
             this._patientGender.ValidationErrorMessage = "Specify \"M\" for male, \"F\" for female or \"U\" for unknown";
             this._patientGender.ValidationListFileName = "";
@@ -865,7 +868,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientBirthDate.Size = new System.Drawing.Size(283, 20);
             this._patientBirthDate.SupportsSwiping = true;
             this._patientBirthDate.TabIndex = 2;
-            this._patientBirthDate.TabStopRequired = true;
+            this._patientBirthDate.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientBirthDate.ValidationCorrectsCase = true;
             this._patientBirthDate.ValidationErrorMessage = "Date of birth must be specified in the format MM/DD/YYYY";
             this._patientBirthDate.ValidationListFileName = null;
@@ -897,7 +900,7 @@ namespace Extract.LabDE.StandardLabDE
             this._patientRecordNum.Size = new System.Drawing.Size(189, 20);
             this._patientRecordNum.SupportsSwiping = true;
             this._patientRecordNum.TabIndex = 4;
-            this._patientRecordNum.TabStopRequired = true;
+            this._patientRecordNum.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._patientRecordNum.ValidationCorrectsCase = true;
             this._patientRecordNum.ValidationErrorMessage = "Medical record number must be specified";
             this._patientRecordNum.ValidationListFileName = null;
@@ -929,7 +932,7 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianInfoGroupBox.Name = "_physicianInfoGroupBox";
             this._physicianInfoGroupBox.ParentDataEntryControl = null;
             this._physicianInfoGroupBox.Size = new System.Drawing.Size(593, 193);
-            this._physicianInfoGroupBox.TabIndex = 4;
+            this._physicianInfoGroupBox.TabIndex = 5;
             this._physicianInfoGroupBox.TabStop = false;
             this._physicianInfoGroupBox.Text = "Physicians";
             // 
@@ -993,7 +996,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._orderingPhysicianFirstNameColumn.Name = "_orderingPhysicianFirstNameColumn";
             this._orderingPhysicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianFirstNameColumn.TabStopRequired = true;
+            this._orderingPhysicianFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._orderingPhysicianFirstNameColumn.UseComboBoxCells = false;
             this._orderingPhysicianFirstNameColumn.ValidationCorrectsCase = true;
             this._orderingPhysicianFirstNameColumn.ValidationErrorMessage = "";
@@ -1011,7 +1014,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianLastNameColumn.MinimumWidth = 75;
             this._orderingPhysicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._orderingPhysicianLastNameColumn.Name = "_orderingPhysicianLastNameColumn";
-            this._orderingPhysicianLastNameColumn.TabStopRequired = true;
+            this._orderingPhysicianLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._orderingPhysicianLastNameColumn.UseComboBoxCells = false;
             this._orderingPhysicianLastNameColumn.ValidationCorrectsCase = true;
             this._orderingPhysicianLastNameColumn.ValidationErrorMessage = "";
@@ -1033,7 +1036,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderingPhysicianCodeColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._orderingPhysicianCodeColumn.Name = "_orderingPhysicianCodeColumn";
             this._orderingPhysicianCodeColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._orderingPhysicianCodeColumn.TabStopRequired = true;
+            this._orderingPhysicianCodeColumn.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._orderingPhysicianCodeColumn.UseComboBoxCells = false;
             this._orderingPhysicianCodeColumn.ValidationCorrectsCase = true;
             this._orderingPhysicianCodeColumn.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
@@ -1069,66 +1072,6 @@ namespace Extract.LabDE.StandardLabDE
             this._physicianTable.SmartHintsEnabled = false;
             this._physicianTable.TabIndex = 2;
             // 
-            // _physicianFirstNameColumn
-            // 
-            this._physicianFirstNameColumn.AttributeName = "First";
-            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
-                "/SQL>";
-            this._physicianFirstNameColumn.FillWeight = 75F;
-            this._physicianFirstNameColumn.FormattingRuleFile = null;
-            this._physicianFirstNameColumn.HeaderText = "First Name";
-            this._physicianFirstNameColumn.MinimumWidth = 75;
-            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
-            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianFirstNameColumn.TabStopRequired = true;
-            this._physicianFirstNameColumn.UseComboBoxCells = false;
-            this._physicianFirstNameColumn.ValidationCorrectsCase = true;
-            this._physicianFirstNameColumn.ValidationErrorMessage = "";
-            this._physicianFirstNameColumn.ValidationListFileName = null;
-            this._physicianFirstNameColumn.ValidationPattern = null;
-            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician ORDER BY FirstName</SQL>";
-            // 
-            // _physicianLastNameColumn
-            // 
-            this._physicianLastNameColumn.AttributeName = "Last";
-            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
-                "/SQL>";
-            this._physicianLastNameColumn.FormattingRuleFile = null;
-            this._physicianLastNameColumn.HeaderText = "Last Name";
-            this._physicianLastNameColumn.MinimumWidth = 75;
-            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
-            this._physicianLastNameColumn.TabStopRequired = true;
-            this._physicianLastNameColumn.UseComboBoxCells = false;
-            this._physicianLastNameColumn.ValidationCorrectsCase = true;
-            this._physicianLastNameColumn.ValidationErrorMessage = "";
-            this._physicianLastNameColumn.ValidationListFileName = null;
-            this._physicianLastNameColumn.ValidationPattern = null;
-            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE <Attribute>../F" +
-                "irst</Attribute> ORDER BY LastName</SQL>";
-            // 
-            // _physicianCode
-            // 
-            this._physicianCode.AttributeName = "Code";
-            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../Last<" +
-                "/Attribute>, 1, 20) + \'%\' AND FirstName LIKE SUBSTRING(<Attribute>../First</Attr" +
-                "ibute>, 1, 20) + \'%\'</SQL>";
-            this._physicianCode.FillWeight = 1F;
-            this._physicianCode.FormattingRuleFile = null;
-            this._physicianCode.HeaderText = "Code";
-            this._physicianCode.MinimumWidth = 65;
-            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
-            this._physicianCode.Name = "_physicianCode";
-            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
-            this._physicianCode.TabStopRequired = true;
-            this._physicianCode.UseComboBoxCells = false;
-            this._physicianCode.ValidationCorrectsCase = true;
-            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
-            this._physicianCode.ValidationListFileName = null;
-            this._physicianCode.ValidationPattern = null;
-            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
-            // 
             // _testDetailsGroupBox
             // 
             this._testDetailsGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
@@ -1150,7 +1093,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testDetailsGroupBox.Location = new System.Drawing.Point(0, 686);
             this._testDetailsGroupBox.Name = "_testDetailsGroupBox";
             this._testDetailsGroupBox.Size = new System.Drawing.Size(593, 393);
-            this._testDetailsGroupBox.TabIndex = 6;
+            this._testDetailsGroupBox.TabIndex = 7;
             this._testDetailsGroupBox.TabStop = false;
             this._testDetailsGroupBox.Text = "Selected Order Details";
             // 
@@ -1180,7 +1123,7 @@ namespace Extract.LabDE.StandardLabDE
             this._orderNumber.Size = new System.Drawing.Size(197, 20);
             this._orderNumber.SupportsSwiping = true;
             this._orderNumber.TabIndex = 2;
-            this._orderNumber.TabStopRequired = true;
+            this._orderNumber.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._orderNumber.ValidationCorrectsCase = true;
             this._orderNumber.ValidationErrorMessage = "Order Number must be specified";
             this._orderNumber.ValidationListFileName = null;
@@ -1215,7 +1158,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testComment.Size = new System.Drawing.Size(569, 47);
             this._testComment.SupportsSwiping = true;
             this._testComment.TabIndex = 6;
-            this._testComment.TabStopRequired = false;
+            this._testComment.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
             this._testComment.ValidationCorrectsCase = true;
             this._testComment.ValidationErrorMessage = "";
             this._testComment.ValidationListFileName = null;
@@ -1248,7 +1191,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testResultTime.Size = new System.Drawing.Size(153, 20);
             this._testResultTime.SupportsSwiping = true;
             this._testResultTime.TabIndex = 4;
-            this._testResultTime.TabStopRequired = true;
+            this._testResultTime.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._testResultTime.ValidationCorrectsCase = true;
             this._testResultTime.ValidationErrorMessage = "Result time must be formatted HH:MM";
             this._testResultTime.ValidationListFileName = "";
@@ -1281,7 +1224,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testResultDate.Size = new System.Drawing.Size(171, 20);
             this._testResultDate.SupportsSwiping = true;
             this._testResultDate.TabIndex = 3;
-            this._testResultDate.TabStopRequired = true;
+            this._testResultDate.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._testResultDate.ValidationCorrectsCase = true;
             this._testResultDate.ValidationErrorMessage = "Result date must be formatted MM/DD/YYYY";
             this._testResultDate.ValidationListFileName = null;
@@ -1296,7 +1239,7 @@ namespace Extract.LabDE.StandardLabDE
             this._testsGroupBox.Location = new System.Drawing.Point(0, 521);
             this._testsGroupBox.Name = "_testsGroupBox";
             this._testsGroupBox.Size = new System.Drawing.Size(593, 159);
-            this._testsGroupBox.TabIndex = 5;
+            this._testsGroupBox.TabIndex = 6;
             this._testsGroupBox.TabStop = false;
             this._testsGroupBox.Text = "Orders";
             // 
@@ -1322,7 +1265,7 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatus.Size = new System.Drawing.Size(189, 21);
             this._resultStatus.SupportsSwiping = false;
             this._resultStatus.TabIndex = 1;
-            this._resultStatus.TabStopRequired = true;
+            this._resultStatus.TabStopMode = Extract.DataEntry.TabStopMode.Always;
             this._resultStatus.ValidationCorrectsCase = true;
             this._resultStatus.ValidationErrorMessage = "";
             this._resultStatus.ValidationListFileName = "";
@@ -1365,7 +1308,7 @@ namespace Extract.LabDE.StandardLabDE
             this._filenameLabel.AutoSize = true;
             this._filenameLabel.Location = new System.Drawing.Point(6, 80);
             this._filenameLabel.Name = "_filenameLabel";
-            this._filenameLabel.Size = new System.Drawing.Size(49, 13);
+            this._filenameLabel.Size = new System.Drawing.Size(60, 13);
             this._filenameLabel.TabIndex = 8;
             this._filenameLabel.Text = "Image path";
             // 
@@ -1378,18 +1321,19 @@ namespace Extract.LabDE.StandardLabDE
             this._filename.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._filename.AutoUpdateQuery = "<SourceDocName/>";
             this._filename.BackColor = System.Drawing.SystemColors.Control;
-            this._filename.Disabled = true;
+            this._filename.Disabled = false;
             this._filename.ForeColor = System.Drawing.Color.Black;
             this._filename.FormattingRuleFile = null;
             this._filename.Location = new System.Drawing.Point(7, 96);
             this._filename.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._filename.Name = "_filename";
             this._filename.ParentDataEntryControl = null;
+            this._filename.ReadOnly = true;
             this._filename.Size = new System.Drawing.Size(509, 20);
             this._filename.SupportsSwiping = false;
             this._filename.TabIndex = 2;
             this._filename.TabStop = false;
-            this._filename.TabStopRequired = true;
+            this._filename.TabStopMode = Extract.DataEntry.TabStopMode.Never;
             this._filename.ValidationCorrectsCase = true;
             this._filename.ValidationErrorMessage = "";
             this._filename.ValidationListFileName = null;
@@ -1399,12 +1343,96 @@ namespace Extract.LabDE.StandardLabDE
             // _copyButton
             // 
             this._copyButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._copyButton.CopySourceControl = this._filename;
+            this._copyButton.Disabled = false;
             this._copyButton.Location = new System.Drawing.Point(522, 94);
+            this._copyButton.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._copyButton.Name = "_copyButton";
+            this._copyButton.ParentDataEntryControl = null;
             this._copyButton.Size = new System.Drawing.Size(55, 23);
-            this._copyButton.TabIndex = 10;
+            this._copyButton.TabIndex = 3;
+            this._copyButton.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
             this._copyButton.Text = "Copy";
             this._copyButton.UseVisualStyleBackColor = true;
+            this._copyButton.ValidationErrorMessage = "Press the copy button to copy the image path to the clipboard.";
+            // 
+            // dataGridViewColumn1
+            // 
+            this.dataGridViewColumn1.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn1.HeaderText = "Address";
+            this.dataGridViewColumn1.Name = "dataGridViewColumn1";
+            // 
+            // dataGridViewColumn2
+            // 
+            this.dataGridViewColumn2.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn2.HeaderText = "Address";
+            this.dataGridViewColumn2.Name = "dataGridViewColumn2";
+            // 
+            // dataGridViewColumn3
+            // 
+            this.dataGridViewColumn3.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.dataGridViewColumn3.HeaderText = "Address";
+            this.dataGridViewColumn3.Name = "dataGridViewColumn3";
+            // 
+            // _physicianFirstNameColumn
+            // 
+            this._physicianFirstNameColumn.AttributeName = "First";
+            this._physicianFirstNameColumn.AutoUpdateQuery = "<SQL>SELECT FirstName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
+                "/SQL>";
+            this._physicianFirstNameColumn.FillWeight = 75F;
+            this._physicianFirstNameColumn.FormattingRuleFile = null;
+            this._physicianFirstNameColumn.HeaderText = "First Name";
+            this._physicianFirstNameColumn.MinimumWidth = 75;
+            this._physicianFirstNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianFirstNameColumn.Name = "_physicianFirstNameColumn";
+            this._physicianFirstNameColumn.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianFirstNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
+            this._physicianFirstNameColumn.UseComboBoxCells = false;
+            this._physicianFirstNameColumn.ValidationCorrectsCase = true;
+            this._physicianFirstNameColumn.ValidationErrorMessage = "";
+            this._physicianFirstNameColumn.ValidationListFileName = null;
+            this._physicianFirstNameColumn.ValidationPattern = null;
+            this._physicianFirstNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT FirstName FROM Physician ORDER BY FirstName</SQL>";
+            // 
+            // _physicianLastNameColumn
+            // 
+            this._physicianLastNameColumn.AttributeName = "Last";
+            this._physicianLastNameColumn.AutoUpdateQuery = "<SQL>SELECT  LastName FROM Physician WHERE Code = <Attribute>../Code</Attribute><" +
+                "/SQL>";
+            this._physicianLastNameColumn.FormattingRuleFile = null;
+            this._physicianLastNameColumn.HeaderText = "Last Name";
+            this._physicianLastNameColumn.MinimumWidth = 75;
+            this._physicianLastNameColumn.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianLastNameColumn.Name = "_physicianLastNameColumn";
+            this._physicianLastNameColumn.TabStopMode = Extract.DataEntry.TabStopMode.Always;
+            this._physicianLastNameColumn.UseComboBoxCells = false;
+            this._physicianLastNameColumn.ValidationCorrectsCase = true;
+            this._physicianLastNameColumn.ValidationErrorMessage = "";
+            this._physicianLastNameColumn.ValidationListFileName = null;
+            this._physicianLastNameColumn.ValidationPattern = null;
+            this._physicianLastNameColumn.ValidationQuery = "[BLANK]\r\n<SQL>SELECT LastName FROM Physician WHERE FirstName LIKE <Attribute>../F" +
+                "irst</Attribute> ORDER BY LastName</SQL>";
+            // 
+            // _physicianCode
+            // 
+            this._physicianCode.AttributeName = "Code";
+            this._physicianCode.AutoUpdateQuery = "<SQL>SELECT Code FROM Physician WHERE LastName LIKE SUBSTRING(<Attribute>../Last<" +
+                "/Attribute>, 1, 20) + \'%\' AND FirstName LIKE SUBSTRING(<Attribute>../First</Attr" +
+                "ibute>, 1, 20) + \'%\'</SQL>";
+            this._physicianCode.FillWeight = 1F;
+            this._physicianCode.FormattingRuleFile = null;
+            this._physicianCode.HeaderText = "Code";
+            this._physicianCode.MinimumWidth = 65;
+            this._physicianCode.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
+            this._physicianCode.Name = "_physicianCode";
+            this._physicianCode.Resizable = System.Windows.Forms.DataGridViewTriState.True;
+            this._physicianCode.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenInvalid;
+            this._physicianCode.UseComboBoxCells = false;
+            this._physicianCode.ValidationCorrectsCase = true;
+            this._physicianCode.ValidationErrorMessage = "Physician code is missing or does not correspond with the specified name.";
+            this._physicianCode.ValidationListFileName = null;
+            this._physicianCode.ValidationPattern = null;
+            this._physicianCode.ValidationQuery = resources.GetString("_physicianCode.ValidationQuery");
             // 
             // StandardLabDEPanel
             // 
@@ -1504,9 +1532,6 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianFirstNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianLastNameColumn;
         private Extract.DataEntry.DataEntryTableColumn _orderingPhysicianCodeColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianFirstNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianLastNameColumn;
-        private Extract.DataEntry.DataEntryTableColumn _physicianCode;
         private Extract.DataEntry.DataEntryTableColumn _testName;
         private Extract.DataEntry.DataEntryTableColumn _orderCode;
         private Extract.DataEntry.DataEntryTableColumn _testID;
@@ -1523,6 +1548,12 @@ namespace Extract.LabDE.StandardLabDE
         private System.Windows.Forms.TextBox _operatorComments;
         private System.Windows.Forms.Label _filenameLabel;
         private Extract.DataEntry.DataEntryTextBox _filename;
-        private System.Windows.Forms.Button _copyButton;
+        private Extract.DataEntry.DataEntryCopyButton _copyButton;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn1;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn2;
+        private Extract.DataEntry.DataEntryTableColumn _physicianFirstNameColumn;
+        private Extract.DataEntry.DataEntryTableColumn _physicianLastNameColumn;
+        private Extract.DataEntry.DataEntryTableColumn _physicianCode;
+        private System.Windows.Forms.DataGridViewColumn dataGridViewColumn3;
     }
 }

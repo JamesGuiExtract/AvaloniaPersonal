@@ -1279,7 +1279,8 @@ namespace Extract.DataEntry
         {
             try
             {
-                _isActive = setActive;
+                // The table should be displayed as active only if it is editable.
+                _isActive = setActive && !base.ReadOnly;
                 _color = color;
 
                 // Update the color of the cell styles if necessary.

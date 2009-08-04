@@ -29,7 +29,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             this._tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this._labelProductName = new System.Windows.Forms.Label();
-            this._labelVersion = new System.Windows.Forms.Label();
+            this._labelFrameworkVersion = new System.Windows.Forms.Label();
             this._labelCopyright = new System.Windows.Forms.Label();
             this._labelCompanyName = new System.Windows.Forms.Label();
             this._textBoxDescription = new System.Windows.Forms.TextBox();
@@ -37,6 +37,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._linkLabelWebsite = new System.Windows.Forms.LinkLabel();
             this._labelLicenseInformation = new System.Windows.Forms.Label();
             this._logoImage = new System.Windows.Forms.PictureBox();
+            this._labelProductVersion = new System.Windows.Forms.Label();
             this._tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._logoImage)).BeginInit();
             this.SuspendLayout();
@@ -46,28 +47,31 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._tableLayoutPanel.ColumnCount = 1;
             this._tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this._tableLayoutPanel.Controls.Add(this._labelProductName, 0, 1);
-            this._tableLayoutPanel.Controls.Add(this._labelVersion, 0, 2);
-            this._tableLayoutPanel.Controls.Add(this._labelCopyright, 0, 3);
-            this._tableLayoutPanel.Controls.Add(this._labelCompanyName, 0, 4);
-            this._tableLayoutPanel.Controls.Add(this._textBoxDescription, 0, 5);
-            this._tableLayoutPanel.Controls.Add(this._okButton, 0, 8);
-            this._tableLayoutPanel.Controls.Add(this._linkLabelWebsite, 0, 6);
-            this._tableLayoutPanel.Controls.Add(this._labelLicenseInformation, 0, 7);
+            this._tableLayoutPanel.Controls.Add(this._labelFrameworkVersion, 0, 3);
+            this._tableLayoutPanel.Controls.Add(this._labelCopyright, 0, 4);
+            this._tableLayoutPanel.Controls.Add(this._labelCompanyName, 0, 5);
+            this._tableLayoutPanel.Controls.Add(this._textBoxDescription, 0, 6);
+            this._tableLayoutPanel.Controls.Add(this._okButton, 0, 9);
+            this._tableLayoutPanel.Controls.Add(this._linkLabelWebsite, 0, 7);
+            this._tableLayoutPanel.Controls.Add(this._labelLicenseInformation, 0, 8);
             this._tableLayoutPanel.Controls.Add(this._logoImage, 0, 0);
+            this._tableLayoutPanel.Controls.Add(this._labelProductVersion, 0, 2);
             this._tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this._tableLayoutPanel.Location = new System.Drawing.Point(9, 9);
             this._tableLayoutPanel.Name = "_tableLayoutPanel";
-            this._tableLayoutPanel.RowCount = 9;
+            this._tableLayoutPanel.RowCount = 10;
             this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36321F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36321F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36321F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36321F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.4544F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36663F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36291F));
-            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 11.36321F));
-            this._tableLayoutPanel.Size = new System.Drawing.Size(417, 401);
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20403F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20115F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20403F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20403F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20403F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 18.36782F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.2071F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20376F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10.20403F));
+            this._tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this._tableLayoutPanel.Size = new System.Drawing.Size(417, 428);
             this._tableLayoutPanel.TabIndex = 0;
             // 
             // _labelProductName
@@ -82,22 +86,22 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._labelProductName.Text = "Product Name";
             this._labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // _labelVersion
+            // _labelFrameworkVersion
             // 
-            this._labelVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelVersion.Location = new System.Drawing.Point(6, 178);
-            this._labelVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-            this._labelVersion.MaximumSize = new System.Drawing.Size(0, 17);
-            this._labelVersion.Name = "_labelVersion";
-            this._labelVersion.Size = new System.Drawing.Size(408, 17);
-            this._labelVersion.TabIndex = 0;
-            this._labelVersion.Text = "Version";
-            this._labelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this._labelFrameworkVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._labelFrameworkVersion.Location = new System.Drawing.Point(6, 206);
+            this._labelFrameworkVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelFrameworkVersion.MaximumSize = new System.Drawing.Size(0, 17);
+            this._labelFrameworkVersion.Name = "_labelFrameworkVersion";
+            this._labelFrameworkVersion.Size = new System.Drawing.Size(408, 17);
+            this._labelFrameworkVersion.TabIndex = 0;
+            this._labelFrameworkVersion.Text = "Framework Version";
+            this._labelFrameworkVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _labelCopyright
             // 
             this._labelCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelCopyright.Location = new System.Drawing.Point(6, 206);
+            this._labelCopyright.Location = new System.Drawing.Point(6, 234);
             this._labelCopyright.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
             this._labelCopyright.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelCopyright.Name = "_labelCopyright";
@@ -109,7 +113,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelCompanyName
             // 
             this._labelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelCompanyName.Location = new System.Drawing.Point(6, 234);
+            this._labelCompanyName.Location = new System.Drawing.Point(6, 262);
             this._labelCompanyName.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
             this._labelCompanyName.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelCompanyName.Name = "_labelCompanyName";
@@ -121,7 +125,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _textBoxDescription
             // 
             this._textBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._textBoxDescription.Location = new System.Drawing.Point(6, 265);
+            this._textBoxDescription.Location = new System.Drawing.Point(6, 293);
             this._textBoxDescription.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
             this._textBoxDescription.Multiline = true;
             this._textBoxDescription.Name = "_textBoxDescription";
@@ -136,7 +140,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._okButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this._okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this._okButton.Location = new System.Drawing.Point(339, 377);
+            this._okButton.Location = new System.Drawing.Point(339, 404);
             this._okButton.Name = "_okButton";
             this._okButton.Size = new System.Drawing.Size(75, 21);
             this._okButton.TabIndex = 24;
@@ -146,7 +150,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._linkLabelWebsite.AutoSize = true;
             this._linkLabelWebsite.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._linkLabelWebsite.Location = new System.Drawing.Point(3, 313);
+            this._linkLabelWebsite.Location = new System.Drawing.Point(3, 341);
             this._linkLabelWebsite.Name = "_linkLabelWebsite";
             this._linkLabelWebsite.Size = new System.Drawing.Size(411, 28);
             this._linkLabelWebsite.TabIndex = 26;
@@ -159,7 +163,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             this._labelLicenseInformation.AutoSize = true;
             this._labelLicenseInformation.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelLicenseInformation.Location = new System.Drawing.Point(3, 341);
+            this._labelLicenseInformation.Location = new System.Drawing.Point(3, 369);
             this._labelLicenseInformation.Name = "_labelLicenseInformation";
             this._labelLicenseInformation.Size = new System.Drawing.Size(411, 28);
             this._labelLicenseInformation.TabIndex = 27;
@@ -179,12 +183,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._logoImage.TabIndex = 28;
             this._logoImage.TabStop = false;
             // 
+            // _labelProductVersion
+            // 
+            this._labelProductVersion.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._labelProductVersion.Location = new System.Drawing.Point(6, 178);
+            this._labelProductVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelProductVersion.MaximumSize = new System.Drawing.Size(0, 17);
+            this._labelProductVersion.Name = "_labelProductVersion";
+            this._labelProductVersion.Size = new System.Drawing.Size(408, 17);
+            this._labelProductVersion.TabIndex = 29;
+            this._labelProductVersion.Text = "Product Version";
+            this._labelProductVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
             // AboutForm
             // 
             this.AcceptButton = this._okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(435, 419);
+            this.ClientSize = new System.Drawing.Size(435, 446);
             this.Controls.Add(this._tableLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -206,7 +222,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
         private System.Windows.Forms.TableLayoutPanel _tableLayoutPanel;
         private System.Windows.Forms.Label _labelProductName;
-        private System.Windows.Forms.Label _labelVersion;
+        private System.Windows.Forms.Label _labelFrameworkVersion;
         private System.Windows.Forms.Label _labelCopyright;
         private System.Windows.Forms.Label _labelCompanyName;
         private System.Windows.Forms.TextBox _textBoxDescription;
@@ -214,5 +230,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.LinkLabel _linkLabelWebsite;
         private System.Windows.Forms.Label _labelLicenseInformation;
         private System.Windows.Forms.PictureBox _logoImage;
+        private System.Windows.Forms.Label _labelProductVersion;
     }
 }

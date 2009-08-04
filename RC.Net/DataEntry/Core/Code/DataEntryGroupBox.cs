@@ -172,7 +172,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         MultipleMatchSelectionMode.First, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, false, null, null, null);
+                        sourceAttributes, null, this, 0, false, TabStopMode.Never, null, null, null);
                 }
 
                 OnPropagateAttributes();

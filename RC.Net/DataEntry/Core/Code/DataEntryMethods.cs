@@ -192,9 +192,9 @@ namespace Extract.DataEntry
         /// <param name="validator">An object to be used to validate the data contained in the
         /// <see cref="IAttribute"/>.  Can be <see langword="null"/> if data validation is not 
         /// required.</param>
-        /// <param name="tabStopRequired"><see langword="true"/> if the <see cref="IAttribute"/> 
-        /// should always be a tabstop, <see langword="false"/> if the attribute can be skipped if
-        /// empty and valid.</param>
+        /// <param name="tabStopMode">A <see cref="TabStopMode"/> under what circumstances the
+        /// attribute should serve as a tab stop (<see langword="null"/> to keep any existing
+        /// tabStopMode setting).</param>
         /// <param name="autoUpdateQuery">A query which will cause an attribute's value to
         /// automatically be updated using values from other <see cref="IAttribute"/>'s and/or a
         /// database query.</param>
@@ -208,7 +208,7 @@ namespace Extract.DataEntry
             MultipleMatchSelectionMode selectionMode, bool createIfNotFound,
             IUnknownVector sourceAttributes, IUnknownVector removedMatches, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
-            bool tabStopRequired, DataEntryValidator validator, string autoUpdateQuery,
+            TabStopMode? tabStopMode, DataEntryValidator validator, string autoUpdateQuery,
             string validationQuery)
         {
             try
@@ -220,7 +220,7 @@ namespace Extract.DataEntry
                 // Retrieve a vector of attributes satisfying the provided parameters.
                 IUnknownVector attributes = DataEntryMethods.InitializeAttributes(attributeName,
                     selectionMode, sourceAttributes, removedMatches, owningControl, displayOrder,
-                    considerPropagated, tabStopRequired, validator, autoUpdateQuery, validationQuery);
+                    considerPropagated, tabStopMode, validator, autoUpdateQuery, validationQuery);
 
                 ExtractException.Assert("ELI23694", "Expected one attribute, but got many!",
                     attributes.Size() <= 1);
@@ -242,7 +242,7 @@ namespace Extract.DataEntry
                     attribute.Name = attributeName;
 
                     AttributeStatusInfo.Initialize(attribute, sourceAttributes, owningControl,
-                        displayOrder, considerPropagated, tabStopRequired, validator,
+                        displayOrder, considerPropagated, tabStopMode, validator,
                         autoUpdateQuery, validationQuery);
 
                     // Add the created attributes to the sourceAttribute vector so that it is included
@@ -301,9 +301,9 @@ namespace Extract.DataEntry
         /// <param name="validator">An object to be used to validate the data contained in the
         /// <see cref="IAttribute"/>.  Can be <see langword="null"/> if data validation is not 
         /// required.</param>
-        /// <param name="tabStopRequired"><see langword="true"/> if the <see cref="IAttribute"/> 
-        /// should always be a tabstop, <see langword="false"/> if the attribute can be skipped if
-        /// empty and valid.</param>
+        /// <param name="tabStopMode">A <see cref="TabStopMode"/> under what circumstances the
+        /// attributes should serve as a tab stop (<see langword="null"/> to keep any existing
+        /// tabStopMode setting).</param>
         /// <param name="autoUpdateQuery">A query which will cause a contained cell's value to
         /// automatically be updated using values from other <see cref="IAttribute"/>'s and/or a
         /// database query.</param>
@@ -317,8 +317,8 @@ namespace Extract.DataEntry
         [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
         internal static IUnknownVector InitializeAttributes(string attributeName,
             MultipleMatchSelectionMode selectionMode, IUnknownVector sourceAttributes,
-            IUnknownVector removedMatches, IDataEntryControl owningControl, 
-            int? displayOrder, bool considerPropagated, bool tabStopRequired,
+            IUnknownVector removedMatches, IDataEntryControl owningControl,
+            int? displayOrder, bool considerPropagated, TabStopMode? tabStopMode,
             DataEntryValidator validator, string autoUpdateQuery, string validationQuery)
         {
             try
@@ -390,7 +390,7 @@ namespace Extract.DataEntry
                     // If the attribute did not already have the status info provided, trigger the 
                     // attributes in sourceAttributes to be reordered according to displayOrder.
                     AttributeStatusInfo.Initialize(attribute, sourceAttributes,
-                        owningControl, displayOrder, considerPropagated, tabStopRequired, validator,
+                        owningControl, displayOrder, considerPropagated, tabStopMode, validator,
                         autoUpdateQuery, validationQuery);
                 }
 
@@ -482,7 +482,7 @@ namespace Extract.DataEntry
                 // in the overall attribute hierarchy.
                 AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(newAttribute);
                 AttributeStatusInfo.Initialize(newAttribute, attributeVector, statusInfo.OwningControl,
-                        null, false, statusInfo.TabStopRequired, statusInfo.Validator,
+                        null, false, statusInfo.TabStopMode, statusInfo.Validator,
                         statusInfo.AutoUpdateQuery, statusInfo.ValidationQuery);
 
                 return oldAttributeRemoved;
@@ -739,7 +739,6 @@ namespace Extract.DataEntry
                     // Insert the attributes.
                     sourceAttributes.InsertVector(index, attributesToReorder);
                 }
-                
             }
             catch (Exception ex)
             {

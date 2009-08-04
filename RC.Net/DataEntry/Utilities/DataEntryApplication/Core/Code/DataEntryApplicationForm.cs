@@ -1320,10 +1320,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Show the about dialog
-                using (AboutForm aboutForm =
-                    new AboutForm(_dataEntryControlHost.ApplicationTitle,
-                        _dataEntryControlHost.ApplicationDescription,
-                        _dataEntryControlHost.AboutLogo))
+                using (AboutForm aboutForm = new AboutForm(_dataEntryControlHost))
                 {
                     aboutForm.ShowDialog();
                 }

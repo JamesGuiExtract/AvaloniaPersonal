@@ -102,10 +102,9 @@ namespace Extract.DataEntry
         private string _validationQuery;
 
         /// <summary>
-        /// Specifies whether tab should always stop on the text box or whether it can be skipped
-        /// if empty and valid.
+        /// Specifies under what circumstances the control's attribute should serve as a tab stop.
         /// </summary>
-        private bool _tabStopRequired = true;
+        private TabStopMode _tabStopMode = TabStopMode.Always;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
@@ -451,24 +450,24 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether tab should always stop on this field or whether it can be skipped
-        /// if it is empty and valid.
+        /// Specifies under what circumstances the <see cref="DataEntryTextBox"/>'s
+        /// <see cref="IAttribute"/> should serve as a tab stop.
         /// </summary>
-        /// <value><see langword="true"/> if the field should always be a tabstop,
-        /// <see langword="false"/> if the field can be skipped if empty and valid</value>
-        /// <returns><see langword="true"/> if the field is always be a tabstop,
-        /// <see langword="false"/> if the field will be skipped if empty and valid</returns>
+        /// <value>A <see cref="TabStopMode"/> value indicating when the attribute should serve as a
+        /// tab stop.</value>
+        /// <returns>A <see cref="TabStopMode"/> value indicating when the attribute will serve as a
+        /// tab stop.</returns>
         [Category("Data Entry Text Box")]
-        public bool TabStopRequired
+        public TabStopMode TabStopMode
         {
             get
             {
-                return _tabStopRequired;
+                return _tabStopMode;
             }
 
             set
             {
-                _tabStopRequired = value;
+                _tabStopMode = value;
             }
         }
 
@@ -779,7 +778,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         _multipleMatchSelectionMode, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, _tabStopRequired, _validator,
+                        sourceAttributes, null, this, 0, false, _tabStopMode, _validator,
                         _autoUpdateQuery, _validationQuery);
 
                     if (base.Visible)
@@ -787,11 +786,19 @@ namespace Extract.DataEntry
                         // Mark the attribute as visible if the textbox is visible
                         AttributeStatusInfo.MarkAsViewable(_attribute, true);
 
-                        // [DataEntry:327] If this control is active, ensure the attribute is marked as viewed.
+                        // [DataEntry:327] If this control is active, ensure the attribute is
+                        // marked as viewed.
                         if (_isActive)
                         {
                             AttributeStatusInfo.MarkAsViewed(_attribute, true);
                         }
+                    }
+
+                    // If a control is read-only, consider the attribute as viewed since it is
+                    // unlikely to matter if a field that can't be changed was viewed.
+                    if (base.ReadOnly)
+                    {
+                        AttributeStatusInfo.MarkAsViewed(_attribute, true);
                     }
 
                     // If the attribute has not been viewed, apply bold font.  Otherwise, use
@@ -827,8 +834,9 @@ namespace Extract.DataEntry
         {
             try
             {
-                // The combo box can be active only if it is mapped to an attribute.
-                _isActive = (setActive && _attribute != null);
+                // The text box should be displayed as active only if it is editable and mapped to
+                // an attribute.
+                _isActive = (setActive && !base.ReadOnly && _attribute != null);
 
                 // Change the background color to display active status.
                 if (_isActive)
@@ -1076,7 +1084,7 @@ namespace Extract.DataEntry
             // associated with this control has changed.
             OnAttributesSelected();
 
-            // Raise the PropagateAttributes event so that any descendents of this data controlc can
+            // Raise the PropagateAttributes event so that any descendents of this data control can
             // re-map themselves.
             OnPropagateAttributes();
         }

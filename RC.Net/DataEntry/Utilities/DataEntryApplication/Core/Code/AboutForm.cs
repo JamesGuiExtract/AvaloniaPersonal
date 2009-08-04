@@ -36,10 +36,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <summary>
         /// Initializes a new instance of <see cref="AboutForm"/> class.
         /// </summary>
-        /// <param name="productName">The name of the product.</param>
-        /// <param name="productDescription">A description of the product.</param>
-        /// <param name="aboutLogo">The product logo.</param>
-        public AboutForm(string productName, string productDescription, Image aboutLogo)
+        /// <param name="dataEntryControlHost">The <see cref="DataEntryControlHost"/> which contains the
+        /// product information.</param>
+        public AboutForm(DataEntryControlHost dataEntryControlHost)
         {
             try
             {
@@ -47,20 +46,29 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26960", _OBJECT_NAME);
 
+                ExtractException.Assert("ELI27009", "Null argument exception!",
+                    dataEntryControlHost != null);
+
                 InitializeComponent();
 
-                // Initialize product info from the info passed in.
-                _logoImage.Image = aboutLogo;
-                _labelProductName.Text = productName;
-                _textBoxDescription.Text = productDescription;
-                Text = String.Format(CultureInfo.CurrentCulture, "About {0}", productName);
+                // Initialize product info from the dataEntryControlHost passed in.
+                _logoImage.Image = dataEntryControlHost.AboutLogo;
+                _labelProductName.Text = dataEntryControlHost.ApplicationTitle;
+                _textBoxDescription.Text = dataEntryControlHost.ApplicationDescription;
+                Text = String.Format(CultureInfo.CurrentCulture, "About {0}",
+                    dataEntryControlHost.ApplicationTitle);
 
-                //  Initialize version and company info from the assembly information.
+                // Extract the product version from the dataEntryControlHost's assembly.
+                Assembly controlHostAssembly = Assembly.GetAssembly(dataEntryControlHost.GetType());
+                _labelProductVersion.Text = String.Format(CultureInfo.CurrentCulture,
+                    "Version {0}", controlHostAssembly.GetName().Version.ToString());
+
+                //  Initialize framework version and company info from the assembly information.
                 //  Change assembly information settings for your application through either:
                 //  - Project->Properties->Application->Assembly Information
                 //  - AssemblyInfo.cs
-                _labelVersion.Text = String.Format(CultureInfo.CurrentCulture, "Version {0}",
-                    AssemblyVersion);
+                _labelFrameworkVersion.Text = String.Format(CultureInfo.CurrentCulture,
+                    "Framework version {0}", AssemblyVersion);
                 _labelCopyright.Text = AssemblyCopyright;
                 _labelCompanyName.Text = AssemblyCompany;
                 _linkLabelWebsite.Text = AssemblyCompanyUrl;
