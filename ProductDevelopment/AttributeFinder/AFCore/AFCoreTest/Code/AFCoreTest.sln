@@ -1454,6 +1454,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder", "
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{7F591058-6DC9-4787-AE25-5A45AE78E3FA} = {7F591058-6DC9-4787-AE25-5A45AE78E3FA}
+		{80E248C0-9AFF-42BC-9CBF-B4274D19298C} = {80E248C0-9AFF-42BC-9CBF-B4274D19298C}
+		{83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA} = {83C2C49F-E325-4ABF-B4EB-8125EE2DD4FA}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj", "{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}"
 	ProjectSection(WebsiteProperties) = preProject
