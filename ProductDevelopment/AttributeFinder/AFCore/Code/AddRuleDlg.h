@@ -16,11 +16,13 @@
 #pragma once
 
 #include "resource.h"
+
 #include <string>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CAddRuleDlg dialog
-
 class CAddRuleDlg : public CDialog
 {
 	typedef enum EControlSelected
@@ -36,7 +38,7 @@ public:
 		UCLID_AFCORELib::IAttributeRulePtr ipRule, CWnd* pParent = NULL);
 
 	// Set the prompt text
-	void	SetPromptText(std::string strPrompt);
+	void	SetPromptText(string strPrompt);
 
 // Dialog Data
 	//{{AFX_DATA(CAddRuleDlg)

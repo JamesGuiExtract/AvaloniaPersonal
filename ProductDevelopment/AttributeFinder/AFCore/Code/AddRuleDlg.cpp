@@ -120,7 +120,7 @@ END_MESSAGE_MAP()
 //-------------------------------------------------------------------------------------------------
 // Public methods
 //-------------------------------------------------------------------------------------------------
-void CAddRuleDlg::SetPromptText(std::string strPrompt) 
+void CAddRuleDlg::SetPromptText(string strPrompt) 
 {
 	// Set the prompt text
 	m_zPrompt = strPrompt.c_str();
@@ -194,8 +194,8 @@ void CAddRuleDlg::OnBtnConfigureRule2()
 				m_comboRule.GetLBText( iIndex, zText );
 
 				// Create prompt string
-				std::string strTitle = std::string( "Configure " ) + 
-					std::string( zText.operator LPCTSTR() );
+				string strTitle = string( "Configure " ) + 
+					string( LPCTSTR(zText) );
 				_bstr_t	bstrTitle( strTitle.c_str() );
 
 				// Display the Property Page
@@ -247,7 +247,7 @@ void CAddRuleDlg::OnBtnAddRule()
 		{
 			// Retrieve the description
 			_bstr_t	bstrText = ipObject->GetDescription();
-			CString	zText( bstrText.operator const char *() );
+			CString	zText( (const char *)bstrText );
 
 			// Get index of previously selected AMRule
 			int iIndex = -1;
@@ -274,7 +274,7 @@ void CAddRuleDlg::OnBtnAddRule()
 			}
 			// Put the text into the box.
 			m_listRules.SetItemText( iNewIndex, giDESC_LIST_COLUMN, 
-					zText.operator LPCTSTR() );
+					LPCTSTR(zText) );
 
 
 			// Set the checkbox based on the object's Enabled state.
@@ -347,7 +347,7 @@ void CAddRuleDlg::OnBtnDeleteRule()
 		}
 
 		// Present MessageBox
-		iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+		iResult = MessageBox( LPCTSTR(zPrompt), "Confirm Delete", 
 			MB_YESNO | MB_ICONQUESTION );
 
 		// Act on response
@@ -462,7 +462,7 @@ void CAddRuleDlg::OnBtnRuleUp()
 
 			// Restore the description
 			m_listRules.SetItemText( iIndex -1 , giDESC_LIST_COLUMN, 
-					zDescription.operator LPCTSTR() );
+					LPCTSTR(zDescription) );
 
 			// Restore the check state
 			m_listRules.SetCheck(iIndex -1, bChecked);
@@ -521,7 +521,7 @@ void CAddRuleDlg::OnBtnRuleDown()
 
 			// Restore the description
 			m_listRules.SetItemText( iIndex +1 , giDESC_LIST_COLUMN, 
-					zDescription.operator LPCTSTR() );
+					LPCTSTR(zDescription) );
 
 			// Restore the check state
 			m_listRules.SetCheck(iIndex + 1, bChecked);
@@ -675,7 +675,7 @@ void CAddRuleDlg::OnSelchangeComboRule()
 		m_comboRule.GetLBText( iIndex, zAFRuleName );
 
 		// Store the AF Rule
-		m_ipAFRule = getObjectFromName( zAFRuleName.operator LPCTSTR() );
+		m_ipAFRule = getObjectFromName( LPCTSTR(zAFRuleName) );
 
 		// Check configured state of Attribute Finding Rule
 		showReminder();
@@ -776,7 +776,7 @@ void CAddRuleDlg::OnOK()
 		if (m_ipRule != NULL)
 		{
 			// Store the rule description
-			_bstr_t	bstrDesc( m_zDescription.operator LPCTSTR() );
+			_bstr_t	bstrDesc = LPCTSTR(m_zDescription);
 			m_ipRule->PutDescription( bstrDesc );
 
 			// Store the Attribute Finding Rule
@@ -1212,7 +1212,7 @@ void CAddRuleDlg::deleteMarkedRules()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-UCLID_AFCORELib::IAttributeFindingRulePtr CAddRuleDlg::getObjectFromName(std::string strName)
+UCLID_AFCORELib::IAttributeFindingRulePtr CAddRuleDlg::getObjectFromName(string strName)
 {
 	// Check for the Prog ID in the map
 	_bstr_t	bstrName( strName.c_str() );
@@ -1222,8 +1222,7 @@ UCLID_AFCORELib::IAttributeFindingRulePtr CAddRuleDlg::getObjectFromName(std::st
 		_bstr_t	bstrProgID = m_ipAFRulesMap->GetValue( bstrName );
 		
 		// Create the object
-		ICategorizedComponentPtr ipComponent( 
-			bstrProgID.operator const char *() );
+		ICategorizedComponentPtr ipComponent(asString(bstrProgID).c_str());
 
 		return ipComponent;
 	}
@@ -1451,7 +1450,7 @@ void CAddRuleDlg::setDescription()
 		_bstr_t	bstrDesc = m_ipRule->GetDescription();
 
 		// Apply the string
-		m_zDescription = bstrDesc.operator char *();
+		m_zDescription = (char *)bstrDesc;
 
 		UpdateData( FALSE );
 	}
@@ -1487,7 +1486,7 @@ void CAddRuleDlg::setAFRule()
 		if (ipComponent != NULL)
 		{
 			_bstr_t	bstrCompDesc = ipComponent->GetComponentDescription();
-			std::string	strActualName( bstrCompDesc );
+			string	strActualName( bstrCompDesc );
 
 			// Set the combo box selection
 			m_comboRule.SelectString( -1, strActualName.c_str() );
@@ -1505,12 +1504,12 @@ void CAddRuleDlg::setAFRule()
 			CString	zName;
 			m_comboRule.GetLBText( 0, zName );
 
-			m_ipAFRule = getObjectFromName( zName.operator LPCTSTR() );
+			m_ipAFRule = getObjectFromName( LPCTSTR(zName) );
 			if (m_ipAFRule == NULL)
 			{
 				// Create and throw an exception
 				UCLIDException	ue( "ELI04360", "Cannot find Attribute Finding Rule!");
-				ue.addDebugInfo( "Rule name", zName.operator LPCTSTR() );
+				ue.addDebugInfo( "Rule name", LPCTSTR(zName) );
 				throw ue;
 			}
 		}
@@ -1552,13 +1551,13 @@ void CAddRuleDlg::setAMRules()
 				_bstr_t	bstrText = ipObj->GetDescription();
 
 				// put the description in a usable format
-				std::string strText = bstrText;
+				string strText = bstrText;
 				CString zText = strText.c_str();
 
 				// Add the item to the list
 				m_listRules.InsertItem(i, "");
 				m_listRules.SetItemText( i, giDESC_LIST_COLUMN, 
-					zText.operator LPCTSTR() );
+					LPCTSTR(zText) );
 
 				// Set the checkbox accordingly
 				VARIANT_BOOL vbEnabled = ipObj->GetEnabled();
@@ -1639,12 +1638,12 @@ void CAddRuleDlg::replaceRuleInListAt(int iIndex, IObjectWithDescriptionPtr ipNe
 
 	// Get the data for the description
 	_bstr_t bstrDesc = ipNewRule->Description;
-	std::string	strBstrTemp = asString(bstrDesc);
+	string	strBstrTemp = asString(bstrDesc);
 	CString zDescription = strBstrTemp.c_str();
 
 	// Restore the description
 	m_listRules.SetItemText( iIndex , giDESC_LIST_COLUMN, 
-		zDescription.operator LPCTSTR() );
+		LPCTSTR(zDescription) );
 	
 	// Manage the check box
 	m_listRules.SetCheck(iIndex, asMFCBool(ipNewRule->Enabled == VARIANT_TRUE) );
@@ -1659,7 +1658,7 @@ void CAddRuleDlg::updatePreprocessorCheckBoxAndEditControl()
 	_bstr_t _bstrText = ipPPWithDesc->Description;
 	
 	// Update the displayed Preprocessor description
-	m_zPPDescription = _bstrText.operator const char *();
+	m_zPPDescription = (const char *)_bstrText;
 
 	// get check box
 	CButton* pCheckBox = (CButton*) GetDlgItem( IDC_CHECK_AFRULE_DOC_PP );
