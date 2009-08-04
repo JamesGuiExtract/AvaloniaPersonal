@@ -313,15 +313,15 @@ library UCLID_AFCORELib
 		// [id(4), helpstring("method SetProgressEventHandler")] HRESULT SetProgressEventHandler(
 		//	[in] IProgressEventHandler* pEventHandler);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT AttributeNameToInfoMap(
-			[out, retval] IStrToObjectMap * *pVal);
-		[propput, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT AttributeNameToInfoMap(
-			[in] IStrToObjectMap * newVal);
+		[propget, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT 
+			AttributeNameToInfoMap([out, retval] IStrToObjectMap * *pVal);
+		[propput, id(5), helpstring("property AttributeNameToInfoMap")] HRESULT 
+			AttributeNameToInfoMap([in] IStrToObjectMap * newVal);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT GlobalDocPreprocessor(
-			[out, retval] IObjectWithDescription **pVal);
-		[propput, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT GlobalDocPreprocessor(
-			[in] IObjectWithDescription *newVal);
+		[propget, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT 
+			GlobalDocPreprocessor([out, retval] IObjectWithDescription **pVal);
+		[propput, id(6), helpstring("property GlobalDocPreprocessor")] HRESULT 
+			GlobalDocPreprocessor([in] IObjectWithDescription *newVal);
 		//-----------------------------------------------------------------------------------------
 		// The FileName property is used to retrieve the filename associated with
 		// this RuleSet object.  Retrieving the FileName property will return the
@@ -330,34 +330,59 @@ library UCLID_AFCORELib
 		// The FileName put-property is primarily exposed for the sake of 
 		// implementing ICopyableObject, but can theoretically be used to overwrite
 		// (or disassociate) the filename associated with this object.
-		[propget, id(7), helpstring("property FileName")] HRESULT FileName([out, retval] BSTR *pVal);
-		[propput, id(7), helpstring("property FileName")] HRESULT FileName([in] BSTR newVal);
+		[propget, id(7), helpstring("property FileName")] HRESULT FileName(
+			[out, retval] BSTR *pVal);
+		[propput, id(7), helpstring("property FileName")] HRESULT FileName(
+			[in] BSTR newVal);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(8), helpstring("property IsEncrypted")] HRESULT IsEncrypted([out, retval] VARIANT_BOOL *pVal);
-		[propget, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler([out, retval] IObjectWithDescription **pVal);
-		[propput, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler([in] IObjectWithDescription *newVal);
-		[propget, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter([in] VARIANT_BOOL newVal);
-		[propget, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT UsePagesRedactionCounter([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT UsePagesRedactionCounter([in] VARIANT_BOOL newVal);
-		[propget, id(12), helpstring("property UsePaginationCounter")] HRESULT UsePaginationCounter([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(12), helpstring("property UsePaginationCounter")] HRESULT UsePaginationCounter([in] VARIANT_BOOL newVal);
-		[propget, id(13), helpstring("property ForInternalUseOnly")] HRESULT ForInternalUseOnly([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(13), helpstring("property ForInternalUseOnly")] HRESULT ForInternalUseOnly([in] VARIANT_BOOL newVal);
+		[propget, id(8), helpstring("property IsEncrypted")] HRESULT IsEncrypted(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propget, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler(
+			[out, retval] IObjectWithDescription **pVal);
+		[propput, id(9), helpstring("property GlobalOutputHandler")] HRESULT GlobalOutputHandler(
+			[in] IObjectWithDescription *newVal);
+		[propget, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(10), helpstring("property UseIndexingCounter")] HRESULT UseIndexingCounter(
+			[in] VARIANT_BOOL newVal);
+		[propget, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT 
+			UsePagesRedactionCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(11), helpstring("property UsePagesRedactionCounter")] HRESULT 
+			UsePagesRedactionCounter([in] VARIANT_BOOL newVal);
+		[propget, id(12), helpstring("property UsePaginationCounter")] HRESULT 
+			UsePaginationCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(12), helpstring("property UsePaginationCounter")] HRESULT 
+			UsePaginationCounter([in] VARIANT_BOOL newVal);
+		[propget, id(13), helpstring("property ForInternalUseOnly")] HRESULT 
+			ForInternalUseOnly([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(13), helpstring("property ForInternalUseOnly")] HRESULT 
+			ForInternalUseOnly([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
 		// Returns a string with comma separated serial numbers for valid keys to use with this ruleset
-		[propget, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList([out, retval] BSTR *pVal);
+		[propget, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList(
+			[out, retval] BSTR *pVal);
 		//-----------------------------------------------------------------------------------------
 		// Sets the serial number list
 		// newVal is a string with comma separated serial numbers for the valid keys to use with this ruleset
-		[propput, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList([in] BSTR newVal);
+		[propput, id(14), helpstring("property KeySerialList")] HRESULT KeySerialList(
+			[in] BSTR newVal);
 		//-----------------------------------------------------------------------------------------
 		// PROMISE:	To return the version number associated with the RuleSet object
-		[propget, id(15), helpstring("property VersionNumber")] HRESULT VersionNumber([out, retval] long *nVersion);
+		[propget, id(15), helpstring("property VersionNumber")] HRESULT VersionNumber(
+			[out, retval] long *nVersion);
 		//-----------------------------------------------------------------------------------------
-		[propget, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT UseDocsRedactionCounter([out, retval] VARIANT_BOOL *pVal);
-		[propput, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT UseDocsRedactionCounter([in] VARIANT_BOOL newVal);
+		[propget, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT 
+			UseDocsRedactionCounter([out, retval] VARIANT_BOOL *pVal);
+		[propput, id(16), helpstring("property UseDocsRedactionCounter")] HRESULT 
+			UseDocsRedactionCounter([in] VARIANT_BOOL newVal);
 		//-----------------------------------------------------------------------------------------
+		[propget, id(17), helpstring("property IsSwipingRule")] HRESULT IsSwipingRule(
+			[out, retval] VARIANT_BOOL *pVal);
+		[propput, id(17), helpstring("property IsSwipingRule")] HRESULT IsSwipingRule(
+			[in] VARIANT_BOOL newVal);
+		//-----------------------------------------------------------------------------------------
+		[propget, id(18), helpstring("property CanSave")] HRESULT CanSave(
+			[out, retval] VARIANT_BOOL *pVal);
 	};
 
 	[
