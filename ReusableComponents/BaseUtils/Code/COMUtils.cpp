@@ -767,37 +767,55 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			ue.addHresult(hr);
 			throw ue;
 		}
-		
-		// Create a stream within the storage object to store the object
-		IStreamPtr ipStream;
-		hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
-		if (ipStream == NULL || FAILED(hr))
-		{
-			UCLIDException ue("ELI25589", "Unable to create stream object.");
-			ue.addDebugInfo("File name", asString(bstrFileName));
-			ue.addDebugInfo("Stream name", asString(bstrObjectName));
-			ue.addHresult(hr);
-			throw ue;
-		}
 
-		// Write file signature to stream if specified
-		if (!strSignature.empty())
+		try
 		{
-			CComBSTR bstrSignature(strSignature.c_str());
-			bstrSignature.WriteToStream(ipStream);
-		}
+			// Create a stream within the storage object to store the object
+			IStreamPtr ipStream;
+			hr = ipStorage->CreateStream(bstrObjectName, gdwSTREAM_CREATE_MODE, 0, 0, &ipStream);
+			if (ipStream == NULL || FAILED(hr))
+			{
+				UCLIDException ue("ELI25589", "Unable to create stream object.");
+				ue.addDebugInfo("File name", asString(bstrFileName));
+				ue.addDebugInfo("Stream name", asString(bstrObjectName));
+				ue.addHresult(hr);
+				throw ue;
+			}
 
-		// Save the object to the stream
-		hr = ipObject->Save(ipStream, asMFCBool(bClearDirty));
-		if (FAILED(hr))
+			// Write file signature to stream if specified
+			if (!strSignature.empty())
+			{
+				CComBSTR bstrSignature(strSignature.c_str());
+				bstrSignature.WriteToStream(ipStream);
+			}
+
+			// Save the object to the stream
+			hr = ipObject->Save(ipStream, asMFCBool(bClearDirty));
+			if (FAILED(hr))
+			{
+				string strMessage = "Unable to save " + asString(bstrObjectName) + ".";
+				HANDLE_HRESULT(hr, "ELI25590", strMessage, ipObject, IID_IPersistStream);
+			}
+
+			// Ensure the stream and storage are closed [LRCAU #5078]
+			ipStream = NULL;
+			ipStorage = NULL;
+		}
+		catch (...)
 		{
-			string strMessage = "Unable to save " + asString(bstrObjectName) + ".";
-			HANDLE_HRESULT(hr, "ELI25590", strMessage, ipObject, IID_IPersistStream);
-		}
+			// The object could not be streamed successfully. Delete the output file.
+			try
+			{
+				string strFileName = asString(bstrFileName);
+				if (isValidFile(strFileName))
+				{
+					deleteFile(strFileName);
+				}
+			}
+			CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27023")
 
-		// Ensure the stream and storage are closed [LRCAU #5078]
-		ipStream = NULL;
-		ipStorage = NULL;
+			throw;
+		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25597")
 }
