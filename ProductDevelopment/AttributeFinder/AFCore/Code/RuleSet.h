@@ -5,11 +5,14 @@
 #include "resource.h"       // main symbols
 #include "RuleSetEditor.h"
 #include "SafeNetLicenseMgr.h"
+
 #include <afxmt.h>
 
-#include <vector>
-#include <string>
 #include <memory>
+#include <string>
+#include <vector>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CRuleSet
@@ -49,34 +52,35 @@ public:
 	STDMETHOD(ShowUIForEditing)(BSTR strFileName, BSTR strBinFolder);
 
 // IRuleSet
-	STDMETHOD(ExecuteRulesOnText)(/*[in]*/ IAFDocument* pAFDoc, 
-		/*[in]*/ IVariantVector *pvecAttributeNames,
-		/*[in]*/ IProgressStatus *pProgressStatus,
-		/*[out, retval]*/ IIUnknownVector** pAttributes);
-	STDMETHOD(SaveTo)(/*[in]*/ BSTR strFullFileName, VARIANT_BOOL bClearDirty);
-	STDMETHOD(LoadFrom)(/*[in]*/ BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
-	STDMETHOD(get_AttributeNameToInfoMap)(/*[out, retval]*/ IStrToObjectMap * *pVal);
-	STDMETHOD(put_AttributeNameToInfoMap)(/*[in]*/ IStrToObjectMap * newVal);
-	STDMETHOD(get_GlobalDocPreprocessor)(/*[out, retval]*/ IObjectWithDescription **pVal);
-	STDMETHOD(put_GlobalDocPreprocessor)(/*[in]*/ IObjectWithDescription *newVal);
-	STDMETHOD(get_FileName)(/*[out, retval]*/ BSTR *pVal);
-	STDMETHOD(put_FileName)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_IsEncrypted)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(get_GlobalOutputHandler)(/*[out, retval]*/ IObjectWithDescription **pVal);
-	STDMETHOD(put_GlobalOutputHandler)(/*[in]*/ IObjectWithDescription *newVal);
-	STDMETHOD(get_UsePaginationCounter)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_UsePaginationCounter)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_UsePagesRedactionCounter)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_UsePagesRedactionCounter)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_UseDocsRedactionCounter)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_UseDocsRedactionCounter)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_UseIndexingCounter)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_UseIndexingCounter)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_ForInternalUseOnly)(/*[out, retval]*/ VARIANT_BOOL *pVal);
-	STDMETHOD(put_ForInternalUseOnly)(/*[in]*/ VARIANT_BOOL newVal);
-	STDMETHOD(get_KeySerialList)(/*[out, retval]*/ BSTR  *pVal);
-	STDMETHOD(put_KeySerialList)(/*[in]*/ BSTR newVal);
-	STDMETHOD(get_VersionNumber)(/*[out, retval]*/ long *nVersion);
+	STDMETHOD(ExecuteRulesOnText)(IAFDocument* pAFDoc, IVariantVector *pvecAttributeNames,
+		IProgressStatus *pProgressStatus, IIUnknownVector** pAttributes);
+	STDMETHOD(SaveTo)(BSTR strFullFileName, VARIANT_BOOL bClearDirty);
+	STDMETHOD(LoadFrom)(BSTR strFullFileName, VARIANT_BOOL bSetDirtyFlagToTrue);
+	STDMETHOD(get_AttributeNameToInfoMap)(IStrToObjectMap * *pVal);
+	STDMETHOD(put_AttributeNameToInfoMap)(IStrToObjectMap * newVal);
+	STDMETHOD(get_GlobalDocPreprocessor)(IObjectWithDescription **pVal);
+	STDMETHOD(put_GlobalDocPreprocessor)(IObjectWithDescription *newVal);
+	STDMETHOD(get_FileName)(BSTR *pVal);
+	STDMETHOD(put_FileName)(BSTR newVal);
+	STDMETHOD(get_IsEncrypted)(VARIANT_BOOL *pVal);
+	STDMETHOD(get_GlobalOutputHandler)(IObjectWithDescription **pVal);
+	STDMETHOD(put_GlobalOutputHandler)(IObjectWithDescription *newVal);
+	STDMETHOD(get_UsePaginationCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UsePaginationCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_UsePagesRedactionCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UsePagesRedactionCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_UseDocsRedactionCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UseDocsRedactionCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_UseIndexingCounter)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_UseIndexingCounter)(VARIANT_BOOL newVal);
+	STDMETHOD(get_ForInternalUseOnly)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_ForInternalUseOnly)(VARIANT_BOOL newVal);
+	STDMETHOD(get_KeySerialList)(BSTR  *pVal);
+	STDMETHOD(put_KeySerialList)(BSTR newVal);
+	STDMETHOD(get_VersionNumber)(long *nVersion);
+	STDMETHOD(get_IsSwipingRule)(VARIANT_BOOL *pVal);
+	STDMETHOD(put_IsSwipingRule)(VARIANT_BOOL newVal);
+	STDMETHOD(get_CanSave)(VARIANT_BOOL *pVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -100,7 +104,7 @@ private:
 	
 	IStrToObjectMapPtr m_ipAttributeNameToInfoMap;
 
-	std::auto_ptr<CRuleSetEditor> m_apDlg;
+	auto_ptr<CRuleSetEditor> m_apDlg;
 
 	// Global Document Preprocessor
 	IObjectWithDescriptionPtr m_ipDocPreprocessor;
@@ -117,14 +121,14 @@ private:
 	bool m_bIsEncrypted;
 
 	// the filename associated with this ruleset
-	std::string m_strFileName;
+	string m_strFileName;
 
 	// this mutex is used in the constructor and destructor to protect the m_apSafeNetMgr member
 	static CMutex ms_mutexLM;
 
 	// The should be only one SafeNetLicenseMgr object
 	// protected by ms_mutexLM
-	static std::auto_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
+	static auto_ptr<SafeNetLicenseMgr> m_apSafeNetMgr;
 	
 	// This is need to to keep track of the number of RuleSet intances that are active so it will
 	// be possible to know when the m_apSafeNetMgr object can safely be deleted 
@@ -140,12 +144,15 @@ private:
 	bool m_bUsePagesRedactionCounter;
 	bool m_bUseDocsRedactionCounter;
 
-	std::string m_strKeySerialNumbers;
-	std::vector<DWORD> m_vecSerialNumbers;
+	string m_strKeySerialNumbers;
+	vector<DWORD> m_vecSerialNumbers;
 
 	// a flag to indicate whether this ruleset should only be used
 	// internally (i.e. from with other rule objects that UCLID delivers to customers)
 	bool m_bRuleSetOnlyForInternalUse;
+
+	// Indicates whether this rule is a swiping rule
+	bool m_bSwipingRule;
 
 	// version number of the ruleset
 	long m_nVersionNumber;
@@ -174,9 +181,6 @@ private:
 	// Validates Rule Set Editor license
 	void validateUILicense();
 
-	// Validates selection of a USB Counter unless full RDT license
-	void validateUSBCounter();
-
 	// create the MiscUtils object if necessary and return it
 	IMiscUtilsPtr getMiscUtils();
 
@@ -185,7 +189,7 @@ private:
 
 	// returns a reference of the member variable m_vecSerialNumbers
 	// this function separates the serial numbers in the string m_strKeySerialNumbers
-	std::vector<DWORD>& getSerialListAsDWORDS(); 
+	vector<DWORD>& getSerialListAsDWORDS(); 
 
 	// Returns true if consideration of USB Key counters is to be ignored.
 	// This implements machine-level locking and is managed via license file.
@@ -212,4 +216,16 @@ private:
 	// This method will return true if and only if an output handler is defined
 	// for this RuleSet, and the 'run output handler' checkbox is enabled.
 	bool enabledOutputHandlerExists();
+
+	// true if the Rule Development Toolkit is licensed; otherwise false.
+	bool isRdtLicensed();
+
+	// true if any counter is being used, false if all counters are not being used.
+	bool isUsingCounter();
+
+	// true if any of the following are true:
+	// 1) The Rule Development Toolkit is licensed
+	// 2) At least one usb counter is enabled
+	// 3) This is an internal ruleset
+	bool isLicensedToSave();
 };

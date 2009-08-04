@@ -16,7 +16,7 @@
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 7;
+const unsigned long gnCurrentVersion = 8;
 
 const string gstrRULESET_FILE_SIGNATURE = "UCLID AttributeFinder RuleSet Definition (RSD) File";
 const string gstrRULESET_FILE_SIGNATURE_2 = "UCLID AttributeFinder RuleSet Definition (RSD) File 2";
@@ -43,6 +43,7 @@ m_bUsePaginationCounter(false),
 m_bUsePagesRedactionCounter(false),
 m_bUseDocsRedactionCounter(false),
 m_bRuleSetOnlyForInternalUse(false),
+m_bSwipingRule(false),
 m_strKeySerialNumbers(""),
 m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current version number
 {
@@ -60,7 +61,7 @@ m_nVersionNumber(gnCurrentVersion) // by default, all rulesets are the current v
 		m_iSNMRefCount++;
 
 		// If full RDT is not licensed, we may be able to preset a USB counter
-		if (!LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+		if (!isRdtLicensed())
 		{
 			// If FLEX Index rule writing is licensed and not ID Shield rule writing
 			if (LicenseManagement::sGetInstance().isLicensed( gnFLEXINDEX_RULE_WRITING_OBJECTS ) && 
@@ -182,9 +183,6 @@ STDMETHODIMP CRuleSet::SaveTo(BSTR strFullFileName, VARIANT_BOOL bClearDirty)
 	{
 		validateLicense();
 
-		// Check for required USB Counter
-		validateUSBCounter();
-
 		writeObjectToFile(this, strFullFileName, m_bstrStreamName, asCppBool(bClearDirty));
 
 		// mark this object as dirty depending upon bDontChangeDirtyFlag
@@ -229,7 +227,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				if (!isRuleExecutionAllowed())
 				{
 					throw UCLIDException("ELI21520", 
-						"Rule execution is not allowed - make sure that a USB counter is selected!");
+						"Rule execution is not allowed - make sure that a USB counter is selected.");
 				}
 
 				// Wrap pvecAttributeNames in a smart pointer
@@ -239,7 +237,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				IVariantVectorPtr ipAttributeNames = m_ipAttributeNameToInfoMap->GetKeys();
 				if (ipAttributeNames == NULL)
 				{
-					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset!");
+					throw UCLIDException("ELI04375", "Unable to retrieve names of attributes from ruleset.");
 				}
 
 				// Determine the total number of attributes for which rules will need to be run
@@ -281,7 +279,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				char c2 = 'I';
 				if (m_nVersionNumber < (c2 - c1))
 				{
-					UCLIDException ue("ELI11653", "This version of the rule execution engine is not backward compatible with older rules!");
+					UCLIDException ue("ELI11653", "This version of the rule execution engine is not backward compatible with older rules.");
 					ue.addDebugInfo("VersionNumber", m_nVersionNumber);
 					throw ue;
 				}
@@ -295,10 +293,9 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 				// that stacksize > 1.
 				// Can directly execute internal-use rules if USB Key Serial Numbers are disabled (P13 #3474)
 				// Direct execution of internal-use rules now requires an RDT license [FlexIDSCore #3200]
-				if (m_bRuleSetOnlyForInternalUse && nStackSize == 1 && 
-					!LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+				if (m_bRuleSetOnlyForInternalUse && nStackSize == 1 && !isRdtLicensed())
 				{
-					UCLIDException ue("ELI11546", "This ruleset cannot be used directly by an application!");
+					UCLIDException ue("ELI11546", "This ruleset cannot be used directly by an application.");
 					throw ue;
 				}
 
@@ -364,7 +361,7 @@ STDMETHODIMP CRuleSet::ExecuteRulesOnText(IAFDocument* pAFDoc,
 						m_ipAttributeNameToInfoMap->GetValue(_bstrAttributeName);
 					if (ipAttributeFindInfo == NULL)
 					{
-						UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info!");
+						UCLIDException ue("ELI04376", "Unable to retrieve attribute rules info.");
 						string stdstrAttribute = _bstrAttributeName;
 						ue.addDebugInfo("Attribute", stdstrAttribute);
 						throw ue;
@@ -447,7 +444,7 @@ STDMETHODIMP CRuleSet::get_AttributeNameToInfoMap(IStrToObjectMap **pVal)
 		// called.
 		if (m_bIsEncrypted)
 		{
-			throw UCLIDException("ELI07610", "Cannot retrieve requested information - RuleSet object is encrypted!");
+			throw UCLIDException("ELI07610", "Cannot retrieve requested information - RuleSet object is encrypted.");
 		}
 
 		// if the map object has not yet been created, create it
@@ -476,7 +473,7 @@ STDMETHODIMP CRuleSet::put_AttributeNameToInfoMap(IStrToObjectMap *newVal)
 		// store the pointer internally after ensuring that it is not NULL.
 		if (newVal == NULL)
 		{
-			throw UCLIDException("ELI04382", "Invalid String-to-Object map!");
+			throw UCLIDException("ELI04382", "Invalid String-to-Object map.");
 		}
 
 		m_ipAttributeNameToInfoMap = newVal;
@@ -501,7 +498,7 @@ STDMETHODIMP CRuleSet::get_GlobalDocPreprocessor(IObjectWithDescription **pVal)
 		if (m_bIsEncrypted)
 		{
 			throw UCLIDException( "ELI07632", 
-				"Cannot retrieve requested information - RuleSet object is encrypted!" );
+				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
 		if (m_ipDocPreprocessor == NULL)
@@ -547,7 +544,7 @@ STDMETHODIMP CRuleSet::get_GlobalOutputHandler(IObjectWithDescription **pVal)
 		if (m_bIsEncrypted)
 		{
 			throw UCLIDException( "ELI07723", 
-				"Cannot retrieve requested information - RuleSet object is encrypted!" );
+				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
 		if (m_ipOutputHandler == NULL)
@@ -621,6 +618,8 @@ STDMETHODIMP CRuleSet::get_IsEncrypted(VARIANT_BOOL *pVal)
 
 	try
 	{
+		validateLicense();
+
 		*pVal = asVariantBool(m_bIsEncrypted);
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI15159")
@@ -781,16 +780,17 @@ STDMETHODIMP CRuleSet::put_ForInternalUseOnly(VARIANT_BOOL newVal)
 
 	try
 	{
+		validateLicense();
+
 		// Check to see if this setting has changed
 		bool bNewValue = asCppBool( newVal );
 		if (bNewValue != m_bRuleSetOnlyForInternalUse)
 		{
 			// NOTE: Unlike other methods/properties, calling this method requires
 			// full RDT license.
-			if (!LicenseManagement::sGetInstance().isLicensed( 
-				gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+			if (!isRdtLicensed())
 			{
-				UCLIDException ue( "ELI21522", "Modifying ForInternalUseOnly is not licensed!" );
+				UCLIDException ue( "ELI21522", "Modifying ForInternalUseOnly is not licensed." );
 				ue.addDebugInfo( "Rule Set Filename", m_strFileName );
 				throw ue;
 			}
@@ -851,6 +851,66 @@ STDMETHODIMP CRuleSet::get_VersionNumber(long *nVersion)
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_IsSwipingRule(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(m_bSwipingRule);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27013")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::put_IsSwipingRule(VARIANT_BOOL newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Check to see if this setting has changed
+		bool bNewValue = asCppBool(newVal);
+		if (bNewValue != m_bSwipingRule)
+		{
+			// Setting this property requires full RDT license.
+			if (!isRdtLicensed())
+			{
+				UCLIDException ue("ELI27012", "Not licensed to modify swiping rule status.");
+				ue.addDebugInfo("Rule set filename", m_strFileName);
+				throw ue;
+			}
+
+			// Change the setting and set the dirty flag
+			m_bSwipingRule = bNewValue;
+			m_bDirty = true;
+		}
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27014")
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CRuleSet::get_CanSave(VARIANT_BOOL *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		*pVal = asVariantBool(!m_bIsEncrypted && isLicensedToSave());
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27019")
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -878,7 +938,7 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 			IPersistStreamPtr ipPersistStream(m_ipAttributeNameToInfoMap);
 			if (ipPersistStream==NULL)
 			{
-				throw UCLIDException("ELI04784", "Object does not support persistence!");
+				throw UCLIDException("ELI04784", "Object does not support persistence.");
 			}
 
 			hr = ipPersistStream->IsDirty();
@@ -894,7 +954,7 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 				ipPersistStream = m_ipDocPreprocessor;
 				if (ipPersistStream == NULL)
 				{
-					throw UCLIDException( "ELI06130", "Object does not support persistence!" );
+					throw UCLIDException( "ELI06130", "Object does not support persistence." );
 				}
 
 				hr = ipPersistStream->IsDirty();
@@ -911,7 +971,7 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 				ipPersistStream = m_ipOutputHandler;
 				if (ipPersistStream == NULL)
 				{
-					throw UCLIDException( "ELI07928", "Object does not support persistence!" );
+					throw UCLIDException( "ELI07928", "Object does not support persistence." );
 				}
 
 				hr = ipPersistStream->IsDirty();
@@ -929,7 +989,13 @@ STDMETHODIMP CRuleSet::IsDirty(void)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 7: Added the ability to decrement the redaction counter by pages OR documents. 
+// Version 3:
+//   Added Output Handler persistence
+// Version 7:
+//	 Added ability to decrement the redaction counter per document. Modified existing decrement 
+//   method to be called pages to distinguish between the two.
+// Version 8:
+//   Added swiping rule flag
 STDMETHODIMP CRuleSet::Load(IStream *pStream)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -952,6 +1018,9 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		// by default rulesets can be used internally or externally
 		m_bRuleSetOnlyForInternalUse = false;
 
+		// By default rulesets are not swiping rules
+		m_bSwipingRule = false;
+
 		// whether or not this is a version 2 and beyond
 		bool bVersion2AndBeyond = false;
 
@@ -970,7 +1039,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 		}
 		else
 		{
-			UCLIDException ue("ELI04481", "Invalid RuleSet Definition file!");
+			UCLIDException ue("ELI04481", "Invalid RuleSet Definition file.");
 			ue.addDebugInfo("Signature", strSignatureFromFile);
 			throw ue;
 		}
@@ -991,6 +1060,17 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			// Read the individual data items from the bytestream
 			/////////////////////////////////////////////////////
 			dataReader >> m_nVersionNumber;
+
+			// Check for newer version
+			if (m_nVersionNumber > gnCurrentVersion)
+			{
+				// Throw exception
+				UCLIDException ue("ELI07628", "Unable to load newer RuleSet.");
+				ue.addDebugInfo("Current Version", gnCurrentVersion);
+				ue.addDebugInfo("Version to Load", m_nVersionNumber);
+				throw ue;
+			}
+
 			if ( m_nVersionNumber >= 4 )
 			{
 				// Read counter settings
@@ -1011,25 +1091,17 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 				dataReader >> m_bRuleSetOnlyForInternalUse;
 			}
 
+			if (m_nVersionNumber >= 8)
+			{
+				// Read swiping rule flag
+				dataReader >> m_bSwipingRule;
+			}
+
 			if ( m_nVersionNumber >= 6 )
 			{
 				// Read USB serial numbers
 				dataReader >> m_strKeySerialNumbers;
-
-				//CComBSTR bstrKeySerialNumbers;
-				//bstrKeySerialNumbers.ReadFromStream(pStream);
-				//m_strKeySerialNumbers = CString(bstrKeySerialNumbers);
 			}
-		}
-
-		// Check for newer version
-		if (m_nVersionNumber > gnCurrentVersion)
-		{
-			// Throw exception
-			UCLIDException ue( "ELI07628", "Unable to load newer RuleSet." );
-			ue.addDebugInfo( "Current Version", gnCurrentVersion );
-			ue.addDebugInfo( "Version to Load", m_nVersionNumber );
-			throw ue;
 		}
 
 		// load the string-to-object map (attribute name to attribute find info map)
@@ -1047,7 +1119,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			if (ipObj == NULL)
 			{
 				throw UCLIDException("ELI07391", 
-					"DocumentPreprocessor object could not be read from stream!");
+					"DocumentPreprocessor object could not be read from stream.");
 			}
 			m_ipDocPreprocessor = ipObj;
 		}
@@ -1061,7 +1133,7 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 			if (ipObj == NULL)
 			{
 				throw UCLIDException( "ELI07736", 
-					"Output Handler object could not be read from stream!");
+					"Output Handler object could not be read from stream.");
 			}
 			m_ipOutputHandler = ipObj;
 		}
@@ -1078,11 +1150,6 @@ STDMETHODIMP CRuleSet::Load(IStream *pStream)
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-// Version 3:
-//   Added Output Handler persistence
-// Version 7:
-//	 Added ability to decrement the redaction counter per document. Modified existing decrement method
-//	 to be called pages to distinguish between the two.
 STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
@@ -1095,8 +1162,13 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// it may not be saved
 		if (m_bIsEncrypted)
 		{
-			UCLIDException ue("ELI11581", "Encrypted RuleSet files may not be saved!");
-			throw ue;
+			throw UCLIDException("ELI11581", "Encrypted RuleSet files may not be saved.");
+		}
+
+		// Must be using a counter or have the RDT licensed to save external rules [FIDSC #3592]
+		if (!isLicensedToSave())
+		{
+			throw UCLIDException("ELI21505", "A USB counter must be selected.");
 		}
 
 		// write signature to stream
@@ -1120,9 +1192,9 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		// flag for internal-use-only added in version 5.
 		dataWriter << m_bRuleSetOnlyForInternalUse;
 
-		dataWriter << m_strKeySerialNumbers ;
-		//CComBSTR bstrKeySerialNumbers(m_strKeySerialNumbers.c_str());
-		//bstrKeySerialNumbers.WriteToStream(pStream);
+		dataWriter << m_bSwipingRule;
+
+		dataWriter << m_strKeySerialNumbers;
 
 		// flush bytes
 		dataWriter.flushToByteStream();
@@ -1137,7 +1209,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipObj = m_ipAttributeNameToInfoMap;
 		if (ipObj == NULL)
 		{
-			throw UCLIDException("ELI04700", "String-To-Object Map component does not support persistence!");
+			throw UCLIDException("ELI04700", "String-To-Object Map component does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09910", fClearDirty);
 
@@ -1145,7 +1217,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		ipObj = getDocPreprocessor();
 		if (ipObj == NULL)
 		{
-			throw UCLIDException("ELI07392", "DocumentPreprocessor object does not support persistence!");
+			throw UCLIDException("ELI07392", "DocumentPreprocessor object does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09911", fClearDirty);
 
@@ -1154,7 +1226,7 @@ STDMETHODIMP CRuleSet::Save(IStream *pStream, BOOL fClearDirty)
 		if (ipObj == NULL)
 		{
 			throw UCLIDException( "ELI07737", 
-				"Output Handler object does not support persistence!" );
+				"Output Handler object does not support persistence." );
 		}
 		writeObjectToStream( ipObj, pStream, "ELI09912", fClearDirty );
 
@@ -1254,21 +1326,21 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		ASSERT_RESOURCE_ALLOCATION("ELI08224", ipSource != NULL);
 
 		// Set this object's map of Attribute Names to Infos
-		ICopyableObjectPtr ipCopyableObject = ipSource->GetAttributeNameToInfoMap();
+		ICopyableObjectPtr ipCopyableObject = ipSource->AttributeNameToInfoMap;
 		ASSERT_RESOURCE_ALLOCATION("ELI08225", ipCopyableObject != NULL);
 
 		m_ipAttributeNameToInfoMap = ipCopyableObject->Clone();
 
 		// Set this object's filename
-		m_strFileName = ipSource->GetFileName();
+		m_strFileName = asString(ipSource->FileName);
 
 		// Set the other object's global pre-processor
-		ipCopyableObject = ipSource->GetGlobalDocPreprocessor();
+		ipCopyableObject = ipSource->GlobalDocPreprocessor;
 		ASSERT_RESOURCE_ALLOCATION("ELI08226", ipCopyableObject != NULL);
 		m_ipDocPreprocessor = ipCopyableObject->Clone();
 
 		// Set the other object's global output handler
-		ipCopyableObject = ipSource->GetGlobalOutputHandler();
+		ipCopyableObject = ipSource->GlobalOutputHandler;
 		ASSERT_RESOURCE_ALLOCATION("ELI08227", ipCopyableObject != NULL);
 		m_ipOutputHandler = ipCopyableObject->Clone();
 
@@ -1281,7 +1353,10 @@ STDMETHODIMP CRuleSet::raw_CopyFrom(IUnknown * pObject)
 		// copy internal-use-only flag
 		m_bRuleSetOnlyForInternalUse = (ipSource->ForInternalUseOnly == VARIANT_TRUE);
 
-		m_strKeySerialNumbers = ipSource->KeySerialList;
+		// Copy the swiping rule flag
+		m_bSwipingRule = asCppBool(ipSource->IsSwipingRule);
+
+		m_strKeySerialNumbers = asString(ipSource->KeySerialList);
 		m_vecSerialNumbers.clear();
 
 		// copy the version number
@@ -1337,7 +1412,7 @@ IObjectWithDescriptionPtr CRuleSet::getDocPreprocessor()
 		if (m_bIsEncrypted)
 		{
 			throw UCLIDException( "ELI16931", 
-				"Cannot retrieve requested information - RuleSet object is encrypted!" );
+				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
 		if (m_ipDocPreprocessor == NULL)
@@ -1359,7 +1434,7 @@ IObjectWithDescriptionPtr CRuleSet::getOutputHandler()
 		if (m_bIsEncrypted)
 		{
 			throw UCLIDException( "ELI16934", 
-				"Cannot retrieve requested information - RuleSet object is encrypted!" );
+				"Cannot retrieve requested information - RuleSet object is encrypted." );
 		}
 
 		if (m_ipOutputHandler == NULL)
@@ -1383,20 +1458,6 @@ void CRuleSet::validateUILicense()
 	VALIDATE_LICENSE( gnRULESET_EDITOR_UI_OBJECT, "ELI06413", "Rule Set Editor" );
 }
 //-------------------------------------------------------------------------------------------------
-void CRuleSet::validateUSBCounter()
-{
-	// A USB Counter must be selected if full RDT is not licensed [FlexIDSCore #3059]
-	if (!LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
-	{
-		// At least one USB flag must be set
-		if (!m_bUseIndexingCounter && !m_bUsePaginationCounter && 
-			!m_bUsePagesRedactionCounter && !m_bUseDocsRedactionCounter)
-		{
-			throw UCLIDException( "ELI21505", "A USB counter must be selected!" );
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
 IMiscUtilsPtr CRuleSet::getMiscUtils()
 {
 	if (m_ipMiscUtils == NULL)
@@ -1418,8 +1479,7 @@ void CRuleSet::decrementCounters( ISpatialStringPtr ipText )
 	}
 
 	// Only check counters if at least one counter is checked
-	if ( m_bUseIndexingCounter || m_bUsePaginationCounter || 
-		m_bUsePagesRedactionCounter || m_bUseDocsRedactionCounter)
+	if (isUsingCounter())
 	{
 		// Check to see if USB Key serial numbers should be ignored
 		bool bDisableUSBSNs = usbSerialNumbersDisabled();
@@ -1490,7 +1550,7 @@ void CRuleSet::validateKeySerialNumber()
 	// Throw exception if rules require a different S/N 
 	if ( !bValidSerial )
 	{
-		UCLIDException ue("ELI11635", "Counter Key Serial # is not allowed with current rules!" );
+		UCLIDException ue("ELI11635", "Counter Key Serial # is not allowed with current rules." );
 		ue.addDebugInfo( "Serial #", dwLicenseSN);
 		ue.addDebugInfo( "Valid Serial Numbers", m_strKeySerialNumbers );
 		throw ue;
@@ -1499,16 +1559,12 @@ void CRuleSet::validateKeySerialNumber()
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::usbCountersDisabled()
 {
-	static const unsigned long DISABLE_USB_COUNTERS = gnIGNORE_USB_DECREMENT_FEATURE;
-
-	return LicenseManagement::sGetInstance().isLicensed( DISABLE_USB_COUNTERS ); 
+	return LicenseManagement::sGetInstance().isLicensed(gnIGNORE_USB_DECREMENT_FEATURE); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::usbSerialNumbersDisabled()
 {
-	static const unsigned long DISABLE_USB_KEY_SERIAL_NUMBERS = gnIGNORE_USB_IDCHECK_FEATURE;
-
-	return LicenseManagement::sGetInstance().isLicensed( DISABLE_USB_KEY_SERIAL_NUMBERS ); 
+	return LicenseManagement::sGetInstance().isLicensed(gnIGNORE_USB_IDCHECK_FEATURE); 
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::isRuleExecutionAllowed()
@@ -1516,18 +1572,9 @@ bool CRuleSet::isRuleExecutionAllowed()
 	// [FlexIDSCore #3061] Requires:
 	// - A USB counter OR
 	// - Internal-use flag OR
+	// - Is a swiping rule OR
 	// - Full RDT license
-	if (m_bUseIndexingCounter || m_bUsePaginationCounter || 
-		m_bUsePagesRedactionCounter || m_bUseDocsRedactionCounter || 
-		m_bRuleSetOnlyForInternalUse || 
-		LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
+	return isUsingCounter() || m_bRuleSetOnlyForInternalUse || m_bSwipingRule || isRdtLicensed();
 }
 //-------------------------------------------------------------------------------------------------
 bool CRuleSet::enabledDocumentPreprocessorExists()
@@ -1540,5 +1587,21 @@ bool CRuleSet::enabledOutputHandlerExists()
 {
 	return (m_ipOutputHandler) && (m_ipOutputHandler->Object != NULL) && 
 		(m_ipOutputHandler->GetEnabled() == VARIANT_TRUE);
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSet::isRdtLicensed()
+{
+	return LicenseManagement::sGetInstance().isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSet::isUsingCounter()
+{
+	return m_bUseIndexingCounter || m_bUsePaginationCounter || m_bUsePagesRedactionCounter || 
+		m_bUseDocsRedactionCounter;
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSet::isLicensedToSave()
+{
+	return isUsingCounter() || m_bRuleSetOnlyForInternalUse || isRdtLicensed();
 }
 //-------------------------------------------------------------------------------------------------
