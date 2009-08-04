@@ -41,11 +41,12 @@ CRuleSetPropertiesDlg::CRuleSetPropertiesDlg(UCLID_AFCORELib::IRuleSetPtr ipRule
 void CRuleSetPropertiesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
-	//{{AFX_DATA_MAP(CRuleSetPropertiesDlg)
 	DDX_Control(pDX, IDC_COUNTER_LIST, m_CounterList);
 	DDX_Control(pDX, IDC_CHECK_INTERNAL_USE_ONLY, m_checkboxForInternalUseOnly);
 	DDX_Control(pDX, IDC_SERIAL_NUMBERS, m_editKeySerialNumbers);
-	//}}AFX_DATA_MAP
+	DDX_Control(pDX, IDC_CHECK_SWIPING_RULE, m_checkSwipingRule);
+	DDX_Control(pDX, IDOK, m_buttonOk);
+	DDX_Control(pDX, IDCANCEL, m_buttonCancel);
 }
 //-------------------------------------------------------------------------------------------------
 
@@ -166,10 +167,15 @@ BOOL CRuleSetPropertiesDlg::OnInitDialog()
 		// Update the USB counter serial number edit box
 		m_editKeySerialNumbers.SetWindowText(m_ipRuleSet->KeySerialList);
 
-		// Update the internal use checkbox + disable without full RDT license [FlexIDSCore #3062]
-		m_checkboxForInternalUseOnly.SetCheck( asMFCBool( m_ipRuleSet->ForInternalUseOnly ) );
-		m_checkboxForInternalUseOnly.EnableWindow( asMFCBool( 
-			LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ) ) );
+		// Update the checkboxes
+		m_checkboxForInternalUseOnly.SetCheck( asBSTChecked(m_ipRuleSet->ForInternalUseOnly) );
+		m_checkSwipingRule.SetCheck( asBSTChecked(m_ipRuleSet->IsSwipingRule) );
+
+		// Hide checkboxes without full RDT license [FIDSC #3062, #3594]
+		if (!isRdtLicensed())
+		{
+			hideCheckboxes();
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI11552")
 
@@ -227,16 +233,21 @@ void CRuleSetPropertiesDlg::OnOK()
 		// Get the serial number list
 		CString czSerialText;
 		m_editKeySerialNumbers.GetWindowText(czSerialText);
+
 		// Set focus to serial number list so if list not valid it will have the focus
 		m_editKeySerialNumbers.SetFocus();
-		validateSerialList( czSerialText.operator LPCTSTR() );
+		validateSerialList( LPCTSTR(czSerialText) );
 
 		// Serial number list is valid so save in the ruleset
 		m_ipRuleSet->KeySerialList = _bstr_t(czSerialText);
 		
 		// update the value related to the checkbox for internal use
-		iCheckBoxState = m_checkboxForInternalUseOnly.GetCheck();
-		m_ipRuleSet->ForInternalUseOnly = (iCheckBoxState == TRUE) ? VARIANT_TRUE : VARIANT_FALSE;
+		bool bChecked = m_checkboxForInternalUseOnly.GetCheck() == BST_CHECKED;
+		m_ipRuleSet->ForInternalUseOnly = asVariantBool(bChecked);
+
+		// Store whether this is a swiping rule
+		bChecked = m_checkSwipingRule.GetCheck() == BST_CHECKED;
+		m_ipRuleSet->IsSwipingRule = asVariantBool(bChecked);
 
 		CDialog::OnOK();
 	}
@@ -314,6 +325,49 @@ void CRuleSetPropertiesDlg::OnNMClickCounterList(NMHDR *pNMHDR, LRESULT *pResult
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
+void CRuleSetPropertiesDlg::hideCheckboxes()
+{
+	// Hide the check boxes
+	m_checkboxForInternalUseOnly.ShowWindow(FALSE);
+	m_checkSwipingRule.ShowWindow(FALSE);
+
+	// Get the dimensions of the swiping rule checkbox (ie. the last checkbox)
+	RECT checkRect = {0};
+	m_checkSwipingRule.GetWindowRect(&checkRect);
+	ScreenToClient(&checkRect);
+
+	// Get the dimensions of the key serial numbers edit box 
+	// (ie. the control immediately above the check boxes)
+	RECT editRect = {0};
+	m_editKeySerialNumbers.GetWindowRect(&editRect);
+	ScreenToClient(&editRect);
+
+	// Calculate the distance of empty space that should be removed
+	long lDelta = checkRect.bottom - editRect.bottom;
+
+	// Move the OK button up to fill the empty space
+	RECT okRect = {0};
+	m_buttonOk.GetWindowRect(&okRect);
+	ScreenToClient(&okRect);
+	okRect.top -= lDelta;
+	okRect.bottom -= lDelta;
+	m_buttonOk.MoveWindow(&okRect);
+
+	// Move the cancel button up to fill the empty space
+	RECT cancelRect = {0};
+	m_buttonCancel.GetWindowRect(&cancelRect);
+	ScreenToClient(&cancelRect);
+	cancelRect.top -= lDelta;
+	cancelRect.bottom -= lDelta;
+	m_buttonCancel.MoveWindow(&cancelRect);
+
+	// Shrink the dialog by the amount of empty space
+	RECT mainRect = {0};
+	GetWindowRect(&mainRect);
+	mainRect.bottom -= lDelta;
+	MoveWindow(&mainRect);
+}
+//-------------------------------------------------------------------------------------------------
 void CRuleSetPropertiesDlg::setupCounterList()
 {
 	m_CounterList.SetExtendedStyle( 
@@ -356,7 +410,7 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Pagination rules are licensed - requires full RDT license
-	if (LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+	if (isRdtLicensed())
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -382,7 +436,7 @@ void CRuleSetPropertiesDlg::setupCounterList()
 	}
 
 	// Determine if Redaction By Documents rules are licensed - requires full RDT license
-	if (LicenseManagement::sGetInstance().isLicensed( gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS ))
+	if (isRdtLicensed())
 	{
 		// Add this item next
 		nCounterItemPosition = m_CounterList.InsertItem( nCounterItemPosition + 1, "" );
@@ -420,5 +474,10 @@ void CRuleSetPropertiesDlg::validateSerialList( const string &strSerialList )
 		// if any exceptions are thrown it is because a serial number is not valid
 	}
 	// no exceptions means serial numbers are valid
+}
+//-------------------------------------------------------------------------------------------------
+bool CRuleSetPropertiesDlg::isRdtLicensed()
+{
+	return LicenseManagement::sGetInstance().isLicensed(gnRULE_DEVELOPMENT_TOOLKIT_OBJECTS);
 }
 //-------------------------------------------------------------------------------------------------
