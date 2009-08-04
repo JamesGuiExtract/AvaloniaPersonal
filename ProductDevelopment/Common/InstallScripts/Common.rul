@@ -32,6 +32,7 @@
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE "{0EACBFA9-5D4F-4D7E-8FB2-5C9E66FB6632}"
+    #define REG_PATH_DOT_NET_35_UNINSTALL REG_PATH_UNINSTALL ^ "Microsoft .NET Framework 3.5"
 //////////////////// installation declarations ///////////////////
 
     // In order to have your InstallScript function executed as a custom
@@ -203,15 +204,11 @@ int nResult, svServiceState;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0) then
-		if ( SYSINFO.bIsWow64 ) then
-			szProgram = SUPPORTDIR ^ "\\NetFx64.exe";
-		else
-			szProgram = SUPPORTDIR ^ "\\dotnetfx.exe";
-		endif;
+	if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0) then
+		szProgram = SUPPORTDIR ^ "\\dotnetfx35.exe";
 		LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
-		SdShowMsg("Setup is Installing .NET Framework 2.0", FALSE);
-		if ( RegDBKeyExist ( REG_PATH_DOT_NET_VER_2_0 ) < 0  ) then
+		SdShowMsg("Setup is Installing .NET Framework 3.5", FALSE);
+		if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0  ) then
 			MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
 			gbInstalled = FALSE;
 			abort;
