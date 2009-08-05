@@ -41,7 +41,7 @@
 			<LI>Select the whole row for <b>Chloride</b>.
 			<LI>Confirm that the view and zoom level changes such that the highlights and 
 			hint are visible.
-			<LI>Confirm that tooltips <b>are not</b> visible.
+			<LI>Confirm that tooltips <b>are</b> visible.
 <p>
 			<li><b>[DataEntry #294]</b> Angular highlights highlight too much.
 			<ul>
@@ -54,14 +54,15 @@
 		<LI><b>Highlights and OCR confidence</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>BASIC METABOLIC PANEL</b> row in the <b>Orders</b> table.
+			<LI>Select the first <b>ECO2</b> row in the <b>Orders</b> table.
 			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
 			a red background indicating lower OCR confidence.
 			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
 			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
-			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> have red backgrounds indicating 
-			lower OCR confidence.
-			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes <b>Carbon Monoxide</b>.
+			<LI>Confirm that some individual characters in <b>Carbon Dioxide</b> have red 
+			backgrounds indicating lower OCR confidence.
+			<LI>Manually edit the <b>Order Name</b> cell such that <b>Carbon Dioxide</b> becomes 
+			<b>Carbon Monoxide</b>.
 			<ul>
 				<LI>Confirm that the tooltip changes to <b>Carbon Monoxide</b>.
 				<LI>Confirm that the highlight is now completely <b>green</b>.
@@ -85,7 +86,7 @@
 		<LI><b>Highlights across pages</b>
 		<ul>
 			<LI>Open image <b>352.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>COMPREHENSIVE PANEL</b> row.
+			<LI>Select the <b>COMPREHENSIVE PANEL</b> row.
 			<LI>Confirm that the entire set of highlights and hints is visible on 
 			<b>page 1</b>.
 			<LI>Select the <b>LIPID PANEL</b> row.
@@ -99,19 +100,12 @@
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Orders</b> table.
-			<LI>Confirm that selecting each individual row of the address table provides the 
-			appropriate highlight and hint.
-			<LI>Confirm that selecting multiple rows of the address table in various 
-			combinations provides the appropriate highlights but without any hints.
-<p>
 			<li>Select the <b>UnknownOrder</b> cell in the bottom row.
-			<LI>Select the <b>Carbon Dioxide</b> cell in the 
+			<LI>Select the <b>Anion Gap</b> cell in the 
 			<b>Selected Order Details</b> table.
-			<LI>Confirm that the <b>Carbon Dioxide</b> text is highlighted 
-			and that a hint is also displayed.
-			<LI>Select the entire <b>Carbon Dioxide</b> row in the 
-			<b>Selected Order Details</b> table.
+			<LI>Confirm that the <b>Anion Gap</b> text is highlighted.
+			<LI>Select the entire <b>Unknown Order</b> row in the 
+			<b>Order</b> table.
 			<ul>
 				<LI>Confirm that all of the test results for the <b>Order</b> are 
 				highlighted and that hints are displayed.
@@ -120,7 +114,7 @@
 				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
 				provided for <b>Flag</b> items under the <b>OUT OF RANGE</b> column.
 			</ul>
-			<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Test 
+			<LI>Select one of the empty <b>Flag</b> cells in the <b>Selected Order 
 			Details</b> table.
 			<LI>Confirm that a <b>direct</b> hint is provided under the 
 			<b>OUT OF RANGE</b> column.
@@ -214,7 +208,7 @@
 				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
 				<LI>Confirm that <b>all</b> found data and hints are highlighted.
 			</ul>
-			<LI>Select an item from <b>Selected Test Details</b>.
+			<LI>Select an item from <b>Selected Order Details</b>.
 			<ul>
 				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
 				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
@@ -298,7 +292,7 @@
 			<LI>Confirm that the tooltip changes properly with each character change.  
 			<li><b>[DataEntry #330]</b> Also confirm that the orientation of the tooltip 
 			does not changes as text is typed.
-			<LI>Confirm that whitespace is trimmed from each end of the tooltip as 
+			<LI>Confirm that whitespace is trimmed from the back end of the tooltip as 
 			the text is updated.
 <p>
 			<LI>Click the <b>Highlight all data in image</b> button.
@@ -390,8 +384,8 @@
 <p>
 		<LI>Open image <b>003.tif</b> from Demo_LabDE.
 		<LI>Rotate the image and confirm that the existing highlights rotate properly.
-		<LI>Swipe some text in the rotated image.  Confirm that the text is recognized 
-		and highlighted properly and that it appears in the DEP.
+		<LI><b>[DataEntry #391]</b> Swipe some text in the rotated image.  Confirm that the text 
+		is recognized and highlighted properly and that it appears in the DEP.
 	</ul>
 <p>
 	<LI><h3>Angular Highlight Tool</h3>
