@@ -65,6 +65,7 @@ namespace Extract.Redaction.Verification
             this._exemptionsColumn});
             this._dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._dataGridView.Location = new System.Drawing.Point(0, 0);
+            this._dataGridView.Margin = new System.Windows.Forms.Padding(0);
             this._dataGridView.Name = "_dataGridView";
             this._dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._dataGridView.Size = new System.Drawing.Size(575, 300);

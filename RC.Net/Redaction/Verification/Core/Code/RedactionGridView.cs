@@ -69,6 +69,17 @@ namespace Extract.Redaction.Verification
 
         #endregion RedactionGridView Fields
 
+        #region RedactionGridView Events
+
+        /// <summary>
+        /// Occurs when an exemption code is applied to a redaction.
+        /// </summary>
+        [Category("Action")]
+        [Description("Occurs when an exemption code is applied to a redaction.")]
+        public event EventHandler<ExemptionsAppliedEventArgs> ExemptionsApplied;
+
+        #endregion RedactionGridView Events
+
         #region RedactionGridView Constructors
 
         /// <summary>
@@ -144,6 +155,19 @@ namespace Extract.Redaction.Verification
                 }
 
                 return _masterCodes;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether any exemption codes have been applied.
+        /// </summary>
+        /// <returns><see langword="true"/> if any exemption codes have been applied;
+        /// <see langword="false"/> if no exemption codes have been applied.</returns>
+        public bool HasAppliedExemptions
+        {
+            get
+            {
+                return _lastApplied != null;
             }
         }
 
@@ -322,6 +346,9 @@ namespace Extract.Redaction.Verification
                 RedactionGridViewRow redaction = _redactions[row.Index];
                 redaction.Exemptions = exemptions;
                 _dataGridView.UpdateCellValue(_exemptionsColumn.Index, row.Index);
+
+                // Raise the ExemptionsApplied event
+                OnExemptionsApplied(new ExemptionsAppliedEventArgs(exemptions, redaction));
             }
         }
 
@@ -444,6 +471,23 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion RedactionGridView Methods
+
+        #region RedactionGridView OnEvents
+
+        /// <summary>
+        /// Raises the <see cref="ExemptionsApplied"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="ExemptionsApplied"/> 
+        /// event.</param>
+        protected virtual void OnExemptionsApplied(ExemptionsAppliedEventArgs e)
+        {
+            if (ExemptionsApplied != null)
+            {
+                ExemptionsApplied(this, e);
+            }
+        }
+
+        #endregion RedactionGridView OnEvents
 
         #region RedactionGridView Event Handlers
 
@@ -622,5 +666,56 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion IImageViewerControl Members
+    }
+
+    /// <summary>
+    /// Provides data for the <see cref="RedactionGridView.ExemptionsApplied"/> event.
+    /// </summary>
+    public class ExemptionsAppliedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// The exemption codes that were applied.
+        /// </summary>
+        readonly ExemptionCodeList _exemptions;
+
+        /// <summary>
+        /// The row to which the exemptions were applied.
+        /// </summary>
+        readonly RedactionGridViewRow _row;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExemptionsAppliedEventArgs"/> class.
+        /// </summary>
+        /// <param name="exemptions">The exemption codes that were applied.</param>
+        /// <param name="row">The row to which the exemptions were applied.</param>
+        public ExemptionsAppliedEventArgs(ExemptionCodeList exemptions, RedactionGridViewRow row)
+        {
+            _exemptions = exemptions;
+            _row = row;
+        }
+
+        /// <summary>
+        /// Gets the exemption codes that were applied.
+        /// </summary>
+        /// <returns>The exemption codes that were applied.</returns>
+        public ExemptionCodeList Exemptions
+        {
+            get
+            {
+                return _exemptions;
+            }
+        }
+
+        /// <summary>
+        /// Gets the row to which the exemptions were applied.
+        /// </summary>
+        /// <returns>The row to which the exemptions were applied.</returns>
+        public RedactionGridViewRow Row
+        {
+            get
+            {
+                return _row;
+            }
+        }
     }
 }

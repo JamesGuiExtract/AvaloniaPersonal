@@ -108,7 +108,7 @@ namespace Extract.Redaction.Verification
             _category = category;
             _type = type;
             _firstPage = GetFirstPageNumber();
-            _exemptions = exemptions;
+            _exemptions = exemptions ?? new ExemptionCodeList();
         }
 
         #endregion RedactionGridViewRow Constructors
@@ -220,7 +220,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _exemptions ?? new ExemptionCodeList();
+                return _exemptions;
             }
             set
             {
@@ -379,7 +379,7 @@ namespace Extract.Redaction.Verification
             ComAttribute exemptionsAttribute = GetExemptionsComAttribute(attribute.SubAttributes);
             if (exemptionsAttribute == null)
             {
-                return null;
+                return new ExemptionCodeList();
             }
 
             string category = exemptionsAttribute.Type;
