@@ -489,6 +489,12 @@
     <Compile Include="MenuItems\PreviousTileToolStripMenuItem.Designer.cs">
       <DependentUpon>PreviousTileToolStripMenuItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="PageSummaryView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="PageSummaryView.Designer.cs">
+      <DependentUpon>PageSummaryView.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controls\RectangularHighlightToolStripButton.cs">
       <SubType>Component</SubType>
@@ -797,6 +803,10 @@
     <EmbeddedResource Include="Resources\DeleteSelectionButtonSmall.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="PageSummaryView.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>PageSummaryView.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\OpenImageButtonSmall.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
