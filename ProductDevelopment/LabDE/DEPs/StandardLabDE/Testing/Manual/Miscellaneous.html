@@ -17,8 +17,8 @@
 		<LI><b>[DataEntry #146]</b> Scrolling and table activation
 		<ul>
 			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Resize the DEP such that the table of test names is not completely 
-			visible.
+			<LI>Resize the DEP such that the table of <b>Order</b> names is not 
+			completely visible.
 			<LI>Select a <b>Test Name</b> cell.
 			<LI>Confirm that the table does not automatically scroll into view.
 		</ul>
@@ -58,13 +58,13 @@
 <p>
 			<LI><b>[DataEntry #278]</b> Tab loop after swiping
 			<ul>
-				<LI>Open image <b>004.tif</b> from Demo_LabDE.
+				<LI>Open image <b>057.tif</b> from Demo_LabDE.
 				<LI>Select the first <b>Order</b>.
 				<LI>Select the <b>Result Date</b> field.
 				<LI>Swipe a different date from the image.
 				<LI>Click the <b>Tab</b> key to step through elements of the selected test.
-				<LI>Confirm that after viewing all entries in the Completed Test, the 
-				next Completed Test is selected and subsequent Tabs move through its fields.
+				<LI>Confirm that after viewing all entries in the Order, the 
+				next Order is selected and subsequent Tabs move through its fields.
 			</ul>
 <p>
 			<li><b>[DataEntry #288]</b> Smarter cell selection after swiping new data
@@ -76,9 +76,10 @@
 				<li>Confirm that the newly-swiped Name cell is still selected.
 			</ul>
 <p>
-			<li><b>[DataEntry #289]</b> Arrow keys disabled after swiping new test name
+			<li><b>[DataEntry #289]</b> Arrow keys disabled after swiping new order name
 			<ul>
-				<li>Open a document and select the Name cell of the starred row of the test table.
+				<li>Open a document and select the Name cell of the starred row of 
+				the order table.
 				<li>Swipe some text.
 				<li>Confirm that the arrow keys can still be used to navigate the table.
 			</ul>
@@ -95,7 +96,7 @@
 			<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
 			<ul>
 				<LI>Open image <b>151.tif</b> from Demo_LabDE.
-				<LI>Select the <b>Carbon Dioxide</b> component name field.
+				<LI>Select the <b>Carbon Dioxide</b> test name field.
 				<LI>Confirm that original OCR confidence includes some red background. 
 				<LI>Reswipe the text.
 				<LI>Confirm that the new text also includes some red characters.
@@ -147,12 +148,6 @@
 				<li>Confirm that you can save the document.
 			</ul>
 <p>
-			<li><b>[DataEntry #243]</b> Lab Address is always in a viewed state
-			<ul>
-				<li>Open a document with a fresh .voa file.
-				<li>Confirm that all fields begin in an unviewed state.
-			</ul>
-<p>
 			<LI><b>[DataEntry #256]</b> Typing into empty table cell
 			<ul>
 				<LI>Open image <b>003.tif</b> from Demo_LabDE.
@@ -186,7 +181,7 @@
 			<LI><b>[DataEntry #267, #275]</b> Home, End, Shift+Space when editing a text box
 			<ul>
 				<LI>Open image <b>003.tif</b> from Demo_LabDE.
-				<LI>Double-click the <b>Patient Information - Name</b> field.
+				<LI>Double-click the <b>Date of Birth</b> field.
 				<LI>Confirm that the entire contents of the text box are selected for editing.
 				<LI>Type <b>Home</b>.
 				<LI>Confirm that the edit cursor moves to the beginning of the text.
@@ -212,11 +207,11 @@
 			<LI><b>[DataEntry #277]</b> Unexpected exception for go to next unviewed
 			<ul>
 				<LI>Open image <b>151.tif</b> from Demo_LabDE.
-				<LI>Select the <b>Result Date</b> for the first Completed Test.
+				<LI>Select the <b>Result Date</b> for the first Order.
 				<LI>Swipe in a new <b>Result Date</b>.
 				<LI>Type the <b>F10</b> key to highlight all attributes.
-				<LI>Select a different <b>Completed Test</b>.
-				<LI>Type <b>Alt+G</b> and select the highlight for the previously 
+				<LI>Select a different <b>Order</b>.
+				<LI>Type <b>Alt+R</b> and select the highlight for the previously 
 				swiped <b>Result Date</b>.
 				<LI>Confirm that the date is accepted and no exception is displayed.
 			</ul>
@@ -245,7 +240,7 @@
 			<LI><b>[DataEntry #295]</b> Ctrl+A in a text box
 			<ul>
 				<LI>Open image <b>003.tif</b> from Demo_LabDE.
-				<LI>Select the <b>Patient Information - Name</b> field.
+				<LI>Select the <b>Date of Birth</b> field.
 				<LI>Type <b>Ctrl+A</b>.
 				<LI>Confirm that the entire contents of the text box are selected.
 			</ul>
@@ -298,26 +293,26 @@
 			<li>Confirm that focus jumps to Result Time.
 		</ul>
 <p>
-		<LI><b>[DataEntry #255]</b> Tab loop after swiping
+		<LI><b>[DataEntry #255]</b> Tab into new row of table
 		<ul>
 			<LI>Open image <b>004.tif</b> from Demo_LabDE.
-			<LI>Select the <b>HEMATOLOGY</b> test.
+			<LI>Select the <b>CBC</b> test.
 			<LI>Click the <b>Tab</b> key to step through elements of the selected test.
-			<LI>Confirm that after selection of the <b>Comment</b> cell in the 
-			<b>RDW</b> test, Tab advances to the Component Name cell in the empty row.
+			<LI>Confirm that after selection of the <b>Flag</b> cell in the 
+			<b>BASO,ABS (AUTO)</b> test, Tab advances to the Component Name cell in 
+			the empty row.
 		</ul>
 <p>
 		<LI><b>[DataEntry #263]</b> Tab navigation skips tables with no data
 		<ul>
 			<LI>Open image <b>003.tif</b> from Demo_LabDE.
-			<LI>Select and delete the entire <b>Physician</b> row.
-			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Select the <b>Ordering Physician</b> row.
 			<LI>Click the <b>Tab</b> key to step through different cells.
-			<LI>Confirm that even though no Physicians are available, the empty row 
-			can be selected.
-			<LI>Select and delete every <b>Component</b> row for the Completed Test.
+			<LI>Confirm that even though no <b>CopyTo: Physicians</b> are available, the 
+			empty row can be selected.
+			<LI>Select and delete every <b>Test</b> row for the Order.
 			<LI>Click the <b>Tab</b> key to step through different cells.
-			<LI>Confirm that even though no Components are available, the empty row 
+			<LI>Confirm that even though no Tests are available, the empty row 
 			can be selected.
 		</ul>
 <p>
@@ -363,7 +358,8 @@
 	<ul>
 		<li><b>[DataEntry #302]</b> Scroll wheel operations should work without clicking
 		<ul>
-			<li>Open an image and type something in any field in the Data Entry Panel.
+			<li>Open an image and type something in any text box field in the 
+			Data Entry Panel.
 			<li>Move the mouse over the Image Viewer.
 			<li>Confirm that CTRL + mouse wheel can be used to zoom.
 			<li>Confirm that the mouse wheel can be used to scroll. Note that this
@@ -381,9 +377,6 @@
 			logged if <b>F4</b> is pressed.
 		</ul>
 <p>
-	</ul>
-	<li><h3>TBD</h3>
-	<ul>
 	</ul>
 </UL>
 </BODY>
