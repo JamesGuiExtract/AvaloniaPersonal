@@ -67,7 +67,7 @@
 		<LI>Change a character in a single field.
 		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
 		<LI>Confirm that <b>Yes</b> closes the FAM and <b>does</b> update the VOA file.
-		<LI>Start processing and confirm that the next image is displayed.
+		<LI>Start processing and confirm that the same image is displayed.
 <p>
 		<LI>Start processing.
 		<LI>Swipe text into the <b>Comment</b> field.
@@ -79,7 +79,7 @@
 		<LI>Swipe text into the <b>Comment</b> field.
 		<LI>Select <b>File - Stop processing</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
 		<LI>Confirm that <b>Yes</b> closes the FAM and <b>does</b> update the VOA file.
-		<LI>Start processing and confirm that the next image is displayed.
+		<LI>Start processing and confirm that the same image is displayed.
 <p>
 		<LI><b>[DataEntry #291]</b> Crashes when stopped with unsaved changes
 		<ul>
@@ -87,15 +87,15 @@
 			<LI>Change data such that the contents are all valid.
 			<LI>Stop processing <b>from the FAM</b>.  
 			<li>Confirm that a <b>Data Not Saved</b> prompt is displayed.
-			<LI>Confirm that <b>Cancel</b> returns to the document without closing the FAM 
+			<LI>Confirm that <b>Cancel</b> returns to the document without closing LabDE 
 			and that data is retained.
-			<LI>Run this test again and Confirm that <b>Ok</b> saves the data and closes the FAM.
+			<LI>Run this test again and Confirm that <b>Ok</b> saves the data and closes LabDE.
 <p>
 			<LI>Start processing.
 			<LI>Change data such that some data are invalid.
 			<LI>Stop processing <b>from the FAM</b>.  
 			<li>Confirm that an <b>Invalid value</b> exception is displayed.
-			<LI>Close the exception and confirm that the FAM closes.
+			<LI>Close the exception and confirm that LabDE closes after choosing to not save changes.
 		</ul>
 <p>
 		<li><b>[DataEntry #308]</b> Files fail after stopping processing.
@@ -191,7 +191,7 @@
 	<ul>
 		<li>Exercise the <b>Demo_LabDE</b> images.
 		<li>Open <b>003.tif</b>.
-		<LI><b>[DataEntry #327]</b> Confirm that the <b>Patient Name</b> field is 
+		<LI><b>[DataEntry #327]</b> Confirm that the <b>Result Status</b> field is 
 		initially selected and displays as viewed (non-bold font).
 		<LI>Confirm that no data values are invalid.
 		<li>Click the <b>Save</b> button.
@@ -211,7 +211,7 @@
 	<ul>
 		<li>Exercise the <b>Demo_LabDE</b> images.
 		<li>Open <b>003.tif</b>.
-		<LI><b>[DataEntry #327]</b> Confirm that the <b>Patient Name</b> field is 
+		<LI><b>[DataEntry #327]</b> Confirm that the <b>Result Status</b> field is 
 		initially selected and displays as viewed (non-bold font).
 		<LI>Confirm that no data values are invalid.
 		<li>Click the <b>Save</b> button.
