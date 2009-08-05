@@ -67,6 +67,9 @@ namespace Extract.Redaction.Verification
             _settings = settings;
 
             InitializeComponent();
+
+            _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
+            _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
         }
 
         #endregion VerificationTaskForm Constructors
@@ -85,13 +88,18 @@ namespace Extract.Redaction.Verification
         }
         
         /// <summary>
-        /// Saves and commits the currently open image file.
+        /// Saves and optionally commits the currently open image file.
         /// </summary>
-        void Save()
+        /// <param name="commit"><see langword="true"/> if the image file should be commited; 
+        /// <see langword="false"/> if the image file should not be committed.</param>
+        void Save(bool commit)
         {
             _redactionGridView.SaveTo(GetVoaFileName());
 
-            OnFileComplete(EFileProcessingResult.kProcessingSuccessful);
+            if (commit)
+            {
+                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
+            }
         }
 
         #endregion VerificationTaskForm Methods
@@ -144,13 +152,13 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Raises the <see cref="FileComplete"/> event.
         /// </summary>
-        /// <param name="fileProcessingResult">Specifies under what circumstances
-        /// verification of the file completed.</param>
-        protected virtual void OnFileComplete(EFileProcessingResult fileProcessingResult)
+        /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
+        /// event.</param>
+        protected virtual void OnFileComplete(FileCompleteEventArgs e)
         {
             if (FileComplete != null)
             {
-                FileComplete(this, new FileCompleteEventArgs(fileProcessingResult));
+                FileComplete(this, e);
             }
         }
 
@@ -169,7 +177,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Save();
+                Save(true);
             }
             catch (Exception ex)
             {
@@ -190,11 +198,158 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Save();
+                Save(true);
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26785", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleSaveToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                Save(false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27044", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandlePrintToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27045", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleSkipProcessingToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27046", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleStopProcessingToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingCancelled));
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27047", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleDiscardChangesToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27048", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleIDShieldHelpToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27049", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleAboutIDShieldToolStripMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27050", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
@@ -243,6 +398,28 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Handles the <see cref="RedactionGridView.ExemptionsApplied"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="RedactionGridView.ExemptionsApplied"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="RedactionGridView.ExemptionsApplied"/> event.</param>
+        void HandleRedactionGridViewExemptionsApplied(object sender, ExemptionsAppliedEventArgs e)
+        {
+            try
+            {
+                // Enable the apply last exemption codes tool strip button if there are redactions
+                _lastExemptionToolStripButton.Enabled = _imageViewer.LayerObjects.Count > 0;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27051", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="ImageViewer.ImageFileChanged"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -267,6 +444,56 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI26760", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
+        void HandleImageViewerLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        {
+            try
+            {
+                if (_imageViewer.LayerObjects.Count == 1)
+                {
+                    _applyExemptionToolStripButton.Enabled = true;
+                    _lastExemptionToolStripButton.Enabled = _redactionGridView.HasAppliedExemptions;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27052", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
+        void HandleImageViewerLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        {
+            try
+            {
+                if (_imageViewer.LayerObjects.Count == 0)
+                {
+                    _applyExemptionToolStripButton.Enabled = false;
+                    _lastExemptionToolStripButton.Enabled = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27053", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
