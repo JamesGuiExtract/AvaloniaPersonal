@@ -32,7 +32,8 @@
     #define EXCEPTION_FILE_NAME "ExtractException.uex"
     #define UCLID_EXCEPTION_FILE_NAME "UCLIDException.uex"
     #define SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE "{0EACBFA9-5D4F-4D7E-8FB2-5C9E66FB6632}"
-    #define REG_PATH_DOT_NET_35_UNINSTALL REG_PATH_UNINSTALL ^ "Microsoft .NET Framework 3.5"
+    #define REG_PATH_DOT_NET_35_INSTALL "\\SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v3.5"
+    
 //////////////////// installation declarations ///////////////////
 
     // In order to have your InstallScript function executed as a custom
@@ -72,6 +73,7 @@
     prototype UnnstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
+    prototype DetectDotNET_35();
     
     // your global variables
     BOOL gbInstalled;
@@ -203,18 +205,18 @@ STRING szProgram;
 int nResult, svServiceState;
 begin
 	// Change the root for the registry
-	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0) then
-		szProgram = SUPPORTDIR ^ "\\dotnetfx35.exe";
-		LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
-		SdShowMsg("Setup is Installing .NET Framework 3.5", FALSE);
-		if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0  ) then
-			MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
-			gbInstalled = FALSE;
-			abort;
-		endif;
-	endif;
-
+	//RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+	//if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_INSTALL ) < 0) then
+	//	szProgram = SUPPORTDIR ^ "\\dotnetfx35.exe";
+	//	LaunchAppAndWait(szProgram, "", LAAW_OPTION_WAIT); 
+	//	SdShowMsg("Setup is Installing .NET Framework 3.5", FALSE);
+	//	if ( RegDBKeyExist ( REG_PATH_DOT_NET_35_UNINSTALL ) < 0  ) then
+	//		MessageBox(".NET Framework was not successfully Installed, installation will be aborted", SEVERE);
+	//		gbInstalled = FALSE;
+	//		abort;
+	//	endif;
+	//endif;
+    DetectDotNET_35();
 end;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -504,4 +506,30 @@ begin
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
 		SdShowMsg("Setup is Installing SQL Compact Edition Editor", FALSE);
 	endif;
+end;
+
+            
+///////////////////////////////////////////////////////////////////////////////
+//
+//  FUNCTION:   DetectDotNET_35
+//
+//  EVENT:      Aborts with message if .NET 3.5 is not installed
+//
+///////////////////////////////////////////////////////////////////////////////
+function DetectDotNET_35()
+STRING szProgram, svValue;
+int nResult, svServiceState;       
+NUMBER nvType, nvSize;
+begin
+	// Change the root for the registry
+	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
+ 
+ 	svValue = "";   
+	RegDBGetKeyValueEx (REG_PATH_DOT_NET_35_INSTALL, "Install", nvType, svValue, nvSize);
+	
+	if ( svValue != "1") then
+		gbInstalled  = FALSE;
+		MessageBox("Microsoft .NET 3.5 is must be installed before running this install.", MB_OK);
+		abort;
+	endif; 
 end;

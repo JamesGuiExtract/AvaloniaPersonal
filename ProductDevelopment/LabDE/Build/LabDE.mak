@@ -159,7 +159,7 @@ CreateDemo_LabDE:
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
 	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
-	@COPY /v "$(LabDEDir)\DEPs\StandardLabDE\Misc\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\"
+	@COPY /v "$(LabResultsDir)\Demo2\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\"
 	@COPY /v "$(LabResultsDir)\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
 	@COPY /v "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
 	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" /v /s /e /y

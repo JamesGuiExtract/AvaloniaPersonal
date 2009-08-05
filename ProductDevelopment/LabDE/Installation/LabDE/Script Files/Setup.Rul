@@ -64,6 +64,9 @@ begin
 		MessageBox("You must have administrative privileges on this computer to install the software package. Setup will terminate.", WARNING);
 		abort;
 	endif;
+	
+	// Check for .NET 3.5
+	DetectDotNET_35();
 	    
 	CheckOtherExtractProducts();
 	
@@ -101,7 +104,7 @@ Dlg_SdStartCopy:
    	CopyLicFiles();
    	
    	// Install .net if not installed
-   	InstallDotNET();
+   	//InstallDotNET();
    	                                
 	// Install SQL Native Client if not installed
    	InstallSQLNativeClient();
