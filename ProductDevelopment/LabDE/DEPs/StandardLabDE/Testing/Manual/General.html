@@ -27,26 +27,26 @@
 	<ul>
 		<LI>Create or identify at least two distinct DEPs.
 		<ul>
-			<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+			<LI>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution 
 			folder so that <b>DataEntryPanelFileName</b> is set to the first DEP.
 			<LI>Confirm that the appropriate DEP is loaded in <b>stand-alone</b> mode.
 			<LI>Confirm that the appropriate DEP is loaded in <b>FAM</b> mode.
 <p>
-			<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+			<LI>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution 
 			folder so that <b>DataEntryPanelFileName</b> is set to the second DEP.
 			<LI>Confirm that the appropriate DEP is loaded in <b>stand-alone</b> mode.
 			<LI>Confirm that the appropriate DEP is loaded in <b>FAM</b> mode.
 		</ul>
 <p>
-		<LI>Modify <b>StandardLabDE.config</b> in the appropriate Solution 
+		<LI>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution 
 		folder so that <b>ApplicationTitle</b> is set to a unique string.
 		<LI>Exercise LabDE in <b>stand-alone</b> mode.
 		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> 
-		and the <b>task bar</b>.
+		title bar and the <b>task bar</b>.
 		<LI>Exercise LabDE in <b>FAM</b> mode.
-		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b>.
+		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> title bar.
 <p>
-		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		<li>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution
 		folder so that <b>DisabledControls</b> is set to the name(s) of one or more
 		controls (examples might include "_epicPatientNameTable", "_patientRecordNum", 
 		or "_orderNumber").
@@ -55,7 +55,7 @@
 		<li>Exercise LabDE in <b>FAM</b> mode.
 		<li>Confirm that the specified controls are disabled.
 <p>
-		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		<li>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution
 		folder so that <b>HighlightConfidenceBoundary</b> is set to a number between
 		0 and 100.
 		<li>Exercise LabDE in <b>stand-alone</b> mode.
@@ -67,7 +67,7 @@
 <p>
 		<li>Find or create a second .sdf database file and place it in an appropriate
 		location.
-		<li>Modify <b>StandardLabDE.config</b> in the appropriate Solution
+		<li>Modify <b>StandardLabDE_Phase2.config</b> in the appropriate Solution
 		folder so that <b>LocalDataSource</b> is set to the relative path to the
 		second database.
 		<li>Exercise LabDE in <b>stand-alone</b> mode.
@@ -85,8 +85,9 @@
 			<li>Exercise LabDE in <b>stand-alone</b> mode.
 			<li>Modify window size and position.
 			<ul>
-				<li><b>[DataEntry #313]</b> Confirm that the DEP is required to be wide
-				enough that all fields are visible.
+				<li><b>[DataEntry #313, #522]</b> Confirm that the DEP is required 
+				to be wide enough that all fields are visible.  Check the <b>t</b> in 
+				the <b>Comment</b> column heading.
 				<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
 				<ul>
 					<li>Click and drag the divider between the DEP and the Image Viewer to
@@ -104,8 +105,9 @@
 			<li>Exercise LabDE in <b>FAM</b> mode.
 			<li>Modify window size and position.
 			<ul>
-				<li><b>[DataEntry #313]</b> Confirm that the DEP is required to be wide
-				enough that all fields are visible.
+				<li><b>[DataEntry #313, #522]</b> Confirm that the DEP is required 
+				to be wide enough that all fields are visible.  Check the <b>t</b> in 
+				the <b>Comment</b> column heading.
 				<li><b>[DataEntry #406]</b> Patient Name table doesn't resize with DEP
 				<ul>
 					<li>Click and drag the divider between the DEP and the Image Viewer to
@@ -144,6 +146,10 @@
 <p>
 		<li>File menu - FAM mode
 		<ul>
+			<li>Confirm that <b>File - Skip processing</b> closes the open file and opens 
+			the next image.
+			<li>Confirm that <b>File - Skip processing</b> for the last queued image closes 
+			the open file and exits the application.
 			<li>Confirm that <b>File - Stop processing</b> closes the open file and exits 
 			the application.
 		</ul>
@@ -248,6 +254,12 @@
 			appropriate toolbar button.
 			<li>Confirm that the menu item and toolbar button each remain selected after use.
 		</ul>
+<p>
+		<li>Help menu
+		<ul>
+			<li>Confirm that <b>Help - LabDE Help</b> opens the Help file.
+			<li>Confirm that <b>Help - About LabDE</b> displays the LabDE About box.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Shortcuts</h3>
@@ -308,7 +320,7 @@
 <p>
 		<li>FAM mode
 		<ul>
-			<li>Confirm that <b>Ctrl+F4</b> stops processing.
+			<li><b>[DataEntry #414]</b> Confirm that <b>Ctrl+F4</b> stops processing.
 			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
 			may be presented if invalid data are present.
 			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog.
