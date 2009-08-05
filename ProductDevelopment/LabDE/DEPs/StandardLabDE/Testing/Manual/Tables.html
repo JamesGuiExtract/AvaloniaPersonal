@@ -27,8 +27,8 @@
 		<ul>
 <!--			<LI>Confirm that the <b>GLUCOSE</b> header is highlighted.		-->
 			<LI>Confirm that the collection date and time are <b>not</b> highlighted. 
-			<LI>Confirm that the individual tests are <b>not</b> highlighted and that 
-			hints are <b>not</b> visible.
+			<LI>Confirm that the individual tests are <b>not</b> highlighted.
+			<LI>Confirm that hints are <b>not</b> visible except for date and time.
 			<LI>Confirm that the <b>Selected Order Details</b> data is provided.
 		</ul>
 		<LI>Select both the <b>GLUCOSE</b> cell and the <b>HGB</b> cell.
@@ -132,8 +132,6 @@
 		<LI>Use the angular highlight tool to Swipe the <b>Sodium</b> test data.
 		<LI>Confirm that the <b>Sodium</b> data appears in the <b>Selected Order 
 		Details</b> table and replaces the previously selected row.
-		<LI>Confirm that the <b>swiped</b> data is selected in the table and 
-		that the appropriate highlights and hints are visible in the image.
 <p>
 		<LI><b>[DataEntry #309]</b> Swiping and Ctrl + Letter
 		<ul>
@@ -327,20 +325,24 @@
 <p>
 	<LI><h3>Navigation</h3>
 	<ul>
+		<LI>Configure a <b>Verify extracted data</b> task to use the <b>Phase 2</b> 
+		config file.
 		<LI>Open image <b>004.tif</b> from Demo_LabDE.
-		<LI>Confirm that <b>Patient Information - Name</b> is initially selected. 
+		<LI>Confirm that <b>Result Status</b> is initially selected. 
 		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
-		<LI>Confirm that selection changes to the <b>Medical Record #</b> edit box. 
+		<LI>Confirm that selection changes to the <b>Patient Information - From Lab Result - 
+		First Name</b> cell. 
 		<LI>Click the <b>Go to next invalid item</b> toolbar button. 
+		<LI>Confirm that selection changes to the <b>Patient Information - From EpicCare - 
+		First Name</b> cell. 
+		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
+		<LI>Confirm that selection changes to the <b>Date of Birth</b> edit box. 
+		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
 		<LI>Confirm that selection changes to the <b>Gender</b> combo box. 
-		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
-		<LI>Confirm that selection changes to the first <b>Physicians - Name</b> cell. 
-		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
-		<LI>Confirm that selection changes to the first <b>Physicians - Type</b> cell. 
 		<LI>Click the <b>Go to next invalid item</b> toolbar button. 
-		<LI>Confirm that selection changes to the first empty <b>Value</b> cell. 
+		<LI>Confirm that selection changes to the <b>Medical Record #</b> cell. 
 		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
-		<LI>Confirm that selection changes to the associated <b>Units</b> cell. 
+		<LI>Confirm that selection changes to the first <b>Physicians - Ordering - First Name</b> cell. 
 	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
@@ -349,10 +351,9 @@
 		<ul>
 			<LI>Open image <b>004.tif</b> from Demo_LabDE.
 			<LI>Select the <b>CBC</b> cell.
-			<LI>Click the <b>Tab</b> key to step through elements of the completed 
-			test.
+			<LI>Click the <b>Tab</b> key to step through elements of the order row.
 			<LI>Confirm that continued Tabs advance to the <b>Selected Order Details</b> 
-			and not to the second completed test.
+			and not to the empty order row.
 		</ul>
 <p>
 		<LI><b>[Data Entry #219]</b> Cells automatically enter edit mode
