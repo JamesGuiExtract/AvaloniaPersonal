@@ -180,6 +180,10 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="UserPreferencesPropertyPage.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>UserPreferencesPropertyPage.cs</DependentUpon>
+    </EmbeddedResource>
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
@@ -198,6 +202,13 @@
     </Compile>
     <Compile Include="RegistryManager.cs">
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="UserPreferences.cs" />
+    <Compile Include="UserPreferencesPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="UserPreferencesPropertyPage.Designer.cs">
+      <DependentUpon>UserPreferencesPropertyPage.cs</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -571,12 +571,31 @@ namespace Extract.DataEntry
                     selectedAttributes.PushBack(this._tabOrderPlaceholderAttribute);
                 }
 
+                // Allow all selected cells to be viewed with tooltips only if exactly one row
+                // attribute is selected.
+                // [DataEntry:491] Don't show tooltips during a drag & drop.
+                bool rowView = selectedAttributes.Size() == 1 && !base.DragOverInProgress;
+
+                // If the whole row is being viewed, mark the row's attributes as viewed.
+                if (rowView)
+                {
+                    foreach (DataGridViewCell cell in base.SelectedRows[0].Cells)
+                    {
+                        IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+
+                        if (dataEntryCell != null && dataEntryCell.Attribute != null)
+                        {
+                            AttributeStatusInfo.MarkAsViewed(dataEntryCell.Attribute, true);
+
+                            UpdateCellStyle(dataEntryCell);
+                        }
+                    }
+                }
+
                 // Notify listeners that the spatial info to be associated with the table has
                 // changed (include all subattributes to the row(s)'s attribute(s) in the 
                 // spatial info).
-                // [DataEntry:491] Don't show tooltips during a drag & drop.
-                OnAttributesSelected(selectedAttributes, true,  selectedAttributes.Size() == 1 &&
-                    !base.DragOverInProgress);
+                OnAttributesSelected(selectedAttributes, true, rowView);
             }
             else if (base.SelectedCells.Count > 0)
             {
@@ -621,12 +640,29 @@ namespace Extract.DataEntry
                     selectedAttributes.PushBack(_tabOrderPlaceholderAttribute);
                 }
 
-                // Include all the attributes for the specifically selected cells in the 
-                // spatial info, not any children of those attributes. Show tooltips only
-                // if one attribute is selected.
+                // Allow all selected cells to be viewed with tooltips only if exactly one row
+                // attribute is selected.
                 // [DataEntry:491] Don't show tooltips during a drag & drop.
-                OnAttributesSelected(selectedAttributes, false, selectedRowAttributes.Size() == 1 &&
-                    !base.DragOverInProgress);
+                bool rowView = selectedRowAttributes.Size() == 1 && !base.DragOverInProgress;
+
+                // If the whole row is being viewed, mark the row's attributes as viewed.
+                if (rowView)
+                {
+                    int selectedCount = selectedAttributes.Size();
+                    for (int i = 0; i < selectedCount; i++)
+                    {
+                        AttributeStatusInfo.MarkAsViewed((IAttribute)selectedAttributes.At(i), true);
+                    }
+
+                    foreach (DataGridViewCell cell in base.SelectedCells)
+                    {
+                        UpdateCellStyle(cell);
+                    }
+                }
+
+                // Include all the attributes for the specifically selected cells in the 
+                // spatial info, not any children of those attributes.
+                OnAttributesSelected(selectedAttributes, false, rowView);
             }
             else
             {

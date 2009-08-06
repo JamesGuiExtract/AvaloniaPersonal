@@ -7,356 +7,255 @@ using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
 using UCLID_COMUTILSLib;
+using UCLID_RASTERANDOCRMGMTLib;
 
 namespace Extract.DataEntry
 {
     partial class AutoUpdateTrigger
     {
-        /// <summary>
-        /// The name of a query element which should be resolved using an SQL query.
-        /// </summary>
-        private static string _SQL_NODE = "SQL";
+        #region Enums
 
         /// <summary>
-        /// The name of a query element which should be resolved using an Attribute query.
+        /// Specifies the way in which spatial information will be persisted from
+        /// <see cref="QueryNode"/>s.
         /// </summary>
-        private static string _ATTRIBUTE_NODE = "Attribute";
-
-        /// <summary>
-        /// The name of a query element which should be resolved using the current source doc name.
-        /// </summary>
-        private static string _SOURCEDOCNAME_NODE = "SourceDocName";
-
-        /// <summary>
-        /// The name of an element attribute specifying whether the result should be parameterized
-        /// if it is used in an SQL query.
-        /// </summary>
-        private static string _PARAMETERIZE_ATTRIBUTE = "Parameterize";
-
-        /// <summary>
-        /// Describes node in an <see cref="AutoUpdateTrigger"/> query.
-        /// </summary>
-        private interface IQueryNode
+        private enum SpatialMode
         {
             /// <summary>
-            /// Gets or sets whether the query node should be should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
+            /// If a node's result is spatial, the spatial info will be returned.  Spatial info
+            /// will be persisted as the result is combined with other results (spatial or not) as
+            /// part of standard ComplexQueries, but will not be persisted through parent SQL nodes.
             /// </summary>
-            /// <value><see langword="true"/> if the query's result should be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result should be used as literal text.</value>
-            /// <returns><see langword="true"/> if the query's result will be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result will be used as literal text.</returns>
-            bool Parameterize
-            {
-                get;
-                set;
-            }
+            Normal,
 
             /// <summary>
-            /// Gets whether the query node is completely resolved (all required triggers have been
-            /// registered) and can be evaluated.
+            /// If a node's result is spatial, the spatial info will be returned.  Spatial info
+            /// will be persisted as the result is combined with other results (spatial or not) as
+            /// part of standard ComplexQueries, and also will not be persisted through parent SQL
+            /// nodes.
             /// </summary>
-            /// <returns><see langword="true"/> if all triggers are registered and the query node can
-            /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
-            /// the query node can be evaluated.</returns>
-            bool IsResolved
-            {
-                get;
-            }
+            Force,
 
             /// <summary>
-            /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
+            /// Only the spatial information from the node should be persisted, not the node text.
+            /// The spatial info will be persisted as is with "Normal" mode.
             /// </summary>
-            /// <param name="statusInfo">If <see langword="null"/> the <see cref="IQueryNode"/> will
-            /// attempt to resolve all unresolved triggers. If specified, the corresponding
-            /// query node will attempt to register the corresponding <see cref="IAttribute"/> with
-            /// all unresolved nodes.</param>
-            /// <returns><see langword="true"/> if one or more <see cref="IQueryNode"/>s were
-            /// resolved; <see langword="false"/> otherwise.</returns>
-            bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo);
+            Only,
 
             /// <summary>
-            /// Evaluates the query.
+            /// No spatial information should be persisted from the node.
             /// </summary>
-            /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-            string Evaluate();
+            None
         }
 
-        /// <summary>
-        /// An <see cref="IQueryNode"/> consisting of un-interpreted, literal text.
-        /// </summary>
-        private class LiteralQueryNode : IQueryNode
-        {
-            /// <summary>
-            /// The literal text to be returned during evaluation.
-            /// </summary>
-            protected string _query;
-
-            /// <summary>
-            /// Specifies whether the query node should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
-            /// </summary>
-            protected bool _parameterize;
-
-            /// <summary>
-            /// Initializes a new <see cref="LiteralQueryNode"/> instance.
-            /// </summary>
-            /// <param name="query">The literal text to be returned during evaluation.</param>
-            public LiteralQueryNode(string query)
-            {
-                _query = query;
-            }
-
-            /// <summary>
-            /// Gets or sets whether the query node should be should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
-            /// </summary>
-            /// <value><see langword="true"/> if the query's result should be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result should be used as literal text.</value>
-            /// <returns><see langword="true"/> if the query's result will be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result will be used as literal text.</returns>
-            public bool Parameterize
-            {
-                get
-                {
-                    return _parameterize;
-                }
-
-                set
-                {
-                    _parameterize = value;
-                }
-            }
-
-            /// <summary>
-            /// Gets whether the query node is completely resolved (all required triggers have been
-            /// registered) and can be evaluated.
-            /// </summary>
-            /// <returns><see langword="true"/> if all triggers are registered and the query node can
-            /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
-            /// the query node can be evaluated.</returns>
-            public bool IsResolved
-            {
-                get
-                {
-                    return !string.IsNullOrEmpty(_query);
-                }
-            }
-
-            /// <summary>
-            /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
-            /// </summary>
-            /// <param name="statusInfo">Not used by <see cref="LiteralQueryNode"/>.</param>
-            /// <returns><see langword="false"/> since <see cref="LiteralQueryNode"/> instances do
-            /// not support trigger attributes.</returns>
-            public bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
-            {
-                return false;
-            }
-
-            /// <summary>
-            /// Evaluates the query.
-            /// </summary>
-            /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-            public string Evaluate()
-            {
-                ExtractException.Assert("ELI26753", "Cannot evaluate un-resolved query!",
-                    this.IsResolved);
-
-                return _query;
-            }
-        }
+        #endregion Enums
 
         /// <summary>
-        /// An <see cref="IQueryNode"/> to be resolved using the current source doc name.
+        /// Represents the result of evaluating a <see cref="QueryNode"/>.
         /// </summary>
-        private class SourceDocNameQueryNode : IQueryNode
+        private class QueryResult
         {
             /// <summary>
-            /// Specifies whether the query node should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
+            /// A query result as a <see langword="string"/> (as opposed to spatial).
             /// </summary>
-            protected bool _parameterize;
+            string _stringResult;
 
             /// <summary>
-            /// Initializes a new <see cref="SourceDocNameQueryNode"/> instance.
+            /// A query result with spatial information.
             /// </summary>
-            public SourceDocNameQueryNode()
-            {
-            }
+            SpatialString _spatialResult;
 
             /// <summary>
-            /// Gets or sets whether the query node should be should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
+            /// Initializes a new <see cref="QueryResult"/> instance.
             /// </summary>
-            /// <value><see langword="true"/> if the query's result should be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result should be used as literal text.</value>
-            /// <returns><see langword="true"/> if the query's result will be parameterized when
-            /// used as part of an <see cref="SqlQueryNode"/>, <see langword="false"/> if the
-            /// query's result will be used as literal text.</returns>
-            public bool Parameterize
-            {
-                get
-                {
-                    return _parameterize;
-                }
-
-                set
-                {
-                    _parameterize = value;
-                }
-            }
-
-            /// <summary>
-            /// Gets whether the query node is completely resolved (all required triggers have been
-            /// registered) and can be evaluated.
-            /// </summary>
-            /// <returns><see langword="true"/> if all triggers are registered and the query node can
-            /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
-            /// the query node can be evaluated.</returns>
-            public bool IsResolved
-            {
-                get
-                {
-                    return true;
-                }
-            }
-
-            /// <summary>
-            /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
-            /// </summary>
-            /// <param name="statusInfo">Not used by <see cref="SourceDocNameQueryNode"/>.</param>
-            /// <returns><see langword="false"/> since <see cref="SourceDocNameQueryNode"/>
-            /// instances do not support trigger attributes.</returns>
-            public bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
-            {
-                return false;
-            }
-
-            /// <summary>
-            /// Evaluates the query using the current source doc name.
-            /// </summary>
-            /// <returns>The current source doc name</returns>
-            public string Evaluate()
-            {
-                return AttributeStatusInfo.SourceDocName;
-            }
-        }
-
-        /// <summary>
-        /// An <see cref="IQueryNode"/> that is comprised of one or more child
-        /// <see cref="IQueryNode"/>s.
-        /// </summary>
-        private class ComplexQueryNode : IQueryNode
-        {
-            /// <summary>
-            /// The unparsed XML from which the query node has been loaded.
-            /// </summary>
-            protected string _query;
-
-            /// <summary>
-            /// Specifies whether the query node should be should be parameterized if it is used
-            /// in an <see cref="SqlQueryNode"/>.
-            /// </summary>
-            protected bool _parameterize = true;
-
-            /// <summary>
-            /// The AutoUpdateTrigger to which this query belongs.
-            /// </summary>
-            protected AutoUpdateTrigger _trigger;
-
-            /// <summary>
-            /// The RootQueryNode to which this query is a descendent.
-            /// </summary>
-            protected RootQueryNode _rootQuery;
-
-            /// <summary>
-            /// The child IQueryNodes of this query node.
-            /// </summary>
-            protected List<IQueryNode> _childNodes = new List<IQueryNode>();
-
-            /// <summary>
-            /// Initializes a new <see cref="ComplexQueryNode"/> instance.
-            /// </summary>
-            public ComplexQueryNode()
-            {
-            }
-
-            /// <summary>
-            /// Loads the <see cref="IQueryNode"/> using the specified XML query string.
-            /// </summary>
-            /// <param name="xmlNode">The XML query string defining the query.</param>
-            /// <param name="trigger">The <see cref="AutoUpdateTrigger"/> for which this query is used.
-            /// </param>
-            /// <param name="rootQuery">The <see cref="RootQueryNode"/> that is the root of this
+            /// <param name="stringResult">A <see langword="string"/> representing the result of a
             /// query.</param>
-            public virtual void LoadFromXml(XmlNode xmlNode, AutoUpdateTrigger trigger,
-                RootQueryNode rootQuery)
+            public QueryResult(string stringResult)
             {
-                _query = xmlNode.InnerXml;
-                _trigger = trigger;
-                _rootQuery = rootQuery;
+                _stringResult = stringResult ?? "";
+            }
 
-                // Parameterize unless the parameterize attribute is present and specifies not to.
-                XmlAttribute xmlAttribute = xmlNode.Attributes[_PARAMETERIZE_ATTRIBUTE];
-                if (xmlAttribute != null && xmlAttribute.Value == "0")
+            /// <summary>
+            /// Initializes a new <see cref="QueryResult"/> instance.
+            /// </summary>
+            /// <param name="spatialResult">A <see langword="SpatialString"/> representing the result
+            /// of a query.</param>
+            public QueryResult(SpatialString spatialResult)
+            {
+                try
                 {
-                    _parameterize = false;
-                }
-
-                // Iterate through each child of the current XML node and use each to initialize a
-                // new child IQueryNode.
-                foreach (XmlNode childNode in xmlNode.ChildNodes)
-                {
-                    // If the node is text, initialize a LiteralQueryNode node.
-                    if (childNode.NodeType == XmlNodeType.Text)
+                    if (spatialResult != null && spatialResult.HasSpatialInfo())
                     {
-                        _childNodes.Add(new LiteralQueryNode(childNode.InnerText));
+                        _spatialResult = spatialResult;
                     }
-                    // If the node is an element, initialize a new ComplexQueryNode.
-                    else if (childNode.NodeType == XmlNodeType.Element)
+                    else
                     {
-                        XmlElement childElement = ((XmlElement)childNode);
+                        _stringResult = (spatialResult != null) ? spatialResult.String : "";
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27060", ex);
+                }
+            }
 
-                        // Check for SourceDocName (which is not a ComplexQueryNode). 
-                        if (childElement.Name.Equals(_SOURCEDOCNAME_NODE, 
-                                StringComparison.OrdinalIgnoreCase))
+            /// <summary>
+            /// Gets whether the result contains spatial information.
+            /// </summary>
+            /// <returns><see langword="true"/> if the result contains spatial information;
+            /// <see langword="false"/> if it does not.</returns>
+            public bool IsSpatial
+            {
+                get
+                {
+                    try
+                    {
+                        return (_spatialResult != null &&
+                            _spatialResult.HasSpatialInfo());
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ExtractException.AsExtractException("ELI27059", ex);
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Gets the result of the query as a <see langword="string"/>.
+            /// </summary>
+            /// <returns>The result of the query as a <see langword="string"/>.</returns>
+            public string String
+            {
+                get
+                {
+                    if (_spatialResult != null)
+                    {
+                        return _spatialResult.String;
+                    }
+                    else
+                    {
+                        return _stringResult;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Gets the result of the query as a <see langword="SpatialString"/>.
+            /// <para><b>Require:</b></para>
+            /// <see cref="IsSpatial"/> must be <see langword="true"/>.
+            /// </summary>
+            /// <returns>The result of the query as a <see langword="SpatialString"/>.</returns>
+            public SpatialString SpatialString
+            {
+                get
+                {
+                    ExtractException.Assert("ELI27058",
+                        "Query result does not have any spatial info!", this.IsSpatial);
+
+                    return _spatialResult;
+                }
+            }
+
+            /// <summary>
+            /// Appends the specified <see cref="QueryResult"/> to the end of this query result
+            /// preserving any spatial info contained in accordance with the specified
+            /// <see cref="SpatialMode"/>.
+            /// </summary>
+            /// <param name="otherResult">The <see cref="QueryResult"/> to append to this result.
+            /// </param>
+            /// <param name="spatialMode">A <see cref="SpatialMode"/> indicating the fashion in
+            /// which spatial info should be persisted.</param>
+            public void Append(QueryResult otherResult, SpatialMode spatialMode)
+            {
+                // If this string is spatial, preserve
+                if (this.IsSpatial)
+                {
+                    // If the other result has spatial info that should be persisted.
+                    if (otherResult.IsSpatial && spatialMode != SpatialMode.None)
+                    {
+                        // If persisting only the spatial info of the other result, append the
+                        // strings, but then replace the text of the result with the original text
+                        // of this result.
+                        if (spatialMode == SpatialMode.Only)
                         {
-                            _childNodes.Add(new SourceDocNameQueryNode());
+                            _stringResult = this.String;
+
+                            _spatialResult.Append(otherResult.SpatialString);
+
+                            _spatialResult.ReplaceAndDowngradeToHybrid(_stringResult);
                         }
+                        // Otherwise, append the other result normally.
                         else
                         {
-                            ComplexQueryNode childQueryNode = null;
-
-                            // Create the element as an SQL node?
-                            if (childElement.Name.Equals(_SQL_NODE,
-                                    StringComparison.OrdinalIgnoreCase))
-                            {
-                                childQueryNode = new SqlQueryNode();
-                            }
-                            // Create the element as an Attribute node?
-                            else if (childElement.Name.Equals(_ATTRIBUTE_NODE,
-                                StringComparison.OrdinalIgnoreCase))
-                            {
-                                childQueryNode = new AttributeQueryNode();
-                            }
-
-                            ExtractException.Assert("ELI26726", "Failed parsing auto-update query!",
-                                childQueryNode != null);
-
-                            // Load the node.
-                            childQueryNode.LoadFromXml(childNode, _trigger, rootQuery);
-
-                            _childNodes.Add(childQueryNode);
+                            _spatialResult.Append(otherResult.SpatialString);
                         }
                     }
+                    // If the other result doesn't have any spatial info to persist, append its
+                    // string value.
+                    else
+                    {
+                        _spatialResult.AppendString(otherResult.String);
+                    }
+                }
+                // If this result doesn't have spatial info, but the other result does have spatial
+                // info to persist.
+                else if (otherResult.IsSpatial && spatialMode != SpatialMode.None)
+                {
+                    // Make sure _stringResult contains the current string value in case
+                    // _spatialString exists but is non-spatial.
+                    _stringResult = this.String;
+
+                    // Initialize this result's _spatialResult as a clone of the other result.
+                    ICopyableObject copySource = (ICopyableObject)otherResult.SpatialString;
+                    _spatialResult = (SpatialString)copySource.Clone();
+
+                    // If persisting only the spatial info of the other result, clear the text.
+                    if (_spatialResult.HasSpatialInfo() && spatialMode == SpatialMode.Only)
+                    {
+                        _spatialResult.ReplaceAndDowngradeToHybrid("");
+                    }
+                    
+                    // Insert the text of this result before any text from the other result.
+                    _spatialResult.InsertString(0, _stringResult);
+                }
+                // There is no spatial info to persist; simply append the other result's text.
+                else
+                {
+                    _stringResult = this.String + otherResult.String;
+                    
+                    // In case a spatial result existed but did not have spatial info to persist,
+                    // null it out now-- it is no longer needed.
+                    _spatialResult = null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Describes a node in an <see cref="AutoUpdateTrigger"/> query.
+        /// </summary>
+        abstract class QueryNode
+        {
+            /// <summary>
+            /// The unparsed XML text that defines the query.
+            /// </summary>
+            protected string _query;
+
+            /// <summary>
+            /// Specifies whether the query node should be parameterized if it is used
+            /// in an <see cref="SqlQueryNode"/>.
+            /// </summary>
+            bool _parameterize;
+
+            /// <summary>
+            /// Specifies the way in which spatial information will be persisted from this
+            /// <see cref="QueryNode"/>.
+            /// </summary>
+            SpatialMode _spatialMode = SpatialMode.Normal;
+
+            /// <summary>
+            /// Specifies whether this <see cref="QueryNode"/> is required to execute the query.
+            /// </summary>
+            bool _required = true;
 
             /// <summary>
             /// Gets or sets whether the query node should be should be parameterized if it is used
@@ -382,19 +281,348 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
+            /// Gets or sets the way in which spatial information will be persisted from this
+            /// <see cref="QueryNode"/>.
+            /// </summary>
+            /// <value>A <see cref="SpatialMode"/> specifying the way in which spatial information
+            /// will be persisted.</value>
+            /// <returns>A <see cref="SpatialMode"/> specifying the way in which spatial information
+            /// is persisted </returns>
+            public SpatialMode SpatialMode
+            {
+                get
+                {
+                    return _spatialMode;
+                }
+
+                set
+                {
+                    _spatialMode = value;
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets whether this <see cref="QueryNode"/> is required to execute the query.
+            /// </summary>
+            /// <value><see langword="true"/> if this node must be resolved to execute the query or
+            /// <see langword="false"/> if this node can be evaluated when unresolved (and return an
+            /// empty result.</value>
+            /// <returns><see langword="true"/> if this node must be resolved to execute the query
+            /// or <see langword="false"/> if this node can be evaluated when unresolved (and return an
+            /// empty result.</returns>
+            public virtual bool Required
+            {
+                get
+                {
+                    return _required;
+                }
+
+                set
+                {
+                    _required = value;
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> if all required triggers are registered and the
+            /// query node can be evaluated, <see langword="false"/> if one or more triggers must
+            /// be resolved before the query node can be evaluated.</returns>
+            public abstract bool IsMinimallyResolved
+            {
+                get;
+            }
+
+            /// <summary>
+            /// Gets whether the query node is completely resolved and there no more triggers that
+            /// need to be registered.
+            /// </summary>
+            /// <returns><see langword="true"/> if all triggers are registered,
+            /// <see langword="false"/> if one or more triggers are yet be resolved.</returns>
+            public abstract bool IsFullyResolved
+            {
+                get;
+            }
+
+            /// <summary>
+            /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
+            /// </summary>
+            /// <param name="statusInfo">If <see langword="null"/> the <see cref="QueryNode"/> will
+            /// attempt to resolve all unresolved triggers. If specified, the corresponding
+            /// query node will attempt to register the corresponding <see cref="IAttribute"/> with
+            /// all unresolved nodes.</param>
+            /// <returns><see langword="false"/> unless overriden.</returns>
+            public virtual bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
+            {
+                return false;
+            }
+
+            /// <summary>
+            /// Evaluates the query.
+            /// </summary>
+            /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+            public abstract QueryResult Evaluate();
+        }
+
+        /// <summary>
+        /// A <see cref="QueryNode"/> consisting of un-interpreted, literal text.
+        /// </summary>
+        private class LiteralQueryNode : QueryNode
+        {
+            /// <summary>
+            /// Initializes a new <see cref="LiteralQueryNode"/> instance.
+            /// </summary>
+            /// <param name="query">The literal text to be returned during evaluation.</param>
+            public LiteralQueryNode(string query)
+            {
+                _query = query;
+            }
+
+            /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since a literal query is always resolved.</returns>
+            public override bool IsMinimallyResolved
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query node is completely resolved (all required triggers have been
+            /// registered) and can be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since a literal query is always resolved.</returns>
+            public override bool IsFullyResolved
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Evaluates the query.
+            /// </summary>
+            /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+            public override QueryResult Evaluate()
+            {
+                ExtractException.Assert("ELI26753", "Cannot evaluate un-resolved query!",
+                    this.IsMinimallyResolved);
+
+                return new QueryResult(_query);
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="QueryNode"/> to be resolved using the current source doc name.
+        /// </summary>
+        private class SourceDocNameQueryNode : QueryNode
+        {
+            /// <summary>
+            /// Initializes a new <see cref="SourceDocNameQueryNode"/> instance.
+            /// </summary>
+            public SourceDocNameQueryNode()
+            {
+            }
+
+            /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since a SourceDoc query is always resolved.</returns>
+            public override bool IsMinimallyResolved
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query node is completely resolved (all required triggers have been
+            /// registered) and can be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since a SourceDoc query is always resolved.</returns>
+            public override bool IsFullyResolved
+            {
+                get
+                {
+                    return true;
+                }
+            }
+
+            /// <summary>
+            /// Evaluates the query using the current source doc name.
+            /// </summary>
+            /// <returns>The current source doc name</returns>
+            public override QueryResult Evaluate()
+            {
+                return new QueryResult(AttributeStatusInfo.SourceDocName);
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="QueryNode"/> that is comprised of one or more child
+        /// <see cref="QueryNode"/>s.
+        /// </summary>
+        private class ComplexQueryNode : QueryNode
+        {
+            /// <summary>
+            /// The AutoUpdateTrigger to which this query belongs.
+            /// </summary>
+            protected AutoUpdateTrigger _trigger;
+
+            /// <summary>
+            /// The RootQueryNode to which this query is a descendent.
+            /// </summary>
+            protected RootQueryNode _rootQuery;
+
+            /// <summary>
+            /// The child QueryNodes of this query node.
+            /// </summary>
+            protected List<QueryNode> _childNodes = new List<QueryNode>();
+
+            /// <summary>
+            /// Initializes a new <see cref="ComplexQueryNode"/> instance.
+            /// </summary>
+            public ComplexQueryNode()
+            {
+                base.Parameterize = true;
+            }
+
+            /// <summary>
+            /// Loads the <see cref="QueryNode"/> using the specified XML query string.
+            /// </summary>
+            /// <param name="xmlNode">The XML query string defining the query.</param>
+            /// <param name="trigger">The <see cref="AutoUpdateTrigger"/> for which this query is used.
+            /// </param>
+            /// <param name="rootQuery">The <see cref="RootQueryNode"/> that is the root of this
+            /// query.</param>
+            public virtual void LoadFromXml(XmlNode xmlNode, AutoUpdateTrigger trigger,
+                RootQueryNode rootQuery)
+            {
+                _query = xmlNode.InnerXml;
+                _trigger = trigger;
+                _rootQuery = rootQuery;
+
+                // Parameterize unless the parameterize attribute is present and specifies not to.
+                XmlAttribute xmlAttribute = xmlNode.Attributes["Parameterize"];
+                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                {
+                    base.Parameterize = false;
+                }
+
+                xmlAttribute = xmlNode.Attributes["SpatialMode"];
+                if (xmlAttribute != null)
+                {
+                    if (xmlAttribute.Value.Equals("Force", StringComparison.OrdinalIgnoreCase))
+                    {
+                        base.SpatialMode = SpatialMode.Force;
+                    }
+                    else if (xmlAttribute.Value.Equals("Only", StringComparison.OrdinalIgnoreCase))
+                    {
+                        base.SpatialMode = SpatialMode.Only;
+                    }
+                    else if (xmlAttribute.Value.Equals("None", StringComparison.OrdinalIgnoreCase))
+                    {
+                        base.SpatialMode = SpatialMode.None;
+                    }
+                }
+
+                xmlAttribute = xmlNode.Attributes["Required"];
+                if (xmlAttribute != null && xmlAttribute.Value == "0")
+                {
+                    base.Required = false;
+                }
+
+                // Iterate through each child of the current XML node and use each to initialize a
+                // new child QueryNode.
+                foreach (XmlNode childNode in xmlNode.ChildNodes)
+                {
+                    // If the node is text, initialize a LiteralQueryNode node.
+                    if (childNode.NodeType == XmlNodeType.Text)
+                    {
+                        _childNodes.Add(new LiteralQueryNode(childNode.InnerText));
+                    }
+                    // If the node is an element, initialize a new ComplexQueryNode.
+                    else if (childNode.NodeType == XmlNodeType.Element)
+                    {
+                        XmlElement childElement = ((XmlElement)childNode);
+
+                        // Check for SourceDocName (which is not a ComplexQueryNode). 
+                        if (childElement.Name.Equals("SourceDocName", 
+                                StringComparison.OrdinalIgnoreCase))
+                        {
+                            _childNodes.Add(new SourceDocNameQueryNode());
+                        }
+                        else
+                        {
+                            ComplexQueryNode childQueryNode = null;
+
+                            // Create the element as an SQL node?
+                            if (childElement.Name.Equals("SQL",
+                                    StringComparison.OrdinalIgnoreCase))
+                            {
+                                childQueryNode = new SqlQueryNode();
+                            }
+                            // Create the element as an Attribute node?
+                            else if (childElement.Name.Equals("Attribute",
+                                StringComparison.OrdinalIgnoreCase))
+                            {
+                                childQueryNode = new AttributeQueryNode();
+                            }
+
+                            ExtractException.Assert("ELI26726", "Failed parsing auto-update query!",
+                                childQueryNode != null);
+
+                            // Load the node.
+                            childQueryNode.LoadFromXml(childNode, _trigger, rootQuery);
+
+                            _childNodes.Add(childQueryNode);
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> if all required triggers are registered and the
+            /// query node can be evaluated, <see langword="false"/> if one or more triggers must
+            /// be resolved before the query node can be evaluated.</returns>
+            public override bool IsMinimallyResolved
+            {
+                get
+                {
+                    foreach (QueryNode childNode in _childNodes)
+                    {
+                        if (!childNode.IsMinimallyResolved)
+                        {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+
+            /// <summary>
             /// Gets whether the query node is completely resolved (all required triggers have been
             /// registered) and can be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> if all triggers are registered and the query node can
             /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
             /// the query node can be evaluated.</returns>
-            public virtual bool IsResolved
+            public override bool IsFullyResolved
             {
                 get
                 {
-                    foreach (IQueryNode childNode in _childNodes)
+                    foreach (QueryNode childNode in _childNodes)
                     {
-                        if (!childNode.IsResolved)
+                        if (!childNode.IsFullyResolved)
                         {
                             return false;
                         }
@@ -407,20 +635,20 @@ namespace Extract.DataEntry
             /// <summary>
             /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
             /// </summary>
-            /// <param name="statusInfo">If <see langword="null"/> the <see cref="IQueryNode"/> will
+            /// <param name="statusInfo">If <see langword="null"/> the <see cref="QueryNode"/> will
             /// attempt to resolve all unresolved triggers. If specified, the corresponding
             /// query node will attempt to register the corresponding <see cref="IAttribute"/> with
             /// all unresolved nodes.</param>
-            /// <returns><see langword="true"/> if one or more <see cref="IQueryNode"/>s were
+            /// <returns><see langword="true"/> if one or more <see cref="QueryNode"/>s were
             /// resolved; <see langword="false"/> otherwise.</returns>
-            public virtual bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
+            public override bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
             {
                 bool resolved = false;
 
-                // If this query isn't resolved, attempt to register all child query nodes.
-                if (!this.IsResolved)
+                // If this query isn't fully resolved, attempt to register all child query nodes.
+                if (!this.IsFullyResolved)
                 {
-                    foreach (IQueryNode childNode in _childNodes)
+                    foreach (QueryNode childNode in _childNodes)
                     {
                         if (childNode.RegisterTriggerCandidate(statusInfo))
                         {
@@ -433,22 +661,22 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Evaluates the query by combining all child <see cref="IQueryNode"/>s.
+            /// Evaluates the query by combining all child <see cref="QueryNode"/>s.
             /// </summary>
             /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-            public virtual string Evaluate()
+            public override QueryResult Evaluate()
             {
                 try
                 {
-                    StringBuilder result = new StringBuilder();
+                    QueryResult result = new QueryResult("");
 
                     // Combine the results of all child nodes.
-                    foreach (IQueryNode childNode in _childNodes)
+                    foreach (QueryNode childNode in _childNodes)
                     {
-                        result.Append(childNode.Evaluate());
+                        result.Append(childNode.Evaluate(), childNode.SpatialMode);
                     }
 
-                    return result.ToString();
+                    return result;
                 }
                 catch (Exception ex)
                 {
@@ -461,7 +689,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="IQueryNode"/> that is to be resolved using an SQL query against the active
+        /// A <see cref="QueryNode"/> that is to be resolved using an SQL query against the active
         /// database.
         /// </summary>
         private class SqlQueryNode : ComplexQueryNode
@@ -476,15 +704,15 @@ namespace Extract.DataEntry
 
             /// <summary>
             /// Evaluates the query by using the combined result of all child
-            /// <see cref="IQueryNode"/>s as an SQL query against the active database.
+            /// <see cref="QueryNode"/>s as an SQL query against the active database.
             /// </summary>
-            /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-            public override string Evaluate()
+            /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+            public override QueryResult Evaluate()
             {
                 try
                 {
                     ExtractException.Assert("ELI26754", "Cannot evaluate un-resolved query!",
-                        this.IsResolved);
+                        this.IsMinimallyResolved);
 
                     StringBuilder sqlQuery = new StringBuilder();
 
@@ -494,25 +722,47 @@ namespace Extract.DataEntry
                         "Auto-update queries currently support only SQL compact databases",
                         sqlCeConnection != null);
 
+                    // Keep track of the combined spatial result for all child nodes which have a
+                    // spatial mode of "Force".
+                    SpatialString spatialResult = null;
+
                     // Child query nodes whose results have been parameterized.
                     Dictionary<string, string> parameters = new Dictionary<string, string>();
 
                     // Combine the result of all child queries parameterizing as necessary.
-                    foreach (IQueryNode childNode in _childNodes)
+                    foreach (QueryNode childNode in _childNodes)
                     {
+                        QueryResult childQueryResult = childNode.Evaluate();
+
+                        // If the current child has a spatial mode of "Force", store its spatial
+                        // info so it can be applied to the query result later.
+                        if (childQueryResult.IsSpatial && childNode.SpatialMode == SpatialMode.Force)
+                        {
+                            if (spatialResult == null)
+                            {
+                                ICopyableObject copySource =
+                                    (ICopyableObject)childQueryResult.SpatialString;
+                                spatialResult = (SpatialString)copySource.Clone();
+                            }
+                            else
+                            {
+                                spatialResult.Append(childQueryResult.SpatialString);
+                            }
+                        }
+
                         if (childNode.Parameterize)
                         {
                             // If parameterizing, don't add the query result directly, rather add a
                             // parameter name to the query and add the key/value pair to parameters.
                             string key = "@" + parameters.Count.ToString(CultureInfo.InvariantCulture);
-                            string value = childNode.Evaluate();
+                            string value = childQueryResult.String;
 
                             parameters[key] = value;
                             sqlQuery.Append(key);
                         }
                         else
                         {
-                            sqlQuery.Append(childNode.Evaluate());
+                            sqlQuery.Append(childQueryResult.String);
                         }
                     }
 
@@ -520,8 +770,22 @@ namespace Extract.DataEntry
                     using (DbCommand dbCommand = DataEntryMethods.CreateDBCommand(
                         sqlCeConnection, sqlQuery.ToString(), parameters))
                     {
-                        return DataEntryMethods.ExecuteDBQuery(dbCommand,
+                        // Execute the query.
+                        string queryResult = DataEntryMethods.ExecuteDBQuery(dbCommand,
                             (_trigger._validationTrigger ? "\r\n" : null), ", ");
+
+                        // Apply the spatial infomation of child nodes with "Force" spatial mode if
+                        // necessary.
+                        if (spatialResult != null && spatialResult.HasSpatialInfo())
+                        {
+                            spatialResult.ReplaceAndDowngradeToHybrid(queryResult);
+                            return new QueryResult(spatialResult);
+                        }
+                        // Otherwise, just return the text value.
+                        else
+                        {
+                            return new QueryResult(queryResult);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -535,7 +799,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="IQueryNode"/> that is to be resolved using the value of an
+        /// A <see cref="QueryNode"/> that is to be resolved using the value of an
         /// <see cref="IAttribute"/>. Changes made to this <see cref="IAttribute"/> will cause the
         /// target attribute to be updated.
         /// </summary>
@@ -584,39 +848,70 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> if all required triggers are registered and the
+            /// query node can be evaluated, <see langword="false"/> if one or more triggers must
+            /// be resolved before the query node can be evaluated.</returns>
+            public override bool IsMinimallyResolved
+            {
+                get
+                {
+                    // If a triggerAttribute was previously registered, but the query used to
+                    // register it is no longer resolved, unregister the trigger attribute.
+                    if (!base.IsMinimallyResolved && _triggerAttribute != null)
+                    {
+                        UnregisterTriggerAttribute();
+                    }
+
+                    // The node is minimally resolved if the base is as well and this node either
+                    // has a registered attribute or is marked as not required.
+                    return base.IsMinimallyResolved && (!base.Required || _triggerAttribute != null);
+                }
+            }
+
+            /// <summary>
             /// Gets whether the query node is completely resolved (all required triggers have been
             /// registered) and can be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> if all triggers are registered and the query node can
             /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
             /// the query node can be evaluated.</returns>
-            public override bool IsResolved
+            public override bool IsFullyResolved
             {
                 get
                 {
                     // If a triggerAttribute was previously registered, but the query used to
                     // register it is no longer resolved, unregister the trigger attribute.
-                    if (!base.IsResolved && _triggerAttribute != null)
+                    if (!base.IsFullyResolved && _triggerAttribute != null)
                     {
                         UnregisterTriggerAttribute();
                     }
 
-                    return base.IsResolved && _triggerAttribute != null;
+                    return base.IsFullyResolved && _triggerAttribute != null;
                 }
             }
 
             /// <summary>
             /// Evaluates the query by using the value of the specified <see cref="IAttribute"/>.
             /// </summary>
-            /// <returns>A <see langword="string"/> representing the result of the query.</returns>
-            public override string Evaluate()
+            /// <returns>A <see cref="QueryResult"/> representing the result of the query.</returns>
+            public override QueryResult Evaluate()
             {
                 try
                 {
                     ExtractException.Assert("ELI26757", "Cannot evaluate un-resolved query!",
-                        this.IsResolved);
+                        this.IsMinimallyResolved);
 
-                    return _triggerAttribute.Value.String;
+                    if (_triggerAttribute != null)
+                    {
+                        return new QueryResult(_triggerAttribute.Value);
+                    }
+                    else
+                    {
+                        // In case the node is not required and not resolved.
+                        return new QueryResult("");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -630,11 +925,11 @@ namespace Extract.DataEntry
             /// <summary>
             /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
             /// </summary>
-            /// <param name="statusInfo">If <see langword="null"/> the <see cref="IQueryNode"/> will
+            /// <param name="statusInfo">If <see langword="null"/> the <see cref="QueryNode"/> will
             /// attempt to resolve all unresolved triggers. If specified, the corresponding
             /// query node will attempt to register the corresponding <see cref="IAttribute"/> with
             /// all unresolved nodes.</param>
-            /// <returns><see langword="true"/> if one or more <see cref="IQueryNode"/>s were
+            /// <returns><see langword="true"/> if one or more <see cref="QueryNode"/>s were
             /// resolved; <see langword="false"/> otherwise.</returns>
             public override bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
             {
@@ -642,12 +937,12 @@ namespace Extract.DataEntry
                 bool resolved = base.RegisterTriggerCandidate(statusInfo);
 
                 // If all child nodes are resolved, but this node is not, attempt to resolve it.
-                if (!this.IsResolved && base.IsResolved)
+                if (!this.IsFullyResolved && base.IsMinimallyResolved)
                 {
                     if (string.IsNullOrEmpty(_attributeValueFullPath))
                     {
                         _attributeValueFullPath = AttributeStatusInfo.GetFullPath(
-                            _trigger._rootPath, base.Evaluate());
+                            _trigger._rootPath, base.Evaluate().String);
                     }
 
                     // Test to see that if an attribute was supplied, its path matches the path
@@ -656,7 +951,7 @@ namespace Extract.DataEntry
                     {
                         // Search for candidate triggers.
                         IUnknownVector candidateTriggers = AttributeStatusInfo.ResolveAttributeQuery(
-                                            _trigger._targetAttribute, base.Evaluate());
+                                            _trigger._targetAttribute, base.Evaluate().String);
 
                         int candidateCount = candidateTriggers.Size();
 
@@ -740,7 +1035,7 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// An <see cref="IQueryNode"/> that is to represent the root level of a query for a
+        /// A <see cref="QueryNode"/> that is to represent the root level of a query for a
         /// <see cref="AutoUpdateTrigger"/>.
         /// </summary>
         private class RootQueryNode : ComplexQueryNode, IDisposable
@@ -767,10 +1062,10 @@ namespace Extract.DataEntry
                 try
                 {
                     // Ensure the query is resolved.
-                    if (base.IsResolved)
+                    if (base.IsMinimallyResolved)
                     {
                         // If so, evaluate it.
-                        string queryResult = base.Evaluate();
+                        QueryResult queryResult = base.Evaluate();
 
                         // Use the results to update the target attribute's validation list if the
                         // AutoUpdateTrigger is a validation trigger.
@@ -785,7 +1080,7 @@ namespace Extract.DataEntry
                                 validator != null);
 
                             // Parse the file contents into individual list items.
-                            string[] listItems = queryResult.ToString().Split(
+                            string[] listItems = queryResult.String.Split(
                                 new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
                             validator.SetValidationListValues(listItems);
@@ -796,11 +1091,19 @@ namespace Extract.DataEntry
                         // Otherwise, update the value of the attribute itself.
                         else
                         {
-                            if (!string.IsNullOrEmpty(queryResult))
+                            if (!string.IsNullOrEmpty(queryResult.String) || queryResult.IsSpatial)
                             {
                                 // Update the attribute's value.
-                                AttributeStatusInfo.SetValue(_trigger._targetAttribute, queryResult,
-                                    false, true);
+                                if (queryResult.IsSpatial)
+                                {
+                                    AttributeStatusInfo.SetValue(_trigger._targetAttribute,
+                                        queryResult.SpatialString, false, true);
+                                }
+                                else
+                                {
+                                    AttributeStatusInfo.SetValue(_trigger._targetAttribute,
+                                        queryResult.String, false, true);
+                                }
 
                                 // After applying the value, direct the control that contains it to
                                 // refresh the value.

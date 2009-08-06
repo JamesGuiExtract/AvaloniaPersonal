@@ -1,3 +1,4 @@
+using Extract.DataEntry;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,6 +52,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The value to indicate the initial splitter position of the DataEntryApplication.
         /// </summary>
         static readonly string _SPLITTER_POSITION = "SplitterPostion";
+
+        /// <summary>
+        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
+        /// </summary>
+        static readonly string _AUTO_ZOOM_MODE = "AutoZoomMode";
+
+        /// <summary>
+        /// The page space (context) that should be shown around a selected object.
+        /// </summary>
+        static readonly string _AUTO_ZOOM_CONTEXT = "AutoZoomContext";
 
         #endregion RegistryManager Keys
 
@@ -209,6 +220,69 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI25074", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
+        /// </summary>
+        public static AutoZoomMode AutoZoomMode
+        {
+            get
+            {
+                try
+                {
+                    return (AutoZoomMode)_userDataEntrySubKey.GetValue(_AUTO_ZOOM_MODE,
+                        (int)AutoZoomMode.ZoomOutIfNecessary);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27027", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    _userDataEntrySubKey.SetValue(_AUTO_ZOOM_MODE, (int)value);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27029", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// The page space (context) that should be shown around a selected object.
+        /// </summary>
+        public static double AutoZoomContext
+        {
+            get
+            {
+                try
+                {
+                    object value = _userDataEntrySubKey.GetValue(_AUTO_ZOOM_CONTEXT, "0.5");
+                    return System.Convert.ToDouble(value, CultureInfo.CurrentCulture);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27030", ex);
+                }
+            }
+
+            set
+            {
+                try
+                {
+                    string stringValue = System.Convert.ToString(value, CultureInfo.CurrentCulture);
+                    _userDataEntrySubKey.SetValue(_AUTO_ZOOM_CONTEXT, stringValue);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27031", ex);
                 }
             }
         }

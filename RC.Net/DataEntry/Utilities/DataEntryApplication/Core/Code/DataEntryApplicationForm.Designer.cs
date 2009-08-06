@@ -93,6 +93,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._userActionToolStripStatusLabel = new Extract.Imaging.Forms.UserActionToolStripStatusLabel();
             this._resolutionToolStripStatusLabel = new Extract.Imaging.Forms.ResolutionToolStripStatusLabel();
             this._mousePositionToolStripStatusLabel = new Extract.Imaging.Forms.MousePositionToolStripStatusLabel();
+            this._toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this._optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._splitContainer.Panel1.SuspendLayout();
             this._splitContainer.Panel2.SuspendLayout();
             this._splitContainer.SuspendLayout();
@@ -549,7 +551,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._panToolStripMenuItem,
             this._selectLayerObjectMenuItem,
             this._angularHighlightToolStripMenuItem,
-            this._rectangularHighlightToolStripMenuItem});
+            this._rectangularHighlightToolStripMenuItem,
+            this._toolStripSeparator8,
+            this._optionsToolStripMenuItem});
             this._toolsToolStripMenuItem.Name = "_toolsToolStripMenuItem";
             this._toolsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this._toolsToolStripMenuItem.Text = "&Tools";
@@ -616,13 +620,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _appHelpMenuItem
             // 
             this._appHelpMenuItem.Name = "_appHelpMenuItem";
-            this._appHelpMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._appHelpMenuItem.Size = new System.Drawing.Size(114, 22);
             this._appHelpMenuItem.Text = "&Help";
             // 
             // _aboutMenuItem
             // 
             this._aboutMenuItem.Name = "_aboutMenuItem";
-            this._aboutMenuItem.Size = new System.Drawing.Size(152, 22);
+            this._aboutMenuItem.Size = new System.Drawing.Size(114, 22);
             this._aboutMenuItem.Text = "&About";
             // 
             // _fileCommandsToolStrip
@@ -882,6 +886,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._mousePositionToolStripStatusLabel.Size = new System.Drawing.Size(175, 17);
             this._mousePositionToolStripStatusLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // _toolStripSeparator8
+            // 
+            this._toolStripSeparator8.Name = "_toolStripSeparator8";
+            this._toolStripSeparator8.Size = new System.Drawing.Size(228, 6);
+            // 
+            // _optionsToolStripMenuItem
+            // 
+            this._optionsToolStripMenuItem.Name = "_optionsToolStripMenuItem";
+            this._optionsToolStripMenuItem.Size = new System.Drawing.Size(231, 22);
+            this._optionsToolStripMenuItem.Text = "&Options...";
+            // 
             // DataEntryApplicationForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -995,6 +1010,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _appHelpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutMenuItem;
+        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator8;
+        private System.Windows.Forms.ToolStripMenuItem _optionsToolStripMenuItem;
     }
 }
 

@@ -1233,21 +1233,74 @@ namespace Extract.Imaging.Forms
         /// added to account for link arrows.</returns>
         private Rectangle PadViewingRectangle(Rectangle viewRectangle)
         {
-            // Get padding values (want to try to make room for link arrows)
-            int xPadding = 
-                (viewRectangle.Location.X > _ZOOM_TO_OBJECT_WIDTH_PADDING
-                && viewRectangle.Right < (this.ImageWidth - _ZOOM_TO_OBJECT_WIDTH_PADDING))
-                ? _ZOOM_TO_OBJECT_WIDTH_PADDING : 0;
-            int yPadding =
-                (viewRectangle.Location.Y > _ZOOM_TO_OBJECT_HEIGHT_PADDING
-                && viewRectangle.Bottom < (this.ImageHeight - _ZOOM_TO_OBJECT_HEIGHT_PADDING))
-                ? _ZOOM_TO_OBJECT_HEIGHT_PADDING : 0;
+            return PadViewingRectangle(viewRectangle, _ZOOM_TO_OBJECT_WIDTH_PADDING,
+                _ZOOM_TO_OBJECT_HEIGHT_PADDING, false);
+        }
 
-            // Adjust rectangle by the padding values
-            viewRectangle.Inflate(xPadding * 2, yPadding * 2);
-            viewRectangle.Location.Offset((-1) * xPadding, (-1) * yPadding);
+        /// <summary>
+        /// Will return a new rectangle that has been inflated in each direction by
+        /// the specified amount while keeping the rectangle on-page.
+        /// </summary>
+        /// <param name="viewRectangle">The <see cref="Rectangle"/> to enlarge.</param>
+        /// <param name="horizontalPadding">The amount to expand the left and right sides.</param>
+        /// <param name="verticalPadding">The amount to expand the top and bottom sides.</param>
+        /// <param name="transferPaddingIfOffPage">If <see langword="true"/>, if applying the
+        /// padding to any side would cause the rectangle to extend offpage, the padding that
+        /// cannot be applied will be applied to the opposite side instead. If
+        /// <see langword="false"/>, the padding will be discarded resulting in a truncated
+        /// rectangle.</param>
+        /// <returns>A padded version of the specified rectangle.</returns>
+        public Rectangle PadViewingRectangle(Rectangle viewRectangle, int horizontalPadding,
+            int verticalPadding, bool transferPaddingIfOffPage)
+        {
+            try
+            {
+                // Apply the specified padding to all sides.
+                int left = viewRectangle.Left - horizontalPadding;
+                int top = viewRectangle.Top - verticalPadding;
+                int right = viewRectangle.Right + horizontalPadding;
+                int bottom = viewRectangle.Bottom + verticalPadding;
 
-            return viewRectangle;
+                // If transferring padding, look for offpage coordinates.
+                if (transferPaddingIfOffPage)
+                {
+                    // If offpage left, transfer the excess padding to the right side.
+                    if (left < 0)
+                    {
+                        right -= left;
+                        left = 0;
+                    }
+                    // If offpage right, transfer the excess padding to the left side.
+                    else if (right >= this.ImageWidth)
+                    {
+                        left -= (right - this.ImageWidth);
+                        right = this.ImageWidth - 1;
+                    }
+
+                    // If offpage top, transfer the excess padding to the bottom side.
+                    if (top < 0)
+                    {
+                        bottom -= top;
+                        top = 0;
+                    }
+                    // If offpage bottom, transfer the excess padding to the top side.
+                    else if (bottom >= this.ImageHeight)
+                    {
+                        top -= (bottom - this.ImageHeight);
+                        bottom = this.ImageHeight - 1;
+                    }
+                }
+
+                // Create the padded rectangle then lop off any portion that extends offpage.
+                Rectangle paddedRectangle = Rectangle.FromLTRB(left, top, right, bottom);
+                paddedRectangle.Intersect(new Rectangle(0, 0, this.ImageWidth, this.ImageHeight));
+
+                return paddedRectangle;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27035", ex);
+            }
         }
 
         /// <summary>
@@ -2443,33 +2496,40 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">No image is open.</exception>
         /// <event cref="ZoomChanged"><paramref name="raiseZoomChanged"/> was 
         /// <see langword="true"/>.</event>
-        private void ZoomToRectangle(Rectangle rc, bool updateZoomHistory, bool raiseZoomChanged,
+        public void ZoomToRectangle(Rectangle rc, bool updateZoomHistory, bool raiseZoomChanged,
             bool updateFitMode)
         {
-            // Ensure an image is open
-            ExtractException.Assert("ELI21455", "No image is open.", base.Image != null);
-
-            // Suspend paint event until after zoom has changed
-            base.BeginUpdate();
             try
             {
-                // Change the fit mode if it is not fit mode none
-                if (updateFitMode && _fitMode != FitMode.None)
+                // Ensure an image is open
+                ExtractException.Assert("ELI21455", "No image is open.", base.Image != null);
+
+                // Suspend paint event until after zoom has changed
+                base.BeginUpdate();
+                try
                 {
-                    // Set the fit mode to none without updating the zoom
-                    SetFitMode(FitMode.None, false, false);
+                    // Change the fit mode if it is not fit mode none
+                    if (updateFitMode && _fitMode != FitMode.None)
+                    {
+                        // Set the fit mode to none without updating the zoom
+                        SetFitMode(FitMode.None, false, false);
+                    }
+
+                    // Zoom to the specified rectangle
+                    base.ZoomToRectangle(rc);
+                }
+                finally
+                {
+                    base.EndUpdate();
                 }
 
-                // Zoom to the specified rectangle
-                base.ZoomToRectangle(rc);
+                // Update the zoom if necessary
+                UpdateZoom(updateZoomHistory, raiseZoomChanged);
             }
-            finally
+            catch (Exception ex)
             {
-                base.EndUpdate();
+                throw ExtractException.AsExtractException("ELI27034", ex);
             }
-
-            // Update the zoom if necessary
-            UpdateZoom(updateZoomHistory, raiseZoomChanged);
         }
 
         /// <summary>

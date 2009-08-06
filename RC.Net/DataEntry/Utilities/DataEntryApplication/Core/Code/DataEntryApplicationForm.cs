@@ -174,6 +174,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         DbConnection _dbConnection;
 
+        /// <summary>
+        /// The user-specified settings for the data entry application.
+        /// </summary>
+        UserPreferences _userPreferences;
+
+        /// <summary>
+        /// The dialog for setting user preferences.
+        /// </summary>
+        PropertyPageForm _userPreferencesDialog;
+
         #endregion Fields
 
         #region Constructors
@@ -203,6 +213,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 
                 InitializeComponent();
 
+                // Read the user preferences object from the registry
+                _userPreferences = UserPreferences.FromRegistry();
+
                 // Need to set _openFileToolStripButton by searching for it.
                 foreach (ToolStripItem item in _fileCommandsToolStrip.Items)
                 {
@@ -226,6 +239,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     this.DataEntryControlHost.DatabaseConnection = _dbConnection;
                 }
+
+                this.DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
+                this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
 
                 _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &Help...";
                 _aboutMenuItem.Text = "&About " + this.DataEntryControlHost.ApplicationTitle + "...";
@@ -602,6 +618,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _splitContainer.SplitterMoved += HandleSplitterMoved;
                 _aboutMenuItem.Click += HandleAboutMenuItemClick;
                 _appHelpMenuItem.Click += HandleHelpMenuItemClick;
+                _optionsToolStripMenuItem.Click += HandleOptionsMenuItemClick;
 
                 // [DataEntry:195] Open the form with the position and size set per the registry 
                 // settings. Do this regardless of whether the window will be maximized so that it
@@ -1330,6 +1347,48 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ExtractException.Display("ELI26957", ex);
             }
         }
+
+        /// <summary>
+        /// Handles the case that the user selected the Tools | Options menu item.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The event data associated with the event.</param>
+        void HandleOptionsMenuItemClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // Create the preferences dialog if not already created
+                if (_userPreferencesDialog == null)
+                {
+                    _userPreferencesDialog = new PropertyPageForm("Options",
+                        (IPropertyPage)_userPreferences.PropertyPage);
+                    // TODO: Use icon from the _dataEntryControlHost.
+//                    _userPreferencesDialog.Icon =
+//                        ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+                }
+
+                // Display the dialog
+                DialogResult result = _userPreferencesDialog.ShowDialog();
+                if (result == DialogResult.OK)
+                {
+                    // If the user applied settings, store them to the registry and update the
+                    // dataEntryControlHost's settings.
+                    _userPreferences.WriteToRegistry();
+
+                    this.DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
+                    this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
+                }
+                else
+                {
+                    _userPreferences.ReadFromRegistry();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI27020", ex);
+            }
+        }
+
 
         #endregion Event Handlers
 

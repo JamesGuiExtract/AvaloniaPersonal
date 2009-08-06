@@ -1208,7 +1208,7 @@ namespace Extract.DataEntry
 
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
-                    if (!autoUpdateTrigger.IsResolved)
+                    if (!autoUpdateTrigger.IsFullyResolved)
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for RegisterTriggerCandidate to work. When creating a new
@@ -1259,7 +1259,7 @@ namespace Extract.DataEntry
 
                 foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
                 {
-                    if (!validationTrigger.IsResolved)
+                    if (!validationTrigger.IsFullyResolved)
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for RegisterTriggerCandidate to work. When creating a new

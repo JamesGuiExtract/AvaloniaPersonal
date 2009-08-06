@@ -150,12 +150,12 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns><see langword="true"/> if the query is completely resolved, <see langword="false"/>
         /// there are still trigger attributes that need to be registered..</returns>
-        public bool IsResolved
+        public bool IsFullyResolved
         {
             get
             {
                 // Check to see if the default query has been resolved (if one was specifed).
-                if (_defaultQuery != null && !_defaultQuery.IsResolved)
+                if (_defaultQuery != null && !_defaultQuery.IsFullyResolved)
                 {
                     return false;
                 }
@@ -163,7 +163,7 @@ namespace Extract.DataEntry
                 // Check to see if any query in the queries list has not yet been resolved.
                 foreach (RootQueryNode query in _queries)
                 {
-                    if (!query.IsResolved)
+                    if (!query.IsFullyResolved)
                     {
                         return false;
                     }
@@ -201,7 +201,7 @@ namespace Extract.DataEntry
 
                 // Attempt to register the attribute as a trigger for the default query (if one was
                 // specified).
-                if (_defaultQuery != null && !_defaultQuery.IsResolved)
+                if (_defaultQuery != null && !_defaultQuery.IsFullyResolved)
                 {
                     if (_defaultQuery.RegisterTriggerCandidate(statusInfo))
                     {
@@ -212,7 +212,7 @@ namespace Extract.DataEntry
                 // Attempt to register the attribute as a trigger with each query.
                 foreach (RootQueryNode query in _queries)
                 {
-                    if (!query.IsResolved)
+                    if (!query.IsFullyResolved)
                     {
                         if (query.RegisterTriggerCandidate(statusInfo))
                         {
@@ -247,7 +247,7 @@ namespace Extract.DataEntry
                 // Attempt an update with all resolved queries.
                 foreach (RootQueryNode query in _queries)
                 {
-                    if (query.IsResolved && query.UpdateValue())
+                    if (query.IsMinimallyResolved && query.UpdateValue())
                     {
                         // Once the target attribute has been updated, don't attempt an update with
                         // any remaining queries.
@@ -258,7 +258,7 @@ namespace Extract.DataEntry
 
                 // If an update hasn't yet occured, the attribute's value is empty and a default
                 // query has been specified, update the attribute using the default query.
-                if (!valueUpdated && _defaultQuery != null && _defaultQuery.IsResolved &&
+                if (!valueUpdated && _defaultQuery != null && _defaultQuery.IsMinimallyResolved &&
                     string.IsNullOrEmpty(_targetAttribute.Value.String) &&
                     _defaultQuery.UpdateValue())
                 {

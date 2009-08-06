@@ -77,6 +77,35 @@ namespace Extract.DataEntry
     }
 
     /// <summary>
+    /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
+    /// </summary>
+    public enum AutoZoomMode
+    {
+        /// <summary>
+        /// If the selected object is not completely visible, the image will be scrolled to place
+        /// the center of the object in the center of the screen, but the zoom level will not be
+        /// changed (either in or out).
+        /// </summary>
+        NoZoom = 0,
+
+        /// <summary>
+        /// If the selected object is not completely visible, the image will be scrolled. If the
+        /// selected object cannot be fit at the current zoom level, the zoom level will be
+        /// expanded. For items that can be fit, zoom will be returned as close as possible to the
+        /// last manually set zoom level while still displaying the entire selected object.
+        /// </summary>
+        ZoomOutIfNecessary = 1,
+
+        /// <summary>
+        /// Zoom and position will be automatically centered around the current selection with a
+        /// user-specified amount of page context displayed around the object.
+        /// </summary>
+        AutoZoom = 2
+    }
+
+    #endregion Enums
+
+    /// <summary>
     /// Describes a <see cref="Color"/> to use for indicating active status in a 
     /// <see cref="IDataEntryControl"/> or displaying is associated data in the image viewer for a
     /// range of OCR confidence levels.
@@ -164,8 +193,6 @@ namespace Extract.DataEntry
         }
     }
 
-    #endregion Enums
-
     /// <summary>
     /// A control whose contents define a Data Entry Pane (DEP).  All data entry controls must be
     /// contained in an DataEntryControlHost instance.
@@ -232,6 +259,12 @@ namespace Extract.DataEntry
         /// invalid data.
         /// </summary>
         const double _ERROR_ICON_SIZE = 0.15;
+
+        /// <summary>
+        /// The maximum percentage of the shortest page dimension that will be included on either
+        /// side of an object as context in auto-zoom mode.
+        /// </summary>
+        const double _AUTO_ZOOM_MAX_CONTEXT = 0.75;
 
         #endregion Constants
 
@@ -529,6 +562,30 @@ namespace Extract.DataEntry
         /// A control that should be used to display change the file comment for a FAM task.
         /// </summary>
         Control _commentControl;
+
+        /// <summary>
+        /// Specifies how the image viewer zoom/view is adjusted when new fields are selected.
+        /// </summary>
+        AutoZoomMode _autoZoomMode;
+
+        /// <summary>
+        /// The page space (context) that should be shown around an object selected when AutoZoom
+        /// mode is active. 0 indicates no context space should be shown around the current
+        /// selection where 1 indicates the maximum context space should be shown.
+        /// </summary>
+        double _autoZoomContext;
+
+        /// <summary>
+        /// The size of the visible image region (in image coordinates) the last time the user
+        /// manually adjusted zoom.
+        /// </summary>
+        Size _lastManualZoomSize;
+
+        /// <summary>
+        /// Indicates whether the image viewer is currently being zoomed automatically per AutoZoom
+        /// settings.
+        /// </summary>
+        bool _performingAutoZoom;
 
         #endregion Fields
 
@@ -1048,6 +1105,50 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Specifies how the <see cref="ImageViewer"/> zoom/view is adjusted when new fields are
+        /// selected.
+        /// </summary>
+        /// <value>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
+        /// zoom/view should be adjusted when new fields are selected.</value>
+        /// <returns>An <see cref="AutoZoomMode"/> value specifying how the <see cref="ImageViewer"/>
+        /// zoom/view is adjusted when new fields are selected.</returns>
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public AutoZoomMode AutoZoomMode
+        {
+            get
+            {
+                return _autoZoomMode;
+            }
+
+            set
+            {
+                _autoZoomMode = value;
+            }
+        }
+
+        /// <summary>
+        /// The page space (context) that should be shown around an object selected when AutoZoom
+        /// mode is active. 0 indicates no context space should be shown around the current
+        /// selection where 1 indicates the maximum context space should be shown.
+        /// </summary>
+        /// <value>The page space (context) that should be shown around an object.</value>
+        /// <returns>The page space (context) that will be shown around an object.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public double AutoZoomContext
+        {
+            get
+            {
+                return _autoZoomContext;
+            }
+
+            set
+            {
+                _autoZoomContext = value;
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -1094,6 +1195,8 @@ namespace Extract.DataEntry
                         _imageViewer.SelectionToolEnteredLayerObject -= HandleSelectionToolEnteredLayerObject;
                         _imageViewer.SelectionToolLeftLayerObject -= HandleSelectionToolLeftLayerObject;
                         _imageViewer.MouseDown -= HandleImageViewerMouseDown;
+                        _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
+                        _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
                     }
 
                     // Store the new image viewer internally
@@ -1109,13 +1212,14 @@ namespace Extract.DataEntry
                         _imageViewer.SelectionToolEnteredLayerObject += HandleSelectionToolEnteredLayerObject;
                         _imageViewer.SelectionToolLeftLayerObject += HandleSelectionToolLeftLayerObject;
                         _imageViewer.MouseDown += HandleImageViewerMouseDown;
+                        _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
+                        _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
                     }
                 }
                 catch (Exception e)
                 {
-
                     ExtractException ee = new ExtractException("ELI23665",
                         "Unable to establish connection to image viewer.", e);
                     ee.AddDebugData("Image viewer", value, false);
@@ -1768,6 +1872,14 @@ namespace Extract.DataEntry
             {
                 using (new TemporaryWaitCursor())
                 {
+                    // De-activate any existing control that is active to prevent problems with
+                    // last selected control remaining active when the next document is loaded.
+                    if (_activeDataControl != null)
+                    {
+                        _activeDataControl.IndicateActive(false, _imageViewer.DefaultHighlightColor);
+                        _activeDataControl = null;
+                    }
+
                     // Prevent updates to the controls during the attribute propagation
                     // that will occur as data is loaded.
                     LockControlUpdates(true);
@@ -2067,7 +2179,7 @@ namespace Extract.DataEntry
 
                 // If this is the active control and the image page is not in the process of being
                 // changed, redraw all highlights.
-                if (!_changingImage)
+                if (!_changingImage && dataControl == _activeDataControl)
                 {
                     DrawHighlights(true);
                 }
@@ -2596,6 +2708,52 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the case that the  <see cref="ImageViewer"/>'s level of zoom has been changed.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleImageViewerZoomChanged(object sender, ZoomChangedEventArgs e)
+        {
+            try
+            {
+                if (!_performingAutoZoom)
+                {
+                    _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true).Size;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27056", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that the  <see cref="ImageViewer"/>'s scroll position has been changed.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleImageViewerScrollPositionsChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!_performingAutoZoom)
+                {
+                    _lastManualZoomSize = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true).Size;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27067", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2959,7 +3117,7 @@ namespace Extract.DataEntry
                     // Show the hover attribute's highlight and error icon (if one exists).
                     ShowAttributeHighlights(_hoverAttribute, true);
 
-                    if (!_temporarilyHidingTooltips)
+                    if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
                     {
                         // The tooltip should also be displayed for the hover attribute, but don't
                         // position it along with the tooltips for currently selected attributes.
@@ -3011,7 +3169,10 @@ namespace Extract.DataEntry
             if (ensureActiveAttributeVisible &&
                 (pageToShow != -1 || firstPageOfHighlights != -1))
             {
-                pageToShow = firstPageOfHighlights;
+                if (pageToShow == -1)
+                {
+                    pageToShow = firstPageOfHighlights;
+                }
 
                 _imageViewer.SetPageNumber(pageToShow, false, true);
             }
@@ -3028,28 +3189,147 @@ namespace Extract.DataEntry
                         attributeTooltip.Value.TextLayerObject.GetBounds());
                 }
 
-                Rectangle viewRectangle = _imageViewer.GetTransformedRectangle(
-                        _imageViewer.GetVisibleImageArea(), true);
-
-                // Ensure the area of both the highlight and any associated tooltip is visible.
-                if (!viewRectangle.Contains(unifiedBounds[pageToShow]))
-                {
-                    // Create a temporary highlight object to use for the CenterOnLayerObject
-                    // call.
-                    // TODO: Create a more efficient way of centering on an image region.
-                    RasterZone rasterZone = new RasterZone(unifiedBounds[pageToShow], pageToShow);
-                    Highlight temporaryHighlight = new Highlight(_imageViewer, "", rasterZone);
-
-                    _imageViewer.CenterOnLayerObject(temporaryHighlight, true);
-
-                    temporaryHighlight.Dispose();
-                }
+                EnforceAutoZoomSettings(unifiedBounds[pageToShow]);
             }
 
             // Update _displayedHighlights with the new set of highlights.
             _displayedAttributeHighlights = newDisplayedAttributeHighlights;
 
             _imageViewer.Invalidate();
+        }
+
+        /// <summary>
+        /// Given the specified bounds of the selected object (including tooltips), adjusts the view
+        /// and zoom to best display the region according to the specified auto-zoom settings.
+        /// </summary>
+        /// <param name="selectedImageRegion">A <see cref="Rectangle"/> describing the image region
+        /// of the currently selected object (including tooltips).</param>
+        void EnforceAutoZoomSettings(Rectangle selectedImageRegion)
+        {
+            try
+            {
+                _performingAutoZoom = true;
+
+                // Initialize the newViewRegion as the selected object region.
+                Rectangle newViewRegion = selectedImageRegion;
+
+                // Determine the current view region.
+                Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
+                        _imageViewer.GetVisibleImageArea(), true);
+
+                // The amount of padding to be added in each direction (always add at least 3 pixels
+                // so tooltip borders do not extend offscreen.
+                int xPadAmount = 3;
+                int yPadAmount = 3;
+
+                if (_autoZoomMode == AutoZoomMode.NoZoom)
+                {
+                    // If the selected object is already completely visible, there is nothing to do.
+                    if (currentViewRegion.Contains(newViewRegion))
+                    {
+                        return;
+                    }
+
+                    // Determine x-axis offset to get from the center of the current view to the
+                    // center of the new view.
+                    int xOffset = (newViewRegion.Left - currentViewRegion.Left) +
+                                  (newViewRegion.Right - currentViewRegion.Right);
+                    xOffset /= 2;
+
+                    // Determine y-axis offset to get from the center of the current view to the
+                    // center of the new view.
+                    int yOffset = (newViewRegion.Top - currentViewRegion.Top) +
+                                  (newViewRegion.Bottom - currentViewRegion.Bottom);
+                    yOffset /= 2;
+
+                    // Shift the current view rectangle by the calculated offsets.  This will be the
+                    // new view whether or not the selected object is completely contained or not.
+                    newViewRegion = currentViewRegion;
+                    newViewRegion.Offset(xOffset, yOffset);
+                }
+                else if (_autoZoomMode == AutoZoomMode.ZoomOutIfNecessary)
+                {
+                    // Determine the amount the current view must be resized to get back to the last
+                    // manual zoom level.
+                    int widthAdjustment = _lastManualZoomSize.Width - currentViewRegion.Width;
+                    widthAdjustment = widthAdjustment > 0 ? 0 : widthAdjustment;
+
+                    int heightAdjustment = _lastManualZoomSize.Height - currentViewRegion.Height;
+                    heightAdjustment = heightAdjustment > 0 ? 0 : heightAdjustment;
+
+                    // If the current zoom is further out than the last manual zoom, set 
+                    // selectedImageRegion as currentViewRegion "zoomed" back in to the last manual
+                    // zoom level.
+                    if (widthAdjustment < 0 || heightAdjustment < 0)
+                    {
+                        currentViewRegion.Inflate(widthAdjustment, heightAdjustment);
+                    }
+
+                    // If the selected object is completely visible in currentViewRegion use the
+                    // currentViewRegion.
+                    if (currentViewRegion.Contains(newViewRegion))
+                    {
+                        newViewRegion = currentViewRegion;
+
+                        // Don't pad the currentViewRegion.
+                        xPadAmount = 0;
+                        yPadAmount = 0;
+                    }
+                    else
+                    {
+                        // If selectedImageRegion is not completely contained in the current view,
+                        // adjust the view to include the extents of the selected object.
+                        int totalWidth = xPadAmount * 2 + selectedImageRegion.Width;
+                        if (totalWidth < _lastManualZoomSize.Width)
+                        {
+                            xPadAmount += (_lastManualZoomSize.Width - totalWidth) / 2;
+                        }
+
+                        int totalHeight = yPadAmount * 2 + selectedImageRegion.Width;
+                        if (totalHeight < _lastManualZoomSize.Width)
+                        {
+                            yPadAmount += (_lastManualZoomSize.Width - totalHeight) / 2;
+                        }
+                    }
+                }
+                else // _autoZoomMode == AutoZoomMode.AutoZoom
+                {
+                    // Determine the maximum amount of context space that can be added based on a
+                    // percentage of the smaller dimension.
+                    int smallerDimension = Math.Min(_imageViewer.ImageWidth,
+                        _imageViewer.ImageHeight);
+                    int maxPadAmount = (int)(smallerDimension * _AUTO_ZOOM_MAX_CONTEXT) / 2;
+
+                    // If using auto-zoom, translate the zoomContext percentage into a value that
+                    // grows exponentially from 0 to 1 so that the more _autoZoomContext approaches
+                    // 1, the text pixels are being padded.
+                    double padFactor = Math.Pow(_autoZoomContext, 2);
+
+                    // Calculate the pad amounts as a fraction of the maxPadAmount specified determined
+                    // using padFactor.
+                    xPadAmount += (int)(maxPadAmount * padFactor);
+                    yPadAmount = xPadAmount;
+                }
+
+                // Apply the padding.
+                newViewRegion = _imageViewer.PadViewingRectangle(newViewRegion,
+                        xPadAmount, yPadAmount, true);
+
+                // Translate the image coordinates into client coordinates.
+                newViewRegion =
+                    _imageViewer.GetTransformedRectangle(newViewRegion, false);
+
+                // Zoom to the specified rectangle.
+                _imageViewer.ZoomToRectangle(newViewRegion, true, true, true);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27061", ex);
+            }
+            finally
+            {
+                _performingAutoZoom = false;
+            }
         }
 
         /// <summary>
