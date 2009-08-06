@@ -11,6 +11,13 @@
             </xs:sequence>
           </xs:complexType>
         </xs:element>
+        <xs:element name="Filename">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="PatientInfo" minOccurs="1">
           <xs:complexType>
             <xs:sequence>
