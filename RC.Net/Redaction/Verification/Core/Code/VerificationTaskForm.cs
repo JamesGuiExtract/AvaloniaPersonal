@@ -36,10 +36,17 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The settings for verification.
         /// </summary>
-        // TODO: Don't forget to remove suppress message.
-        // Temporarily suppress this warning. Verification codes will be used in the future.
-        [SuppressMessage("Microsoft.Performance", "CA1823:AvoidUnusedPrivateFields")]
         readonly VerificationSettings _settings;
+
+        /// <summary>
+        /// Expands File Action Manager path tags.
+        /// </summary>
+        FAMTagManager _tagManager;
+
+        /// <summary>
+        /// Gets the fully expanded voa file name.
+        /// </summary>
+        string _voaFile;
 
         #endregion VerificationTaskForm Fields
 
@@ -77,29 +84,73 @@ namespace Extract.Redaction.Verification
         #region VerificationTaskForm Methods
 
         /// <summary>
-        /// Gets the voa file for the currently open image.
-        /// </summary>
-        /// <returns>The voa file for the currently open image.</returns>
-        string GetVoaFileName()
-        {
-            // TODO: Use the path tags settings to determine the voa file
-            // The fps file directory is not yet bubbling down to the VerificationTaskForm.
-            return _imageViewer.ImageFile + ".voa";
-        }
-        
-        /// <summary>
         /// Saves and optionally commits the currently open image file.
         /// </summary>
-        /// <param name="commit"><see langword="true"/> if the image file should be commited; 
+        /// <param name="commit"><see langword="true"/> if the image file should be committed; 
         /// <see langword="false"/> if the image file should not be committed.</param>
         void Save(bool commit)
         {
-            _redactionGridView.SaveTo(GetVoaFileName());
+            // Raise any necessary prompts before committing this file.
+            if (commit && PromptBeforeCommit())
+            {
+                return;
+            }
+
+            _redactionGridView.SaveTo(_voaFile);
 
             if (commit)
             {
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
             }
+        }
+
+        /// <summary>
+        /// Raises user prompts if any required fields are unfilled.
+        /// </summary>
+        /// <returns><see langword="true"/> if the user needs to make corrections before 
+        /// committing; <see langword="false"/> if the commit can continue.</returns>
+        bool PromptBeforeCommit()
+        {
+            // Prompt for verification of all pages
+            if (_settings.General.VerifyAllPages && !_pageSummaryView.HasVisitedAllPages())
+            {
+                MessageBox.Show("Must visit all pages before continuing to new document.",
+                    "Must visit all pages", MessageBoxButtons.OK, MessageBoxIcon.None,
+                    MessageBoxDefaultButton.Button1, 0);
+                return true;
+            }
+            
+            // Prompt for requiring all redactions to have a type
+            if (_settings.General.RequireTypes)
+            {
+                foreach (RedactionGridViewRow row in _redactionGridView.Rows)
+                {
+                    if (string.IsNullOrEmpty(row.RedactionType))
+                    {
+                        MessageBox.Show("Must specify type for all redactions before continuing to new document.", 
+                            "Must specify type", MessageBoxButtons.OK, MessageBoxIcon.None,
+                            MessageBoxDefaultButton.Button1, 0);
+                        return true;
+                    }
+                }
+            }
+
+            // Prompt for all redactions to have an exemption code
+            if (_settings.General.RequireExemptions)
+            {
+                foreach (RedactionGridViewRow row in _redactionGridView.Rows)
+                {
+                    if (row.Exemptions.IsEmpty)
+                    {
+                        MessageBox.Show("Must specify exemption codes for all redactions before continuing to new document.", 
+                            "Must specify exemption codes", MessageBoxButtons.OK, 
+                            MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         #endregion VerificationTaskForm Methods
@@ -118,6 +169,8 @@ namespace Extract.Redaction.Verification
             try
             {
                 _imageViewer.EstablishConnections(this);
+
+                _imageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
             }
             catch (Exception ex)
             {
@@ -434,10 +487,11 @@ namespace Extract.Redaction.Verification
                 {
                     _currentDocumentTextBox.Text = _imageViewer.ImageFile;
 
-                    string voaFile = GetVoaFileName();
-                    if (File.Exists(voaFile))
+                    // Load the voa, if it exists
+                    _voaFile = _tagManager.ExpandTags(_settings.InputFile, _imageViewer.ImageFile);
+                    if (File.Exists(_voaFile))
                     {
-                        _redactionGridView.LoadFrom(voaFile);
+                        _redactionGridView.LoadFrom(_voaFile);
                     }
                 }
             }
@@ -522,6 +576,8 @@ namespace Extract.Redaction.Verification
                         new object[] { fileName, fileID, actionID, tagManager, fileProcessingDB });
                     return;
                 }
+
+                _tagManager = tagManager;
 
                 _imageViewer.OpenImage(fileName, false);
             }
