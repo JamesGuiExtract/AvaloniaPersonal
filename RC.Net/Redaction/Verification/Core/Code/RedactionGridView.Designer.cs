@@ -43,6 +43,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this._dataGridView = new System.Windows.Forms.DataGridView();
             this._textColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this._categoryColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -71,6 +72,7 @@ namespace Extract.Redaction.Verification
             this._dataGridView.Size = new System.Drawing.Size(575, 300);
             this._dataGridView.TabIndex = 0;
             this._dataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.HandleDataGridViewCellDoubleClick);
+            this._dataGridView.SelectionChanged += new System.EventHandler(this.HandleDataGridViewSelectionChanged);
             // 
             // _textColumn
             // 
@@ -100,6 +102,8 @@ namespace Extract.Redaction.Verification
             // _pageColumn
             // 
             this._pageColumn.DataPropertyName = "PageNumber";
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this._pageColumn.DefaultCellStyle = dataGridViewCellStyle1;
             this._pageColumn.FillWeight = 25F;
             this._pageColumn.HeaderText = "Page";
             this._pageColumn.MinimumWidth = 40;

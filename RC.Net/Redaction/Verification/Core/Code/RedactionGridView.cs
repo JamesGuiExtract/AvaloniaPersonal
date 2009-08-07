@@ -9,6 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_COMUTILSLib;
@@ -98,6 +99,26 @@ namespace Extract.Redaction.Verification
         #endregion RedactionGridView Constructors
 
         #region RedactionGridView Properties
+
+        /// <summary>
+        /// Gets the rows of the <see cref="RedactionGridView"/>.
+        /// </summary>
+        /// <returns>The rows of the <see cref="RedactionGridView"/>.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IEnumerable<RedactionGridViewRow> Rows
+        {
+            get
+            {
+                // Commit any pending changes to the binding list
+                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
+
+                foreach (DataGridViewRow row in _dataGridView.Rows)
+                {
+                    yield return _redactions[row.Index];
+                }
+            }
+        }
 
         /// <summary>
         /// Gets the selected rows of the <see cref="RedactionGridView"/>.
@@ -274,6 +295,45 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26714", ex);
+            }
+        }
+
+        /// <summary>
+        /// Selects the layer objects on the image viewer that correspond to selected rows.
+        /// </summary>
+        void UpdateSelection()
+        {
+            // Prevent this method from calling itself
+            _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
+            _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
+            try
+            {
+                // Get a collection of the ids of all the layer objects that should be selected
+                List<long> selectedIds = new List<long>();
+                foreach (RedactionGridViewRow row in SelectedRows)
+                {
+                    foreach (LayerObject layerObject in row.LayerObjects)
+                    {
+                        selectedIds.Add(layerObject.Id);
+                    }
+                }
+
+                // Select/deselect the layer objects corresponding to each selected row
+                foreach (LayerObject layerObject in _imageViewer.LayerObjects)
+                {
+                    bool shouldBeSelected = selectedIds.Contains(layerObject.Id);
+                    if (layerObject.Selected != shouldBeSelected)
+                    {
+                        layerObject.Selected = shouldBeSelected;
+                    }
+                }
+
+                _imageViewer.Invalidate();
+            }
+            finally
+            {
+                _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
             }
         }
 
@@ -470,7 +530,71 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Selects or deselects the row corresponding the specified layer object.
+        /// </summary>
+        /// <param name="layerObject">The layer object contained by the row to select or deselect.
+        /// </param>
+        /// <param name="select"><see langword="true"/> if the row should be selected; 
+        /// <see langword="false"/> if the row should be deselected.</param>
+        void SelectRowContainingLayerObject(LayerObject layerObject, bool select)
+        {
+            // Prevent this method from calling itself
+            _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
+            try
+            {
+                foreach (DataGridViewRow row in _dataGridView.Rows)
+                {
+                    if (_redactions[row.Index].ContainsLayerObject(layerObject))
+                    {
+                        // Change the selection if necessary
+                        if (row.Selected != select)
+                        {
+                            row.Selected = select;
+                        }
+
+                        return;
+                    }
+                }
+
+                // The layer object wasn't found. Complain.
+                ExtractException ee = new ExtractException("ELI27062", "Layer object not found.");
+                ee.AddDebugData("Id", layerObject.Id, false);
+                throw ee;
+            }
+            finally
+            {
+                _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
+            }
+        }
+
         #endregion RedactionGridView Methods
+
+        #region RedactionGridView Overrides
+
+        /// <summary>
+        /// Processes a command key.
+        /// </summary>
+        /// <param name="msg">The window message to process.</param>
+        /// <param name="keyData">The key to process.</param>
+        /// <returns><see langword="true"/> if the character was processed by the control; 
+        /// otherwise, <see langword="false"/>.</returns>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            if (keyData == Keys.Delete) 
+            {
+                // Remove the selected redactions
+                _imageViewer.LayerObjects.RemoveSelected();
+                _imageViewer.Invalidate();
+
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        #endregion RedactionGridView Overrides
 
         #region RedactionGridView OnEvents
 
@@ -589,6 +713,71 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.LayerObjectAdded"/> event.</param>
+        void HandleSelectionLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
+        {
+            try
+            {
+                // Select the row containing the layer object
+                SelectRowContainingLayerObject(e.LayerObject, true);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27061", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
+        void HandleSelectionLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        {
+            try
+            {
+                // Deselect the row containing the layer object
+                SelectRowContainingLayerObject(e.LayerObject, false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27065", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.SelectionChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="DataGridView.SelectionChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="DataGridView.SelectionChanged"/> event.</param>
+        void HandleDataGridViewSelectionChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                UpdateSelection();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27064", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
         /// Handles the <see cref="DataGridView.CellDoubleClick"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
@@ -612,7 +801,7 @@ namespace Extract.Redaction.Verification
                 ee.Display();
             }
         }
-
+        
         #endregion RedactionGridView Event Handlers
 
         #region IImageViewerControl Members
@@ -643,6 +832,8 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
                         _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
+                        _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
+                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
                     }
 
                     // Store the new image viewer
@@ -655,6 +846,9 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                         _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
                         _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
+                        _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                        _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
+
                     }
                 }
                 catch (Exception ex)
