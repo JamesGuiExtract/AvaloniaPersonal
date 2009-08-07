@@ -43,11 +43,6 @@ namespace Extract.Imaging.Forms
         ImageViewer _imageViewer;
 
         /// <summary>
-        /// The one-based page number which was most recently active.
-        /// </summary>
-        int _lastPage;
-
-        /// <summary>
         /// The cell style associated with pages that have been visited.
         /// </summary>
         DataGridViewCellStyle _visitedPageStyle;
@@ -94,6 +89,36 @@ namespace Extract.Imaging.Forms
         #region PageSummaryView Methods
 
         /// <summary>
+        /// Determines whether all pages have been visited.
+        /// </summary>
+        /// <returns><see langword="true"/> if all pages have been visited; 
+        /// <see langword="false"/> if at least one page has not been visited.</returns>
+        public bool HasVisitedAllPages()
+        {
+            try
+            {
+                foreach (DataGridViewRow row in _dataGridView.Rows)
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        if (cell.Tag == null)
+                        {
+                            // All pages have been visited iff this cell is empty
+                            return string.IsNullOrEmpty(cell.Value as string);
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27068",
+                    "Unable to determine visited pages.", ex);
+            }
+        }
+
+        /// <summary>
         /// Determines whether it is valid to move forward the specified number of pages.
         /// </summary>
         /// <param name="pages">The number of pages to move forward. May be negative.</param>
@@ -118,7 +143,6 @@ namespace Extract.Imaging.Forms
             // Reset the list view
             _dataGridView.Rows.Clear();
             _dataGridView.Enabled = imageAvailable;
-            _lastPage = 0;
 
             if (imageAvailable)
             {
@@ -292,15 +316,12 @@ namespace Extract.Imaging.Forms
                     currentCell.Selected = true;
                 }
 
-                // Mark the previously visited page
-                if (_lastPage > 0)
-	            {
-                    DataGridViewCell previousCell = GetCellByPageNumber(_lastPage);
-                    previousCell.Style = VisitedPageStyle;
-	            }
-
-                // Store the current page as the last visited page
-                _lastPage = e.PageNumber;
+                // Tag the cell as visited, unless it is already tagged
+                if (currentCell.Tag == null)
+                {
+                    currentCell.Tag = new object();
+                    currentCell.Style = VisitedPageStyle;
+                }
             }
             catch (Exception ex)
             {
