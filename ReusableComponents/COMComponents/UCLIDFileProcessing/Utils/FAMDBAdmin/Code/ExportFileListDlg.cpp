@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "ExportFileListDlg.h"
 #include "FAMDBAdminUtils.h"
+#include "SelectFilesDlg.h"
 
 #include <UCLIDException.h>
 #include <FileDialogEx.h>
@@ -19,14 +20,14 @@ static char THIS_FILE[] = __FILE__;
 
 //-------------------------------------------------------------------------------------------------
 // Constant
-const CString gzSQL_QUERY_STRING = "SELECT FAMFile.FileName FROM ";
+const string gstrSQL_QUERY_STRING = "SELECT FAMFile.FileName FROM ";
+
 //-------------------------------------------------------------------------------------------------
 // CExportFileListDlg dialog
 //-------------------------------------------------------------------------------------------------
 CExportFileListDlg::CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB)
 : CDialog(CExportFileListDlg::IDD),
-m_ipFAMDB(ipFAMDB),
-m_zSqlQuery("")
+m_ipFAMDB(ipFAMDB)
 {
 	//{{AFX_DATA_INIT(CExportFileListDlg)
 		// NOTE: the ClassWizard will add member initialization here
@@ -39,24 +40,19 @@ void CExportFileListDlg::DoDataExchange(CDataExchange* pDX)
 	//{{AFX_DATA_MAP(CExportFileListDlg)
 	// NOTE: the ClassWizard will add DDX and DDV calls here
 	//}}AFX_DATA_MAP
-	DDX_Control(pDX, IDC_RADIO_ALL_FILES, m_radioAllFiles);
-	DDX_Control(pDX, IDC_RADIO_STATUS, m_radioStatus);
-	DDX_Control(pDX, IDC_CMB_ACTION_STATUS, m_comboStatus);
-	DDX_Control(pDX, IDC_CMB_ACTION_NAME, m_comboActions);
-	DDX_Control(pDX, IDC_RADIO_SQL_QUERY, m_radioQuery);
-	DDX_Control(pDX, IDC_EDIT_SQL_QUERY, m_editQuery);
+	DDX_Control(pDX, IDC_EDIT_FL_SLCT_SMRY_EXPORT, m_editSummary);
 	DDX_Control(pDX, IDC_EDT_FILE_NAME, m_editFileName);
 	DDX_Control(pDX, IDC_BTN_BROWSE_FILE, m_btnBrowse);
+	DDX_Control(pDX, IDOK, m_btnOk);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CExportFileListDlg, CDialog)
 	//{{AFX_MSG_MAP(CExportFileListDlg)
 	//}}AFX_MSG_MAP
-	ON_BN_CLICKED(IDC_RADIO_ALL_FILES, &CExportFileListDlg::OnRadioAllFiles)
-	ON_BN_CLICKED(IDC_RADIO_STATUS, &CExportFileListDlg::OnRadioStatus)
-	ON_BN_CLICKED(IDC_RADIO_SQL_QUERY, &CExportFileListDlg::OnRadioSqlQuery)
+	ON_BN_CLICKED(IDC_BTN_SLCT_FLS_EXPORT, &CExportFileListDlg::OnClickedSelectFiles)
 	ON_BN_CLICKED(IDC_BTN_BROWSE_FILE, &CExportFileListDlg::OnClickedBrowseFile)
 	ON_BN_CLICKED(IDOK, &CExportFileListDlg::OnClickedOK)
+	ON_EN_CHANGE(IDC_EDT_FILE_NAME, &CExportFileListDlg::OnChangedEditFileName)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -70,83 +66,11 @@ BOOL CExportFileListDlg::OnInitDialog()
 	{
 		CDialog::OnInitDialog();
 
-		// display a wait-cursor because we are getting information from the DB, which may take a few seconds
-		CWaitCursor wait;
-
-		// Insert the action status to the ComboBox
-		CFAMDBAdminUtils::addStatusInComboBox(m_comboStatus);
-
-		// Set the default item in the status ComboBox to Pending
-		m_comboStatus.SetCurSel(1);
-
-		// Read all actions from the DB
-		IStrToStrMapPtr pMapActions = m_ipFAMDB->GetActions();
-
-		// Insert actions into ComboBox
-		for (int i = 0; i < pMapActions->GetSize(); i++)
-		{
-			// Get one actions' name and ID inside the database
-			CComBSTR bstrKey, bstrValue;
-			pMapActions->GetKeyValue(i, &bstrKey, &bstrValue);
-			string strAction = asString(bstrKey);
-			DWORD nID = asUnsignedLong(asString(bstrValue));
-
-			// Insert the action name into combo box
-			int nIndex = m_comboActions.InsertString(-1, strAction.c_str());
-
-			// Set the index of the item inside the Combobox same as the ID of the action
-			m_comboActions.SetItemData(nIndex, nID);
-		}
-		
-		// Set the current action to the first action
-		m_comboActions.SetCurSel(0);
-
-		// Select the status radio button as default setting
-		m_radioStatus.SetCheck(BST_CHECKED);
 		updateControls();
-
-		// Set the focus to the status combo box
-		m_comboStatus.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14730")
 
 	return FALSE;
-}
-//-------------------------------------------------------------------------------------------------
-void CExportFileListDlg::OnRadioAllFiles()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		updateControls();
-		m_editFileName.SetFocus();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14881")
-}
-//-------------------------------------------------------------------------------------------------
-void CExportFileListDlg::OnRadioStatus()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		updateControls();
-		m_comboStatus.SetFocus();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14882")
-}
-//-------------------------------------------------------------------------------------------------
-void CExportFileListDlg::OnRadioSqlQuery()
-{
-	AFX_MANAGE_STATE( AfxGetModuleState() );
-
-	try
-	{
-		updateControls();
-		m_editQuery.SetFocus();
-	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14883")
 }
 //-------------------------------------------------------------------------------------------------
 void CExportFileListDlg::OnClickedBrowseFile()
@@ -171,8 +95,46 @@ void CExportFileListDlg::OnClickedBrowseFile()
 			// Get the file name
 			m_editFileName.SetWindowText(fileDlg.GetPathName());
 		}
+
+		updateControls();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14731");
+}
+//-------------------------------------------------------------------------------------------------
+void CExportFileListDlg::OnChangedEditFileName()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Update the controls (enables/disables the ok button appropriately)
+		updateControls();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27066");
+}
+//-------------------------------------------------------------------------------------------------
+void CExportFileListDlg::OnClickedSelectFiles()
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		CSelectFilesDlg dlg(m_ipFAMDB, "Select filenames to export", 
+			gstrSQL_QUERY_STRING, m_settings);
+
+		// Display the dialog and save changes if user clicked OK
+		if (dlg.DoModal() == IDOK)
+		{
+			// Get the settings from the dialog
+			m_settings = dlg.getSettings();
+
+			// Update the summary description
+			m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
+		}
+
+		updateControls();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27063");
 }
 //-------------------------------------------------------------------------------------------------
 void CExportFileListDlg::OnClickedOK()
@@ -209,60 +171,59 @@ void CExportFileListDlg::OnClickedOK()
 		// which may take a few seconds
 		CWaitCursor wait;
 
-		// Query based on the action status
-		if (m_radioStatus.GetCheck() == BST_CHECKED)
-		{
-			// Get the current action name
-			CString zAction;
-			m_comboActions.GetWindowText(zAction);
+		string strQuery = gstrSQL_QUERY_STRING;
 
-			if (zAction.IsEmpty())
+		switch(m_settings.getScope())
+		{
+			// Query based on the action status
+		case eAllFilesForWhich:
 			{
-				// Prompt to the users that there should be an action specified 
-				// if they choose to export file list according to file name and status
-				MessageBox("An action must be specified to export the file list!", 
-					"Error", MB_ICONINFORMATION);
+				strQuery += "FAMFile ";
+
+				// Check if comparing skipped status
+				if (m_settings.getStatus() == kActionSkipped)
+				{
+					strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
+						"(SkippedFile.ActionID = " + m_settings.getActionID();
+					string strUser = m_settings.getUser();
+					if (strUser != gstrANY_USER)
+					{
+						strQuery += " AND SkippedFile.UserName = '" + strUser + "'";
+					}
+					strQuery += ")";
+				}
+				else
+				{
+					// Get the status as a string
+					string strStatus = m_ipFAMDB->AsStatusString(
+						(UCLID_FILEPROCESSINGLib::EActionStatus)m_settings.getStatus());
 				
-				// Set the focus back to action combo box and return
-				m_comboActions.SetFocus();
-				return;
+					strQuery += "WHERE (ASC_" + m_settings.getAction() + " = '"
+						+ strStatus + "')";
+				}
 			}
+			break;
 
-			// Action status selected in the status combo box
-			UCLID_FILEPROCESSINGLib::EActionStatus eStatus;
+			// Query to export all the files
+		case eAllFiles:
+			{
+				strQuery += "FAMFile";
+			}
+			break;
 
-			// Cast the current selected status to an EActionStatus type
-			int iStatusID = m_comboStatus.GetCurSel();
-			eStatus = (UCLID_FILEPROCESSINGLib::EActionStatus)(iStatusID);
+			// Export based on customer query
+		case eAllFilesQuery:
+			{
+				// Get the query input by the user
+				strQuery += m_settings.getSQLString();
+			}
+			break;
 
-			// Get the action status as a string
-			CString zActionStatus = asStatusString(eStatus);
+		case eAllFilesTag:
+			// TODO: This is not implemented yet
+			break;
 
-			// Action Column to export
-			CString zActionCol = "ASC_" + zAction;
-
-			// Form the sql query string
-			m_zSqlQuery = gzSQL_QUERY_STRING + "FAMFile WHERE (" + zActionCol + " = '" + zActionStatus + "')";
-		}
-		// Query to export all the files
-		else if (m_radioAllFiles.GetCheck() == BST_CHECKED)
-		{
-			// Form the sql query string
-			m_zSqlQuery = gzSQL_QUERY_STRING + "FAMFile";
-		}
-		// Export based on customer query
-		else if (m_radioQuery.GetCheck() == BST_CHECKED)
-		{
-			// Get the query input by the user
-			CString zCustomQuery;
-			m_editQuery.GetWindowText(zCustomQuery);
-
-			// Add the header and build a complete query
-			m_zSqlQuery = gzSQL_QUERY_STRING + zCustomQuery;
-		}
-		else
-		{
-			// We should never reach here
+		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI14879");
 		}
 
@@ -270,15 +231,16 @@ void CExportFileListDlg::OnClickedOK()
 		long lNumFilesExported;
 
 		// Call ExportFileList() to export the fil list
-		lNumFilesExported = m_ipFAMDB->ExportFileList(m_zSqlQuery.operator LPCTSTR(), _bstrFileName);
-
-		OnOK();
+		lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName);
 
 		// Prompt the users that epxorting files is finished and
 		// if they want to open the file contains the file list
 		CString zPrompt;
-		zPrompt.Format("A list of %ld files were\n\rexported to the selected output file.", lNumFilesExported);
+		zPrompt.Format("A list of %ld files were\n\rexported to the selected output file.",
+			lNumFilesExported);
 		MessageBox(zPrompt, "Success", MB_ICONINFORMATION);
+
+		CDialog::OnOK();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14886");
 }
@@ -288,55 +250,23 @@ void CExportFileListDlg::OnClickedOK()
 //-------------------------------------------------------------------------------------------------
 void CExportFileListDlg::updateControls() 
 {
-	AFX_MANAGE_STATE( AfxGetModuleState() );
+	AFX_MANAGE_STATE(AfxGetModuleState());
 
 	try
 	{
-		if (m_radioAllFiles.GetCheck() == BST_CHECKED)
-		{
-			// Disable two combo boxes and the query edit box
-			m_comboStatus.EnableWindow(FALSE);
-			m_comboActions.EnableWindow(FALSE);
-			m_editQuery.EnableWindow(FALSE);
-		}
-		else
-		{
-			if (m_radioStatus.GetCheck() == BST_CHECKED)
-			{
-				// Enable combo boxes and disable the query edit box
-				m_comboStatus.EnableWindow(TRUE);
-				m_comboActions.EnableWindow(TRUE);
-				m_editQuery.EnableWindow(FALSE);
-			}
-			else
-			{
-				// Disable combo boxes and enable the query edit box
-				m_comboStatus.EnableWindow(FALSE);
-				m_comboActions.EnableWindow(FALSE);
-				m_editQuery.EnableWindow(TRUE);
-			}
-		}
+		// Enable/disable the okay button based on whether the settings are initialized
+		// Get the text from the edit box
+		CString zText;
+		m_editFileName.GetWindowText(zText);
+
+		// Enable the OK button if the settings are initialized
+		// and the edit box contains at least 4 characters
+		// and the file name is not a relative path
+		bool bEnable = m_settings.isInitialized()
+			&& zText.GetLength() > 4
+			&& isAbsolutePath((LPCTSTR)zText);
+		m_btnOk.EnableWindow(asMFCBool(bEnable));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14732");
-}
-//-------------------------------------------------------------------------------------------------
-CString CExportFileListDlg::asStatusString(UCLID_FILEPROCESSINGLib::EActionStatus eStatusID)
-{
-	switch ( eStatusID )
-	{
-	case kActionUnattempted:
-		return "U";
-	case kActionPending:
-		return "P";
-	case kActionProcessing:
-		return "R";
-	case kActionCompleted:
-		return "C";
-	case kActionFailed:
-		return "F";
-	default:
-		THROW_LOGIC_ERROR_EXCEPTION("ELI14880");
-	}
-	return "U";
 }
 //-------------------------------------------------------------------------------------------------

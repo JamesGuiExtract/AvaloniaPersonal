@@ -259,6 +259,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SelectFilesDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SetActionStatusDlg.cpp"
 				>
 			</File>
@@ -330,6 +334,14 @@
 			</File>
 			<File
 				RelativePath=".\SelectDBDialog.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SelectFilesDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\SelectFileSettings.h"
 				>
 			</File>
 			<File

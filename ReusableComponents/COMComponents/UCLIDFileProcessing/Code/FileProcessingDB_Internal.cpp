@@ -930,21 +930,46 @@ void CFileProcessingDB::initializeTableValues()
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
-										 string strTo, bool bAddTransRecords)
+										 string strTo, bool bAddTransRecords, long nToActionID)
 {
-	if ( bAddTransRecords )
+	try
 	{
-		string strTransition = "INSERT INTO FileActionStateTransition "
-			"(FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, Comment, FAMUserID, MachineID) "
-			"SELECT ID, " + asString(getActionID(ipConnection, strTo)) + " AS ActionID, ASC_" + 
-			strTo + ", ASC_" + strFrom + " , GETDATE() AS TS_Trans, 'Copy status from " + 
-			strFrom +" to " + strTo + "' AS Comment, " + asString(getFAMUserID(ipConnection)) + 
-			", " + asString(getMachineID(ipConnection)) + " FROM FAMFile";
+		if ( bAddTransRecords )
+		{
+			string strToActionID = asString(nToActionID == -1 ? getActionID(ipConnection, strTo) : nToActionID);
+			string strTransition = "INSERT INTO FileActionStateTransition "
+				"(FileID, ActionID, ASC_From, ASC_To, DateTimeStamp, Comment, FAMUserID, MachineID) "
+				"SELECT ID, " + strToActionID + " AS ActionID, ASC_" + 
+				strTo + ", ASC_" + strFrom + " , GETDATE() AS TS_Trans, 'Copy status from " + 
+				strFrom +" to " + strTo + "' AS Comment, " + asString(getFAMUserID(ipConnection)) + 
+				", " + asString(getMachineID(ipConnection)) + " FROM FAMFile";
 
-		executeCmdQuery(ipConnection, strTransition);
+			executeCmdQuery(ipConnection, strTransition);
+		}
+
+		// Check if the skipped table needs to be updated
+		if (nToActionID != -1)
+		{
+			// Get the to action ID as a string
+			string strToActionID = asString(nToActionID);
+
+			// Delete any existing skipped records (files may be leaving skipped status)
+			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = " + strToActionID;
+
+			// Need to add any new skipped records (files may be entering skipped status)
+			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName) SELECT "
+				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" + getCurrentUserName()
+				+ "' AS NewUserName FROM FAMFile WHERE ASC_" + strFrom + " = 'S'";
+
+			// Delete the existing skipped records for this action and insert any new ones
+			executeCmdQuery(ipConnection, strDeleteSkipped);
+			executeCmdQuery(ipConnection, strAddSkipped);
+		}
+
+		string strCopy = "UPDATE FAMFile SET ASC_" + strTo + " = ASC_" + strFrom;
+		executeCmdQuery(ipConnection, strCopy);
 	}
-	string strCopy = "UPDATE FAMFile SET ASC_" + strTo + " = ASC_" + strFrom;
-	executeCmdQuery(ipConnection, strCopy);
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27054");
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addActionColumn(string strAction)

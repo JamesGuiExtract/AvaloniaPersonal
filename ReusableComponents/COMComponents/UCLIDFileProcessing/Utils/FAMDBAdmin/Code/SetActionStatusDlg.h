@@ -6,6 +6,7 @@
 
 #include "resource.h"
 #include "afxwin.h"
+#include "SelectFileSettings.h"
 
 // SetActionStatusDlg.h : header file
 //
@@ -22,16 +23,6 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CSetActionStatusDlg)
 	enum { IDD = IDD_DLG_SET_ACTION_STATUS };
-	CComboBox m_comboActions;
-	CButton m_radioAllFiles;
-	CButton m_radioFilesForWhich;
-	CComboBox m_comboFilesUnderAction;
-	CComboBox m_comboFilesUnderStatus;
-	CButton m_radioNewStatus;
-	CButton m_radioStatusFromAction;
-	CComboBox m_comboNewStatus;
-	CComboBox m_comboStatusFromAction;
-	CComboBox m_comboSkippedUser;
 	//}}AFX_DATA
 
 // Overrides
@@ -47,13 +38,11 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CSetActionStatusDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnClickedRadioAllFiles();
-	afx_msg void OnClickedRadioFilesStatus();
 	afx_msg void OnClickedRadioNewStatus();
 	afx_msg void OnClickedRadioStatusOfAction();
-	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnClickedOK();
 	afx_msg void OnClickedApply();
+	afx_msg void OnClickedSelectFiles();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -61,8 +50,19 @@ private:
 	////////////
 	//Variables
 	///////////
+	CComboBox m_comboActions;
+	CEdit m_editSummary;
+	CButton m_radioNewStatus;
+	CButton m_radioStatusFromAction;
+	CButton m_btnOK;
+	CButton m_btnApply;
+	CComboBox m_comboNewStatus;
+	CComboBox m_comboStatusFromAction;
+
 	// The file action manager DB pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
+
+	SelectFileSettings m_settings;
 
 	////////////
 	//Methods
@@ -77,9 +77,6 @@ private:
 	void applyActionStatusChanges(bool bCloseDialog);
 
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: To fill in the by user combo box for selecting files skipped by a particular user
-	void fillSkippedUsers();
-
 	// Update controls
 	void updateControls();
 };

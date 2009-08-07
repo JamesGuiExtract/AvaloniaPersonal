@@ -6,6 +6,7 @@
 
 #include "resource.h"
 #include "afxwin.h"
+#include "SelectFileSettings.h"
 
 // ExportFileListDlg.h : header file
 //
@@ -22,13 +23,9 @@ public:
 // Dialog Data
 	//{{AFX_DATA(CExportFileListDlg)
 	enum { IDD = IDD_DLG_EXPORT_FILES };
-	CButton m_radioAllFiles;
-	CButton m_radioStatus;
-	CComboBox m_comboStatus;
-	CComboBox m_comboActions;
-	CButton m_radioQuery;
-	CEdit m_editQuery;
+	CEdit m_editSummary;
 	CEdit m_editFileName;
+	CButton m_btnOk;
 	CButton m_btnBrowse;
 	//}}AFX_DATA
 
@@ -45,11 +42,10 @@ protected:
 	// Generated message map functions
 	//{{AFX_MSG(CExportFileListDlg)
 	virtual BOOL OnInitDialog();
-	afx_msg void OnRadioAllFiles();
-	afx_msg void OnRadioStatus();
-	afx_msg void OnRadioSqlQuery();
+	afx_msg void OnClickedSelectFiles();
 	afx_msg void OnClickedBrowseFile();
 	afx_msg void OnClickedOK();
+	afx_msg void OnChangedEditFileName();
 	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
@@ -60,17 +56,14 @@ private:
 	// The file action manager DB pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
 
-	// The SQL query string used to export related file list
-	CString m_zSqlQuery;
+	// Settings for the export
+	SelectFileSettings m_settings;
 
 	////////////
 	//Methods
 	///////////
 	// Update controls
 	void updateControls();
-
-	// To return the string representation of the given EActionStatus
-	CString asStatusString(UCLID_FILEPROCESSINGLib::EActionStatus eStatusID);
 };
 
 //{{AFX_INSERT_LOCATION}}

@@ -18,6 +18,7 @@
 #define IDR_ACCELERATORS                132
 #define IDD_DIALOG_SELECT_REPORT        133
 #define IDD_DIALOG_CLEAR_WARNING        134
+#define IDD_DLG_SELECT_FILES			135
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -73,6 +74,12 @@
 #define IDC_CHECK_RETAIN_ACTIONS        2038
 #define IDC_CAPTION                     2039
 #define IDC_CMB_FILE_SKIPPED_USER		2040
+#define IDC_GROUP_SELECT				2041
+#define IDC_EDIT_FL_SLCT_SMRY_STATUS	2042
+#define IDC_BTN_SLCT_FLS_STATUS			2043
+#define IDC_EDIT_FL_SLCT_SMRY_EXPORT	2044
+#define IDC_BTN_SLCT_FLS_EXPORT			2045
+#define IDC_SLCT_FILE_QUERY_LABEL		2046
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -95,9 +102,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        135
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32790
-#define _APS_NEXT_CONTROL_VALUE         2041
+#define _APS_NEXT_CONTROL_VALUE         2047
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

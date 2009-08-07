@@ -925,9 +925,10 @@ STDMETHODIMP CFileProcessingDB::GetFileStatus( long nFileID,  BSTR strAction,  E
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  EActionStatus eFromStatus,  
+STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID,  EActionStatus eWhereStatus,  
 														  long nToActionID, EActionStatus eToStatus,
-														  BSTR bstrSkippedFromUserName, long * pnNumRecordsModified)
+														  BSTR bstrSkippedFromUserName, 
+														  long nFromActionID, long * pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
 
@@ -947,8 +948,8 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		// and the Action ids are the same, there is nothing to do
 		// If setting skipped status the skipped file table needs to be updated
 		if ( eToStatus != kActionSkipped
-			&& eFromStatus == eToStatus
-			&& nToActionID == nFromActionID)
+			&& eWhereStatus == eToStatus
+			&& nToActionID == nWhereActionID)
 		{
 			// nothing to do
 			return S_OK;
@@ -956,9 +957,9 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
-		
+
 		BEGIN_CONNECTION_RETRY();
-		
+
 		// Get the connection for the thread and save it locally.
 		ipConnection = getDBConnection();
 
@@ -969,10 +970,17 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		validateDBSchemaVersion();
 
 		string strToAction = getActionName(ipConnection, nToActionID);
-		string strFromAction = getActionName(ipConnection, nFromActionID);
+		string strWhereAction = getActionName(ipConnection, nWhereActionID);
+		string strFromActionCol;
+		if (nFromActionID > 0)
+		{
+			strFromActionCol = "ASC_" + getActionName(ipConnection, nFromActionID);
+		}
+
+		// Action column to search
+		string strWhereActionCol = "ASC_" + strWhereAction;
 
 		// Action Column to change
-		string strFromActionCol = "ASC_" + strFromAction;
 		string strToActionCol = "ASC_" + strToAction;
 
 		// Begin a transaction
@@ -981,48 +989,67 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nFromActionID,  
 		// Get a vector of FileIDS to modify
 		vector<long> vecFileIDs;
 
-		// From status is skipped, get all files skipped by specified user
-		if (eFromStatus == kActionSkipped)
+		string strSQL = "SELECT FAMFile.ID AS FAMFileID";
+		if (!strFromActionCol.empty())
 		{
-			getFilesSkippedByUser(vecFileIDs, nFromActionID, asString(bstrSkippedFromUserName),
-				ipConnection);
+			strSQL += ", FAMFile." + strFromActionCol;
 		}
-		// From status is not skipped, get all files that match
-		else
+
+		strSQL += " FROM FAMFile";
+
+		string strWhere = " WHERE (FAMFile." + strWhereActionCol + " = '"
+			+ asStatusString(eWhereStatus) + "'";
+
+		// Where status is skipped, need to add inner join to skip file table
+		if (eWhereStatus == kActionSkipped)
 		{
-			string strSQL = "SELECT [ID] FROM FAMFile WHERE (" + strFromActionCol + " = '"
-				+ asStatusString(eFromStatus ) + "')";
-
-			// Get a recordset to fill with the File IDs
-			_RecordsetPtr ipFileSet(__uuidof(Recordset));
-			ASSERT_RESOURCE_ALLOCATION("ELI26913", ipFileSet != NULL);
-
-			// Open the recordset
-			ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-			adOpenForwardOnly, adLockReadOnly, adCmdText );
-
-			// Modify each files status (count the number of records modified)
-			while(ipFileSet->adoEOF == VARIANT_FALSE)
+			strSQL += " INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID ";
+			strWhere += " AND SkippedFile.ActionID = " + asString(nWhereActionID);
+			string strUser = asString(bstrSkippedFromUserName);
+			if (!strUser.empty())
 			{
-				vecFileIDs.push_back(getLongField(ipFileSet->Fields, "ID"));
-
-				ipFileSet->MoveNext();
+				strWhere += " AND SkippedFile.UserName = '" + strUser + "'";
 			}
 		}
+
+		// Close the where clause and add it to the SQL statement
+		strWhere += ")";
+		strSQL += strWhere;
 
 		// Get the to status as a string
 		string strToStatus = asStatusString(eToStatus);
 
-		// For each FileID, set the file action state
-		for (vector<long>::iterator it = vecFileIDs.begin(); it != vecFileIDs.end(); it++)
+		// Get a recordset to fill with the File IDs
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI26913", ipFileSet != NULL);
+
+		// Open the recordset
+		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Modify each files status (count the number of records modified)
+		long nRecordsModified = 0;
+		while(ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			// This will update the FAST table as well as the skipped file table for
-			// records that are moving to/from skipped status
-			setFileActionState(ipConnection, *it, strToAction, strToStatus, "", nToActionID, false);
+			FieldsPtr ipFields = ipFileSet->Fields;
+			long nFileID = getLongField(ipFields, "FAMFileID");
+			if (nFromActionID > 0)
+			{
+				strToStatus = getStringField(ipFields, strFromActionCol);
+			}
+
+			setFileActionState(ipConnection, nFileID, strToAction, strToStatus, "",
+				nToActionID, false);
+
+			// Update modified records count
+			nRecordsModified++;
+
+			// Move to next record
+			ipFileSet->MoveNext();
 		}
 
 		// Set the return value
-		*pnNumRecordsModified = vecFileIDs.size();
+		*pnNumRecordsModified = nRecordsModified;
 
 		// update the stats
 		reCalculateStats(ipConnection, nToActionID);
@@ -1418,7 +1445,7 @@ STDMETHODIMP CFileProcessingDB::CopyActionStatusFromAction( long  nFromAction, l
 		TransactionGuard tg(ipConnection);
 
 		// Copy Action status and only update the FAST table if required
-		copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable);
+		copyActionStatus(ipConnection, strFrom, strTo, m_bUpdateFASTTable, nToAction);
 
 		// update the stats for the to action
 		reCalculateStats(ipConnection, nToAction);
@@ -1464,7 +1491,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction( long nActionID, BSTR strNewActionN
 		// Add a new column to the FMPFile table
 		addActionColumn(strNew);
 
-		// Copy status from the old column without transition records
+		// Copy status from the old column without transition records (and without update skipped table)
 		copyActionStatus(ipConnection, strOld, strNew, false);
 
 		// Change the name of the action in the action table
@@ -2476,14 +2503,14 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 		string strCommentSQL = "SELECT * FROM FileActionComment WHERE FileID = "
 			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
 
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
 		_RecordsetPtr ipCommentSet(__uuidof(Recordset));
 		ASSERT_RESOURCE_ALLOCATION("ELI26794", ipCommentSet != NULL);
 
 		ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
 			adLockOptimistic, adCmdText);
-
-		// Begin a transaction
-		TransactionGuard tg(ipConnection);
 
 		// Only need to delete the row if it exists
 		if (ipCommentSet->BOF == VARIANT_FALSE)
@@ -2501,6 +2528,95 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26777");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, BSTR bstrToAction,
+														   EActionStatus eaStatus, BSTR bstrFromAction)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check that an action name and a FROM clause have been passed in
+		string strQueryFrom = asString(bstrQueryFrom);
+		ASSERT_ARGUMENT("ELI27037", !strQueryFrom.empty());
+		string strToAction = asString(bstrToAction);
+		ASSERT_ARGUMENT("ELI27038", !strToAction.empty());
+
+		string strFromAction = asString(bstrFromAction);
+		bool bFromSpecified = !strFromAction.empty();
+
+		validateLicense();
+
+		// Build the file set query
+		string strFileQuery = "SELECT FAMFile.ID";
+		string strStatus = "";
+		if (bFromSpecified)
+		{
+			strFromAction = "FAMFile.ASC_" + strFromAction;
+			strFileQuery += ", " + strFromAction;
+		}
+		else
+		{
+			// Get the new status as a string
+			strStatus = asStatusString(eaStatus);
+		}
+		strFileQuery += " FROM " + strQueryFrom;
+
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27039", ipFileSet != NULL);
+
+		// Open the file set
+		ipFileSet->Open(strFileQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		// Loop through each record
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
+
+			// Get the file ID
+			long nFileID = getLongField(ipFields, "ID");
+
+			// If copying from an action, get the status for the action
+			if (bFromSpecified)
+			{
+				strStatus = getStringField(ipFields, strFromAction);
+			}
+
+			// Set the file action state
+			setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", -1, false);
+
+			// Move to next record
+			ipFileSet->MoveNext();
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27041");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26982");
 }
 
 //-------------------------------------------------------------------------------------------------

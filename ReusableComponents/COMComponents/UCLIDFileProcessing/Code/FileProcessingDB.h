@@ -82,8 +82,9 @@ public:
 	STDMETHOD(SetFileStatusToUnattempted)( long nFileID,  BSTR strAction);
 	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, VARIANT_BOOL vbUpdateSkippedFileTable);
 	STDMETHOD(GetFileStatus)( long nFileID,  BSTR strAction,  EActionStatus * pStatus);
-	STDMETHOD(SearchAndModifyFileStatus)( long nFromActionID,  EActionStatus eFromStatus,  
-		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long * pnNumRecordsModified);
+	STDMETHOD(SearchAndModifyFileStatus)( long nWhereActionID,  EActionStatus eWhereStatus,  
+		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
+		long * pnNumRecordsModified);
 	STDMETHOD(SetStatusForAllFiles)( BSTR strAction,  EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)( long nID,  BSTR strAction,  EActionStatus eStatus,  EActionStatus * poldStatus);
 	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
@@ -120,6 +121,8 @@ public:
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
+	STDMETHOD(ModifyActionStatusForQuery)(BSTR bstrQueryFrom, BSTR bstrToAction,
+		EActionStatus eaStatus, BSTR bstrFromAction);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -301,7 +304,7 @@ private:
 	//			if bAddTransRecords is true records will be added to the transition table
 	//			using the connection provided.
 	void copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
-		string strTo, bool bAddTransRecords);
+		string strTo, bool bAddTransRecords, long nToActionID = -1);
 
 	// PROMISE:	To add action related columns and indexes to the FPMFile table
 	void addActionColumn(string strAction);
