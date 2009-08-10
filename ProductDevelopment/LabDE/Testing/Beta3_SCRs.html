@@ -48,7 +48,7 @@
 	<LI><b>[DataEntry #401, #509]</b> Tooltip Positioning and Overlap
        	<ul>
   	   	<LI>Use the test images from <b>I:\Common\Testing\PVCS_Testing\DataEntry\401</b>.  Note 
-		that VOA files are not needed since test can be done with swipes into various fields.
+		that VOA files are not needed since testing can be done with swipes into various fields.
 		<li>For each test case, confirm that the tooltips are reasonably positioned without 
 		overlapping each other, going offscreen, or obscuring highlighted text.
 		<li>Tooltips are allowed to shift but one tooltip should not extend past the midpoint 
@@ -118,13 +118,29 @@
 <p>
 	<LI><b>[DataEntry #416]</b> Code Fields Are Not Tab Stops
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Perform <b>Phase 1</b> verification of a test image.
+  	   	<LI>Confirm that tabbing through fields in the DEP skips over the following
+	       	<ul>
+	  	   	<LI>Ordering Physician Code
+	  	   	<LI>Orders - Epic Code
+	  	   	<LI>Selected Order Details - Lab Code
+	  	   	<LI>Test Code
+	       	</ul>
+  	   	<LI>Confirm that tabbing through fields in the DEP <b>does not</b> skip over 
+		the following fields if they previously had content
+	       	<ul>
+	  	   	<LI>Comments (for operator's use)
+	  	   	<LI>Selected Order Details - Comment
+	  	   	<LI>Test Comment
+	       	</ul>
        	</ul>
    	</LI>
 <p>
 	<LI><b>[DataEntry #487]</b> Table Cells Are Marked Read When Viewed By Row
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Perform <b>Phase 1</b> verification of a test image.
+  	   	<LI>Confirm that selecting a cell within a row marks that cell as read.
+  	   	<LI>Confirm that selecting the entire row marks each cell in the row as read.
        	</ul>
    	</LI>
 <p>
@@ -137,31 +153,92 @@
 <p>
 	<LI><b>[DataEntry #505, #559]</b> DataEntry and LabDE Have New Licenses
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Confirm that processing of images with LabDE rules will not work with a <b>FLEX 
+		Index Server</b> license.
+  	   	<LI>Confirm that processing of images with LabDE rules will work with a <b>LabDE 
+		Server</b> license.
        	</ul>
    	</LI>
 <p>
 	<LI><b>[DataEntry #528, #529]</b> Validation Is Disabled For Ordering Physician In Phase 1
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Perform <b>Phase 1</b> verification of a test image.
+  	   	<LI>Confirm that the <b>Ordering Physician</b> field is not validated.
+  	   	<LI>Perform <b>Phase 2</b> verification of a test image.
+  	   	<LI>Confirm that the <b>Ordering Physician</b> field is validated.
        	</ul>
    	</LI>
 <p>
 	<LI><b>[DataEntry #530]</b> Comments Can Be Added For Documents
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Confirm that the DEP includes a <b>Comments</b> edit box.
+  	   	<LI>Confirm that <b>Comments</b> provided during one verification session are 
+		retained and displayed during a subsequent verification session.
        	</ul>
    	</LI>
 <p>
 	<LI><b>[DataEntry #531]</b> Documents Can Be Skipped
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Confirm that a <b>File - Skip document</b> menu item is available.
+  	   	<LI>Confirm that selecting the <b>Skip document</b> menu item saves current 
+		settings without validation and advances to the next document.
+  	   	<LI>Confirm that skipping the last document saves current settings and 
+		stops processing.
+<p>
+		<li>Exercise <b>DB Admin</b> with respect to skipped files
+		<ul>
+			<li>Confirm that the <b>Summary</b> tab includes a column for Skipped files.
+			<li>Confirm that the <b>Summary</b> tab is updated properly with changes 
+			in file status.
+			<li>Confirm that <b>Manually set action status</b> includes options for 
+			Skipped files.
+			<li>Confirm that when updating status on <b>Skipped</b> files, the combo box for 
+			<b>By</b> is enabled.
+			<li>Confirm that the <b>By</b> combo box includes <b>&lt;any user&gt;</b> as the 
+			single option.
+		</ul>
+<p>
+		<li>Exercise <b>Processing Setup</b> with respect to skipped files
+		<ul>
+			<li>Confirm that a <b>File processing scope</b> group box exists.
+			<li>Confirm that the default option is to <b>Process all files in the queue 
+			(in order of priority)</b>.
+			<li>Confirm that the alternate option is to <b>Process all files that I skipped</b>.
+			<li>Confirm that the associated combo box includes options for <b>I</b> 
+			and <b>Anyone</b>.
+			<li>Confirm that processing files skipped by the current user works as expected.
+			<li>Confirm that processing files skipped by any user works as expected.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #533, #534, #562]</b> Image Path Edit Box and Copy Button
+       	<ul>
+  	   	<LI>Confirm that the DEP includes a read-only edit box containing the fully 
+		qualified path to the image.
+  	   	<LI>Confirm that the DEP includes a <b>Copy</b> button that allows the 
+		image path to be copied to the Clipboard.
+  	   	<LI>Confirm that the Copy button is disabled during <b>Phase 1</b> verification.
+  	   	<LI>Confirm that the Copy button is enabled during <b>Phase 2</b> verification.
        	</ul>
    	</LI>
 <p>
 	<LI><b>[DataEntry #550]</b> Tools - Options Menu
        	<ul>
-  	   	<LI>TBD
+  	   	<LI>Confirm that selecting <b>Tools - Options</b> displays an Options dialog.
+  	   	<LI>Confirm that three options are presented for <b>Center on selected text and</b>
+	       	<ul>
+  	   		<LI>Don't change zoom level
+  	   		<LI>Zoom out if necessary to fit current selection
+  	   		<LI>Automatically adjust zoom to area around current selection
+	       	</ul>
+  	   	<LI>Confirm that the slider bar is only enabled with <b>Automatically adjust zoom 
+		to area around current selection</b>.
+  	   	<LI>Confirm that <b>Don't change zoom level</b> works as expected.
+  	   	<LI>Confirm that <b>Zoom out if necessary to fit current selection</b> works 
+		as expected.
+  	   	<LI>Confirm that <b>Automatically adjust zoom to area around current selection</b> 
+		works as expected.  Exercise different levels of context around the selected data.
        	</ul>
    	</LI>
 <p>
