@@ -179,9 +179,7 @@ namespace Extract.DataEntry
                         if (spatialMode == SpatialMode.Only)
                         {
                             _stringResult = this.String;
-
                             _spatialResult.Append(otherResult.SpatialString);
-
                             _spatialResult.ReplaceAndDowngradeToHybrid(_stringResult);
                         }
                         // Otherwise, append the other result normally.
@@ -1046,6 +1044,22 @@ namespace Extract.DataEntry
             List<IAttribute> _triggerAttributes = new List<IAttribute>();
 
             /// <summary>
+            /// Indicates whether this query is a default query.
+            /// </summary>
+            bool _defaultQuery;
+
+            /// <summary>
+            /// Indicates whether an update using this query is needed once unresolved portions of
+            /// the query are resolved.
+            /// </summary>
+            bool _updatePending;
+
+            /// <summary>
+            /// Indicates whether this query is disabled and should not be evaluated.
+            /// </summary>
+            bool _disabled;
+
+            /// <summary>
             /// Initializes a new <see cref="RootQueryNode"/> instance.
             /// </summary>
             public RootQueryNode()
@@ -1054,9 +1068,46 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
+            /// Gets or set whether this query is a default query.
+            /// </summary>
+            /// <value><see langword="true"/> if this query is a default auto-update query which is
+            /// only to execute in order to provide a default value when there isn't an initial
+            /// value; <see langword="false"/> otherwise.</value>
+            /// <returns><see langword="true"/> if this query is a default auto-update query which
+            /// is only to execute in order to provide a default value when there isn't an initial
+            /// value; <see langword="false"/> otherwise.</returns>
+            public bool DefaultQuery
+            {
+                get
+                {
+                    return _defaultQuery;
+                }
+
+                set
+                {
+                    _defaultQuery = value;
+                }
+            }
+
+            /// <summary>
+            /// Gets whether the query is disabled.
+            /// </summary>
+            /// <returns><see langword="true"/> if the query is disabled; <see langword="false"/>
+            /// otherwise.</returns>
+            public bool Disabled
+            {
+                get
+                {
+                    return _disabled;
+                }
+            }
+
+            /// <summary>
             /// Attempts to update the target <see cref="IAttribute"/> using the result of the
             /// evaluated query.
             /// </summary>
+            /// <returns><see langword="true"/> if the <see cref="IAttribute"/> was updated;
+            /// <see langword="false"/> otherwise.</returns>
             public bool UpdateValue()
             {
                 try
@@ -1088,31 +1139,49 @@ namespace Extract.DataEntry
 
                             return true;
                         }
-                        // Otherwise, update the value of the attribute itself.
-                        else
+                        // If this auto-update query should only provide a default value
+                        else if (this.DefaultQuery)
                         {
-                            if (!string.IsNullOrEmpty(queryResult.String) || queryResult.IsSpatial)
+                            // If this is a default trigger that is fully resolved, it will
+                            // never need to fire again-- clear all triggers.
+                            if (this.IsFullyResolved)
                             {
-                                // Update the attribute's value.
-                                if (queryResult.IsSpatial)
-                                {
-                                    AttributeStatusInfo.SetValue(_trigger._targetAttribute,
-                                        queryResult.SpatialString, false, true);
-                                }
-                                else
-                                {
-                                    AttributeStatusInfo.SetValue(_trigger._targetAttribute,
-                                        queryResult.String, false, true);
-                                }
+                                _disabled = true;
+                                ClearAllTriggers();
+                            }
 
-                                // After applying the value, direct the control that contains it to
-                                // refresh the value.
-                                AttributeStatusInfo.GetOwningControl(_trigger._targetAttribute).
-                                    RefreshAttribute(_trigger._targetAttribute);
+                            // If the target attribute is empty and would need a default value
+                            // (or it was when the default trigger was created) update the
+                            // attribute using the default value.
+                            if (_updatePending ||
+                                string.IsNullOrEmpty(_trigger._targetAttribute.Value.String))
+                            {
+                                // If the default query is not fully resolved, flag _updatePending
+                                // to allow it an opportunity to apply its update as query
+                                // components become resolved.
+                                _updatePending = !this.IsFullyResolved;
 
-                                return true;
+                                // Apply the default query value.
+                                return ApplyQueryResult(queryResult);
+                            }
+                            else
+                            {
+                                return false;
                             }
                         }
+                        // A normal auto-update query- apply the query results (if there were any).
+                        else
+                        {
+                            return ApplyQueryResult(queryResult);
+                        }
+                    }
+                    else if (this.DefaultQuery &&
+                        string.IsNullOrEmpty(_trigger._targetAttribute.Value.String))
+                    {
+                        // If the target attribute could use a default value, but the default query
+                        // is not yet resolved, set _updatePending so that it will fire
+                        // once it is resolved.
+                        _updatePending = true;
                     }
 
                     return false;
@@ -1178,13 +1247,7 @@ namespace Extract.DataEntry
                 if (disposing)
                 {
                     // Ensure no more AttributeValueModified events are handled.
-                    foreach (IAttribute attribute in _triggerAttributes)
-                    {
-                        AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
-                        statusInfo.AttributeValueModified -= HandleAttributeValueModified;
-                    }
-
-                    _triggerAttributes.Clear();
+                    ClearAllTriggers();
                 }
             }
 
@@ -1206,7 +1269,18 @@ namespace Extract.DataEntry
                     // If the modification is not incremental, update the attribute value.
                     if (!e.IncrementalUpdate)
                     {
-                        UpdateValue();
+                        if (this.DefaultQuery)
+                        {
+                            // Always ensure a default query applies updates as part of a full
+                            // auto-update trigger to ensure normal auto-update triggers can apply
+                            // their updates on top of any default value.
+                            _trigger.UpdateValue();
+                        }
+                        else
+                        {
+                            // If no a default auto-update trigger, update using only this query.
+                            UpdateValue();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -1218,6 +1292,61 @@ namespace Extract.DataEntry
             }
 
             #endregion Event Handlers
+
+            #region Private Members
+
+            /// <summary>
+            /// Unregisters all triggers so that this query will no longer execute in response to
+            /// updated attribute.
+            /// </summary>
+            public void ClearAllTriggers()
+            {
+                foreach (IAttribute attribute in _triggerAttributes)
+                {
+                    AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                    statusInfo.AttributeValueModified -= HandleAttributeValueModified;
+                }
+
+                _triggerAttributes.Clear();
+            }
+
+            /// <summary>
+            /// Attempts to apply the specified <see cref="QueryResult"/> to the target attribute.
+            /// </summary>
+            /// <param name="queryResult">The <see cref="QueryResult"/> to be applied.</param>
+            /// <returns><see langword="true"/> if the <see cref="IAttribute"/> was updated;
+            /// <see langword="false"/> otherwise.</returns>
+            bool ApplyQueryResult(QueryResult queryResult)
+            {
+                if (!string.IsNullOrEmpty(queryResult.String) ||
+                    queryResult.IsSpatial)
+                {
+                    // Update the attribute's value.
+                    if (queryResult.IsSpatial)
+                    {
+                        AttributeStatusInfo.SetValue(_trigger._targetAttribute,
+                            queryResult.SpatialString, false, true);
+                    }
+                    else
+                    {
+                        AttributeStatusInfo.SetValue(_trigger._targetAttribute,
+                            queryResult.String, false, true);
+                    }
+
+                    // After applying the value, direct the control that contains it to
+                    // refresh the value.
+                    AttributeStatusInfo.GetOwningControl(_trigger._targetAttribute).
+                        RefreshAttribute(_trigger._targetAttribute);
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            #endregion Private Members
         }
     }
 }

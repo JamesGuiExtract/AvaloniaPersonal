@@ -118,7 +118,10 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="_laboratoryIdentifier.AutoUpdateQuery" xml:space="preserve">
-    <value>&lt;SQL Required='0'&gt;SELECT LabName FROM LabAddresses WHERE Address1 LIKE SUBSTRING(&lt;Attribute SpatialMode='Force'&gt;../Address/Address1&lt;/Attribute&gt;,1,10) + '%' AND City LIKE SUBSTRING(&lt;Attribute SpatialMode='Force'&gt;../Address/City&lt;/Attribute&gt;,1,5) + '%' AND Zip LIKE SUBSTRING(&lt;Attribute SpatialMode='Force'&gt;../Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Address/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Name&lt;/Attribute&gt;</value>
+    <value>&lt;Query Default='1'&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Name&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Address/City&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Address/State&lt;/Attribute&gt;&lt;Attribute SpatialMode='Only' Required='0'&gt;../Address/ZipCode&lt;/Attribute&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%') + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and Zip LIKE SUBSTRING(&lt;Attribute&gt;../Address/ZipCode&lt;/Attribute&gt;,1,5) + '%'&lt;/SQL&gt;&lt;/Query&gt;
+&lt;Query&gt;&lt;SQL&gt;SELECT LabName FROM LabAddresses WHERE LabName LIKE '%' + SUBSTRING(REPLACE(REPLACE(REPLACE(REPLACE(&lt;Attribute&gt;../Name&lt;/Attribute&gt;, ' ', '%'), 'LABORATORY', '%'),'LABORATORIES', '%'), 'MEDICAL', '%'), 1, 10) + '%' and City LIKE &lt;Attribute&gt;../Address/City&lt;/Attribute&gt;&lt;/SQL&gt;&lt;/Query&gt;</value>
   </data>
   <metadata name="_testName.UserAddedColumn" type="System.Boolean, mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>

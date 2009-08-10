@@ -2206,6 +2206,22 @@ namespace Extract.DataEntry
             {
                 OnDataChanged();
 
+                // If the spatial info for the attribute has changed, re-create the highlight for
+                // the attribute with the new spatial information.
+                if (e.SpatialInfoChanged)
+                {
+                    RemoveAttributeHighlight(e.Attribute);
+
+                    SetAttributeHighlight(e.Attribute, false);
+
+                    // Update the highlights as long as image is not currently loading or a swipe
+                    // is not currently in progress.
+                    if (!_changingImage && !_processingSwipe)
+                    {
+                        DrawHighlights(false);
+                    }
+                }
+
                 // Update the attribute's highlights if the modification is not happening during 
                 // image loading, and the update is coming from the active data control.
                 // [DataEntry:329]
@@ -2238,8 +2254,6 @@ namespace Extract.DataEntry
                     // Always redraw the highlights in order to create/update the tooltip of the
                     // attribute that changed (even if it is not the only one selected)
                     DrawHighlights(false);
-
-                    _imageViewer.Invalidate();
                 }
             }
             catch (Exception ex)
@@ -2579,12 +2593,18 @@ namespace Extract.DataEntry
                         AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect)
                     {
                         // If there is not currently a hover attribute or the current hover attribute
-                        // is a hint while the new candidate is not, use the new attribute as the hover
-                        // attribute.
+                        // is a hint while the new candidate is not, use the new attribute as the
+                        // hover attribute.
                         if (_hoverAttribute == null ||
-                            AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
-                            AttributeStatusInfo.GetHintType(_hoverAttribute) != HintType.None)
+                            (AttributeStatusInfo.GetHintType(attribute) == HintType.None &&
+                             AttributeStatusInfo.GetHintType(_hoverAttribute) != HintType.None))
                         {
+                            // Remove any tooltip the previous hover attribute may have had.
+                            if (_hoverAttribute != null)
+                            {
+                                RemoveAttributeToolTip(_hoverAttribute);
+                            }
+
                             _hoverAttribute = attribute;
                             DrawHighlights(false);
                         }
@@ -2662,6 +2682,7 @@ namespace Extract.DataEntry
 
                         // Selection is changing to the hover attribute, so it is no longer the
                         // hover attribute.
+                        RemoveAttributeToolTip(_hoverAttribute);
                         _hoverAttribute = null;
 
                         // Indicate a manual focus event so that HandleControlGotFocus allows the
@@ -4653,10 +4674,6 @@ namespace Extract.DataEntry
             // Check if the attribute is the _hoverAttribute and remove the _hoverToolTip if so.
             if (attribute != null && attribute == _hoverAttribute && _hoverToolTip != null)
             {
-                if (_imageViewer.LayerObjects.Contains(_hoverToolTip.TextLayerObject))
-                {
-                    _imageViewer.LayerObjects.Remove(_hoverToolTip.TextLayerObject);
-                }
                 _hoverToolTip.Dispose();
                 _hoverToolTip = null;
             }
@@ -4668,11 +4685,6 @@ namespace Extract.DataEntry
             {
                 if (toolTip != null)
                 {
-                    if (_imageViewer.LayerObjects.Contains(toolTip.TextLayerObject))
-                    {
-                        _imageViewer.LayerObjects.Remove(toolTip.TextLayerObject);
-                    }
-
                     toolTip.Dispose();
                 }
 

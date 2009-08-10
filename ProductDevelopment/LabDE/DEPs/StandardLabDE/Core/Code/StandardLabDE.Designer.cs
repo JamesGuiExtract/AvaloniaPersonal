@@ -1418,7 +1418,9 @@ namespace Extract.LabDE.StandardLabDE
             this._labName.AttributeName = "Name";
             this._labName.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._labName.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
-            this._labName.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../LabInfo/Name</Attribute></Query>";
+            this._labName.AutoUpdateQuery = "<Query Default=\'1\'><Attribute>../../../LabInfo/Name</Attribute></Query>\r\n<Query><" +
+                "SQL>SELECT LabName FROM LabAddresses WHERE LabCode = <Attribute>../LabCode</Attr" +
+                "ibute></SQL></Query>";
             this._labName.Disabled = false;
             this._labName.FormattingRuleFile = null;
             this._labName.Location = new System.Drawing.Point(6, 44);
@@ -1449,7 +1451,6 @@ namespace Extract.LabDE.StandardLabDE
             this.Controls.Add(this._filenameLabel);
             this.Controls.Add(this._operatorCommentLabel);
             this.Controls.Add(this._labAddress);
-            this.Controls.Add(this._labName);
             this.Controls.Add(this._resultStatusLabel);
             this.Controls.Add(this._resultStatus);
             this.Controls.Add(this._testsGroupBox);
@@ -1457,6 +1458,7 @@ namespace Extract.LabDE.StandardLabDE
             this.Controls.Add(this._physicianInfoGroupBox);
             this.Controls.Add(this._patientInfoGroupBox);
             this.Controls.Add(this._operatorComments);
+            this.Controls.Add(this._labName);
             highlightColor1.Color = System.Drawing.Color.LightSalmon;
             highlightColor1.MaxOcrConfidence = 89;
             highlightColor2.Color = System.Drawing.Color.LightGreen;

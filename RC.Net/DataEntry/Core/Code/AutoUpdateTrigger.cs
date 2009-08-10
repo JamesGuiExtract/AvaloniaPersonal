@@ -117,6 +117,7 @@ namespace Extract.DataEntry
                         ExtractException.Assert("ELI26763",
                             "Only one default query can be specified!", _defaultQuery == null);
 
+                        rootQuery.DefaultQuery = true;
                         _defaultQuery = rootQuery;
                     }
                     // Otherwise add it into the general _queries list.
@@ -244,6 +245,14 @@ namespace Extract.DataEntry
             {
                 bool valueUpdated = false;
 
+                // If the attribute's value is empty and a default query has been specified,
+                // update the attribute using the default query.
+                if (_defaultQuery != null && !_defaultQuery.Disabled &&
+                    _defaultQuery.IsMinimallyResolved)
+                {
+                    _defaultQuery.UpdateValue();
+                }
+
                 // Attempt an update with all resolved queries.
                 foreach (RootQueryNode query in _queries)
                 {
@@ -254,15 +263,6 @@ namespace Extract.DataEntry
                         valueUpdated = true;
                         break;
                     }
-                }
-
-                // If an update hasn't yet occured, the attribute's value is empty and a default
-                // query has been specified, update the attribute using the default query.
-                if (!valueUpdated && _defaultQuery != null && _defaultQuery.IsMinimallyResolved &&
-                    string.IsNullOrEmpty(_targetAttribute.Value.String) &&
-                    _defaultQuery.UpdateValue())
-                {
-                    valueUpdated = true;
                 }
 
                 return valueUpdated;

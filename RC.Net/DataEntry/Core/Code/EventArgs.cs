@@ -307,6 +307,11 @@ namespace Extract.DataEntry
         private readonly bool _acceptSpatialInfo;
 
         /// <summary>
+        /// Specifies whether the spatial info for the <see cref="IAttribute"/> has changed.
+        /// </summary>
+        readonly bool _spatialInfoChanged;
+
+        /// <summary>
         /// Initializes a new <see cref="AttributeValueModifiedEventArgs"/> instance.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> whose value was modified.</param>
@@ -316,14 +321,18 @@ namespace Extract.DataEntry
         /// trigger the <see cref="IAttribute"/>'s spatial info to be accepted,
         /// <see langword="false"/> if the spatial info acceptance state should be left as is.
         /// </param>
-        public AttributeValueModifiedEventArgs(IAttribute attribute, bool incrementalUpdate, 
-            bool acceptSpatialInfo)
+        /// <param name="spatialInfoChanged"><see langword="true"/> if the spatial info for the
+        /// <see cref="IAttribute"/> has changed, <see langword="false"/> if only the text has
+        /// changed.</param>
+        public AttributeValueModifiedEventArgs(IAttribute attribute, bool incrementalUpdate,
+            bool acceptSpatialInfo, bool spatialInfoChanged)
         {
             try
             {
                 _attribute = attribute;
                 _incrementalUpdate = incrementalUpdate;
                 _acceptSpatialInfo = acceptSpatialInfo;
+                _spatialInfoChanged = spatialInfoChanged;
             }
             catch (Exception ex)
             {
@@ -370,6 +379,19 @@ namespace Extract.DataEntry
             get
             {
                 return _acceptSpatialInfo;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the spatial info for the <see cref="IAttribute"/> has changed.
+        /// </summary>
+        /// <returns><see langword="true"/> if the spatial info for the <see cref="IAttribute"/>
+        /// has changed, <see langword="false"/> if only the text has changed.</returns>
+        public bool SpatialInfoChanged
+        {
+            get
+            {
+                return _spatialInfoChanged;
             }
         }
     }

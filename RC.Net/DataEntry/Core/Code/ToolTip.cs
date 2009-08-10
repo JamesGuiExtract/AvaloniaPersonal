@@ -348,10 +348,15 @@ namespace Extract.DataEntry
             {
                 if (disposing)
                 {
-                    // The TextLayerObject's Dispose will remove itself from the ImageViewer if
-                    // necessary.
                     if (_textLayerObject != null)
                     {
+                        // Remove the text layer object from the ImageViewer if necessary.
+                        if (_host.ImageViewer != null &&
+                            _host.ImageViewer.LayerObjects.Contains(_textLayerObject))
+                        {
+                            _host.ImageViewer.LayerObjects.Remove(_textLayerObject);
+                        }
+
                         _textLayerObject.Dispose();
                         _textLayerObject = null;
                     }

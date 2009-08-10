@@ -627,11 +627,11 @@ namespace Extract.DataEntry
 
         /// <summary>
         /// Keeps track of the attributes that have been modified since the last time EndEdit was
-        /// called in order to determine for which attributes an AttributeValueModified event needs
-        /// to be fired.
+        /// called and whether the spatial information for the attribute changed or not in order to
+        /// determine for which attributes an AttributeValueModified event needs to be fired.
         /// </summary>
-        private static List<IAttribute> _attributesBeingModified =
-            new List<IAttribute>();
+        private static Dictionary<IAttribute, bool> _attributesBeingModified =
+            new Dictionary<IAttribute, bool>();
 
         /// <summary>
         /// Keeps track of whether EndEdit is currently being processed.
@@ -1322,7 +1322,7 @@ namespace Extract.DataEntry
                 {
                     // If EndEdit is currently being processed (and this is a result of it), raise
                     // the non-incremental modification event now.
-                    statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo);
+                    statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, true);
                 }
                 else
                 {
@@ -1330,13 +1330,10 @@ namespace Extract.DataEntry
                     {
                         // If not the end of the edit raise an incremental modification event and
                         // queue the value for an eventual non-incremental event.
-                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, true);
                     }
 
-                    if (!_attributesBeingModified.Contains(attribute))
-                    {
-                        _attributesBeingModified.Add(attribute);
-                    }
+                    _attributesBeingModified[attribute] = true;
 
                     // After queing the modification, call EndEdit if directed.
                     if (endOfEdit)
@@ -1396,17 +1393,17 @@ namespace Extract.DataEntry
                     {
                         // If EndEdit is currently being processed (and this is a result of it), raise
                         // the non-incremental modification event now.
-                        statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo);
+                        statusInfo.OnAttributeValueModified(attribute, false, acceptSpatialInfo, false);
                     }
                     else
                     {
                         // Raise an incremental modification event and queue the value for an
                         // eventual non-incremental event.
-                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo);
+                        statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, false);
 
-                        if (!_attributesBeingModified.Contains(attribute))
+                        if (!_attributesBeingModified.ContainsKey(attribute))
                         {
-                            _attributesBeingModified.Add(attribute);
+                            _attributesBeingModified[attribute] = false;
                         }
                     }
                 }
@@ -2437,10 +2434,12 @@ namespace Extract.DataEntry
                     {
                         _endEditInProgress = true;
 
-                        foreach (IAttribute attribute in _attributesBeingModified)
+                        foreach (KeyValuePair<IAttribute, bool> modifiedAttribute in
+                            _attributesBeingModified)
                         {
-                            AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
-                            statusInfo.OnAttributeValueModified(attribute, false, false);
+                            AttributeStatusInfo statusInfo = GetStatusInfo(modifiedAttribute.Key);
+                            statusInfo.OnAttributeValueModified(modifiedAttribute.Key, false, false,
+                                modifiedAttribute.Value);
                         }
 
                         _attributesBeingModified.Clear();
@@ -2686,8 +2685,11 @@ namespace Extract.DataEntry
         /// trigger the <see cref="IAttribute"/>'s spatial info to be accepted,
         /// <see langword="false"/> if the spatial info acceptance state should be left as is.
         /// </param>
+        /// <param name="spatialInfoChanged"><see langword="true"/> if the spatial info for the
+        /// <see cref="IAttribute"/> has changed, <see langword="false"/> if only the text has
+        /// changed.</param>
         private void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
-            bool acceptSpatialInfo)
+            bool acceptSpatialInfo, bool spatialInfoChanged)
         {
             // Don't raise the event if it is already being raised (prevents recursion).
             if (this.AttributeValueModified != null && !_raisingAttributeValueModified)
@@ -2698,7 +2700,7 @@ namespace Extract.DataEntry
 
                     AttributeValueModified(this,
                         new AttributeValueModifiedEventArgs(
-                            attribute, incrementalUpdate, acceptSpatialInfo));
+                            attribute, incrementalUpdate, acceptSpatialInfo, spatialInfoChanged));
                 }
                 finally
                 {
