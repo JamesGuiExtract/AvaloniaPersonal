@@ -1,0 +1,112 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.0 Hotfix 09 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.0 Hotfix 09 Testing </h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Customer:</b> Priton Group
+   	<LI><b>SCRs:</b> FlexIDSCore #3627
+   	<LI><b>Issue:</b> This customer would like to use our Redaction Verification user interface 
+	without a back-end database.  The current verification task requires a database pointer 
+	so that the ID Shield data table can be updated appropriately.  Modify the relevant code 
+	so that for a NULL database pointer, the database updates are skipped.
+</ul>
+<p>
+<h3>Hotfix Tests</h3>
+<OL>
+	<LI><b>Test Setup</b>
+	<ul>
+		<LI>Install <b>7.0.0.39</b> on a test machine.
+		<LI>Install <b>Visual Studio 2008 Express C#</b> on the same test machine.
+		<LI>Install <b>Hotfix #09</b> on the same test machine.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Tests</b>
+	<ul>
+		<LI><b>SDK Testing</b>
+		<ul>
+			<li>Create an SDK license file with saved passwords for the test machine.
+			<li>Copy the <b>IDShieldIntegrationDemo.zip</b> solution to the test 
+			machine from <b>I:\Users\Jeff_Shergalis\Public\Hotfix-9</b>.
+			<li>Modify <b>Form1.cs</b> to use the appropriate license file 
+			and passwords.
+			<li>Build the test solution.
+<p>
+			<li>Exercise <b>IDShieldIntegrationDemo.exe</b> with Demo_IDShield rules and images
+	       		<ul>
+				<li>Click the <b>Run rules</b> button.
+				<li>Confirm that (for TestImage001.tif) two message boxes containing 
+				position information for a redaction rectangle appear.
+<p>
+				<li>Click the <b>Verify results</b> button.
+				<li>Confirm that the verification UI appears.
+				<li>Click the <b>Save redacted image</b> button.
+				<li>Confirm that a redacted image is created.
+				<li>Confirm that a metadata XML file is created for the 
+				redacted image.
+				<li>Delete the redacted image.
+				<li>Confirm that <b>RedactFromXML.exe</b> properly creates 
+				a redacted image from the metadata XML file.
+<p>
+				<li>Click the <b>Verify results</b> button again.
+				<li>Confirm that the verification UI appears.
+				<li>Add one or more manual redactions.
+				<li>Click the <b>Save redacted image</b> button.
+				<li>Confirm that a redacted image is created that includes 
+				the manual redactions.
+				<li>Confirm that a metadata XML file is created for the 
+				redacted image.
+				<li>Delete the redacted image.
+				<li>Confirm that <b>RedactFromXML.exe</b> properly creates 
+				a redacted image from the metadata XML file.
+	       		</ul>
+       		</ul>
+	   	</LI>
+<p>
+		<LI><b>Normal Testing</b>
+		<ul>
+			<li>Exercise the <b>ID Shield Testing</b> section of the Sanity Test checklist.
+			<li>Confirm that <b>RedactFromXML.exe</b> properly creates 
+			redacted images from metadata XML files.
+<p>
+			<li>Exercise the <b>ID Shield List of Documents Verified By Specific User</b> 
+			report.  Confirm that data was provided to the database so that a meaningful 
+			report could be created.
+			<li>Exercise the <b>ID Shield Verification Times And Rates (By User)</b> 
+			report.  Confirm that data was provided to the database so that a meaningful 
+			report could be created.
+	       	</ul>
+   		</LI>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Sanity Test</b>
+       	<ul>
+  	   	<LI>Operating system: ____________________
+  	   	<LI>Test machine: ____________________
+  	   	<LI>Tester: ____________________
+  	   	<LI>Date: ____________________
+  	   	<LI>Notes: ____________________
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Automated Testing</b>
+       	<ul>
+  	   	<LI>Automated Tests : AFCore.tcl
+  	   	<LI>National Ruleset : Grantor-Grantee
+		<LI>National Ruleset : Document Classification
+		<LI>National Ruleset : Redaction
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
