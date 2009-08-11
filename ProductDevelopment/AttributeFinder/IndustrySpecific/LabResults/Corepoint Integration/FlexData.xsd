@@ -4,6 +4,13 @@
   <xs:element name="FlexData">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="OperatorComments" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="ResultStatus" minOccurs="1">
           <xs:complexType>
             <xs:sequence>
