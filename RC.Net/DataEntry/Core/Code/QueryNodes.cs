@@ -344,6 +344,14 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
+            /// Causes the values returned by <see cref="IsFullyResolved"/> and
+            /// <see cref="IsMinimallyResolved"/> to be re-calculated.
+            /// </summary>
+            public virtual void UpdateResolvedStatus()
+            {
+            }
+
+            /// <summary>
             /// Attempts to register candidate <see cref="IAttribute"/> trigger(s).
             /// </summary>
             /// <param name="statusInfo">If <see langword="null"/> the <see cref="QueryNode"/> will
@@ -484,6 +492,20 @@ namespace Extract.DataEntry
             protected List<QueryNode> _childNodes = new List<QueryNode>();
 
             /// <summary>
+            /// Caches the <see cref="IsFullyResolved"/> status of the query node.
+            /// <see langword="null"/> if there is no cached value and IsFullyResolved needs to be
+            /// re-calculated.
+            /// </summary>
+            bool? _isFullyResolved;
+
+            /// <summary>
+            /// Caches the <see cref="IsMinimallyResolved"/> status of the query node.
+            /// <see langword="null"/> if there is no cached value and IsMinimallyResolved needs to be
+            /// re-calculated.
+            /// </summary>
+            bool? _isMinimallyResolved;
+
+            /// <summary>
             /// Initializes a new <see cref="ComplexQueryNode"/> instance.
             /// </summary>
             public ComplexQueryNode()
@@ -586,6 +608,23 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
+            /// Causes the values returned by <see cref="IsFullyResolved"/> and
+            /// <see cref="IsMinimallyResolved"/> to be re-calculated.
+            /// </summary>
+            public override void UpdateResolvedStatus()
+            {
+                // Clear the local cached values.
+                _isFullyResolved = null;
+                _isMinimallyResolved = null;
+
+                // Call UpdateResolvedStatus on any child complex nodes.
+                foreach (QueryNode childNode in _childNodes)
+                {
+                    childNode.UpdateResolvedStatus();
+                }
+            }
+
+            /// <summary>
             /// Gets whether the query node is resolved enough to be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> if all required triggers are registered and the
@@ -595,15 +634,26 @@ namespace Extract.DataEntry
             {
                 get
                 {
+                    // If there is a cached minimally resolved status, return it.
+                    if (_isMinimallyResolved != null)
+                    {
+                        return _isMinimallyResolved.Value;
+                    }
+
+                    // ...otherwise, re-calculate it. Default to true.
+                    _isMinimallyResolved = true;
+
+                    // If any child not is not minimally resolved, neither is this node.
                     foreach (QueryNode childNode in _childNodes)
                     {
                         if (!childNode.IsMinimallyResolved)
                         {
-                            return false;
+                            _isMinimallyResolved = false;
+                            break;
                         }
                     }
 
-                    return true;
+                    return _isMinimallyResolved.Value;
                 }
             }
 
@@ -618,15 +668,26 @@ namespace Extract.DataEntry
             {
                 get
                 {
+                    // If there is a cached fully resolved status, return it.
+                    if (_isFullyResolved != null)
+                    {
+                        return _isFullyResolved.Value;
+                    }
+
+                    // ...otherwise, re-calculate it. Default to true.
+                    _isFullyResolved = true;
+
+                    // If any child not is not fully resolved, neither is this node.
                     foreach (QueryNode childNode in _childNodes)
                     {
                         if (!childNode.IsFullyResolved)
                         {
-                            return false;
+                            _isFullyResolved = false;
+                            break;
                         }
                     }
 
-                    return true;
+                    return _isFullyResolved.Value;
                 }
             }
 
@@ -641,7 +702,7 @@ namespace Extract.DataEntry
             /// resolved; <see langword="false"/> otherwise.</returns>
             public override bool RegisterTriggerCandidate(AttributeStatusInfo statusInfo)
             {
-                bool resolved = false;
+                bool resolvedAttribute = false;
 
                 // If this query isn't fully resolved, attempt to register all child query nodes.
                 if (!this.IsFullyResolved)
@@ -650,12 +711,19 @@ namespace Extract.DataEntry
                     {
                         if (childNode.RegisterTriggerCandidate(statusInfo))
                         {
-                            resolved = true;
+                            resolvedAttribute = true;
                         }
                     }
                 }
 
-                return resolved;
+                // If child node was resolved, the cached resolved statuses need to be recalculated.
+                if (resolvedAttribute)
+                {
+                    _isFullyResolved = null;
+                    _isMinimallyResolved = null;
+                }
+
+                return resolvedAttribute;
             }
 
             /// <summary>
@@ -1126,8 +1194,10 @@ namespace Extract.DataEntry
                             AttributeStatusInfo statusInfo =
                                 AttributeStatusInfo.GetStatusInfo(_trigger._targetAttribute);
 
-                            DataEntryValidator validator = statusInfo.Validator;
-                            ExtractException.Assert("ELI26154", "Uninitialized validator!",
+                            // Validation queries can only be specified for attributes with a
+                            // DataEntryValidator as its validator.
+                            DataEntryValidator validator = statusInfo.Validator as DataEntryValidator;
+                            ExtractException.Assert("ELI26154", "Uninitialized or invalid validator!",
                                 validator != null);
 
                             // Parse the file contents into individual list items.
@@ -1223,6 +1293,10 @@ namespace Extract.DataEntry
 
                     AttributeStatusInfo.GetStatusInfo(triggerAttribute).AttributeValueModified -=
                         HandleAttributeValueModified;
+
+                    // Ensure all nodes in the query update cached resolved status values to reflect
+                    // the change.
+                    _rootQuery.UpdateResolvedStatus();
                 }
             }
 

@@ -16,7 +16,8 @@ namespace Extract.DataEntry
     /// text of another control to the clipboard and report its "data" as invalid until it is
     /// pressed.
     /// </summary>
-    public partial class DataEntryCopyButton : Button, IDataEntryControl, IRequiresErrorProvider
+    public partial class DataEntryCopyButton : Button, IDataEntryControl, IRequiresErrorProvider,
+        IDataEntryValidator
     {
         #region Fields
 
@@ -159,6 +160,37 @@ namespace Extract.DataEntry
         }
 
         #endregion Overrides
+
+        #region IDataEntryValidator Members
+
+        /// <summary>
+        /// Tests to see if the provided <see cref="IAttribute"/> meets all specified 
+        /// validation requirements the implementing class has.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose data is to be validated.
+        /// </param>
+        /// <throws><see cref="DataEntryValidationException"/> if the <see cref="IAttribute"/>'s 
+        /// data fails to match any validation requirements it has.</throws>
+        public void Validate(IAttribute attribute)
+        {
+            try
+            {
+                ExtractException.Assert("ELI27080", "Error validating data!",
+                    attribute == _attribute);
+
+                if (!AttributeStatusInfo.IsDataValid(attribute))
+                {
+                    throw new DataEntryValidationException("ELI27081", _validationErrorMessage,
+                        this);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27079", ex);
+            }
+        }
+
+        #endregion IDataEntryValidator Members
 
         #region IRequiresErrorProvider Members
 
@@ -313,7 +345,7 @@ namespace Extract.DataEntry
                     // attribute if no such attribute can be found.
                     _attribute = DataEntryMethods.InitializeAttribute(_attributeName,
                         MultipleMatchSelectionMode.First, !string.IsNullOrEmpty(_attributeName),
-                        sourceAttributes, null, this, 0, false, _tabStopMode, null, null, null);
+                        sourceAttributes, null, this, 0, false, _tabStopMode, this, null, null);
 
                     if (base.Visible)
                     {

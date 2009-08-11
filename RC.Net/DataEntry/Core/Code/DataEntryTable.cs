@@ -577,7 +577,7 @@ namespace Extract.DataEntry
                 bool rowView = selectedAttributes.Size() == 1 && !base.DragOverInProgress;
 
                 // If the whole row is being viewed, mark the row's attributes as viewed.
-                if (rowView)
+                if (rowView && base.IsActive)
                 {
                     foreach (DataGridViewCell cell in base.SelectedRows[0].Cells)
                     {
@@ -646,7 +646,7 @@ namespace Extract.DataEntry
                 bool rowView = selectedRowAttributes.Size() == 1 && !base.DragOverInProgress;
 
                 // If the whole row is being viewed, mark the row's attributes as viewed.
-                if (rowView)
+                if (rowView && base.IsActive)
                 {
                     int selectedCount = selectedAttributes.Size();
                     for (int i = 0; i < selectedCount; i++)

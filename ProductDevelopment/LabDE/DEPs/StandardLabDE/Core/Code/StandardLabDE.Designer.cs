@@ -130,17 +130,17 @@ namespace Extract.LabDE.StandardLabDE
             this._laboratoryIdentifier.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
             this._laboratoryIdentifier.AttributeName = "LabIdentifier";
+            this._laboratoryIdentifier.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
             this._laboratoryIdentifier.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
             this._laboratoryIdentifier.AutoUpdateQuery = resources.GetString("_laboratoryIdentifier.AutoUpdateQuery");
             this._laboratoryIdentifier.Disabled = false;
-            this._laboratoryIdentifier.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this._laboratoryIdentifier.FormattingEnabled = true;
             this._laboratoryIdentifier.FormattingRuleFile = null;
             this._laboratoryIdentifier.Location = new System.Drawing.Point(7, 70);
             this._laboratoryIdentifier.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._laboratoryIdentifier.Name = "_laboratoryIdentifier";
             this._laboratoryIdentifier.ParentDataEntryControl = this._labInfoPassThrough;
-            this._laboratoryIdentifier.Size = new System.Drawing.Size(447, 21);
+            this._laboratoryIdentifier.Size = new System.Drawing.Size(428, 21);
             this._laboratoryIdentifier.SupportsSwiping = false;
             this._laboratoryIdentifier.TabIndex = 1;
             this._laboratoryIdentifier.TabStopMode = Extract.DataEntry.TabStopMode.Always;
@@ -1442,6 +1442,7 @@ namespace Extract.LabDE.StandardLabDE
             // 
             this.AboutLogo = global::Extract.LabDE.StandardLabDE.Properties.Resources._labDELogo;
             this.ApplicationDescription = "A powerful productivity tool for your lab, hospital or clinic.";
+            this.ApplicationIcon = ((System.Drawing.Icon)(resources.GetObject("$this.ApplicationIcon")));
             this.ApplicationTitle = "LabDE";
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.SystemColors.Control;

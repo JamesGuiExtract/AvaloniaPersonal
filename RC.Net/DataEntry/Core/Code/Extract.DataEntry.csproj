@@ -181,6 +181,7 @@
     <Compile Include="IDataEntryTableCell.cs">
       <DependentUpon>DataEntryTableBase.cs</DependentUpon>
     </Compile>
+    <Compile Include="IDataEntryValidator.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

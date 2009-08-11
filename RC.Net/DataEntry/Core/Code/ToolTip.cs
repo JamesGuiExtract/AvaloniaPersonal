@@ -106,6 +106,12 @@ namespace Extract.DataEntry
             double _shiftProjectionFactor;
 
             /// <summary>
+            /// Specifies the rotation (in degrees, as a multiple of 90) that would best position
+            /// the tooltips being drawn "up" in relation to the image coordinates.
+            /// </summary>
+            int _referenceOrientation;
+
+            /// <summary>
             /// The smallest rectangle containing the TextLayerObject in ImageViewer coordinates.
             /// </summary>
             Rectangle _normalizedBounds;
@@ -233,7 +239,7 @@ namespace Extract.DataEntry
                             // Check for overlap between the last tooltip and this tooltip's attribute.
                             Rectangle lastToolTipBounds = GeometryMethods.RotateRectangle(
                                 lastToolTip._textLayerObject.GetBounds(),
-                                lastToolTip._host.ImageViewer.Orientation, new PointF(0, 0));
+                                toolTip._referenceOrientation, new PointF(0, 0));
                             lastToolTipBounds.Offset(-lastToolTip._normalizedImageBounds.X,
                                 -lastToolTip._normalizedImageBounds.Y);
                             Rectangle overlap =
@@ -251,7 +257,7 @@ namespace Extract.DataEntry
                             // attribute.
                             Rectangle toolTipBounds = GeometryMethods.RotateRectangle(
                                 toolTip._textLayerObject.GetBounds(),
-                                toolTip._host.ImageViewer.Orientation, new PointF(0, 0));
+                                toolTip._referenceOrientation, new PointF(0, 0));
                             toolTipBounds.Offset(-toolTip._normalizedImageBounds.X,
                                 -toolTip._normalizedImageBounds.Y);
                             overlap =
@@ -535,6 +541,10 @@ namespace Extract.DataEntry
                         "ToolTip", toolTipText, _host._toolTipFont, _highlightAnchorPoint,
                         toolTipAnchorAlignment, Color.Yellow, Color.Black, (float)toolTipRotation);
 
+                    // Calculate the _referenceOrientation as the closest 90 degree angle to the
+                    // negative of the specified tooltip rotation.
+                    _referenceOrientation = - (int)Math.Round(toolTipRotation / 90) * 90;
+
                     // Initialize position data for use in positioning the tooltip
                     InitializePosition(highlightCenterPoint);
 
@@ -583,10 +593,10 @@ namespace Extract.DataEntry
                     // coordinates.
                     PointF rotationPoint = new PointF(0, 0);
                     _normalizedBounds = GeometryMethods.RotateRectangle(
-                        _textLayerObject.GetBounds(), _host.ImageViewer.Orientation, rotationPoint);
+                        _textLayerObject.GetBounds(), _referenceOrientation, rotationPoint);
                     _normalizedImageBounds = GeometryMethods.RotateRectangle(
                         new Rectangle(0, 0, _host.ImageViewer.ImageWidth, _host.ImageViewer.ImageHeight),
-                        _host.ImageViewer.Orientation, rotationPoint);
+                        _referenceOrientation, rotationPoint);
 
                     // The normalized page bounds are the initial _maximumExtent for this tooltip.
                     _maximumExtent = _normalizedImageBounds;
@@ -601,11 +611,11 @@ namespace Extract.DataEntry
                         Point[] coordinateProjectionFactor = new Point[1];
 
                         // Translate the coordinates into the ImageViewer coordinate system.
-                        transform.Rotate(_host.ImageViewer.Orientation);
+                        transform.Rotate(_referenceOrientation);
                         transform.TransformPoints(cornerPoints);
                         transform.TransformPoints(highlightAnchorPoints);
 
-                        ExtractException.Assert("ELI26930", 
+                        ExtractException.Assert("ELI26930",
                             "Cannot create tooltip for empty attribute!",
                             cornerPoints[0].X != cornerPoints[1].X &&
                             cornerPoints[0].Y != cornerPoints[3].Y);
@@ -635,7 +645,7 @@ namespace Extract.DataEntry
                         // system into the TextLayerObject coordinate system.
                         transform.Reset();
                         transform.Rotate(
-                            -(_textLayerObject.Orientation + _host.ImageViewer.Orientation));
+                            -(_textLayerObject.Orientation + _referenceOrientation));
                         transform.TransformVectors(coordinateProjectionFactor);
 
                         if (_horizontal)

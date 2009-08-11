@@ -208,7 +208,7 @@ namespace Extract.DataEntry
             MultipleMatchSelectionMode selectionMode, bool createIfNotFound,
             IUnknownVector sourceAttributes, IUnknownVector removedMatches, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
-            TabStopMode? tabStopMode, DataEntryValidator validator, string autoUpdateQuery,
+            TabStopMode? tabStopMode, IDataEntryValidator validator, string autoUpdateQuery,
             string validationQuery)
         {
             try
@@ -319,7 +319,7 @@ namespace Extract.DataEntry
             MultipleMatchSelectionMode selectionMode, IUnknownVector sourceAttributes,
             IUnknownVector removedMatches, IDataEntryControl owningControl,
             int? displayOrder, bool considerPropagated, TabStopMode? tabStopMode,
-            DataEntryValidator validator, string autoUpdateQuery, string validationQuery)
+            IDataEntryValidator validator, string autoUpdateQuery, string validationQuery)
         {
             try
             {

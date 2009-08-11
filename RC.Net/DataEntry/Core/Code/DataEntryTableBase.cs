@@ -387,6 +387,19 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets whether the table is currently active.
+        /// </summary>
+        /// <returns><see langword="true"/> if the table is currently active (in terms of the data
+        /// entry framwork); <see langword="false"/> otherwise.</returns>
+        protected bool IsActive
+        {
+            get
+            {
+                return _isActive;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the name identifying the <see cref="IAttribute"/>(s) to be associated with 
         /// the table.</summary>
         /// <value>Sets the name identifying the <see cref="IAttribute"/>(s) to be associated with 

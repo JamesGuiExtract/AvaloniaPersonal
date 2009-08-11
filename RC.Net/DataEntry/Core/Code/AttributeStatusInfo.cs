@@ -654,7 +654,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The validator used to validate the attribute's data.
         /// </summary>
-        private DataEntryValidator _validator;
+        private IDataEntryValidator _validator;
 
         /// <summary>
         /// Indicates whether the user has viewed the attribute's data.
@@ -807,14 +807,14 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="DataEntryValidator"/> used to validate the associated 
+        /// Gets or sets the <see cref="IDataEntryValidator"/> used to validate the associated 
         /// <see cref="IAttribute"/>'s data.
         /// </summary>
-        /// <value>The <see cref="DataEntryValidator"/> used to validate the associated 
+        /// <value>The <see cref="IDataEntryValidator"/> used to validate the associated 
         /// <see cref="IAttribute"/>'s data.</value>
-        /// <returns>The <see cref="DataEntryValidator"/> used to validate the associated 
+        /// <returns>The <see cref="IDataEntryValidator"/> used to validate the associated 
         /// <see cref="IAttribute"/>'s data.</returns>
-        public DataEntryValidator Validator
+        public IDataEntryValidator Validator
         {
             get
             {
@@ -1080,7 +1080,7 @@ namespace Extract.DataEntry
         [ComVisible(false)]
         public static void Initialize(IAttribute attribute, IUnknownVector sourceAttributes, 
             IDataEntryControl owningControl, int? displayOrder, bool considerPropagated,
-            TabStopMode? tabStopMode, DataEntryValidator validator, string autoUpdateQuery,
+            TabStopMode? tabStopMode, IDataEntryValidator validator, string autoUpdateQuery,
             string validationQuery)
         {
             try
@@ -2892,16 +2892,16 @@ namespace Extract.DataEntry
                 _hintEnabled = source._hintEnabled;
                 _parentAttribute = source._parentAttribute;
                 _fullPath = source._fullPath;
-                _validator = (source._validator == null) 
-                    ? null : (DataEntryValidator)source._validator.Clone();
                 _tabStopMode = source._tabStopMode;
                 _persistAttribute = source._persistAttribute;
                 
                 // _raisingAttributeValueModified is intentionally not copied.
+                // _validator cannot be copied; Each control instance must supply its own.
                 // Do not copy _autoUpdateQuery or _validationQuery since a query is specified to
                 // its location in the attribute hierarchy and persisting the query values will
                 // prevent new triggers from being created when the attribute is re-initialized.
                 _raisingAttributeValueModified = false;
+                _validator = null;
                 _autoUpdateQuery = null;
                 _validationQuery = null;
             }

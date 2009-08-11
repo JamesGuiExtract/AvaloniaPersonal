@@ -243,6 +243,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 this.DataEntryControlHost.AutoZoomMode = _userPreferences.AutoZoomMode;
                 this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
 
+                base.Icon = _dataEntryControlHost.ApplicationIcon;
                 _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &Help...";
                 _aboutMenuItem.Text = "&About " + this.DataEntryControlHost.ApplicationTitle + "...";
             }
@@ -1362,9 +1363,8 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 {
                     _userPreferencesDialog = new PropertyPageForm("Options",
                         (IPropertyPage)_userPreferences.PropertyPage);
-                    // TODO: Use icon from the _dataEntryControlHost.
-//                    _userPreferencesDialog.Icon =
-//                        ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+
+                    _userPreferencesDialog.Icon = _dataEntryControlHost.ApplicationIcon;
                 }
 
                 // Display the dialog

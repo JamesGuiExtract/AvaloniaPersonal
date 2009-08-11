@@ -13,6 +13,7 @@ using System.Data;
 using System.Data.Common;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 using System.IO;
 using System.Security.Permissions;
@@ -554,9 +555,14 @@ namespace Extract.DataEntry
         string _applicationDescription;
 
         /// <summary>
-        /// The logo for of the current DataEntry application.
+        /// The logo for the current DataEntry application.
         /// </summary>
         Image _aboutLogo;
+
+        /// <summary>
+        /// The icon for the current DataEntry application.
+        /// </summary>
+        Icon _applicationIcon;
 
         /// <summary>
         /// A control that should be used to display change the file comment for a FAM task.
@@ -960,10 +966,10 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// The logo for of the current DataEntry application.
+        /// The logo for the current DataEntry application.
         /// </summary>
-        /// <value>An <see cref="Image"/> of the logo for of the current application.</value>
-        /// <returns>An <see cref="Image"/> of the logo for of the current application.</returns>
+        /// <value>An <see cref="Image"/> of the logo for the current application.</value>
+        /// <returns>An <see cref="Image"/> of the logo for the current application.</returns>
         [Category("Data Entry Control Host")]
         public virtual Image AboutLogo
         {
@@ -975,6 +981,27 @@ namespace Extract.DataEntry
             set
             {
                 _aboutLogo = value;
+            }
+        }
+
+        /// <summary>
+        /// The icon for the current DataEntry application.
+        /// </summary>
+        /// <value>An <see cref="Image"/> of the logo for the current application.</value>
+        /// <returns>An <see cref="Image"/> of the logo for the current application.</returns>
+        [Category("Data Entry Control Host")]
+        [TypeConverter(typeof(IconConverter))]
+        [Editor("System.Drawing.Design.IconEditor, System.Design", typeof(UITypeEditor))]
+        public virtual Icon ApplicationIcon
+        {
+            get
+            {
+                return _applicationIcon;
+            }
+
+            set
+            {
+                _applicationIcon = value;
             }
         }
 
@@ -3234,6 +3261,10 @@ namespace Extract.DataEntry
                 // Initialize the newViewRegion as the selected object region.
                 Rectangle newViewRegion = selectedImageRegion;
 
+                // [DataEntry:532] Ensure we're not trying to zoom to a region that extends offpage.
+                newViewRegion.Intersect(
+                    new Rectangle(0, 0, _imageViewer.ImageWidth, _imageViewer.ImageHeight));
+
                 // Determine the current view region.
                 Rectangle currentViewRegion = _imageViewer.GetTransformedRectangle(
                         _imageViewer.GetVisibleImageArea(), true);
@@ -4099,11 +4130,13 @@ namespace Extract.DataEntry
                 new Dictionary<IAttribute, RasterZone>();
             foreach (IAttribute attribute in _attributeToolTips.Keys)
             {
+                // Prepare true spatial attributes
                 if (attribute.Value.HasSpatialInfo())
                 {
                     SpatialString valueOnPage = attribute.Value.GetSpecifiedPages(
                         _imageViewer.PageNumber, _imageViewer.PageNumber);
 
+                    // Ensure the attribute has spatial info on the current page
                     if (valueOnPage != null && valueOnPage.HasSpatialInfo())
                     {
                         LongRectangle rectangle = valueOnPage.GetOCRImageBounds();
@@ -4113,12 +4146,54 @@ namespace Extract.DataEntry
                         attributeBoundingZones[attribute] =
                             new RasterZone(Rectangle.FromLTRB(left, top, right, bottom),
                                 _imageViewer.PageNumber);
-
-                        continue;
+                    }
+                    // If the attribute does not have spatial info on the current page, skip it.
+                    else
+                    {
+                        attributesNotNeedingTooltips.Add(attribute);
                     }
                 }
+                // Prepare attributes with direct hints.
+                else if (AttributeStatusInfo.GetHintType(attribute) == HintType.Direct)
+                {
+                    // Keep track of the overall bounds of hints on the current page
+                    // (currently, there should only be one).
+                    Rectangle? bounds = null;
+                    
+                    // Get the bounds of any rectangles on the current page
+                    IEnumerable<RasterZone> rasterZones = AttributeStatusInfo.GetHintRasterZones(attribute);
+                    foreach (RasterZone rasterZone in rasterZones)
+                    {
+                        if (rasterZone.PageNumber == _imageViewer.PageNumber)
+                        {
+                            if (bounds == null)
+                            {
+                                bounds = rasterZone.GetRectangularBounds();
+                            }
+                            else
+                            {
+                                bounds = Rectangle.Union(bounds.Value, rasterZone.GetRectangularBounds());
+                            }
+                        }
+                    }
 
-                attributesNotNeedingTooltips.Add(attribute);
+                    // If there was at least one raster zone, use this attribute.
+                    if (bounds != null)
+                    {
+                        attributeBoundingZones[attribute] = new RasterZone(bounds.Value, _imageViewer.PageNumber);
+                    }
+                    // Otherwise, skip this attribute.
+                    else
+                    {
+                        attributesNotNeedingTooltips.Add(attribute);
+                    }
+                }
+                // If not a spatial attribute and not an attribute with a direct hint, skip this
+                // attribute.
+                else
+                {
+                    attributesNotNeedingTooltips.Add(attribute);
+                }
             }
 
             // Clear the tooltip designation for attributes without spatial info on the current page.
@@ -4814,8 +4889,11 @@ namespace Extract.DataEntry
 
                     // Obtain a validator that can be used to generate a 
                     // DataEntryValidationException for the attribute.
-                    DataEntryValidator validator =
+                    IDataEntryValidator validator =
                             AttributeStatusInfo.GetStatusInfo(invalidAttribute).Validator;
+
+                    ExtractException.Assert("ELI27082", "Uninitialized validator!",
+                        validator != null);
                     
                     try
                     {
