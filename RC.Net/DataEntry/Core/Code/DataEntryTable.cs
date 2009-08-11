@@ -1686,6 +1686,14 @@ namespace Extract.DataEntry
         {
             try
             {
+                // [DataEntry:587]
+                // Ensure this table is active before performing any sort of operation that can be
+                // started via a context menu to prevent confusion with the current selection.
+                if (!base.IsActive)
+                {
+                    base.Focus();
+                }
+
                 // Determine the location where the context menu was opened.
                 Point mouseLocation = base.PointToClient(Control.MousePosition);
                 HitTestInfo hit = base.HitTest(mouseLocation.X, mouseLocation.Y);

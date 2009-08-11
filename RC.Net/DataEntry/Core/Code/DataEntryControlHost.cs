@@ -5121,6 +5121,65 @@ namespace Extract.DataEntry
                 // Select the first control on the form.
                 base.Focus();
                 base.SelectNextControl(null, true, true, true, true);
+
+                // If there is an active data control, ensure the initially selected attribute is
+                // appropriate based on its TabStopMode
+                if (_activeDataControl != null)
+                {
+                    List<IAttribute> controlAttributes;
+                    if (_controlAttributes.TryGetValue(_activeDataControl, out controlAttributes))
+                    {
+                        IAttribute activeAttribute = GetFirstAttribute(controlAttributes);
+                        if (activeAttribute != null)
+                        {
+                            // We found an active attribute.  Specify advanceSelection based on the
+                            // attribute's TabStopMode.
+                            bool advanceSelection = false;
+
+                            switch (AttributeStatusInfo.GetStatusInfo(activeAttribute).TabStopMode)
+                            {
+                                case TabStopMode.OnlyWhenPopulatedOrInvalid:
+                                    {
+                                        if (string.IsNullOrEmpty(activeAttribute.Value.String) &&
+                                            AttributeStatusInfo.IsDataValid(activeAttribute))
+                                        {
+                                            advanceSelection = true;
+                                        }
+                                    }
+                                    break;
+
+                                case TabStopMode.OnlyWhenInvalid:
+                                    {
+                                        if (AttributeStatusInfo.IsDataValid(activeAttribute))
+                                        {
+                                            advanceSelection = true;
+                                        }
+                                    }
+                                    break;
+
+                                case TabStopMode.Never:
+                                    {
+                                        advanceSelection = true;
+                                    }
+                                    break;
+                            }
+
+                            // If selection should be advanced based on the attribute's TabStopMode,
+                            // do so.
+                            if (advanceSelection)
+                            {
+                                Stack<IAttribute> nextTabStopAttribute =
+                                AttributeStatusInfo.GetNextTabStopAttribute(_attributes,
+                                    ActiveAttributeGenealogy(), !_shiftKeyDown);
+
+                                if (nextTabStopAttribute != null)
+                                {
+                                    PropagateAttributes(nextTabStopAttribute, true);
+                                }
+                            }
+                        }
+                    }
+                }
             }
             else
             {

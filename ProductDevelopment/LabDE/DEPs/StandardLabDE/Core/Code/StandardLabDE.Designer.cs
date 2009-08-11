@@ -98,7 +98,7 @@ namespace Extract.LabDE.StandardLabDE
             this._resultStatus = new Extract.DataEntry.DataEntryComboBox();
             this._resultStatusLabel = new System.Windows.Forms.Label();
             this._operatorCommentLabel = new System.Windows.Forms.Label();
-            this._operatorComments = new System.Windows.Forms.TextBox();
+            this._operatorComments = new Extract.DataEntry.DataEntryTextBox();
             this._filenameLabel = new System.Windows.Forms.Label();
             this._filename = new Extract.DataEntry.DataEntryTextBox();
             this._copyButton = new Extract.DataEntry.DataEntryCopyButton();
@@ -1354,12 +1354,28 @@ namespace Extract.LabDE.StandardLabDE
             // 
             this._operatorComments.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this._operatorComments.AttributeName = "OperatorComments";
+            this._operatorComments.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.SuggestAppend;
+            this._operatorComments.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            this._operatorComments.AutoUpdateQuery = null;
+            this._operatorComments.Disabled = false;
             this._operatorComments.Enabled = false;
+            this._operatorComments.FormattingRuleFile = null;
             this._operatorComments.Location = new System.Drawing.Point(7, 27);
             this._operatorComments.Multiline = true;
+            this._operatorComments.MultipleMatchSelectionMode = Extract.DataEntry.MultipleMatchSelectionMode.First;
             this._operatorComments.Name = "_operatorComments";
+            this._operatorComments.ParentDataEntryControl = null;
+            this._operatorComments.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this._operatorComments.Size = new System.Drawing.Size(371, 46);
-            this._operatorComments.TabIndex = 7;
+            this._operatorComments.SupportsSwiping = true;
+            this._operatorComments.TabIndex = 0;
+            this._operatorComments.TabStopMode = Extract.DataEntry.TabStopMode.OnlyWhenPopulatedOrInvalid;
+            this._operatorComments.ValidationCorrectsCase = true;
+            this._operatorComments.ValidationErrorMessage = "Invalid value";
+            this._operatorComments.ValidationListFileName = null;
+            this._operatorComments.ValidationPattern = null;
+            this._operatorComments.ValidationQuery = null;
             // 
             // _filenameLabel
             // 
@@ -1551,7 +1567,7 @@ namespace Extract.LabDE.StandardLabDE
         private Extract.DataEntry.DataEntryTableColumn _componentFlag;
         private Extract.DataEntry.DataEntryTableColumn _componentComment;
         private System.Windows.Forms.Label _operatorCommentLabel;
-        private System.Windows.Forms.TextBox _operatorComments;
+        private Extract.DataEntry.DataEntryTextBox _operatorComments;
         private System.Windows.Forms.Label _filenameLabel;
         private Extract.DataEntry.DataEntryTextBox _filename;
         private Extract.DataEntry.DataEntryCopyButton _copyButton;
