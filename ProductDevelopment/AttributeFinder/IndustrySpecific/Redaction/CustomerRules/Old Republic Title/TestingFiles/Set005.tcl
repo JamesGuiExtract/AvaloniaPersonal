@@ -1,1 +1,0 @@
-EXTRACTRedactionTester.IDShieldTester.1;;Set005.dat
