@@ -475,10 +475,21 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 			else if (eNewStatus == kRecordNone)
 			{
 				_lastCodePos = "280";
-				// If the new status is pending and the old status is current, 
-				// Reset the file status to pending
-				m_ipFPMDB->SetFileStatusToPending(nTaskID, m_strAction.c_str());
-				_lastCodePos = "290";
+				// If the new status is none and the old status is current, 
+				// Reset the file status to skipped or pending depending
+				// on whether skipped files are being processed or pending files
+				// [LRCAU #5396 - 08/11/2009 - JDS]
+				if (m_bProcessSkippedFiles)
+				{
+					// Set the file back to skipped (do not update the skipped table)
+					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), VARIANT_FALSE);
+					_lastCodePos = "290_A";
+				}
+				else
+				{
+					m_ipFPMDB->SetFileStatusToPending(nTaskID, m_strAction.c_str());
+					_lastCodePos = "290_B";
+				}
 			}
 		}
 		
