@@ -37,7 +37,7 @@ IDShieldInstallFilesRootDir=P:\AttributeFinder\IDShieldInstallation\Files
 
 ClearImageInstallFilesDir=P:\AttributeFinder\ClearImageFiles
 
-ObfuscationFilesArchive=P:\AttributeFinder\Archive\ObfuscationFiles\InternalBuilds\$(FlexIndexVersion)
+InternalUseBuildFilesArchive=P:\AttributeFinder\Archive\InternalUseBuildFiles\InternalBuilds\$(FlexIndexVersion)
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -114,7 +114,7 @@ CopyFilesToInstallFolder: ObfuscateFiles
     @ECHO Copying the AttributeFinderCore files to installation directory...
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\DotNetGAC" @MKDIR "$(AFCoreInstallFilesRootDir)\DotNetGAC"
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\Reports" @MKDIR "$(AFCoreInstallFilesRootDir)\Reports"
-	@IF NOT EXIST "$(ObfuscationFilesArchive)" @MKDIR "$(ObfuscationFilesArchive)"
+	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)"
     @DeleteFiles "$(IDShieldInstallFilesRootDir)\NonSelfRegCommonComponents\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\Reports\*.*"
 	@DeleteFiles "$(IDShieldInstallFilesRootDir)\ExemptionCodes\*.*"
@@ -201,9 +201,10 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\Inlite_5_7\bin\*.*" "$(ClearImageInstallFilesDir)\" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	
-# Copy .NET pdb and map files to archive
-	@XCOPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(ObfuscationFilesArchive)" /Y/E
-	@XCOPY  "$(BinariesFolder)\Map\*.xml" "$(ObfuscationFilesArchive)" /Y/E
+# Copy pdb and map files to archive
+	@XCOPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" /Y/E
+	@XCOPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" /Y/E
+	@XCOPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" /Y/E
 	
 # Create RegList.dat file for registration
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegCoreComponents\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents\AFCore.rl"
