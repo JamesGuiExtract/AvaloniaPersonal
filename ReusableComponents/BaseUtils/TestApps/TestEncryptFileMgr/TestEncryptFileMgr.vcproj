@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="TestEncryptFileMgr"
 	ProjectGUID="{D3B7C216-C6F6-4BB7-A8B7-83D687A03F18}"
+	RootNamespace="TestEncryptFileMgr"
 	SccProjectName="TestEncryptFileMgr"
 	SccAuxPath="http://white.extract.local/VaultService"
 	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
@@ -65,6 +66,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
