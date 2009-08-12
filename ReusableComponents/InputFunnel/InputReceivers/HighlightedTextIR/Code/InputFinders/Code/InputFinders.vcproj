@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="InputFinders"
 	ProjectGUID="{6E79B970-87F0-4B8C-8C3D-C449CF29E8F9}"
+	RootNamespace="InputFinders"
 	SccProjectName="InputFinders"
 	SccAuxPath="http://white.extract.local/VaultService"
 	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
@@ -64,6 +65,7 @@
 				ProgramDataBaseFileName=".\..\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

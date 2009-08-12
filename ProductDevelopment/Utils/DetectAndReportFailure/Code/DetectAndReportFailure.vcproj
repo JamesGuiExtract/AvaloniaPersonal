@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="DetectAndReportFailure"
 	ProjectGUID="{A96917AB-80A9-44A7-AC3B-6EA28075CE38}"
+	RootNamespace="DetectAndReportFailure"
 	SccProjectName="DetectAndReportFailure"
 	SccAuxPath="http://white.extract.local/VaultService"
 	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
@@ -67,6 +68,7 @@
 				ProgramDataBaseFileName=".\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

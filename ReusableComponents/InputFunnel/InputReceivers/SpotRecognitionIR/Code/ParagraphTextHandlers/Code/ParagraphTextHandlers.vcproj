@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="ParagraphTextHandlers"
 	ProjectGUID="{13DE434B-18A0-4597-9F1D-64A0AB2F8918}"
+	RootNamespace="ParagraphTextHandlers"
 	SccProjectName="ParagraphTextHandlers"
 	SccAuxPath="http://white.extract.local/VaultService"
 	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
@@ -164,6 +165,7 @@
 				ProgramDataBaseFileName=".\..\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"

@@ -4,6 +4,7 @@
 	Version="8.00"
 	Name="InputContexts"
 	ProjectGUID="{7A732EC5-7C8C-4EEC-8A51-E8BCAF6EDB8E}"
+	RootNamespace="InputContexts"
 	SccProjectName="InputContexts"
 	SccAuxPath="http://white.extract.local/VaultService"
 	SccLocalPath="2~90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41"
@@ -164,6 +165,7 @@
 				ProgramDataBaseFileName=".\..\Release/"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
