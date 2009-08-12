@@ -77,11 +77,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelProductName
             // 
             this._labelProductName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelProductName.Location = new System.Drawing.Point(6, 150);
-            this._labelProductName.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelProductName.Location = new System.Drawing.Point(3, 150);
             this._labelProductName.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelProductName.Name = "_labelProductName";
-            this._labelProductName.Size = new System.Drawing.Size(408, 17);
+            this._labelProductName.Size = new System.Drawing.Size(411, 17);
             this._labelProductName.TabIndex = 19;
             this._labelProductName.Text = "Product Name";
             this._labelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -89,11 +88,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelFrameworkVersion
             // 
             this._labelFrameworkVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelFrameworkVersion.Location = new System.Drawing.Point(6, 206);
-            this._labelFrameworkVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelFrameworkVersion.Location = new System.Drawing.Point(3, 206);
             this._labelFrameworkVersion.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelFrameworkVersion.Name = "_labelFrameworkVersion";
-            this._labelFrameworkVersion.Size = new System.Drawing.Size(408, 17);
+            this._labelFrameworkVersion.Size = new System.Drawing.Size(411, 17);
             this._labelFrameworkVersion.TabIndex = 0;
             this._labelFrameworkVersion.Text = "Framework Version";
             this._labelFrameworkVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -101,11 +99,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelCopyright
             // 
             this._labelCopyright.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelCopyright.Location = new System.Drawing.Point(6, 234);
-            this._labelCopyright.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelCopyright.Location = new System.Drawing.Point(3, 234);
             this._labelCopyright.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelCopyright.Name = "_labelCopyright";
-            this._labelCopyright.Size = new System.Drawing.Size(408, 17);
+            this._labelCopyright.Size = new System.Drawing.Size(411, 17);
             this._labelCopyright.TabIndex = 21;
             this._labelCopyright.Text = "Copyright";
             this._labelCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -113,11 +110,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelCompanyName
             // 
             this._labelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelCompanyName.Location = new System.Drawing.Point(6, 262);
-            this._labelCompanyName.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelCompanyName.Location = new System.Drawing.Point(3, 262);
             this._labelCompanyName.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelCompanyName.Name = "_labelCompanyName";
-            this._labelCompanyName.Size = new System.Drawing.Size(408, 17);
+            this._labelCompanyName.Size = new System.Drawing.Size(411, 17);
             this._labelCompanyName.TabIndex = 22;
             this._labelCompanyName.Text = "Company Name";
             this._labelCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -125,13 +121,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _textBoxDescription
             // 
             this._textBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._textBoxDescription.Location = new System.Drawing.Point(6, 293);
-            this._textBoxDescription.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
+            this._textBoxDescription.Location = new System.Drawing.Point(3, 293);
             this._textBoxDescription.Multiline = true;
             this._textBoxDescription.Name = "_textBoxDescription";
             this._textBoxDescription.ReadOnly = true;
             this._textBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this._textBoxDescription.Size = new System.Drawing.Size(408, 45);
+            this._textBoxDescription.Size = new System.Drawing.Size(411, 45);
             this._textBoxDescription.TabIndex = 23;
             this._textBoxDescription.TabStop = false;
             this._textBoxDescription.Text = "Description";
@@ -168,6 +163,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._labelLicenseInformation.Size = new System.Drawing.Size(411, 28);
             this._labelLicenseInformation.TabIndex = 27;
             this._labelLicenseInformation.Text = "License Information";
+            this._labelLicenseInformation.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // _logoImage
             // 
@@ -186,11 +182,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // _labelProductVersion
             // 
             this._labelProductVersion.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._labelProductVersion.Location = new System.Drawing.Point(6, 178);
-            this._labelProductVersion.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
+            this._labelProductVersion.Location = new System.Drawing.Point(3, 178);
             this._labelProductVersion.MaximumSize = new System.Drawing.Size(0, 17);
             this._labelProductVersion.Name = "_labelProductVersion";
-            this._labelProductVersion.Size = new System.Drawing.Size(408, 17);
+            this._labelProductVersion.Size = new System.Drawing.Size(411, 17);
             this._labelProductVersion.TabIndex = 29;
             this._labelProductVersion.Text = "Product Version";
             this._labelProductVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;

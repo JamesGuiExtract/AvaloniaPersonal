@@ -1326,7 +1326,7 @@ namespace IDShieldOffice
             this._printImageToolStripButton.Name = "_printImageToolStripButton";
             this._printImageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._printImageToolStripButton.Text = "Print image";
-            this._printImageToolStripButton.ToolTipText = "Print image";
+            this._printImageToolStripButton.BaseToolTipText = "Print image";
             // 
             // _basicToolsToolStrip
             // 
@@ -1355,7 +1355,7 @@ namespace IDShieldOffice
             this._selectLayerObjectToolStripButton.ImageViewer = null;
             this._selectLayerObjectToolStripButton.Name = "_selectLayerObjectToolStripButton";
             this._selectLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._selectLayerObjectToolStripButton.ToolTipText = "Select redactions and other objects";
+            this._selectLayerObjectToolStripButton.BaseToolTipText = "Select redactions and other objects";
             // 
             // _dataTypesFinderToolStripButton
             // 
@@ -1411,7 +1411,7 @@ namespace IDShieldOffice
             this._deleteSelectionToolStripButton.Name = "_deleteSelectionToolStripButton";
             this._deleteSelectionToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._deleteSelectionToolStripButton.Text = "Delete selection";
-            this._deleteSelectionToolStripButton.ToolTipText = "Delete Selection";
+            this._deleteSelectionToolStripButton.BaseToolTipText = "Delete Selection";
             // 
             // _viewCommandsToolStrip
             // 
@@ -1444,7 +1444,7 @@ namespace IDShieldOffice
             this._fitToPageToolStripButton.Name = "_fitToPageToolStripButton";
             this._fitToPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToPageToolStripButton.Text = "Fit to page";
-            this._fitToPageToolStripButton.ToolTipText = "Fit to page";
+            this._fitToPageToolStripButton.BaseToolTipText = "Fit to page";
             // 
             // _fitToWidthToolStripButton
             // 
@@ -1455,7 +1455,7 @@ namespace IDShieldOffice
             this._fitToWidthToolStripButton.Name = "_fitToWidthToolStripButton";
             this._fitToWidthToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToWidthToolStripButton.Text = "Fit to width";
-            this._fitToWidthToolStripButton.ToolTipText = "Fit to width";
+            this._fitToWidthToolStripButton.BaseToolTipText = "Fit to width";
             // 
             // toolStripSeparator1
             // 
@@ -1470,7 +1470,7 @@ namespace IDShieldOffice
             this._zoomWindowToolStripButton.ImageViewer = null;
             this._zoomWindowToolStripButton.Name = "_zoomWindowToolStripButton";
             this._zoomWindowToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._zoomWindowToolStripButton.ToolTipText = "Zoom window";
+            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             // 
             // _panToolStripButton
             // 
@@ -1480,7 +1480,7 @@ namespace IDShieldOffice
             this._panToolStripButton.ImageViewer = null;
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._panToolStripButton.ToolTipText = "Pan";
+            this._panToolStripButton.BaseToolTipText = "Pan";
             // 
             // toolStripSeparator2
             // 
@@ -1496,7 +1496,7 @@ namespace IDShieldOffice
             this._zoomInToolStripButton.Name = "_zoomInToolStripButton";
             this._zoomInToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomInToolStripButton.Text = "Zoom in";
-            this._zoomInToolStripButton.ToolTipText = "Zoom in";
+            this._zoomInToolStripButton.BaseToolTipText = "Zoom in";
             // 
             // _zoomOutToolStripButton
             // 
@@ -1507,7 +1507,7 @@ namespace IDShieldOffice
             this._zoomOutToolStripButton.Name = "_zoomOutToolStripButton";
             this._zoomOutToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomOutToolStripButton.Text = "Zoom out";
-            this._zoomOutToolStripButton.ToolTipText = "Zoom out";
+            this._zoomOutToolStripButton.BaseToolTipText = "Zoom out";
             // 
             // toolStripSeparator3
             // 
@@ -1523,7 +1523,7 @@ namespace IDShieldOffice
             this._zoomPreviousToolStripButton.Name = "_zoomPreviousToolStripButton";
             this._zoomPreviousToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomPreviousToolStripButton.Text = "Zoom previous";
-            this._zoomPreviousToolStripButton.ToolTipText = "Zoom previous";
+            this._zoomPreviousToolStripButton.BaseToolTipText = "Zoom previous";
             // 
             // _zoomNextToolStripButton
             // 
@@ -1534,7 +1534,7 @@ namespace IDShieldOffice
             this._zoomNextToolStripButton.Name = "_zoomNextToolStripButton";
             this._zoomNextToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomNextToolStripButton.Text = "Zoom next";
-            this._zoomNextToolStripButton.ToolTipText = "Zoom next";
+            this._zoomNextToolStripButton.BaseToolTipText = "Zoom next";
             // 
             // _layerNavigationToolStrip
             // 
@@ -1560,7 +1560,7 @@ namespace IDShieldOffice
             this._previousTileToolStripButton.Name = "_previousTileToolStripButton";
             this._previousTileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousTileToolStripButton.Text = "previousTileToolStripButton1";
-            this._previousTileToolStripButton.ToolTipText = "Previous tile";
+            this._previousTileToolStripButton.BaseToolTipText = "Previous tile";
             // 
             // _nextTileToolStripButton
             // 
@@ -1571,7 +1571,7 @@ namespace IDShieldOffice
             this._nextTileToolStripButton.Name = "_nextTileToolStripButton";
             this._nextTileToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextTileToolStripButton.Text = "nextTileToolStripButton1";
-            this._nextTileToolStripButton.ToolTipText = "Next tile";
+            this._nextTileToolStripButton.BaseToolTipText = "Next tile";
             // 
             // _previousLayerObjectToolStripButton
             // 
@@ -1582,7 +1582,7 @@ namespace IDShieldOffice
             this._previousLayerObjectToolStripButton.Name = "_previousLayerObjectToolStripButton";
             this._previousLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousLayerObjectToolStripButton.Text = "previousLayerObjectToolStripButton1";
-            this._previousLayerObjectToolStripButton.ToolTipText = "Go to previous object";
+            this._previousLayerObjectToolStripButton.BaseToolTipText = "Go to previous object";
             // 
             // _nextLayerObjectToolStripButton
             // 
@@ -1593,7 +1593,7 @@ namespace IDShieldOffice
             this._nextLayerObjectToolStripButton.Name = "_nextLayerObjectToolStripButton";
             this._nextLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextLayerObjectToolStripButton.Text = "nextLayerObjectToolStripButton1";
-            this._nextLayerObjectToolStripButton.ToolTipText = "Go to next object";
+            this._nextLayerObjectToolStripButton.BaseToolTipText = "Go to next object";
             // 
             // _pageNavigationToolStrip
             // 
@@ -1620,7 +1620,7 @@ namespace IDShieldOffice
             this._firstPageToolStripButton.Name = "_firstPageToolStripButton";
             this._firstPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._firstPageToolStripButton.Text = "firstPageToolStripButton1";
-            this._firstPageToolStripButton.ToolTipText = "Go To First Page";
+            this._firstPageToolStripButton.BaseToolTipText = "Go To First Page";
             // 
             // _previousPageToolStripButton
             // 
@@ -1631,7 +1631,7 @@ namespace IDShieldOffice
             this._previousPageToolStripButton.Name = "_previousPageToolStripButton";
             this._previousPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousPageToolStripButton.Text = "previousPageToolStripButton1";
-            this._previousPageToolStripButton.ToolTipText = "Go To Previous Page";
+            this._previousPageToolStripButton.BaseToolTipText = "Go To Previous Page";
             // 
             // _pageNavigationToolStripTextBox
             // 
@@ -1650,7 +1650,7 @@ namespace IDShieldOffice
             this._nextPageToolStripButton.Name = "_nextPageToolStripButton";
             this._nextPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextPageToolStripButton.Text = "nextPageToolStripButton1";
-            this._nextPageToolStripButton.ToolTipText = "Go To Next Page";
+            this._nextPageToolStripButton.BaseToolTipText = "Go To Next Page";
             // 
             // _lastPageToolStripButton
             // 
@@ -1661,7 +1661,7 @@ namespace IDShieldOffice
             this._lastPageToolStripButton.Name = "_lastPageToolStripButton";
             this._lastPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._lastPageToolStripButton.Text = "lastPageToolStripButton1";
-            this._lastPageToolStripButton.ToolTipText = "Go To Last Page";
+            this._lastPageToolStripButton.BaseToolTipText = "Go To Last Page";
             // 
             // _dockableWindowsToolStrip
             // 
@@ -1719,7 +1719,7 @@ namespace IDShieldOffice
             this._rotateCounterclockwiseToolStripButton.Name = "_rotateCounterclockwiseToolStripButton";
             this._rotateCounterclockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateCounterclockwiseToolStripButton.Text = "Rotate counterclockwise";
-            this._rotateCounterclockwiseToolStripButton.ToolTipText = "Rotate counterclockwise";
+            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
             // 
             // _rotateClockwiseToolStripButton
             // 
@@ -1730,7 +1730,7 @@ namespace IDShieldOffice
             this._rotateClockwiseToolStripButton.Name = "_rotateClockwiseToolStripButton";
             this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
-            this._rotateClockwiseToolStripButton.ToolTipText = "Rotate clockwise";
+            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
             // 
             // _rectangularRedactionToolStripButton
             // 
@@ -1740,7 +1740,7 @@ namespace IDShieldOffice
             this._rectangularRedactionToolStripButton.ImageViewer = null;
             this._rectangularRedactionToolStripButton.Name = "_rectangularRedactionToolStripButton";
             this._rectangularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rectangularRedactionToolStripButton.ToolTipText = "Create rectangular redaction";
+            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction";
             // 
             // _angularRedactionToolStripButton
             // 
@@ -1750,7 +1750,7 @@ namespace IDShieldOffice
             this._angularRedactionToolStripButton.ImageViewer = null;
             this._angularRedactionToolStripButton.Name = "_angularRedactionToolStripButton";
             this._angularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._angularRedactionToolStripButton.ToolTipText = "Create angular redaction";
+            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction";
             // 
             // IDShieldOfficeForm
             // 

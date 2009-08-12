@@ -975,11 +975,6 @@ namespace Extract.DataEntry
                             {
                                 drgevent.Effect &= DragDropEffects.None;
                             }
-                            // If the new row is selected, allow the source to be duplicated into it.
-                            else if (base.CurrentRow.Index == base.NewRowIndex)
-                            {
-                                drgevent.Effect &= DragDropEffects.Copy;
-                            }
                             // Otherwise, allow the data to be moved to the drag position.
                             else
                             {

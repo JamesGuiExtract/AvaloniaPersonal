@@ -217,6 +217,43 @@ namespace Extract.Imaging.Forms
         #region ImageViewerCommandToolStripButton Properties
 
         /// <summary>
+        /// The tooltip text to display in the <see cref="ToolStripButton"/>. (minus any shortcut
+        /// keys assigned for this command)
+        /// </summary>
+        /// <value>The tooltip text to display.</value>
+        /// <returns>The tooltip text to display.</returns>
+        public string BaseToolTipText
+        {
+            get
+            {
+                return _baseToolTipText;
+            }
+
+            set
+            {
+                _baseToolTipText = value;
+            }
+        }
+
+        /// <summary>
+        /// Masks ToolTipText property of <see cref="ToolStripButton"/> which shouldn't be used.
+        /// Rather the <see cref="BaseToolTipText"/> property should be used for
+        /// <see cref="ImageViewerCommandToolStripButton"/>s.
+        /// </summary>
+        /// <return>The ToolTipText currently displayed in this <see cref="ToolStripButton"/>.
+        /// </return>
+        [Browsable(false)]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public new string ToolTipText
+        {
+            get
+            {
+                return base.ToolTipText;
+            }
+        }
+
+        /// <summary>
         /// Gets the image that is displayed in this <see cref="ToolStripButton"/>.
         /// </summary>
         /// <value>The set property has been obsoleted and disabled.</value>

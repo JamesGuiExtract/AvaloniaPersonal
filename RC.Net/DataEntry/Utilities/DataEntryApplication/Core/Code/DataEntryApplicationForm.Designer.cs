@@ -724,7 +724,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._zoomWindowToolStripButton.ImageViewer = null;
             this._zoomWindowToolStripButton.Name = "_zoomWindowToolStripButton";
             this._zoomWindowToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._zoomWindowToolStripButton.ToolTipText = "Zoom window";
+            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             // 
             // _panToolStripButton
             // 
@@ -734,7 +734,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._panToolStripButton.ImageViewer = null;
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._panToolStripButton.ToolTipText = "Pan";
+            this._panToolStripButton.BaseToolTipText = "Pan";
             // 
             // _selectLayerObjectToolStripButton
             // 
@@ -744,7 +744,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._selectLayerObjectToolStripButton.ImageViewer = null;
             this._selectLayerObjectToolStripButton.Name = "_selectLayerObjectToolStripButton";
             this._selectLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._selectLayerObjectToolStripButton.ToolTipText = "Review and select";
+            this._selectLayerObjectToolStripButton.BaseToolTipText = "Review and select";
             // 
             // _angularHighlightToolStripButton
             // 
@@ -754,7 +754,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._angularHighlightToolStripButton.ImageViewer = null;
             this._angularHighlightToolStripButton.Name = "_angularHighlightToolStripButton";
             this._angularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._angularHighlightToolStripButton.ToolTipText = "Swipe text in angular zone";
+            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone (Alt+S)";
             // 
             // _rectangularHighlightToolStripButton
             // 
@@ -764,7 +764,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._rectangularHighlightToolStripButton.ImageViewer = null;
             this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
             this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rectangularHighlightToolStripButton.ToolTipText = "Swipe text in rectangular zone";
+            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone (Alt+S)";
             // 
             // _pageNavigationImageViewerToolStrip
             // 
@@ -791,7 +791,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._firstPageToolStripButton.Name = "_firstPageToolStripButton";
             this._firstPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._firstPageToolStripButton.Text = "Go to first page";
-            this._firstPageToolStripButton.ToolTipText = "Go to first page";
+            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             // 
             // _previousPageToolStripButton
             // 
@@ -802,7 +802,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._previousPageToolStripButton.Name = "_previousPageToolStripButton";
             this._previousPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousPageToolStripButton.Text = "Go to previous page";
-            this._previousPageToolStripButton.ToolTipText = "Go to previous page";
+            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             // 
             // _pageNavigationToolStripTextBox
             // 
@@ -821,7 +821,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextPageToolStripButton.Name = "_nextPageToolStripButton";
             this._nextPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextPageToolStripButton.Text = "Go to next page";
-            this._nextPageToolStripButton.ToolTipText = "Go to next page";
+            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             // 
             // _lastPageToolStripButton
             // 
@@ -832,7 +832,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._lastPageToolStripButton.Name = "_lastPageToolStripButton";
             this._lastPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._lastPageToolStripButton.Text = "Go to last page";
-            this._lastPageToolStripButton.ToolTipText = "Go to last page";
+            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             // 
             // _viewCommandsImageViewerToolStrip
             // 

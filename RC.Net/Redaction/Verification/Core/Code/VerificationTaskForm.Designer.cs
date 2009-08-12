@@ -607,7 +607,7 @@ namespace Extract.Redaction.Verification
             this._printImageToolStripButton.Name = "_printImageToolStripButton";
             this._printImageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._printImageToolStripButton.Text = "Print image";
-            this._printImageToolStripButton.ToolTipText = "Print image";
+            this._printImageToolStripButton.BaseToolTipText = "Print image";
             // 
             // toolStripSeparator4
             // 
@@ -622,7 +622,7 @@ namespace Extract.Redaction.Verification
             this._zoomWindowToolStripButton.ImageViewer = null;
             this._zoomWindowToolStripButton.Name = "_zoomWindowToolStripButton";
             this._zoomWindowToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._zoomWindowToolStripButton.ToolTipText = "Zoom window";
+            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             // 
             // _panToolStripButton
             // 
@@ -632,7 +632,7 @@ namespace Extract.Redaction.Verification
             this._panToolStripButton.ImageViewer = null;
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._panToolStripButton.ToolTipText = "Pan";
+            this._panToolStripButton.BaseToolTipText = "Pan";
             // 
             // _selectLayerObjectToolStripButton
             // 
@@ -642,7 +642,7 @@ namespace Extract.Redaction.Verification
             this._selectLayerObjectToolStripButton.ImageViewer = null;
             this._selectLayerObjectToolStripButton.Name = "_selectLayerObjectToolStripButton";
             this._selectLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._selectLayerObjectToolStripButton.ToolTipText = "Select redactions and other objects";
+            this._selectLayerObjectToolStripButton.BaseToolTipText = "Select redactions and other objects";
             // 
             // _angularRedactionToolStripButton
             // 
@@ -652,7 +652,7 @@ namespace Extract.Redaction.Verification
             this._angularRedactionToolStripButton.ImageViewer = null;
             this._angularRedactionToolStripButton.Name = "_angularRedactionToolStripButton";
             this._angularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._angularRedactionToolStripButton.ToolTipText = "Create angular redaction";
+            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction";
             // 
             // _rectangularRedactionToolStripButton
             // 
@@ -662,7 +662,7 @@ namespace Extract.Redaction.Verification
             this._rectangularRedactionToolStripButton.ImageViewer = null;
             this._rectangularRedactionToolStripButton.Name = "_rectangularRedactionToolStripButton";
             this._rectangularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rectangularRedactionToolStripButton.ToolTipText = "Create rectangular redaction";
+            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction";
             // 
             // _pageNavigationToolStrip
             // 
@@ -688,7 +688,7 @@ namespace Extract.Redaction.Verification
             this._firstPageToolStripButton.Name = "_firstPageToolStripButton";
             this._firstPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._firstPageToolStripButton.Text = "firstPageToolStripButton1";
-            this._firstPageToolStripButton.ToolTipText = "Go to first page";
+            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             // 
             // _previousPageToolStripButton
             // 
@@ -699,7 +699,7 @@ namespace Extract.Redaction.Verification
             this._previousPageToolStripButton.Name = "_previousPageToolStripButton";
             this._previousPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousPageToolStripButton.Text = "previousPageToolStripButton1";
-            this._previousPageToolStripButton.ToolTipText = "Go to previous page";
+            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             // 
             // _pageNavigationToolStripTextBox
             // 
@@ -718,7 +718,7 @@ namespace Extract.Redaction.Verification
             this._nextPageToolStripButton.Name = "_nextPageToolStripButton";
             this._nextPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextPageToolStripButton.Text = "nextPageToolStripButton1";
-            this._nextPageToolStripButton.ToolTipText = "Go to next page";
+            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             // 
             // _lastPageToolStripButton
             // 
@@ -729,7 +729,7 @@ namespace Extract.Redaction.Verification
             this._lastPageToolStripButton.Name = "_lastPageToolStripButton";
             this._lastPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._lastPageToolStripButton.Text = "lastPageToolStripButton1";
-            this._lastPageToolStripButton.ToolTipText = "Go to last page";
+            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             // 
             // _viewCommandsToolStrip
             // 
@@ -760,7 +760,7 @@ namespace Extract.Redaction.Verification
             this._zoomInToolStripButton.Name = "_zoomInToolStripButton";
             this._zoomInToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomInToolStripButton.Text = "Zoom in";
-            this._zoomInToolStripButton.ToolTipText = "Zoom in";
+            this._zoomInToolStripButton.BaseToolTipText = "Zoom in";
             // 
             // _zoomOutToolStripButton
             // 
@@ -771,7 +771,7 @@ namespace Extract.Redaction.Verification
             this._zoomOutToolStripButton.Name = "_zoomOutToolStripButton";
             this._zoomOutToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomOutToolStripButton.Text = "Zoom out";
-            this._zoomOutToolStripButton.ToolTipText = "Zoom out";
+            this._zoomOutToolStripButton.BaseToolTipText = "Zoom out";
             // 
             // _zoomPreviousToolStripButton
             // 
@@ -782,7 +782,7 @@ namespace Extract.Redaction.Verification
             this._zoomPreviousToolStripButton.Name = "_zoomPreviousToolStripButton";
             this._zoomPreviousToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomPreviousToolStripButton.Text = "Zoom previous";
-            this._zoomPreviousToolStripButton.ToolTipText = "Zoom previous";
+            this._zoomPreviousToolStripButton.BaseToolTipText = "Zoom previous";
             // 
             // _zoomNextToolStripButton
             // 
@@ -793,7 +793,7 @@ namespace Extract.Redaction.Verification
             this._zoomNextToolStripButton.Name = "_zoomNextToolStripButton";
             this._zoomNextToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomNextToolStripButton.Text = "Zoom next";
-            this._zoomNextToolStripButton.ToolTipText = "Zoom next";
+            this._zoomNextToolStripButton.BaseToolTipText = "Zoom next";
             // 
             // toolStripSeparator5
             // 
@@ -809,7 +809,7 @@ namespace Extract.Redaction.Verification
             this._fitToPageToolStripButton.Name = "_fitToPageToolStripButton";
             this._fitToPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToPageToolStripButton.Text = "Fit to page";
-            this._fitToPageToolStripButton.ToolTipText = "Fit to page";
+            this._fitToPageToolStripButton.BaseToolTipText = "Fit to page";
             // 
             // _fitToWidthToolStripButton
             // 
@@ -820,7 +820,7 @@ namespace Extract.Redaction.Verification
             this._fitToWidthToolStripButton.Name = "_fitToWidthToolStripButton";
             this._fitToWidthToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToWidthToolStripButton.Text = "Fit to width";
-            this._fitToWidthToolStripButton.ToolTipText = "Fit to width";
+            this._fitToWidthToolStripButton.BaseToolTipText = "Fit to width";
             // 
             // toolStripSeparator6
             // 
@@ -836,7 +836,7 @@ namespace Extract.Redaction.Verification
             this._rotateCounterclockwiseToolStripButton.Name = "_rotateCounterclockwiseToolStripButton";
             this._rotateCounterclockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateCounterclockwiseToolStripButton.Text = "Rotate counterclockwise";
-            this._rotateCounterclockwiseToolStripButton.ToolTipText = "Rotate counterclockwise";
+            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
             // 
             // _rotateClockwiseToolStripButton
             // 
@@ -847,7 +847,7 @@ namespace Extract.Redaction.Verification
             this._rotateClockwiseToolStripButton.Name = "_rotateClockwiseToolStripButton";
             this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
-            this._rotateClockwiseToolStripButton.ToolTipText = "Rotate clockwise";
+            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
             // 
             // VerificationTaskForm
             // 
