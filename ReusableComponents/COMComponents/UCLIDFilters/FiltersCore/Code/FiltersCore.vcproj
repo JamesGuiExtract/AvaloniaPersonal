@@ -184,6 +184,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\FiltersCore.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/FiltersCore.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/FiltersCore.lib"

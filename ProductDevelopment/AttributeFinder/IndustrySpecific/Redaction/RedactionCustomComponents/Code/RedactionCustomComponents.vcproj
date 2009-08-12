@@ -89,6 +89,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\..\..\ReusableComponents\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\RedactionCustomComponents.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/RedactionCC.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/RedactionCC.lib"

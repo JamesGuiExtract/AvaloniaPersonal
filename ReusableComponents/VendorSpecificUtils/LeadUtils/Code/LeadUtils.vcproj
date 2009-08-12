@@ -88,6 +88,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\APIs\LeadTools_16\Lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/LeadUtils.pdb"
 				ImportLibrary=".\..\Release/LeadUtils.lib"
 				TargetMachine="1"

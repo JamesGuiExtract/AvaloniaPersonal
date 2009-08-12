@@ -75,6 +75,7 @@
 				OutputFile=".\..\Release/LandRecords.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/LandRecords.pdb"
 				SubSystem="1"
 				TargetMachine="1"

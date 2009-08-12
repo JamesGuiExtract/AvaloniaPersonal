@@ -182,6 +182,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Release/IndexConverter.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/IndexConverter.pdb"
 				SubSystem="2"
 				TargetMachine="1"

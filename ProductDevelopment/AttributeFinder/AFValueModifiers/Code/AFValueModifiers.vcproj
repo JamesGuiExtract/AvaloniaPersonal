@@ -85,6 +85,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFValueModifiers.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFValueModifiers.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFValueModifiers.lib"

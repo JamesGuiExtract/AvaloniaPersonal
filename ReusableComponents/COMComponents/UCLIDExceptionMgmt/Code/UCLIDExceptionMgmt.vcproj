@@ -185,6 +185,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDExceptionMgmt.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDExceptionMgmt.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDExceptionMgmt.lib"

@@ -88,6 +88,7 @@
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\GenericDisplay.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/UCLIDGenericDisplay2.pdb"
 				SubSystem="2"
 				ImportLibrary=".\Release/UCLIDGenericDisplay2.lib"

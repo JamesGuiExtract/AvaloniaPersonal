@@ -185,6 +185,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Release\RunRules.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/RunRules.pdb"
 				SubSystem="2"
 				TargetMachine="1"

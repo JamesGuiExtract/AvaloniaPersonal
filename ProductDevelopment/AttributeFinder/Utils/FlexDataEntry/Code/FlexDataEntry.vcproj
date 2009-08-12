@@ -187,6 +187,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\..\ReusableComponents\APIs\RogueWave\lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/FlexDataEntry.pdb"
 				SubSystem="2"
 				TargetMachine="1"

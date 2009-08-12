@@ -84,6 +84,7 @@
 				OutputFile="..\..\..\..\..\..\Binaries\Release/ProcessFiles.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/ProcessFiles.pdb"
 				SubSystem="2"
 				TargetMachine="1"

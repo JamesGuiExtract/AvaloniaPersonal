@@ -86,6 +86,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\AFOutputHandlers.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFOutputHandlers.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFOutputHandlers.lib"

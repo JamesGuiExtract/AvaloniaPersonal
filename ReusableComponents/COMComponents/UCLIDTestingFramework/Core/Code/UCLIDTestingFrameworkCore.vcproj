@@ -86,6 +86,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDTestingFrameworkCore.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDTestingFrameworkCore.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDTestingFrameworkCore.lib"

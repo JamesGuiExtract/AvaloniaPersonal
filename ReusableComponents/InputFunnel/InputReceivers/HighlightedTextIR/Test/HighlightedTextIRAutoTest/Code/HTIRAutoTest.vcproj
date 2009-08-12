@@ -183,6 +183,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\HTIRAutoTest.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/HighlightedTextIRAutoTest.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/HighlightedTextIRAutoTest.lib"

@@ -84,6 +84,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ParagraphTextCorrectors.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/ParagraphTextCorrectors.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/ParagraphTextCorrectors.lib"

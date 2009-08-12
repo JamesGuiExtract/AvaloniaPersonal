@@ -86,6 +86,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\UCLIDFileProcessing.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDFileProcessing.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDFileProcessing.lib"

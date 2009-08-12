@@ -86,6 +86,7 @@
 				OutputFile="../../../../Binaries/Release/DetectAndReportFailure.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/DetectAndReportFailure.pdb"
 				SubSystem="2"
 				TargetMachine="1"

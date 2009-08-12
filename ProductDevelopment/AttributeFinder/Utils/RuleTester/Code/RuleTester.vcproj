@@ -84,6 +84,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Release/RuleTester.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/RuleTester.pdb"
 				SubSystem="2"
 				TargetMachine="1"

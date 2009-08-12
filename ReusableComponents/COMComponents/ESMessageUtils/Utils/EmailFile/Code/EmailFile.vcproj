@@ -177,6 +177,7 @@
 				OutputFile="..\..\..\..\..\..\Binaries\Release/EmailFile.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/EmailFile.pdb"
 				SubSystem="2"
 				TargetMachine="1"

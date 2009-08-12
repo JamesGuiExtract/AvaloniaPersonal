@@ -85,6 +85,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\LeadTools_16\Lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/CreateMultiPageImage.pdb"
 				SubSystem="1"
 				TargetMachine="1"

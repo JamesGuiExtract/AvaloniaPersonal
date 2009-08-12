@@ -84,6 +84,7 @@
 				OutputFile="..\..\..\..\Binaries\Release/USSFileViewer.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/SpatialStringViewer.pdb"
 				SubSystem="2"
 				TargetMachine="1"

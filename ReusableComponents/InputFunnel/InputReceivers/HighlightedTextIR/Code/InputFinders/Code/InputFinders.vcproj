@@ -84,6 +84,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\InputFinders.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/InputFinders.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/InputFinders.lib"

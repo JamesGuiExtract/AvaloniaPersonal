@@ -85,6 +85,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\GeneralIV.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/GeneralIV.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/GeneralIV.lib"

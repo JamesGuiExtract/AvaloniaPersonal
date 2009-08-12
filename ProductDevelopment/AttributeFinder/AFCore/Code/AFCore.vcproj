@@ -186,6 +186,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\AFCore.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFCore.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFCore.lib"

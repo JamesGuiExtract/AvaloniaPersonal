@@ -187,6 +187,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\FileProcessors.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/FileProcessors.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/FileProcessors.lib"
@@ -660,19 +661,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_down.ico"
-				>
-			</File>
-			<File
 				RelativePath="..\..\Code\res\icon_down.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_down.ico"
 				>
 			</File>
 			<File
 				RelativePath="..\..\Code\res\icon_up.ico"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
 				>
 			</File>
 			<File

@@ -81,6 +81,7 @@
 				OutputFile="..\..\..\..\Binaries\Release/TopoUtils.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/TopoUtils.pdb"
 				ImportLibrary=".\..\Release/TopoUtils.lib"
 				TargetMachine="1"

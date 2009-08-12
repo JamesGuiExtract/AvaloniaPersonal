@@ -191,6 +191,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\APIs\SafeNetUltraPro\lib"
 				ModuleDefinitionFile=".\SafeNetUtilsTest.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/SafeNetUtilsTest.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/SafeNetUtilsTest.lib"

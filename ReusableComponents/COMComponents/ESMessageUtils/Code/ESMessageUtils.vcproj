@@ -188,6 +188,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ESMessageUtils.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/ESMessageUtils.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/ESMessageUtils.lib"

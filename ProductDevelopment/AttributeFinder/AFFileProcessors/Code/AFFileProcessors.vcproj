@@ -85,6 +85,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFFileProcessors.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFFileProcessors.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFFileProcessors.lib"

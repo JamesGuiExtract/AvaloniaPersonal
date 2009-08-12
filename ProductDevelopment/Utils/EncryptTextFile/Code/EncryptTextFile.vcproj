@@ -80,6 +80,7 @@
 				OutputFile="..\..\..\..\Binaries\Release/EncryptFile.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/EncryptFile.pdb"
 				SubSystem="1"
 				TargetMachine="1"

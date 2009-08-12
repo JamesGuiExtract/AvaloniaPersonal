@@ -184,6 +184,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\LineTextCorrectors.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/LineTextCorrectors.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/LineTextCorrectors.lib"

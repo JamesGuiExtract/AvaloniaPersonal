@@ -85,6 +85,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFUtils.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFUtils.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFUtils.lib"

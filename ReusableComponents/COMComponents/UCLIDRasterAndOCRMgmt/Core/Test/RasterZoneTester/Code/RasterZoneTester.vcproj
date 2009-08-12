@@ -184,6 +184,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RasterZoneTester.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/RasterZoneTester.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/RasterZoneTester.lib"

@@ -84,6 +84,7 @@
 				SuppressStartupBanner="true"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				ModuleDefinitionFile=".\Filters.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/Filters.pdb"
 				SubSystem="2"
 				OptimizeReferences="1"

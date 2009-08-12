@@ -186,6 +186,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				IgnoreDefaultLibraryNames="MSVCRT.lib,mfcs80.lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/ZLibUtils.pdb"
 				ImportLibrary=".\..\Release/ZLibUtils.lib"
 				TargetMachine="1"

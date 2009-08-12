@@ -188,6 +188,7 @@
 				OutputFile="..\..\..\..\Binaries\Release/UEXViewer.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UEXViewer.pdb"
 				SubSystem="2"
 				TargetMachine="1"

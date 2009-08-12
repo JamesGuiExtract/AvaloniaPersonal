@@ -87,6 +87,7 @@
 				OutputFile="..\..\..\..\Binaries\$(ConfigurationName)\ImageViewer.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/SRIRImageViewer.pdb"
 				SubSystem="2"
 				TargetMachine="1"

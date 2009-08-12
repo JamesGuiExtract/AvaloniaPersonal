@@ -186,6 +186,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\COMLMCore.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/COMLMCore.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/COMLMCore.lib"

@@ -87,6 +87,7 @@
 				OutputFile="..\..\..\..\..\Binaries\Release/RuleSetEditor.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/RuleSetEditor.pdb"
 				SubSystem="2"
 				TargetMachine="1"

@@ -88,6 +88,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFConditions.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/UCLIDAFConditions.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFConditions.lib"

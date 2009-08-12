@@ -196,6 +196,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\APIs\LeadTools_16\Lib"
 				ModuleDefinitionFile=".\ImageEdit.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/ImageEdit.pdb"
 				SubSystem="2"
 				ImportLibrary=".\Release/ImageEdit.lib"

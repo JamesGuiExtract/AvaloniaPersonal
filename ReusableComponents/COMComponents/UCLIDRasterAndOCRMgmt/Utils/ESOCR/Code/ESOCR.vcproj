@@ -189,6 +189,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\..\APIs\LeadTools_16\Lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/ESOCR.pdb"
 				SubSystem="2"
 				TargetMachine="1"

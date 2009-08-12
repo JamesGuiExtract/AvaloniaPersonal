@@ -184,6 +184,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\LandRecordsIV.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/LandRecordsIV.pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/LandRecordsIV.lib"

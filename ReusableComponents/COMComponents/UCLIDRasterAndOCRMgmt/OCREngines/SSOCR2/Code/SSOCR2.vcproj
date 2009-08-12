@@ -189,6 +189,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\..\APIs\Nuance_16\Lib"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\..\Release/SSOCR2.pdb"
 				SubSystem="2"
 				TargetMachine="1"
