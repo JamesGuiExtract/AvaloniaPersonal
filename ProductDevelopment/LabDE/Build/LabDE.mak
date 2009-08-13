@@ -75,10 +75,6 @@ BuildLabDEApplication: BuildAFSDK
 	@CD "$(LabDEDir)\Core\Code"
     @devenv LabDE.sln /BUILD $(BuildConfig) /USEENV
 
-CopyComponentVersionFile:
-	@ECHO Copying Conponent Version file...
-    @COPY /v "$(PDRootDir)\Common\LatestComponentVersions.mak" "$(LabDEBleedingEdgeDir)\ComponentsVersions.txt"
-	
 ObfuscateFiles: BuildLabDEApplication
 #	Copy the strong naming key to location dotfuscator xml file expects
 	@IF NOT EXIST "$(AFCoreInstallFilesRootDir)\StrongNameKey" @MKDIR "$(AFCoreInstallFilesRootDir)\StrongNameKey"
@@ -149,7 +145,9 @@ CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(LabDEInstallDir)" /v /s /e /y
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\Launch.ini" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
-
+	@COPY "$(LabDEDir)\DEPs\StandardLabDE\Core\Code\Resources\LabDE.ico" "$(LabDEInstallDir)"
+	@COPY "$(LabDEInstallRootDir)\LabDEInstall\autorun.inf" "$(LabDEBleedingEdgeDir)"
+	
 CreateDemo_LabDE: 
 	@ECHO Copying Demo_LabDE files...
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
@@ -176,7 +174,7 @@ CreateDemo_LabDE:
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
 
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CopyComponentVersionFile CreateDemo_LabDE
+DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T

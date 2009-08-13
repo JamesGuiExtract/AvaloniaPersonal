@@ -19,6 +19,7 @@ PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 LabDEDir=$(PDRootDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
+Branch=
 
 Get=vault GETLABEL 
 GetOptions=-server $(VAULT_SERVER) -repository $(VAULT_REPOSITORY) -makewritable 
@@ -28,14 +29,14 @@ GetPDCommonFiles:
     @IF NOT EXIST "$(PDRootDir)\Common" MKDIR "$(PDRootDir)\Common"
 	$(BUILD_DRIVE) 
     @CD  "$(PDRootDir)\Common"
-    $(Get) $(GetOptions) -nonworkingfolder "$(PDRootDir)\Common" $$/Engineering/ProductDevelopment/Common  "$(ProductVersion)" 
+    $(Get) $(GetOptions) -nonworkingfolder "$(PDRootDir)\Common" $$$(Branch)/Engineering/ProductDevelopment/Common  "$(ProductVersion)" 
 	
 GetAttributeFinderFiles:
 	@ECHO Getting $(FlexIndexVersion) 
 	@IF NOT EXIST "$(AFRootDirectory)" @MKDIR "$(AFRootDirectory)"
 	$(BUILD_DRIVE) 
     @CD "$(AFRootDirectory)"
-    $(Get) $(GetOptions) -nonworkingfolder "$(AFRootDirectory)" $$/Engineering/ProductDevelopment/AttributeFinder  "$(FlexIndexVersion)"
+    $(Get) $(GetOptions) -nonworkingfolder "$(AFRootDirectory)" $$$(Branch)/Engineering/ProductDevelopment/AttributeFinder  "$(FlexIndexVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(FlexIndexVersion)"
 
@@ -44,7 +45,7 @@ GetRCdotNETFiles:
 	@IF NOT EXIST "$(RCDotNETDir)" @MKDIR "$(RCDotNETDir)"
 	$(BUILD_DRIVE) 
 	@CD "$(RCDotNETDir)"
-    $(Get) $(GetOptions) -nonworkingfolder "$(RCDotNETDir)" "$$/Engineering/RC.Net" "$(RCDotNetVersion)"
+    $(Get) $(GetOptions) -nonworkingfolder "$(RCDotNETDir)" "$$$(Branch)/Engineering/RC.Net" "$(RCDotNetVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cpp 1 1 $(UpdateFileVersion) "$(RCDotNetVersion)"
@@ -54,7 +55,7 @@ GetReusableComponentFiles:
 	@IF NOT EXIST "$(ReusableComponentsRootDirectory)" @MKDIR "$(ReusableComponentsRootDirectory)"
 	$(BUILD_DRIVE) 
 	@CD "$(ReusableComponentsRootDirectory)"
-	@$(Get) $(GetOptions) -nonworkingfolder "$(ReusableComponentsRootDirectory)" $$/Engineering/ReusableComponents "$(ReusableComponentsVersion)"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(ReusableComponentsRootDirectory)" $$$(Branch)/Engineering/ReusableComponents "$(ReusableComponentsVersion)"
 	@SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(ReusableComponentsVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(ReusableComponentsVersion)"
 
@@ -64,7 +65,7 @@ GetPDUtilsFiles :
     @IF NOT EXIST "$(PDUtilsRootDir)" @MKDIR "$(PDUtilsRootDir)"
 	$(BUILD_DRIVE) 
     @CD "$(PDUtilsRootDir)"
-    $(Get) $(GetOptions) -nonworkingfolder "$(PDUtilsRootDir)" $$/Engineering/ProductDevelopment/Utils "$(PDUtilsVersion)"
+    $(Get) $(GetOptions) -nonworkingfolder "$(PDUtilsRootDir)" $$$(Branch)/Engineering/ProductDevelopment/Utils "$(PDUtilsVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(PDUtilsVersion)"
 
 GetIDShieldOfficeFiles: 
@@ -73,7 +74,7 @@ GetIDShieldOfficeFiles:
 	@IF NOT EXIST "$(IDShieldOfficeDir)" @MKDIR "$(IDShieldOfficeDir)"
 	$(BUILD_DRIVE) 
 	@CD "$(IDShieldOfficeDir)"
-	$(Get) $(GetOptions) -nonworkingfolder "$(IDShieldOfficeDir)" "$$/Engineering/ProductDevelopment/IDShieldOffice" "$(IDShieldOfficeVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(IDShieldOfficeDir)" "$$$(Branch)/Engineering/ProductDevelopment/IDShieldOffice" "$(IDShieldOfficeVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(IDShieldOfficeVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(IDShieldOfficeVersion)"
 
@@ -83,17 +84,17 @@ GetLabDEFiles:
 	@IF NOT EXIST "$(LabDEDir)" @MKDIR "$(LabDEDir)"
 	$(BUILD_DRIVE) 
 	@CD "$(LabDEDir)"
-	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$/Engineering/ProductDevelopment/LabDE" "$(LabDEVersion)"
+	$(Get) $(GetOptions) -nonworkingfolder "$(LabDEDir)" "$$$(Branch)/Engineering/ProductDevelopment/LabDE" "$(LabDEVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LabDEVersion)"
 
 GetLaserFicheFiles: 
     @IF NOT EXIST "$(LaserFicheDir)" @MKDIR "$(LaserFicheDir)"
-    @ECHO Getting files from LaserFiche folder 
+    @ECHO Getting files from LaserFiche folder
     @ECHO Please wait...
 	$(BUILD_DRIVE) 
     @CD "$(LaserFicheDir)"
-    $(Get) $(GetOptions) -nonworkingfolder "$(LaserFicheDir)" $$/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserficheVersion)"
+    $(Get) $(GetOptions) -nonworkingfolder "$(LaserFicheDir)" $$$(Branch)/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserficheVersion)"
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 
