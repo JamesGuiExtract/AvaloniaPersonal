@@ -9,8 +9,12 @@ using namespace std;
 //--------------------------------------------------------------------------------------------------
 void RuleSetLoader::loadObjectFromFile(IRuleSetPtr ipRuleSet, const string& strFile)
 {
-	ASSERT_ARGUMENT("ELI10951", ipRuleSet != NULL);
+	try
+	{
+		ASSERT_ARGUMENT("ELI10951", ipRuleSet != NULL);
 
-	ipRuleSet->LoadFrom(strFile.c_str(), VARIANT_FALSE);
+		ipRuleSet->LoadFrom(strFile.c_str(), VARIANT_FALSE);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27086");
 }
 //--------------------------------------------------------------------------------------------------

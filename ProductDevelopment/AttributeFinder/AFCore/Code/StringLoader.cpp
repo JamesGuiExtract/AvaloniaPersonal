@@ -16,6 +16,16 @@ StringLoader::StringLoader()
 	}
 }
 //--------------------------------------------------------------------------------------------------
+StringLoader::~StringLoader()
+{
+	try
+	{
+		// Reset the misc utils pointer
+		m_ipMiscUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27085");
+}
+//--------------------------------------------------------------------------------------------------
 void StringLoader::loadObjectFromFile(std::string& strFromFile, const std::string& strFile)
 {
 	// Call GetStringOptionallyFromFile() to load the string

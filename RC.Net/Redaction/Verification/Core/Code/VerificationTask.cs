@@ -283,16 +283,10 @@ namespace Extract.Redaction.Verification
                     return EFileProcessingResult.kProcessingCancelled;
                 }
 
-                _form.ShowDocument(bstrFileFullName, nFileID, nActionID, pFAMTM, pDB);
+                EFileProcessingResult result = _form.ShowDocument(bstrFileFullName, nFileID,
+                    nActionID, pFAMTM, pDB);
 
-                if (_form.Canceled)
-                {
-                    return EFileProcessingResult.kProcessingCancelled;
-                }
-                else
-                {
-                    return EFileProcessingResult.kProcessingSuccessful;
-                }
+                return result;
             }
             catch (Exception ex)
             {
