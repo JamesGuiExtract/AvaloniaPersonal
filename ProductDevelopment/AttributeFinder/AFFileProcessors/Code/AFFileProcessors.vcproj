@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFFileProcessors.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDAFFileProcessors.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFFileProcessors.lib"
 				TargetMachine="1"

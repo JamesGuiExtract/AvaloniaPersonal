@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\LineTextCorrectors.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/LineTextCorrectors.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/LineTextCorrectors.lib"
 				TargetMachine="1"

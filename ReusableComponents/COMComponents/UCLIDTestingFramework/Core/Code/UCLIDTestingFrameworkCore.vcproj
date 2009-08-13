@@ -87,7 +87,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDTestingFrameworkCore.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDTestingFrameworkCore.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDTestingFrameworkCore.lib"
 				TargetMachine="1"

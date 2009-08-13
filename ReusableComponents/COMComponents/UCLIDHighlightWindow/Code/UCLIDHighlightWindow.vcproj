@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDHighlightWindow.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDHighlightWindow.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDHighlightWindow.lib"
 				TargetMachine="1"

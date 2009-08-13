@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFSplittersTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/AFSplittersTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/AFSplittersTest.lib"
 				TargetMachine="1"

@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFValueFinderTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/AFValueFinderTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/AFValueFinderTest.lib"
 				TargetMachine="1"

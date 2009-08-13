@@ -88,7 +88,7 @@
 				AdditionalLibraryDirectories="..\..\..\APIs\LeadTools_16\Lib"
 				ModuleDefinitionFile=".\UCLIDImageUtils.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDImageUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDImageUtils.lib"
 				TargetMachine="1"

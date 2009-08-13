@@ -189,7 +189,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ESMessageUtils.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/ESMessageUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/ESMessageUtils.lib"
 				TargetMachine="1"

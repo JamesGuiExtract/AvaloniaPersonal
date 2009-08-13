@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFConditions.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDAFConditions.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDAFConditions.lib"
 				TargetMachine="1"

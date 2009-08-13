@@ -193,6 +193,7 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile=".\RedactionTester.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

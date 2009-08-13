@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFCoreTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/AFCoreTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/AFCoreTest.lib"
 				TargetMachine="1"

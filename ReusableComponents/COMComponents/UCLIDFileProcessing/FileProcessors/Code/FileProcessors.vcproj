@@ -188,7 +188,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\FileProcessors.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/FileProcessors.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/FileProcessors.lib"
 				TargetMachine="1"

@@ -85,7 +85,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDMeasurements.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDMeasurements.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDMeasurements.lib"
 				TargetMachine="1"

@@ -90,7 +90,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\..\..\ReusableComponents\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\RedactionCustomComponents.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/RedactionCC.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/RedactionCC.lib"
 				TargetMachine="1"

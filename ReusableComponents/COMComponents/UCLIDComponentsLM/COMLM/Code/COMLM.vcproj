@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\COMLM.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/COMLM.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/COMLM.lib"
 				TargetMachine="1"

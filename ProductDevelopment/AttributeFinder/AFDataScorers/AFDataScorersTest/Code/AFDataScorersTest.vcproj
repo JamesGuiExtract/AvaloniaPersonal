@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFDataScorersTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/AFDataScorersTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/AFDataScorersTest.lib"
 				TargetMachine="1"

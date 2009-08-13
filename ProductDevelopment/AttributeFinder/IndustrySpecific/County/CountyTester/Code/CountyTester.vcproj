@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\CountyTester.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/CountyTester.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/CountyTester.lib"
 				TargetMachine="1"

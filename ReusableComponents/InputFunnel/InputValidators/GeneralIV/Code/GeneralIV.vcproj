@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\GeneralIV.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/GeneralIV.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/GeneralIV.lib"
 				TargetMachine="1"

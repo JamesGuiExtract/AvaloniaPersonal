@@ -186,7 +186,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDDistanceConverter.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDDistanceConverter.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDDistanceConverter.lib"
 				TargetMachine="1"

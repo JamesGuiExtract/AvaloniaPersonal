@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\GenericDisplay.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Release/UCLIDGenericDisplay2.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\Release/UCLIDGenericDisplay2.lib"
 				TargetMachine="1"

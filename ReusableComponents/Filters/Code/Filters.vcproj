@@ -85,7 +85,7 @@
 				IgnoreDefaultLibraryNames="LIBCMT"
 				ModuleDefinitionFile=".\Filters.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/Filters.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="1"
 				ImportLibrary=".\..\Release/Filters.lib"

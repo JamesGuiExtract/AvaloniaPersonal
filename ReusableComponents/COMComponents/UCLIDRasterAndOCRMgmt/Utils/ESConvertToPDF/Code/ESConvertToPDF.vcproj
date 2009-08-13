@@ -157,7 +157,7 @@
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="..\..\..\..\..\APIs\Nuance_16\Lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\release\$(TargetName).pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

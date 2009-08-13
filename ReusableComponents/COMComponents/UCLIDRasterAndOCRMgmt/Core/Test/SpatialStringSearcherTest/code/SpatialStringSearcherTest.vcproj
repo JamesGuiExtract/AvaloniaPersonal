@@ -188,7 +188,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\SpatialStringSearcherTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/SpatialStringSearcherTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/SpatialStringSearcherTest.lib"
 				TargetMachine="1"

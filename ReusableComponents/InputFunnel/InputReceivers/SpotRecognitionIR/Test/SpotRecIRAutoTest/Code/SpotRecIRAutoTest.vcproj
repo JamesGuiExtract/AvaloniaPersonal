@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\SpotRecIRAutoTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/SpotRecIRAutoTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/SpotRecIRAutoTest.lib"
 				TargetMachine="1"

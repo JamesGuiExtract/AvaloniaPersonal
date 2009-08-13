@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\CountyCustomComponents.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/CountyCustomComponents.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/CountyCustomComponents.lib"
 				TargetMachine="1"

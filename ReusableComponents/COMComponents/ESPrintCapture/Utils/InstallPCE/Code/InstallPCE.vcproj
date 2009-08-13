@@ -162,6 +162,7 @@
 				OutputFile="..\..\..\..\..\..\binaries\Release/InstallPCE.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

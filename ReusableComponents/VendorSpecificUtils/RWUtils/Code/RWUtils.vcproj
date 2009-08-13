@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\APIs\RogueWave\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/RWUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				ImportLibrary=".\..\Release/RWUtils.lib"
 				TargetMachine="1"
 			/>

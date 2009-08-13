@@ -184,7 +184,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\TestFilters.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/TestFilters.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/TestFilters.lib"
 				TargetMachine="1"

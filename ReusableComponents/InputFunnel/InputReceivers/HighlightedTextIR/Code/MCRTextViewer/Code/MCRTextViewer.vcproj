@@ -193,7 +193,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\OmniORB\Lib,..\..\..\..\Rainbow\Lib"
 				ModuleDefinitionFile=".\MCRTextViewer.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDMCRTextViewer.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDMCRTextViewer.lib"
 				TargetMachine="1"

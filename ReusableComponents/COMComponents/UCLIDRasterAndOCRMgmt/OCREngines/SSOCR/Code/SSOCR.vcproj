@@ -188,7 +188,7 @@
 				AdditionalLibraryDirectories=""
 				ModuleDefinitionFile=".\SSOCR.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/SSOCR.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/SSOCR.lib"
 				TargetMachine="1"

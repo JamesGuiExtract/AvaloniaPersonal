@@ -184,7 +184,7 @@
 				IgnoreDefaultLibraryNames="LIBCMT"
 				ModuleDefinitionFile=".\BaseUtils.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/BaseUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/BaseUtils.lib"
 				TargetMachine="1"

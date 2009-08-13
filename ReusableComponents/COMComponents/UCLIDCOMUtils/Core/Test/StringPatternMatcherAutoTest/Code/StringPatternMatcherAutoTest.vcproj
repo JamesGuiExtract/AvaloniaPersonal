@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\StringPatternMatcherAutoTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/StringPatternMatcherAutoTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/StringPatternMatcherAutoTest.lib"
 				TargetMachine="1"

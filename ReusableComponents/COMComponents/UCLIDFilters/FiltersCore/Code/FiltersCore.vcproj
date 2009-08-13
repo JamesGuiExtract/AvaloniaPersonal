@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\FiltersCore.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/FiltersCore.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/FiltersCore.lib"
 				TargetMachine="1"

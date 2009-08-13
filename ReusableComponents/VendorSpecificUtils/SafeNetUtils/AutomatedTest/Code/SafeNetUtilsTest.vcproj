@@ -192,7 +192,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\APIs\SafeNetUltraPro\lib"
 				ModuleDefinitionFile=".\SafeNetUtilsTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/SafeNetUtilsTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/SafeNetUtilsTest.lib"
 				TargetMachine="1"

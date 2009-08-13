@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\LineTextEvaluators.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/LineTextEvaluators.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/LineTextEvaluators.lib"
 				TargetMachine="1"

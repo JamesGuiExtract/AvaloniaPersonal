@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ParagraphTextHandlers.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/ParagraphTextHandlers.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/ParagraphTextHandlers.lib"
 				TargetMachine="1"

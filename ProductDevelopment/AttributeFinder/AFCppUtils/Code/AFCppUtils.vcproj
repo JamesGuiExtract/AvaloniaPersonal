@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFCppUtils.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Release/AFCppUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\Release/AFCppUtils.lib"
 				TargetMachine="1"

@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\TestEncryptFileMgr.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Release/TestEncryptFileMgr.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\Release/TestEncryptFileMgr.lib"
 				TargetMachine="1"

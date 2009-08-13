@@ -186,6 +186,7 @@
 				LinkIncremental="1"
 				ModuleDefinitionFile=".\AFSelectors.def"
 				GenerateDebugInformation="true"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"

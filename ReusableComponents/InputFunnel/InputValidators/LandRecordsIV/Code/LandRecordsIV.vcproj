@@ -185,7 +185,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\LandRecordsIV.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/LandRecordsIV.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/LandRecordsIV.lib"
 				TargetMachine="1"

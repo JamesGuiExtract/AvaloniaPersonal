@@ -87,7 +87,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\APIs\RogueWave\lib"
 				ModuleDefinitionFile=".\UCLIDCOMUtils.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDCOMUtils.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDCOMUtils.lib"
 				TargetMachine="1"

@@ -184,7 +184,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\RegExprIV.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/RegExprIV.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/RegExprIV.lib"
 				TargetMachine="1"

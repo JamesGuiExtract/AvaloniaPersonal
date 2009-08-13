@@ -86,7 +86,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\AFUtilsTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/AFUtilsTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/AFUtilsTest.lib"
 				TargetMachine="1"

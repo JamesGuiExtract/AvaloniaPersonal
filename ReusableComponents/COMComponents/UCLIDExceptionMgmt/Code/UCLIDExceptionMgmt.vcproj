@@ -186,7 +186,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\UCLIDExceptionMgmt.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/UCLIDExceptionMgmt.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/UCLIDExceptionMgmt.lib"
 				TargetMachine="1"

@@ -85,7 +85,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\ParagraphTextCorrectors.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/ParagraphTextCorrectors.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/ParagraphTextCorrectors.lib"
 				TargetMachine="1"

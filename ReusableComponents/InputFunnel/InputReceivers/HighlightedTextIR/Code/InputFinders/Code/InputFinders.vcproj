@@ -85,7 +85,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\InputFinders.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/InputFinders.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/InputFinders.lib"
 				TargetMachine="1"

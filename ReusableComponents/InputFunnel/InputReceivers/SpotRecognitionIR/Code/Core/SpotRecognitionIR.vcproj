@@ -88,7 +88,7 @@
 				AdditionalLibraryDirectories="..\..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Lib"
 				ModuleDefinitionFile=".\SpotRecognitionIR.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\..\Release/SpotRecognitionIR.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\..\Release/SpotRecognitionIR.lib"
 				TargetMachine="1"

@@ -176,7 +176,7 @@
 				OutputFile="..\..\..\..\..\..\Binaries\Release/FAMDBAdmin.exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/FAMDBAdmin.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				OptimizeReferences="0"
 				EnableCOMDATFolding="0"

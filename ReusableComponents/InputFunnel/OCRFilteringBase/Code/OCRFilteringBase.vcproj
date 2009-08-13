@@ -186,7 +186,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\OCRFilteringBase.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/OCRFilteringBase.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/OCRFilteringBase.lib"
 				TargetMachine="1"

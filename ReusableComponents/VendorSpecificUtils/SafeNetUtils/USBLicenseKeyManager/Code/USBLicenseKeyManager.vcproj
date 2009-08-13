@@ -89,7 +89,7 @@
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\..\..\APIs\RogueWave\lib"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/USBLicenseKeyManager.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				TargetMachine="1"
 			/>

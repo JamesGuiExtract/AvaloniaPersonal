@@ -184,7 +184,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\HTIRAutoTest.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/HighlightedTextIRAutoTest.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/HighlightedTextIRAutoTest.lib"
 				TargetMachine="1"

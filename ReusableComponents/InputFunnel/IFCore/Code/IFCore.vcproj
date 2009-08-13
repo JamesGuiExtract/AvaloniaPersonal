@@ -186,7 +186,7 @@
 				SuppressStartupBanner="true"
 				ModuleDefinitionFile=".\IFCore.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\..\Release/IFCore.pdb"
+				ProgramDatabaseFile="$(TargetDir)$(TargetName).pdb"
 				SubSystem="2"
 				ImportLibrary=".\..\Release/IFCore.lib"
 				TargetMachine="1"
