@@ -40,6 +40,10 @@ LabDEInstallMediaDir=$(LabDEInstallRootDir)\LabDE\Media\CD-ROM\DiskImages\DISK1
 LabDEObfuscationFilesArchive=$(DataEntryInstallFiles)\LabDE\Archive\ObfuscationFiles\$(LabDEVersion)
 LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
+RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit
+RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
+RDTReleaseBleedingEdgeDir=LabDEBleedingEdgeDir\RDT_InternalUseOnly
+
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
 
@@ -64,13 +68,18 @@ BuildAFCore:
 	@CD "$(AFRootDirectory)\Build"
     @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
 
-BuildAFSDK:
+BuildRDT:
 	@ECHO Building AttributeFinderCore...
 	@CD "$(AFRootDirectory)\Build"
-    @nmake /F AttributeFinderSDK.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
-    @nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
+    @nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" BuildRDTInstall
 
-BuildLabDEApplication: BuildAFSDK
+CopyRDTToInstallFolder:
+    @IF NOT EXIST "$(RDTReleaseBleedingEdgeDir)" MKDIR "$(RDTReleaseBleedingEdgeDir)"
+    @XCOPY "$(RDTInstallMediaDir)\*.*" "$(RDTReleaseBleedingEdgeDir)" /v /s /e /y
+    $(VerifyDir) "$(RDTInstallMediaDir)" "$(RDTReleaseBleedingEdgeDir)"
+    @DeleteFiles "$(RDTReleaseBleedingEdgeDir)\vssver.scc"
+
+BuildLabDEApplication: BuildRDT
 	@ECHO Building LabDE...
 	@CD "$(LabDEDir)\Core\Code"
     @devenv LabDE.sln /BUILD $(BuildConfig) /USEENV
@@ -147,7 +156,7 @@ CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\LabDEInstall.dbd" "$(LabDEInstallDir)"
 	@COPY "$(LabDEDir)\DEPs\StandardLabDE\Core\Code\Resources\LabDE.ico" "$(LabDEInstallDir)"
 	@COPY "$(LabDEInstallRootDir)\LabDEInstall\autorun.inf" "$(LabDEBleedingEdgeDir)"
-	
+
 CreateDemo_LabDE: 
 	@ECHO Copying Demo_LabDE files...
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
