@@ -1,1 +1,1 @@
-EXTRACTRedactionTester.IDShieldTester.1;;Interim - RandomSubset.dat
+EXTRACTRedactionTester.IDShieldTester.1;;VA - Fairfax.dat
