@@ -1,0 +1,54 @@
+//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//
+<SETTING>;AutomatedConditionQuantifier=only any
+//only any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
+//
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+//|Clues|LCData testing with supposed customer configuration
+<SETTING>;OutputHybridStats=0
+//<SETTING>;TypeToBeTested=SSN
+//<SETTING>;OUTPUT_FINAL_STATS_ONLY=TRUE
+<SETTING>;OutputFinalStatsOnly=1
+//<SETTING>;CreateTestOutputVOAFiles=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\B00321;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\B00321;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\C00005;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\C00170;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\C00398;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D00050;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D00200;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D00400;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D04000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D05000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D08000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D11000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D12000;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\D20270;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\F00005;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\F00270;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\J00002;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\J00018;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\J00025;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\J00075;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\J00156;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\M00003;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\M00025;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\M00065;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\M00090;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\M00132;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\N00013;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\T00002;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\T00036;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\T00040;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\T00093;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00005;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00250;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00256;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00420;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00645;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00655;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\Images\W00850;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
