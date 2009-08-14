@@ -7,7 +7,6 @@
 <SETTING>;OutputFinalStatsOnly=1
 
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\RandomSubset\B00321;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\RandomSubset\B00321;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\RandomSubset\C00005;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\RandomSubset\C00170;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\Fairfax County\Set001\RandomSubset\C00398;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions_1stPass\$FileOf(<SourceDocName>).voa
