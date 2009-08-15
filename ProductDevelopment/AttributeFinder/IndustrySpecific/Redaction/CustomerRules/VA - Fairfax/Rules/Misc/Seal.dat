@@ -1,0 +1,10 @@
+(?x)(?<error>){1}
+^.?
+(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\(]|[^\(](?=\()))*?(?<match>
+\()|(?<-error>)[^\(]?)|((?<match>\()|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>
+S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^e]|[^e](?=e)))*?(?<match>
+e)|(?<-error>)[^e]?)|((?<match>e)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>
+a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^l]|[^l](?=l)))*?(?<match>
+l)|(?<-error>)[^l]?)|((?<match>l)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\)]|[^\)](?=\))))*?(?<match>
+\))|(?<-error>)[^\)]?)|((?<match>\))|(?<-error>)))
+(?=\r)

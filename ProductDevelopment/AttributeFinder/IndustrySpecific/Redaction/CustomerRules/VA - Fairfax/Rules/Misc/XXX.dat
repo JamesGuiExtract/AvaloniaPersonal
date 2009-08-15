@@ -1,0 +1,9 @@
+(?x)(?<error>){1}
+(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^X]|[^X](?=X)))*?(?<match>
+X)|(?<-error>)[^X]?)|((?<match>X)|(?<-error>)))
+X*

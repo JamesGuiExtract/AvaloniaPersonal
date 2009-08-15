@@ -1,0 +1,14 @@
+(?x)(?<error>){2}
+\b
+(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>
+S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^o]|[^o](?=o)))*?(?<match>
+o)|(?<-error>)[^o]?)|((?<match>o)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^c]|[^c](?=c)))*?(?<match>
+c)|(?<-error>)[^c]?)|((?<match>c)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\.]|[^\.](?=\.)))*?(?<match>
+\.)|(?<-error>)[^\.]?)|((?<match>\.)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^S]|[^S](?=S)))*?(?<match>
+S)|(?<-error>)[^S]?)|((?<match>S)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^e]|[^e](?=e)))*?(?<match>
+e)|(?<-error>)[^e]?)|((?<match>e)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^c]|[^c](?=c)))*?(?<match>
+c)|(?<-error>)[^c]?)|((?<match>c)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\.]|[^\.](?=\.)))*?(?<match>
+\.)|(?<-error>)[^\.]?)|((?<match>\.)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^N]|[^N](?=N)))*?(?<match>
+N)|(?<-error>)[^N]?)|((?<match>N)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^o]|[^o](?=o)))*?(?<match>
+o)|(?<-error>)[^o]?)|((?<match>o)|(?<-error>)))
+\b
