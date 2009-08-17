@@ -24,6 +24,16 @@ namespace Extract.Drawing
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
         #region GeometryMethods Methods
 
         /// <summary>
@@ -42,9 +52,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23162",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23162");
 
                 return Math.Atan2(end.Y - start.Y, end.X - start.X);
             }
@@ -72,9 +81,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23163",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23163");
 
                 // Check if the line is vertical
                 float deltaX = start.X - end.X;
@@ -142,9 +150,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23164",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23164");
 
                 return new Point(
                     (int)((start.X + end.X) / 2.0 + 0.5),
@@ -172,9 +179,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23165",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23165");
 
                 // Calculate the slope of the line
                 double slope = GeometryMethods.GetAngle(start, end);
@@ -215,9 +221,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23166",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23166");
 
                 // Calculate the slope of the line
                 double slope = GeometryMethods.GetAngle(Point.Truncate(start),
@@ -259,9 +264,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23167",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23167");
 
                 // Calculate the angle of the line
                 double angle = GeometryMethods.GetAngle(start, end);
@@ -312,9 +316,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26445",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26445");
 
                 ExtractException.Assert("ELI25671", "Invalid parameter!", points.Length > 0);
 
@@ -353,9 +356,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26446",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26446");
 
                 // Initialize a vector of point representing the corners of the rectangle.
                 Point[] cornerPoints = { rectangle.Location, new Point(rectangle.Right, rectangle.Top),
@@ -390,9 +392,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26447",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26447");
 
                 // Compute the X and Y distance
                 double dX = pointA.X - pointB.X;
@@ -424,9 +425,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23168",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23168");
 
                 // Compute the area
                 double area = Distance(start, end) * (double)height;
@@ -461,9 +461,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23169",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23169");
 
                 // Check for coordinates validity
                 if (start == end)
@@ -540,9 +539,8 @@ namespace Extract.Drawing
         {
             try
             {
-                // Validate licensing
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI25692",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI25692");
 
                 // Get the difference between the two angles.
                 double delta = endAngle - startAngle;

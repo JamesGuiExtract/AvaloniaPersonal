@@ -22,6 +22,16 @@ namespace Extract.Drawing
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
         /// <overloads>Draws the specified text string with the specified rotation.</overloads>
         /// <summary>
         /// Draws the specified text string with the specified rotation.
@@ -137,8 +147,7 @@ namespace Extract.Drawing
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23161",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23161");
 
                 // Determine the size of the layout rectangle if necessary
                 if (layoutRectangle.Size.IsEmpty)

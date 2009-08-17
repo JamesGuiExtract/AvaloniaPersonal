@@ -23,6 +23,16 @@ namespace Extract.AttributeFinder
 
         #endregion AttributesFile Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.RuleWritingCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
         #region AttributesFile Methods
 
         /// <summary>
@@ -34,8 +44,8 @@ namespace Extract.AttributeFinder
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.RuleWritingCoreObjects,
-                    "ELI26791", _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26791");
 
                 // Load the attributes from the voa file
                 IUnknownVector vector = new IUnknownVector();

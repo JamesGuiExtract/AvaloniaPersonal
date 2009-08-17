@@ -53,6 +53,8 @@ namespace Extract.ReportViewer
     /// <typeparam name="T">The type of data the report parameter represents.</typeparam>
     public abstract class ExtractReportParameter<T> : IExtractReportParameter
     {
+        #region Fields
+
         /// <summary>
         /// The current value of the parameter.
         /// </summary>
@@ -68,6 +70,14 @@ namespace Extract.ReportViewer
         /// </summary>
         private bool _hasValueSet;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Extract Report Parameter");
+
+        #endregion Fields
+
         /// <overloads>Initializes a new <see cref="ExtractReportParameter{T}"/> class.</overloads>
         /// <summary>
         /// Initializes a new <see cref="ExtractReportParameter{T}"/> class.
@@ -78,8 +88,7 @@ namespace Extract.ReportViewer
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23809", "Extract Report Parameter");
+                _licenseCache.Validate("ELI23809");
 
                 _parameterName = parameterName;
             }
@@ -100,8 +109,7 @@ namespace Extract.ReportViewer
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23810", "Extract Report Parameter");
+                _licenseCache.Validate("ELI23810");
 
                 _parameterName = parameterName;
                 _currentValue = defaultValue;
@@ -462,10 +470,20 @@ namespace Extract.ReportViewer
     /// </summary>
     public static class DateRangeValueTypeHelper
     {
+        #region Fields
+
         private static Dictionary<DateRangeValue, string> _dateRangeAsString =
             new Dictionary<DateRangeValue, string>(Enum.GetValues(typeof(DateRangeValue)).Length);
 
         private static List<string> _enumStrings;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Date Range Value Type Helper");
+
+        #endregion Fields
 
         /// <summary>
         /// Returns a <see cref="string"/> array containing all of the
@@ -478,8 +496,7 @@ namespace Extract.ReportViewer
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23811", "Get Human Readable Strings");
+                _licenseCache.Validate("ELI23811");
 
                 if (_enumStrings == null)
                 {
@@ -512,8 +529,7 @@ namespace Extract.ReportViewer
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23813", "Get Human Readable String");
+                _licenseCache.Validate("ELI23813");
 
                 // First check if the string has been computed yet, if not then
                 // compute the string
@@ -586,8 +602,7 @@ namespace Extract.ReportViewer
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23816", "Parse String");
+                _licenseCache.Validate("ELI23816");
 
                 // Remove the spaces from the string
                 string value = enumValue.Replace(" ", "");

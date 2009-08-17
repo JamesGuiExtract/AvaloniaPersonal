@@ -24,6 +24,16 @@ namespace Extract.ReportViewer
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Parameter Entry Form");
+
+        #endregion Fields
+
         #region Constructors
 
         /// <overloads>Intializes a new <see cref="ParameterEntryForm"/> class.</overloads>
@@ -50,8 +60,7 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23821", "Parameter Entry Form");
+                _licenseCache.Validate("ELI23821");
 
                 // Display wait cursor while the form is configured
                 using (Extract.Utilities.Forms.TemporaryWaitCursor waitCursor

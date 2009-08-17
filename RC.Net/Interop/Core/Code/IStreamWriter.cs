@@ -33,6 +33,12 @@ namespace Extract.Interop
         /// </summary>
         readonly BinaryFormatter _formatter = new BinaryFormatter(); 
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion IStreamWriter Fields
 
         #region IStreamWriter Constructors
@@ -44,8 +50,8 @@ namespace Extract.Interop
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI26483",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26483");
 
                 _formatter.Serialize(_stream, version);
             }

@@ -78,6 +78,12 @@ namespace Extract.Utilities.Forms
         /// </summary>
         static Cursor _zoomWindow;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion ExtractCursors Fields
 
         #region ExtractCursors Properties
@@ -274,8 +280,7 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23140",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23140");
 
                 ExtractException.Assert("ELI21217", "Stream must be specified.", stream != null);
 
@@ -333,8 +338,7 @@ namespace Extract.Utilities.Forms
             try
             {
                 // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23141",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23141");
 
                 // Get the executing assembly
                 Assembly thisAssembly = Assembly.GetExecutingAssembly();

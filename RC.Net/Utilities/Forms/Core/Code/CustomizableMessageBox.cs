@@ -47,6 +47,12 @@ namespace Extract.Utilities.Forms
         /// </summary>
         private string _name;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region Properties
@@ -714,8 +720,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23137", _OBJECT_NAME);
+                _licenseCache.Validate("ELI23137");
             }
             catch (Exception ex)
             {

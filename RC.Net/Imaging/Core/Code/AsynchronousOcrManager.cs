@@ -217,6 +217,12 @@ namespace Extract.Imaging
         /// </summary>
         private EventWaitHandle _ocrCanceledEvent = new ManualResetEvent(false);
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Events
@@ -268,8 +274,8 @@ namespace Extract.Imaging
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.OcrOnClientFeature, "ELI23120",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23120");
 
                 // Set the tradeoff
                 _tradeoff = tradeoff;

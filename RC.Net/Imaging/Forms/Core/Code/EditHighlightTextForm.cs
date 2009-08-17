@@ -25,6 +25,16 @@ namespace Extract.Imaging.Forms
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
         #region EditHighlightTextForm Constructors
 
         /// <summary>
@@ -44,8 +54,8 @@ namespace Extract.Imaging.Forms
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 }
 
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23175",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23175");
 
                 InitializeComponent();
 

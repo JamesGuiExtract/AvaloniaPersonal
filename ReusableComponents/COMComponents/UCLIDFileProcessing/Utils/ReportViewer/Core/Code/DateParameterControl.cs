@@ -23,6 +23,12 @@ namespace Extract.ReportViewer
         /// </summary>
         DateParameter _dateParameter;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Date Parameter Control");
+
         #endregion Fields
 
         #region Constructors
@@ -53,8 +59,7 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23802", "Date Parameter Control");
+                _licenseCache.Validate("ELI23802");
 
                 InitializeComponent();
 

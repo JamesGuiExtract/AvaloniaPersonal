@@ -79,6 +79,12 @@ namespace Extract.Utilities.Forms
         /// </summary>
         PathTagsButtonDisplayStyle _displayStyle = PathTagsButtonDisplayStyle.ImageOnly;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion PathTagsButton Fields
 
         #region PathTagsButton Events
@@ -109,8 +115,7 @@ namespace Extract.Utilities.Forms
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23150",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23150");
 
                 InitializeComponent();
 

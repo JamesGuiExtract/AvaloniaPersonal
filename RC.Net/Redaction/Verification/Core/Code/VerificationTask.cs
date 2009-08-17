@@ -50,6 +50,12 @@ namespace Extract.Redaction.Verification
         static readonly VerificationForm<VerificationTaskForm> _form = 
             new VerificationForm<VerificationTaskForm>();
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, _COMPONENT_DESCRIPTION);
+
         #endregion VerificationTask Fields
 
         #region VerificationTask Constructors
@@ -142,9 +148,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
-                    "ELI26890", _COMPONENT_DESCRIPTION);
+                // Validate the license
+                _licenseCache.Validate("ELI26890");
 
                 // Allow the user to set the verification settings
                 using (VerificationSettingsDialog dialog = new VerificationSettingsDialog(_settings))
@@ -201,9 +206,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
-                    "ELI26893", _COMPONENT_DESCRIPTION);
+                // Validate the license
+                _licenseCache.Validate("ELI26893");
 
                 _form.Cancel();
             }
@@ -221,9 +225,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
-                    "ELI26901", _COMPONENT_DESCRIPTION);
+                // Validate the license
+                _licenseCache.Validate("ELI26901");
 
                 _form.CloseForm();
             }
@@ -241,9 +244,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
-                    "ELI26891", _COMPONENT_DESCRIPTION);
+                // Validate the license
+                _licenseCache.Validate("ELI26891");
 
                 _form.ShowForm(CreateVerificationTaskForm);
             }
@@ -274,9 +276,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IDShieldVerificationObject,
-                    "ELI26894", _COMPONENT_DESCRIPTION);
+                // Validate the license
+                _licenseCache.Validate("ELI26894");
 
                 if (bCancelRequested)
                 {

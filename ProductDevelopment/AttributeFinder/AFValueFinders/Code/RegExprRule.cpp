@@ -55,6 +55,23 @@ CRegExprRule::~CRegExprRule()
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16347");
 }
+//--------------------------------------------------------------------------------------------------
+HRESULT CRegExprRule::FinalConstruct()
+{
+	return S_OK;
+}
+//--------------------------------------------------------------------------------------------------
+void CRegExprRule::FinalRelease()
+{
+	try
+	{
+		// Set COM objects to NULL
+		m_ipRegExParser = NULL;
+		m_ipMiscUtils = NULL;
+		m_ipAFUtility = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27092");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ISupportsErrorInfo

@@ -220,10 +220,6 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23147",
-                    "Native Utility Form Methods");
-
                 // Ensure that the window object is not null
                 ExtractException.Assert("ELI21970", "Window object is null!",
                     window != null);
@@ -257,10 +253,6 @@ namespace Extract.Utilities.Forms
 		{
 			try
 			{
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23148",
-                    "Native Utility Form Methods");
-
     			NONCLIENTMETRICS ncm = new NONCLIENTMETRICS();
     			ncm.cbSize = Marshal.SizeOf(typeof(NONCLIENTMETRICS));
 
@@ -289,10 +281,6 @@ namespace Extract.Utilities.Forms
 		{
 			try
 			{
-                // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23149",
-                    "Native Utility Form Methods");
-
 				EnableMenuItem(GetSystemMenu(form.Handle, false),
                     SC_CLOSE, MF_BYCOMMAND | MF_GRAYED);
 			}

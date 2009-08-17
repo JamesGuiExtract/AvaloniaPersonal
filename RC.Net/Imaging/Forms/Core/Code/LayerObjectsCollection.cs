@@ -60,6 +60,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         bool _isSelectionCollection;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region LayerObjects Collection Events
@@ -111,8 +117,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23113",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23113");
             }
             catch (Exception ex)
             {
@@ -138,8 +144,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23115",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23115");
 
                 // Add the specified objects
                 foreach (LayerObject layerObject in objects)

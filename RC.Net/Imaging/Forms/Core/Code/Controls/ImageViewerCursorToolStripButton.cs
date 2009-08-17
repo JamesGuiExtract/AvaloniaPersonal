@@ -46,6 +46,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private string _baseToolTipText;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region ImageViewerCursorToolStripButton Constructors
@@ -106,8 +112,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23102",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23102");
 
                 // Ensure button text and image have been specified
                 ExtractException.Assert("ELI21227", "buttonText must not be empty!",

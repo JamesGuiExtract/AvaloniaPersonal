@@ -205,25 +205,10 @@ void LicenseUtilities::ValidateLicense(LicenseIdName id, String^ eliCode, String
 {
 	try
 	{
-		// Only call into LicenseManagement::validateLicense once every second per ID (this ensures
-		// the license state is valid on an on-going basis, even though 
-		// LicenseManagement::validateLicense will only check each component's license every 24
-		// hours.
-		DWORD dwLastValidateCallSecond;
-		bool bContainsKey = _internalTimeCheckArray->TryGetValue(id, dwLastValidateCallSecond);
-		if (!bContainsKey || (GetTickCount() / 1000) != dwLastValidateCallSecond)
-		{
-			if (bContainsKey)
-			{
-				_internalTimeCheckArray->Remove(id);
-			}
-
-			LicenseManagement::sGetInstance().validateLicense(
-				ValueMapConversion::getConversion(static_cast<unsigned int>(id)),
-				asString(eliCode), asString(componentName));
-
-			_internalTimeCheckArray[id] = (GetTickCount() / 1000);
-		}
+		// Validate the license ID
+		LicenseManagement::sGetInstance().validateLicense(
+			ValueMapConversion::getConversion(static_cast<unsigned int>(id)),
+			asString(eliCode), asString(componentName));
 	}
 	catch(UCLIDException& uex)
 	{

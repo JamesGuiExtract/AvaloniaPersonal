@@ -71,6 +71,12 @@ namespace Extract.ReportViewer
         /// </summary>
         private List<string> _standardReports;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.FlexIndexIDShieldCoreObjects, "Report Viewer Form");
+
         #endregion Fields
 
         #region Constructors
@@ -104,8 +110,8 @@ namespace Extract.ReportViewer
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 }
 
-                LicenseUtilities.ValidateLicense(LicenseIdName.FlexIndexIDShieldCoreObjects,
-                    "ELI23504", "Report Viewer Form");
+                // Validate the license
+                _licenseCache.Validate("ELI23504");
 
                 InitializeComponent();
 

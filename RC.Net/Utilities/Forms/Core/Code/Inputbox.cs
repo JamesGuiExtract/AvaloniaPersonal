@@ -26,7 +26,17 @@ namespace Extract.Utilities.Forms
 
         #endregion Constants
 
-		/// <summary>
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        #endregion Fields
+
+        /// <summary>
 		/// Displays a prompt in a dialog box, waits for the user to input text or
         /// click a button, and then returns a string containing the contents of the text box.
 		/// </summary>
@@ -80,9 +90,8 @@ namespace Extract.Utilities.Forms
 
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23171",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23171");
 
                 // Get the screen rectangle of the owner window
                 Rectangle ownerRectangle = NativeMethods.GetWindowScreenRectangle(owner);
@@ -154,9 +163,8 @@ namespace Extract.Utilities.Forms
 		{
             try
             {
-                // Validate license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23256",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23256");
 
                 // Create a new input box dialog
                 using (InputBoxForm inputBox = new InputBoxForm())

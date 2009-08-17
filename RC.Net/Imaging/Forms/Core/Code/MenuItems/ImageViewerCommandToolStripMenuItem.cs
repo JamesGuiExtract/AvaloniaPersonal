@@ -35,6 +35,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private ImageViewer _imageViewer;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region ImageViewerCommandToolStripMenuItem Constructors
@@ -115,8 +121,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23116",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23116");
 
                 // Ensure a type has been passed in for the menu item
                 ExtractException.Assert("ELI21382", 

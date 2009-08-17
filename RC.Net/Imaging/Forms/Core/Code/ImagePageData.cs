@@ -49,6 +49,12 @@ namespace Extract.Imaging.Forms
         /// <seealso cref="Orientation"/>
         int _orientation;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion ImagePageData Fields
 
         #region ImagePageData Constructors
@@ -60,8 +66,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23107",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI23107");
             }
             catch (Exception ex)
             {

@@ -38,6 +38,12 @@ namespace Extract.Utilities.Parsers
         /// </summary>
         private string _pattern = "";
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "DotNetRegExParser");
+
         #endregion
 
         #region IRegularExprParser Properties
@@ -405,8 +411,7 @@ namespace Extract.Utilities.Parsers
         private static void ValidateLicense()
         {
             // Validate the license
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                "ELI22446", "DotNetRegExParser object is not licensed.");
+            _licenseCache.Validate("ELI22446");
         }
 
         /// <summary>

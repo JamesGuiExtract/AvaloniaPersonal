@@ -21,6 +21,12 @@ namespace Extract.ReportViewer
         /// </summary>
         ValueListParameter _valueListParameter;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Value List Parameter Control");
+
         #endregion Fields
 
         #region Constructors
@@ -51,8 +57,7 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23826", "Value List Parameter Control");
+                _licenseCache.Validate("ELI23826");
 
                 InitializeComponent();
 

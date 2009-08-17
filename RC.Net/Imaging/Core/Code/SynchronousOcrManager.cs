@@ -50,6 +50,12 @@ namespace Extract.Imaging
         /// </summary>
         RasterCodecs _codecs;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.OcrOnClientFeature, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Constructors
@@ -72,8 +78,8 @@ namespace Extract.Imaging
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.OcrOnClientFeature, "ELI24040",
-                    _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI24040");
 
                 // Set the tradeoff
                 _tradeoff = tradeoff;

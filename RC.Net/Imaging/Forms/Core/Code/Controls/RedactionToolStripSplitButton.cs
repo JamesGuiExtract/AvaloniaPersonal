@@ -62,6 +62,12 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private CursorTool _redactionTool;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region RedactionToolStripSplitButton Constructors
@@ -83,8 +89,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23105",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23105");
 
                 InitializeComponent();
 

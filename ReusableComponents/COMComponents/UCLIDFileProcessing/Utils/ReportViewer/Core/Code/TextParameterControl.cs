@@ -21,6 +21,12 @@ namespace Extract.ReportViewer
         /// </summary>
         TextParameter _textParameter;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, "Text Parameter Control");
+
         #endregion Fields
 
         #region Constructors
@@ -51,8 +57,7 @@ namespace Extract.ReportViewer
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23823", "Text Parameter Control");
+                _licenseCache.Validate("ELI23823");
 
                 InitializeComponent();
 

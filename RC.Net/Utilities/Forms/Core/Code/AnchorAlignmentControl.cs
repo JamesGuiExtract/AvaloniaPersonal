@@ -132,6 +132,12 @@ namespace Extract.Utilities.Forms
         /// </summary>
         RectangleF[] _anchorPoints;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion AnchorAlignmentControl Fields
 
         #region AnchorAlignmentControl Events
@@ -162,8 +168,7 @@ namespace Extract.Utilities.Forms
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23135",
-                    _OBJECT_NAME); 
+                _licenseCache.Validate("ELI23135");
 
                 InitializeComponent();
             }

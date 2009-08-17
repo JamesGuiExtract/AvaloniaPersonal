@@ -99,6 +99,12 @@ namespace Extract.Utilities.Forms
         private Dictionary<CustomizableMessageBoxButton, Button> _buttonControlsTable =
             new Dictionary<CustomizableMessageBoxButton, Button>();
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion
 
         #region Properties
@@ -482,8 +488,7 @@ namespace Extract.Utilities.Forms
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23139",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23139");
 
                 //
                 // Required for Windows Form Designer support

@@ -715,6 +715,24 @@ namespace Extract.Imaging.Forms
         /// </summary>
         FileStream _currentOpenFile;
 
+        /// <summary>
+        /// License cache for validating the core license.
+        /// </summary>
+        static LicenseStateCache _licenseCore =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
+        /// <summary>
+        /// License cache for validating the annotation license.
+        /// </summary>
+        static LicenseStateCache _licenseAnnotation =
+            new LicenseStateCache(LicenseIdName.AnnotationFeature, "Annotation Objects");
+
+        /// <summary>
+        /// License cache for validating the anti-alias license.
+        /// </summary>
+        static LicenseStateCache _licenseAntiAlias =
+            new LicenseStateCache(LicenseIdName.AntiAliasingFeature, "Anti-aliasing Component");
+
         #endregion
 
         #region Image Viewer Events
@@ -819,8 +837,7 @@ namespace Extract.Imaging.Forms
                 // Startup the raster codecs framework
                 RasterCodecs.Startup();
 
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects,
-                    "ELI23109", _OBJECT_NAME);
+                _licenseCore.Validate("ELI23109");
 
                 // Check if PDF Read and Write is licensed
                 if (LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature))
@@ -1127,8 +1144,7 @@ namespace Extract.Imaging.Forms
                         // LeadTools support
                         if (!this.DesignMode)
                         {
-                            LicenseUtilities.ValidateLicense(LicenseIdName.AnnotationFeature,
-                                "ELI21920", "Annotation Objects");
+                            _licenseAnnotation.Validate("ELI21920");
                         }
 
                         // Set display annotations to true
@@ -1191,8 +1207,7 @@ namespace Extract.Imaging.Forms
                         // LeadTools support
                         if (!this.DesignMode)
                         {
-                            LicenseUtilities.ValidateLicense(LicenseIdName.AntiAliasingFeature,
-                                "ELI21921", "Anti-aliasing Component");
+                            _licenseAntiAlias.Validate("ELI21921");
 
                             // Turn on anti-aliasing
                             RasterPaintProperties properties = base.PaintProperties;

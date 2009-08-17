@@ -1,4 +1,5 @@
 using Extract.Imaging.Forms;
+using Extract.Licensing;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
 using System;
@@ -48,6 +49,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         string _voaFile;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, "Verification Form");
+
         #endregion VerificationTaskForm Fields
 
         #region VerificationTaskForm Events
@@ -68,15 +75,31 @@ namespace Extract.Redaction.Verification
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
         public VerificationTaskForm(VerificationSettings settings)
         {
-            // License SandDock before creating the form
-            SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
+            try
+            {
+                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                {
+                    // Load the license files from folder
+                    LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
+                }
 
-            _settings = settings;
+                // Validate the license
+                _licenseCache.Validate("ELI27105");
 
-            InitializeComponent();
+                // License SandDock before creating the form
+                SandDockManager.ActivateProduct(_SANDDOCK_LICENSE_STRING);
 
-            _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
-            _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
+                _settings = settings;
+
+                InitializeComponent();
+
+                _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
+                _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27104", ex);
+            }
         }
 
         #endregion VerificationTaskForm Constructors

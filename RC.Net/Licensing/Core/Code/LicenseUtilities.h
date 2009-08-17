@@ -103,10 +103,6 @@ namespace Extract
 			// The array used to store the public key for this assembly
 			static array<Byte>^ _myArray = CreateInternalArray();
 
-			// Dictionary for caching license checks
-			static Dictionary<LicenseIdName, DWORD>^ _internalTimeCheckArray =
-				gcnew Dictionary<LicenseIdName, DWORD>();
-
 			// boolean flag to indicate whether licenses have been loaded from folder yet
 			static bool _licensesLoaded;
 
