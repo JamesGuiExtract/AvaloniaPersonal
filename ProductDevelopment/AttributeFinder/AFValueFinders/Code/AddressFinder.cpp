@@ -139,26 +139,31 @@ STDMETHODIMP CAddressFinder::raw_ParseText(IAFDocument * pAFDoc, IProgressStatus
 			ISpatialStringPtr ipRegion = ipSearcher->GetDataInRegion(ipRect, VARIANT_TRUE);
 			ASSERT_RESOURCE_ALLOCATION("ELI15593", ipRegion != NULL);
 
-			IIUnknownVectorPtr ipBlocks = ipRegion->GetJustifiedBlocks(3);
-			ASSERT_RESOURCE_ALLOCATION("ELI15594", ipBlocks != NULL);
-
-			ipBlocks = chooseAddressBlocks(m_ipRegExpParser, ipBlocks);
-
-			long lBlocksSize = ipBlocks->Size();
-			for (long j = 0; j < lBlocksSize; j++)
+			// Only work on strings in kSpatialMode
+			// [FlexIDSCore #3589]
+			if (ipRegion->GetMode() == kSpatialMode)
 			{
-				// Create a ReturnAddress Attribute
-				IAttributePtr ipAttribute(CLSID_Attribute);
-				ASSERT_RESOURCE_ALLOCATION("ELI15595", ipAttribute != NULL);
+				IIUnknownVectorPtr ipBlocks = ipRegion->GetJustifiedBlocks(3);
+				ASSERT_RESOURCE_ALLOCATION("ELI15594", ipBlocks != NULL);
 
-				// Add Name and Value
-				ipAttribute->Name = "ReturnAddress";
-				ISpatialStringPtr ipTmpString = ipBlocks->At(j);
-				ASSERT_RESOURCE_ALLOCATION("ELI15596", ipTmpString != NULL);
-				ipAttribute->Value = ipTmpString;
+				ipBlocks = chooseAddressBlocks(m_ipRegExpParser, ipBlocks);
 
-				// Add to Attributes collection
-				ipAttributes->PushBack(ipAttribute);
+				long lBlocksSize = ipBlocks->Size();
+				for (long j = 0; j < lBlocksSize; j++)
+				{
+					// Create a ReturnAddress Attribute
+					IAttributePtr ipAttribute(CLSID_Attribute);
+					ASSERT_RESOURCE_ALLOCATION("ELI15595", ipAttribute != NULL);
+
+					// Add Name and Value
+					ipAttribute->Name = "ReturnAddress";
+					ISpatialStringPtr ipTmpString = ipBlocks->At(j);
+					ASSERT_RESOURCE_ALLOCATION("ELI15596", ipTmpString != NULL);
+					ipAttribute->Value = ipTmpString;
+
+					// Add to Attributes collection
+					ipAttributes->PushBack(ipAttribute);
+				}
 			}
 		}
 
