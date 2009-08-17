@@ -93,11 +93,13 @@ String^ AsSystemString(string stdString)
 //--------------------------------------------------------------------------------------------------
 // Public methods
 //--------------------------------------------------------------------------------------------------
-[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 void LicenseUtilities::LoadLicenseFilesFromFolder(int licenseType, MapLabel^ mapLabel)
 {
 	try
 	{
+		// Ensure a map label has been specified
+		ASSERT_ARGUMENT("ELI27107", mapLabel != nullptr);
+
 		if (!_licensesLoaded)
 		{
 			// Ensure the calling assembly has been signed by Extract
@@ -337,11 +339,13 @@ void LicenseUtilities::DisableId(LicenseIdName id)
 	}
 }
 //--------------------------------------------------------------------------------------------------
-[SuppressMessage("Microsoft.Usage", "CA1801:ReviewUnusedParameters", MessageId="mapLabel")]
 String^ LicenseUtilities::GetMapLabelValue(MapLabel^ mapLabel)
 {
 	try
 	{
+		// Ensure a map label has been specified
+		ASSERT_ARGUMENT("ELI27108", mapLabel != nullptr);
+
 		// Ensure the calling assembly has been signed by Extract
 		if (!CheckData(Assembly::GetCallingAssembly()))
 		{

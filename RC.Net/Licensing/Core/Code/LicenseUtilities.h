@@ -8,17 +8,9 @@ using namespace System::Collections::Generic;
 using namespace System::Reflection;
 using namespace System::Security::Permissions;
 using namespace System::Security::Policy;
-using namespace System::Diagnostics::CodeAnalysis;
 using namespace System::Runtime::CompilerServices;
 using namespace System::Runtime::InteropServices;
 
-// This namespace only contains two types: MapLabel and LicenseUtilities.
-// As a general rule you should not create a new namespace for just a couple
-// of types, but this namespace has been created specificially for licensing
-// and to obscure the licensing functions via unmanaged code so it is safe
-// to ignore this warning.
-[module: SuppressMessage("Microsoft.Design", "CA1020:AvoidNamespacesWithFewTypes",
-						 Scope="namespace", Target="Extract.Licensing")];
 namespace Extract
 {
 	namespace Licensing
