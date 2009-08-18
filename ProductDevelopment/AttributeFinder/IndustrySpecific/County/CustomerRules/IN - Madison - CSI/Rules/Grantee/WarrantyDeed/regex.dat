@@ -1,0 +1,64 @@
+[("]grantor[")]
+.{0,6}
+\bto\b
+(?<grantee1>
+	[\s\S]{1,50}?
+)
+(
+	\band\b
+	(?<grantee2>
+		[\s\S]{1,50}?
+	)
+)?	
+[("]grantee
+
+|
+
+\bconvey
+.{0,6}
+\bto\b
+(?<grantee1>
+	[\s\S]{1,50}?
+)
+(
+	\band\b
+	(?<grantee2>
+		[\s\S]{1,50}?
+	)
+)?	
+\bin
+\s*
+consideration
+
+|
+
+\bconvey
+.{0,6}
+\bto\b
+(?<grantee1>
+	[\s\S]{1,100}?
+)
+\bas\s*trustee\s*for\b
+(?<grantee2>
+	[\s\S]{1,100}?
+)
+\b
+(?:
+	for.{0,6}sum
+	|
+	\d+[\s\S]{1,15}
+	\b
+	(?:
+		St(?:reet)?
+		|
+		R(?:oa)?d
+		|
+		Dr(?:ive)?
+		|
+		B(?:ou)?le?v(?:ar)?d
+		|
+		Ave?(?:nue)?
+	)
+	\b
+)
+\b

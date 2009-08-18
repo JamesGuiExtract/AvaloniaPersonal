@@ -1,0 +1,31 @@
+[\.\,\;\:\'\"\(\)\`\?\/\\\|]% 
+\bGrantee%
+\bmers\b%MORTGAGE ELECTRONIC REGISTRATION SYSTEMS
+MORTGAGE\sELECTRONIC\sREGISTRATION\sSYSTEMS?(?:,?\s{0,4}inc\.?)?%MORTGAGE ELECTRONIC REGISTRATION SYSTEM
+(?:MORT.{3,5}|.{1,3}RTGA.{1,3}|.{3,5}GAGE)\s{0,4}(?:ELECT.{4,6}|.{1,3}ECTRON.{1,3}|.{4,6}RONIC)\s{0,4}(?:REGIST.{5,7}|.{1,4}ISTRAT.{1,4}|.{5,7}RATION)\s{0,4}(?:SYS.{4,5}|.{1,2}YSTEM.{1,2}|.{3,4}TEMS)\s(?:inc)?%MORTGAGE ELECTRONIC REGISTRATION SYSTEM
+\bINDIANA\sSTATE\sUNIVERSITY\b%ISU
+\bthe\b%
+fka\s{0,4}[\s\S]*$%
+[\s\S]*\bas\s*trustee(?:\s*for\b)%
+[\s\S]*\bon\s*behalf\s*of\b%
+//\bCORP\b%corporation //Vigo had this switched on, but Madison doesn't seem to use this abreviation
+//\-% //this was on for Vigo County, Madison index data contains a lot of hyphens
+\bfifth\s{0,4}third\s{0,4}bank\s{0,4}(?:(?:(?:central)?\sindiana|in)|(?:wes.{4,5}|.{1,2}ester.{1,2}|.{3,4}tern)\s{0,4}(?:mich.{3,5}|.{1,3}chig.{1,3}|.{3,5}igan))\b%FIFTH THIRD BANK
+\ba\s{0,4}competent\s{0,4}adult\b%
+\bin\s{0,4}witness\s{0,4}whereof\b%
+\bsaid\s*mortgage\b%
+\bsaid\b%
+\bUNION\s{0,4}PLANTERS\s{0,4}BANK\s{0,4}NATIONAL\s{0,4}ASSOCIATION\b%UNION PLANTERS BANK
+\b2008\b%
+[\s\S]*~{3}[\s\S]*%invalid
+\bsuccessor\b[\s\S]*%
+^.(?=\r\n)%invalid
+\b(?:a\s{0,4})?division\s{0,4}of\b[\s\S]*%
+[\s\S]*\bHOUSING[\s\S]{0,6}URBAN\s*DEVELOPMENT\b%HUD
+^\s*and\s*\b%
+^\s*trust\s*company\s*$%
+^\s*as\s*owner\s*$%
+^\s*as\s*$%
+^\s*owner\s*$%
+^\s*pooling\s*$%
+^\s*servicing\s*$%
