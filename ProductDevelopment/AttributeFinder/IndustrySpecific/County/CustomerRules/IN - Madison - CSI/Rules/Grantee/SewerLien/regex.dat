@@ -1,0 +1,18 @@
+(?x)
+	\bname\x20*on\x20*the\x20*account[:;]
+	(?<grantee1>
+		.+?
+	)
+	\bAccount\x20*[#*\dH]
+|
+	\bhereby\s*notified\s*that\b
+	(?<grantee>
+		[\s\S]{1,100}?
+	)
+	(?:
+		\(
+		|
+		hereinafter
+		|
+		"Claimant
+	)

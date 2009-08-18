@@ -1,0 +1,11 @@
+(?x)
+(?:
+	\b
+	executed
+	\s*by
+	(?<grantee1>
+		[\s\S]{1,150}?
+	)
+	\b
+	recorded
+)
