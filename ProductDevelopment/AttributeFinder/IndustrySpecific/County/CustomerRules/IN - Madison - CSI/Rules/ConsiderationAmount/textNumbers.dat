@@ -1,0 +1,41 @@
+(?x)
+(?#
+#	Dollar amounts as text
+#
+#
+)
+(?<=
+	\bsum\x20*of\b
+	|
+	\bfor\b
+)
+(?<dollars>
+	.*?
+	(?=
+		(
+			\band
+			\s*
+			(?<cents>
+				\d{2}
+				|
+				\bno
+			)
+			/100
+			\s*
+		)?
+		\bDollars?\b
+		(
+			\s*
+			(?:
+				and
+				\s*
+			)?
+			(?<cents>
+				\d{2}
+				|
+				\bno
+			)
+			/100
+		)?
+	)
+)
