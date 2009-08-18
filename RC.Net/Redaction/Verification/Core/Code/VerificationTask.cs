@@ -47,14 +47,18 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The form to display for verifying documents.
         /// </summary>
-        static readonly VerificationForm<VerificationTaskForm> _form = 
-            new VerificationForm<VerificationTaskForm>();
+        static VerificationForm<VerificationTaskForm> _form;
 
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
         static LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, _COMPONENT_DESCRIPTION);
+
+        /// <summary>
+        /// Object used to mutex around the verification form creation.
+        /// </summary>
+        static object _lock = new object();
 
         #endregion VerificationTask Fields
 
@@ -66,6 +70,15 @@ namespace Extract.Redaction.Verification
         public VerificationTask()
         {
             _settings = new VerificationSettings();
+
+            // Lock around form creation
+            lock (_lock)
+            {
+                if (_form == null)
+                {
+                    _form = new VerificationForm<VerificationTaskForm>();
+                }
+            }
         }
 
         /// <summary>
