@@ -188,17 +188,6 @@
 				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
 				<LI>Confirm that <b>all</b> found data and hints are highlighted.
 			</ul>
-<!-- Deprecated
-			<LI>Select an item from <b>Laboratory</b>.
-			<ul>
-				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
-				<LI>Toggle the <b>Show all highlights</b> button <b>off</b>.
-				<LI>Confirm that the appropriate selected information 
-				remains highlighted.
-				<LI>Toggle the <b>Show all highlights</b> button <b>on</b>.
-				<LI>Confirm that <b>all</b> found data and hints are highlighted.
-			</ul>
--->			
 			<LI>Select an item from <b>Orders</b>.
 			<ul>
 				<LI>Confirm that <b>all</b> found data and hints remain highlighted.
@@ -323,6 +312,83 @@
 				<LI>Confirm a single tooltip is now displayed.
 			</ul>
 		</ul>
+<p>
+		<LI><b>Tooltip positioning and overlap</b>
+       		<ul>
+  	   		<LI>Use the test images from <b>I:\Common\Testing\PVCS_Testing\DataEntry\401</b>.  
+			Note that VOA files are not needed since testing can be done with swipes 
+			into various fields.
+			<li>For each test case, confirm that the tooltips are reasonably positioned 
+			without overlapping each other, going offscreen, or obscuring highlighted text.
+			<li>Tooltips are allowed to shift but one tooltip should not extend past 
+			the midpoint of an adjacent highlighted field.
+			<li>Vetically arranged highlights should have tooltips that display to the 
+			side rather than above or below.
+  		   	<LI><b>RotatedAndSkewed.tif</b>.
+			<ul>
+				<li>On page 1, use the angular highlight tool to swipe <b>Rogers, 
+				John C MD</b> into the entire row of one of the name fields.
+				<li>Select the entire table row and check tooltips.
+				<li>Add <b>1</b> to the end of each cell; re-select the row 
+				and re-check the tooltips.
+				<li>Add <b>2345</b> to the end of each cell; re-select the row and 
+				re-check the tooltips (some tooltips should now be positioned beneath 
+				the text to allow room).
+				<li>Go to page 2, rotate the image so that it is vertical, and repeat 
+				the previous steps.
+				<li>Repeat the previous steps for <b>page 3</b>.
+				<li>Repeat the previous steps for <b>page 4</b>.
+<p>
+				<li>On page 2, use the angular highlight tool to swipe <b>COLLOTON, JEAN</b> 
+				into the entire row of one of the name fields.
+				<li>Select the entire table row and check tooltips.
+				<li>Add <b>0123456789</b> to the end of <b>COLLOTON</b>.
+				<li>Re-select the row and confirm that <b>Jean</b> is now positioned below 
+				the text to make room for the lengthened last name tooltip.
+				<li>Repeat the previous steps for <b>page 3</b>.
+<p>
+				<li>On page 2, use the angular highlight tool to swipe <b>ACCESSION #:   A003388367  
+				PATIENT ID #:</b> into the <b>Medical Record</b> field.
+				<li>Confirm that the tooltip is <b>4 lines high</b> and that it was moved 
+				below the text so that it remained on the page.
+				<li>Add characters to the end of the field until it is long enough to extend 
+				off the page.
+				<li>Confirm that the tooltip shifts left to remain visible on the page.
+				<li>Delete all the text except <b>ACCESSION #:</b>.
+				<li>Confirm that the tooltip is now displayed above the text.
+				<li>Repeat the previous steps for <b>page 3</b>.
+			</ul>
+  		   	<LI><b>413.tif</b>.
+			<ul>
+				<li>Enter some text in the first cell of the <b>Order</b> 
+				table to create a new order.
+				<li>Select the first row in the test table.
+				<li>Use the rectangular highlight tool on page 1 to swipe the <b>HGB</b> column.
+				<li>Confirm that the tooltips display to the side and do not obscure any 
+				highlighted text.
+				<li>Swipe the result value that did not get used <b>(probably 14.4)</b> into 
+				the Comment column.
+				<li>Re-select the table row.
+				<li>Confirm that one of the tooltips is now displayed on the left since there 
+				isn't enough room on the right.
+				<li>Go to page 2, rotate the image so that it is vertical, and repeat the 
+				previous steps.
+				<li>Repeat the previous steps for <b>page 3</b>.
+				<li>Repeat the previous steps for <b>page 4</b>.
+<p>
+				<li>On page 1, use the rectangular highlight tool to swipe the <b>RBC</b> 
+				column.
+				<li>Confirm that the tooltips appear to the side.
+				<li>Confiorm that the <b>4.00-5.30</b> tooltip appears on the left because 
+				there is not enough room on the right.
+				<li>Confirm that none of the highlighted text is obscured by a tooltip.
+				<li>Go to page 2, rotate the image so that it is vertical, and repeat the 
+				previous steps.
+				<li>Repeat the previous steps for <b>page 3</b>.
+				<li>Repeat the previous steps for <b>page 4</b>.
+			</ul>
+	       	</ul>
+   		</LI>
 <p>
 		<LI><b>Tooltips on rotated images</b>
 		<ul>

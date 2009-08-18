@@ -146,6 +146,18 @@
 <p>
 		<li>File menu - FAM mode
 		<ul>
+			<LI><b>[DataEntry #254]</b> Save Without Commit
+			<ul>
+				<li>Open a Demo_LabDE sample image.
+				<li>Confirm that data in one or more fields are <b>invalid</b>.
+				<li>Modify some data.
+				<li>Confirm that <b>Save and Commit</b> requires all data to be valid.
+				<li>Confirm that <b>Save</b> accepts invalid data.  
+				<li>Confirm that the output VOA file includes one or more invalid items 
+				or is lacking one or more missing but required items.
+		       	</ul>
+		   	</LI>
+<p>
 			<li>Confirm that <b>File - Skip processing</b> closes the open file and opens 
 			the next image.
 			<li>Confirm that <b>File - Skip processing</b> for the last queued image closes 
@@ -253,12 +265,29 @@
 			<li>Confirm that the cursor and swipe result are the same when using the 
 			appropriate toolbar button.
 			<li>Confirm that the menu item and toolbar button each remain selected after use.
+<p>
+	  	   	<LI>Confirm that selecting <b>Tools - Options</b> displays an Options dialog.
+  		   	<LI>Confirm that three options are presented for <b>Center on selected text and</b>
+	       		<ul>
+  	   			<LI>Don't change zoom level
+	  	   		<LI>Zoom out if necessary to fit current selection
+  		   		<LI>Automatically adjust zoom to area around current selection
+	       		</ul>
+	  	   	<LI>Confirm that the slider bar is only enabled with <b>Automatically adjust zoom 
+			to area around current selection</b>.
+  	   		<LI>Confirm that <b>Don't change zoom level</b> works as expected.
+	  	   	<LI>Confirm that <b>Zoom out if necessary to fit current selection</b> works 
+			as expected.
+  	   		<LI>Confirm that <b>Automatically adjust zoom to area around current selection</b> 
+			works as expected.  Exercise different levels of context around the selected data.
 		</ul>
 <p>
 		<li>Help menu
 		<ul>
 			<li>Confirm that <b>Help - LabDE Help</b> opens the Help file.
 			<li>Confirm that <b>Help - About LabDE</b> displays the LabDE About box.
+			<li>Confirm that the About box includes the <b>framework</b> version.
+			<li>Confirm that the About box includes the <b>application</b> version.
 		</ul>
 	</ul>
 <p>
@@ -359,12 +388,30 @@
 	<LI><h3>Data Entry in cells</h3>
 	<ul>
 		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<LI><b>Comments (for operator's use)</b>
+       		<ul>
+  	   		<LI>Confirm that the DEP includes a <b>Comments</b> edit box.
+	  	   	<LI>Confirm that <b>Comments</b> provided during one verification session are 
+			retained and displayed during a subsequent verification session.
+	       	</ul>
+   		</LI>
+<p>
 		<li><b>Result Status</b>
 		<ul>
 			<li>Confirm that text cannot be swiped into the combo box.
 			<li>Confirm that typing <b>C</b>, <b>F</b>, <b>P</b>, or <b>R</b> into the
 			combo box changes the setting to <b>Complete</b>, <b>Final</b>, <b>Preliminary</b>,
 			or <b>Reviewed</b>, respectively.
+		</ul>
+<p>
+		<li><b>Image Path and Copy button</b>
+		<ul>
+	  	   	<LI>Confirm that the DEP includes a read-only edit box containing the fully 
+			qualified path to the image.
+  	   		<LI>Confirm that the DEP includes a <b>Copy</b> button that allows the 
+			image path to be copied to the Clipboard.
+  		   	<LI>Confirm that the Copy button is disabled during <b>Phase 1</b> verification.
+  	   		<LI>Confirm that the Copy button is enabled during <b>Phase 2</b> verification.
 		</ul>
 <p>
 		<li><b>Patient Information</b>
