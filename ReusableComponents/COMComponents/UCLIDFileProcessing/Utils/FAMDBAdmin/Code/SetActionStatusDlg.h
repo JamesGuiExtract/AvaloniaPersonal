@@ -54,8 +54,6 @@ private:
 	CEdit m_editSummary;
 	CButton m_radioNewStatus;
 	CButton m_radioStatusFromAction;
-	CButton m_btnOK;
-	CButton m_btnApply;
 	CComboBox m_comboNewStatus;
 	CComboBox m_comboStatusFromAction;
 

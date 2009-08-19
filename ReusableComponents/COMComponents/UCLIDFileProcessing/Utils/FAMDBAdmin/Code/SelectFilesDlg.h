@@ -87,5 +87,5 @@ private:
 	void updateControls();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To save the selected dialog settings to the settings object
-	void saveSettings();
+	bool saveSettings();
 };

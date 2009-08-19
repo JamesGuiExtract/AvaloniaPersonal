@@ -67,6 +67,9 @@ BOOL CExportFileListDlg::OnInitDialog()
 		CDialog::OnInitDialog();
 
 		updateControls();
+
+		// Update the summary with the settings string
+		m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14730")
 
@@ -259,12 +262,9 @@ void CExportFileListDlg::updateControls()
 		CString zText;
 		m_editFileName.GetWindowText(zText);
 
-		// Enable the OK button if the settings are initialized
-		// and the edit box contains at least 4 characters
+		// Enable the OK button if the edit box contains at least 4 characters
 		// and the file name is not a relative path
-		bool bEnable = m_settings.isInitialized()
-			&& zText.GetLength() > 4
-			&& isAbsolutePath((LPCTSTR)zText);
+		bool bEnable = zText.GetLength() > 4 && isAbsolutePath((LPCTSTR)zText);
 		m_btnOk.EnableWindow(asMFCBool(bEnable));
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14732");

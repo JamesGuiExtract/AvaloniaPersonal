@@ -201,6 +201,9 @@ private:
 	// Flag indicating if records should be added to the FileActionStatusTransition table
 	bool m_bUpdateFASTTable;
 
+	// Flag inidicating whether file action comments should be deleted when files are completed
+	bool m_bAutoDeleteFileActionComment;
+
 	// Contains the number of times an attempt to reconnect. Each
 	// time the reconnect attempt times out an exception will be logged.
 	int m_iNumberOfRetries;
@@ -425,6 +428,12 @@ private:
 	// all users if strUserName is "")
 	void getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, long nActionID,
 		string strUserName, const ADODB::_ConnectionPtr& ipConnection);
+
+	// Clears the file action comment for the specified fileID and actionID pair.  If
+	// nActionID == -1 will clear comments for the specified file for all actions.
+	// If nFileID == -1 will clear comments for all files for the specified action.  If
+	// both nActionID == -1 and nFileID == -1 then all comments from the table will be cleared.
+	void clearFileActionComment(const _ConnectionPtr& ipConnection, long nFileID, long nActionID);
 
 	void validateLicense();
 };

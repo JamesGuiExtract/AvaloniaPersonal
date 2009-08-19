@@ -109,6 +109,7 @@ m_lMachineID(0),
 m_iCommandTimeout(glDEFAULT_COMMAND_TIMEOUT),
 m_bUpdateQueueEventTable(true),
 m_bUpdateFASTTable(true),
+m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT)
 {
@@ -719,6 +720,7 @@ STDMETHODIMP CFileProcessingDB::RemoveFile( BSTR strFile, BSTR strAction )
 				addQueueEventRecord( ipConnection, nFileID, asString(strFile), "D" );
 			}
 		}
+
 		// Commit the changes
 		tg.CommitTrans();
 
@@ -1140,6 +1142,13 @@ STDMETHODIMP CFileProcessingDB::SetStatusForAllFiles( BSTR strAction,  EActionSt
 
 		// Update the FAMFiles table
 		executeCmdQuery(ipConnection, strUpdateSQL);
+
+		// If going to complete status and AutoDeleteFileActionComments == true then
+		// clear the file action comments
+		if (eStatus == kActionCompleted && m_bAutoDeleteFileActionComment)
+		{
+			clearFileActionComment(ipConnection, -1, nActionID);
+		}
 
 		// update the stats
 		reCalculateStats(ipConnection, nActionID);
@@ -2500,25 +2509,11 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 
 		validateDBSchemaVersion();
 
-		string strCommentSQL = "SELECT * FROM FileActionComment WHERE FileID = "
-			+ asString(nFileID) + " AND ActionID = " + asString(nActionID);
-
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		_RecordsetPtr ipCommentSet(__uuidof(Recordset));
-		ASSERT_RESOURCE_ALLOCATION("ELI26794", ipCommentSet != NULL);
-
-		ipCommentSet->Open(strCommentSQL.c_str(), _variant_t((IDispatch*)ipConnection, true), adOpenDynamic,
-			adLockOptimistic, adCmdText);
-
-		// Only need to delete the row if it exists
-		if (ipCommentSet->BOF == VARIANT_FALSE)
-		{
-			// Delete the row and update the table
-			ipCommentSet->Delete(adAffectCurrent);
-			ipCommentSet->Update();
-		}
+		// Clear the comment
+		clearFileActionComment(ipConnection, nFileID, nActionID);
 
 		// Commit the transaction
 		tg.CommitTrans();

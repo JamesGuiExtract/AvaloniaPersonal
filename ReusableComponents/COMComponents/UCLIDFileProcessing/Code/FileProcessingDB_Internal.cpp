@@ -176,6 +176,13 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 			// set the new state
 			setStringField( ipFileSetFields, strActionCol, strState );
 
+			// If transition to complete and AutoDeleteFileActionComment == true
+			// then clear the file action comment for this file
+			if (strState == "C" && m_bAutoDeleteFileActionComment)
+			{
+				clearFileActionComment(ipConnection, nFileID, nActionID);
+			}
+
 			// Update the file record
 			ipFileSet->Update();
 
@@ -924,6 +931,11 @@ void CFileProcessingDB::initializeTableValues()
 	// Add Update Queue Event Table setting
 	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
 	vecQueries.push_back( strSQL);
+
+	// Add Auto Delete File Action Comment On Complete setting
+	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
+		+ "', '0')";
+	vecQueries.push_back(strSQL);
 
 	// Execute all of the queries
 	executeVectorOfSQL( getDBConnection(), vecQueries);
@@ -1860,6 +1872,12 @@ void CFileProcessingDB::loadDBInfoSettings(ADODB::_ConnectionPtr ipConnection)
 						// Get the connection retry timeout
 						m_dRetryTimeout =  asDouble(getStringField(ipFields, "Value"));
 					}
+					else if (strValue == gstrAUTO_DELETE_FILE_ACTION_COMMENT)
+					{
+						_lastCodePos = "170";
+
+						m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
+					}
 				}
 				else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
 				{
@@ -2242,5 +2260,39 @@ void CFileProcessingDB::getFilesSkippedByUser(vector<long>& rvecSkippedFileIDs, 
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26907");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnection, long nFileID,
+											   long nActionID)
+{
+	try
+	{
+		// Query for deleting the comment
+		string strCommentSQL = "DELETE FROM FileActionComment ";
+		string strWhere = "";
+		if (nFileID != -1)
+		{
+			strWhere += "FileID = " + asString(nFileID);
+		}
+
+		// If nActionID == -1 then delete all comments for the FileID
+		if (nActionID != -1)
+		{
+			if (nFileID != -1)
+			{
+				strWhere += " AND ";
+			}
+			strWhere += "ActionID = " + asString(nActionID);
+		}
+
+		if (!strWhere.empty())
+		{
+			strCommentSQL += "WHERE " + strWhere;
+		}
+
+		// Perform the deletion
+		executeCmdQuery(ipConnection, strCommentSQL);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27109");
 }
 //--------------------------------------------------------------------------------------------------

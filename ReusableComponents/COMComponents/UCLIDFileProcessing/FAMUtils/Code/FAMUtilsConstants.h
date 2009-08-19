@@ -15,6 +15,7 @@ static const string gstrUPDATE_FAST_TABLE = "UpdateFileActionStateTransitionTabl
 static const string gstrCOMMAND_TIMEOUT = "CommandTimeout";
 static const string gstrNUMBER_CONNECTION_RETRIES = "NumberOfConnectionRetries";
 static const string gstrCONNECTION_RETRY_TIMEOUT = "ConnectionRetryTimeout";
+static const string gstrAUTO_DELETE_FILE_ACTION_COMMENT = "AutoDeleteFileActionCommentOnComplete";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

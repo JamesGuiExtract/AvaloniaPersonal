@@ -39,19 +39,17 @@ private:
 	bool m_bNarrowScope; // Whether to narrow the selection
 	int m_nRandomPercent; // The random percentage to narrow it by
 
-	bool m_bInitialized;
-
 public:
-	SelectFileSettings() { m_bInitialized = false; }
+	// Default the setting to all files
+	SelectFileSettings() : m_scope(eAllFiles)
+	{
+	}
 	SelectFileSettings(const SelectFileSettings& settings)
 	{
 		*this = settings;
 	}
 
 	~SelectFileSettings() {};
-
-	bool isInitialized() { return m_bInitialized; }
-	void setInitialized(bool bInitialized) { m_bInitialized = bInitialized; }
 
 	void setScope(FileSelectScope scope) { m_scope = scope; }
 	FileSelectScope getScope() { return m_scope; }

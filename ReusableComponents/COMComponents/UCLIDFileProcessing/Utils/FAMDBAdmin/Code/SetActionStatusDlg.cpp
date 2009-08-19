@@ -36,8 +36,6 @@ void CSetActionStatusDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CMB_NEW_STATUS, m_comboNewStatus);
 	DDX_Control(pDX, IDC_CMB_STATUS_OF_ACTION, m_comboStatusFromAction);
 	DDX_Control(pDX, IDC_EDIT_FL_SLCT_SMRY_STATUS, m_editSummary);
-	DDX_Control(pDX, IDOK, m_btnOK);
-	DDX_Control(pDX, IDC_BTN_APPLY_ACTION_STATUS, m_btnApply);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSetActionStatusDlg, CDialog)
@@ -102,6 +100,9 @@ BOOL CSetActionStatusDlg::OnInitDialog()
 
 		// Update the controls
 		updateControls();
+
+		// Update the summary edit box with the settings
+		m_editSummary.SetWindowText(m_settings.getSummaryString().c_str());
 
 		// Set the focus to the select files button
 		GetDlgItem(IDC_BTN_SLCT_FLS_STATUS)->SetFocus();
@@ -379,11 +380,6 @@ void CSetActionStatusDlg::updateControls()
 			m_comboNewStatus.EnableWindow(FALSE);
 			m_comboStatusFromAction.EnableWindow(TRUE);
 		}
-
-		// Enable/disable the apply and ok buttons based on settings
-		BOOL bEnable = asMFCBool(m_settings.isInitialized());
-		m_btnOK.EnableWindow(bEnable);
-		m_btnApply.EnableWindow(bEnable);
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14904");
 }

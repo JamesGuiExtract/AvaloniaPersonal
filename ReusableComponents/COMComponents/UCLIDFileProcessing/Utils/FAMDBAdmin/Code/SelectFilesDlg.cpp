@@ -200,9 +200,12 @@ void CSelectFilesDlg::OnClickedOK()
 
 	try
 	{
-		// Save the settings and close the dialog
-		saveSettings();
-		CDialog::OnOK();
+		// Save the settings
+		if (saveSettings())
+		{
+			// If settings saved successfully, close the dialog
+			CDialog::OnOK();
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26992");
 }
@@ -234,7 +237,7 @@ void CSelectFilesDlg::OnFilesUnderStatusChange()
 //-------------------------------------------------------------------------------------------------
 // Private Methods
 //-------------------------------------------------------------------------------------------------
-void CSelectFilesDlg::saveSettings()
+bool CSelectFilesDlg::saveSettings()
 {
 	try
 	{
@@ -285,6 +288,18 @@ void CSelectFilesDlg::saveSettings()
 			// Get the query from the edit box
 			CString zTemp;
 			m_editSelectQuery.GetWindowText(zTemp);
+			if (zTemp.IsEmpty())
+			{
+				// Show error message to user
+				MessageBox("Query may not be blank!", "Configuration Error",
+					MB_OK | MB_ICONERROR);
+
+				// Set focus to query
+				m_editSelectQuery.SetFocus();
+
+				// Return false
+				return false;
+			}
 			m_settings.setSQLString((LPCTSTR) zTemp);
 		}
 		else
@@ -293,9 +308,9 @@ void CSelectFilesDlg::saveSettings()
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26995");
 		}
 
-		m_settings.setInitialized(true);
+		return true;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26996")
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26996")
 }
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::updateControls() 
@@ -349,84 +364,80 @@ void CSelectFilesDlg::setControlsFromSettings()
 		int nSetAllFileForWhich = BST_UNCHECKED;
 		int nSetAllFilesQuery = BST_UNCHECKED;
 
-		// Only copy the settings from the settings object if it is initialized
-		if (m_settings.isInitialized())
+		// Check which scope is selected and set the appropriate controls
+		switch(m_settings.getScope())
 		{
-			// Check which scope is selected and set the appropriate controls
-			switch(m_settings.getScope())
+		case eAllFiles:
+			nSetAllFiles = BST_CHECKED;
+			break;
+
+		case eAllFilesForWhich:
 			{
-			case eAllFiles:
-				nSetAllFiles = BST_CHECKED;
-				break;
+				nSetAllFileForWhich = BST_CHECKED;
 
-			case eAllFilesForWhich:
+				// Search for the action name from the settings
+				int nSelection =
+					m_comboFilesUnderAction.FindString(-1, m_settings.getAction().c_str());
+				// Ensure the action name was found
+				if (nSelection == CB_ERR)
 				{
-					nSetAllFileForWhich = BST_CHECKED;
+					UCLIDException ue("ELI26998", "Action no longer exists!");
+					ue.addDebugInfo("Action Name", m_settings.getAction());
+					throw ue;
+				}
+				// Select the specified action
+				m_comboFilesUnderAction.SetCurSel(nSelection);
 
-					// Search for the action name from the settings
-					int nSelection =
-						m_comboFilesUnderAction.FindString(-1, m_settings.getAction().c_str());
-					// Ensure the action name was found
-					if (nSelection == CB_ERR)
+				// Now set the status
+				long nStatus = m_settings.getStatus();
+				m_comboFilesUnderStatus.SetCurSel(nStatus);
+
+				// If the status is skipped, select the appropriate user
+				if (nStatus == kActionSkipped)
+				{
+					// Update the skipped users combo box
+					fillSkippedUsers();
+
+					// Enable the combo box
+					m_comboSkippedUser.EnableWindow(TRUE);
+
+					// Search for the specified user
+					nSelection =
+						m_comboSkippedUser.FindString(-1, m_settings.getUser().c_str());
+					if (nSelection != CB_ERR)
 					{
-						UCLIDException ue("ELI26998", "Action no longer exists!");
-						ue.addDebugInfo("Action Name", m_settings.getAction());
-						throw ue;
+						m_comboSkippedUser.SetCurSel(nSelection);
 					}
-					// Select the specified action
-					m_comboFilesUnderAction.SetCurSel(nSelection);
-
-					// Now set the status
-					long nStatus = m_settings.getStatus();
-					m_comboFilesUnderStatus.SetCurSel(nStatus);
-
-					// If the status is skipped, select the appropriate user
-					if (nStatus == kActionSkipped)
+					else
 					{
-						// Update the skipped users combo box
-						fillSkippedUsers();
-
-						// Enable the combo box
-						m_comboSkippedUser.EnableWindow(TRUE);
-
-						// Search for the specified user
-						nSelection =
-							m_comboSkippedUser.FindString(-1, m_settings.getUser().c_str());
-						if (nSelection != CB_ERR)
-						{
-							m_comboSkippedUser.SetCurSel(nSelection);
-						}
-						else
-						{
-							m_comboSkippedUser.SetCurSel(0);
-						}
+						m_comboSkippedUser.SetCurSel(0);
 					}
 				}
-				break;
-				
-			case eAllFilesQuery:
-				{
-					nSetAllFilesQuery = BST_CHECKED;
-					m_editSelectQuery.SetWindowText(m_settings.getSQLString().c_str());
-				}
-				break;
-
-			case eAllFilesTag:
-				// NOT IMPLEMENTED CURRENTLY
-				break;
-
-			default:
-				THROW_LOGIC_ERROR_EXCEPTION("ELI26999");
 			}
+			break;
 
-			// Set the radio buttons
-			m_radioAllFiles.SetCheck(nSetAllFiles);
-			m_radioFilesForWhich.SetCheck(nSetAllFileForWhich);
-			m_radioFilesFromQuery.SetCheck(nSetAllFilesQuery);
+		case eAllFilesQuery:
+			{
+				nSetAllFilesQuery = BST_CHECKED;
+				m_editSelectQuery.SetWindowText(m_settings.getSQLString().c_str());
+			}
+			break;
 
-			// Since changes have been made, re-update the controls
-			updateControls();
+		case eAllFilesTag:
+			// NOT IMPLEMENTED CURRENTLY
+			break;
+
+		default:
+			THROW_LOGIC_ERROR_EXCEPTION("ELI26999");
 		}
+
+		// Set the radio buttons
+		m_radioAllFiles.SetCheck(nSetAllFiles);
+		m_radioFilesForWhich.SetCheck(nSetAllFileForWhich);
+		m_radioFilesFromQuery.SetCheck(nSetAllFilesQuery);
+
+		// Since changes have been made, re-update the controls
+		updateControls();
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27000");
 }
