@@ -581,6 +581,12 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 
 				_lastCodePos = "120";
 
+				// If the previous status was skipped, remove the record from the skipped file table
+				if (*pPrevStatus == kActionSkipped)
+				{
+					removeSkipFileRecord(ipConnection, nID, nActionID);
+				}
+
 				// add an Action State Transition if the previous state was not unattempted or was not the
 				// same as the new status
 				if ( *pPrevStatus != kActionUnattempted && *pPrevStatus != eNewStatus  )
