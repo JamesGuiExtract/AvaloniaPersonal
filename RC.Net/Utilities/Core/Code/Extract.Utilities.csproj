@@ -50,8 +50,10 @@
     <Compile Include="CollectionMethods.cs" />
     <Compile Include="FileActionManagerTags.cs" />
     <Compile Include="FileSystemMethods.cs" />
+    <Compile Include="InitializationFile.cs" />
     <Compile Include="IPathTags.cs" />
     <Compile Include="IPathTagsConverter.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="PathTagsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SourceDocumentPathTags.cs" />
