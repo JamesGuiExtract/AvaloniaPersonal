@@ -68,6 +68,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         MasterExemptionCodeList _masterCodes;
 
+        /// <summary>
+        /// <see langword="true"/> if changes have been made to the grid since it was loaded;
+        /// <see langword="false"/> if no changes have been made to the grid since it was loaded.
+        /// </summary>
+        bool _dirty;
+
         #endregion RedactionGridView Fields
 
         #region RedactionGridView Events
@@ -192,6 +198,27 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Gets or sets whether the redactions have been modified since they were last loaded.
+        /// </summary>
+        /// <value><see langword="true"/> if the redactions have been modified since they were 
+        /// last loaded; <see langword="false"/> if the redactions have not been modified since 
+        /// they were last loaded.</value>
+        /// <returns><see langword="true"/> if the redactions have been modified since they were 
+        /// last loaded; <see langword="false"/> if the redactions have not been modified since 
+        /// they were last loaded.</returns>
+        public bool Dirty
+        {
+            get
+            {
+                return _dirty;
+            }
+            set
+            {
+                _dirty = value;
+            }
+        }
+
         #endregion RedactionGridView Properties
 
         #region RedactionGridView Methods
@@ -222,11 +249,14 @@ namespace Extract.Redaction.Verification
         /// <param name="row">The row to add.</param>
         void Add(RedactionGridViewRow row)
         {
-            if (!_typeColumn.Items.Contains(row.RedactionType))
+            string type = row.RedactionType;
+            if (!string.IsNullOrEmpty(type) && !_typeColumn.Items.Contains(type))
             {
-                _typeColumn.Items.Add(row.RedactionType);
+                _typeColumn.Items.Add(type);
             }
             _redactions.Add(row);
+
+            _dirty = true;
         }
 
         /// <summary>
@@ -247,6 +277,9 @@ namespace Extract.Redaction.Verification
                         {
                             _redactions.RemoveAt(i);
                         }
+
+                        _dirty = true;
+
                         return;
                     }
                 }
@@ -401,14 +434,19 @@ namespace Extract.Redaction.Verification
         /// <param name="exemptions">The exemption codes to apply.</param>
         void ApplyExemptionsToSelected(ExemptionCodeList exemptions)
         {
-            foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+            if (_dataGridView.SelectedRows.Count > 0)
             {
-                RedactionGridViewRow redaction = _redactions[row.Index];
-                redaction.Exemptions = exemptions;
-                _dataGridView.UpdateCellValue(_exemptionsColumn.Index, row.Index);
+                _dirty = true;
 
-                // Raise the ExemptionsApplied event
-                OnExemptionsApplied(new ExemptionsAppliedEventArgs(exemptions, redaction));
+                foreach (DataGridViewRow row in _dataGridView.SelectedRows)
+                {
+                    RedactionGridViewRow redaction = _redactions[row.Index];
+                    redaction.Exemptions = exemptions;
+                    _dataGridView.UpdateCellValue(_exemptionsColumn.Index, row.Index);
+
+                    // Raise the ExemptionsApplied event
+                    OnExemptionsApplied(new ExemptionsAppliedEventArgs(exemptions, redaction));
+                }
             }
         }
 
@@ -432,6 +470,10 @@ namespace Extract.Redaction.Verification
                 // As layer objects are added to the image viewer, don't handle the event.
                 // Otherwise two rows will be added for each attribute.
                 _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
+                _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
+
+                _redactions.Clear();
+                _imageViewer.LayerObjects.Clear();
 
                 // Iterate over the attributes
                 foreach (ComAttribute attribute in AttributesFile.ReadAll(fileName))
@@ -449,6 +491,8 @@ namespace Extract.Redaction.Verification
                         }
                     }
                 }
+
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -460,6 +504,7 @@ namespace Extract.Redaction.Verification
             finally
             {
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
             }
         }
 
@@ -486,6 +531,8 @@ namespace Extract.Redaction.Verification
 
                 // Save the attributes
                 attributes.SaveTo(fileName, false);
+
+                _dirty = false;
             }
             catch (Exception ex)
             {
@@ -493,6 +540,23 @@ namespace Extract.Redaction.Verification
                     "Unable to save VOA file.", ex);
                 ee.AddDebugData("Voa file", fileName, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified types to the list of valid redaction types.
+        /// </summary>
+        /// <param name="types">The list of types to add.</param>
+        public void AddRedactionTypes(string[] types)
+        {
+            try
+            {
+                _typeColumn.Items.AddRange(types);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27119",
+                    "Unable to add redaction types.", ex);
             }
         }
 
@@ -695,6 +759,9 @@ namespace Extract.Redaction.Verification
                     if (row.ContainsLayerObject(e.LayerObject))
                     {
                         row.LayerObjectsDirty = true;
+
+                        _dirty = true;
+
                         return;
                     }
                 }
