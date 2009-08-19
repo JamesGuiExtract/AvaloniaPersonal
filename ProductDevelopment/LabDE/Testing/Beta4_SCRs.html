@@ -1,0 +1,262 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.0 Beta 4 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.0 Beta 4 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a Beta 4 
+	release candidate is to explicitly exercise these recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #145, #163, #194, #260, #314]</b> Windows Tooltips For Swipe Problems
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Select a cell and swipe a white area so that no text is recognized.
+  	   	<LI>Confirm that a tooltip is displayed describing the problem.
+  	   	<LI>Swipe an area that extends off the page.
+  	   	<LI>Confirm that a tooltip is displayed describing the problem.
+<p>
+  	   	<LI>Exercise an image that causes an <b>OCR Engine</b> exception.
+  	   	<LI>Confirm that a tooltip is displayed describing the problem.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #306, #615]</b> Characters In New Row
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Select the new row of a table.
+  	   	<LI>Turn on <b>CAPS LOCK</b>.
+  	   	<LI>Type some characters.
+  	   	<LI>Confirm that every typed character appears in upper case.
+  	   	<LI>Turn off <b>CAPS LOCK</b>.
+<p>
+  	   	<LI>Select the new row of another table.
+  	   	<LI>Type some characters.
+  	   	<LI>Confirm that every typed character appears in the first cell.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #412]</b> Shortcuts And Frozen Application
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image in <b>stand-alone</b> mode.
+  	   	<LI>Close the document.
+  	   	<LI>Test the following shortcuts
+		<ul>
+	  	   	<LI><b>Ctrl+S</b> - Save
+	  	   	<LI><b>Ctrl+P</b> - Print
+	  	   	<LI><b>Ctrl+T</b> - Accept Highlight
+	  	   	<LI><b>Ctrl+D</b> - Remove Highlight
+	  	   	<LI><b>Alt+Z</b> - Zoom Tool
+	  	   	<LI><b>Alt+A</b> - Pan Tool
+	  	   	<LI><b>Alt+R</b> - Select Tool
+	  	   	<LI><b>Alt+S</b> - Swipe Tool
+		</ul>
+  	   	<LI>Confirm that the application is not frozen after each shortcut.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #440, #512, #589, #590, #609, #610]</b> Various Installation Issues
+	<ul>
+		<li>Exercise the <b>Demo Shield</b> installation.
+		<li>Confirm that <b>.NET 3.5</b> is the first item listed.
+<p>
+		<li>Confirm that a <b>LabDE</b> icon is used for the installation.
+<p>
+		<li>Finish the installation.
+		<li>Check <b>TBD</b> and confirm that the installed version of the Corepoint 
+		software is 4.0.1.
+		<li>Confirm that <b>Verify extracted data</b> is available as a processing task.
+<p>
+		<li>Confirm that an associated <b>RDT</b> installation is available with LabDE.
+<p>
+		<li>Uninstall <b>LabDE</b>.
+		<li>Confirm that the <b>Lead Tools</b> DLLs are removed.
+		<li>Confirm that the <b>Extract Systems Interop</b> DLLs are removed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #516]</b> Text For Toolbar Buttons
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Confirm appropriate tooltip text for the <b>Review and Select</b> tool.
+  	   	<LI>Confirm appropriate tooltip text for the <b>Angular Highlight</b> tool.
+  	   	<LI>Confirm appropriate tooltip text for the <b>Rectangular Highlight</b> tool.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #517]</b> Rectangle Selection With Review Tool
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Exercise the <b>Review and select</b> tool.
+  	   	<LI>Confirm that rectangle selection is no longer supported.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #532]</b> Unnecessary Zoom After Swipe
+	<ul>
+  	   	<LI>Exercise the <b>I:\Common\Testing|PVCS_Testing\DataEntry\144</b> image.
+		<li>Swipe some phone numbers in the top left corner of the image.
+  	   	<LI>Confirm that no unexpected zooms occur.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #536]</b> Dragging Row Within Same Table
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+		<li>Drag a table row to the new row within the same table.
+  	   	<LI>Confirm that the table rows are re-ordered as expected and that 
+		the dragged row is not duplicated.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #571, #573, #603]</b> Operator Comment Field And Tab Stop
+	<ul>
+  	   	<LI>Open a <b>LabDE</b> demo image.
+  	   	<LI>Confirm that the <b>Operator Comment</b> field is not a tab stop if 
+		the field is empty.
+  	   	<LI>Confirm that the <b>Operator Comment</b> field is a tab stop if 
+		the field is non-empty.
+  	   	<LI>Confirm that the <b>Operator Comment</b> field has a vertical scrollbar if 
+		enough text is entered.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #572]</b> LabDE Icon
+	<ul>
+  	   	<LI>Confirm that the <b>DEP</b> uses the LabDE icon.
+  	   	<LI>Confirm that <b>DataEntryApplication.exe</b> uses the LabDE icon.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #578]</b> Over Persistent Tooltip
+	<ul>
+  	   	<LI>Open a <b>LabDE</b> demo image.
+  	   	<LI>Select a row in the <b>Test</b> table.
+  	   	<LI>Use the <b>Review and select</b> tool to select a value.
+  	   	<LI>Click on a <b>Units</b> cell in the table.
+  	   	<LI>Confirm that Value highlight disappears and is replaced by the Units highlight.
+  	   	<LI>Note that this bug was not always readily reproduced.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #579]</b> Performing Lab Populated Via Lab List
+	<ul>
+  	   	<LI>Exercise several <b>LabDE</b> images.
+  	   	<LI>Confirm that the <b>Laboratory</b> information is provided in the DEP.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #581]</b> Cells Marked As Viewed On Open
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Confirm that the first cells in various tables are <b>not</b> presented 
+		as already viewed immediately after opening the image.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #587]</b> Context Menu Paste
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Copy some data to the Clipboard.
+  	   	<LI>Paste the copied data to an appropriate location via <b>Context</b> menu.
+  	   	<LI>Confirm that the pasted data is selected.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #588, #593]</b> Issues With Swiping Vertical Text
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Swipe some vertical text into a first name field.
+  	   	<LI>Confirm that a <b>Cannot create tooltip for empty attribute!</b> 
+		exception is not displayed.
+<p>
+  	   	<LI>Rotate the image <b>90 degrees</b>.
+  	   	<LI>Click on a populated field that is associated with a highlight.
+  	   	<LI>Confirm that a <b>Cannot create tooltip for empty attribute!</b> 
+		exception is not displayed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #601]</b> Tooltips Displayed For Direct Hints
+	<ul>
+  	   	<LI>Exercise a <b>LabDE</b> image.
+  	   	<LI>Select a cell that should have a value but instead has only a 
+		direct hint.
+  	   	<LI>Type some text into the cell.
+  	   	<LI>Confirm that the typed text is displayed as a tooltip.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #602]</b> Crash Without Pressing Copy Button
+	<ul>
+  	   	<LI>Exercise a LabDE image using the <b>MatchToPatientAndOrder</b> 
+		configuration.
+  	   	<LI>Correct all invalid items <b>except</b> the Copy button.
+  	   	<LI>Attempt to <b>Save and Commit</b> the document.
+  	   	<LI>Confirm that an exception is displayed noting that the Copy 
+		button has not been pressed.
+  	   	<LI>Confirm that the application does not crash.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #604]</b> Initial Selection And Tab Stop
+	<ul>
+  	   	<LI>Exercise a LabDE image without pre-defined <b>Operator's Comments</b> 
+		content.
+  	   	<LI>Confirm that the <b>Operator's Comments</b> field is not the 
+		initial selection.
+<p>
+  	   	<LI>Exercise a LabDE image with pre-defined <b>Operator's Comments</b> 
+		content.
+  	   	<LI>Confirm that the <b>Operator's Comments</b> field is the 
+		initial selection.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #606]</b> Alignment of About Box Text
+	<ul>
+  	   	<LI>Confirm that the text in the <b>About Box</b> is aligned correctly.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #611]</b> Repeated Exceptions With Auto-Update Query
+	<ul>
+  	   	<LI>Exercise a LabDE image.
+  	   	<LI>Select the <b>Name</b> cell of a <b>Test</b> row.
+  	   	<LI>Paste the text provided in the SCR into the cell.
+  	   	<LI>Confirm that an exception is displayed.
+  	   	<LI>Close the exception and confirm that the exception is not 
+		displayed again.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[LegacyRC #5388, #5396]</b> Skipped Files Do Not Revert To Pending
+       	<ul>
+  	   	<LI>Exercise several <b>LabDE</b> images.
+  	   	<LI>Skip a document and stop processing.
+  	   	<LI>Reconfigure the task to process <b>only documents that I skipped</b>.
+  	   	<LI>Start processing and <b>skip</b> the file again.
+  	   	<LI>Confirm that the skipped document remains in <b>Skipped</b> status.
+<p>
+  	   	<LI>Exercise several <b>LabDE</b> images.
+  	   	<LI>Skip some documents and stop processing.
+  	   	<LI>Confirm that <b>all</b> skipped documents remain in <b>Skipped</b> status.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
