@@ -1,3 +1,5 @@
+using System;
+
 namespace Extract.Redaction.Verification
 {
     partial class VerificationTaskForm
@@ -21,6 +23,18 @@ namespace Extract.Redaction.Verification
                 if (components != null)
                 {
                     components.Dispose();
+                }
+                if (_memento != null)
+                {
+                    try
+                    {
+                        // This method should never throw exceptions, but wrap in try anyway.
+                        ClearMemento();
+                    }
+                    catch (Exception ex)
+                    {
+                        ExtractException.Log("ELI27118", ex);
+                    }
                 }
             }
 
@@ -64,7 +78,7 @@ namespace Extract.Redaction.Verification
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveAndCommitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._printToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this._printImageToolStripMenuItem =new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
             this._skipProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._stopProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -297,7 +311,7 @@ namespace Extract.Redaction.Verification
             this._saveToolStripMenuItem,
             this._saveAndCommitToolStripMenuItem,
             toolStripSeparator7,
-            this._printToolStripMenuItem,
+            this._printImageToolStripMenuItem,
             toolStripSeparator8,
             this._skipProcessingToolStripMenuItem,
             this._stopProcessingToolStripMenuItem});
@@ -324,12 +338,13 @@ namespace Extract.Redaction.Verification
             toolStripSeparator7.Name = "toolStripSeparator7";
             toolStripSeparator7.Size = new System.Drawing.Size(163, 6);
             // 
-            // _printToolStripMenuItem
+            // _printImageToolStripMenuItem
             // 
-            this._printToolStripMenuItem.Name = "_printToolStripMenuItem";
-            this._printToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
-            this._printToolStripMenuItem.Text = "Print...";
-            this._printToolStripMenuItem.Click += new System.EventHandler(this.HandlePrintToolStripMenuItemClick);
+            this._printImageToolStripMenuItem.Enabled = false;
+            this._printImageToolStripMenuItem.Name = "_printImageToolStripMenuItem";
+            this._printImageToolStripMenuItem.ShortcutKeyDisplayString = "";
+            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this._printImageToolStripMenuItem.Text = "&Print...";
             // 
             // toolStripSeparator8
             // 
@@ -431,6 +446,7 @@ namespace Extract.Redaction.Verification
             this._previousDocumentToolStripButton.Name = "_previousDocumentToolStripButton";
             this._previousDocumentToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousDocumentToolStripButton.Text = "Previous document";
+            this._previousDocumentToolStripButton.Click += new System.EventHandler(this.HandlePreviousDocumentToolStripButtonClick);
             // 
             // _nextDocumentToolStripButton
             // 
@@ -441,6 +457,7 @@ namespace Extract.Redaction.Verification
             this._nextDocumentToolStripButton.Name = "_nextDocumentToolStripButton";
             this._nextDocumentToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextDocumentToolStripButton.Text = "Next document";
+            this._nextDocumentToolStripButton.Click += new System.EventHandler(this.HandleNextDocumentToolStripButtonClick);
             // 
             // toolStripSeparator2
             // 
@@ -456,6 +473,7 @@ namespace Extract.Redaction.Verification
             this._previousRedactionToolStripButton.Name = "_previousRedactionToolStripButton";
             this._previousRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousRedactionToolStripButton.Text = "Previous redaction";
+            this._previousRedactionToolStripButton.Click += new System.EventHandler(this.HandlePreviousRedactionToolStripButtonClick);
             // 
             // _nextRedactionToolStripButton
             // 
@@ -466,6 +484,7 @@ namespace Extract.Redaction.Verification
             this._nextRedactionToolStripButton.Name = "_nextRedactionToolStripButton";
             this._nextRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextRedactionToolStripButton.Text = "Next redaction";
+            this._nextRedactionToolStripButton.Click += new System.EventHandler(this.HandleNextRedactionToolStripButtonClick);
             // 
             // toolStripSeparator3
             // 
@@ -481,6 +500,7 @@ namespace Extract.Redaction.Verification
             this._optionsToolStripButton.Name = "_optionsToolStripButton";
             this._optionsToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._optionsToolStripButton.Text = "Options";
+            this._optionsToolStripButton.Click += new System.EventHandler(this.HandleOptionsToolStripButtonClick);
             // 
             // _exemptionsToolStrip
             // 
@@ -940,7 +960,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.TextBox _commentsTextBox;
         private System.Windows.Forms.ToolStripMenuItem _saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _saveAndCommitToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _printToolStripMenuItem;
+        private Extract.Imaging.Forms.PrintImageToolStripMenuItem _printImageToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _skipProcessingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _stopProcessingToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _discardChangesToolStripMenuItem;

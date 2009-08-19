@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Security.Permissions;
 using System.Text;
@@ -30,6 +31,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly string _SANDDOCK_LICENSE_STRING = @"1970|siE7SnF/jzINQg1AOTIaCXLlouA=";
 
+        /// <summary>
+        /// The maximum number of documents to store in the history.
+        /// </summary>
+        const int _MAX_DOCUMENT_HISTORY = 20;
+
         #endregion VerificationTaskForm Constants
 
         #region VerificationTaskForm Fields
@@ -40,14 +46,32 @@ namespace Extract.Redaction.Verification
         readonly VerificationSettings _settings;
 
         /// <summary>
-        /// Expands File Action Manager path tags.
-        /// </summary>
-        FAMTagManager _tagManager;
-
-        /// <summary>
-        /// Gets the fully expanded voa file name.
+        /// The fully expanded voa file name of the currently processing document.
         /// </summary>
         string _voaFile;
+
+        /// <summary>
+        /// The state of currently processing document.
+        /// </summary>
+        VerificationMemento _memento;
+
+        /// <summary>
+        /// <see langword="true"/> if the currently processing document has been modified; 
+        /// <see langword="false"/> if the currently processing document has not been modified.
+        /// </summary>
+        bool _dirty;
+
+        /// <summary>
+        /// The previously verified documents.
+        /// </summary>
+        List<VerificationMemento> _history = new List<VerificationMemento>(_MAX_DOCUMENT_HISTORY);
+
+        /// <summary>
+        /// Represents the index in <see cref="_history"/> of the currently displayed document. 
+        /// If the index is beyond the end of the <see cref="_history"/>, the currently 
+        /// displayed document is the currently processing document.
+        /// </summary>
+        int _historyIndex;
 
         /// <summary>
         /// License cache for validating the license.
@@ -93,6 +117,10 @@ namespace Extract.Redaction.Verification
 
                 InitializeComponent();
 
+                // Add the default redaction types
+                string[] types = GetRedactionTypes();
+                _redactionGridView.AddRedactionTypes(types);
+
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
             }
@@ -104,25 +132,119 @@ namespace Extract.Redaction.Verification
 
         #endregion VerificationTaskForm Constructors
 
+        #region VerificationTaskForm Properties
+
+        /// <summary>
+        /// Gets whether the currently viewed document is a history document.
+        /// </summary>
+        /// <returns><see langword="true"/> if a document from the history is what is currently viewed;
+        /// <see langword="false"/> if the currently processing document is being viewed.</returns>
+        public bool IsInHistory
+        {
+            get
+            {
+                return _historyIndex < _history.Count;
+            }
+        }
+
+        #endregion VerificationTaskForm Properties
+
         #region VerificationTaskForm Methods
 
         /// <summary>
-        /// Saves and optionally commits the currently open image file.
+        /// Gets an array of the default redaction types.
         /// </summary>
-        /// <param name="commit"><see langword="true"/> if the image file should be committed; 
-        /// <see langword="false"/> if the image file should not be committed.</param>
-        void Save(bool commit)
+        /// <returns>An array of the default redaction types.</returns>
+        static string[] GetRedactionTypes()
         {
-            // Raise any necessary prompts before committing this file.
-            if (commit && PromptBeforeCommit())
+            // Get the number of types from the ini file
+            InitializationFile iniFile = GetInitializationFile();
+            int typeCount = iniFile.ReadInt32("RedactionDataTypes", "NumRedactionDataTypes");
+            string[] types = new string[typeCount];
+
+            // Get each type
+            for (int i = 1; i <= typeCount; i++)
             {
-                return;
+                string key = "RedactionDataType" + i.ToString(CultureInfo.InvariantCulture);
+                types[i-1] = iniFile.ReadString("RedactionDataTypes", key);
             }
 
-            _redactionGridView.SaveTo(_voaFile);
+            return types;
+        }
 
-            if (commit)
+        /// <summary>
+        /// Gets the ID Shield initialization file.
+        /// </summary>
+        /// <returns>The ID Shield initialization file.</returns>
+        static InitializationFile GetInitializationFile()
+        {
+            string path = FileSystemMethods.GetAbsolutePath("IDShield.ini");
+            return new InitializationFile(path);
+        }
+
+        /// <summary>
+        /// Saves and commits the currently viewed document.
+        /// </summary>
+        void Commit()
+        {
+            if (!WarnIfInvalid())
             {
+                Save();
+
+                AdvanceToNextDocument();
+            }
+        }
+
+        /// <summary>
+        /// Saves the currently viewed voa file.
+        /// </summary>
+        void Save()
+        {
+            // Save the voa
+            string voaFile = GetDestinationVoa();
+            _redactionGridView.SaveTo(voaFile);
+
+            // Reset the dirty flag
+            if (!IsInHistory)
+            {
+                _dirty = false;
+            }
+        }
+
+        /// <summary>
+        /// Moves to the next document either in the history queue or the next document to be 
+        /// processed.
+        /// </summary>
+        void AdvanceToNextDocument()
+        {
+            if (IsInHistory)
+            {
+                // Advance the history index
+                _historyIndex++;
+
+                // Open the next file
+                VerificationMemento memento = GetCurrentDocument();
+                _imageViewer.OpenImage(memento.ImageFile, false);
+            }
+            else
+            {
+                // Reset the dirty flag
+                _dirty = false;
+
+                // If the max document history was reached, drop the first item
+                if (_history.Count == _MAX_DOCUMENT_HISTORY)
+                {
+                    _history.RemoveAt(0);
+                    _historyIndex--;
+                }
+
+                // Store the current document in the history
+                VerificationMemento memento =
+                    new VerificationMemento(_imageViewer.ImageFile, _voaFile);
+                _history.Add(memento);
+                _historyIndex++;
+
+                // Successfully complete this file
                 OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSuccessful));
             }
         }
@@ -132,14 +254,13 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <returns><see langword="true"/> if the user needs to make corrections before 
         /// committing; <see langword="false"/> if the commit can continue.</returns>
-        bool PromptBeforeCommit()
+        bool WarnIfInvalid()
         {
             // Prompt for verification of all pages
             if (_settings.General.VerifyAllPages && !_pageSummaryView.HasVisitedAllPages())
             {
-                MessageBox.Show("Must visit all pages before continuing to new document.",
-                    "Must visit all pages", MessageBoxButtons.OK, MessageBoxIcon.None,
-                    MessageBoxDefaultButton.Button1, 0);
+                MessageBox.Show("Must visit all pages before saving.", "Must visit all pages", 
+                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
                 return true;
             }
             
@@ -150,7 +271,7 @@ namespace Extract.Redaction.Verification
                 {
                     if (string.IsNullOrEmpty(row.RedactionType))
                     {
-                        MessageBox.Show("Must specify type for all redactions before continuing to new document.", 
+                        MessageBox.Show("Must specify type for all redactions before saving.", 
                             "Must specify type", MessageBoxButtons.OK, MessageBoxIcon.None,
                             MessageBoxDefaultButton.Button1, 0);
                         return true;
@@ -165,7 +286,7 @@ namespace Extract.Redaction.Verification
                 {
                     if (row.Exemptions.IsEmpty)
                     {
-                        MessageBox.Show("Must specify exemption codes for all redactions before continuing to new document.", 
+                        MessageBox.Show("Must specify exemption codes for all redactions before saving.", 
                             "Must specify exemption codes", MessageBoxButtons.OK, 
                             MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
                         return true;
@@ -174,6 +295,98 @@ namespace Extract.Redaction.Verification
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Displays a warning message that allows the user to save or discard any changes. If no 
+        /// changes have been made, no message is displayed.
+        /// </summary>
+        /// <returns><see langword="true"/> if the user chose to cancel or the user tried to save 
+        /// with invalid data; <see langword="false"/> if the currently viewed document was not 
+        /// modified or if changes were successfully discarded or saved.</returns>
+        bool WarnIfDirty()
+        {
+            // Check if the viewed document is dirty
+            if (_redactionGridView.Dirty)
+            {
+                using (CustomizableMessageBox messageBox = new CustomizableMessageBox())
+                {
+                    messageBox.Caption = "Save changes?";
+                    messageBox.Text = "Changes made to this document have not been saved." +
+                        Environment.NewLine + Environment.NewLine +
+                        "Would you like to save them now?";
+
+                    messageBox.AddButton("Save changes", "Save", false);
+                    messageBox.AddButton("Discard changes", "Discard", false);
+                    messageBox.AddButton("Cancel", "Cancel", true);
+
+                    string result = messageBox.Show();
+                    if (result == "Cancel")
+                    {
+                        return true;
+                    }
+                    else if (result == "Save")
+                    {
+                        if (WarnIfInvalid())
+                        {
+                            return true;
+                        }
+
+                        Save();
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the current document to view from the history.
+        /// </summary>
+        /// <returns>The current document to view from the history.</returns>
+        VerificationMemento GetCurrentDocument()
+        {
+            if (IsInHistory)
+            {
+                return _history[_historyIndex];
+            }
+            else
+            {
+                return _memento ?? new VerificationMemento(_imageViewer.ImageFile, _voaFile);
+            }
+        }
+
+        /// <summary>
+        /// Gets the voa file to use as the destination voa.
+        /// </summary>
+        /// <returns>The voa file to use as the destination voa.</returns>
+        string GetDestinationVoa()
+        {
+            if (IsInHistory)
+            {
+                return _history[_historyIndex].AttributesFile;
+            }
+            else
+            {
+                return _voaFile;
+            }
+        }
+
+        /// <summary>
+        /// Resets <see cref="_memento"/> to <see langword="null"/>.
+        /// </summary>
+        void ClearMemento()
+        {
+            if (_memento != null)
+            {
+                string voaFile = _memento.AttributesFile;
+                if (File.Exists(voaFile))
+                {
+                    FileSystemMethods.TryDeleteFile(voaFile);
+                }
+
+                _memento = null;
+            }
         }
 
         #endregion VerificationTaskForm Methods
@@ -198,6 +411,29 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException.Display("ELI26715", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Form.FormClosing"/> event.
+        /// </summary>
+        /// <param name="e">The event data associated with the <see cref="Form.FormClosing"/> 
+        /// event.</param>
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            try
+            {
+                // TODO: Also check if the main document is dirty, but not in view.
+                if (WarnIfDirty())
+                {
+                    e.Cancel = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI27116", ex);
             }
         }
 
@@ -253,7 +489,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Save(true);
+                Commit();
             }
             catch (Exception ex)
             {
@@ -274,7 +510,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Save(true);
+                Commit();
             }
             catch (Exception ex)
             {
@@ -295,7 +531,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Save(false);
+                if (!IsInHistory)
+                {
+                    Save();
+                }
             }
             catch (Exception ex)
             {
@@ -312,32 +551,14 @@ namespace Extract.Redaction.Verification
         /// <see cref="ToolStripItem.Click"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="ToolStripItem.Click"/> event.</param>
-        void HandlePrintToolStripMenuItemClick(object sender, EventArgs e)
-        {
-            try
-            {
-                // TODO: Implement me
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27045", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ToolStripItem.Click"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="ToolStripItem.Click"/> event.</param>
         void HandleSkipProcessingToolStripMenuItemClick(object sender, EventArgs e)
         {
             try
             {
-                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+                if (!WarnIfDirty())
+                {
+                    OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
+                }
             }
             catch (Exception ex)
             {
@@ -358,7 +579,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingCancelled));
+                Close();
             }
             catch (Exception ex)
             {
@@ -379,7 +600,20 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                if (_imageViewer.IsImageAvailable)
+                {
+                    // Clear any stored changes
+                    if (!IsInHistory)
+                    {
+                        ClearMemento();
+
+                        _dirty = false;
+                    }
+
+                    // Load the original voa
+                    string voaFile = GetDestinationVoa();
+                    _redactionGridView.LoadFrom(voaFile);
+                }
             }
             catch (Exception ex)
             {
@@ -426,6 +660,139 @@ namespace Extract.Redaction.Verification
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI27050", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandlePreviousDocumentToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (IsInHistory)
+                {
+                    // Check if changes have been made before moving away from a history document
+                    if (WarnIfDirty())
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    // Preserve the currently processing document
+                    if (_memento == null)
+                    {
+                        string tempVoa = FileSystemMethods.GetTemporaryFileName(".voa");
+                        _memento = new VerificationMemento(_imageViewer.ImageFile, tempVoa);
+                    }
+
+                    // Save the state of the current document before moving back
+                    _dirty = _redactionGridView.Dirty;
+                    _redactionGridView.SaveTo(_memento.AttributesFile);
+                }
+
+                // Go to the previous document
+                _historyIndex--;
+                VerificationMemento memento = GetCurrentDocument();
+                _imageViewer.OpenImage(memento.ImageFile, false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27074", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleNextDocumentToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (!WarnIfDirty())
+                {
+                    AdvanceToNextDocument();
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27075", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandlePreviousRedactionToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27076", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleNextRedactionToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27077", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripItem.Click"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="ToolStripItem.Click"/> event.</param>
+        void HandleOptionsToolStripButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                // TODO: Implement me
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27078", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
@@ -510,12 +877,34 @@ namespace Extract.Redaction.Verification
                 {
                     _currentDocumentTextBox.Text = _imageViewer.ImageFile;
 
+                    _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
+                    _nextDocumentToolStripButton.Enabled = IsInHistory;
+
+                    _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
+                    _saveToolStripMenuItem.Enabled = !IsInHistory;
+
                     // Load the voa, if it exists
-                    _voaFile = _tagManager.ExpandTags(_settings.InputFile, _imageViewer.ImageFile);
-                    if (File.Exists(_voaFile))
+                    VerificationMemento memento = GetCurrentDocument();
+                    string voaFile = memento.AttributesFile;
+                    if (File.Exists(voaFile))
                     {
-                        _redactionGridView.LoadFrom(_voaFile);
+                        _redactionGridView.LoadFrom(voaFile);
                     }
+
+                    if (!IsInHistory)
+                    {
+                        _redactionGridView.Dirty = _dirty;
+                    }
+                }
+                else
+                {
+                    _currentDocumentTextBox.Text = "";
+
+                    _previousDocumentToolStripButton.Enabled = false;
+                    _nextDocumentToolStripButton.Enabled = false;
+
+                    _skipProcessingToolStripMenuItem.Enabled = false;
+                    _saveToolStripMenuItem.Enabled = false;
                 }
             }
             catch (Exception ex)
@@ -600,9 +989,13 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
-                _tagManager = tagManager;
+                string fullPath = Path.GetFullPath(fileName);
+                _voaFile = tagManager.ExpandTags(_settings.InputFile, fullPath);
 
-                _imageViewer.OpenImage(fileName, false);
+                // Reset the current memento
+                ClearMemento();
+
+                _imageViewer.OpenImage(fullPath, false);
             }
             catch (Exception ex)
             {
