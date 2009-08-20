@@ -38,15 +38,16 @@
 	<ul>
 		<li><b>Database Administration</b>
 		<ul>
-			<li>Confirm that <b>Database server name</b> is prepopulated with the previously 
-			selected server.
-			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
-			database name.
 			<li>Confirm that <b>Database server name</b> includes a <b>&lt;Browse...&gt;</b> 
 			choice that populates the combo box with names of all reachable SQL Server machines.
 			<li>Confirm that <b>Database name</b> includes a <b>&lt;Browse...&gt;</b> 
 			choice that populates the combo box with names of all databases available on the 
 			selected server.
+<p>
+                        <li>Restart the utility and confirm that <b>Database server name</b> is
+                        prepopulated with the previously selected server.
+			<li>Confirm that <b>Database name</b> is prepopulated with the previously selected 
+			database name.
 <p>
 			<li>Confirm that an action can be <b>added</b> to the database.
 			<li>Confirm that an action can be <b>removed</b> from the database.
@@ -181,7 +182,7 @@
 		that its status returns to <b>Pending</b>.
 		<LI>Stop processing from <b>File - Stop processing</b> in the Data Entry Application. 
 		Confirm that the active document is closed and that its status returns to <b>Pending</b>.
-		<LI>Stop processing from the <b>red X</b> on the title bar in the Data Entry Application. 
+		<LI>Stop processing from the <b>X</b> on the title bar in the Data Entry Application. 
 		Confirm that the active document is closed and that its status returns to <b>Pending</b>.
 <p>
 		<LI><b>Skip processing</b>
@@ -233,10 +234,10 @@
 		<LI><b>OCR confidence</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the first <b>ECO2</b> row in the <b>Orders</b> table.
+			<LI>Select the <b>ECO2</b> row in the <b>Orders</b> table.
 			<LI>Confirm that in the <b>Carbon Dioxide</b> text that the word <b>Carbon</b> has
 			a red background indicating lower OCR confidence.
-			<LI>Swipe <b>Carbon Dioxide</b> to replace the Order Name.
+			<LI>Select the Order Name field and swipe <b>Carbon Dioxide</b> to replace the Order Name.
 			<LI>Confirm that the text OCRs correctly. <b>Dioxide</b> may mis-ocr.
 			<LI>Confirm that now the word <b>Carbon</b> and the <b>x</b> in <b>Dioxide</b> 
 			have red backgrounds indicating lower OCR confidence.
@@ -256,20 +257,20 @@
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
 			<LI>Select the <b>Orders</b> table.
-			<LI>Confirm that selecting each individual row of the address table provides the 
-			appropriate highlight and hint.
-			<LI>Confirm that selecting multiple rows of the address table in various 
-			combinations provides the appropriate highlights but without any hints.
+			<LI>Confirm that selecting each individual row of the orders table provides the 
+			appropriate highlights and tooltips.
+			<LI>Confirm that selecting multiple rows of the orders table in various 
+			combinations provides the appropriate highlights but without any tooltips.
 <p>
-			<LI>Select one of the <b>Basic Metabolic Panel</b> cells in the 
-			<b>Orders</b> table.
-			<LI>Confirm that the <b>Basic Metabolic Panel</b> text is highlighted 
-			and that a hint is also displayed.
-			<LI>Select an entire <b>Basic Metabolic Panel</b> row in the 
+			<LI>Select one of the <b>Test Name</b> cells in the 
+			<b>Selected Order Details</b> table.
+			<LI>Confirm that the <b>Test Name</b> text is highlighted 
+			and that a tooltip is also displayed.
+			<LI>Select the entire <b>UnknownOrder</b> row in the 
 			<b>Orders</b> table.
 			<ul>
-				<LI>Confirm that all of the test results for the <b>Panel</b> are 
-				highlighted and that no hint is displayed.
+				<LI>Confirm that all of the test results for the <b>Order</b> are 
+				highlighted but that none of the test results tooltips are displayed.
 				<LI>Confirm that both <b>Red</b> and <b>Green</b> highlights are 
 				visible for individual characters.
 				<LI>Confirm that several <b>direct</b> hints (dotted line boxes) are 
@@ -293,11 +294,11 @@
 			list should be restricted to the entries that match the typed text.
 			<ul>
 				<LI>Ordering Physician - First Name
-				<LI>Ordering Physician - Last Name
-				<LI>Ordering Physician - Code
+				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
+				<LI>Ordering Physician - Code (NOTE: this is dependent on the values of the Name fields)
 				<LI>CopyTo Physician - First Name
-				<LI>CopyTo Physician - Last Name
-				<LI>CopyTo Physician - Code
+				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
+				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values of the Name fields)
 				<LI>Orders - Order Name
 				<LI>Orders - Epic Code
 				<LI>Selected Order Details - Lab Name
@@ -310,11 +311,11 @@
 			can be dropped down from an empty cell by pressing the <b>space</b> bar.
 			<ul>
 				<LI>Ordering Physician - First Name
-				<LI>Ordering Physician - Last Name
-				<LI>Ordering Physician - Code
+				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
+				<LI>Ordering Physician - Code (NOTE: this is dependent on the values of the Name fields)
 				<LI>CopyTo Physician - First Name
-				<LI>CopyTo Physician - Last Name
-				<LI>CopyTo Physician - Code
+				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
+				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values of the Name fields)
 				<LI>Orders - Order Name
 				<LI>Orders - Epic Code
 				<LI>Selected Order Details - Lab Name
@@ -331,9 +332,9 @@
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
 			are available for the selected fields.
-			<LI>Select the <b>Patient Information - Name</b> field.
+			<LI>Select the row in the <b>Patient Information - From Lab Result</b> table.
 			<LI>Swipe different text and confirm that the new text is entered 
-			in the field.
+			in the fields.
 			<LI>Confirm that the tooltip moves to directly above the swiped text 
 			and now reflects the OCR result from the swipe.
 			<LI>Swipe the original text.
@@ -345,9 +346,9 @@
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.  Note that highlights 
 			are available.
-			<LI>Select the <b>Patient Information - Name</b> field.
-			<LI>Manually edit the text in the field.
-			<LI>Confirm that the tooltip changes properly with each character change.
+			<LI>Select the row in the <b>Patient Information - From Lab Result</b> table.
+			<LI>Manually edit the text in the fields.
+			<LI>Confirm that the tooltips change properly with each character change.
 			<LI>Confirm that whitespace is trimmed from each end of the tooltip as 
 			the text is updated.
 <p>
@@ -361,7 +362,7 @@
 	<LI><h3>Swiping from tables</h3>
 	<ul>
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
-		<LI>Select the <b>Basic Metabolic Panel</b>.
+		<LI>Select <b>UnknownOrder</b>.
 		<LI>Select the empty row at the bottom of the <b>Selected Order Details</b>.
 		<LI>Use the angular highlight tool to swipe the <b>Sodium</b> test data.
 		<ul>
@@ -377,15 +378,16 @@
 <p>
 		<LI>Open image <b>191.tif</b> from Demo_LabDE.
 		<LI>Select the empty row at the bottom of the <b>Orders</b> table.
-		<LI>Use the rectangular highlight tool to swipe the entire <b>TUMOR MARKER 
-		STUDIES</b> order and data including the collection date and time.
+                <LI>Use the rectangular highlight tool to swipe the entire <b>TOTAL/FREE PSA PANEL
+                </b> order (from the date above <b>TUMOR MARKER STUDIES</b> to the indented line
+                that starts with <b>% FREE PSA</b>).
 		<ul>
-			<LI>Confirm that a new <b>TUMOR MARKER STUDIES</b> order appears in the 
+			<LI>Confirm that a new <b>TOTAL/FREE PSA PANEL</b> order appears in the 
 			<b>Orders</b> table.
-			<LI>Confirm that test information is provided for <b>TOTAL PSA</b>, 
+			<LI>Confirm that test information is provided for <b>PSA, TOTAL</b>, 
 			<b>FREE PSA</b>, and <b>% FREE PSA</b>.
 			<LI>Confirm that highlights and hints are provided.
-			<LI>Note whether or not the <b>TOTAL PSA</b> data was found correctly. 
+			<LI>Note whether or not the <b>PSA, TOTAL</b> data was found correctly. 
 			<LI>Note whether or not the <b>FREE PSA</b> data was found correctly. 
 			<LI>Note whether or not the <b>% FREE PSA</b> data was found correctly. 
 			<LI>Select a cell with missing or incorrect text.
@@ -397,8 +399,8 @@
 	<LI><h3>Copy and Paste from tables</h3>
 	<ul>
 		<LI>Open image <b>151.tif</b> from Demo_LabDE.
-		<LI>Select the entire <b>Potassium</b> row from the test details in the first 
-		<b>Potassium</b> order.
+                <LI>Select the entire <b>Potassium</b> row from the test details in the
+                <b>Potassium</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
 		<LI>Select another order.
 		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
@@ -410,10 +412,9 @@
 			<LI>Confirm that selecting the entire <b>Potassium</b> row displays 
 			proper highlights and all tooltips. 
 		</ul>
-		<LI>Select <b>multiple</b> rows from the test details in the first 
-		<b>Basic Metabolic Panel</b>.
+		<LI>Select <b>multiple</b> rows from the test details in the <b>UnknownOrder</b>.
 		<LI>Right-click and select <b>Copy row(s)</b>.
-		<LI>Select the second <b>Basic Metabolic Panel</b>.
+		<LI>Select the another order.
 		<LI>Right-click the empty test details row and select <b>Paste copied row(s)</b>.
 		<ul>
 			<LI>Confirm that all of the <b>copied rows</b> appear in the <b>Selected Test 
@@ -440,527 +441,7 @@
 			<LI>Configure the <b>Verify extracted data</b> task to use 
 			<b>StandardLabDE_AH_Phase1.config</b>.
 <p>
-			<li><b>[DataEntry #296, #417]</b>
-			<ul>
-				<li>As you verify the following documents, confirm via "Show all highlights"
-				that at no point is a highlight from an earlier image visible on the image
-				currently being verified.
-				<li>Also confirm that the output .voa files do not contain
-				<b>.PlaceholderAttribute__testComponentTable</b> or
-				<b>PlaceholderAttribute__laboratoryTestTable</b> attributes.
-			</ul>
-		</ul>
-<p>
-		<LI><b>003.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
-			complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Ordering Physician</b> is present.
-			<LI>Confirm that one <b>Order</b> is present for 
-			<b>CREATININE</b>.
-			<LI>CREATININE
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that order data is present for <b>CREATININE</b>, 
-				<b>GFR AFRICAN AMERICAN</b> and <b>GFR, ESTIMATE</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for each test.
-			</ul>
-		</ul>
-<p>
-		<LI><b>004.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
-			complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that <b>Date of Birth</b> is present.
-			<LI><b>[DataEntry #469]</b> Confirm that <b>Gender</b> is missing and 
-			therefore set to <b>U</b>.
-			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
-			<LI>Confirm that two <b>CopyTo: Physicians</b> are present.
-			<LI>Confirm that one <b>Order</b> is present for 
-			<b>CBC</b>.
-			<LI>CBC
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that order data is present for <b>20</b> tests.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for each test.
-			</ul>
-		</ul>
-<p>
-		<LI><b>057.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
-			complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Ordering: Physician</b> is present.
-			<LI>Confirm that no <b>CopyTo: Physicians</b> are present.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>GLUCOSE</b> and <b>HGB</b>.
-			<LI>GLUCOSE
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>GLUCOSE</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>HGB
-			<ul>
-				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
-				<LI>Confirm that <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>HEMOGLOBIN</b>.
-				<LI>Confirm that the <b>Code</b> column is empty and invalid.
-			</ul>
-		</ul>
-<p>
-		<LI><b>151.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
-			complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
-			<LI>Confirm that one <b>CopyTo: Physician</b> is present.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>CALCIUM</b>, <b>CHLORIDE</b>, <b>CREATININE</b>, <b>GLUCOSE</b>, 
-			<b>POTASSIUM</b> and <b>UnknownOrder</b>.
-			<LI>CALCIUM
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>CALCIUM</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>CHLORIDE
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>CHLORIDE</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>CREATININE
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>CREATININE</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>GLUCOSE
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>GLUCOSE</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>POTASSIUM
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>POTASSIUM</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>UnknownOrder
-			<ul>
-				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
-				<LI>Confirm that <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>Carbon Dioxide</b>, 
-				<b>Anion Gap</b>, <b>Blood Urea Nitrogen</b>, <b>Glomerular Filtration Rate</b>, 
-				and <b>BUN/Creat Ratio</b>.
-				<LI>Confirm that the <b>Code</b> column is empty and invalid.
-			</ul>
-		</ul>
-<p>
-		<LI><b>191.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
-			except for <b>Gender</b>.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that two <b>Physicians</b> are present.
-			<LI>Confirm that one <b>Order</b> is present for 
-			<b>Total/Free PSA Panel</b>.
-			<LI>Confirm that each test has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that <b>Test</b> data is present for <b>PSA, TOTAL</b>, <b>FREE PSA</b> 
-			and <b>% FREE PSA</b>.
-		</ul>
-<p>
-		<LI><b>221.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that one <b>Completed Test</b> is present for 
-			<b>Hemogram with Differential</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data is present for <b>20 of 21</b> tests.
-			<LI>Confirm that test data was not found for the <b>Hct</b> test.
-			<LI>Confirm that the found test data was all valid except for <b>Units</b> on 
-			the <b>MCH</b> test.
-			<LI>Confirm that the <b>Flags</b> item was missed on the <b>Lymphs</b> test.
-		</ul>
-<p>
-		<LI><b>348.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and valid 
-			except for <b>Gender</b>.
-			<LI>Confirm that <b>Gender</b> is displayed as <b>U</b>.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that two <b>Physicians</b> are present.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>CHEMISTRY</b> and <b>ELECTROLYTES/BLOOD GASES</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that <b>CHEMISTRY</b> test data is present for <b>6</b> of 
-			<b>6</b> tests.
-			<LI>Confirm that 1 of 6 <b>Value</b> items is blank and invalid.  Note that 
-			Glucose and Bun results are also incorrect due to the cross-outs.
-			<LI>Confirm that <b>ELECTROLYTES/BLOOD GASES</b> test data is present for 
-			<b>5</b> of <b>5</b> tests.
-			<LI>Confirm that 3 of 5 <b>Value</b> items are blank and invalid.
-		</ul>
-<p>
-		<LI><b>350.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>LIPID PANEL</b> and <b>Other</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for the <b>LIPID PANEL</b> is present 
-			for <b>5</b> tests.
-			<LI>Confirm that test data for <b>Other</b> is present 
-			for <b>1</b> test <b>(AST)</b>.
-		</ul>
-<p>
-		<LI><b>352.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that two <b>Physicians</b> are present.
-			<LI>Confirm that the <b>NT, CLIE</b> physician is incorrect.
-			<LI>Confirm that <b>Orders</b> are present for two 
-			<b>COMP METABOLIC PNL</b> plus <b>Other</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Components</b>.
-			<LI>Confirm that test data for the first <b>COMP METABOLIC PNL</b> is present 
-			for <b>20</b> tests plus <b>3</b> tests underneath a <b>LIPID PANEL 
-			W/REFLEX</b> heading.  Note that each test is present on page 1.
-			<LI>Confirm that test data for the second <b>COMP METABOLIC PNL</b> is present 
-			for <b>4</b> more tests underneath the original <b>LIPID PANEL 
-			W/REFLEX</b> heading.  Note that each test is present on page 2.
-			<LI>Confirm that test data for <b>Other</b> is present 
-			for <b>1</b> test <b>(TSH)</b> on page 2.
-		</ul>
-<p>
-		<LI><b>402.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that one <b>Completed Test</b> is present for 
-			<b>URINE MACROSCOPIC</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data is present for <b>12</b> of <b>12</b> tests.
-			<LI>Confirm that all found data is valid.
-		</ul>
-<p>
-		<LI><b>403.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that the <b>Date of Birth</b> data is present and valid. 
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that <b>Orders</b> are present for <b>Thyroid Stimulating 
-			Hormone</b> and <b>Free T4</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for <b>Thyroid Stimulating Hormone</b> is present 
-			for <b>1</b> test.
-			<LI>Confirm that test data for <b>Free T4</b> is present for <b>1</b> test.
-			<LI>Confirm that all found data is valid.
-		</ul>
-<p>
-		<LI><b>413.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that <b>Orders</b> are present for 
-			<b>HEMATOLOGY</b> (twice), <b>INDICES DATA</b> (twice), <b>DIFFERENTIAL 
-			(AUTOMATED)</b> (twice, not four times), <b>COAGULATION</b>, <b>CHEMISTRY</b> 
-			(six, not fourteen times), <b>LIPID STUDIES</b> (once, not twice), 
-			<b>ELECTROLYTES - BLOOD GASES</b> (three, not five times), 
-			<b>THYROID</b> (once, not twice).
-			<LI>Note whether or not <b>Other</b> results were found.  Information found 
-			in footnotes is generally not expected to be reported as test data.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is only present for 
-			<b>Result Date</b> and <b>Result Time</b> for the <b>Other</b> test.
-			<LI><b>HEMATOLOGY</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>6</b> of 
-				<b>6</b> tests for each of the two collection times.
-				<LI>Confirm that Units are invalid for <b>HCT</b>.
-			</ul>
-			<LI><b>INDICES DATA</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>4</b> of 
-				<b>4</b> tests for each of the two collection times.
-				<LI>Confirm that all found data is valid.
-			</ul>
-			<LI><b>DIFFERENTIAL (AUTOMATED)</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>10</b> of 
-				<b>10</b> tests for each of the two collection times.
-				<LI>Confirm that all found data is valid.
-				<LI>Note whether or not NEUT, LYMPH, MONO, EOS, and BASOS 
-				correctly found % for Units.
-			</ul>
-			<LI><b>COAGULATION</b> test data
-			<ul>
-				<LI>Confirm that test data is present for the <b>D-DIMER QUANT</b> test.
-				<LI>Confirm that all found data is valid.
-			</ul>
-			<LI><b>CHEMISTRY</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>7</b> tests for the  
-				<b>10/03/08 0533</b> collection time.
-				<LI>Confirm that test data is present for <b>3</b> tests for the  
-				<b>10/03/08 0557</b> collection time.
-				<LI>Confirm that test data is present for <b>4</b> tests for the  
-				<b>10/03/08 1152</b> collection time.
-				<LI>Confirm that test data is present for <b>4</b> tests for the  
-				<b>10/03/08 1825</b> collection time.
-				<LI>Confirm that test data is present for <b>6</b> tests for the  
-				<b>10/04/08 0445</b> collection time.
-				<LI>Confirm that test data is present for <b>1</b> test for the  
-				<b>10/04/08 1450</b> collection time.
-				<LI>Confirm that all found data is valid.
-			</ul>
-			<LI><b>LIPID STUDIES</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>5</b> of 
-				<b>5</b> tests.
-				<LI>Confirm that all found data is valid.
-			</ul>
-			<LI><b>ELECTROLYTES - BLOOD GASES</b> test data
-			<ul>
-				<LI>Confirm that test data is present for <b>3</b> tests for the  
-				<b>10/03/08 0533</b> collection time.
-				<LI>Confirm that test data is present for <b>1</b> test for the  
-				<b>10/03/08 1825</b> collection time.
-				<LI>Confirm that test data is present for <b>5</b> tests for the  
-				<b>10/04/08 0445</b> collection time.
-				<LI>Confirm that all found data is valid.
-			</ul>
-			<LI><b>THYROID</b> test data
-			<ul>
-				<LI>Confirm that test data is present for the single <b>TSH</b> test.
-				<LI>Confirm that all found data is valid.
-			</ul>
-		</ul>
-<p>
-		<LI><b>418.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete and correct.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that two <b>Physicians</b> are present.
-			<LI>Confirm that <b>Orders</b> are present for <b>Glucose, Blood</b>, 
-			<b>HGB A1C, Hemoglobin A1C</b>, and <b>CBC, Complete Blood Count</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for <b>Glucose, Blood</b> is present 
-			for <b>1</b> test and all found data is valid.
-			<LI>Confirm that test data for <b>HGB A1C, Hemoglobin A1C</b> is present 
-			for <b>1</b> test and all found data is valid.  Note whether or not the 
-			<b>H</b> flag was found correctly.
-			<LI>Confirm that test data for <b>CBC, Complete Blood Count</b> is present 
-			for <b>21</b> tests and all found data is valid.  Note whether or not the 
-			<b>Units</b> were all found correctly.
-		</ul>
-<p>
-		<LI><b>498.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information</b> data is complete 
-			except for <b>Medical Record #</b>.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that one <b>Physician</b> is present.
-			<LI>Confirm that one <b>Completed Test</b> is present for <b>CBC</b>.
-			<LI>Confirm that each order has data for <b>Collection Date</b> and 
-			<b>Collection Time</b>.
-			<LI>Confirm that <b>Selected Order Details</b> data is present for 
-			<b>Result Date</b> and <b>Result Time</b>.
-			<LI>Confirm that test data for <b>CBC</b> is present 
-			for <b>20</b> tests.
-			<LI>Confirm that all found data is valid.
-			<LI>Confirm that all <b>11</b> Flags were found correctly.
-		</ul>
-<p>
-		<LI><b>1270.tif</b>
-		<ul>
-			<LI>Open the image.
-			<LI>Review the found data and confirm that the image has been sanitized.
-			<LI>Confirm that the <b>Result Status</b> is set to <b>Final</b>.
-			<LI>Confirm that the <b>Patient Information - From Lab Result</b> data is 
-			complete and valid.
-			<LI>Confirm that the <b>Patient Information - From EpicCare</b> data is 
-			empty and disabled.
-			<LI>Confirm that the <b>Date of Birth</b> and <b>Gender</b> fields are present.
-			<LI>Confirm that the <b>Medical Record #</b> field is empty and disabled.
-			<LI>Confirm that no <b>Ordering: Physicians</b> are present.
-			<LI>Confirm that one <b>CopyTo: Physician</b> is present.  Note that Dr. Raman 
-			may not be present in the Physician database.
-			<LI>Confirm that <b>Orders</b> are present for <b>TSH W/ REFLEX IF ABN</b> 
-			and <b>UnknownOrder</b>.
-			<LI>TSH W/ REFLEX IF ABN
-			<ul>
-				<LI>Confirm that <b>Epic Code</b>, <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>TSH</b>.
-				<LI>Confirm that the <b>Code</b> column has meaningful data for the test.
-			</ul>
-			<LI>UnknownOrder
-			<ul>
-				<LI>Confirm that <b>Epic Code</b> is empty and invalid.
-				<LI>Confirm that <b>Collection Date</b> and 
-				<b>Collection Time</b> are present.
-				<LI>Confirm that <b>Selected Order Details</b> data is not present for 
-				<b>Result Date</b>, <b>Result Time</b>, <b>Lab Name</b> and <b>Lab Code</b>.
-				<LI>Confirm that the <b>Order Number</b> is empty and disabled.
-				<LI>Confirm that test data is present for <b>FT4</b> and <b>FREE T3</b>.
-				<LI>Confirm that the <b>Code</b> columns are empty and invalid.
-			</ul>
+			<li>Mark the <b>Demo_LabDE Check Table</b> while you verify the documents.
 		</ul>
 <p>
 		<LI><b>Test Setup for second-stage verification</b>
