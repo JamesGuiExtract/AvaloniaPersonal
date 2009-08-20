@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<SETTING>;TypeToBeTested=DOB
-
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\OH - Montgomery Clerk Backfile\Rules\Master.rsd;K:\Common\Engineering\Sample Files\OH - Montgomery County\Set002\clerk\Backfile\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
