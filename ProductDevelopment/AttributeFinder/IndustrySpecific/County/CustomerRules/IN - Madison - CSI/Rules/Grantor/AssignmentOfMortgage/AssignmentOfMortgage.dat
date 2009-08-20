@@ -1,0 +1,27 @@
+[PATTERNS_BEGIN]
+
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626428.TIF.uss
+GRANTOR_02=of^3~which^3~is^3~hereby^3~acknowledged^?Grantor^200~hereby^3~sells^3~assigns^3~and^3~transfers
+
+GRANTOR_04=for^3~value^3~received^?Grantor^200~hereby^3~sells^3~assigns|transfers^10~transfers|assigns|sets over
+
+
+GRANTOR_05=that^?Grantor^200~whose^11~address^3~is^80~acting^3~herein^3~by^3~and^3~through
+
+
+GRANTOR_06=executed by^100~[to]^?Grantor^200~[a]^25~organized^3~under^3~the^3~laws
+
+
+//GRANTOR_07=transfer^3~and^3~convey^3~unto^?Grantor^200~whose^3~address^3~is
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626775.TIF.uss
+GRANTOR_08=for^3~value^3~received^30~mortgage^3~to^?Grantor^200~which^3~is^3~recorded
+
+
+GRANTOR_09=of^3~which^3~is^3~hereby^3~acknowledged^?Grantor^200~whose^3~address^3~is^200~does^30~convey|sell|grant|assign
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000635987.TIF.uss
+GRANTOR_10=for^3~value^3~previously^3~received^?GrantorA^200~hereby^3~assigns^200~executed^3~by^100~[to]^?Grantor^200~[on]
+
+[PATTERNS_END]
