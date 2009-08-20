@@ -1,0 +1,17 @@
+[VARS_BEGIN]
+
+Digits=0|1|2|3|4|5|6|7|8|9
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+Sewer_01=\r\nto:|\r\nto;^?Grantor^80~\r\n
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Sewer_Lien\0000633632.TIF.uss
+Sewer_02=Name^3~on^3~the^3~account^?Grantor^80~account
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Sewer_Lien\0000632708.TIF.uss
+Sewer_03=name^3~or^3~names^3~of^3~owner^50~\r\n^?Grantor^80~@Digits
+
+[PATTERNS_END]
