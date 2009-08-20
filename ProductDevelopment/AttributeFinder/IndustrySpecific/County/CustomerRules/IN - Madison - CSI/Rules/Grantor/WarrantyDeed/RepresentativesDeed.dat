@@ -9,6 +9,9 @@ Numbers=0|1|2|3|4|5|6|7|8|9
 
 RP_Grantor001=PERSONAL^3~REPRESENTATIVE'S^3~DEED^?Grantor^200~estate^15~pending
 
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Warranty_Deed\0000633479.TIF.uss
+RP_Grantor005=witnesseth^3~that^?Grantor^200~personal^3~representative^3~of^3~the^3~estate^3~of^?GrantorDeceased^200~which|deceased|pursuant
+
 RP_Grantor002=PERSONAL^3~REPRESENTATIVE'S^3~DEED^?Grantor^200~deceased
 
 //K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000376779.TIF
@@ -17,6 +20,12 @@ RP_Grantor003=CO^3~GUARDIANS^4~DEED^?Grantor^200~Guardianship
 //K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000377459.TIF
 RP_Grantor004=CO^3~PERSONAL^4~REPRESENTATIVE^5~DEED^20~THIS^3~INDENTURE^3~WITNESSETH^?Grantor^250~deceased
 
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Warranty_Deed\0000635811.TIF.uss
+RP_Grantor006=GUARDIAN^4~DEED^4~\r\n^?Grantor^300~which^3~estate
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Warranty_Deed\0000629724.TIF.uss
+RP_Grantor007=comes^3~now^?Grantor^200~which^4~guardianship
 [PATTERNS_END]
 
 

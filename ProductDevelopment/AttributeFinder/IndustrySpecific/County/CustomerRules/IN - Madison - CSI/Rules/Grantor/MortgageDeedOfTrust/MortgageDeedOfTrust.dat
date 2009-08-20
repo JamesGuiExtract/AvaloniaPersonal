@@ -2,4 +2,10 @@
 
 GRANTOR_01=MORTGAGOR:^?Grantor^80~Husband and Wife
 
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Mortgage_Deed_of_Trust\0000627754.TIF.uss
+GRANTOR_02=hereinafter^3~called^20~,^?Grantor^100~hereinafter^3~called^3~borrower
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Mortgage_Deed_of_Trust\0000627737.TIF.uss
+GRANTOR_03=this^3~mortgage^20~is^3~given^3~by^?Grantor^100~"Mortgagor"
+
 [PATTERNS_END]

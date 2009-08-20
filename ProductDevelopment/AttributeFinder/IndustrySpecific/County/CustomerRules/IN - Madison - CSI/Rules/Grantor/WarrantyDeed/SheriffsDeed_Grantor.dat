@@ -4,7 +4,7 @@ Numbers=0|1|2|3|4|5|6|7|8|9
 [PATTERNS_BEGIN]
 
 
-rule01=[was]^3~Plaintiff^?Grantor^100~Defendants^10~consideration^4~of^15~sum
+rule01=[was]^7~Plaintiff^3~and^?Grantor^100~Defendants^10~consideration^4~of^15~sum
 
 //K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed\0000374907.TIF
 rule02=[was]^3~Plaintiff^?Grantor^100~Mortgage Electronic Registration Systems
