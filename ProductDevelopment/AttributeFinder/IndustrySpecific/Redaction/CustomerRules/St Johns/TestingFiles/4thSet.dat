@@ -1,6 +1,3 @@
-//-----------------------------------------------------------------------------
-// TestHarness Settings
-//-----------------------------------------------------------------------------
   <SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
   <SETTING>;VerificationConditionQuantifier=any
   <SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
@@ -9,14 +6,4 @@
 
   <SETTING>;OutputFinalStatsOnly=1
 
-//-----------------------------------------------------------------------------
-// Ruletester2 Settings
-//
-//   Start with '//#'
-//   When token 1 contains ignore will ignore TESTFOLDERs
-//-----------------------------------------------------------------------------
-
-  //#IGNORE;;Sensitive.txt;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-
-
-<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\St Johns\Set004\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\St Johns\Set004\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
