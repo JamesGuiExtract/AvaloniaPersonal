@@ -1,0 +1,20 @@
+/* //this caused a lot of fp's
+(?<!
+	#import said.dat.etf
+	\s*
+	section
+	\s*
+)
+(?<=
+	\bsection
+	\s*
+)
+\d+\s*
+(?:
+	#import directions.dat.etf
+)?
+*/
+
+	(?<=\bSection\s*)\d+(?=-)
+|
+	(?<=\bSection\s*\w+\s*\()\d+

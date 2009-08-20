@@ -1,0 +1,16 @@
+(?<!
+	#import said.dat.etf
+)	
+#import directions.dat.etf
+(?=
+	\s*
+	#import quarterOf.dat.etf
+)
+(?!
+	(?:
+		\s*
+		#import quarterOf.dat.etf
+		\s*
+		#import directions.dat.etf
+	){2,}
+)

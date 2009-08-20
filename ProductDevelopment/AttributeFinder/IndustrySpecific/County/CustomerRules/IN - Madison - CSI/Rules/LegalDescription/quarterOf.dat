@@ -1,0 +1,10 @@
+(?x)
+\b
+(?:
+	(?:half|quarter)
+	\s*
+	of
+	\s*
+	the
+)
+\b

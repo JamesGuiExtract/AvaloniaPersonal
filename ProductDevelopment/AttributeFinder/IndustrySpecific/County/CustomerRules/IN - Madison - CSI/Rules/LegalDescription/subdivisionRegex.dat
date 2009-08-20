@@ -1,0 +1,72 @@
+	\b
+	(?<!\bsubdivision\s*)in
+	(?!
+		\s*
+		(?:
+			said
+			|
+			block
+			|
+			lot
+		)
+		\s*
+	)
+	\b
+	(?<Subdivision>
+		[\s\S]{1,100}?
+		\b
+		(?:
+			Addition
+			|
+			Development
+			|
+			(?<!\boriginal\s*)Plat
+		)
+	)
+	\b
+|
+	\b
+	(?<!\bsubdivision\s*)in
+	(?!
+		\s*
+		(?:
+			said
+			|
+			block
+			|
+			lot
+		)
+		\s*
+	)
+	\b
+	(?<Subdivision>
+		[\s\S]{1,100}?
+
+		
+	)
+
+	(?:
+		\s*
+		a
+		\s*
+	)?
+	subdivision
+	\b
+
+|
+	\b
+	in\s*the\s*(?:original\s*)?Plats?\s*of
+	\s*
+	(?<Subdivision>
+		[a-z]+
+	)
+	\b
+|
+
+	\b
+	Lot\s*number(?:ed|s)?[\s\S]{0,25}?\bin
+	\s*
+	(?<Subdivision>
+		[\s\S]{1,25}?
+	)
+	\bin\b
