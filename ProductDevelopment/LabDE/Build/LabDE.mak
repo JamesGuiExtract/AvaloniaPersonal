@@ -42,7 +42,7 @@ LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
 RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
-RDTReleaseBleedingEdgeDir=LabDEBleedingEdgeDir\RDT_InternalUseOnly
+RDTReleaseBleedingEdgeDir=$(LabDEBleedingEdgeDir)\RDT_InternalUseOnly
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
@@ -68,12 +68,12 @@ BuildAFCore:
 	@CD "$(AFRootDirectory)\Build"
     @nmake /F AttributeFinderCore.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" DoEverythingNoGet
 
-BuildRDT:
+BuildRDT: BuildAFCore
 	@ECHO Building AttributeFinderCore...
 	@CD "$(AFRootDirectory)\Build"
     @nmake /F RuleDevelopmentKit.mak BuildConfig="Release" ProductRootDirName="$(ProductRootDirName)" ProductVersion="$(ProductVersion)" BuildRDTInstall
 
-CopyRDTToInstallFolder:
+CopyRDTToInstallFolder: BuildRDT
     @IF NOT EXIST "$(RDTReleaseBleedingEdgeDir)" MKDIR "$(RDTReleaseBleedingEdgeDir)"
     @XCOPY "$(RDTInstallMediaDir)\*.*" "$(RDTReleaseBleedingEdgeDir)" /v /s /e /y
     $(VerifyDir) "$(RDTInstallMediaDir)" "$(RDTReleaseBleedingEdgeDir)"
@@ -183,7 +183,7 @@ CreateDemo_LabDE:
 
 GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
 
-DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CreateDemo_LabDE
+DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CopyRDTToInstallFolder CreateDemo_LabDE
     @ECHO.
     @DATE /T
     @TIME /T

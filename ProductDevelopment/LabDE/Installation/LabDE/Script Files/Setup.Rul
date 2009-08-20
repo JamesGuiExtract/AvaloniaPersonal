@@ -24,8 +24,6 @@
 #define CORE_POINT_CLIENT_GUID "{5DAD3198-6D64-46FA-961C-FBB76B722F4A}"
 
 prototype RegisterDataEntryApp();
-prototype InstallCorepoint();
-prototype UnInstallCorepoint();
 prototype InstallMSMQ();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -175,10 +173,10 @@ begin
 	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.DataEntry.dll" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 
-	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "DataEntryApplication.exe" + "\"";
+	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.LabResultsCustomComponents.dll" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 
-	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "Extract.LabResultsCustomComponents.dll" + "\"";
+	strPathForDataEntryApplication = "\"" + PROGRAMFILES ^ EXTRACT_DIR ^ "DataEntryApplication.exe" + "\"";
 	LaunchAppAndWait( PATH_TO_REGASM, strPathForDataEntryApplication, LAAW_OPTION_WAIT | LAAW_OPTION_HIDDEN | LAAW_OPTION_SHOW_HOURGLASS );
 end;
 
@@ -215,73 +213,5 @@ begin
 	SdShowMsg("Setup is Configuring MSMQ", FALSE);
 end;
              
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: InstallCorepoint
-//
-//  Purpose: This function installs the Corepoint Runtime.
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function InstallCorepoint()
-STRING szProgram, szCmdLine, strUninstallKey;
-int nResult, svServiceState;
-begin
-	SdShowMsg("Setup is Installing Corepoint Integration Engine", TRUE);
 
-	// Need to install msmq which depends on the OS Version
-	if ( SYSINFO.nOSMajor = 5 ) then
-		szProgram = "sysocmgr";
-		szCmdLine = "/i:" + WINDIR ^ "inf\sysoc.inf /u:\"" + SUPPORTDIR ^ "XP_2003_MSMQ.ini\" /q";
-		//MessageBox( szCmdLine, MB_OK);
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	elseif (SYSINFO.nOSMajor = 6 ) then
-		szProgram = "ocsetup";
-		// If it is server the arguments need to be different
-		if ( SYSINFO. nOSProductType = VER_NT_SERVER ) then
-			szCmdLine = "MSMQ-Server /passive /quiet";	
-		else
-			szCmdLine = "MSMQ-Container;MSMQ-Server /passive /quiet";
-		endif;
-		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
-	endif;
-	
-	// Install Crystal Reports
-	szProgram = SUPPORTDIR ^ "Corepoint-Health-Setup-4.0.0.exe";
-	szCmdLine = " /S /v\"ALLUSERS=1 ADDLOCAL=HiddenFeatures,InstallDirRegMarker," +
-		"IntegrationEngine,MessageProcessingGears,RfmdbGear,CorepointHealthSolutions," +
-		"CommunicationGears,EngineDocumentation,FileGear,FtpGear,HttpPostGear,"+
-		"NeoReport,ReleaseNotes,SharedComObjects,TcpIpKeepAlive /qn\"";
-	LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS); 
-	  
-	// Create the path for the uninstall key
-	strUninstallKey = REG_PATH_UNINSTALL ^ CORE_POINT_CLIENT_GUID;
-	                                        
-	// If key exists get the version
-	if (RegDBKeyExist(strUninstallKey) = 1 ) then
-		CopyFile( SUPPORTDIR ^ "NeoEnableXML.dll", PROGRAMFILES ^ "Corepoint Health\\Shared Components\\NeoEnableXML.dll");
-	endif;
-	
-	SdShowMsg("Setup is Installing Corepoint Integration Engine", FALSE);
-end;
         
-        
-///////////////////////////////////////////////////////////////////////////////
-//
-// Function: UninstallCorepoint
-//
-//  Purpose: This function uninstalls the Corepoint Integration Engine.
-//	Returns 0 if no errors
-///////////////////////////////////////////////////////////////////////////////
-function UnInstallCorepoint()
-STRING szProgram, szCmdLine;
-int nResult, svServiceState;
-begin
-		// Ask user if they wish to unintall Corepoint
-	nResult = MessageBox("Do you wish to uninstall Corepoint Integration Engine?" + 
-		"\r\nOther installed applications may use this and uninstalling " + 
-		" will cause those applications to work incorrectly." , MB_YESNO );
-
-	if (nResult = IDYES) then
-	    UninstallApplication(CORE_POINT_CLIENT_GUID,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
-  	endif;
-end;

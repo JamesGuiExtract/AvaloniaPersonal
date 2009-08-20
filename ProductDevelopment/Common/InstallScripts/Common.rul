@@ -18,6 +18,7 @@
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
     #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
     #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition"
+    #define SQL_COMPACT_EDITION_GUID "{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B}"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
     #define REG_PATH_UNINSTALL "\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall"
     #define FLEX_INDEX_PRODUCT_CODE "{A7DFE34D-A07E-4D57-A624-B758E42A69D4}"
@@ -67,13 +68,14 @@
     prototype CheckOtherExtractProducts();
     prototype RenameUEXFile();
     prototype InstallInliteKeyDrivers();
-    prototype UnInstallInliteKeyDrivers();
+    prototype UninstallInliteKeyDrivers();
     prototype InstallCrystalReports();
     prototype CloseApps();
-    prototype UnnstallCrystalReports12();
+    prototype UninstallCrystalReports12();
     prototype BOOL CheckProductKeyInstalled(STRING, STRING, BYREF STRING, BOOL);
     prototype InstallSQLCE();
     prototype DetectDotNET_35();
+    prototype UninstallInstallSQLCE();
     
     // your global variables
     BOOL gbInstalled;
@@ -389,11 +391,11 @@ end;
 
 ///////////////////////////////////////////////////////////////////////////////
 //
-// Function: UnInstallInliteKeyDrivers
+// Function: UninstallInliteKeyDrivers
 //
 //  Purpose: This function uninstalls the drivers for the Inlite Key
 ///////////////////////////////////////////////////////////////////////////////
-function UnInstallInliteKeyDrivers()
+function UninstallInliteKeyDrivers()
 	string szProgram;
 begin       
   	SdShowMsg("Setup is Uninstalling Inlite drivers.", TRUE);
@@ -450,7 +452,7 @@ end;
 //  Purpose: This function uninstalls the Crystal Reports Runtime.
 //	Returns 0 if no errors
 ///////////////////////////////////////////////////////////////////////////////
-function UnnstallCrystalReports12()
+function UninstallCrystalReports12()
 STRING szProgram, szCmdLine;
 int nResult, svServiceState;
 begin
@@ -532,4 +534,30 @@ begin
 		MessageBox("Microsoft .NET 3.5 is must be installed before running this install.", MB_OK);
 		abort;
 	endif; 
+end;
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: UninstallInstallSQLCE
+//
+//  Purpose: This function uninstalls the SQL Server Compact Edition.
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function UninstallInstallSQLCE()
+STRING szProgram, szCmdLine;
+int nResult, svServiceState;
+begin  
+	if ( RegDBKeyExist ( REG_PATH_SQL_COMPACT_EDITION ) = 0) then
+		// Ask user if they wish to unintall SQL Server CE
+		nResult = MessageBox("Do you wish to uninstall SQL Compact Edition?" + 
+			"\r\nOther installed applications may use this and uninstalling " + 
+			" will cause those applications to work incorrectly." , MB_YESNO );
+
+		if (nResult = IDYES) then
+			SdShowMsg("Setup is Uninstalling SQL Compact Edition", TRUE);
+	    	UninstallApplication(REG_PATH_SQL_COMPACT_EDITION,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+	    	UninstallApplication(SQL_CE_DATABASE_VIEWER_AND_EDITOR_CODE,"", LAAW_OPTION_WAIT  | LAAW_OPTION_SHOW_HOURGLASS);
+			SdShowMsg("Setup is Installing SQL Compact Edition ", FALSE);
+	  	endif;
+	endif;
 end;

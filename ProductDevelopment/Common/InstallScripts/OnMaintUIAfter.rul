@@ -11,7 +11,7 @@ function OnMaintUIAfter()
 	NUMBER bOpt1, bOpt2;
 begin
     if ( REMOVEALLMODE) then
-    	UnInstallInliteKeyDrivers();
+    	UninstallInliteKeyDrivers();
     endif;
     
 	Disable(STATUSEX);

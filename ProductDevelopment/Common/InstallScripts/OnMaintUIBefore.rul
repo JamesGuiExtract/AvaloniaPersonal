@@ -68,8 +68,8 @@ Dlg_SdFeatureTree:
 			detectRDTInstall();
 		
 			// Uninstall Crystal Reports
-			UnnstallCrystalReports12();
-  
+			UninstallCrystalReports12();
+			UninstallInstallSQLCE ();
   			FeatureRemoveAll();
 		case REPAIR:    
 			FeatureReinstall();
