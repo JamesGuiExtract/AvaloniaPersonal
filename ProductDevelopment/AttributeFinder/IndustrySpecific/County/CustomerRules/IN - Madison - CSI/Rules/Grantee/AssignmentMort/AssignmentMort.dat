@@ -1,0 +1,44 @@
+[VARS_BEGIN]
+
+Month=january|february|march|april|may|june|july|august|september|october|november|december
+Number=0|1|2|3|4|5|6|7|8|9
+GranteeWords=Grantee|Grantee(s)|Grantees|"Grantee"|"Grantee(s)"|"Grantees"|Buyer|Buyer(s)|Buyers|"Buyer"|"Buyer(s)"|"Buyers"|Assignee|"Assignee"|Assignee(s)
+
+[VARS_END]
+
+[PATTERNS_BEGIN]
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626221.TIF.uss
+Grantee_01=sets^3~over^3~unto^?Grantee^200~without^3~recourse
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626221.TIF.uss
+Grantee_02=mortgage^3~recorded^60~executed^3~by^?Grantee^200~which^3~said^3~mortgage
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000631202.TIF.uss
+Grantee_02a=mortgage^3~executed^3~by^?Grantee^200~[to]|recorded|[said mortgage
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000629811.TIF.uss
+Grantee_02b=mortgage^3~dated^60~made|executed^3~by^?Grantee^200~[to]
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626223.TIF.uss
+Grantee_02c=mortgage^80~made^3~by^?Grantee^45~recorded
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000628994.TIF.uss
+Grantee_02d=due^3~thereon^3~executed^3~by^?Grantee^60~[to]
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000629811.TIF.uss
+Grantee_03=due^3~thereon^3~to^?Grantee^200~[under^3~the^40~agreement
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000631202.TIF.uss
+Grantee_04=otherwise^3~transferred^3~to^?Grantee^200~\r\n\r\n
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626223.TIF.uss
+Grantee_05=to^3~it^3~paid^3~by^?Grantee^200~party
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626319.TIF.uss
+Grantee_06=grant|convey|assign|transfer|set over, without recourse^4~to^?Grantee^200~@GranteeWords
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626854.TIF
+Grantee_06a=grant|sell|assign|transfer|convey^3~unto^?Grantee^200~[all]
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000628970.TIF.uss
+Grantee_06b=grant|sell|convey|assign|transfer^3~to^?Grantee^100~the^3~mortgage^3~executed
+
+// K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626854.TIF
+Grantee_07=\r\nborrower^3~:|;^?Grantee^100~\r\n
+
+[PATTERNS_END]
