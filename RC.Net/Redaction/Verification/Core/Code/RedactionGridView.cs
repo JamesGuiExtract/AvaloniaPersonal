@@ -69,6 +69,12 @@ namespace Extract.Redaction.Verification
         MasterExemptionCodeList _masterCodes;
 
         /// <summary>
+        /// COM attributes that are not displayed in the redaction grid but are carried forward 
+        /// when the vector of attributes is saved.
+        /// </summary>
+        List<ComAttribute> _undisplayedAttributes;
+
+        /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
         /// <see langword="false"/> if no changes have been made to the grid since it was loaded.
         /// </summary>
@@ -216,6 +222,19 @@ namespace Extract.Redaction.Verification
             set
             {
                 _dirty = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the redaction grid contains any redactions.
+        /// </summary>
+        /// <value><see langword="true"/> if the grid contains redactions;
+        /// <see langword="false"/> if the grid does not contain redactions.</value>
+        public bool HasRedactions
+        {
+            get
+            {
+                return _redactions.Count > 0;
             }
         }
 
@@ -474,6 +493,7 @@ namespace Extract.Redaction.Verification
 
                 _redactions.Clear();
                 _imageViewer.LayerObjects.Clear();
+                _undisplayedAttributes = new List<ComAttribute>();
 
                 // Iterate over the attributes
                 foreach (ComAttribute attribute in AttributesFile.ReadAll(fileName))
@@ -481,7 +501,11 @@ namespace Extract.Redaction.Verification
                     // Add a row for each attribute
                     RedactionGridViewRow row = 
                         RedactionGridViewRow.FromComAttribute(attribute, _imageViewer, MasterCodes);
-                    if (row != null)
+                    if (row == null)
+                    {
+                        _undisplayedAttributes.Add(attribute);
+                    }
+                    else
                     {
                         Add(row);
 
@@ -508,6 +532,7 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <overloads>Saves the rows of the <see cref="RedactionGridView"/>.</overloads>
         /// <summary>
         /// Saves the rows of the <see cref="RedactionGridView"/> to the specified vector of 
         /// attributes file.
@@ -515,14 +540,36 @@ namespace Extract.Redaction.Verification
         /// <param name="fileName">A file to contain a vector of attributes.</param>
         public void SaveTo(string fileName)
         {
+            SaveTo(fileName, null);
+        }
+
+        /// <summary>
+        /// Saves the rows of the <see cref="RedactionGridView"/> to the specified vector of 
+        /// attributes file relative to the specified source document.
+        /// </summary>
+        /// <param name="fileName">A file to contain a vector of attributes.</param>
+        /// <param name="sourceDocument">The source document to which the attributes are relative; 
+        /// if <see langword="null"/> the currently viewed source document is used.</param>
+        public void SaveTo(string fileName, string sourceDocument)
+        {
             try
             {
                 // Get the image information
-                string sourceDocName = _imageViewer.ImageFile;
+                string sourceDocName = sourceDocument ?? _imageViewer.ImageFile;
                 LongToObjectMap pageInfoMap = GetPageInfoMap();
 
-                // Create an attribute for each row
+                // Add the undisplayed attributes
                 IUnknownVector attributes = new IUnknownVector();
+                if (_undisplayedAttributes != null)
+                {
+                    foreach (ComAttribute attribute in _undisplayedAttributes)
+                    {
+                        SetSourceDocument(attribute, sourceDocName);
+                        attributes.PushBack(attribute);
+                    }
+                }
+
+                // Create an attribute for each row
                 foreach (RedactionGridViewRow row in _redactions)
                 {
                     ComAttribute attribute = row.ToComAttribute(sourceDocName, pageInfoMap);
@@ -540,6 +587,26 @@ namespace Extract.Redaction.Verification
                     "Unable to save VOA file.", ex);
                 ee.AddDebugData("Voa file", fileName, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Sets the source document of the specified attribute and its sub attributes.
+        /// </summary>
+        /// <param name="attribute">The attribute that contains the source document to change.</param>
+        /// <param name="sourceDocument">The full path to the new source document.</param>
+        void SetSourceDocument(ComAttribute attribute, string sourceDocument)
+        {
+            attribute.Value.SourceDocName = sourceDocument;
+
+            IIUnknownVector subattributes = attribute.SubAttributes;
+            if (subattributes != null)
+            {
+                int count = subattributes.Size();
+                for (int i = 0; i < count; i++)
+			    {
+                    SetSourceDocument((ComAttribute) subattributes.At(i), sourceDocument);
+			    }
             }
         }
 
