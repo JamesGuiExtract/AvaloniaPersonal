@@ -757,13 +757,17 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 	{
 		ASSERT_ARGUMENT("ELI25598", ipObject != NULL);
 
+		// Create a directory for the file if necessary
+		string strFileName = asString(bstrFileName);
+		createDirectory( getDirectoryFromFullPath(strFileName) );
+
 		// Create the file storage object
 		IStoragePtr ipStorage;
 		HRESULT hr = waitForStgFileCreate(bstrFileName, &ipStorage, gdwSTORAGE_CREATE_MODE);
 		if (ipStorage == NULL || FAILED(hr))
 		{
 			UCLIDException ue("ELI25588", "Unable to create file storage object.");
-			ue.addDebugInfo("File name", asString(bstrFileName));
+			ue.addDebugInfo("File name", strFileName);
 			ue.addHresult(hr);
 			throw ue;
 		}
@@ -776,7 +780,7 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			if (ipStream == NULL || FAILED(hr))
 			{
 				UCLIDException ue("ELI25589", "Unable to create stream object.");
-				ue.addDebugInfo("File name", asString(bstrFileName));
+				ue.addDebugInfo("File name", strFileName);
 				ue.addDebugInfo("Stream name", asString(bstrObjectName));
 				ue.addHresult(hr);
 				throw ue;
@@ -806,7 +810,6 @@ void writeObjectToFile(IPersistStreamPtr ipObject, BSTR bstrFileName, BSTR bstrO
 			// The object could not be streamed successfully. Delete the output file.
 			try
 			{
-				string strFileName = asString(bstrFileName);
 				if (isValidFile(strFileName))
 				{
 					deleteFile(strFileName);
