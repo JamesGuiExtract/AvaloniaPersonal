@@ -11,7 +11,7 @@ using System.Xml;
 namespace Extract.Imaging.Forms
 {
     /// <summary>
-    /// Represetns a clue that may span multiple lines.
+    /// Represents a clue that may span multiple lines.
     /// </summary>
     public class Clue : CompositeHighlightLayerObject, IComparable<Clue>
     {
