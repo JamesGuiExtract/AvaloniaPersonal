@@ -24,12 +24,12 @@ namespace Extract.Redaction.Verification
                 {
                     components.Dispose();
                 }
-                if (_memento != null)
+                if (_unsavedMemento != null)
                 {
                     try
                     {
                         // This method should never throw exceptions, but wrap in try anyway.
-                        ClearMemento();
+                        ResetUnsavedMemento();
                     }
                     catch (Exception ex)
                     {

@@ -14,12 +14,22 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The image file associated with the verified document.
         /// </summary>
-        string _imageFile;
+        readonly string _imageFile;
 
         /// <summary>
         /// The voa file with the current (perhaps uncommitted) redactions.
         /// </summary>
-        string _voaFile; 
+        readonly string _voaFile;
+
+        /// <summary>
+        /// The type of the document.
+        /// </summary>
+        readonly string _documentType;
+
+        /// <summary>
+        /// The fully expanded path to the destination feedback image.
+        /// </summary>
+        readonly string _feedbackImage;
 
         #endregion VerificationMemento Fields
 
@@ -28,10 +38,13 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationMemento"/> class.
         /// </summary>
-        public VerificationMemento(string imageFile, string attributesFile)
+        public VerificationMemento(string imageFile, string attributesFile, string documentType,
+            string feedbackImage)
         {
             _imageFile = imageFile;
             _voaFile = attributesFile;
+            _documentType = documentType;
+            _feedbackImage = feedbackImage;
         }
 
         #endregion VerificationMemento Constructors
@@ -59,6 +72,30 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _voaFile;
+            }
+        }
+
+        /// <summary>
+        /// Gets the type of the document.
+        /// </summary>
+        /// <value>The type of the document.</value>
+        public string DocumentType
+        {
+            get
+            {
+                return _documentType;
+            }
+        }
+
+        /// <summary>
+        /// Gets the fully expanded path of the destination for the feedback image.
+        /// </summary>
+        /// <value>The fully expanded path of the destination for the feedback image.</value>
+        public string FeedbackImage
+        {
+            get
+            {
+                return _feedbackImage;
             }
         }
 

@@ -1,3 +1,4 @@
+using Extract.AttributeFinder;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -14,7 +15,10 @@ using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
+using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
+
+using ComAttribute = UCLID_AFCORELib.Attribute;
 
 namespace Extract.Redaction.Verification
 {
@@ -46,14 +50,15 @@ namespace Extract.Redaction.Verification
         readonly VerificationSettings _settings;
 
         /// <summary>
-        /// The fully expanded voa file name of the currently processing document.
+        /// The last saved state of the currently processing document.
         /// </summary>
-        string _voaFile;
+        VerificationMemento _savedMemento;
 
         /// <summary>
-        /// The state of currently processing document.
+        /// The unsaved state of currently processing document; if <see langword="null"/> no 
+        /// changes have been made to the currently processing document.
         /// </summary>
-        VerificationMemento _memento;
+        VerificationMemento _unsavedMemento;
 
         /// <summary>
         /// <see langword="true"/> if the currently processing document has been modified; 
@@ -137,8 +142,8 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Gets whether the currently viewed document is a history document.
         /// </summary>
-        /// <returns><see langword="true"/> if a document from the history is what is currently viewed;
-        /// <see langword="false"/> if the currently processing document is being viewed.</returns>
+        /// <value><see langword="true"/> if a document from the history is what is currently viewed;
+        /// <see langword="false"/> if the currently processing document is being viewed.</value>
         public bool IsInHistory
         {
             get
@@ -183,6 +188,24 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Gets the document type of the specified vector of attributes (VOA) file.
+        /// </summary>
+        /// <param name="voaFile">The vector of attributes (VOA) file.</param>
+        /// <returns>The first document type in <paramref name="voaFile"/>.</returns>
+        static string GetDocumentType(string voaFile)
+        {
+            foreach (ComAttribute attribute in AttributesFile.ReadAll(voaFile))
+            {
+                if (attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                {
+                    return attribute.Value.String;
+                }
+            }
+
+            return "";
+        }
+
+        /// <summary>
         /// Saves and commits the currently viewed document.
         /// </summary>
         void Commit()
@@ -200,15 +223,117 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Save()
         {
+            // Collect feedback if necessary
+	        if (ShouldCollectFeedback())
+	        {
+                CollectFeedback();
+	        }
+
             // Save the voa
             string voaFile = GetDestinationVoa();
             _redactionGridView.SaveTo(voaFile);
 
-            // Reset the dirty flag
+            // Clear the unsaved state
             if (!IsInHistory)
             {
-                _dirty = false;
+                ResetUnsavedMemento();
             }
+        }
+
+        /// <summary>
+        /// Gets whether feedback should be collected for the currently viewed document.
+        /// </summary>
+        /// <returns><see langword="true"/> if feedback should be collected;
+        /// <see langword="false"/> if feedback should not be collected.</returns>
+        bool ShouldCollectFeedback()
+        {
+            FeedbackSettings settings = _settings.Feedback;
+            if (settings.Collect)
+            {
+                CollectionTypes types = settings.CollectionTypes;
+                if (types == CollectionTypes.All)
+                {
+                    // All documents are being collected
+                    return true;
+                }
+                else if ((types & CollectionTypes.Corrected) > 0 && _redactionGridView.Dirty)
+                {
+                    // Collect because user corrections were made
+                    return true;
+                }
+                else if ((types & CollectionTypes.Redacted) > 0 && _redactionGridView.HasRedactions)
+                {
+                    // Collect because document contains redactions
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Collects the feedback about the currently viewed document.
+        /// </summary>
+        void CollectFeedback()
+        {
+            // Get the destination for the feedback image
+            VerificationMemento memento = GetCurrentDocument();
+            string feedbackImage = memento.FeedbackImage;
+
+            // Check if the original document is being collected
+            if (_settings.Feedback.CollectOriginalDocument)
+            {
+                // Copy the file if the source and destination differ
+                string originalImage = _imageViewer.ImageFile;
+                if (!originalImage.Equals(feedbackImage, StringComparison.OrdinalIgnoreCase))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(feedbackImage));   
+                    File.Copy(originalImage, feedbackImage, true);
+                }
+
+                // Create a VOA file relative to the image collected for feedback
+                _redactionGridView.SaveTo(feedbackImage + ".voa", feedbackImage);
+            }
+            else
+            {
+                // Create a VOA file relative to the original image
+                _redactionGridView.SaveTo(feedbackImage + ".voa");
+            }
+        }
+
+        /// <summary>
+        /// Gets the fully expanded path of the feedback image file.
+        /// </summary>
+        /// <param name="tags">Expands File Action Manager path tags.</param>
+        /// <param name="sourceDocument">The source document.</param>
+        /// <param name="fileId">The id in the database that corresponds to this file.</param>
+        /// <returns>The fully expanded path of the feedback image file.</returns>
+        string GetFeedbackImageFileName(FileActionManagerPathTags tags, string sourceDocument, 
+            int fileId)
+        {
+            // If feedback settings aren't being collected, this is irrelevant
+            FeedbackSettings settings = _settings.Feedback;
+            if (!settings.Collect)
+            {
+                return null;
+            }
+
+            // Get the feedback directory and file name
+            string directory = tags.Expand(settings.DataFolder);
+            string fileName;
+            if (settings.UseOriginalFileNames)
+	        {
+                // Original file name
+                fileName = Path.GetFileName(sourceDocument);
+	        }
+            else
+	        {
+                // Unique file name
+                fileName = fileId.ToString(CultureInfo.InvariantCulture) +
+                    Path.GetExtension(sourceDocument);
+	        }
+
+            return Path.Combine(directory, fileName);
         }
 
         /// <summary>
@@ -239,9 +364,7 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Store the current document in the history
-                VerificationMemento memento =
-                    new VerificationMemento(_imageViewer.ImageFile, _voaFile);
-                _history.Add(memento);
+                _history.Add(_savedMemento);
                 _historyIndex++;
 
                 // Successfully complete this file
@@ -352,7 +475,7 @@ namespace Extract.Redaction.Verification
             }
             else
             {
-                return _memento ?? new VerificationMemento(_imageViewer.ImageFile, _voaFile);
+                return _unsavedMemento ?? _savedMemento;
             }
         }
 
@@ -362,31 +485,61 @@ namespace Extract.Redaction.Verification
         /// <returns>The voa file to use as the destination voa.</returns>
         string GetDestinationVoa()
         {
-            if (IsInHistory)
-            {
-                return _history[_historyIndex].AttributesFile;
-            }
-            else
-            {
-                return _voaFile;
-            }
+            // Return either the history VOA or the currently processing VOA
+            VerificationMemento memento = IsInHistory ? _history[_historyIndex] : _savedMemento;
+            return memento.AttributesFile;
         }
 
         /// <summary>
-        /// Resets <see cref="_memento"/> to <see langword="null"/>.
+        /// Creates a memento to store the last saved state of the processing document.
         /// </summary>
-        void ClearMemento()
+        /// <param name="imageFile">The name of the processing document.</param>
+        /// <param name="fileID">The file Id of the <paramref name="imageFile"/> in File Action 
+        /// Manager database.</param>
+        /// <param name="pathTags">Expands File Action Manager path tags.</param>
+        /// <returns>A memento to store the last saved state of the processing document.</returns>
+        VerificationMemento CreateSavedMemento(string imageFile, int fileID, 
+            FileActionManagerPathTags pathTags)
         {
-            if (_memento != null)
+            string attributesFile = pathTags.Expand(_settings.InputFile);
+            string documentType = GetDocumentType(attributesFile);
+            string feedbackImage = GetFeedbackImageFileName(pathTags, imageFile, fileID);
+
+            return new VerificationMemento(imageFile, attributesFile, documentType, feedbackImage);
+        }
+
+        /// <summary>
+        /// Creates a memento to store the current (unsaved) state of the processing document.
+        /// </summary>
+        /// <returns>A memento to store the current (unsaved) state of the processing document.
+        /// </returns>
+        VerificationMemento CreateUnsavedMemento()
+        {
+            string imageFile = _savedMemento.ImageFile;
+            string attributesFile = FileSystemMethods.GetTemporaryFileName(".voa");
+            string documentType = _savedMemento.DocumentType;
+            string feedbackImage = _savedMemento.FeedbackImage;
+
+            return new VerificationMemento(imageFile, attributesFile, documentType, feedbackImage);
+        }
+
+        /// <summary>
+        /// Resets <see cref="_unsavedMemento"/> to <see langword="null"/>.
+        /// </summary>
+        void ResetUnsavedMemento()
+        {
+            if (_unsavedMemento != null)
             {
-                string voaFile = _memento.AttributesFile;
+                string voaFile = _unsavedMemento.AttributesFile;
                 if (File.Exists(voaFile))
                 {
                     FileSystemMethods.TryDeleteFile(voaFile);
                 }
 
-                _memento = null;
+                _unsavedMemento = null;
             }
+
+            _dirty = false;
         }
 
         #endregion VerificationTaskForm Methods
@@ -605,9 +758,7 @@ namespace Extract.Redaction.Verification
                     // Clear any stored changes
                     if (!IsInHistory)
                     {
-                        ClearMemento();
-
-                        _dirty = false;
+                        ResetUnsavedMemento();
                     }
 
                     // Load the original voa
@@ -687,15 +838,14 @@ namespace Extract.Redaction.Verification
                 else
                 {
                     // Preserve the currently processing document
-                    if (_memento == null)
+                    if (_unsavedMemento == null)
                     {
-                        string tempVoa = FileSystemMethods.GetTemporaryFileName(".voa");
-                        _memento = new VerificationMemento(_imageViewer.ImageFile, tempVoa);
+                        _unsavedMemento = CreateUnsavedMemento();
                     }
 
                     // Save the state of the current document before moving back
                     _dirty = _redactionGridView.Dirty;
-                    _redactionGridView.SaveTo(_memento.AttributesFile);
+                    _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
                 }
 
                 // Go to the previous document
@@ -895,6 +1045,9 @@ namespace Extract.Redaction.Verification
                     {
                         _redactionGridView.Dirty = _dirty;
                     }
+
+                    // Set the document type
+                    _documentTypeTextBox.Text = memento.DocumentType;
                 }
                 else
                 {
@@ -989,11 +1142,18 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
+                // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);
-                _voaFile = tagManager.ExpandTags(_settings.InputFile, fullPath);
+                
+                // Create the path tags
+                FileActionManagerPathTags pathTags = 
+                    new FileActionManagerPathTags(fullPath, tagManager.FPSFileDir);
 
-                // Reset the current memento
-                ClearMemento();
+                // Create the saved memento
+                _savedMemento = CreateSavedMemento(fullPath, fileID, pathTags);
+
+                // Reset the unsaved memento
+                ResetUnsavedMemento();
 
                 _imageViewer.OpenImage(fullPath, false);
             }
