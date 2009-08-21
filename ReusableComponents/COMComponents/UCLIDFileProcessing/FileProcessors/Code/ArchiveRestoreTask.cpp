@@ -403,12 +403,6 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nF
 			CFileProcessorsUtils::ExpandTagsAndTFE(pTagManager, m_strFileToArchive, strSourceDoc);
 		_lastCodePos = "40";
 
-		// Get the file ID for source doc
-		IFileProcessingDBPtr ipDB(pDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI24758", ipDB != NULL);
-		long lFileID = ipDB->GetFileID(strSourceDoc.c_str());
-		_lastCodePos = "50";
-
 		// Ensure there is a '\' on the archive folder
 		if (m_strArchiveFolder[m_strArchiveFolder.length()-1] != '\\')
 		{
@@ -420,10 +414,10 @@ STDMETHODIMP CArchiveRestoreTask::raw_ProcessFile(BSTR bstrFileFullName, long nF
 		// <ArchiveRoot>\((FileID/1,000,000) * 1,000,000)\((FileID/10,000) * 10,000)\
 		// ((FileID/100) * 100)\FileID\<Tag>
 		string strArchiveFileName = m_strArchiveFolder
-			+ padCharacter(asString((lFileID/1000000) * 1000000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
-			+ padCharacter(asString((lFileID/10000) * 10000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
-			+ padCharacter(asString((lFileID/100) * 100), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
-			+ padCharacter(asString(lFileID), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
+			+ padCharacter(asString((nFileID/1000000) * 1000000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
+			+ padCharacter(asString((nFileID/10000) * 10000), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
+			+ padCharacter(asString((nFileID/100) * 100), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
+			+ padCharacter(asString(nFileID), true, '0', giARCHIVE_FOLDER_DIGIT_COUNT) + "\\"
 			+ m_strFileTag;
 		_lastCodePos = "70";
 
