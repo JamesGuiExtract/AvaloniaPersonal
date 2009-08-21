@@ -1,1 +1,0 @@
-(of.{0,3}(judgment|judgement|judg[^e]|gment|j.d.ment))|((abstract|abstr|bstr|stract).{0,3}(of|.f|o.).{0,2}j)|((criminal|crimin|minal).{0,3}(judgment|judgement|judg[^e]|gment|j.d.ment))|((satisfaction|satisfac|isfaction).{0,5}(of|.f|o.).{0,2}j)|((release|relea|lease).{0,3}(of|.f|o.).{0,2}j)
