@@ -15,12 +15,22 @@
 	<li><h3>Install</h3>
 	<ul>
 		<li>Start with a clean machine.
-		<li><b>[DataEntry #345, 350]</b>
+		<LI><b>[DataEntry #345, #350, #440, #512, #589, #590, #609, #610]</b>
 		<ul>
+			<li>Exercise the <b>Demo Shield</b> installation.
+			<li>Confirm that <b>.NET 3.5</b> is the first item listed.
+			<li>Confirm that a <b>LabDE</b> icon is used for the installation.
+<p>
+			<li>Finish the installation.
+			<li>Check <b>TBD</b> and confirm that the installed version of the Corepoint 
+			software is 4.0.1.
+			<li>Confirm that <b>Verify extracted data</b> is available as a processing task.
+<p>
 			<li>Confirm that installing LabDE (and not FLEX Index or ID Shield) is
 			sufficient to allow installation of the RDT.
 			<li>Confirm that LabDE can be installed alongside FLEX Index or ID Shield.
-		</ul>
+			<li>Confirm that an associated <b>RDT</b> installation is available with LabDE.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Config File Support</h3>
@@ -123,6 +133,14 @@
 <p>
 	<LI><h3>Menus and Toolbars</h3>
 	<ul>
+		<LI><b>[DataEntry #516]</b> Text for toolbar buttons
+		<ul>
+  	   		<LI>Exercise a <b>LabDE</b> image.
+	  	   	<LI>Confirm appropriate tooltip text for the <b>Review and Select</b> tool.
+  		   	<LI>Confirm appropriate tooltip text for the <b>Angular Highlight</b> tool.
+  	   		<LI>Confirm appropriate tooltip text for the <b>Rectangular Highlight</b> tool.
+	       	</ul>
+<p>
 		<li>File menu - Stand-alone mode
 		<ul>
 			<li>Confirm that <b>File - Open</b> allows a file to be be selected 
@@ -164,6 +182,19 @@
 			the open file and exits the application.
 			<li>Confirm that <b>File - Stop processing</b> closes the open file and exits 
 			the application.
+<p>
+			<LI><b>[LegacyRC #5388, #5396]</b> Skipped Files Do Not Revert To Pending
+		       	<ul>
+  	   			<LI>Exercise several <b>LabDE</b> images.
+		  	   	<LI>Skip a document and stop processing.
+  			   	<LI>Reconfigure the task to process <b>only documents that I skipped</b>.
+  	   			<LI>Start processing and <b>skip</b> the file again.
+		  	   	<LI>Confirm that the skipped document remains in <b>Skipped</b> status.
+<p>
+		  	   	<LI>Exercise several <b>LabDE</b> images.
+  	   			<LI>Skip some documents and stop processing.
+		  	   	<LI>Confirm that <b>all</b> skipped documents remain in <b>Skipped</b> status.
+		       	</ul>
 		</ul>
 <p>
 		<li>View menu
@@ -383,6 +414,24 @@
 			<li>Confirm that <b>Alt+S</b> activates one of the swiping tools.
 			<li>Confirm that another <b>Alt+S</b> activates the other swiping tool.
 		</ul>
+<p>
+		<LI><b>[DataEntry #412]</b> Shortcuts and frozen application
+		<ul>
+  	   		<LI>Exercise a <b>LabDE</b> image in <b>stand-alone</b> mode.
+	  	   	<LI>Close the document.
+  		   	<LI>Test the following shortcuts
+			<ul>
+	  	   		<LI><b>Ctrl+S</b> - Save
+		  	   	<LI><b>Ctrl+P</b> - Print
+		  	   	<LI><b>Ctrl+T</b> - Accept Highlight
+	  		   	<LI><b>Ctrl+D</b> - Remove Highlight
+	  	   		<LI><b>Alt+Z</b> - Zoom Tool
+		  	   	<LI><b>Alt+A</b> - Pan Tool
+		  	   	<LI><b>Alt+R</b> - Select Tool
+	  		   	<LI><b>Alt+S</b> - Swipe Tool
+			</ul>
+  		   	<LI>Confirm that the application is not frozen after each shortcut.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Data Entry in cells</h3>
@@ -393,6 +442,17 @@
   	   		<LI>Confirm that the DEP includes a <b>Comments</b> edit box.
 	  	   	<LI>Confirm that <b>Comments</b> provided during one verification session are 
 			retained and displayed during a subsequent verification session.
+<p>
+			<LI><b>[DataEntry #571, #573, #603]</b> Operator Comment Field And Tab Stop
+			<ul>
+  	   			<LI>Open a <b>LabDE</b> demo image.
+		  	   	<LI>Confirm that the <b>Operator Comment</b> field is not a tab 
+				stop if the field is empty.
+		  	   	<LI>Confirm that the <b>Operator Comment</b> field is a tab 
+				stop if the field is not empty.
+		  	   	<LI>Confirm that the <b>Operator Comment</b> field has a vertical 
+				scrollbar if enough text is entered.
+		       	</ul>
 	       	</ul>
    		</LI>
 <p>
@@ -630,6 +690,13 @@
 			to drag the row and drop it into a different order.
 			<li><b>[DataEntry #491]</b> Confirm that tooltips are disabled during drag operations.
 		</ul>
+	</ul>
+<p>
+	<li><h3>Uninstall</h3>
+	<ul>
+		<li>Uninstall <b>LabDE</b>.
+		<li>Confirm that the <b>Lead Tools</b> DLLs are removed.
+		<li>Confirm that the <b>Extract Systems Interop</b> DLLs are removed.
 	</ul>
 </UL>
 </BODY>

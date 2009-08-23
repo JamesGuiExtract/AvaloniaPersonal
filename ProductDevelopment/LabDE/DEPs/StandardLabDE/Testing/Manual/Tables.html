@@ -118,7 +118,8 @@
 			<li>Select the <b>HGB</b> order then select <b>GLUCOSE</b> again.
 			<li>Confirm that there are no extra rows in the table.
 			<li>Repeat the same test, but this time swipe/type some data into the inserted row
-			before navigating to <b>HGB</b>. Confirm that there are still no extra rows in the test table.
+			before navigating to <b>HGB</b>. Confirm that there are still no extra rows 
+			in the test table.
 		</ul>
 	</ul>
 <p>
@@ -162,6 +163,15 @@
 			<li>Confirm that no exception is seen.
 			<li>Repeat this test with a <b>Collection time</b> cell.
 		</ul>
+<p>
+		<LI><b>[DataEntry #601]</b> Tooltips displayed for direct hints
+		<ul>
+  	   		<LI>Exercise a <b>LabDE</b> image.
+	  	   	<LI>Select a cell that should have a value but instead has only a 
+			direct hint.
+  	   		<LI>Type some text into the cell.
+	  	   	<LI>Confirm that the typed text is displayed as a tooltip.
+       		</ul>
 	</ul>
 <p>
 	<LI><h3>Copy and Paste from tables</h3>
@@ -171,7 +181,8 @@
 		<b>POTASSIUM</b> order.
 		<LI>Right-click and select <b>Copy row(s)</b>.
 		<LI>Select another order</b>.
-		<LI>Right-click the empty <b>Selected Order Details</b> details row and select <b>Paste copied row(s)</b>.
+		<LI>Right-click the empty <b>Selected Order Details</b> details row and select 
+		<b>Paste copied row(s)</b>.
 		<ul>
 			<LI>Confirm that the <b>Potassium</b> data appears in the <b>Selected Order 
 			Details</b> table.
@@ -396,6 +407,20 @@
 			order is correct.
        		</ul>
    		</LI>
+<p>
+		<LI><b>[DataEntry #306, #615]</b> Characters in new row
+		<ul>
+  	   		<LI>Exercise a <b>LabDE</b> image.
+	  	   	<LI>Select the new row of a table.
+  		   	<LI>Turn on <b>CAPS LOCK</b>.
+  	   		<LI>Type some characters.
+	  	   	<LI>Confirm that every typed character appears in upper case.
+  		   	<LI>Turn off <b>CAPS LOCK</b>.
+<p>
+	  	   	<LI>Select the new row of another table.
+  		   	<LI>Type some characters.
+  	   		<LI>Confirm that every typed character appears in the first cell.
+	       	</ul>
 <p>
 		<LI><b>[Data Entry #307]</b> Reappearance of hidden tooltips
 		<ul>
