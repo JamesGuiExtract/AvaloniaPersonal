@@ -239,20 +239,36 @@ string asString(ULONGLONG ullValue)
 	return string(pszTemp);
 }
 //--------------------------------------------------------------------------------------------------
-string asString(CLSID clsID)
+string asString(const CLSID& clsID)
 {
-	string strResult;
-
-	OLECHAR wszCLSID[45];
-	if (!StringFromGUID2(clsID, wszCLSID, 45))
+	try
 	{
-		throw UCLIDException("ELI02157", "Unable to convert GUID to string!");
+		OLECHAR wszCLSID[45] = {0};
+		if (!StringFromGUID2(clsID, wszCLSID, 45))
+		{
+			throw UCLIDException("ELI02157",
+				"Unable to convert GUID to string: Conversion function failed!");
+		}
+
+		// Get the string as a _bstr_t
+		_bstr_t _bstrCLSID(wszCLSID);
+
+		// Check for too short of a string (GUID is 35 characters, 37 if wrapped by {})
+		if (_bstrCLSID.length() < 35)
+		{
+			UCLIDException ue("ELI27137",
+				"Unable to convert GUID to string: Resulting string too short!");
+			ue.addDebugInfo("String Length", _bstrCLSID.length());
+			ue.addDebugInfo("Converted Value", _bstrCLSID.length() > 0 ? string(_bstrCLSID) : "");
+			throw ue;
+		}
+		else
+		{
+			string strResult = _bstrCLSID;
+			return strResult;
+		}
 	}
-
-	_bstr_t _bstrCLSID = wszCLSID;
-	strResult = _bstrCLSID;
-
-	return strResult;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27136");
 }
 //--------------------------------------------------------------------------------------------------
 double asDouble(const string& strValue)

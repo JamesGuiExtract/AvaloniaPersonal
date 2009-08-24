@@ -66,6 +66,7 @@ library UCLID_COMUTILSLib
 		[id(10001), helpstring("method Clone")] HRESULT Clone([out, retval] IUnknown* *pObject);
 		[id(10002), helpstring("method CopyFrom")] HRESULT CopyFrom([in] IUnknown *pObject);
 	};
+
 	[
 		object,
 		uuid(C1D9B337-3D1B-4322-B2A2-A09AA2C9C4E9),
@@ -78,6 +79,22 @@ library UCLID_COMUTILSLib
 		[id(1), helpstring("method ShallowCopy")] HRESULT ShallowCopy(
 			[out, retval] IUnknown** pObject);
 	};
+
+	[
+		object,
+		uuid(EDBE3151-08B4-43EC-9B7D-D6E738DDE0F1),
+		dual,
+		helpstring("IClipboardCopyable Interface"),
+		pointer_default(unique)
+	]
+	interface IClipboardCopyable : IDispatch
+	{
+		// Method called by clipboard manager to notify the object that it was copied
+		// from the clipboard
+		[id(10001), helpstring("method NotifyCopiedFromClipboard")] HRESULT
+			NotifyCopiedFromClipboard();
+	};
+
 	[
 		object,
 		uuid(EFD1C465-8ABA-4d81-A983-73E15A8C202F),

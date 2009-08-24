@@ -12,10 +12,15 @@
 #include "FileNamePattern.h"
 #include "FileNamePatternPP.h"
 #include "GenericMultiSkipCondition.h"
+#include "MathematicalCondition.h"
+#include "MathematicalConditionPP.h"
+#include "ModulusEqualsMathCondition.h"
 #include "MultiSkipConditionAND.h"
 #include "MultiSkipConditionOR.h"
 #include "MultiSkipConditionEXACTONE.h"
 #include "MultiSkipConditionNONE.h"
+#include "OnceEveryMathCondition.h"
+#include "RandomMathCondition.h"
 
 CComModule _Module;
 
@@ -25,10 +30,15 @@ OBJECT_ENTRY(CLSID_FileExistencePP, CFileExistencePP)
 OBJECT_ENTRY(CLSID_FileNamePattern, CFileNamePattern)
 OBJECT_ENTRY(CLSID_FileNamePatternPP, CFileNamePatternPP)
 OBJECT_ENTRY(CLSID_GenericMultiFAMCondition, CGenericMultiFAMCondition)
+OBJECT_ENTRY(CLSID_MathematicalCondition, CMathematicalCondition)
+OBJECT_ENTRY(CLSID_MathematicalConditionPP, CMathematicalConditionPP)
+OBJECT_ENTRY(CLSID_ModulusEqualsMathCondition, CModulusEqualsMathCondition)
 OBJECT_ENTRY(CLSID_MultiFAMConditionAND, CMultiFAMConditionAND)
 OBJECT_ENTRY(CLSID_MultiFAMConditionOR, CMultiFAMConditionOR)
 OBJECT_ENTRY(CLSID_MultiFAMConditionEXACTONE, CMultiFAMConditionEXACTONE)
 OBJECT_ENTRY(CLSID_MultiFAMConditionNONE, CMultiFAMConditionNONE)
+OBJECT_ENTRY(CLSID_OnceEveryMathCondition, COnceEveryMathCondition)
+OBJECT_ENTRY(CLSID_RandomMathCondition, CRandomMathCondition)
 END_OBJECT_MAP()
 
 class CESFAMConditionsApp : public CWinApp

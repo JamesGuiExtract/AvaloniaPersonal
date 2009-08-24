@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.ModulusEqualsMathCondition.1 = s 'ModulusEqualsMathCondition Class'
+	{
+		CLSID = s '{F58E3618-4ED3-4826-9736-6011B6511A7A}'
+	}
+	ESFAMConditions.ModulusEqualsMathCondition = s 'ModulusEqualsMathCondition Class'
+	{
+		CLSID = s '{F58E3618-4ED3-4826-9736-6011B6511A7A}'
+		CurVer = s 'ESFAMConditions.ModulusEqualsMathCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {F58E3618-4ED3-4826-9736-6011B6511A7A} = s 'ModulusEqualsMathCondition Class'
+		{
+			ProgID = s 'ESFAMConditions.ModulusEqualsMathCondition.1'
+			VersionIndependentProgID = s 'ESFAMConditions.ModulusEqualsMathCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

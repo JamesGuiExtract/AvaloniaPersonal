@@ -66,6 +66,16 @@ HRESULT CConditionalTask::FinalConstruct()
 //--------------------------------------------------------------------------------------------------
 void CConditionalTask::FinalRelease()
 {
+	try
+	{
+		// Set COM pointers to NULL
+		m_ipFAMCondition = NULL;
+		m_ipTasksForTrue = NULL;
+		m_ipTasksForFalse = NULL;
+		m_ipFAMTaskExecutor = NULL;
+		m_ipMiscUtils = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27261");
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -194,6 +204,37 @@ STDMETHODIMP CConditionalTask::raw_Clone(IUnknown **pObject)
 }
 
 //-------------------------------------------------------------------------------------------------
+// IClipboardCopyable
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CConditionalTask::raw_NotifyCopiedFromClipboard()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Check the condition object itself
+		if (m_ipFAMCondition != NULL)
+		{
+			IClipboardCopyablePtr ipClip = m_ipFAMCondition->Object;
+			if (ipClip != NULL)
+			{
+				ipClip->NotifyCopiedFromClipboard();
+			}
+		}
+
+		// Check each object in the conditional lists
+		notifyClipboardCopiedForTask(m_ipTasksForTrue);
+		notifyClipboardCopiedForTask(m_ipTasksForFalse);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27260");
+}
+
+//-------------------------------------------------------------------------------------------------
 // IMustBeConfiguredObject
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CConditionalTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
@@ -307,17 +348,25 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 
 		if (bConditionSatisfied)
 		{
-			// Execute true tasks
-			*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
-				m_ipTasksForTrue, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
-				bCancelRequested);
+			// Ensure there are tasks to execute before attempting to execute them
+			if (m_ipTasksForTrue != NULL && m_ipTasksForTrue->Size() > 0)
+			{
+				// Execute true tasks
+				*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
+					m_ipTasksForTrue, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+					bCancelRequested);
+			}
 		}
 		else
 		{
-			// Execute false tasks
-			*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
-				m_ipTasksForFalse, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
-				bCancelRequested);
+			// Ensure there are tasks to execute before attempting to execute them
+			if (m_ipTasksForFalse != NULL && m_ipTasksForFalse->Size() > 0)
+			{
+				// Execute false tasks
+				*pResult = m_ipFAMTaskExecutor->InitProcessClose(bstrFileFullName, 
+					m_ipTasksForFalse, nFileID, nActionID, pDB, pTagManager, ipSubProgressStatus,
+					bCancelRequested);
+			}
 		}
 
 		// Updated progress status to indicate completion
@@ -664,5 +713,36 @@ void CConditionalTask::validateLicense()
 	static const unsigned long THIS_COMPONENT_ID = gnFILE_ACTION_MANAGER_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_COMPONENT_ID, "ELI16109", "Conditional Task File Processor" );
+}
+//-------------------------------------------------------------------------------------------------
+void CConditionalTask::notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ipTasks)
+{
+	try
+	{
+		if (ipTasks == NULL)
+		{
+			return;
+		}
+
+		// Get the number of tasks
+		long nCount = ipTasks->Size();
+
+		// Check each item in the task list
+		for (long i = 0; i < nCount; i++)
+		{
+			// Get the OWD from the task list
+			IObjectWithDescriptionPtr ipTemp = ipTasks->At(i);
+			ASSERT_RESOURCE_ALLOCATION("ELI27263", ipTemp != NULL);
+			
+			// Check for OWD containing ClipboardCopyable object
+			IClipboardCopyablePtr ipClip = ipTemp->Object;
+			if (ipClip != NULL)
+			{
+				// Notify that the object has been copied
+				ipClip->NotifyCopiedFromClipboard();
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27262");
 }
 //-------------------------------------------------------------------------------------------------

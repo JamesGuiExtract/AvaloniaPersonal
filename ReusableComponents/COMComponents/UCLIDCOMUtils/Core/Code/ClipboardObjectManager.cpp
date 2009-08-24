@@ -80,6 +80,9 @@ STDMETHODIMP CClipboardObjectManager::GetObjectInClipboard(IUnknown **pObj)
 		IUnknownPtr ipObj = m_apCBMWnd->getObjectFromClipboard();
 		if (ipObj)
 		{
+			// NotifyCopyFromClipboard if necessary
+			notifyCopiedFromClipboard(ipObj);
+
 			*pObj = ipObj.Detach();
 		}
 		else
@@ -209,5 +212,42 @@ void CClipboardObjectManager::validateLicense()
 	static const unsigned long THIS_COMPONENT_ID = gnEXTRACT_CORE_OBJECTS;
 
 	VALIDATE_LICENSE( THIS_COMPONENT_ID, "ELI05552", "ClipboardObjectManager" );
+}
+//-------------------------------------------------------------------------------------------------
+void CClipboardObjectManager::notifyCopiedFromClipboard(const IUnknownPtr& ipObj)
+{
+	try
+	{
+		// Check if the object is a clipboard copyable object
+		UCLID_COMUTILSLib::IClipboardCopyablePtr ipClip = ipObj;
+		if (ipClip != NULL)
+		{
+			// Call notify
+			ipClip->NotifyCopiedFromClipboard();
+			return;
+		}
+
+		// Check if the object is an object with description object
+		UCLID_COMUTILSLib::IObjectWithDescriptionPtr ipOWD = ipObj;
+		if (ipOWD != NULL)
+		{
+			notifyCopiedFromClipboard(ipOWD->Object);
+			return;
+		}
+
+		// Check if this object is an IUnknownVector
+		UCLID_COMUTILSLib::IIUnknownVectorPtr ipVec = ipObj;
+		if (ipVec != NULL)
+		{
+			// Check each item in the IUnknownVector
+			long nSize = ipVec->Size();
+			for (long i=0; i < nSize; i++)
+			{
+				// Check the item
+				notifyCopiedFromClipboard(ipVec->At(i));
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27259");
 }
 //-------------------------------------------------------------------------------------------------

@@ -743,7 +743,7 @@ EXPORT_BaseUtils string asString(LONGLONG llValue);
 //-------------------------------------------------------------------------------------------------
 EXPORT_BaseUtils string asString(ULONGLONG ullValue);
 //-------------------------------------------------------------------------------------------------
-EXPORT_BaseUtils string asString(CLSID clsID);
+EXPORT_BaseUtils string asString(const CLSID& clsID);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Will check whether the Commas in a string are in right position
 //			It doesn't check whether it is a valid number.

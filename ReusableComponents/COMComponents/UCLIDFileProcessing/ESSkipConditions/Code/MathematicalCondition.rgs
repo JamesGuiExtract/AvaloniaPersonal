@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.MathematicalCondition.1 = s 'MathematicalCondition Class'
+	{
+		CLSID = s '{B377CED4-6059-4748-B548-4FA4CA0EEC12}'
+	}
+	ESFAMConditions.MathematicalCondition = s 'MathematicalCondition Class'
+	{
+		CLSID = s '{B377CED4-6059-4748-B548-4FA4CA0EEC12}'
+		CurVer = s 'ESFAMConditions.MathematicalCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {B377CED4-6059-4748-B548-4FA4CA0EEC12} = s 'MathematicalCondition Class'
+		{
+			ProgID = s 'ESFAMConditions.MathematicalCondition.1'
+			VersionIndependentProgID = s 'ESFAMConditions.MathematicalCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

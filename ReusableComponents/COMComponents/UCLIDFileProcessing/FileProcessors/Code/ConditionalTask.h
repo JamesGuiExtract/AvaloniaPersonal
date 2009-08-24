@@ -22,6 +22,7 @@ class ATL_NO_VTABLE CConditionalTask :
 	public IDispatchImpl<IFileProcessingTask, &__uuidof(IFileProcessingTask), &LIBID_UCLID_FILEPROCESSINGLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ICategorizedComponent, &__uuidof(ICategorizedComponent), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ICopyableObject, &__uuidof(ICopyableObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
+	public IDispatchImpl<IClipboardCopyable, &__uuidof(IClipboardCopyable), &LIBID_UCLID_COMUTILSLib, 1>,
 	public IDispatchImpl<IMustBeConfiguredObject, &__uuidof(IMustBeConfiguredObject), &LIBID_UCLID_COMUTILSLib, /* wMajor = */ 1>,
 	public IDispatchImpl<ILicensedComponent, &__uuidof(ILicensedComponent), &LIBID_UCLID_COMLMLib, /* wMajor = */ 1>,
 	public ISpecifyPropertyPagesImpl<CConditionalTask>
@@ -40,6 +41,7 @@ public:
 		COM_INTERFACE_ENTRY(ILicensedComponent)
 		COM_INTERFACE_ENTRY(ICategorizedComponent)
 		COM_INTERFACE_ENTRY(ICopyableObject)
+		COM_INTERFACE_ENTRY(IClipboardCopyable)
 		COM_INTERFACE_ENTRY(IPersistStream)
 		COM_INTERFACE_ENTRY(IMustBeConfiguredObject)
 		COM_INTERFACE_ENTRY_IMPL(ISpecifyPropertyPages)
@@ -70,6 +72,9 @@ public:
 // ICopyableObject
 	STDMETHOD(raw_Clone)(IUnknown * * pObject);
 	STDMETHOD(raw_CopyFrom)(IUnknown * pObject);
+
+// IClipboardCopyable
+	STDMETHOD(raw_NotifyCopiedFromClipboard)();
 
 // IMustBeConfiguredObject
 	STDMETHOD(raw_IsConfigured)(VARIANT_BOOL * pbValue);
@@ -125,6 +130,10 @@ private:
 
 	// Creates the MiscUtils object if necessary and returns it
 	IMiscUtilsPtr getMiscUtils();
+
+	// Iterates the list of tasks searching for IClipboardCopyable items and calls
+	// NotifyCopiedFromClipboard on each one
+	void notifyClipboardCopiedForTask(const IIUnknownVectorPtr& ipTasks);
 
 	void	validateLicense();
 };

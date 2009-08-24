@@ -1,0 +1,23 @@
+HKCR
+{
+	ESFAMConditions.MathematicalConditionPP.1 = s 'MathematicalConditionPP Class'
+	{
+		CLSID = s '{46571961-56D1-4157-92BF-1FA791658174}'
+	}
+	FileProcessors.MathematicalConditionPP = s 'MathematicalConditionPP Class'
+	{
+		CLSID = s '{46571961-56D1-4157-92BF-1FA791658174}'
+		CurVer = s 'ESFAMConditions.MathematicalConditionPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {46571961-56D1-4157-92BF-1FA791658174} = s 'MathematicalConditionPP Class'
+		{
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+		}
+	}
+}

@@ -302,13 +302,6 @@ STDMETHODIMP CFileProcessingTaskExecutor::raw_IsLicensed(VARIANT_BOOL *pbValue)
 //-------------------------------------------------------------------------------------------------
 void CFileProcessingTaskExecutor::verifyInitialization()
 {
-	// Verify the task array is valid
-	if (m_vecProcessingTasks.empty())
-	{
-		UCLIDException ue("ELI17856", "Internal error: Task executor has invalid task list!");
-		throw ue;
-	}
-
 	// Verify the tasks have been initialized
 	if (m_bInitialized == false)
 	{

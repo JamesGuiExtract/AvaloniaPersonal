@@ -1,0 +1,26 @@
+HKCR
+{
+	ESFAMConditions.RandomMathCondition.1 = s 'RandomMathCondition Class'
+	{
+		CLSID = s '{E7B93F0F-C8ED-4FC7-A6AC-47C3B7D7B669}'
+	}
+	ESFAMConditions.RandomMathCondition = s 'RandomMathCondition Class'
+	{
+		CLSID = s '{E7B93F0F-C8ED-4FC7-A6AC-47C3B7D7B669}'
+		CurVer = s 'ESFAMConditions.RandomMathCondition.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {E7B93F0F-C8ED-4FC7-A6AC-47C3B7D7B669} = s 'RandomMathCondition Class'
+		{
+			ProgID = s 'ESFAMConditions.RandomMathCondition.1'
+			VersionIndependentProgID = s 'ESFAMConditions.RandomMathCondition'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{292B3BCA-F371-457C-892A-E4383087C5D4}'
+		}
+	}
+}

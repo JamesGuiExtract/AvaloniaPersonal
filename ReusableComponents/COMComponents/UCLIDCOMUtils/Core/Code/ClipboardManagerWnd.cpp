@@ -125,42 +125,46 @@ void ClipboardManagerWnd::copyObjectToClipboard(IUnknownPtr ipObj)
 //-------------------------------------------------------------------------------------------------
 IUnknownPtr ClipboardManagerWnd::getObjectFromClipboard()
 {
-	IUnknownPtr ipObj;
-
-	// open the clipboard
-	ClipboardOpenerCloser clipboardOpener(this);
-	
-	// check to see if what is in the clipboard is an UCLID object
-	if (IsClipboardFormatAvailable(g_nFormat))
+	try
 	{
-		// get the clipboard data
-		GlobalMemoryHandler hMemory = GetClipboardData(g_nFormat);		
-		char *pBuffer = (char *) hMemory.getData();
-		DWORD dwBufferLength = GlobalSize(hMemory);
+		IUnknownPtr ipObj = NULL;
 
-		// create a temporary IStream object
-		IStreamPtr ipStream;
-		if (FAILED(CreateStreamOnHGlobal(NULL, TRUE, &ipStream)))
+		// open the clipboard
+		ClipboardOpenerCloser clipboardOpener(this);
+
+		// check to see if what is in the clipboard is an UCLID object
+		if (IsClipboardFormatAvailable(g_nFormat))
 		{
-			throw UCLIDException("ELI05541", "Unable to create stream object!");
+			// get the clipboard data
+			GlobalMemoryHandler hMemory = GetClipboardData(g_nFormat);		
+			char *pBuffer = (char *) hMemory.getData();
+			DWORD dwBufferLength = GlobalSize(hMemory);
+
+			// create a temporary IStream object
+			IStreamPtr ipStream;
+			if (FAILED(CreateStreamOnHGlobal(NULL, TRUE, &ipStream)))
+			{
+				throw UCLIDException("ELI05541", "Unable to create stream object!");
+			}
+
+			// write the buffer to the stream
+			ipStream->Write(pBuffer, dwBufferLength, NULL);
+
+			// reset the stream current position to the beginning of the stream
+			LARGE_INTEGER zeroOffset;
+			zeroOffset.QuadPart = 0;
+			ipStream->Seek(zeroOffset, STREAM_SEEK_SET, NULL);
+
+			// stream the object out of the IStream
+			IPersistStreamPtr ipPersistObj;
+			readObjectFromStream(ipPersistObj, ipStream, "ELI09978");
+			ipObj = ipPersistObj;
 		}
 
-		// write the buffer to the stream
-		ipStream->Write(pBuffer, dwBufferLength, NULL);
-
-		// reset the stream current position to the beginning of the stream
-		LARGE_INTEGER zeroOffset;
-		zeroOffset.QuadPart = 0;
-		ipStream->Seek(zeroOffset, STREAM_SEEK_SET, NULL);
-
-		// stream the object out of the IStream
-		IPersistStreamPtr ipPersistObj;
-		readObjectFromStream(ipPersistObj, ipStream, "ELI09978");
-		ipObj = ipPersistObj;
+		m_ipObj = ipObj;
+		return m_ipObj;
 	}
-
-	m_ipObj = ipObj;
-	return m_ipObj;
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27258");
 }
 //-------------------------------------------------------------------------------------------------
 bool ClipboardManagerWnd::objectIsIUnknownVectorOfType(REFIID riid)

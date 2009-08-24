@@ -290,6 +290,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MathematicalCondition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\MathematicalConditionPP.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ModulusEqualsMathCondition.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\MultiSkipConditionAND.cpp"
 				>
 			</File>
@@ -303,6 +315,14 @@
 			</File>
 			<File
 				RelativePath=".\MultiSkipConditionOR.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\OnceEveryMathCondition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\RandomMathCondition.cpp"
 				>
 			</File>
 			<File
@@ -364,6 +384,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MathematicalCondition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\MathematicalConditionPP.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ModulusEqualsMathCondition.h"
+				>
+			</File>
+			<File
 				RelativePath=".\MultiSkipConditionAND.h"
 				>
 			</File>
@@ -377,6 +409,14 @@
 			</File>
 			<File
 				RelativePath=".\MultiSkipConditionOR.h"
+				>
+			</File>
+			<File
+				RelativePath=".\OnceEveryMathCondition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\RandomMathCondition.h"
 				>
 			</File>
 			<File
@@ -426,6 +466,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\MathematicalCondition.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\MathematicalConditionPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\ModulusEqualsMathCondition.rgs"
+				>
+			</File>
+			<File
 				RelativePath=".\MultiSkipConditionAnd.rgs"
 				>
 			</File>
@@ -439,6 +491,14 @@
 			</File>
 			<File
 				RelativePath=".\MultiSkipConditionOR.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\OnceEveryMathCondition.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\RandomMathCondition.rgs"
 				>
 			</File>
 			<File

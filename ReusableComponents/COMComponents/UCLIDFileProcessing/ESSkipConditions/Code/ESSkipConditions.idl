@@ -105,6 +105,100 @@ library EXTRACT_FAMCONDITIONSLib
 
 	[
 		object,
+		uuid(E46D8A95-EA9B-4D90-8703-99621B19E4A0),
+		dual,
+		helpstring("IMathConditionChecker Interface"),
+		pointer_default(unique)
+	]
+	interface IMathConditionChecker : IDispatch
+	{
+		// Returns VARIANT_TRUE if the condition is met and VARIANT_FALSE if it is not met
+		[id(10001), helpstring("method CheckCondition")] HRESULT CheckCondition([in] BSTR bstrFileName,
+			[in] IFileProcessingDB* pFPDB, [out, retval] VARIANT_BOOL* pbResult);
+	};
+
+	[
+		object,
+		uuid(30409BCC-76AF-4C72-940E-7C2E71604B0C),
+		dual,
+		helpstring("IRandomMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IRandomMathCondition : IMathConditionChecker
+	{
+		// Percentage of when the condition is satisfied (must be between 1 and 99 inclusive)
+		[propget, id(1), helpstring("property Percent")] HRESULT Percent([out, retval] long* pnPercent);
+		[propput, id(1), helpstring("property Percent")] HRESULT Percent([in] long nPercent);
+	};
+
+	[
+		object,
+		uuid(5B2A7A6D-665F-41FB-B591-EC3C9902E26E),
+		dual,
+		helpstring("IOnceEveryMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IOnceEveryMathCondition : IMathConditionChecker
+	{
+		// How often each run the condition is satisified (must be greater than 2)
+		[propget, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
+			[out, retval] long* pnTimes);
+		[propput, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
+			[in] long nTimes);
+
+		// A unique ID for this instance of the condition checker. It is recommended
+		// that the caller use a GUID generator to assign this value.
+		[propget, id(2), helpstring("property UsageID")] HRESULT UsageID(
+			[out, retval] BSTR* bstrUsageID);
+		[propput, id(2), helpstring("property UsageID")] HRESULT UsageID(
+			[in] BSTR bstrUsageID);
+	};
+
+	[
+		object,
+		uuid(70C82D6D-69BF-4D4F-83BB-C406FCAB28F1),
+		dual,
+		helpstring("IModulusEqualsMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IModulusEqualsMathCondition : IMathConditionChecker
+	{
+		// The modulus value for checking the condition. Must be > 1.
+		[propget, id(1), helpstring("property Modulus")] HRESULT Modulus([out, retval] long* pnModulus);
+		[propput, id(1), helpstring("property Modulus")] HRESULT Modulus([in] long nModulus);
+
+		// The value that the modulus must equal for the condition to be satisfied
+		// Must be >= 0 and < Modulus.
+		[propget, id(2), helpstring("property ModEquals")] HRESULT ModEquals(
+			[out, retval] long* pnValue);
+		[propput, id(2), helpstring("property ModEquals")] HRESULT ModEquals([in] long nValue);
+	};
+
+	[
+		object,
+		uuid(6255D260-327D-456B-A638-DE18DCAA1105),
+		dual,
+		helpstring("IMathematicalFAMCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IMathematicalFAMCondition : IDispatch
+	{
+		// Indicates whether to consider the condition met or not met when the
+		// MathematicalCondition is satisfied
+		[propget, id(1), helpstring("property ConsiderMet")] HRESULT
+			ConsiderMet([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(1), helpstring("property ConsiderMet")] HRESULT
+			ConsiderMet([in] VARIANT_BOOL newVal);
+
+		// The mathematical condition to test
+		[propget, id(2), helpstring("property MathematicalCondition")] HRESULT
+			MathematicalCondition([out, retval] IMathConditionChecker** ppMathCondition);
+		[propput, id(2), helpstring("property MathematicalCondition")] HRESULT
+			MathematicalCondition([in] IMathConditionChecker* pMathCondition);
+	};
+
+	[
+		object,
 		uuid(570EE4FB-5071-4620-A0D5-4A0A589F5B4C),
 		dual,
 		nonextensible,
@@ -182,6 +276,69 @@ library EXTRACT_FAMCONDITIONSLib
 		interface IUnknown;
 	};
 
+	[
+		uuid(E7B93F0F-C8ED-4FC7-A6AC-47C3B7D7B669),
+		helpstring("RandomMathCondition Class")
+	]
+	coclass RandomMathCondition
+	{
+		[default] interface IRandomMathCondition;
+		interface IMathConditionChecker;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(29B3478A-2878-403E-8D32-03E8C45813DA),
+		helpstring("OnceEveryMathCondition Class")
+	]
+	coclass OnceEveryMathCondition
+	{
+		[default] interface IOnceEveryMathCondition;
+		interface IMathConditionChecker;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IClipboardCopyable;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(F58E3618-4ED3-4826-9736-6011B6511A7A),
+		helpstring("ModulusEqualsMathCondition Class")
+	]
+	coclass ModulusEqualsMathCondition
+	{
+		[default] interface IModulusEqualsMathCondition;
+		interface IMathConditionChecker;
+		interface ILicensedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+	};
+
+	[
+		uuid(B377CED4-6059-4748-B548-4FA4CA0EEC12),
+		helpstring("MathematicalCondition Class")
+	]
+	coclass MathematicalCondition
+	{
+		[default] interface IMathematicalFAMCondition;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IClipboardCopyable;
+		interface IMustBeConfiguredObject;
+		interface IFAMCondition;
+	};
+	[
+		uuid(46571961-56D1-4157-92BF-1FA791658174),
+		helpstring("MathematicalConditionPP Class")
+	]
+	coclass MathematicalConditionPP
+	{
+		interface IUnknown;
+	};
+		
 	[
 		uuid(6DEF16E6-8A3A-4104-BDD3-7F54F18E1363),
 		helpstring("GenericMultiFAMCondition Class")
