@@ -202,9 +202,9 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@XCOPY "$(ReusableComponentsRootDirectory)\COMComponents\UCLIDFileProcessing\Reports\*.*" "$(AFCoreInstallFilesRootDir)\Reports" /Y/E
 	
 # Copy pdb and map files to archive
-	@XCOPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" /Y/E
-	@XCOPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" /Y/E
-	@XCOPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" /Y/E
+	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
+	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
+	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 	
 # Create RegList.dat file for registration
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegCoreComponents\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegCoreComponents\AFCore.rl"

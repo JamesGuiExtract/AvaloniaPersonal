@@ -236,6 +236,7 @@
 		<row><td>Leadtools.WinForms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{0BC19709-5DB1-4CE2-877E-DD3BE5FAD1FB}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>leadtools.winforms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{039C1CE0-3745-49EE-9CC3-1BD293E78158}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{27F1FF87-EB92-48B3-BB63-36A63BBD1DDC}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>AFCommon.rl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>1</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{14CB5FC3-E5F2-4793-8E2F-A452B33B01A5}</td><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{472A6ABF-B5A3-44C3-B987-EA3CF32DC69A}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{CACED6F9-E130-4273-9223-E4CE0D6C107D}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>UCLIDAFDataScorers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>{987CF926-1EDB-46F0-8967-D31ADAC4FDA0}</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>8</td><td/><td>UCLIDAFDataScorers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>20</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -346,6 +347,7 @@
 		<row><td>CommonFilesFolder</td><td>TARGETDIR</td><td>.:Common</td><td/><td>0</td><td/></row>
 		<row><td>DesktopFolder</td><td>TARGETDIR</td><td>.:Desktop</td><td/><td>3</td><td/></row>
 		<row><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ProgramFilesFolder</td><td>EXTRAC~1|Extract Systems</td><td/><td>0</td><td/></row>
+		<row><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>COMMON_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FILEPR~1|FileProcessingComponents</td><td/><td>0</td><td/></row>
 		<row><td>FLEXINDEX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1|FlexIndex</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_BIN.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXINDEX.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Bin</td><td/><td>0</td><td/></row>
 		<row><td>FLEX_INDEX_COMPONENTS_BIN.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>IF_COMPONENT.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Bin</td><td/><td>0</td><td/></row>
@@ -362,7 +364,9 @@
 		<row><td>ProgramFiles64Folder</td><td>TARGETDIR</td><td>.:Prog64~1|Program Files 64</td><td/><td>0</td><td/></row>
 		<row><td>ProgramFilesFolder</td><td>TARGETDIR</td><td>.:PROGRA~1|program files</td><td/><td>0</td><td/></row>
 		<row><td>ProgramMenuFolder</td><td>TARGETDIR</td><td>.:Programs</td><td/><td>3</td><td/></row>
+		<row><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FILE_PROCESSING_COMPONENTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports</td><td/><td>0</td><td/></row>
 		<row><td>SDK_BIN.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRACT_SYSTEMS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>FLEXIN~1|FLEX Index SDK</td><td/><td>0</td><td/></row>
+		<row><td>STANDARD_REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>REPORTS.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>STANDA~1|Standard reports</td><td/><td>0</td><td/></row>
 		<row><td>SendToFolder</td><td>TARGETDIR</td><td>.:SendTo</td><td/><td>3</td><td/></row>
 		<row><td>StartMenuFolder</td><td>TARGETDIR</td><td>.:STARTM~1|Start Menu</td><td/><td>3</td><td/></row>
 		<row><td>StartupFolder</td><td>TARGETDIR</td><td>.:StartUp</td><td/><td>3</td><td/></row>
@@ -452,6 +456,7 @@
 		<row><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueFinders.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueFinders.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueFinders.dll</td><td>1</td><td/></row>
 		<row><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDAFValueModifiers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDA~1.DLL|UCLIDAFValueModifiers.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCORECOMP_FILES&gt;\UCLIDAFValueModifiers.dll</td><td>1</td><td/></row>
 		<row><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFileProcessing.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDF~1.DLL|UCLIDFileProcessing.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\UCLIDFileProcessing.dll</td><td>1</td><td/></row>
+		<row><td>detailed_report_for_.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>DETAIL~1.RPT|Detailed report for specific document.rpt</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;SDK_REPORT_PATH&gt;\Detailed report for specific document.rpt</td><td>1</td><td/></row>
 		<row><td>esfamconditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESFAMC~1.DLL|ESFAMConditions.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESFAMConditions.dll</td><td>1</td><td/></row>
 		<row><td>esimagecleanup.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESImageCleanup.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>ESIMAG~1.DLL|ESImageCleanup.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_SELFREGCOMMONCO_FILES&gt;\ESImageCleanup.dll</td><td>1</td><td/></row>
 		<row><td>extract.attributefin.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>Extract.AttributeFin.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>EXTRAC~1.DLL|Extract.AttributeFinder.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_DOTNET_GAC_FILES&gt;\Extract.AttributeFinder.dll</td><td>1</td><td/></row>
@@ -632,6 +637,7 @@
 		<row><td>Leadtools.WinForms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_BCE4DCDB_74BB_46F1_A6B4_F1CE7C4A72CE_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_1863DFFC_577A_47F5_B92E_4102011374AA_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_58B22BFE_2B7B_41E1_91C4_FA3CC232A1D6_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_6AE1A17B_7E4E_49B5_A4A1_19D6BFF8C693_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_8092811F_A55E_4587_A4E2_B6275094D308_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_37DDF078_6601_4BE8_864A_AF9E2399CB02_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>UCLIDAFDataScorers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td/><td/><td>_293FDB5A_263B_43B7_BE6B_382C12E8F003_FILTER</td><td/><td/><td/><td/></row>
@@ -705,6 +711,7 @@
 		<row><td>ComponentData.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_COMPONENTDATA_FILES&gt;</td><td>4</td><td/><td>FKBVersion.txt</td><td>2</td></row>
 		<row><td>CoreComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOREC_FILES&gt;</td><td>4</td><td/><td>AFCore.rl</td><td>0</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_NONSELFREGCOMMON_FILES&gt;</td><td>4</td><td/><td>AFCommon.rl, RWUtils.dll</td><td>2</td></row>
+		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;SDK_REPORT_PATH&gt;</td><td>4</td><td/><td>Detailed report for specific document.rpt</td><td>2</td></row>
 		<row><td>USBLicenseKey.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;PATH_TO_FILES_FILES&gt;</td><td>4</td><td/><td>SafeNetUtils.dll</td><td>0</td></row>
 	</table>
 
@@ -742,6 +749,8 @@
 		<col key="yes" def="s72">ISLinkerLibrary</col>
 		<col def="s255">Library</col>
 		<col def="i4">Order</col>
+		<row><td>Isrt.obl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;ISProductFolder&gt;\Script\ISRT\Lib\isrt.obl</td><td>2</td></row>
+		<row><td>Iswi.obl.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>&lt;ISProductFolder&gt;\Script\ISWi\Lib\iswi.obl</td><td>1</td></row>
 		<row><td>_IsrtObl</td><td>&lt;ISProductFolder&gt;\Script\ISRT\Lib\isrt.obl</td><td>2</td></row>
 		<row><td>_IswiObl</td><td>&lt;ISProductFolder&gt;\Script\ISWi\Lib\iswi.obl</td><td>1</td></row>
 	</table>
@@ -840,9 +849,9 @@
 		<col def="S255">TestValue</col>
 		<col def="i4">Type</col>
 		<row><td>CommonFilesFolder</td><td/><td/><td>1</td></row>
-		<row><td>ISPROJECTDIR</td><td>1</td><td/><td>1</td></row>
+		<row><td>ISPROJECTDIR</td><td/><td/><td>1</td></row>
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
-		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
+		<row><td>ISProjectDataFolder</td><td/><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_DOTNET_GAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ClearImageFiles</td><td/><td>2</td></row>
@@ -858,6 +867,7 @@
 		<row><td>PATH_TO_SELFREGCORECOMP_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\SelfRegCoreComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_UTILS_FILES</td><td>I:\Common\Engineering\Tools\Utils</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
+		<row><td>SDK_REPORT_PATH</td><td>P:\AttributeFinder\CoreInstallation\Files\Reports</td><td/><td>2</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>
 	</table>
@@ -1203,6 +1213,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Leadtools.WinForms.d.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>Leadtools.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>NonSelfRegCommonComponents.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
+		<row><td>Reports.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDAFConditions.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDAFCore.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
 		<row><td>UCLIDAFDataScorers.dll.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>UCLIDFlexIndex.CA42753B_6AFC_4293_937C_BCCFA0CC407C</td><td>0</td></row>
