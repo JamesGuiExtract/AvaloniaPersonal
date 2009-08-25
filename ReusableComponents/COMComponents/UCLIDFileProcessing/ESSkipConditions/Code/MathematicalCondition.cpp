@@ -212,10 +212,9 @@ STDMETHODIMP CMathematicalCondition::raw_CopyFrom(IUnknown *pObject)
 
 		// Get the math condition object as a copyable object
 		ICopyableObjectPtr ipConditionCopier = ipCopyThis->MathematicalCondition;
-		ASSERT_RESOURCE_ALLOCATION("ELI27254", ipConditionCopier != NULL);
 
 		// Clone the math condition object
-		m_ipConditionChecker = ipConditionCopier->Clone();
+		m_ipConditionChecker = ipConditionCopier != NULL ? ipConditionCopier->Clone() : NULL;
 
 		return S_OK;
 	}
