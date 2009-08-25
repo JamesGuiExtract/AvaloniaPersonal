@@ -18,13 +18,6 @@
 #include <ComponentLicenseIDs.h>
 #include <TextFunctionExpander.h>
 
-#include <afxmt.h>
-#include <io.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-using namespace std;
-
 /////////////
 // Key Names
 /////////////
@@ -44,8 +37,7 @@ const string strSOURCE_DOC_PATH_TAG = "<SourceDocName.Path>";
 
 // globals and statics
 map<string, string> CAFUtility::ms_mapINIFileTagNameToValue;
-
-CMutex CAFUtility::ms_mutex;
+CMutex CAFUtility::ms_Mutex;
 
 //-------------------------------------------------------------------------------------------------
 // CAFUtility
@@ -159,8 +151,6 @@ STDMETHODIMP CAFUtility::GetComponentDataFolder(BSTR *pstrComponentDataFolder)
 	{
 		validateLicense();
 
-		CSingleLock lg(&ms_mutex, TRUE);
-
 		// get the component data folder and return it
 		string strFolder;
 		getComponentDataFolder(strFolder);
@@ -179,8 +169,6 @@ STDMETHODIMP CAFUtility::GetPrefixedFileName(BSTR strNonPrefixFullPath, BSTR* ps
 	try
 	{
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Get local copy of string
 		string	strNonPrefixFile = asString(strNonPrefixFullPath);
@@ -234,8 +222,6 @@ STDMETHODIMP CAFUtility::GetLoadFilePerSession(VARIANT_BOOL *pbSetting)
 		// Check license state
 		validateLicense();
 
-		CSingleLock lg(&ms_mutex, TRUE);
-
 		// Check for key existence
 		if (!ma_pUserCfgMgr->keyExists( gstrAF_REG_SETTINGS_FOLDER, DOCTYPE_LOADFILE_PERSESSION ))
 		{
@@ -266,8 +252,6 @@ STDMETHODIMP CAFUtility::SetAutoEncrypt(VARIANT_BOOL bAutoEncryptOn)
 	try
 	{
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Store the setting
 		ma_pUserCfgMgr->setKeyValue( gstrAF_REG_SETTINGS_FOLDER, 
@@ -388,8 +372,6 @@ STDMETHODIMP CAFUtility::ExpandTags(BSTR strInput, IAFDocument *pDoc, BSTR *pstr
 	{
 		validateLicense();
 
-		CSingleLock lg(&ms_mutex, TRUE);
-
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
 		ASSERT_RESOURCE_ALLOCATION("ELI07464", ipDoc != NULL);
@@ -417,8 +399,6 @@ STDMETHODIMP CAFUtility::StringContainsTags(BSTR strInput, VARIANT_BOOL *pbValue
 		ASSERT_ARGUMENT("ELI26574", pbValue != NULL);
 
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the input as a STL string
 		string stdstrInput = asString(strInput);
@@ -449,8 +429,6 @@ STDMETHODIMP CAFUtility::StringContainsInvalidTags(BSTR strInput, VARIANT_BOOL *
 	try
 	{
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the input as a STL string
 		string stdstrInput = asString(strInput);
@@ -638,8 +616,6 @@ STDMETHODIMP CAFUtility::GetBuiltInTags(IVariantVector** ppTags)
 
 		validateLicense();
 
-		CSingleLock lg(&ms_mutex, TRUE);
-
 		IVariantVectorPtr ipVec = getBuiltInTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI11773", ipVec != NULL);
 
@@ -657,8 +633,6 @@ STDMETHODIMP CAFUtility::GetINIFileTags(IVariantVector** ppTags)
 	try
 	{	
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		IVariantVectorPtr ipVec = getINIFileTags();
 		ASSERT_RESOURCE_ALLOCATION("ELI11774", ipVec != NULL);
@@ -679,8 +653,6 @@ STDMETHODIMP CAFUtility::GetAllTags(IVariantVector** ppTags)
 		ASSERT_ARGUMENT("ELI26585", ppTags != NULL);
 
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// Get the built in tags
 		IVariantVectorPtr ipVec1 = getBuiltInTags();
@@ -707,8 +679,6 @@ STDMETHODIMP CAFUtility::get_ShouldCacheRSD(VARIANT_BOOL *pvbCacheRSD)
 
 	try
 	{	
-		CSingleLock lg(&ms_mutex, TRUE);
-
 		// Check if the registry setting exists
 		if (ma_pUserCfgMgr->keyExists(gstrAF_REG_SETTINGS_FOLDER, gstrAF_CACHE_RSD_KEY))
 		{
@@ -736,8 +706,6 @@ STDMETHODIMP CAFUtility::ExpandTagsAndFunctions(BSTR bstrInput, IAFDocument *pDo
 	try
 	{
 		validateLicense();
-
-		CSingleLock lg(&ms_mutex, TRUE);
 
 		// get the document as a smart pointer
 		IAFDocumentPtr ipDoc(pDoc);
@@ -1053,40 +1021,46 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 	// Get the tag name without the < > symbols
 	string strTag = strTagName.substr(1, nLen-2);
 
-	// check if we have already cached the value of the tag
-	map<string, string>::iterator iter;
-	iter = ms_mapINIFileTagNameToValue.find(strTag);
-	if (iter != ms_mapINIFileTagNameToValue.end())
+	// Scope for the mutex
 	{
-		rstrTagValue = iter->second;
-		return true;
-	}
+		// Mutex while accessing static collection
+		CSingleLock lg(&ms_Mutex, TRUE);
 
-	// compute the INI file name if it hasn't been computed already
-	static string ls_strINIFileName;
-	if (ls_strINIFileName.empty())
-	{
-		ls_strINIFileName = getModuleDirectory(_Module.m_hInst);
-		ls_strINIFileName += "\\UCLIDAFCore.INI";
-	}
+		// check if we have already cached the value of the tag
+		map<string, string>::iterator iter;
+		iter = ms_mapINIFileTagNameToValue.find(strTag);
+		if (iter != ms_mapINIFileTagNameToValue.end())
+		{
+			rstrTagValue = iter->second;
+			return true;
+		}
 
-	// get the value of the tag from the INI file
-	// NOTE: This code below is not very robust because it cannot
-	// distinguish between a non-existant key in the INI file and
-	// an existing key in the INI file with an empty value
-	const char *pszSectionName = "ExpandableTags";
-	char pszResult[1024];
-	if (GetPrivateProfileString(pszSectionName, strTag.c_str(), "", 
-		pszResult, sizeof(pszResult), ls_strINIFileName.c_str()) <= 0)
-	{
-		return false;
-	}
-	
-	// if the result is not-empty, cache it
-	rstrTagValue = pszResult;
-	if (!rstrTagValue.empty())
-	{
-		ms_mapINIFileTagNameToValue[strTagName] = rstrTagValue;
+		// compute the INI file name if it hasn't been computed already
+		static string ls_strINIFileName;
+		if (ls_strINIFileName.empty())
+		{
+			ls_strINIFileName = getModuleDirectory(_Module.m_hInst);
+			ls_strINIFileName += "\\UCLIDAFCore.INI";
+		}
+
+		// get the value of the tag from the INI file
+		// NOTE: This code below is not very robust because it cannot
+		// distinguish between a non-existant key in the INI file and
+		// an existing key in the INI file with an empty value
+		const char *pszSectionName = "ExpandableTags";
+		char pszResult[1024];
+		if (GetPrivateProfileString(pszSectionName, strTag.c_str(), "", 
+			pszResult, sizeof(pszResult), ls_strINIFileName.c_str()) <= 0)
+		{
+			return false;
+		}
+
+		// if the result is not-empty, cache it
+		rstrTagValue = pszResult;
+		if (!rstrTagValue.empty())
+		{
+			ms_mapINIFileTagNameToValue[strTagName] = rstrTagValue;
+		}
 	}
 
 	return true;

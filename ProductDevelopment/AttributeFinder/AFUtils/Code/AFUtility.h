@@ -6,11 +6,11 @@
 
 #include <IConfigurationSettingsPersistenceMgr.h>
 
+#include <afxmt.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <memory>
-#include <afxmt.h>
 
 using namespace std;
 
@@ -28,8 +28,6 @@ public:
 	~CAFUtility();
 
 DECLARE_REGISTRY_RESOURCEID(IDR_AFUTILITY)
-
-DECLARE_CLASSFACTORY_SINGLETON(CAFUtility)
 
 DECLARE_PROTECT_FINAL_CONSTRUCT()
 
@@ -269,15 +267,13 @@ private:
 	// Variables
 	/////////////
 
-	// cache of tag name/value read from the INI file
+	// cache of tag name/value read from the INI file and mutex for reading/writing it
 	static map<string, string> ms_mapINIFileTagNameToValue;
+	static CMutex ms_Mutex;
 
 	// Handles registry settings
 	auto_ptr<IConfigurationSettingsPersistenceMgr> ma_pUserCfgMgr;
 
 	// pointer to the utility object that deals with encryption
 	IMiscUtilsPtr m_ipMiscUtils;
-
-	// Mutex for accessing public methods
-	static CMutex ms_mutex;
 };
