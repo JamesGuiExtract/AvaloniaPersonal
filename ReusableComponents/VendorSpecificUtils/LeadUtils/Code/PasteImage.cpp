@@ -283,9 +283,12 @@ void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const str
 		int iRetryCount(0), iRetryTimeout(0);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
 
+		// Create a temporary file to write the image to [LRCAU #5408]
+		TemporaryFileName tmpFile(NULL, getExtensionFromFullPath(strOutImage).c_str());
+
 		// Scope for PDF manager
 		{
-			PDFInputOutputMgr outFile(strOutImage, false);
+			PDFInputOutputMgr outFile(tmpFile.getName(), false);
 
 			// create the save options
 			SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
@@ -298,22 +301,27 @@ void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const str
 			// Get the compression factor for the input image type
 			L_INT nCompression = getCompressionFactor(flInInfo.Format);
 
+			// Get the file name from the output file manager
+			char* pszFileName = (char*) outFile.getFileName().c_str();
+
 			// loop through all the pages and save them to the out file
 			for (long i = 0; i < lNumberOfPages; i++)
 			{
+				string strPageNumber = asString(i+1);
+
 				// load one page of the bitmap
 				BITMAPHANDLE bPageHandle;
 				nRet = L_GetBitmapListItem(hInBitmapList, i, &bPageHandle, sizeof(BITMAPHANDLE));
 				throwExceptionIfNotSuccess(nRet, "ELI20072",
 					"Failed loading bitmap page from list!");
-				_lastCodePos = "20 Page# " + asString(i);
+				_lastCodePos = "20 Page# " + strPageNumber;
 
 				// save the loaded page
 				sfo.PageNumber = i+1;
 				int nNumFailedAttempts = 0;
 				while (nNumFailedAttempts < iRetryCount)
 				{
-					nRet = L_SaveBitmap(_bstr_t(outFile.getFileName().c_str()), &bPageHandle, 
+					nRet = L_SaveBitmap(pszFileName, &bPageHandle, 
 						flInInfo.Format, flInInfo.BitsPerPixel, nCompression, &sfo);
 
 					// check result
@@ -333,7 +341,8 @@ void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const str
 				if (nRet != SUCCESS)
 				{
 					UCLIDException ue("ELI20074", "Cannot save page");
-					ue.addDebugInfo("Original File", outFile.getFileNameInformationString());
+					ue.addDebugInfo("Destination file", strOutImage);
+					ue.addDebugInfo("Temporary file", tmpFile.getName());
 					ue.addDebugInfo("PDF Manager File", outFile.getFileName());
 					ue.addDebugInfo("Actual Error Code", nRet);
 					ue.addDebugInfo("Error Message", getErrorCodeDescription(nRet));
@@ -341,6 +350,7 @@ void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const str
 					ue.addDebugInfo("Number Of Retries", nNumFailedAttempts);
 					ue.addDebugInfo("Max Number Of Retries", iRetryCount);
 					ue.addDebugInfo("Compression Flag", nCompression);
+					ue.addDebugInfo("Total Number of pages", lNumberOfPages);
 					addFormatDebugInfo(ue, flInInfo.Format);
 					throw ue;
 				}
@@ -350,22 +360,39 @@ void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const str
 					{
 						UCLIDException ue("ELI20367",
 							"Application Trace: Successfully saved image page after retry.");
+						ue.addDebugInfo("Page number", i+1);
+						ue.addDebugInfo("Destination file", strOutImage);
 						ue.addDebugInfo("File Name", outFile.getFileNameInformationString());
 						ue.addDebugInfo("Retries", nNumFailedAttempts);
 						ue.log();
 					}
 				}
-				_lastCodePos = "30 Page# " + asString(i);
+				_lastCodePos = "30 Page# " + strPageNumber;
 			}
 			// done saving pages
 		} // end scope for PDF manager
 
-		// Make sure the file can be read - the file being inaccessable may have be the
-		// reason the retries were required.
-		waitForFileToBeReadable(strOutImage);
+		// Make sure the file can be read
+		waitForFileToBeReadable(tmpFile.getName());
+		_lastCodePos = "40";
+
+		// Check that the input image and the output image have the same number of pages
+		long nTmpCount = getNumberOfPagesInImage(tmpFile.getName());
+		if (nTmpCount != lNumberOfPages)
+		{
+			UCLIDException ue("ELI27272", "Page count mismatch when saving image!");
+			ue.addDebugInfo("Destination file", strOutImage);
+			ue.addDebugInfo("Destination page count", lNumberOfPages);
+			ue.addDebugInfo("Temporary file", tmpFile.getName());
+			ue.addDebugInfo("Temporary page count", nTmpCount);
+			throw ue;
+		}
+		_lastCodePos = "50";
+
+		// Copy the temporary file to the destination file
+		copyFile(tmpFile.getName(), strOutImage, false);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI20075");
-
 }
 //--------------------------------------------------------------------------------------------------
 void matchPalette(BITMAPHANDLE& hBmpSource, BITMAPHANDLE& rhBmpDest)
