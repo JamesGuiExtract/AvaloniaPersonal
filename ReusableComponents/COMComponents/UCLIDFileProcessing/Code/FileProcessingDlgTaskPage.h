@@ -70,6 +70,7 @@ public:
 	CButton m_radioProcessAll;
 	CButton m_radioProcessSkipped;
 	CComboBox m_comboSkipped;
+	CStatic m_staticSkipped;
 	//}}AFX_DATA
 
 // Overrides

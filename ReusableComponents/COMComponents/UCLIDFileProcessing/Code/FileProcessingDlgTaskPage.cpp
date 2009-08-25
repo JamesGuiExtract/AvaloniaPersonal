@@ -120,6 +120,7 @@ void FileProcessingDlgTaskPage::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_RADIO_PROCESS_ALL_FILES_PRIORITY, m_radioProcessAll);
 	DDX_Control(pDX, IDC_RADIO_PROCESS_SKIPPED_FILES, m_radioProcessSkipped);
 	DDX_Control(pDX, IDC_COMBO_SKIPPED_SCOPE, m_comboSkipped);
+	DDX_Control(pDX, IDC_STATIC_SKIPPED, m_staticSkipped);
 	//}}AFX_DATA_MAP 
 }
 //-------------------------------------------------------------------------------------------------
@@ -1647,6 +1648,12 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 		m_btnErrorSelectTag.EnableWindow(FALSE);
 		m_btnBrowseErrorLog.EnableWindow(FALSE);
 
+		// Scope controls
+		m_radioProcessAll.EnableWindow(FALSE);
+		m_radioProcessSkipped.EnableWindow(FALSE);
+		m_comboSkipped.EnableWindow(FALSE);
+		m_staticSkipped.EnableWindow(FALSE);
+
 		// Error task controls
 		m_btnExecuteErrorTask.EnableWindow(FALSE);
 		m_btnSelectErrorTask.EnableWindow(FALSE);
@@ -1667,6 +1674,11 @@ void FileProcessingDlgTaskPage::setEnabled(bool bEnabled)
 			m_btnErrorSelectTag.EnableWindow(TRUE);
 			m_btnBrowseErrorLog.EnableWindow(TRUE);
 		}
+
+		// Scope controls
+		m_radioProcessAll.EnableWindow(TRUE);
+		m_radioProcessSkipped.EnableWindow(TRUE);
+		m_staticSkipped.EnableWindow(TRUE);
 
 		// Set the button states that depend on settings
 		setButtonStates();
@@ -1935,9 +1947,12 @@ void FileProcessingDlgTaskPage::setButtonStates()
 	m_SpinThreads.EnableWindow( bNumThreadsChecked );
 	GetDlgItem(IDC_STATIC_THREADS)->EnableWindow( TRUE );
 
+	// Can always check/uncheck log error details
+	m_btnLogErrorDetails.EnableWindow(TRUE); 
+
 	// Enable / disable controls for logging error details
 	m_editErrorLog.EnableWindow(m_bLogErrorDetails);
-	m_btnLogErrorDetails.EnableWindow(m_bLogErrorDetails);
+	m_btnErrorSelectTag.EnableWindow(m_bLogErrorDetails);
 	m_btnBrowseErrorLog.EnableWindow(m_bLogErrorDetails);
 
 	// Can always check/uncheck error task
