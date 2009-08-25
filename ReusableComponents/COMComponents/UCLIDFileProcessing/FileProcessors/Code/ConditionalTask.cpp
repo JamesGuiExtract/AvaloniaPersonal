@@ -257,12 +257,8 @@ STDMETHODIMP CConditionalTask::raw_IsConfigured(VARIANT_BOOL *pbValue)
 		else
 		{
 			// At least one task must be enabled
-			int nTrueEnabledCount = getMiscUtils()->CountEnabledObjectsIn( m_ipTasksForTrue );
-			int nFalseEnabledCount = getMiscUtils()->CountEnabledObjectsIn( m_ipTasksForFalse );
-			if (nTrueEnabledCount + nFalseEnabledCount == 0)
-			{
-				bConfigured = false;
-			}
+			bConfigured = getMiscUtils()->CountEnabledObjectsIn(m_ipTasksForTrue) > 0
+				|| getMiscUtils()->CountEnabledObjectsIn(m_ipTasksForFalse) > 0;
 		}
 
 		// Return result to caller
@@ -300,11 +296,25 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 		// Check license
 		validateLicense();
 
+		IFileProcessingDBPtr ipDB(pDB);
+		ASSERT_ARGUMENT("ELI17909", ipDB != NULL);
 		ASSERT_ARGUMENT("ELI17906", bstrFileFullName != NULL);
 		ASSERT_ARGUMENT("ELI17907", asString(bstrFileFullName).empty() == false);
 		ASSERT_ARGUMENT("ELI17908", pTagManager != NULL);
-		ASSERT_ARGUMENT("ELI17909", pDB != NULL);
 		ASSERT_ARGUMENT("ELI17910", pResult != NULL);
+
+		// Get the action name
+		_bstr_t bstrActionName = "";
+		map<long, _bstr_t>::iterator it = m_mapActionIDToName.find(nActionID);
+		if (it == m_mapActionIDToName.end())
+		{
+			bstrActionName = ipDB->GetActionName(nActionID);
+			m_mapActionIDToName[nActionID] = bstrActionName;
+		}
+		else
+		{
+			bstrActionName = it->second;
+		}
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -332,7 +342,7 @@ STDMETHODIMP CConditionalTask::raw_ProcessFile(BSTR bstrFileFullName, long nFile
 
 		// Exercise the FAM Condition
 		bool bConditionSatisfied = asCppBool(ipFAMCondition->FileMatchesFAMCondition(bstrFileFullName, pDB, 
-										get_bstr_t(""), pTagManager));
+										bstrActionName, pTagManager));
 
 		// Kick off progress status for task execution
 		IProgressStatusPtr ipSubProgressStatus = NULL;
@@ -568,9 +578,9 @@ STDMETHODIMP CConditionalTask::IsDirty(void)
 		else
 		{
 			// Check dirty state of each object
-			VARIANT_BOOL vbDirty = getMiscUtils()->IsAnyObjectDirty3( m_ipFAMCondition, 
-				m_ipTasksForTrue, m_ipTasksForFalse );
-			if (asCppBool(vbDirty))
+			bool bDirty = asCppBool(getMiscUtils()->IsAnyObjectDirty3( m_ipFAMCondition, 
+				m_ipTasksForTrue, m_ipTasksForFalse ));
+			if (bDirty)
 			{
 				// S_OK implies dirty
 				return S_OK;
