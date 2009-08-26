@@ -70,21 +70,25 @@ long getYCoordinate(double dVertPercent, L_INT liHeight);
 //
 // ARGS:	lX				- the X coordinate for the image
 //			lY				- the Y coordinate for the image
-//			hBmpSource		- the BITMAPHANDLE for the source image page to be stamped
-//			hBmpStamp		- the BITMAPHANDLE for the image that will be stamped
+//			lDestWidth		- The width of the destination image
+//			lDestHeight		- The height of the destination image
+//			lStampWidth		- The width of the stamp image
+//			lStampHeight	- The height of the stamp image
 //
 // PROMISE: To throw an exception if pasting the image would result pasting pixels outside
 //			the bounds of the orignial image
-void validateStampLocation(long lX, long lY, const BITMAPHANDLE& hBmpSource, 
-						   const BITMAPHANDLE& hBmpStamp);
+void validateStampLocation(long lX, long lY, long lDestWidth, long lDestHeight, 
+						   long lStampWidth, long lStampHeight);
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: To validate the size of the stamp image
 //
-// ARGS:	hBmpSource		- the BITMAPHANDLE for the source image page to be stamped
-//			hBmpStamp		- the BITMAPHANDLE for the image that will be stamped
+// ARGS:	lDestWidth		- The width of the destination image
+//			lDestHeight		- The height of the destination image
+//			lStampWidth		- The width of the stamp image
+//			lStampHeight	- The height of the stamp image
 //
 // PROMISE:	To throw an exception if the stamp image is bigger than the source image
-void validateStampImageSize(const BITMAPHANDLE& hBmpSource, const BITMAPHANDLE& hBmpStamp);
+void validateStampImageSize(long lDestWidth, long lDestHeight, long lStampWidth, long lStampHeight);
 //--------------------------------------------------------------------------------------------------
 // PURPOSE:	To validate the page number specified to apply the stamp on
 //
@@ -99,20 +103,10 @@ void validatePageNumber(long lPageNumber, long lNumberOfPages);
 //
 // ARGS:	hPasteBmp		- the BITMAPHANDLE for the stamp image
 //			hInBitmapList	- the BITMAPLIST for the source image
-//			lPageNumber		- the page number to place the stamp on
 //			dHorizPercent	- the horizontal percentage offset from the top left of the image
 //			dVertPercent 	- the vertical percentage offset from the top left of the image
-void placeStamp(BITMAPHANDLE& hPasteBmp, HBITMAPLIST& hInBitmapList, 
-				long lPageNumber, double dHorizPercent, double dVertPercent);
-//--------------------------------------------------------------------------------------------------
-// PURPOSE: To save the now stamped image to the specified output image file
-//
-// ARGS:	hInBitmapList	- the BITMAPLIST for the source image
-//			lNumberOfPages	- the number of pages in the source image
-//			strOutImage		- the name of the output image file
-//			flInInfo		- the FILEINFO struct for the source image
-void saveStampedImage(HBITMAPLIST& hInBitmapList, long lNumberOfPages, const string& strOutImage,
-					  const FILEINFO& flInInfo);
+void placeStamp(BITMAPHANDLE& hStampBmp, BITMAPHANDLE& hDestBmp, double dHorizPercent,
+				double dVertPercent);
 //--------------------------------------------------------------------------------------------------
 // PURPOSE: To make the color palette of the destination bitmap match the color palette of
 //			the source bitmap

@@ -16,9 +16,6 @@ public:
 		// Initialize the BITMAPHANDLE if desired
 		if (bInitializeBMH)
 		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
 			L_InitBitmap( &m_bitmapHandle, sizeof( BITMAPHANDLE ), 0, 0, 0 );
 		}
 	}
@@ -28,9 +25,6 @@ public:
 		// Free the BITMAPHANDLE only if it has been allocated
 		if (m_bitmapHandle.Flags.Allocated)
 		{
-			// Provide multi-thread protection for PDF images
-//			LeadToolsPDFLoadLocker ltPDF( false );
-
 			L_FreeBitmap(&m_bitmapHandle);
 		}
 	}

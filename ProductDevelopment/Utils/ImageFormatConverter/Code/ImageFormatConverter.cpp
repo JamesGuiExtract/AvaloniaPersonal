@@ -14,6 +14,7 @@
 #include <ltkey.h>
 #include <ComponentLicenseIDs.h>
 #include <MiscLeadUtils.h>
+#include <LeadtoolsBitmapFreeer.h>
 #include <StringCSIS.h>
 
 #ifdef _DEBUG
@@ -119,7 +120,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 {
 	HANNOBJECT hFileContainer = NULL;
 	ANNENUMCALLBACK pfnCallBack = NULL;
-	BITMAPHANDLE hBitmap = {0};
 	try
 	{
 		try
@@ -217,6 +217,9 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 
 				// Set the 1-relative page number in the LOADFILEOPTION structure 
 				lfo.PageNumber = i;
+
+				BITMAPHANDLE hBitmap = {0};
+				LeadToolsBitmapFreeer freer(hBitmap);
 
 				// Load the current page from the bitmap
 				nRet = L_LoadBitmap(pszInputFile, &hBitmap, sizeof(BITMAPHANDLE), 0, 0,
@@ -345,12 +348,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 					// successive pages (P16 #2216)
 					nRet = L_SetTag( ANNTAG_TIFF, 0, 0, NULL );
 				}
-
-				// Free the bitmap handle
-				if (hBitmap.Flags.Allocated)
-				{
-					L_FreeBitmap(&hBitmap);
-				}
 			}	// end for each page
 
 			// Wait for the file to be readable before continuing
@@ -379,11 +376,6 @@ void convertImage(const string strInputFileName, const string strOutputFileName,
 				ex.log();
 			}
 			hFileContainer = NULL;
-		}
-		// If a bitmap is allocated, free it
-		if (hBitmap.Flags.Allocated)
-		{
-				L_FreeBitmap(&hBitmap);
 		}
 		if (bRetainAnnotations)
 		{

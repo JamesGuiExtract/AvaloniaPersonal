@@ -8,6 +8,7 @@
 #include <misc.h>
 #include <cpputil.h>
 #include <ComUtils.h>
+#include <MiscLeadUtils.h>
 #include <ExtractZoneAsImage.h>
 #include <LeadToolsBitmapFreeer.h>
 #include <ComponentLicenseIDs.h>
@@ -215,6 +216,8 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 	{
 		validateLicense();
 
+		ASSERT_ARGUMENT("ELI27291", ppImageStats != NULL);
+
 		BITMAPHANDLE bmPageBitmap;
 		LeadToolsBitmapFreeer freeerPage( bmPageBitmap, true );
 
@@ -264,8 +267,8 @@ STDMETHODIMP CImageUtils::GetImageStats(BSTR strImage, IRasterZone * pRaster,
 			}
 			ipVecFGPixelsInRow->PushBack(nPixelsFoundInRow);
 		}
-		CComQIPtr<IImageStats> ipTemp = ipImageStats;
-		ipTemp.CopyTo(ppImageStats);
+
+		*ppImageStats = (IImageStats*) ipImageStats.Detach();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13297");
 

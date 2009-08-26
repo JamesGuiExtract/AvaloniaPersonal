@@ -60,6 +60,9 @@ public:
 	//			returns a string of the format "Original: <orig> As: <converted>"
 	const std::string& getFileNameInformationString();
 
+	// Returns true if the original file was used as input and false otherwise
+	bool isInputFile() { return m_bOriginalUsedAsInput; }
+
 	// Moves all active items to inactive queue then removes all items from the queue
 	static void sFlushCache();
 

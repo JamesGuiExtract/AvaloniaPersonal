@@ -2,6 +2,7 @@
 #pragma once
 
 #include "LeadUtils.h"
+#include "PDFInputOutputMgr.h"
 
 #include <TemporaryFileName.h>
 #include <UCLIDException.h>
@@ -235,8 +236,38 @@ LEADUTILS_API void getImagePixelHeightAndWidth(const string& strImageFileName, i
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the handle of a bitmap for the given page in the file
 // the bitmap will have to be free'd by caller
-LEADUTILS_API void loadImagePage(const string strImageFileName, unsigned long ulPage, 
-								 BITMAPHANDLE &rBitmap);
+LEADUTILS_API void loadImagePage(const string& strImageFileName, unsigned long ulPage, 
+								 BITMAPHANDLE &rBitmap, bool bChangeViewPerspective = true);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the handle of a bitmap for the specified file loaded based upon
+//			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
+//			the bitmap will have to be free'd by caller
+LEADUTILS_API void loadImagePage(const string& strImageFileName, BITMAPHANDLE &rBitmap,
+								 FILEINFO& flInfo, LOADFILEOPTION& lfo,
+								 bool bChangeViewPerspective = true);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To return the handle of a bitmap for the specified file loaded based upon
+//			the provided LOADFILEOPTION (will load the page set in the lfo.PageNumber field)
+//			the bitmap will have to be free'd by caller
+// REQUIRE:	inputFile is in input mode
+LEADUTILS_API void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
+								 FILEINFO& flInfo, LOADFILEOPTION& lfo,
+								 bool bChangeViewPerspective = true);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To save the bitmap to the specified image at the specified page number
+// NOTE:	This code will internally perform multiple retry attempts when saving the page.
+LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile,
+								 FILEINFO& flInfo, long lPageNumber);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
+// NOTE:	This code will internally perform multiple retry attempts when saving the page.
+LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile,
+								 FILEINFO& flInfo, SAVEFILEOPTION& sfo);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To save the bitmap to the specified image based on the SAVEFILEOPTION struct.
+// NOTE:	This code will internally perform multiple retry attempts when saving the page.
+LEADUTILS_API void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
+								 FILEINFO& flInfo, SAVEFILEOPTION& sfo);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the color of the designated pixel
 LEADUTILS_API COLORREF getPixelColor(BITMAPHANDLE &rBitmap, int iRow, int iCol);

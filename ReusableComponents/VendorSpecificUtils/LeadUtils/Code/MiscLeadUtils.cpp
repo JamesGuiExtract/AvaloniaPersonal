@@ -2,7 +2,6 @@
 #include "stdafx.h"
 #include "MiscLeadUtils.h"
 #include "ImageConversion.h"
-#include "PDFInputOutputMgr.h"
 #include "LeadToolsFormatHelpers.h"
 
 #include <UCLIDException.h>
@@ -1499,43 +1498,183 @@ void addTextToImage(HDC hDC, const PageRasterZone &rZone, int iVerticalDpi)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void loadImagePage(const string strImageFileName, unsigned long ulPage, BITMAPHANDLE &rBitmap)
+void loadImagePage(const string& strImageFileName, unsigned long ulPage, BITMAPHANDLE &rBitmap,
+				   bool bChangeViewPerspective)
 {
-	L_INT nRet;
-
-	// Get initialized LOADFILEOPTION struct. 
-	// IgnoreViewPerspective to avoid a black region at the bottom of the image
-	LOADFILEOPTION LoadOptions = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
-
-	// get the default load options
-	nRet = L_GetDefaultLoadFileOption(&LoadOptions, sizeof(LOADFILEOPTION));
-	throwExceptionIfNotSuccess(nRet, "ELI13283", 
-		"Unable to get default file load options for LeadTools imaging library.");
-
-	// Convert a PDF input image to a temporary TIF
-	PDFInputOutputMgr ltPDF( strImageFileName, true );
-
-	// Get initialized FILEINFO struct
-	FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
-
-	LoadOptions.PageNumber = ulPage;
-	nRet = L_LoadBitmap( (char*)( ltPDF.getFileName().c_str()), 
-		&rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &LoadOptions, &fileInfo);
-	if (nRet != SUCCESS)
+	try
 	{
-		UCLIDException ue("ELI13284", "Unable to get load image file/page.");
-		ue.addDebugInfo("Error code", nRet);
-		ue.addDebugInfo("Filename", strImageFileName);
-		ue.addDebugInfo("PageNumber", ulPage);
-		throw ue;
+		// Get initialized FILEINFO struct
+		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+
+		// Get initialized LOADFILEOPTION struct. 
+		// IgnoreViewPerspective to avoid a black region at the bottom of the image
+		LOADFILEOPTION lfo = GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+
+		// Get the default load options and set the page
+		throwExceptionIfNotSuccess(L_GetDefaultLoadFileOption(&lfo, sizeof(LOADFILEOPTION)),
+			"ELI13283", "Unable to get default file load options for LeadTools imaging library.");
+		lfo.PageNumber = ulPage;
+
+		// Wrap the input image in PDF manager
+		PDFInputOutputMgr inputFile(strImageFileName, true);
+
+		loadImagePage(inputFile, rBitmap, fileInfo, lfo, bChangeViewPerspective);
 	}
-
-	// if the bitmap was loaded successfully, check the perspective to make
-	// sure that (0,0) is at the top left corner
-	if (rBitmap.ViewPerspective != TOP_LEFT)
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27279");
+}
+//-------------------------------------------------------------------------------------------------
+void loadImagePage(const string& strImageFileName, BITMAPHANDLE& rBitmap,
+				   FILEINFO& rFileInfo, LOADFILEOPTION& lfo, bool bChangeViewPerspective)
+{
+	try
 	{
-		nRet = L_ChangeBitmapViewPerspective(NULL, &rBitmap, sizeof(BITMAPHANDLE), TOP_LEFT);
-		throwExceptionIfNotSuccess(nRet, "ELI14634", "Unable to change bitmap perspective.");
+		// Wrap input file in PDF manager
+		PDFInputOutputMgr inputFile(strImageFileName, true);
+
+		loadImagePage(inputFile, rBitmap, rFileInfo, lfo, bChangeViewPerspective);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27285");
+}
+//-------------------------------------------------------------------------------------------------
+void loadImagePage(PDFInputOutputMgr& inputFile, BITMAPHANDLE& rBitmap,
+				   FILEINFO& rFileInfo, LOADFILEOPTION& lfo, bool bChangeViewPerspective)
+{
+	// Check that the PDF manager is in input mode
+	ASSERT_ARGUMENT("ELI27288", inputFile.isInputFile());
+
+	try
+	{
+		try
+		{
+			throwExceptionIfNotSuccess(L_LoadBitmap( (char*)( inputFile.getFileName().c_str()), 
+				&rBitmap, sizeof(BITMAPHANDLE), 0, ORDER_RGB, &lfo, &rFileInfo),"ELI13284",
+				"Unable to load image page!");
+
+			// If bChangeViewPerspective == true && the view perspective is not TOP_LEFT 
+			// then attempt to change the view perspective
+			if (bChangeViewPerspective && rBitmap.ViewPerspective != TOP_LEFT)
+			{
+				throwExceptionIfNotSuccess(L_ChangeBitmapViewPerspective(NULL, &rBitmap,
+					sizeof(BITMAPHANDLE), TOP_LEFT),"ELI14634",
+					"Unable to change bitmap perspective!");
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27280");
+	}
+	catch(UCLIDException& ue)
+	{
+		ue.addDebugInfo("File To Load", inputFile.getFileNameInformationString());
+		ue.addDebugInfo("Page Number", lfo.PageNumber);
+	}
+}
+//-------------------------------------------------------------------------------------------------
+void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO& flInfo,
+				   long lPageNumber)
+{
+	try
+	{
+		// Create default save file options and set the page number
+		SAVEFILEOPTION sfo = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
+		throwExceptionIfNotSuccess(L_GetDefaultSaveFileOption(&sfo, sizeof(SAVEFILEOPTION)),
+			"ELI27292", "Unable to get default save file options!");
+		sfo.PageNumber = lPageNumber;
+
+		// Wrap the output file in a PDF manager
+		PDFInputOutputMgr outFile(strOutputFile, false);
+
+		saveImagePage(hBitmap, outFile, flInfo, sfo);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27282");
+}
+//-------------------------------------------------------------------------------------------------
+void saveImagePage(BITMAPHANDLE& hBitmap, const string& strOutputFile, FILEINFO& flInfo,
+				   SAVEFILEOPTION& sfo)
+{
+	try
+	{
+		// Wrap the output file in a PDF manager
+		PDFInputOutputMgr outFile(strOutputFile, false);
+
+		saveImagePage(hBitmap, outFile, flInfo, sfo);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27284");
+}
+//-------------------------------------------------------------------------------------------------
+void saveImagePage(BITMAPHANDLE& hBitmap, PDFInputOutputMgr& outFile,
+				   FILEINFO& flInfo, SAVEFILEOPTION &sfo)
+{
+	// Check that the PDF manager is in output mode
+	ASSERT_ARGUMENT("ELI27289", !outFile.isInputFile());
+
+	try
+	{
+		try
+		{
+			// Get the retry count and timeout
+			int iRetryCount(0), iRetryTimeout(0);
+			getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
+
+			// Get the file name as a char*
+			char* pszOutFile = (char*) outFile.getFileName().c_str();
+
+			// Get the compression factor
+			long nCompression = getCompressionFactor(flInfo.Format);
+
+			// Default return to success
+			L_INT nRet = SUCCESS;
+
+			// Perform the save operation in a loop
+			long nNumFailedAttempts = 0;
+			while (nNumFailedAttempts < iRetryCount)
+			{
+				nRet = L_SaveBitmap(pszOutFile, &hBitmap, flInfo.Format, flInfo.BitsPerPixel,
+					nCompression, &sfo);
+
+				// Check result
+				if (nRet == SUCCESS)
+				{
+					// Exit loop
+					break;
+				}
+				else
+				{
+					// Increment the attempt count and sleep
+					nNumFailedAttempts++;
+					Sleep(iRetryTimeout);
+				}
+			}
+
+			// If still not success, throw an exception
+			if (nRet != SUCCESS)
+			{
+				UCLIDException ue("ELI27283", "Cannot save page");
+				ue.addDebugInfo("Actual Error Code", nRet);
+				ue.addDebugInfo("Error Message", getErrorCodeDescription(nRet));
+				ue.addDebugInfo("Number Of Retries", nNumFailedAttempts);
+				ue.addDebugInfo("Max Number Of Retries", iRetryCount);
+				ue.addDebugInfo("Compression Flag", nCompression);
+				addFormatDebugInfo(ue, flInfo.Format);
+				throw ue;
+			}
+			// Check if a retry was necessary, if so log an application trace
+			else if (nNumFailedAttempts > 0)
+			{
+				UCLIDException ue("ELI20367",
+					"Application Trace: Successfully saved image page after retry.");
+				ue.addDebugInfo("Page Number", sfo.PageNumber);
+				ue.addDebugInfo("Output File Name", outFile.getFileNameInformationString());
+				ue.addDebugInfo("Retries", nNumFailedAttempts);
+				ue.log();
+			}
+		}
+		CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27281");
+	}
+	catch(UCLIDException& uex)
+	{
+		uex.addDebugInfo("Output File Name", outFile.getFileNameInformationString());
+		uex.addDebugInfo("Page Number", sfo.PageNumber);
+
+		throw uex;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -1692,6 +1831,8 @@ int getCompressionFactor(L_INT nFormat)
 	// Static map to store the format to compression factor values
 	static map<L_INT, int> smapFormatToCompressionFactor;
 
+	static CMutex mutex;
+
 	try
 	{
 		// Default value to 0 (this flag will work for most compression values although
@@ -1700,6 +1841,13 @@ int getCompressionFactor(L_INT nFormat)
 
 		// Get the string value for the format
 		string strFormat = getStringFromFormat(nFormat);
+
+		// Get a registry persistance manager to search for a compression value
+		// for this file type
+		RegistryPersistenceMgr rpm(HKEY_LOCAL_MACHINE, gstrRC_REG_PATH);
+
+		// Mutex while accessing the map
+		CSingleLock lg(&mutex, TRUE);
 
 		// Look for the value in the map
 		map<L_INT, int>::iterator it = smapFormatToCompressionFactor.find(nFormat);
@@ -1710,10 +1858,6 @@ int getCompressionFactor(L_INT nFormat)
 		}
 		else
 		{
-			// Get a registry persistance manager to search for a compression value
-			// for this file type
-			RegistryPersistenceMgr rpm(HKEY_LOCAL_MACHINE, gstrRC_REG_PATH);
-
 			// Check for registry key
 			if (rpm.keyExists(gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER, strFormat))
 			{
@@ -1747,6 +1891,9 @@ int getCompressionFactor(L_INT nFormat)
 			// Store the compression factor in the map (even if there was no key in the registry)
 			smapFormatToCompressionFactor[nFormat] = nReturn;
 		}
+
+		// Unlock the mutex
+		lg.Unlock();
 
 		// Return the compression factor
 		return nReturn;
