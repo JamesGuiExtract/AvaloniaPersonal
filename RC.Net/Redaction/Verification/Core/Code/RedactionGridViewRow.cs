@@ -85,7 +85,6 @@ namespace Extract.Redaction.Verification
             string type)
             : this(new LayerObject[] { layerObject }, text, category, type, null, null)
         {
-
         }
 
         /// <summary>
@@ -335,12 +334,13 @@ namespace Extract.Redaction.Verification
         /// <see cref="RedactionGridViewRow"/>.</param>
         /// <param name="imageViewer">The image viewer on which layer objects should be added.</param>
         /// <param name="masterCodes">The master list of valid exemption codes and categories.</param>
+        /// <param name="level">The confidence level of <paramref name="attribute"/>.</param>
         /// <returns>A <see cref="RedactionGridViewRow"/> with information from the specified 
         /// <paramref name="attribute"/> or <see langword="null"/> if the attribute does not 
         /// contain spatial information.</returns>
         [CLSCompliant(false)]
-        public static RedactionGridViewRow FromComAttribute(ComAttribute attribute, 
-            ImageViewer imageViewer, MasterExemptionCodeList masterCodes)
+        public static RedactionGridViewRow FromComAttribute(ComAttribute attribute,
+            ImageViewer imageViewer, MasterExemptionCodeList masterCodes, ConfidenceLevel level)
         {
             try
             {
@@ -352,7 +352,8 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Get the data for the row from the attribute
-                List<LayerObject> layerObjects = GetLayerObjectsFromSpatialString(value, imageViewer);
+                List<LayerObject> layerObjects = 
+                    GetLayerObjectsFromSpatialString(value, imageViewer, level);
                 string text = StringMethods.ConvertLiteralToDisplay(value.String);
                 string category = attribute.Name;
                 string type = attribute.Type;
@@ -566,15 +567,16 @@ namespace Extract.Redaction.Verification
         /// <param name="spatialString">The spatial string from which to create the layer object.
         /// </param>
         /// <param name="imageViewer">The image viewer on which the spatial string appears.</param>
+        /// <param name="level">The confidence level of the layer objects to create.</param>
         /// <returns>A layer object that corresponds to <paramref name="value"/>.</returns>
-        static List<LayerObject> GetLayerObjectsFromSpatialString(SpatialString spatialString, 
-            ImageViewer imageViewer)
+        static List<LayerObject> GetLayerObjectsFromSpatialString(SpatialString spatialString,
+            ImageViewer imageViewer, ConfidenceLevel level)
         {
             // Get the raster zones of the spatial string, organized by page
             Dictionary<int, List<RasterZone>> pagesToZones = GetRasterZonesByPage(spatialString);
 
             // Create a layer object for each page of raster zones
-            return CreateLayerObjects(pagesToZones, imageViewer);
+            return CreateLayerObjects(pagesToZones, imageViewer, level);
         }
 
         /// <summary>
@@ -621,10 +623,12 @@ namespace Extract.Redaction.Verification
         /// <see cref="LayerObject"/>s.</param>
         /// <param name="imageViewer">The image viewer to which each <see cref="LayerObject"/> 
         /// will be associated.</param>
+        /// <param name="level">The confidence level of the layer objects to create.</param>
         /// <returns>A <see cref="List{T}"/> of <see cref="LayerObject"/> created from the 
         /// specified raster zones, one for each page of <paramref name="pagesToZones"/>.</returns>
         static List<LayerObject> CreateLayerObjects(
-            Dictionary<int, List<RasterZone>> pagesToZones, ImageViewer imageViewer)
+            Dictionary<int, List<RasterZone>> pagesToZones, ImageViewer imageViewer, 
+            ConfidenceLevel level)
         {
             // Iterate over each raster zone
             LayerObject previous = null;
@@ -634,6 +638,8 @@ namespace Extract.Redaction.Verification
                 // Create a redaction and add it to the result collection
                 RedactionLayerObject redaction = new RedactionLayerObject(imageViewer,
                     pair.Key, new string[] { "Redaction" }, pair.Value);
+                redaction.Color = level.Color;
+                redaction.CanRender = level.Output;
                 layerObjects.Add(redaction);
 
                 // If necessary, link to the previous page
