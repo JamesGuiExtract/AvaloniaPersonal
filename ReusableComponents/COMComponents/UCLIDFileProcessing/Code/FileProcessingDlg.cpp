@@ -386,6 +386,19 @@ void FileProcessingDlg::OnBtnRun()
 		ASSERT_RESOURCE_ALLOCATION("ELI26941", ipRole != NULL);
 		m_bProcessingSkippedFiles = asCppBool(ipRole->ProcessSkippedFiles);
 
+		// Check if authentication is needed for processing skipped files [LRCAU #5413]
+		if (m_bProcessingSkippedFiles && ipRole->SkippedForAnyUser == VARIANT_TRUE)
+		{
+			// Show the DB login prompt
+			VARIANT_BOOL vbCancelled;
+			if (getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
+			{
+				MessageBox("Invalid password! Cannot process skipped files for all users!",
+					"Authentication Failed", MB_OK | MB_ICONERROR);
+				return;
+			}
+		}
+
 		// If the current tab is not one of the log tab or the statistics tab
 		if (iActiveIndex != iQueueLogIndex && iActiveIndex != iProcLogIndex
 			&& iActiveIndex != iStatisticsIndex)
