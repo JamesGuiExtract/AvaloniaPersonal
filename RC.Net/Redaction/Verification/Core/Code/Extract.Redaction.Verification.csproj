@@ -138,6 +138,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfidenceLevel.cs" />
+    <Compile Include="ConfidenceLevelsCollection.cs" />
     <Compile Include="ExemptionCategory.cs" />
     <Compile Include="ExemptionCode.cs" />
     <Compile Include="ExemptionCodeList.cs" />
@@ -155,6 +157,7 @@
       <DependentUpon>FeedbackSettingsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="GeneralVerificationSettings.cs" />
+    <Compile Include="InitializationSettings.cs" />
     <Compile Include="MasterExemptionCodeList.cs" />
     <Compile Include="MetadataSettings.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -197,6 +200,14 @@
     </COMReference>
     <COMReference Include="UCLID_AFCORELib">
       <Guid>{69D40760-8162-4822-85D6-C10B02044E9D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+    <COMReference Include="UCLID_AFUTILSLib">
+      <Guid>{AC966E48-1A26-40C7-B61E-AC4C09C9D565}</Guid>
       <VersionMajor>1</VersionMajor>
       <VersionMinor>0</VersionMinor>
       <Lcid>0</Lcid>
