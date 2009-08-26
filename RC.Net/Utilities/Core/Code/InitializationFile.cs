@@ -28,15 +28,16 @@ namespace Extract.Utilities
         public InitializationFile(string file)
         {
             // Ensure the file is valid
-            if (!File.Exists(file))
+            string fullPath = FileSystemMethods.GetAbsolutePath(file);
+            if (!File.Exists(fullPath))
             {
                 ExtractException ee = new ExtractException("ELI27073", 
                     "Invalid initialization file.");
-                ee.AddDebugData("File", file, false);
+                ee.AddDebugData("File", fullPath, false);
                 throw ee;
             }
 
-            _file = file;
+            _file = fullPath;
         }
 
         #endregion InitializationFile Constructors
