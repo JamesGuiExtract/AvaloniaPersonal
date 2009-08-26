@@ -1,10 +1,18 @@
-<SETTING>;QueryForAutomatedRedaction=HCData|LCData|MCData
-<SETTING>;QueryForVerification=HCData|LCData|MCData|Clues
-// output verification result
-//<SETTING>;CreateTestOutputVOAFiles=1
-// Type of Redactions to be tested
+//<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+//
+<SETTING>;AutomatedConditionQuantifier=any
+//only any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
+//
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+//|Clues|LCData testing with supposed customer configuration
+<SETTING>;OutputHybridStats=0
 //<SETTING>;TypeToBeTested=SSN
-//<SETTING>;OutputAttributeNamesFileLists=1
+//<SETTING>;OUTPUT_FINAL_STATS_ONLY=TRUE
+<SETTING>;OutputFinalStatsOnly=1
+//<SETTING>;CreateTestOutputVOAFiles=1
 
 // Master.rsd rule file
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\AtPac\CA - San Francisco\Set002\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
