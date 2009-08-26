@@ -50,6 +50,11 @@ namespace Extract.Redaction.Verification
         readonly VerificationSettings _settings;
 
         /// <summary>
+        /// The settings specified in the ID Shield initialization file.
+        /// </summary>
+        readonly InitializationSettings _iniSettings = new InitializationSettings();
+
+        /// <summary>
         /// The last saved state of the currently processing document.
         /// </summary>
         VerificationMemento _savedMemento;
@@ -81,7 +86,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// License cache for validating the license.
         /// </summary>
-        static LicenseStateCache _licenseCache =
+        readonly static LicenseStateCache _licenseCache =
             new LicenseStateCache(LicenseIdName.IDShieldVerificationObject, "Verification Form");
 
         #endregion VerificationTaskForm Fields
@@ -126,6 +131,7 @@ namespace Extract.Redaction.Verification
                 string[] types = GetRedactionTypes();
                 _redactionGridView.AddRedactionTypes(types);
 
+                // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
             }
@@ -194,11 +200,14 @@ namespace Extract.Redaction.Verification
         /// <returns>The first document type in <paramref name="voaFile"/>.</returns>
         static string GetDocumentType(string voaFile)
         {
-            foreach (ComAttribute attribute in AttributesFile.ReadAll(voaFile))
+            if (File.Exists(voaFile))
             {
-                if (attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                foreach (ComAttribute attribute in AttributesFile.ReadAll(voaFile))
                 {
-                    return attribute.Value.String;
+                    if (attribute.Name.Equals("DocumentType", StringComparison.OrdinalIgnoreCase))
+                    {
+                        return attribute.Value.String;
+                    }
                 }
             }
 
@@ -560,6 +569,9 @@ namespace Extract.Redaction.Verification
                 _imageViewer.EstablishConnections(this);
 
                 _imageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
+
+                // Set confidence levels
+                _redactionGridView.ConfidenceLevels = _iniSettings.ConfidenceLevels;
             }
             catch (Exception ex)
             {
