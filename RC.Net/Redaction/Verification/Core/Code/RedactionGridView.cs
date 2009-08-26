@@ -12,6 +12,7 @@ using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
+using UCLID_AFUTILSLib;
 using UCLID_COMUTILSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -67,6 +68,11 @@ namespace Extract.Redaction.Verification
         /// The master list of valid exemption categories and codes.
         /// </summary>
         MasterExemptionCodeList _masterCodes;
+
+        /// <summary>
+        /// The confidence levels of attributes in the <see cref="RedactionGridView"/>.
+        /// </summary>
+        ConfidenceLevelsCollection _levels;
 
         /// <summary>
         /// COM attributes that are not displayed in the redaction grid but are carried forward 
@@ -238,6 +244,36 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Gets or sets the levels of confidence associated with attributes in the 
+        /// <see cref="RedactionGridView"/>.
+        /// </summary>
+        /// <value>The levels of confidence associated with attributes in the 
+        /// <see cref="RedactionGridView"/>.</value>
+        /// <returns>The levels of confidence associated with attributes in the 
+        /// <see cref="RedactionGridView"/>.</returns>
+        // ConfidenceLevelsCollection IS a read only collection.
+        [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public ConfidenceLevelsCollection ConfidenceLevels
+        {
+            get
+            {
+                return _levels;
+            }
+            set
+            {
+                try
+                {
+                    _levels = value;
+                }
+                catch (Exception ex)
+                {
+                    throw new ExtractException("ELI27273",
+                        "Unable to set data confidence level.", ex);
+                }
+            }
+        }
+        
         #endregion RedactionGridView Properties
 
         #region RedactionGridView Methods
@@ -490,30 +526,31 @@ namespace Extract.Redaction.Verification
                 // Otherwise two rows will be added for each attribute.
                 _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
+                _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
 
+                // Reset the attributes
                 _redactions.Clear();
                 _imageViewer.LayerObjects.Clear();
                 _undisplayedAttributes = new List<ComAttribute>();
 
-                // Iterate over the attributes
-                foreach (ComAttribute attribute in AttributesFile.ReadAll(fileName))
-                {
-                    // Add a row for each attribute
-                    RedactionGridViewRow row = 
-                        RedactionGridViewRow.FromComAttribute(attribute, _imageViewer, MasterCodes);
-                    if (row == null)
-                    {
-                        _undisplayedAttributes.Add(attribute);
-                    }
-                    else
-                    {
-                        Add(row);
+                // Load the attributes from the file
+                IUnknownVector attributes = new IUnknownVector();
+                attributes.LoadFrom(fileName, false);
 
-                        foreach (LayerObject layerObject in row.LayerObjects)
-                        {
-                            _imageViewer.LayerObjects.Add(layerObject);
-                        }
-                    }
+                // Query and add attributes at each confidence level
+                AFUtility utility = new AFUtility();
+                foreach (ConfidenceLevel level in _levels)
+                {
+                    IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
+                    AddAttributes(vector, level);
+                }
+
+                // Add any remaining attributes as undisplayed attributes
+                int count = attributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    ComAttribute attribute = (ComAttribute)attributes.At(i);
+                    _undisplayedAttributes.Add(attribute);
                 }
 
                 _dirty = false;
@@ -529,6 +566,39 @@ namespace Extract.Redaction.Verification
             {
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified attributes to the <see cref="RedactionGridView"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes to add.</param>
+        /// <param name="level">The confidence level of the <paramref name="attributes"/>.</param>
+        void AddAttributes(IUnknownVector attributes, ConfidenceLevel level)
+        {
+            // Iterate over the attributes
+            int count = attributes.Size();
+            for (int i = 0; i < count; i++)
+            {
+                ComAttribute attribute = (ComAttribute)attributes.At(i);
+
+                // Add each attribute
+                RedactionGridViewRow row =
+                    RedactionGridViewRow.FromComAttribute(attribute, _imageViewer, MasterCodes, level);
+                if (row == null)
+                {
+                    _undisplayedAttributes.Add(attribute);
+                }
+                else
+                {
+                    Add(row);
+
+                    foreach (LayerObject layerObject in row.LayerObjects)
+                    {
+                        _imageViewer.LayerObjects.Add(layerObject);
+                    }
+                }
             }
         }
 
@@ -778,7 +848,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Add(e.LayerObject, "[No text]", "Man", "");
+                Add(e.LayerObject, "[No text]", "Manual", "");
             }
             catch (Exception ex)
             {
