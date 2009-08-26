@@ -1,14 +1,55 @@
 <HTML>
 	<HEAD>
-		<TITLE>Creating an OS backup using Clonezilla.</TITLE>
+		<TITLE>Creating a partition backup using Clonezilla</TITLE>
 		<link type="text/css" rel="stylesheet" href="../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 	</HEAD>
 	<BODY>
-		<h1>Creating an OS backup using Clonezilla.</h1>
+		<h1>Creating a partition backup using Clonezilla.</h1>
 		<hr>
 		<ul>
-			<li><h3>Partition Hard Disk</h3></li>
-		
+			<li><h3>Install an Operating System</h3></li>
+			<ul>
+				<li>If you need a different operating system than the currently installed OS, a backup image is not available, or no OS is present. Otherwise skip to the 
+					next section.
+				</li>
+				<ul>
+					<li>Ensure that a backup of the current OS is present and create an updated image if possible.</li>
+					<li>Boot the machine from the OS installation media.</li>
+					<li>Follow the on screen instructions to reformat the OS partition (typically C:, the size should be ~20 or 40 GB) and install the 
+						desired OS.
+					</li>
+				</ul>
+			</ul>
+			<li><h3>Update the Operating System</h3></li>
+			<ul>
+				<li>Install the latest service pack for your OS. Service packs can be found on the network at <a href="\\jake\applications\Service Packs">
+					\\jake\applications\Service Packs</a></li>
+				<li>Install the latest OS updates ie. <a href="http://update.microsoft.com">Windows Update</a>. Note that the previous link only works in 
+					Internet Explorer</li>
+				<li>Rerun Windows Update until no updates are available. Check in on the machine occasionally during updates, as some have EULA's or other
+					boxes to click through that will hold up the entire process. Internet Explorer installation boxes like to hide behind your other windows.</li>
+			</ul>
+			<li><h3>Windows Settings</h3></li>
+			<ul>
+				<li>All Windows flavors (XP and newer)</li>
+				<ul>
+					<li>Set the password for the Administrator account to the default password for test machines if it is not already configured.</li>
+					<li>While logged in as "Administrator:"</li>
+					<ul>
+						<li>Press ctrl+alt+del and select <b>Change password...</b></li>
+						<li>Follow the on screen instructions.</li>
+					</ul>
+					<li>Right click <b>My Computer</b> and select <b>Properties</b>. Alternatively, go to <b>Control Panel -> System</b></li>
+					<ul>
+						<li>Under <b>Computer Name</b> click <b>Change</b>.</li>
+						<li>Set the radio button under <b>Member of</b> to "Domain" and enter "extract.local" in the edit box.</li>
+						<li>Switch to the <b>System Restore</b>/<b>System Protection</b> tab and disable restore points for all drives.
+					</ul>
+				</ul>
+				
+			</ul>
+
+
 		</ul>
 		
 	
