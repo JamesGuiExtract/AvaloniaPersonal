@@ -226,7 +226,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI26598",
+                throw ExtractException.CreateComVisible("ELI26598", 
                     "Error canceling verification.", ex);
             }
         }
@@ -245,7 +245,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI26599",
+                throw ExtractException.CreateComVisible("ELI26599",
                     "Error closing verification.", ex);
             }
         }
@@ -264,7 +264,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI26600",
+                throw ExtractException.CreateComVisible("ELI26600",
                     "Error initializing verification.", ex);
             }
         }
@@ -304,7 +304,7 @@ namespace Extract.Redaction.Verification
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI26601",
+                throw ExtractException.CreateComVisible("ELI26601",
                     "Unable to verify document.", ex);
             }
         }
