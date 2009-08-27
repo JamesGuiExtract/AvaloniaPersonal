@@ -42,7 +42,7 @@ LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
 RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit
 RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
-RDTReleaseBleedingEdgeDir=$(LabDEBleedingEdgeDir)\RDT_InternalUseOnly
+RDTReleaseBleedingEdgeDir=S:\LabDE\Internal\BleedingEdge\$(LabDEVersion)\RDT
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
 LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules

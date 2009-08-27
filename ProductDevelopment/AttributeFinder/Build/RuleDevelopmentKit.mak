@@ -34,7 +34,7 @@ RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 IDSInstallProjectDirectory=$(AFRootDirectory)\IndustrySpecific\Redaction\Installation\IDShieldCustomerRDT
 IDSRDTInstallMediaDir=$(IDSInstallProjectDirectory)\Media\CD-ROM\DiskImages\Disk1
 
-RDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_InternalUseOnly
+RDTReleaseBleedingEdgeDir=S:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT
 IDSRDTReleaseBleedingEdgeDir=R:\FlexIndex\Internal\BleedingEdge\$(FlexIndexVersion)\RDT_IDShieldCustomer
 
 # determine the name of the release output directory based upon the build

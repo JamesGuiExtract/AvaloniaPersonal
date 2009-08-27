@@ -19,3 +19,9 @@ IF DEFINED BUILD_INSTALL_FILES (
 ) ELSE (
 	net use p: \\fnp2\internal\Common\Engineering\productdevelopment
 )
+
+IF DEFINED BUILD_INTERNAL_INSTALLS (
+	net use s: %BUILD_INTERNAL_INSTALLS%
+) ELSE (
+	net use s: \\fnp2\internal\Common\Engineering\ProductReleases_InternalUseOnly
+)
