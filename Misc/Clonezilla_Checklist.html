@@ -1,13 +1,13 @@
 <HTML>
 	<HEAD>
-		<TITLE>Creating a partition backup using Clonezilla</TITLE>
+		<TITLE>Backing up a test machine using Clonezilla</TITLE>
 		<link type="text/css" rel="stylesheet" href="../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
 	</HEAD>
 	<BODY>
-		<h1>Creating a partition backup using Clonezilla.</h1>
+		<h1>Backing up a test machine using Clonezilla.</h1>
 		<hr>
 		<ul>
-			<li><h3>Install an Operating System</h3></li>
+			<li><h3>Install an Operating System:</h3></li>
 			<ul>
 				<li>If you need a different operating system than the currently installed OS, a backup image is not available, or no OS is present. Otherwise skip to the 
 					next section.
@@ -20,36 +20,68 @@
 					</li>
 				</ul>
 			</ul>
-			<li><h3>Update the Operating System</h3></li>
+			<li><h3>Update the Operating System:</h3></li>
 			<ul>
 				<li>Install the latest service pack for your OS. Service packs can be found on the network at <a href="\\jake\applications\Service Packs">
 					\\jake\applications\Service Packs</a></li>
-				<li>Install the latest OS updates ie. <a href="http://update.microsoft.com">Windows Update</a>. Note that the previous link only works in 
+				<li>Install the latest OS updates ie. <a href="http://update.microsoft.com">Windows Update</a>. Note: the previous link only works in 
 					Internet Explorer</li>
 				<li>Rerun Windows Update until no updates are available. Check in on the machine occasionally during updates, as some have EULA's or other
 					boxes to click through that will hold up the entire process. Internet Explorer installation boxes like to hide behind your other windows.</li>
 			</ul>
-			<li><h3>Windows Settings</h3></li>
+			<li><h3>Windows Settings:</h3></li>
 			<ul>
-				<li>All Windows flavors (XP and newer)</li>
+				<li>Set the password for the Administrator account to the default password for test machines if it is not already configured.</li>
+				<li>While logged in as "Administrator:"</li>
 				<ul>
-					<li>Set the password for the Administrator account to the default password for test machines if it is not already configured.</li>
-					<li>While logged in as "Administrator:"</li>
-					<ul>
-						<li>Press ctrl+alt+del and select <b>Change password...</b></li>
-						<li>Follow the on screen instructions.</li>
-					</ul>
-					<li>Right click <b>My Computer</b> and select <b>Properties</b>. Alternatively, go to <b>Control Panel -> System</b></li>
-					<ul>
-						<li>Under <b>Computer Name</b> click <b>Change</b>.</li>
-						<li>Set the radio button under <b>Member of</b> to "Domain" and enter "extract.local" in the edit box.</li>
-						<li>Switch to the <b>System Restore</b>/<b>System Protection</b> tab and disable restore points for all drives.
-					</ul>
+					<li>Press ctrl+alt+del and select <b>Change password...</b></li>
+					<li>Follow the on screen instructions.</li>
 				</ul>
-				
+				<li>Right click <b>My Computer</b> and select <b>Properties</b>. Alternatively, go to <b>Control Panel -> System</b></li>
+				<ul>
+					<li>Under <b>Computer Name</b> click <b>Change</b>.</li>
+					<li>Set the radio button under <b>Member of</b> to "Domain" and enter "extract.local" in the edit box.</li>
+					<li>Switch to the <b>System Restore</b>/<b>System Protection</b> tab and disable restore points for all drives.</li>
+					<li>Switch to the <b>Automatic Updates</b> tab (XP) or click <b>Windows Update</b> under <b>See Also</b> in <b>System</b>, then click <b>Change
+						Settings</b> (Vista). Turn updates off or set them to manual installation.</li>
+					<li>Under <b>Remote</b>, turn on remote desktop (choose "Allow users running any version of Remote Desktop" in Vista, or XP machines might not 
+						be able to connect).</li>
+				</ul>
+				<li><b>Start Menu</b> -&gt <b>Control Panel</b> -&gt <b>Windows Firewall</b></li>
+				<ul>
+					<li>Turn off/disable Windows Firewall.</li>
+				</ul>
+				<li>Right click on the desktop and select <b>Properties...</b> or <b>Personalize</b>.</li>
+				<ul>
+					<li>Under <b>Screen Saver</b> -&gt <b>Power...</b>
+					<li>Disable sleep/hibernation. Disable powering off the hard drives. Set any perfomance profile option to "High performance." Power saving modes
+						can prevent users from making remote desktop connections. Your OS my have one or more of those options.</li>
+				</ul>
+				<li>Right click <b>My Computer</b> and select <b>Magage</b>.</li>
+				<ul>
+					<li>Expand <b>System Tools</b> -&gt <b>Local Users and Groups</b> and select <b>Groups</b>.</li>
+					<li>Right click the <b>Administrators</b> group. Select <b>Add to Group...</b>. Click <b>Add...</b></li>
+					<li>Enter "Domain Users" into the edit box. You may be prompted for your domain username and password.</li>
+				</ul>
+				<li>Open Windows Explorer/My Computer</li>
+				<ul>
+					<li>For each local hard drive listed (typically 'C:' and 'D:'):</li>
+					<li>Right click the drive and click <b>Properties</b>. Uncheck the drive indexing box.</li>
+				</ul>
+				<li>On Vista:</li>
+				<ul>
+					<li>Right click the sidebar icon in the notification area of the taskbar. Click <b>exit</b>. Be sure to uncheck the "start sidebar with 
+						Windows" checkbox.</li>
+				</ul>
 			</ul>
-
-
+			<li><h3>Create backup disk image:</h3></li>
+			<ul>
+				<li>Create a "Clonezilla" folder on the machines data partition (typically 'D:'). This must be a different partition than the one containiong the
+					OS.</li>
+				<li>Insert a Clonezilla disc into the machine and boot to it. Follow the onscreen instructions to create a backup of the partition containnig the 
+					operating system. Name your backup using the following format: <i>OSbits_Date</i> eg: <i>Server2008x64_08-27-2009</i></li>
+				<li>See <a href="http://clonezilla.org/">http://clonezilla.org/</a> for Clonezilla info/downloads.</li>
+			</ul>
 		</ul>
 		
 	
