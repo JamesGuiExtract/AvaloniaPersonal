@@ -7,6 +7,7 @@
 		<h1>Backing up a test machine using Clonezilla.</h1>
 		<hr>
 		<ul>
+			<p>
 			<li><h3>Install an Operating System:</h3></li>
 			<ul>
 				<li>If you need a different operating system than the currently installed OS, a backup image is not available, or no OS is present. Otherwise skip to the 
@@ -20,6 +21,7 @@
 					</li>
 				</ul>
 			</ul>
+			<p>
 			<li><h3>Update the Operating System:</h3></li>
 			<ul>
 				<li>Install the latest service pack for your OS. Service packs can be found on the network at <a href="\\jake\applications\Service Packs">
@@ -29,6 +31,7 @@
 				<li>Rerun Windows Update until no updates are available. Check in on the machine occasionally during updates, as some have EULA's or other
 					boxes to click through that will hold up the entire process. Internet Explorer installation boxes like to hide behind your other windows.</li>
 			</ul>
+			<p>
 			<li><h3>Windows Settings:</h3></li>
 			<ul>
 				<li>Set the password for the Administrator account to the default password for test machines if it is not already configured.</li>
@@ -57,7 +60,7 @@
 					<li>Disable sleep/hibernation. Disable powering off the hard drives. Set any perfomance profile option to "High performance." Power saving modes
 						can prevent users from making remote desktop connections. Your OS my have one or more of those options.</li>
 				</ul>
-				<li>Right click <b>My Computer</b> and select <b>Magage</b>.</li>
+				<li>Right click <b>My Computer</b> and select <b>Manage</b>.</li>
 				<ul>
 					<li>Expand <b>System Tools</b> -&gt <b>Local Users and Groups</b> and select <b>Groups</b>.</li>
 					<li>Right click the <b>Administrators</b> group. Select <b>Add to Group...</b>. Click <b>Add...</b></li>
@@ -74,12 +77,14 @@
 						Windows" checkbox.</li>
 				</ul>
 			</ul>
+			<p>
 			<li><h3>Create backup disk image:</h3></li>
 			<ul>
-				<li>Create a "Clonezilla" folder on the machines data partition (typically 'D:'). This must be a different partition than the one containiong the
+				<li>Create a "Clonezilla" folder on the machines data partition (typically 'D:'). This must be a different partition than the one containing the
 					OS.</li>
-				<li>Insert a Clonezilla disc into the machine and boot to it. Follow the onscreen instructions to create a backup of the partition containnig the 
-					operating system. Name your backup using the following format: <i>OSbits_Date</i> eg: <i>Server2008x64_08-27-2009</i></li>
+				<li>Insert a Clonezilla disc into the machine and boot to it. Follow the onscreen instructions to create a backup of the partition containing the 
+					operating system, selecting "saveparts" to create an image of a partition and paying particular attention to the source and destination partitions.
+					Name your backup using the following format: <i>OSbits_Date</i> eg: <i>Server2008x64_08-27-2009</i></li>
 				<li>See <a href="http://clonezilla.org/">http://clonezilla.org/</a> for Clonezilla info/downloads.</li>
 			</ul>
 		</ul>
