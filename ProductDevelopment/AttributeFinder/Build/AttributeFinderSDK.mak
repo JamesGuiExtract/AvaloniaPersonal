@@ -66,6 +66,10 @@ BuildOutputDir=Debug
 !ERROR Internal error - invalid value for BuildConfig variable!
 !ENDIF
 
+!IF "$(ProductVersion)" != "$(FlexIndexVersion)"
+!ERROR FLEX Index version being build is not current version in LatestComponentVersions.mak file.
+!ENDIF
+
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 
 #############################################################################
