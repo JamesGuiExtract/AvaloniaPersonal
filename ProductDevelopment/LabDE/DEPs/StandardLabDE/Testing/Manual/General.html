@@ -156,6 +156,11 @@
 			when all data items are valid.
 			<li>Confirm that the <b>Save</b> toolbar button does not display a Save dialog.
 			<li>Confirm that <b>File - Print</b> allows a file to be be printed.
+			<li><b>[DataEntry #461]</b> Items not printing correctly
+			<ul>
+				<li>Confirm that the document prints as expected with highlights appropriately
+				located.
+			</ul>
 			<li>Confirm that the <b>Print image</b> toolbar button allows a file to 
 			be printed.
 			<li>Confirm that <b>File - Exit</b> closes the open file and exits 
@@ -281,6 +286,11 @@
 			a highlight and tooltip or a hint.
 			<li>Confirm that the cursor and zoom are the same when using the 
 			appropriate toolbar button.
+			<li><b>[DataEntry #517]</b> Disallow rectangular selection w/ review and select
+			<ul>
+				<li>Confirm that clicking and draggin with the review and select tool
+				does not create a rectangular selection zone.
+			</ul>
 <p>
 			<li>Confirm that <b>Tools - Swipe text in angular zone</b> changes the cursor 
 			to a Yellow Highlighter.
@@ -380,7 +390,8 @@
 <p>
 		<li>FAM mode
 		<ul>
-			<li><b>[DataEntry #414]</b> Confirm that <b>Ctrl+F4</b> stops processing.
+			<li><b>[DataEntry #414]</b> Confirm that <b>Ctrl+F4</b> does not close the open
+			document.
 			<li>Confirm that <b>Ctrl+S</b> saves an open image.  Note that validation messages 
 			may be presented if invalid data are present.
 			<li>Confirm that <b>Ctrl+P</b> displays the File - Print dialog.
@@ -611,12 +622,28 @@
 			edit box is empty.
 			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
 			available lab names.
+			<li><b>[DataEntry #613]</b>
+			<ul>
+				<li>Select the lab name field in a document.
+				<li>Type "q".
+				<li>Use the arrow keys to select "QUEST DIAGNOSTICS".
+				<li>Press tab.
+				<li>Confirm that the lab name field is populated with "QUEST DIAGNOSTICS".
+			</ul>
 			<li>Confirm that text can be swiped into the <b>Lab Code</b> edit box.
 			<li>Confirm that text can be typed into the <b>Lab Code</b> edit box.
 			<li>Confirm that a validation icon is displayed if the <b>Lab Code</b> edit
 			box is empty.
 			<li>Confirm that selected a <b>Lab Name</b> automatically updates the <b>Lab
 			Code</b> field and vice-versa.
+			<li><b>[DataEntry #600, #619]</b>
+			<ul>
+				<li>Select ACL Central Lab in the lab name field.
+				<li>Click in the lab code field.
+				<li>Type "CHW".
+				<li>Press tab.
+				<li>Confirm that the lab name field updates appropriately
+			</ul>
 			<li>Confirm that text can be swiped into the <b>Comment</b> edit box.
 			<li>Confirm that text can be typed into the <b>Comment</b> edit box.
 			<li>Confirm that a validation icon is not displayed even if the 

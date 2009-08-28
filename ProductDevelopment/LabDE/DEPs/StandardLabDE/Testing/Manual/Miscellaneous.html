@@ -48,6 +48,16 @@
 				</ul>
 			</ul>
 <p>
+			<li><b>[DataEntry #260]</b> Swipes resulting in no recognized text
+			<ul>
+				<li>Open an image.
+				<li>Using the angular highlight tool, swipe an area that contains no text.
+				<li>Confirm that a tooltip appears explaining that no text was recognized and
+				no exceptions are logged.
+				<li>Repeat the same test using the rectangular highlight tool.
+				<li>Repeat the test swiping into a variety of different fields.
+			</ul>
+<p>
 			<LI><b>[DataEntry #273]</b> Carriage returns in swiped text
 			<ul>
 				<LI>Open image <b>003.tif</b> from Demo_LabDE.
@@ -93,6 +103,25 @@
 				backwards another step.
 			</ul>
 <p>
+			<li><b>[DataEntry #314]</b> Unable to insert zone exceptions
+			<ul>
+				<li>Open a document and zoom out.
+				<li>Select a field and make swipes that extend off the edge of the document.
+				<li>Confirm that exceptions are not seen.
+				<li>Note: Exceptions may be seen in extreme cases.
+			</ul>
+<p>
+			<li><b>[DataEntry #316, #317]</b> Mischief while drawing highlight
+			<ul>
+				<li>Open a document and select a field.
+				<li>Begin drawing a highlight. Before releasing the mouse button, press the
+				Alt key and confirm that it is not possible to navigate the menu bar in the
+				middle of the highlight.
+				<li>Begin drawing another highlight. Before releasing the mouse button, use
+				Alt+Tab to navigate to another application and back to LabDE.
+				<li>Confirm that the swipe was cancelled when you navigated away.
+			</ul>
+<p>
 			<LI><b>[DataEntry #329]</b> Swiping and OCR confidence
 			<ul>
 				<LI>Open image <b>151.tif</b> from Demo_LabDE.
@@ -119,6 +148,17 @@
 				<li>Select a <b>Physician name</b> row.
 				<li>Swipe in a valid name.
 				<li>Confirm that the name is split appropriately.
+			</ul>
+<p>
+			<li><b>[DataEntry #624, #632]</b> Error when navigating away while swipe is
+			processing.
+			<ul>
+				<li>Swipe an order.
+				<li>While the swipe is processing, navigate away from LabDE (using alt+tab
+				or clicking on another window).
+				<li>Return to LabDE.
+				<li>Confirm that the swipe completes processing as expected and that no
+				exception is seen.
 			</ul>
 		</ul>
 <p>
@@ -352,6 +392,19 @@
 			tabbing.
 			<li>Confirm that the tab order is correct.
 		</ul>
+<p>
+		<li><b>[DataEntry #486]</b> Enter key behavior
+		<ul>
+			<li>Open a document and select a table that contains several rows.
+			<li>Play with navigating the table using the keyboard. Confirm that:
+			<ul>
+				<li>Pressing enter after navigating to a cell using the arrow keys,
+				shift+tab, or the mouse moves focus down to the cell below the 
+				one currently selected.
+				<li>Pressing enter after navigating to a cell using a series of tabs,
+				focus moves down to the cell below the first in that series.
+			</ul>
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Other</h3>
@@ -366,6 +419,18 @@
 			functionality may not have been implemented yet.
 		</ul>
 <p>
+		<li><b>[DataEntry #413]</b> Cursor displays as active tool after document closes
+		<ul>
+			<li>Open a document in standalone mode.
+			<li>Select the zoom tool.
+			<li>Close the document. Confirm that the cursor does not display as the zoom
+			tool.
+			<li>Repeat the above test with the pan and create rectangular highlight tools.
+			<li>Repeat the above test in FAM mode. To close a document in FAM mode, process
+			all documents in the queue with an FPS file configured to process continously
+			as documents are added.
+		</ul>
+<p>
 		<li><b>[DataEntry #424]</b> Current cell cannot be set to an invisible cell.
 		<ul>
 			<li>Open a document. Select a populated <b>Order name</b> cell.
@@ -377,6 +442,31 @@
 			logged if <b>F4</b> is pressed.
 		</ul>
 <p>
+		<li><b>[DataEntry #450]</b> "Enter" not being handled correctly.
+		<ul>
+			<li>Open a document. Select any cell but the first in any row of a table.
+			<li>Do something that causes a dialog box to appear (for instance, hit F4 when there
+			are already no unviewed items).
+			<li>Hit enter.
+			<li>Confirm that focus does not move.
+		</ul>
+<p>
+		<li><b>[DataEntry #489]</b> SQL query truncated error
+		<ul>
+			<li>Select the order name field.
+			<li>Swipe a large section of text. Confirm that no exceptions are thrown.
+			<li>Select a code field.
+			<li>Enter a lengthy string (more that 25 characters). Confirm that no exceptions
+			are thrown.
+		</ul>
+<p>
+		<li><b>[DataEntry #593]</b> Exceptions with vertical swipes
+		<ul>
+			<li>Open an image that has a populated .voa file.
+			<li>Rotate it ninety degrees.
+			<li>Select a field in the DEP that is associated with spatial information.
+			<li>Confirm that no exceptions are seen.
+		</ul>
 	</ul>
 </UL>
 </BODY>
