@@ -1,0 +1,56 @@
+/*
+	(?<=\bSouth)\s*(?=Side\b)%
+	[\s\S]*\bHarter\b[\s\S]*%HARTERS
+	(?<=\bCOOPERS\s*)DEVELOPMENT\s*PLAT\b%
+	(?<=\bBarton)[\s\S]{0,12}\bAddition\b%
+	(?<=\bGOEHLER)'?S?\b[\s\S]{0,25}?\bADDITION\b%
+	(?<=\bSigler'?s\b)[\s\S]{0,25}?\bADDITION\b%
+	(?<=\bAlexandria\s*Land\s*and\s*Gas)\s*Company'?s?[\s\S]{0,25}?\bADDITION\b%
+	\bSharp(?=\s*Addition\b)%SHARPS
+	(?<=\bFletcher)\s*and\s*Williams\b%
+	\bR\.?N\.?\s*(?=Williams\b)%
+	(?<=\bRodefer)'?s(?=\s*Addition\b)%
+	(?<=\b\w+)\s+\w*(?:First|Second|Third|th|\d+(?:st|nd|rd))\s*Addition\b%
+	(?<=\b\w+'?)\s+\w*(?:First|Second|Third|th|\d+(?:st|nd|rd))\b%
+	\(\s*\d+(?:st|nd|rd)\s*\)%
+	\b\w+\s*AND\s*(?=BREWER'?S\b)%
+	//output from make_approx.rb
+	//string    = "Lakes at Killbuck"
+	//tolerance = "4"
+	(?x)[\s\S]*\b(?<error>){4}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^L]|[^L](?=L)))*?(?<match>L)|(?<-error>)[^L]?)|((?<match>L)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^k]|[^k](?=k)))*?(?<match>k)|(?<-error>)[^k]?)|((?<match>k)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^e]|[^e](?=e)))*?(?<match>e)|(?<-error>)[^e]?)|((?<match>e)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^s]|[^s](?=s)))*?(?<match>s)|(?<-error>)[^s]?)|((?<match>s)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\x20]|[^\x20](?=\x20)))*?(?<match>\x20)|(?<-error>)[^\x20]?)|((?<match>\x20)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^t]|[^t](?=t)))*?(?<match>t)|(?<-error>)[^t]?)|((?<match>t)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\x20]|[^\x20](?=\x20)))*?(?<match>\x20)|(?<-error>)[^\x20]?)|((?<match>\x20)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^K]|[^K](?=K)))*?(?<match>K)|(?<-error>)[^K]?)|((?<match>K)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^l]|[^l](?=l)))*?(?<match>l)|(?<-error>)[^l]?)|((?<match>l)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^l]|[^l](?=l)))*?(?<match>l)|(?<-error>)[^l]?)|((?<match>l)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^b]|[^b](?=b)))*?(?<match>b)|(?<-error>)[^b]?)|((?<match>b)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^u]|[^u](?=u)))*?(?<match>u)|(?<-error>)[^u]?)|((?<match>u)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^c]|[^c](?=c)))*?(?<match>c)|(?<-error>)[^c]?)|((?<match>c)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^k]|[^k](?=k)))*?(?<match>k)|(?<-error>)[^k]?)|((?<match>k)|(?<-error>)))\b[\s\S]*%KILLBUCK
+	//output from make_approx.rb
+	//string    = "R.R. Bynum's"
+	//tolerance = "3"
+	(?x)[\s\S]*\b(?<error>){3}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^R]|[^R](?=R)))*?(?<match>R)|(?<-error>)[^R]?)|((?<match>R)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\.]|[^\.](?=\.)))*?(?<match>\.)|(?<-error>)[^\.]?)|((?<match>\.)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^R]|[^R](?=R)))*?(?<match>R)|(?<-error>)[^R]?)|((?<match>R)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\.]|[^\.](?=\.)))*?(?<match>\.)|(?<-error>)[^\.]?)|((?<match>\.)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^\x20]|[^\x20](?=\x20)))*?(?<match>\x20)|(?<-error>)[^\x20]?)|((?<match>\x20)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^B]|[^B](?=B)))*?(?<match>B)|(?<-error>)[^B]?)|((?<match>B)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^y]|[^y](?=y)))*?(?<match>y)|(?<-error>)[^y]?)|((?<match>y)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^n]|[^n](?=n)))*?(?<match>n)|(?<-error>)[^n]?)|((?<match>n)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^u]|[^u](?=u)))*?(?<match>u)|(?<-error>)[^u]?)|((?<match>u)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^m]|[^m](?=m)))*?(?<match>m)|(?<-error>)[^m]?)|((?<match>m)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^']|[^'](?=')))*?(?<match>')|(?<-error>)[^']?)|((?<match>')|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^s]|[^s](?=s)))*?(?<match>s)|(?<-error>)[^s]?)|((?<match>s)|(?<-error>)))[\s\S]*%BYRUM
+	[\s\S]*(?=\bHickory\b)%
+	(?<=\bHickory\b)[\s\S]*%
+	\b(?:north|south|east|west)\s*(?=acres)%
+	\bacres\b%ACRE
+	(?<=\bRichland)\s*wood\b%
+	\bMyrena\s*(?=Inman\b)%
+	\bIra\s*(?=Kidwell'?s)%
+	\bAndrew\s*(?=Jackson'?s\b)%
+*/
+\bno\x20anderson\b%
+(?<=Norris)\s*Heights\b%
+\b(?:the\s*)?replat(?:\s*of)?\b%
+\bof\s*(?=out\s*lots?)%
+(?<=\bout\s*lot)s%
+\A\s*-plat\s*\z%
+(?<!-)\bplat\b[\s\S]*%
+(?<=\bLindbergh)\s*estates?\b%
+\bsubdivision[\s\S]*%
+\bAddition\b%
+\bSection\b[\s\S]*%
+\bdevelopments?\b%
+\b(?:the\s*)?original%
+\bcontinuation(?:\s*of)?%
+\bthe\b%
+//output from make_approx.rb
+//string    = "addition"
+//tolerance = "1"
+(?x)\b(?<error>){1}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^d]|[^d](?=d)))*?(?<match>d)|(?<-error>)[^d]?)|((?<match>d)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^d]|[^d](?=d)))*?(?<match>d)|(?<-error>)[^d]?)|((?<match>d)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^t]|[^t](?=t)))*?(?<match>t)|(?<-error>)[^t]?)|((?<match>t)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^o]|[^o](?=o)))*?(?<match>o)|(?<-error>)[^o]?)|((?<match>o)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^n]|[^n](?=n)))*?(?<match>n)|(?<-error>)[^n]?)|((?<match>n)|(?<-error>)))\b%
+[\s\S]*\bin\b%
+\b(?:in\s*)?the\s*county\s*of\s*[a-z]+%
+\b(?:in\s*)?the\s*state\s*of\s*[a-z]+%
+\blot\s*number(?:ed)?\s*\d+\s*in\b%

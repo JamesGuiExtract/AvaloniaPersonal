@@ -1,0 +1,14 @@
+(?<=
+   \bPT
+   (?:
+      \x20*
+      #import SL_directions.dat.etf
+
+   )*
+   \x20*
+)
+#import SL_directions.dat.etf
+(?!
+   \x20*
+   #import SL_directions.dat.etf
+)
