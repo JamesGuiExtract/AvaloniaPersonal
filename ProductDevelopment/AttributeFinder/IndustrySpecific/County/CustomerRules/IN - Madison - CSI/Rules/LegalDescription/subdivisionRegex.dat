@@ -16,7 +16,7 @@
 		[\s\S]{1,100}?
 		\b
 		(?:
-			Addition
+			Addition(\s*of\s*out\s*lots?\b)?
 			|
 			Development
 			|
@@ -44,13 +44,25 @@
 
 		
 	)
-
+	\b
 	(?:
 		\s*
 		a
 		\s*
 	)?
-	subdivision
+	(?<error>){1}
+	(?(match)(((?<-error>)(?<-match>)((?<-match>)[^s]|[^s](?=s)))*?(?<match>
+	s)|(?<-error>)[^s]?)|((?<match>s)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^u]|[^u](?=u)))*?(?<match>
+	u)|(?<-error>)[^u]?)|((?<match>u)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^b]|[^b](?=b)))*?(?<match>
+	b)|(?<-error>)[^b]?)|((?<match>b)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^d]|[^d](?=d)))*?(?<match>
+	d)|(?<-error>)[^d]?)|((?<match>d)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>
+	i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^v]|[^v](?=v)))*?(?<match>
+	v)|(?<-error>)[^v]?)|((?<match>v)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>
+	i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^s]|[^s](?=s)))*?(?<match>
+	s)|(?<-error>)[^s]?)|((?<match>s)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^i]|[^i](?=i)))*?(?<match>
+	i)|(?<-error>)[^i]?)|((?<match>i)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^o]|[^o](?=o)))*?(?<match>
+	o)|(?<-error>)[^o]?)|((?<match>o)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^n]|[^n](?=n)))*?(?<match>
+	n)|(?<-error>)[^n]?)|((?<match>n)|(?<-error>)))
 	\b
 
 |

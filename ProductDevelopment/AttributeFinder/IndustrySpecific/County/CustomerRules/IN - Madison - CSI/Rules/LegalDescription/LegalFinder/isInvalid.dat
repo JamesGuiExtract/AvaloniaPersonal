@@ -1,5 +1,5 @@
 //This file contains words and phrases that invalidate the entire attribute.
-^\d{1,2}\.\d\b
+^(section\s*)?\d{1,2}\.\d{1,2}\b
 |
 \beasements?\b[\s\S]*?\benjoyment\b
 |
