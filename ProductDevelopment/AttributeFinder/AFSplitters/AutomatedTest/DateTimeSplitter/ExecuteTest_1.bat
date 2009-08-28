@@ -8,4 +8,4 @@ REM Execute command-line for desired test
 START ProcessFiles.exe MemoryLeak_1.fps /s
 
 REM Start Logging Statistics to numbered subfolder
-LogProcessStats ProcessFiles 5s .\Stats\Test_1 /el
+LogProcessStats.exe ProcessFiles 5s .\Stats\Test_1 /el
