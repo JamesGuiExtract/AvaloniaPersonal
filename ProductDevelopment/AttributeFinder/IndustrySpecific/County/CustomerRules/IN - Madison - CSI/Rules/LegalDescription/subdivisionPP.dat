@@ -1,1 +1,0 @@
-\b(?:town|city|village|county|state)\s*of\s*(?<place>\w+)(?<filler>[\s\S]*?)\<place>%${filler}
