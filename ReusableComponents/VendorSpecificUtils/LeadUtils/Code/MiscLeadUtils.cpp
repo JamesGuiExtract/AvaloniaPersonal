@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "MiscLeadUtils.h"
 #include "ImageConversion.h"
+#include "LeadToolsBitmapFreeer.h"
 #include "LeadToolsFormatHelpers.h"
 
 #include <UCLIDException.h>
@@ -17,16 +18,17 @@
 
 #include <cmath>
 #include <cstdio>
+#include <algorithm>
 
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 // Registry path and key for LeadTools serialization
-const std::string gstrLEADTOOLS_SERIALIZATION_PATH = "\\VendorSpecificUtils\\LeadUtils";
-const std::string gstrSERIALIZATION_KEY = "Serialization"; 
+const string gstrLEADTOOLS_SERIALIZATION_PATH = "\\VendorSpecificUtils\\LeadUtils";
+const string gstrSERIALIZATION_KEY = "Serialization"; 
 
 // Path to the leadtools compression flag folder
-const std::string gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER =
+const string gstrLEADTOOLS_COMPRESSION_VALUE_FOLDER =
 	"\\VendorSpecificUtils\\LeadUtils\\CompressionFlags";
 
 // Default value for JPEG compression flag (produces reasonably small file while
@@ -47,7 +49,7 @@ bool	LeadToolsPDFLoadLocker::ms_bRegistryValueRead = false;
 bool	LeadToolsPDFLoadLocker::ms_bSerializeLeadToolsCalls = false;
 
 //-------------------------------------------------------------------------------------------------
-LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const std::string& strFileName)
+LeadToolsPDFLoadLocker::LeadToolsPDFLoadLocker(const string& strFileName)
 :m_pLock(NULL)
 {
 	// If a file is PDF file, acquire ownership of the mutex
@@ -140,6 +142,23 @@ int getFontSizeThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi);
 //          piFontSize - Set to the font size in pixels that fits. Ignored if NULL.
 void calculateFontThatFits(HDC hDC, const PageRasterZone& zone, int iVerticalDpi, HFONT* phFont, 
 	int* piFontSize);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To validate that each zone has valid dimensions and appears on a valid page
+void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumberOfPages);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To apply the specified text (if any) to the annotation rectangle
+void applyAnnotationText(const PageRasterZone& rZone, BITMAPHANDLE& hBitmap, HANNOBJECT& hContainer,
+						 HDC& hDC, int iYResolution, ANNRECT& rect);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To create a device context and assign it to hDC.  If hDC is not NULL no new context
+//			will be created.
+void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap);
+//-------------------------------------------------------------------------------------------------
+// PURPOSE: To return true if leftZone.m_nPage < rightZone.m_nPage
+bool compareZoneByPage(const PageRasterZone& leftZone, const PageRasterZone& rightZone);
+//-------------------------------------------------------------------------------------------------
+// PROMISE: To convert the specified page zone into an Annotation Rectangle (ANNRECT)
+void pageZoneToAnnRect(const PageRasterZone& rZone, ANNRECT& rect);
 
 //-------------------------------------------------------------------------------------------------
 // Exported DLL Functions
@@ -149,9 +168,9 @@ string getErrorCodeDescription(int iErrorCode)
 	return LBase::GetErrorString(iErrorCode);
 }
 //-------------------------------------------------------------------------------------------------
-void throwExceptionIfNotSuccess(L_INT iErrorCode, const std::string& strELICode, 
-								const std::string& strErrorDescription,
-								const std::string& strFileName)
+void throwExceptionIfNotSuccess(L_INT iErrorCode, const string& strELICode, 
+								const string& strErrorDescription,
+								const string& strFileName)
 {
 	if (iErrorCode != SUCCESS)
 	{
@@ -199,20 +218,13 @@ void fillImageArea(const string& strImageFileName, const string& strOutputImageN
 		bApplyAsAnnotations);
 }
 //-------------------------------------------------------------------------------------------------
-void fillImageArea(const std::string& strImageFileName, const std::string& strOutputImageName, 
-				   const std::vector<PageRasterZone> &vecZones, bool bRetainAnnotations, 
+void fillImageArea(const string& strImageFileName, const string& strOutputImageName, 
+				   vector<PageRasterZone>& rvecZones, bool bRetainAnnotations, 
 				   bool bApplyAsAnnotations)
 {
 	INIT_EXCEPTION_AND_TRACING("MLI02774");
 	try
 	{
-		// Check for empty collection of redaction areas
-		if ( vecZones.size() == 0 ) 
-		{
-			// Nothing to do
-			return;
-		}
-
 		// Check if an annotation license is required
 		if (bRetainAnnotations || bApplyAsAnnotations)
 		{
@@ -233,14 +245,44 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strImageFileName);
 		LicenseManagement::sGetInstance().verifyFileTypeLicensed(strOutputImageName);
 
+		// Sort the vector of zones by page
+		sort(rvecZones.begin(), rvecZones.end(), compareZoneByPage);
+
 		// Get the retry counts and timeout value
 		int iRetryCount(0), iRetryTimeout(0);
 		getFileAccessRetryCountAndTimeout(iRetryCount, iRetryTimeout);
 		_lastCodePos = "20";
 
+		// Get initialized FILEINFO struct
+		FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+
+		// Convert the PDF input image to a temporary TIF
+		PDFInputOutputMgr ltPDF( strImageFileName, true );
+		char* pszInputFile = (char*) ltPDF.getFileName().c_str();
+
+		// Get the file info
+		throwExceptionIfNotSuccess(L_FileInfo(pszInputFile, &fileInfo,
+			sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27301",
+			"Unable to get file info!", ltPDF.getFileNameInformationString());
+
+		// Get the number of pages
+		long nNumberOfPages = fileInfo.TotalPages;
+
+		// Cache the file format
+		int iFormat = fileInfo.Format;
+
+		// Get initialized LOADFILEOPTION struct.
+		// IgnoreViewPerspective to avoid a black region at the bottom of the image
+		LOADFILEOPTION lfo =
+			GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
+
+		// Validate each zone
+		validateRedactionZones(rvecZones, nNumberOfPages);
+
 		// loop to allow for multiple attempts to fill an image area (P16 #2593)
 		bool bSuccessful = false;
 		bool bAnnotationsAppliedToDocument = false;
+		_lastCodePos = "40";
 		for (int i=0; i < gnOUTPUT_IMAGE_RETRIES; i++)
 		{
 			// Write the output to a temporary file so that the creation of the
@@ -254,103 +296,61 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 
 			// Declare objects outside of try scope so that they can be released if an exception
 			// is thrown
-			HBITMAPLIST hFileBitmaps = NULL; // Bitmap list for the input image
-			L_UINT nPages = 0; // Number of pages for this image
 			HDC hDC = NULL; // Windows DC for drawing functions
-			HANNOBJECT hFileContainer = NULL; // Annotation container to hold existing annotations
 			HANNOBJECT hContainer = NULL; // Annotation container for redactions
+			_lastCodePos = "50";
 			try
 			{
 				try
 				{
-					// Get initialized FILEINFO struct
-					FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
+					// Create PDFOutputManager object to handle file conversion
+					// if result will be PDF
+					PDFInputOutputMgr outMgr( tempOutFile.getName(), false );
+
 					int nRet = FAILURE;
-
-					// Convert the PDF input image to a temporary TIF
-					PDFInputOutputMgr ltPDF( strImageFileName, true );
-					_lastCodePos = "30";
-
-					// Get initialized LOADFILEOPTION struct.
-					// IgnoreViewPerspective to avoid a black region at the bottom of the image
-					LOADFILEOPTION lfo =
-						GetLeadToolsSizedStruct<LOADFILEOPTION>(ELO_IGNOREVIEWPERSPECTIVE);
-					_lastCodePos = "40";
-
-					// Load image
-					nRet = L_LoadBitmapList((char*)(ltPDF.getFileName().c_str()), &hFileBitmaps, 0, 0, 
-						&lfo, &fileInfo );
-					if (nRet != SUCCESS)
-					{
-						UCLIDException uex("ELI09198", "Could not open the image.");
-						uex.addDebugInfo("Error Code", nRet);
-						uex.addDebugInfo("Error Message", getErrorCodeDescription(nRet));
-						uex.addDebugInfo("Original File", ltPDF.getFileNameInformationString());
-						uex.addDebugInfo("PDF Manager File", ltPDF.getFileName());
-						throw uex;
-					}
-
-					// Get Number of pages
-					nRet = L_GetBitmapListCount( hFileBitmaps, &nPages );
-					throwExceptionIfNotSuccess(nRet, "ELI09199", "Could not obtain page count.");
-
-					// Validate each zone
-					long nNumZones = vecZones.size();
-					_lastCodePos = "50";
-					for ( int k = 0; k < nNumZones; k++ )
-					{
-						// Validate position
-						if ( vecZones[k].m_nStartX == 0 && vecZones[k].m_nStartY == 0 && 
-							vecZones[k].m_nEndX== 0 && vecZones[k].m_nEndY == 0 &&
-							vecZones[k].m_nPage == 0 )
-						{
-							UCLIDException ue("ELI09200", "No valid position.");
-							throw ue;
-						}
-
-						// Validate page number
-						if( (L_UINT) vecZones[k].m_nPage > nPages || vecZones[k].m_nPage < 1 )
-						{
-							UCLIDException ue("ELI09201", "Page number selected does not exist.");
-							ue.addDebugInfo("Page", vecZones[k].m_nPage );
-							throw ue;
-						}
-					}
-					_lastCodePos = "60";
 
 					// Get initialized SAVEFILEOPTION struct
 					SAVEFILEOPTION sfOptions = GetLeadToolsSizedStruct<SAVEFILEOPTION>(0);
-					L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
-					_lastCodePos = "70";
-
-					// Create PDFOutputManager object to handle file conversion
-					// If result will be PDF
-					// - Each page processed in the loop below will be appended to an internal temporary file
-					// - Desired PDF output file will be created from conversion of this temporary TIF
-					PDFInputOutputMgr outMgr( tempOutFile.getName(), false );
-					_lastCodePos = "80";
+					nRet = L_GetDefaultSaveFileOption(&sfOptions, sizeof(sfOptions));
+					throwExceptionIfNotSuccess(nRet, "ELI27299", "Unable to get default save options!");
+					_lastCodePos = "60";
 
 					// Create the brush and pen collections
 					BrushCollection brushes;
 					PenCollection pens;
 
-					// Get the appropriate compression factor for the file type [LRCAU #5248]
-					// NOTE: Compression flag is ignored by file formats that do not support
-					// compression.  For file types which support this flag and what values
-					// are appropriate for those file types look at Leadtools help for the
-					// L_SaveBitmap call and click the link about Compression Quality Factors
-					L_INT nCompression = getCompressionFactor(fileInfo.Format);
+					// Get the pointer to the first raster zone (we will remember the
+					// last zone applied so that the entire collection does not need
+					// to be walked for each page
+					vector<PageRasterZone>::iterator it = rvecZones.begin();
 
-					// Handle pages individually for loading of existing annotations
-					// and saving of redactions as new annotations
-					_lastCodePos = "90";
-					for (unsigned int j = 0; j < nPages; j++)
+					// Process the image one page at a time
+					_lastCodePos = "70";
+					for (long i=1; i <= nNumberOfPages; i++)
 					{
-						// Set the 1-relative page number in the LOADFILEOPTION structure used for loading
-						lfo.PageNumber = j + 1;
+						string strPageNumber = asString(i);
+
+						// Set the load option for the current page
+						lfo.PageNumber = i;
+
+						// Set FILEINFO_FORMATVALID (this will speed up the L_LoadBitmap calls)
+						fileInfo = GetLeadToolsSizedStruct<FILEINFO>(FILEINFO_FORMATVALID);
+						fileInfo.Format = iFormat;
+
+						// Get a bitmap handle and wrap it with a bitmap freer
+						BITMAPHANDLE hBitmap = {0};
+						LeadToolsBitmapFreeer freer(hBitmap);
+
+						// Load the bitmap
+						loadImagePage(ltPDF, hBitmap, fileInfo, lfo, false);
+						_lastCodePos = "70_A_Page#" + strPageNumber;
+
+						bool bLoadExistingAnnotations = bRetainAnnotations
+							&& hasAnnotations(ltPDF.getFileName(), lfo, iFormat);
 
 						// Create Annotation container sized to image extent if applying as annotations
-						if (bApplyAsAnnotations || bRetainAnnotations)
+						// or retaining existing annotations
+						if (bApplyAsAnnotations || bLoadExistingAnnotations)
 						{
 							ANNRECT rect = {0, 0, fileInfo.Width, fileInfo.Height};
 							nRet = L_AnnCreateContainer( NULL, &rect, FALSE, &hContainer );
@@ -362,62 +362,87 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 							throwExceptionIfNotSuccess(nRet, "ELI14605",
 								"Could not set annotation user mode.");
 						}
-						_lastCodePos = "100";
+						_lastCodePos = "70_B_Page#" + strPageNumber;
 
-						// Load existing annotations, if desired and if file
-						// contains annotations. [P16 #3046]
-						if (bRetainAnnotations && hasAnnotations(ltPDF.getFileName(), lfo,
-							fileInfo.Format))
+						// Load the existing annotations if required
+						if (bLoadExistingAnnotations)
 						{
-							// Load any existing annotations on this page
-							nRet = L_AnnLoad((char*)ltPDF.getFileName().c_str(), &hFileContainer, &lfo);
-							throwExceptionIfNotSuccess(nRet, "ELI14630", 
-								"Could not load annotations.", ltPDF.getFileNameInformationString());
-
-							// Check for NULL or empty container
-							if (hFileContainer != NULL)
+							HANNOBJECT hFileContainer = NULL; // Annotation container to hold existing annotations
+							try
 							{
-								HANNOBJECT hFirst;
-								nRet = L_AnnGetItem(hFileContainer, &hFirst);
-								throwExceptionIfNotSuccess(nRet, "ELI14631", 
-									"Could not get item from annotation container.");
+								// Load any existing annotations on this page
+								nRet = L_AnnLoad(pszInputFile, &hFileContainer, &lfo);
+								throwExceptionIfNotSuccess(nRet, "ELI14630", 
+									"Could not load annotations.", ltPDF.getFileNameInformationString());
 
-								if (hFirst != NULL)
+								// Check for NULL or empty container
+								if (hFileContainer != NULL)
 								{
-									// Insert the existing annotations from File Container
-									// into the main container. This destroys the File Container.
-									nRet = L_AnnInsert(hContainer, hFileContainer, TRUE);
-									throwExceptionIfNotSuccess( nRet, "ELI14632", 
-										"Could not insert existing annotation objects.");
-									bAnnotationsAppliedToPage = true;
+									HANNOBJECT hFirst;
+									nRet = L_AnnGetItem(hFileContainer, &hFirst);
+									throwExceptionIfNotSuccess(nRet, "ELI14631", 
+										"Could not get item from annotation container.");
+
+									if (hFirst != NULL)
+									{
+										// Insert the existing annotations from File Container
+										// into the main container. This destroys the File Container.
+										nRet = L_AnnInsert(hContainer, hFileContainer, TRUE);
+										throwExceptionIfNotSuccess( nRet, "ELI14632", 
+											"Could not insert existing annotation objects.");
+										bAnnotationsAppliedToPage = true;
+									}
+									else
+									{
+										nRet = L_AnnDestroy(hFileContainer, 0);
+										throwExceptionIfNotSuccess(nRet, "ELI23570",
+											"Unable to destroy annotation container.");
+									}
+
+									// The file container was destroyed 
+									// either by L_AnnInsert or L_AnnDestroy
+									hFileContainer = NULL;
 								}
-								else
+							}
+							catch(...)
+							{
+								if (hFileContainer != NULL)
 								{
-									nRet = L_AnnDestroy(hFileContainer, 0);
-									throwExceptionIfNotSuccess(nRet, "ELI23570",
-										"Unable to destroy annotation container.");
+									try
+									{
+										// Destroy the annotation container
+										throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, ANNFLAG_RECURSE), 
+											"ELI23567",	"Unable to destroy annotation container.");
+									}
+									catch(UCLIDException& ex)
+									{
+										ex.log();
+									}
+									hFileContainer = NULL;
 								}
 
-								// The file container was destroyed 
-								// either by L_AnnInsert or L_AnnDestroy
-								hFileContainer = NULL;
+								throw;
 							}
 							// else container is NULL, so nothing to insert
 						}
-						_lastCodePos = "110";
-
-						// Get the Page to modify
-						BITMAPHANDLE hBitmap;
-						nRet = L_GetBitmapListItem(hFileBitmaps, j, &hBitmap, sizeof(BITMAPHANDLE));
-						throwExceptionIfNotSuccess(nRet, "ELI19358", "Could not obtain page.");
+						_lastCodePos = "70_C_Page#" + strPageNumber;
 
 						// Check each zone
-						for (vector<PageRasterZone>::const_iterator it = vecZones.begin();
-							it != vecZones.end(); it++)
+						for (; it != rvecZones.end(); it++)
 						{
-							// Handle this zone if it is on this page
-							if (it->m_nPage == j + 1)
+							// Get the page from the zone
+							long nZonePage = it->m_nPage;
+
+							// Check if this page is greater than the current page
+							if (nZonePage > i)
 							{
+								// If we have passed the current page, just break from the loop
+								break;
+							}
+							// Handle this zone if it is on this page
+							else if (nZonePage == i)
+							{
+								_lastCodePos = "70_D_Page#" + strPageNumber;
 								if (bApplyAsAnnotations)
 								{
 									// Create a redaction annotation object
@@ -441,19 +466,10 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 									throwExceptionIfNotSuccess(nRet, "ELI14608", 
 										"Could not set annotation tag.");
 
-
-									///////////////////
-									// Calculate points on bounding rectangle
-									///////////////////
-									POINT p1, p2, p3, p4;
-									pageZoneToPoints((*it), p1, p2, p3, p4);
-
-									// Apply bounding RECT to redaction object
+									// Convert the zone to an annotation rectangle
 									ANNRECT rect;
-									rect.top = min(p1.y, min(p2.y, min(p3.y, p4.y)));
-									rect.left = min(p1.x, min(p2.x, min(p3.x, p4.x)));
-									rect.bottom = max(p1.y, max(p2.y, max(p3.y, p4.y)));
-									rect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
+									pageZoneToAnnRect((*it), rect);
+
 									nRet = L_AnnSetRect(hRedaction, &rect);
 									throwExceptionIfNotSuccess(nRet, "ELI14609", 
 										"Could not bound redaction annotation object." );
@@ -462,109 +478,17 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 									nRet = L_AnnInsert(hContainer, hRedaction, FALSE);
 									throwExceptionIfNotSuccess(nRet, "ELI14610", 
 										"Could not insert redaction annotation object.");
+
+									// Apply annotation text
+									applyAnnotationText((*it), hBitmap, hContainer, hDC,
+										fileInfo.YResolution, rect);
+
 									bAnnotationsAppliedToPage = true;
-
-									// Check if any text was specified
-									if (it->m_strText.size() > 0)
-									{
-										// Create a device context (needed to ensure font size fits)
-										if (hDC == NULL)
-										{
-											hDC = L_CreateLeadDC(&hBitmap);
-											if (hDC == NULL)
-											{
-												UCLIDException uex("ELI24891",
-													"Unable to create device context.");
-												uex.addDebugInfo("Image file name",
-													ltPDF.getFileNameInformationString());
-												uex.addDebugInfo("Page number", j+1);
-												throw uex;
-											}
-										}
-
-										int iFontSize = 
-											getFontSizeThatFits(hDC, *it, fileInfo.YResolution);
-
-										// Get the current annotation options
-										L_UINT uOptions = 0;
-										nRet = L_AnnGetOptions(&uOptions);
-										throwExceptionIfNotSuccess(nRet, "ELI24470",
-											"Could not get annotation options.");
-
-										// Ensure text options are available
-										uOptions |= OPTIONS_NEW_TEXT_OPTIONS;
-										nRet = L_AnnSetOptions(NULL, uOptions);
-										throwExceptionIfNotSuccess(nRet, "ELI24471",
-											"Could not set text annotation options.");
-
-										// Creat a text annotation object
-										HANNOBJECT hText;
-										nRet = L_AnnCreate(ANNOBJECT_TEXT, &hText);
-										throwExceptionIfNotSuccess(nRet, "ELI24465", 
-											"Could not create text annotation object.");
-
-										// Make text object visible
-										nRet = L_AnnSetVisible(hText, TRUE, 0, NULL);
-										throwExceptionIfNotSuccess(nRet, "ELI24467", 
-											"Could not set visibility for redaction annotation object.");
-
-										// Set the font size
-										nRet = L_AnnSetFontSize(hText, iFontSize, 0);
-										throwExceptionIfNotSuccess(nRet, "ELI24472",
-											"Could not set font size.");
-
-										// Set the font name
-										nRet = L_AnnSetFontName(hText, (char*)it->m_font.lfFaceName, 0);
-										throwExceptionIfNotSuccess(nRet, "ELI24473",
-											"Could not set font name.");
-
-										// Set text color
-										ANNTEXTOPTIONS textOptions = 
-											GetLeadToolsSizedStruct<ANNTEXTOPTIONS>(0);
-										textOptions.bShowText = TRUE;
-										textOptions.bShowBorder = FALSE;
-										textOptions.crText = it->m_crTextColor;
-										textOptions.uFlags = ANNTEXT_ALL;
-										nRet = L_AnnSetTextOptions(hText, &textOptions, 0);
-										throwExceptionIfNotSuccess(nRet, "ELI24474",
-											"Could not set font name.");
-
-										// Set the tiff tag
-										nRet = L_AnnSetTag(hText, ANNTAG_TIFF, 0);
-										throwExceptionIfNotSuccess(nRet, "ELI24468", 
-											"Could not set annotation tag.");
-
-										// Set the spatial boundaries for the text annotation
-										nRet = L_AnnSetRect(hText, &rect);
-										throwExceptionIfNotSuccess(nRet, "ELI24469", 
-											"Could not bound text annotation object.");
-
-										// Set the text
-										nRet = L_AnnSetText(hText, (char*)it->m_strText.c_str(), 0);
-										throwExceptionIfNotSuccess(nRet, "ELI24475",
-											"Could not set text.");
-
-										// Insert the text object into the container
-										nRet = L_AnnInsert(hContainer, hText, FALSE);
-										throwExceptionIfNotSuccess(nRet, "ELI24466", 
-											"Could not insert text annotation object." );
-									}
 								}
 								else
 								{
-									if (hDC == NULL)
-									{
-										hDC = L_CreateLeadDC( &hBitmap );
-										if (hDC == NULL)
-										{
-											UCLIDException uex("ELI23576",
-												"Unable to create device context!");
-											uex.addDebugInfo("Image File Name",
-												ltPDF.getFileNameInformationString());
-											uex.addDebugInfo("Page number", j+1);
-											throw uex;
-										}
-									}
+									// Create the device context
+									createLeadDC(hDC, hBitmap);
 
 									// Set the appropriate brush and pen
 									SelectObject(hDC, brushes.getColoredBrush(it->m_crFillColor));
@@ -584,104 +508,51 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 										addTextToImage(hDC, *it, fileInfo.YResolution);
 									}
 								}
-							}	// end if this zone is on this page
-						}		// end for each zone
-						_lastCodePos = "130";
+								_lastCodePos = "70_E_Page#" + strPageNumber;
+							} // end if this zone is on this page
+						} // end for each zone
+						_lastCodePos = "70_F_Page#" + strPageNumber;
 
 						// Delete the Device Context
 						if (hDC != NULL)
 						{
 							L_DeleteLeadDC( hDC );
 							hDC = NULL;
-
-							// If the image has changed, set the bitmap list item 
-							// [LegacyRCAndUtils #5299]
-							if (!bApplyAsAnnotations)
-							{
-								L_SetBitmapListItem(hFileBitmaps, j, &hBitmap);
-							}
 						}
-						_lastCodePos = "140";
-
-						// Save the collected redaction annotations
-						//   Save in WANG-mode for greatest compatibility
-						//   The next call to SaveBitmap will include these annotations
-						if (bAnnotationsAppliedToPage)
-						{
-							// Set annotations added to document flag [FlexIDSCore #3131]
-							bAnnotationsAppliedToDocument = true;
-
-							nRet = L_AnnSaveTag(hContainer, ANNFMT_WANGTAG, FALSE );
-							throwExceptionIfNotSuccess(nRet, "ELI14611", 
-								"Could not save redaction annotation objects.");
-						}
-						_lastCodePos = "150";
+						_lastCodePos = "70_G_Page#" + strPageNumber;
 
 						// Set the page number for save options
-						sfOptions.PageNumber = j + 1;
+						sfOptions.PageNumber = i;
 
-						// Save this page of the original file
-						int nNumFailedAttempts = 0;
-						while (nNumFailedAttempts < iRetryCount)
+						if (!bAnnotationsAppliedToPage)
 						{
-							nRet = L_SaveBitmap((char*)(outMgr.getFileName().c_str()), &hBitmap, 
-								fileInfo.Format, fileInfo.BitsPerPixel, nCompression, &sfOptions);
-
-							// Check result
-							if (nRet == SUCCESS)
-							{
-								// Exit loop
-								break;
-							}
-							else
-							{
-								// Increment counter
-								nNumFailedAttempts++;
-
-								// Sleep before retrying the Save
-								Sleep( iRetryTimeout);
-							}
-						}
-						if (nRet != SUCCESS)
-						{
-							UCLIDException ue("ELI09202", "Could not save image.");
-							ue.addDebugInfo("Output Image", strOutputImageName);
-							ue.addDebugInfo("Temporary Image", tempOutFile.getName());
-							ue.addDebugInfo("Output Manager File", outMgr.getFileName());
-							ue.addDebugInfo("Actual Page", j + 1);
-							ue.addDebugInfo("Error description", getErrorCodeDescription(nRet));
-							ue.addDebugInfo("Actual Error Code", nRet);
-							ue.addDebugInfo("Retries attempted", nNumFailedAttempts);
-							ue.addDebugInfo("Max Retries", iRetryCount);
-							ue.addDebugInfo("Compression Factor", nCompression);
-							addFormatDebugInfo(ue, fileInfo.Format);
-							throw ue;
+							// Save the image page
+							saveImagePage(hBitmap, outMgr, fileInfo, sfOptions);
 						}
 						else
 						{
-							if (nNumFailedAttempts > 0)
-							{
-								UCLIDException ue("ELI20366",
-									"Application Trace:Saved image page successfully after retry.");
-								ue.addDebugInfo("Retries", nNumFailedAttempts);
-								ue.addDebugInfo("Temporary Image", tempOutFile.getName());
-								ue.addDebugInfo("Output Image", strOutputImageName);
-								ue.addDebugInfo("Page", j+1);
-								ue.log();
-							}
-						}
-						_lastCodePos = "160";
+							// Save the collected redaction annotations
+							//   Save in WANG-mode for greatest compatibility
+							//   The next call to SaveBitmap will include these annotations
+							nRet = L_AnnSaveTag(hContainer, ANNFMT_WANGTAG, FALSE );
+							throwExceptionIfNotSuccess(nRet, "ELI14611", 
+								"Could not save redaction annotation objects.");
 
-						if (bAnnotationsAppliedToPage)
-						{
+							// Save the image page with the annotations
+							saveImagePage(hBitmap, outMgr, fileInfo, sfOptions);
+
+							// Set annotations added to document flag [FlexIDSCore #3131]
+							bAnnotationsAppliedToDocument = true;
+
 							// Clear any previously defined annotations
 							// If not done, any annotations applied to this page may be applied to 
 							// successive pages [FlexIDSCore #2216]
 							nRet = L_SetTag(ANNTAG_TIFF, 0, 0, NULL);
 
-							// Reset loaded annotation flag
+							// Reset annotations applied to page flag
 							bAnnotationsAppliedToPage = false;
 						}
+						_lastCodePos = "70_H_Page#" + strPageNumber;
 
 						// Destroy the annotation container
 						if (hContainer != NULL)
@@ -691,14 +562,8 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 								"Could not destroy annotation container.");
 							hContainer = NULL;
 						}
-						_lastCodePos = "170";
-					}	// end for each page
-
-					L_DestroyBitmapList(hFileBitmaps);
-					hFileBitmaps = NULL;
-
-					// Wait for the file to be readable before continuing
-					waitForFileToBeReadable(outMgr.getFileName());
+						_lastCodePos = "70_I_Page#" + strPageNumber;
+					} // end for each page
 				}
 				CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI23568");
 			}
@@ -707,59 +572,52 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 				uex.addDebugInfo("Input Image File", strImageFileName);
 				uex.addDebugInfo("Output Image File", strOutputImageName);
 
+				// Need to clear annotation tags if any where applied
 				if (bAnnotationsAppliedToPage)
 				{
 					// Clear any previously defined annotations
 					// If not done, any annotations applied to this page may be applied to 
 					// successive pages [FlexIDSCore #2216]
 					L_SetTag(ANNTAG_TIFF, 0, 0, NULL);
+					bAnnotationsAppliedToPage = false;
 				}
-				if (hFileContainer != NULL)
+
+				// Destroy the annotation containers
+				if (hContainer != NULL)
 				{
 					try
 					{
 						// Destroy the annotation container
-						throwExceptionIfNotSuccess(L_AnnDestroy(hFileContainer, ANNFLAG_RECURSE), 
-							"ELI23567",	"Unable to destroy annotation container.");
+						throwExceptionIfNotSuccess(L_AnnDestroy(hContainer, ANNFLAG_RECURSE), 
+							"ELI27297",	"Unable to destroy annotation container.");
 					}
 					catch(UCLIDException& ex)
 					{
 						ex.log();
 					}
-					hFileContainer = NULL;
+					hContainer = NULL;
 				}
 
+				// Need to delete the device context if it is not NULL
 				if (hDC != NULL)
 				{
 					L_DeleteLeadDC( hDC );
 					hDC = NULL;
 				}
-				if (hFileBitmaps != NULL)
-				{
-					L_DestroyBitmapList(hFileBitmaps);
-					hFileBitmaps = NULL;
-				}
-				// Destroy the annotation container
-				if (hContainer != NULL)
-				{
-					L_AnnDestroy(hContainer, ANNFLAG_RECURSE);
-					hContainer = NULL;
-				}
 
 				throw uex;
 			}
-			_lastCodePos = "180";
+			_lastCodePos = "80";
 
 			// check the number of pages in the output
 			int nNumberOfPagesInOutput = getNumberOfPagesInImage(tempOutFile.getName());
-			_lastCodePos = "190";
 
 			// if the page numbers don't match log an exception and retry
-			if (nPages != nNumberOfPagesInOutput)
+			if (nNumberOfPages != nNumberOfPagesInOutput)
 			{
 				UCLIDException ue("ELI23562", "Application Trace: Output page count mismatch.");
 				ue.addDebugInfo("Attempt", i+1);
-				ue.addDebugInfo("Source Pages", nPages);
+				ue.addDebugInfo("Source Pages", nNumberOfPages);
 				ue.addDebugInfo("Source Image", strImageFileName);
 				ue.addDebugInfo("Output Pages", nNumberOfPagesInOutput);
 				ue.addDebugInfo("Output Image", strOutputImageName);
@@ -778,7 +636,7 @@ void fillImageArea(const std::string& strImageFileName, const std::string& strOu
 				break;
 			}
 		}
-		_lastCodePos = "200";
+		_lastCodePos = "90";
 
 		// failed after retrying, throw a failure exception
 		if (!bSuccessful)
@@ -1223,7 +1081,7 @@ bool isLeadToolsSerialized()
 		? true : false;
 }
 //-------------------------------------------------------------------------------------------------
-void convertTIFToPDF(const std::string& strTIF, const std::string& strPDF, bool bRetainAnnotations)
+void convertTIFToPDF(const string& strTIF, const string& strPDF, bool bRetainAnnotations)
 {
 	try
 	{
@@ -1261,7 +1119,7 @@ void convertTIFToPDF(const std::string& strTIF, const std::string& strPDF, bool 
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void convertPDFToTIF(const std::string& strPDF, const std::string& strTIF)
+void convertPDFToTIF(const string& strPDF, const string& strTIF)
 {
 	try
 	{
@@ -1349,7 +1207,7 @@ bool isTiff(int iFormat)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool hasAnnotations(string strFilename, LOADFILEOPTION &lfo, int iFileFormat)
+bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFormat)
 {
 	// if this is not a tiff file it does not contain annotations.
 	if(!isTiff(iFileFormat))
@@ -1378,7 +1236,7 @@ bool hasAnnotations(string strFilename, LOADFILEOPTION &lfo, int iFileFormat)
 	return uCount > 0;
 }
 //-------------------------------------------------------------------------------------------------
-bool hasAnnotations(string strFilename, int iPageNumber)
+bool hasAnnotations(const string& strFilename, int iPageNumber)
 {
 	// check if this is a pdf file
 	if( isPDFFile(strFilename) )
@@ -1899,5 +1757,138 @@ int getCompressionFactor(L_INT nFormat)
 		return nReturn;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI25419");
+}
+//-------------------------------------------------------------------------------------------------
+void validateRedactionZones(const vector<PageRasterZone>& vecZones, long nNumberOfPages)
+{
+	try
+	{
+		// Validate each raster zone in the collection
+		for (vector<PageRasterZone>::const_iterator it = vecZones.begin();
+			it != vecZones.end(); it++)
+		{
+			// Validate non-empty zone
+			if (it->isEmptyZone()) 
+			{
+				UCLIDException ue("ELI09200", "Empty zone!");
+				throw ue;
+			}
+
+			// Validate page number
+			long nPage = it->m_nPage;
+			if( nPage > nNumberOfPages || nPage < 1 )
+			{
+				UCLIDException ue("ELI09201", "Page number selected does not exist!");
+				ue.addDebugInfo("Page", nPage );
+				ue.addDebugInfo("Total number of pages", nNumberOfPages);
+				throw ue;
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27293");
+}
+//-------------------------------------------------------------------------------------------------
+void applyAnnotationText(const PageRasterZone& rZone, BITMAPHANDLE& hBitmap,
+						 HANNOBJECT& hContainer, HDC& hDC, int iYResolution, ANNRECT& rect)
+{
+	try
+	{
+		// Check if any text was specified
+		if (!rZone.m_strText.empty())
+		{
+			// Get the device context
+			createLeadDC(hDC, hBitmap);
+
+			int iFontSize = getFontSizeThatFits(hDC, rZone, iYResolution);
+
+			// Get the current annotation options
+			L_UINT uOptions = 0;
+			throwExceptionIfNotSuccess(L_AnnGetOptions(&uOptions), "ELI24470",
+				"Could not get annotation options.");
+
+			// Ensure text options are available
+			uOptions |= OPTIONS_NEW_TEXT_OPTIONS;
+
+			// Set the options
+			throwExceptionIfNotSuccess(L_AnnSetOptions(NULL, uOptions), "ELI24471",
+				"Could not set text annotation options.");
+
+			// Creat a text annotation object
+			HANNOBJECT hText;
+			throwExceptionIfNotSuccess(L_AnnCreate(ANNOBJECT_TEXT, &hText), "ELI24465", 
+				"Could not create text annotation object.");
+
+			// Make text object visible
+			throwExceptionIfNotSuccess(L_AnnSetVisible(hText, TRUE, 0, NULL), "ELI24467", 
+				"Could not set visibility for redaction annotation object.");
+
+			// Set the font size
+			throwExceptionIfNotSuccess(L_AnnSetFontSize(hText, iFontSize, 0), "ELI24472",
+				"Could not set font size.");
+
+			// Set the font name
+			throwExceptionIfNotSuccess(L_AnnSetFontName(hText, (char*)rZone.m_font.lfFaceName, 0),
+				"ELI24473", "Could not set font name.");
+
+			// Set text color
+			ANNTEXTOPTIONS textOptions = 
+				GetLeadToolsSizedStruct<ANNTEXTOPTIONS>(0);
+			textOptions.bShowText = TRUE;
+			textOptions.bShowBorder = FALSE;
+			textOptions.crText = rZone.m_crTextColor;
+			textOptions.uFlags = ANNTEXT_ALL;
+			throwExceptionIfNotSuccess(L_AnnSetTextOptions(hText, &textOptions, 0), "ELI24474",
+				"Could not set font name.");
+
+			// Set the tiff tag
+			throwExceptionIfNotSuccess(L_AnnSetTag(hText, ANNTAG_TIFF, 0), "ELI24468", 
+				"Could not set annotation tag.");
+
+			// Set the spatial boundaries for the text annotation
+			throwExceptionIfNotSuccess(L_AnnSetRect(hText, &rect), "ELI24469", 
+				"Could not bound text annotation object.");
+
+			// Set the text
+			throwExceptionIfNotSuccess(L_AnnSetText(hText, (char*)rZone.m_strText.c_str(), 0),
+				"ELI24475", "Could not set text.");
+
+			// Insert the text object into the container
+			throwExceptionIfNotSuccess(L_AnnInsert(hContainer, hText, FALSE), "ELI24466", 
+				"Could not insert text annotation object." );
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27294");
+}
+//-------------------------------------------------------------------------------------------------
+void createLeadDC(HDC& hDC, BITMAPHANDLE& hBitmap)
+{
+	// Create a device context if it has not been created already
+	if (hDC == NULL)
+	{
+		hDC = L_CreateLeadDC(&hBitmap);
+		if (hDC == NULL)
+		{
+			UCLIDException uex("ELI24891", "Unable to create device context.");
+			throw uex;
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+bool compareZoneByPage(const PageRasterZone& leftZone, const PageRasterZone& rightZone)
+{
+	return leftZone.m_nPage < rightZone.m_nPage;
+}
+//-------------------------------------------------------------------------------------------------
+void pageZoneToAnnRect(const PageRasterZone &rZone, ANNRECT& rRect)
+{
+	// Calculate points on bounding rectangle
+	POINT p1, p2, p3, p4;
+	pageZoneToPoints(rZone, p1, p2, p3, p4);
+
+	// Apply bounding RECT to redaction object
+	rRect.top = min(p1.y, min(p2.y, min(p3.y, p4.y)));
+	rRect.left = min(p1.x, min(p2.x, min(p3.x, p4.x)));
+	rRect.bottom = max(p1.y, max(p2.y, max(p3.y, p4.y)));
+	rRect.right = max(p1.x, max(p2.x, max(p3.x, p4.x)));
 }
 //-------------------------------------------------------------------------------------------------

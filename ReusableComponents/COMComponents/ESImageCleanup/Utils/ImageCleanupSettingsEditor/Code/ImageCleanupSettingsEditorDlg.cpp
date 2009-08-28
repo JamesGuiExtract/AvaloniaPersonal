@@ -2477,7 +2477,7 @@ void CImageCleanupSettingsEditorDlg::openImageFile(const string& strImageFileNam
 		validateFileOrFolderExistence(strImageFileName);
 
 		// options for opening the file with the SRW
-		string strOpenOptions = "/m \"" + strImageFileName + "\"";
+		string strOpenOptions = "\"" + strImageFileName + "\"";
 		switch(GetCheckedRadioButton(IDC_RADIO_EXTRACT, IDC_RADIO_REGISTERED))
 		{
 		case IDC_RADIO_EXTRACT:

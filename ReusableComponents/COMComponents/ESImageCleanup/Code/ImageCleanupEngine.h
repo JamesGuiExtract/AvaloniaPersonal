@@ -8,6 +8,10 @@
 #include <PDFInputOutputMgr.h>
 
 #include <string>
+#include <set>
+#include <vector>
+
+using namespace std;
 
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Single-threaded COM objects are not properly supported on Windows CE platform, such as the Windows Mobile platforms that do not include full DCOM support. Define _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA to force ATL to support creating single-thread COM object's and allow use of it's single-threaded COM object implementations. The threading model in your rgs file was set to 'Free' as that is the only threading model supported in non DCOM Windows CE platforms."
@@ -45,46 +49,45 @@ public:
 
 private:
 	// Variables
-	// LeadTools bitmap list for the dirty file
-	HBITMAPLIST m_hFileBitmaps;
 
 	// string to hold the path to the CleanupImage.exe
 	string m_strPathToCleanupImageEXE;
 
-	// Methods
 	//----------------------------------------------------------------------------------------------
-	// PURPOSE:	To open the image file and load m_hFileBitmaps with the bitmap pages in the file.
-	//
-	// PROMISE: To return the number of pages that the image contained after opening the image
-	//
-	// NOTE:	rFileInfo will be reset when it enters the function and will contain the
-	//			FILEINFO associated with the image that was opened
-	unsigned long openDirtyImage(const string& rstrFileName, FILEINFO& rFileInfo);
+	// Methods
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE:	To perform the repair operations contained in the vector of operations on the
 	//			specified page of the image.
 	//
 	// NOTE:	The first page of the image is stored as 0
-	void cleanImagePage(int iPageNumber, ICiServerPtr ipciServer, ICiRepairPtr ipciRepair,
-		IIUnknownVectorPtr ipVectorOfCleanupOperations);
+	void cleanImagePage(BITMAPHANDLE& rhBitmap, const ICiServerPtr& ipciServer,
+		const ICiRepairPtr& ipciRepair,
+		const vector<ESImageCleanupLib::IImageCleanupOperationPtr>& vecOperations);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE:	To write the cleaned up image page to the PDFInputOutputMgr output file
 	void writeCleanImage(unsigned long lNumberOfPages, const FILEINFO& rFileInfo,
 		PDFInputOutputMgr& rOutMgr);
 	//----------------------------------------------------------------------------------------------
-	void getVectorOfPages(vector<int>& rvecPageNumbers, 
-		ESImageCleanupLib::IImageCleanupSettingsPtr ipSettings, long lPageCount);
+	void getSetOfPages(set<int>& rsetPageNumbers,
+		const ESImageCleanupLib::IImageCleanupSettingsPtr& ipSettings, int nPageCount);
+	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To get a vector of all enabled image cleanup operations
+	void getEnabledCleanupOperations(vector<ESImageCleanupLib::IImageCleanupOperationPtr>& rvecOps,
+		const IIUnknownVectorPtr& ipOperations);
 	//----------------------------------------------------------------------------------------------
 	// PURPOSE: To get the path to CleanupImage.exe
 	// PROMISE: To return the absolute path to CleanupImage.exe or throw an exception if it 
 	//			cannot be found
 	string getESImageCleanupEngineEXE();
 	//----------------------------------------------------------------------------------------------
+	// PURPOSE: To swap the palette of the bitonal bitmap from {white, black} to {black, white}
+	// NOTE:	DO NOT CALL this method if the bitmaphandle is not a bitonal bitmap, it will
+	//			change the bitmap to a bitonal bitmap and replace the color palette
+	void swapPalette(BITMAPHANDLE& rhBitmap);
+	//----------------------------------------------------------------------------------------------
 	// PURPOSE: validate the image cleanup license
 	void validateLicense();
 	//---------------------------------------------------------------------------------------------
-	// PURPOSE: Frees the memory allocated for the bitmap list if necessary.
-	void freeBitmapList();
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(ImageCleanupEngine), CImageCleanupEngine)

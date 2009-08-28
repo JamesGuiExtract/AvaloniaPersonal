@@ -31,8 +31,9 @@ const int gnOUTPUT_IMAGE_RETRIES = 3;
 // Structs
 //--------------------------------------------------------------------------------------------------
 // Structure that defines a raster zone on a page with a specified line color and border color
-struct PageRasterZone
+class PageRasterZone
 {
+public:
 	// Initialize struct to empty data
 	PageRasterZone()
 		: m_nStartX(0),
@@ -50,6 +51,11 @@ struct PageRasterZone
 		memset(&m_font, 0, sizeof(LOGFONT));
 	}
 	
+	bool isEmptyZone() const
+	{
+		return m_nPage == 0 && m_nStartX == 0 && m_nStartY == 0 && m_nEndX == 0 && m_nEndY == 0;
+	}
+
 	long m_nStartX; 
 	long m_nStartY; 
 	long m_nEndX; 
@@ -97,7 +103,17 @@ public:
 		HBRUSH hBrush = NULL;
 		if (it == m_mapColorToBrush.end())
 		{
+			// Create the brush
 			hBrush = CreateSolidBrush(color);
+
+			// Ensure the brush was created
+			if (hBrush == NULL)
+			{
+				UCLIDException ue("ELI27295", "Unable to create brush!");
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			m_mapColorToBrush[color] = hBrush;
 		}
 		else
@@ -146,6 +162,15 @@ public:
 		if (it == m_mapColorToPen.end())
 		{
 			hPen = CreatePen(PS_SOLID, 2, color);
+
+			// Ensure the pen was created
+			if (hPen == NULL)
+			{
+				UCLIDException ue("ELI27296", "Unable to create pen!");
+				ue.addWin32ErrorInfo();
+				throw ue;
+			}
+
 			m_mapColorToPen[color] = hPen;
 		}
 		else
@@ -209,9 +234,10 @@ LEADUTILS_API void fillImageArea(const string& strImageFileName,
 // PROMISE: To fill (i.e. redact) all areas of the image specified in specified in vecZones,
 //			with the color and text specified within each zone
 // ARGS:	vecFillAreas contains multiple FillAreaStruct elements to fill
+// NOTE:	rvecZones will be sorted by page number after a call to this method
 LEADUTILS_API void fillImageArea(const string& strImageFileName, 
 								 const string& strOutputImageName,
-								 const vector<PageRasterZone> &vecZones, 
+								 vector<PageRasterZone>& rvecZones, 
 								 bool bRetainAnnotations, 
 								 bool bApplyAsAnnotations);
 //-------------------------------------------------------------------------------------------------
@@ -324,8 +350,8 @@ LEADUTILS_API void pageZoneToPoints(const PageRasterZone &rZone, POINT &p1, POIN
 LEADUTILS_API bool isTiff(int iFormat);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: Returns true if the specified file page has an annotations tag, false otherwise.
-LEADUTILS_API bool hasAnnotations(string strFilename, LOADFILEOPTION &lfo, int iFileFormat);
-LEADUTILS_API bool hasAnnotations(string strFilename, int iPageNumber);
+LEADUTILS_API bool hasAnnotations(const string& strFilename, LOADFILEOPTION &lfo, int iFileFormat);
+LEADUTILS_API bool hasAnnotations(const string& strFilename, int iPageNumber);
 //-------------------------------------------------------------------------------------------------
 // PROMISE: To return the compression factor for a particular file format based on the
 //			value in the registry.

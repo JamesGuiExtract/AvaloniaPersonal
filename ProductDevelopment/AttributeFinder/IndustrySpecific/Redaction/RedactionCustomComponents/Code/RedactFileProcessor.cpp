@@ -363,8 +363,9 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long n
 
 		// Redact the areas
 		// if Attributes found OR forced creation flag is set
-		// Flag to indicate if there are zones to redact
-		if (vecZones.size() > 0)
+		// Always call fillImageArea to take care of removing existing annotations issues
+		// [FlexIDSCore #3584 & #3585]
+		if (vecZones.size() > 0 || m_lCreateIfRedact == 0)
 		{
 			_lastCodePos = "390";
 
@@ -373,19 +374,6 @@ STDMETHODIMP CRedactFileProcessor::raw_ProcessFile(BSTR bstrFileFullName, long n
 				m_bCarryForwardAnnotations, m_bApplyRedactionsAsAnnotations);
 
 			_lastCodePos = "400";
-		}
-		// Check for creating the output file even if no redactions
-		else if ( m_lCreateIfRedact == 0 )
-		{
-			_lastCodePos = "410";
-			// if the image file name is not the equal to the output filename 
-			// and the always create flag is set copy the image file to the output name
-			// but if the UseRedacted image is set don't copy over an existing output filename.
-			if ( strOutputName != strImageToRedact )
-			{
-				_lastCodePos = "420";
-				copyFile ( strImageToRedact, strOutputName );
-			}
 		}
 		_lastCodePos = "430";
 

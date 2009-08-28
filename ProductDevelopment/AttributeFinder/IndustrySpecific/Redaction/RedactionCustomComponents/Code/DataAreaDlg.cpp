@@ -769,25 +769,16 @@ bool CDataAreaDlg::doRedaction(const DocumentData& document)
 
 			// Redact the Zones
 			bool bRedacted = vecZones.size() > 0;
-			if (bRedacted)
+			if (bRedacted || m_UISettings.getAlwaysOutputImage())
 			{
 				_lastCodePos = "40_A";
 
-				// Save redactions
+				// Save redactions (even if their are no redactions we need to call this
+				// method if we are always outputting an image, this will take care
+				// of issues related to annotations not being removed [FlexIDSCore #3584 & #3585]
 				fillImageArea(document.m_strInput, document.m_strOutput, vecZones, 
 					m_UISettings.getCarryForwardAnnotations(),
 					m_UISettings.getApplyRedactionsAsAnnotations());
-			}
-			// Perhaps created Redacted file anyway
-			else if (m_UISettings.getAlwaysOutputImage())
-			{
-				_lastCodePos = "40_B";
-
-				// Only copy if the file names differ [FlexIDSCore #3450]
-				if (_stricmp(document.m_strInput.c_str(), document.m_strOutput.c_str()) != 0)
-				{
-					copyFile(document.m_strInput, document.m_strOutput, true);
-				}
 			}
 			_lastCodePos = "50";
 

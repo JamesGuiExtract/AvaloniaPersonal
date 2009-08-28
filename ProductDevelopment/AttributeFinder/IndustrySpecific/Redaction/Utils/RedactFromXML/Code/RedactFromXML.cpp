@@ -77,18 +77,14 @@ BOOL CRedactFromXMLApp::InitInstance()
 			// Get a vector of raster zones from the IDShield metadata xml			
 			vector<PageRasterZone> vecZones = getRasterZonesFromXML(m_strXMLFile);
 
-			// Redact the area if any zones were found
-			if (vecZones.size() > 0)
+			// Redact the area if any zones were found or always outputting a file
+			// Calling fillImageArea will handle removing exisiting annotations even
+			// if the redacted file is not being created [FlexIDSCore #3584 & #3585]
+			if (vecZones.size() > 0 || m_bAlwaysOutput)
 			{
 				// Save redactions
 				fillImageArea(m_strInputFile, m_strOutputFile, vecZones, m_bRetainAnnotations, 
 					m_bRedactAsAnnotation);
-			}
-			else if (m_bAlwaysOutput && m_strInputFile != m_strOutputFile)
-			{
-				// if the image file name is not the equal to the output filename 
-				// and the always create flag is set, copy the image file to the output name
-				copyFile(m_strInputFile, m_strOutputFile);
 			}
 		} // end scope for COM objects
 
