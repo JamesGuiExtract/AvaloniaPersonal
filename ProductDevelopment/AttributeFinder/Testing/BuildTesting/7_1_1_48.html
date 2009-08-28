@@ -1,0 +1,400 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.1.48 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.1.48 Testing </h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3570, #3586]</b> Verify Redactions Two
+	       	<ul>
+	      		<li>Confirm that this task is available from the FAM after installation.  It 
+			may be necessary to <b>Check for new components</b>.
+	      		<li>Confirm that the toolbar includes a complete set of compatible icons, 
+			especially Next document, Previous document, Add exemption, Add last exemption, 
+			and Options. 
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3579]</b> FAM Lockup
+	       	<ul>
+	      		<li>Exercise the following memory leak tests and confirm that processing 
+			does not lock up.
+		       	<ul>
+			       	<li>Date Time Splitter - Test 1
+			       	<li>Regular Expression Value Finder - Test 1
+			       	<li>Convert VOA To XML - Test 1 (if available)
+			       	<li>Lab Results Order Mapper - Test 1 (if available)
+		       	</ul>
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3589]</b> Address Finder
+	       	<ul>
+	      		<li>Exercise the <b>I:\Common\Testing\Rotated_Images\Image152_R180.tif</b>
+			image with an <b>Address Finder</b> rule.
+	      		<li>Confirm that a <b>ELI06814: Cannot perform this operation on a 
+			non-spatial string!</b> exception is not seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3592, #3593, #3594]</b> Swiping Rules
+	       	<ul>
+	      		<li>Install and the <b>RDT</b>.
+	      		<li>Create separate license files for the <b>RDT</b> and for <b>ID 
+			Shield Rule Writing</b>.
+	      		<li>Create, save and exercise a <b>Simple Rules</b> rule set.
+	      		<li>Confirm presence of a <b>This is a swiping rule</b> checkbox. 
+	      		<li>Confirm that a <b>Swiping</b> rule can be saved without an 
+			RDT license <b>only if</b> a counter is selected.
+	      		<li>Confirm that a <b>Swiping</b> rule can be saved without a 
+			counter <b>only</b> with an RDT license.
+	      		<li>Confirm that rule execution is allowed without a counter if 
+			the RSD file is a swiping rule. 
+	       	</ul>
+<p>
+  	   	<LI><b>.NET Verification</b> - Exercise <b>Verify redactions two</b>
+	       	<ul>
+	  	   	<LI><b>[FlexIDSCore #3616]</b> Confirm that a Page summary grid is 
+			provided that displayed visited pages with a green background.
+      			<li>Confirm that a vertical scrollbar is presented for a document 
+			with many pages.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3617]</b> Confirm that a <b>File - Save</b> menu 
+			item allows the user to save current items to a VOA file without 
+			advancing to the next document.
+      			<li>Confirm that <b>Save without commit</b> is successful even if 
+			required type information has not yet been specified.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3618]</b> Confirm that a <b>File - Stop processing</b> 
+			menu item allows the user to stop processing.
+      			<li>Confirm that <b>File - Stop processing</b> prompts the user to 
+			save changes if necessary.
+      			<li>Confirm that <b>File - Stop processing</b> prompts the user to 
+			provide missing type information, if required.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3618]</b> Confirm that a <b>File - Skip document</b> 
+			menu item allows the user to stop processing the current document and 
+			move to the next document.
+      			<li>Confirm that <b>File - Skip document</b> prompts the user to 
+			save changes if necessary.
+      			<li>Confirm that <b>File - Skip document</b> does not prompt the user to 
+			provide missing type information, if required.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3619]</b> Confirm that the <b>Ctrl+F4</b> shortcut 
+			has no effect.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3622]</b> Confirm that the following settings are 
+			available to be required before the user can advance to a new document.  
+			Also confirm that the settings are enforced.
+			<ul>
+	      			<li>Verify all pages
+	      			<li>Specify type for all redactions
+	      			<li>Specify exemption codes for all redactions
+			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3623]</b> Confirm that selecting an item in the 
+			<b>grid view</b> also selects the corresponding item in the <b>Image 
+			Viewer</b>.
+      			<li>Confirm that selecting an item in the <b>Image Viewer</b> 
+			also selects the corresponding item in the <b>grid view</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3624]</b> Confirm that the <b>Delete</b> key works 
+			as expected after selecting an item in the <b>grid view</b>.
+      			<li>Confirm that the <b>Delete</b> key works as expected after 
+			selecting an item in the <b>Image Viewer</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3625]</b> Confirm that tag expansion is supported 
+			for the <b>input</b> VOA file.
+      			<li>Confirm that tag expansion is supported for the <b>output</b> VOA file.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3628]</b> Confirm that supported redaction types are 
+			properly read from <b>IDShield.ini</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3634]</b> Blank types are not presented
+			<ul>
+	      			<li>Verify a document that contains redactions.
+	      			<li>Draw a redaction.
+	      			<li>Select a redaction that contains a type.
+	      			<li>Click on the combo box in the <b>Type</b> column.
+	      			<li>Confirm that only <b>non-blank</b> values are presented.
+			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3635]</b> Confirm that a verification history of 
+			<b>20</b> previous documents is supported.
+      			<li>Confirm that the number of supported documents in controlled by the 
+			<b>HKCU/Software/Extract Systems/AttributeFinder/IndustrySpecific/Redaction/RedactionCustomComponents/IDShield/NumPreviousDocsToQueue</b> 
+			registry key.
+<p>
+	  	   	<LI>Verification history documents
+			<ul>
+	      			<li><b>[FlexIDSCore #3636]</b> Confirm that a warning message is 
+				presented if the user attempts to navigate away from a modified 
+				image.
+	      			<li><b>[FlexIDSCore #3637]</b> Confirm that <b>File - Skip document</b> 
+				is disabled when viewing a verification history item.
+			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3638]</b> Confirm that <b>Edit - Discard changes</b> 
+			allows the user to discard all changes made since the last <b>File - Save</b>.
+      			<li>Confirm that interim changes that were saved via <b>File - Save</b> 
+			are still retained after <b>Edit - Discard changes</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3640]</b> Confirm that the <b>Document type</b> 
+			edit box is correctly populated.
+	  	   	<LI>Confirm that the <b>Document type</b> edit box displays 
+			<b>Unclassified</b> if the VOA file does not contain a DocType attribute.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3641]</b> Support for feedback collection
+			<ul>
+	      			<li>Confirm that feedback collection can be enabled and disabled.
+	      			<li>Confirm that <b>tag selection</b> is supported for specifying 
+				the folder in which to collect feedback.
+	      			<li>Confirm that an option is included for saving the 
+				original document.
+	      			<li>Confirm that feedback can be saved using <b>original filenames</b>.
+	      			<li>Confirm that feedback can be saved using <b>file names based on 
+				file ID</b> instead of the original filenames.
+	      			<li>Confirm that <b>all documents</b> can be collected.
+	      			<li>Confirm that <b>documents with redactions</b> can be collected.
+	      			<li>Confirm that <b>documents modified by the verifier</b> can be 
+				collected.
+	      			<li>Confirm that both <b>documents with redactions</b> and <b>documents 
+				modified by the verifier</b> can be collected.
+			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3645, #3647]</b> Confirm that <b>HCData</b> items are 
+			selected via query and displayed with the color specified in 
+			<b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>MCData</b> items are selected via query and displayed 
+			with the color specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>LCData</b> items are selected via query and displayed 
+			with the color specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>Clues</b> items are selected via query and displayed 
+			with the color specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>Manual</b> items are selected via query and displayed 
+			with the color specified in <b>IDShield.ini</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3646]</b> Confirm that <b>HCData</b> items are 
+			printed based on <b>Output=1</b> as specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>MCData</b> items are printed based on <b>Output=1</b> 
+			as specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>Manual</b> items are printed based on <b>Output=1</b> 
+			as specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>LCData</b> items are not printed based on <b>Output=o</b> 
+			as specified in <b>IDShield.ini</b>.
+	  	   	<LI>Confirm that <b>Clues</b> items are not printed based on <b>Output=o</b> 
+			as specified in <b>IDShield.ini</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5387]</b> File selection dialog
+	       	<ul>
+	      		<li>Confirm that a file selection details have changed for  
+			<b>Manually set action status</b> and <b>Export file lists</b>.
+	      		<li>Confirm that file selection includes a multi-line read-only 
+			edit box with a text description of the file selection.
+	      		<li>Confirm that file selection includes a <b>Select files...</b> 
+			button.
+	      		<li>Confirm that the <b>Select files</b> dialog includes and supports the 
+			usual information
+		       	<ul>
+		      		<li>An <b>All files referenced in the database</b> radio button.
+		      		<li>An <b>All files for which</b> radio button.
+		      		<li>An <b>All files that result from this SQL query</b> radio button.
+<p>
+		      		<li>Confirm that <b>All files for which</b> supports selection 
+				of an action, a corresponding status, and a user name. 
+		      		<li>Confirm that the selection items are disabled if and only if 
+				the radio button is not selected. 
+<p>
+		      		<li>Confirm that <b>All files that result from this SQL query</b> 
+				supports specification of a query string within a multi-line edit box. 
+		      		<li>Confirm that the edit box is disabled if and only if 
+				the radio button is not selected. 
+		       	</ul>
+	      		<li>Confirm that file selection works correctly with a combination of 
+			<b>Action</b>, <b>Status</b> and <b>User</b>.
+	      		<li>Confirm that file selection works correctly for a <b>SQL query</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5389]</b> Mathematical condition object
+	       	<ul>
+	      		<li>Confirm presence of a <b>Mathematical condition</b> object.
+	      		<li>Confirm that the condition object includes a combo box for 
+			<b>met</b> versus <b>not met</b>.
+<p>
+	      		<li>Confirm presence of a radio button for <bRandomly</b>.
+	      		<li>Confirm presence of an associated edit box for a percentage.
+	      		<li>Confirm that the edit box contents are restricted to be between 
+			<b>1</b> and <b>99</b>.
+	      		<li>Confirm that the edit box is enabled only when the radio button 
+			is selected.
+	      		<li>Confirm proper behavior for this condition being <b>met</b>.
+	      		<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+	      		<li>Confirm presence of a radio button for <bOnce every</b>.
+	      		<li>Confirm presence of an associated edit box for a number of times.
+	      		<li>Confirm that the edit box contents are restricted to be greater than 
+			<b>1</b>.
+	      		<li>Confirm that the edit box is enabled only when the radio button 
+			is selected.
+	      		<li>Confirm proper behavior for this condition being <b>met</b>.
+	      		<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+	      		<li>Confirm presence of a radio button for <bFile ID</b>.
+	      		<li>Confirm presence of an associated edit box for a modulus.
+	      		<li>Confirm presence of an associated edit box for a result.
+	      		<li>Confirm that the <b>modulus</b> edit box contents are restricted to 
+			be greater than <b>1</b>.
+	      		<li>Confirm that the <b>result</b> edit box contents are restricted to be 
+			between <b>0</b> and <b>one less than the modulus</b>.
+	      		<li>Confirm that the edit boxes are enabled only when the radio button 
+			is selected.
+	      		<li>Confirm proper behavior for this condition being <b>met</b>.
+	      		<li>Confirm proper behavior for this condition being <b>not met</b>.
+<p>
+	      		<li>Exercise the <b>Conditional Task</b> memory leak test.
+	      		<li>Confirm that no memory leaks are seen.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5392]</b> Manually set action status
+	       	<ul>
+	      		<li>Confirm that the dialog now supports setting <b>ActionA</b> files to 
+			status of <b>ActionB</b> for all files in which <b>ActionC</b> has a 
+			particular status.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5397]</b> FAM status bar problems with skipped files
+	       	<ul>
+	      		<li>Create an FPS file with a file supplier configured to <b>force 
+			processing</b>.
+	      		<li>Use <b>Verify extracted data</b> or <b>Verify redactions two</b> since 
+			those tasks support skipping files.
+	      		<li>Start processing and skip all the files. 
+	      		<li>Confirm that the status bar shows correct numbers for skipped, 
+			pending and processing.
+	      		<li>Start processing again and skip all the files again. 
+	      		<li>Confirm that the status bar shows correct numbers for skipped, 
+			pending and processing.
+	      		<li>Close the FAM instance. 
+	      		<li>Reopen the FPS file and start processing. 
+	      		<li>Confirm that the status bar shows correct numbers for skipped, 
+			pending and processing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5395, #5398, #5399]</b> Processing Setup UI
+	       	<ul>
+	      		<li>Confirm that the <b>Log the details of the error to the following 
+			file</b> check box is enabled during setup.
+	      		<li>Confirm that the associated tag selector is enabled only 
+			when the check box is checked.
+	      		<li>Confirm that the <b>File processing scope</b> controls are disabled 
+			while processing is active.
+	      		<li>Confirm that all text is visible in the <b>Threads for processing</b> 
+			group box.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5405]</b> Automatic deletion of comments upon file completion
+	       	<ul>
+	      		<li>Confirm that a new <b>AutoDeleteFileActionCommentOnComplete</b> 
+			setting has been added to the <b>DBInfo</b> table inthe database.
+	      		<li>Confirm that the default setting is <b>0</b>.
+	      		<li>Confirm that for <b>0</b>, comments <b>are not</b> removed from the 
+			database after files are completed.
+	      		<li>Confirm that for <b>1</b>, comments <b>are</b> removed from the 
+			database after files are completed.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5406]</b> Conditional task processing with an empty list
+	       	<ul>
+	      		<li>Create an FPS file with a conditional task with an empty list of 
+			tasks to be executed if the condition is <b>false</b>.
+	      		<li>Confirm that the task works correctly when the condition is <b>true</b>.
+	      		<li>Confirm that the expected behavior of <b>nothing</b> happens when 
+			the condition is <b>false</b>.
+<p>
+	      		<li>Create an FPS file with a conditional task with an empty list of 
+			tasks to be executed if the condition is <b>true</b>.
+	      		<li>Confirm that the task works correctly when the condition is <b>false</b>.
+	      		<li>Confirm that the expected behavior of <b>nothing</b> happens when 
+			the condition is <b>true</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5408, #5410]</b> Errors when using Add Watermark
+	       	<ul>
+	      		<li>Process an image with many pages using the <b>Add Watermark</b> task.
+	      		<li>During processing, modify file/folder permissions such that 
+			the watermark cannot be added to one or more of the subsequent pages.
+	      		<li>Confirm that an output image ( with an incorrect page count ) was 
+			<b>not</b> created.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5413]</b> Password required to process skipped files
+	       	<ul>
+	      		<li>Create an FPS file to process files skipped by the logged in user.
+	      		<li>Confirm that processing of skipped files succeeds without prompt.
+	      		<li>Modify the FPS file to process files skipped by any user.
+	      		<li>Confirm that a prompt for the database administrator password is 
+			displayed after attempting to start processing.
+	      		<li>Confirm that processing of skipped files <b>succeeds</b> if the correct 
+			password is provided.
+	      		<li>Confirm that processing of skipped files <b>does not succeed</b> if an 
+			incorrect password is provided.
+	      		<li>Confirm that processing of skipped files <b>does not succeed</b> if the  
+			password prompt is cancelled.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
