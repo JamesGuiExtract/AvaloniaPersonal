@@ -95,6 +95,7 @@ static const string gstrCREATE_FAM_FILE_ACTION_COMMENT_TABLE = "CREATE TABLE [Fi
 	"[ActionID] [int] NULL, "
 	"[Comment] [ntext] NULL, "
 	"[DateTimeStamp] [datetime] NULL, "
+	"[TimeSinceSkipped] AS (DATEDIFF(second,[DateTimeStamp],GETDATE())), " // Computed column for time skipped
 	"CONSTRAINT [PK_FAMFileActionComment] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
 static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFile] ("
@@ -102,6 +103,7 @@ static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFi
 	"[UserName] [nvarchar](50) NULL, "
 	"[FileID] [int] NULL, "
 	"[ActionID] [int] NULL, "
+	"[UniqueFAMID] [nvarchar](50) NULL, "
 	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
 // Create table indexes SQL

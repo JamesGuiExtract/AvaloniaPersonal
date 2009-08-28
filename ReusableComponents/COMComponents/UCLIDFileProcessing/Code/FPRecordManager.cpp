@@ -22,7 +22,8 @@ FPRecordManager::FPRecordManager()
   m_ipFPMDB(NULL),
   m_bKeepProcessingAsAdded(true),
   m_bProcessSkippedFiles(false),
-  m_bSkippedFilesForCurrentUser(true)
+  m_bSkippedFilesForCurrentUser(true),
+  m_strUniqueProcessID("")
 {
 	try
 	{
@@ -94,7 +95,7 @@ void FPRecordManager::discardProcessingQueue()
 		if (m_bProcessSkippedFiles)
 		{
 			// Return the state of the file to skipped in the database
-			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, VARIANT_FALSE);
+			m_ipFPMDB->SetFileStatusToSkipped( l, bstrAction, "");
 		}
 		else
 		{
@@ -457,7 +458,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 				else if ( eNewStatus == kRecordSkipped )
 				{
 					_lastCodePos = "225";
-					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID);
+					m_ipFPMDB->NotifyFileSkipped(nTaskID, m_nActionID, m_strUniqueProcessID.c_str());
 				}
 
 				_lastCodePos = "230";
@@ -482,7 +483,7 @@ void FPRecordManager::changeState(FileProcessingRecord& task, CSingleLock& rLock
 				if (m_bProcessSkippedFiles)
 				{
 					// Set the file back to skipped (do not update the skipped table)
-					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), VARIANT_FALSE);
+					m_ipFPMDB->SetFileStatusToSkipped(nTaskID, m_strAction.c_str(), "");
 					_lastCodePos = "290_A";
 				}
 				else
@@ -603,7 +604,7 @@ long FPRecordManager::loadTasksFromDB(long nNumToLoad)
 	string strSkippedUser = 
 		m_bSkippedFilesForCurrentUser && m_bProcessSkippedFiles ? getCurrentUserName() : "";
 	IIUnknownVectorPtr ipFileList = m_ipFPMDB->GetFilesToProcess(m_strAction.c_str(), nNumToLoad,
-		asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str());
+		asVariantBool(m_bProcessSkippedFiles), strSkippedUser.c_str(), m_strUniqueProcessID.c_str());
 
 	// Attempt to create a task for each file record and add it to the queue
 	long nNumFiles = ipFileList->Size();
@@ -637,6 +638,11 @@ void FPRecordManager::setFPMDB(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipF
 	ASSERT_ARGUMENT("ELI14005", ipFPMDB != NULL);
 	// Set the database object
 	m_ipFPMDB = ipFPMDB;
+}
+//-------------------------------------------------------------------------------------------------
+void FPRecordManager::setUniqueProcessID(const string& strUniqueProcessID)
+{
+	m_strUniqueProcessID = strUniqueProcessID;
 }
 //-------------------------------------------------------------------------------------------------
 void FPRecordManager::setActionID(long nActionID)

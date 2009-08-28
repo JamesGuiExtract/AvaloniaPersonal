@@ -17,6 +17,7 @@
 #include <StringTokenizer.h>
 #include <TextFunctionExpander.h>
 #include <UCLIDException.h>
+#include <UPI.h>
 
 using namespace ADODB;
 
@@ -34,6 +35,7 @@ m_strPreviousDBServer(""),
 m_strPreviousDBName(""),
 m_isDBConnectionReady(false),
 m_nNumberOfFilesToExecute(0),
+m_iUPICounter(1),
 m_bCancelling(false)
 {
 	try
@@ -176,6 +178,10 @@ STDMETHODIMP CFileProcessingManager::StartProcessing()
 
 		// Reset the DB Connection
 		getFPMDB()->ResetDBConnection();
+
+		// Set unique process ID for this run (needed when processing skipped files)
+		m_recordMgr.setUniqueProcessID(
+			UPI::getCurrentProcessUPI().getUPI() + "\\" + asString(m_iUPICounter++));
 
 		// Set the number of files to process
 		m_recordMgr.setNumberOfFilesToProcess(m_nNumberOfFilesToExecute);

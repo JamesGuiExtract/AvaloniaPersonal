@@ -27,7 +27,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 9;
+const long glFAMDBSchemaVersion = 10;
 
 // Table names
 static const string gstrACTION = "Action";
@@ -111,7 +111,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 													string strAction, const string& strState,
 													const string& strException,
 													long nActionID, bool bLockDB,
-													bool bUpdateSkippedTable)
+													const string& strUniqueProcessID)
 {
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
 	auto_ptr<TransactionGuard> apTG;
@@ -220,7 +220,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 						strState, strException, "" );
 				}
 
-				if (bUpdateSkippedTable)
+				if (!strUniqueProcessID.empty())
 				{
 					// These calls are order dependent.
 					// Remove the skipped record (if any) and add a new
@@ -229,7 +229,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 					if (strState == "S")
 					{
 						// Add a record to the skipped table
-						addSkipFileRecord(ipConnection, nFileID, nActionID);
+						addSkipFileRecord(ipConnection, nFileID, nActionID, strUniqueProcessID);
 					}
 				}
 			}
@@ -2064,7 +2064,8 @@ bool CFileProcessingDB::reConnectDatabase()
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnection,
-										  long nFileID, long nActionID)
+										  long nFileID, long nActionID,
+										  const string& strUniqueProcessID)
 {
 	try
 	{
@@ -2100,6 +2101,7 @@ void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnect
 			setStringField(ipFields, "UserName", strUserName);
 			setLongField(ipFields, "FileID", nFileID);
 			setLongField(ipFields, "ActionID", nActionID);
+			setStringField(ipFields, "UniqueFAMID", strUniqueProcessID);
 
 			// Update the row
 			ipSkippedSet->Update();

@@ -844,7 +844,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToUnattempted( long nFileID,  BSTR 
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAction,
-													   VARIANT_BOOL bUpdateSkippedFileTable)
+													   BSTR bstrUniqueProcessID)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -863,7 +863,7 @@ STDMETHODIMP CFileProcessingDB::SetFileStatusToSkipped(long nFileID, BSTR strAct
 
 		// Change the given files state to Skipped
 		setFileActionState(ipConnection, nFileID, asString(strAction), "S", "", -1, true,
-			asCppBool(bUpdateSkippedFileTable));
+			asString(bstrUniqueProcessID));
 
 		END_CONNECTION_RETRY(ipConnection, "ELI26938");
 
@@ -1198,6 +1198,7 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFile( long nID,  BSTR strAction,  EA
 STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFiles, 
 												  VARIANT_BOOL bGetSkippedFiles,
 												  BSTR bstrSkippedForUserName,
+												  BSTR bstrUniqueProcessID,
 												  IIUnknownVector * * pvecFileRecords)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState())
@@ -1245,6 +1246,16 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 				string strUserAnd = " AND SkippedFile.UserName = '" + strUserName + "'";
 				strWhere += strUserAnd;
 			}
+
+			string strUniqueProcessID = asString(bstrUniqueProcessID);
+			if (!strUniqueProcessID.empty())
+			{
+				replaceVariable(strUniqueProcessID, "'", "''");
+				strWhere += " AND SkippedFile.UniqueFAMID <> '";
+				strWhere += strUniqueProcessID;
+				strWhere += "'";
+			}
+
 			strWhere += " )";
 		}
 		else
@@ -2320,7 +2331,8 @@ STDMETHODIMP CFileProcessingDB::GetActionName(long nActionID, BSTR *pbstrActionN
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26771");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
+STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID,
+												  BSTR bstrUniqueProcessID)
 {
 	try
 	{
@@ -2339,7 +2351,8 @@ STDMETHODIMP CFileProcessingDB::NotifyFileSkipped(long nFileID, long nActionID)
 		string strActionName = getActionName(ipConnection, nActionID);
 
 		// Set the file state to skipped
-		setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID);
+		setFileActionState(ipConnection, nFileID, strActionName, "S", "", nActionID, true,
+			asString(bstrUniqueProcessID));
 
 		END_CONNECTION_RETRY(ipConnection, "ELI26778");
 

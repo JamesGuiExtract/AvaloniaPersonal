@@ -80,7 +80,7 @@ public:
 	STDMETHOD(NotifyFileFailed)( long nFileID,  BSTR strAction,  BSTR strException);
 	STDMETHOD(SetFileStatusToPending)( long nFileID,  BSTR strAction);
 	STDMETHOD(SetFileStatusToUnattempted)( long nFileID,  BSTR strAction);
-	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, VARIANT_BOOL vbUpdateSkippedFileTable);
+	STDMETHOD(SetFileStatusToSkipped)(long nFileID, BSTR strAction, BSTR bstrUniqueProcessID);
 	STDMETHOD(GetFileStatus)( long nFileID,  BSTR strAction,  EActionStatus * pStatus);
 	STDMETHOD(SearchAndModifyFileStatus)( long nWhereActionID,  EActionStatus eWhereStatus,  
 		long nToActionID, EActionStatus eToStatus, BSTR bstrSkippedFromUserName, long nFromActionID,
@@ -88,7 +88,7 @@ public:
 	STDMETHOD(SetStatusForAllFiles)( BSTR strAction,  EActionStatus eStatus);
 	STDMETHOD(SetStatusForFile)( long nID,  BSTR strAction,  EActionStatus eStatus,  EActionStatus * poldStatus);
 	STDMETHOD(GetFilesToProcess)( BSTR strAction,  long nMaxFiles, VARIANT_BOOL bGetSkippedFiles,
-		BSTR bstrSkippedForUserName, IIUnknownVector * * pvecFileRecords);
+		BSTR bstrSkippedForUserName, BSTR bstrUniqueProcessID, IIUnknownVector * * pvecFileRecords);
 	STDMETHOD(GetStats)(/*[in]*/ long nActionID, /*[out, retval]*/ IActionStatistics* *pStats);
 	STDMETHOD(Clear)();
 	STDMETHOD(CopyActionStatusFromAction)( /*[in]*/ long  nFromAction, /*[in]*/ long nToAction );
@@ -117,7 +117,7 @@ public:
 	STDMETHOD(AsEActionStatus)(BSTR bstrStatus, EActionStatus *peaStatus);
 	STDMETHOD(GetFileID)(BSTR bstrFileName, long* pnFileID);
 	STDMETHOD(GetActionName)(long nActionID, BSTR* pbstrActionName);
-	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID);
+	STDMETHOD(NotifyFileSkipped)(long nFileID, long nActionID, BSTR bstrUniqueProcessID);
 	STDMETHOD(SetFileActionComment)(long nFileID, long nActionID, BSTR bstrComment);
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
@@ -284,9 +284,12 @@ private:
 	//			guard, if bLockDB == true then this method will lock the DB and declare a
 	//			transaction guard (in this case the outer scope MUST NOT lock the DB or begin
 	//			a transaction)
+	//			If strUniqueProcessID != "" and strState == "S" then the skipped file table
+	//			will be updated with the new process ID string.  If strUniqueProcessID == ""
+	//			then the skipped file table will not be updated.
 	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1, bool bLockDB = true, bool bUpdateSkippedTable = true);
+		long nActionID = -1, bool bLockDB = true, const string& strUniqueProcessID = "");
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
@@ -412,7 +415,8 @@ private:
 	bool reConnectDatabase();
 
 	// Adds a record to the skipped file table
-	void addSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID, long nActionID);
+	void addSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID, long nActionID,
+		const string& strUniqueProcessID);
 
 	// Removes a record from the skipped file table
 	void removeSkipFileRecord(const ADODB::_ConnectionPtr& ipConnection, long nFileID,
