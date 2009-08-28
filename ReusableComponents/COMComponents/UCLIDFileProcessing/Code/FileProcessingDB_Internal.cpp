@@ -937,6 +937,11 @@ void CFileProcessingDB::initializeTableValues()
 		+ "', '0')";
 	vecQueries.push_back(strSQL);
 
+	// Add Require Password To Process All Skipped Files setting (default to true)
+	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
+		+ "', '1')";
+	vecQueries.push_back(strSQL);
+
 	// Execute all of the queries
 	executeVectorOfSQL( getDBConnection(), vecQueries);
 }

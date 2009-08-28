@@ -389,9 +389,14 @@ void FileProcessingDlg::OnBtnRun()
 		// Check if authentication is needed for processing skipped files [LRCAU #5413]
 		if (m_bProcessingSkippedFiles && ipRole->SkippedForAnyUser == VARIANT_TRUE)
 		{
-			// Show the DB login prompt
+			// Get whether the password is required [LRCAU #5415]
+			string strRequirePass = asString(getDBPointer()->GetDBInfoSetting(
+				gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED.c_str()));
+
+			// Show the DB login prompt (if password is required)
 			VARIANT_BOOL vbCancelled;
-			if (getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
+			if (strRequirePass == "1"
+				&& getDBPointer()->ShowAdminLogin(&vbCancelled) == VARIANT_FALSE)
 			{
 				MessageBox("Invalid password! Cannot process skipped files for all users!",
 					"Authentication Failed", MB_OK | MB_ICONERROR);
