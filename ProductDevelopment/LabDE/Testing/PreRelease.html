@@ -1,0 +1,54 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE Pre-Release Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>LabDE Pre-Release Testing<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Exercise Demo Application</h2>
+<UL>
+  	<li>Review the <b>Demo_LabDE</b> instructions.</li>
+  	<li>Exercise the <b>Demo_LabDE</b> FPS files and links.</li>
+  	<li>Exercise the <b>Demo_LabDE</b> portion of the Sanity Test checklist.</li>
+  	<li>Confirm that the <b>Demo_LabDE</b> images are non-sensitive by reviewing the original 
+	images and confirming that sensitive data has been changed.</li>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Create Master CD</h2>
+<UL>
+  	<li>Create an autorun.inf file for the root of the CD with the following lines:</li>
+	<UL>
+	  	<li>[autorun]</li>
+	  	<li>open=LabDEInstall\Launch.exe</li>
+	  	<li>icon=LabDEInstall\LabDE.ico</li>
+	</UL>
+	<li>Add the following folders and their contents to the root of the CD:</li>
+	<UL>
+	  	<li>DotNet 3.5 Framework</li>
+	  	<li>Extract Systems LM</li>
+	  	<li>LabDE</li>
+	  	<li>LabDEInstall</li>
+	  	<li>SQLServerExpress2005</li>
+	</UL>
+  	<li>Create an appropriate ISO image to facilitate creation of copied CDs.</li>
+<p>
+  	<li>Test the <b>LabDE</b> CD by installing each application.</li>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</HTML>
