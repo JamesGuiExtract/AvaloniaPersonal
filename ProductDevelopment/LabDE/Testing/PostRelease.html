@@ -1,0 +1,70 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE Post-Release Activities Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>LabDE Post-Release Activities<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Source Code Backup - On the Build Machine</h2>
+<UL>
+  	<li>Rename the <b>D:\temp</b> folder on the build machine to <b>temp a.b.c.d</b>.
+  	<li>As VSS and/or domain administrator.
+	<UL>
+	  	<li>Undo current SourceSafe checkouts.</li>
+	  	<li>Copy the current VSS folder to an appropriately named folder under 
+		<b>I:\Common\Engineering\VSSReleaseBuilds</b>.</li>
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Documentation Backup - From I:\Common\Tech Comm</h2>
+<UL>
+  	<li>Zip the <b>I:\Common\Tech Comm\RoboHELP\File Action Manager</b> folder and 
+	store it in <b>I:\Common\Tech Comm\RoboHELP\Archives</b>.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Release Notes and Licensing</h2>
+<UL>
+  	<li>Create an email to company employees describing in fair detail each of the 
+	new features and enhancements associated with the new release.
+  	<li>Update the <b>Notable LabDE Versions.rtf</b> file located at 
+	<b>I:\Common\Engineering\ProductReleases\LabDE</b>.
+  	<li>Update the <b>I:\Common\Engineering\Tools\SecureClients\COMLicense</b> folder 
+	used to create license files for the new release.
+  	<li>Confirm that the new licensing folder cannot be used to create the following 
+	license packages: <b>Disable USB Key Serial Numbers</b>, <b>Rule Development Toolkit</b>, 
+	<b>Simple Rule Writing</b>.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Post-Release Testing Activities</h2>
+<UL>
+  	<li>Finish exercising any remaining testing checklists.
+  	<li>Finish creating and exercising any missing <b>automated</b> tests.
+  	<li>Finish creating and exercising any missing <b>Memory Leak</b> tests.
+  	<li>Update testing checklists per comments and notes from testers.
+<p>
+  	<li>Review and test the <b>Untested</b> SCRs in <b>DataEntry</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>DotNetRCAndUtils</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>FlexIDSCore</b>.
+  	<li>Review and test the <b>Untested</b> SCRs in <b>LegacyRCAndUtils</b>.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+</HTML>
