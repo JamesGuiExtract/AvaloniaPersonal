@@ -1,0 +1,97 @@
+<HTML>
+
+<HEAD>
+<TITLE>Pre-Code Freeze Testing Checklist</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1>LabDE Pre-Code Freeze Testing<br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+
+<!-- *********************************************** -->
+<LI><h2>Purpose</h2>
+<UL>
+  	<li>Confirm proper project settings in the code baseline.</li>
+  	<li>Basic testing of core features to find problems before it is too late to 
+	fix them.</li>
+  	<li>Performance testing of new features and enhancements to confirm 
+	expected behavior.</li>
+  	<li>Review current state of documentation to confirm that contents reflect 
+	the expected behavior of the new release.</li>
+  	<li>Testing of the LabDE demo to ensure effective operation after installation.</li>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Engineering Project Settings - All Projects</h2>
+<UL>
+  	<li>Confirm that Optimizations are set to <b>Disabled (/Od)</b> via C/C++ - Optimization.
+  	<li>Confirm that C++ Exceptions are set to <b>Yes With SEH Exceptions (/EHa)</b> via 
+	C/C++ - Code Generation.
+  	<li>Confirm that Generate Debug Info is set to <b>Yes (/DEBUG)</b> in Release mode 
+	via Linker - Debugging.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Core Features - Exercise Testing Checklists</h2>
+<UL>
+  	<li><b>Sanity Tests</b> - run on each supported operating system
+  	<li><b>Stress Testing</b> - run on each supported operating system
+<p>
+  	<li><b>Other Base Checklists</b> - once each
+  	<li><b>Recently Fixed SCRs</b> - basic testing
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Performance Testing</h2>
+<UL>
+  	<li><b>New Rule Objects</b>
+	<UL>
+	  	<li>Create comprehensive set of automated tests.
+	  	<li>Create Memory Leak test(s).
+	  	<li>Exercise basic functionality with large set of images.
+<p>
+		<li><b>Order Mapper</b> - Output Handler
+	</UL>
+<p>
+  	<li><b>New Task Objects</b>
+	<UL>
+	  	<li>Create comprehensive set of automated tests.
+	  	<li>Create Memory Leak test(s).
+	  	<li>Exercise basic functionality with large set of images.
+<p>
+		<li><b>Convert VOA To XML</b> - Task
+		<li><b>Verify Extract Data</b> - Task
+	</UL>
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Documentation Review</h2>
+<UL>
+  	<li>Review <b>LabDE.chm</b> checking accuracy and completeness.
+  	<li>Review <b>LabDEinstall.chm</b> checking completeness of installation instructions.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+<LI><h2>Demo Application</h2>
+<UL>
+  	<li>Confirm that all <b>Demo_LabDE</b> images are suitably sanitized.
+  	<li>Confirm that installation and basic testing of <b>Demo_LabDE</b> works 
+	on a clean machine.
+</UL>
+<br>
+
+<!-- *********************************************** -->
+</OL>
+
+</HTML>
