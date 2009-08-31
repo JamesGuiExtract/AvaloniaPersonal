@@ -1,0 +1,18 @@
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+
+//Old Stats
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;AutomatedConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
+
+//Hybrid Stats
+//<SETTING>;VerificationConditionQuantifier=any
+//<SETTING>;VerificationCondition=MCData|LCData|Clues
+//<SETTING>;AutomatedConditionQuantifier=only any
+//<SETTING>;AutomatedCondition=HCData
+//<SETTING>;OutputHybridStats=1
+
+<SETTING>;OutputFinalStatsOnly=1
+
+<TESTFOLDER>;;k:\Common\Engineering\Sample Files\FNTI\CA - Alameda\Set005\RandomSubset\;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
