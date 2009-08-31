@@ -26,6 +26,44 @@ namespace Extract.Redaction.Verification
     /// </summary>
     public partial class RedactionGridView : UserControl, IImageViewerControl
     {
+        #region RedactionGridView Enums
+
+        /// <summary>
+        /// Specifies the set of indexes in <see cref="_CATEGORIES"/>.
+        /// </summary>
+        enum CategoryIndex
+        {
+            /// <summary>
+            /// Clues
+            /// </summary>
+            Clues,
+
+            /// <summary>
+            /// High confidence data
+            /// </summary>
+            HCData,
+
+            /// <summary>
+            /// Low confidence data
+            /// </summary>
+            LCData,
+
+            /// <summary>
+            /// Manual redactions
+            /// </summary>
+            Manual,
+
+            /// <summary>
+            /// Medium confidence data
+            /// </summary>
+            MCData
+
+            // Note: New values must be inserted in alphabetical order,
+            // because the names of the enum are binary searched.
+        }
+
+        #endregion RedactionGridView Enums
+
         #region RedactionGridView Constants
 
         /// <summary>
@@ -37,6 +75,11 @@ namespace Extract.Redaction.Verification
 #else
 	        "..\\IDShield\\ExemptionCodes";
 #endif
+
+        /// <summary>
+        /// Gets the redaction categories that are recorded in the ID Shield database.
+        /// </summary>
+        static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
 
         #endregion RedactionGridView Constants
 
@@ -79,6 +122,11 @@ namespace Extract.Redaction.Verification
         /// when the vector of attributes is saved.
         /// </summary>
         List<ComAttribute> _undisplayedAttributes;
+
+        /// <summary>
+        /// Keeps track of the count of categories of deleted redactions.
+        /// </summary>
+        int[] _deleted = new int[_CATEGORIES.Length];
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
@@ -330,6 +378,8 @@ namespace Extract.Redaction.Verification
                     {
                         if (row.LayerObjectCount == 0)
                         {
+                            AddToDeletedCount(row);
+
                             _redactions.RemoveAt(i);
                         }
 
@@ -348,6 +398,33 @@ namespace Extract.Redaction.Verification
             {
                 throw ExtractException.AsExtractException("ELI26693", ex);
             }
+        }
+
+        /// <summary>
+        /// Adds the specified row to the counts of deleted redaction categories.
+        /// </summary>
+        /// <param name="row">The row that is being deleted.</param>
+        void AddToDeletedCount(RedactionGridViewRow row)
+        {
+            // Check if this category of redaction should be tracked
+            // Note: Deleted manual redactions are not tracked
+            int index = GetCategoryIndex(row);
+            if (index >= 0 && index != (int)CategoryIndex.Manual)
+            {
+                _deleted[index]++;
+            }
+        }
+
+        /// <summary>
+        /// Gets index of the category of the specified row.
+        /// </summary>
+        /// <param name="row">The row to evaluate.</param>
+        /// <returns>The index of the category of <paramref name="row"/>; or -1 if the category of 
+        /// <paramref name="row"/> does not correspond to a <see cref="CategoryIndex"/>.</returns>
+        static int GetCategoryIndex(RedactionGridViewRow row)
+        {
+            return Array.BinarySearch<string>(_CATEGORIES, row.Category, 
+                StringComparer.OrdinalIgnoreCase);
         }
 
         /// <summary>
@@ -532,6 +609,10 @@ namespace Extract.Redaction.Verification
                 _redactions.Clear();
                 _imageViewer.LayerObjects.Clear();
                 _undisplayedAttributes = new List<ComAttribute>();
+                for (int i = 0; i < _deleted.Length; i++)
+                {
+                    _deleted[i] = 0;
+                }
 
                 // Load the attributes from the file
                 IUnknownVector attributes = new IUnknownVector();
@@ -729,6 +810,51 @@ namespace Extract.Redaction.Verification
                 // Restore the original page number
                 _imageViewer.SetPageNumber(page, false, false);
             }
+        }
+
+        /// <summary>
+        /// Gets the counts of redactions for the current document.
+        /// </summary>
+        /// <returns>The counts of redaction for the current document.</returns>
+        // This method is too computationally expensive to be a property.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public RedactionCounts GetRedactionCounts()
+        {
+            try
+            {
+                // Start with the deleted counts
+                int[] counts = (int[])_deleted.Clone();
+                int total = 0;
+
+                // Add counts for categories that still exist
+                foreach (RedactionGridViewRow row in _redactions)
+                {
+                    int index = GetCategoryIndex(row);
+                    if (index >= 0)
+                    {
+                        counts[index]++;
+
+                        if (index != (int)CategoryIndex.Clues)
+                        {
+                            total++;
+                        }
+                    }
+                }
+
+                // Get the counts by index
+                int high = counts[(int)CategoryIndex.HCData];
+                int medium = counts[(int)CategoryIndex.MCData];
+                int low = counts[(int)CategoryIndex.LCData];
+                int clues = counts[(int)CategoryIndex.Clues];
+                int manual = counts[(int)CategoryIndex.Manual];
+
+                return new RedactionCounts(high, medium, low, clues, manual, total);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27317",
+                    "Unable to get counts for redaction statistics.", ex);
+            }         
         }
 
         /// <summary>

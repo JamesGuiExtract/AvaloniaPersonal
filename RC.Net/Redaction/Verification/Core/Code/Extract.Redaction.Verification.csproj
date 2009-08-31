@@ -172,6 +172,7 @@
     <Compile Include="RedactionGridView.Designer.cs">
       <DependentUpon>RedactionGridView.cs</DependentUpon>
     </Compile>
+    <Compile Include="RedactionCounts.cs" />
     <Compile Include="VerificationMemento.cs" />
     <Compile Include="VerificationSettings.cs" />
     <Compile Include="VerificationSettingsDialog.cs">

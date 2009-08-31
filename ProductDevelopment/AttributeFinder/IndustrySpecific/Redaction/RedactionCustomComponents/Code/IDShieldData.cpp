@@ -27,7 +27,6 @@ IDShieldData::~IDShieldData(void)
 //-------------------------------------------------------------------------------------------------
 void IDShieldData::clear()
 {
-	m_bVerified = false;
 	m_lNumHCDataFound = 0;
 	m_lNumMCDataFound = 0;
 	m_lNumLCDataFound = 0;

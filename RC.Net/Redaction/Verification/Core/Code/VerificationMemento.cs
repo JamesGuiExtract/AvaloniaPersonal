@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
 namespace Extract.Redaction.Verification
@@ -30,6 +31,11 @@ namespace Extract.Redaction.Verification
         /// The fully expanded path to the destination feedback image.
         /// </summary>
         readonly string _feedbackImage;
+
+        /// <summary>
+        /// The amount of time the verify has spent on the document
+        /// </summary>
+        readonly Stopwatch _screenTime = new Stopwatch();
 
         #endregion VerificationMemento Fields
 
@@ -100,5 +106,27 @@ namespace Extract.Redaction.Verification
         }
 
         #endregion VerificationMemento Properties
+
+        #region VerificationMemento Methods
+
+        /// <summary>
+        /// Starts the screen verification time clock.
+        /// </summary>
+        public void StartScreenTime()
+        {
+            _screenTime.Start();
+        }
+
+        /// <summary>
+        /// Stops the screen verification time clock.
+        /// </summary>
+        /// <returns>The total elapsed seconds of screen verification time.</returns>
+        public double StopScreenTime()
+        {
+            _screenTime.Stop();
+            return _screenTime.ElapsedMilliseconds / 1000.0;
+        }
+
+        #endregion VerificationMemento Methods
     }
 }

@@ -27,8 +27,6 @@ public:
 	void countNotRedacted(IAttributePtr ipAttribute);
 
 	// Variables
-
-	bool m_bVerified;
 	long m_lNumHCDataFound;
 	long m_lNumMCDataFound;
 	long m_lNumLCDataFound;
