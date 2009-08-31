@@ -131,6 +131,8 @@ namespace Extract.Redaction.Verification
                 string[] types = GetRedactionTypes();
                 _redactionGridView.AddRedactionTypes(types);
 
+                _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
+
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted += HandleImageViewerLayerObjectDeleted;
@@ -221,10 +223,25 @@ namespace Extract.Redaction.Verification
         {
             if (!WarnIfInvalid())
             {
+                SaveRedactionCounts();
+
                 Save();
 
                 AdvanceToNextDocument();
             }
+        }
+
+        /// <summary>
+        /// Saves the ID Shield redaction counts to the ID Shield database.
+        /// </summary>
+        void SaveRedactionCounts()
+        {
+            // Get the screen time for the current document
+            VerificationMemento memento = GetCurrentDocument();
+            double elapsedSeconds = memento.StopScreenTime();
+
+            // TODO: Actually store data in database
+            Console.WriteLine(elapsedSeconds.ToString(CultureInfo.CurrentCulture));
         }
 
         /// <summary>
@@ -839,31 +856,30 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (IsInHistory)
+                // Check if changes have been made before moving away from a history document
+                bool inHistory = IsInHistory;
+                if (!inHistory || !WarnIfDirty())
                 {
-                    // Check if changes have been made before moving away from a history document
-                    if (WarnIfDirty())
+                    SaveRedactionCounts();
+
+                    if (!inHistory)
                     {
-                        return;
-                    }
-                }
-                else
-                {
-                    // Preserve the currently processing document
-                    if (_unsavedMemento == null)
-                    {
-                        _unsavedMemento = CreateUnsavedMemento();
+                        // Preserve the currently processing document
+                        if (_unsavedMemento == null)
+                        {
+                            _unsavedMemento = CreateUnsavedMemento();
+                        }
+
+                        // Save the state of the current document before moving back
+                        _dirty = _redactionGridView.Dirty;
+                        _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
                     }
 
-                    // Save the state of the current document before moving back
-                    _dirty = _redactionGridView.Dirty;
-                    _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
+                    // Go to the previous document
+                    _historyIndex--;
+                    VerificationMemento memento = GetCurrentDocument();
+                    _imageViewer.OpenImage(memento.ImageFile, false);
                 }
-
-                // Go to the previous document
-                _historyIndex--;
-                VerificationMemento memento = GetCurrentDocument();
-                _imageViewer.OpenImage(memento.ImageFile, false);
             }
             catch (Exception ex)
             {
@@ -886,6 +902,8 @@ namespace Extract.Redaction.Verification
             {
                 if (!WarnIfDirty())
                 {
+                    SaveRedactionCounts();
+
                     AdvanceToNextDocument();
                 }
             }
@@ -1060,6 +1078,9 @@ namespace Extract.Redaction.Verification
 
                     // Set the document type
                     _documentTypeTextBox.Text = memento.DocumentType;
+
+                    // Start recording the screen time
+                    memento.StartScreenTime();
                 }
                 else
                 {
