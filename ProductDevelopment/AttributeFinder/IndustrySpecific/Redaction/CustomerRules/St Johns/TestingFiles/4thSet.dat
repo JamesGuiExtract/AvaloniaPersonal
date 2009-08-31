@@ -1,8 +1,8 @@
-  <SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
+  <SETTING>;QueryForAutomatedRedaction=HCData|MCData
   <SETTING>;VerificationConditionQuantifier=any
   <SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
   <SETTING>;AutomatedConditionQuantifier=any
-  <SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
+  <SETTING>;AutomatedCondition=HCData|MCData
 
   <SETTING>;OutputFinalStatsOnly=1
 
