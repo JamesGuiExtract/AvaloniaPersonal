@@ -1,10 +1,8 @@
-//<SETTING>;QueryForVerification=HCData|MCData|Clues
-//<SETTING>;QueryForAutomatedRedaction=HCData|MCData
 <SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
 <SETTING>;VerificationConditionQuantifier=any
-<SETTING>;AutomatedCondition=HCData|MCData
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
 <SETTING>;AutomatedConditionQuantifier=any
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData
+<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
 <SETTING>;OutputHybridStats=0
 <SETTING>;OutputFinalStatsOnly=1
 <SETTING>;DocTypesToVerify=Certificate of Death|Affidavit of Death
