@@ -1,3 +1,4 @@
+using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The color of redactions in redacted images.
         /// </summary>
-        readonly Color _outputRedactionColor;
+        readonly RedactionColor _outputRedactionColor;
 
         #endregion InitializationSettings Fields
 
@@ -129,7 +130,7 @@ namespace Extract.Redaction.Verification
         /// Gets the color of redactions in redacted output images.
         /// </summary>
         /// <value>The color of redactions in redacted output images.</value>
-        public Color OutputRedactionColor
+        public RedactionColor OutputRedactionColor
         {
             get
             {
@@ -218,13 +219,13 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="iniFile">The initialization file from which to read.</param>
         /// <returns>The color of redactions in output images.</returns>
-        static Color GetRedactionColor(InitializationFile iniFile)
+        static RedactionColor GetRedactionColor(InitializationFile iniFile)
         {
             // The color is either white or black
             string color = iniFile.ReadString(_GENERAL_SECTION, _REDACTION_COLOR_KEY);
             bool isWhite = color.Equals("White", StringComparison.OrdinalIgnoreCase);
 
-            return isWhite ? Color.White : Color.Black;
+            return isWhite ? RedactionColor.White : RedactionColor.Black;
         }
 
         #endregion InitializationSettings Methods
