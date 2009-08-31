@@ -1,0 +1,10 @@
+  <SETTING>;QueryForAutomatedRedaction=HCData|MCData
+  <SETTING>;VerificationConditionQuantifier=any
+  <SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+  <SETTING>;AutomatedConditionQuantifier=any
+  <SETTING>;AutomatedCondition=HCData|MCData
+
+  <SETTING>;CreateTestOutputVOAFiles=0
+  <SETTING>;OutputFinalStatsOnly=1
+
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\St Johns\Set009\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\..\..\Set002\Images\ExpectedRedactions\$FileOf(<SourceDocName>).voa
