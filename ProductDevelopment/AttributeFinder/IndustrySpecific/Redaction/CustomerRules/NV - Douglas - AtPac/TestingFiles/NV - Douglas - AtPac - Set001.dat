@@ -1,5 +1,12 @@
-<SETTING>;QueryForVerification=HCData|MCData|Clues
+//<SETTING>;QueryForVerification=HCData|MCData|Clues
+//<SETTING>;QueryForAutomatedRedaction=HCData|MCData
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
+<SETTING>;VerificationConditionQuantifier=any
+<SETTING>;AutomatedCondition=HCData|MCData
+<SETTING>;AutomatedConditionQuantifier=any
 <SETTING>;QueryForAutomatedRedaction=HCData|MCData
+<SETTING>;OutputHybridStats=0
+<SETTING>;OutputFinalStatsOnly=1
+<SETTING>;DocTypesToVerify=Certificate of Death|Affidavit of Death
 
-
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\NV - Douglas - AtPac\Rules\Master.rsd;K:\Common\Engineering\Sample Files\AtPac\NV - Douglas\Set001;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
+<TESTFOLDER>;;K:\Common\Engineering\Sample Files\AtPac\NV - Douglas\Set001;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
