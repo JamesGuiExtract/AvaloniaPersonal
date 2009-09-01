@@ -7,4 +7,8 @@
 |
 // tax id's and well-formed social
 ~~~~
+|
+none
+|
+\bn\s*/\s*a\b
 )
