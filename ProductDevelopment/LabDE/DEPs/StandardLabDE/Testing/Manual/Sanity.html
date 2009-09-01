@@ -27,10 +27,42 @@
 			<LI>Confirm that LabDE <b>does</b> run in FAM mode with only 
 			the <b>LabDE</b> license.
 		</ul>
-		<LI>Uninstall <b>LabDE</b>.
+	</ul>
+<p>
+	<LI><h3>Demo_LabDE</h3>
+	<ul>
+		<LI><b>Test Setup for first-stage verification</b>
 		<ul>
-			<LI>Confirm that <b>Extract Systems LabDE</b> is completely removed from the 
-			Start menu.
+			<LI>Confirm that the <b>Demo_LabDE</b> folder has been copied to the test machine.
+			<LI><b>[DataEntry #474]</b> Examine the <b>Solution/Rules</b> folder and confirm that 
+			no unencrypted DAT or RSD files are present.
+			<LI>Install the <b>LongDemo</b> images by executing 
+			<b>Demo_LabDE/DemoFiles/Installs/LongDemo/Install.bat</b>.
+			<LI>Reset the demo by executing <b>Demo_LabDE/Clean.bat</b>.
+			<LI>Confirm that no unexpected errors are noted.
+<p>
+			<LI>Queue and process the images using <b>Demo_LabDE/FPS/ExtractData.fps</b>.
+			<LI>Confirm that no exceptions are logged.
+			<LI>Verify the images using <b>Demo_LabDE/FPS/Verify.fps</b>.
+			<li>Mark the <b>Demo_LabDE Check Table</b> while you verify the documents.
+		</ul>
+<p>
+		<LI><b>Second-stage verification</b>
+		<ul>
+			<LI>Verify the images using <b>Demo_LabDE/FPS/MatchToPatientAndOrders.fps</b>.
+			<LI>Confirm that <b>Patient Information - From EpicCare</b>, <b>Medical 
+			Record #</b> and <b>Order Number</b> fields are enabled and required for each file.
+			<LI>Fill in these fields and save results for each file.
+			<LI>Confirm that no exceptions are noted.
+		</ul>
+<p>
+		<LI><b>Send To EMR</b>
+		<ul>
+			<LI>Process the images using <b>Demo_LabDE/FPS/SendToEMR.fps</b>.
+			<LI>Confirm that no exceptions are noted.
+			<LI>Confirm that output files are created in the 
+			<b>.\Demo_LabDE\Outbound XML Messages</b> folder.
+			<LI>Ask Steve to confirm that appropriate XML files have been created.
 		</ul>
 	</ul>
 <p>
@@ -76,13 +108,14 @@
 			Start menu starts with empty <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b> 
 			and <b>Email</b> fields.
 			<li>Confirm that the <b>User License Key</b> field is populated and read-only.
-			<li>Confirm that one or more of the Extract Systems software products is 
-			available for selection.
-			<li>Confirm that the selected software product includes the appropriate 
-			version number.
+			<li>Confirm that one or more of the Extract Systems software products (or 
+			<b>Extract Systems software</b>) is available for selection.
+			<li>Confirm that the selected software product (if available) includes 
+			the appropriate version number.
 			<li>Confirm that when <b>Name</b>, <b>Company Name</b>, <b>Phone Number</b>, 
-			and <b>Email</b> fields and <b>Product</b>, <b>Version</b>, and <b>Type</b> 
-			drop-boxes are populated, the<b> &lt;Next&gt;</b> button becomes active.
+			and <b>Email</b> fields and <b>Product</b>, <b>Version</b>, and (optionally) 
+			<b>Type</b> drop-boxes are populated, the<b> &lt;Next&gt;</b> button 
+			becomes active.
           		<li>Confirm that selecting the "<b>I use a desktop email application...</b>" 
 			radio button and pressing <b>&lt;Next&gt;</b> takes you to step three.
 			<li>Confirm that <b>here</b> displays an email message to the specified 
@@ -256,8 +289,8 @@
 		<LI><b>Highlights and hints on tables</b>
 		<ul>
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
-			<LI>Select the <b>Orders</b> table.
-			<LI>Confirm that selecting each individual row of the orders table provides the 
+			<LI>Select the <b>Test</b> table.
+			<LI>Confirm that selecting each individual row of the test table provides the 
 			appropriate highlights and tooltips.
 			<LI>Confirm that selecting multiple rows of the orders table in various 
 			combinations provides the appropriate highlights but without any tooltips.
@@ -294,11 +327,15 @@
 			list should be restricted to the entries that match the typed text.
 			<ul>
 				<LI>Ordering Physician - First Name
-				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
-				<LI>Ordering Physician - Code (NOTE: this is dependent on the values of the Name fields)
+				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the 
+				presence of a valid First Name)
+				<LI>Ordering Physician - Code (NOTE: this is dependent on the values 
+				of the Name fields)
 				<LI>CopyTo Physician - First Name
-				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
-				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values of the Name fields)
+				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the 
+				presence of a valid First Name)
+				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values 
+				of the Name fields)
 				<LI>Orders - Order Name
 				<LI>Orders - Epic Code
 				<LI>Selected Order Details - Lab Name
@@ -311,11 +348,15 @@
 			can be dropped down from an empty cell by pressing the <b>space</b> bar.
 			<ul>
 				<LI>Ordering Physician - First Name
-				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
-				<LI>Ordering Physician - Code (NOTE: this is dependent on the values of the Name fields)
+				<LI>Ordering Physician - Last Name (NOTE: this is dependent on the 
+				presence of a valid First Name)
+				<LI>Ordering Physician - Code (NOTE: this is dependent on the values of 
+				the Name fields)
 				<LI>CopyTo Physician - First Name
-				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the presence of a valid First Name)
-				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values of the Name fields)
+				<LI>CopyTo Physician - Last Name (NOTE: this is dependent on the 
+				presence of a valid First Name)
+				<LI>CopyTo Physician - Code (NOTE: this is dependent on the values 
+				of the Name fields)
 				<LI>Orders - Order Name
 				<LI>Orders - Epic Code
 				<LI>Selected Order Details - Lab Name
@@ -426,49 +467,6 @@
 		</ul>
 	</ul>
 <p>
-	<LI><h3>Demo_LabDE</h3>
-	<ul>
-		<LI><b>Test Setup for first-stage verification</b>
-		<ul>
-			<LI>Confirm that the <b>Demo_LabDE</b> folder has been copied to the test machine.
-			<LI><b>[DataEntry #474]</b> Examine the <b>Rules</b> folder and confirm that 
-			no unencrypted DAT or RSD files are present.
-<p>
-			<LI>Delete any existing VOA files.
-			<LI>Queue and process the images using the FAM.  
-			<LI>Confirm that no exceptions are logged.
-			<LI>Prepare to <b>Verify extracted data</b> for some of the images.
-			<LI>Configure the <b>Verify extracted data</b> task to use 
-			<b>StandardLabDE_AH_Phase1.config</b>.
-<p>
-			<li>Mark the <b>Demo_LabDE Check Table</b> while you verify the documents.
-		</ul>
-<p>
-		<LI><b>Test Setup for second-stage verification</b>
-		<ul>
-			<LI>Prepare to <b>Verify extracted data</b> for the images.
-			<LI>Configure the <b>Verify extracted data</b> task to use 
-			<b>StandardLabDE.config</b>.
-		</ul>
-<p>
-		<LI><b>Second-stage verification</b>
-		<ul>
-			<LI>Process the images using the FAM.  
-			<LI>Confirm that <b>Patient Information - From EpicCare</b>, <b>Medical 
-			Record #</b> and <b>Order Number</b> fields are enabled and required for each file.
-			<LI>Fill in these fields and save results for each file.
-			<LI>Confirm that no exceptions are noted.
-		</ul>
-<p>
-		<LI><b>Send To EMR</b>
-		<ul>
-			<LI>Process the images with <b>Convert VOA to XML</b> using the FAM.  
-			<LI>Confirm that no exceptions are noted.
-			<LI>Confirm that output files are created in the 
-			<b>.\Demo_LabDE\Outbound XML Messages</b> folder.
-		</ul>
-	</ul>
-<p>
 	<LI><h3>File Formats</h3>
 	<ul>
 		<LI>Make a local copy of the images from 
@@ -478,6 +476,12 @@
 		Image Viewer and the appropriate highlights are displayed.
 		<LI>Re-verify the images using <b>stand-alone</b> mode.  Confirm that each image appears 
 		in the Image Viewer and the appropriate highlights are displayed.
+	</ul>
+<p>
+	<LI><h3>Uninstall</h3>
+	<ul>
+		<LI>Confirm that <b>Extract Systems LabDE</b> is completely removed from the 
+		Start menu.
 	</ul>
 </UL>
 </BODY>
