@@ -315,7 +315,7 @@ namespace Extract.Imaging.Forms
                 OnImageFileChanged(new ImageFileChangedEventArgs(fileName));
 
                 // Raise the on page changed event
-                OnPageChanged(new PageChangedEventArgs(1));
+                OnPageChanged(new PageChangedEventArgs(base.Image.Page));
 
                 // Update the zoom history and raise the zoom changed event
                 UpdateZoom(true, true);
@@ -334,7 +334,7 @@ namespace Extract.Imaging.Forms
                 catch (Exception ex)
                 {
                     ExtractException ee = new ExtractException("ELI21588",
-                        "Unable to remove file from MRU list!", ex);
+                        "Unable to remove file from MRU list.", ex);
                     ee.AddDebugData("File to remove", fileName, false);
                     ee.Log();
                 }
@@ -397,7 +397,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                ExtractException.Assert("ELI22337", "An image must be open!",
+                ExtractException.Assert("ELI22337", "An image must be open.",
                     base.IsImageAvailable);
 
                 // If there is an open image, raise the image file closing event
@@ -484,7 +484,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure not saving to the currently open image
-                ExtractException.Assert("ELI23374", "Cannot save to the currently open image!",
+                ExtractException.Assert("ELI23374", "Cannot save to the currently open image.",
                     !fileName.Equals(_imageFile, StringComparison.OrdinalIgnoreCase));
 
                 // Set the wait cursor
@@ -555,7 +555,7 @@ namespace Extract.Imaging.Forms
                     if (hdc != IntPtr.Zero && retries > 0)
                     {
                         ExtractException ee = new ExtractException("ELI23377",
-                            "Device context created successfully after retry");
+                            "Device context created successfully after retry.");
                         ee.AddDebugData("Retries attempted", retries, false);
                         AddImageDebugInfo(ee, page, i);
                         ee.Log();
@@ -564,7 +564,7 @@ namespace Extract.Imaging.Forms
                     {
                         // Throw an exception
                         ExtractException ee = new ExtractException("ELI23378",
-                            "Unabled to create device context");
+                            "Unable to create device context.");
                         AddImageDebugInfo(ee, page, i);
                         ee.AddDebugData("Memory before reclaim", GC.GetTotalMemory(false), false);
                         ee.AddDebugData("Memory after reclaim", GC.GetTotalMemory(true), false);
@@ -1174,7 +1174,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                ExtractException.Assert("ELI22430", "Object cannot be null!",
+                ExtractException.Assert("ELI22430", "Object cannot be null.",
                     layerObject != null);
 
                 // Get the current zoom info
@@ -4045,7 +4045,7 @@ namespace Extract.Imaging.Forms
             IEnumerable<string> requiredTags, ArgumentRequirement tagsArgumentRequirement)
         {
             // Ensure the required tags is not null
-            ExtractException.Assert("ELI22339", "Required tags may not be null!",
+            ExtractException.Assert("ELI22339", "Required tags may not be null.",
                 requiredTags != null);
 
             // Get each of the objects tags and check
@@ -5400,7 +5400,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI21232", "Unable to initialize cursor objects!",
+                throw new ExtractException("ELI21232", "Unable to initialize cursor objects.",
                     ex);
             }
         }
