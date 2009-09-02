@@ -17,6 +17,7 @@ static const string gstrNUMBER_CONNECTION_RETRIES = "NumberOfConnectionRetries";
 static const string gstrCONNECTION_RETRY_TIMEOUT = "ConnectionRetryTimeout";
 static const string gstrAUTO_DELETE_FILE_ACTION_COMMENT = "AutoDeleteFileActionCommentOnComplete";
 static const string gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
+static const string gstrALLOW_DYNAMIC_TAG_CREATION = "AllowDynamicTagCreation";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;

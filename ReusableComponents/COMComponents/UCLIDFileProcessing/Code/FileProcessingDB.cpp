@@ -111,6 +111,7 @@ m_bUpdateQueueEventTable(true),
 m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
+m_ipParser(NULL),
 m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT)
 {
 	try
@@ -147,8 +148,21 @@ CFileProcessingDB::~CFileProcessingDB()
 	{
 		// Clean up the map of connections
 		m_mapThreadIDtoDBConnections.clear();
+
+		// Ensure the parser is released
+		m_ipParser = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14981");
+}
+//-------------------------------------------------------------------------------------------------
+void CFileProcessingDB::FinalRelease()
+{
+	try
+	{
+		// Ensure the parser is released
+		m_ipParser = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27324");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -2049,6 +2063,22 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 
 		validateLicense();
 
+		// Convert setting name and value to string 
+		string strSettingName = asString(bstrSettingName);
+		string strSettingValue = asString(bstrSettingValue);
+
+		// Setup Setting Query
+		string strSQL = gstrDBINFO_SETTING_QUERY;
+		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
+		
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Lock the database for this instance
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
@@ -2059,19 +2089,11 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 		_RecordsetPtr ipDBInfoSet( __uuidof( Recordset ));
 		ASSERT_RESOURCE_ALLOCATION("ELI19792", ipDBInfoSet != NULL );
 
-		// Convert setting name and value to string 
-		string strSettingName = asString(bstrSettingName);
-		string strSettingValue = asString(bstrSettingValue);
-
-		// Setup Setting Query
-		string strSQL = gstrDBINFO_SETTING_QUERY;
-		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
-		
 		// Begin Transaction
-		TransactionGuard tg(getDBConnection());
+		TransactionGuard tg(ipConnection);
 		
 		// Open recordset for the DBInfo Settings
-		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), adOpenDynamic, 
+		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
 			adLockOptimistic, adCmdText ); 
 
 		// Check if setting record exist
@@ -2090,6 +2112,8 @@ STDMETHODIMP CFileProcessingDB::SetDBInfoSetting(BSTR bstrSettingName, BSTR bstr
 
 		// Commit transaction
 		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27328");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18936");
 	return S_OK;
@@ -2105,39 +2129,27 @@ STDMETHODIMP CFileProcessingDB::GetDBInfoSetting(BSTR bstrSettingName, BSTR* pbs
 
 		validateLicense();
 
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+		
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
 		// Lock the database for this instance
 		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
 
 		// Make sure the DB Schema is the expected version
 		validateDBSchemaVersion();
 
-		// Create a pointer to a recordset
-		_RecordsetPtr ipDBInfoSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI19793", ipDBInfoSet != NULL );
+		// Get the setting
+		string strSetting = getDBInfoSetting(ipConnection, asString(bstrSettingName));
 
-		// Convert Setting name to string
-		string strSettingName = asString(bstrSettingName);
-		
-		// Setup Setting Query
-		string strSQL = gstrDBINFO_SETTING_QUERY;
-		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
-		
-		// Open the record set using the Setting Query		
-		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)getDBConnection(), true), adOpenStatic, 
-			adLockReadOnly, adCmdText ); 
+		// Set the return value
+		*pbstrSettingValue = _bstr_t(strSetting.c_str()).Detach();
 
-		// Check if any data returned
-		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
-		{
-			// Return the setting value
-			*pbstrSettingValue = get_bstr_t(getStringField(ipDBInfoSet->Fields, "Value")).Detach();
-		}
-		else
-		{
-			UCLIDException ue("ELI18940", "DBInfo setting does not exist!");
-			ue.addDebugInfo("Setting", strSettingName);
-			throw  ue;
-		}
+		END_CONNECTION_RETRY(ipConnection, "ELI27327");
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI18937");
 
@@ -2631,6 +2643,799 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26982");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetTags(IStrToStrMap **ppTags)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27329", ppTags != NULL);
+
+		// Create a map to hold the return values
+		IStrToStrMapPtr ipTagToDesc(CLSID_StrToStrMap);
+		ASSERT_RESOURCE_ALLOCATION("ELI27330", ipTagToDesc != NULL);
+
+		// Create query to get the tags and descriptions
+		string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag]";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27331", ipTagSet != NULL );
+
+		// Open Recordset that contains all the tags and their descriptions
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Add each tag and description to the map
+		while (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipTagSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27332", ipFields != NULL);
+
+			// Get the tag and description
+			string strTagName = getStringField(ipFields, "TagName");
+			string strDesc = getStringField(ipFields, "TagDescription");
+
+			// Add the tag and description to the map
+			ipTagToDesc->Set(strTagName.c_str(), strDesc.c_str());
+
+			// Move to the next record
+			ipTagSet->MoveNext();
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27333");
+
+		// Set the out value
+		*ppTags = ipTagToDesc.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27334");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetTagNames(IVariantVector **ppTagNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27335", ppTagNames != NULL);
+
+		IVariantVectorPtr ipVecTags(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI27336", ipVecTags != NULL);
+
+		string strQuery = "SELECT [TagName] FROM [Tag]";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27337", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Loop through each tag name and add it to the variant vector
+		while (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the tag and add it to the collection
+			string strTagName = getStringField(ipTagSet->Fields, "TagName");
+			ipVecTags->PushBack(strTagName.c_str());
+
+			// Move to the next tag
+			ipTagSet->MoveNext();
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27338");
+
+		// Set the out value
+		*ppTagNames = ipVecTags.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27339");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27340", pvbVal != NULL);
+
+		bool bHasTags = false;
+
+		string strQuery = "SELECT [TagName] FROM [Tag]";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27341", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Check if there is at least 1 tag
+		bHasTags = ipTagSet->adoEOF == VARIANT_FALSE;
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27342");
+
+		*pvbVal = asVariantBool(bHasTags);
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27343");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::TagFile(long nFileID, BSTR bstrTagName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strTagName = asString(bstrTagName);
+		validateTagName(strTagName);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Validate the file ID
+		validateFileID(ipConnection, nFileID);
+
+		// Get the tag ID (this will also validate the ID)
+		long nTagID = getTagID(ipConnection, strTagName);
+
+		string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
+			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27344", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		// Only need to add a record if one does not already exist
+		if(ipTagSet->adoEOF == VARIANT_TRUE)
+		{
+			// Add a new record
+			ipTagSet->AddNew();
+
+			// Get the fields pointer
+			FieldsPtr ipFields = ipTagSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27345", ipFields != NULL);
+
+			setLongField(ipFields, "FileID", nFileID);
+			setLongField(ipFields, "TagID", nTagID);
+
+			ipTagSet->Update();
+		}
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27346");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27347");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::UntagFile(long nFileID, BSTR bstrTagName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strTagName = asString(bstrTagName);
+		validateTagName(strTagName);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Validate the file ID
+		validateFileID(ipConnection, nFileID);
+
+		// Get the tag ID (this will also validate the ID)
+		long nTagID = getTagID(ipConnection, strTagName);
+
+		string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
+			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27348", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		// Only need to remove the record if one exists
+		if(ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			// Delete this record
+			ipTagSet->Delete(adAffectCurrent);
+
+			ipTagSet->Update();
+		}
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27349");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27350");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ToggleTagOnFile(long nFileID, BSTR bstrTagName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		string strTagName = asString(bstrTagName);
+		validateTagName(strTagName);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Validate the file ID
+		validateFileID(ipConnection, nFileID);
+
+		// Get the tag ID (this will also validate the ID)
+		long nTagID = getTagID(ipConnection, strTagName);
+
+		string strQuery = "SELECT [FileID], [TagID] FROM [FileTag] WHERE [FileID] = "
+			+ asString(nFileID) + " AND [TagID] = " + asString(nTagID);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27351", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		// If record does not exist, add it
+		if (ipTagSet->adoEOF == VARIANT_TRUE)
+		{
+			// Add a new record
+			ipTagSet->AddNew();
+
+			// Get the fields pointer
+			FieldsPtr ipFields = ipTagSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27352", ipFields != NULL);
+
+			setLongField(ipFields, "FileID", nFileID);
+			setLongField(ipFields, "TagID", nTagID);
+
+		}
+		// Record does exist, remove it
+		else
+		{
+			ipTagSet->Delete(adAffectCurrent);
+		}	
+
+		// Update the table
+		ipTagSet->Update();
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27353");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27354");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AddTag(BSTR bstrTagName, BSTR bstrTagDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the tag name
+		string strTagName = asString(bstrTagName);
+
+		// Validate the tag name
+		validateTagName(strTagName);
+
+		// Get the description
+		string strDescription = asString(bstrTagDescription);
+
+		string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '"
+			+ strTagName + "'";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27355", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		if (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			string strCurrentDescription = getStringField(ipTagSet->Fields, "TagDescription");
+
+			UCLIDException ue("ELI27356", "Specified tag already exists!");
+			ue.addDebugInfo("Tag Name", strTagName);
+			ue.addDebugInfo("Current Description", strCurrentDescription);
+			ue.addDebugInfo("New Description", strDescription);
+			throw ue;
+		}
+		else
+		{
+			ipTagSet->AddNew();
+
+			// Get the fields
+			FieldsPtr ipFields = ipTagSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27357", ipFields != NULL);
+
+			// Set the fields
+			setStringField(ipFields, "TagName", strTagName);
+			setStringField(ipFields, "TagDescription", strDescription);
+
+			// Update the table
+			ipTagSet->Update();
+		}
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27358");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27359");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::DeleteTag(BSTR bstrTagName)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the tag name
+		string strTagName = asString(bstrTagName);
+		validateTagName(strTagName);
+		
+		// Build the query
+		string strQuery = "SELECT * FROM [Tag] WHERE [TagName] = '" + strTagName + "'";
+
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27418", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		if (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			// Delete the current record
+			ipTagSet->Delete(adAffectCurrent);
+
+			// Update the table
+			ipTagSet->Update();
+		}
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27365");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27366");
+
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ModifyTag(BSTR bstrOldTagName, BSTR bstrNewTagName,
+										  BSTR bstrNewTagDescription)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the old tag name and validate it
+		string strOldTagName = asString(bstrOldTagName);
+		validateTagName(strOldTagName);
+
+		// Get the new tag name and description
+		string strNewTagName = asString(bstrNewTagName);
+		string strNewDescription = asString(bstrNewTagDescription);
+
+		// If new tag name is not empty, validate it
+		if (!strNewTagName.empty())
+		{
+			validateTagName(strNewTagName);
+		}
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Begin a transaction
+		TransactionGuard tg(ipConnection);
+
+		string strQuery = "SELECT [TagName], [TagDescription] FROM [Tag] WHERE [TagName] = '"
+			+ strOldTagName + "'";
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27362", ipTagSet != NULL );
+
+		// Open Recordset that contains the tag names
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		// Ensure there is a record for the old tag name
+		if (ipTagSet->adoEOF == VARIANT_TRUE)
+		{
+			UCLIDException ue("ELI27363", "The tag specified does not exist!");
+			ue.addDebugInfo("Tag Name", strOldTagName);
+			ue.addDebugInfo("New Tag Name", strNewTagName);
+			ue.addDebugInfo("New Description", strNewDescription);
+			throw ue;
+		}
+
+		// Get the fields pointer
+		FieldsPtr ipFields = ipTagSet->Fields;
+		ASSERT_RESOURCE_ALLOCATION("ELI27364", ipFields != NULL);
+
+		// Update the record with the new values
+		if (!strNewTagName.empty())
+		{
+			setStringField(ipFields, "TagName", strNewTagName);
+		}
+		
+		// Update the description even if it is empty (allows clearing description)
+		setStringField(ipFields, "TagDescription", strNewDescription);
+
+		ipTagSet->Update();
+
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27419");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27420");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetFilesWithTags(IVariantVector* pvecTagNames,
+												 VARIANT_BOOL vbAndOperation,
+												 IVariantVector** ppvecFileIDs)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Check arguments
+		IVariantVectorPtr ipVecTagNames(pvecTagNames);
+		ASSERT_ARGUMENT("ELI27367", ipVecTagNames != NULL);
+		ASSERT_ARGUMENT("ELI27368", ppvecFileIDs != NULL);
+
+		// Create the vector to return the file IDs
+		IVariantVectorPtr ipVecFileIDs(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI27369", ipVecFileIDs != NULL);
+
+		// Get the size of the vector of tag names
+		long lSize = ipVecTagNames->Size;
+
+		// If no tags specified return empty collection
+		if (lSize == 0)
+		{
+			// Set the return value
+			*ppvecFileIDs = ipVecFileIDs.Detach();
+
+			return S_OK;
+		}
+		
+		string strConjunction = asCppBool(vbAndOperation) ? " AND " : " OR ";
+
+		// Build the sql string
+		string strQuery = "SELECT DISTINCT [FileTag].[FileID] FROM [FileTag] INNER JOIN "
+			"[Tag] ON [FileTag].[TagID] = [Tag].[ID] ";
+
+		string strWhere = "WHERE [Tag].[TagName] = '" + asString(ipVecTagNames->GetItem(0).bstrVal)
+			+ "'";
+		for (long i=1; i < lSize; i++)
+		{
+			string strTagName = asString(ipVecTagNames->GetItem(i).bstrVal);
+			if (!strTagName.empty())
+			{
+				strWhere += strConjunction + "[Tag].[TagName] = '" + strTagName + "'";
+			}
+		}
+
+		strQuery += strWhere + " ORDER BY [FileTag].[FileID]";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27370", ipTagSet != NULL );
+
+		// Open Recordset that contains the file IDs
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Loop through each file ID and add it to the variant vector
+		while (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the file ID
+			_variant_t vtID(getLongField(ipTagSet->Fields, "FileID"));
+			
+			// Add the file ID to the collection
+			ipVecFileIDs->PushBack(vtID);
+
+			// Move to the next file ID
+			ipTagSet->MoveNext();
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27371");
+
+		// Set the out value
+		*ppvecFileIDs = ipVecFileIDs.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27372");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetTagsOnFile(long nFileID, IVariantVector** ppvecTagNames)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Check argument
+		ASSERT_ARGUMENT("ELI27373", ppvecTagNames != NULL);
+
+		// Build the sql string
+		string strQuery = "SELECT DISTINCT [Tag].[TagName] FROM [FileTag] INNER JOIN "
+			"[Tag] ON [FileTag].[TagID] = [Tag].[ID] WHERE [FileTag].[FileID] = ";
+		strQuery += asString(nFileID) + " ORDER BY [Tag].[TagName]";
+
+		// Create the vector to return the tag names
+		IVariantVectorPtr ipVecTagNames(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI27374", ipVecTagNames != NULL);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		validateDBSchemaVersion();
+
+		// Validate the file ID
+		validateFileID(ipConnection, nFileID);
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipTagSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27375", ipTagSet != NULL );
+
+		// Open Recordset that contains the file IDs
+		ipTagSet->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Loop through each tag name and add it to the vector
+		while (ipTagSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the tag name
+			_variant_t vtTagName(getStringField(ipTagSet->Fields, "TagName").c_str());
+
+			// Add it to the vector
+			ipVecTagNames->PushBack(vtTagName);
+
+			// Move to the next tag name
+			ipTagSet->MoveNext();
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27376");
+
+		// Set the out value
+		*ppvecTagNames = ipVecTagNames.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27377");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AllowDynamicTagCreation(VARIANT_BOOL* pvbVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27378", pvbVal != NULL);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Get the allow dynamic tag creation setting value
+		string strSetting = getDBInfoSetting(ipConnection, gstrALLOW_DYNAMIC_TAG_CREATION);
+
+		// Set the out value
+		*pvbVal = strSetting == "1" ? VARIANT_TRUE : VARIANT_FALSE;
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27379");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27380");
 }
 
 //-------------------------------------------------------------------------------------------------

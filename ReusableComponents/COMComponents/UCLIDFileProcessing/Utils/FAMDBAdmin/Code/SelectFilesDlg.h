@@ -22,6 +22,7 @@ public:
 // Construction
 	CSelectFilesDlg(const IFileProcessingDBPtr& ipFAMDB, const string& strSectionHeader,
 		const string& strQueryLabel, const SelectFileSettings& settings);
+	~CSelectFilesDlg();
 
 // Methods
 	// Return the settings from the dialog
@@ -52,6 +53,7 @@ protected:
 	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnCancel();
 	afx_msg void OnClose();
+	afx_msg void OnOK();
 	afx_msg void OnClickedOK();
 	afx_msg void OnClickedCancel();
 

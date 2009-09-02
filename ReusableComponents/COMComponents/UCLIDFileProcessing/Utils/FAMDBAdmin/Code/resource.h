@@ -19,6 +19,7 @@
 #define IDD_DIALOG_SELECT_REPORT        133
 #define IDD_DIALOG_CLEAR_WARNING        134
 #define IDD_DLG_SELECT_FILES			135
+#define IDR_MANAGE_TAG_ACCELERATORS		136
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -80,6 +81,20 @@
 #define IDC_EDIT_FL_SLCT_SMRY_EXPORT	2044
 #define IDC_BTN_SLCT_FLS_EXPORT			2045
 #define IDC_SLCT_FILE_QUERY_LABEL		2046
+#define IDC_SELECT_BTN_OK				2047
+#define IDC_SELECT_BTN_CANCEL			2048
+#define	IDD_DIALOG_MANAGE_TAGS			2049
+#define IDC_LIST_TAGS					2050
+#define IDC_BTN_ADD_TAG					2051
+#define IDC_BTN_MODIFY_TAG				2052
+#define IDC_BTN_DELETE_TAGS				2053
+#define IDC_BTN_REFRESH_TAGS			2054
+#define IDC_BTN_TAGS_CLOSE				2055
+#define IDD_DIALOG_ADDMODIFY_TAG		2056
+#define IDC_EDIT_TAG_NAME				2057
+#define IDC_EDIT_TAG_DESCRIPTION		2058
+#define IDC_BTN_ADD_TAG_OK				2059
+#define IDC_BTN_ADD_TAG_CANCEL			2060
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -97,14 +112,15 @@
 #define ID_TOOLS_FILEACTIONMANAGER      32787
 #define ID_TOOLS_REPORTS                32788
 #define ID_TOOLS_CHECKFORNEWCOMPONENTS  32789
+#define ID_TOOLS_MANAGE_TAGS			32790
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        136
-#define _APS_NEXT_COMMAND_VALUE         32790
-#define _APS_NEXT_CONTROL_VALUE         2047
+#define _APS_NEXT_RESOURCE_VALUE        137
+#define _APS_NEXT_COMMAND_VALUE         32791
+#define _APS_NEXT_CONTROL_VALUE         2061
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

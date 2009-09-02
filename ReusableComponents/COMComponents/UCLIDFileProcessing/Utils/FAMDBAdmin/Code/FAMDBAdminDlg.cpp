@@ -8,6 +8,7 @@
 #include "ClearWarningDlg.h"
 #include "ExportFileListDlg.h"
 #include "FileProcessingAddActionDlg.h"
+#include "ManageTagsDlg.h"
 #include "RenameActionDlg.h"
 #include "SetActionStatusDlg.h"
 #include "..\..\..\code\FPCategories.h"
@@ -70,6 +71,7 @@ CFAMDBAdminDlg::~CFAMDBAdminDlg()
 {
 	try
 	{
+		m_ipFAMDB = NULL;
 		m_ipMiscUtils = NULL;
 		m_ipCategoryManager = NULL;
 	}
@@ -102,6 +104,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_WM_GETMINMAXINFO()
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
+	ON_COMMAND(ID_TOOLS_MANAGE_TAGS, &CFAMDBAdminDlg::OnToolsManageTags)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -800,6 +803,21 @@ void CFAMDBAdminDlg::OnToolsCheckForNewComponents()
 		enableMenus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI18159");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnToolsManageTags()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new tag manager dialog
+		CManageTagsDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27416");
 }
 
 //-------------------------------------------------------------------------------------------------

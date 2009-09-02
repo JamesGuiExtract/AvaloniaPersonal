@@ -52,6 +52,7 @@ protected:
 	afx_msg void OnToolsFileActionManager();
 	afx_msg void OnToolsReports();
 	afx_msg void OnToolsCheckForNewComponents();
+	afx_msg void OnToolsManageTags();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged

@@ -58,7 +58,7 @@ void pasteImageAtLocation(const string& strInputImage, const string& strOutputIm
 				// Get the file info for the input image
 				FILEINFO fileInfo = GetLeadToolsSizedStruct<FILEINFO>(0);
 				throwExceptionIfNotSuccess(L_FileInfo((char*)inImage.getFileName().c_str(),
-					&fileInfo, sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI25229",
+					&fileInfo, sizeof(FILEINFO), FILEINFO_TOTALPAGES, NULL), "ELI27421",
 					"Could not obtain FileInfo!", inImage.getFileNameInformationString());
 
 				// Get the page count and format information

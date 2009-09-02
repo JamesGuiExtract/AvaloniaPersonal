@@ -81,7 +81,7 @@ STDMETHODIMP CImageCleanupEngine::CleanupImageInternalUseOnly(BSTR bstrInputFile
 		ASSERT_RESOURCE_ALLOCATION("ELI17090", ipImageCleanupSettings != NULL);
 
 		IIUnknownVectorPtr ipOperations = ipImageCleanupSettings->ImageCleanupOperations;
-		ASSERT_RESOURCE_ALLOCATION("ELI0", ipOperations != NULL);
+		ASSERT_RESOURCE_ALLOCATION("ELI27417", ipOperations != NULL);
 
 		vector<ESImageCleanupLib::IImageCleanupOperationPtr> vecEnabledCleanupOperations;
 		getEnabledCleanupOperations(vecEnabledCleanupOperations, ipOperations);

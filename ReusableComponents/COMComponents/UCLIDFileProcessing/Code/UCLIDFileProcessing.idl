@@ -697,6 +697,71 @@ library UCLID_FILEPROCESSINGLib
 		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
 			[in] BSTR bstrQueryFrom, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
 			[in] BSTR bstrFromAction);
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to file tagging
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get a map of tag names to tag descriptions
+		[id(52), helpstring("method GetTags")] HRESULT GetTags([out, retval] IStrToStrMap** ppTags);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get a collection of tag names
+		[id(53), helpstring("method GetTagNames")] HRESULT GetTagNames(
+			[out, retval] IVariantVector** ppvecTagName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return VARIANT_TRUE if there are any tags in the tags table and VARIANT_FALSE
+		//			if there are no tags in the tags table
+		[id(54), helpstring("method HasTags")] HRESULT HasTags(VARIANT_BOOL* pbVal);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add the specified tag to the specified file. If the file already contains
+		//			the specified tag this method will do nothing.
+		// REQUIRE: bstrTagName is not NULL or empty string AND bstrTagName exists in the Tag table
+		[id(55), helpstring("method TagFile")] HRESULT TagFile([in] long nFileID, [in] BSTR bstrTagName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the specified tag from the specified file.  If the file does not contain
+		//			the specified tag this method will do nothing.
+		// REQUIRE: bstrTagName is not NULL or empty string AND bstrTagName exists in the Tag table
+		[id(56), helpstring("method UntagFile")] HRESULT UntagFile([in] long nFileID, [in] BSTR bstrTagName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To toggle the specified tag for the specified file. If the file does not
+		//			currently contain the specified tag then the tag will be applied, if the file
+		//			contains the tag it will be removed.
+		// REQUIRE: bstrTagName is not NULL or empty string AND bstrTagName exists in the Tag table
+		[id(57), helpstring("method ToggleTagOnFile")] HRESULT ToggleTagOnFile([in] long nFileID,
+			[in] BSTR bstrTagName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add a new tag to the Tag table with the specified description.
+		// REQUIRE: bstrTagName is not NULL or empty string AND bstrTagName does not already
+		//			exist in the Tag table.
+		[id(58), helpstring("method AddTag")] HRESULT AddTag([in] BSTR bstrTagName, [in] BSTR bstrTagDescription);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the specified tag from the Tag table. If bstrTagName does not exist
+		//			in the Tag table then the Tag table will remain unchanged.
+		// NOTE:	This will also remove the tag from files containing it.
+		// REQUIRE: bstrTagName is not NULL or empty string.
+		[id(59), helpstring("method DeleteTag")] HRESULT DeleteTag([in] BSTR bstrTagName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To change the name and/or description of an existing tag. If bstrNewTagNam is
+		//			NULL or empty string then only the description will be changed,	otherwise both
+		//			name and description will be changed.
+		// REQUIRE: bstrOldTagName is not NULL or empty string AND bstrOldTagName is in the Tag table
+		[id(60), helpstring("method ModifyTag")] HRESULT ModifyTag([in] BSTR bstrOldTagName,
+			[in] BSTR bstrNewTagName, [in] BSTR bstrNewTagDescription);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get a list of FileIDs that contain the specified tags.  If vbAndOperation
+		//			is VARIANT_TRUE then the files returned will contain all specified tags,
+		//			if vbAndOperation is VARIANT_FALSE then the files returned will contain
+		//			at least one of the specified tags.
+		[id(61), helpstring("method GetFilesWithTags")] HRESULT GetFilesWithTags([in] IVariantVector* pvecTagNames,
+			[in] VARIANT_BOOL vbAndOperation, [out, retval] IVariantVector** ppvecFileIDs);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get a list of all tags for a specific file
+		[id(62), helpstring("method GetTagsOnFile")] HRESULT GetTagsOnFile([in] long nFileID,
+			[out, retval] IVariantVector** ppTagNames);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get whether dynamic tag creation is allowed or not.
+		[id(63), helpstring("method AllowDynamicTagCreation")] HRESULT AllowDynamicTagCreation(
+			[out, retval] VARIANT_BOOL* pvbVal);
+		// -----------------------------------------------------------------------------------------------
 	};
 
 	[

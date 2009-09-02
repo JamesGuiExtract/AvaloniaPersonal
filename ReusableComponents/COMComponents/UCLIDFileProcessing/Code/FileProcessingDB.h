@@ -59,9 +59,7 @@ public:
 		return S_OK;
 	}
 
-	void FinalRelease()
-	{
-	}
+	void FinalRelease();
 
 public:
 	// ISupportsErrorInfo
@@ -123,6 +121,19 @@ public:
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
 	STDMETHOD(ModifyActionStatusForQuery)(BSTR bstrQueryFrom, BSTR bstrToAction,
 		EActionStatus eaStatus, BSTR bstrFromAction);
+	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
+	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
+	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
+	STDMETHOD(TagFile)(long nFileID, BSTR bstrTagName);
+	STDMETHOD(UntagFile)(long nFileID, BSTR bstrTagName);
+	STDMETHOD(ToggleTagOnFile)(long nFileID, BSTR bstrTagName);
+	STDMETHOD(AddTag)(BSTR bstrTagName, BSTR bstrTagDescription);
+	STDMETHOD(DeleteTag)(BSTR bstrTagName);
+	STDMETHOD(ModifyTag)(BSTR bstrOldTagName, BSTR bstrNewTagName, BSTR bstrNewTagDescription);
+	STDMETHOD(GetFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
+		IVariantVector** ppvecFileIDs);
+	STDMETHOD(GetTagsOnFile)(long nFileID, IVariantVector** ppvecTagNames);
+	STDMETHOD(AllowDynamicTagCreation)(VARIANT_BOOL* pvbVal);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -210,6 +221,9 @@ private:
 
 	// Contains the time in seconds to keep retrying.  
 	double m_dRetryTimeout;
+
+	// Regular expression parser to validate tag names
+	IRegularExprParserPtr m_ipParser;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -438,6 +452,20 @@ private:
 	// If nFileID == -1 will clear comments for all files for the specified action.  If
 	// both nActionID == -1 and nFileID == -1 then all comments from the table will be cleared.
 	void clearFileActionComment(const _ConnectionPtr& ipConnection, long nFileID, long nActionID);
+
+	// Validates the tag name, tag is valid if:
+	// 1. It is not NULL or empty string
+	// 2. It matches the regular express: ^[a-zA-Z0-9_][a-zA-Z0-9\s_]*$
+	void validateTagName(const string& strTagName);
+
+	// Validates the provided file ID
+	void validateFileID(const _ConnectionPtr& ipConnection, long nFileID);
+
+	// Gets the tag ID for the specified tag name
+	long getTagID(const _ConnectionPtr& ipConnection, string& rstrTagName);
+
+	// Internal function for getting DB info settings
+	string getDBInfoSetting(const _ConnectionPtr& ipConnection, const string& strSettingName);
 
 	void validateLicense();
 };

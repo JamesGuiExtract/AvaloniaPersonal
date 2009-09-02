@@ -188,7 +188,7 @@ void CSetActionStatusDlg::OnClickedSelectFiles()
 
 		updateControls();
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26981");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27422");
 }
 
 //-------------------------------------------------------------------------------------------------

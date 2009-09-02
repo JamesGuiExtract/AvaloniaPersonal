@@ -27,7 +27,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 10;
+const long glFAMDBSchemaVersion = 11;
 
 // Table names
 static const string gstrACTION = "Action";
@@ -44,6 +44,8 @@ static const string gstrMACHINE = "Machine";
 static const string gstrFAM_USER = "FAMUser";
 static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
 static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
+static const string gstrFAM_TAG = "Tag";
+static const string gstrFAM_FILE_TAG = "FileTag";
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -53,6 +55,8 @@ const unsigned long	gulFAMKey1 = 0x78932517;
 const unsigned long	gulFAMKey2 = 0x193E2224;
 const unsigned long	gulFAMKey3 = 0x20134253;
 const unsigned long	gulFAMKey4 = 0x15990323;
+
+static const string gstrTAG_REGULAR_EXPRESSION = "^[a-zA-Z0-9_][a-zA-Z0-9\\s_]*$";
 
 //--------------------------------------------------------------------------------------------------
 // FILE-SCOPE FUNCTIONS
@@ -122,7 +126,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 
 		EActionStatus easRtn = kActionUnattempted;
 
-		// Set up the select query to selec the file to change
+		// Set up the select query to select the file to change
 		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
 
 		if (bLockDB)
@@ -844,6 +848,9 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
+		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -867,6 +874,8 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_FILE_ACTION_COMMENT_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK);
+		vecQueries.push_back(gstrADD_FILE_TAG_FAM_FILE_FK);
+		vecQueries.push_back(gstrADD_FILE_TAG_TAG_ID_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -940,6 +949,11 @@ void CFileProcessingDB::initializeTableValues()
 	// Add Require Password To Process All Skipped Files setting (default to true)
 	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
 		+ "', '1')";
+	vecQueries.push_back(strSQL);
+
+	// Add Allow Dynamic Tag Creation setting (default to false)
+	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
+		+ "', '0')";
 	vecQueries.push_back(strSQL);
 
 	// Execute all of the queries
@@ -2301,5 +2315,101 @@ void CFileProcessingDB::clearFileActionComment(const _ConnectionPtr& ipConnectio
 		executeCmdQuery(ipConnection, strCommentSQL);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27109");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::validateTagName(const string& strTagName)
+{
+	try
+	{
+		// If the parser has not been created yet, create it
+		if (m_ipParser == NULL)
+		{
+			IMiscUtilsPtr ipMisc(CLSID_MiscUtils);
+			ASSERT_RESOURCE_ALLOCATION("ELI27381", ipMisc != NULL);
+
+			m_ipParser = ipMisc->GetNewRegExpParserInstance("");
+			ASSERT_RESOURCE_ALLOCATION("ELI27382", m_ipParser != NULL);
+
+			// Set the pattern
+			m_ipParser->Pattern = gstrTAG_REGULAR_EXPRESSION.c_str();
+		}
+
+		if (strTagName.empty() ||
+			m_ipParser->StringMatchesPattern(strTagName.c_str()) == VARIANT_FALSE)
+		{
+			UCLIDException ue("ELI27383", "Invalid tag name!");
+			ue.addDebugInfo("Tag", strTagName);
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27384");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::validateFileID(const _ConnectionPtr& ipConnection, long nFileID)
+{
+	try
+	{
+		string strQuery = "SELECT [FileName] FROM [" + gstrFAM_FILE + "] WHERE [ID] = "
+			+ asString(nFileID);
+
+		_RecordsetPtr ipRecord(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27385", ipRecord != NULL);
+
+		ipRecord->Open( strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenStatic, 
+			adLockOptimistic, adCmdText );
+
+		if (ipRecord->adoEOF == VARIANT_TRUE)
+		{
+			UCLIDException ue("ELI27386", "Invalid File ID: File ID does not exist in database!");
+			ue.addDebugInfo("File ID", nFileID);
+			ue.addDebugInfo("Database Name", m_strDatabaseName);
+			ue.addDebugInfo("Database Server", m_strDatabaseServer);
+			throw ue;
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27387");
+}
+//--------------------------------------------------------------------------------------------------
+string CFileProcessingDB::getDBInfoSetting(const _ConnectionPtr& ipConnection,
+										   const string& strSettingName)
+{
+	try
+	{
+		// Create a pointer to a recordset
+		_RecordsetPtr ipDBInfoSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI19793", ipDBInfoSet != NULL );
+
+		// Setup Setting Query
+		string strSQL = gstrDBINFO_SETTING_QUERY;
+		replaceVariable(strSQL, gstrSETTING_NAME, strSettingName);
+		
+		// Open the record set using the Setting Query		
+		ipDBInfoSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText ); 
+
+		// Check if any data returned
+		if (ipDBInfoSet->adoEOF == VARIANT_FALSE)
+		{
+			// Return the setting value
+			return getStringField(ipDBInfoSet->Fields, "Value");
+		}
+		else
+		{
+			UCLIDException ue("ELI18940", "DBInfo setting does not exist!");
+			ue.addDebugInfo("Setting", strSettingName);
+			throw  ue;
+		}
+
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27388");
+}
+//--------------------------------------------------------------------------------------------------
+long CFileProcessingDB::getTagID(const _ConnectionPtr &ipConnection, string &rstrTagName)
+{
+	try
+	{
+		return getKeyID(ipConnection, gstrFAM_TAG, "TagName", rstrTagName, false);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27389");
 }
 //--------------------------------------------------------------------------------------------------

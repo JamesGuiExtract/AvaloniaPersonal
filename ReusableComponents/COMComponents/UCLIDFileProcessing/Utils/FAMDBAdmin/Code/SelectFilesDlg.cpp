@@ -30,6 +30,15 @@ m_settings(settings)
 {
 }
 //-------------------------------------------------------------------------------------------------
+CSelectFilesDlg::~CSelectFilesDlg()
+{
+	try
+	{
+		m_ipFAMDB = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27325");
+}
+//-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);
@@ -53,8 +62,8 @@ BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_ALL_FILES, &CSelectFilesDlg::OnClickedRadioAllFiles)
 	ON_BN_CLICKED(IDC_RADIO_FILES_UNDER_STATUS, &CSelectFilesDlg::OnClickedRadioFilesStatus)
 	ON_BN_CLICKED(IDC_RADIO_SQL_QUERY, &CSelectFilesDlg::OnClickedRadioFilesFromQuery)
-	ON_BN_CLICKED(IDOK, &CSelectFilesDlg::OnClickedOK)
-	ON_BN_CLICKED(IDCANCEL, &CSelectFilesDlg::OnClickedCancel)
+	ON_BN_CLICKED(IDC_SELECT_BTN_OK, &CSelectFilesDlg::OnClickedOK)
+	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &CSelectFilesDlg::OnClickedCancel)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_ACTION, &CSelectFilesDlg::OnFilesUnderActionChange)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_STATUS, &CSelectFilesDlg::OnFilesUnderStatusChange)
 END_MESSAGE_MAP()
@@ -165,6 +174,11 @@ void CSelectFilesDlg::OnClickedRadioFilesFromQuery()
 		m_editSelectQuery.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26989")
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::OnOK()
+{
+	// Stubbed in to prevent dialog closing when enter is pressed
 }
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::OnCancel()

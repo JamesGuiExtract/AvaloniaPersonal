@@ -106,6 +106,17 @@ static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFi
 	"[UniqueFAMID] [nvarchar](50) NULL, "
 	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
+static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [Tag] ("
+	"[ID] [int] IDENTITY(1,1) NOT NULL, "
+	"[TagName] [nvarchar](100) NOT NULL, "
+	"[TagDescription] [nvarchar](255) NULL, "
+	"CONSTRAINT [PK_FAMTag] PRIMARY KEY CLUSTERED ([ID] ASC), "
+	"CONSTRAINT [IX_TagName] UNIQUE NONCLUSTERED ([TagName] ASC))";
+
+static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [FileTag] ("
+	"[FileID] [int] NOT NULL, "
+	"[TagID] [int] NOT NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_FileName] "
 	"ON [FAMFile]([FileName] ASC)";
@@ -118,6 +129,9 @@ static const string gstrCREATE_FILE_ACTION_COMMENT_INDEX = "CREATE UNIQUE NONCLU
 
 static const string gstrCREATE_SKIPPED_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Skipped_File] ON [SkippedFile]([FileID], [ActionID])";
+
+static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_File_Tag] ON [FileTag]([FileID], [TagID])";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -210,6 +224,20 @@ static const string gstrADD_SKIPPED_FILE_ACTION_FK =
 	"ALTER TABLE [SkippedFile]  "
 	"WITH CHECK ADD CONSTRAINT [FK_SkippedFile_Action] FOREIGN KEY([ActionID]) "
 	"REFERENCES [Action] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_TAG_FAM_FILE_FK =
+	"ALTER TABLE [FileTag] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileTag_FamFile] FOREIGN KEY([FileID]) "
+	"REFERENCES [FAMFile] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_FILE_TAG_TAG_ID_FK =
+	"ALTER TABLE [FileTag] "
+	"WITH CHECK ADD CONSTRAINT [FK_FileTag_Tag] FOREIGN KEY([TagID]) "
+	"REFERENCES [Tag] ([ID]) "
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 
