@@ -134,6 +134,21 @@ namespace Extract.Redaction.Verification
         /// </summary>
         bool _dirty;
 
+        /// <summary>
+        /// Font for rows that have been visited.
+        /// </summary>
+        Font _visitedFont;
+
+        /// <summary>
+        /// The cell style for rows that have been visited.
+        /// </summary>
+        DataGridViewCellStyle _visitedCellStyle;
+
+        /// <summary>
+        /// The cell style for the page cell of visited rows.
+        /// </summary>
+        DataGridViewCellStyle _visitedPageCellStyle;
+
         #endregion RedactionGridView Fields
 
         #region RedactionGridView Events
@@ -321,6 +336,67 @@ namespace Extract.Redaction.Verification
                 }
             }
         }
+
+        /// <summary>
+        /// Gets the font associated with visited redactions.
+        /// </summary>
+        /// <value>The font associated with visited redactions.</value>
+        Font VisitedFont
+        {
+            get
+            {
+                if (_visitedFont == null)
+                {
+                    // Un-bold the default font
+                    Font font = _dataGridView.DefaultCellStyle.Font;
+                    _visitedFont = new Font(font, font.Style & ~FontStyle.Bold);
+                }
+
+                return _visitedFont;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> associated with visited redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> associated with visited redactions.</value>
+        DataGridViewCellStyle VisitedCellStyle
+        {
+            get
+            {
+                if (_visitedCellStyle == null)
+                {
+                    // Use the visited font for this row
+                    DataGridViewCellStyle style = _dataGridView.DefaultCellStyle.Clone();
+                    style.Font = VisitedFont;
+                    _visitedCellStyle = style;
+                }
+
+                return _visitedCellStyle;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="DataGridViewCellStyle"/> for the cell in the page column of 
+        /// visited redactions.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCellStyle"/> for the cell in the page column of 
+        /// visited redactions.</value>
+        DataGridViewCellStyle VisitedPageCellStyle
+        {
+            get
+            {
+                if (_visitedPageCellStyle == null)
+                {
+                    // Use the visited row but change the text alignment
+                    DataGridViewCellStyle style = VisitedCellStyle.Clone();
+                    style.Alignment = DataGridViewContentAlignment.MiddleCenter;
+                    _visitedPageCellStyle = style;
+                }
+
+                return _visitedPageCellStyle;
+            }
+        }
         
         #endregion RedactionGridView Properties
 
@@ -468,29 +544,31 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void UpdateSelection()
         {
+            // Short circuit if no redactions exist to update 
+            if (_redactions.Count <= 0)
+            {
+                return;
+            }
+
             // Prevent this method from calling itself
             _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
             _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
             try
             {
-                // Get a collection of the ids of all the layer objects that should be selected
-                List<long> selectedIds = new List<long>();
-                foreach (RedactionGridViewRow row in SelectedRows)
+                // Mark all selected rows as visited
+                foreach (DataGridViewRow row in _dataGridView.SelectedRows)
                 {
-                    foreach (LayerObject layerObject in row.LayerObjects)
-                    {
-                        selectedIds.Add(layerObject.Id);
-                    }
+                    MarkAsVisited(row);
                 }
 
-                // Select/deselect the layer objects corresponding to each selected row
-                foreach (LayerObject layerObject in _imageViewer.LayerObjects)
+                // Select only those layer objects that correspond to selected rows
+                UpdateLayerObjectSelection();
+
+                // If no redaction is on the currently visible page, 
+                // go to the page of the first selected redaction.
+                if (!IsRedactionVisible())
                 {
-                    bool shouldBeSelected = selectedIds.Contains(layerObject.Id);
-                    if (layerObject.Selected != shouldBeSelected)
-                    {
-                        layerObject.Selected = shouldBeSelected;
-                    }
+                    _imageViewer.PageNumber = GetFirstSelectedPage();
                 }
 
                 _imageViewer.Invalidate();
@@ -500,6 +578,86 @@ namespace Extract.Redaction.Verification
                 _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
                 _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
             }
+        }
+
+        /// <summary>
+        /// Selects layer objects corresponding to the currently selected rows; deselects all 
+        /// other layer objects.
+        /// </summary>
+        void UpdateLayerObjectSelection()
+        {
+            // Get a collection of the ids of all the layer objects that should be selected
+            List<long> selectedIds = new List<long>();
+            foreach (RedactionGridViewRow row in SelectedRows)
+            {
+                foreach (LayerObject layerObject in row.LayerObjects)
+                {
+                    selectedIds.Add(layerObject.Id);
+                }
+            }
+
+            // Select/deselect the layer objects corresponding to each selected row
+            foreach (LayerObject layerObject in _imageViewer.LayerObjects)
+            {
+                bool shouldBeSelected = selectedIds.Contains(layerObject.Id);
+                if (layerObject.Selected != shouldBeSelected)
+                {
+                    layerObject.Selected = shouldBeSelected;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines whether any redaction is on the currently visible page.
+        /// </summary>
+        /// <returns><see langword="true"/> if there is a redaction on the currently visible page;
+        /// <see langword="false"/> if there are no redactions or all redactions are on 
+        /// non-visible pages.</returns>
+        bool IsRedactionVisible()
+        {
+            // Get the current page number
+            int currentPage = _imageViewer.PageNumber;
+            foreach (RedactionGridViewRow row in SelectedRows)
+            {
+                foreach (LayerObject layerObject in row.LayerObjects)
+                {
+                    if (layerObject.PageNumber == currentPage)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The one-based first page on which selected redactions appear.
+        /// </summary>
+        /// <returns>The one-based first page on which selected redactions appear; or -1 if there 
+        /// are no redactions.</returns>
+        int GetFirstSelectedPage()
+        {
+            int firstPage = -1;
+            foreach (RedactionGridViewRow row in SelectedRows)
+            {
+                if (firstPage > row.PageNumber || firstPage == -1)
+                {
+                    firstPage = row.PageNumber;
+                }
+            }
+
+            return firstPage;
+        }
+
+        /// <summary>
+        /// Visually marks the specified row as viewed.
+        /// </summary>
+        /// <param name="row">The row to mark as visited.</param>
+        void MarkAsVisited(DataGridViewRow row)
+        {
+            row.DefaultCellStyle = VisitedCellStyle;
+            row.Cells[_pageColumn.Index].Style = VisitedPageCellStyle;
         }
 
         /// <summary>
@@ -604,37 +762,50 @@ namespace Extract.Redaction.Verification
                 _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
                 _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
+                _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
 
-                // Reset the attributes
-                _redactions.Clear();
-                _imageViewer.LayerObjects.Clear();
-                _undisplayedAttributes = new List<ComAttribute>();
-                for (int i = 0; i < _deleted.Length; i++)
+                try
                 {
-                    _deleted[i] = 0;
+                    // Reset the attributes
+                    _redactions.Clear();
+                    _imageViewer.LayerObjects.Clear();
+                    _undisplayedAttributes = new List<ComAttribute>();
+                    for (int i = 0; i < _deleted.Length; i++)
+                    {
+                        _deleted[i] = 0;
+                    }
+
+                    // Load the attributes from the file
+                    IUnknownVector attributes = new IUnknownVector();
+                    attributes.LoadFrom(fileName, false);
+
+                    // Query and add attributes at each confidence level
+                    AFUtility utility = new AFUtility();
+                    foreach (ConfidenceLevel level in _levels)
+                    {
+                        IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
+                        AddAttributes(vector, level);
+                    }
+
+                    // Add any remaining attributes as undisplayed attributes
+                    int count = attributes.Size();
+                    for (int i = 0; i < count; i++)
+                    {
+                        ComAttribute attribute = (ComAttribute)attributes.At(i);
+                        _undisplayedAttributes.Add(attribute);
+                    }
+
+                    _dirty = false;
+                }
+                finally
+                {
+                    _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
+                    _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
+                    _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
+                    _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
                 }
 
-                // Load the attributes from the file
-                IUnknownVector attributes = new IUnknownVector();
-                attributes.LoadFrom(fileName, false);
-
-                // Query and add attributes at each confidence level
-                AFUtility utility = new AFUtility();
-                foreach (ConfidenceLevel level in _levels)
-                {
-                    IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
-                    AddAttributes(vector, level);
-                }
-
-                // Add any remaining attributes as undisplayed attributes
-                int count = attributes.Size();
-                for (int i = 0; i < count; i++)
-                {
-                    ComAttribute attribute = (ComAttribute)attributes.At(i);
-                    _undisplayedAttributes.Add(attribute);
-                }
-
-                _dirty = false;
+                UpdateSelection();
             }
             catch (Exception ex)
             {
@@ -642,12 +813,6 @@ namespace Extract.Redaction.Verification
                     "Unable to load VOA file.", ex);
                 ee.AddDebugData("Voa file", fileName, false);
                 throw ee;
-            }
-            finally
-            {
-                _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
-                _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
-                _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
             }
         }
 
@@ -877,6 +1042,8 @@ namespace Extract.Redaction.Verification
                         // Change the selection if necessary
                         if (row.Selected != select)
                         {
+                            MarkAsVisited(row);
+
                             row.Selected = select;
                         }
 
