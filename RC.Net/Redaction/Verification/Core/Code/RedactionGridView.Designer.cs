@@ -27,6 +27,11 @@ namespace Extract.Redaction.Verification
                     _exemptionsDialog.Dispose();
                     _exemptionsDialog = null;
 	            }
+                if (_visitedFont != null)
+                {
+                    _visitedFont.Dispose();
+                    _visitedFont = null;
+                }
             }
 
             // Release unmanaged resources
@@ -43,6 +48,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         private void InitializeComponent()
         {
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this._dataGridView = new System.Windows.Forms.DataGridView();
             this._textColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -64,10 +70,19 @@ namespace Extract.Redaction.Verification
             this._typeColumn,
             this._pageColumn,
             this._exemptionsColumn});
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this._dataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this._dataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._dataGridView.Location = new System.Drawing.Point(0, 0);
             this._dataGridView.Margin = new System.Windows.Forms.Padding(0);
             this._dataGridView.Name = "_dataGridView";
+            this._dataGridView.RowHeadersVisible = false;
             this._dataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this._dataGridView.Size = new System.Drawing.Size(575, 300);
             this._dataGridView.TabIndex = 0;
