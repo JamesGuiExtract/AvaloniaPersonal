@@ -494,7 +494,6 @@ namespace Extract.Redaction.Verification
             // _optionsToolStripButton
             // 
             this._optionsToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._optionsToolStripButton.Enabled = false;
             this._optionsToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.VerifyOptions;
             this._optionsToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._optionsToolStripButton.Name = "_optionsToolStripButton";

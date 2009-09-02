@@ -55,6 +55,11 @@ namespace Extract.Redaction.Verification
         readonly InitializationSettings _iniSettings = new InitializationSettings();
 
         /// <summary>
+        /// The settings for the user interface.
+        /// </summary>
+        VerificationOptions _options;
+
+        /// <summary>
         /// The last saved state of the currently processing document.
         /// </summary>
         VerificationMemento _savedMemento;
@@ -132,6 +137,8 @@ namespace Extract.Redaction.Verification
                 _redactionGridView.AddRedactionTypes(types);
 
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
+
+                _options = VerificationOptions.ReadFrom(_iniSettings);
 
                 // Subscribe to layer object events
                 _imageViewer.LayerObjects.LayerObjectAdded += HandleImageViewerLayerObjectAdded;
@@ -968,7 +975,13 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                VerificationOptionsDialog dialog = new VerificationOptionsDialog(_options);
+                if (dialog.ShowDialog() == DialogResult.OK)
+                {
+                    _options = dialog.VerificationOptions;
+
+                    // TODO: Write options to ini file
+                }
             }
             catch (Exception ex)
             {

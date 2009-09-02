@@ -24,6 +24,8 @@ namespace Extract.Redaction.Verification
 
         static readonly string _AUTO_ZOOM_SCALE_KEY = "AutoZoomScale";
 
+        static readonly string _AUTO_TOOL_KEY = "AutoPan";
+
         static readonly string _REDACTION_COLOR_KEY = "RedactionColorInOutputFile";
 
         static readonly string _LEVEL_COUNT_KEY = "NumConfidenceLevels";
@@ -61,6 +63,11 @@ namespace Extract.Redaction.Verification
         readonly int _autoZoomScale;
 
         /// <summary>
+        /// The tool to automatically select after the user manually creates a redaction.
+        /// </summary>
+        readonly AutoTool _autoTool;
+
+        /// <summary>
         /// The color of redactions in redacted images.
         /// </summary>
         readonly RedactionColor _outputRedactionColor;
@@ -79,6 +86,7 @@ namespace Extract.Redaction.Verification
             _levels = GetConfidenceLevels(iniFile);
             _autoZoom = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_KEY) == 1;
             _autoZoomScale = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_SCALE_KEY);
+            _autoTool = (AutoTool)iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_TOOL_KEY);
             _outputRedactionColor = GetRedactionColor(iniFile);
         }
 
@@ -123,6 +131,18 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _autoZoomScale;
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="CursorTool"/> to select after manually creating a redaction.
+        /// </summary>
+        /// <value>The <see cref="CursorTool"/> to select after manually creating a redaction.</value>
+        public AutoTool AutoTool
+        {
+            get
+            {
+                return _autoTool;
             }
         }
         

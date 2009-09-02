@@ -174,6 +174,13 @@
     </Compile>
     <Compile Include="RedactionCounts.cs" />
     <Compile Include="VerificationMemento.cs" />
+    <Compile Include="VerificationOptions.cs" />
+    <Compile Include="VerificationOptionsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="VerificationOptionsDialog.Designer.cs">
+      <DependentUpon>VerificationOptionsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="VerificationSettings.cs" />
     <Compile Include="VerificationSettingsDialog.cs">
       <SubType>Form</SubType>
@@ -308,6 +315,10 @@
     <EmbeddedResource Include="RedactionGridView.resx">
       <SubType>Designer</SubType>
       <DependentUpon>RedactionGridView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="VerificationOptionsDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>VerificationOptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VerificationSettingsDialog.resx">
       <SubType>Designer</SubType>
