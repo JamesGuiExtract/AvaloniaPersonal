@@ -146,6 +146,18 @@ namespace Extract.Imaging.Forms
 
             if (imageAvailable)
             {
+                CreateCells();
+            }
+        }
+
+        /// <summary>
+        /// Creates a cell corresponding to each page of the currently open image. 
+        /// </summary>
+        void CreateCells()
+        {
+            _dataGridView.CurrentCellChanged -= HandleDataGridViewCurrentCellChanged;
+            try
+            {
                 // Compute the number of full rows and remaining cells needed to represent the pages
                 int fullRows = _imageViewer.PageCount / CELLS_PER_ROW;
                 int remainingCells = _imageViewer.PageCount % CELLS_PER_ROW;
@@ -163,6 +175,10 @@ namespace Extract.Imaging.Forms
                     string[] row = CreateRow(fullRows, remainingCells);
                     _dataGridView.Rows.Add(row);
                 }
+            }
+            finally
+            {
+                _dataGridView.CurrentCellChanged += HandleDataGridViewCurrentCellChanged;
             }
         }
 
