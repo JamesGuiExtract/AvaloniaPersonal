@@ -20,7 +20,7 @@
 			|
 			Development
 			|
-			(?<!\boriginal\s*)Plat
+			(?<!\b(?:original|per)\s*)Plat
 		)
 	)
 	\b
@@ -76,9 +76,21 @@
 |
 
 	\b
-	Lot\s*number(?:ed|s)?[\s\S]{0,25}?\bin
+	Lots?\s*number(?:ed|s)?[\s\S]{0,25}?(?:\bin|\D,)
+	(?!
+		\s*
+		(?:
+			said
+			|
+			block
+			|
+			(?:a?\s*replat\s*(?:of\s*)?)?lot
+		)
+		\s*
+	)
+	
 	\s*
 	(?<Subdivision>
 		[\s\S]{1,25}?
 	)
-	\bin\b
+	(?:\bin\b|,)

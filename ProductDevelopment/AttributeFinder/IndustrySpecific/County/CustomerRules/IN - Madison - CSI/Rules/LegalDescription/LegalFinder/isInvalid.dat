@@ -1,4 +1,6 @@
 //This file contains words and phrases that invalidate the entire attribute.
+\bbest\s*of\s*my\s*knowledge\b
+|
 ^(section\s*)?\d{1,2}\.\d{1,2}\b
 |
 \beasements?\b[\s\S]*?\benjoyment\b

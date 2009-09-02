@@ -1,4 +1,4 @@
-/*
+/* //commented out section is leftover from original trim list--pre match closest value in list
 	(?<=\bSouth)\s*(?=Side\b)%
 	[\s\S]*\bHarter\b[\s\S]*%HARTERS
 	(?<=\bCOOPERS\s*)DEVELOPMENT\s*PLAT\b%
@@ -31,6 +31,11 @@
 	\bIra\s*(?=Kidwell'?s)%
 	\bAndrew\s*(?=Jackson'?s\b)%
 */
+[\s\S]*\bjohn\s*davis'?[\s\S]*%DAVIS
+\bCharl(?:es|ie)\s*(?=Fisher)%
+[\s\S]*\bdehority[\s\S]*%DEHORITY
+[\s\S]*\bHarter[\s\S]*%HARTER
+\bWilliam\s*(?=Barton'?s?)%
 \bno\x20anderson\b%
 (?<=Norris)\s*Heights\b%
 \b(?:the\s*)?replat(?:\s*of)?\b%
@@ -54,3 +59,4 @@
 \b(?:in\s*)?the\s*county\s*of\s*[a-z]+%
 \b(?:in\s*)?the\s*state\s*of\s*[a-z]+%
 \blot\s*number(?:ed)?\s*\d+\s*in\b%
+\ba\s*recorded\b%
