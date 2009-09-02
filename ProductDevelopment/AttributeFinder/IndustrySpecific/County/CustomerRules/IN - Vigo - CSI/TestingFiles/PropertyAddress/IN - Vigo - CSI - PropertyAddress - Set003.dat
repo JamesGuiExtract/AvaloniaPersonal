@@ -1,0 +1,3 @@
+//<SETTING>;EAV_MUST_EXIST=TRUE
+//Top 80 Percent: 
+<TESTFOLDER>;TestPropertyAddress.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\Images;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).propaddress.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\EAV\PropertyAddress\$FileNoExtOf(<SourceDocName>).eav
