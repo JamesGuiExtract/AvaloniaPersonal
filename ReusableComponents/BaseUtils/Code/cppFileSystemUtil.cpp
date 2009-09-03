@@ -508,19 +508,24 @@ bool getAllSubDirsAndDeleteAllFiles(const string &strDirectory, vector<string> &
 bool directoryExists(const string &strDir)
 {
 	// first store the current working directory
-	char buf[MAX_PATH];
-	if (!GetCurrentDirectory(MAX_PATH, buf))
+	char buf[MAX_PATH] = {0};
+	if (GetCurrentDirectory(MAX_PATH, buf) == 0)
 	{
-		throw UCLIDException("ELI00260", "Error in directoryExists()!");
+		UCLIDException ue("ELI00260", "Unable to get current directory.");
+		ue.addWin32ErrorInfo();
+		throw ue;
 	}
 
 	// change the working directory to strDir, just to find out if strDir exists
 	bool bRet = (SetCurrentDirectory(strDir.c_str()) != 0);
 	
 	// restore the previous working directory
-	if (!SetCurrentDirectory(buf))
+	if (SetCurrentDirectory(buf) == 0)
 	{
-		throw UCLIDException("ELI00261", "Unable to set directory in directoryExists()!");
+		UCLIDException ue("ELI00261", "Unable to set directory.");
+		ue.addWin32ErrorInfo();
+		ue.addDebugInfo("Directory to set", buf);
+		throw ue;
 	}
 
 	return bRet;
