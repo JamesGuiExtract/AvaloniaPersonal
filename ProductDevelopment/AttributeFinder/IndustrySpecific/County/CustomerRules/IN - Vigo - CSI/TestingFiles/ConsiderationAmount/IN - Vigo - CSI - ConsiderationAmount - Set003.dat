@@ -1,2 +1,0 @@
-//<SETTING>;EAV_MUST_EXIST=TRUE
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\Images\;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
