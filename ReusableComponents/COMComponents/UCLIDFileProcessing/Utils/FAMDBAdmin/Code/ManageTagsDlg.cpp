@@ -242,6 +242,9 @@ void CManageTagsDlg::OnBtnAdd()
 		
 		if (dlg.DoModal() == IDOK)
 		{
+			// Show the wait cursor while updating the dialog
+			CWaitCursor wait;
+
 			// Get the tag name and description from the dialog
 			string strTagName = dlg.getTagName();
 			string strDescription = dlg.getDescription();
@@ -280,6 +283,9 @@ void CManageTagsDlg::OnBtnModify()
 
 			if (dlg.DoModal() == IDOK)
 			{
+				// Show the wait cursor while updating the dialog
+				CWaitCursor wait;
+
 				// Modify the existing tag
 				m_ipFAMDB->ModifyTag((LPCTSTR)zTagName, dlg.getTagName().c_str(),
 					dlg.getDescription().c_str());

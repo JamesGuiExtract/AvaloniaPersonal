@@ -762,6 +762,12 @@ library UCLID_FILEPROCESSINGLib
 		[id(63), helpstring("method AllowDynamicTagCreation")] HRESULT AllowDynamicTagCreation(
 			[out, retval] VARIANT_BOOL* pvbVal);
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To set the status for files based on a collection of tags.  If nFromActionID == -1
+		//			then all files with be set to eaNewStatus, if nFromActionID != -1 then each
+		//			file will have its status copied from nFromAction.
+		[id(64), helpstring("method SetStatusForFilesWithTags")] HRESULT SetStatusForFilesWithTags(
+			[in] IVariantVector* pvecTagNames, [in] VARIANT_BOOL vbAndOperation, [in] long nToActionID,
+			[in] EActionStatus eaNewStatus, [in] long nFromActionID);
 	};
 
 	[

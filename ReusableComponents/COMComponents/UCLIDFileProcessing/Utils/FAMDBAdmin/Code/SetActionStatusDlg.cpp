@@ -221,32 +221,36 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		CWaitCursor wait;
 
 		// Check whether setting a new status or copying from existing action status
-		bool bNewStatus = m_radioNewStatus.GetCheck() == BST_CHECKED;
+		long lFromActionID = -1;
+		EActionStatus eNewStatus = kActionUnattempted;
+		if (m_radioNewStatus.GetCheck() == BST_CHECKED)
+		{
+			// Get the new status ID and cast to EActionStatus
+			int iStatusID = m_comboNewStatus.GetCurSel();
+			eNewStatus = (EActionStatus)(iStatusID);
+			uex.addDebugInfo("New Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
+		}
+		else
+		{
+			long lIndex = m_comboStatusFromAction.GetCurSel();
+			lFromActionID = m_comboStatusFromAction.GetItemData(lIndex);
+			uex.addDebugInfo("Copy From Action", lFromActionID); 
+		}
+
 		switch(m_settings.getScope())
 		{
 		// If choose to change that status for all the files
 		case eAllFiles:
 			{
-				if (bNewStatus)
+				if (lFromActionID == -1)
 				{
-					// Get the new status ID and cast to EActionStatus
-					int iStatusID = m_comboNewStatus.GetCurSel();
-					UCLID_FILEPROCESSINGLib::EActionStatus eNewStatus = 
-						(UCLID_FILEPROCESSINGLib::EActionStatus)(iStatusID);
-
 					// Call SetStatusForAllFiles() to set the new status for the selected action
 					m_ipFAMDB->SetStatusForAllFiles(_bstr_t(zToActionName), eNewStatus);
-					uex.addDebugInfo("New Status", asString(m_ipFAMDB->AsStatusString(eNewStatus)));
 				}
 				else
 				{
-					// Get the action ID from which we will copy the status to the selected action
-					long lIndex = m_comboStatusFromAction.GetCurSel();
-					long lFromActionID = m_comboStatusFromAction.GetItemData(lIndex);
-
 					// Call CopyActionStatusFromAction() to set the new status for the selected action
 					m_ipFAMDB->CopyActionStatusFromAction(lFromActionID, lToActionID);
-					uex.addDebugInfo("Copy From Action", lFromActionID);
 				}
 			}
 			break;
@@ -263,24 +267,6 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				(UCLID_FILEPROCESSINGLib::EActionStatus)(iWhereStatusID);
 			uex.addDebugInfo("Action Where", lWhereActionID);
 			uex.addDebugInfo("Action Where Status", asString(m_ipFAMDB->AsStatusString(eWhereStatus)));
-
-			UCLID_FILEPROCESSINGLib::EActionStatus eNewStatus =
-				(UCLID_FILEPROCESSINGLib::EActionStatus)(0);
-			long lFromActionID = -1;
-			if (bNewStatus)
-			{
-				// Get the new status ID and cast to EActionStatus
-				int iStatusID = m_comboNewStatus.GetCurSel();
-				eNewStatus = (UCLID_FILEPROCESSINGLib::EActionStatus)(iStatusID);
-				uex.addDebugInfo("Action To Status",
-					asString(m_ipFAMDB->AsStatusString(eNewStatus)));
-			}
-			else
-			{
-				long lIndex = m_comboStatusFromAction.GetCurSel();
-				lFromActionID = m_comboStatusFromAction.GetItemData(lIndex);
-				uex.addDebugInfo("Copy From Action", lFromActionID); 
-			}
 
 			// If going from the skipped status check user name list
 			string strUser = "";
@@ -305,7 +291,20 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		break;
 
 		case eAllFilesTag:
-			// THIS IS NOT CURRENTLY IMPLEMENTED
+			{
+				// Get the tags and add them to an IVariantVector
+				vector<string> vecTagNames = m_settings.getTags();
+				IVariantVectorPtr ipVecTags(CLSID_VariantVector);
+				for (vector<string>::iterator it = vecTagNames.begin();
+					it != vecTagNames.end(); it++)
+				{
+					_variant_t vtTemp(it->c_str());
+					ipVecTags->PushBack(vtTemp);
+				}
+
+				m_ipFAMDB->SetStatusForFilesWithTags(ipVecTags, asVariantBool(!m_settings.getAnyTags()),
+					lToActionID, eNewStatus, lFromActionID);
+			}
 			break;
 
 		case eAllFilesQuery:
@@ -314,24 +313,11 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				uex.addDebugInfo("SQL Query", strSQL);
 					UCLID_FILEPROCESSINGLib::EActionStatus eNewStatus = 
 						(UCLID_FILEPROCESSINGLib::EActionStatus)(0);
-					CString zFromAction = "";
-				if (bNewStatus)
-				{
-					// Get the new status ID and cast to EActionStatus
-					int iStatusID = m_comboNewStatus.GetCurSel();
-					eNewStatus = (UCLID_FILEPROCESSINGLib::EActionStatus)(iStatusID);
-					uex.addDebugInfo("Action To Status",
-						asString(m_ipFAMDB->AsStatusString(eNewStatus)));
-				}
-				else
+				CString zFromAction = "";
+				if (lFromActionID != -1)
 				{
 					// Get the action name from the combo box
 					m_comboStatusFromAction.GetWindowText(zFromAction);
-
-					// Add the action ID to the debug data
-					long nFromActionID =
-						m_comboStatusFromAction.GetItemData(m_comboStatusFromAction.GetCurSel());
-					uex.addDebugInfo("Copy From Action", nFromActionID); 
 				}
 
 				// Modify the action status from the specified query

@@ -11,6 +11,7 @@
 #include <cpputil.h>
 #include <ComUtils.h>
 #include <LoadFileDlgThread.h>
+#include <FAMUtilsConstants.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -223,7 +224,35 @@ void CExportFileListDlg::OnClickedOK()
 			break;
 
 		case eAllFilesTag:
-			// TODO: This is not implemented yet
+			{
+				// Get the vector of tags
+				vector<string> vecTags = m_settings.getTags();
+
+				// Get the size and ensure there is at least 1 tag
+				size_t nSize = vecTags.size();
+				if (nSize == 0)
+				{
+					MessageBox("No tags selected!", "No Tags", MB_OK | MB_ICONERROR);
+					return;
+				}
+
+				string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
+				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT, "FAMFile.FileName");
+
+				// Get the conjunction for the where clause
+				string strConjunction = m_settings.getAnyTags() ? "\nUNION\n" : "\nINTERSECT\n";
+
+				strQuery = strMainQueryTemp;
+				replaceVariable(strQuery, gstrTAG_NAME_VALUE, vecTags[0]);
+
+				// Build the rest of the query
+				for (size_t i=1; i < nSize; i++)
+				{
+					string strTemp = strMainQueryTemp;
+					replaceVariable(strTemp, gstrTAG_NAME_VALUE, vecTags[i]);
+					strQuery += strConjunction + strTemp;
+				}
+			}
 			break;
 
 		default:
@@ -233,7 +262,7 @@ void CExportFileListDlg::OnClickedOK()
 		// Define how many file has been exported 
 		long lNumFilesExported;
 
-		// Call ExportFileList() to export the fil list
+		// Call ExportFileList() to export the file list
 		lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName);
 
 		// Prompt the users that epxorting files is finished and

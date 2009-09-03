@@ -134,6 +134,8 @@ public:
 		IVariantVector** ppvecFileIDs);
 	STDMETHOD(GetTagsOnFile)(long nFileID, IVariantVector** ppvecTagNames);
 	STDMETHOD(AllowDynamicTagCreation)(VARIANT_BOOL* pvbVal);
+	STDMETHOD(SetStatusForFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
+		long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

@@ -17,6 +17,12 @@ static char THIS_FILE[] = __FILE__;
 #endif
 
 //-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
+static const int giANY_TAG = 0;
+static const int giALL_TAG = 1;
+
+//-------------------------------------------------------------------------------------------------
 // CSelectFilesDlg dialog
 //-------------------------------------------------------------------------------------------------
 CSelectFilesDlg::CSelectFilesDlg(const IFileProcessingDBPtr& ipFAMDB,
@@ -52,6 +58,9 @@ void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_CMB_FILE_ACTION, m_comboFilesUnderAction);
 	DDX_Control(pDX, IDC_CMB_FILE_STATUS, m_comboFilesUnderStatus);
 	DDX_Control(pDX, IDC_CMB_FILE_SKIPPED_USER, m_comboSkippedUser);
+	DDX_Control(pDX, IDC_RADIO_TAGGED_FILES, m_radioFilesWithTags);
+	DDX_Control(pDX, IDC_CMB_ANY_ALL_TAGS, m_comboTagsAnyAll);
+	DDX_Control(pDX, IDC_SELECT_LIST_TAGS, m_listTags);
 	DDX_Control(pDX, IDC_RADIO_SQL_QUERY, m_radioFilesFromQuery);
 	DDX_Control(pDX, IDC_EDIT_SQL_QUERY, m_editSelectQuery);
 }
@@ -62,6 +71,7 @@ BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_ALL_FILES, &CSelectFilesDlg::OnClickedRadioAllFiles)
 	ON_BN_CLICKED(IDC_RADIO_FILES_UNDER_STATUS, &CSelectFilesDlg::OnClickedRadioFilesStatus)
 	ON_BN_CLICKED(IDC_RADIO_SQL_QUERY, &CSelectFilesDlg::OnClickedRadioFilesFromQuery)
+	ON_BN_CLICKED(IDC_RADIO_TAGGED_FILES, &CSelectFilesDlg::OnClickedRadioFilesWithTags)
 	ON_BN_CLICKED(IDC_SELECT_BTN_OK, &CSelectFilesDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &CSelectFilesDlg::OnClickedCancel)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_ACTION, &CSelectFilesDlg::OnFilesUnderActionChange)
@@ -88,6 +98,14 @@ BOOL CSelectFilesDlg::OnInitDialog()
 
 		// Set the query box header
 		m_lblQuery.SetWindowText(m_strQueryHeader.c_str());
+
+		// Configure the tag list and populate it with the current tags
+		configureAndPopulateTagList();
+
+		// Add the any and all values to the combo box
+		m_comboTagsAnyAll.InsertString(giANY_TAG, "Any");
+		m_comboTagsAnyAll.InsertString(giALL_TAG, "All");
+		m_comboTagsAnyAll.SetCurSel(giANY_TAG);
 
 		// Read all actions from the DB
 		IStrToStrMapPtr ipMapActions = m_ipFAMDB->GetActions();
@@ -159,6 +177,20 @@ void CSelectFilesDlg::OnClickedRadioFilesStatus()
 		m_comboFilesUnderAction.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26988")
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::OnClickedRadioFilesWithTags()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Update the controls
+		updateControls();
+
+		m_comboTagsAnyAll.SetFocus();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27426");
 }
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::OnClickedRadioFilesFromQuery()
@@ -294,11 +326,42 @@ bool CSelectFilesDlg::saveSettings()
 				m_settings.setUser((LPCTSTR) zTemp);
 			}
 		}
+		else if (m_radioFilesWithTags.GetCheck() == BST_CHECKED)
+		{
+			// Get each selected tag from the list
+			vector<string> vecTags;
+			int nCount = m_listTags.GetItemCount();
+			for (int i=0; i < nCount; i++)
+			{
+				if (m_listTags.GetCheck(i) == TRUE)
+				{
+					// Get the text for the item
+					CString zTagName = m_listTags.GetItemText(i, 0);
+					vecTags.push_back((LPCTSTR) zTagName);
+				}
+			}
+
+			// Check for at least 1 tag selected
+			if (vecTags.size() == 0)
+			{
+				// Prompt the user
+				MessageBox("You must select at least 1 tag!", "No Tag Selected",
+					MB_OK | MB_ICONERROR);
+
+				// Set focus to the list control
+				m_listTags.SetFocus();
+
+				// Return false
+				return false;
+			}
+
+			m_settings.setTags(vecTags);
+			m_settings.setScope(eAllFilesTag);
+			m_settings.setAnyTags(m_comboTagsAnyAll.GetCurSel() == giANY_TAG);
+
+		}
 		else if (m_radioFilesFromQuery.GetCheck() == BST_CHECKED)
 		{
-			// Set the scope to all files from query
-			m_settings.setScope(eAllFilesQuery);
-
 			// Get the query from the edit box
 			CString zTemp;
 			m_editSelectQuery.GetWindowText(zTemp);
@@ -314,6 +377,9 @@ bool CSelectFilesDlg::saveSettings()
 				// Return false
 				return false;
 			}
+
+			// Set the scope to all files from query
+			m_settings.setScope(eAllFilesQuery);
 			m_settings.setSQLString((LPCTSTR) zTemp);
 		}
 		else
@@ -335,6 +401,7 @@ void CSelectFilesDlg::updateControls()
 	{
 		BOOL bFilesForWhich = asMFCBool(m_radioFilesForWhich.GetCheck() == BST_CHECKED);
 		BOOL bFilesFromSQL = asMFCBool(m_radioFilesFromQuery.GetCheck() == BST_CHECKED);
+		BOOL bFilesWithTags = asMFCBool(m_radioFilesWithTags.GetCheck() == BST_CHECKED);
 
 		// Enable the query edit box based on radio selection
 		m_editSelectQuery.EnableWindow(bFilesFromSQL);
@@ -366,6 +433,11 @@ void CSelectFilesDlg::updateControls()
 				m_comboSkippedUser.SetCurSel(nSelection != CB_ERR ? nSelection : 0);
 			}
 		}
+
+		// Enable the any/all combo box and the list control
+		// based on the files with tags radio button
+		m_comboTagsAnyAll.EnableWindow(bFilesWithTags);
+		m_listTags.EnableWindow(bFilesWithTags);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26997");
 }
@@ -377,6 +449,7 @@ void CSelectFilesDlg::setControlsFromSettings()
 		int nSetAllFiles = BST_UNCHECKED;
 		int nSetAllFileForWhich = BST_UNCHECKED;
 		int nSetAllFilesQuery = BST_UNCHECKED;
+		int nSetAllFilesWithTags = BST_UNCHECKED;
 
 		// Check which scope is selected and set the appropriate controls
 		switch(m_settings.getScope())
@@ -438,7 +511,47 @@ void CSelectFilesDlg::setControlsFromSettings()
 			break;
 
 		case eAllFilesTag:
-			// NOT IMPLEMENTED CURRENTLY
+			{
+				nSetAllFilesWithTags = BST_CHECKED;
+
+				// Set the any/all value
+				m_comboTagsAnyAll.SetCurSel(m_settings.getAnyTags() ? giANY_TAG : giALL_TAG); 
+
+				// Now attempt to select the appropriate tag names
+				vector<string> vecTags = m_settings.getTags();
+				vector<string> vecTagsNotFound;
+				LVFINDINFO info;
+				info.flags = LVFI_STRING;
+				for (vector<string>::iterator it = vecTags.begin(); it != vecTags.end(); it++)
+				{
+					// Find each value in the list
+					info.psz = it->c_str();
+					int iIndex = m_listTags.FindItem(&info);
+					if (iIndex == -1)
+					{
+						// Tag was not found, add to the list of not found
+						vecTagsNotFound.push_back(*it);
+					}
+					else
+					{
+						// Set this item as checked
+						m_listTags.SetCheck(iIndex, TRUE);
+					}
+				}
+
+				if (vecTagsNotFound.size() > 0)
+				{
+					// Prompt the user that there were tags that no longer exist
+					string strMessage = "The following tag(s) no longer exist in the database:\n";
+					for (vector<string>::iterator it = vecTagsNotFound.begin();
+						it != vecTagsNotFound.end(); it++)
+					{
+						strMessage += (*it) + "\n";
+					}
+
+					MessageBox(strMessage.c_str(), "Tags Not Found", MB_OK | MB_ICONINFORMATION);
+				}
+			}
 			break;
 
 		default:
@@ -448,6 +561,7 @@ void CSelectFilesDlg::setControlsFromSettings()
 		// Set the radio buttons
 		m_radioAllFiles.SetCheck(nSetAllFiles);
 		m_radioFilesForWhich.SetCheck(nSetAllFileForWhich);
+		m_radioFilesWithTags.SetCheck(nSetAllFilesWithTags);
 		m_radioFilesFromQuery.SetCheck(nSetAllFilesQuery);
 
 		// Since changes have been made, re-update the controls
@@ -494,5 +608,65 @@ void CSelectFilesDlg::fillSkippedUsers()
 		m_comboSkippedUser.SetCurSel(0);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27002");
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::configureAndPopulateTagList()
+{
+	try
+	{
+		// Enable full row selection plus grid lines and checkboxes
+		// for the tags list control
+		m_listTags.SetExtendedStyle(LVS_EX_GRIDLINES | 
+			LVS_EX_FULLROWSELECT | LVS_EX_CHECKBOXES);
+
+		// Build column information struct
+		LVCOLUMN lvColumn;
+		lvColumn.mask = LVCF_FMT | LVCF_TEXT | LVCF_WIDTH;
+		lvColumn.fmt = LVCFMT_LEFT;
+
+		CRect recList;
+		m_listTags.GetWindowRect(&recList);
+
+		// Set information for tag name column
+		lvColumn.pszText = "Tag name";
+		lvColumn.cx = recList.Width() - 4; // Remove 4 pixels for the column divider
+
+		// Get the list of tag names
+		IVariantVectorPtr ipVecTagNames = m_ipFAMDB->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI27423", ipVecTagNames != NULL);
+
+		// Get the count of items
+		long nSize = ipVecTagNames->Size;
+
+		// Check if need to add space for scroll bar
+		if (nSize > m_listTags.GetCountPerPage())
+		{
+			// Get the scroll bar width, if 0 and error occurred, just log an
+			// application trace and set the width to 17
+			int nVScrollWidth = GetSystemMetrics(SM_CXVSCROLL);
+			if (nVScrollWidth == 0)
+			{
+				UCLIDException ue("ELI27424", "Application Trace: Unable to determine scroll bar width.");
+				ue.log();
+
+				nVScrollWidth = 17;
+			}
+
+			// Deduct space for the scroll bar from the width
+			lvColumn.cx -= nVScrollWidth;
+		}
+
+		// Add the tag name column
+		m_listTags.InsertColumn(0, &lvColumn);
+
+		// Now add each tag name to the control
+		for (long i=0; i < nSize; i++)
+		{
+			_bstr_t bstrTag(ipVecTagNames->Item[i]);
+
+			m_listTags.InsertItem(i, (const char*)bstrTag);
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27425");
 }
 //-------------------------------------------------------------------------------------------------

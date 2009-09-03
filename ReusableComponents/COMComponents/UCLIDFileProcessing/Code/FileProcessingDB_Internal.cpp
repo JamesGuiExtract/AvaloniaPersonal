@@ -1752,6 +1752,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFAM_USER);
 	vecTables.push_back(gstrFAM_FILE_ACTION_COMMENT);
 	vecTables.push_back(gstrFAM_SKIPPED_FILE);
+	vecTables.push_back(gstrFAM_FILE_TAG);
+	vecTables.push_back(gstrFAM_TAG);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

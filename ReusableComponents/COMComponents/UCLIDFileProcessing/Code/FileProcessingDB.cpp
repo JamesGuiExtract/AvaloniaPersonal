@@ -2779,7 +2779,7 @@ STDMETHODIMP CFileProcessingDB::HasTags(VARIANT_BOOL* pvbVal)
 
 		bool bHasTags = false;
 
-		string strQuery = "SELECT [TagName] FROM [Tag]";
+		string strQuery = "SELECT TOP 1 [TagName] FROM [Tag]";
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -3274,24 +3274,28 @@ STDMETHODIMP CFileProcessingDB::GetFilesWithTags(IVariantVector* pvecTagNames,
 			return S_OK;
 		}
 		
-		string strConjunction = asCppBool(vbAndOperation) ? " AND " : " OR ";
+		string strConjunction = asCppBool(vbAndOperation) ? "\nINTERSECT\n" : "\nUNION\n";
+
+		// Get the main sql string
+		string strMainQuery = "SELECT [FileTag].[FileID] FROM [FileTag] INNER JOIN [Tag] ON "
+			"[FileTag].[TagID] = [Tag].[ID] WHERE [Tag].[TagName] = '";
+		strMainQuery += gstrTAG_NAME_VALUE + "'";
 
 		// Build the sql string
-		string strQuery = "SELECT DISTINCT [FileTag].[FileID] FROM [FileTag] INNER JOIN "
-			"[Tag] ON [FileTag].[TagID] = [Tag].[ID] ";
+		string strQuery = strMainQuery;
+		replaceVariable(strQuery, gstrTAG_NAME_VALUE, asString(ipVecTagNames->GetItem(0).bstrVal));
 
-		string strWhere = "WHERE [Tag].[TagName] = '" + asString(ipVecTagNames->GetItem(0).bstrVal)
-			+ "'";
 		for (long i=1; i < lSize; i++)
 		{
 			string strTagName = asString(ipVecTagNames->GetItem(i).bstrVal);
 			if (!strTagName.empty())
 			{
-				strWhere += strConjunction + "[Tag].[TagName] = '" + strTagName + "'";
+				string strTemp = strMainQuery;
+				replaceVariable(strTemp, gstrTAG_NAME_VALUE,
+					asString(ipVecTagNames->GetItem(i).bstrVal));
+				strQuery += strConjunction + strTemp;
 			}
 		}
-
-		strQuery += strWhere + " ORDER BY [FileTag].[FileID]";
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -3436,6 +3440,119 @@ STDMETHODIMP CFileProcessingDB::AllowDynamicTagCreation(VARIANT_BOOL* pvbVal)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27380");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTagNames,
+														  VARIANT_BOOL vbAndOperation,
+														  long nToActionID,
+														  EActionStatus eaNewStatus,
+														  long nFromActionID)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		IVariantVectorPtr ipVecTagNames(pvecTagNames);
+		ASSERT_ARGUMENT("ELI27427", ipVecTagNames != NULL);
+
+		long lSize = ipVecTagNames->Size;
+
+		// If no tags specified do nothing
+		if (lSize == 0)
+		{
+			return S_OK;
+		}
+		
+		string strConjunction = asCppBool(vbAndOperation) ? "\nINTERSECT\n" : "\nUNION\n";
+
+		string strQuery = gstrQUERY_FILES_WITH_TAGS;
+		replaceVariable(strQuery, gstrTAG_NAME_VALUE, asString(ipVecTagNames->GetItem(0).bstrVal));
+
+		for (long i=1; i < lSize; i++)
+		{
+			string strTagName = asString(ipVecTagNames->GetItem(i).bstrVal);
+			if (!strTagName.empty())
+			{
+				string strTemp = gstrQUERY_FILES_WITH_TAGS;
+				replaceVariable(strTemp, gstrTAG_NAME_VALUE,
+					asString(ipVecTagNames->GetItem(i).bstrVal));
+				strQuery += strConjunction + strTemp;
+			}
+		}
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		bool bFromAction = nFromActionID != -1;
+		string strStatus = "";
+		string strFromAction = "";
+		if (bFromAction)
+		{
+			strFromAction = "ASC_" + getActionName(ipConnection, nFromActionID);
+			replaceVariable(strQuery, gstrTAG_QUERY_SELECT,
+				"[FAMFile].[ID], [FAMFile]." + strFromAction);
+		}
+		else
+		{
+			replaceVariable(strQuery, gstrTAG_QUERY_SELECT, "[FAMFile].[ID]");
+
+			// Get the new status as a string
+			strStatus = asStatusString(eaNewStatus);
+		}
+
+		// Get the action name 
+		string strToAction = getActionName(ipConnection, nToActionID);
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		_RecordsetPtr ipFileSet(__uuidof(Recordset));
+		ASSERT_RESOURCE_ALLOCATION("ELI27428", ipFileSet != NULL);
+
+		// Open the file set
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch*)ipConnection, true),
+			adOpenForwardOnly, adLockReadOnly, adCmdText);
+
+		// Loop through each record
+		while (ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipFileSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27429", ipFields != NULL);
+
+			// Get the file ID
+			long nFileID = getLongField(ipFields, "ID");
+
+			// If copying from an action, get the status for the action
+			if (bFromAction)
+			{
+				strStatus = getStringField(ipFields, strFromAction);
+			}
+
+			// Set the file action state
+			setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", nToActionID, false);
+
+			// Move to next record
+			ipFileSet->MoveNext();
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27430");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27431");
 }
 
 //-------------------------------------------------------------------------------------------------

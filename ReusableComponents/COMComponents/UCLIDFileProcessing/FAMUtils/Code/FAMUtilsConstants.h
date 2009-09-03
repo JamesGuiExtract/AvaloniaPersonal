@@ -27,3 +27,10 @@ static const double gdDEFAULT_RETRY_TIMEOUT = 120.0;  // seconds
 // Local machine as database host
 static const string gstrLOCAL_STRING = "(local)";
 static const string gstrDEFAULT_SQL_INSTANCE_NAME = "MSSQLSERVER";
+
+// Query for getting files with a particular tags
+static const string gstrTAG_NAME_VALUE = "<TagNameValue>";
+static const string gstrTAG_QUERY_SELECT = "<SelectFileValues>";
+static const string gstrQUERY_FILES_WITH_TAGS = "SELECT <SelectFileValues> FROM ([FileTag] INNER JOIN "
+	"[Tag] ON [FileTag].[TagID] = [Tag].[ID]) INNER JOIN [FAMFile] ON [FileTag].[FileID] = "
+	"[FAMFile].[ID] WHERE [Tag].[TagName] = '<TagNameValue>'";

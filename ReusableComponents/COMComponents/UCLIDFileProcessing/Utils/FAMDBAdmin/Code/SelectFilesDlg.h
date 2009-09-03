@@ -34,11 +34,14 @@ public:
 	CStatic m_lblQuery;
 	CButton m_radioAllFiles;
 	CButton m_radioFilesForWhich;
+	CButton m_radioFilesWithTags;
 	CButton m_radioFilesFromQuery;
 	CComboBox m_comboFilesUnderAction;
 	CComboBox m_comboFilesUnderStatus;
 	CComboBox m_comboSkippedUser;
+	CComboBox m_comboTagsAnyAll;
 	CEdit m_editSelectQuery;
+	CListCtrl m_listTags;
 
 // Implementation
 protected:
@@ -49,6 +52,7 @@ protected:
 	afx_msg void OnClickedRadioAllFiles();
 	afx_msg void OnClickedRadioFilesStatus();
 	afx_msg void OnClickedRadioFilesFromQuery();
+	afx_msg void OnClickedRadioFilesWithTags();
 	afx_msg void OnFilesUnderActionChange();
 	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnCancel();
@@ -87,6 +91,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To update controls
 	void updateControls();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To configure the tag list and fill it with the current tags from the database
+	void configureAndPopulateTagList();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To save the selected dialog settings to the settings object
 	bool saveSettings();
