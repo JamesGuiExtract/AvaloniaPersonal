@@ -1,0 +1,333 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.0 Beta 5 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.0 Beta 5 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a Beta 5 
+	release candidate is to explicitly exercise these recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #173]</b> Trim Whitespace on Load
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Confirm that leading whitespace is not seen for any attributes.
+		<li>Confirm that trailing whitespace is not seen for any attributes.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #211]</b> Case Sensitivity in Validation
+	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Modify a <b>Units</b> value using a different case than provided in the 
+		validation list.
+		<li>Confirm that the new casing is accepted as valid.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #273, #594]</b> Carriage Returns Removed From Fields
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Swipe the name of a lab that spans two or more lines.
+  	   	<LI>Confirm that the string result replaces any carriage return characters 
+		with a single space.
+  	   	<LI>Swipe other text spanning two or more lines into a multi-line 
+		<b>Comment</b> field.
+  	   	<LI>Confirm that the string result retains carriage return characters and 
+		displays the result on multiple lines.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #311]</b> Limits on Zoom
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Zoom in as far as you can go or until the image disappears.
+		<li>Click on a populated field in the DEP.
+  	   	<LI>Confirm that no <b>ELI22431: Cannot be less than 1.</b> exceptions 
+		are seen.
+		<li>Zoom out a long ways.
+  	   	<LI>Confirm that no <b>ELI21133: Unable to draw image.</b> exceptions 
+		are seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #312]</b> Escape During Pan
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select the <b>Pan</b> tool and navigate around the image.
+		<li>Click the <b>Escape</b> key during a Pan operation.
+  	   	<LI>Confirm that the Pan operation ends and that the cursor returns to normal.
+		<li>Zoom out a long ways.
+  	   	<LI>Confirm that no <b>ELI21133: Unable to draw image.</b> exceptions 
+		are seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #316]</b> Keyboard Navigation During Swipe
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Start swiping some text.
+		<li>Confirm that keyboard navigation of the menu is not supported during a swipe.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #326]</b> VOA Viewer
+       	<ul>
+		<li>Open a <b>VOA</b> file created from a Demo_LabDE sample image.
+  	   	<LI>Confirm that changes can be saved as an <b>EAV</b> file.
+  	   	<LI>Confirm that changes can be saved as a <b>VOA</b> file.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #399]</b> Support For Remote Database
+       	<ul>
+		<li>Prepare a remote testing machine to host the <b>LabDE Solution</b> and 
+		associated database file.  Note the size of the remote database file.
+		<li>Update one or more local <b>.config</b> files to reference the remote 
+		machine via UNC path for the <b>LocalDataSource</b> setting.
+		<li>Open a local Demo_LabDE sample image.
+		<li>Confirm that a <b>tmp</b> file is created in the local temp folder 
+		that is the same size as the remote database file.
+		<li>Confirm that changes can be made to the local VOA file. 
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #415]</b> Tab Key Behavior
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select the starred new row of the <b>Order</b> table.
+		<li>Swipe one entire order.
+		<li>Click <b>F2</b> to enter edit mode in the order name cell.
+		<li>Backspace to remove the name found by the rules.
+		<li>Start typing a valid order name.
+		<li>Press <b>Tab</b> once auto-complete has supplied the end of the order name.
+		<li>Confirm that focus moves to the next cell in the row instead of to the 
+		cell below the order name.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #431]</b> Validation of Date Time Fields
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select a <b>Result Date</b> field.
+  	   	<LI>Confirm that obviously incorrect dates such as <b>42/01/2009</b> cannot 
+		be entered.
+		<li>Select a <b>Result Time</b> field.
+  	   	<LI>Confirm that obviously incorrect times such as <b>42:73</b> cannot 
+		be entered.
+		<li>Select a <b>Date of Birth</b> field.
+  	   	<LI>Confirm that obviously incorrect dates such as <b>42/01/2009</b> cannot 
+		be entered.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #450]</b> Unwanted Enter Key Behavior
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select any cell but the first in any row of a table.
+  	   	<LI>Do something to cause a dialog to appear such as clicking <b>F4</b> when 
+		there are no unviewed items.
+  	   	<LI>Click the <b>Enter</b> key.
+  	   	<LI>Confirm that cell selection is unchanged.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #461]</b> Document Printing Without Highlight, Tooltip or Error Items
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select some data so that highlights are visible on the document.
+  	   	<LI>Confirm that highlights are not included on printed output.
+		<li>Select some data so that tooltips are visible on the document.
+  	   	<LI>Confirm that tooltips are not included on printed output.
+		<li>Select some data so that an error icon is visible on the document.
+  	   	<LI>Confirm that the error icon is not included on printed output.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #464]</b> Pasting Text
+       	<ul>
+		<li>Exercise the <b>003.tif</b> image from Demo_LabDE.
+		<li>Click in the <b>Test Name</b> field in the starred row.
+		<li>Paste plain text from the Clipboard into the cell and press <b>Enter</b>.
+  	   	<LI>Repeat several times.
+  	   	<LI>Confirm that no error is seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #467]</b> Missing Highlights
+       	<ul>
+		<li>Exercise the image and VOA file located at 
+		<b>I:\Common\Testing\PVCS_Testing\DataEntry\467</b>.
+		<li>Select the first <b>Reference Range</b> cell for the first order.
+  	   	<LI>Confirm that a highlight / tooltip is displayed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #470]</b> MessageSequenceNumber.txt
+       	<ul>
+  	   	<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file is located in 
+		the Solution folder.
+		<li>Process a Demo_LabDE sample image for <b>SendToEMR</b>.
+  	   	<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file is updated.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #472]</b> Enforce Field Length Constraints
+       	<ul>
+		<li>Process a Demo_LabDE sample image for <b>MatchToPatientAndOrders</b>.
+  	   	<LI>Add a <b>Copy To: Physician</b> longer than 24 characters.
+  	   	<LI>Modify the <b>Lab Name</b> field to be longer than 24 characters.
+		<li>Save the VOA file.
+		<li>Process the same image for <b>SendToEMR</b>.
+  	   	<LI>Confirm that the <b>Copy To: Physician</b> field is limited to 24 characters.
+  	   	<LI>Confirm that the <b>Lab Name</b> field is limited to 24 characters.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #556]</b> Table Colors For Disabled & Inactive
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that the background color used for a disabled table row such as 
+		<b>Ordering Physician</b> is different than the color used for a selected 
+		but inactive row.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #613, #618]</b> Lab Name Control
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that the <b>Lab Name</b> data no longer is initially displayed 
+		as already viewed.
+  	   	<LI>Confirm that the <b>Lab Name</b> control is an edit box instead of 
+		a combo box.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #619]</b> Lab Code Updates Lab Name
+       	<ul>
+		<li>Exercise the <b>003.tif</b> image from Demo_LabDE.
+		<li>Click in the <b>Lab Code</b> field and enter <b>acl</b>.
+  	   	<LI>Confirm that the text is modified to uppoer case.
+  	   	<LI>Confirm that the <b>Lab Name</b> field is updated.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #623]</b> Toolbar Button Text
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that the <b>Save and commit</b> toolbar button is properly in 
+		sentence case.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #624, #632]</b> Application Switching During Swipe
+       	<ul>
+		<li>Remove the USB key from the local machine or remove the configuration 
+		to a remote machine.
+		<li>Open a Demo_LabDE sample image.
+		<li>Swipe a <b>Test</b> into a Test row.
+  	   	<LI>Confirm that LabDE is waiting because a USB key is not available.
+		<li>Use <b>USB License Key Manager</b> to assign a key.
+  	   	<LI>Confirm that the rules finish running and results are properly added 
+		to the specified row.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #626]</b> Dragging Whole Order
+       	<ul>
+		<li>Exercise the <b>151.tif</b> image from Demo_LabDE.
+		<li>Select all rows in the <b>Order</b> table.
+  	   	<LI>Scroll down until the <b>Test</b> table is visible.
+		<li>Click on a row header in the <b>Order</b> table and drag the row 
+		around the table.
+  	   	<LI>Confirm that the selected row is dragged over a different row, the 
+		<b>Selected Order Details</b> table does not update based on the different row.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #627]</b> Physician Name
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that the <b>Physician Name</b> tables now include a column 
+		for <b>Middle</b>.
+  	   	<LI>Confirm that the <b>Physician Name</b> tables are now ordered as <b>Last</b>, 
+		<b>First</b>, <b>Middle</b>.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #629, #631, #646]</b> LabDE Splash Screen and Installation
+       	<ul>
+  	   	<LI>Confirm that the <b>LabDE</b> installation splash screen does not 
+		reference <b>FLEX Index</b>.
+  	   	<LI>Confirm that the installation no longer asks for a destination directory.
+  	   	<LI>Confirm that <b>SqlCompactExporter</b> and <b>SqlCompactImporter</b> 
+		utilities are included with the installation.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #633]</b> Rule Execution Stack Is Empty
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Swipe an <b>Order</b> into an Order row.
+  	   	<LI>Confirm that the rules finish running and results are properly added 
+		to the specified row.
+  	   	<LI>Confirm that no <b>ELI11649: Rule execution stack is empty.</b> exceptions 
+		are seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #634]</b> Tab Stops For Middle Name & Suffix
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that the <b>Middle Name</b> and <b>Suffix</b> cells are tab 
+		stops only if they contain text.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #641]</b> Cell Selection And Delete
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select one or more cells of a row in the <b>Test</b> table.
+		<li>Confirm that <b>Delete</b> removes the highlights and text for 
+		the selected cells.
+		<li>Confirm that the highlights and text for the non-selected cells 
+		are not affected.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #642]</b> Deleting Spatial Info In Dependent Controls
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select a row in the <b>Order</b> table.
+		<li>Type <b>Ctrl+D</b> to remove the highlights for the order.
+  	   	<LI>Confirm that the highlights for the rows and cells in the <b>Test</b> 
+		table are retained.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #643]</b> Support For Order Code And Test Code
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Confirm that <b>NA</b> (for SODIUM) is accepted as an entry in the 
+		<b>Test Name</b> cell.
+  	   	<LI>Confirm that <b>BMP1</b> (for BASIC METABOLIC PANEL) is accepted as 
+		an entry in the <b>Order Name</b> cell.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
