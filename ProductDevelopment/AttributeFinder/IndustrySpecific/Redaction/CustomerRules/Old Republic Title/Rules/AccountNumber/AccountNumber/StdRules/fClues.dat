@@ -1,0 +1,24 @@
+(?snx)
+~
+(?<false>
+(?>
+ Act\sor
+|.*Cat\.\sNo[^~»]{0,3}
+|Act\sof
+|Act\sis
+|Act\s?
+|Act\sand
+|acting
+|amount[^»]+
+|Account\sof
+|Account(?=»\sthat)
+|(?<=the\s~)account
+|(?<=type\sof\s~)account
+|and\sNumber
+|am\sno
+|a\snumber
+|account\sis
+|account\sunder
+|account(?=»s)
+))
+»
