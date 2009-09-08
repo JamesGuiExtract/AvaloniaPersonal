@@ -1,1 +1,0 @@
-(?:^N.m.\W*.nd\W+|^N.m.[\s\S]{2,8}.ddr.ss|^.{2,6}.nd\W*.ddr.ss|^St.cks[\s\S]{0,6}B.nds|^Alimony|^.*(?:and\W*address|nd\W*.ddr.ss\W*of|dress[\s\S]{0,8}(?:c.mp.ny|bank)|/\s*Ch.ld\W*s.pp.rt|ch.ld\W*s.pp.rt\s*/|/\s*S.p.r.te\W*Main)).*
