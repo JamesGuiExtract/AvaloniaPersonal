@@ -1,14 +1,11 @@
-//ruletester2
-//<SETTING>;QueryForVerification=LCData|MCData|Clues|Affidavit of Death
-
 <SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
 
 //Old Stats
 <SETTING>;VerificationConditionQuantifier=any
-<SETTING>;VerificationCondition=MCData|LCData|Clues
+<SETTING>;VerificationCondition=HCData|MCData|LCData|Clues
 <SETTING>;AutomatedConditionQuantifier=any
-<SETTING>;AutomatedCondition=HCData|MCData|LCData|Clues
-<SETTING>;DocTypesToVerify=Affidavit of Death
+<SETTING>;AutomatedCondition=HCData|MCData|LCData
+
 
 //Hybrid Stats
 //<SETTING>;VerificationConditionQuantifier=any
@@ -17,6 +14,7 @@
 //<SETTING>;AutomatedCondition=HCData
 //<SETTING>;OutputHybridStats=1
 
+<SETTING>;DocTypesToVerify=Affidavit of Death
 <SETTING>;OutputFinalStatsOnly=1
 
 <TESTFOLDER>;;K:\Common\Engineering\Sample Files\AtPac\CA - Fresno\Set008\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
