@@ -1,5 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-//Assignment of Mortgage
-<TESTFOLDER>;DocumentDateTesting.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set001\EAV\DocumentDate\$FileNoExtOf(<SourceDocName>).eav
-//<TESTFOLDER>;DocumentDateTesting.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set002\EAV\DocumentDate\$FileNoExtOf(<SourceDocName>).eav
-//<TESTFOLDER>;DocumentDateTesting.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\Images\AST;;K:\Common\Engineering\Sample Files\ACS\MI - Oakland\Set003\EAV\DocumentDate\$FileNoExtOf(<SourceDocName>).eav
