@@ -1,3 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-<TESTFOLDER>;..\..\Rules\OwnerName\OwnerName.rsd;K:\Common\Engineering\Sample Files\ByteManagers\Set011\Images;;K:\Common\Engineering\Sample Files\ByteManagers\Set011\EAV\OwnerName\$FileNoExtOf(<SourceDocName>).eav
-
