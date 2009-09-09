@@ -210,7 +210,7 @@ namespace Extract.Imaging.Forms
                 OnLoadingNewImage(new LoadingNewImageEventArgs());
 
                 // Refresh the image viewer before opening the new image
-                this.RefreshImageViewerAndParent();
+                RefreshImageViewerAndParent();
 
                 if (!FileSystemMethods.TryOpenExclusive(fileName,
                     out _currentOpenFile))
@@ -285,7 +285,7 @@ namespace Extract.Imaging.Forms
                         // Set the cursor tool to zoom window if none is set
                         if (_cursorTool == CursorTool.None)
                         {
-                            this.CursorTool = CursorTool.ZoomWindow;
+                            CursorTool = CursorTool.ZoomWindow;
                         }
                     }
                     catch (Exception ex)
@@ -1087,11 +1087,11 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the next visible layer object
-                LayerObject nextLayerObject = this.GetNextVisibleLayerObject();
+                LayerObject nextLayerObject = GetNextVisibleLayerObject();
 
                 if (nextLayerObject != null)
                 {
-                    this.CenterOnLayerObject(nextLayerObject, true);
+                    CenterOnLayerObject(nextLayerObject, true);
 
                     if (selectObject)
                     {
@@ -1141,11 +1141,11 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the next visible layer object
-                LayerObject previousLayerObject = this.GetPreviousVisibleLayerObject();
+                LayerObject previousLayerObject = GetPreviousVisibleLayerObject();
 
                 if (previousLayerObject != null)
                 {
-                    this.CenterOnLayerObject(previousLayerObject, true);
+                    CenterOnLayerObject(previousLayerObject, true);
 
                     if (selectObject)
                     {
@@ -1177,24 +1177,26 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI22430", "Object cannot be null.",
                     layerObject != null);
 
-                // Get the current zoom info
-                ZoomInfo zoomInfo = this.GetZoomInfo();
+                // Is the image viewer in fit to page mode?
+                bool isFitToPage = _fitMode == FitMode.FitToPage;
 
                 // Set the image viewer to the proper page for this object
-                this.PageNumber = layerObject.PageNumber;
+                if (PageNumber != layerObject.PageNumber)
+                {
+                    SetPageNumber(layerObject.PageNumber, isFitToPage, true);
+                }
+
+                // Get the current zoom info
+                ZoomInfo zoomInfo = GetZoomInfo();
 
                 // Set the appropriate scale factor if necessary
-                if (zoomInfo.FitMode != FitMode.FitToPage)
+                if (!isFitToPage)
                 {
-                    // Get the center point for the object
-                    Point[] centerPoint = new Point[] {
-                        layerObject.GetCenterPoint() };
-
                     // Set the center point
-                    zoomInfo.Center = centerPoint[0];
+                    zoomInfo.Center = layerObject.GetCenterPoint();
 
-                    // Center the view on the layer objects center point
-                    this.SetZoomInfo(zoomInfo, zoomInfo.FitMode == FitMode.None);
+                    // Center the view on the layer object's center point
+                    SetZoomInfo(zoomInfo, !adjustZoomToFitObject);
 
                     // Check if the zoom should be adjusted to fit the object
                     if (adjustZoomToFitObject)
@@ -1202,19 +1204,20 @@ namespace Extract.Imaging.Forms
                         // Get the current view rectangle
                         // Do not pad the viewing rectangle [DNRCAU #282]
                         Rectangle viewRectangle =
-                            this.GetTransformedRectangle(this.GetVisibleImageArea(), true);
+                            GetTransformedRectangle(GetVisibleImageArea(), true);
 
                         // Check if the object is in view
                         if (!layerObject.IsContained(viewRectangle, base.Image.Page))
                         {
                             // Object is not in view, adjust the zoom so that the object
-                            // is in view (also update zoom history and change fit mode
-                            // if necessary and raise zoom changed event)
+                            // is in view (also change fit mode if necessary)
                             Rectangle zoomRectangle = PadViewingRectangle(layerObject.GetBounds());
-                            this.ZoomToRectangle(
-                                this.GetTransformedRectangle(zoomRectangle, false),
-                                true, true, true);
+                            zoomRectangle = GetTransformedRectangle(zoomRectangle, false);
+                            ZoomToRectangle(zoomRectangle, false, false, true);
                         }
+
+                        // Update the zoom history and raise the zoom changed event
+                        UpdateZoom(true, true);
                     }
                 }
             }
@@ -1271,10 +1274,10 @@ namespace Extract.Imaging.Forms
                         left = 0;
                     }
                     // If offpage right, transfer the excess padding to the left side.
-                    else if (right >= this.ImageWidth)
+                    else if (right >= ImageWidth)
                     {
-                        left -= (right - this.ImageWidth);
-                        right = this.ImageWidth - 1;
+                        left -= (right - ImageWidth);
+                        right = ImageWidth - 1;
                     }
 
                     // If offpage top, transfer the excess padding to the bottom side.
@@ -1284,16 +1287,16 @@ namespace Extract.Imaging.Forms
                         top = 0;
                     }
                     // If offpage bottom, transfer the excess padding to the top side.
-                    else if (bottom >= this.ImageHeight)
+                    else if (bottom >= ImageHeight)
                     {
-                        top -= (bottom - this.ImageHeight);
-                        bottom = this.ImageHeight - 1;
+                        top -= (bottom - ImageHeight);
+                        bottom = ImageHeight - 1;
                     }
                 }
 
                 // Create the padded rectangle then lop off any portion that extends offpage.
                 Rectangle paddedRectangle = Rectangle.FromLTRB(left, top, right, bottom);
-                paddedRectangle.Intersect(new Rectangle(0, 0, this.ImageWidth, this.ImageHeight));
+                paddedRectangle.Intersect(new Rectangle(0, 0, ImageWidth, ImageHeight));
 
                 return paddedRectangle;
             }
@@ -1314,7 +1317,7 @@ namespace Extract.Imaging.Forms
             LayerObject returnObject = null;
 
             // Get the next object (if there is one)
-            int index = this.GetNextVisibleLayerObjectIndex();
+            int index = GetNextVisibleLayerObjectIndex();
             if (index != -1)
             {
                 returnObject = _layerObjects.GetSortedVisibleCollection(true)[index];
@@ -1334,7 +1337,7 @@ namespace Extract.Imaging.Forms
             LayerObject returnObject = null;
 
             // Get the previous object (if there is one)
-            int index = this.GetPreviousVisibleLayerObjectIndex();
+            int index = GetPreviousVisibleLayerObjectIndex();
             if (index != -1)
             {
                 returnObject = _layerObjects.GetSortedVisibleCollection(true)[index];
@@ -1359,12 +1362,12 @@ namespace Extract.Imaging.Forms
                 _layerObjects.GetSortedVisibleCollection(true);
 
             // Get the current view rectangle
-            Rectangle viewRectangle = this.GetTransformedRectangle(
-                this.GetVisibleImageArea(), true);
+            Rectangle viewRectangle = GetTransformedRectangle(
+                GetVisibleImageArea(), true);
 
             // Check for a selection first (There must be at least one selected object
             // in the current view, otherwise search as if there is no selection)
-            if (_layerObjects.Selection.IsAnyObjectContained(viewRectangle, this.PageNumber))
+            if (_layerObjects.Selection.IsAnyObjectContained(viewRectangle, PageNumber))
             {
                 ReadOnlyCollection<LayerObject> sortedSelection =
                     _layerObjects.Selection.GetSortedVisibleCollection(true);
@@ -1389,7 +1392,7 @@ namespace Extract.Imaging.Forms
 
                 // Get the list of objects in view
                 Collection<int> objectsInViewIndex =
-                    _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(this.PageNumber,
+                    _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
                     viewRectangle, true, true);
 
                 if (objectsInViewIndex.Count == 1)
@@ -1429,17 +1432,17 @@ namespace Extract.Imaging.Forms
                     // Get a rectangle encapsulating the right of this view and search for
                     // an object in that area
                     Rectangle rightView = new Rectangle(viewRectangle.Right, viewRectangle.Top,
-                        this.ImageWidth - viewRectangle.Right, viewRectangle.Height);
+                        ImageWidth - viewRectangle.Right, viewRectangle.Height);
                     Collection<int> index = _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(
-                        this.PageNumber, rightView, false, false);
+                        PageNumber, rightView, false, false);
 
                     // If haven't found an object yet, search below the view area
                     if (index.Count == 0)
                     {
                         Rectangle bottomView = new Rectangle(0, viewRectangle.Bottom,
-                            this.ImageWidth, this.ImageHeight - viewRectangle.Bottom);
+                            ImageWidth, ImageHeight - viewRectangle.Bottom);
                         index = _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(
-                            this.PageNumber, bottomView, false, false);
+                            PageNumber, bottomView, false, false);
                     }
 
                     // If there was an item found set the index to the first item in
@@ -1452,7 +1455,7 @@ namespace Extract.Imaging.Forms
                     {
                         for (int i = 0; i < sortedCollection.Count; i++)
                         {
-                            if (sortedCollection[i].PageNumber > this.PageNumber)
+                            if (sortedCollection[i].PageNumber > PageNumber)
                             {
                                 nextIndex = i;
                                 break;
@@ -1487,12 +1490,12 @@ namespace Extract.Imaging.Forms
                 _layerObjects.GetSortedVisibleCollection(true);
 
             // Get the current view rectangle
-            Rectangle viewRectangle = this.GetTransformedRectangle(
-                this.GetVisibleImageArea(), true);
+            Rectangle viewRectangle = GetTransformedRectangle(
+                GetVisibleImageArea(), true);
 
             // Check for a selection first (There must be at least one selected object
             // in the current view, otherwise search as if there is no selection)
-            if (_layerObjects.Selection.IsAnyObjectContained(viewRectangle, this.PageNumber))
+            if (_layerObjects.Selection.IsAnyObjectContained(viewRectangle, PageNumber))
             {
                 // Get the sorted collection of selection objects
                 ReadOnlyCollection<LayerObject> sortedSelection =
@@ -1518,7 +1521,7 @@ namespace Extract.Imaging.Forms
 
                 // Get the list of objects in view
                 Collection<int> objectsInViewIndex =
-                    _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(this.PageNumber,
+                    _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(PageNumber,
                     viewRectangle, true, true);
 
                 if (objectsInViewIndex.Count == 1)
@@ -1560,15 +1563,15 @@ namespace Extract.Imaging.Forms
                     Rectangle leftView = new Rectangle(0, viewRectangle.Top,
                         viewRectangle.Left, viewRectangle.Height);
                     Collection<int> index = _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(
-                        this.PageNumber, leftView, true, false);
+                        PageNumber, leftView, true, false);
 
                     // If haven't found an object yet, search above the view area
                     if (index.Count == 0)
                     {
                         Rectangle topView = new Rectangle(0, 0,
-                            this.ImageWidth, viewRectangle.Top);
+                            ImageWidth, viewRectangle.Top);
                         index = _layerObjects.GetIndexOfSortedLayerObjectsInRectangle(
-                            this.PageNumber, topView, true, false);
+                            PageNumber, topView, true, false);
                     }
 
                     // If there were items found set the index to the last item in
@@ -1581,7 +1584,7 @@ namespace Extract.Imaging.Forms
                     {
                         for (int i = sortedCollection.Count - 1; i >= 0; i--)
                         {
-                            if (sortedCollection[i].PageNumber < this.PageNumber)
+                            if (sortedCollection[i].PageNumber < PageNumber)
                             {
                                 previousIndex = i;
                                 break;
@@ -1695,7 +1698,7 @@ namespace Extract.Imaging.Forms
 
                 // Ensure there is a previous zoom history entry
                 ExtractException.Assert("ELI21469", "There is no previous zoom history entry.",
-                    this.CanZoomPrevious);
+                    CanZoomPrevious);
 
                 // Get the previous zoom history entry
                 ZoomInfo zoomInfo = _imagePages[base.Image.Page - 1].ZoomPrevious();
@@ -1729,7 +1732,7 @@ namespace Extract.Imaging.Forms
 
                 // Ensure there is a subsequent zoom history entry
                 ExtractException.Assert("ELI21470", "There is no subsequent zoom history entry.",
-                    this.CanZoomNext);
+                    CanZoomNext);
 
                 // Get the previous zoom history entry
                 ZoomInfo zoomInfo = _imagePages[base.Image.Page - 1].ZoomNext();
@@ -1887,7 +1890,7 @@ namespace Extract.Imaging.Forms
         /// <exception cref="ExtractException">No image is open.</exception>
         public void Print()
         {
-            this.Print(true);
+            Print(true);
         }
 
         /// <summary>
@@ -1937,13 +1940,13 @@ namespace Extract.Imaging.Forms
                         _printDialog.PrinterSettings.PrinterName.ToUpperInvariant()))
                     {
                         // Refresh the form
-                        this.RefreshImageViewerAndParent();
+                        RefreshImageViewerAndParent();
 
                         // Print the document
                         _printDialog.Document.Print();
 
                         // Store the last printer
-                        this.LastPrinter = _printDialog.PrinterSettings.PrinterName;
+                        LastPrinter = _printDialog.PrinterSettings.PrinterName;
 
                         showDialog = false;
                     }
@@ -1972,7 +1975,7 @@ namespace Extract.Imaging.Forms
                             MessageBoxDefaultButton.Button1, 0);
 
                         // Refresh the form
-                        this.RefreshImageViewerAndParent();
+                        RefreshImageViewerAndParent();
 
                         // Update the print dialog
                         UpdatePrintDialog();
@@ -2002,7 +2005,7 @@ namespace Extract.Imaging.Forms
                 + "Please install a printer and try again.", "No printers available", 
                 MessageBoxButtons.OK, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1, 0);
 
-            this.RefreshImageViewerAndParent();
+            RefreshImageViewerAndParent();
         }
 
         /// <summary>
@@ -2062,7 +2065,7 @@ namespace Extract.Imaging.Forms
                 {
                     // Set the appropriate settings for the print preview dialog
                     _printPreview.Document = GetPrintDocument();
-                    _printPreview.Text = "Preview - " + this.ImageFile;
+                    _printPreview.Text = "Preview - " + ImageFile;
                     _printPreview.UseAntiAlias = true;
                     
                     // Display a warning message and quit if no printers are valid
@@ -2098,7 +2101,7 @@ namespace Extract.Imaging.Forms
                     _printPreview.Load += HandlePrintPreviewLoad;
 
                     // Invalidate the image viewer before displaying the form
-                    this.RefreshImageViewerAndParent();
+                    RefreshImageViewerAndParent();
 
                     // Show the dialog
                     _printPreview.ShowDialog();
@@ -2126,7 +2129,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Refresh the image viewer
-                this.RefreshImageViewerAndParent();
+                RefreshImageViewerAndParent();
 
                 // Create the page setup dialog
                 using (PageSetupDialog pageSetupDialog = new PageSetupDialog())
@@ -2183,7 +2186,7 @@ namespace Extract.Imaging.Forms
                     _disallowedPrinters.Contains(temp.PrinterName.ToUpperInvariant()))
                 {
                     // Default is invalid, try last printer
-                    string lastPrinter = this.LastPrinter;
+                    string lastPrinter = LastPrinter;
                     if (string.IsNullOrEmpty(lastPrinter))
                     {
                         // Last printer was invalid, set to the first valid printer found
@@ -2679,7 +2682,7 @@ namespace Extract.Imaging.Forms
                                     layerObject.Selected = true;
 
                                     // Switch the cursor to the move cursor
-                                    this.Cursor = Cursors.SizeAll;
+                                    Cursor = Cursors.SizeAll;
                                 }
                                 else if (modifiers == Keys.Control)
                                 {
@@ -2736,7 +2739,7 @@ namespace Extract.Imaging.Forms
         private void GoToLink(bool previous, LayerObject layerObject)
         {
             // Get the current zoom info
-            ZoomInfo zoomInfo = this.GetZoomInfo();
+            ZoomInfo zoomInfo = GetZoomInfo();
 
             // Get the side of the layer object from which the 
             // view is relative in physical (client) coordinates
@@ -2787,7 +2790,7 @@ namespace Extract.Imaging.Forms
 
                 // Set the center point
                 zoomInfo.Center = newCenter[0];
-                this.SetZoomInfo(zoomInfo, true);
+                SetZoomInfo(zoomInfo, true);
             }
         }
 
@@ -3177,7 +3180,7 @@ namespace Extract.Imaging.Forms
                         else
                         {
                             // Instantiate a new redaction and add it to _layerObjects
-                            Redaction redaction = new Redaction(this, this.PageNumber, 
+                            Redaction redaction = new Redaction(this, PageNumber, 
                                 LayerObject.ManualComment,
                                 new RasterZone[] { new RasterZone(points[0], points[1],
                                     _defaultHighlightHeight, base.Image.Page) },
@@ -3194,7 +3197,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Invalidate the image viewer so the object is updated
-            this.Invalidate();
+            Invalidate();
         }
 
         /// <summary>
@@ -3254,7 +3257,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Restore the last continuous use cursor tool
-            this.CursorTool = _lastContinuousUseTool;
+            CursorTool = _lastContinuousUseTool;
         }
 
         /// <summary>
@@ -3303,7 +3306,7 @@ namespace Extract.Imaging.Forms
                         {
                             new RasterZone(points[0], points[1], height, base.Image.Page)
                         };
-                        _layerObjects.Add(new Redaction(this, this.PageNumber, 
+                        _layerObjects.Add(new Redaction(this, PageNumber, 
                             LayerObject.ManualComment, rasterZones, _defaultRedactionFillColor));
                     }
 
@@ -3314,7 +3317,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Invalidate the image viewer so the object is updated
-            this.Invalidate();
+            Invalidate();
         }
 
         /// <summary>
@@ -3350,7 +3353,7 @@ namespace Extract.Imaging.Forms
                 Math.Pow(line[0].Y - line[1].Y, 2)) + 0.5);
 
             // Restore the last continuous use cursor tool
-            this.CursorTool = _lastContinuousUseTool;
+            CursorTool = _lastContinuousUseTool;
         }
 
         /// <summary>
@@ -4170,7 +4173,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Set the visible state of the layer objects
-                foreach (LayerObject layerObject in this.GetLayeredObjects(tags,
+                foreach (LayerObject layerObject in GetLayeredObjects(tags,
                     ArgumentRequirement.Any, includeTypes, ArgumentRequirement.Any,
                     null, ArgumentRequirement.Any))
                 {
@@ -4332,7 +4335,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 return rectangle.Left >= 0 && rectangle.Top >= 0 &&
-            rectangle.Right <= this.ImageWidth && rectangle.Bottom <= this.ImageHeight;
+            rectangle.Right <= ImageWidth && rectangle.Bottom <= ImageHeight;
             }
             catch (Exception ex)
             {
@@ -4367,7 +4370,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                return rectangle.Left < this.ImageWidth && rectangle.Top < this.ImageHeight &&
+                return rectangle.Left < ImageWidth && rectangle.Top < ImageHeight &&
             rectangle.Right > 0 && rectangle.Bottom > 0;
             }
             catch (Exception ex)
@@ -4387,7 +4390,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.Pan;
+                    CursorTool = CursorTool.Pan;
                 }
             }
             catch (Exception ex)
@@ -4405,7 +4408,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.ZoomWindow;
+                    CursorTool = CursorTool.ZoomWindow;
                 }
             }
             catch (Exception ex)
@@ -4430,16 +4433,16 @@ namespace Extract.Imaging.Forms
                     // If the current tool is a highlight tool, toggle it
                     if (_cursorTool == CursorTool.RectangularHighlight)
                     {
-                        this.CursorTool = CursorTool.AngularHighlight;
+                        CursorTool = CursorTool.AngularHighlight;
                     }
                     else if (_cursorTool == CursorTool.AngularHighlight)
                     {
-                        this.CursorTool = CursorTool.RectangularHighlight;
+                        CursorTool = CursorTool.RectangularHighlight;
                     }
                     else
                     {
                         // Select the last used highlight tool
-                        this.CursorTool = RegistryManager.GetLastUsedHighlightTool();
+                        CursorTool = RegistryManager.GetLastUsedHighlightTool();
                     }
                 }
             }
@@ -4458,7 +4461,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.AngularHighlight;
+                    CursorTool = CursorTool.AngularHighlight;
                 }
             }
             catch (Exception ex)
@@ -4476,7 +4479,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.RectangularHighlight;
+                    CursorTool = CursorTool.RectangularHighlight;
                 }
             }
             catch (Exception ex)
@@ -4501,16 +4504,16 @@ namespace Extract.Imaging.Forms
                     // If the current tool is a redaction tool, toggle it
                     if (_cursorTool == CursorTool.RectangularRedaction)
                     {
-                        this.CursorTool = CursorTool.AngularRedaction;
+                        CursorTool = CursorTool.AngularRedaction;
                     }
                     else if (_cursorTool == CursorTool.AngularRedaction)
                     {
-                        this.CursorTool = CursorTool.RectangularRedaction;
+                        CursorTool = CursorTool.RectangularRedaction;
                     }
                     else
                     {
                         // Select the last used redaction tool
-                        this.CursorTool = RegistryManager.GetLastUsedRedactionTool();
+                        CursorTool = RegistryManager.GetLastUsedRedactionTool();
                     }
                 }
             }
@@ -4529,7 +4532,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.EditHighlightText;
+                    CursorTool = CursorTool.EditHighlightText;
                 }
             }
             catch (Exception ex)
@@ -4547,7 +4550,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.DeleteLayerObjects;
+                    CursorTool = CursorTool.DeleteLayerObjects;
                 }
             }
             catch (Exception ex)
@@ -4565,7 +4568,7 @@ namespace Extract.Imaging.Forms
             {
                 if (base.Image != null)
                 {
-                    this.CursorTool = CursorTool.SelectLayerObject;
+                    CursorTool = CursorTool.SelectLayerObject;
                 }
             }
             catch (Exception ex)
@@ -4584,7 +4587,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (base.Image != null)
                 {
-                    this.PageNumber = 1;
+                    PageNumber = 1;
                 }
             }
             catch (Exception e)
@@ -4608,7 +4611,7 @@ namespace Extract.Imaging.Forms
                     if (page > 1)
                     {
                         // Go to the previous page
-                        this.PageNumber = page - 1;
+                        PageNumber = page - 1;
                     }
                 }
             }
@@ -4633,7 +4636,7 @@ namespace Extract.Imaging.Forms
                     if (page < base.Image.PageCount)
                     {
                         // Go to the next page
-                        this.PageNumber = page + 1;
+                        PageNumber = page + 1;
                     }
                 }
             }
@@ -4653,7 +4656,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (base.Image != null)
                 {
-                    this.PageNumber = base.Image.PageCount;
+                    PageNumber = base.Image.PageCount;
                 }
             }
             catch (Exception e)
@@ -4672,7 +4675,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 90 degrees
-                    this.Rotate(90, base.Image.Page);
+                    Rotate(90, base.Image.Page);
                 }
             }
             catch (Exception ex)
@@ -4691,7 +4694,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 270 degrees
-                    this.Rotate(270, base.Image.Page);
+                    Rotate(270, base.Image.Page);
                 }
             }
             catch (Exception ex)
@@ -4774,7 +4777,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Open the specified file and update the MRU list
-                    this.OpenImage(fileDialog.FileName, true);
+                    OpenImage(fileDialog.FileName, true);
                 }
             }
             catch (Exception e)
@@ -5075,7 +5078,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Go to the next zone if an image is open and this is not the last tile
-                if (base.Image != null && !this.IsLastTile)
+                if (base.Image != null && !IsLastTile)
                 {
                     NextTile();
                 }
@@ -5094,7 +5097,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Go to the next zone if an image is open and this is not the first tile
-                if (base.Image != null && !this.IsFirstTile)
+                if (base.Image != null && !IsFirstTile)
                 {
                     PreviousTile();
                 }
@@ -5151,7 +5154,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Zoom previous if an image is open
-                if (base.Image != null && this.CanZoomPrevious)
+                if (base.Image != null && CanZoomPrevious)
                 {
                     ZoomPrevious();
                 }
@@ -5170,7 +5173,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Zoom next if an image is open
-                if (base.Image != null && this.CanZoomNext)
+                if (base.Image != null && CanZoomNext)
                 {
                     ZoomNext();
                 }
