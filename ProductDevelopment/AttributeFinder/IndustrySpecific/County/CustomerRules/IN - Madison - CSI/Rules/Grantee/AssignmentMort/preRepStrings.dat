@@ -1,4 +1,0 @@
-\bpaid\s*by\b[\s\S]{0,200}[\("]Assignee%~~~~~~~~~~
-\bmortgagor\s*in\s*connection\s*with\s*the\s*mortgage\b%~~~~~~~~~~
-//filling garbage text for the next replace string caused the GG finder to fail
-//\bsaid\s*mortgage\b% //this is eating a grantee in K:\Common\Engineering\Sample Files\CSI\IN - Madison\Set002\Images\Assignment_of_Mortgage\0000626442.TIF
