@@ -1,4 +1,0 @@
-[PATTERNS_BEGIN]
-rule02=executed^3~by^?Grantee^300~party of|[of]^3~the^3~first^3~[p^1~rt]
-rule03=executed^3~by^?Grantee^240~and^3~recorded
-[PATTERNS_END]
