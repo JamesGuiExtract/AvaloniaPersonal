@@ -183,6 +183,7 @@
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{26431AF3-29B3-4D12-9672-40A5214682D4}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{0A06E51C-1038-4613-AACE-79E968210746}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{2124E4F3-D821-48C7-AD99-01BC8E9CE602}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.labde.standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.labresultscu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{6FAF55FF-9DD1-47DA-8247-FEAC88D0111E}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_afoutp.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
@@ -358,6 +359,7 @@
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>dataentryapplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DATAEN~1.EXE|DataEntryApplication.exe</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\DataEntryApplication.exe</td><td>1</td><td/></row>
 		<row><td>extract.dataentry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.DataEntry.dll</td><td>0</td><td/><td/><td>0</td><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.DataEntry.dll</td><td>1</td><td/></row>
+		<row><td>extract.labde.standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.LabDE.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabDE.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_afoutp.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_AFOUTPUTHANDLERSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_AFOUTPUTHANDLERSLib.dll</td><td>1</td><td/></row>
 	</table>
@@ -448,6 +450,7 @@
 		<col def="S0">Miscellaneous</col>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_9E879378_D7C5_4840_9A1D_B25425D160EB_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_1D662107_2612_4CA6_B3AF_26979F2ED520_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_289B4052_0DE8_4907_BA40_F09ACBE814E1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_191157CD_8DA3_4B03_8EF0_3DF0B1D382DE_FILTER</td><td/><td/><td/><td/></row>
 	</table>
@@ -933,6 +936,7 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<col key="yes" def="i2">Language</col>
 		<row><td>DataEntryApplication.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Extract.DataEntry.dl.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
+		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 	</table>

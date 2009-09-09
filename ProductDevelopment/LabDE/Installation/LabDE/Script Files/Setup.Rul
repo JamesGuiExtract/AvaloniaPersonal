@@ -86,13 +86,9 @@ Dlg_SdLicense:
 	nResult = SdLicense2(szTitle, "", "", "License.txt", FALSE);
 	if nResult = BACK goto Dlg_SdWelcome;
 
-Dlg_SdAskDestPath:    	
-    nResult = SdAskDestPath(szTitle, szMsg, INSTALLDIR, 0);
-    if (nResult = BACK) goto Dlg_SdLicense;
-
 Dlg_SdStartCopy:	
     if (nResult = BACK) then
-        goto Dlg_SdAskDestPath;
+        goto Dlg_SdLicense;
     endif;
 
     // setup default status

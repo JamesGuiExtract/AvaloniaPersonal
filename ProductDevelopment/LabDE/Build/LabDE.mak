@@ -37,7 +37,6 @@ DataEntryCoreInstallFilesDir=$(DataEntryInstallFiles)\CoreInstallation\Files
 LabDEInstallFiles =$(DataEntryInstallFiles)\LabDE\Files
 DataEntryInstallMediaDir=$(LabDEInstallRootDir)\DataEntry\Media\CD-ROM\DiskImages\DISK1
 LabDEInstallMediaDir=$(LabDEInstallRootDir)\LabDE\Media\CD-ROM\DiskImages\DISK1
-LabDEObfuscationFilesArchive=$(DataEntryInstallFiles)\LabDE\Archive\ObfuscationFiles\$(LabDEVersion)
 LabDEInstallDir=$(LabDEBleedingEdgeDir)\LabDEInstall
 
 RDTInstallProjectRootDir=$(EngineeringRootDirectory)\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit
@@ -49,6 +48,7 @@ LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
 
 DataEntryApplicationDir=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
+InternalUseBuildFilesArchive=P:\DataEntry\LabDE\Archive\InternalUseBuildFiles\InternalBuilds\$(LabDEVersion)
 
 # determine the name of the release output directory based upon the build
 # configuration that is being built
@@ -96,19 +96,26 @@ ObfuscateFiles: BuildLabDEApplication
 	dotfuscator.exe  /in:"$(BinariesFolder)\DataEntryApplication.exe" /mapout:"$(BinariesFolder)\Map\mapDataEntryApplication.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabDE.StandardLabDE.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.LabDE.StandardLabDE.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	dotfuscator.exe  /in:"$(BinariesFolder)\Extract.LabResultsCustomComponents.dll" /mapout:"$(BinariesFolder)\Map\mapEExtract.LabResultsCustomComponents.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactImporter.exe" /mapout:"$(BinariesFolder)\Map\mapSqlCompactImporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
+	dotfuscator.exe  /in:"$(BinariesFolder)\SqlCompactExporter.exe" /mapout:"$(BinariesFolder)\Map\SqlCompactExporter.xml" /encrypt:on /enhancedOI:on /out:"$(BinariesFolder)\Obfuscated" $(AFRootDirectory)\Build\ObfuscateConfig.xml
 	
 CopyFilesToInstallFolder: ObfuscateFiles
 	@ECHO Moving files to LabDE Installation
 	@IF NOT EXIST "$(DataEntryCoreInstallFilesDir)\DotNet" @MKDIR "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@IF NOT EXIST "$(LabDEObfuscationFilesArchive)" @MKDIR "$(LabDEObfuscationFilesArchive)" 
+	@IF NOT EXIST "$(InternalUseBuildFilesArchive)" @MKDIR "$(InternalUseBuildFilesArchive)" 
 	
 	@DeleteFiles  "$(DataEntryCoreInstallFilesDir)\DotNet\*.*" /S
 	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Dotnet\leadtools*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet"
 	@COPY /v "$(BinariesFolder)\Obfuscated\*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Obfuscated\DataEntryApplication.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
 	@COPY /v "$(BinariesFolder)\Interop.*.dll" "$(DataEntryCoreInstallFilesDir)\DotNet" 
-	@XCOPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(LabDEObfuscationFilesArchive)" /Y/E
-	@XCOPY  "$(BinariesFolder)\Map\*.xml" "$(LabDEObfuscationFilesArchive)" /Y/E
+	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactImporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+	@COPY /v "$(BinariesFolder)\Obfuscated\SqlCompactExporter.exe" "$(DataEntryCoreInstallFilesDir)\DotNet" 
+
+# Copy pdb and map files to archive
+	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
+	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
+	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
 
 BuildDataEntryMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder BuildLabDEApplication
     @ECHO Building Extract Systems DataEntry Merge Module...

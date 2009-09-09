@@ -313,7 +313,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
