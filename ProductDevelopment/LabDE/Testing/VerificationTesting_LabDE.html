@@ -1,0 +1,122 @@
+<html>
+
+<head>
+<title>LabDE Verification Testing</title>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</head>
+
+<body>
+
+<h1>LabDE Verification Testing<br>
+<img src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+<h2>NOTE: Test notes should be archived under I:\Common\Testing\Product Testing\LabDE_10\VerificationTests</h2>
+<ol>
+	<li><h2>Server Preparation</h2>
+	<ul>
+		<li>Select a <b>server</b> test machine ( i.e. SuperTester or UltraTester or 
+		a quad-core ).
+		<li>Copy suitable image files for processing to the test machine.  The 
+		<b>Endurance Test</b> checklist provides suitable image folders.
+		<li>Confirm that <b>SQL Server</b> is installed on the server.  Either the Standard 
+		edition or the Express edition of SQL 2005 or SQL 2008 is acceptable.
+		<li>Create a <b>V:</b> drive mapped to the root folder containing the local 
+		test images.
+		<li>Use <b>USB License Key Manager</b> to connect to a USB key.
+	</ul>
+<p>
+	<li><h2>Database Preparation</h2>
+	<ul>
+		<li>Copy the <b>Demo_LabDE</b> folder to the test machine.
+		<li>Run <b>Demo_LabDE\DemoFiles\Installs\LongDemo\Install.bat</b>.
+		<li>Run <b>Demo_LabDE\Clean.bat</b> to create a <b>Demo_LabDE</b> database.
+	</ul>
+<p>
+	<li><h2>File Preparation</h2>
+	<ul>
+		<li>Modify the <b>Demo_LabDE\FPS\ExtractData.fps</b> file supplier to supply the 
+		images from <b>drive V:</b>.  
+		<li>Modify the <b>Demo_LabDE\Solution\StandardLabDE_AH_Phase1.config</b> file such 
+		that <b>applicationSettings\LocalDataSource</b> uses a complete UNC path 
+		to the database file.
+	</ul>
+<p>
+	<li><h2>Second Processing Machine Preparation</h2>
+	<ul>
+		<li>Select a quad-core test machine.
+		<li>Install the chosen build of <b>LabDE</b>.
+		<li>Add a license file for <b>LabDE Server</b>.
+		<li>Create a <b>V:</b> drive mapped to the root folder of the image server machine.
+		<li>Use <b>USB License Key Manager</b> to connect to a USB key.
+		<li>TBD
+	</ul>
+<p>
+	<li><h2>Verification Machine Preparation</h2>
+	<ul>
+		<li>For each test machine included in this test
+		<ul>
+			<li>Install the chosen build of <b>LabDE</b>.
+			<li>Add a license file for <b>LabDE Client</b>.
+			<li>Create a <b>V:</b> drive mapped to the root folder of the 
+			image server machine.
+			<li>TBD
+		</ul>
+	</ul>
+<p>
+	<li><h2>Test Execution - Processing Test</h2>
+	<ul>
+		<li>Begin processing images on the main image server by running 
+		<b>ExtractData.fps</b>.
+		<li>Begin processing images on the second processing machine by running 
+		<b>ExtractData.fps</b>.
+		<li>TBD
+	</ul>
+<p>
+	<li><h2>Test Execution - Verification Test - Part 1</h2>
+	<ul>
+		<li>Open <b>Verify.fps</b> from drive V:.
+		<li><b>Start processing</b> to confirm that images and VOA files can be read.
+		<li><b>Stop processing</b> without saving any results until all of the 
+		testers are ready.
+		<li>TBD
+<p>
+		<li><b>Start processing</b> and make suitable corrections as needed to the 
+		extracted data.
+		<li><b>Stop processing</b> at the end of the testing time.
+	</ul>
+<p>
+	<li><h2>Test Execution - Verification Test - Part 2</h2>
+	<ul>
+		<li>Open <b>MatchToPatientsAndOrders.fps</b> from drive V:.
+		<li><b>Start processing</b> to confirm that images and VOA files can be read.
+		<li><b>Stop processing</b> without saving any results until all of the 
+		testers are ready.
+		<li>TBD
+<p>
+		<li><b>Start processing</b> and make suitable corrections as needed to the 
+		extracted data.
+		<li><b>Stop processing</b> at the end of the testing time.
+	</ul>
+<p>
+	<li><h2>Test Execution - Send To EMR Test</h2>
+	<ul>
+		<li>Open <b>SendToEMR.fps</b> on the main processing server.
+		<li><b>Start processing</b> and confirm that suitable XML files are created.
+		<li><b>Stop processing</b> when all of the <b>Pending</b> files have 
+		been processed.
+		<li>TBD
+	</ul>
+<p>
+	<li><h2>Test Review and Data Analysis</h2>
+	<ul>
+		<li>The following items should be reviewed after each test execution exercise.
+		<ul>
+			<li>Confirm that no unexpected errors were seen by any tester.
+			<li>Confirm that the expected number of output files are present.
+			<li>TBD
+		</ul>
+	</ul>
+</ol>
+</body>
+</html>
