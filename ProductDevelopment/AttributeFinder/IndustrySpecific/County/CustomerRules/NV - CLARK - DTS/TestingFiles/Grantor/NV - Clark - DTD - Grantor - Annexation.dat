@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Assignment of Mortgage
-<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Annexation;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

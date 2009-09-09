@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Homestead Designation
-<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Homestead;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber

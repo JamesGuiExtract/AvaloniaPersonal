@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Notice of Federal Tax Lien
-<TESTFOLDER>;..\..\Rules\ParcelNumber.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\IRS Lien Notice;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\ParcelNumber

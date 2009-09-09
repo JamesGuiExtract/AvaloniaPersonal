@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Notice of Default
-<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Default;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav

@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Judgment
-<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\Images\Judgment;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\DTS\NV - Clark\Set001\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav
