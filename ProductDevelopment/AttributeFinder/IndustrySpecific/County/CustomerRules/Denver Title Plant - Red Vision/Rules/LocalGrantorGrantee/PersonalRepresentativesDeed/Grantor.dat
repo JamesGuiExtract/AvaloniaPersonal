@@ -1,4 +1,0 @@
-[PATTERNS_BEGIN]
-rule01=between|made by]^?PersRep^80~personal^3~representative^18~estate^5~of^?Estate^350~deceased^8~grantor
-rule02=between|made by]^?PersRep^80~personal^3~representative
-[PATTERNS_END]

@@ -1,4 +1,0 @@
-[PATTERNS_BEGIN]
-//K:\Common\Engineering\Sample Files\Red Vision\Denver Title Plant\Set001\Images\LN\2001089036.tif
-rule01=[for]|value|received^24~undersigned]^?Grantor^160~borrower^6~promise
-[PATTERNS_END]

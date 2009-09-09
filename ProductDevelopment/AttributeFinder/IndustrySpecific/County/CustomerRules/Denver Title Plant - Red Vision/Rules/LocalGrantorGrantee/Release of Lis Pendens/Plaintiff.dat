@@ -1,3 +1,0 @@
-[PATTERNS_BEGIN]
-rule01=Plaintiff:^?Plaintiff^80~\r\n^3~Defendant
-[PATTERNS_END]

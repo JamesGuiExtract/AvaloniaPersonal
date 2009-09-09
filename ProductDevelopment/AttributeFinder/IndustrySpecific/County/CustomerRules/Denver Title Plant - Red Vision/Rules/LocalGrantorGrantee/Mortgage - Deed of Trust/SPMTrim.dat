@@ -1,8 +1,0 @@
-[\s\S]*\bpublic\s{0,4}trustee\s{0,4}(?:of\s{0,4})?denver$%
-\b(?:the\s{0,4})?(?:pub.{2,4}|.{1,2}ubli.{1,2}|.{2,4}lic)\s{0,4}(?:tru.{4,5}|.{1,2}ruste.{1,2}|.{3,4}stee)[\s\S]{0,6}(?:den.{2,4}|.{1,2}enve.{1,2}|.{2,4}ver)\b%
-\d+\s{0,4}(?:N(?:orth)?|S(?:outh)?|W(?:est)?|E(?:ast)?)[\s\S]*%
-\b(?:orga.{5,6}|.{1,3}ganiz.{1,3}|.{4,5}nized)?[\s\S]{0,6}(?:exis.{3,5}|.{1,3}isti.{1,3}|.{3,5}ting)\b[\s\S]*%
-\b(?:a\x20)?division\x20of\b[\s\S]*%
-\bf[\/\.]?k[\/\.]?a\b[\s\S]*%
-\bd[\/\.]?b[\/\.]?a\b[\s\S]*%
-\bwhose\saddress\sis[\s\S]{1,30}\d{5}%
