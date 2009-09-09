@@ -1,3 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set007\Images;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).grantor.voa;K:\Common\Engineering\Sample Files\AtPac\CA - ContraCosta\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
