@@ -1,6 +1,0 @@
-^[\s\S]*\band\s{0,4}IS\s{0,4}DESCRIBED\s{0,4}AS\s{0,4}FOLLOWS\:?%
-^[\s\S]*\bDESCRIBED\s{0,4}AS\s{0,4}(?:FOLLOWS)?\:?%
-^[\s\S]*\bfollowing\s{0,4}\bdescribed\s{0,4}property\b[\s\S]{0,100}\:%
-^[\s\S]*\bsituated\s{0,4}in\s{0,4}the\b[\s\S]{0,40}\b(?:city|county|state)\b[\s\S]{0,40}\:%
-^[\s\S]*\bfollowing\s{0,4}(?:described\s{0,4})?real\s{0,4}property\b[\s\S]{0,100}\:%
-^[\s\S]*\bfollowing\s{0,4}described\s{0,4}property\b[\s\S]{0,100}\:%
