@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Satisfaction of Mortgage
-<TESTFOLDER>;TestGrantee.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\SATISF OF MORTGAGE or DEED OF RECON FOR TRUST DEED or WEATHERIZ LIEN;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gee.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantee\$FileNoExtOf(<SourceDocName>).eav

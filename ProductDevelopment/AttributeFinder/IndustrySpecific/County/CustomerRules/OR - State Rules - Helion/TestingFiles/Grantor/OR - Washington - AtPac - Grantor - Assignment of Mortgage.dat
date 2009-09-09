@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Assignment of Mortgage
-<TESTFOLDER>;TestGrantor.rsd;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\Images\ASSIGNMENT OF MORTGAGE OR TRUST DEED;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).gor.voa;K:\Common\Engineering\Sample Files\AtPac\OR - Washington\Set007\EAV\Grantor\$FileNoExtOf(<SourceDocName>).eav
