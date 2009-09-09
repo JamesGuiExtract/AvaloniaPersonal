@@ -1,9 +1,0 @@
-.*TGAGE\W*elec.+stration\W*syst.+(?:\W*inc\.?)?;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-.*tgage.*el.+regis.+ystem.*(?:\W*inc\.?)?;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-.*ortgage.*ronic.*gistration.*system.*(?:\W*inc\.?)?;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-mortga.*onic.*gistration.*system.*(?:\W*inc\.?)?;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-.*GAGE\W*ELECTRONIC\W*REGISTRATION\W*SYSTEMS.*(?:\W*inc\.?)?;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-[\s\S]*onic\W*Registration\W*systems\W*Inc[\s\S]*;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-Mortgage\W*Electronic\W*Registration\W*Systems(?!\W*Inc(?=\r?$))[\s\S]*;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-Mortgage\W*Electronic\W*Reg(?!istration\W*Systems)[\s\S]*;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC
-Mortgage (?!Electronic).{5,12} Registration Systems, Inc;MORTGAGE ELECTRONIC REGISTRATION SYSTEMS, INC

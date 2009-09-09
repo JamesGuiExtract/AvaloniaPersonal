@@ -1,8 +1,0 @@
-// *******
-// Imports
-// *******
-#import "..\\Common\\CommonDef.dat"
-[PATTERNS_BEGIN]
-//K:\Common\Engineering\Sample Files\AtPac\CA - Stanislaus\Set003\Images\AFFIDAVIT OF DEATH\20079000664000.003.uss
-LocalDecedent01=says^5~[that]^?Decedent^80~[the^3~decedent^3~mentioned
-[PATTERNS_END]
