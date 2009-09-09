@@ -81,6 +81,12 @@ namespace Extract.Redaction.Verification
         /// </summary>
         static readonly string[] _CATEGORIES = Enum.GetNames(typeof(CategoryIndex));
 
+        /// <summary>
+        /// The amount to multiply the <see cref="AutoZoomScale"/> when calculating the padding 
+        /// around a view.
+        /// </summary>
+        const int _PADDING_MULTIPLIER = 25;
+
         #endregion RedactionGridView Constants
 
         #region RedactionGridView Fields
@@ -127,6 +133,22 @@ namespace Extract.Redaction.Verification
         /// Keeps track of the count of categories of deleted redactions.
         /// </summary>
         int[] _deleted = new int[_CATEGORIES.Length];
+
+        /// <summary>
+        /// The tool to automatically select after a redaction has been created.
+        /// </summary>
+        AutoTool _autoTool;
+
+        /// <summary>
+        /// <see langword="true"/> if the zoom setting should change when redactions are selected;
+        /// <see langword="false"/> if the zoom setting should remain the same.
+        /// </summary>
+        bool _autoZoom;
+
+        /// <summary>
+        /// The zoom setting when <see cref="_autoZoom"/> is <see langword="true"/>.
+        /// </summary>
+        int _autoZoomScale;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
@@ -334,6 +356,61 @@ namespace Extract.Redaction.Verification
                     throw new ExtractException("ELI27273",
                         "Unable to set data confidence level.", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="CursorTool"/> that is automatically selected when a layer 
+        /// object is added.
+        /// </summary>
+        /// <value>The <see cref="CursorTool"/> that is automatically selected when a layer object 
+        /// is added.</value>
+        public AutoTool AutoTool
+        {
+            get
+            {
+                return _autoTool;
+            }
+            set
+            {
+                _autoTool = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether to automatically zoom to selected redactions.
+        /// </summary>
+        /// <value><see langword="true"/> if the view should zoom automatically to selected redactions;
+        /// <see langword="false"/> if the view should not change when redactions are selected.</value>
+        /// <returns><see langword="true"/> if the view should zoom automatically to selected redactions;
+        /// <see langword="false"/> if the view should not change when redactions are selected.</returns>
+        public bool AutoZoom
+        {
+            get
+            {
+                return _autoZoom;
+            }
+            set
+            {
+                _autoZoom = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the amount to zoom out when <see cref="AutoZoom"/> is 
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <value>The amount to zoom out when <see cref="AutoZoom"/> is <see langword="true"/>.
+        /// </value>
+        public int AutoZoomScale
+        {
+            get
+            {
+                return _autoZoomScale;
+            }
+            set
+            {
+                _autoZoomScale = value;
             }
         }
 
@@ -564,11 +641,21 @@ namespace Extract.Redaction.Verification
                 // Select only those layer objects that correspond to selected rows
                 UpdateLayerObjectSelection();
 
-                // If no redaction is on the currently visible page, 
-                // go to the page of the first selected redaction.
-                if (!IsRedactionVisible())
+                // Is at least one row selected?
+                if (_dataGridView.SelectedRows.Count > 0)
                 {
-                    _imageViewer.PageNumber = GetFirstSelectedPage();
+                    // If no redaction is on the currently visible page, 
+                    // go to the page of the first selected redaction.
+                    if (!IsRedactionVisible())
+                    {
+                        _imageViewer.PageNumber = GetFirstSelectedPage();
+                    }
+
+                    // If auto-zoom is on, zoom around all layer objects on the current page.
+                    if (_autoZoom)
+                    {
+                        PerformAutoZoom();
+                    }
                 }
 
                 _imageViewer.Invalidate();
@@ -648,6 +735,57 @@ namespace Extract.Redaction.Verification
             }
 
             return firstPage;
+        }
+
+        /// <summary>
+        /// Zooms around selected layer objects on the current page.
+        /// </summary>
+        void PerformAutoZoom()
+        {
+            // Get combined area of all the selected layer objects on the current page
+            Rectangle area = GetSelectedBoundsOnPage(_imageViewer.PageNumber);
+
+            // Adjust the area by the auto zoom scale
+            int padding = _autoZoomScale * _PADDING_MULTIPLIER;
+            area = _imageViewer.PadViewingRectangle(area, padding, padding, false);
+            area = _imageViewer.GetTransformedRectangle(area, false);
+
+            // Zoom to appropriate area
+            _imageViewer.ZoomToRectangle(area);
+        }
+
+        /// <summary>
+        /// Determines the smallest bounding rectangle around all selected layer objects on the 
+        /// specified page.
+        /// </summary>
+        /// <param name="pageNumber">The page on which the selected layer objects appear.</param>
+        /// <returns>The smallest bounding rectangle around all selected layer objects on 
+        /// <paramref name="page"/>; or <see cref="Rectangle.Empty"/> if no layer objects are 
+        /// selected on <paramref name="page"/>.</returns>
+        Rectangle GetSelectedBoundsOnPage(int pageNumber)
+        {
+            // Iterate over each layer object on the page
+            Rectangle? area = null;
+            foreach (RedactionGridViewRow row in SelectedRows)
+            {
+                foreach (LayerObject layerObject in row.LayerObjects)
+                {
+                    if (layerObject.PageNumber == pageNumber)
+                    {
+                        // Append the bounds of this layer object
+                        if (area == null)
+                        {
+                            area = layerObject.GetBounds();
+                        }
+                        else
+                        {
+                            area = Rectangle.Union(area.Value, layerObject.GetBounds());
+                        }
+                    }
+                }
+            }
+
+            return area ?? Rectangle.Empty;
         }
 
         /// <summary>
@@ -1062,6 +1200,30 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="CursorTool"/> that corresponds to the current 
+        /// <see cref="AutoTool"/>.
+        /// </summary>
+        /// <returns>The <see cref="CursorTool"/> corresponding to the current 
+        /// <see cref="AutoTool"/>.</returns>
+        CursorTool GetAutoCursorTool()
+        {
+            switch (_autoTool)
+            {
+                case AutoTool.None:
+                    return CursorTool.None;
+
+                case AutoTool.Pan:
+                    return CursorTool.Pan;
+
+                case AutoTool.SelectLayerObject:
+                    return CursorTool.SelectLayerObject;
+
+                default:
+                    throw new ExtractException("ELI27436", "Unexpected auto tool.");
+            }
+        }
+
         #endregion RedactionGridView Methods
 
         #region RedactionGridView Overrides
@@ -1142,6 +1304,11 @@ namespace Extract.Redaction.Verification
             try
             {
                 Add(e.LayerObject, "[No text]", "Manual", "");
+
+                if (_autoTool != AutoTool.None)
+                {
+                    _imageViewer.CursorTool = GetAutoCursorTool();
+                }
             }
             catch (Exception ex)
             {

@@ -980,6 +980,10 @@ namespace Extract.Redaction.Verification
                 {
                     _options = dialog.VerificationOptions;
 
+                    _redactionGridView.AutoTool = _options.AutoTool;
+                    _redactionGridView.AutoZoom = _options.AutoZoom;
+                    _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
+
                     // TODO: Write options to ini file
                 }
             }
