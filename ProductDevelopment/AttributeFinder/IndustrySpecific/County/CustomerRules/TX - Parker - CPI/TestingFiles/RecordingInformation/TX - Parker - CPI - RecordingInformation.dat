@@ -1,3 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-<TESTFOLDER>;TestRecordingInformation.rsd;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\Images;;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\EAV\RecordingInformation\$FileNoExtOf(<SourceDocName>).eav

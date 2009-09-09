@@ -1,2 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-<TESTFOLDER>;..\Rules\CrossReference.rsd;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\Images;;K:\Common\Engineering\Sample Files\CPI\TX - Parker\Set002\EAV\CrossReference\$FileNoExtOf(<SourceDocName>).eav
