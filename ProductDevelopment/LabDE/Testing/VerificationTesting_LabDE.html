@@ -24,11 +24,27 @@
 		<li>Create a <b>V:</b> drive mapped to the root folder containing the local 
 		test images.
 		<li>Use <b>USB License Key Manager</b> to connect to a USB key.
+		<li>Install Corepoint. 
+		<ul>
+			<li>The default options can be used throughout
+			<li>Don't install the samples.
+			<li>At the completion of the install, an evaluation license for Corepoint will need to be created.
+			<li>Open Start | Programs | Corepoint Health | Corepoint Integration Engine | Corepoint Integration Engine - Configuration
+			<li>From the file menu, select "Import..."
+			<li>Browse to the Demo_LabDE\Solution\Corepoint Integration and select the AdvancedHealth.nix file.
+			<li>Confirm all prompts to import all contained objects.
+			<li>Close the Corepoint Configuration.
+			<li>Open Start | Programs | Corepoint Health | Corepoint Integration Engine | Corepoint Integration Engine - Administration
+			<li>Confirm that Connections "PT_LABDE_XML_ORU" and "PT_AdvancedHealth_ORU" are running. "OB_AdvancedHealth_ORU" will not be
+				running-- that is okay.
+		</ul>
 	</ul>
 <p>
 	<li><h2>Database Preparation</h2>
 	<ul>
-		<li>Copy the <b>Demo_LabDE</b> folder to the test machine.
+		<li>Copy the <b>Demo_LabDE</b> folder to the root of the C drive on the server machine.
+		<li>Create a network share for the Demo_LabDE folder. The current account needs write access to the share. Remote machines need only
+			read access.
 		<li>Run <b>Demo_LabDE\DemoFiles\Installs\LongDemo\Install.bat</b>.
 		<li>Run <b>Demo_LabDE\Clean.bat</b> to create a <b>Demo_LabDE</b> database.
 	</ul>
@@ -36,10 +52,11 @@
 	<li><h2>File Preparation</h2>
 	<ul>
 		<li>Modify the <b>Demo_LabDE\FPS\ExtractData.fps</b> file supplier to supply the 
-		images from <b>drive V:</b>.  
-		<li>Modify the <b>Demo_LabDE\Solution\StandardLabDE_AH_Phase1.config</b> file such 
-		that <b>applicationSettings\LocalDataSource</b> uses a complete UNC path 
-		to the database file.
+		images from <b>drive V:</b>.
+		<li>Re-configure Verify.fps to use the full UNC path to the StandardLabDE_AH_Phase1.config file.
+			(eg. "\\machinename\Demo_LabDE\Solution\StandardLabDE_AH_Phase1.config")
+		<li>Re-configure MatchToPatientAndOrder.fps to use the full UNC path to the StandardLabDE_AH_Phase2.config file.
+			(eg. "\\machinename\Demo_LabDE\Solution\StandardLabDE_AH_Phase2.config")
 	</ul>
 <p>
 	<li><h2>Second Processing Machine Preparation</h2>
@@ -102,7 +119,8 @@
 	<li><h2>Test Execution - Send To EMR Test</h2>
 	<ul>
 		<li>Open <b>SendToEMR.fps</b> on the main processing server.
-		<li><b>Start processing</b> and confirm that suitable XML files are created.
+		<li><b>Start processing</b> and confirm that suitable XML files are created end up in "C:\Demo_LabDE\Outbound XML Messages\Sent"
+			and that HL7 messages are written to text files in "C:\Demo_LabDE\Transmitted HL7 Messages"
 		<li><b>Stop processing</b> when all of the <b>Pending</b> files have 
 		been processed.
 		<li>TBD
