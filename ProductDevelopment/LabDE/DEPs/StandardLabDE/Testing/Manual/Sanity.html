@@ -54,6 +54,22 @@
 			Record #</b> and <b>Order Number</b> fields are enabled and required for each file.
 			<LI>Fill in these fields and save results for each file.
 			<LI>Confirm that no exceptions are noted.
+<p>
+			<LI><b>[DataEntry #472]</b> Enforce field length constraints
+	       		<ul>
+				<li>Process a Demo_LabDE sample image for 
+				<b>MatchToPatientAndOrders</b>.
+		  	   	<LI>Add a <b>Copy To: Physician</b> longer than 
+				24 characters.
+  	   			<LI>Modify the <b>Lab Name</b> field to be longer 
+				than 24 characters.
+				<li>Save the VOA file.
+				<li>Process the same image for <b>SendToEMR</b>.
+		  	   	<LI>Confirm that the <b>Copy To: Physician</b> field is limited 
+				to 24 characters.
+  	   			<LI>Confirm that the <b>Lab Name</b> field is limited 
+				to 24 characters.
+		       	</ul>
 		</ul>
 <p>
 		<LI><b>Send To EMR</b>
@@ -63,6 +79,15 @@
 			<LI>Confirm that output files are created in the 
 			<b>.\Demo_LabDE\Outbound XML Messages</b> folder.
 			<LI>Ask Steve to confirm that appropriate XML files have been created.
+<p>
+			<LI><b>[DataEntry #470]</b> MessageSequenceNumber.txt
+		       	<ul>
+  	   			<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file is 
+				located in the Solution folder.
+				<li>Process a Demo_LabDE sample image for <b>SendToEMR</b>.
+		  	   	<LI>Confirm that the <b>MessageSequenceNumber.txt</b> file 
+				is updated.
+		       	</ul>
 		</ul>
 	</ul>
 <p>
@@ -465,6 +490,15 @@
 			<LI>Confirm that selecting the entire rows displays 
 			proper highlights and all tooltips. 
 		</ul>
+<p>
+		<LI><b>[DataEntry #464]</b> Pasting text
+       		<ul>
+			<li>Exercise the <b>003.tif</b> image from Demo_LabDE.
+			<li>Click in the <b>Test Name</b> field in the starred row.
+			<li>Paste plain text from the Clipboard into the cell and press <b>Enter</b>.
+  	   		<LI>Repeat several times.
+	  	   	<LI>Confirm that no error is seen.
+       		</ul>
 	</ul>
 <p>
 	<LI><h3>File Formats</h3>

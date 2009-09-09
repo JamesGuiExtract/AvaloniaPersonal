@@ -419,6 +419,36 @@
 			functionality may not have been implemented yet.
 		</ul>
 <p>
+		<LI><b>[DataEntry #311]</b> Limits on zoom
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Zoom in as far as you can go or until the image disappears.
+			<li>Click on a populated field in the DEP.
+  	   		<LI>Confirm that no <b>ELI22431: Cannot be less than 1.</b> exceptions 
+			are seen.
+			<li>Zoom out a long ways.
+  	   		<LI>Confirm that no <b>ELI21133: Unable to draw image.</b> exceptions 
+			are seen.
+       		</ul>
+<p>
+		<LI><b>[DataEntry #312]</b> Escape during pan
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select the <b>Pan</b> tool and navigate around the image.
+			<li>Click the <b>Escape</b> key during a Pan operation.
+  	   		<LI>Confirm that the Pan operation ends and that the cursor returns to normal.
+			<li>Zoom out a long ways.
+  		   	<LI>Confirm that no <b>ELI21133: Unable to draw image.</b> exceptions 
+			are seen.
+	       	</ul>
+<p>
+		<LI><b>[DataEntry #316]</b> Keyboard navigation during swipe
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Start swiping some text.
+			<li>Confirm that keyboard navigation of the menu is not supported during a swipe.
+	       	</ul>
+<p>
 		<li><b>[DataEntry #413]</b> Cursor displays as active tool after document closes
 		<ul>
 			<li>Open a document in standalone mode.
@@ -441,6 +471,20 @@
 			<li>Confirm that <b>Go to next unviewed</b> is disabled and that no exceptions are
 			logged if <b>F4</b> is pressed.
 		</ul>
+<p>
+		<LI><b>[DataEntry #431]</b> Validation of Date Time fields
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select a <b>Result Date</b> field.
+  		   	<LI>Confirm that obviously incorrect dates such as <b>42/01/2009</b> cannot 
+			be entered.
+			<li>Select a <b>Result Time</b> field.
+  		   	<LI>Confirm that obviously incorrect times such as <b>42:73</b> cannot 
+			be entered.
+			<li>Select a <b>Date of Birth</b> field.
+  		   	<LI>Confirm that obviously incorrect dates such as <b>42/01/2009</b> cannot 
+			be entered.
+	       	</ul>
 <p>
 		<li><b>[DataEntry #450]</b> "Enter" not being handled correctly.
 		<ul>

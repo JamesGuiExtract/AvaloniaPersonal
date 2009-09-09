@@ -121,6 +121,16 @@
 			before navigating to <b>HGB</b>. Confirm that there are still no extra rows 
 			in the test table.
 		</ul>
+<p>
+		<LI><b>[DataEntry #633]</b> Rule execution stack is empty
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Swipe an <b>Order</b> into an Order row.
+  		   	<LI>Confirm that the rules finish running and results are properly added 
+			to the specified row.
+	  	   	<LI>Confirm that no <b>ELI11649: Rule execution stack is empty.</b> exceptions 
+			are seen.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Cell Swiping</h3>
@@ -291,6 +301,17 @@
 			<li>Reopen the same document and confirm that there is only one row in the ordering
 			physician table.
 		</ul>
+<p>
+		<LI><b>[DataEntry #626]</b> Dragging whole Order
+       		<ul>
+			<li>Exercise the <b>151.tif</b> image from Demo_LabDE.
+			<li>Select all rows in the <b>Order</b> table.
+  		   	<LI>Scroll down until the <b>Test</b> table is visible.
+			<li>Click on a row header in the <b>Order</b> table and drag the row 
+			around the table.
+  		   	<LI>Confirm that the selected row is dragged over a different row, the 
+			<b>Selected Order Details</b> table does not update based on the different row.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Context menu for tables</h3>
@@ -351,6 +372,19 @@
 		<LI>Confirm that selection changes to the <b>Medical Record #</b> cell. 
 		<LI>Click the <b>Go to next unviewed item</b> toolbar button. 
 		<LI>Confirm that selection changes to the first <b>Physicians - Ordering - First Name</b> cell. 
+<p>
+		<LI><b>[DataEntry #415]</b> Tab key behavior
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select the starred new row of the <b>Order</b> table.
+			<li>Swipe one entire order.
+			<li>Click <b>F2</b> to enter edit mode in the order name cell.
+			<li>Backspace to remove the name found by the rules.
+			<li>Start typing a valid order name.
+			<li>Press <b>Tab</b> once auto-complete has supplied the end of the order name.
+			<li>Confirm that focus moves to the next cell in the row instead of to the 
+			cell below the order name.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Miscellaneous</h3>
@@ -363,6 +397,14 @@
 			<LI>Confirm that continued Tabs advance to the <b>Selected Order Details</b> 
 			and not to the empty order row.
 		</ul>
+<p>
+		<LI><b>[DataEntry #211]</b> Case Sensitivity in Validation
+		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Modify a <b>Units</b> value using a different case than provided in the 
+			validation list.
+			<li>Confirm that the new casing is accepted as valid.
+	       	</ul>
 <p>
 		<LI><b>[Data Entry #219]</b> Cells automatically enter edit mode
 		<ul>
@@ -468,6 +510,35 @@
 			<li>Confirm that when you enter edit mode, selection reverts from the entire
 			row to just the cell you're editing.
 		</ul>
+<p>
+		<LI><b>[DataEntry #641]</b> Cell selection and Delete
+	       	<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select one or more cells of a row in the <b>Test</b> table.
+			<li>Confirm that <b>Delete</b> removes the highlights and text for 
+			the selected cells.
+			<li>Confirm that the highlights and text for the non-selected cells 
+			are not affected.
+       		</ul>
+<p>
+		<LI><b>[DataEntry #642]</b> Deleting spatial info in dependent controls
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select a row in the <b>Order</b> table.
+			<li>Type <b>Ctrl+D</b> to remove the highlights for the order.
+  	   		<LI>Confirm that the highlights for the rows and cells in the <b>Test</b> 
+			table are retained.
+       		</ul>
+<p>
+		<LI><b>[DataEntry #643]</b> Support for Order Code and Test Code
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+	  	   	<LI>Confirm that <b>NA</b> (for SODIUM) is accepted as an entry in the 
+			<b>Test Name</b> cell.
+  	   		<LI>Confirm that <b>BMP1</b> (for BASIC METABOLIC PANEL) is accepted as 
+			an entry in the <b>Order Name</b> cell.
+       		</ul>
+   	</LI>
 	</ul>
 </UL>
 </BODY>

@@ -151,6 +151,14 @@
 				proper highlights and tooltips. 
 			</ul>
 <p>
+			<LI><b>[DataEntry #467]</b> Missing highlights
+		       	<ul>
+				<li>Exercise the image and VOA file located at 
+				<b>I:\Common\Testing\PVCS_Testing\DataEntry\467</b>.
+				<li>Select the first <b>Reference Range</b> cell for the first order.
+		  	   	<LI>Confirm that a highlight / tooltip is displayed.
+		       	</ul>
+<p>
 			<li><b>[DataEntry #547]</b> Spatial info deletion propagating to indirect hints.
 			<ul>
 				<li>Open a document with a populated .voa file.
@@ -476,6 +484,18 @@
 		<LI>Rotate the image and confirm that the existing highlights rotate properly.
 		<LI><b>[DataEntry #391]</b> Swipe some text in the rotated image.  Confirm that the text 
 		is recognized and highlighted properly and that it appears in the DEP.
+<p>
+		<LI><b>[DataEntry #273, #594]</b> Carriage returns removed from fields
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+  		   	<LI>Swipe the name of a lab that spans two or more lines.
+  	   		<LI>Confirm that the string result replaces any carriage return characters 
+			with a single space.
+  		   	<LI>Swipe other text spanning two or more lines into a multi-line 
+			<b>Comment</b> field.
+	  	   	<LI>Confirm that the string result retains carriage return characters and 
+			displays the result on multiple lines.
+	       	</ul>
 	</ul>
 <p>
 	<LI><h3>Angular Highlight Tool</h3>
