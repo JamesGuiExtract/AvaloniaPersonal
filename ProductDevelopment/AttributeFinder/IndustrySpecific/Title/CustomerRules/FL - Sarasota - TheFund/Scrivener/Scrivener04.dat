@@ -1,8 +1,0 @@
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257703.tif.uss
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257780.tif.uss
-//this document causes strange behaviour ^^^^^
-//think about loosening to pass this
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257883.tif.uss
-//(?:^|\r\n)(?:this\s*(?:mortgage|instrument|document))?(?:\s*was)?\s*PREPARED\s*BY:\x20(?:\w+\.?,?\x20)+\w+,?\.?\r\n
-//try below
-(?:^|\r\n)(?:this\s*(?:mortgage|instrument|document))?(?:\s*was)?\s*PREPARED\s*BY:\x20(?:\w+\.?,?\x20)+\w+,?\.?\r\n(?!.*(?:\b(?:bank|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|equity|mortgage|financial|funding|capital|title|credit|loans|lend(?:er|ing)?)\b|\w,?\s*&\s*\w|\bP\.A\.))

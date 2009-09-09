@@ -1,4 +1,0 @@
-//recorded[\s\S]{0,34}
-//(?:,?\s*in\s*Official\s*Records\s*Book\s*\d{3,4},?\s*Page\s*\d{3,4},?\s*Public\s*Records\s*of\s*(?:[a-z]+\s*){1,3}county,?\s*[a-z]+)*
-//(?:,?\s*(?:and\s*)?in\s*Official\s*Records\s*Book\s*\d{3,4},?\s*Page,?\s*\d{3,4},?\s*Public\s*Records\s*of\s*(?:[a-z]+\.?\s*){1,3}county,?\s*[a-z]+)*
-,?\s*(?:and\s*)?in\s*Official\s*Records\s*Book\s*\d{3,4},?\s*Page,?\s*\d{3,4},?\s*Public\s*Records\s*of\s*Sarasota\s*county,?\s*Florida

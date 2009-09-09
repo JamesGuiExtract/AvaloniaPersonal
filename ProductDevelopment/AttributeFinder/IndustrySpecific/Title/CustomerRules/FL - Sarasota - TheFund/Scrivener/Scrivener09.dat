@@ -1,3 +1,0 @@
-//find title and escrow company
-Prepared\s*by\s*and\s*return\s*to:.{0,5}(?:\r\n){1,2}(?:\w{0,9}-?\w{0,9}(?:\r\n){1,2})?(?:\w+\.?\x20)*title.+\r\n
-

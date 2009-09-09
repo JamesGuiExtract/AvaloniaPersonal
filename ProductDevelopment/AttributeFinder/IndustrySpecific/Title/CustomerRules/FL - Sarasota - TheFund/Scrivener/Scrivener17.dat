@@ -1,1 +1,0 @@
-(.*(?:\b(?:bank|equity|capital|\w*title|credit|loans|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|lending?)\b|\w,?\s*&\s*\w).*)

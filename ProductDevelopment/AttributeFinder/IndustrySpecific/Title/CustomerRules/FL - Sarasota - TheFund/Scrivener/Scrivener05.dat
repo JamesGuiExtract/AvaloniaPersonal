@@ -1,2 +1,0 @@
-This\s*document\s*was\s*prepared\s*by.+Loan\s*Closer\r\n[\s\S]{1,480}Record\s*and\s*Return\s*To:(?:\r\n){1,2}(?:\w+[,\x20\.]{0,3})+\r\n
-

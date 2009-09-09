@@ -1,1 +1,0 @@
-recorded[\s\S]{0,36}as\s*Instrument\s*No\.?\s*\d{7,9},?\s*in\s*Book\s*No\.?\s*\d{3,4},?\s*at\s*Page\s*No\.?\s*\d{2,4}

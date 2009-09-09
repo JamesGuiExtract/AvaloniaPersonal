@@ -1,3 +1,0 @@
-//put near last
-(?:this\s*(?:mortgage|instrument|document)(?:\s*was)?\s*)?PREPARED(?:\s*without\s*examination\s*of\s*title)?\s*BY(?:\s*or\s*under\s*the\s*supervision\s*of)?.{0,40}(?:\r\n){1,2}(?!recor(?:d|p)|parcel|\d)(?:Law\s*office\s*of(?:\r\n){1,2})?.{0,5}(?:\w+[,\x20.;]{0,3})+\r\n
-//(?:this\s*(?:mortgage|instrument|document)(?:\s*was)?\s*)?PREPARED\s*BY(?:\s*or\s*under\s*the\s*supervision\s*of)?:.{0,40}(?:\r\n){1,2}(?!recor(?:d|p)|parcel|\d)(?:Law\s*office\s*of(?:\r\n){1,2})?(?:\w+[,x20.;]{0,3})+\r\n

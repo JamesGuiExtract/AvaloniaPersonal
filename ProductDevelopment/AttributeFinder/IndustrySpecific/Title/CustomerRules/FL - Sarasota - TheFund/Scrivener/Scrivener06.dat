@@ -1,9 +1,0 @@
-//think about loosening rule to pass this file
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\M\2005257769.tif.uss
-//this below does pass
-//K:\Common\Engineering\Sample Files\The_Fund\FL - Sarasota\Set001\Images\Multi-Page\WD\2005258236.tif.uss
-//try without new line
-//(?:After\s*Recording|when\s*record.{2,4}|.{2,4}pared\s*by\s*and)?,?\s*(?:please\s*)?(?:mail|Return)\s*To:?.{0,5}(?:\r\n){1,2}(?:.+(?:\r\n){1,2}){0,3}(.*(?:\b(?:bank|equity|\w*mortgage|financial|capital|\w*title|credit|loans|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|lending?)\b|\w,?\s*&\s*\w)(?!\s*,?\s*coordinator).*)\r\n
-//test with above change
-(?:After\s*Recording|when\s*record.{2,4}|.{2,4}pared\s*by\s*and)?,?\s*(?:please\s*)?(?:mail|Return)\s*To:?.{0,5}(?:\r\n){1,2}(?:.+(?:\r\n){1,2})?(.*(?:\b(?:bank|equity|\w*mortgage|financial|capital|\w*title|credit|loans|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|lending?)\b|\w,?\s*&\s*\w)(?!\s*,?\s*coordinator).*)\r\n
-//\r\n(?:After\s*Recording|when\s*record.{2,4}|.{2,4}pared\s*by\s*and)?,?\s*(?:please\s*)?(?:mail|Return)\s*To:?.{0,5}(?:\r\n){1,2}(?:.+(?:\r\n){1,2})??(.*(?:\b(?:bank|equity|\w*mortgage|title|credit|loans|first(?!\s*st\.?(?:reet)?|\s*ave.(?:nue)?)|lending?)\b|\w,?\s*&\s*\w)(?!\s*,?\s*coordinator).*)\r\n

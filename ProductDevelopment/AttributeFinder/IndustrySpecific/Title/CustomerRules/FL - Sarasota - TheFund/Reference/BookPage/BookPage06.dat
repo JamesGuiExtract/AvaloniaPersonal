@@ -1,1 +1,0 @@
-(,?\s*in\s*Official\s*Records\s*Book\s*\d+,?\s*Page\s*\d+,?\s*Public\s*Records\s*of[\s\S]{0,24}County,?\s*Florida)+,?\s*in\s*Official\s*Records\s*Book\s*\d{3,4},?\s*Page\s*\d{3,4},?\s*Public\s*Records\s*of\s*Sarasota\s*County,?\s*Florida

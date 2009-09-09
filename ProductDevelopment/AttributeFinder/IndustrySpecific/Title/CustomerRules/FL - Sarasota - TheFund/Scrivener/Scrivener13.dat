@@ -1,1 +1,0 @@
-(?:\r\n|^)PREPARED\s*BY:(?:\r\n){1,2}(?:.+(?:\r\n){1,2})?Name:.*(?:\r\n){1,2}Address:.*\b(?:bank|equity|\w*mortgage|financial|capital|title|loans?|law\x20offices?)\b(?!\s*,?\s*coordinator).*\r\n
