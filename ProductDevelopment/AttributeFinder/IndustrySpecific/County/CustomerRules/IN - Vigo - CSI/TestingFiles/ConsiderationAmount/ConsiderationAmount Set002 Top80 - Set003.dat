@@ -1,8 +1,0 @@
-//Set002 Top 80 Percent: 
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Satisfaction_of_Mortgage;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Mortgage_Deed_of_Trust;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Warranty_Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\Images\Quit_Claim_Deed;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set002\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
-
-//Set003
-<TESTFOLDER>;TestConsiderationAmount.rsd;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\Images\;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CA.voa;K:\Common\Engineering\Sample Files\CSI\IN - Vigo\Set003\EAV\ConsiderationAmount\$FileNoExtOf(<SourceDocName>).eav
