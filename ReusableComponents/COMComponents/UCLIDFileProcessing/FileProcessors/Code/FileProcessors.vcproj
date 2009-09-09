@@ -439,6 +439,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\ManageTagsTask.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageTagsTaskPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath="OCRFileProcessor.cpp"
 				>
 				<FileConfiguration
@@ -584,6 +592,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ManageTagsTask.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageTagsTaskPP.h"
+				>
+			</File>
+			<File
 				RelativePath="OCRFileProcessor.h"
 				>
 			</File>
@@ -669,11 +685,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\Code\res\icon_up.ico"
+				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\..\BaseUtils\Code\res\icon_up.ico"
+				RelativePath="..\..\Code\res\icon_up.ico"
 				>
 			</File>
 			<File
@@ -682,6 +698,14 @@
 			</File>
 			<File
 				RelativePath="LaunchAppFileProcessorPP.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageTagsTask.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageTagsTaskPP.rgs"
 				>
 			</File>
 			<File

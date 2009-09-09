@@ -108,6 +108,8 @@ IDR_ADD_WATERMARK_TASK  REGISTRY                "AddWatermarkTask.rgs"
 IDR_ADD_WATERMARK_TASKPP REGISTRY                "AddWatermarkTaskPP.rgs"
 IDR_ARCHIVE_RESTORE_TASK REGISTRY                "ArchiveRestoreTask.rgs"
 IDR_ARCHIVE_RESTORE_TASKPP REGISTRY                "ArchiveRestoreTaskPP.rgs"
+IDR_MANAGE_TAGS_TASK	REGISTRY				"ManageTagsTask.rgs"
+IDR_MANAGE_TAGS_TASKPP	REGISTRY				"ManageTagsTaskPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -297,6 +299,18 @@ BEGIN
 					BS_AUTORADIOBUTTON,12,232,120,12
 END
 
+IDD_MANAGE_TAGS_TASKPP DIALOGEX 0, 0, 250, 182
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+EXSTYLE WS_EX_CONTROLPARENT
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+	GROUPBOX		"Select tag operation to execute on document",IDC_STATIC,7,5,236,55
+	CONTROL			"Apply the tags selected below", IDC_RADIO_APPLY_TAG, "Button", BS_AUTORADIOBUTTON | WS_GROUP, 12,15,125,12
+	CONTROL			"Remove the tags selected below", IDC_RADIO_REMOVE_TAG, "Button", BS_AUTORADIOBUTTON, 12,30,130,12
+	CONTROL			"Toggle the state of the tags selected below", IDC_RADIO_TOGGLE_TAG, "Button", BS_AUTORADIOBUTTON, 12,45,150,12
+	GROUPBOX		"Tags", IDC_STATIC, 7,65,236,110
+	CONTROL			"", IDC_LIST_TAGS, "SysListView32", LVS_REPORT | LVS_SHOWSELALWAYS | LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP | LVS_SINGLESEL, 12,75,226,95
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //

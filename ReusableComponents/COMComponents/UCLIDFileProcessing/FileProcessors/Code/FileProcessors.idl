@@ -83,6 +83,18 @@ library UCLID_FILEPROCESSORSLib
 		kCMDOperationRestoreFile = 1
 	} EArchiveRestoreOperationType;
 
+	typedef
+	[
+		uuid(B3D0DFEC-0CA6-46B0-94AC-E9DF2A27C2E1),
+		helpstring("Extract Tag Manager Operation Types")
+	]
+	enum
+	{
+		kOperationApplyTags = 0,
+		kOperationRemoveTags = 1,
+		kOperationToggleTags = 2
+	} EManageTagsOperationType;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -299,7 +311,7 @@ library UCLID_FILEPROCESSORSLib
 		uuid(85E680F9-FA49-4532-92AF-1DDBF131FF25),
 		dual,
 		nonextensible,
-		helpstring("IFileArchive Interface"),
+		helpstring("IArchiveRestoreTask Interface"),
 		pointer_default(unique)
 	]
 	interface IArchiveRestoreTask : IDispatch
@@ -343,6 +355,30 @@ library UCLID_FILEPROCESSORSLib
 		[propget, id(6), helpstring("property DeleteFileAfterArchive")]
 			HRESULT DeleteFileAfterArchive([out, retval] VARIANT_BOOL* pVal);
 		//------------------------------------------------------------------------------------------
+	};
+
+	// IManageTagsTask
+	[
+		object,
+		uuid(C0CAD861-ABF7-4E7F-ACF8-5513B6B55532),
+		dual,
+		nonextensible,
+		helpstring("IManageTagsTask Interface"),
+		pointer_default(unique)
+	]
+	interface IManageTagsTask : IDispatch
+	{
+		// Gets/sets the tag operation to perform
+		[propget, id(1), helpstring("property Operation")] HRESULT Operation(
+			[out, retval] EManageTagsOperationType* pOperation);
+		[propput, id(1), helpstring("property Operation")] HRESULT Operation(
+			[in] EManageTagsOperationType newOperation);
+		
+		// Gets/sets the tag names to manage
+		[propget, id(2), helpstring("property Tags")] HRESULT Tags(
+			[out, retval] IVariantVector** ppvecTags);
+		[propput, id(2), helpstring("property Tags")] HRESULT Tags(
+			[in] IVariantVector* pvecTags);
 	};
 
 	//----------------------------------------------------------------------------------------------
@@ -551,6 +587,29 @@ library UCLID_FILEPROCESSORSLib
 		helpstring("ArchiveRestoreTaskPP Class")
 	]
 	coclass ArchiveRestoreTaskPP
+	{
+		[default] interface IUnknown;
+	};
+
+	// ManageTagsTask CoClass and its Property page
+	[
+		uuid(34564360-1374-42B0-9512-25A92C5D9816),
+		helpstring("ManageTagsTask Class")
+	]
+	coclass ManageTagsTask
+	{
+		[default] interface IManageTagsTask;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IFileProcessingTask;
+		interface ILicensedComponent;
+		interface IMustBeConfiguredObject;
+	};
+	[
+		uuid(202BC3DE-65C4-412A-841B-F890A4CDC0BA),
+		helpstring("ManageTagsTaskPP Class")
+	]
+	coclass ManageTagsTaskPP
 	{
 		[default] interface IUnknown;
 	};

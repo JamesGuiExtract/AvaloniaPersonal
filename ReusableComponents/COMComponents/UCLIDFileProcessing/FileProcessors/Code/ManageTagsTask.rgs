@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.ManageTagsTask.1 = s 'ManageTagsTask Class'
+	{
+		CLSID = s '{34564360-1374-42B0-9512-25A92C5D9816}'
+	}
+	FileProcessors.ManageTagsTask = s 'ManageTagsTask Class'
+	{
+		CLSID = s '{34564360-1374-42B0-9512-25A92C5D9816}'
+		CurVer = s 'FileProcessors.ManageTagsTask.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {34564360-1374-42B0-9512-25A92C5D9816} = s 'ManageTagsTask Class'
+		{
+			ProgID = s 'FileProcessors.ManageTagsTask.1'
+			VersionIndependentProgID = s 'FileProcessors.ManageTagsTask'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}

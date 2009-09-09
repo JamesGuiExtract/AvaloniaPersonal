@@ -1,0 +1,26 @@
+HKCR
+{
+	FileProcessors.ManageTagsTaskPP.1 = s 'ManageTagsTaskPP Class'
+	{
+		CLSID = s '{202BC3DE-65C4-412A-841B-F890A4CDC0BA}'
+	}
+	FileProcessors.ManageTagsTaskPP = s 'ManageTagsTaskPP Class'
+	{
+		CLSID = s '{202BC3DE-65C4-412A-841B-F890A4CDC0BA}'
+		CurVer = s 'FileProcessors.ManageTagsTaskPP.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {202BC3DE-65C4-412A-841B-F890A4CDC0BA} = s 'ManageTagsTaskPP Class'
+		{
+			ProgID = s 'FileProcessors.ManageTagsTaskPP.1'
+			VersionIndependentProgID = s 'FileProcessors.ManageTagsTaskPP'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{961EB40F-4291-4EB7-B615-FAB2ABD620CE}'
+		}
+	}
+}
