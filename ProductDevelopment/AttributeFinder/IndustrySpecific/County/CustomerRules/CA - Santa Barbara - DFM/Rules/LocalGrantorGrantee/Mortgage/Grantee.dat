@@ -1,7 +1,0 @@
-[PATTERNS_BEGIN]
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\DeedOfTrust\2009-0000548.tif
-rule01=lender^5~is]^?Grantee^120~lender^5~is^30~califo|fornia|corpor|poration
-rule02=lender^5~is]^?Grantee^120~[lend^8~[is^30~califo|fornia|corpor|poration
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\DeedOfTrust\2009-0000625.tif
-rule03=lender^5~is]^?Grantee^120~[lender^40~corporation|california|national bank|bank asso|united par|partnership
-[PATTERNS_END]

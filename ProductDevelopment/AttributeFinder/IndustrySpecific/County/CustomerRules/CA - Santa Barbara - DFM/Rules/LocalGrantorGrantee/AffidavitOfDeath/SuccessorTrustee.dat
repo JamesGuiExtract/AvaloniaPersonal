@@ -1,9 +1,0 @@
-[PATTERNS_BEGIN]
-AOD_01=executed^5~by^160~[to]^?SuccessorTrustee^160~successor|succesor^5~trustee^5~under|[of the]|[of]^?Grantee^80~[as^5~to^30~undivided|interest
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\AffidavitOfDeath\2009-0000790.tif
-AOD_02=undersigned^5~surviving^5~co^5~trustee^?SurvivingCoTrustee^75~being^4~first|duly^500~trustee^6~of]^?Grantee^120~under^5~instrument
-AOD_06=\r\n^?SuccessorCoTrustee^100~co^5~trustee^20~being^4~first|duly^400~settlors|settlers^20~entered^5~into the]|into]^?Grantee^100~[dated]
-AOD_06a=\r\n^?SuccessorCoTrustee^100~co^5~trustee^20~being^4~first|duly
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set005\Images\AffidavitOfDeath\2009-0000743.tif
-AOD_15=[I,^?SuccessorTrustee^80~successor^5~trustee
-[PATTERNS_END]

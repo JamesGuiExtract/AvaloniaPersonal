@@ -1,1 +1,0 @@
-UCLIDAFCoreTest.AutomatedRuleSetTester.1;;CA - Santa Barbara - DocumentType.dat

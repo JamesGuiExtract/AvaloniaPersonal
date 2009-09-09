@@ -1,2 +1,0 @@
-\bMac\s{0,4}Donald\b%MacDonald
-^[\s\S]*\d\.%

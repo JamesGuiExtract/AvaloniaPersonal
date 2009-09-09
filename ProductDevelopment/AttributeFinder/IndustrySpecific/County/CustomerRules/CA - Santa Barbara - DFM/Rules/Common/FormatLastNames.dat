@@ -1,8 +1,0 @@
-\bDE\s+LA\s+(\w+);DELA$1
-\bDE\s+(\w+);DE$1
-\bDI\s+(\w+);DI$1
-\b(VAN\s*(?:DEN|DER))\s*(\w+);$1$2
-\b(VAN)\s*(\w+);$1$2
-\b(MC|MAC)\s+(\w+);$1$2
-\b(O)\W*(\w+);$1$2
-(?:^\W+|\W+$);

@@ -1,9 +1,0 @@
-[PATTERNS_BEGIN]
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0059072.tif
-inCap01=[on]^?inCap^qualified|acting^25~trustee^100~certified^25~physician^6~unable^25~trustee^50~certificate^6~incapacity
-
-//K:\Common\Engineering\Sample Files\DFM\CA - Santa Barbara\Set001\Images\Affidavit of Death.Affidavit - Death of Trustee\2008-0059485.tif
-Grantor01=died on^50~said settlor|is the^12~same person as^?Grantor01^who^12~decedent
-
-[PATTERNS_END]
