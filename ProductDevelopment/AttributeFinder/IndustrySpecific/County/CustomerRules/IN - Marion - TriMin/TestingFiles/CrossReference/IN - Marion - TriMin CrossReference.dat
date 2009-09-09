@@ -1,5 +1,0 @@
-//Top 80%
-//<TESTFOLDER>;TestCrossReference.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTG;;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\CrossReference\$FileNoExtOf(<SourceDocName>).eav
-//<TESTFOLDER>;TestCrossReference.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\DEED;;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\CrossReference\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestCrossReference.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\MTGR;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CrossReference.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\CrossReference\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestCrossReference.rsd;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\Images\ASMT;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).CrossReference.voa;K:\Common\Engineering\Sample Files\Trimin\IN - Marion\Set003\EAV\CrossReference\$FileNoExtOf(<SourceDocName>).eav
