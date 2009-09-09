@@ -1,7 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Assignment of Mortgage
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\ASSIGNMENT;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav

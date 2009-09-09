@@ -1,7 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Mortgage - Deed of Trust
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set001\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set002\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set003\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
-<TESTFOLDER>;TestGrantorGrantee.rsd;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\Images\DEED OF TRUST;;K:\Common\Engineering\Sample Files\ACS\TX - Midland\Set004\EAV\GrantorGrantee\$FileNoExtOf(<SourceDocName>).eav
