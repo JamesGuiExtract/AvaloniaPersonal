@@ -1,7 +1,0 @@
-// All lines beginning with // are ignored as well as all whitespace " \f\n\r\t\v"
-
-// $2 is the BODY
-(
-// Body of Address
-[\s\S]{1,300}?\b\s*
-)
