@@ -1,8 +1,0 @@
-(?:ADD[\s\S]{3,9}|DDITI[\s\S]{1,7}|ITION[\s\S]{0,4})(?:D.BT|.{0,2}.BT.|.{0,4}(?:BT.R|T.R.?S))
-.DD.T..N.L\s*(?:D.BT|.{0,2}.BT.|.{0,4}(?:BT.R|T.R.?S))
-^2\.?\s*.DD.T..N.L
-^2.*D.BT.R.?S\s*.X.CT
-.*(?!.*21.*|.*11.*)AL\s*D.BT.R.?S\s*.X.CT
-[o0]ne\s*d.bt.r.*2[ab]
-name\s*.?2a\s*.r\s*2b
-^2[.,].*(?:insert\s*only|only\s*one\s*debtor|do\s*not\s*abbr|combine\s*names)

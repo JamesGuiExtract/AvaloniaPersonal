@@ -1,5 +1,0 @@
-^[^a-z\r\n]{0,3}\bSTATE\b
-^[^a-z\r\n]{0,3}(?:MIDD|IDDL|DDLE)[\s\S]{0,6}(?:NAM|AME)(?!.*S.FF.X)
-[^1][1lI|t2367](?![1lI|tc0on]|[A-Z]{3,})[^2\n']{1,9}(?:.NT.TY.?S\s*.RGAN|.RGAN\S{3,7}NAL|RGAN.{0,10}|ZAT..NAL).{0,4}(?:ID|\#)
-\D11\D.{0,3}.RG.N.Z.T..N.L\s*(?:ID|.{0,3}\#)
-^11(?:g|\x20*g[.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS))

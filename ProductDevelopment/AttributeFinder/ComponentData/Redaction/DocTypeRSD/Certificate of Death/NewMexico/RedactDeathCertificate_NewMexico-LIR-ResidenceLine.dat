@@ -1,6 +1,0 @@
-^(RESID[\s\S]{0,10}State|RESIDENCE)
-^County\s*(16|City)
-^CITY[.,]\s*TOWN\s*OR
-TOWN\s*OR\s*LOCATI
-INSIDE\s*CITY
-CITY\s*LIMITS\?

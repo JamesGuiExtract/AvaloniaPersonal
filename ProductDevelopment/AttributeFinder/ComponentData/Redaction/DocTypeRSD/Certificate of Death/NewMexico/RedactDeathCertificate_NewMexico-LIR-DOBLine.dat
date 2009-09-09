@@ -1,7 +1,0 @@
-DATE\s*OF\s*BIRTH
-RACE.{0,4}Specify
-AGE.{0,4}(la|st).{0,6}(birt|rthda|thday)
-IF\S*NATIVE\s*AMER
-^.{0,3}UNDER\s*1\s*(YEAR|DAY).{0,3}(?=\r?$)
-Specify\S*White.{0,3}Black
-White.{0,3}Black.{0,3}Native

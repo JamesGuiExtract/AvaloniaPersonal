@@ -1,5 +1,0 @@
-(?:4a[\s\S]{0,5}Age|
-5[\s\S]{0,5}Date[\s\S]{0,5}of|
-8[\s\S]{0,5}Soc[\s\S]{0,10}Sec|
-10a[\s\S]{0,5}Current|
-10b[\s\S]{0,5}County|)

@@ -1,1 +1,0 @@
-(?<!has[\s\S]{0,2}no[\s\S]{0,5}|contain[\s\S]{0,9}|include[\s\S]{0,9}|is[\s\S]{0,3}(?:no\b|\ba\b)|Notice[\s\S]{0,3}of[\s\S]{0,5}|remov(?:ing|ed)[\s\S]{0,9}|protect[\s\S]{0,3}your[\s\S]{0,9}|(?:redact|dacting)[\s\S]{0,50}|(discl|losure)[\s\S]{0,9})(So|cia|ial)[\s\S]{0,10}(Sec|cur|rity)[\s\S]{0,7}(Nu|umb|ber)

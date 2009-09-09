@@ -1,5 +1,0 @@
-^24[\s\S]{0,5}ADD[\s\S]{3,9}(?:DEBT|.{0,2}EBTO|.{0,4}(?:BTOR|TOR.?S))
-24[\s\S]{0,6}.DD.T..N.L
-24.?\x20*(?:ADD[\s\S]{3,9}|[\s\S]{0,2}DDITI[\s\S]{1,7}|[\s\S]{1,4}ITION[\s\S]{0,4})(?:D.BT|.{0,2}.BT.|.{0,4}(?:BT.R|T.R.?S))
-name\s*.?24a\s*.r\s*24b
-[o0]ne\s*d.bt.r.*24[ab]
