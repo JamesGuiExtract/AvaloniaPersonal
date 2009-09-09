@@ -1,5 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-<TESTFOLDER>;..\..\Rules\LoanOfficer\LoanOfficer.rsd;K:\Common\Engineering\Sample Files\Investors Title\Set006\Images;;K:\Common\Engineering\Sample Files\Investors Title\Set006\EAV\LoanOfficer\$FileNoExtOf(<SourceDocName>).eav
-
-
