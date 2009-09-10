@@ -1,6 +1,18 @@
 (?:
 
-	^.{2,8}(?:MORTGAGE)[\s\S]{0,55}?
+	(?:
+	
+		^.{2,8}(?:MORTGAGE)
+		
+		|
+		
+		THIS.{0,30}MORTGAGE
+		
+		(?#K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06173AA.ABP.TIF)
+		
+	)
+	
+	[\s\S]{0,85}?
 	
 	(?:\bMAD|ADE\b|\bBETW|TWEEN\b)[\s\S]{0,250}?
 	
