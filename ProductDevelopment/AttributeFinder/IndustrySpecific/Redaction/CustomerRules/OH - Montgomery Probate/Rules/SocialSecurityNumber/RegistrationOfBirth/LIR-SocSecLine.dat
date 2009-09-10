@@ -1,6 +1,0 @@
-Social\s*Sec
-(?:Soc|.{1,2}ocia.{1,2|.{1,4}ial)\s*(?:Sec|.{1,4}curi|.{2,6}rity)
-Soc.{2,10}(?:secu|ecur|curi|urit|rity)
-Social.{4,13}\bNo
-^.{0,2}Full\s*Name
-Name\W*at\W*time\W*of
