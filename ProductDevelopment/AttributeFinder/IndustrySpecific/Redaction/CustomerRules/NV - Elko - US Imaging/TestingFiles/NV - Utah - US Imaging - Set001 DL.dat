@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<SETTING>;TypeToBeTested=DLN
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\US Imaging\NV - Elko\Set001\Images;<SourceDocName>.DL.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
