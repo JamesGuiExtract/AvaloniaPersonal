@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-//<SETTING>;TypeToBeTested=SSN
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Unity Business Systems\VA - Martinsville\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
