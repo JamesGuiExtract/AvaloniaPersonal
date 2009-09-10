@@ -1,1 +1,0 @@
-(?:Phone\s*Number|include\s*area|area\s*code)(?![\s\S]{0,260}?(?:Court\s*registration\s*(?:Num|No)|supreme\s*court))

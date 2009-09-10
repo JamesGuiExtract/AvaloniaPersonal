@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=15.a. member|15a member|15.b. high|15b high|15a. member|15a member|16. days|16 days|17. member|17 member|17 member|17 member|19.a. mailing|19a mailing|19.b. nearest|19b nearest|19a. mailing|19a mailing|22. official|22 official|6. reserve|6 reserve|7.a. place|7a place|7.b. home|7b home|7a. place|7a place|8.a. last|8a last|8.b. station|8b station|8a. last|8a last|DISCHARGE FROM ACTIVE
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1988_00^@hc_clues
-[PATTERNS_END]

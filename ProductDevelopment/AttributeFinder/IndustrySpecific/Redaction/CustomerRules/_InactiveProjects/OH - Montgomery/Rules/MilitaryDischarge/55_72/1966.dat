@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=10a. selective|10a selective|14. district,|14 district|15. reenlistment|15 reenlistment|16. terminal|16 terminal|17. current|17 current|18. prior|18 prior|19. grade,|19 grade|20. place|20 place|21. home|21 home|22. statement|22 statement|24. decorations,|24 decorations|25. education|25 education|26a. non-pay|26a nonpay|27a. insurance|27a insurance|28. va|28 va|29. servicemen's|29 servicemens|30. remarks|30 remarks|31. permanent|31 permanent|32. signature|32 signature|33. typed|33 typed|5a. grade,|5a grade|7. u.s.|7 us|8. place|8 place
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1966^@hc_clues
-[PATTERNS_END]

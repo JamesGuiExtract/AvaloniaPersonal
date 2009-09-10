@@ -1,4 +1,0 @@
-^24[\s\S]{0,5}ADD[\s\S]{3,9}(DEBT|.{0,2}EBTO|.{0,4}(BTOR|TOR.?S))
-24[\s\S]{0,6}ADDITIONAL
-24.?\x20*(A[\s\S]{0,3}|[\s\S]{0,3}DD)[\s\S]{3,9}(NAL|[O0C]NA\S{0,3})\s*(DEBT|.{0,2}EBTO|.{0,4}(BTOR|TOR.?S))
-name\s*\w24a\s*[o0]r\s*24b

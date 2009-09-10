@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=15. member|15 member|16. high|16 high|17. days|17 days|22. typed|22 typed|4b. pay|4b pay|6. place|6 place|7. last|7 last|8. station|8 station
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1979^@hc_clues
-[PATTERNS_END]

@@ -1,1 +1,0 @@
-(?:UCC\s*(?:[^\w\s]|_)\s*E|UCCE(?![SsEe])|\bU.C\W*E\b|\bUC.\W*E\b|U(?:C.|.C)\W*E$)

@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=10. reenlistment|10 reenlistment|11. last|11 last|12. command|12 command|13. terminal|13 terminal|14. place|14 place|15. date|15 date|16a. primary|16a primary|17.a secondary|17a secondary|18. record|18 record|19. indochina|19 indochina|2. sex|2 sex|20. highest|20 highest|21. time|21 time|22. days|22 days|23. servicemen's|23 servicemens|24. disability|24 disability|25. personnel|25 personnel|27. remarks|27 remarks|28. mailing|28 mailing|29. signature|29 signature|30. typed|30 typed|31. signature|31 signature|4. date|4 date|5. department,|5 department|6a. grade,|6a grade|7. date|7 date|8a. selective|8a selective|9a. type|9a type
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1972^@hc_clues
-[PATTERNS_END]

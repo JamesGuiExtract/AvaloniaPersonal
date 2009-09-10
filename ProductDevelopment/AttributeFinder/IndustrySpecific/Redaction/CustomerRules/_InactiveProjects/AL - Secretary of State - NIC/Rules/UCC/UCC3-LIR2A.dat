@@ -1,1 +1,0 @@
-^(?:[^\d\r\n]{0,2}2A|A)\W*(?:N.m..{2,7}(?:addr|.ddr.s)|Name\W*and|\W*(?:addr|.ddr.s)|.{10,25}of\W*D.bt.r|.{25,35}\bany\b)

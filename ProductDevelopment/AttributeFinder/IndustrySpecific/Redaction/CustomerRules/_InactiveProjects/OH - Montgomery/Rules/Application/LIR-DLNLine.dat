@@ -1,5 +1,0 @@
-Attorney\x20*Reg
-rney\x20*registr
-attor[\s\S]{4,12}ration\s*No
-Driver[\s\S]{1,5}License
-License\s*(?:no:#)

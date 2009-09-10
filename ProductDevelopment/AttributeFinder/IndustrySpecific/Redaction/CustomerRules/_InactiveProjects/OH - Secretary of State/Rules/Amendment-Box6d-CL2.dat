@@ -1,3 +1,0 @@
-^7\.?\s*CHANGED
-7[\s\S]{0,4}CHANGED
-^[\s\S]{0,5}CHANGED[\s\S]{0,3}NEW

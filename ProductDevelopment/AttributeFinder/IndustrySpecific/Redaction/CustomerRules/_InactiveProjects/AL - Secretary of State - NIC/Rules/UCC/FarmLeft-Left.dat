@@ -1,8 +1,0 @@
-^FARM
-^This\W*Form\W*is
-^int.r.st\W*in\W*f.rm
-^for\W*farm\W*pr.d.cts
-^back\W*page
-^.{0,2}A\W*Debtor
-.ddr.ss[\s\S]{1,6}(?:s.c.r.d|sec|.{1,2}ecu|.{3,5}ured)
-^.{0,2}N\W*.dd.t..n.l

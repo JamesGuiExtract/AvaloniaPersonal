@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=(continuation sheet)|continuation sheet|(same as|same as|as block|as block|block 12b.)|block 12b|continuation of|continuation of|continuation sheet|continuation sheet|do form|do form|for certificate|for certificate|from do|from do|information from|information from|name grade,|name grade
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1988_continuation^@hc_clues
-[PATTERNS_END]

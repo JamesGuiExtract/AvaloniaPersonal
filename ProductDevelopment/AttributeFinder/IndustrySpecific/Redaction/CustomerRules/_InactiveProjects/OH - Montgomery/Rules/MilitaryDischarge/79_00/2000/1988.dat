@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=15.b. high|15b high|17 member|17 member|19.b. nearest|19b nearest|4.b. pay|4b pay|7.b. home|7b home|8.b. station|8b station|AREAS RENDER
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1988^@hc_clues
-[PATTERNS_END]

@@ -1,6 +1,0 @@
-[VARS_BEGIN]
-hc_clues=1. insert|1 insert|1. last|1 last|10. record|10 record|11. terminal|11 terminal|12. military|12 military|13. primary|13 primary|14. highest|14 highest|15. decorations,|15 decorations|16. serviceman's|16 servicemans|17. personnel|17 personnel|2. enlisted|2 enlisted|20. signature|20 signature|21. typed|21 typed|22. signature|22 signature|23. authority|23 authority|24. character|24 character|25. type|25 type|26. reenlistment|26 reenlistment|4. date|4 date|5a. rank|5a rank|5b. pay|5b pay|7. date|7 date|8a. station|8a station|8b. effective|8b effective
-[VARS_END]
-[PATTERNS_BEGIN]
-rule1=?HC_1983^@hc_clues
-[PATTERNS_END]
