@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-//Set001
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\LoganSystems\VA - Stafford\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-

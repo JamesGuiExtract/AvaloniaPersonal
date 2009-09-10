@@ -1,7 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-
-//Set001
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - Non-Judgments - Logan\Rules\Master.rsd;K:\Common\Engineering\Sample Files\LoganSystems\VA - Charlottesville\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
-
