@@ -1,2 +1,0 @@
-Decedent.?s\s*social\s*security\s*number
-^(Dece.{1,6}|.{1,6}dent.?s)[\s\S]{0,10}(so[\s\S]{1,6}|(cia|ial)[\s\S]{0,4})(sec[\s\S]{1,9}|[\s\S]{1,3}cur[\s\S]{1,5}|[\s\S]{1,5}rity[\s\S]{0,3})(num[\s\S]{0,3}|[\s\S]{0,4}ber|nu[\s\S]{0,4}er)
