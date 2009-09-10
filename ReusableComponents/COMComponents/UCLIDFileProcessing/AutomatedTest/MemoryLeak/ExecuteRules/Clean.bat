@@ -1,2 +1,3 @@
 echo off
-del /q .\Source\*.*
+del /S /F /q .\Source\*.*
+del /S /F /q .\Stats\*.*
