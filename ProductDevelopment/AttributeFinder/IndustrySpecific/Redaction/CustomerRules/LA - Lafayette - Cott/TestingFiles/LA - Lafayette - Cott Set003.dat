@@ -1,7 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData
-
-//<SETTING>;CreateTestOutputVOAFiles=1
-<SETTING>;OutputAttributeNamesFileLists=1
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - Lafayette\Set003\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

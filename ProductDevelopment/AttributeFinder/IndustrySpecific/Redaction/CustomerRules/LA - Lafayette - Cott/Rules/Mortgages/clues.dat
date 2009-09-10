@@ -1,1 +1,0 @@
-(?:[sS5][sS5][aA]?[nN](\b|[;:#]))|(?:^[S58]{2}.)|(?:[Ss5]\.?[sS5]\.?#)|(?:[sS]ecu|SECU|curi|CURI|rity|RITY)[\s\S]{0,8}(?:#|\b[Nn][oO0]\b|[Nn]umber|NUMBER)(?:[\s\S]{0,3}[iI][sS])?|\(\s*[s5]{2}|[A-Z]{2}\.?\x20*,\x20*\(
