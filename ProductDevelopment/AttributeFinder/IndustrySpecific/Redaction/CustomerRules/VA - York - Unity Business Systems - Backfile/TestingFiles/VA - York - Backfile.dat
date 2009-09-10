@@ -1,4 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Unity Business Systems\VA - York\Set001\Backfile;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
