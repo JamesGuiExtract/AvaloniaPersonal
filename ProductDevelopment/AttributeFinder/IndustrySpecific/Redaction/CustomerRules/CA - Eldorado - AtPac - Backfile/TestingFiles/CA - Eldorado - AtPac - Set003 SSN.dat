@@ -1,5 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-//<SETTING>;TypeToBeTested=SSN
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\AtPac\CA - Eldorado\Set003\images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
