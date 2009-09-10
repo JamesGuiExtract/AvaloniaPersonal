@@ -1,8 +1,0 @@
-(?x)(?:
-		[\[({]
-			\x20*(?:Type|name)\x20*of\x20*Recording\x20*Jurisdiction\x20*
-		[\])}]
-		.*
-		(?<newline>\r\n)
-	
-)	
