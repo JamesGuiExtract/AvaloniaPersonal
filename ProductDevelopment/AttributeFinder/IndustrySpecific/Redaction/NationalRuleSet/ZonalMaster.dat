@@ -1,5 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-//Images
-<TESTFOLDER>;F:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\General\Master.rsd;I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\Redaction\Images;;I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\Redaction\Images\ExpectedVOA\$FileOf(<SourceDocName>).voa

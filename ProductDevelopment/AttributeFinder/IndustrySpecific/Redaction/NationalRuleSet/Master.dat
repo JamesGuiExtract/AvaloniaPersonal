@@ -1,4 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-//Images
-<TESTFOLDER>;..\CustomerRules\General\Master.rsd;I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\Redaction\Images;;I:\Common\Engineering\ProductDevelopment\AttributeFinder\NationalRuleSet\Redaction\EAV\$FileNoExtOf(<SourceDocName>).eav
