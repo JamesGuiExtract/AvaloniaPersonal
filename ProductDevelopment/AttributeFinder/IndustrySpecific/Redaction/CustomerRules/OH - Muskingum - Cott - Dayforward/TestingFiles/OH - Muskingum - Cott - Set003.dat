@@ -1,8 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues|Discharge from Active Duty
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<SETTING>;OutputAttributeNamesFileLists=1
-
-//<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\OH - Muskingum\Set003\Stapled;$DirOf(<SourceDocName>)\VOA\$FileOf(<SourceDocName>).voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\OH - Muskingum\Set003\Stapled;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
