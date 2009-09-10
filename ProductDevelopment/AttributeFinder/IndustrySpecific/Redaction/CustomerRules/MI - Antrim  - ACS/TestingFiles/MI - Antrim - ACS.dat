@@ -1,7 +1,0 @@
-//Adjust as needed
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-//Top 80 Percent: 
-<TESTFOLDER>;..\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\MI - Antrim\Set001\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-
-//Below top 80 percent: 
