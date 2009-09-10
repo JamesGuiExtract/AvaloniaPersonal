@@ -1,3 +1,0 @@
-(?:m.n.r|.?inor|m.?nor|mi.?or|min.?r|mino.?|\b(?:.inor|m.nor|mi.or|min.r|mino.)\b)\s*
-(?:ch.ld|.?hild|c.?ild|ch.?ld|chi.?d|chil.?|\b(?:.hild|c.ild|ch.ld|chi.d|chil.)\b)
-\w*
