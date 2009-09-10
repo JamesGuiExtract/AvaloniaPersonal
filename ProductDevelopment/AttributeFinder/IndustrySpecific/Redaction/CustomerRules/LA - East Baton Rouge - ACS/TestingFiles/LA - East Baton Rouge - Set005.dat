@@ -1,4 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\LA - East Baton Rouge - ACS\Rules\Master.rsd;K:\Common\Engineering\Sample Files\ACS\LA - East Baton Rouge\Set005\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa

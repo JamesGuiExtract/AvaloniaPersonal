@@ -1,1 +1,0 @@
-(?:.ocial|S.cial|So.ial|Soc.al|Soci.l|Socia.).{0,10}(?:.ecurity|S.curity|Se.urity|Sec.rity|Secu.ity|Secur.ty|Securi.y|Securit.).{0,10}(?:.ax|T.x|Ta.).{0,10}(?:Identif.{6,8}|.{1,4}ntificat.{1,4}|.{6,8}ication).{0,10}(?:.umber|N.mber|Nu.ber|Num.er|Numb.r|Numbe.)
