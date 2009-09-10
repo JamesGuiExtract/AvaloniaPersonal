@@ -1,6 +1,0 @@
-Date\s*of\s*Assessment
-Date[\s\S]{2,6}Assessment
-D.t.[\s\S]{2,6}.ss.ssm.nt
-Date[\s\S]{2,6}(?:asses.{4,6}|\b.{1,3}sessme.{1,3}|\b.{4,6}sment)
-D.t.[\s\S]{2,6}(?:asses.{4,6}|\b.{1,3}sessme.{1,3}|\b.{4,6}sment)
-D.t.[\s\S]{2,6}(?:.ss.s.{4,6}|\b.{1,3}s.ssm..{1,3}|\b.{4,6}sm.nt)

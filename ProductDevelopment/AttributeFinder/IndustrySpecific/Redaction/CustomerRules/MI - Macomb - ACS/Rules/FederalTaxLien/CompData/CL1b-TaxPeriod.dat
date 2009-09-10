@@ -1,6 +1,0 @@
-Tax\s*Period
-T.x\s*P.r..d
-Tax\s*(?:per.{2,4}|.{1,2}erio.{1,2}|.{2,4}iod)
-(?:Ta.?|.?ax)\s*Period
-(?:Ta.?|.?ax)\s*P.r..d
-(?:Ta.?|.?ax)\s*(?:per.{2,4}|.{1,2}erio.{1,2}|.{2,4}iod)
