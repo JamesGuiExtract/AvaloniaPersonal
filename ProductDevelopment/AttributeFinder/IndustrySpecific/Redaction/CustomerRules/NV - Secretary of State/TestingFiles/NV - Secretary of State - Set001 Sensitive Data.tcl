@@ -1,1 +1,0 @@
-EXTRACTRedactionTester.IDShieldTester.1;;NV - Secretary of State - Set001 Sensitive Data.dat
