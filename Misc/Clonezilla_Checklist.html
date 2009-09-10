@@ -1,91 +1,91 @@
 <HTML>
 	<HEAD>
 		<TITLE>Backing up a test machine using Clonezilla</TITLE>
-		<link type="text/css" rel="stylesheet" href="../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+		<link type="text/css" rel="stylesheet" href="Interactive_Checklist.css">
 	</HEAD>
 	<BODY>
 		<h1>Backing up a test machine using Clonezilla.</h1>
 		<hr>
 		<ul>
 			<p>
-			<li><h3>Install an Operating System:</h3></li>
+			<li><h3><input type="checkbox">Install an Operating System:</input></h3></li>
 			<ul>
-				<li>If you need a different operating system than the currently installed OS, a backup image is not available, or no OS is present. Otherwise skip to the 
+				<li><input type="checkbox">If you need a different operating system than the currently installed OS, a backup image is not available, or no OS is present. Otherwise skip to the 
 					next section.
-				</li>
+				</input></li>
 				<ul>
-					<li>Ensure that a backup of the current OS is present and create an updated image if possible.</li>
-					<li>Boot the machine from the OS installation media.</li>
-					<li>Follow the on screen instructions to reformat the OS partition (typically C:, the size should be ~20 or 40 GB) and install the 
+					<li><input type="checkbox">Ensure that a backup of the current OS is present and create an updated image if possible.</input></li>
+					<li><input type="checkbox">Boot the machine from the OS installation media.</input></li>
+					<li><input type="checkbox">Follow the on screen instructions to reformat the OS partition (typically C:, the size should be ~20 or 40 GB) and install the 
 						desired OS.
-					</li>
+					</input></li>
 				</ul>
 			</ul>
 			<p>
-			<li><h3>Update the Operating System:</h3></li>
+			<li><h3><input type="checkbox">Update the Operating System:</input></h3></li>
 			<ul>
-				<li>Install the latest service pack for your OS. Service packs can be found on the network at <a href="\\jake\applications\Service Packs">
-					\\jake\applications\Service Packs</a></li>
-				<li>Install the latest OS updates ie. <a href="http://update.microsoft.com">Windows Update</a>. Note: the previous link only works in 
-					Internet Explorer</li>
-				<li>Rerun Windows Update until no updates are available. Check in on the machine occasionally during updates, as some have EULA's or other
-					boxes to click through that will hold up the entire process. Internet Explorer installation boxes like to hide behind your other windows.</li>
+				<li><input type="checkbox">Install the latest service pack for your OS. Service packs can be found on the network at <a href="\\jake\applications\Service Packs">
+					\\jake\applications\Service Packs</a></input></li>
+				<li><input type="checkbox">Install the latest OS updates ie. <a href="http://update.microsoft.com">Windows Update</a>. Note: the previous link only works in 
+					Internet Explorer</input></li>
+				<li><input type="checkbox">Rerun Windows Update until no updates are available. Check in on the machine occasionally during updates, as some have EULA's or other
+					boxes to click through that will hold up the entire process. Internet Explorer installation boxes like to hide behind your other windows.</input></li>
 			</ul>
 			<p>
-			<li><h3>Windows Settings:</h3></li>
+			<li><h3><input type="checkbox">Windows Settings:</input></h3></li>
 			<ul>
-				<li>Set the password for the Administrator account to the default password for test machines if it is not already configured.</li>
-				<li>While logged in as "Administrator:"</li>
+				<li><input type="checkbox">Set the password for the Administrator account to the default password for test machines if it is not already configured.</input></li>
+				<li><input type="checkbox">While logged in as "Administrator:"</input></li>
 				<ul>
-					<li>Press ctrl+alt+del and select <b>Change password...</b></li>
-					<li>Follow the on screen instructions.</li>
+					<li><input type="checkbox">Press ctrl+alt+del and select <b>Change password...</b></input></li>
+					<li><input type="checkbox">Follow the on screen instructions.</input></li>
 				</ul>
-				<li>Right click <b>My Computer</b> and select <b>Properties</b>. Alternatively, go to <b>Control Panel -> System</b></li>
+				<li><input type="checkbox">Right click <b>My Computer</b> and select <b>Properties</b>. Alternatively, go to <b>Control Panel -> System</b></input></li>
 				<ul>
-					<li>Under <b>Computer Name</b> click <b>Change</b>.</li>
-					<li>Set the radio button under <b>Member of</b> to "Domain" and enter "extract.local" in the edit box.</li>
-					<li>Switch to the <b>System Restore</b>/<b>System Protection</b> tab and disable restore points for all drives.</li>
-					<li>Switch to the <b>Automatic Updates</b> tab (XP) or click <b>Windows Update</b> under <b>See Also</b> in <b>System</b>, then click <b>Change
-						Settings</b> (Vista). Turn updates off or set them to manual installation.</li>
-					<li>Under <b>Remote</b>, turn on remote desktop (choose "Allow users running any version of Remote Desktop" in Vista, or XP machines might not 
-						be able to connect).</li>
+					<li><input type="checkbox">Under <b>Computer Name</b> click <b>Change</b>.</input></li>
+					<li><input type="checkbox">Set the radio button under <b>Member of</b> to "Domain" and enter "extract.local" in the edit box.</input></li>
+					<li><input type="checkbox">Switch to the <b>System Restore</b>/<b>System Protection</b> tab and disable restore points for all drives.</input></li>
+					<li><input type="checkbox">Switch to the <b>Automatic Updates</b> tab (XP) or click <b>Windows Update</b> under <b>See Also</b> in <b>System</b>, then click <b>Change
+						Settings</b> (Vista). Turn updates off or set them to manual installation.</input></li>
+					<li><input type="checkbox">Under <b>Remote</b>, turn on remote desktop (choose "Allow users running any version of Remote Desktop" in Vista, or XP machines might not 
+						be able to connect).</input></li>
 				</ul>
-				<li><b>Start Menu</b> -&gt <b>Control Panel</b> -&gt <b>Windows Firewall</b></li>
+				<li><input type="checkbox"><b>Start Menu</b> -&gt <b>Control Panel</b> -&gt <b>Windows Firewall</b></input></li>
 				<ul>
-					<li>Turn off/disable Windows Firewall.</li>
+					<li><input type="checkbox">Turn off/disable Windows Firewall.</input></li>
 				</ul>
-				<li>Right click on the desktop and select <b>Properties...</b> or <b>Personalize</b>.</li>
+				<li><input type="checkbox">Right click on the desktop and select <b>Properties...</b> or <b>Personalize</b>.</input></li>
 				<ul>
-					<li>Under <b>Screen Saver</b> -&gt <b>Power...</b>
-					<li>Disable sleep/hibernation. Disable powering off the hard drives. Set any perfomance profile option to "High performance." Power saving modes
-						can prevent users from making remote desktop connections. Your OS my have one or more of those options.</li>
+					<li><input type="checkbox">Under <b>Screen Saver</b> -&gt <b>Power...</b>
+					<li><input type="checkbox">Disable sleep/hibernation. Disable powering off the hard drives. Set any perfomance profile option to "High performance." Power saving modes
+						can prevent users from making remote desktop connections. Your OS my have one or more of those options.</input></li>
 				</ul>
-				<li>Right click <b>My Computer</b> and select <b>Manage</b>.</li>
+				<li><input type="checkbox">Right click <b>My Computer</b> and select <b>Manage</b>.</input></li>
 				<ul>
-					<li>Expand <b>System Tools</b> -&gt <b>Local Users and Groups</b> and select <b>Groups</b>.</li>
-					<li>Right click the <b>Administrators</b> group. Select <b>Add to Group...</b>. Click <b>Add...</b></li>
-					<li>Enter "Domain Users" into the edit box. You may be prompted for your domain username and password.</li>
+					<li><input type="checkbox">Expand <b>System Tools</b> -&gt <b>Local Users and Groups</b> and select <b>Groups</b>.</input></li>
+					<li><input type="checkbox">Right click the <b>Administrators</b> group. Select <b>Add to Group...</b>. Click <b>Add...</b></input></li>
+					<li><input type="checkbox">Enter "Domain Users" into the edit box. You may be prompted for your domain username and password.</input></li>
 				</ul>
-				<li>Open Windows Explorer/My Computer</li>
+				<li><input type="checkbox">Open Windows Explorer/My Computer</input></li>
 				<ul>
-					<li>For each local hard drive listed (typically 'C:' and 'D:'):</li>
-					<li>Right click the drive and click <b>Properties</b>. Uncheck the drive indexing box.</li>
+					<li><input type="checkbox">For each local hard drive listed (typically 'C:' and 'D:'):</input></li>
+					<li><input type="checkbox">Right click the drive and click <b>Properties</b>. Uncheck the drive indexing box.</input></li>
 				</ul>
-				<li>On Vista:</li>
+				<li><input type="checkbox">On Vista:</input></li>
 				<ul>
-					<li>Right click the sidebar icon in the notification area of the taskbar. Click <b>exit</b>. Be sure to uncheck the "start sidebar with 
-						Windows" checkbox.</li>
+					<li><input type="checkbox">Right click the sidebar icon in the notification area of the taskbar. Click <b>exit</b>. Be sure to uncheck the "start sidebar with 
+						Windows" checkbox.</input></li>
 				</ul>
 			</ul>
 			<p>
-			<li><h3>Create backup disk image:</h3></li>
+			<li><h3><input type="checkbox">Create backup disk image:</input></h3></li>
 			<ul>
-				<li>Create a "Clonezilla" folder on the machines data partition (typically 'D:'). This must be a different partition than the one containing the
-					OS.</li>
-				<li>Insert a Clonezilla disc into the machine and boot to it. Follow the onscreen instructions to create a backup of the partition containing the 
+				<li><input type="checkbox">Create a "Clonezilla" folder on the machines data partition (typically 'D:'). This must be a different partition than the one containing the
+					OS.</input></li>
+				<li><input type="checkbox">Insert a Clonezilla disc into the machine and boot to it. Follow the onscreen instructions to create a backup of the partition containing the 
 					operating system, selecting "saveparts" to create an image of a partition and paying particular attention to the source and destination partitions.
-					Name your backup using the following format: <i>OSbits_Date</i> eg: <i>Server2008x64_08-27-2009</i></li>
-				<li>See <a href="http://clonezilla.org/">http://clonezilla.org/</a> for Clonezilla info/downloads.</li>
+					Name your backup using the following format: <i>OSbits_Date</i> eg: <i>Server2008x64_08-27-2009</i></input></li>
+				<li><input type="checkbox">See <a href="http://clonezilla.org/">http://clonezilla.org/</a> for Clonezilla info/downloads.</input></li>
 			</ul>
 		</ul>
 		
