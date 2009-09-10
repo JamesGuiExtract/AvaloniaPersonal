@@ -1,1 +1,0 @@
-((So|SO|so|cia|CIA|ial|IAL)[\s\S]{0,10}(Sec|SEC|sec|cur|CUR|rity|RITY)[\s\S]{0,7}(Nu|nu|NU|umb|UMB|ber|BER))|((?:\b[S5]\s?[,.]?\s?[S5]|[S5]\s?[,.]?\s?[S5]\b)[\s\S]{0,2}(\b[Oo0]r\b|\b[Nn][o0O]\b))
