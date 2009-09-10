@@ -1,5 +1,0 @@
-//rearange names printed 'Last First' to 'Last, First' so the builtin splitter handles them correctly
-^([a-z]+)\x20([a-z]+)$%$1, $2
-^([a-z]+)\x20([a-z])\x20([a-z])$%$1, $2 $3
-//'Last First MD' to 'Last MD, First'
-^([a-z]+)\x20([a-z]+)\x20(M\.?D\.?)$%$1, $2 $3
