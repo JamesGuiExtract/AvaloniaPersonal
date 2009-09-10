@@ -1,2 +1,0 @@
-2\W*(?:.?ecured|S.?cured|Se.?ured|Sec.?red|Secu.?ed|Secur.?d|Secure.?)
-(?:S.c.r.d|.?ecured|S.?cured|Se.?ured|Sec.?red|Secu.?ed|Secur.?d|Secure.?|\b(?:Sec.{4,5}|.{1,2}ecure.{1,2}|.{3,4}ured)\b)[\s\S]{0,4}(?:P.rty|.?arty|P.?rty|Pa.?ty|Par.?y|Part.?|\b(?:.arty|P.rty|Pa.ty|Par.y|Part.)\b)

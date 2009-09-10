@@ -1,3 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData 
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Utah - Department of Commerce\Set001\Random2000Subset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
