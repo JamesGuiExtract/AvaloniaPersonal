@@ -1,4 +1,0 @@
-//Adjust as needed
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Secova\Set001\Images;<SourceDocName>.msm.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa

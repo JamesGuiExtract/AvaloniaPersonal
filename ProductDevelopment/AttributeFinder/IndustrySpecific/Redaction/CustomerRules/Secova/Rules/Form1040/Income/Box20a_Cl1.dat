@@ -1,3 +1,0 @@
-20a.{0,3}Social.{0,3}security.{0,3}benefits
-|
-Social.{0,3}security.{0,3}benefits(?=(?:.+(?:taxab|axable).*(?:incom|ncome))|[\s\S]{0,80}Other.{0,3}Income)
