@@ -1,1 +1,0 @@
-\b(?:num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber|.?umber|n.?mber|nu.?ber|num.?er|numb.?r|numbe.?)\b(?:\W*is)?(?!.{0,4}\r?$)

@@ -1,7 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<SETTING>;TypeToBeTested=SSN
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\FNTI\SetDemo\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\FNTI\RedactionDemo\Random2000Subset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).voa
