@@ -1,3 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Advance Health\Set002\Subset;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).li.voa;K:\Common\Engineering\Sample Files\Advance Health\Set002\EAV\LabInfo\$FileNoExtOf(<SourceDocName>).eav

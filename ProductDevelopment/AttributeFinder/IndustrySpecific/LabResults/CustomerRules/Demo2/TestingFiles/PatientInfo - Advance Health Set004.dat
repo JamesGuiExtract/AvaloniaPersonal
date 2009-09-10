@@ -1,3 +1,0 @@
-<SETTING>;EAV_MUST_EXIST=TRUE
-
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Advance Health\Set004\Images;$DirOf(<SourceDocName>)\$FileNoExtOf(<SourceDocName>).pi.voa;K:\Common\Engineering\Sample Files\Advance Health\Set004\EAV\PatientInfo\$FileNoExtOf(<SourceDocName>).eav
