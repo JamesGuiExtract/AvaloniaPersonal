@@ -1,1 +1,0 @@
-SSN\d|(?:\bS.N\d?\b|\b.SN\d?\b|\bSS.{1,2}\b)
