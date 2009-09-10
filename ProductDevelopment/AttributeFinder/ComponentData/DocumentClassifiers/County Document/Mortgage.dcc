@@ -41,6 +41,15 @@
 			// NRS Example: 004.tif
 			//-----------------------------------
 			03=MORTGAGE[\s\S]{0,5}(?:WI|TH).{0,8}(?:FUTU|TURE).{0,8}(?:ADVA|VANCE).{0,9}(?:CLAU|AUSE)
+			
+			//-----------------------------------
+			// THIS IS A FUTURE ADVANCE MORTGAGE
+			// on the top 25% of the first or
+			// second page
+			//
+			// NRS Example: K:\Common\Engineering\Sample Files\ACS\MI - Washtenaw\Set008\Images\MORTGAGE\B06174AA.AD9.TIF
+			//-----------------------------------
+			04=^.{0,5}(?:\bTHI|HIS\b).{0,13}(?:FUTU|UTURE).{0,7}(?:ADVA|VANCE).{0,6}MORTGAGE
 
 		OR_END
 		
@@ -88,11 +97,10 @@
 			
 			//-----------------------------------
 			// "SPACE ABOVE THIS LINE" followed
-			// by "Mortgage" near the
-			// beginning of a line (Common in 
+			// by "Mortgage" (Common in 
 			// Fannie / Freddie mortgages)
 			//-----------------------------------
-			02=^.{0,3}(?:SPA|ACE)[\s\S]{0,8}(?:ABO|OVE)[\s\S]{0,8}(?:TH|IS)[\s\S]{0,8}(?:LI|NE)[\s\S]{0,50}(?:^MORTGAGE|MORTGAGE\r?$)
+			02=^.{0,3}(?:SPA|ACE)[\s\S]{0,8}(?:ABO|OVE)[\s\S]{0,8}(?:TH|IS)[\s\S]{0,8}(?:LI|NE)[\s\S]{0,50}(?:\bMORTGAGE\b)
 
 		OR_END
 		
@@ -104,7 +112,25 @@
 
 [MAYBE_BEGIN]
 
+	SCOPE_BEGIN,0,1,1,2
+	
+		AND_BEGIN,Maybe_01,false
+		
+			//-----------------------------------
+			// Phrases that are common in 
+			// Fannie / Freddie mortgages in
+			// addition to the word "MORTGAGE"
+			// near the begining of a line
+			//-----------------------------------
+			^.{0,3}A.{0,5}SECU|
+			^.{0,3}B.{0,5}BORRO|
+			^.{0,3}[CE].{0,5}\bMERS\b|
+			^.{0,3}[CD].{0,5}LEND
+			^.{0,3}MORTGAGE
 
+		AND_END
+		
+	SCOPE_END
 
 
 [MAYBE_END]
