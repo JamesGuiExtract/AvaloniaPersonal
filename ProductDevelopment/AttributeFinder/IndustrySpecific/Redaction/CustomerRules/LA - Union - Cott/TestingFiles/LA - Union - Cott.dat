@@ -1,5 +1,0 @@
-//Adjust as needed
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-<SETTING>;TypeToBeTested=SSN
-<TESTFOLDER>;;K:\Common\Engineering\Sample Files\Cott\LA - Union\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).evoa
