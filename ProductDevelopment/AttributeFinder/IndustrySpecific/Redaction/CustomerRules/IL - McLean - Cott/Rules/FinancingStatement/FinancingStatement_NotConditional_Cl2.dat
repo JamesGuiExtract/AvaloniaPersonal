@@ -1,3 +1,0 @@
-(?:.his|T.is|Th.s|Thi.).{0,4}(?:stat.{5,6}|.{1,3}ateme.{1,3}|.{4,5}ement).{0,4}(?:ref.{2,4}|.{1,2}efer.{1,2}|.{2,4}ers).{0,4}(?:.o|t.).+(?:(?:orig.{3,5}|.{1,3}igin.{1,3}|.{3,5}inal)|(?:Fina.{5,6}|.{1,3}nanci.{1,3}|.{4,5}ncing).{0,4}(?:Stat.{5,6}|.{1,3}ateme.{1,3}|.{4,5}ement).{0,4}(?:bea.{4,5}|.{1,2}earin.{1,2}|.{3,4}ring))
-This.{0,3}state.+nancing.{0,3}state.+bearing
-This.{0,3}st.+financing.{0,3}state.+bearing
