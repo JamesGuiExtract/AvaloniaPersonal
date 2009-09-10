@@ -1,1 +1,0 @@
-(So|cia|ial)[\s\S]{0,10}(S.{0,3}ur.{0,3}ty)[\s\S]{0,7}(Nu|umb|ber)|(Socia)[\s\S]{0,5}(s.{2,5}ty)[\s\S]{0,5}(Number)
