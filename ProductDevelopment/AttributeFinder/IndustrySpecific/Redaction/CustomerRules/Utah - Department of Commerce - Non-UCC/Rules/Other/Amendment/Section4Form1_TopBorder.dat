@@ -1,5 +1,0 @@
-Please.*list.*(?:officers|directors).*(?:general|partners|members)
-|
-(?:Partnersh|nership).*(?:Corpor|orati).*(?:offic|fficers).*(?:direc|ctors).*(?:general|partners)(?=[\s\S]{0,150}section[\s\S]{0,6}5)
-|
-partners.*members.*(?:fiduc|uciaries).*Use.*additional.*sheet

@@ -1,1 +1,0 @@
-(?:Fede|\w*ederal).{0,9}(?:Identi|tifica|fication).{0,12}(?:Num|mber)(?![\s\S]{0,6}\b(?:\d[^\w\r\n]{0,3}){7,9}\d\b)

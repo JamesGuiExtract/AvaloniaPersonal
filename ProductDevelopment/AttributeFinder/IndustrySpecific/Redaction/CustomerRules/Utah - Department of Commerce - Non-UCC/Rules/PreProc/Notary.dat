@@ -1,2 +1,0 @@
-notary.{0,6}(?:pub|blic).*(?:\r\n){1,2}.+\d+.*;
-(?:My|Commis|mission.*expires).*\d{2},\x20?(?:19[7-9]\d|200\d);

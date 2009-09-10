@@ -1,1 +1,0 @@
-Fed.+(?:Identif.{6,8}|.{1,4}ntificat.{1,4}|.{6,8}ication)[\s\S]{0,10}(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)

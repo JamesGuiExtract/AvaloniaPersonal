@@ -1,7 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData 
-
-//<SETTING>;OutputAttributeNamesFileLists=1
-//<SETTING>;CreateTestOutputVOAFiles=1
-
-<TESTFOLDER>;..\Rules\Master.rsd;k:\Common\Engineering\Sample Files\Utah - Department of Commerce\Set023\Images;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedRedactions\$FileOf(<SourceDocName>).evoa

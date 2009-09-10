@@ -1,3 +1,0 @@
-Soc.+(?:Secu.{3,5}|.{1,3}curi.{1,3}|.{3,5}rity)(?=[\s\S]{0,4}(?:Num.{2,4}|.{1,2}umbe.{1,2}|.{2,4}ber)[\s\S]{0,10}(?:(?:.or|f.r|fo.)[\s\S]{0,8}(?:indiv.{4,6}|.{1,3}dividu.{1,3}|.{4,6}idual)[\s\S]{0,16}(?:.ole|s.le|so.e|sol.)[\s\S]{0,8}(?:propr.{4,6}|.{1,3}opriet.{1,3}|.{4,6}ietor)|for\s*individual)[\s\S]{0,80}with\s*No\s*employe)
-|
-social(?=\s*security\s*number[\s\S]{0,16}for\s*indiv[\s\S]{0,80}with\s*No\s*employe)
