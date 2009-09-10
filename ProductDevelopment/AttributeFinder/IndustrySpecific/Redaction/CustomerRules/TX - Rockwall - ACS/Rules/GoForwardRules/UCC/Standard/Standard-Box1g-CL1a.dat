@@ -1,4 +1,0 @@
-[^1]1g.?\s*(ENTITY.?S\s*)?ORGANIZATIONAL
-[^1]1[^2]{0,5}\s*(ENTITY.?S\s*)?ORGANIZATIONAL
-[^1][1lI|t](?![1lI|tIc0on]|[A-Z]{3,})[^2\n']{1,9}((ENTITY.?S\s*[O0C]RGAN)|[O0C]RGAN\S{3,7}NAL|((RGAN.{0,10}|ZATIONAL).{0,4}(ID|#)))
-[^0-9\r\n]1\D.{0,3}ORGANIZATIONAL\s*(ID|.{0,3}#)

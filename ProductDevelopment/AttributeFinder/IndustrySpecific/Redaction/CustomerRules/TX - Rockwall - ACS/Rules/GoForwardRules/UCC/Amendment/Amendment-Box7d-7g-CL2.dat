@@ -1,4 +1,0 @@
-^8\.?\s*AMENDMENT
-^[^3].?\s*(AMEND[\s\S]{3,7}|[\s\S]{1,5}NDMENT[\s\S]{0,2})C[O0]LL
-8[\s\S]{0,4}AMENDMENT
-^[\s\S]{0,5}AMENDMENT\s*.?C[O0]LL
