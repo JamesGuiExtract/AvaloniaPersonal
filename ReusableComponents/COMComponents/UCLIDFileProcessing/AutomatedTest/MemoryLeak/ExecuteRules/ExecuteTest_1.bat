@@ -8,4 +8,4 @@ REM Execute command-line for desired test
 START ProcessFiles.exe 1_No_USS_Files.fps /s
 
 REM Start Logging Statistics every minute to a numbered subfolder
-LogProcessStats ProcessFiles 1m .\Stats\Test_1 /el
+LogProcessStats.exe ProcessFiles 1m .\Stats\Test_1 /el
