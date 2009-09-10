@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - Albemarle - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\VA - Albemarle\Set001\RandomSubset\DEE;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - Albemarle - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\VA - Albemarle\Set001\RandomSubset\JUD;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\VA - Albemarle - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\VA - Albemarle\Set001\RandomSubset\WIL;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
