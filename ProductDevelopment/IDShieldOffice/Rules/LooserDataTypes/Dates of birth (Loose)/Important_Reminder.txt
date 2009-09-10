@@ -1,2 +1,0 @@
-Remember when creating a delivery to include Clues.dat.ese from 
-the non-loose folder.
