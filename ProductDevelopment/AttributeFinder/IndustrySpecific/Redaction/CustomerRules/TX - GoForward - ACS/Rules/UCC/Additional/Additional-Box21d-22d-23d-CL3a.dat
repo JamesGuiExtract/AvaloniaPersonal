@@ -1,6 +1,0 @@
-A[DO0]{1,2}.?N?L\s*I[NM]F[O0]
-[O0]RGAN[I1]ZAT[I1][00]N\s*[DO0][EF][B8]T[O0]
-[\s\S]{4}L\s+INFO\s+RE\b
-\bA[DO0]{1,2}'N?L\s*I
-//This clue works poorly for : K:\Common\Engineering\Sample Files\eBiz\NY - SOS\Set001\Images\200501060024246.tif (OPTIONAL|[\s\S]{6}FO\s*RE\s*)(\s*([1267]|11|2[123])e|[\s\S]{1,6}TYPE\s*OF)
-\bA.{2,3}L\b\s*INFO

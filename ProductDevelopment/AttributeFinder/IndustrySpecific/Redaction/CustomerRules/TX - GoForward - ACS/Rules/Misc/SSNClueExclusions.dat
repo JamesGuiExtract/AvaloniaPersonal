@@ -1,1 +1,0 @@
-(?:\bSOC|OCIA|CIAL)[\s\S]{0,8}(SECU|ECUR|CURI|RITY)[\S\s]{0,13}(?:act|admi(?:n|ts)|b(?:enefi|usines)|c(?:ard|hecks)|d(?:eath|isab|oes)|f(?:orm|unction)|e(?:nviron|arning)|\.gov|histor|i(?:ncome|ssue)|affirm[\s\S]{1,7}|af[\s\S]{0,6}ation|office|program|re(?:cord|tire)|right|se(?:c(?:ond|retary|tion|ured)|parate|rv(?:e|ice))|so(?:nable|u(?:rce|th))|tax|payment|contrib)
