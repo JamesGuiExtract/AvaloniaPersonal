@@ -1,4 +1,0 @@
-//output from make_approx.rb
-//string    = "pages"
-//tolerance = "1"
-(?x)\b(?<error>){1}(?(match)(((?<-error>)(?<-match>)((?<-match>)[^p]|[^p](?=p)))*?(?<match>p)|(?<-error>)[^p]?)|((?<match>p)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^a]|[^a](?=a)))*?(?<match>a)|(?<-error>)[^a]?)|((?<match>a)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^g]|[^g](?=g)))*?(?<match>g)|(?<-error>)[^g]?)|((?<match>g)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^e]|[^e](?=e)))*?(?<match>e)|(?<-error>)[^e]?)|((?<match>e)|(?<-error>)))(?(match)(((?<-error>)(?<-match>)((?<-match>)[^s]|[^s](?=s)))*?(?<match>s)|(?<-error>)[^s]?)|((?<match>s)|(?<-error>)))\b
