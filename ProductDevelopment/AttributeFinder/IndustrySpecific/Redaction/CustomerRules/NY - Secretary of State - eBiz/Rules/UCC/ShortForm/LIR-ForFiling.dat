@@ -1,4 +1,0 @@
-^4.{0,3}F.r\s*F.l.ng
-^4.*(f.l.ng\s*.ff.c.r|Time.{0,3}No.{0,3}F.l.ng|No.{0,3}F.l.ng\s*b\.ff.c.\b)
-^3.{0,4}The\s*D.bt.r
-^3.*(tr.nsm.tt.ng|tt.ng\s*.t.l.ty)

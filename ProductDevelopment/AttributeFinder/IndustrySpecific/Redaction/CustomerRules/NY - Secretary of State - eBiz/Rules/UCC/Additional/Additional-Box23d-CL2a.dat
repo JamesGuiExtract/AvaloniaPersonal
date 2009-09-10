@@ -1,4 +1,0 @@
-^24[\s\S]{0,5}(?!.DDR.SS)ADD(?!r)[\s\S]{3,9}(?:SEC[\s\S]{3,7}PART|\S{2,4}RED\s*\S{0,3}RTY|S.C.R.D\s*P.RTY|(?:SEC|.{0,3}ECUR|.{0,5}URED)[\s\S]{0,10}(?:PAR|ART|RTY))
-24[\s\S]{0,6}.DD.T..N.L
-24.?\x20*(?:(?!.DDR.SS)ADD(?!r)[\s\S]{3,9}|[\s\S]{0,2}DDITI[\s\S]{1,7}|[\s\S]{1,4}ITION[\s\S]{0,4})(?:SEC[\s\S]{3,7}PART|\S{2,4}RED\s*\S{0,3}RTY|S.C.R.D\s*P.RTY|(?:SEC|.{0,3}ECUR|.{0,5}URED)[\s\S]{0,10}(?:PAR|ART|RTY))
-^.{50,80}(?:name\s*.?(?:24a\s*.r\s*24|24.\s*.r\s*24b)|[o0]ne\s*d.bt.r.*24[ab])

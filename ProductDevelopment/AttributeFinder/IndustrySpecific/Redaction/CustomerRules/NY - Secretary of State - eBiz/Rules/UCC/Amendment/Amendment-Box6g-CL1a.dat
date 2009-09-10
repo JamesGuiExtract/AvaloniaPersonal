@@ -1,4 +1,0 @@
-6g.?\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
-6[\s\S]{0,5}\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
-6\D.{0,3}.RG.N.Z.T..N.L\s*(?:ID|.{0,3}#)
-^6(?:g|\x20*g[.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS))

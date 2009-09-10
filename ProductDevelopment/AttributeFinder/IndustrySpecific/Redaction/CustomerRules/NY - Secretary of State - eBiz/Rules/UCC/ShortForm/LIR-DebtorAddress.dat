@@ -1,2 +1,0 @@
-D.bt.r.{15,35}.ddr.ss
-^[^\d\r\n]{0,3}1.*(?:Last.{8,15}|Name.{2,9}|First).{0,6}.ddr.ss

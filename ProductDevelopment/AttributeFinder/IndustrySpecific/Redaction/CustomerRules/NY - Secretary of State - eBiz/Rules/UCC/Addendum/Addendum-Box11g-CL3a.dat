@@ -1,1 +1,0 @@
-^(?:.{0,5}\b(?:none|NONE)|S.FF.X|C..NTRY(?![\s\S]{0,60}(?:P.ST|OSTA|STAL|C.DE)))(?=\r?$)

@@ -1,5 +1,0 @@
-2g.?\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
-2.{0,5}\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L
-2.{0,5}(?:(?:.NT.TY.?S\s*.RGAN)|.RGAN\S{3,7}NAL|(?:(?:RGAN.{0,10}|Z.T..N.L).{0,4}(?:\bID\b|#|if\x20*any(?=\r?$))))
-\D2\D.{0,3}.RG.N.Z.T..N.L\s*(?:ID|.{0,3}#)
-^2(?:g|\x20*g[.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS))

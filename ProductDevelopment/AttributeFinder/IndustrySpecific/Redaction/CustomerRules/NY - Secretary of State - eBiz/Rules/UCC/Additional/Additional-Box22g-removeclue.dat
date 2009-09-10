@@ -1,1 +1,0 @@
-[\s\S]{0,60}(?:22g.?\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L|22[\s\S]{0,5}\s*(?:.NT.TY.?S\s*)?.RG.N.Z.T..N.L|22(?!I?ON).{1,9}(?:(?:.NT.TY.?S\s*.RGAN)|.RGAN\S{3,7}NAL|(?:(?:RGAN.{0,10}|ZAT..N.L).{0,4}(?:ID|#)))|22[\s\S]{1,9}.RG.N.Z.T..N.L|^22(?:g|\x20*g[.,])(?!.*(?:NAME|MAIL|AILIN|ILING|ADDRE|DRESS|.DDR.SS)))[\s\S]{0,60}
