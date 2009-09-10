@@ -1,6 +1,0 @@
-<SETTING>;QueryForVerification=HCData|MCData|LCData|Clues
-<SETTING>;QueryForAutomatedRedaction=HCData|MCData|LCData
-
-
-//Set001
-<TESTFOLDER>;D:\Engineering\ProductDevelopment\AttributeFinder\IndustrySpecific\Redaction\CustomerRules\NY - Rockland - Cott\Rules\Master.rsd;K:\Common\Engineering\Sample Files\Cott\NY - Rockland\Set001\RandomSubset;<SourceDocName>.voa;$DirOf(<SourceDocName>)\ExpectedVOA\$FileOf(<SourceDocName>).voa
