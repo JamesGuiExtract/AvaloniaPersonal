@@ -1,4 +1,0 @@
-(?:cial\x20?Sec(?=.+Tax.+(?:\bI\W*D\b|No))|cial\x20?Sec(?=urity)|Social\x20?Sec|Social\x20?S..(?=.+Tax))
-Sec(?=(?:urity|u.+or\x20Tax))
-\bS.{0,5}l.{0,3}S..(?=.{0,8}Tax\W*[Il1])
-.+(?=.{0,5}or\x20Tax\x20ID)
