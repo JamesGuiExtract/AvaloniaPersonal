@@ -199,6 +199,36 @@ library EXTRACT_FAMCONDITIONSLib
 
 	[
 		object,
+		uuid(064B346C-43FC-4F24-A251-622056DCFFA7),
+		dual,
+		helpstring("ITagFAMCondition Interface"),
+		pointer_default(unique)
+	]
+	interface ITagCondition : IDispatch
+	{
+		// Indicates whether to consider the condition met or not met when the
+		// Tag condition is satisfied
+		[propget, id(1), helpstring("property ConsiderMet")] HRESULT
+			ConsiderMet([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(1), helpstring("property ConsiderMet")] HRESULT
+			ConsiderMet([in] VARIANT_BOOL newVal);
+
+		// Indicates whether a file needs to have "Any" of the file tags selected, or
+		// "All" of the file tags selected
+		[propget, id(2), helpstring("property AnyTags")] HRESULT
+			AnyTags([out, retval] VARIANT_BOOL* pVal);
+		[propput, id(2), helpstring("property AnyTags")] HRESULT
+			AnyTags([in] VARIANT_BOOL newVal);
+
+		// The list of tags a file must contain to satisfy this condition (
+		[propget, id(3), helpstring("property Tags")] HRESULT
+			Tags([out, retval] IVariantVector** ppVecTags);
+		[propput, id(3), helpstring("property Tags")] HRESULT
+			Tags([in] IVariantVector* pVecTags);
+	};
+
+	[
+		object,
 		uuid(570EE4FB-5071-4620-A0D5-4A0A589F5B4C),
 		dual,
 		nonextensible,
@@ -339,6 +369,28 @@ library EXTRACT_FAMCONDITIONSLib
 		interface IUnknown;
 	};
 		
+	[
+		uuid(1A50AB0C-B935-48F3-9D62-AC567113714F),
+		helpstring("TagCondition Class")
+	]
+	coclass TagCondition
+	{
+		[default] interface ITagCondition;
+		interface ILicensedComponent;
+		interface ICategorizedComponent;
+		interface ICopyableObject;
+		interface IMustBeConfiguredObject;
+		interface IFAMCondition;
+	};
+	[
+		uuid(3FB14376-588C-43AD-98FA-1C0AEFC6DEB2),
+		helpstring("TagConditionPP Class")
+	]
+	coclass TagConditionPP
+	{
+		interface IUnknown;
+	};
+
 	[
 		uuid(6DEF16E6-8A3A-4104-BDD3-7F54F18E1363),
 		helpstring("GenericMultiFAMCondition Class")

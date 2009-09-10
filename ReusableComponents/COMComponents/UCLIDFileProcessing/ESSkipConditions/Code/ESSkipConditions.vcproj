@@ -350,6 +350,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\TagCondition.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\TagConditionPP.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\TaskCondition.cpp"
 				>
 			</File>
@@ -432,6 +440,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\TagCondition.h"
+				>
+			</File>
+			<File
+				RelativePath=".\TagConditionPP.h"
+				>
+			</File>
+			<File
 				RelativePath=".\TaskCondition.h"
 				>
 			</File>
@@ -503,6 +519,14 @@
 			</File>
 			<File
 				RelativePath=".\res\SelectDocTagArrow.ico"
+				>
+			</File>
+			<File
+				RelativePath=".\TagCondition.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\TagConditionPP.rgs"
 				>
 			</File>
 			<File

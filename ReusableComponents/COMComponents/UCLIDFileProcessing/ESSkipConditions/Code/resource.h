@@ -58,14 +58,20 @@
 #define IDR_RANDOM_MATH_CONDITION		153
 #define IDR_ONCE_EVERY_MATH_CONDITION	154
 #define IDR_MODULUS_EQUALS_MATH_CONDITION	155
+#define IDR_TAGCONDITION				156
+#define IDR_TAGCONDITIONPP				157
+#define IDD_TAGCONDITIONPP				158
+#define IDC_TAG_COMBO_MET				159
+#define IDC_TAG_COMBO_ANY				160
+#define IDC_TAG_LIST_TAGS				161
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        156
+#define _APS_NEXT_RESOURCE_VALUE        162
 #define _APS_NEXT_COMMAND_VALUE         32768
 #define _APS_NEXT_CONTROL_VALUE         206
-#define _APS_NEXT_SYMED_VALUE           156
+#define _APS_NEXT_SYMED_VALUE           162
 #endif
 #endif

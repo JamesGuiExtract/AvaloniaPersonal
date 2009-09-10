@@ -205,11 +205,32 @@ void CManageTagsTaskPP::loadTagsFromDatabase(const IFileProcessingDBPtr& ipDB)
 {
 	try
 	{
+		// Get the tags from the database
 		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
 		ASSERT_RESOURCE_ALLOCATION("ELI27503", ipVecTags != NULL);
 
+		// Get the tag count
 		long lSize = ipVecTags->Size;
 
+		// Check if need to add space for scroll bar
+		if (lSize > m_listTags.GetCountPerPage())
+		{
+			// Get the scroll bar width, if 0 and error occurred, just log an
+			// application trace and set the width to 17
+			int nVScrollWidth = GetSystemMetrics(SM_CXVSCROLL);
+			if (nVScrollWidth == 0)
+			{
+				UCLIDException ue("ELI27581", "Application Trace: Unable to determine scroll bar width.");
+				ue.log();
+
+				nVScrollWidth = 17;
+			}
+
+			// Update the column width for the scroll bar
+			m_listTags.SetColumnWidth(0, m_listTags.GetColumnWidth(0) - nVScrollWidth);
+		}
+
+		// Add the tags to the list
 		for (long i=0; i < lSize; i++)
 		{
 			m_listTags.InsertItem(i, asString(ipVecTags->Item[i].bstrVal).c_str());
@@ -235,7 +256,7 @@ void CManageTagsTaskPP::prepareControls()
 	// Get the list size and set up the tag name column
 	CRect rectList;
 	m_listTags.GetClientRect(rectList);
-	m_listTags.InsertColumn(0, "Tags", LVCFMT_LEFT, rectList.Width() - 4, 0);
+	m_listTags.InsertColumn(0, "Tags", LVCFMT_LEFT, rectList.Width(), 0);
 }
 //-------------------------------------------------------------------------------------------------
 void CManageTagsTaskPP::selectTags(const UCLID_FILEPROCESSORSLib::IManageTagsTaskPtr& ipManageTags)

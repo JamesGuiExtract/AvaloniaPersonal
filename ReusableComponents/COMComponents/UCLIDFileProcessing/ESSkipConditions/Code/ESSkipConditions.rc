@@ -107,6 +107,8 @@ IDR_MATHCONDITIONPP		REGISTRY				"MathematicalConditionPP.rgs"
 IDR_RANDOM_MATH_CONDITION	REGISTRY			"RandomMathCondition.rgs"
 IDR_ONCE_EVERY_MATH_CONDITION	REGISTRY		"OnceEveryMathCondition.rgs"
 IDR_MODULUS_EQUALS_MATH_CONDITION	REGISTRY	"ModulusEqualsMathCondition.rgs"
+IDR_TAGCONDITION		REGISTRY				"TagCondition.rgs"
+IDR_TAGCONDITIONPP		REGISTRY				"TagConditionPP.rgs"
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -175,6 +177,21 @@ BEGIN
 	LTEXT			"equals", IDC_STATIC, 126, 66, 20, 10
 	EDITTEXT		IDC_MATH_EDIT_MOD_EQUALS, 148, 65, 40, 13, ES_NUMBER
 	LTEXT			"( Use this option only on files already referenced in the database )", IDC_STATIC, 18,79, 210, 10
+END
+
+IDD_TAGCONDITIONPP DIALOGEX 0, 0, 220, 174
+STYLE DS_SETFONT | WS_CHILD
+FONT 8, "MS Shell Dlg", 0, 0, 0x0
+BEGIN
+	GROUPBOX		"Condition", IDC_STATIC,7,5,206,42
+	LTEXT			"Consider this condition as being", IDC_STATIC, 13,15,100,10
+	COMBOBOX		IDC_TAG_COMBO_MET,114,12,40,30, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	LTEXT			"if the document is tagged with", IDC_STATIC, 13,32,95,10
+	COMBOBOX		IDC_TAG_COMBO_ANY,110,29,30,30, CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
+	LTEXT			"of the following tags", IDC_STATIC, 142,32,70,10
+	GROUPBOX		"Tags", IDC_STATIC,7,53,206,114
+	CONTROL			"", IDC_TAG_LIST_TAGS, "SysListView32", LVS_REPORT | LVS_SHOWSELALWAYS
+					| LVS_NOCOLUMNHEADER | WS_BORDER | WS_TABSTOP | LVS_SINGLESEL, 13,64,196,96
 END
 
 /////////////////////////////////////////////////////////////////////////////
