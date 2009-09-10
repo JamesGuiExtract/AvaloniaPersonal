@@ -1,1 +1,0 @@
-(?x)\ba\s[a-wy-z]{2,}|husband|\s[a-wy-z]{3,}\s|\bof\b|the|and|\)(?![\s\S]{0,2}[(XCO0])|\b[a-wy-z]{4,}
