@@ -146,7 +146,7 @@
 	<li>Confirm that the Summary tab contains an associated button for <b>Refresh</b>.
 	<li>Confirm that the Summary tab contains a list box for Actions and counts.
 	<li>Confirm that columns are provided for <b>Action</b>, <b>Unattempted</b>, 
-	<b>Pending</b>, <b>Processing</b>, <b>Complete</b>, <b>Failed</b> and <b>Total</b>.
+	<b>Pending</b>, <b>Processing</b>, <b>Complete</b>, <b>Skipped</b>, <b>Failed</b> and <b>Total</b>.
 <p>
 	<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed after the 
 	database is cleared by clicking Database->Clear menu.
@@ -262,21 +262,25 @@
 	<li><b>Add...</b></li>
 	<ul>
 		<li><b>Default status for action</b> displays <b>Unattempted</b> by default.
-		<li>Adding an one action with the each status adds a column 
+		<li>Adding an action with the status adds a column 
 		ASC_&lt;ActionName&gt; to <b>dbo.FAMFile</b> with the following values:
 		<ul>
-			<li>Unattempted: U</li>
-			<li>Pending: P</li>
-			<li>Processing: R</li>
-			<li>Completed: C</li>
+			<li>Unattempted: U
+			<li>Pending: P
+			<li>Processing: R
+			<li>Skipped: S
+			<li>Completed: C
+			<li>Failed: F
 		</ul>
 		<li>Adding an action using <b>Copy from</b> adds a column 
 		ASC_&lt;ActionName&gt; to <b>dbo.FAMFile</b> with the expected values:
 		<ul>
-			<li>Unattempted: U</li>
-			<li>Pending: P</li>
-			<li>Processing: R</li>
-			<li>Completed: C</li>
+			<li>Unattempted: U
+			<li>Pending: P
+			<li>Processing: R
+			<li>Skipped: S
+			<li>Completed: C
+			<li>Failed: F
 		</ul>
 		<li>Confirm that an exception is thrown when attempting to 
 		add an action where the first character is a digit.
@@ -301,9 +305,9 @@
 			information matches that seen previously.
 		</ul>
 <p>
-		<li><b>[LegacyRCAndUtils #3857]</b> Ensure that an error message is shown if the user attempts to add an action	to the database that differs from an existing action only in case. I.E. "test" and "TEST".
+		<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown if the user attempts to add an action	to the database that differs from an existing action only in case. I.E. "test" and "TEST".
 		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after a new action is added.
-		<li><b>[LegacyRCAndUtils #5106]</b>Confirm that "Copy From" radio button can be selected by using Tab and Arrow key.
+		<li><b>[LegacyRCAndUtils #5106]</b>Confirm that "Copy From" radio button can be selected by using Tab and Arrow keys.
 	</ul>
 <p>
 	<li><b>Remove...</b></li>
@@ -352,6 +356,15 @@
 		updates the status of all files for the selected action.
 		<li>Confirm that updating a single <b>action status</b> for an 
 		action updates only that action status.
+		<li>Confirm that it is possible to update the action status of files that were <b>skipped</b>
+		for a particular action.
+		<ul>
+			<li>Confirm that selecting <b>Skipped</b> in the <b>Status is</b> dropdown box enables
+			the <b>By</b> dropdown box.
+			<li>Confirm that the <b>By</b> dropdown box contains options for <b>&lt;any user&gt;</b> and
+			for any user other than Administrator who has skipped files in the database.
+			<li>Confirm that selecting these options works as expected.
+		</ul>
 		<li>Confirm that <b>CTRL+M</b> performs the same function as selecting 
 		<b>Manually Set Action Status</b> from the <b>Action</b> menu.
 		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after an action status is manually set.
@@ -412,6 +425,7 @@
 			<li>Unattempted: U
 			<li>Pending: P
 			<li>Processing: R
+			<li>Skipped: S
 			<li>Completed: C
 			<li>Failed: F
 		</ul>
