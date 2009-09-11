@@ -12,32 +12,115 @@
 </h1>
 <hr>
 
+<h2>NOTE: (#xx) items reference the 8.0 Target Features email from 07/16/2009.</h2>
+<hr>
+
 <OL>
-	<LI><h2>Tag Files During Verification</h2>
+	<LI><h2>Tag Files During Verification (#4)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> DotNet #336, FlexIDSCore #3650, LegacyRC #5420, #5421, 
+		#5422, #5423, #5424, #5425, #5426, #5427, #5428, #5429, #5430, #5431
+  	   	<LI><b>Details:</b> This feature is designed to allow the user to apply 
+		their own informative tag strings to documents during verification.  A 
+		Manage Tags task allows handling of files based on tags.  A Task Condition 
+		object allows for additional handling options.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li><u>Toolbar</u>
+	      		<li><u><b>Toolbar</b></u>
 		       	<ul>
 		      		<li>Confirm presence of an <b>Apply tags</b> toolbar button.
 		      		<li>Confirm that the toolbar button provides a drop-down menu 
 				allowing selection/deselection of already defined tags.
 		      		<li>Confirm that the toolbar button provides a means to  
 				define a new tag.
+		      		<li>Confirm that the ability to define a new tag is 
+				controlled by an <b>AllDynamicTagCreation</b> item in 
+				the DB Info table.
+		      		<li>Confirm that <b>AllDynamicTagCreation</b> has a 
+				default value of <b>0</b>.
 		      		<li>Confirm that the drop-down menu provides checkboxes to 
 				indicate that one or more tags are selected.
+		       	</ul>
+	      		<li><u><b>DB Admin</b></u>
+		       	<ul>
+		      		<li>Confirm that the <b>Select Files</b> dialog includes an 
+				option for <b>any</b> or <b>all</b> of the following tags.
+		      		<li>Confirm that the list of tags supports selection of one 
+				of more tags.
+		      		<li>Confirm that the tag-related controls are disabled unless 
+				the appropriate option is selected. 
+<p>
+		      		<li>Confirm presence of a <b>Tools - Manage Tags</b> menu item.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				two-column list of tags and associated descriptions.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Add</b> a new tag.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Modify</b> an existing tag.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Delete</b> an existing tag.
+		      		<li>Confirm that deleting a tag requires confirmation.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Refresh</b> the list of tags.
+		      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+				button to <b>Close</b> the dialog.
+		      		<li>Confirm that tags must begin with a letter, number or 
+				underscore character.
+		      		<li>Confirm that tags can contain spaces allowing for 
+				multiple-word strings.
+		       	</ul>
+	      		<li><u><b>Manage Tags task</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Manage tags</b> task.
+		      		<li>Confirm that the property page includes options to 
+				<b>Apply the tags selected below</b>, <b>Remove the tags 
+				selected below</b>, and <b>Toggle the state of the tags 
+				selected below</b>.
+		      		<li>Confirm that the property page includes a checked list 
+				of defined tags.
+		      		<li>Confirm that property page settings are persistent. 
+		      		<li>Confirm that the task functions as expected. 
+		       	</ul>
+	      		<li><u><b>Tag Condition object</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Tag condition</b> object.
+		      		<li>Confirm that the property page includes a combo box for  
+				considering the condition <b>met</b>, or <b>not met</b>.
+		      		<li>Confirm that the property page includes a combo box for  
+				if the document is tagged with <b>any</b>, or <b>all</b> of 
+				the following conditions.
+		      		<li>Confirm that the property page includes a checked list 
+				of defined tags.
+		      		<li>Confirm that property page settings are persistent. 
+		      		<li>Confirm that the condition object functions as expected. 
+		       	</ul>
+	      		<li><u><b>New Reports</b></u>
+		       	<ul>
+		      		<li>List of all tags - shows a listing of all tags defined 
+				in the project.
+		      		<li>Tagged files - shows a listing of files for each tag, 
+				along with a count per tag and a total count.
+		      		<li>Files tagged with a certain tag - prompts user for a tag 
+				name and displays the <b>Tagged files</b> report narrowed 
+				down to the specified tag.
+		       	</ul>
+	      		<li><u><b>Updated Reports</b></u>
+		       	<ul>
+		      		<li>Detailed report for specific document - to include a 
+				section listing all tags applied on the document.
+		      		<li>ID Shield detailed report for specific document - to 
+				include a section listing all tags applied on the document.
 		       	</ul>
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Skip Files During Verification</h2>
+	<LI><h2>Skip Files During Verification (#5)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> LegacyRC #5362, #5363, #5364, #5365, #5366, #5367, #5368, #5371, 
-		#5372, #5373, #5374, #5375, #5376, #5377, #5378
+		#5372, #5373, #5374, #5375, #5376, #5377, #5378, #5383, #5384, #5385, #5386, 
+		#5413, #5414, #5415, #5416, #5417, #5418
   	   	<LI><b>Details:</b> Verification will support the ability to skip files during 
 		processing.  Statistics and reports for skipped files must be supported.  The DB 
 		Admin utility must support skipping files and processing skipped files - either 
@@ -47,21 +130,92 @@
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li><u>DB Admin</u>
+	      		<li><u><b>DB Admin</b></u>
 		       	<ul>
 		      		<li>Confirm that the <b>Summary</b> tab correctly reports the 
 				number of files that have been skipped.  Include skipping files 
 				by multiple users in this test.
+		      		<li>Confirm that the <b>Select Files</b> dialog includes an 
+				option for selecting files skipped by <b>the current user</b> or 
+				<b>any user</b>.
 		       	</ul>
-	      		<li><u>File Action Manager</u>
+	      		<li><u><b>File Action Manager</b></u>
 		       	<ul>
 		      		<li>Confirm that the <b>Status bar</b> includes a pane to report 
 				skipped files.
+		      		<li>Confirm that the <b>Processing setup</b> tab includes a 
+				<b>File processing scope</b> group box that allows the user to 
+				either process all files in the queue or process skipped files.
+		      		<li>Confirm that processing skipped files can be either files 
+				that the current user skipped or that anyone skipped. 
+		      		<li>Confirm presence of a <b>DB Info</b> setting for 
+				<b>RequirePasswordToProcessAllSkippedFiles</b> and that the 
+				default setting is <b>1</b>. 
+		      		<li>Confirm that processing files that anyone skipped requires 
+				providing the <b>DB Admin</b> password if the associated setting 
+				is on. 
+		      		<li>Confirm that processing files that anyone skipped does not 
+				require the <b>DB Admin</b> password if the associated setting 
+				is off. 
+<p>
+		      		<li>Confirm that if processing is stopped during processing of 
+				skipped files, then the remaining unprocessed files revert to 
+				<b>Skipped</b> status. 
+		      		<li>Confirm that the user can skip a previously skipped file and 
+				that it remains in <b>Skipped</b> status. 
+		       	</ul>
+	      		<li><u><b>Verification UI</b></u>
+		       	<ul>
+		      		<li>Confirm that the user interface contains menus for <b>File</b>, 
+				<b>Edit</b> and <b>Help</b>.
+		      		<li>Confirm that the File menu contains items for <b>Save</b>, 
+				<b>Save and commit Ctrl+S</b>, <b>Print</b>, <b>Skip processing</b> 
+				and <b>Stop processing</b>.
+		      		<li>Confirm that the Edit menu contains a <b>Discard changes</b> 
+				item.
+		      		<li>Confirm that the Help menu contains items for <b>ID Shield 
+				Help</b> and <b>About ID Shield</b>.
+		      		<li>Confirm that the user interface contains a multi-line edit 
+				box for <b>Comments</b>.
+<p>
+		      		<li>Confirm that <b>File - Save</b> saves any pending changes to 
+				the VOA file but <b>does not</b> advance to the next document.
+		      		<li>Confirm that <b>File - Save and commit</b> saves any pending 
+				changes to the VOA file and <b>does</b> advance to the next document.
+		      		<li>Confirm that <b>File - Save</b> is disabled when the user has 
+				navigated to a previous document if the previous document was 
+				processed and not skipped.
+		      		<li>Confirm that <b>File - Save</b> is enabled when the user has 
+				navigated to a previous document if the previous document was 
+				skipped and not processed.
+		      		<li>Confirm that <b>File - Skip processing</b> prompts the user 
+				to save any pending changes to the VOA file and <b>does</b> 
+				advance to the next document.
+		       	</ul>
+	      		<li><u><b>New Reports</b></u>
+		       	<ul>
+		      		<li>Files currently in skipped status - shows timestamp, 
+				user name, file ID, filename, action name, comment and time 
+				since skipped for all files currently in skipped status.
+		      		<li>Skipped files - shows timestamp, user name, file ID, 
+				filename, action name, and comment for all rows in the 
+				FileActionComment table.  Note that contents of this table 
+				are dependent on the <b>AutoDeleteFileActionCommentsOnComplete</b> 
+				setting in the DB Info table.
+		       	</ul>
+	      		<li><u><b>Updated Reports</b></u>
+		       	<ul>
+		      		<li>Detailed report for specific document - to include a 
+				dump of the FileActionComment table for the document.
+		      		<li>Summary of actions and associated document counts - to 
+				include a column for skipped files.
+		      		<li>Summary of actions and associated document page counts - 
+				to include a column for skipped files.
 		       	</ul>
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support For Deleting Redactions During Verification</h2>
+	<LI><h2>Support For Deleting Redactions During Verification (#11)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -73,7 +227,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Add Support For Rotating Redactions</h2>
+	<LI><h2>Add Support For Rotating Redactions (#16)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -85,7 +239,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support Find-And-Redact Of Text Or Regular Expression In Verification</h2>
+	<LI><h2>Support Find-And-Redact Of Text Or Regular Expression In Verification (#19)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -97,7 +251,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support Bates Numbers In Automated, Verification And Hybrid Redaction</h2>
+	<LI><h2>Support Bates Numbers In Automated, Verification And Hybrid Redaction (#20)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
