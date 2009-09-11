@@ -103,8 +103,8 @@ CopyFilesToBuildInstall: ObfuscateFiles
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDlls\pdf" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDlls\pdf"
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls"
 	@IF NOT EXIST "$(IDShieldOfficeInstallFilesRootDir)\CaereDlls" @MKDIR "$(IDShieldOfficeInstallFilesRootDir)\CaereDlls"
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls" /v /s /e /y
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\pdf\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls\pdf" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\pdf\*.*" "$(IDShieldOfficeInstallFilesRootDir)\LeadToolsDlls\pdf" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\RogueWaveDlls" /v /s /e /y
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin\*.*" "$(IDShieldOfficeInstallFilesRootDir)\CaereDLLs" /v /s /e /y
 	@COPY /V "$(BinariesFolder)$(ObfuscatedPath)\IDShieldOffice.exe" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
@@ -121,7 +121,7 @@ CopyFilesToBuildInstall: ObfuscateFiles
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_SSOCRLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"	
 	@COPY /V "$(BinariesFolder)\Interop.UCLID_COMLMLib.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"	
 	@COPY /V "$(RCNETDir)\APIs\Divelements\SandDock\bin\sandDock.dll" "$(IDShieldOfficeInstallFilesRootDir)\DotNetFiles"
-	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Dotnet\leadtools*.dll" "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDotNetDlls"
+	@COPY /V "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Dotnet\leadtools*.dll" "$(IDShieldOfficeInstallFilesRootDir)\LeadtoolsDotNetDlls"
 	@COPY /V "$(BinariesFolder)\BaseUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V "$(BinariesFolder)\ZLibUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
 	@COPY /V "$(BinariesFolder)\TopoUtils.dll" "$(IDShieldOfficeInstallFilesRootDir)\NonSelfRegCommonComponents"
@@ -149,7 +149,7 @@ CopyFilesToBuildInstall: ObfuscateFiles
 
 BuildIDShieldOfficeInstall:CopyFilesToBuildInstall EncryptRuleFiles CreateVersionISImportFile
     @ECHO Building Extract Systems IDShield Office installation...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VAULT_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(IDShieldOfficeDir)\Installation\IDShieldOffice\IDShieldOffice.ism" "$(IDShieldOfficeVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(IDShieldOfficeDir)\Installation\IDShieldOffice\IDShieldOffice.ism"
 	

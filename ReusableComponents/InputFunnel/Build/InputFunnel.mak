@@ -76,8 +76,8 @@ CopyFilesToInstallFolder:  BuildInputFunnelCore BuildPDUtils
 	@DeleteFiles "$(InputFunnelCoreInstallFilesRootDir)\CaereDlls\*.*"
 	
     @ECHO Copying the InputFunnelCore files to installation directory...
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Bin\*.*" "$(InputFunnelCoreInstallFilesRootDir)\LeadToolsDlls" /v /s /e /y
-	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\pdf\*.*" "$(InputFunnelCoreInstallFilesRootDir)\LeadToolsDlls\pdf" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin\*.*" "$(InputFunnelCoreInstallFilesRootDir)\LeadToolsDlls" /v /s /e /y
+	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\pdf\*.*" "$(InputFunnelCoreInstallFilesRootDir)\LeadToolsDlls\pdf" /v /s /e /y
 	@XCOPY "$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin\*.*" "$(InputFunnelCoreInstallFilesRootDir)\RogueWaveDlls" /v /s /e /y
     @XCOPY "$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin\*.*" "$(InputFunnelCoreInstallFilesRootDir)\CaereDLLs" /v /s /e /y
     @COPY /V "$(BinariesFolder)\UCLIDMeasurements.dll" "$(InputFunnelCoreInstallFilesRootDir)\SelfRegCommonComponents"
@@ -142,7 +142,7 @@ CopyFilesToInstallFolder:  BuildInputFunnelCore BuildPDUtils
 ####
 BuildIFCoreMergeModule: CopyFilesToInstallFolder CreateVersionISImportFile
     @ECHO Buliding the UCLID InputFunnel Merge Module installation...
-	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VSS_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
+	@SET PATH=$(WINDIR);$(WINDIR)\System32;$(BinariesFolder);I:\Common\Engineering\Tools\Utils;$(VSS_DIR)\win32;$(ReusableComponentsRootDirectory)\APIs\Nuance_16\bin;$(ReusableComponentsRootDirectory)\APIs\LeadTools_16.5\Bin;$(ReusableComponentsRootDirectory)\APIs\RogueWave\bin;$(ReusableComponentsRootDirectory)\APIs\SafeNetUltraPro\Bin;$(DEVENVDIR);$(VCPP_DIR)\BIN;$(VS_COMMON)\Tools;$(VS_COMMON)\Tools\bin;$(VCPP_DIR)\PlatformSDK\bin;$(VISUAL_STUDIO)\SDK\v2.0\bin;C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727;$(VCPP_DIR)\VCPackages
 	$(SetProductVerScript) "$(InputFunnelCoreMergeModuleInstallRoot)\UCLID Input Funnel.ism" "$(ReusableComponentsVersion)"
     @"$(DEV_STUDIO_DIR)\System\IsCmdBld.exe" -p "$(InputFunnelCoreMergeModuleInstallRoot)\UCLID Input Funnel.ism"
 
