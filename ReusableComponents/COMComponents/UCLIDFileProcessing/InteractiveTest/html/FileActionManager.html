@@ -460,8 +460,8 @@
 	<li>Start a blank <b>File Action Manager</b>.
    	<li>Maximize File Action Manager window, confirm that the left most pane of the Status bar displays the message: <b>Unable to connect to the database!</b>
    	<li>Confirm that the following panes are empty: <b>Total:</b>, <b>Completed:</b>, 
-	<b>Processing:</b>, <b>Pending:</b> <b>Failed:</b>.</li>
-    	<li>Confirm that the Database Connection and Status icon is a yellow cylinder in a 
+	<b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b>, <b>Failed:</b>.
+    <li>Confirm that the Database Connection and Status icon is a yellow cylinder in a 
 	red background.
 	<li>Click the <b>Connect to last used database</b> button.
 	<ul>
@@ -495,7 +495,7 @@
         	<li>Confirm that the Database Connection and Status icon is a yellow cylinder 
 		in a green background.
 	    	<li>Confirm that the following panes display <b>0</b>: <b>Total:</b>, <b>Completed:</b>, 
-		<b>Processing:</b>, <b>Pending:</b> <b>Failed:</b>.
+		<b>Processing:</b>, <b>Pending:</b>, <b>Skipped:</b>, <b>Failed:</b>.
 <p>
     		<li>Confirm that when the checkbox for <b>Queue files for this action</b> is 
 		checked, the Status bar displays the message: <b>At least one file supplier should 
@@ -536,6 +536,10 @@
 			ready for processing.
           		<li>Confirm that the text inside the <b>Pending:</b> pane only takes up about 
 			one third of the pane space.
+			<li>Confirm that the <b>Skipped</b> pane displays the number of files that have been skipped
+			in the database.
+			<li>Confirm that the text inside the <b>Skipped:</b> pane only takes up about half of the
+			pane space.
        			<li>Confirm that the <b>Failed</b> pane displays the number of files that 
 			failed to process all defined tasks.
           		<li>Confirm that the text inside the <b>Failed:</b> pane only takes up about 
