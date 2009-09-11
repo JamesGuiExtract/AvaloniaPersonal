@@ -8,4 +8,5 @@ LaserficheVersion=Integration LF Ver. 1.3.1.48
 FlexIndexVersion=FlexIndex Ver. 7.1.1.48
 IDShieldOfficeVersion=IDShield Office Ver. 1.3.1.48
 LabDEVersion=LabDE Ver. 1.0.2.48
+RulesVersion=Rules Ver. 1.0.0.48
 FKBVersion=FKB Ver. 9.1+

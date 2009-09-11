@@ -25,6 +25,7 @@ PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 AFComponentData=$(AFRootDirectory)\ComponentData
 AFBleedingEdgeDir=I:\Common\Engineering\ProductReleases\FlexIndex\Internal\BleedingEdge
+DemoRulesDir=$(EngineeringRootDirectory)\Rules\IDShield\Demo_IDShield\Rules
 
 RedactionImageDir=I:\Common\Engineering\ProductDevelopment\AttributeFinder\Demo_IDShield\Sanitized
 RedactionInstallDir=$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Demo_IDShield
@@ -46,9 +47,11 @@ BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
 #
 CopyDemoFiles:
     @ECHO Copying the Demo files to installation directory...
-    @IF NOT EXIST "$(RedactionInstallDir)"  @MKDIR "$(RedactionInstallDir)" 
-    @XCOPY "$(AFRootDirectory)\Utils\RedactionDemo\Files\*.*" "$(RedactionInstallDir)" /V /s /e /y
+    @IF NOT EXIST "$(RedactionInstallDir)\Rules"  @MKDIR "$(RedactionInstallDir)\Rules" 
+	@XCOPY "$(AFRootDirectory)\Utils\RedactionDemo\Files\*.*" "$(RedactionInstallDir)" /V /s /e /y
     $(VerifyDir) "$(AFRootDirectory)\Utils\RedactionDemo\Files" "$(RedactionInstallDir)"
+	@XCOPY "$(DemoRulesDir)\*.*" "$(RedactionInstallDir)\Rules" /V /s /e /y
+    $(VerifyDir) "$(DemoRulesDir)" "$(RedactionInstallDir)\Rules"
     @ECHO Encrypting Rules files...
     @SendFilesAsArgumentToApplication "$(RedactionInstallDir)\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
     @SendFilesAsArgumentToApplication "$(RedactionInstallDir)\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

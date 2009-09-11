@@ -44,7 +44,7 @@ RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 RDTReleaseBleedingEdgeDir=S:\LabDE\Internal\BleedingEdge\$(LabDEVersion)\RDT
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
-LabDERulesDir=$(LabResultsDir)\CustomerRules\Demo2\Rules
+LabDERulesDir=$(EngineeringRootDirectory)\Rules\LabDE\Demo_LabDE\Rules
 
 DataEntryApplicationDir=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
@@ -188,7 +188,7 @@ CreateDemo_LabDE:
 	@DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.spm"
     @DeleteFiles "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\vssver.scc"
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetLabDEFiles
+GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetLabDEFiles GetDemo_LabDERules
 
 DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildDataEntryMergeModule  BuildLabDEApplication CreateDemoShieldInstall CopyRDTToInstallFolder CreateDemo_LabDE
     @ECHO.

@@ -19,6 +19,7 @@ PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 LabDEDir=$(PDRootDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
+RulesDir=$(EngineeringRootDirectory)\Rules
 Branch=
 
 Get=vault GETLABEL 
@@ -98,4 +99,31 @@ GetLaserFicheFiles:
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 
+GetComponentDataFiles:
+	@ECHO Getting ComponentDataFiles $(RulesVersion)
+	@IF NOT EXIST "$(RulesDir)\ComponentData" @MKDIR "$(RulesDir)\ComponentData"
+	$(BUILD_DRIVE) 
+	@CD "$(RulesDir)\ComponentData"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\ComponentData" $$/Engineering/Rules/ComponentData "$(RulesVersion)"
 	
+GetDemo_IDShieldRules:
+	@ECHO Getting Demo_IDShield Rules $(RulesVersion)
+	@IF NOT EXIST "$(RulesDir)\IDShield\Demo_IDShield\Rules" @MKDIR "$(RulesDir)\IDShield\Demo_IDShield\Rules"
+	$(BUILD_DRIVE) 
+	@CD "$(RulesDir)\IDShield\Demo_IDShield\Rules"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\IDShield\Demo_IDShield\Rules" $$/Engineering/Rules/IDShield/Demo_IDShield/Rules "$(RulesVersion)"
+
+GetDemo_FLEXIndexRules:
+	@ECHO Getting Demo_FLEXIndex Rules $(RulesVersion)
+	@IF NOT EXIST "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules" @MKDIR "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules"
+	$(BUILD_DRIVE) 
+	@CD "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules" $$/Engineering/Rules/FLEXIndex/Demo_FLEXIndex/Rules "$(RulesVersion)"
+
+GetDemo_LabDERules:
+	@ECHO Getting Demo_LabDE Rules $(RulesVersion)
+	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Rules" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Rules"
+	$(BUILD_DRIVE) 
+	@CD "$(RulesDir)\LabDE\Demo_LabDE\Rules"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE\Rules" $$/Engineering/Rules/LabDE/Demo_LabDE/Rules "$(RulesVersion)"
+

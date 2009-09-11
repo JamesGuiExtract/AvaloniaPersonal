@@ -23,6 +23,7 @@
 #
 PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
+FlexDataEntryRulesDir=$(EngineeringRootDirectory)\Rules\FLEXIndex\Demo_FLEXIndex\Rules
 
 AFInstallPDRootDir=P:\AttributeFinder
 AFInstallFilesRootDir=$(AFInstallPDRootDir)\SDKInstallation\Files
@@ -116,6 +117,7 @@ CreateFlexDataEntryInstallDir:
 	@ECHO Creating FlexDataEntryInstallDir
 	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Bin" MKDIR "$(FlexDataEntryReleaseDir)\Bin"
 	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Input" MKDIR "$(FlexDataEntryReleaseDir)\Input"
+	@IF NOT EXIST "$(FlexDataEntryReleaseDir)\Rules" MKDIR "$(FlexDataEntryReleaseDir)\Rules"
 	@ECHO Copying the FlexDataEntry related files
 	@COPY /v "$(BinariesFolder)\FlexDataEntry.exe" "$(FlexDataEntryReleaseDir)\Bin"
 	@XCOPY "$(DotNetFiles)\*.*" "$(FlexDataEntryReleaseDir)\Bin" /v /s /e /y
@@ -123,6 +125,8 @@ CreateFlexDataEntryInstallDir:
 	$(VerifyDir) "$(AFRootDirectory)\Utils\FlexDataEntry\Files" "$(FlexDataEntryReleaseDir)"
 	@XCOPY "$(FlexDataEntryInstallationFilesDir)\Images\*.*" "$(FlexDataEntryReleaseDir)\Input" /v /s /e /y
 	$(VerifyDir) "$(FlexDataEntryInstallationFilesDir)\Images" "$(FlexDataEntryReleaseDir)\Input"
+	@XCOPY "$(FlexDataEntryRulesDir)\*.*" "$(FlexDataEntryReleaseDir)\Rules" /v /s /e /y
+	$(VerifyDir) "$(FlexDataEntryRulesDir)" "$(FlexDataEntryReleaseDir)\Rules"
 	@ECHO Encrypting FlexDataEntry rsd Files
 	@SendFilesAsArgumentToApplication "$(FlexDataEntryReleaseDir)\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@DeleteFiles "$(FlexDataEntryReleaseDir)\*.rsd"
@@ -167,7 +171,7 @@ CreateInstalls: BuildIDShieldInstall CreateAttributeFinderInstallCD CreateExtrac
 
 DoDemos:CreateFlexDataEntryInstallDir CreateRedactionDemoInstall
 
-GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles
+GetAllFiles: GetPDCommonFiles GetAttributeFinderFiles GetRCdotNETFiles GetReusableComponentFiles GetPDUtilsFiles GetComponentDataFiles GetDemo_IDShieldRules GetDemo_FLEXIndexRules
 
 DoEverythingNoGet: DisplayTimeStamp SetupBuildEnv BuildAttributeFinderCore CreateInstalls CopyComponentVersionFile DoDemos
     @ECHO.
