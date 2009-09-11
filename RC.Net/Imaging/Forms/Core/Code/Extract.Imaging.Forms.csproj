@@ -41,21 +41,21 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Leadtools, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Annotations, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Annotations, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Annotations.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.Annotations.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.Codecs, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.Codecs, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.Codecs.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.Codecs.dll</HintPath>
     </Reference>
-    <Reference Include="Leadtools.WinForms, Version=15.0.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
+    <Reference Include="Leadtools.WinForms, Version=16.5.0.0, Culture=neutral, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16\Dotnet\Leadtools.WinForms.dll</HintPath>
+      <HintPath>..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.WinForms.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />

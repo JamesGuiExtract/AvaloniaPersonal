@@ -1553,7 +1553,7 @@ string getPDFInitializationDirectory()
 {
 #ifdef DEBUG
 		string strTemp = getLeadUtilsDirectory()
-			+ "..\\..\\ReusableComponents\\APIs\\LeadTools_16\\PDF";
+			+ "..\\..\\ReusableComponents\\APIs\\LeadTools_16.5\\PDF";
 #else
 		string strTemp = getLeadUtilsDirectory() + "pdf";
 #endif

@@ -45,7 +45,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16\Include"
+				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -69,7 +69,7 @@
 				AdditionalDependencies="ltwvc_a.lib ltfil_u.lib ltkrn_u.lib ltdis_u.lib ltann_u.lib"
 				OutputFile="..\..\..\..\binaries\debug/GetAllSampleImageTypes.exe"
 				LinkIncremental="2"
-				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\LeadTools_16\Lib"
+				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				TargetMachine="1"
@@ -125,7 +125,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16\Include"
+				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\LeadUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Include"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="2"
@@ -147,7 +147,7 @@
 				AdditionalDependencies="ltwvc_a.lib ltfil_u.lib ltkrn_u.lib ltdis_u.lib ltann_u.lib"
 				OutputFile="..\..\..\..\binaries\release/GetAllSampleImageTypes.exe"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\LeadTools_16\Lib"
+				AdditionalLibraryDirectories="..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Lib"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 				OptimizeReferences="2"

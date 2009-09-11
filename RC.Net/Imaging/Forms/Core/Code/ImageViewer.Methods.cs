@@ -5464,7 +5464,7 @@ namespace Extract.Imaging.Forms
         {
 #if DEBUG
             string pdfInitDir = Path.GetDirectoryName(Application.ExecutablePath)
-                + @"\..\..\ReusableComponents\APIs\LeadTools_16\PDF";
+                + @"\..\..\ReusableComponents\APIs\LeadTools_16.5\PDF";
 #else
             string pdfInitDir = Path.GetDirectoryName(Application.ExecutablePath)
                 + @"\..\..\CommonComponents\pdf";
