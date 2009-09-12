@@ -27,7 +27,7 @@
 <p>
 	<LI><h2>Mathematical Condition Object</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> LegacyRC #5389
+  	   	<LI><b>SCRs:</b> LegacyRC #5389, #5434
   	   	<LI><b>Details:</b> Create a Mathematical Condition object with three options.  Option 
 		1 allows a random percentage.  Option 2 allows once every <i>N</i> times that resets 
 		after each run.  Option 3 allows a modulo operation against the File ID.  See the detailed 
@@ -36,9 +36,24 @@
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>Confirm that the property page UI works as expected.
-	      		<li>Confirm that each option works correctly for considering the condition <b>met</b>.
-	      		<li>Confirm that each option works correctly for considering the condition <b>not met</b>.
+	      		<li><u><b>General</b></u>
+		       	<ul>
+		      		<li>Confirm that the property page UI works as expected.
+		      		<li>Confirm that each option works correctly for considering the 
+				condition <b>met</b>.
+	   	   		<li>Confirm that each option works correctly for considering the 
+				condition <b>not met</b>.
+		      		<li>Confirm that the property page is keyboard navigable.
+		       	</ul>
+	      		<li><u><b>Select Files dialog</b></u>
+		       	<ul>
+		      		<li>Confirm that the dialog includes a group box for <b>Random 
+				subset selection</b>.
+		      		<li>Confirm that the group box includes a checkbox for <b>Further  
+				narrow the above selected scope of files to a ranom subset</b>.
+		      		<li>Confirm that an associated edit box is included for specification 
+				of a numeric percentage between <b>1</b> and <b>99</b>.
+		       	</ul>
 	       	</ul>
        	</ul>
 <p>
