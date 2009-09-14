@@ -3,6 +3,7 @@ using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text;
 using UCLID_COMUTILSLib;
@@ -115,30 +116,30 @@ namespace Extract.Redaction.Verification
         #region RedactionGridViewRow Properties
 
         /// <summary>
-        /// Gets the layer objects associated with the <see cref="RedactionGridViewRow"/>.
+        /// Gets the COM attribute associated with the <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <returns>The layer objects associated with the <see cref="RedactionGridViewRow"/>.
-        /// </returns>
-        public IEnumerable<LayerObject> LayerObjects
+        /// <value>The COM attribute associated with the <see cref="RedactionGridViewRow"/>.</value>
+        internal ComAttribute ComAttribute
         {
             get
             {
-                return _layerObjects;
+                return _attribute;
             }
         }
 
         /// <summary>
-        /// Gets the number of layer objects associated with the <see cref="RedactionGridViewRow"/>.
+        /// Gets the layer objects associated with the <see cref="RedactionGridViewRow"/>.
         /// </summary>
-        /// <returns>The number of layer objects associated with the <see cref="RedactionGridViewRow"/>.</returns>
-        public int LayerObjectCount
+        /// <returns>The layer objects associated with the <see cref="RedactionGridViewRow"/>.
+        /// </returns>
+        public ReadOnlyCollection<LayerObject> LayerObjects
         {
             get
             {
-                return _layerObjects.Count;
+                return _layerObjects.AsReadOnly();
             }
         }
-        
+
         /// <summary>
         /// Gets the text associated with the <see cref="RedactionGridViewRow"/>.
         /// </summary>
