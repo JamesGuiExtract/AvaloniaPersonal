@@ -12,19 +12,11 @@
 </h1>
 <hr>
 
+<h2>NOTE: (#xx) items reference the 8.0 Target Features email from 07/16/2009.</h2>
+<hr>
+
 <OL>
-	<LI><h2>Thumbnail Support In Image Viewer</h2>
-       	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
-  	   	<LI><b>Main Checklists Updated:</b> TBD
-  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
-  	   	<LI><b>Testing:</b> 
-	       	<ul>
-	      		<li>TBD
-	       	</ul>
-       	</ul>
-	<LI><h2>Replace FlexDataEntry With New DEP</h2>
+	<LI><h2>Thumbnail Support In Image Viewer (#7)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -36,7 +28,19 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Switch To .NET Image Viewer</h2>
+	<LI><h2>Replace FlexDataEntry With New DEP (#14)</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> TBD
+  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Switch To .NET Image Viewer (#15)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> Use the .NET Image Viewer in all applications and utilities 
@@ -46,6 +50,34 @@
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Confirm that tooltips are correct for each toolbar button.
+	      		<li>Confirm that OCR of rectangular regions works correctly for the following
+			<ul>
+				<li>Normal TIF
+				<li>Rotated TIF
+				<li>Normal PDF
+				<li>Rotated PDF
+			</ul>
+	      		<li>Confirm that OCR of pages works correctly for the following
+			<ul>
+				<li>Normal TIF
+				<li>Rotated TIF
+				<li>Normal PDF
+				<li>Rotated PDF
+			</ul>
+	      		<li>Confirm that angular and rectangular swipes work correctly for the following
+			<ul>
+				<li>Normal TIF
+				<li>Rotated TIF
+				<li>Normal PDF
+				<li>Rotated PDF
+			</ul>
+			<li>Confirm that the <b>.NET Image Viewer</b> is displayed for the following
+			<ul>
+				<li>ID Shield Verification
+				<li>Image Viewer utility
+				<li>Rule Tester utility
+				<li>VOA Viewer utility
+			</ul>
 	      		<li>Confirm that original Spot Recognition Window command-line options 
 			are still supported.
 	      		<li>Confirm that original Spot Recognition Window scripting options 
@@ -53,7 +85,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support Cropping And Printing Of Image Regions In Image Viewer</h2>
+	<LI><h2>Support Cropping And Printing Of Image Regions In Image Viewer (#22)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -65,7 +97,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support Export Of Debug Data From UEXViewer</h2>
+	<LI><h2>Support Export Of Debug Data From UEX Viewer (#24)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -74,6 +106,26 @@
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>TBD
+	       	</ul>
+       	</ul>
+<p>
+	<LI><h2>Support Display of Spatial String Type In VOA Viewer</h2>
+       	<ul>
+  	   	<LI><b>SCRs:</b> FlexIDSCore #3669
+  	   	<LI><b>Details:</b> There is no other way to indicate the type of the 
+		Spatial String (Spatial, Hybrid, Non-spatial) within an attribute.
+  	   	<LI><b>Main Checklists Updated:</b> TBD
+  	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
+  	   	<LI><b>Testing:</b> 
+	       	<ul>
+	      		<li>Confirm that the attribute list in the <b>VOA Viewer</b> 
+			includes a <b>Spatialness</b> column.
+			<li>Confirm that <b>Spatial</b> attributes are properly 
+			displayed and copied.
+			<li>Confirm that <b>Hybrid</b> attributes are properly 
+			displayed and copied.
+			<li>Confirm that <b>Non-spatial</b> attributes are properly 
+			displayed and copied.
 	       	</ul>
        	</ul>
 </OL>

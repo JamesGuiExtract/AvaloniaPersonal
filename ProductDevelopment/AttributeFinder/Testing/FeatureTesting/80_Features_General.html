@@ -12,8 +12,11 @@
 </h1>
 <hr>
 
+<h2>NOTE: (#xx) items reference the 8.0 Target Features email from 07/16/2009.</h2>
+<hr>
+
 <OL>
-	<LI><h2>Run As Windows Service</h2>
+	<LI><h2>Run As Windows Service (#2)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> The goal for this feature is to allow the FAM to be used in a Windows 
@@ -29,7 +32,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Skip Pages That Fail OCR</h2>
+	<LI><h2>Skip Pages That Fail OCR (Hotfix #08)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> LegacyRC #5370 
   	   	<LI><b>Details:</b> 7.0.0.39 functionality fails a document if a single page fails to 
@@ -54,36 +57,74 @@
   	   	<LI><b>SCRs:</b> LegacyRC #5387
   	   	<LI><b>Details:</b> Create a Select Files dialog for use by Manually set action status and 
 		Export file lists.  Include the ability to handle Skipped status.  Include the ability to 
-		handle any or all of the following tags.  Include the ability to further select a random 
-		percentage of the above scope.  See the detailed <b>8.0 Req-Design - Random file selection 
-		functionality</b> notes posted by Arvind on 7/28/09.
+		handle any or all of the following tags.  
+	       	<ul>
+			<li>See the detailed <b>8.0 Req-Design - Random file selection 
+			functionality</b> notes posted by Arvind on 7/28/09.
+			<li>See the detailed <b>FLEXIDS 8.0 - Tag files specs</b> notes updated 
+			on 9/1/09.
+			<li>See the detailed <b>FLEXIDS 8.0 - File Processing Priority specs</b> 
+			notes updated on 9/11/09.
+	       	</ul>
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
 	      		<li>Confirm that the property page UI works as expected.
-	      		<li>Confirm that selecting Skipped files works correctly for a specific user.
+	      		<li>Confirm that selecting Skipped files works correctly for a 
+			specific user.
 	      		<li>Confirm that selecting Skipped files works correctly for any user.
-	      		<li>Confirm that selecting files works correctly for any of the following tags.
-	      		<li>Confirm that selecting files works correctly for all of the following tags.
-	      		<li>Confirm that each of the main options works correctly when constrained 
-			by a random percentage.
+	      		<li>Confirm that selecting files works correctly for any of the 
+			defined tags.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			SQL query.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			priority.
+	      		<li>Confirm that selecting files works correctly for a specified 
+			random subset.
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Automatic Detection/Correction Of Stuck Files</h2>
+	<LI><h2>Automatic Detection/Correction Of Stuck Files (#8)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>Details:</b> The goal of this feature is to automatically determine 
+		when one or more processing files are stuck.  The File Action Manager shall 
+		automatically revert a stuck file to its previous status.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertLockedFiles</b> with a default of <b>1</b>.
+	      		<li>Confirm that with <b>AutoRevertLockedFiles = 1</b>, stuck 
+			files are automatically reverted to their previous status.
+	      		<li>Confirm that with <b>AutoRevertLockedFiles = 0</b>, stuck 
+			files are not automatically reverted to their previous status.
+<p>
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertTimeOutInMinutes</b> with a default of <b>60</b>.
+	      		<li>Confirm that the minimum value for <b>AutoRevertTimeOutInMinutes</b> 
+			is <b>5</b>.
+	      		<li>Confirm that automatic reversion of stuck files is based on 
+			the timeout value.
+<p>
+	      		<li>Confirm that the <b>DB Info</b> table contains an entry for 
+			<b>AutoRevertNotifyEmailList</b> with a default of <b>an empty 
+			string</b>.
+	      		<li>Confirm that automatic reversion of stuck files sends emails 
+			to the addresses given in <b>AutoRevertNotifyEmailList</b>.
+<p>
+	      		<li>Confirm that an exception is logged if one or more files are 
+			reverted from being stuck.
+	      		<li>Confirm that the exception includes the number of minutes 
+			elapsed before reversion, the count of files that were reverted, 
+			the file status to which a file was reverted, and the associated 
+			action name.
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Installation of SQL Server 2008</h2>
+	<LI><h2>Installation of SQL Server 2008 (#12)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> FlexIDSCore #3604
   	   	<LI><b>Details:</b> The DemoShield installation app currently installs SQL Server 2005. 
@@ -100,7 +141,7 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Endurance Test With Two Million Documents</h2>
+	<LI><h2>Endurance Test With Two Million Documents (#13)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> N/A
   	   	<LI><b>Details:</b> Exercise the <b>Large-scale</b> Endurance test checklist for ID Shield.
@@ -113,19 +154,73 @@
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support User-Configurable File Processing Priority</h2>
+	<LI><h2>Support User-Configurable File Processing Priority (#17)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5436, #5437, #5438, #5439, #5440, #5441, #5442, 
+		#5443, #5444, #5445, #5446
+  	   	<LI><b>Details:</b> This feature allows the user to specify a relative priority 
+		for processing of files.  The expected situation is for a customer to process 
+		backfile images with a lower priority than dayforward images.  Any time a 
+		dayforward image is available it gets bumped to the head of the queue.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><u><b>File Action Manager</b></u>
+		       	<ul>
+		      		<li>Confirm that the <b>Queue Setup</b> tab contains a 
+				<b>Priority</b> column.
+		      		<li>Confirm that the <b>Priority</b> column has the following 
+				options:
+			       	<ul>
+					<li>High
+					<li>Above Normal
+					<li>Normal
+					<li>Below Normal
+					<li>Low
+			       	</ul>
+		      		<li>Confirm that the <b>Queue Log</b> tab contains a 
+				<b>Priority</b> column in each of the three grids.
+		      		<li>Confirm that the <b>Processing Log</b> tab contains a 
+				<b>Priority</b> column in each of the three grids.
+<p>
+		      		<li>Confirm that the <b>Priority</b> column is properly updated 
+				in the <b>Queue Log</b> tab.
+		      		<li>Confirm that the <b>Priority</b> column is properly updated 
+				in the <b>Processing Log</b> tab.
+		       	</ul>
+<p>
+	      		<li><u><b>DB Admin</b></u>
+		       	<ul>
+		      		<li>Confirm that a menu item for <b>Tools - Manually set file 
+				processing prioirity</b> exists and displays an associated 
+				dialog.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains a <b>Select files...</b> button.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains an associated edit box with a text-based description 
+				of the selected files.
+		      		<li>Confirm that the <b>Manually Set File Processing Priority</b> 
+				dialog contains a spinner control to specify the priority.
+		      		<li>Confirm that file priority is set properly.
+<p>
+		      		<li>Confirm that the <b>Select Files</b> dialog contains a 
+				radio button for <b>All files that have the file processing priority 
+				of</b> and an associated spinner control.
+		      		<li>Confirm that file selection is properly based on file priority.
+		       	</ul>
+<p>
+	      		<li><u><b>Updated Reports</b></u>
+		       	<ul>
+		      		<li>Detailed report for specific document - to include document 
+				priority.
+		      		<li>ID Shield detailed report for specific document - to include 
+				document priority.
+		       	</ul>
 	       	</ul>
        	</ul>
 <p>
-	<LI><h2>Support FAM Processing During Specified Times Of Day Or Week</h2>
+	<LI><h2>Support FAM Processing During Specified Times Of Day Or Week (#21)</h2>
        	<ul>
   	   	<LI><b>SCRs:</b> TBD
   	   	<LI><b>Details:</b> TBD
@@ -133,7 +228,34 @@
   	   	<LI><b>Tested By:</b> TBD, 7.1.0.xx, MM/DD/YYYY
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><u><b>File Action Manager</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Processing schedule</b> group 
+				box on the <b>Processing setup</b> tab.
+		      		<li>Confirm that the group box contains a <b>Limit processing 
+				to certain days/times</b> check box.
+		      		<li>Confirm that the group box contains a <b>Set schedule...</b> 
+				button.
+		      		<li>Confirm that the <b>Set schedule...</b> button displays 
+				a <b>Set Processing Schedule</b> dialog.
+		      		<li>Confirm that the <b>Set Processing Scheule</b> dialog 
+				includes a grid for hours and days allowing each of the 168 
+				hours in a week to be controlled.
+		      		<li>Confirm that the schedule settings are persistent.
+<p>
+		      		<li>Confirm processing goes inactive per schedule.
+		      		<li>Confirm that when processing goes inactive, currently 
+				processing files finish, all processing threads exit, and 
+				memory is released.
+		      		<li>Confirm that when processing goes inactive, currently 
+				pending files revert to their previous state.
+		      		<li>Confirm processing goes active per schedule.
+<p>
+		      		<li>Confirm that if processing is inactive, that the FAM title 
+				bar includes the text <b>(Processing Inactive)</b>.
+		      		<li>Confirm that if processing is inactive, that the FAM status 
+				bar includes the text <b>Processing Inactive</b>.
+		       	</ul>
 	       	</ul>
        	</ul>
 </OL>
