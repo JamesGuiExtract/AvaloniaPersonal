@@ -2,6 +2,7 @@ using Extract.AttributeFinder;
 using Extract.Imaging.Forms;
 using Extract.Utilities;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -529,7 +530,7 @@ namespace Extract.Redaction.Verification
                     RedactionGridViewRow row = _redactions[i];
                     if (row.TryRemoveLayerObject(layerObject))
                     {
-                        if (row.LayerObjectCount == 0)
+                        if (row.LayerObjects.Count == 0)
                         {
                             AddToDeletedCount(row);
 
@@ -796,6 +797,7 @@ namespace Extract.Redaction.Verification
         {
             row.DefaultCellStyle = VisitedCellStyle;
             row.Cells[_pageColumn.Index].Style = VisitedPageCellStyle;
+            row.Tag = new object();
         }
 
         /// <summary>
@@ -924,6 +926,10 @@ namespace Extract.Redaction.Verification
                         IUnknownVector vector = utility.QueryAttributes(attributes, level.Query, true);
                         AddAttributes(vector, level);
                     }
+
+                    // Sort the redactions spatially
+                    ArrayList adapter = ArrayList.Adapter(_redactions);
+                    adapter.Sort(new RedactionGridViewRowComparer());
 
                     // Add any remaining attributes as undisplayed attributes
                     int count = attributes.Size();
@@ -1222,6 +1228,163 @@ namespace Extract.Redaction.Verification
                 default:
                     throw new ExtractException("ELI27436", "Unexpected auto tool.");
             }
+        }
+
+        /// <summary>
+        /// Selects the previous redaction row.
+        /// </summary>
+        public void SelectPreviousRedaction()
+        {
+            // If there are no rows, we are done.
+            if (_dataGridView.Rows.Count > 0)
+            {
+                // Go to the previous unviewed row if one exists
+                DataGridViewRow row = GetPreviousUnviewedRow();
+                if (row == null)
+                {
+                    // Otherwise, go to the row prior to the current selection
+                    row = GetPreviousRow();
+                }
+
+                SelectOnly(row);
+            }
+        }
+
+        /// <summary>
+        /// Selects the next redaction row.
+        /// </summary>
+        public void SelectNextRedaction()
+        {
+            // If there are no rows, we are done.
+            if (_dataGridView.Rows.Count > 0)
+            {
+                // Go to the next unviewed row if one exists
+                DataGridViewRow row = GetNextUnviewedRow();
+                if (row == null)
+                {
+                    // Otherwise, go to the row after the current selection
+                    row = GetNextRow();
+                }
+
+                SelectOnly(row);
+            }
+        }
+
+        /// <summary>
+        /// Gets the first unviewed row that occurs before the last selected row.
+        /// </summary>
+        /// <returns>The first unviewed row that occurs before the last selected row; or 
+        /// <see langword="null"/> if no such row exists.</returns>
+        DataGridViewRow GetPreviousUnviewedRow()
+        {
+            // Iterate backwards from the last selected row
+            for (int i = GetLastSelectedRowIndex() - 1; i >= 0; i--)
+            {
+                // Return the first row that is unvisited (visited cells have a tag)
+                DataGridViewRow row = _dataGridView.Rows[i];
+                if (row.Tag == null)
+                {
+                    return row;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the first unviewed row that occurs after the first selected row.
+        /// </summary>
+        /// <returns>The first unviewed row that occurs after the first selected row; or 
+        /// <see langword="null"/> if no such row exists.</returns>
+        DataGridViewRow GetNextUnviewedRow()
+        {
+            // Iterate starting after the first selected row
+            for (int i = GetFirstSelectedRowIndex() + 1; i < _dataGridView.Rows.Count; i++)
+            {
+                // Return the first row that is unvisited (visited cells have a tag)
+                DataGridViewRow row = _dataGridView.Rows[i];
+                if (row.Tag == null)
+                {
+                    return row;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the row that appears immediately before the first selected row.
+        /// </summary>
+        /// <returns>The row that appears immediately before the first selected row; or the first 
+        /// row if the first row is selected.</returns>
+        DataGridViewRow GetPreviousRow()
+        {
+            int nextRow = GetFirstSelectedRowIndex() - 1;
+            if (nextRow < 0)
+            {
+                nextRow = 0;
+            }
+
+            return _dataGridView.Rows[nextRow];
+        }
+
+        /// <summary>
+        /// Gets the row that appears immediately after the last selected row.
+        /// </summary>
+        /// <returns>The row that appears immediately before the last selected row; or the last 
+        /// row if the last row is selected.</returns>
+        DataGridViewRow GetNextRow()
+        {
+            int nextRow = GetLastSelectedRowIndex() + 1;
+            if (nextRow >= _dataGridView.Rows.Count)
+            {
+                nextRow = _dataGridView.Rows.Count - 1;
+            }
+
+            return _dataGridView.Rows[nextRow];
+        }
+
+        /// <summary>
+        /// Gets the index of the first selected row.
+        /// </summary>
+        /// <returns>The index of the first selected row.</returns>
+        int GetFirstSelectedRowIndex()
+        {
+            for (int i = 0; i < _dataGridView.Rows.Count; i++)
+            {
+                if (_dataGridView.Rows[i].Selected)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Gets the index of the last selected row.
+        /// </summary>
+        /// <returns>The index of the last selected row.</returns>
+        int GetLastSelectedRowIndex()
+        {
+            for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
+            {
+                if (_dataGridView.Rows[i].Selected)
+                {
+                    return i;
+                }
+            }
+
+            return _dataGridView.Rows.Count;
+        }
+
+        /// <summary>
+        /// Selects the specified row and deselects all other rows.
+        /// </summary>
+        /// <param name="row">The row to select.</param>
+        void SelectOnly(DataGridViewRow row)
+        {
+            _dataGridView.CurrentCell = row.Cells[0];
         }
 
         #endregion RedactionGridView Methods
