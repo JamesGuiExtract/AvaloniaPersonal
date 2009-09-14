@@ -13,21 +13,17 @@
 //
 //==================================================================================================
 
-#ifndef TPPolygon_H
-#define TPPolygon_H
+#pragma once
 
 #include "TopoUtils.h"
 #include "TPLineSegment.h"
 
 #include <vector>
 
-#pragma warning (disable: 4231)
+using namespace std;
 
-// TESTTHIS Warning given for exporting STL template class 
-// Please refer to Q168958 - HOWTO: Exporting STL Components Inside & Outside of a class
-// http://support.microsoft.com/kb/q168958/
-EXPIMP_TEMPLATE_TOPOUTILS template class EXPORT_TopoUtils std::vector<TPPoint>;
-EXPIMP_TEMPLATE_TOPOUTILS template class EXPORT_TopoUtils std::vector<TPLineSegment>;
+#pragma warning(push)
+#pragma warning(disable: 4251)
 
 class EXPORT_TopoUtils TPPolygon
 {
@@ -48,7 +44,7 @@ public:
 	void getExtents(double& rdMinX, double& rdMinY, double& rdMaxX, double& rdMaxY);
 
 	// Get the line segments of the polygon
-	const std::vector<TPLineSegment> getSegments() const;
+	const vector<TPLineSegment> getSegments() const;
 
 	// Get the intersection area of the two polygon
 	// NOTE: this method should only be called for Convex polygons!!!!
@@ -75,6 +71,7 @@ protected:
 	double m_dMaxX;
 	double m_dMaxY;
 
-	std::vector<TPPoint> m_vecPoints;
+	vector<TPPoint> m_vecPoints;
 };
-#endif // TPPolygon_H
+
+#pragma warning(pop)
