@@ -55,15 +55,18 @@ BOOL CEAVGeneratorDlg::OnInitDialog()
 			CRect rectList;
 			m_listAttributes.GetWindowRect(rectList);
 			ScreenToClient(rectList);
-			long nWidth1 = rectList.Width() / 4;
+			long nWidth1 = rectList.Width() / 5;
+			long nWidth4 = nWidth1;
 			long nWidth2 = 2 * nWidth1;
-			long nWidth3 = rectList.Width() - nWidth1 - nWidth2 - 5;
+			long nWidth3 = rectList.Width() - nWidth1 - nWidth2 - nWidth4 - 5;
 			
 			// add column headers to the list ctrl
 			m_listAttributes.SetExtendedStyle(LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
 			m_listAttributes.InsertColumn(NAME_COLUMN, "Name", LVCFMT_LEFT, nWidth1, NAME_COLUMN);
 			m_listAttributes.InsertColumn(VALUE_COLUMN, "Value", LVCFMT_LEFT, nWidth2, VALUE_COLUMN);
 			m_listAttributes.InsertColumn(TYPE_COLUMN, "Type", LVCFMT_LEFT, nWidth3, TYPE_COLUMN);
+			m_listAttributes.InsertColumn(SPATIALNESS_COLUMN, "Spatialness", LVCFMT_LEFT,
+				nWidth4, SPATIALNESS_COLUMN);
 			
 			// Select the appropriate radio button
 			CheckRadioButton( IDC_RADIO_REPLACE, IDC_RADIO_APPEND, 
@@ -343,6 +346,7 @@ void CEAVGeneratorDlg::OnBtnCopy()
 		CString zName = m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 		CString zValue = m_listAttributes.GetItemText(nSelectedItemIndex, VALUE_COLUMN);
 		CString zType = m_listAttributes.GetItemText(nSelectedItemIndex, TYPE_COLUMN);
+		CString zMode = m_listAttributes.GetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN);
 		IAttributePtr ipOriginal(
 			(IAttribute*) m_listAttributes.GetItemData(nSelectedItemIndex));
 		ASSERT_RESOURCE_ALLOCATION("ELI18135", ipOriginal != NULL);
@@ -364,6 +368,7 @@ void CEAVGeneratorDlg::OnBtnCopy()
 		int nNewItemIndex = m_listAttributes.InsertItem( nCount, zName );
 		m_listAttributes.SetItemText( nNewItemIndex, VALUE_COLUMN, zValue );
 		m_listAttributes.SetItemText( nNewItemIndex, TYPE_COLUMN, zType );
+		m_listAttributes.SetItemText( nNewItemIndex, SPATIALNESS_COLUMN, zMode );
 		m_listAttributes.SetItemData(nNewItemIndex, (DWORD_PTR) pipAttribute);
 
 		// Select the new record
@@ -696,6 +701,7 @@ void CEAVGeneratorDlg::OnBtnDown()
 			CString zName = m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 			CString zValue = m_listAttributes.GetItemText(nSelectedItemIndex, VALUE_COLUMN);
 			CString zType = m_listAttributes.GetItemText(nSelectedItemIndex, TYPE_COLUMN);
+			CString zMode = m_listAttributes.GetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN);
 			DWORD_PTR dwpAttributePtr = m_listAttributes.GetItemData(nSelectedItemIndex);
 
 			// then remove the selected item
@@ -705,6 +711,7 @@ void CEAVGeneratorDlg::OnBtnDown()
 			int nActualIndex = m_listAttributes.InsertItem(nBelowIndex, zName);
 			m_listAttributes.SetItemText(nActualIndex, VALUE_COLUMN, zValue);
 			m_listAttributes.SetItemText(nActualIndex, TYPE_COLUMN, zType);
+			m_listAttributes.SetItemText(nActualIndex, SPATIALNESS_COLUMN, zMode);
 			m_listAttributes.SetItemData(nActualIndex, dwpAttributePtr);
 			
 			// keep this item selected
@@ -737,6 +744,7 @@ void CEAVGeneratorDlg::OnBtnUp()
 			CString zName = m_listAttributes.GetItemText(nSelectedItemIndex, NAME_COLUMN);
 			CString zValue = m_listAttributes.GetItemText(nSelectedItemIndex, VALUE_COLUMN);
 			CString zType = m_listAttributes.GetItemText(nSelectedItemIndex, TYPE_COLUMN);
+			CString zMode = m_listAttributes.GetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN);
 			DWORD_PTR dwpAttributePtr = m_listAttributes.GetItemData(nSelectedItemIndex);
 
 			// then remove the selected item
@@ -746,6 +754,7 @@ void CEAVGeneratorDlg::OnBtnUp()
 			int nActualIndex = m_listAttributes.InsertItem(nAboveIndex, zName);
 			m_listAttributes.SetItemText(nActualIndex, VALUE_COLUMN, zValue);
 			m_listAttributes.SetItemText(nActualIndex, TYPE_COLUMN, zType);
+			m_listAttributes.SetItemText(nActualIndex, SPATIALNESS_COLUMN, zMode);
 			m_listAttributes.SetItemData(nActualIndex, dwpAttributePtr);
 			
 			// keep this item selected

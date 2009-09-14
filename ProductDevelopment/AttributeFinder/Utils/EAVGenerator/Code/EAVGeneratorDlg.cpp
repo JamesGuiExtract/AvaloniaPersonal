@@ -425,10 +425,11 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 		ISpatialStringPtr ipValue = ipThisSub->Value;
 		ASSERT_RESOURCE_ALLOCATION("ELI15605", ipValue != NULL);
 
-		// Get Name, Value, and Type as STL strings
-		string	strName = ipThisSub->Name;
-		string	strValue = ipValue->String;
-		string	strType = ipThisSub->Type;
+		// Get Name, Value, Type, and Mode
+		string	strName = asString(ipThisSub->Name);
+		string	strValue = asString(ipValue->String);
+		string	strType = asString(ipThisSub->Type);
+		ESpatialStringMode eMode = ipValue->GetMode();
 
 		// convert cpp string to user-displayable string
 		::convertCppStringToNormalString(strValue);
@@ -446,6 +447,8 @@ void CEAVGeneratorDlg::addSubAttributes(IAttributePtr ipAttribute,
 		int nNewItemIndex = m_listAttributes.InsertItem( lInsertIndex, strName.c_str() );
 		m_listAttributes.SetItemText( nNewItemIndex, VALUE_COLUMN, strValue.c_str() );
 		m_listAttributes.SetItemText( nNewItemIndex, TYPE_COLUMN, strType.c_str() );
+		m_listAttributes.SetItemText( nNewItemIndex, SPATIALNESS_COLUMN,
+			getModeAsString(eMode).c_str());
 
 		// Add any grandchildren items
 		addSubAttributes( ipThisSub, iNumItemsUnderInsertionPoint, iSubLevel + 1 );
@@ -587,6 +590,10 @@ void CEAVGeneratorDlg::displayAttributes(IIUnknownVectorPtr ipAttributes)
 				m_listAttributes.SetItemText( nNewItemIndex, TYPE_COLUMN, 
 					strType.c_str());
 			}
+
+			// Add the mode
+			m_listAttributes.SetItemText( nNewItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(ipValue->GetMode()).c_str());
 
 			// Add any sub attributes to end of list
 			addSubAttributes( ipAttribute, 0, 1 );
@@ -801,6 +808,10 @@ void CEAVGeneratorDlg::openEAVFile(const CString& zFileName)
 				ipAttribute->Type = vecTokens[2].c_str();
 			}
 
+			// Set the spatial column to non-spatial
+			m_listAttributes.SetItemText(nNewItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(kNonSpatialMode).c_str());
+
 			// get the attribute from the smart pointer
 			IAttribute* pipAttribute = ipAttribute.Detach();
 			ASSERT_RESOURCE_ALLOCATION("ELI18276", pipAttribute != NULL);
@@ -964,6 +975,7 @@ void CEAVGeneratorDlg::saveAttributesToEAV(const CString& zFileName)
 		CString zName = m_listAttributes.GetItemText(n, NAME_COLUMN);
 		CString zValue = m_listAttributes.GetItemText(n, VALUE_COLUMN);
 		CString zType = m_listAttributes.GetItemText(n, TYPE_COLUMN);
+		CString zMode = m_listAttributes.GetItemText(n, SPATIALNESS_COLUMN);
 		
 		// put name|value<|type>
 		string strOutputLine = (LPCTSTR)zName;
@@ -1175,6 +1187,10 @@ void CEAVGeneratorDlg::updateList(int nColumnNumber, const CString& zText)
 			{
 				ipValue->ReplaceAndDowngradeToNonSpatial(strText.c_str());
 			}
+
+			// Update the spatial mode column
+			m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(ipValue->GetMode()).c_str());
 		}
 		break;
 
@@ -1611,6 +1627,10 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 			// replace the text in the attribute list
 			m_listAttributes.SetItemText(nSelectedItemIndex, TYPE_COLUMN, "");
 
+			// update the spatial mode
+			m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(ipNewValue->GetMode()).c_str());
+
 			// get the attribute from the smart pointer
 			IAttribute* pipNewAttribute = ipNewAttribute.Detach();
 			ASSERT_RESOURCE_ALLOCATION("ELI18270", pipNewAttribute != NULL);
@@ -1671,6 +1691,10 @@ void CEAVGeneratorDlg::appendOrReplaceAttribute(IAttributePtr ipNewAttribute)
 			::convertCppStringToNormalString(strText);
 			m_listAttributes.SetItemText(nSelectedItemIndex, VALUE_COLUMN, strText.c_str());
 
+			// Update the spatial mode column
+			m_listAttributes.SetItemText(nSelectedItemIndex, SPATIALNESS_COLUMN,
+				getModeAsString(ipOldValue->GetMode()).c_str());
+
 			// Set the appropriate radio button and reset the flag
 			CheckRadioButton(IDC_RADIO_REPLACE, IDC_RADIO_APPEND, IDC_RADIO_REPLACE);
 			GetDlgItem(IDC_RADIO_REPLACE)->SetFocus();
@@ -1721,6 +1745,27 @@ void CEAVGeneratorDlg::openSRWFromVOAFileName()
 		{
 			openSRWWithImage(strImageToOpen);
 		}
+	}
+}
+//-------------------------------------------------------------------------------------------------
+string CEAVGeneratorDlg::getModeAsString(ESpatialStringMode eMode)
+{
+	switch (eMode)
+	{
+	case kSpatialMode:
+		return "Spatial";
+		break;
+
+	case kHybridMode:
+		return "Hybrid";
+		break;
+
+	case kNonSpatialMode:
+		return "Non-Spatial";
+		break;
+
+	default:
+		THROW_LOGIC_ERROR_EXCEPTION("ELI27590");
 	}
 }
 //-------------------------------------------------------------------------------------------------

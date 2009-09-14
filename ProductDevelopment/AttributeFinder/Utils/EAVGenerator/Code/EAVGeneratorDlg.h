@@ -117,6 +117,7 @@ private:
 	static const int	NAME_COLUMN	= 0;
 	static const int	VALUE_COLUMN = 1;
 	static const int	TYPE_COLUMN = 2;
+	static const int	SPATIALNESS_COLUMN = 3;
 
 	// static constants used to specify whether to open or not open the SRW
 	static const bool gbOPEN_SRW = true;
@@ -297,6 +298,9 @@ private:
 	// PURPOSE: To open the SRW with an image file name generated from the currently open VOA file
 	//			if a valid file can be found
 	void openSRWFromVOAFileName();
+
+	// PURPOSE: To convert the specified spatial mode to a string
+	string getModeAsString(ESpatialStringMode eMode);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
