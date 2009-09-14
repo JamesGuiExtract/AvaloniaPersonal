@@ -3,14 +3,13 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-
-#pragma warning(disable: 4251)
-
 #include "SafeNetLicenseCfg.h"
+
 #include <UCLIDException.h>
 #include <RegistryPersistenceMgr.h>
 #include <RegConstants.h>
 #include <cpputil.h>
+
 #include <string>
 
 using namespace std;

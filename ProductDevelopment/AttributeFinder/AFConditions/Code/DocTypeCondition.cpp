@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "AFConditions.h"
 #include "DocTypeCondition.h"
-#include "..\..\AFCore\Code\AFCategories.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <AFCategories.h>
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
@@ -494,7 +494,7 @@ STDMETHODIMP CDocTypeCondition::Load(IStream *pStream)
 		{
 			// Throw exception
 			UCLIDException ue( "ELI10779", 
-				"Unable to load newer Doc Type Condition!" );
+				"Unable to load newer Doc Type Condition." );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;

@@ -2,10 +2,10 @@
 #include "stdafx.h"
 #include "AFConditions.h"
 #include "RSDFileCondition.h"
-#include "..\..\AFCore\Code\AFCategories.h"
-#include "..\..\AFCore\Code\Common.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <AFCategories.h>
+#include <Common.h>
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <ComUtils.h>
@@ -105,7 +105,7 @@ STDMETHODIMP CRSDFileCondition::put_RSDFileName(BSTR newVal)
 		string strNewVal = asString(newVal);
 		if(strNewVal.empty())
 		{
-			UCLIDException ue("ELI10892", "Cannot specify an empty .rsd file name!");
+			UCLIDException ue("ELI10892", "Cannot specify an empty .rsd file name.");
 			throw ue;
 		}
 		if (strNewVal != m_strRSDFileName)
@@ -157,7 +157,7 @@ STDMETHODIMP CRSDFileCondition::raw_ProcessCondition(IAFDocument *pAFDoc, VARIAN
 		if (m_ipRuleExecutionEnv->IsRSDFileExecuting(strRSDFile.c_str()) ==
 			VARIANT_TRUE)
 		{
-			UCLIDException ue("ELI10243", "Circular reference detected between RSD files in FindFromRSD object!");
+			UCLIDException ue("ELI10243", "Circular reference detected between RSD files in FindFromRSD object.");
 			ue.addDebugInfo("RSD File", strRSDFile);
 			throw ue;
 		}
@@ -381,7 +381,7 @@ STDMETHODIMP CRSDFileCondition::Load(IStream *pStream)
 		{
 			// Throw exception
 			UCLIDException ue( "ELI10904", 
-				"Unable to load newer RSDFile Condition!" );
+				"Unable to load newer RSDFile Condition." );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;

@@ -7,8 +7,6 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-#pragma warning(disable:4786)
-
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>         // MFC core and standard components
@@ -37,7 +35,3 @@ using namespace UCLID_INPUTFUNNELLib;
 
 #import "..\..\..\AFCore\Code\AFCore.tlb" named_guids raw_property_prefixes("raw_get_", "raw_put_", "raw_putref_")
 using namespace UCLID_AFCORELib;
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

@@ -1,13 +1,11 @@
 // GrantorGranteeTester.cpp : Implementation of CGrantorGranteeTester
-#pragma warning (disable : 4786)
 
 #include "stdafx.h"
 #include "CountyTester.h"
 #include "GrantorGranteeTester.h"
-#include "..\..\..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
-
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
 #include <StringTokenizer.h>
@@ -17,13 +15,10 @@
 #include <common.h>
 #include <ComponentLicenseIDs.h>
 
-#include <io.h>
-#include <stdio.h>
-#include <time.h>
+#include <cstdio>
+#include <ctime>
 
-#define CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <cstdlib>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -129,7 +124,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			}
 			else
 			{
-				UCLIDException ue("ELI11931", "Required master testing .DAT file missing!");
+				UCLIDException ue("ELI11931", "Required master testing .DAT file missing.");
 				throw ue;		
 			}			
 
@@ -153,14 +148,14 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			tm pTime;
 			if (_localtime64_s( &pTime, &curTime ) != 0)
 			{
-				throw UCLIDException ("ELI12926", "Unable to retrieve local time!");
+				throw UCLIDException ("ELI12926", "Unable to retrieve local time.");
 			}
 
 			// Convert time to string and add to note text
 			char szTime[32];
 			if (asctime_s( szTime, sizeof(szTime), &pTime ) != 0)
 			{
-				throw UCLIDException ("ELI12927", "Unable to convert local time to string!");
+				throw UCLIDException ("ELI12927", "Unable to convert local time to string.");
 			}
 			string strTimeNote = string( " " ) + trim( szTime, "", "\r\n" );
 			strTimeNote += " ";
@@ -178,8 +173,8 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			//replace the spaces with 0s
 			strTimeStamp.Replace(' ', '0');
 
-			m_strPartialMatchFile = std::string("PartialMatches - ") + (LPCSTR)strTimeStamp + ".dat";
-			std::string strPartialMatchPathAndFile(strTesterResultsFolder + m_strPartialMatchFile);
+			m_strPartialMatchFile = string("PartialMatches - ") + (LPCSTR)strTimeStamp + ".dat";
+			string strPartialMatchPathAndFile(strTesterResultsFolder + m_strPartialMatchFile);
 			
 			//open PartialMatches.dat output file	
 			m_PartialMatchFile.open(strPartialMatchPathAndFile.c_str(), ofstream::out | ofstream::app);
@@ -190,8 +185,8 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 				throw ue;
 			}
 
-			m_strFullMatchFile = std::string("FullMatches - ") + (LPCSTR)strTimeStamp + ".dat";
-			std::string strFullMatchPathAndFile(strTesterResultsFolder + m_strFullMatchFile);
+			m_strFullMatchFile = string("FullMatches - ") + (LPCSTR)strTimeStamp + ".dat";
+			string strFullMatchPathAndFile(strTesterResultsFolder + m_strFullMatchFile);
 
 			//open FullMatches.dat output file		
 			m_FullMatchFile.open(strFullMatchPathAndFile.c_str(), ofstream::out | ofstream::app);
@@ -251,17 +246,17 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			bool bSuccess = m_nTotalTestAttributes == m_nNumOfPassedAttributes;
 
 			// loop through the rule capture map and create output notes for each rule
-			for (std::map<std::string, RuleCaptureData >::iterator iter = m_mapRuleCaptureInfo.begin(); iter != m_mapRuleCaptureInfo.end(); iter++)
+			for (map<string, RuleCaptureData >::iterator iter = m_mapRuleCaptureInfo.begin(); iter != m_mapRuleCaptureInfo.end(); iter++)
 			{
-				std::string strOutput;
+				string strOutput;
 				int fullMatchCount = 0;
 
-				std::vector<TestCaseData> *vecTestCases = &iter->second.m_vecTestCasesInfo;
+				vector<TestCaseData> *vecTestCases = &iter->second.m_vecTestCasesInfo;
 				
 				// loop through the matching test cases for a rule and add them to the output string
-				for (std::vector<TestCaseData>::iterator testCaseIter = vecTestCases->begin(); testCaseIter != vecTestCases->end(); testCaseIter++)
+				for (vector<TestCaseData>::iterator testCaseIter = vecTestCases->begin(); testCaseIter != vecTestCases->end(); testCaseIter++)
 				{
-					std::string strMatchResult;
+					string strMatchResult;
 
 					// create a different prefix for each output string based on its match result
 					switch((*testCaseIter).m_eMatchResult)
@@ -323,7 +318,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 				
 				strOutput = (LPCTSTR)zTemp + strOutput;
 				
-				std::string strRuleID("Rule - " + iter->first);
+				string strRuleID("Rule - " + iter->first);
 
 				m_ipResultLogger->AddTestCaseDetailNote(strRuleID.c_str(), strOutput.c_str());
 			}
@@ -338,7 +333,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 
 			//open testresults.dat output file
 			string strTestResultsDat = strTesterResultsFolder + "TesterResults.dat";
-			std::ofstream testCases(strTestResultsDat.c_str(), ofstream::out | ofstream::app);
+			ofstream testCases(strTestResultsDat.c_str(), ofstream::out | ofstream::app);
 			if (!testCases.is_open())
 			{
 				UCLIDException ue("ELI09024", "Unable to open file for writing.");
@@ -352,7 +347,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_RunAutomatedTests(IVariantVector* pParam
 			createTestFileLine(testCases, m_strPartialMatchFile, true);
 			createCommentLine(testCases, "** Full Match Test Cases **");
 			createTestFileLine(testCases, m_strFullMatchFile, true);
-			testCases << std::endl;
+			testCases << endl;
 
 			testCases.close();
 			waitForFileToBeReadable(strTestResultsDat);
@@ -451,7 +446,7 @@ STDMETHODIMP CGrantorGranteeTester::raw_IsLicensed(VARIANT_BOOL * pbValue)
 //-------------------------------------------------------------------------------------------------
 bool CGrantorGranteeTester::compareAttributes(IIUnknownVectorPtr ipFoundAttributes, 
 											  IIUnknownVectorPtr ipExpectedAttributes,
-											  const std::string& strRuleID)
+											  const string& strRuleID)
 {
 	bool bReturn = false;
 
@@ -494,7 +489,7 @@ bool CGrantorGranteeTester::compareAttributes(IIUnknownVectorPtr ipFoundAttribut
 	}
 
 	// Make a local vector of flags to indicate Used vs. Not Used
-	std::vector<bool>	vecUsedAttributes;
+	vector<bool>	vecUsedAttributes;
 
 	// Fill vector with "False" for each Found Attribute
 	long lFoundSize = ipFoundAttributes->Size();
@@ -752,13 +747,14 @@ string CGrantorGranteeTester::getRuleID(IAFDocumentPtr ipAFDoc)
 			{
 				// Search through all the rules that capture an attribute and append them to
 				// the rule id
-				for(int i = 0; i < ipRulesWorked->Size; i++)
+				long lSize = ipRulesWorked->Size;
+				for(int i = 0; i < lSize; i++)
 				{
 					CComBSTR bstrKey, bstrValue;
 					ipRulesWorked->GetKeyValue(i, &bstrKey, &bstrValue);
 					
 					// if this is the first rule don't prepend an '&', otherwise prepend '&'
-					(i == 0) ? strRuleID = asString(bstrValue) : strRuleID += std::string(" & ") + asString(bstrValue);
+					(i == 0) ? strRuleID = asString(bstrValue) : strRuleID += string(" & ") + asString(bstrValue);
 				}
 			}
 		}
@@ -899,7 +895,7 @@ void CGrantorGranteeTester::interpretLine(const string& strLineText,
 				processTestCase(vecTestFiles[i].m_strRSDFilename, 
 					vecTestFiles[i].m_strUSSFilename,
 					vecTestFiles[i].m_strEAVFilename,
-					strCurrentDatFileName, zCaseNo.operator LPCTSTR(),
+					strCurrentDatFileName, LPCTSTR(zCaseNo),
 					vecTestFiles[i].m_strRuleID );
 				makeLowerCase(vecTestFiles[i].m_strUSSFilename );
 				m_setProcessedFiles.insert(vecTestFiles[i].m_strUSSFilename);
@@ -1250,10 +1246,10 @@ void CGrantorGranteeTester::validateLicense()
 	VALIDATE_LICENSE(THIS_COMPONENT_ID, "ELI07293", "Grantor-Grantee Finder Tester" );
 }
 //-------------------------------------------------------------------------------------------------
-void CGrantorGranteeTester::dumpRuleCaptureInfo(std::ostream& partialMatches, std::ostream& fullMatches)
+void CGrantorGranteeTester::dumpRuleCaptureInfo(ostream& partialMatches, ostream& fullMatches)
 {
 	// loop through all the rules and output their corresponding test cases
-	for (std::map<std::string, RuleCaptureData >::iterator iter = m_mapRuleCaptureInfo.begin(); iter != m_mapRuleCaptureInfo.end(); iter++)
+	for (map<string, RuleCaptureData >::iterator iter = m_mapRuleCaptureInfo.begin(); iter != m_mapRuleCaptureInfo.end(); iter++)
 	{
 		//these bools ensure that the comment header for each rule was displayed only once 
 		//for each matching result type's listing of test cases found under that rule
@@ -1261,10 +1257,10 @@ void CGrantorGranteeTester::dumpRuleCaptureInfo(std::ostream& partialMatches, st
 		bool bFullMatchRuleIDComment = false;
 		bool bNoMatchRuleIDComment = false;
 
-		std::vector<TestCaseData> *vecTestCases = &iter->second.m_vecTestCasesInfo;
+		vector<TestCaseData> *vecTestCases = &iter->second.m_vecTestCasesInfo;
 
 		// loop through the file names for a particular rule and create a testcase for that file
-		for (std::vector<TestCaseData>::iterator testCaseIter = vecTestCases->begin(); testCaseIter != vecTestCases->end(); testCaseIter++)
+		for (vector<TestCaseData>::iterator testCaseIter = vecTestCases->begin(); testCaseIter != vecTestCases->end(); testCaseIter++)
 		{
 			// checks for the type of result (full, partial, or no match)
 			if ((*testCaseIter).m_eMatchResult == kFullMatch)
@@ -1309,42 +1305,42 @@ void CGrantorGranteeTester::dumpRuleCaptureInfo(std::ostream& partialMatches, st
 		if (bFullMatchRuleIDComment)
 		{
 			createCommentLine(fullMatches, " -=[ " + iter->first + " ]=- -=[  END  ]=-");
-			fullMatches << std::endl;
+			fullMatches << endl;
 		}
 
 		if (bPartialMatchRuleIDComment)
 		{
 			createCommentLine(partialMatches, " -=[ " + iter->first + " ]=- -=[  END  ]=-");
-			partialMatches << std::endl;
+			partialMatches << endl;
 		}
 
 		if (bNoMatchRuleIDComment)
 		{
 			createCommentLine(partialMatches, " -=[ NO MATCHING RULE ]=- -=[  END  ]=-");
-			partialMatches << std::endl;
+			partialMatches << endl;
 		}
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CGrantorGranteeTester::createCommentLine(std::ostream& output, const std::string& strComment)
+void CGrantorGranteeTester::createCommentLine(ostream& output, const string& strComment)
 {
-	output << "//" << strComment << std::endl;
+	output << "//" << strComment << endl;
 }
 //-------------------------------------------------------------------------------------------------
-void CGrantorGranteeTester::createTestCaseLine(std::ostream& output, const std::string& strRSDFile, const std::string& strUSSFile, const std::string& strEAVFile)
+void CGrantorGranteeTester::createTestCaseLine(ostream& output, const string& strRSDFile, const string& strUSSFile, const string& strEAVFile)
 {
-	output << "<TESTCASE>;" << strRSDFile << ";" << strUSSFile << ";" << strEAVFile << std::endl;
+	output << "<TESTCASE>;" << strRSDFile << ";" << strUSSFile << ";" << strEAVFile << endl;
 }
 //-------------------------------------------------------------------------------------------------
-void CGrantorGranteeTester::createTestFileLine(std::ostream& output, const std::string& strFilename, const bool bCommented)
+void CGrantorGranteeTester::createTestFileLine(ostream& output, const string& strFilename, const bool bCommented)
 {
 	if(bCommented)
 	{
-		output << "//<FILE>;" << strFilename << std::endl;
+		output << "//<FILE>;" << strFilename << endl;
 	}
 	else
 	{
-		output << "<FILE>;" << strFilename << std::endl;
+		output << "<FILE>;" << strFilename << endl;
 	}
 
 }
@@ -1435,7 +1431,7 @@ vector<CGrantorGranteeTester::TestCaseData> CGrantorGranteeTester::getTestCaseFi
 	return vecTestCaseData;
 }
 //-------------------------------------------------------------------------------------------------
-void CGrantorGranteeTester::getRSDAndEAVFileName ( const std::string& strMapFile, TestCaseData& testCaseData )
+void CGrantorGranteeTester::getRSDAndEAVFileName ( const string& strMapFile, TestCaseData& testCaseData )
 {
 	// Load file into vector;
 	vector<string>& vecLines = convertFileToLines( strMapFile );
@@ -1531,7 +1527,7 @@ void CGrantorGranteeTester::getRSDAndEAVFileName ( const std::string& strMapFile
 //-------------------------------------------------------------------------------------------------
 // CGrantorGranteeTester::TestCaseData
 //-------------------------------------------------------------------------------------------------
-CGrantorGranteeTester::TestCaseData::TestCaseData(const std::string& strRSDFile, const std::string& strUSSFile, const std::string& strEAVFile, const std::string &strRuleID, const ETestCaseResult eResult)
+CGrantorGranteeTester::TestCaseData::TestCaseData(const string& strRSDFile, const string& strUSSFile, const string& strEAVFile, const string &strRuleID, const ETestCaseResult eResult)
 {
 	m_strRSDFilename = strRSDFile;
 	m_strUSSFilename = strUSSFile;	

@@ -13,8 +13,6 @@
 #include <map>
 using namespace std;
 
-#pragma warning (disable: 4231)
-
 EXPIMP_TEMPLATE_BASEUTILS template class EXPORT_BaseUtils std::map<string, ValueTypePair>;
 
 class EXPORT_BaseUtils EventData : public map<string, ValueTypePair>

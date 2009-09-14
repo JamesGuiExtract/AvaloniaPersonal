@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 #include <CommonToExtractProducts.h>
@@ -31,7 +29,3 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 using namespace UCLID_SSOCRLib;
 
 #endif // _AFX_NO_AFXCMN_SUPPORT
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

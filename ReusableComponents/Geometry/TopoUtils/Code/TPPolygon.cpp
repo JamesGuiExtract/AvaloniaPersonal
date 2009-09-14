@@ -250,8 +250,8 @@ double TPPolygon::getIntersectionArea(const TPPolygon& polySecond)
 	try
 	{
 		// Get the points and segments vector of polySecond
-		const std::vector<TPPoint>& vecPointsSecond = polySecond.m_vecPoints;
-		const std::vector<TPLineSegment>& vecSegmentsSecond = polySecond.getSegments();
+		const vector<TPPoint>& vecPointsSecond = polySecond.m_vecPoints;
+		const vector<TPLineSegment>& vecSegmentsSecond = polySecond.getSegments();
 
 		// Intersection polygon
 		TPPolygon polyIntersection;
@@ -331,7 +331,7 @@ double TPPolygon::getIntersectionArea(const TPPolygon& polySecond)
 	}
 	catch(...)
 	{
-		UCLIDException ue("ELI15072", "Error calculating the intersection area of two polygons!");
+		UCLIDException ue("ELI15072", "Error calculating the intersection area of two polygons.");
 		throw ue;
 	}
 }
@@ -349,9 +349,9 @@ void TPPolygon::getExtents(double& rdMinX, double& rdMinY, double& rdMaxX, doubl
 	rdMaxY = m_dMaxY;
 }
 //--------------------------------------------------------------------------------------------------
-const std::vector<TPLineSegment> TPPolygon::getSegments() const
+const vector<TPLineSegment> TPPolygon::getSegments() const
 {
-	std::vector<TPLineSegment> vecSegments;
+	vector<TPLineSegment> vecSegments;
 	if (m_vecPoints.size() >= 3)
 	{
 		for (unsigned int i = 0; i < m_vecPoints.size(); i++)

@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "AFOutputHandlers.h"
 #include "RemoveSubAttributes.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
-#include "..\\..\\AFCore\\Code\\Common.h"
 
+#include <SpecialStringDefinitions.h>
+#include <Common.h>
 #include <UCLIDException.h>
 #include <COMUtils.h>
 #include <cpputil.h>
@@ -13,8 +13,6 @@
 #include <StringTokenizer.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
-
-#include <io.h>
 
 using namespace std;
 //-------------------------------------------------------------------------------------------------
@@ -507,7 +505,7 @@ STDMETHODIMP CRemoveSubAttributes::Load(IStream *pStream)
 		{
 			// Throw exception
 			UCLIDException ue( "ELI09551", 
-				"Unable to load newer Remove SubAttributes Output Handler!" );
+				"Unable to load newer Remove SubAttributes Output Handler." );
 			ue.addDebugInfo( "Current Version", gnCurrentVersion );
 			ue.addDebugInfo( "Version to Load", nDataVersion );
 			throw ue;
@@ -602,7 +600,7 @@ STDMETHODIMP CRemoveSubAttributes::Save(IStream *pStream, BOOL fClearDirty)
 			IPersistStreamPtr ipObj = ipObjWithDesc;
 			if (ipObj == NULL)
 			{
-				throw UCLIDException("ELI09796", "DataScorer object does not support persistence!");
+				throw UCLIDException("ELI09796", "DataScorer object does not support persistence.");
 			}
 			writeObjectToStream(ipObj, pStream, "ELI09915", fClearDirty);
 		}
@@ -613,7 +611,7 @@ STDMETHODIMP CRemoveSubAttributes::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipObj = m_ipAS;
 		if (ipObj == NULL)
 		{
-			throw UCLIDException("ELI13324", "Attribute Selector object does not support persistence!");
+			throw UCLIDException("ELI13324", "Attribute Selector object does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI13325", fClearDirty);
 		

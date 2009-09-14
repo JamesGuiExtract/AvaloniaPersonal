@@ -3,10 +3,8 @@
 #include "AFCoreTest.h"
 #include "AutomatedRuleSetTester.h"
 
-#include "..\..\..\AFUtils\Code\SpecialStringDefinitions.h"
-
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
-
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
 #include <StringTokenizer.h>
@@ -15,16 +13,11 @@
 #include <ComponentLicenseIDs.h>
 #include <TextFunctionExpander.h>
 
-
-#include <io.h>
-#include <stdio.h>
+#include <cstdio>
 #include <fstream>
 #include <set>
 #include <algorithm>
-
-#define CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <cstdlib>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -245,7 +238,7 @@ STDMETHODIMP CAutomatedRuleSetTester::raw_RunAutomatedTests(IVariantVector* pPar
 			}
 			catch (UCLIDException& ue)
 			{
-				UCLIDException uexOuter("ELI07336", "Unable to read RuleSet master test input file!", ue);
+				UCLIDException uexOuter("ELI07336", "Unable to read RuleSet master test input file.", ue);
 				throw uexOuter;
 			}
 
@@ -626,7 +619,7 @@ pair<long, bool> CAutomatedRuleSetTester::computeScore(IAttributePtr ipExpected,
 					// score not being in the collection)
 					if (score == mapBestScores.end())
 					{
-						UCLIDException uex("ELI24705", "Best score value was not in the collection!");
+						UCLIDException uex("ELI24705", "Best score value was not in the collection.");
 						throw uex;
 					}
 
@@ -1367,7 +1360,7 @@ const std::string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorP
 		if(strMasterDatFileName.empty() || (getFileNameFromFullPath(strMasterDatFileName) == ""))
 		{
 			// Create and throw exception
-			UCLIDException ue("ELI19400", "Required master testing .DAT file not found!");
+			UCLIDException ue("ELI19400", "Required master testing .DAT file not found.");
 			throw ue;
 		}
 
@@ -1376,7 +1369,7 @@ const std::string CAutomatedRuleSetTester::getMasterTestFileName(IVariantVectorP
 	else
 	{
 		// Create and throw exception
-		UCLIDException ue("ELI19401", "Required master testing .DAT file not found!");
+		UCLIDException ue("ELI19401", "Required master testing .DAT file not found.");
 		throw ue;	
 	}
 }
@@ -1413,7 +1406,8 @@ bool CAutomatedRuleSetTester::compareResultVectors(IIUnknownVectorPtr ipFound,
 		{
 			// Nothing expected but something found and need to add to count
 			bMatched = false;
-			for ( int i = 0; i < ipFound->Size(); i++)
+			long lSize = ipFound->Size();
+			for (int i = 0; i < lSize; i++)
 			{
 				IAttributePtr ipFoundAttribute = ipFound->At( i );
 				ASSERT_RESOURCE_ALLOCATION("ELI24713", ipFoundAttribute != NULL);

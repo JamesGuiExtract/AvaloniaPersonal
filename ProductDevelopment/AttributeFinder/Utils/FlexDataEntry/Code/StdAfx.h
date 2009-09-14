@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 #include <CommonToExtractProducts.h>
@@ -37,14 +35,11 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
+#import "..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
+using namespace UCLID_SPOTRECOGNITIONIRLib;
+
 #import "..\..\..\AFCore\Code\AFCore.tlb" named_guids
 using namespace UCLID_AFCORELib;
 
 #import "..\..\..\AFUtils\Code\AFUtils.tlb" named_guids
 using namespace UCLID_AFUTILSLib;
-
-#import "..\..\..\..\..\ReusableComponents\InputFunnel\InputReceivers\SpotRecognitionIR\Code\Core\SpotRecognitionIR.tlb" named_guids
-using namespace UCLID_SPOTRECOGNITIONIRLib;
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

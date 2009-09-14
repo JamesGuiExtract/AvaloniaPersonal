@@ -10,8 +10,6 @@
 #endif
 #define _ATL_APARTMENT_THREADED
 
-#pragma warning (disable : 4786)
-
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>
@@ -23,13 +21,8 @@
 extern CComModule _Module;
 #include <atlcom.h>
 
-#pragma warning(disable: 4251)
-
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb"
 using namespace UCLID_COMUTILSLib;
 
 #import "..\..\UCLIDTestingFramework\Interfaces\Code\UCLIDTestingFramework.tlb" named_guids 
 using namespace UCLID_TESTINGFRAMEWORKINTERFACESLib;
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

@@ -20,11 +20,6 @@
 //==================================================================================================
 #include <comdef.h>
 
-#include <string>
-#include <vector>
-#include <map>
-using namespace std;
-
 #include "BaseUtils.h"
 #include "cpputil.h"
 #include "ValueTypePair.h"
@@ -32,12 +27,19 @@ using namespace std;
 #include "Win32CriticalSection.h"
 #include "ByteStream.h"
 
+#include <string>
+#include <vector>
+#include <map>
+
+using namespace std;
+
+#pragma warning(push)
 #pragma warning(disable: 4251) // Eliminate warning arising from <vector>
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
 // String constant for default INI file
-const std::string	gstrLICENSE_CORRUPTION_ELI = "ELI15373";
+const string	gstrLICENSE_CORRUPTION_ELI = "ELI15373";
 
 // Displayed to user if this debug information is sensitive
 const string gstrENCRYPTED_INDICATOR = "<Encrypted>";
@@ -80,12 +82,12 @@ class EXPORT_BaseUtils LastCodePosition
 {
 public:
 	// Constructor, that requires initialization of the method location identifier.
-	LastCodePosition(const std::string& strMethodLocationIdentifier);
+	LastCodePosition(const string& strMethodLocationIdentifier);
 
 	// Overload the string assignment operator so that the m_strLastCodePos
 	// member can easily be updated by setting this object equal to a string
 	// value representing the last code position.
-	void operator=(const std::string& strLastCodePos);
+	void operator=(const string& strLastCodePos);
 
 	// Return the fully qualified last code position, which is a string obtained by
 	// combining the two member variables of this object (m_strMethodLocationIdentifier
@@ -100,15 +102,15 @@ public:
 	// Overload the string operator so that a string object can easily be set to this object.
 	// This method returns the fully qualified last code position returned by the get()
 	// method.
-	operator const std::string();
+	operator const string();
 
 private:
 	// The method location identifier (e.g. "MLI01234")
-	std::string m_strMethodLocationIdentifier;
+	string m_strMethodLocationIdentifier;
 
 	// The last code position within the method, represented by any string chosen by the
 	// developer of that method, such as "1", "3.1", "6.41c", etc.
-	std::string m_strLastCodePos;
+	string m_strLastCodePos;
 };
 
 //==================================================================================================
@@ -1469,3 +1471,4 @@ private:
 	} \
 }
 //--------------------------------------------------------------------------------------------------
+#pragma warning(pop)

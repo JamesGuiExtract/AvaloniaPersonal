@@ -14,8 +14,6 @@
 	
 #include <fstream>
 
-#pragma warning(disable : 4503)
-
 using namespace std;
 
 const int g_FindPartiesColumn = 1;

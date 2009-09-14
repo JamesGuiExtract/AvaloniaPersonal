@@ -26,8 +26,6 @@
 
 using namespace std;
 
-#pragma warning(disable: 4251) // Eliminate warning arising from <vector>
-
 
 class EXPORT_BaseUtils ByteStreamManipulator
 {

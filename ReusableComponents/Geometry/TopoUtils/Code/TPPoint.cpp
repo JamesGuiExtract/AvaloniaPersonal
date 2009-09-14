@@ -13,15 +13,13 @@
 //
 //==================================================================================================
 
-#pragma warning(disable:4786)
-
 #include "stdafx.h"
 #include "TPPoint.h"
 
 #include <UCLIDException.h>
 #include <mathUtil.h>
 
-#include <math.h>
+#include <cmath>
 
 TPPoint::TPPoint()
 {
@@ -94,7 +92,7 @@ double TPPoint::angleTo(const TPPoint& p) const
 
 	if (dH < MathVars::ZERO)
 	{
-		UCLIDException uclidException("ELI01215", "Cannot determine the angle between two coinciding TPPoints!");
+		UCLIDException uclidException("ELI01215", "Cannot determine the angle between two coinciding TPPoints.");
 		uclidException.addDebugInfo("x", m_dX);
 		uclidException.addDebugInfo("y", m_dY);
 		uclidException.addDebugInfo("p.x", p.m_dX);

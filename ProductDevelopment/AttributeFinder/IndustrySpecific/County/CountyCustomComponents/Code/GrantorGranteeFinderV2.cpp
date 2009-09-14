@@ -4,8 +4,7 @@
 #include "DatFileIterator.h"
 
 // the file contains specific tag names for AFDocument
-#include "..\..\..\..\AFUtils\Code\SpecialStringDefinitions.h"
-
+#include <SpecialStringDefinitions.h>
 #include <CommentedTextFileReader.h>
 #include <common.h>
 #include <ComponentLicenseIDs.h>
@@ -17,9 +16,7 @@
 #include <stringCSIS.h>
 #include <UCLIDException.h>
 
-#define CRTDBG_MAP_ALLOC
 #include <cstdlib>
-#include <crtdbg.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,7 +24,6 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-#pragma warning( disable : 4503)
 using namespace std;
 
 //-------------------------------------------------------------------------------------------------
@@ -576,7 +572,7 @@ STDMETHODIMP CGrantorGranteeFinderV2::Save(IStream *pStream, BOOL fClearDirty)
 			
 			if ( ipObj == NULL )
 			{
-				throw UCLIDException("ELI09352", "StrToObjectMap object does not support persistence!");
+				throw UCLIDException("ELI09352", "StrToObjectMap object does not support persistence.");
 			}
 			
 			writeObjectToStream(ipObj, pStream, "ELI09930", fClearDirty);

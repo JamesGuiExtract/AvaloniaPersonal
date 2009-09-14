@@ -4,8 +4,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #define STRICT
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
@@ -31,5 +29,3 @@ using namespace UCLID_COMLMLib;
 
 #import "UCLIDCOMUtils.tlb"
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

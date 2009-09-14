@@ -2,24 +2,19 @@
 #include "stdafx.h"
 #include "AFUtilsTest.h"
 #include "DocumentClassifierTester.h"
-#include "..\..\Code\SpecialStringDefinitions.h"
 
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
 #include <StringTokenizer.h>
 #include <LicenseMgmt.h>
-
 #include <COMUtils.h>
 #include <ComponentLicenseIDs.h>
 
-#include <io.h>
-#include <stdio.h>
+#include <cstdio>
 #include <fstream>
-
-#define CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <cstdlib>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -240,7 +235,8 @@ bool CDocumentClassifierTester::compareTags(const string& strDocName,
 			IVariantVectorPtr ipDocTypes = ipObjTags->GetValue(_bstr_t(DOC_TYPE.c_str()));
 			if (ipDocTypes != NULL)
 			{
-				for (long n=0; n<ipDocTypes->Size; n++)
+				long lSize = ipDocTypes->Size;
+				for (long n = 0; n < lSize; n++)
 				{
 					if (n == 0)
 					{
@@ -284,7 +280,7 @@ bool CDocumentClassifierTester::compareTags(const string& strDocName,
 						zCount.Format( "%d Document Type(s) found", ipDocTypes->Size );
 						
 						m_ipResultLogger->AddTestCaseDetailNote( 
-							_bstr_t( zCount.operator LPCTSTR() ),
+							_bstr_t( LPCTSTR(zCount) ),
 							_bstr_t( zMsg ) );
 
 						// Check size of DocTypes vector
@@ -460,7 +456,7 @@ void CDocumentClassifierTester::processDatFile(const string& strDatFileName)
 	}
 	catch (UCLIDException& ue)
 	{
-		UCLIDException uexOuter("ELI07303", "Unable to read Document Classifier test input file!", ue);
+		UCLIDException uexOuter("ELI07303", "Unable to read Document Classifier test input file.", ue);
 		uexOuter.addDebugInfo( "Filename", strDatFileName );
 		throw uexOuter;
 	}
@@ -737,7 +733,7 @@ const std::string CDocumentClassifierTester::getMasterTestFileName(IVariantVecto
 		if(strMasterDatFileName.empty() || (getFileNameFromFullPath(strMasterDatFileName) == ""))
 		{
 			// Create and throw exception
-			UCLIDException ue("ELI12288", "Required master testing .DAT file not found!");
+			UCLIDException ue("ELI12288", "Required master testing .DAT file not found.");
 			throw ue;
 		}
 
@@ -746,7 +742,7 @@ const std::string CDocumentClassifierTester::getMasterTestFileName(IVariantVecto
 	else
 	{
 		// Create and throw exception
-		UCLIDException ue("ELI12289", "Required master testing .DAT file not found!");
+		UCLIDException ue("ELI12289", "Required master testing .DAT file not found.");
 		throw ue;	
 	}
 }

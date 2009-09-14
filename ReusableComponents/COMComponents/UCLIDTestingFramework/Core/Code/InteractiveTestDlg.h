@@ -1,14 +1,14 @@
-//{{AFX_INCLUDES()
-#include "webbrowser2.h"
-//}}AFX_INCLUDES
-#pragma once
 // InteractiveTestDlg.h : header file
 //
-#pragma warning (disable : 4786)
 
+#pragma once
 
+#include "webbrowser2.h"
 #include "TestCaseInfo.h"
+
 #include <vector>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // InteractiveTestDlg dialog
@@ -56,8 +56,8 @@ private:
 	// Variables
 	/////////////
 	ITestResultLoggerPtr m_ipResultLogger;
-	std::string m_strITCFile;
-	std::vector<TestCaseInfo> m_vecTestCaseInfo;
+	string m_strITCFile;
+	vector<TestCaseInfo> m_vecTestCaseInfo;
 	unsigned long m_ulCurrentTestCase;
 
 	// This is only used in OnSize to skip very first OnSize call when the dialog 

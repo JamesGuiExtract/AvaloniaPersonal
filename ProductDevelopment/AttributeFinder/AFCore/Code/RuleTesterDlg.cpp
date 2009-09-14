@@ -1,4 +1,3 @@
-
 #include "stdafx.h"
 #include "afcore.h"
 #include "RuleTesterDlg.h"
@@ -6,10 +5,9 @@
 #include "TesterDlgEdit.h"
 #include "AFAboutDlg.h"
 #include "AFInternalUtils.h"
-
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 #include "Common.h"
 
+#include <SpecialStringDefinitions.h>
 #include <RegistryPersistenceMgr.h>
 #include <TemporaryResourceOverride.h>
 #include <UCLIDException.h>
@@ -18,8 +16,6 @@
 #include <Win32Util.h>
 #include <FileDialogEx.h>
 #include <ComUtils.h>
-
-#include <io.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -369,7 +365,7 @@ void RuleTesterDlg::OnButtonExecute()
 			}
 			else
 			{
-				throw UCLIDException("ELI08822", "No Rules File selected!" );
+				throw UCLIDException("ELI08822", "No Rules File selected." );
 			}
 		}
 

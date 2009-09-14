@@ -2,10 +2,10 @@
 #include "stdafx.h"
 #include "AFSplitters.h"
 #include "LegalDescSplitter.h"
-#include "..\\..\\AFCore\\Code\\Common.h"
-// the file contains specific tag names for AFDocument
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <Common.h>
+// the file contains specific tag names for AFDocument
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
@@ -17,8 +17,9 @@
 #include <misc.h>
 #include <ComponentLicenseIDs.h>
 
-#include <io.h>
 #include <map>
+
+using namespace std;
 
 #define RANGE_SEPARATORS	"through|-|thru|\\bto\\b"
 #define RANGE_PATTERN		"\\d+\\s*?(through|-|thru|\\bto\\b)\\s*?\\d+"
@@ -332,7 +333,7 @@ void CLegalDescSplitter::processAFDcoument(IAFDocumentPtr& ipAFDoc)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CLegalDescSplitter::processLegal( std::string strLegalType, ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
+void CLegalDescSplitter::processLegal( string strLegalType, ISpatialStringPtr ipInputText, IIUnknownVectorPtr ipSubAttributes)
 {
 	ASSERT_ARGUMENT("ELI07973", ipInputText != NULL );
 	ASSERT_ARGUMENT("ELI07974", ipSubAttributes != NULL );
@@ -953,7 +954,7 @@ void CLegalDescSplitter::processMuni( ISpatialStringPtr ipInputText, IIUnknownVe
 	}		
 }
 //-------------------------------------------------------------------------------------------------
-void CLegalDescSplitter::addAsAttributes( std::string strAttributeName, 
+void CLegalDescSplitter::addAsAttributes( string strAttributeName, 
 										 IIUnknownVectorPtr ipAttributeStrings, 
 										 IIUnknownVectorPtr ipAttributeList, 
 										 bool bAsMultiple, 
@@ -1181,7 +1182,7 @@ IIUnknownVectorPtr CLegalDescSplitter::getFoundStrings( ISpatialStringPtr ipInpu
 }
 
 //-------------------------------------------------------------------------------------------------
-bool CLegalDescSplitter::isRegExpInText ( std::string strSearchText, std::string strRegExp )
+bool CLegalDescSplitter::isRegExpInText ( string strSearchText, string strRegExp )
 {
 	//if the strRegExp or StrSearchText are empty then return false other wise check for the RegExp in SearchText
 	if ( strRegExp != "" && strSearchText != "" )
@@ -1244,7 +1245,7 @@ IMiscUtilsPtr CLegalDescSplitter::getMiscUtils()
 	return m_ipMiscUtils;
 }
 //-------------------------------------------------------------------------------------------------
-IAttributePtr CLegalDescSplitter::createAttribute( std::string strAttrName, ISpatialStringPtr ipAttrValue )
+IAttributePtr CLegalDescSplitter::createAttribute( string strAttrName, ISpatialStringPtr ipAttrValue )
 {
 	IAttributePtr ipAttribute(CLSID_Attribute);
 	ASSERT_RESOURCE_ALLOCATION("ELI08178", ipAttribute != NULL);
@@ -1256,7 +1257,7 @@ IAttributePtr CLegalDescSplitter::createAttribute( std::string strAttrName, ISpa
 	return ipAttribute;
 }
 //-------------------------------------------------------------------------------------------------
-IAttributePtr CLegalDescSplitter::createAttribute( std::string strAttrName, string strAttrValue )
+IAttributePtr CLegalDescSplitter::createAttribute( string strAttrName, string strAttrValue )
 {
 	IAttributePtr ipAttribute(CLSID_Attribute);
 	ASSERT_RESOURCE_ALLOCATION("ELI08180", ipAttribute != NULL);
@@ -1301,8 +1302,8 @@ void CLegalDescSplitter::setupMuniRuleSet()
 //-------------------------------------------------------------------------------------------------
 IIUnknownVectorPtr CLegalDescSplitter::processValueParts( ISpatialStringPtr ipMainValue, 
 														 IIUnknownVectorPtr ipPartStrings, 
-														 std::string strExtractRegExp,
-														 std::string strBeforeRegExp )
+														 string strExtractRegExp,
+														 string strBeforeRegExp )
 {
 	ASSERT_ARGUMENT("ELI08480", ipPartStrings != NULL );
 
@@ -1475,7 +1476,7 @@ void CLegalDescSplitter::makeRangeSeparatorDash( IIUnknownVectorPtr ipRangedValu
 
 }
 //-------------------------------------------------------------------------------------------------
-IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( std::string strLegalType )
+IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( string strLegalType )
 {
 	if ( strLegalType == "" )
 	{
@@ -1520,7 +1521,7 @@ IRuleSetPtr CLegalDescSplitter::getModifierRuleSet( std::string strLegalType )
 	return ipModifierRuleSet;
 }
 //-------------------------------------------------------------------------------------------------
-ISpatialStringPtr CLegalDescSplitter::applyModifiers( std::string strLegalType, std::string strAttrName, ISpatialStringPtr ipValue )
+ISpatialStringPtr CLegalDescSplitter::applyModifiers( string strLegalType, string strAttrName, ISpatialStringPtr ipValue )
 {
 	ASSERT_ARGUMENT("ELI08470", ipValue != NULL );
 

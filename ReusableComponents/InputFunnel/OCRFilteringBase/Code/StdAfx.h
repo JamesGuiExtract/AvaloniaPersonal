@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 #include <CommonToExtractProducts.h>
@@ -20,7 +18,6 @@
 #include <afxdisp.h>        // MFC Automation classes
 #endif // _AFX_NO_OLE_SUPPORT
 
-
 #ifndef _AFX_NO_DB_SUPPORT
 #include <afxdb.h>			// MFC ODBC database classes
 #endif // _AFX_NO_DB_SUPPORT
@@ -33,7 +30,3 @@
 #ifndef _AFX_NO_AFXCMN_SUPPORT
 #include <afxcmn.h>			// MFC support for Windows Common Controls
 #endif // _AFX_NO_AFXCMN_SUPPORT
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

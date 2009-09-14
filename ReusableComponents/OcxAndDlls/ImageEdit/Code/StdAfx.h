@@ -6,8 +6,6 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-#pragma warning (disable:4786)
-
 // Modify the following defines if you have to target a platform prior to the ones specified below.
 // Refer to MSDN for the latest info on corresponding values for different platforms.
 #ifndef WINVER				// Allow use of features specific to Windows XP or later.
@@ -37,7 +35,6 @@
 #include <afxdb.h>			// MFC database classes
 #include <afxdao.h>			// MFC DAO database classes
 
-//#include <ltwrappr.h>
 #include <atlbase.h>
 //You may derive a class from CComModule and use it if you want to override
 //something, but do not change the name of _Module
@@ -45,5 +42,3 @@ extern CComModule _Module;
 #include <atlcom.h>
 #include <atlctl.h>
 
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

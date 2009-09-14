@@ -7,8 +7,6 @@
 
 using namespace std;
 
-#pragma warning (disable: 4231)
-
 //instantiate classes vector<Point>. This doesn't create an object
 EXPIMP_TEMPLATE_BASEUTILS template class EXPORT_BaseUtils std::vector<Point>;
 

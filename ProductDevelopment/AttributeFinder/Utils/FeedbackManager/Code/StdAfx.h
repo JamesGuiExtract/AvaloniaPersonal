@@ -13,9 +13,6 @@
 // DAO support conflicts with ADO support, so remove it
 #define _AFX_NO_DAO_SUPPORT
 
-#pragma warning(disable:4786)
-#pragma warning(disable:4146)
-
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>
@@ -54,6 +51,3 @@ using namespace UCLID_AFCORELib;
 #import "c:\program files\common files\system\ado\msado27.tlb" \
 	no_namespace \
 	rename ("EOF", "adoEOF")
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

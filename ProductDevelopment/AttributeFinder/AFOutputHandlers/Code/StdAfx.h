@@ -4,8 +4,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #define STRICT
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
@@ -27,11 +25,11 @@ extern CComModule _Module;
 #include <atlctl.h>
 #include "..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 
-#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
-using namespace UCLID_COMUTILSLib;
-
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
+using namespace UCLID_COMUTILSLib;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
 	rename("LoadImage", "LoadRasterImage")
@@ -56,8 +54,4 @@ using namespace UCLID_AFUTILSLib;
 #import "..\..\AFSelectors\Code\AFSelectors.tlb" named_guids
 using namespace UCLID_AFSELECTORSLib;
 
-
 #import "AFOutputHandlers.tlb"
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

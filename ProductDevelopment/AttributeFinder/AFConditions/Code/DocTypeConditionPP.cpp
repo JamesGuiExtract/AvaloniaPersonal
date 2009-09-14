@@ -2,14 +2,16 @@
 #include "stdafx.h"
 #include "AFConditions.h"
 #include "DocTypeConditionPP.h"
-#include "..\..\AFCore\Code\EditorLicenseID.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <EditorLicenseID.h>
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <COMUtils.h>
 
-using std::string;
+#include <string>
+
+using namespace std;
 
 //-------------------------------------------------------------------------------------------------
 // CDocTypeConditionPP

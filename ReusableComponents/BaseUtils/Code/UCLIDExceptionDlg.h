@@ -5,8 +5,6 @@
 
 #include <string>
 
-#pragma warning(disable: 4275)	// CDialog is exported
-
 class EXPORT_BaseUtils UCLIDExceptionDlg : public CDialog,
 										public UCLIDExceptionHandler
 {

@@ -3,10 +3,10 @@
 #include "AFCore.h"
 #include "AttributeFinderEngine.h"
 #include "Common.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 #include "AFInternalUtils.h"
 #include "AFAboutDlg.h"
 
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <TemporaryResourceOverride.h>
 #include <cpputil.h>
@@ -15,8 +15,6 @@
 #include <ComUtils.h>
 #include <Misc.h>
 #include <ComponentLicenseIDs.h>
-
-#include <io.h>
 
 using namespace std;
 
@@ -355,14 +353,14 @@ STDMETHODIMP CAttributeFinderEngine::get_FeedbackManager(IFeedbackMgr **pVal)
 				m_ipFeedbackMgr.CreateInstance( strProgID.c_str() );
 				if (m_ipFeedbackMgr == NULL)
 				{
-					UCLIDException ue( "ELI11111", "Failed to create Feedback Manager!" );
+					UCLIDException ue( "ELI11111", "Failed to create Feedback Manager." );
 					ue.addDebugInfo( "Prog ID", strProgID );
 					throw ue;
 				}
 			}
 			else
 			{
-				UCLIDException ue( "ELI11110", "ProgID for Feedback Manager not found!" );
+				UCLIDException ue( "ELI11110", "ProgID for Feedback Manager not found." );
 				throw ue;
 			}
 		}

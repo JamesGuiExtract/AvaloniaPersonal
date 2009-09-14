@@ -2,9 +2,9 @@
 #include "stdafx.h"
 #include "AFValueFinders.h"
 #include "SPMFinder.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
-#include "..\\..\\AFCore\\Code\\Common.h"
 
+#include <SpecialStringDefinitions.h>
+#include <Common.h>
 #include <UCLIDException.h>
 #include <COMUtils.h>
 #include <cpputil.h>
@@ -14,8 +14,6 @@
 #include <Misc.h>
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
-
-#include <io.h>
 
 using namespace std;
 
@@ -127,7 +125,7 @@ STDMETHODIMP CSPMFinder::raw_ParseText(IAFDocument* pAFDoc, IProgressStatus *pPr
 			{
 				// If a tag expanded to a file that doesn't exist we won't throw
 				// an exception, we will just return no attributes
-				UCLIDException ue("ELI07502", "Specified file not found for String Pattern Matcher rule!");
+				UCLIDException ue("ELI07502", "Specified file not found for String Pattern Matcher rule.");
 				ue.addDebugInfo("File", strInput);
 				ue.log();
 				*pAttributes = ipRetAttributes.Detach();
@@ -278,7 +276,7 @@ STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
 		// or if the file name contains valid <DocType> strings
 		if (getAFUtility()->StringContainsInvalidTags(strFile.c_str()) == VARIANT_TRUE)
 		{
-			UCLIDException ue("ELI07473", "The rules file contains invalid tags!");
+			UCLIDException ue("ELI07473", "The rules file contains invalid tags.");
 			ue.addDebugInfo("File", strFile);
 			throw ue;
 		}
@@ -286,13 +284,13 @@ STDMETHODIMP CSPMFinder::put_RulesFileName(BSTR newVal)
 		{
 			if (!isAbsolutePath(strFile))
 			{
-				UCLIDException ue("ELI07501", "Specification of a relative path to the RSD/ETF file is not allowed!");
+				UCLIDException ue("ELI07501", "Specification of a relative path to the RSD/ETF file is not allowed.");
 				ue.addDebugInfo("File", strFile);
 				throw ue;
 			}
 			else if (!isValidFile(strFile))
 			{
-				UCLIDException ue("ELI07474", "The specified rules file does not exist!");
+				UCLIDException ue("ELI07474", "The specified rules file does not exist.");
 				ue.addDebugInfo("File", strFile);
 				ue.addWin32ErrorInfo();
 				throw ue;
@@ -580,7 +578,7 @@ STDMETHODIMP CSPMFinder::put_MinScoreToConsiderAsMatch(long newVal)
 		// ensure that the new minimum match score is in [0,100]
 		if (newVal < 0 || newVal > 100)
 		{
-			UCLIDException ue("ELI08592", "Invalid score - score must be in the range 0 to 100!");
+			UCLIDException ue("ELI08592", "Invalid score - score must be in the range 0 to 100.");
 			ue.addDebugInfo("newVal", newVal);
 			throw ue;
 		}
@@ -621,7 +619,7 @@ STDMETHODIMP CSPMFinder::put_ReturnMatchType(ESPMReturnMatchType eNewVal)
 		if (eNewVal != kReturnBestMatch && eNewVal != kReturnFirstMatch &&
 			eNewVal != kReturnAllMatches && eNewVal != kReturnFirstOrBest)
 		{
-			UCLIDException ue("ELI08620", "Invalid return match type!");
+			UCLIDException ue("ELI08620", "Invalid return match type.");
 			ue.addDebugInfo("eNewVal", (unsigned long) eNewVal);
 			throw ue;
 		}
@@ -1047,7 +1045,7 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		IPersistStreamPtr ipObj = ipObjWithDesc;
 		if (ipObj == NULL)
 		{
-			throw UCLIDException("ELI08625", "DataScorer object does not support persistence!");
+			throw UCLIDException("ELI08625", "DataScorer object does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09920", fClearDirty);
 
@@ -1058,7 +1056,7 @@ STDMETHODIMP CSPMFinder::Save(IStream *pStream, BOOL fClearDirty)
 		ipObj = ipPreprocessors;
 		if (ipObj == NULL)
 		{
-			throw UCLIDException("ELI08758", "VariantVector object does not support persistence!");
+			throw UCLIDException("ELI08758", "VariantVector object does not support persistence.");
 		}
 		writeObjectToStream(ipObj, pStream, "ELI09921", fClearDirty);
 

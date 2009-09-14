@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 
-#pragma warning(disable: 4251) // for string in base utils valuetypepair and namedvaluetypepair
-
 #include "SafeNetLicenseMgr.h"
 #include "SafeNetErr.h"
 #include "SafeNetLicenseCfg.h"
@@ -23,7 +21,7 @@
 #include <TimedRetryDlg.h>
 
 #include <fstream>
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -441,7 +439,7 @@ UINT heartbeatThreadProc(void *pData)
 	if (htd == NULL)
 	{
 		// Log an exception to indicate that thread data was null.
-		UCLIDException ue("ELI24879", "Heartbeat thread data was NULL!");
+		UCLIDException ue("ELI24879", "Heartbeat thread data was NULL.");
 		ue.log();
 
 		// Return non zero value to indicate an error.
@@ -509,7 +507,7 @@ void SafeNetLicenseMgr::getLicense()
 		// If this is a retry attempt log an exception
 		if ( bIsReconnectAttempt )
 		{
-			UCLIDException ue("ELI25006", "Attempting to reconnect to USB Key!");
+			UCLIDException ue("ELI25006", "Attempting to reconnect to USB Key.");
 			ue.log();
 		}
 
@@ -656,7 +654,7 @@ void SafeNetLicenseMgr::getLicense()
 					releaseLicense();
 
 					// Set the saved exception everytime through the loop
-					ueSave = UCLIDException ("ELI18243", "Get USB Key License timed out!", ue);
+					ueSave = UCLIDException ("ELI18243", "Get USB Key License timed out.", ue);
 
 					// Flag that an exception has been thrown
 					bException = true;
@@ -1223,7 +1221,7 @@ void SafeNetLicenseMgr::resetHeartBeatThread()
 	if ( m_htdData.m_bException )
 	{
 		// Encapsulate the thread exception and log
-		UCLIDException ue("ELI24874", "Heartbeat thread exited with exception!", m_htdData.m_ue);
+		UCLIDException ue("ELI24874", "Heartbeat thread exited with exception.", m_htdData.m_ue);
 		ue.log();
 		
 		// Flag exception so that it will not be logged again.

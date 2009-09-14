@@ -5,8 +5,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-
 #include <CommonToExtractProducts.h>
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
@@ -35,7 +33,3 @@ using namespace UCLID_AFCORELib;
 
 #import "..\..\..\AFUtils\Code\AFUtils.tlb" named_guids
 using namespace UCLID_AFUTILSLib;
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

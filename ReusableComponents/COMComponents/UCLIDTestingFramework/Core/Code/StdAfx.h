@@ -10,8 +10,6 @@
 #endif
 #define _ATL_APARTMENT_THREADED
 
-#pragma warning(disable:4786)
-
 #include <afxwin.h>
 #include <afxdisp.h>
 

@@ -7,8 +7,6 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-#pragma warning(disable:4786)
-
 #include "CommonToExtractProducts.h"
 
 #include <afxwin.h>         // MFC core and standard components
@@ -34,6 +32,3 @@
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
 #include <afxsock.h>		// MFC socket extensions
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

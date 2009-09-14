@@ -9,10 +9,6 @@
 #include <cpputil.h>
 #include <ComUtils.h>
 
-// this file generates long identifier names because of map<dword, stack<string>>
-// disable generation of those harmless warnings
-#pragma warning(disable:4503)
-
 // allocate static variables
 map<DWORD, stack<string> > CRuleExecutionEnv::m_mapThreadIDToRSDFileStack;
 
@@ -185,7 +181,7 @@ stack<string>& CRuleExecutionEnv::getCurrentStack(bool bThrowExceptionIfStackEmp
 	// if there is no stack for the current thread, throw an exception
 	if (rThisThreadStack.empty() && bThrowExceptionIfStackEmpty)
 	{
-		UCLIDException ue("ELI11649", "Rule Execution Stack is empty!");
+		UCLIDException ue("ELI11649", "Rule Execution Stack is empty.");
 		ue.addDebugInfo("dwThreadID", dwThreadID);
 		throw ue;
 	}

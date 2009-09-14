@@ -33,9 +33,6 @@
 #include "io.h"
 #include "XBrowseForFolder.h"
 
-#pragma warning(disable: 4127)	// conditional expression is constant (_ASSERTE)
-
-
 #ifndef __AFX_H__
 
 #define TRACE (void(0))

@@ -2,12 +2,14 @@
 
 #pragma once
 #include "resource.h"       // main symbols
-#include "..\..\AFCore\Code\AFCategories.h"
 
-#pragma warning(disable:4503)
+#include <AFCategories.h>
+
 #include <string>
 #include <map>
 #include <vector>
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // CReformatPersonNames
@@ -89,18 +91,18 @@ END_CATEGORY_MAP()
 
 public:
 
-	std::string m_strQuery;
+	string m_strQuery;
 	bool m_bReformatPersonSubAttributes;
-	std::string m_strFormat;
+	string m_strFormat;
 
 	bool m_bDirty;
 	IAFUtilityPtr m_ipAFUtility;
 
 	void validateLicense();
-	void validateFormatString(std::string strFormat);
+	void validateFormatString(string strFormat);
 
-	typedef std::map<std::string, std::vector<ISpatialStringPtr> > VariableMap;
+	typedef map<string, vector<ISpatialStringPtr> > VariableMap;
 	void reformatAttribute(IAttributePtr ipAttribute);
-	ISpatialStringPtr getReformattedName(std::string strFormat, VariableMap& mapVars);
+	ISpatialStringPtr getReformattedName(string strFormat, VariableMap& mapVars);
 };
 

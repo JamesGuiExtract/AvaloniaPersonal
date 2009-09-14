@@ -7,9 +7,6 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
-#pragma warning(disable:4786)
-#pragma warning(disable:4503)
-
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>         // MFC core and standard components
@@ -42,10 +39,4 @@ using namespace UCLID_COMUTILSLib;
 
 #import "..\..\..\COMComponents\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
 using namespace ESMESSAGEUTILSLib;
-
-//#include <mapi.h>
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

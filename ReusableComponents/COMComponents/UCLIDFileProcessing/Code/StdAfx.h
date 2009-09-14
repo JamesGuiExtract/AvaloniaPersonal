@@ -4,8 +4,6 @@
 
 #pragma once
 
-#pragma warning (disable : 4786)
-
 #define _CRT_RAND_S
 
 #include <CommonToExtractProducts.h>
@@ -29,18 +27,15 @@
 extern CComModule _Module;
 #include <atlcom.h>
 
+#import "..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
+using namespace UCLID_COMLMLib;
+
 #import "..\..\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
 
-#import "..\..\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
-using namespace UCLID_COMLMLib;
 
 #import "c:\Program Files\Common Files\System\ADO\msado27.tlb" \
 	rename ("EOF", "adoEOF")
 using namespace ADODB;
 
 #import "UCLIDFileProcessing.tlb" 
-
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

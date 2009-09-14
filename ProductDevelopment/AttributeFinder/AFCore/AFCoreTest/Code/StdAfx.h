@@ -10,8 +10,6 @@
 #endif
 #define _ATL_APARTMENT_THREADED
 
-#pragma warning(disable:4786)
-
 #include <CommonToExtractProducts.h>
 
 #include <afxwin.h>
@@ -51,6 +49,3 @@ using namespace UCLID_AFCORELib;
 
 #import "..\..\..\AFUtils\Code\AFUtils.tlb" named_guids raw_property_prefixes("raw_get_", "raw_put_", "raw_putref_")
 using namespace UCLID_AFUTILSLib;
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

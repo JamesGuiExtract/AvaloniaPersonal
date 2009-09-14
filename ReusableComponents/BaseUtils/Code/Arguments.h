@@ -9,8 +9,6 @@
 //
 //////////////////////////////////////////////////////////////////////
 
-#pragma warning (disable : 4786) 
-
 #pragma once
 
 #include "BaseUtils.h"
@@ -101,5 +99,3 @@ public:
 	Arguments( tstring strCommandName, tstring strDescription=_T(""), tstring strOptionmarkers=_T("-/") );
 	virtual ~Arguments();
 };
-
-#pragma warning (disable : 4786) 

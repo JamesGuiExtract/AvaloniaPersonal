@@ -8,9 +8,6 @@
 
 #include <CommonToExtractProducts.h>
 
-#pragma warning(disable:4786)
-#pragma warning(disable:4503)
-
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxdisp.h>        // MFC Automation classes
@@ -26,9 +23,3 @@ using namespace UCLID_COMUTILSLib;
 
 #import "..\..\..\..\COMComponents\ESMessageUtils\Code\ESMessageUtils.tlb" named_guids
 using namespace ESMESSAGEUTILSLib;
-
-//#include <mapi.h>
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.
-

@@ -2,9 +2,9 @@
 
 #include "stdafx.h"
 #include "IDShieldTester.h"
-#include "..\..\..\..\AFCore\Code\Common.h"
-#include "..\..\AFUtils\Code\SpecialStringDefinitions.h"
 
+#include <Common.h>
+#include <SpecialStringDefinitions.h>
 #include <UCLIDException.h>
 #include <cpputil.h>
 #include <CommentedTextFileReader.h>
@@ -17,7 +17,7 @@
 #include <mathUtil.h>
 #include <SafeTwoDimensionalArray.h>
 
-#include <math.h>
+#include <cmath>
 
 using namespace std;
 
@@ -122,7 +122,7 @@ EAttributeQuantifier validateConditionString(const string& strCondition, const s
 	}
 	else
 	{
-		UCLIDException ue(strELICode, "Invalid condition string!");
+		UCLIDException ue(strELICode, "Invalid condition string.");
 		ue.addDebugInfo("Condition String", strCondition);
 		throw ue;
 	}
@@ -351,7 +351,7 @@ STDMETHODIMP CIDShieldTester::raw_RunAutomatedTests(IVariantVector* pParams, BST
 			}
 			else
 			{
-				UCLIDException ue("ELI15167", "Required master testing .DAT file missing!");
+				UCLIDException ue("ELI15167", "Required master testing .DAT file missing.");
 				throw ue;
 			}	
 
@@ -436,7 +436,7 @@ void CIDShieldTester::processDatFile(const string& strDatFileName)
 
 	if( ! ifs.is_open() )
 	{
-		UCLIDException ue("ELI15168", "Error while opening DAT file!");
+		UCLIDException ue("ELI15168", "Error while opening DAT file.");
 		ue.addDebugInfo("File", strDatFileName);
 		throw ue;
 	}
@@ -481,7 +481,7 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 	int nNumTokens = static_cast<int>( vecTokens.size() );
 	if (nNumTokens < 2)
 	{
-		UCLIDException ue("ELI15171", "Invalid line of text in DAT file!");
+		UCLIDException ue("ELI15171", "Invalid line of text in DAT file.");
 		ue.addDebugInfo("Line", strLineText);
 		throw ue;
 	}
@@ -493,7 +493,7 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 		// Verify the correct number of arguments for the <SETTING> case.
 		if( nNumTokens != 2 )
 		{
-			UCLIDException ue("ELI15172", "Invalid number of arguments for <SETTING> in DAT file!");
+			UCLIDException ue("ELI15172", "Invalid number of arguments for <SETTING> in DAT file.");
 			ue.addDebugInfo("Line Text", strLineText);
 			ue.addDebugInfo("Number of args", nNumTokens);
 			throw ue;
@@ -510,38 +510,38 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 		{
 			// Both condition settings must be set before test folder can take place
 			UCLIDException ue("ELI25180", 
-				"Verification condition must be set before using <TESTFOLDER> test case in DAT file!");
+				"Verification condition must be set before using <TESTFOLDER> test case in DAT file.");
 			throw ue;
 		}
 		else if (m_strVerificationQuantifier.empty())
 		{
 			UCLIDException ue("ELI25181", 
-				"Verification condition quantifier must be set before using <TESTFOLDER> test case in DAT file!");
+				"Verification condition quantifier must be set before using <TESTFOLDER> test case in DAT file.");
 			throw ue;
 		}
 		else if (m_setRedactionCondition.empty())
 		{
 			// Both condition settings must be set before test folder can take place
 			UCLIDException ue("ELI25162", 
-				"Automated redaction condition must be set before using <TESTFOLDER> test case in DAT file!");
+				"Automated redaction condition must be set before using <TESTFOLDER> test case in DAT file.");
 			throw ue;
 		}
 		else if (m_strRedactionQuantifier.empty())
 		{
 			UCLIDException ue("ELI25182", 
-				"Automated redaction condition quantifier must be set before using <TESTFOLDER> test case in DAT file!");
+				"Automated redaction condition quantifier must be set before using <TESTFOLDER> test case in DAT file.");
 			throw ue;
 		}
 		else if( m_strRedactionQuery.empty() )
 		{
 			UCLIDException ue("ELI15194", 
-				"Automated redaction query must be set before using the <TESTFOLDER> test case in DAT file!");
+				"Automated redaction query must be set before using the <TESTFOLDER> test case in DAT file.");
 			throw ue;
 		}
 		else if( nNumTokens != 5 )
 		{
 			UCLIDException ue("ELI15173", 
-				"Invalid number of arguments for <TESTFOLDER> in DAT file!");
+				"Invalid number of arguments for <TESTFOLDER> in DAT file.");
 			ue.addDebugInfo("Line Text", strLineText);
 			ue.addDebugInfo("Number of Args", nNumTokens);
 			throw ue;
@@ -555,7 +555,7 @@ void CIDShieldTester::interpretLine(const string& strLineText,
 	}
 	else
 	{
-		UCLIDException ue("ELI15175", "Invalid prefix in DAT file!");
+		UCLIDException ue("ELI15175", "Invalid prefix in DAT file.");
 		ue.addDebugInfo("Tag value", vecTokens[0]);
 		throw ue;
 	}
@@ -577,7 +577,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 			// If the setting for Verification has already been set, it cannot be set again
 			if (! m_setVerificationCondition.empty())
 			{
-				throw UCLIDException("ELI25158", "Verification condition can only be set once!");
+				throw UCLIDException("ELI25158", "Verification condition can only be set once.");
 			}
 
 			m_strVerificationCondition = vecTokens[1];
@@ -597,7 +597,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 			if (! m_strRedactionQuery.empty())
 			{
 				throw UCLIDException("ELI15236", 
-					"Query for automated redaction can only be set once!");
+					"Query for automated redaction can only be set once.");
 			}
 
 			m_strRedactionQuery = vecTokens[1];
@@ -609,7 +609,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 			if (! m_setRedactionCondition.empty())
 			{
 				throw UCLIDException("ELI25155",
-					"Automated redaction condition can only be set once!");
+					"Automated redaction condition can only be set once.");
 			}
 
 			m_strRedactionCondition = vecTokens[1];
@@ -642,7 +642,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			if (!m_strTypeToBeTested.empty())
 			{
-				throw UCLIDException("ELI18506", "Type to be tested may only be set once!");
+				throw UCLIDException("ELI18506", "Type to be tested may only be set once.");
 			}
 
 			// check for the "all"
@@ -658,7 +658,7 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		{
 			if (!m_setDocTypesToBeVerified.empty())
 			{
-				throw UCLIDException("ELI25149", "Doc types to verify may only be set once!");
+				throw UCLIDException("ELI25149", "Doc types to verify may only be set once.");
 			}
 
 			// Tokenize the doc types to be verified by the '|' character
@@ -680,14 +680,14 @@ void CIDShieldTester::handleSettings(const string& strSettingsText)
 		}
 		else
 		{
-			UCLIDException ue("ELI15176", "Invalid Settings token in DAT file!");
+			UCLIDException ue("ELI15176", "Invalid Settings token in DAT file.");
 			ue.addDebugInfo("Text", strSettingsText);
 			throw ue;
 		}
 	}
 	else
 	{
-		UCLIDException ue("ELI15177", "Invalid <SETTINGS> line in DAT file!");
+		UCLIDException ue("ELI15177", "Invalid <SETTINGS> line in DAT file.");
 		ue.addDebugInfo("Text", strSettingsText);
 		throw ue;
 	}
@@ -775,7 +775,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			// the expected VOA file must always be there
 			if (strExpectedVOAFile.empty())
 			{
-				throw UCLIDException("ELI15246", "Expected VOA file must not be empty!");
+				throw UCLIDException("ELI15246", "Expected VOA file must not be empty.");
 			}
 			else
 			{
@@ -803,7 +803,7 @@ void CIDShieldTester::handleTestCase(const string& strRulesFile, const string& s
 			// If the file does not exist, there are no expected values, throw an exception
 			else
 			{
-				UCLIDException ue("ELI15221", "Invalid file specified for expected values!");
+				UCLIDException ue("ELI15221", "Invalid file specified for expected values.");
 				ue.addDebugInfo("Filename:", strExpectedVOAFile );
 				throw ue;
 			}
@@ -1170,7 +1170,8 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 
 	// For each expected raster zone in the vector, verify that there is some found
 	// raster zone that matches it
-	for ( int e = 0; e < ipExpectedRasterZones->Size(); e++)
+	long lExpectedSize = ipExpectedRasterZones->Size();
+	for ( int e = 0; e < lExpectedSize; e++)
 	{
 		// Get each individual raster zone
 		IRasterZonePtr ipExpectedRZ = ipExpectedRasterZones->At( e );
@@ -1179,7 +1180,8 @@ bool CIDShieldTester::spatiallyMatches(ISpatialStringPtr ipExpectedSS,
 		bool bFoundMatch = false;
 		
 		// Check it against each found raster zone for a match within the limits of the overlap
-		for( int f = 0; f < ipFoundRasterZones->Size(); f++)
+		long lFoundSize = ipFoundRasterZones->Size();
+		for( int f = 0; f < lFoundSize; f++)
 		{
 			IRasterZonePtr ipFoundRZ = ipFoundRasterZones->At( f );
 			ASSERT_RESOURCE_ALLOCATION("ELI15189", ipFoundRZ != NULL);

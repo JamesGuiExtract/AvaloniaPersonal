@@ -3,10 +3,9 @@
 
 #include "BaseUtils.h"
 
-#pragma warning(disable: 4251)
-
 #include <vector>
 #include <string>
+
 using namespace std;
 
 class EXPORT_BaseUtils StringTokenizer

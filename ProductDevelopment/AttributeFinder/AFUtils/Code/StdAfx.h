@@ -4,9 +4,6 @@
 
 #pragma once
 
-#pragma warning(disable:4786)
-#pragma warning(disable:4503)
-
 #define STRICT
 #ifndef _WIN32_WINNT
 #define _WIN32_WINNT 0x0400
@@ -27,11 +24,11 @@ extern CComModule _Module;
 #include <atlctl.h>
 #include "..\..\..\..\ReusableComponents\APIs\Microsoft Visual Studio\VC98\ATL\Include\atlcontrols.h"
 
-#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
-using namespace UCLID_COMUTILSLib;
-
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLM\Code\COMLM.tlb" named_guids 
 using namespace UCLID_COMLMLib;
+
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
+using namespace UCLID_COMUTILSLib;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\Core\Code\UCLIDRasterAndOCRMgmt.tlb" named_guids \
 	rename("LoadImage", "LoadRasterImage")
@@ -40,14 +37,14 @@ using namespace UCLID_RASTERANDOCRMGMTLib;
 #import "..\..\..\..\ReusableComponents\InputFunnel\IFCore\Code\IFCore.tlb" named_guids
 using namespace UCLID_INPUTFUNNELLib;
 
-#import "..\..\AFCore\Code\AFCore.tlb" named_guids
-using namespace UCLID_AFCORELib;
+#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
+using namespace UCLID_IMAGEUTILSLib;
 
 #import "..\..\..\..\ReusableComponents\COMComponents\UCLIDRasterAndOCRMgmt\OCREngines\SSOCR\Code\SSOCR.tlb" named_guids
 using namespace UCLID_SSOCRLib;
 
-#import "..\..\..\..\ReusableComponents\COMComponents\UCLIDImageUtils\Code\UCLIDImageUtils.tlb" named_guids
-using namespace UCLID_IMAGEUTILSLib;
+#import "..\..\AFCore\Code\AFCore.tlb" named_guids
+using namespace UCLID_AFCORELib;
 
 #import "AFUtils.tlb"
 

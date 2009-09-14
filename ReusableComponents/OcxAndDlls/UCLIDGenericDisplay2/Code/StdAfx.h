@@ -1,7 +1,4 @@
-#if !defined(AFX_STDAFX_H__1498157A_9117_11D4_9725_008048FBC96E__INCLUDED_)
-#define AFX_STDAFX_H__1498157A_9117_11D4_9725_008048FBC96E__INCLUDED_
-
-#pragma warning(disable:4786)
+#pragma once
 
 // stdafx.h : include file for standard system include files,
 //      or project specific include files that are used frequently,
@@ -30,5 +27,3 @@
 
 #import "..\..\..\COMComponents\UCLIDCOMUtils\Core\Code\UCLIDCOMUtils.tlb" named_guids
 using namespace UCLID_COMUTILSLib;
-
-#endif // !defined(AFX_STDAFX_H__1498157A_9117_11D4_9725_008048FBC96E__INCLUDED_)

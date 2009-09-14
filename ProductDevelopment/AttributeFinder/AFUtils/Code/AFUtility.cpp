@@ -5,8 +5,8 @@
 #include "AFUtils.h"
 #include "AFUtility.h"
 #include "SpecialStringDefinitions.h"
-#include "..\\..\\AFCore\\Code\\Common.h"
 
+#include <Common.h>
 #include <UCLIDException.h>
 #include <LicenseMgmt.h>
 #include <cpputil.h>
@@ -487,7 +487,7 @@ STDMETHODIMP CAFUtility::GetAttributesFromFile(BSTR strFileName, IIUnknownVector
 				{
 					// Throw exception
 					UCLIDException ue( "ELI07871", 
-						"Object loaded from file is not an attribute!" );
+						"Object loaded from file is not an attribute." );
 					ue.addDebugInfo( "File Name", strFile );
 					ue.addDebugInfo( "Item Number", i );
 					throw ue;
@@ -778,7 +778,7 @@ void CAFUtility::expandRSDFileDirTag(string& rstrInput)
 		// be expanded.
 		if (strDir == "")
 		{
-			UCLIDException ue("ELI07500", "There is no current RSD file to expand the <RSDFileDir> tag!");
+			UCLIDException ue("ELI07500", "There is no current RSD file to expand the <RSDFileDir> tag.");
 			ue.addDebugInfo("strInput", rstrInput);
 			throw ue;
 		}
@@ -804,7 +804,7 @@ void CAFUtility::expandRuleExecIDTag(string& rstrInput,
 		{
 			string strMsg = "The ";
 			strMsg += gstrRULE_EXEC_ID_TAG;
-			strMsg += " tag cannot be expanded because the rule execution ID is not available!";
+			strMsg += " tag cannot be expanded because the rule execution ID is not available.";
 			throw UCLIDException("ELI09835", strMsg);
 		}
 
@@ -853,7 +853,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 	{
 		string strMsg = "There is no source document available to expand the ";
 		strMsg += strSOURCE_DOC_NAME_TAG;
-		strMsg += " tag!";
+		strMsg += " tag.";
 		UCLIDException ue("ELI09069", strMsg);
 		ue.addDebugInfo("strInput", rstrInput);
 		throw ue;
@@ -874,7 +874,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 		{
 			string strMsg = "There is no extension available to expand the ";
 			strMsg += strSOURCE_DOC_EXT_TAG;
-			strMsg += " tag!";
+			strMsg += " tag.";
 			UCLIDException ue("ELI09819", strMsg);
 			ue.addDebugInfo("strSourceDocName", strSourceDocName);
 			throw ue;
@@ -896,7 +896,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 		{
 			string strMsg = "There is no filename available to expand the ";
 			strMsg += strSOURCE_DOC_FILENAME_TAG;
-			strMsg += " tag!";
+			strMsg += " tag.";
 			UCLIDException ue("ELI09820", strMsg);
 			ue.addDebugInfo("strSourceDocName", strSourceDocName);
 			throw ue;
@@ -915,7 +915,7 @@ void CAFUtility::expandSourceDocNameTag(string& rstrInput,
 		{
 			string strMsg = "There is no path available to expand the ";
 			strMsg += strSOURCE_DOC_PATH_TAG;
-			strMsg += " tag!";
+			strMsg += " tag.";
 			UCLIDException ue("ELI09821", strMsg);
 			ue.addDebugInfo("strSourceDocName", strSourceDocName);
 			throw ue;
@@ -944,7 +944,7 @@ void CAFUtility::expandDocTypeTag(string& rstrInput,
 		// exists.  If not, throw an exception
 		if (ipVecDocTypes == NULL)
 		{
-			throw UCLIDException("ELI07466", "Document was not successfully classified!");
+			throw UCLIDException("ELI07466", "Document was not successfully classified.");
 		}
 
 		long nSize = ipVecDocTypes->Size;
@@ -953,11 +953,11 @@ void CAFUtility::expandDocTypeTag(string& rstrInput,
 		// type found, throw an exception
 		if (nSize == 0)
 		{
-			throw UCLIDException("ELI07471", "No document type available!");
+			throw UCLIDException("ELI07471", "No document type available.");
 		}
 		else if (nSize > 1)
 		{
-			throw UCLIDException("ELI07472", "No unique document type available!");
+			throw UCLIDException("ELI07472", "No unique document type available.");
 		}
 
 		// get the string value for the document type tag
@@ -1013,7 +1013,7 @@ bool CAFUtility::getTagValueFromINIFile(const string& strTagName, string& rstrTa
 	if (nLen <= 2 || strTagName[0] != '<' ||
 		strTagName[nLen - 1] != '>')
 	{
-		UCLIDException ue("ELI09817", "Invalid tag name!");
+		UCLIDException ue("ELI09817", "Invalid tag name.");
 		ue.addDebugInfo(strTagName, strTagName);
 		throw ue;
 	}
@@ -1087,7 +1087,7 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 		if (nTagStartPos == string::npos || nTagEndPos == string::npos || 
 			nTagEndPos < nTagStartPos)
 		{
-			UCLIDException ue("ELI19374", "Matching pairs of '<' and '>' not found!");
+			UCLIDException ue("ELI19374", "Matching pairs of '<' and '>' not found.");
 			ue.addDebugInfo("nTagStartPos", nTagStartPos);
 			ue.addDebugInfo("nTagEndPos", nTagEndPos);
 			ue.addDebugInfo("rstrInput", rstrInput);
@@ -1100,7 +1100,7 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 			nTagEndPos - nTagStartPos + 1);
 		if (strTagName.empty())
 		{
-			throw UCLIDException("ELI19375", "An empty tag name cannot be expanded!");
+			throw UCLIDException("ELI19375", "An empty tag name cannot be expanded.");
 		}
 	
 		
@@ -1117,7 +1117,7 @@ void CAFUtility::expandINIFileTags(string& rstrInput,
 
 		if (strTagValue.empty())
 		{
-			UCLIDException ue("ELI09815", "Cannot expand tag to an empty string!");
+			UCLIDException ue("ELI09815", "Cannot expand tag to an empty string.");
 			ue.addDebugInfo("strTagName", strTagName);
 			throw ue;
 		}
@@ -1155,7 +1155,7 @@ void CAFUtility::getTagNames(const string& strInput,
 		if (nTagStartPos == string::npos || nTagEndPos == string::npos || 
 			nTagEndPos < nTagStartPos)
 		{
-			UCLIDException ue("ELI19184", "Matching pairs of '<' and '>' not found!");
+			UCLIDException ue("ELI19184", "Matching pairs of '<' and '>' not found.");
 			ue.addDebugInfo("nTagStartPos", nTagStartPos);
 			ue.addDebugInfo("nTagEndPos", nTagEndPos);
 			throw ue;
@@ -1167,7 +1167,7 @@ void CAFUtility::getTagNames(const string& strInput,
 			nTagEndPos - nTagStartPos + 1);
 		if (strTagName.empty())
 		{
-			throw UCLIDException("ELI19185", "An empty tag name cannot be expanded!");
+			throw UCLIDException("ELI19185", "An empty tag name cannot be expanded.");
 		}
 
 		// continue searching at the next position
@@ -1379,7 +1379,7 @@ ISpatialStringPtr CAFUtility::getReformattedName(const string& strFormat,
 				}
 				else
 				{
-					UCLIDException ue(UCLIDException("ELI12972", "Invalid Variable - Variable identifier cannot be only digits!"));
+					UCLIDException ue(UCLIDException("ELI12972", "Invalid Variable - Variable identifier cannot be only digits."));
 					ue.addDebugInfo("Variable", strFormat.substr(ui, ulLength));
 					throw ue;
 				}
@@ -1531,7 +1531,7 @@ void CAFUtility::expandTags(string& rstrInput, IAFDocumentPtr ipDoc)
 		getTagNames(rstrInput, vecTagNames);
 		if (!vecTagNames.empty())
 		{
-			UCLIDException ue("ELI09818", "One or more tag names could not be expanded!");
+			UCLIDException ue("ELI09818", "One or more tag names could not be expanded.");
 			ue.addDebugInfo("rstrInput", rstrInput);
 			throw ue;
 		}
@@ -1601,7 +1601,7 @@ void CAFUtility::generateAttributesFromEAVFile(const string& strFileName,
 		}
 		else
 		{
-			UCLIDException ue("ELI13035", "Unable to open file!");
+			UCLIDException ue("ELI13035", "Unable to open file.");
 			ue.addDebugInfo("Filename", strFileName);
 			throw ue;
 		}
