@@ -165,6 +165,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RedactionGridViewRowComparer.cs" />
     <Compile Include="RedactionGridViewRow.cs" />
     <Compile Include="RedactionGridView.cs">
       <SubType>UserControl</SubType>
