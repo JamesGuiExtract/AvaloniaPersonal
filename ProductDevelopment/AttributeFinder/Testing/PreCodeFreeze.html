@@ -35,6 +35,8 @@
   	<li>Confirm that Optimizations are set to <b>Disabled (/Od)</b> via C/C++ - Optimization.
   	<li>Confirm that C++ Exceptions are set to <b>Yes With SEH Exceptions (/EHa)</b> via 
 	C/C++ - Code Generation.
+  	<li>Confirm that Generate Debug Info is set to <b>Yes (/DEBUG)</b> in Release mode 
+	via Linker - Debugging.
 </UL>
 <br>
 
@@ -62,6 +64,9 @@
 	  	<li>Create comprehensive set of automated tests.
 	  	<li>Create Memory Leak test(s).
 	  	<li>Exercise basic functionality with large set of images.
+		<UL>
+			<LI> Order Mapper Output Handler
+		</UL>
 	</UL>
 <p>
   	<li><b>New Task Objects</b>
@@ -69,9 +74,12 @@
 	  	<li>Create comprehensive set of automated tests.
 	  	<li>Create Memory Leak test(s).
 	  	<li>Exercise basic functionality with large set of images.
+		<UL>
+			<LI> Convert VOA to XML
+		</UL>
 	</UL>
 <p>
-  	<li><b>Core Feature / Enhancement : Lead Tools version 16</b>
+  	<li><b>Core Feature / Enhancement : Lead Tools version 16.5</b>
 	<UL>
 	  	<li>Confirm proper functionality with new version.
 	  	<li>Confirm that the <b>NAG DLL message</b> is not seen.
@@ -96,52 +104,6 @@
 		existing checklist.
 	  	<li>Open various rotated images in the <b>Image Viewer</b> - through 
 		existing checklist.
-	</UL>
-<p>
-  	<li><b>Core Feature / Enhancement : Nuance OCR engine version 16</b>
-	<UL>
-	  	<li>Confirm proper functionality with new version.
-<p>
-      		<li><b>[FlexIDSCore #3037]</b>
-		<ul>
-			<li>Confirm that the image specified in the SCR OCRs text on 
-			<b>page 1</b> when OCR'ing the entire document.
-		</ul>
-      		<li><b>[LegacyRC #3552]</b> Convlist.txt
-		<ul>
-			<li>Confirm that <b>CONVLIST.TXT</b> is no longer required to be 
-			in the CommonComponents folder.
-		</ul>
-      		<li><b>[LegacyRC #4304]</b> OCR region ignores area on image
-		<ul>
-			<li>Confirm that the two <b>Social Security Number</b> items specified in 
-			the SCR are OCR'd properly.
-		</ul>
-      		<li><b>[LegacyRC #4727]</b> OCR tiled TIF image
-		<ul>
-			<li>Confirm that the attached <b>tiled TIF</b> image OCR's properly.
-		</ul>
-      		<li><b>[LegacyRC #4787]</b> OCR adds extra spaces
-		<ul>
-			<li>Confirm that <b>PHILLIP J JANUS</b> is OCR'd correctly without extra 
-			spaces in the specified image file.
-		</ul>
-      		<li><b>[LegacyRC #4868]</b> OCR adds leading spaces
-		<ul>
-			<li>Confirm that OCR'ing the specified PDF image <b>does not</b> create 
-			lines with leading spaces.
-		</ul>
-      		<li><b>[LegacyRC #4917]</b> OCR confuses image orientation
-		<ul>
-			<li>Confirm that OCR'ing the specified image yields the majority of the 
-			document text right side up.
-			<li>Note that the page footer contains upside down text.
-		</ul>
-      		<li><b>[LegacyRC #5060]</b> OCR failures due to image decomposition errors
-		<ul>
-			<li>Confirm that each image in <b>I:\Common\Testing\PVCS_Testing\LegacyRC\5060</b> 
-			OCRs without error.
-		</ul>
 	</UL>
 </UL>
 <br>
