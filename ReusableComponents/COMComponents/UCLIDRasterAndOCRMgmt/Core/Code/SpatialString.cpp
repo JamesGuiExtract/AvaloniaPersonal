@@ -41,9 +41,6 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 
 		// From here on the suffix S0 on variable will mean it applies to this string
 		// and the suffix S1 on a string will mean it applies to the input string
-		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS0(this);
-		ASSERT_RESOURCE_ALLOCATION("ELI11251", ipS0 != NULL);
-
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS1(pSS);
 		ASSERT_RESOURCE_ALLOCATION("ELI11250", ipS1 != NULL);
 
@@ -72,6 +69,10 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 		{
 			THROW_LOGIC_ERROR_EXCEPTION("ELI11256");
 		}
+
+		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipS0(this);
+		ASSERT_RESOURCE_ALLOCATION("ELI11251", ipS0 != NULL);
+
 		// now we know that both strings start on the same page
 		// so we will get their bounding boxes on that page
 		UCLID_RASTERANDOCRMGMTLib::ISpatialStringPtr ipFirstPageS0 =
@@ -98,7 +99,7 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 			*pbRetVal = VARIANT_TRUE;
 			return S_OK;
 		}
-		else if(nBottomS1 < nTopS0)
+		else if (nBottomS1 < nTopS0)
 		{
 			*pbRetVal = VARIANT_FALSE;
 			return S_OK;
@@ -110,7 +111,6 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 		long nHeightS1 = nBottomS1 - nTopS1;
 
 		long nMinHeight = nHeightS0 < nHeightS1 ? nHeightS0 : nHeightS1;
-		long nMaxHeight = nHeightS0 < nHeightS1 ? nHeightS1 : nHeightS0;
 
 		long nDiff0 = nBottomS0 - nTopS1;
 		long nDiff1 = nBottomS1 - nTopS0;
@@ -123,29 +123,18 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 
 		double dPercentOverlap = 100.0 * (double)nOverlap / (double)nMinHeight;
 
-		if (dPercentOverlap < gfORDER_MIN_OVERLAP_PERCENT)
+		if (dPercentOverlap >= gfORDER_MIN_OVERLAP_PERCENT)
 		{
-			if (nTopS0 < nTopS1)
+			if (nLeftS0 < nLeftS1)
 			{
 				*pbRetVal = VARIANT_TRUE;
 				return S_OK;
 			}
-			else if(nTopS1 < nTopS0)
+			else if (nLeftS1 < nLeftS0)
 			{
 				*pbRetVal = VARIANT_FALSE;
 				return S_OK;
 			}
-		}
-
-		if (nLeftS0 < nLeftS1)
-		{
-			*pbRetVal = VARIANT_TRUE;
-			return S_OK;
-		}
-		else if(nLeftS1 < nLeftS0)
-		{
-			*pbRetVal = VARIANT_FALSE;
-			return S_OK;
 		}
 
 		if (nTopS0 < nTopS1)
@@ -153,7 +142,7 @@ STDMETHODIMP CSpatialString::IsSpatiallyLessThan(ISpatialString* pSS, VARIANT_BO
 			*pbRetVal = VARIANT_TRUE;
 			return S_OK;
 		}
-		else if(nTopS1 < nTopS0)
+		else if (nTopS1 < nTopS0)
 		{
 			*pbRetVal = VARIANT_FALSE;
 			return S_OK;
