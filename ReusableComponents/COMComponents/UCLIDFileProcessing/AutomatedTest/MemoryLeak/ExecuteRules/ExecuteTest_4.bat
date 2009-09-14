@@ -1,5 +1,5 @@
 REM Clean Source and Destination folders
-call Clean.bat
+call Clean.bat Test_4
 
 REM Supply Numbered Files for 6 hours
 START CopyNumberedFiles "..\..\..\..\..\..\ProductDevelopment\AttributeFinder\AFCore\AutomatedTest\Images\Image2.tif" ".\Source" 1 -h6
