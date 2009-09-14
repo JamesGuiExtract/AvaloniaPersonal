@@ -53,7 +53,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\AFCore\Code;..\..\AFCppUtils\Code"
+				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\AFCore\Code;..\..\AFUtils\Code;..\..\AFCppUtils\Code"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_GXDLL"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -152,7 +152,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\AFCore\Code;..\..\AFCppUtils\Code"
+				AdditionalIncludeDirectories="..\..\..\..\ReusableComponents\BaseUtils\Code;..\..\..\..\ReusableComponents\COMComponents\UCLIDComponentsLM\COMLMCore\Code;..\..\..\..\ReusableComponents\VendorSpecificUtils\RWUtils\Code;..\..\..\..\ReusableComponents\APIs\RogueWave\Inc;..\..\AFCore\Code;..\..\AFUtils\Code;..\..\AFCppUtils\Code"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_GXDLL"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
