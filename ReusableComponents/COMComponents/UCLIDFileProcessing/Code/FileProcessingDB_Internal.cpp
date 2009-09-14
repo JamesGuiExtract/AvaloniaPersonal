@@ -27,7 +27,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 11;
+const long glFAMDBSchemaVersion = 12;
 
 // Table names
 static const string gstrACTION = "Action";
@@ -836,6 +836,7 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_DB_INFO_TABLE);
 		vecQueries.push_back(gstrCREATE_ACTION_STATE_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_TABLE);
+		vecQueries.push_back(gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_INDEX);
 		vecQueries.push_back(gstrCREATE_QUEUE_EVENT_CODE_TABLE);
 		vecQueries.push_back(gstrCREATE_ACTION_STATISTICS_TABLE);

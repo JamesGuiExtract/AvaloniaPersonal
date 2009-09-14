@@ -110,6 +110,21 @@ library UCLID_FILEPROCESSINGLib
 		kProcessingSkipped = 2
 	}EFileProcessingResult;
 
+	typedef
+		[
+			uuid(8BEC1731-CD1A-4931-809D-C53FDF9BA21F),
+			helpstring("Extract EFilePriority")
+		]
+	enum
+	{
+		kPriorityDefault = 0,
+		kPriorityLow = 1,
+		kPriorityBelowNormal = 2,
+		kPriorityNormal = 3,
+		kPriorityAboveNormal = 4,
+		kPriorityHigh = 5
+	}EFilePriority;
+
 	//----------------------------------------------------------------------------------------------
 	//-I N T E R F A C E S -------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -478,7 +493,7 @@ library UCLID_FILEPROCESSINGLib
 		//				will be changed to eNewStatus
 		// 
 		[id(4), helpstring("method AddFile")] HRESULT AddFile([in] BSTR strFile, [in] BSTR strAction, 
-			[in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
+			[in] EFilePriority ePriority, [in] VARIANT_BOOL bForceStatusChange, [in] VARIANT_BOOL bFileModified, 
 			[in] EActionStatus eNewStatus, [out] VARIANT_BOOL* pbAlreadyExists, [out] EActionStatus *pPrevStatus, 
 			[out, retval] IFileRecord* *ppFileRecord);
 		// -----------------------------------------------------------------------------------------------
@@ -817,6 +832,12 @@ library UCLID_FILEPROCESSINGLib
 			[out, retval] EFileSupplierStatus *pVal);
 		[propput, id(3), helpstring("property FileSupplierStatus")] HRESULT FileSupplierStatus(
 			[in] EFileSupplierStatus newVal);
+		//-----------------------------------------------------------------------------------------
+		// PURPOSE: To get/set the priority that files will be assigned by the FileSupplier
+		[propget, id(4), helpstring("property Priority")] HRESULT Priority(
+			[out, retval] EFilePriority* pVal);
+		[propput, id(4), helpstring("property Priority")] HRESULT Priority(
+			[in] EFilePriority newVal);
 		//-----------------------------------------------------------------------------------------
 	};
 

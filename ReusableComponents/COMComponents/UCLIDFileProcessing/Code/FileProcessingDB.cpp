@@ -79,14 +79,6 @@ using namespace ADODB;
 DEFINE_LICENSE_MGMT_PASSWORD_FUNCTION;
 
 //-------------------------------------------------------------------------------------------------
-// Constants
-//-------------------------------------------------------------------------------------------------
-// moved to header file so that it is accessible by 
-// multiple files [p13 #4920]
-// User name for FAM DB Admin access
-//const string gstrADMIN_USER = "admin"; 
-
-//-------------------------------------------------------------------------------------------------
 // Static Members
 //-------------------------------------------------------------------------------------------------
 std::string CFileProcessingDB::ms_strCurrServerName = "";
@@ -392,9 +384,10 @@ STDMETHODIMP CFileProcessingDB::GetActions( IStrToStrMap * * pmapActionNameToID)
 
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_BOOL bForceStatusChange, 
-										VARIANT_BOOL bFileModified, EActionStatus eNewStatus,
-										VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord)
+STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+										VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified,
+										EActionStatus eNewStatus, VARIANT_BOOL * pbAlreadyExists,
+										EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -518,6 +511,10 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 			// Set the fields from the new file record
 			setFieldsFromFileRecord(ipFields, ipNewFileRecord);
 
+			// Set the priority
+			setLongField(ipFields, "Priority",
+				ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
+
 			// set the initial Action state to pending
 			setStringField( ipFields, strActionCol, strNewStatus );
 
@@ -570,6 +567,13 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, VARIANT_
 			if ( bForceStatusChange == VARIANT_TRUE || *pPrevStatus == kActionUnattempted )
 			{
 				_lastCodePos = "100.2";
+
+				// If force processing then update the priority field to the new value
+				if (bForceStatusChange == VARIANT_TRUE)
+				{
+					setLongField(ipFields, "Priority",
+						ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
+				}
 
 				// if the previous state is "R" it should not be changed
 				// TODO: Handle the "R" case so that they will be marked as pending after the processing has completed
@@ -1276,13 +1280,20 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		{
 			strWhere = "WHERE (" + strActionCol + " = 'P')";
 		}
+
+		// Order by priority [LRCAU #5438]
+		strWhere += " ORDER BY [FAMFile].[Priority] DESC, [FAMFile].[ID] ASC ";
+
+		// Build the from clause
 		string strFrom = "FROM FAMFile " + strWhere;
 			
 		// create query to select top records;
 		string strSelectSQL = "SELECT " + strTop + " FAMFile.ID, FileName, Pages, FileSize " + strFrom;
 
 		// Create the query to update the status to processing
-		string strUpdateSQL = "UPDATE " + strTop + " FAMFile SET " + strActionCol + " = 'R' " + strFrom;
+		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = 'R' FROM (SELECT "
+			+ strTop + " FAMFile.ID AS ID2 FROM FAMFile " + strWhere
+			+ ") AS Temp INNER JOIN FAMFile ON Temp.ID2 = FAMFile.ID";
 
 		// IUnknownVector to hold the FileRecords to return
 		IIUnknownVectorPtr ipFiles( CLSID_IUnknownVector );

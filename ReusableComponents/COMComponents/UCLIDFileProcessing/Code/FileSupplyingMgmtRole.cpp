@@ -794,8 +794,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(), 
-				ipFSData->ForceProcessing, VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending,
-				&bAlreadyExists, &easPrev );	
+				ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_FALSE,
+				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );	
 
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
 			// Using an auto pointer in order to prevent a memory leak due to exceptions
@@ -962,8 +962,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 				// Add the new filename to the db
 				ipFileRecord = getFPMDB()->AddFile(bstrNewSimplifiedName, m_strAction.c_str(), 
-					ipFSData->ForceProcessing, VARIANT_FALSE, UCLID_FILEPROCESSINGLib::kActionPending,
-					&bAlreadyExists, &easPrev );		
+					ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_FALSE,
+					UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );		
 				apFileSupRec->m_ePreviousActionStatus = easPrev;
 				apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
 				bIsAdded = true;
@@ -1051,8 +1051,8 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 			VARIANT_BOOL bAlreadyExists;
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(),
-				ipFSData->ForceProcessing, VARIANT_TRUE, UCLID_FILEPROCESSINGLib::kActionPending,
-				&bAlreadyExists, &easPrev );
+				ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_TRUE,
+				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );
 		
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
 			// Using an auto pointer in order to prevent a memory leak due to exceptions

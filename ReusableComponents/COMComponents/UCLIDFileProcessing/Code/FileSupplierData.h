@@ -36,9 +36,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 		return S_OK;
 	}
 
-	void FinalRelease()
-	{
-	}
+	void FinalRelease();
 
 
 BEGIN_COM_MAP(CFileSupplierData)
@@ -69,6 +67,8 @@ public:
 	STDMETHOD(put_ForceProcessing)(/*[in]*/ VARIANT_BOOL newVal);
 	STDMETHOD(get_FileSupplierStatus)(/*[out, retval]*/ EFileSupplierStatus *pVal);
 	STDMETHOD(put_FileSupplierStatus)(/*[in]*/ EFileSupplierStatus newVal);
+	STDMETHOD(get_Priority)(EFilePriority* pVal);
+	STDMETHOD(put_Priority)(EFilePriority newVal);
 
 // IPersistStream
 	STDMETHOD(GetClassID)(CLSID *pClassID);
@@ -97,6 +97,10 @@ private:
 
 	// True if this object has been modified
 	bool m_bDirty;
+
+	// The priority for the file supplier
+	// - Defaults to UCLID_FILEPROCESSINGLib::kPriorityDefault (0)
+	EFilePriority m_ePriority;
 
 	/////////////
 	// Methods

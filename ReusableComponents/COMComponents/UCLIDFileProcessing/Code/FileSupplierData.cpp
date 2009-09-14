@@ -11,7 +11,7 @@
 //--------------------------------------------------------------------------------------------------
 // Constants
 //--------------------------------------------------------------------------------------------------
-const unsigned long gnCurrentVersion = 1;
+const unsigned long gnCurrentVersion = 2;
 
 //-------------------------------------------------------------------------------------------------
 // CFileSupplierData
@@ -20,6 +20,7 @@ CFileSupplierData::CFileSupplierData()
 : m_ipFileSupplier(NULL),
   m_bForceProcessing(false),
   m_eSupplierStatus(kInactiveStatus),
+  m_ePriority(kPriorityDefault),
   m_bDirty(false)
 {
 }
@@ -28,8 +29,18 @@ CFileSupplierData::~CFileSupplierData()
 {
 	try
 	{
+		m_ipFileSupplier = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16530");
+}
+//-------------------------------------------------------------------------------------------------
+void CFileSupplierData::FinalRelease()
+{
+	try
+	{
+		m_ipFileSupplier = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27589");
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -263,6 +274,45 @@ STDMETHODIMP CFileSupplierData::put_FileSupplierStatus(EFileSupplierStatus newVa
 
 	return S_OK;
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplierData::get_Priority(EFilePriority *pVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27586", pVal != NULL);
+
+		// Return priority
+		*pVal = m_ePriority;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27587");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileSupplierData::put_Priority(EFilePriority newVal)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		// Check license
+		validateLicense();
+
+		// Save new priority
+		m_ePriority = newVal;
+
+		// Set the dirty flag
+		m_bDirty = true;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27588");
+}
 
 //-------------------------------------------------------------------------------------------------
 // IPersistStream
@@ -320,6 +370,7 @@ STDMETHODIMP CFileSupplierData::Load(IStream *pStream)
 		m_ipFileSupplier = NULL;
 		m_bForceProcessing = false;
 		m_eSupplierStatus = kInactiveStatus;
+		m_ePriority = kPriorityDefault;
 
 		// Read the bytestream data from the IStream object
 		long nDataLength = 0;
@@ -346,9 +397,15 @@ STDMETHODIMP CFileSupplierData::Load(IStream *pStream)
 		dataReader >> m_bForceProcessing;
 
 		// DO NOT Read the Status
-//		long tmp;
-//		dataReader >> tmp;
-//		m_eSupplierStatus = (UCLID_FILEPROCESSINGLib::EFileSupplierStatus)tmp;
+
+		// If version 2 or greater, read the priority
+		if (nDataVersion >= 2)
+		{
+			// Read the priority
+			long lTemp;
+			dataReader >> lTemp;
+			m_ePriority = (EFilePriority)lTemp;
+		}
 
 		// Read in the File Supplier with its Description
 		IPersistStreamPtr ipFSObject;
@@ -357,10 +414,10 @@ STDMETHODIMP CFileSupplierData::Load(IStream *pStream)
 
 		// Clear the dirty flag as we've loaded a fresh object
 		m_bDirty = false;
+	
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13737");
-	
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplierData::Save(IStream *pStream, BOOL fClearDirty)
@@ -378,11 +435,11 @@ STDMETHODIMP CFileSupplierData::Save(IStream *pStream, BOOL fClearDirty)
 		ByteStream data;
 		ByteStreamManipulator dataWriter(ByteStreamManipulator::kWrite, data);
 
-		// Write version number, Force Processing flag, 
+		// Write version number, Force Processing flag, and Priority 
 		// DO NOT write File Supplier status
 		dataWriter << gnCurrentVersion;
 		dataWriter << m_bForceProcessing;
-//		dataWriter << (long)m_eSupplierStatus;
+		dataWriter << (long)m_ePriority;
 
 		dataWriter.flushToByteStream();
 
@@ -401,10 +458,10 @@ STDMETHODIMP CFileSupplierData::Save(IStream *pStream, BOOL fClearDirty)
 		{
 			m_bDirty = false;
 		}
+
+		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI13740");
-
-	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileSupplierData::GetSizeMax(ULARGE_INTEGER *pcbSize)

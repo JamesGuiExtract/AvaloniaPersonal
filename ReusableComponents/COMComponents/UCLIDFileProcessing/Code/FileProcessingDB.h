@@ -29,6 +29,9 @@ using namespace std;
 // User name for FAM DB Admin access
 const string gstrADMIN_USER = "admin";
 
+// The default file priority (Normal)
+const long glDEFAULT_FILE_PRIORITY = (long) kPriorityNormal;
+
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------
@@ -69,8 +72,8 @@ public:
 	STDMETHOD(DefineNewAction)( BSTR strAction,  long * pnID);
 	STDMETHOD(DeleteAction)( BSTR strAction);
 	STDMETHOD(GetActions)( IStrToStrMap * * pmapActionNameToID);
-	STDMETHOD(AddFile)( BSTR strFile,  BSTR strAction, VARIANT_BOOL bForceStatusChange, 
-		VARIANT_BOOL bFileModified, EActionStatus eNewStatus, 
+	STDMETHOD(AddFile)( BSTR strFile,  BSTR strAction, EFilePriority ePriority,
+		VARIANT_BOOL bForceStatusChange, VARIANT_BOOL bFileModified, EActionStatus eNewStatus, 
 		VARIANT_BOOL * pbAlreadyExists, EActionStatus *pPrevStatus, IFileRecord* * ppFileRecord);
 	STDMETHOD(RemoveFile)( BSTR strFile, BSTR strAction );
 	STDMETHOD(RemoveFolder)( BSTR strFolder, BSTR strAction );

@@ -204,7 +204,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::raw_ProcessFile(BSTR bstrFileFullNam
 			// Call AddFile() to set the new status.  This will force the status to 
 			// the new status unless the status is processing
 			VARIANT_BOOL bAlreadyExists = VARIANT_FALSE;
-			ipDB->AddFile(bstrFileFullName, m_strActionName.c_str(), 
+			ipDB->AddFile(bstrFileFullName, m_strActionName.c_str(), kPriorityDefault,
 				VARIANT_TRUE, VARIANT_FALSE, m_eActionStatus, &bAlreadyExists, &ePrevStatus);
 		}
 		else
