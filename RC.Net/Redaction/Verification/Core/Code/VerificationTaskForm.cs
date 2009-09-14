@@ -933,7 +933,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                _redactionGridView.SelectPreviousRedaction();
             }
             catch (Exception ex)
             {
@@ -954,7 +954,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // TODO: Implement me
+                _redactionGridView.SelectNextRedaction();
             }
             catch (Exception ex)
             {

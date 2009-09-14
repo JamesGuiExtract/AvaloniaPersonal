@@ -467,7 +467,6 @@ namespace Extract.Redaction.Verification
             // _previousRedactionToolStripButton
             // 
             this._previousRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._previousRedactionToolStripButton.Enabled = false;
             this._previousRedactionToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.PreviousRedaction;
             this._previousRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._previousRedactionToolStripButton.Name = "_previousRedactionToolStripButton";
@@ -478,7 +477,6 @@ namespace Extract.Redaction.Verification
             // _nextRedactionToolStripButton
             // 
             this._nextRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this._nextRedactionToolStripButton.Enabled = false;
             this._nextRedactionToolStripButton.Image = global::Extract.Redaction.Verification.Properties.Resources.NextRedaction;
             this._nextRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._nextRedactionToolStripButton.Name = "_nextRedactionToolStripButton";
