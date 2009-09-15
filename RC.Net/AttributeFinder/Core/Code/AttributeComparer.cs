@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using UCLID_COMUTILSLib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -141,6 +142,8 @@ namespace Extract.AttributeFinder
         /// <returns>Less than zero if <paramref name="x"/> is less than <paramref name="y"/>;
         /// zero if <paramref name="x"/> equals <paramref name="y"/>; greater than zero if 
         /// <paramref name="x"/> is greater than <paramref name="y"/>.</returns>
+        // This message is being suppressed as Compare should not throw any exceptions
+        [SuppressMessage("ExtractRules", "ES0001:PublicMethodsContainTryCatch")]
         public int Compare(ComAttribute x, ComAttribute y)
         {
             // If these are the same object they are equal

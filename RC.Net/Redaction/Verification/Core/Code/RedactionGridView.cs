@@ -1235,18 +1235,25 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void SelectPreviousRedaction()
         {
-            // If there are no rows, we are done.
-            if (_dataGridView.Rows.Count > 0)
+            try
             {
-                // Go to the previous unviewed row if one exists
-                DataGridViewRow row = GetPreviousUnviewedRow();
-                if (row == null)
+                // If there are no rows, we are done.
+                if (_dataGridView.Rows.Count > 0)
                 {
-                    // Otherwise, go to the row prior to the current selection
-                    row = GetPreviousRow();
-                }
+                    // Go to the previous unviewed row if one exists
+                    DataGridViewRow row = GetPreviousUnviewedRow();
+                    if (row == null)
+                    {
+                        // Otherwise, go to the row prior to the current selection
+                        row = GetPreviousRow();
+                    }
 
-                SelectOnly(row);
+                    SelectOnly(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27593", ex);
             }
         }
 
@@ -1255,18 +1262,25 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void SelectNextRedaction()
         {
-            // If there are no rows, we are done.
-            if (_dataGridView.Rows.Count > 0)
+            try
             {
-                // Go to the next unviewed row if one exists
-                DataGridViewRow row = GetNextUnviewedRow();
-                if (row == null)
+                // If there are no rows, we are done.
+                if (_dataGridView.Rows.Count > 0)
                 {
-                    // Otherwise, go to the row after the current selection
-                    row = GetNextRow();
-                }
+                    // Go to the next unviewed row if one exists
+                    DataGridViewRow row = GetNextUnviewedRow();
+                    if (row == null)
+                    {
+                        // Otherwise, go to the row after the current selection
+                        row = GetNextRow();
+                    }
 
-                SelectOnly(row);
+                    SelectOnly(row);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27592", ex);
             }
         }
 
