@@ -810,18 +810,22 @@ void CFileProcessingDB::reCalculateStats( ADODB::_ConnectionPtr ipConnection, lo
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::dropTables()
 {
-	// First remove all Product Specific stuff
-	removeProductSpecificDB();
+	try
+	{
+		// First remove all Product Specific stuff
+		removeProductSpecificDB();
 
-	// Get the list of tables
-	vector<string> vecTables; 
-	getExpectedTables(vecTables);
+		// Get the list of tables
+		vector<string> vecTables; 
+		getExpectedTables(vecTables);
 
-	// Remove the login table from the list
-	eraseFromVector(vecTables, gstrLOGIN);
+		// Remove the login table from the list
+		eraseFromVector(vecTables, gstrLOGIN);
 
-	// Drop the tables in the vector
-	dropTablesInVector( getDBConnection(), vecTables );
+		// Drop the tables in the vector
+		dropTablesInVector( getDBConnection(), vecTables );
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27605")
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addTables()
@@ -886,79 +890,83 @@ void CFileProcessingDB::addTables()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::initializeTableValues()
 {
-	vector<string> vecQueries;
+	try
+	{
+		vector<string> vecQueries;
 
-	// Add valid action states to the Action State table
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('C', 'Complete')");
+		// Add valid action states to the Action State table
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('C', 'Complete')");
 
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('F', 'Failed')");
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('F', 'Failed')");
 
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('P', 'Pending')");
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('P', 'Pending')");
 
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('R', 'Processing')");
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('R', 'Processing')");
 
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('U', 'Unattempted')");
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('U', 'Unattempted')");
 
-	vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
-		"VALUES('S', 'Skipped')");
+		vecQueries.push_back( "INSERT INTO [ActionState] ([Code], [Meaning]) "
+			"VALUES('S', 'Skipped')");
 
-	// Add Valid Queue event codes the QueueEventCode table
-	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
-		"VALUES('A', 'File added to queue')");
-	
-	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
-		"VALUES('D', 'File deleted from queue')");
+		// Add Valid Queue event codes the QueueEventCode table
+		vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('A', 'File added to queue')");
+		
+		vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('D', 'File deleted from queue')");
 
-	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
-		"VALUES('F', 'Folder was deleted')");
+		vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('F', 'Folder was deleted')");
 
-	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
-		"VALUES('M', 'File was modified')");
+		vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('M', 'File was modified')");
 
-	vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
-		"VALUES('R', 'File was renamed')");
+		vecQueries.push_back( "INSERT INTO [QueueEventCode] ([Code], [Description]) "
+			"VALUES('R', 'File was renamed')");
 
-	// Add the schema version to the DBInfo table
-	string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
-		"', '" + asString(glFAMDBSchemaVersion) + "')";
-	vecQueries.push_back( strSQL);
+		// Add the schema version to the DBInfo table
+		string strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrFAMDB_SCHEMA_VERSION +
+			"', '" + asString(glFAMDBSchemaVersion) + "')";
+		vecQueries.push_back( strSQL);
 
-	// Add Command Timeout setting
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
-		"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
-	vecQueries.push_back( strSQL);
+		// Add Command Timeout setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrCOMMAND_TIMEOUT +
+			"', '" + asString(glDEFAULT_COMMAND_TIMEOUT) + "')";
+		vecQueries.push_back( strSQL);
 
-	// Add Update Queue Event Table setting
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
-		+ "', '1')";
-	vecQueries.push_back( strSQL);
+		// Add Update Queue Event Table setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_QUEUE_EVENT_TABLE 
+			+ "', '1')";
+		vecQueries.push_back( strSQL);
 
-	// Add Update Queue Event Table setting
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
-	vecQueries.push_back( strSQL);
+		// Add Update Queue Event Table setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrUPDATE_FAST_TABLE + "', '1')";
+		vecQueries.push_back( strSQL);
 
-	// Add Auto Delete File Action Comment On Complete setting
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
-		+ "', '0')";
-	vecQueries.push_back(strSQL);
+		// Add Auto Delete File Action Comment On Complete setting
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_DELETE_FILE_ACTION_COMMENT
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
 
-	// Add Require Password To Process All Skipped Files setting (default to true)
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
-		+ "', '1')";
-	vecQueries.push_back(strSQL);
+		// Add Require Password To Process All Skipped Files setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
 
-	// Add Allow Dynamic Tag Creation setting (default to false)
-	strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
-		+ "', '0')";
-	vecQueries.push_back(strSQL);
+		// Add Allow Dynamic Tag Creation setting (default to false)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
+			+ "', '0')";
+		vecQueries.push_back(strSQL);
 
-	// Execute all of the queries
-	executeVectorOfSQL( getDBConnection(), vecQueries);
+		// Execute all of the queries
+		executeVectorOfSQL( getDBConnection(), vecQueries);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27606")
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
@@ -1982,38 +1990,46 @@ IIUnknownVectorPtr CFileProcessingDB::getLicensedProductSpecificMgrs()
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::removeProductSpecificDB()
 {
-	// Get vector of all license product specific managers
-	IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-	ASSERT_RESOURCE_ALLOCATION("ELI18951", ipProdSpecMgrs != NULL);
-
-	// Loop through all of the objects and call the RemoveProductSpecificSchema 
-	long nSize = ipProdSpecMgrs->Size();
-	for ( long n = 0; n < nSize; n++ )
+	try
 	{
-		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != NULL);
+		// Get vector of all license product specific managers
+		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
+		ASSERT_RESOURCE_ALLOCATION("ELI18951", ipProdSpecMgrs != NULL);
 
-		// Remove the schema for the product specific manager
-		ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr());
+		// Loop through all of the objects and call the RemoveProductSpecificSchema 
+		long nSize = ipProdSpecMgrs->Size();
+		for ( long n = 0; n < nSize; n++ )
+		{
+			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
+			ASSERT_RESOURCE_ALLOCATION("ELI18952", ipMgr != NULL);
+
+			// Remove the schema for the product specific manager
+			ipMgr->RemoveProductSpecificSchema(getThisAsCOMPtr());
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27610")
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addProductSpecificDB()
 {
-	// Get vector of all license product specific managers
-	IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
-	ASSERT_RESOURCE_ALLOCATION("ELI19790", ipProdSpecMgrs != NULL);
-
-	// Loop through all of the objects and call the AddProductSpecificSchema
-	long nSize = ipProdSpecMgrs->Size();
-	for ( long n = 0; n < nSize; n++ )
+	try
 	{
-		UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
-		ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != NULL);
+		// Get vector of all license product specific managers
+		IIUnknownVectorPtr ipProdSpecMgrs = getLicensedProductSpecificMgrs();
+		ASSERT_RESOURCE_ALLOCATION("ELI19790", ipProdSpecMgrs != NULL);
 
-		// Add the schema from the product specific db manager
-		ipMgr->AddProductSpecificSchema(getThisAsCOMPtr());
+		// Loop through all of the objects and call the AddProductSpecificSchema
+		long nSize = ipProdSpecMgrs->Size();
+		for ( long n = 0; n < nSize; n++ )
+		{
+			UCLID_FILEPROCESSINGLib::IProductSpecificDBMgrPtr ipMgr = ipProdSpecMgrs->At(n);
+			ASSERT_RESOURCE_ALLOCATION("ELI19791", ipMgr != NULL);
+
+			// Add the schema from the product specific db manager
+			ipMgr->AddProductSpecificSchema(getThisAsCOMPtr());
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27608")
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isConnectionAlive(ADODB::_ConnectionPtr ipConnection)

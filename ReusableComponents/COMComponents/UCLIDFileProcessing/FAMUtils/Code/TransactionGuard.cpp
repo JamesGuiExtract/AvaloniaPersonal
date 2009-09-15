@@ -25,23 +25,29 @@ TransactionGuard::~TransactionGuard()
 	// and don't want to throw an exception from a catch
 	try
 	{
-		// If a transactino is open roll it back
+		// If a transaction is open roll it back
 		if ( m_bTransactionStarted )
 		{
 			// Rollback the open transaction
 			m_ipConnection->RollbackTrans();
 		}
+
+		m_ipConnection = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI14980");
 }
 //-------------------------------------------------------------------------------------------------
 void TransactionGuard::CommitTrans()
 {
-	// Commit open transaction
-	m_ipConnection->CommitTrans();
-	
-	// There is no longer a transaction in progress-- so reset the started flag
-	m_bTransactionStarted = false;
+	try
+	{
+		// Commit open transaction
+		m_ipConnection->CommitTrans();
+		
+		// There is no longer a transaction in progress-- so reset the started flag
+		m_bTransactionStarted = false;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27607")
 }
 //-------------------------------------------------------------------------------------------------
 

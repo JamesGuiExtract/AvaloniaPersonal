@@ -594,39 +594,43 @@ void dropTablesInVector(const _ConnectionPtr& ipDBConnection, const vector<strin
 {
 	ASSERT_ARGUMENT("ELI18821", ipDBConnection != NULL);
 	
-	// Get the tables that exist in the database
-	_RecordsetPtr ipTables = ipDBConnection->OpenSchema(adSchemaTables);
-
-	// Drop all Foreign key constraints
-	dropFKContraintsOnTables(ipDBConnection, vecTables);
-
-	// Drop Each table
-	ipTables->MoveFirst();
-
-	// Go thru all of the tables and Remove FK constraints
-	while ( ipTables->adoEOF != VARIANT_TRUE)
+	try
 	{
-		// Get the Table Type
-		string strType = getStringField( ipTables->Fields, "TABLE_TYPE" );
+		// Get the tables that exist in the database
+		_RecordsetPtr ipTables = ipDBConnection->OpenSchema(adSchemaTables);
 
-		// Only want to drop tables that we create
-		if ( strType == "TABLE" )
+		// Drop all Foreign key constraints
+		dropFKContraintsOnTables(ipDBConnection, vecTables);
+
+		// Drop Each table
+		ipTables->MoveFirst();
+
+		// Go thru all of the tables and Remove FK constraints
+		while ( ipTables->adoEOF != VARIANT_TRUE)
 		{
-			// Get the table name 
-			string strTableName = getStringField( ipTables->Fields, "TABLE_NAME" );
+			// Get the Table Type
+			string strType = getStringField( ipTables->Fields, "TABLE_TYPE" );
 
-			// Don't drop the Login table if it exists and only drop Extract systems tables
-			if (vectorContainsElement(vecTables, strTableName))
+			// Only want to drop tables that we create
+			if ( strType == "TABLE" )
 			{
-				// Build the drop script
-				string strDropSQL = "DROP TABLE [" + strTableName + "]";
+				// Get the table name 
+				string strTableName = getStringField( ipTables->Fields, "TABLE_NAME" );
 
-				// Drop the table
-				executeCmdQuery(ipDBConnection, strDropSQL, true);
+				// Don't drop the Login table if it exists and only drop Extract systems tables
+				if (vectorContainsElement(vecTables, strTableName))
+				{
+					// Build the drop script
+					string strDropSQL = "DROP TABLE [" + strTableName + "]";
+
+					// Drop the table
+					executeCmdQuery(ipDBConnection, strDropSQL, true);
+				}
 			}
+			ipTables->MoveNext();
 		}
-		ipTables->MoveNext();
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27611")
 }
 //-------------------------------------------------------------------------------------------------
 bool doesTableExist(const _ConnectionPtr& ipDBConnection, string strTable)
