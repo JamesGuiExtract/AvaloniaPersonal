@@ -7,18 +7,19 @@
 #include "RWUtils.h"
 
 #include <vector>
+#include <set>
 #include <string>
 
 using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
-// CCheckCheckGridWnd window
+// CCheckCheckComboGridWnd window
 
-class RW_UTILS_API CCheckCheckGridWnd : public CGXGridWnd
+class RW_UTILS_API CCheckCheckComboGridWnd : public CGXGridWnd
 {
 // Construction
 public:
-	CCheckCheckGridWnd();
+	CCheckCheckComboGridWnd();
 
 // Attributes
 public:
@@ -49,12 +50,10 @@ public:
 	bool	GetRowLock(int nRow);
 	void	SetRowLock(int nRow, bool bLocked);
 
-	// Add dummy entries to grid
-	void	PopulateGrid();
-
 	// Define column count, column widths, prepare header labels
 	// First column width of zero will be the variable width column
-	void	PrepareGrid(const vector<string>& vecHeaders, const vector<int>& vecWidths);
+	void	PrepareGrid(const vector<string>& vecHeaders, const vector<int>& vecWidths,
+		const vector<string>& vecComboList);
 
 	// Sets selected state for nRow
 	void	SelectRow(int nRow);
@@ -66,8 +65,10 @@ public:
 	//    nRow > 0
 	//    bChecked1 - sets check mark in first column
 	//    bChecked2 - sets check mark in second column
+	//	  strComboValue - sets the appropriate combo box value
 	//    vecStrings - text data for subsequent columns.  Later columns in row will be blank
-	int		SetRowInfo(int nRow, bool bChecked1, bool bChecked2, const vector<string>& vecStrings);
+	int		SetRowInfo(int nRow, bool bChecked1, bool bChecked2, const string& strComboValue,
+		const vector<string>& vecStrings);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -76,13 +77,18 @@ public:
 
 // Implementation
 public:
-	virtual ~CCheckCheckGridWnd();
+	virtual ~CCheckCheckComboGridWnd();
+	virtual void Initialize();
 	virtual void OnClickedButtonRowCol(ROWCOL nRow, ROWCOL nCol);
 	virtual BOOL GetStyleRowCol(ROWCOL nRow, ROWCOL nCol, CGXStyle& style, GXModifyType mt, int nType);
 	virtual void DrawInvertCell(CDC* /*pDC*/, ROWCOL nRow, ROWCOL nCol, CRect rectItem);
 	virtual BOOL OnTrackColWidth(ROWCOL nCol);
 	virtual BOOL OnStartSelection(ROWCOL nRow, ROWCOL nCol, UINT flags, CPoint point);
 	virtual BOOL OnLButtonDblClkRowCol(ROWCOL nRow, ROWCOL nCol, UINT nFlags, CPoint pt);
+	virtual BOOL OnLButtonClickedRowCol(ROWCOL nRow, ROWCOL nCol, UINT nFlags, CPoint pt);
+	virtual BOOL OnLButtonHitRowCol(ROWCOL nRow, ROWCOL nCol, ROWCOL nDragRow, ROWCOL nDragCol,
+		CPoint cpPoint, UINT uiFlags, WORD nHitState);
+	virtual void OnModifyCell(ROWCOL nRow, ROWCOL nCol);
 
 	// Generated message map functions
 protected:
@@ -101,8 +107,7 @@ private:
 	///////////////
 	// Data Members
 	///////////////
-	// Collected strings used for column headings
-	vector<string> m_vecHeaders;
+	set<string> m_setComboList;
 
 	// Control ID used in various notification messages.
 	//   Changing the value will change ID for ALL notifications
@@ -114,6 +119,9 @@ private:
 
 	// Column for width resizing
 	int			m_iResizeColumn;
+
+	// Row to exclude the highlight in the combo drop down cell
+	int			m_iRowToNotHighlight;
 };
 
 /////////////////////////////////////////////////////////////////////////////

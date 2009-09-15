@@ -3,8 +3,8 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "UCLIDFileProcessing.h"
+#include "FileProcessingConstants.h"
 #include "FileProcessingDlgScopePage.h"
-
 #include "FileProcessingManager.h"
 #include "FPCategories.h"
 
@@ -32,11 +32,11 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const std::string	gstrINACTIVE = "Inactive";
-const std::string	gstrACTIVE = "Active";
-const std::string	gstrPAUSED = "Paused";
-const std::string	gstrSTOPPED = "Stopped";
-const std::string	gstrDONE = "Done";
+const string	gstrINACTIVE = "Inactive";
+const string	gstrACTIVE = "Active";
+const string	gstrPAUSED = "Paused";
+const string	gstrSTOPPED = "Stopped";
+const string	gstrDONE = "Done";
 
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgScopePage property page
@@ -51,15 +51,35 @@ FileProcessingDlgScopePage::FileProcessingDlgScopePage()
   m_bEnabled(true),
   m_bInitialized(false)
 {
-	//{{AFX_DATA_INIT(FileProcessingDlgScopePage)
-	m_zSkipDescription = _T("");
-	//}}AFX_DATA_INIT
+	try
+	{
+		m_zSkipDescription = _T("");
+
+		// Get a DB pointer
+		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI27598", ipDB != NULL);
+
+		// Get the priorities
+		IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
+		ASSERT_RESOURCE_ALLOCATION("ELI27599", ipVecPriorities != NULL);
+
+		// Fill the priority vector with the strings
+		long lSize = ipVecPriorities->Size;
+		for (long i=0; i < lSize; i++)
+		{
+			m_vecPriorities.push_back(asString(ipVecPriorities->Item[i].bstrVal));
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27600");
 }
 //-------------------------------------------------------------------------------------------------
 FileProcessingDlgScopePage::~FileProcessingDlgScopePage()
 {
 	try
 	{
+		// Ensure COM pointers are released
+		m_ipClipboardMgr = NULL;
+		m_ipMiscUtils = NULL;
 	}
 	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16528");
 }
@@ -94,7 +114,7 @@ void FileProcessingDlgScopePage::refresh()
 	{
 		// get the skip condition's description
 		_bstr_t _bstrText = ipSkipObjWithDesc->GetDescription();
-		m_zSkipDescription = _bstrText.operator const char *();
+		m_zSkipDescription = (const char*)_bstrText;
 	}
 
 	UpdateData( FALSE );
@@ -222,6 +242,7 @@ BEGIN_MESSAGE_MAP(FileProcessingDlgScopePage, CPropertyPage)
 	ON_BN_CLICKED(IDC_BTN_SKIPCONDITION, OnBtnSelectSkip)
 	ON_MESSAGE(WM_NOTIFY_GRID_LCLICK, OnLButtonClkRowCol)
 	ON_MESSAGE(WM_NOTIFY_CELL_DBLCLK, OnLButtonDblClkRowCol)
+	ON_MESSAGE(WM_NOTIFY_CELL_MODIFIED, OnModifyCell)
 	//}}AFX_MSG_MAP
 	ON_STN_DBLCLK(IDC_EDIT_SKIP, &FileProcessingDlgScopePage::OnDoubleClickSkipCondition)
 END_MESSAGE_MAP()
@@ -246,23 +267,26 @@ BOOL FileProcessingDlgScopePage::OnInitDialog()
 		m_wndGrid.SubclassDlgItem( IDC_GRID, this );
 
 		// Prepare Header labels
-		std::vector<std::string>	vecHeader;
-		vecHeader.push_back( string( "Enabled" ) );
-		vecHeader.push_back( string( "Force Processing" ) );
-		vecHeader.push_back( string( "Description" ) );
-		vecHeader.push_back( string( "Status" ) );
+		vector<string>	vecHeader;
+		vecHeader.push_back("Enabled");
+		vecHeader.push_back("Force Processing");
+		vecHeader.push_back("Priority");
+		vecHeader.push_back("Description");
+		vecHeader.push_back("Status");
 
 		// Prepare Column widths
-		std::vector<int>	vecWidths;
+		vector<int>	vecWidths;
 		vecWidths.push_back( 70 );
 		vecWidths.push_back( 120 );
+		vecWidths.push_back( 100 );
 		vecWidths.push_back( 0 );		// Will be resized by DoResize()
 		vecWidths.push_back( 80 );
 
 		// Setup the grid control
-		//    4 columns of header labels
-		//    4 columns of column widths
-		m_wndGrid.PrepareGrid( vecHeader, vecWidths );
+		//    5 columns of header labels
+		//    5 columns of column widths
+		//	  A list of priorities for the drop down column
+		m_wndGrid.PrepareGrid( vecHeader, vecWidths, m_vecPriorities );
 		m_wndGrid.SetControlID( IDC_GRID );
 		m_wndGrid.GetParam()->EnableUndo(TRUE);
 
@@ -318,15 +342,15 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 		{
 			// Retrieve the description
 			_bstr_t	bstrText = ipObject->GetDescription();
-			CString	zText( bstrText.operator const char *() );
+			CString	zText((const char*)bstrText);
 
 			// Get list count and index of previously selected File Supplier
 			int iCount = m_wndGrid.GetRowCount();
 			int iSelectedRow = m_wndGrid.GetFirstSelectedRow();
 
 			// Populate vector of strings for text cells
-			std::vector<std::string>	vecText;
-			vecText.push_back( zText.operator LPCTSTR() );
+			vector<string>	vecText;
+			vecText.push_back( (LPCTSTR)zText );
 			vecText.push_back( gstrINACTIVE.c_str() );
 
 			// Determine index of new row
@@ -337,7 +361,7 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 			m_wndGrid.InsertRows( iNewIndex, 1 );
 			
 			// Add info: Enabled, not Forced, Description, Inactive
-			m_wndGrid.SetRowInfo( iNewIndex, true, false, vecText );
+			m_wndGrid.SetRowInfo( iNewIndex, true, false, "Normal", vecText );
 
 			// Create a new FileSupplierData object with Not Forced
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );
@@ -354,7 +378,7 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 			CGXRangeList* pList = m_wndGrid.GetParam()->GetRangeList();
 			ASSERT_RESOURCE_ALLOCATION("ELI15639", pList != NULL);
 			POSITION area = pList->AddTail(new CGXRange);
-			m_wndGrid.SetSelection( area, iNewIndex, 1, iNewIndex, 4 );
+			m_wndGrid.SetSelection( area, iNewIndex, 1, iNewIndex, 5 );
 
 			// Update the display
 			UpdateData( FALSE );
@@ -391,7 +415,7 @@ void FileProcessingDlgScopePage::OnBtnRemove()
 				zDescription );
 
 			// Present MessageBox
-			iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+			iResult = MessageBox( (LPCTSTR)zPrompt, "Confirm Delete", 
 				MB_YESNO | MB_ICONQUESTION );
 
 			// Act on response
@@ -488,7 +512,8 @@ LRESULT FileProcessingDlgScopePage::OnLButtonClkRowCol(WPARAM wParam, LPARAM lPa
 
 		// Simply return if click on the header of the grid
 		// Fix [P13: 3930] L. L Song
-		if (nRow <= 0)
+		// OR if click is not in one of the check box columns
+		if (nRow <= 0 || (nCol != 1 && nCol != 2))
 		{
 			// Call setButtonStates() to disable 
 			// remove and configure butttons
@@ -496,18 +521,13 @@ LRESULT FileProcessingDlgScopePage::OnLButtonClkRowCol(WPARAM wParam, LPARAM lPa
 			return 0;
 		}
 
-		// Check ID - not needed at this time
-//		if (wParam == IDC_GRID)
-//		{
-//		}
-
 		// Retrieve the File Supplier Data
 		UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD = getFileSuppliersData()->At( nRow - 1 );
 		ASSERT_RESOURCE_ALLOCATION( "ELI14085", ipFSD != NULL );
 
 		// Get the new setting
 		CString zTemp = m_wndGrid.GetCellValue( nRow, nCol );
-		int nCheck = atol( zTemp.operator LPCTSTR() );
+		long nCheck = asLong( (LPCTSTR)zTemp );
 
 		// Update Enabled flag
 		if (nCol == 1)
@@ -830,7 +850,7 @@ void FileProcessingDlgScopePage::OnContextDelete()
 		int		iResult;
 		zPrompt.Format( "Are you sure that Skip Condition '%s' should be deleted?", 
 			zDesc );
-		iResult = MessageBox( zPrompt.operator LPCTSTR(), "Confirm Delete", 
+		iResult = MessageBox( (LPCTSTR)zPrompt, "Confirm Delete", 
 			MB_YESNO | MB_ICONQUESTION );
 
 		// Act on response
@@ -846,6 +866,58 @@ void FileProcessingDlgScopePage::OnContextDelete()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15820");
 }
+//-------------------------------------------------------------------------------------------------
+LRESULT FileProcessingDlgScopePage::OnModifyCell(WPARAM wParam, LPARAM lParam)
+{
+	AFX_MANAGE_STATE(AfxGetModuleState());
+
+	try
+	{
+		// Extract Row and Column
+		int nRow = LOWORD( lParam );
+		int nCol = HIWORD( lParam );
+
+		// Check ID - the message is only sent by the drop down column so no need to
+		// check the column ID, just get the cell value
+		if (wParam == IDC_GRID)
+		{
+			// Get the new priority value from the grid
+			string strPriority = (LPCTSTR) m_wndGrid.GetCellValue(nRow, nCol);
+			
+			// Get the priority value
+			bool bFound = false;
+			unsigned long nPriority = 0;
+			for (;nPriority < m_vecPriorities.size(); nPriority++)
+			{
+				if (strPriority == m_vecPriorities[nPriority])
+				{
+					bFound = true;
+					break;
+				}
+			}
+
+			if (!bFound)
+			{
+				UCLIDException uex("ELI27602", "Invalid priority value.");
+				uex.addDebugInfo("Priority", strPriority);
+				throw uex;
+			}
+
+			// Get the file supplier for this row
+			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFD =
+				getFileSuppliersData()->At(nRow-1);
+
+			// Set the priority
+			ipFD->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) (nPriority+1);
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27601");
+
+	return 0;
+}
+
+//-------------------------------------------------------------------------------------------------
+// Private methods
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgScopePage::displayContextMenu()
 {
@@ -886,9 +958,6 @@ void FileProcessingDlgScopePage::displayContextMenu()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15822")
 }
-
-//-------------------------------------------------------------------------------------------------
-// Private methods
 //-------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileSupplierPtr FileProcessingDlgScopePage::getFileSupplier(int iRow)
 {
@@ -1035,18 +1104,19 @@ void FileProcessingDlgScopePage::updateList(int nRow,
 
 	// Retrieve Description text
 	_bstr_t bstrDescription = ipObj->GetDescription();
-	string strDescription = bstrDescription.operator const char *();
+	string strDescription = asString(bstrDescription);
 
 	// Retrieve status
 	UCLID_FILEPROCESSINGLib::EFileSupplierStatus eStatus = ipFSD->FileSupplierStatus;
 
 	// Create text vector - defaulting to Inactive
-	std::vector<std::string> vecText;
+	vector<string> vecText;
 	vecText.push_back( strDescription.c_str() );
 	vecText.push_back( gstrINACTIVE.c_str() );
 
 	// Update the row
-	m_wndGrid.SetRowInfo( nRow, bEnabled, bForce, vecText );
+	m_wndGrid.SetRowInfo(nRow, bEnabled, bForce,
+		getPriorityString(ipFSD->Priority), vecText);
 
 	// Set the proper status in the row
 	if (eStatus != UCLID_FILEPROCESSINGLib::kInactiveStatus)
@@ -1121,5 +1191,18 @@ IMiscUtilsPtr FileProcessingDlgScopePage::getMiscUtils()
 	}
 
 	return m_ipMiscUtils;
+}
+//-------------------------------------------------------------------------------------------------
+string FileProcessingDlgScopePage::getPriorityString(
+	UCLID_FILEPROCESSINGLib::EFilePriority ePriority)
+{
+	try
+	{
+		// Get the priority value
+		long lPriority = ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority;
+
+		return m_vecPriorities[lPriority-1];
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27609");
 }
 //-------------------------------------------------------------------------------------------------

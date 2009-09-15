@@ -4,6 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "UCLIDFileProcessing.h"
+#include "FileProcessingConstants.h"
 #include "FP_UI_Notifications.h"
 #include "TransactionGuard.h"
 
@@ -28,9 +29,6 @@ using namespace std;
 // as per [p13 #4920]
 // User name for FAM DB Admin access
 const string gstrADMIN_USER = "admin";
-
-// The default file priority (Normal)
-const long glDEFAULT_FILE_PRIORITY = (long) kPriorityNormal;
 
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
@@ -139,6 +137,7 @@ public:
 	STDMETHOD(AllowDynamicTagCreation)(VARIANT_BOOL* pvbVal);
 	STDMETHOD(SetStatusForFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
 		long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
+	STDMETHOD(GetPriorities)(IVariantVector** ppvecPriorities);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

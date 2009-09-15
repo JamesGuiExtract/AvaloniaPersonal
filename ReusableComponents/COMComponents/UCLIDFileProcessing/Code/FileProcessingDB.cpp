@@ -3565,6 +3565,32 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27431");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::GetPriorities(IVariantVector** ppvecPriorities)
+{
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27596", ppvecPriorities != NULL);
+
+		IVariantVectorPtr ipVecPriorities(CLSID_VariantVector);
+		ASSERT_RESOURCE_ALLOCATION("ELI27597", ipVecPriorities != NULL);
+
+		// Add the priority levels to the vector
+		ipVecPriorities->PushBack("Low");
+		ipVecPriorities->PushBack("Below Normal");
+		ipVecPriorities->PushBack("Normal");
+		ipVecPriorities->PushBack("Above Normal");
+		ipVecPriorities->PushBack("High");
+
+		// Set the return value
+		*ppvecPriorities = ipVecPriorities.Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27595");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

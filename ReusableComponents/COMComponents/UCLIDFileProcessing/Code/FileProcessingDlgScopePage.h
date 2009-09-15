@@ -7,11 +7,13 @@
 #include <string>
 #include <vector>
 #include <QuickMenuChooser.h>
-#include <CheckCheckGridWnd.h>
+#include <CheckCheckComboGridWnd.h>
 #include <Notifications.h>
 
 class FileProcessingConfigMgr;
 class FileProcessingManager;
+
+using namespace std;
 
 /////////////////////////////////////////////////////////////////////////////
 // FileProcessingDlgScopePage dialog
@@ -70,8 +72,6 @@ public:
 
 // Implementation
 protected:
-	// Generated message map functions
-	//{{AFX_MSG(FileProcessingDlgScopePage)
 	afx_msg void OnBtnAdd();
 	afx_msg void OnBtnRemove();
 	afx_msg void OnBtnConfigure();
@@ -84,7 +84,7 @@ protected:
 	afx_msg void OnContextDelete();
 	afx_msg LRESULT OnLButtonClkRowCol(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnLButtonDblClkRowCol(WPARAM wParam, LPARAM lParam);
-	//}}AFX_MSG
+	afx_msg LRESULT OnModifyCell(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnDoubleClickSkipCondition();
 	DECLARE_MESSAGE_MAP()
 
@@ -108,13 +108,16 @@ private:
 	// False if one of the suppliers is in active, pause status
 	bool m_bEnabled;
 
-	// Grid window with two checkbox columns
-	CCheckCheckGridWnd	m_wndGrid;
+	// Grid window with two checkbox and a combo box column
+	CCheckCheckComboGridWnd	m_wndGrid;
 
 	// This variable is initialized to false so that the first call of OnSize()
 	// before OnInitDialog() will be skipped, then it will be set to true inside 
 	// OnInitDialog()
 	bool m_bInitialized;
+
+	// Vector to hold the priority values
+	vector<string> m_vecPriorities;
 
 	//////////
 	// Methods
@@ -167,6 +170,9 @@ private:
 
 	// Display the context menu
 	void displayContextMenu();
+
+	// Gets the priority as a string
+	string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

@@ -110,6 +110,10 @@ library UCLID_FILEPROCESSINGLib
 		kProcessingSkipped = 2
 	}EFileProcessingResult;
 
+	// EFilePriority definition.
+	// NOTE: If modifying priorities in this enum, also need to update
+	//		 the IFileProcessingDB::GetPriorities method to return the
+	//		 appropriate strings in the appropriate order.
 	typedef
 		[
 			uuid(8BEC1731-CD1A-4931-809D-C53FDF9BA21F),
@@ -783,6 +787,18 @@ library UCLID_FILEPROCESSINGLib
 		[id(64), helpstring("method SetStatusForFilesWithTags")] HRESULT SetStatusForFilesWithTags(
 			[in] IVariantVector* pvecTagNames, [in] VARIANT_BOOL vbAndOperation, [in] long nToActionID,
 			[in] EActionStatus eaNewStatus, [in] long nFromActionID);
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to file priority
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return a collection of the file priorities string representations.
+		//			Note, in order to map the string to its priority value add 1 to the
+		//			strings index value in the vector (i.e. ppvecPriorities[0] has a
+		//			priority value of 1, and ppvecPriorities[i] has a priority value of
+		//			i+1 - so if ppvecPriorities[0] = "Low" then "Low" corresponds to
+		//			priority 1.
+		[id(65), helpstring("method GetPriorities")] HRESULT GetPriorities(
+			[out, retval] IVariantVector** ppvecPriorities);
 	};
 
 	[

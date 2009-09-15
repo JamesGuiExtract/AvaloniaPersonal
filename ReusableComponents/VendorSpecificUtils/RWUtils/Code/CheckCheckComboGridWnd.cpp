@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "CheckCheckGridWnd.h"
+#include "CheckCheckComboGridWnd.h"
 #include "Notifications.h"
 #include "resource.h"
 
@@ -14,50 +14,78 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
+//-------------------------------------------------------------------------------------------------
+// Constants
+//-------------------------------------------------------------------------------------------------
 // Gray background color for rows where Normal attribute = 0
 const COLORREF g_colorAltBack = RGB( 192, 192, 192 );
 
+// The column which contains the drop down column
+const int giDROP_DOWN_COL = 3;
+
 //-------------------------------------------------------------------------------------------------
-// CCheckCheckGridWnd
+// CCheckCheckComboGridWnd
 //-------------------------------------------------------------------------------------------------
-CCheckCheckGridWnd::CCheckCheckGridWnd()
+CCheckCheckComboGridWnd::CCheckCheckComboGridWnd()
 : m_bIsPrepared(false),
   m_iResizeColumn(-1),
+  m_iRowToNotHighlight(-1),
   m_nControlID(-1)
 {
 }
 //-------------------------------------------------------------------------------------------------
-CCheckCheckGridWnd::~CCheckCheckGridWnd()
+CCheckCheckComboGridWnd::~CCheckCheckComboGridWnd()
 {
 	try
 	{
 	}
-	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16473");
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27612");
 }
 //-------------------------------------------------------------------------------------------------
-BEGIN_MESSAGE_MAP(CCheckCheckGridWnd, CGXGridWnd)
-	//{{AFX_MSG_MAP(CCheckCheckGridWnd)
+BEGIN_MESSAGE_MAP(CCheckCheckComboGridWnd, CGXGridWnd)
+	//{{AFX_MSG_MAP(CCheckCheckComboGridWnd)
 		// NOTE - the ClassWizard will add and remove mapping macros here.
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
-// CCheckCheckGridWnd message handlers
+// CCheckCheckComboGridWnd message handlers
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::OnClickedButtonRowCol(ROWCOL nRow, ROWCOL nCol)
+void CCheckCheckComboGridWnd::Initialize()
 {
 	try
 	{
+		CGXGridWnd::Initialize();
+
+		// Override the default combo box so the drop down list will always display button
+		CGXComboBox* pWnd = new CGXComboBox(this, GX_IDS_CTRL_CBS_DROPDOWN,
+			GX_IDS_CTRL_CBS_DROPDOWN+1, GXCOMBO_TEXTFIT);
+		ASSERT_RESOURCE_ALLOCATION("ELI27613", pWnd != NULL);
+
+		pWnd->m_bInactiveDrawButton = TRUE;
+
+		// Register the new control (the Grid will automatically release the memory when
+		// the control is destroyed)
+		RegisterControl(GX_IDS_CTRL_CBS_DROPDOWNLIST, pWnd);
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27614");
+}
+//-------------------------------------------------------------------------------------------------
+void CCheckCheckComboGridWnd::OnClickedButtonRowCol(ROWCOL nRow, ROWCOL nCol)
+{
+	try
+	{
+		// Only perform the check if the column is a check box column
 		if (nCol == 1 || nCol == 2)
 		{
-			// Retrieve new check state
-			CString	zTemp;
-			zTemp = GetValueRowCol( nRow, nCol );
-			long nCheck = asLong((LPCTSTR)zTemp);
-
 			// Checked Locked state
 			if (GetRowLock( nRow ))
 			{
+				// Retrieve new check state
+				CString	zTemp;
+				zTemp = GetValueRowCol( nRow, nCol );
+				long nCheck = asLong((LPCTSTR)zTemp);
+
 				// Restore previous setting and return
 				SetValueRange( CGXRange(nRow, nCol), (nCheck == 1) ? "0" : "1" );
 				return;
@@ -72,10 +100,10 @@ void CCheckCheckGridWnd::OnClickedButtonRowCol(ROWCOL nRow, ROWCOL nCol)
 			}
 		}
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13690");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27615");
 }
 //-------------------------------------------------------------------------------------------------
-BOOL CCheckCheckGridWnd::GetStyleRowCol(ROWCOL nRow, ROWCOL nCol, CGXStyle& style, GXModifyType mt, int nType)
+BOOL CCheckCheckComboGridWnd::GetStyleRowCol(ROWCOL nRow, ROWCOL nCol, CGXStyle& style, GXModifyType mt, int nType)
 { 
 	try
 	{
@@ -88,8 +116,8 @@ BOOL CCheckCheckGridWnd::GetStyleRowCol(ROWCOL nRow, ROWCOL nCol, CGXStyle& styl
 			// Check for selected row
 			if (GetInvertStateRowCol( nRow, nCol, GetParam()->GetRangeList() ))
 			{
-				// Make sure that this cell is not being edited
-				if (m_iResizeColumn != nCol)
+				// Make sure this is not the selected drop down list column
+				if (nCol != giDROP_DOWN_COL || nRow != m_iRowToNotHighlight)
 				{
 					// Use system colors for background and text
 					style.SetInterior(::GetSysColor(COLOR_HIGHLIGHT));
@@ -101,12 +129,12 @@ BOOL CCheckCheckGridWnd::GetStyleRowCol(ROWCOL nRow, ROWCOL nCol, CGXStyle& styl
 		
 		return bRet;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13691");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27616");
 	// if it gets here method failed
 	return FALSE;
 } 
 //-------------------------------------------------------------------------------------------------
-BOOL CCheckCheckGridWnd::OnTrackColWidth(ROWCOL nCol)
+BOOL CCheckCheckComboGridWnd::OnTrackColWidth(ROWCOL nCol)
 { 
 	try
 	{
@@ -118,12 +146,12 @@ BOOL CCheckCheckGridWnd::OnTrackColWidth(ROWCOL nCol)
 		// ... but do allow visible columns to be resized
 		return TRUE; 
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13692");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27617");
 	// if it gets here method failed
 	return FALSE;
 } 
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::DrawInvertCell(CDC* /*pDC*/, ROWCOL nRow, ROWCOL nCol, CRect rectItem)
+void CCheckCheckComboGridWnd::DrawInvertCell(CDC* /*pDC*/, ROWCOL nRow, ROWCOL nCol, CRect rectItem)
 {
 	try
 	{
@@ -149,10 +177,10 @@ void CCheckCheckGridWnd::DrawInvertCell(CDC* /*pDC*/, ROWCOL nRow, ROWCOL nCol, 
 			InvalidateRect(&rectItem); 
 		} 
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13693");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27618");
 } 
 //-------------------------------------------------------------------------------------------------
-BOOL CCheckCheckGridWnd::OnLButtonDblClkRowCol(ROWCOL nRow, ROWCOL nCol, UINT flags, CPoint point)
+BOOL CCheckCheckComboGridWnd::OnLButtonDblClkRowCol(ROWCOL nRow, ROWCOL nCol, UINT flags, CPoint point)
 {
 	try
 	{
@@ -168,15 +196,78 @@ BOOL CCheckCheckGridWnd::OnLButtonDblClkRowCol(ROWCOL nRow, ROWCOL nCol, UINT fl
 		
 		return TRUE;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13942");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27619");
 	// if it gets here method failed
 	return FALSE;
 }
+//-------------------------------------------------------------------------------------------------
+BOOL CCheckCheckComboGridWnd::OnLButtonHitRowCol(ROWCOL nRow, ROWCOL nCol, ROWCOL nDragRow,
+												 ROWCOL nDragCol, CPoint cpPoint, UINT uiFlags,
+												 WORD nHitState)
+{
+	try
+	{
+		if (nCol == giDROP_DOWN_COL)
+		{
+			m_iRowToNotHighlight = nRow;
+		}
+		else
+		{
+			m_iRowToNotHighlight = -1;
+		}
+
+		return CGXGridWnd::OnLButtonHitRowCol(nRow, nCol, nDragRow, nDragCol, cpPoint,
+			uiFlags, nHitState);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27620");
+
+	// If we reach here the method failed
+	return FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+BOOL CCheckCheckComboGridWnd::OnLButtonClickedRowCol(ROWCOL nRow, ROWCOL nCol,
+													 UINT nFlags, CPoint pt)
+{
+	try
+	{
+		if (nCol == giDROP_DOWN_COL)
+		{
+			m_iRowToNotHighlight = nRow;
+		}
+		else
+		{
+			m_iRowToNotHighlight = -1;
+		}
+
+		return CGXGridWnd::OnLButtonClickedRowCol(nRow, nCol, nFlags, pt);
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27621");
+
+	// If we reached here the method failed
+	return FALSE;
+}
+//-------------------------------------------------------------------------------------------------
+void CCheckCheckComboGridWnd::OnModifyCell(ROWCOL nRow, ROWCOL nCol)
+{
+	try
+	{
+		// Only post the message if the cell being modified is the drop down column
+		if (m_nControlID != -1 && nCol == giDROP_DOWN_COL)
+		{
+			// Post the message with 
+			//   wParam = Control ID
+			//   lParam: LOWORD nRow, HIWORD = nCol
+			GetParent()->PostMessage( WM_NOTIFY_CELL_MODIFIED, m_nControlID, 
+				MAKELPARAM( nRow, nCol ) );
+		}
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27622");
+}
 
 //-------------------------------------------------------------------------------------------------
-// CCheckCheckGridWnd public methods
+// CCheckCheckComboGridWnd public methods
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::CheckItem(int iItem, int iSubitem, bool bCheck)
+void CCheckCheckComboGridWnd::CheckItem(int iItem, int iSubitem, bool bCheck)
 {
 	// Validate iSubitem
 	if ((iSubitem == 1) || (iSubitem == 2))
@@ -186,7 +277,7 @@ void CCheckCheckGridWnd::CheckItem(int iItem, int iSubitem, bool bCheck)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::Clear()
+void CCheckCheckComboGridWnd::Clear()
 {
 	long lRowCount = GetRowCount();
 	long lColCount = GetColCount();
@@ -213,7 +304,7 @@ void CCheckCheckGridWnd::Clear()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::DoResize() 
+void CCheckCheckComboGridWnd::DoResize() 
 {
 	// Just return if PrepareGrid() has not been called
 	if (!m_bIsPrepared)
@@ -254,7 +345,7 @@ void CCheckCheckGridWnd::DoResize()
 	}
 }
 //-------------------------------------------------------------------------------------------------
-CString	CCheckCheckGridWnd::GetCellValue(ROWCOL nRow, ROWCOL nCol)
+CString	CCheckCheckComboGridWnd::GetCellValue(ROWCOL nRow, ROWCOL nCol)
 {
 	// If this cell is currently active - do not depend on stored data
 	if (IsCurrentCell(nRow, nCol) && IsActiveCurrentCell())
@@ -271,7 +362,7 @@ CString	CCheckCheckGridWnd::GetCellValue(ROWCOL nRow, ROWCOL nCol)
 	}
 }
 //-------------------------------------------------------------------------------------------------
-bool CCheckCheckGridWnd::GetCheckedState(int iRow, int iColumn) 
+bool CCheckCheckComboGridWnd::GetCheckedState(int iRow, int iColumn) 
 {
 	int iCount = 0;
 
@@ -279,7 +370,7 @@ bool CCheckCheckGridWnd::GetCheckedState(int iRow, int iColumn)
 	long lCount = GetRowCount();
 	if ((iRow < 1) || (iRow > lCount))
 	{
-		UCLIDException ue( "ELI27630", "Invalid row number" );
+		UCLIDException ue( "ELI27629", "Invalid row number" );
 		ue.addDebugInfo( "Row Number", iRow );
 		ue.addDebugInfo( "Row Count", lCount );
 		throw ue;
@@ -298,7 +389,7 @@ bool CCheckCheckGridWnd::GetCheckedState(int iRow, int iColumn)
 	return false;
 }
 //--------------------------------------------------------------------------------------------------
-int CCheckCheckGridWnd::GetFirstSelectedRow()
+int CCheckCheckComboGridWnd::GetFirstSelectedRow()
 {
 	// Retrieve list of selected rows
 	CGXRangeList selList;
@@ -313,7 +404,7 @@ int CCheckCheckGridWnd::GetFirstSelectedRow()
 	return -1;
 }
 //-------------------------------------------------------------------------------------------------
-bool CCheckCheckGridWnd::GetRowLock(int nRow)
+bool CCheckCheckComboGridWnd::GetRowLock(int nRow)
 {
 	// Retrieve style information from first column of specified row
 	CGXStyle	style;
@@ -323,7 +414,7 @@ bool CCheckCheckGridWnd::GetRowLock(int nRow)
 	return (lValue == 1);
 }
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::SetRowLock(int nRow, bool bLocked)
+void CCheckCheckComboGridWnd::SetRowLock(int nRow, bool bLocked)
 {
 	// Set the attribute of first column in specified row
 	SetStyleRange(CGXRange().SetCells( nRow, 1 ),
@@ -332,8 +423,19 @@ void CCheckCheckGridWnd::SetRowLock(int nRow, bool bLocked)
 					);
 }
 //--------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::PrepareGrid(const vector<string>& vecHeaders, const vector<int>& vecWidths) 
+void CCheckCheckComboGridWnd::PrepareGrid(const vector<string>& vecHeaders,
+										  const vector<int>& vecWidths,
+										  const vector<string>& vecComboList) 
 {
+	// Ensure there is at least 1 item for the combo list
+	ASSERT_ARGUMENT("ELI27623", vecComboList.size() > 0);
+
+	// Clear the set
+	m_setComboList.clear();
+
+	// Add the combo list items to the set
+	m_setComboList.insert(vecComboList.begin(), vecComboList.end());
+
 	// Initialize the grid. For CWnd based grids 
 	// this call is essential. For view based 
 	// grids this initialization is done in 
@@ -396,6 +498,22 @@ void CCheckCheckGridWnd::PrepareGrid(const vector<string>& vecHeaders, const vec
 						.SetUserAttribute( IDS_LOCKED_ATTRIBUTE, 0L )
 					);
 
+	// Set the choice list for the combo box
+	vector<string>::const_iterator it = vecComboList.begin();
+	string strList = *it;
+	for (++it; it != vecComboList.end(); it++)
+	{
+		strList += "\n" + (*it);
+	}
+
+	// Third column is a combo box
+	SetStyleRange(CGXRange().SetCols(3),
+					CGXStyle()
+						.SetControl(GX_IDS_CTRL_CBS_DROPDOWNLIST)
+						.SetHorizontalAlignment( DT_LEFT )
+						.SetChoiceList(strList.c_str())
+					);
+
 	// Last column is centered static text
 	SetStyleRange(CGXRange().SetCols( lCount ),
 					CGXStyle()
@@ -404,7 +522,7 @@ void CCheckCheckGridWnd::PrepareGrid(const vector<string>& vecHeaders, const vec
 					);
 
 	// Remaining columns are left-justified static text
-	for (int j = 3; j < lCount; j++)
+	for (int j = 4; j < lCount; j++)
 	{
 		SetStyleRange(CGXRange().SetCols( j ),
 						CGXStyle()
@@ -417,58 +535,34 @@ void CCheckCheckGridWnd::PrepareGrid(const vector<string>& vecHeaders, const vec
 	m_bIsPrepared = true;
 }
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::PopulateGrid() 
-{
-	////////////////////
-	// Add dummy entries
-	////////////////////
-	int		iCount = 8;
-	CString	zName;
-	CString	zValue;
-	int		j = 1;
-
-	for (int i = 1; i <= iCount; i++)
-	{
-		// Create strings
-		zName.Format( "Name %d", i );
-		zValue.Format( "Value %d", i );
-
-		// Populate the vector
-		vector<string>	vecText;
-		vecText.push_back( (LPCTSTR)zName );
-		vecText.push_back( (LPCTSTR)zValue );
-
-		// Add the item
-		SetRowInfo( j++, (j % 2 == 0) ? true : false, (j % 3 == 0) ? true : false, vecText );
-
-		// Maybe add a duplicate item
-		if (i % 3)
-		{
-			SetRowInfo( j++, (j % 2 == 0) ? true : false, (j % 3 == 0) ? true : false, vecText );
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::SelectRow(int nRow)
+void CCheckCheckComboGridWnd::SelectRow(int nRow)
 {
 	// Clear existing selection
 	SetSelection( 0 );
 
 	// Set selection on this row
 	CGXRangeList* pList = GetParam()->GetRangeList();
-	ASSERT_RESOURCE_ALLOCATION("ELI15633", pList != NULL);
+	ASSERT_RESOURCE_ALLOCATION("ELI27624", pList != NULL);
 	POSITION area = pList->AddTail( new CGXRange );
 	SetSelection( area, nRow, 1, nRow, GetColCount() );
 }
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::SetControlID(int nID) 
+void CCheckCheckComboGridWnd::SetControlID(int nID) 
 {
 	m_nControlID = nID;
 }
 //-------------------------------------------------------------------------------------------------
-int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2, 
-							  const vector<string>& vecStrings)
+int CCheckCheckComboGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
+										const string& strComboValue, const vector<string>& vecStrings)
 {
+	// Ensure the combo value is valid
+	if (m_setComboList.find(strComboValue) == m_setComboList.end())
+	{
+		UCLIDException uex("ELI27625", "Combo value was not found in the list.");
+		uex.addDebugInfo("Combo Value", strComboValue);
+		throw uex;
+	}
+
 	int iNewItem = nRow;
 
 	// Check column count
@@ -479,7 +573,7 @@ int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
 	if (iNumStrings > iColumnCount + 2)
 	{
 		// Throw exception
-		UCLIDException	ue( "ELI13694", "Too many strings for Grid control." );
+		UCLIDException	ue( "ELI27626", "Too many strings for Grid control." );
 		ue.addDebugInfo( "String count", iNumStrings );
 		ue.addDebugInfo( "Column count", iColumnCount );
 		ue.addDebugInfo( "Checkbox Count", 2 );
@@ -490,7 +584,7 @@ int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
 	if (nRow < 1)
 	{
 		// Throw exception
-		UCLIDException	ue( "ELI13695", "Invalid row number." );
+		UCLIDException	ue( "ELI27627", "Invalid row number." );
 		ue.addDebugInfo( "Row number", nRow );
 		throw ue;
 	}
@@ -502,7 +596,7 @@ int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
 	}
 
 	// Set starting column for strings
-	int iStart = 3;
+	int iStart = 4;
 
 	// Unlock the read-only cells
 	GetParam()->SetLockReadOnly( FALSE );
@@ -532,9 +626,17 @@ int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
 						);
 	}
 
+	// Set the appropriate combo value
+	SetStyleRange(CGXRange(nRow, 3),
+					CGXStyle()
+						.SetValue(strComboValue.c_str())
+					);
+
 	// Set checked states
 	checkAttribute( nRow, 1, bChecked1 );
 	checkAttribute( nRow, 2, bChecked2 );
+
+	// Set the drop down item
 
 	// Relock the read-only cells
 	GetParam()->SetLockReadOnly( TRUE );
@@ -542,7 +644,7 @@ int CCheckCheckGridWnd::SetRowInfo(int nRow, bool bChecked1, bool bChecked2,
 	return nRow;
 }
 //-------------------------------------------------------------------------------------------------
-BOOL CCheckCheckGridWnd::OnStartSelection(ROWCOL nRow, ROWCOL nCol, UINT flags, CPoint point)
+BOOL CCheckCheckComboGridWnd::OnStartSelection(ROWCOL nRow, ROWCOL nCol, UINT flags, CPoint point)
 {
 	try
 	{
@@ -568,7 +670,7 @@ BOOL CCheckCheckGridWnd::OnStartSelection(ROWCOL nRow, ROWCOL nCol, UINT flags, 
 		
 		return TRUE;
 	}
-	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI13689");
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27628");
 	// if it gets here the start selection failed
 	return FALSE;
 }
@@ -576,7 +678,7 @@ BOOL CCheckCheckGridWnd::OnStartSelection(ROWCOL nRow, ROWCOL nCol, UINT flags, 
 //-------------------------------------------------------------------------------------------------
 // Private methods
 //-------------------------------------------------------------------------------------------------
-void CCheckCheckGridWnd::checkAttribute(int iItem, int iSubitem, bool bCheck)
+void CCheckCheckComboGridWnd::checkAttribute(int iItem, int iSubitem, bool bCheck)
 {
 	// Validate iSubitem
 	if ((iSubitem < 1) || (iSubitem > 2))

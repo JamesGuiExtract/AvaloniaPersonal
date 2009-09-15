@@ -247,6 +247,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\CheckCheckComboGridWnd.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CheckCheckGridWnd.cpp"
 				>
 			</File>
@@ -391,6 +395,10 @@
 			>
 			<File
 				RelativePath="BasicGridWnd.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CheckCheckComboGridWnd.h"
 				>
 			</File>
 			<File

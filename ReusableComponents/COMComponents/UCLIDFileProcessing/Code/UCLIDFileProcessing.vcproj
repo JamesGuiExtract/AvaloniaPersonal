@@ -652,6 +652,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FileProcessingConstants.h"
+				>
+			</File>
+			<File
 				RelativePath=".\FileProcessingDB.h"
 				>
 			</File>
