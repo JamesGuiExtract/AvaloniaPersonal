@@ -1,5 +1,6 @@
+@echo off
 REM Clean Source folder
-call Clean.bat Test_1
+call Clean.bat Test_1 > NUL
 
 REM Supply Numbered Files for 4 hours
 START CopyNumberedFiles "..\..\..\AFCore\AutomatedTest\Images\Image1.tif.uss" ".\Source" 400ms -h4
