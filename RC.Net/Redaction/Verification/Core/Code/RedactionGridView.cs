@@ -4,6 +4,7 @@ using Extract.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
@@ -88,6 +89,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         const int _PADDING_MULTIPLIER = 25;
 
+        /// <summary>
+        /// The default value for the <see cref="AutoZoomScale"/>.
+        /// </summary>
+        const int _DEFAULT_AUTO_ZOOM_SCALE = 5;
+
         #endregion RedactionGridView Constants
 
         #region RedactionGridView Fields
@@ -149,7 +155,7 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// The zoom setting when <see cref="_autoZoom"/> is <see langword="true"/>.
         /// </summary>
-        int _autoZoomScale;
+        int _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
 
         /// <summary>
         /// <see langword="true"/> if changes have been made to the grid since it was loaded;
@@ -210,17 +216,14 @@ namespace Extract.Redaction.Verification
         /// <returns>The rows of the <see cref="RedactionGridView"/>.</returns>
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public IEnumerable<RedactionGridViewRow> Rows
+        public ReadOnlyCollection<RedactionGridViewRow> Rows
         {
             get
             {
                 // Commit any pending changes to the binding list
                 _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
 
-                foreach (DataGridViewRow row in _dataGridView.Rows)
-                {
-                    yield return _redactions[row.Index];
-                }
+                return new ReadOnlyCollection<RedactionGridViewRow>(_redactions);
             }
         }
 
@@ -305,6 +308,8 @@ namespace Extract.Redaction.Verification
         /// <returns><see langword="true"/> if the redactions have been modified since they were 
         /// last loaded; <see langword="false"/> if the redactions have not been modified since 
         /// they were last loaded.</returns>
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool Dirty
         {
             get
@@ -340,6 +345,8 @@ namespace Extract.Redaction.Verification
         /// <see cref="RedactionGridView"/>.</returns>
         // ConfidenceLevelsCollection IS a read only collection.
         [SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ConfidenceLevelsCollection ConfidenceLevels
         {
             get
@@ -366,6 +373,8 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <value>The <see cref="CursorTool"/> that is automatically selected when a layer object 
         /// is added.</value>
+        [DefaultValue(AutoTool.None)]
+        [Description("The tool that is automatically selected when a redaction is added.")]
         public AutoTool AutoTool
         {
             get
@@ -385,6 +394,8 @@ namespace Extract.Redaction.Verification
         /// <see langword="false"/> if the view should not change when redactions are selected.</value>
         /// <returns><see langword="true"/> if the view should zoom automatically to selected redactions;
         /// <see langword="false"/> if the view should not change when redactions are selected.</returns>
+        [DefaultValue(false)]
+        [Description("Whether to automatically zoom to selected redactions.")]
         public bool AutoZoom
         {
             get
@@ -403,6 +414,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <value>The amount to zoom out when <see cref="AutoZoom"/> is <see langword="true"/>.
         /// </value>
+        [Description("The amount to zoom out when AutoZoom is true.")]
         public int AutoZoomScale
         {
             get
@@ -413,6 +425,24 @@ namespace Extract.Redaction.Verification
             {
                 _autoZoomScale = value;
             }
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="AutoZoomScale"/> property should be serialized.
+        /// </summary>
+        /// <returns><see langword="true"/> if the property should be serialized; 
+        /// <see langword="false"/> if the property should not be serialized.</returns>
+        bool ShouldSerializeAutoZoomScale()
+        {
+            return _autoZoom && _autoZoomScale != _DEFAULT_AUTO_ZOOM_SCALE;
+        }
+
+        /// <summary>
+        /// Resets the <see cref="AutoZoomScale"/> property to its default value.
+        /// </summary>
+        void ResetAutoZoomScale()
+        {
+            _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
         }
 
         /// <summary>
@@ -1231,174 +1261,235 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Selects the previous redaction row.
+        /// Gets the index of the first unviewed row that occurs at or before the specified row.
         /// </summary>
-        public void SelectPreviousRedaction()
+        /// <param name="startIndex">The first index to check for being unviewed.</param>
+        /// <returns>The index of the first unviewed row that occurs at or before 
+        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
+        public int GetPreviousUnviewedRowIndex(int startIndex)
         {
             try
             {
-                // If there are no rows, we are done.
-                if (_dataGridView.Rows.Count > 0)
+                // Iterate backwards starting at the specified row
+                for (int i = startIndex; i >= 0; i--)
                 {
-                    // Go to the previous unviewed row if one exists
-                    DataGridViewRow row = GetPreviousUnviewedRow();
-                    if (row == null)
+                    // Return to the first row that is unvisited (visited cells have a tag)
+                    if (_dataGridView.Rows[i].Tag == null)
                     {
-                        // Otherwise, go to the row prior to the current selection
-                        row = GetPreviousRow();
+                        return i;
                     }
-
-                    SelectOnly(row);
                 }
+
+                return -1;
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27593", ex);
+                throw new ExtractException("ELI27670",
+                    "Unable to determine previous unviewed row.", ex);
             }
         }
 
         /// <summary>
-        /// Selects the next redaction row.
+        /// Gets the index of the first unviewed row that occurs at or after the specified row.
         /// </summary>
-        public void SelectNextRedaction()
+        /// <param name="startIndex">The first index to check for being unviewed.</param>
+        /// <returns>The index of the first unviewed row that occurs at or after 
+        /// <paramref name="startIndex"/>; or -1 if no such row exists.</returns>
+        public int GetNextUnviewedRowIndex(int startIndex)
         {
             try
             {
-                // If there are no rows, we are done.
-                if (_dataGridView.Rows.Count > 0)
+                // Iterate starting at the specified row
+                for (int i = startIndex; i < _dataGridView.Rows.Count; i++)
                 {
-                    // Go to the next unviewed row if one exists
-                    DataGridViewRow row = GetNextUnviewedRow();
-                    if (row == null)
+                    // Return to the first row that is unvisited (visited cells have a tag)
+                    if (_dataGridView.Rows[i].Tag == null)
                     {
-                        // Otherwise, go to the row after the current selection
-                        row = GetNextRow();
+                        return i;
                     }
-
-                    SelectOnly(row);
                 }
+
+                return -1;
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27592", ex);
+                throw new ExtractException("ELI27645",
+                    "Unable to determine next unviewed row.", ex);
             }
         }
 
         /// <summary>
-        /// Gets the first unviewed row that occurs before the last selected row.
+        /// Determines the index of the row before the currently selected row.
         /// </summary>
-        /// <returns>The first unviewed row that occurs before the last selected row; or 
-        /// <see langword="null"/> if no such row exists.</returns>
-        DataGridViewRow GetPreviousUnviewedRow()
+        /// <returns>The index of the row before the currently selected row.</returns>
+        // This is performing a calculation, so is better suited as a method.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetPreviousRowIndex()
         {
-            // Iterate backwards from the last selected row
-            for (int i = GetLastSelectedRowIndex() - 1; i >= 0; i--)
+            try
             {
-                // Return the first row that is unvisited (visited cells have a tag)
-                DataGridViewRow row = _dataGridView.Rows[i];
-                if (row.Tag == null)
+                // Check if a row is selected
+                int selectedRowIndex = GetFirstSelectedRowIndex();
+                if (selectedRowIndex < 0)
                 {
-                    return row;
+                    // No row is selected, return the index of
+                    // the first redaction on a previous page
+                    int currentPage = _imageViewer.PageNumber;
+                    for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
+                    {
+                        if (_redactions[i].PageNumber <= currentPage)
+                        {
+                            return i;
+                        }
+                    }
                 }
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// Gets the first unviewed row that occurs after the first selected row.
-        /// </summary>
-        /// <returns>The first unviewed row that occurs after the first selected row; or 
-        /// <see langword="null"/> if no such row exists.</returns>
-        DataGridViewRow GetNextUnviewedRow()
-        {
-            // Iterate starting after the first selected row
-            for (int i = GetFirstSelectedRowIndex() + 1; i < _dataGridView.Rows.Count; i++)
-            {
-                // Return the first row that is unvisited (visited cells have a tag)
-                DataGridViewRow row = _dataGridView.Rows[i];
-                if (row.Tag == null)
+                else if (selectedRowIndex > 0)
                 {
-                    return row;
+                    // Return the previous row index, unless this is the first row of the grid
+                    return selectedRowIndex - 1;
                 }
-            }
 
-            return null;
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27669",
+                    "Unable to determine previous selected row.", ex);
+            }
         }
 
         /// <summary>
-        /// Gets the row that appears immediately before the first selected row.
+        /// Determines the index of the row after the currently selected row.
         /// </summary>
-        /// <returns>The row that appears immediately before the first selected row; or the first 
-        /// row if the first row is selected.</returns>
-        DataGridViewRow GetPreviousRow()
+        /// <returns>The index of the row after the currently selected row.</returns>
+        // This is performing a calculation, so is better suited as a method.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetNextRowIndex()
         {
-            int nextRow = GetFirstSelectedRowIndex() - 1;
-            if (nextRow < 0)
+            try
             {
-                nextRow = 0;
+                // Check if a row is selected
+                int selectedRowIndex = GetLastSelectedRowIndex();
+                if (selectedRowIndex < 0)
+                {
+                    // No row is selected, return the index of
+                    // the first redaction on a subsequent page
+                    int currentPage = _imageViewer.PageNumber;
+                    for (int i = 0; i < _dataGridView.Rows.Count; i++)
+                    {
+                        if (_redactions[i].PageNumber >= currentPage)
+                        {
+                            return i;
+                        }
+                    }
+                }
+                else if (selectedRowIndex + 1 < _dataGridView.Rows.Count)
+                {
+                    // Return the next row index, unless this is the last row of the grid
+                    return selectedRowIndex + 1;
+                }
+
+                return -1;
             }
-
-            return _dataGridView.Rows[nextRow];
-        }
-
-        /// <summary>
-        /// Gets the row that appears immediately after the last selected row.
-        /// </summary>
-        /// <returns>The row that appears immediately before the last selected row; or the last 
-        /// row if the last row is selected.</returns>
-        DataGridViewRow GetNextRow()
-        {
-            int nextRow = GetLastSelectedRowIndex() + 1;
-            if (nextRow >= _dataGridView.Rows.Count)
+            catch (Exception ex)
             {
-                nextRow = _dataGridView.Rows.Count - 1;
+                throw new ExtractException("ELI27642",
+                    "Unable to determine next selected row.", ex);
             }
-
-            return _dataGridView.Rows[nextRow];
         }
 
         /// <summary>
         /// Gets the index of the first selected row.
         /// </summary>
         /// <returns>The index of the first selected row.</returns>
-        int GetFirstSelectedRowIndex()
+        // This is performing a calculation, so is better suited as a method.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetFirstSelectedRowIndex()
         {
-            for (int i = 0; i < _dataGridView.Rows.Count; i++)
+            try
             {
-                if (_dataGridView.Rows[i].Selected)
+                for (int i = 0; i < _dataGridView.Rows.Count; i++)
                 {
-                    return i;
+                    if (_dataGridView.Rows[i].Selected)
+                    {
+                        return i;
+                    }
                 }
-            }
 
-            return -1;
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27643",
+                    "Unable to determine first selected row.", ex);
+            }
         }
 
         /// <summary>
         /// Gets the index of the last selected row.
         /// </summary>
-        /// <returns>The index of the last selected row.</returns>
-        int GetLastSelectedRowIndex()
+        /// <returns>The index of the last selected row; or -1 if no row is selected.</returns>
+        // This is performing a calculation, so is better suited as a method.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetLastSelectedRowIndex()
         {
-            for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
+            try
             {
-                if (_dataGridView.Rows[i].Selected)
+                for (int i = _dataGridView.Rows.Count - 1; i >= 0; i--)
                 {
-                    return i;
+                    if (_dataGridView.Rows[i].Selected)
+                    {
+                        return i;
+                    }
                 }
-            }
 
-            return _dataGridView.Rows.Count;
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27644",
+                    "Unable to determine last selected row.", ex);
+            }
         }
 
         /// <summary>
-        /// Selects the specified row and deselects all other rows.
+        /// Selects the specified row by index and deselects all other rows.
         /// </summary>
-        /// <param name="row">The row to select.</param>
-        void SelectOnly(DataGridViewRow row)
+        /// <param name="index">The index of the row to select.</param>
+        public void SelectOnly(int index)
         {
-            _dataGridView.CurrentCell = row.Cells[0];
+            try
+            {
+                _dataGridView.CurrentCell = _dataGridView.Rows[index].Cells[0];
+
+                if (!_dataGridView.CurrentCell.Selected)
+                {
+                    _dataGridView.CurrentCell.Selected = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27659",
+                    "Unable to select row.", ex);
+                ee.AddDebugData("Row index", index, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Cancels the selection of the currently selected rows.
+        /// </summary>
+        public void ClearSelection()
+        {
+            try
+            {
+                _dataGridView.ClearSelection();
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27658",
+                    "Unable to clear selection.", ex);
+            }
         }
 
         #endregion RedactionGridView Methods
