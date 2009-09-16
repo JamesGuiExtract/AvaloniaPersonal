@@ -1582,7 +1582,10 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI23309", "Unable to set page number.", ex);
+                ExtractException ee = new ExtractException("ELI23309",
+                    "Unable to set page number.", ex);
+                ee.AddDebugData("Page number", pageNumber, false);
+                throw ee;
             }
         }
 
