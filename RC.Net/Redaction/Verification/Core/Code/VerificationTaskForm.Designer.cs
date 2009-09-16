@@ -78,7 +78,7 @@ namespace Extract.Redaction.Verification
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._saveAndCommitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._printImageToolStripMenuItem =new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
+            this._printImageToolStripMenuItem = new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
             this._skipProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._stopProcessingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -229,6 +229,7 @@ namespace Extract.Redaction.Verification
             this._currentDocumentTextBox.ReadOnly = true;
             this._currentDocumentTextBox.Size = new System.Drawing.Size(564, 20);
             this._currentDocumentTextBox.TabIndex = 4;
+            this._currentDocumentTextBox.TabStop = false;
             // 
             // label2
             // 
@@ -248,6 +249,7 @@ namespace Extract.Redaction.Verification
             this._documentTypeTextBox.ReadOnly = true;
             this._documentTypeTextBox.Size = new System.Drawing.Size(564, 20);
             this._documentTypeTextBox.TabIndex = 2;
+            this._documentTypeTextBox.TabStop = false;
             // 
             // label1
             // 
@@ -617,6 +619,7 @@ namespace Extract.Redaction.Verification
             // 
             // _printImageToolStripButton
             // 
+            this._printImageToolStripButton.BaseToolTipText = "Print image";
             this._printImageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._printImageToolStripButton.Enabled = false;
             this._printImageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -624,7 +627,6 @@ namespace Extract.Redaction.Verification
             this._printImageToolStripButton.Name = "_printImageToolStripButton";
             this._printImageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._printImageToolStripButton.Text = "Print image";
-            this._printImageToolStripButton.BaseToolTipText = "Print image";
             // 
             // toolStripSeparator4
             // 
@@ -633,53 +635,53 @@ namespace Extract.Redaction.Verification
             // 
             // _zoomWindowToolStripButton
             // 
+            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             this._zoomWindowToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomWindowToolStripButton.Enabled = false;
             this._zoomWindowToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._zoomWindowToolStripButton.ImageViewer = null;
             this._zoomWindowToolStripButton.Name = "_zoomWindowToolStripButton";
             this._zoomWindowToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             // 
             // _panToolStripButton
             // 
+            this._panToolStripButton.BaseToolTipText = "Pan";
             this._panToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._panToolStripButton.Enabled = false;
             this._panToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._panToolStripButton.ImageViewer = null;
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._panToolStripButton.BaseToolTipText = "Pan";
             // 
             // _selectLayerObjectToolStripButton
             // 
+            this._selectLayerObjectToolStripButton.BaseToolTipText = "Select redactions and other objects";
             this._selectLayerObjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._selectLayerObjectToolStripButton.Enabled = false;
             this._selectLayerObjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._selectLayerObjectToolStripButton.ImageViewer = null;
             this._selectLayerObjectToolStripButton.Name = "_selectLayerObjectToolStripButton";
             this._selectLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._selectLayerObjectToolStripButton.BaseToolTipText = "Select redactions and other objects";
             // 
             // _angularRedactionToolStripButton
             // 
+            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction";
             this._angularRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._angularRedactionToolStripButton.Enabled = false;
             this._angularRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._angularRedactionToolStripButton.ImageViewer = null;
             this._angularRedactionToolStripButton.Name = "_angularRedactionToolStripButton";
             this._angularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._angularRedactionToolStripButton.BaseToolTipText = "Create angular redaction";
             // 
             // _rectangularRedactionToolStripButton
             // 
+            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction";
             this._rectangularRedactionToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._rectangularRedactionToolStripButton.Enabled = false;
             this._rectangularRedactionToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._rectangularRedactionToolStripButton.ImageViewer = null;
             this._rectangularRedactionToolStripButton.Name = "_rectangularRedactionToolStripButton";
             this._rectangularRedactionToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rectangularRedactionToolStripButton.BaseToolTipText = "Create rectangular redaction";
             // 
             // _pageNavigationToolStrip
             // 
@@ -698,6 +700,7 @@ namespace Extract.Redaction.Verification
             // 
             // _firstPageToolStripButton
             // 
+            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             this._firstPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._firstPageToolStripButton.Enabled = false;
             this._firstPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -705,10 +708,10 @@ namespace Extract.Redaction.Verification
             this._firstPageToolStripButton.Name = "_firstPageToolStripButton";
             this._firstPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._firstPageToolStripButton.Text = "firstPageToolStripButton1";
-            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             // 
             // _previousPageToolStripButton
             // 
+            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             this._previousPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._previousPageToolStripButton.Enabled = false;
             this._previousPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -716,7 +719,6 @@ namespace Extract.Redaction.Verification
             this._previousPageToolStripButton.Name = "_previousPageToolStripButton";
             this._previousPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousPageToolStripButton.Text = "previousPageToolStripButton1";
-            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             // 
             // _pageNavigationToolStripTextBox
             // 
@@ -728,6 +730,7 @@ namespace Extract.Redaction.Verification
             // 
             // _nextPageToolStripButton
             // 
+            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             this._nextPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._nextPageToolStripButton.Enabled = false;
             this._nextPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -735,10 +738,10 @@ namespace Extract.Redaction.Verification
             this._nextPageToolStripButton.Name = "_nextPageToolStripButton";
             this._nextPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextPageToolStripButton.Text = "nextPageToolStripButton1";
-            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             // 
             // _lastPageToolStripButton
             // 
+            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             this._lastPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._lastPageToolStripButton.Enabled = false;
             this._lastPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -746,7 +749,6 @@ namespace Extract.Redaction.Verification
             this._lastPageToolStripButton.Name = "_lastPageToolStripButton";
             this._lastPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._lastPageToolStripButton.Text = "lastPageToolStripButton1";
-            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             // 
             // _viewCommandsToolStrip
             // 
@@ -770,6 +772,7 @@ namespace Extract.Redaction.Verification
             // 
             // _zoomInToolStripButton
             // 
+            this._zoomInToolStripButton.BaseToolTipText = "Zoom in";
             this._zoomInToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomInToolStripButton.Enabled = false;
             this._zoomInToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -777,10 +780,10 @@ namespace Extract.Redaction.Verification
             this._zoomInToolStripButton.Name = "_zoomInToolStripButton";
             this._zoomInToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomInToolStripButton.Text = "Zoom in";
-            this._zoomInToolStripButton.BaseToolTipText = "Zoom in";
             // 
             // _zoomOutToolStripButton
             // 
+            this._zoomOutToolStripButton.BaseToolTipText = "Zoom out";
             this._zoomOutToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomOutToolStripButton.Enabled = false;
             this._zoomOutToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -788,10 +791,10 @@ namespace Extract.Redaction.Verification
             this._zoomOutToolStripButton.Name = "_zoomOutToolStripButton";
             this._zoomOutToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomOutToolStripButton.Text = "Zoom out";
-            this._zoomOutToolStripButton.BaseToolTipText = "Zoom out";
             // 
             // _zoomPreviousToolStripButton
             // 
+            this._zoomPreviousToolStripButton.BaseToolTipText = "Zoom previous";
             this._zoomPreviousToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomPreviousToolStripButton.Enabled = false;
             this._zoomPreviousToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -799,10 +802,10 @@ namespace Extract.Redaction.Verification
             this._zoomPreviousToolStripButton.Name = "_zoomPreviousToolStripButton";
             this._zoomPreviousToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomPreviousToolStripButton.Text = "Zoom previous";
-            this._zoomPreviousToolStripButton.BaseToolTipText = "Zoom previous";
             // 
             // _zoomNextToolStripButton
             // 
+            this._zoomNextToolStripButton.BaseToolTipText = "Zoom next";
             this._zoomNextToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomNextToolStripButton.Enabled = false;
             this._zoomNextToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -810,7 +813,6 @@ namespace Extract.Redaction.Verification
             this._zoomNextToolStripButton.Name = "_zoomNextToolStripButton";
             this._zoomNextToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._zoomNextToolStripButton.Text = "Zoom next";
-            this._zoomNextToolStripButton.BaseToolTipText = "Zoom next";
             // 
             // toolStripSeparator5
             // 
@@ -819,6 +821,7 @@ namespace Extract.Redaction.Verification
             // 
             // _fitToPageToolStripButton
             // 
+            this._fitToPageToolStripButton.BaseToolTipText = "Fit to page";
             this._fitToPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._fitToPageToolStripButton.Enabled = false;
             this._fitToPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -826,10 +829,10 @@ namespace Extract.Redaction.Verification
             this._fitToPageToolStripButton.Name = "_fitToPageToolStripButton";
             this._fitToPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToPageToolStripButton.Text = "Fit to page";
-            this._fitToPageToolStripButton.BaseToolTipText = "Fit to page";
             // 
             // _fitToWidthToolStripButton
             // 
+            this._fitToWidthToolStripButton.BaseToolTipText = "Fit to width";
             this._fitToWidthToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._fitToWidthToolStripButton.Enabled = false;
             this._fitToWidthToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -837,7 +840,6 @@ namespace Extract.Redaction.Verification
             this._fitToWidthToolStripButton.Name = "_fitToWidthToolStripButton";
             this._fitToWidthToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._fitToWidthToolStripButton.Text = "Fit to width";
-            this._fitToWidthToolStripButton.BaseToolTipText = "Fit to width";
             // 
             // toolStripSeparator6
             // 
@@ -846,6 +848,7 @@ namespace Extract.Redaction.Verification
             // 
             // _rotateCounterclockwiseToolStripButton
             // 
+            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
             this._rotateCounterclockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._rotateCounterclockwiseToolStripButton.Enabled = false;
             this._rotateCounterclockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -853,10 +856,10 @@ namespace Extract.Redaction.Verification
             this._rotateCounterclockwiseToolStripButton.Name = "_rotateCounterclockwiseToolStripButton";
             this._rotateCounterclockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateCounterclockwiseToolStripButton.Text = "Rotate counterclockwise";
-            this._rotateCounterclockwiseToolStripButton.BaseToolTipText = "Rotate counterclockwise";
             // 
             // _rotateClockwiseToolStripButton
             // 
+            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
             this._rotateClockwiseToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._rotateClockwiseToolStripButton.Enabled = false;
             this._rotateClockwiseToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -864,7 +867,6 @@ namespace Extract.Redaction.Verification
             this._rotateClockwiseToolStripButton.Name = "_rotateClockwiseToolStripButton";
             this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
-            this._rotateClockwiseToolStripButton.BaseToolTipText = "Rotate clockwise";
             // 
             // VerificationTaskForm
             // 
