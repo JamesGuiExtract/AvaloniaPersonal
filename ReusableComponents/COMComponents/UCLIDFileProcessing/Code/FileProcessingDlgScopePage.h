@@ -116,9 +116,6 @@ private:
 	// OnInitDialog()
 	bool m_bInitialized;
 
-	// Vector to hold the priority values
-	vector<string> m_vecPriorities;
-
 	//////////
 	// Methods
 	//////////
@@ -170,9 +167,6 @@ private:
 
 	// Display the context menu
 	void displayContextMenu();
-
-	// Gets the priority as a string
-	string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority);
 };
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

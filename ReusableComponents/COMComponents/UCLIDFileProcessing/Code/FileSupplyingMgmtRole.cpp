@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 #include "UCLIDFileProcessing.h"
-#include "FileProcessingConstants.h"
+#include "FilePriorityHelper.h"
 #include "FileSupplyingMgmtRole.h"
 #include "FP_UI_Notifications.h"
 #include "FileSupplyingRecord.h"
@@ -1726,62 +1726,5 @@ bool CFileSupplyingMgmtRole::stopSupplingIfDBNotConnected()
 
 	// Supplying should be stopped
 	return true;
-}
-//-------------------------------------------------------------------------------------------------
-string CFileSupplyingMgmtRole::getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority)
-{
-	try
-	{
-		// Static collection to hold the priority strings
-		static map<long, string> smapPriorityToString;
-
-		// Mutex and initialized flag to ensure thread safety over collection
-		static CMutex mutex;
-		static bool bInitialized = false;
-		if (!bInitialized)
-		{
-			CSingleLock lg(&mutex, TRUE);
-
-			// Check initialization again (in case blocked while another thread initialized)
-			if (!bInitialized)
-			{
-				// Ensure the collection is empty
-				smapPriorityToString.clear();
-
-				// Get a DB pointer
-				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-				ASSERT_RESOURCE_ALLOCATION("ELI27633", ipDB != NULL);
-
-				// Get the priorities
-				IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
-				ASSERT_RESOURCE_ALLOCATION("ELI27634", ipVecPriorities != NULL);
-
-				// Add each priority to the map
-				long lSize = ipVecPriorities->Size;
-				for (long i=0; i < lSize; i++)
-				{
-					string strTemp = asString(ipVecPriorities->Item[i].bstrVal);
-					smapPriorityToString[i+1] = strTemp;
-				}
-
-				// Map has been initialized, set initialized to true
-				bInitialized = true;
-			}
-		}
-
-		// Get the priority value
-		long lPriority = (ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
-
-		map<long, string>::iterator it = smapPriorityToString.find(lPriority);
-		if (it == smapPriorityToString.end())
-		{
-			UCLIDException uex("ELI27635", "Invalid priority.");
-			uex.addDebugInfo("Priority", lPriority);
-			throw uex;
-		}
-
-		return it->second;
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27636");
 }
 //-------------------------------------------------------------------------------------------------

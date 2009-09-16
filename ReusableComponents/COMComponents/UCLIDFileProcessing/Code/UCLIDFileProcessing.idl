@@ -439,10 +439,14 @@ library UCLID_FILEPROCESSINGLib
 		[propput, id(5), helpstring("property ActionID")] HRESULT ActionID([in] LONG pVal);
 		[id(6), helpstring("method GetFileData")] HRESULT GetFileData(
 			[out] LONG* plFileID, [out] LONG* plActionID, [out] BSTR* pbstrFileName,
-			[out] LONGLONG* pllFileSize, [out] LONG* plPages);
+			[out] LONGLONG* pllFileSize, [out] LONG* plPages, [out] EFilePriority* pePriority);
 		[id(7), helpstring("method SetFileData")] HRESULT SetFileData(
 			[in] LONG lFileID, [in] LONG lActionID, [in] BSTR bstrFileName,
-			[in] LONGLONG llFileSize, [in] LONG lPages);
+			[in] LONGLONG llFileSize, [in] LONG lPages, [in] EFilePriority ePriority);
+		[propget, id(8), helpstring("property Priority")] HRESULT Priority(
+			[out, retval] EFilePriority* pePriority);
+		[propput, id(8), helpstring("property Priority")] HRESULT Priority(
+			[in] EFilePriority ePriority);
 	};
 
 	[

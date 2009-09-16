@@ -15,7 +15,8 @@ m_strName(""),
 m_lActionID(0),
 m_lFileID(0),
 m_llFileSize(0),
-m_lPages(0)
+m_lPages(0),
+m_ePriority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
 {
 }
 
@@ -173,7 +174,8 @@ STDMETHODIMP CFileRecord::put_ActionID(LONG newVal)
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pbstrFileName,
-									  LONGLONG *pllFileSize, LONG *plPages)
+									  LONGLONG *pllFileSize, LONG *plPages,
+									  EFilePriority *pePriority)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -185,6 +187,7 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 		ASSERT_ARGUMENT("ELI26746", pbstrFileName != NULL);
 		ASSERT_ARGUMENT("ELI26747", pllFileSize != NULL);
 		ASSERT_ARGUMENT("ELI26748", plPages != NULL);
+		ASSERT_ARGUMENT("ELI27649", pePriority != NULL);
 
 		// Copy the values
 		*plFileID = m_lFileID;
@@ -192,6 +195,7 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 		*pbstrFileName = _bstr_t(m_strName.c_str()).Detach();
 		*pllFileSize = m_llFileSize;
 		*plPages = m_lPages;
+		*pePriority = (EFilePriority) m_ePriority;
 
 		return S_OK;
 	}
@@ -199,7 +203,7 @@ STDMETHODIMP CFileRecord::GetFileData(LONG *plFileID, LONG *plActionID, BSTR *pb
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFileName,
-									  LONGLONG llFileSize, LONG lPages)
+									  LONGLONG llFileSize, LONG lPages, EFilePriority ePriority)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -211,9 +215,37 @@ STDMETHODIMP CFileRecord::SetFileData(LONG lFileID, LONG lActionID, BSTR bstrFil
 		m_strName = asString(bstrFileName);
 		m_llFileSize = llFileSize;
 		m_lPages = lPages;
+		m_ePriority = (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority;
 
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI26883");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::get_Priority(EFilePriority* pePriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		ASSERT_ARGUMENT("ELI27651", pePriority != NULL);
+
+		*pePriority = (EFilePriority) m_ePriority;
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27652");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileRecord::put_Priority(EFilePriority ePriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		m_ePriority = (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority;
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27653");
 }
 //-------------------------------------------------------------------------------------------------

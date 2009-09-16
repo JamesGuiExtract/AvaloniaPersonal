@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "resource.h"
+#include "FilePriorityHelper.h"
 #include "FileProcessingDlgStatusPage.h"
 #include "TaskInfoDlg.h"
 #include "HelperFunctions.h"
@@ -36,21 +37,25 @@ static const int giALL_LISTS_NUM_PAGES_COLUMN = 4;
 // columns in the currently being processed files grid
 static const int giLIST1_TASK_COLUMN = 5;				// text representing the current task
 static const int giLIST1_PROGRESS_STATUS_COLUMN = 6;	// progress status for the current task
-static const int giLIST1_FOLDER_COLUMN = 7;
+static const int giLIST1_FILE_PRIORITY_COLUMN = 7;
+static const int giLIST1_FOLDER_COLUMN = 8;
 
 // Column for the completed processing recently and failed grids
 static const int giLIST2_TOTAL_TIME_COLUMN = 5;
-static const int giLIST2_FOLDER_COLUMN = 6;
+static const int giLIST2_FILE_PRIORITY_COLUMN = 6;
+static const int giLIST2_FOLDER_COLUMN = 7;
 
 // Column for the failed processing recently grid
 static const int giLIST3_TOTAL_TIME_COLUMN = 5;
 static const int giLIST3_EXCEPTION_COLUMN = 6;
-static const int giLIST3_FOLDER_COLUMN = 7;
+static const int giLIST3_FILE_PRIORITY_COLUMN = 7;
+static const int giLIST3_FOLDER_COLUMN = 8;
 
 // Set some column widths
 static const int giCURRENT_TASK_COL_WIDTH = 120;
 static const int giCURRENT_TASK_PROGRESS_COL_WIDTH = 120;
 static const int giTOTAL_TIME_COL_WIDTH = 80;
+static const int giFILE_PRIORITY_WIDTH = 80;
 
 // Other constants
 static const int giPROGRESS_REFRESH_EVENTID = 1000;
@@ -336,6 +341,7 @@ BOOL FileProcessingDlgStatusPage::OnInitDialog()
 		m_currentFilesList.InsertColumn(giALL_LISTS_NUM_PAGES_COLUMN , "Pages", LVCFMT_LEFT, giNUM_PAGES_COL_WIDTH );
 		m_currentFilesList.InsertColumn(giLIST1_TASK_COLUMN, "Current Task", LVCFMT_LEFT, giCURRENT_TASK_COL_WIDTH);
 		m_currentFilesList.InsertColumn(giLIST1_PROGRESS_STATUS_COLUMN, "Current Task Progress", LVCFMT_LEFT, giCURRENT_TASK_PROGRESS_COL_WIDTH);
+		m_currentFilesList.InsertColumn(giLIST1_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_currentFilesList.InsertColumn(giLIST1_FOLDER_COLUMN, "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH );
 
 		// Prepare the Files that completed recently columns
@@ -346,6 +352,7 @@ BOOL FileProcessingDlgStatusPage::OnInitDialog()
 		m_completedFilesList.InsertColumn(giALL_LISTS_FILE_NAME_COLUMN, "Filename", LVCFMT_LEFT, giFILENAME_COL_WIDTH);
 		m_completedFilesList.InsertColumn(giALL_LISTS_NUM_PAGES_COLUMN , "Pages", LVCFMT_LEFT, giNUM_PAGES_COL_WIDTH );
 		m_completedFilesList.InsertColumn(giLIST2_TOTAL_TIME_COLUMN , "Total Time (s)", LVCFMT_LEFT, giTOTAL_TIME_COL_WIDTH );
+		m_completedFilesList.InsertColumn(giLIST2_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_completedFilesList.InsertColumn(giLIST2_FOLDER_COLUMN, "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH);
 
 		// Prepare the Files that failed recently columns
@@ -357,6 +364,7 @@ BOOL FileProcessingDlgStatusPage::OnInitDialog()
 		m_failedFilesList.InsertColumn(giALL_LISTS_NUM_PAGES_COLUMN , "Pages", LVCFMT_LEFT, giNUM_PAGES_COL_WIDTH );
 		m_failedFilesList.InsertColumn(giLIST3_TOTAL_TIME_COLUMN , "Total Time (s)", LVCFMT_LEFT, giTOTAL_TIME_COL_WIDTH );
 		m_failedFilesList.InsertColumn(giLIST3_EXCEPTION_COLUMN, "Error", LVCFMT_LEFT, giEXCEPTION_COL_WIDTH);
+		m_failedFilesList.InsertColumn(giLIST3_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_failedFilesList.InsertColumn(giLIST3_FOLDER_COLUMN, "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH);
 
 		// By default, the exception details button is disabled.  It is only 
@@ -791,6 +799,10 @@ void FileProcessingDlgStatusPage::moveTaskFromPendingToCurrent(long nFileID)
 	// update the folder column
 	m_currentFilesList.SetItemText(iNewItemIndex, giLIST1_FOLDER_COLUMN, 
 		getDirectoryFromFullPath(task.getFileName()).c_str());
+
+	// update the priority column
+	m_currentFilesList.SetItemText(iNewItemIndex, giLIST1_FILE_PRIORITY_COLUMN,
+		getPriorityString(task.getPriority()).c_str());
 }
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgStatusPage::moveTaskFromCurrentToComplete(long nFileID)
@@ -810,6 +822,10 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToComplete(long nFileID)
 	// update the total time column
 	m_completedFilesList.SetItemText(iNewItemIndex, giLIST2_TOTAL_TIME_COLUMN, 
 		commaFormatNumber(task.getTaskDuration(), 2).c_str());
+
+	// update the priority column
+	m_completedFilesList.SetItemText(iNewItemIndex, giLIST2_FILE_PRIORITY_COLUMN,
+		getPriorityString(task.getPriority()).c_str());
 
 	// update the folder column
 	m_completedFilesList.SetItemText(iNewItemIndex, giLIST2_FOLDER_COLUMN, 
@@ -842,6 +858,10 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 	ue.createFromString("ELI14108", task.m_strException);
 	m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_EXCEPTION_COLUMN , ue.getTopText().c_str());
 
+	// update the priority column
+	m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FILE_PRIORITY_COLUMN,
+		getPriorityString(task.getPriority()).c_str());
+
 	// update the folder column
 	m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FOLDER_COLUMN, 
 		getDirectoryFromFullPath(task.getFileName()).c_str());
@@ -860,6 +880,10 @@ void FileProcessingDlgStatusPage::moveTaskFromCurrentToFailed(long nFileID)
 		UCLIDException ue;
 		ue.createFromString("ELI18015", task.m_strErrorTaskException);
 		m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_EXCEPTION_COLUMN , ue.getTopText().c_str());
+
+		// update the priority column
+		m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FILE_PRIORITY_COLUMN,
+			getPriorityString(task.getPriority()).c_str());
 
 		// update the folder column
 		m_failedFilesList.SetItemText(iNewItemIndex, giLIST3_FOLDER_COLUMN, 

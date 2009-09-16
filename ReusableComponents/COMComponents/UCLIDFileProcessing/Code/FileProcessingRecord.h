@@ -1,5 +1,7 @@
 
 #pragma once
+#include "stdafx.h"
+#include "uclidfileprocessing.h"
 
 #include <COMUtils.h>
 #include <StopWatch.h>
@@ -111,8 +113,12 @@ public:
 	long long getFileSize() const;
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: Returns the # of pages for the file
-	//			if the m_ipFileRcd is NULL and exception will be thrown
+	//			if the m_ipFileRcd is NULL an exception will be thrown
 	long getNumberOfPages() const;
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: Returns the priority for the file
+	//			if the m_ipFileRcd is NULL an exception will be thrown
+	UCLID_FILEPROCESSINGLib::EFilePriority getPriority() const;
 	//---------------------------------------------------------------------------------------------
 
 	static const long NO_ID;
@@ -131,9 +137,11 @@ private:
 		long ActionID;
 		long long FileSize;
 		long NumberOfPages;
+		UCLID_FILEPROCESSINGLib::EFilePriority Priority;
 
 		LocalFileRecord() : FileRecord(NULL), FileName(""), FileID(-1), ActionID(-1),
-			FileSize(-1), NumberOfPages(-1)
+			FileSize(-1), NumberOfPages(-1),
+			Priority((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault)
 		{
 		}
 
@@ -156,7 +164,7 @@ private:
 				// Get the data from the ipRecord object
 				_bstr_t bstrFileName;
 				ipRecord->GetFileData(&FileID, &ActionID, bstrFileName.GetAddress(),
-					&FileSize, &NumberOfPages);
+					&FileSize, &NumberOfPages, &Priority);
 
 				// Convert bstr to string
 				FileName = asString(bstrFileName);
@@ -176,6 +184,7 @@ private:
 				ActionID = -1;
 				FileSize = -1;
 				NumberOfPages = -1;
+				Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) kPriorityDefault;
 				FileRecord = NULL;
 			}
 			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26751");

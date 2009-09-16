@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "UCLIDFileProcessing.h"
-#include "FileProcessingConstants.h"
+#include "FilePriorityHelper.h"
 #include "FileProcessingDlgScopePage.h"
 #include "FileProcessingManager.h"
 #include "FPCategories.h"
@@ -54,21 +54,6 @@ FileProcessingDlgScopePage::FileProcessingDlgScopePage()
 	try
 	{
 		m_zSkipDescription = _T("");
-
-		// Get a DB pointer
-		UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
-		ASSERT_RESOURCE_ALLOCATION("ELI27598", ipDB != NULL);
-
-		// Get the priorities
-		IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
-		ASSERT_RESOURCE_ALLOCATION("ELI27599", ipVecPriorities != NULL);
-
-		// Fill the priority vector with the strings
-		long lSize = ipVecPriorities->Size;
-		for (long i=0; i < lSize; i++)
-		{
-			m_vecPriorities.push_back(asString(ipVecPriorities->Item[i].bstrVal));
-		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27600");
 }
@@ -282,11 +267,15 @@ BOOL FileProcessingDlgScopePage::OnInitDialog()
 		vecWidths.push_back( 0 );		// Will be resized by DoResize()
 		vecWidths.push_back( 80 );
 
+		// Get the priority strings
+		vector<string> vecPriorities;
+		getPrioritiesVector(vecPriorities);
+
 		// Setup the grid control
 		//    5 columns of header labels
 		//    5 columns of column widths
 		//	  A list of priorities for the drop down column
-		m_wndGrid.PrepareGrid( vecHeader, vecWidths, m_vecPriorities );
+		m_wndGrid.PrepareGrid( vecHeader, vecWidths, vecPriorities );
 		m_wndGrid.SetControlID( IDC_GRID );
 		m_wndGrid.GetParam()->EnableUndo(TRUE);
 
@@ -887,30 +876,14 @@ LRESULT FileProcessingDlgScopePage::OnModifyCell(WPARAM wParam, LPARAM lParam)
 			string strPriority = (LPCTSTR) m_wndGrid.GetCellValue(nRow, nCol);
 			
 			// Get the priority value
-			bool bFound = false;
-			unsigned long nPriority = 0;
-			for (;nPriority < m_vecPriorities.size(); nPriority++)
-			{
-				if (strPriority == m_vecPriorities[nPriority])
-				{
-					bFound = true;
-					break;
-				}
-			}
-
-			if (!bFound)
-			{
-				UCLIDException uex("ELI27602", "Invalid priority value.");
-				uex.addDebugInfo("Priority", strPriority);
-				throw uex;
-			}
+			UCLID_FILEPROCESSINGLib::EFilePriority ePriority = getPriorityFromString(strPriority);
 
 			// Get the file supplier for this row
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFD =
 				getFileSuppliersData()->At(nRow-1);
 
 			// Set the priority
-			ipFD->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) (nPriority+1);
+			ipFD->Priority = ePriority;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27601");
@@ -1193,18 +1166,5 @@ IMiscUtilsPtr FileProcessingDlgScopePage::getMiscUtils()
 	}
 
 	return m_ipMiscUtils;
-}
-//-------------------------------------------------------------------------------------------------
-string FileProcessingDlgScopePage::getPriorityString(
-	UCLID_FILEPROCESSINGLib::EFilePriority ePriority)
-{
-	try
-	{
-		// Get the priority value
-		long lPriority = ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority;
-
-		return m_vecPriorities[lPriority-1];
-	}
-	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27609");
 }
 //-------------------------------------------------------------------------------------------------

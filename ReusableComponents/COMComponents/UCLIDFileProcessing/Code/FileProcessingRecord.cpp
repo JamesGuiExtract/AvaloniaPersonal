@@ -285,3 +285,13 @@ long FileProcessingRecord::getNumberOfPages() const
 	return m_lfrFileRcd.NumberOfPages;
 }
 //-------------------------------------------------------------------------------------------------
+UCLID_FILEPROCESSINGLib::EFilePriority FileProcessingRecord::getPriority() const
+{
+	if (m_lfrFileRcd.FileRecord == NULL)
+	{
+		UCLIDException ue("ELI27648", "File record is not set.");
+		throw ue;
+	}
+	return m_lfrFileRcd.Priority;
+}
+//-------------------------------------------------------------------------------------------------

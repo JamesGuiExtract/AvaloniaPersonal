@@ -491,6 +491,9 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 		// Set the FileSize in return record
 		ipNewFileRecord->FileSize = llFileSize;
 
+		// Set the priority in return record
+		ipNewFileRecord->Priority = (UCLID_FILEPROCESSINGLib::EFilePriority) ePriority;
+
 		_lastCodePos = "50";
 
 		string strNewStatus = asStatusString(eNewStatus);
@@ -547,8 +550,8 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 			ASSERT_RESOURCE_ALLOCATION("ELI26873", ipFields != NULL);
 
 			// Get the file record from the fields
-			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord;
-			ipOldRecord = getFileRecordFromFields(ipFields);
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipOldRecord = getFileRecordFromFields(ipFields);
+			ASSERT_RESOURCE_ALLOCATION("ELI27657", ipOldRecord != NULL);
 
 			// Set the Current file Records ID
 			nID = ipOldRecord->FileID;
@@ -568,13 +571,6 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 			{
 				_lastCodePos = "100.2";
 
-				// If force processing then update the priority field to the new value
-				if (bForceStatusChange == VARIANT_TRUE)
-				{
-					setLongField(ipFields, "Priority",
-						ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
-				}
-
 				// if the previous state is "R" it should not be changed
 				// TODO: Handle the "R" case so that they will be marked as pending after the processing has completed
 				if ( *pPrevStatus == kActionProcessing )
@@ -586,7 +582,8 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 				}
 
 				// set the fields to the new file Record
-				setFieldsFromFileRecord(ipFields, ipNewFileRecord);
+				// (only update the priority if force processing)
+				setFieldsFromFileRecord(ipFields, ipNewFileRecord, asCppBool(bForceStatusChange));
 
 				// set the Action state to the new status
 				setStringField(ipFields, strActionCol, strNewStatus );
@@ -1287,7 +1284,8 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		string strFrom = "FROM FAMFile " + strWhere;
 			
 		// create query to select top records;
-		string strSelectSQL = "SELECT " + strTop + " FAMFile.ID, FileName, Pages, FileSize " + strFrom;
+		string strSelectSQL = "SELECT " + strTop
+			+ " FAMFile.ID, FileName, Pages, FileSize, Priority " + strFrom;
 
 		// Create the query to update the status to processing
 		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = 'R' FROM (SELECT "
@@ -1312,10 +1310,9 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		// Fill the ipFiles collection
 		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
-			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord;
-
 			// Get the file Record from the fields
-			ipFileRecord = getFileRecordFromFields(ipFileSet->Fields);
+			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord =
+				getFileRecordFromFields(ipFileSet->Fields);
 
 			// Put record in list of records to return
 			ipFiles->PushBack(ipFileRecord);

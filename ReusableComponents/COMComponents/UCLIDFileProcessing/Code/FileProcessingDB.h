@@ -4,7 +4,7 @@
 
 #include "resource.h"       // main symbols
 #include "UCLIDFileProcessing.h"
-#include "FileProcessingConstants.h"
+#include "FilePriorityHelper.h"
 #include "FP_UI_Notifications.h"
 #include "TransactionGuard.h"
 
@@ -234,11 +234,12 @@ private:
 	//-------------------------------------------------------------------------------------------------
 	
 	// PROMISE: returns a pointer to a new FileRecord object filled from ipFields
-	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(ADODB::FieldsPtr ipFields);
+	UCLID_FILEPROCESSINGLib::IFileRecordPtr getFileRecordFromFields(const ADODB::FieldsPtr& ipFields);
 
 	// PROMISE: To transfer the data from the ipFileRecord object to the appropriate Field in ipFields
 	// NOTE: This does not set the ID field from the ipFileRecord.
-	void setFieldsFromFileRecord(ADODB::FieldsPtr ipFields, UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord);
+	void setFieldsFromFileRecord(const ADODB::FieldsPtr& ipFields,
+		const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRecord, bool bSetPriority = true);
 	
 	// PROMISE:	To return the EActionStatus code for the string 
 	//			representation( "U", "P", "R", "F", or "C" ) given

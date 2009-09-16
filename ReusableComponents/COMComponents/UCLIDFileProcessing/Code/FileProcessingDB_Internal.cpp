@@ -1094,11 +1094,13 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 	// Attempt to get the file data
 	LONGLONG llOldFileSize(-1), llNewFileSize(-1);
 	long lOldPages(-1), lNewPages(-1), lTempFileID(-1), lTempActionID(-1);
+	UCLID_FILEPROCESSINGLib::EFilePriority ePriority(
+		(UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault);
 	_bstr_t bstrTemp;
 	if (ipOldRecord != NULL)
 	{
 		ipOldRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
-			&llOldFileSize, &lOldPages);
+			&llOldFileSize, &lOldPages, &ePriority);
 	}
 	if (ipNewRecord != NULL)
 	{
@@ -1111,7 +1113,7 @@ void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nA
 		else
 		{
 			ipNewRecord->GetFileData(&lTempFileID, &lTempActionID, bstrTemp.GetAddress(),
-				&llNewFileSize, &lNewPages);
+				&llNewFileSize, &lNewPages, &ePriority);
 		}
 	}
 
@@ -1629,7 +1631,7 @@ UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr CFileProcessingDB::getThisAsCOMPtr
 }
 //--------------------------------------------------------------------------------------------------
 UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFields(
-	ADODB::FieldsPtr ipFields)
+	const ADODB::FieldsPtr& ipFields)
 {
 	// Make sure the ipFields argument is not NULL
 	ASSERT_ARGUMENT("ELI17028", ipFields != NULL);
@@ -1640,13 +1642,14 @@ UCLID_FILEPROCESSINGLib::IFileRecordPtr CFileProcessingDB::getFileRecordFromFiel
 	// Set the file data from the fields collection (set ActionID to 0)
 	ipFileRecord->SetFileData(getLongField(ipFields, "ID"), 0,
 		getStringField(ipFields, "FileName").c_str(), getLongLongField(ipFields, "FileSize"),
-		getLongField(ipFields, "Pages"));
+		getLongField(ipFields, "Pages"),
+		(UCLID_FILEPROCESSINGLib::EFilePriority)getLongField(ipFields, "Priority"));
 
 	return ipFileRecord;
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::setFieldsFromFileRecord(ADODB::FieldsPtr ipFields, 
-											UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord)
+void CFileProcessingDB::setFieldsFromFileRecord(const ADODB::FieldsPtr& ipFields, 
+		const UCLID_FILEPROCESSINGLib::IFileRecordPtr& ipFileRecord, bool bSetPriority)
 {
 	// Make sure the ipFields argument is not NULL
 	ASSERT_ARGUMENT("ELI17031", ipFields != NULL);
@@ -1657,9 +1660,11 @@ void CFileProcessingDB::setFieldsFromFileRecord(ADODB::FieldsPtr ipFields,
 	// Get the file data
 	long lFileID(-1), lActionID(-1), lNumPages(-1);
 	LONGLONG llFileSize(-1);
+	UCLID_FILEPROCESSINGLib::EFilePriority ePriority(
+		(UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault);
 	_bstr_t bstrFileName;
 	ipFileRecord->GetFileData(&lFileID, &lActionID, bstrFileName.GetAddress(),
-		&llFileSize, &lNumPages);
+		&llFileSize, &lNumPages, &ePriority);
 
 	// set the file name field
 	setStringField(ipFields, "FileName", asString(bstrFileName));
@@ -1669,6 +1674,13 @@ void CFileProcessingDB::setFieldsFromFileRecord(ADODB::FieldsPtr ipFields,
 
 	// Set the number of pages
 	setLongField(ipFields, "Pages", lNumPages);
+
+	if (bSetPriority)
+	{
+		// Set the priority
+		setLongField(ipFields, "Priority",
+			(ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority));
+	}
 }
 //--------------------------------------------------------------------------------------------------
 bool  CFileProcessingDB::isAdminPasswordValid(const string& strPassword)

@@ -199,9 +199,6 @@ private:
 
 	// thread procedure that executes each file supplier in a seperate thread
 	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData);
-
-	// Gets the string representation of the specified priority
-	static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority);
 };
 //-------------------------------------------------------------------------------------------------
 

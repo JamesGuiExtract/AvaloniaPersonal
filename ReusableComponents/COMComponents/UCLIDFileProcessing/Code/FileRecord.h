@@ -59,9 +59,11 @@ public:
 	STDMETHOD(get_ActionID)(LONG* pVal);
 	STDMETHOD(put_ActionID)(LONG newVal);
 	STDMETHOD(GetFileData)(LONG* plFileID, LONG* plActionID, BSTR* pbstrFileName,
-		LONGLONG* pllFileSize, LONG* plPages);
+		LONGLONG* pllFileSize, LONG* plPages, EFilePriority* pePriority);
 	STDMETHOD(SetFileData)(LONG lFileID, LONG lActionID, BSTR bstrFileName,
-		LONGLONG llFileSize, LONG lPages);
+		LONGLONG llFileSize, LONG lPages, EFilePriority ePriority);
+	STDMETHOD(get_Priority)(EFilePriority* pePriority);
+	STDMETHOD(put_Priority)(EFilePriority ePriority);
 
 private:
 
@@ -71,6 +73,7 @@ private:
 	string m_strName;
 	long long m_llFileSize;
 	long m_lPages;
+	UCLID_FILEPROCESSINGLib::EFilePriority m_ePriority;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(FileRecord), CFileRecord)
