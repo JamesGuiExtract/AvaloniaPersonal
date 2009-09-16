@@ -119,6 +119,68 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets the first unvisited page before the active page.
+        /// </summary>
+        /// <returns>The first unvisited page before the active page.</returns>
+        // Complex operations are better suited as methods.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetPreviousUnvisitedPage()
+        {
+            try
+            {
+                // Iterate over each page before the current page
+                for (int i = _imageViewer.PageNumber - 1; i >= 1; i--)
+                {
+                    // If this cell is unvisited (untagged), return the page number
+                    DataGridViewCell cell = GetCellByPageNumber(i);
+                    if (cell.Tag == null)
+                    {
+                        return i;
+                    }
+                }
+
+                // All prior pages were visited
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27668",
+                    "Unable to get previous unvisited page.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the first unvisited page after the active page.
+        /// </summary>
+        /// <returns>The first unvisited page after the active page.</returns>
+        // Complex operations are better suited as methods.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public int GetNextUnvisitedPage()
+        {
+            try
+            {
+                // Iterate over each page after the current page
+                for (int i = _imageViewer.PageNumber + 1; i <= _imageViewer.PageCount; i++)
+                {
+                    // If this cell is unvisited (untagged), return the page number
+                    DataGridViewCell cell = GetCellByPageNumber(i);
+                    if (cell.Tag == null)
+                    {
+                        return i;
+                    }
+                }
+
+                // All subsequent pages were visited
+                return -1;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27647",
+                    "Unable to get next unvisited page.", ex);
+            }
+        }
+
+        /// <summary>
         /// Determines whether it is valid to move forward the specified number of pages.
         /// </summary>
         /// <param name="pages">The number of pages to move forward. May be negative.</param>
