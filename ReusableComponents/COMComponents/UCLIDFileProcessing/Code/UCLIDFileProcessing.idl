@@ -803,6 +803,15 @@ library UCLID_FILEPROCESSINGLib
 		//			priority 1.
 		[id(65), helpstring("method GetPriorities")] HRESULT GetPriorities(
 			[out, retval] IVariantVector** ppvecPriorities);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To convert the EFilePriority value to a string.
+		[id(66), helpstring("method AsPriorityString")] HRESULT AsPriorityString(
+			[in] EFilePriority ePriority, [out, retval] BSTR* pbstrPriority);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To convert the priority string to its EFilePriority value.
+		[id(67), helpstring("method AsEFilePriority")] HRESULT AsEFilePriority(
+			[in] BSTR bstrPriority, [out, retval] EFilePriority* pePriority);
+		// -----------------------------------------------------------------------------------------------
 	};
 
 	[

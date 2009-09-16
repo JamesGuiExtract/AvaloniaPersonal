@@ -5,6 +5,7 @@
 // Contains the definition of the SelectFileSettings class
 //-------------------------------------------------------------------------------------------------
 #include <UCLIDException.h>
+#include <COMUtils.h>
 
 #include <string>
 #include <vector>
@@ -13,7 +14,8 @@ using namespace std;
 
 const string gstrANY_USER = "<any user>";
 
-enum FileSelectScope { eAllFiles, eAllFilesForWhich, eAllFilesTag, eAllFilesQuery };
+enum FileSelectScope { eAllFiles, eAllFilesForWhich, eAllFilesTag,
+						eAllFilesQuery, eAllFilesPriority };
 
 class SelectFileSettings
 {
@@ -32,8 +34,12 @@ private:
 	bool m_bAnyTags; // Whether the user choose any tags or all tags
 	vector<string> m_vecTags; // The list of tags selected
 
-	// Value for the eSelectQuery scope
+	// Value for the eAllFilesQuery scope
 	string m_strSQL; // The query statement to complete the line SELECT FAMFile.ID FROM
+
+	// Values for the eAllFilesPriority scope
+	EFilePriority m_ePriority; // The priority to select
+	string m_strPriority;
 
 	// Values for the random subset selection restriction
 	bool m_bNarrowScope; // Whether to narrow the selection
@@ -77,6 +83,15 @@ public:
 
 	void setSQLString(const string& strSQL) { m_strSQL = strSQL; }
 	string getSQLString() { return m_strSQL; }
+
+	void setPriority(EFilePriority ePriority) {
+		m_ePriority = ePriority;
+		IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+		ASSERT_RESOURCE_ALLOCATION("ELI27675", ipDB != NULL);
+		m_strPriority = asString(ipDB->AsPriorityString(ePriority));
+	}
+	EFilePriority getPriority() { return m_ePriority; }
+	string getPriorityString() { return m_strPriority; }
 
 	void setNarrowScope(bool bNarrowScope) { m_bNarrowScope = bNarrowScope; }
 	bool getNarrowScope() { return m_bNarrowScope; }
@@ -130,6 +145,10 @@ public:
 
 		case eAllFilesQuery:
 			strSummary += "selected by this custom query: SELECT FAMFile.ID FROM " + m_strSQL;
+			break;
+
+		case eAllFilesPriority:
+			strSummary += "with a file processing priority of " + m_strPriority;
 			break;
 
 		default:

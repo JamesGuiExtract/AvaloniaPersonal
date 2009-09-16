@@ -311,8 +311,6 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 			{
 				string strSQL = m_settings.getSQLString();
 				uex.addDebugInfo("SQL Query", strSQL);
-					UCLID_FILEPROCESSINGLib::EActionStatus eNewStatus = 
-						(UCLID_FILEPROCESSINGLib::EActionStatus)(0);
 				CString zFromAction = "";
 				if (lFromActionID != -1)
 				{
@@ -323,6 +321,26 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				// Modify the action status from the specified query
 				m_ipFAMDB->ModifyActionStatusForQuery(strSQL.c_str(),
 					(LPCTSTR)zToActionName, eNewStatus, (LPCTSTR)zFromAction);
+			}
+			break;
+
+		case eAllFilesPriority:
+			{
+				long lPriority = (long) m_settings.getPriority();
+
+				uex.addDebugInfo("Priority String", m_settings.getPriorityString());
+				uex.addDebugInfo("Priority", lPriority);
+
+				string strQuery = "FAMFile WHERE FAMFile.Priority = " + asString(lPriority);
+
+				CString zFromAction = "";
+				if (lFromActionID != -1)
+				{
+					m_comboStatusFromAction.GetWindowText(zFromAction);
+				}
+
+				m_ipFAMDB->ModifyActionStatusForQuery(strQuery.c_str(), (LPCTSTR)zToActionName,
+					eNewStatus, (LPCTSTR)zFromAction);
 			}
 			break;
 

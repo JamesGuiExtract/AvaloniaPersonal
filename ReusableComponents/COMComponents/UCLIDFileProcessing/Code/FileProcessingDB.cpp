@@ -3564,6 +3564,8 @@ STDMETHODIMP CFileProcessingDB::SetStatusForFilesWithTags(IVariantVector *pvecTa
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::GetPriorities(IVariantVector** ppvecPriorities)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	try
 	{
 		validateLicense();
@@ -3586,6 +3588,41 @@ STDMETHODIMP CFileProcessingDB::GetPriorities(IVariantVector** ppvecPriorities)
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27595");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AsPriorityString(EFilePriority ePriority, BSTR *pbstrPriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27671", pbstrPriority != NULL);
+
+		*pbstrPriority = _bstr_t(
+			getPriorityString((UCLID_FILEPROCESSINGLib::EFilePriority)ePriority).c_str()).Detach();
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27672");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::AsEFilePriority(BSTR bstrPriority, EFilePriority *pePriority)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27673", pePriority != NULL);
+
+		*pePriority = (EFilePriority) getPriorityFromString(asString(bstrPriority));
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27674");
 }
 
 //-------------------------------------------------------------------------------------------------

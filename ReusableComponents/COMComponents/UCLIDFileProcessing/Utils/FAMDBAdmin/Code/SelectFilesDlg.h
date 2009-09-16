@@ -36,10 +36,12 @@ public:
 	CButton m_radioFilesForWhich;
 	CButton m_radioFilesWithTags;
 	CButton m_radioFilesFromQuery;
+	CButton m_radioFilesWithPriority;
 	CComboBox m_comboFilesUnderAction;
 	CComboBox m_comboFilesUnderStatus;
 	CComboBox m_comboSkippedUser;
 	CComboBox m_comboTagsAnyAll;
+	CComboBox m_comboPriority;
 	CEdit m_editSelectQuery;
 	CListCtrl m_listTags;
 
@@ -53,6 +55,7 @@ protected:
 	afx_msg void OnClickedRadioFilesStatus();
 	afx_msg void OnClickedRadioFilesFromQuery();
 	afx_msg void OnClickedRadioFilesWithTags();
+	afx_msg void OnClickedRadioFilesWithPriority();
 	afx_msg void OnFilesUnderActionChange();
 	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnCancel();
@@ -94,6 +97,9 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To configure the tag list and fill it with the current tags from the database
 	void configureAndPopulateTagList();
+	//---------------------------------------------------------------------------------------------
+	// PURPOSE: To fill the priority combo box
+	void fillPriorities();
 	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To save the selected dialog settings to the settings object
 	bool saveSettings();

@@ -63,6 +63,8 @@ void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_SELECT_LIST_TAGS, m_listTags);
 	DDX_Control(pDX, IDC_RADIO_SQL_QUERY, m_radioFilesFromQuery);
 	DDX_Control(pDX, IDC_EDIT_SQL_QUERY, m_editSelectQuery);
+	DDX_Control(pDX, IDC_RADIO_FILE_PRIORITY, m_radioFilesWithPriority);
+	DDX_Control(pDX, IDC_CMB_FILE_PRIORITY, m_comboPriority);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
@@ -72,6 +74,7 @@ BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
 	ON_BN_CLICKED(IDC_RADIO_FILES_UNDER_STATUS, &CSelectFilesDlg::OnClickedRadioFilesStatus)
 	ON_BN_CLICKED(IDC_RADIO_SQL_QUERY, &CSelectFilesDlg::OnClickedRadioFilesFromQuery)
 	ON_BN_CLICKED(IDC_RADIO_TAGGED_FILES, &CSelectFilesDlg::OnClickedRadioFilesWithTags)
+	ON_BN_CLICKED(IDC_RADIO_FILE_PRIORITY, &CSelectFilesDlg::OnClickedRadioFilesWithPriority)
 	ON_BN_CLICKED(IDC_SELECT_BTN_OK, &CSelectFilesDlg::OnClickedOK)
 	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &CSelectFilesDlg::OnClickedCancel)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_ACTION, &CSelectFilesDlg::OnFilesUnderActionChange)
@@ -136,6 +139,12 @@ BOOL CSelectFilesDlg::OnInitDialog()
 
 		// Set the initial status to Pending
 		m_comboFilesUnderStatus.SetCurSel(1);
+
+		// Populate the prioriy combo box
+		fillPriorities();
+
+		// Select the first item in the priority combo
+		m_comboPriority.SetCurSel(0);
 
 		// Select the all file reference radio button and new action status
 		// radio button as default setting
@@ -206,6 +215,20 @@ void CSelectFilesDlg::OnClickedRadioFilesFromQuery()
 		m_editSelectQuery.SetFocus();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26989")
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::OnClickedRadioFilesWithPriority()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Update the controls
+		updateControls();
+
+		m_comboPriority.SetFocus();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27676")
 }
 //-------------------------------------------------------------------------------------------------
 void CSelectFilesDlg::OnOK()
@@ -382,6 +405,12 @@ bool CSelectFilesDlg::saveSettings()
 			m_settings.setScope(eAllFilesQuery);
 			m_settings.setSQLString((LPCTSTR) zTemp);
 		}
+		else if (m_radioFilesWithPriority.GetCheck() == BST_CHECKED)
+		{
+			// Set the priority (priority is current selected index + 1)
+			m_settings.setPriority((EFilePriority)(m_comboPriority.GetCurSel()+1));
+			m_settings.setScope(eAllFilesPriority);
+		}
 		else
 		{
 			// We will never reach here
@@ -402,6 +431,7 @@ void CSelectFilesDlg::updateControls()
 		BOOL bFilesForWhich = asMFCBool(m_radioFilesForWhich.GetCheck() == BST_CHECKED);
 		BOOL bFilesFromSQL = asMFCBool(m_radioFilesFromQuery.GetCheck() == BST_CHECKED);
 		BOOL bFilesWithTags = asMFCBool(m_radioFilesWithTags.GetCheck() == BST_CHECKED);
+		BOOL bFilesWithPriority = asMFCBool(m_radioFilesWithPriority.GetCheck() == BST_CHECKED);
 
 		// Enable the query edit box based on radio selection
 		m_editSelectQuery.EnableWindow(bFilesFromSQL);
@@ -438,6 +468,9 @@ void CSelectFilesDlg::updateControls()
 		// based on the files with tags radio button
 		m_comboTagsAnyAll.EnableWindow(bFilesWithTags);
 		m_listTags.EnableWindow(bFilesWithTags);
+
+		// Enable the priority combo box
+		m_comboPriority.EnableWindow(bFilesWithPriority);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26997");
 }
@@ -450,6 +483,7 @@ void CSelectFilesDlg::setControlsFromSettings()
 		int nSetAllFileForWhich = BST_UNCHECKED;
 		int nSetAllFilesQuery = BST_UNCHECKED;
 		int nSetAllFilesWithTags = BST_UNCHECKED;
+		int nSetAllFilesWithPriority = BST_UNCHECKED;
 
 		// Check which scope is selected and set the appropriate controls
 		switch(m_settings.getScope())
@@ -554,6 +588,14 @@ void CSelectFilesDlg::setControlsFromSettings()
 			}
 			break;
 
+		case eAllFilesPriority:
+			{
+				nSetAllFilesWithPriority = BST_CHECKED;
+
+				m_comboPriority.SetCurSel(((int)(m_settings.getPriority()))-1);
+			}
+			break;
+
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26999");
 		}
@@ -563,6 +605,7 @@ void CSelectFilesDlg::setControlsFromSettings()
 		m_radioFilesForWhich.SetCheck(nSetAllFileForWhich);
 		m_radioFilesWithTags.SetCheck(nSetAllFilesWithTags);
 		m_radioFilesFromQuery.SetCheck(nSetAllFilesQuery);
+		m_radioFilesWithPriority.SetCheck(nSetAllFilesWithPriority);
 
 		// Since changes have been made, re-update the controls
 		updateControls();
@@ -668,5 +711,22 @@ void CSelectFilesDlg::configureAndPopulateTagList()
 		}
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27425");
+}
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::fillPriorities()
+{
+	try
+	{
+		IVariantVectorPtr ipVecPriority = m_ipFAMDB->GetPriorities();
+		ASSERT_RESOURCE_ALLOCATION("ELI27678", ipVecPriority != NULL);
+
+		// Add each priority to the combo box
+		long lSize = ipVecPriority->Size;
+		for (long i=0; i < lSize; i++)
+		{
+			m_comboPriority.AddString(asString(ipVecPriority->Item[i].bstrVal).c_str());
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27679");
 }
 //-------------------------------------------------------------------------------------------------

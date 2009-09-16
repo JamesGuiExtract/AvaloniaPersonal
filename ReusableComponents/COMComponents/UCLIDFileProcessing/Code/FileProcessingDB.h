@@ -138,6 +138,8 @@ public:
 	STDMETHOD(SetStatusForFilesWithTags)(IVariantVector* pvecTagNames, VARIANT_BOOL vbAndOperation,
 		long nToActionID, EActionStatus eaNewStatus, long nFromActionID);
 	STDMETHOD(GetPriorities)(IVariantVector** ppvecPriorities);
+	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
+	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

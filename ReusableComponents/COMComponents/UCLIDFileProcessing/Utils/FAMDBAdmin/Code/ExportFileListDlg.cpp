@@ -255,6 +255,13 @@ void CExportFileListDlg::OnClickedOK()
 			}
 			break;
 
+		case eAllFilesPriority:
+			{
+				strQuery += "FAMFile WHERE FAMFile.Priority = "
+					+ asString((long)m_settings.getPriority());
+			}
+			break;
+
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI14879");
 		}
