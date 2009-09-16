@@ -575,6 +575,194 @@ namespace Extract.Redaction.Verification
             _dirty = false;
         }
 
+        /// <summary>
+        /// Selects the previous redaction row.
+        /// </summary>
+        void SelectPreviousRedaction()
+        {
+            try
+            {
+                // If no image is available, do nothing
+                if (!_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
+                // Go to the previous unviewed row (or page) if it exists
+                int previous = _redactionGridView.GetPreviousRowIndex();
+                if (GoToPreviousUnviewed(previous))
+                {
+                    return;
+                }
+
+                // Go to the previous row if it exists
+                if (previous >= 0)
+                {
+                    _redactionGridView.SelectOnly(previous);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27593", ex);
+            }
+        }
+
+        /// <summary>
+        /// Selects the next redaction row.
+        /// </summary>
+        void SelectNextRedaction()
+        {
+            try
+            {
+                // If no image is available, do nothing
+                if (!_imageViewer.IsImageAvailable)
+                {
+                    return;
+                }
+
+                // Go to the next unviewed row (or page) if it exists
+                int next = _redactionGridView.GetNextRowIndex();
+                if (GoToNextUnviewed(next))
+                {
+                    return;
+                }
+
+                // Go to the first unviewed row (or page) if it exists
+                if (GoToNextUnviewed(0))
+                {
+                    return;
+                }
+
+                // Go to the next row
+                if (next >= 0)
+                {
+                    _redactionGridView.SelectOnly(next);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27592", ex);
+            }
+        }
+
+        /// <summary>
+        /// Goes to the first unviewed redaction at or before the redaction at the specified index. 
+        /// If the verify all pages option is <see langword="true"/> and an unvisited page comes 
+        /// after the previous unviewed redaction, that page is visited instead.
+        /// </summary>
+        /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
+        /// check for pages.</param>
+        /// <returns><see langword="true"/> if there is an unviewed redaction (or page) before the 
+        /// redaction at <paramref name="startIndex"/>; <see langword="false"/> if there was no 
+        /// unviewed redaction (or page) before <paramref name="startIndex"/>.</returns>
+        bool GoToPreviousUnviewed(int startIndex)
+        {
+            int unviewed =
+                startIndex < 0 ? -1 : _redactionGridView.GetPreviousUnviewedRowIndex(startIndex);
+
+            if (_settings.General.VerifyAllPages)
+            {
+                // Visit the unvisited page if it comes after the unviewed redaction
+                int unvisitedPage = _pageSummaryView.GetPreviousUnvisitedPage();
+                if (IsPageAfterRedactionAtIndex(unvisitedPage, unviewed))
+                {
+                    VisitPage(unvisitedPage);
+                    return true;
+                }
+            }
+
+            // If there is a valid redaction to select, select it.
+            if (unviewed >= 0)
+            {
+                _redactionGridView.SelectOnly(unviewed);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Goes to the first unviewed redaction at or after the redaction at the specified index. 
+        /// If the verify all pages option is <see langword="true"/> and an unvisited page comes 
+        /// before the next unviewed redaction, that page is visited instead.
+        /// </summary>
+        /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
+        /// check for pages.</param>
+        /// <returns><see langword="true"/> if there is an unviewed redaction (or page) after the 
+        /// redaction at <paramref name="startIndex"/>; <see langword="false"/> if there was no 
+        /// unviewed redaction (or page) after <paramref name="startIndex"/>.</returns>
+        bool GoToNextUnviewed(int startIndex)
+        {
+            int unviewed = 
+                startIndex < 0 ? -1 : _redactionGridView.GetNextUnviewedRowIndex(startIndex);
+
+            if (_settings.General.VerifyAllPages)
+            {
+                // Visit the unvisited page if it comes before the unviewed redaction
+                int unvisitedPage = _pageSummaryView.GetNextUnvisitedPage();
+                if (IsPageBeforeRedactionAtIndex(unvisitedPage, unviewed))
+                {
+                    VisitPage(unvisitedPage);
+                    return true;
+                }
+            }
+
+            // If there is a valid redaction to select, select it.
+            if (unviewed >= 0)
+            {
+                _redactionGridView.SelectOnly(unviewed);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether the specified page comes before the redaction at the specified index.
+        /// </summary>
+        /// <param name="page">The 1-based page number of the page to compare; or -1 if there is 
+        /// no page to compare and the result should be <see langword="false"/>.</param>
+        /// <param name="index">The index of the redaction row to compare; or -1 if there is no 
+        /// row to compare and the result should be <see langword="true"/> if 
+        /// <paramref name="page"/> is valid.</param>
+        /// <returns><see langword="true"/> if <paramref name="page"/> is valid and either 
+        /// <paramref name="index"/> is invalid or <paramref name="page"/> comes before the 
+        /// redaction at <paramref name="index"/>; <see langword="false"/> if 
+        /// <paramref name="page"/> is invalid or <paramref name="index"/> corresponds to a 
+        /// redaction on or after <paramref name="page"/>.</returns>
+        bool IsPageBeforeRedactionAtIndex(int page, int index)
+        {
+            return page > 0 && (index < 0 || page < _redactionGridView.Rows[index].PageNumber);
+        }
+
+        /// <summary>
+        /// Determines whether the specified page comes after the redaction at the specified index.
+        /// </summary>
+        /// <param name="page">The 1-based page number of the page to compare; or -1 if there is 
+        /// no page to compare and the result should be <see langword="false"/>.</param>
+        /// <param name="index">The index of the redaction row to compare; or -1 if there is no 
+        /// row to compare and the result should be <see langword="true"/> if 
+        /// <paramref name="page"/> is valid.</param>
+        /// <returns><see langword="true"/> if <paramref name="page"/> is valid and either 
+        /// <paramref name="index"/> is invalid or <paramref name="page"/> comes after the 
+        /// redaction at <paramref name="index"/>; <see langword="false"/> if 
+        /// <paramref name="page"/> is invalid or <paramref name="index"/> corresponds to a 
+        /// redaction on or before <paramref name="page"/>.</returns>
+        bool IsPageAfterRedactionAtIndex(int page, int index)
+        {
+            return page > 0 && (index < 0 || page > _redactionGridView.Rows[index].PageNumber);
+        }
+
+        /// <summary>
+        /// Clears the current selection and goes to the specified page.
+        /// </summary>
+        /// <param name="page">The 1-based page number to visit.</param>
+        void VisitPage(int page)
+        {
+            _redactionGridView.ClearSelection();
+            _imageViewer.PageNumber = page;
+        }
+
         #endregion VerificationTaskForm Methods
 
         #region VerificationTaskForm Overrides
@@ -592,7 +780,12 @@ namespace Extract.Redaction.Verification
             {
                 _imageViewer.EstablishConnections(this);
 
+                // Disable the close image shortcut key
                 _imageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
+
+                // Next/previous redaction shortcut keys
+                _imageViewer.Shortcuts[Keys.Tab] = SelectNextRedaction;
+                _imageViewer.Shortcuts[Keys.Tab | Keys.Shift] = SelectPreviousRedaction;
 
                 // Set confidence levels
                 _redactionGridView.ConfidenceLevels = _iniSettings.ConfidenceLevels;
@@ -933,7 +1126,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _redactionGridView.SelectPreviousRedaction();
+                SelectPreviousRedaction();
             }
             catch (Exception ex)
             {
@@ -954,7 +1147,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                _redactionGridView.SelectNextRedaction();
+                SelectNextRedaction();
             }
             catch (Exception ex)
             {
