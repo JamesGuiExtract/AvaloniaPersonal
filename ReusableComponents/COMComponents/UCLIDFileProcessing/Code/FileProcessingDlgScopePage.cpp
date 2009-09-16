@@ -360,8 +360,10 @@ void FileProcessingDlgScopePage::OnBtnAdd()
 			// Insert or append a new row
 			m_wndGrid.InsertRows( iNewIndex, 1 );
 			
-			// Add info: Enabled, not Forced, Description, Inactive
-			m_wndGrid.SetRowInfo( iNewIndex, true, false, "Normal", vecText );
+			// Add info: Enabled, not Forced, Priority, Description, Inactive
+			m_wndGrid.SetRowInfo( iNewIndex, true, false,
+				getPriorityString((UCLID_FILEPROCESSINGLib::EFilePriority)kPriorityDefault),
+				vecText );
 
 			// Create a new FileSupplierData object with Not Forced
 			UCLID_FILEPROCESSINGLib::IFileSupplierDataPtr ipFSD( CLSID_FileSupplierData );

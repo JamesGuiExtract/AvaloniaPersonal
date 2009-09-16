@@ -582,7 +582,6 @@ STDMETHODIMP CFileProcessingDB::AddFile( BSTR strFile,  BSTR strAction, EFilePri
 					UCLIDException ue("ELI15043", "Cannot force status from Processing.");
 					ue.addDebugInfo("File", strFileName );
 					ue.addDebugInfo("Action Name", strActionName);
-					ue.log();
 					throw ue;
 				}
 

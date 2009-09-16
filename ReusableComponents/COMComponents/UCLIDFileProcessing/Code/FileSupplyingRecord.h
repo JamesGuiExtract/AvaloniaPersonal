@@ -1,8 +1,11 @@
 
 #pragma once
 
-#include <string>
 #include <UCLIDException.h>
+
+#include <string>
+
+using namespace std;
 
 //---------------------------------------------------------------------------------------------
 // EFileSupplyingRecordType
@@ -46,18 +49,18 @@ struct FileSupplyingRecord
 	EFileSupplyingRecordType m_eFSRecordType;
 
 	// Original name of file or folder for Rename event
-	std::string m_strOriginalFileName;
+	string m_strOriginalFileName;
 
 	// Name of file affected by the queue event
 	// Also holds new name of file or folder for Rename event
-	std::string m_strNewFileName;
+	string m_strNewFileName;
 
 	// Number of pages in image file OR 
 	// 0 if m_strNewFileName is not an image file
 	unsigned long m_ulNumPages;
 
 	// Description string associated with the File Supplier
-	std::string m_strFSDescription;
+	string m_strFSDescription;
 
 	// True if result from database operation indicates that 
 	// m_strNewFileName already exists in the database queue,
@@ -73,5 +76,8 @@ struct FileSupplyingRecord
 
 	// execption, if any, associated with handling this event
 	UCLIDException m_ueException;
+
+	// Priority of the file being queued
+	string m_strPriority;
 };
 //---------------------------------------------------------------------------------------------

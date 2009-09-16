@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 //-------------------------------------------------------------------------------------------------
 // SupplierThreadData class
 //-------------------------------------------------------------------------------------------------
@@ -125,11 +127,11 @@ private:
 	IObjectWithDescriptionPtr m_ipFAMCondition;
 
 	// Action Name being processed
-	std::string m_strAction;
+	string m_strAction;
 
 	// vector of thread data objects containing data for each of the processing threads, and a method
 	// to release the memory allocated to the objects referenced by pointers in the vector
-	std::vector<SupplierThreadData *> m_vecSupplyingThreadData;
+	vector<SupplierThreadData *> m_vecSupplyingThreadData;
 
 	// a flag to indicate whether the file supplying role is enabled or not
 	bool m_bEnabled;
@@ -169,7 +171,7 @@ private:
 	void validateLicense();
 
 	// this method returns true if the file matches the FAM condition
-	bool fileMatchesFAMCondition(std::string strFile);
+	bool fileMatchesFAMCondition(string strFile);
 
 	// internal method to clear data
 	void clear();
@@ -178,14 +180,13 @@ private:
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To post the queue-event-received notification to the UI with the appropriate
 	//			data
-	void postQueueEventReceivedNotification(BSTR bstrFile, 
-		const std::string& strFSDescription, EFileSupplyingRecordType eFSRecordType);
+	void postQueueEventReceivedNotification(BSTR bstrFile, const string& strFSDescription,
+		const string& strPriority, EFileSupplyingRecordType eFSRecordType);
 	//---------------------------------------------------------------------------------------------
 	// PROMISE:	To post the queue-event-failed notification to the UI with the appropriate
 	//			data
-	void postQueueEventFailedNotification(BSTR bstrFile, 
-		const string& strFSDescription, EFileSupplyingRecordType eFSRecordType,
-		const UCLIDException& ue);
+	void postQueueEventFailedNotification(BSTR bstrFile, const string& strFSDescription,
+		const string& strPriority, EFileSupplyingRecordType eFSRecordType, const UCLIDException& ue);
 	//---------------------------------------------------------------------------------------------
 
 	// Gets the this pointer as a IFileActionMgmtRole Pointer
@@ -198,6 +199,9 @@ private:
 
 	// thread procedure that executes each file supplier in a seperate thread
 	static UINT CFileSupplyingMgmtRole::fileSupplyingThreadProc(void *pData);
+
+	// Gets the string representation of the specified priority
+	static string getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority);
 };
 //-------------------------------------------------------------------------------------------------
 

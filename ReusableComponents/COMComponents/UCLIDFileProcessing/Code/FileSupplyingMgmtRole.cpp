@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "UCLIDFileProcessing.h"
+#include "FileProcessingConstants.h"
 #include "FileSupplyingMgmtRole.h"
 #include "FP_UI_Notifications.h"
 #include "FileSupplyingRecord.h"
@@ -36,7 +37,7 @@ const unsigned long gnCurrentVersion = 1;
 	catch (UCLIDException& ue) \
 	{ \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25314", "Unable to connect to database. Supplying stopped.", ue); \
@@ -56,10 +57,10 @@ const unsigned long gnCurrentVersion = 1;
 			ue.createFromString(strELI, pszDescription); \
 		else \
 			ue.createFromString(strELI, "COM exception caught!"); \
-		ue.addDebugInfo("err.Error", e.Error()); \
+		ue.addHresult(e.Error()); \
 		ue.addDebugInfo("err.WCode", e.WCode()); \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25315", "Unable to connect to database. Supplying stopped.", ue); \
@@ -77,7 +78,7 @@ const unsigned long gnCurrentVersion = 1;
 		ue.addDebugInfo("Error Code", pEx->m_wCode); \
 		ue.addDebugInfo("CatchID", strELI); \
 		pEx->Delete(); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25316", "Unable to connect to database. Supplying stopped.", ue); \
@@ -94,7 +95,7 @@ const unsigned long gnCurrentVersion = 1;
 		ue.createFromString(strELI, (LPCTSTR) ex.m_strDescription); \
 		ue.addDebugInfo("Error Code", ex.m_wCode); \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25317", "Unable to connect to database. Supplying stopped.", ue); \
@@ -113,7 +114,7 @@ const unsigned long gnCurrentVersion = 1;
 		ue.createFromString(strELI, pszCause); \
 		ue.addDebugInfo("Status Code", ex.m_sc); \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25318", "Unable to connect to database. Supplying stopped.", ue); \
@@ -132,7 +133,7 @@ const unsigned long gnCurrentVersion = 1;
 		UCLIDException ue; \
 		ue.createFromString(strELI, pszCause); \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25319", "Unable to connect to database. Supplying stopped.", ue); \
@@ -147,7 +148,7 @@ const unsigned long gnCurrentVersion = 1;
 	{ \
 		UCLIDException ue(strELI, "Unexpected exception caught."); \
 		ue.addDebugInfo("CatchID", strELI); \
-		postQueueEventFailedNotification(bstrFile, strFSDescription, eFSRecordType, ue); \
+		postQueueEventFailedNotification(bstrFile, strFSDescription, strPriority, eFSRecordType, ue); \
 		if ( stopSupplingIfDBNotConnected() ) \
 		{ \
 			UCLIDException ueConnection("ELI25320", "Unable to connect to database. Supplying stopped.", ue); \
@@ -761,10 +762,14 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 		ASSERT_RESOURCE_ALLOCATION("ELI14007", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		UCLID_FILEPROCESSINGLib::EFilePriority ePriority = ipFSData->Priority;
+		string strPriority = getPriorityString(ePriority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrFile, strFSDescription, kFileAdded);
+			postQueueEventReceivedNotification(bstrFile, strFSDescription, strPriority, kFileAdded);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -794,7 +799,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipFileRecord(CLSID_FileRecord);
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(), 
-				ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_FALSE,
+				ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
 				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );	
 
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
@@ -808,6 +813,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileAdded(BSTR bstrFile, IFileSupplie
 			apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
 			apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 
 			// Post the message which will be handled by the FPDlg's OnQueueEvent method
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -840,10 +846,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 		ASSERT_RESOURCE_ALLOCATION("ELI14009", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		string strPriority = getPriorityString(ipFSData->Priority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrFile, strFSDescription, kFileRemoved);
+			postQueueEventReceivedNotification(bstrFile, strFSDescription, strPriority, kFileRemoved);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -878,6 +887,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRemoved(BSTR bstrFile, IFileSuppl
 			apFileSupRec->m_strFSDescription = strFSDescription;
 			apFileSupRec->m_strOriginalFileName = strFile;
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 			
 			// Post the message which will be handled by the FPDlg's OnQueueEvent method
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -914,10 +924,14 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 		ASSERT_RESOURCE_ALLOCATION("ELI14012", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		UCLID_FILEPROCESSINGLib::EFilePriority ePriority = ipFSData->Priority;
+		string strPriority = getPriorityString(ePriority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrOldFile, strFSDescription, kFileRenamed);
+			postQueueEventReceivedNotification(bstrOldFile, strFSDescription, strPriority, kFileRenamed);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -962,7 +976,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 				UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 				// Add the new filename to the db
 				ipFileRecord = getFPMDB()->AddFile(bstrNewSimplifiedName, m_strAction.c_str(), 
-					ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_FALSE,
+					ePriority, ipFSData->ForceProcessing, VARIANT_FALSE,
 					UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );		
 				apFileSupRec->m_ePreviousActionStatus = easPrev;
 				apFileSupRec->m_bAlreadyExisted = (bAlreadyExists == VARIANT_TRUE);
@@ -981,6 +995,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileRenamed(BSTR bstrOldFile, BSTR bs
 			apFileSupRec->m_strOriginalFileName = strOldFile;
 			apFileSupRec->m_strNewFileName = strNewFile;
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 
 			if (bIsAdded)
 			{
@@ -1017,10 +1032,14 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 		ASSERT_RESOURCE_ALLOCATION("ELI14015", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		UCLID_FILEPROCESSINGLib::EFilePriority ePriority = ipFSData->Priority;
+		string strPriority = getPriorityString(ePriority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrFile, strFSDescription, kFileModified);
+			postQueueEventReceivedNotification(bstrFile, strFSDescription, strPriority, kFileModified);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -1051,7 +1070,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 			VARIANT_BOOL bAlreadyExists;
 			UCLID_FILEPROCESSINGLib::EActionStatus easPrev;
 			ipFileRecord = getFPMDB()->AddFile(bstrSimplifiedName, m_strAction.c_str(),
-				ipFSData->Priority, ipFSData->ForceProcessing, VARIANT_TRUE,
+				ePriority, ipFSData->ForceProcessing, VARIANT_TRUE,
 				UCLID_FILEPROCESSINGLib::kActionPending, &bAlreadyExists, &easPrev );
 		
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
@@ -1065,6 +1084,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFileModified(BSTR bstrFile, IFileSupp
 			apFileSupRec->m_ePreviousActionStatus = easPrev;
 			apFileSupRec->m_ulNumPages = ipFileRecord->Pages;
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 
 			// Post the message which will be handled by the FPDlg's OnQueueEvent method
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -1100,10 +1120,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 		ASSERT_RESOURCE_ALLOCATION("ELI19427", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		string strPriority = getPriorityString(ipFSData->Priority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrFolder, strFSDescription, kFolderRemoved);
+			postQueueEventReceivedNotification(bstrFolder, strFSDescription, strPriority, kFolderRemoved);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -1126,6 +1149,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderDeleted(BSTR bstrFolder, IFileS
 			apFileSupRec->m_strFSDescription = asString(ipObjectWithDescription->Description);
 			apFileSupRec->m_strOriginalFileName = asString(bstrFolder);
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 
 			// Post the message which will be handled by the FPDlg's OnQueueEvent method
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -1161,10 +1185,13 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 		ASSERT_RESOURCE_ALLOCATION("ELI14945", ipObjectWithDescription != NULL);
 		string strFSDescription = ipObjectWithDescription->Description;
 
+		// Get the file priority
+		string strPriority = getPriorityString(ipFSData->Priority);
+
 		try
 		{
 			// post the queue-event received notification
-			postQueueEventReceivedNotification(bstrOldFolder, strFSDescription, kFolderRenamed);
+			postQueueEventReceivedNotification(bstrOldFolder, strFSDescription, strPriority, kFolderRenamed);
 
 			#ifdef INJECT_FS_EVENT_HANDLING_EXCEPTIONS
 				// Defect Injection - randomly simulate failure in handling queue event
@@ -1190,6 +1217,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 			apFileSupRec->m_strOriginalFileName = asString(bstrOldFolder);
 			apFileSupRec->m_strNewFileName = asString(bstrNewFolder);
 			apFileSupRec->m_eQueueEventStatus = kQueueEventHandled;
+			apFileSupRec->m_strPriority = strPriority;
 
 			// Create and fill the FileSupplyingRecord to be passed to PostMessage
 			::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM)apFileSupRec.release(), 0);
@@ -1203,6 +1231,7 @@ STDMETHODIMP CFileSupplyingMgmtRole::NotifyFolderRenamed(BSTR bstrOldFolder, BST
 //-------------------------------------------------------------------------------------------------
 void CFileSupplyingMgmtRole::postQueueEventReceivedNotification(BSTR bstrFile, 
 																const string& strFSDescription,
+																const string& strPriority,
 																EFileSupplyingRecordType eFSRecordType)
 {
 	// Create and fill the FileSupplyingRecord to be passed to PostMessage
@@ -1212,6 +1241,7 @@ void CFileSupplyingMgmtRole::postQueueEventReceivedNotification(BSTR bstrFile,
 	apFileSupRec->m_strFSDescription = strFSDescription;
 	apFileSupRec->m_strOriginalFileName = asString(bstrFile);
 	apFileSupRec->m_eQueueEventStatus = kQueueEventReceived;
+	apFileSupRec->m_strPriority = strPriority;
 
 	// Post the message which will be handled by the FPDlg's OnQueueEvent method
 	::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -1219,6 +1249,7 @@ void CFileSupplyingMgmtRole::postQueueEventReceivedNotification(BSTR bstrFile,
 //-------------------------------------------------------------------------------------------------
 void CFileSupplyingMgmtRole::postQueueEventFailedNotification(BSTR bstrFile, 
 															  const string& strFSDescription,
+															  const string& strPriority,
 															  EFileSupplyingRecordType eFSRecordType,
 															  const UCLIDException& ue)
 {
@@ -1230,6 +1261,7 @@ void CFileSupplyingMgmtRole::postQueueEventFailedNotification(BSTR bstrFile,
 	apFileSupRec->m_strOriginalFileName = asString(bstrFile);
 	apFileSupRec->m_eQueueEventStatus = kQueueEventFailed;
 	apFileSupRec->m_ueException = ue;
+	apFileSupRec->m_strPriority = strPriority;
 
 	// Post the message which will be handled by the FPDlg's OnQueueEvent method
 	::PostMessage(m_hWndOfUI, FP_QUEUE_EVENT, (WPARAM) apFileSupRec.release(), 0);
@@ -1694,5 +1726,62 @@ bool CFileSupplyingMgmtRole::stopSupplingIfDBNotConnected()
 
 	// Supplying should be stopped
 	return true;
+}
+//-------------------------------------------------------------------------------------------------
+string CFileSupplyingMgmtRole::getPriorityString(UCLID_FILEPROCESSINGLib::EFilePriority ePriority)
+{
+	try
+	{
+		// Static collection to hold the priority strings
+		static map<long, string> smapPriorityToString;
+
+		// Mutex and initialized flag to ensure thread safety over collection
+		static CMutex mutex;
+		static bool bInitialized = false;
+		if (!bInitialized)
+		{
+			CSingleLock lg(&mutex, TRUE);
+
+			// Check initialization again (in case blocked while another thread initialized)
+			if (!bInitialized)
+			{
+				// Ensure the collection is empty
+				smapPriorityToString.clear();
+
+				// Get a DB pointer
+				UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipDB(CLSID_FileProcessingDB);
+				ASSERT_RESOURCE_ALLOCATION("ELI27633", ipDB != NULL);
+
+				// Get the priorities
+				IVariantVectorPtr ipVecPriorities = ipDB->GetPriorities();
+				ASSERT_RESOURCE_ALLOCATION("ELI27634", ipVecPriorities != NULL);
+
+				// Add each priority to the map
+				long lSize = ipVecPriorities->Size;
+				for (long i=0; i < lSize; i++)
+				{
+					string strTemp = asString(ipVecPriorities->Item[i].bstrVal);
+					smapPriorityToString[i+1] = strTemp;
+				}
+
+				// Map has been initialized, set initialized to true
+				bInitialized = true;
+			}
+		}
+
+		// Get the priority value
+		long lPriority = (ePriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long) ePriority);
+
+		map<long, string>::iterator it = smapPriorityToString.find(lPriority);
+		if (it == smapPriorityToString.end())
+		{
+			UCLIDException uex("ELI27635", "Invalid priority.");
+			uex.addDebugInfo("Priority", lPriority);
+			throw uex;
+		}
+
+		return it->second;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27636");
 }
 //-------------------------------------------------------------------------------------------------

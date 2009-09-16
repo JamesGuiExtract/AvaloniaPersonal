@@ -19,7 +19,8 @@ static const int giALL_LISTS_FILENAME_COLUMN = 3;
 
 // columns used in the attempting-to-queue grid
 static const int giLIST1_FILE_SUPPLIER_COLUMN = 4;
-static const int giLIST1_FOLDER_COLUMN = 5;
+static const int giLIST1_FILE_PRIORITY_COLUMN = 5;
+static const int giLIST1_FOLDER_COLUMN = 6;
 
 // columns in the queue-log grid
 static const int giLIST2_FILE_ID_COLUMN = 4;
@@ -28,12 +29,14 @@ static const int giLIST2_ALREADY_EXISTED_COLUMN = 6;
 static const int giLIST2_PREVIOUS_STATUS_COLUMN = 7;
 static const int giLIST2_COMMENTS_COLUMN = 8;
 static const int giLIST2_FILE_SUPPLIER_COLUMN = 9;
-static const int giLIST2_FOLDER_COLUMN = 10;
+static const int giLIST2_FILE_PRIORITY_COLUMN = 10;
+static const int giLIST2_FOLDER_COLUMN = 11;
 
 // columns used in the queuing-errors grid
 static const int giLIST3_EXCEPTION_COLUMN = 4;
 static const int giLIST3_FILE_SUPPLIER_COLUMN = 5;
-static const int giLIST3_FOLDER_COLUMN = 6;
+static const int giLIST3_FILE_PRIORITY_COLUMN = 6;
+static const int giLIST3_FOLDER_COLUMN = 7;
 
 // Default widths for the columns
 static const int giQUEUE_EVENT_WIDTH = 85;
@@ -41,6 +44,7 @@ static const int giALREADY_EXISTED_WIDTH = 90;
 static const int giPREVIOUS_STATUS_WIDTH = 90;
 static const int giCOMMENTS_WIDTH = 100;
 static const int giFILE_SUPPLIER_WIDTH = 100;
+static const int giFILE_PRIORITY_WIDTH = 80;
 
 //-------------------------------------------------------------------------------------------------
 // FileProcessingDlgQueueLog Property page
@@ -123,6 +127,7 @@ BOOL FileProcessingDlgQueueLogPage::OnInitDialog()
 		m_listAttemptingToQueue.InsertColumn(giALL_LISTS_QUEUE_EVENT_COLUMN , "Queue Event", LVCFMT_LEFT, giQUEUE_EVENT_WIDTH );
 		m_listAttemptingToQueue.InsertColumn(giALL_LISTS_FILENAME_COLUMN , "Name", LVCFMT_LEFT, giFILENAME_COL_WIDTH );
 		m_listAttemptingToQueue.InsertColumn(giLIST1_FILE_SUPPLIER_COLUMN , "File Supplier", LVCFMT_LEFT, giFILE_SUPPLIER_WIDTH  );
+		m_listAttemptingToQueue.InsertColumn(giLIST1_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_listAttemptingToQueue.InsertColumn(giLIST1_FOLDER_COLUMN , "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH  );
 
 		// Prepare the middle list control
@@ -137,6 +142,7 @@ BOOL FileProcessingDlgQueueLogPage::OnInitDialog()
 		m_listQueueLog.InsertColumn(giLIST2_PREVIOUS_STATUS_COLUMN , "Previous Status", LVCFMT_LEFT, giPREVIOUS_STATUS_WIDTH );
 		m_listQueueLog.InsertColumn(giLIST2_COMMENTS_COLUMN, "Comments", LVCFMT_LEFT, giCOMMENTS_WIDTH );
 		m_listQueueLog.InsertColumn(giLIST2_FILE_SUPPLIER_COLUMN , "File Supplier", LVCFMT_LEFT, giFILE_SUPPLIER_WIDTH  );
+		m_listQueueLog.InsertColumn(giLIST2_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_listQueueLog.InsertColumn(giLIST2_FOLDER_COLUMN , "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH  );
 
 		// Prepare the bottom list control
@@ -147,6 +153,7 @@ BOOL FileProcessingDlgQueueLogPage::OnInitDialog()
 		m_listFailedQueing.InsertColumn(giALL_LISTS_FILENAME_COLUMN , "Name", LVCFMT_LEFT, giFILENAME_COL_WIDTH );
 		m_listFailedQueing.InsertColumn(giLIST3_EXCEPTION_COLUMN , "Error", LVCFMT_LEFT, giEXCEPTION_COL_WIDTH );
 		m_listFailedQueing.InsertColumn(giLIST3_FILE_SUPPLIER_COLUMN, "File Supplier", LVCFMT_LEFT, giFILE_SUPPLIER_WIDTH  );
+		m_listFailedQueing.InsertColumn(giLIST3_FILE_PRIORITY_COLUMN, "Priority", LVCFMT_LEFT, giFILE_PRIORITY_WIDTH);
 		m_listFailedQueing.InsertColumn(giLIST3_FOLDER_COLUMN , "Folder", LVCFMT_LEFT, giFOLDER_COL_WIDTH  );
 
 		// By default, the exception details button is disabled.  It is only 
@@ -316,6 +323,8 @@ void FileProcessingDlgQueueLogPage::onQueueEventReceived(FileSupplyingRecord* pF
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::onQueueEventHandled(FileSupplyingRecord* pFileSupRec)
 {
+	ASSERT_ARGUMENT("ELI27640", pFileSupRec != NULL);
+
 	// limit the list size
 	limitListSizeIfNeeded(m_listQueueLog, m_pCfgMgr);
 
@@ -370,6 +379,8 @@ void FileProcessingDlgQueueLogPage::onQueueEventHandled(FileSupplyingRecord* pFi
 //-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::onQueueEventFailed(FileSupplyingRecord* pFileSupRec)
 {
+	ASSERT_ARGUMENT("ELI27641", pFileSupRec != NULL);
+
 	// limit the list size.  If a record was deleted, delete the corresponding record
 	// from the internal member variable also
 	if (limitListSizeIfNeeded(m_listFailedQueing, m_pCfgMgr))
@@ -389,6 +400,8 @@ void FileProcessingDlgQueueLogPage::onQueueEventFailed(FileSupplyingRecord* pFil
 long FileProcessingDlgQueueLogPage::appendNewRecord(CListCtrl& rListCtrl, 
 													FileSupplyingRecord* pFileSupRec)
 {
+	ASSERT_ARGUMENT("ELI27639", pFileSupRec != NULL);
+
 	// create a new record in the list control and set the leftmost column to the current date
 	long nNewItemIndex = rListCtrl.GetItemCount();
 	rListCtrl.InsertItem(nNewItemIndex, getMonthDayDateString().c_str());
@@ -412,6 +425,10 @@ long FileProcessingDlgQueueLogPage::appendNewRecord(CListCtrl& rListCtrl,
 	// update the file supplier column
 	rListCtrl.SetItemText(nNewItemIndex, getFileSupplierColumnID(rListCtrl), 
 		pFileSupRec->m_strFSDescription.c_str());
+
+	// update the file priority column
+	rListCtrl.SetItemText(nNewItemIndex, getFilePriorityColumnID(rListCtrl),
+		pFileSupRec->m_strPriority.c_str());
 
 	// update the folder column
 	string strFolder;
@@ -510,6 +527,27 @@ long FileProcessingDlgQueueLogPage::getFolderColumnID(CListCtrl& rListCtrl)
 	}
 }
 //-------------------------------------------------------------------------------------------------
+long FileProcessingDlgQueueLogPage::getFilePriorityColumnID(CListCtrl& rListCtrl)
+{
+	if (&rListCtrl == &m_listAttemptingToQueue)
+	{
+		return giLIST1_FILE_PRIORITY_COLUMN;
+	}
+	else if (&rListCtrl == &m_listQueueLog)
+	{
+		return giLIST2_FILE_PRIORITY_COLUMN;
+	}
+	else if (&rListCtrl == &m_listFailedQueing)
+	{
+		return giLIST3_FILE_PRIORITY_COLUMN;
+	}
+	else
+	{
+		// we should never reach here
+		THROW_LOGIC_ERROR_EXCEPTION("ELI27638")
+	}
+}
+//-------------------------------------------------------------------------------------------------
 void FileProcessingDlgQueueLogPage::clear()
 {
 	m_listAttemptingToQueue.DeleteAllItems();
@@ -540,6 +578,7 @@ void FileProcessingDlgQueueLogPage::updateAttemptingToQueueListColumnWidths()
 	nCurrWidth -= m_listAttemptingToQueue.GetColumnWidth(giALL_LISTS_QUEUE_EVENT_COLUMN);
 	nCurrWidth -= m_listAttemptingToQueue.GetColumnWidth(giALL_LISTS_FILENAME_COLUMN);
 	nCurrWidth -= m_listAttemptingToQueue.GetColumnWidth(giLIST1_FILE_SUPPLIER_COLUMN);
+	nCurrWidth -= m_listAttemptingToQueue.GetColumnWidth(giLIST1_FILE_PRIORITY_COLUMN);
 
 	if( nCurrWidth < giFOLDER_COL_WIDTH)
 	{
@@ -581,6 +620,7 @@ void FileProcessingDlgQueueLogPage::updateQueueLogColumnWidths()
 	nCurrWidth -= m_listQueueLog.GetColumnWidth(giLIST2_PREVIOUS_STATUS_COLUMN);
 	nCurrWidth -= m_listQueueLog.GetColumnWidth(giLIST2_COMMENTS_COLUMN);
 	nCurrWidth -= m_listQueueLog.GetColumnWidth(giLIST2_FILE_SUPPLIER_COLUMN);
+	nCurrWidth -= m_listQueueLog.GetColumnWidth(giLIST2_FILE_PRIORITY_COLUMN);
 
 	if( nCurrWidth < giFOLDER_COL_WIDTH)
 	{
@@ -619,6 +659,7 @@ void FileProcessingDlgQueueLogPage::updateFailedQueueEventsListColumnWidths()
 	nCurrWidth -= m_listFailedQueing.GetColumnWidth(giALL_LISTS_FILENAME_COLUMN);
 	nCurrWidth -= m_listFailedQueing.GetColumnWidth(giLIST3_EXCEPTION_COLUMN);
 	nCurrWidth -= m_listFailedQueing.GetColumnWidth(giLIST3_FILE_SUPPLIER_COLUMN);
+	nCurrWidth -= m_listFailedQueing.GetColumnWidth(giLIST3_FILE_PRIORITY_COLUMN);
 
 	if( nCurrWidth < giFOLDER_COL_WIDTH)
 	{

@@ -129,6 +129,10 @@ private:
 	//			list control.
 	long getFolderColumnID(CListCtrl& rListCtrl);
 	//---------------------------------------------------------------------------------------------
+	// PROMISE:	To return the column ID of the file priority column for the specified
+	//			list control.
+	long getFilePriorityColumnID(CListCtrl& rListCtrl);
+	//---------------------------------------------------------------------------------------------
 	// PURPOSE: To return the CWnd pointer to the specified dialog control, and optionally
 	//			also return the control's current window coordinates.
 	// REQUIRE:	InitDialog() has already been called and the control represented by uiControlID
