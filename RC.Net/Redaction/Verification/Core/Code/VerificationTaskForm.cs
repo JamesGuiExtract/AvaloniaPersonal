@@ -588,17 +588,21 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
+                // Determine whether to verify all pages
+                bool verifyAllPages = _settings.General.VerifyAllPages;
+
                 // Go to the previous unviewed row (or page) if it exists
-                int previous = _redactionGridView.GetPreviousRowIndex();
-                if (GoToPreviousUnviewed(previous))
+                int previousRow = _redactionGridView.GetPreviousRowIndex();
+                int previousPage = verifyAllPages ? _imageViewer.PageNumber - 1 : -1;
+                if (GoToPreviousUnviewed(previousRow, previousPage))
                 {
                     return;
                 }
 
                 // Go to the previous row if it exists
-                if (previous >= 0)
+                if (previousRow >= 0)
                 {
-                    _redactionGridView.SelectOnly(previous);
+                    _redactionGridView.SelectOnly(previousRow);
                 }
             }
             catch (Exception ex)
@@ -619,24 +623,28 @@ namespace Extract.Redaction.Verification
                 {
                     return;
                 }
+                
+                // Determine whether to verify all pages
+                bool verifyAllPages = _settings.General.VerifyAllPages;
 
                 // Go to the next unviewed row (or page) if it exists
-                int next = _redactionGridView.GetNextRowIndex();
-                if (GoToNextUnviewed(next))
+                int nextRow = _redactionGridView.GetNextRowIndex();
+                int nextPage = verifyAllPages ? _imageViewer.PageNumber + 1 : -1;
+                if (GoToNextUnviewed(nextRow, nextPage))
                 {
                     return;
                 }
 
                 // Go to the first unviewed row (or page) if it exists
-                if (GoToNextUnviewed(0))
+                if (GoToNextUnviewed(0, verifyAllPages ? 1 : -1))
                 {
                     return;
                 }
 
                 // Go to the next row
-                if (next >= 0)
+                if (nextRow >= 0)
                 {
-                    _redactionGridView.SelectOnly(next);
+                    _redactionGridView.SelectOnly(nextRow);
                 }
             }
             catch (Exception ex)
@@ -646,35 +654,37 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Goes to the first unviewed redaction at or before the redaction at the specified index. 
-        /// If the verify all pages option is <see langword="true"/> and an unvisited page comes 
-        /// after the previous unviewed redaction, that page is visited instead.
+        /// Goes to the first unviewed redaction or the first unvisited page at or before the 
+        /// specified redaction and page, whichever comes last. 
         /// </summary>
         /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
         /// check for pages.</param>
-        /// <returns><see langword="true"/> if there is an unviewed redaction (or page) before the 
-        /// redaction at <paramref name="startIndex"/>; <see langword="false"/> if there was no 
-        /// unviewed redaction (or page) before <paramref name="startIndex"/>.</returns>
-        bool GoToPreviousUnviewed(int startIndex)
+        /// <param name="startPage">The first page to check for being unvisited; or -1 to only 
+        /// check for redactions.</param>
+        /// <returns><see langword="true"/> if there is an unviewed redaction on or before 
+        /// <paramref name="startIndex"/> or an unvisited page at or before 
+        /// <paramref name="startPage"/>; <see langword="false"/> otherwise.</returns>
+        bool GoToPreviousUnviewed(int startIndex, int startPage)
         {
-            int unviewed =
+            // Get the next unviewed row
+            int unviewedRow =
                 startIndex < 0 ? -1 : _redactionGridView.GetPreviousUnviewedRowIndex(startIndex);
 
-            if (_settings.General.VerifyAllPages)
+            // Get the next unvisited page
+            int unvisitedPage = 
+                startPage < 0 ? -1 : _pageSummaryView.GetPreviousUnvisitedPage(startPage);
+
+            // Visit the unvisited page if it comes after the unviewed redaction
+            if (IsPageAfterRedactionAtIndex(unvisitedPage, unviewedRow))
             {
-                // Visit the unvisited page if it comes after the unviewed redaction
-                int unvisitedPage = _pageSummaryView.GetPreviousUnvisitedPage();
-                if (IsPageAfterRedactionAtIndex(unvisitedPage, unviewed))
-                {
-                    VisitPage(unvisitedPage);
-                    return true;
-                }
+                VisitPage(unvisitedPage);
+                return true;
             }
 
             // If there is a valid redaction to select, select it.
-            if (unviewed >= 0)
+            if (unviewedRow >= 0)
             {
-                _redactionGridView.SelectOnly(unviewed);
+                _redactionGridView.SelectOnly(unviewedRow);
                 return true;
             }
 
@@ -682,35 +692,37 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Goes to the first unviewed redaction at or after the redaction at the specified index. 
-        /// If the verify all pages option is <see langword="true"/> and an unvisited page comes 
-        /// before the next unviewed redaction, that page is visited instead.
+        /// Goes to the first unviewed redaction or the first unvisited page at or after the 
+        /// specified redaction and page, whichever comes first.
         /// </summary>
         /// <param name="startIndex">The first redaction to check if is unviewed; or -1 to only 
         /// check for pages.</param>
-        /// <returns><see langword="true"/> if there is an unviewed redaction (or page) after the 
-        /// redaction at <paramref name="startIndex"/>; <see langword="false"/> if there was no 
-        /// unviewed redaction (or page) after <paramref name="startIndex"/>.</returns>
-        bool GoToNextUnviewed(int startIndex)
+        /// <param name="startPage">The first page to check for being unvisited; or -1 to only 
+        /// check for redactions.</param>
+        /// <returns><see langword="true"/> if there is an unviewed redaction on or after 
+        /// <paramref name="startIndex"/> or an unvisited page at or after 
+        /// <paramref name="startPage"/>; <see langword="false"/> otherwise.</returns>
+        bool GoToNextUnviewed(int startIndex, int startPage)
         {
-            int unviewed = 
+            // Get the next unviewed row
+            int unviewedRow = 
                 startIndex < 0 ? -1 : _redactionGridView.GetNextUnviewedRowIndex(startIndex);
 
-            if (_settings.General.VerifyAllPages)
+            // Get the next unvisited page
+            int unvisitedPage = 
+                startPage < 0 ? -1 : _pageSummaryView.GetNextUnvisitedPage(startPage);
+
+            // Visit the unvisited page if it comes before the unviewed redaction
+            if (IsPageBeforeRedactionAtIndex(unvisitedPage, unviewedRow))
             {
-                // Visit the unvisited page if it comes before the unviewed redaction
-                int unvisitedPage = _pageSummaryView.GetNextUnvisitedPage();
-                if (IsPageBeforeRedactionAtIndex(unvisitedPage, unviewed))
-                {
-                    VisitPage(unvisitedPage);
-                    return true;
-                }
+                VisitPage(unvisitedPage);
+                return true;
             }
 
             // If there is a valid redaction to select, select it.
-            if (unviewed >= 0)
+            if (unviewedRow >= 0)
             {
-                _redactionGridView.SelectOnly(unviewed);
+                _redactionGridView.SelectOnly(unviewedRow);
                 return true;
             }
 
