@@ -119,17 +119,18 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets the first unvisited page before the active page.
+        /// Gets the first unvisited page on or before the specified page.
         /// </summary>
-        /// <returns>The first unvisited page before the active page.</returns>
+        /// <param name="startPage">The first page to check for being unvisited.</param>
+        /// <returns>The first unvisited page on or before the specified page.</returns>
         // Complex operations are better suited as methods.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public int GetPreviousUnvisitedPage()
+        public int GetPreviousUnvisitedPage(int startPage)
         {
             try
             {
-                // Iterate over each page before the current page
-                for (int i = _imageViewer.PageNumber - 1; i >= 1; i--)
+                // Iterate over each page on or before the specified page
+                for (int i = startPage; i > 0; i--)
                 {
                     // If this cell is unvisited (untagged), return the page number
                     DataGridViewCell cell = GetCellByPageNumber(i);
@@ -150,17 +151,18 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Gets the first unvisited page after the active page.
+        /// Gets the first unvisited page on or after the specified page.
         /// </summary>
-        /// <returns>The first unvisited page after the active page.</returns>
+        /// <param name="startPage">The first page to check for being unvisited.</param>
+        /// <returns>The first unvisited page on or after the specified page.</returns>
         // Complex operations are better suited as methods.
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
-        public int GetNextUnvisitedPage()
+        public int GetNextUnvisitedPage(int startPage)
         {
             try
             {
-                // Iterate over each page after the current page
-                for (int i = _imageViewer.PageNumber + 1; i <= _imageViewer.PageCount; i++)
+                // Iterate over each page on or after the specified page
+                for (int i = startPage; i <= _imageViewer.PageCount; i++)
                 {
                     // If this cell is unvisited (untagged), return the page number
                     DataGridViewCell cell = GetCellByPageNumber(i);
