@@ -43,6 +43,11 @@ namespace Extract.Imaging.Forms
         ImageViewer _imageViewer;
 
         /// <summary>
+        /// The number of pages that have been visited.
+        /// </summary>
+        int _visitedPageCount;
+
+        /// <summary>
         /// The cell style associated with pages that have been visited.
         /// </summary>
         DataGridViewCellStyle _visitedPageStyle;
@@ -66,6 +71,31 @@ namespace Extract.Imaging.Forms
         #region PageSummaryView Properties
 
         /// <summary>
+        /// Gets the number of pages that are marked as visited.
+        /// </summary>
+        /// <value>The number of pages that are marked as visited.</value>
+        public int VisitedPageCount
+        {
+            get
+            {
+                return _visitedPageCount;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether all pages have been visited.
+        /// </summary>
+        /// <value><see langword="true"/> if all pages have been visited;
+        /// <see langword="false"/> if at least one page has not been visited.</value>
+        public bool HasVisitedAllPages
+        {
+            get
+            {
+                return _visitedPageCount == _imageViewer.PageCount;
+            }
+        }
+
+        /// <summary>
         /// Gets the style for visited page cells.
         /// </summary>
         /// <returns>The style for visited page cells.</returns>
@@ -87,36 +117,6 @@ namespace Extract.Imaging.Forms
         #endregion PageSummaryView Properties
 
         #region PageSummaryView Methods
-
-        /// <summary>
-        /// Determines whether all pages have been visited.
-        /// </summary>
-        /// <returns><see langword="true"/> if all pages have been visited; 
-        /// <see langword="false"/> if at least one page has not been visited.</returns>
-        public bool HasVisitedAllPages()
-        {
-            try
-            {
-                foreach (DataGridViewRow row in _dataGridView.Rows)
-                {
-                    foreach (DataGridViewCell cell in row.Cells)
-                    {
-                        if (cell.Tag == null)
-                        {
-                            // All pages have been visited iff this cell is empty
-                            return string.IsNullOrEmpty(cell.Value as string);
-                        }
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                throw new ExtractException("ELI27068",
-                    "Unable to determine visited pages.", ex);
-            }
-        }
 
         /// <summary>
         /// Gets the first unvisited page on or before the specified page.
@@ -206,6 +206,7 @@ namespace Extract.Imaging.Forms
 
             // Reset the list view
             _dataGridView.Rows.Clear();
+            _visitedPageCount = 0;
             _dataGridView.Enabled = imageAvailable;
 
             if (imageAvailable)
@@ -401,6 +402,8 @@ namespace Extract.Imaging.Forms
                 {
                     currentCell.Tag = new object();
                     currentCell.Style = VisitedPageStyle;
+
+                    _visitedPageCount++;
                 }
             }
             catch (Exception ex)
