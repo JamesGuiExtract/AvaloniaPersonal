@@ -1744,7 +1744,7 @@
 		<row><td>PATH_TO_NONSELFREGCOMPO_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\NonSelfRegComponents</td><td/><td>2</td></row>
 		<row><td>PATH_TO_REPORTS_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\Reports</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGIDSHIELD_FILES</td><td>P:\AttributeFinder\IDShieldInstallation\Files\SelfRegIDShieldComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SQLSERVEREXPRES_FILES</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2005</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SQLSERVEREXPRES_FILES</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2008</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SystemFolder</td><td/><td/><td>1</td></row>
 		<row><td>WindowsFolder</td><td/><td/><td>1</td></row>

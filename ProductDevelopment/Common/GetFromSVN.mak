@@ -19,6 +19,7 @@ PDUtilsRootDir=$(EngineeringRootDirectory)\ProductDevelopment\Utils
 IDShieldOfficeDir=$(PDRootDir)\IDShieldOffice
 LabDEDir=$(PDRootDir)\LabDE
 LaserFicheDir=$(PDRootDir)\AFIntegrations\Laserfiche
+RulesDir=$(EngineeringRootDirectory)\Rules
 
 SVN="C:\Program Files\CollabNet Subversion\svn.exe" export
 SVNOptions=--force
@@ -94,7 +95,7 @@ GetLaserFicheFiles:
     @ECHO Please wait...
 	$(BUILD_DRIVE) 
     @CD "$(LaserFicheDir)"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/ProductDevelopment/AFIntegrations/Laserfiche "$(LaserFicheDir)" $(SVNOptions)
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/ProductDevelopment/AFIntegrations/Laserfiche" "$(LaserFicheDir)" $(SVNOptions)
     @SendFilesAsArgumentToApplication *.rc 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 	@SendFilesAsArgumentToApplication AssemblyInfo.cs 1 1 $(UpdateFileVersion) "$(LaserficheVersion)"
 
@@ -103,25 +104,25 @@ GetComponentDataFiles:
 	@IF NOT EXIST "$(RulesDir)\ComponentData" @MKDIR "$(RulesDir)\ComponentData"
 	$(BUILD_DRIVE) 
 	@CD "$(RulesDir)\ComponentData"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/ComponentData "$(RulesDir)\ComponentData" $(SVNOptions)
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/ComponentData" "$(RulesDir)\ComponentData" $(SVNOptions)
 	
 GetDemo_IDShieldRules:
 	@ECHO Getting Demo_IDShield Rules $(RulesVersion)
 	@IF NOT EXIST "$(RulesDir)\IDShield\Demo_IDShield\Rules" @MKDIR "$(RulesDir)\IDShield\Demo_IDShield\Rules"
 	$(BUILD_DRIVE) 
 	@CD "$(RulesDir)\IDShield\Demo_IDShield\Rules"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/IDShield/Demo_IDShield/Rules "$(RulesDir)\IDShield\Demo_IDShield\Rules" $(SVNOptions)
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/IDShield/Demo_IDShield/Rules" "$(RulesDir)\IDShield\Demo_IDShield\Rules" $(SVNOptions)
 
 GetDemo_FLEXIndexRules:
 	@ECHO Getting Demo_FLEXIndex Rules $(RulesVersion)
 	@IF NOT EXIST "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules" @MKDIR "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules"
 	$(BUILD_DRIVE) 
 	@CD "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/FLEXIndex/Demo_FLEXIndex/Rules "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules" $(SVNOptions)
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/FLEXIndex/Demo_FLEXIndex/Rules" "$(RulesDir)\FLEXIndex\Demo_FLEXIndex\Rules" $(SVNOptions)
 
 GetDemo_LabDERules:
 	@ECHO Getting Demo_LabDE Rules $(RulesVersion)
 	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Rules" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Rules"
 	$(BUILD_DRIVE) 
 	@CD "$(RulesDir)\LabDE\Demo_LabDE\Rules"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/LabDE/Demo_LabDE/Rules "$(RulesDir)\LabDE\Demo_LabDE\Rules" $(SVNOptions)
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/LabDE/Demo_LabDE/Rules" "$(RulesDir)\LabDE\Demo_LabDE\Rules" $(SVNOptions)

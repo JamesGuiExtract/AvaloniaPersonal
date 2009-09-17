@@ -213,6 +213,9 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@DIR "$(AFCoreInstallFilesRootDir)\SelfRegCommonComponents\*.*" /b >"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCommon.rl"
 	@Dir "$(IDShieldInstallFilesRootDir)\SelfRegIDShieldComponents\*.*" /b >"$(IDShieldInstallFilesRootDir)\NonSelfRegComponents\IDShield.rl"
 	@DIR "$(ClearImageInstallFilesDir)\*Image.dll" /b >"$(AFCoreInstallFilesRootDir)\ClearImage.rl"
+# Add .net com objects to the .nl file
+	@DIR Extract.Utilities.Parsers.dll /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCore.nl
+	@DIR Extract.Redaction.Verification.dll /b >>"$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\AFCore.nl
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\NonSelfRegCommonComponents\vssver.scc" 
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\vssver.scc"
     @DeleteFiles "$(AFCoreInstallFilesRootDir)\mssccprj.scc"

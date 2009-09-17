@@ -15,7 +15,7 @@ static const string& gstrSERVER = "Server";
 static const string& gstrDATABASE = "Database";
 
 // Settings that don't change if included in the connection string
-static const string& gstrPROVIDER = "Provider=SQLNCLI";
+static const string& gstrPROVIDER = "Provider=SQLNCLI10";
 static const string& gstrINTEGRATED_SECURITY = "Integrated Security=SSPI";
 static const string& gstrDATA_TYPE_COMPATIBILITY = "DataTypeCompatibility=80";
 static const string& gstrMARS_CONNECTION = "MARS Connection=True";

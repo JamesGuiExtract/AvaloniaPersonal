@@ -135,9 +135,17 @@ CreateFlexDataEntryInstallDir:
 CreateDemoShieldInstall:
 	@ECHO Copying Required installs
 	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework"
-	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
+	@IF NOT EXIST "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" MKDIR "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
 	@XCOPY "$(AFRequiredInstallsDir)\DotNet 3.5 Framework\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\DotNet 3.5 Framework" /v /s /e /y
-	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2005\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2005" /v /s /e /y
+	@XCOPY "$(AFRequiredInstallsDir)\SQLServerExpress2008\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008" /v /s /e /y
+	@XCOPY "$(AFRequiredInstallsDir)\WindowsInstaller\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller" /v /s /e /y
+	@XCOPY "$(AFRequiredInstallsDir)\Powershell\*.*" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell" /v /s /e /y
+	@COPY "$(CommonDirectory)\InstallPowershell.bat" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\Powershell"
+	@COPY "$(CommonDirectory)\InstallWindowsInstaller.bat" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\WindowsInstaller"
+	@COPY "$(CommonDirectory)\InstallSQLServer.bat" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008"
+	@COPY "$(CommonDirectory)\InstallSQLServerMgr.bat" "$(AFBleedingEdgeDir)\$(FlexIndexVersion)\SQLServerExpress2008"
 	@ECHO Copying DemoShield Files
 	@IF NOT EXIST "$(FlexIndexInstallDir)" MKDIR "$(FlexIndexInstallDir)"
 	@XCOPY "$(DemoShieldRunFilesDir)\*.*" "$(FlexIndexInstallDir)" /v /s /e /y

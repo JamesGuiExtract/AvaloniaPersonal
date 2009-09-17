@@ -1741,7 +1741,7 @@
 		<row><td>PATH_TO_REDIST_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Redist</td><td/><td>2</td></row>
 		<row><td>PATH_TO_RULEDEVELOPMENT_FILES</td><td>D:\Source\Engineering\ProductDevelopment\AttributeFinder\Installation\RuleDevelopmentKit</td><td/><td>2</td></row>
 		<row><td>PATH_TO_SELFREGCORECOMP_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\SelfRegCoreComponents</td><td/><td>2</td></row>
-		<row><td>PATH_TO_SQLSERVEREXPRES_FILES</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2005</td><td/><td>2</td></row>
+		<row><td>PATH_TO_SQLSERVEREXPRES_FILES</td><td>P:\AttributeFinder\RequiredInstalls\SQLServerExpress2008</td><td/><td>2</td></row>
 		<row><td>PATH_TO_TUTORIAL_FILES</td><td>P:\AttributeFinder\SDKInstallation\Files\Tutorial</td><td/><td>2</td></row>
 		<row><td>ProgramFilesFolder</td><td/><td/><td>1</td></row>
 		<row><td>SDK_REPORT_PATH</td><td>P:\AttributeFinder\CoreInstallation\Files\Reports</td><td/><td>2</td></row>

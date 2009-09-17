@@ -16,7 +16,7 @@
 ////////////////////// string defines ////////////////////////////
     #define UCLID_DIR "\\UCLID Software\\CommonComponents"
     #define EXTRACT_DIR "\\Extract Systems\\CommonComponents"
-    #define REG_PATH_SQL_NATIVE_CLIENT "\\SOFTWARE\\Microsoft\\Microsoft SQL Native Client\\CurrentVersion"
+    #define REG_PATH_SQL_NATIVE_CLIENT "SOFTWARE\\Microsoft\\Microsoft SQL Native Client 10.0\\CurrentVersion"
     #define REG_PATH_SQL_COMPACT_EDITION "SOFTWARE\\Microsoft\\Microsoft SQL Server Compact Edition"
     #define SQL_COMPACT_EDITION_GUID "{E59113EB-0285-4BFD-A37A-B79EAC6B8F4B}"
     #define REG_PATH_DOT_NET_VER_2_0 "\\SOFTWARE\\Microsoft\\.NETFramework\\policy\\v2.0"
@@ -149,7 +149,7 @@ int nResult, svServiceState;
 begin
 	// Change the root for the registry
 	RegDBSetDefaultRoot(HKEY_LOCAL_MACHINE);
-	if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0) then
+	//if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0) then
 		// Install SQL Native Client
 		szProgram = "msiexec";
 		if ( SYSINFO.bIsWow64 ) then
@@ -159,12 +159,12 @@ begin
 		endif;
 		LaunchAppAndWait(szProgram, szCmdLine, LAAW_OPTION_WAIT); 
 		SdShowMsg("Setup is Installing SQL Native Client", FALSE);
-		if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0  ) then
-			MessageBox("SQL Native Client was not successfully Installed, installation will be aborted", SEVERE);
-			gbInstalled = FALSE;
-			abort;
-		endif;
-	endif;
+		//if ( RegDBKeyExist ( REG_PATH_SQL_NATIVE_CLIENT ) < 0  ) then
+		//	MessageBox("SQL Native Client was not successfully Installed, installation will be aborted", SEVERE);
+		//	gbInstalled = FALSE;
+		//	abort;
+		//endif;
+	//endif;
 
 end;
 
