@@ -35,6 +35,15 @@ m_ipFAMDB(ipFAMDB)
 	//}}AFX_DATA_INIT
 }
 //-------------------------------------------------------------------------------------------------
+CExportFileListDlg::~CExportFileListDlg()
+{
+	try
+	{
+		m_ipFAMDB = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27682");
+}
+//-------------------------------------------------------------------------------------------------
 void CExportFileListDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialog::DoDataExchange(pDX);

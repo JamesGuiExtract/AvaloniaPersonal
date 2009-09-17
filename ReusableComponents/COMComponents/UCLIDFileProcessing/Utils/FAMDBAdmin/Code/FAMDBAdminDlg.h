@@ -53,11 +53,15 @@ protected:
 	afx_msg void OnToolsReports();
 	afx_msg void OnToolsCheckForNewComponents();
 	afx_msg void OnToolsManageTags();
+	afx_msg void OnToolsSetPriority();
 	DECLARE_MESSAGE_MAP()
 
 	//INotifyDBConfigChanged
 public:
 	virtual void OnDBConfigChanged(const std::string& strServer, const std::string& strDatabase);
+
+	// Method called to cause the summary tab to refresh its data
+	void NotifyStatusChanged();
 
 private:
 	//////////

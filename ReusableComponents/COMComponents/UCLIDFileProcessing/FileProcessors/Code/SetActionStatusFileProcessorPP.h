@@ -6,6 +6,8 @@
 
 #include <string>
 
+using namespace std;
+
 //--------------------------------------------------------------------------------------------------
 // CSetActionStatusFileProcessorPP
 //--------------------------------------------------------------------------------------------------
@@ -46,11 +48,6 @@ private:
 	// UI controls
 	ATLControls::CComboBox m_cmbActionName;
 	ATLControls::CComboBox m_cmbActionStatus;
-
-	// Methods to convert action status from string to enum and vice-a-versa
-	// This functionality will be moved to UCLIDFileProcessing DLL eventually
-	EActionStatus getActionStatus(const std::string& strActionStatus) const;
-	const std::string& getActionStatus(EActionStatus eActionStatus) const;
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(SetActionStatusFileProcessorPP), CSetActionStatusFileProcessorPP)

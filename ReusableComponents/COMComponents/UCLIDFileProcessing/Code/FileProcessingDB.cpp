@@ -3624,6 +3624,51 @@ STDMETHODIMP CFileProcessingDB::AsEFilePriority(BSTR bstrPriority, EFilePriority
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27674");
 }
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnRecordsAffected)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the query string and ensure it is not empty
+		string strQuery = asString(bstrQuery);
+		ASSERT_ARGUMENT("ELI27684", !strQuery.empty());
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Execute the query
+		long nRecordsAffected = executeCmdQuery(ipConnection, strQuery);
+
+		// If user wants a count of affected records, return it
+		if (pnRecordsAffected != NULL)
+		{
+			*pnRecordsAffected = nRecordsAffected;
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27685");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
+}
 
 //-------------------------------------------------------------------------------------------------
 // ILicensedComponent Methods

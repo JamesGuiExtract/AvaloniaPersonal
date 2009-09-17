@@ -80,6 +80,7 @@ BOOL FileProcessingAddActionDlg::OnInitDialog()
 		m_cmbStatus.InsertString(2, "Processing");
 		m_cmbStatus.InsertString(3, "Completed");
 		m_cmbStatus.InsertString(4, "Failed");
+		m_cmbStatus.InsertString(5, "Skipped");
 
 		// Set the default item in the status ComboBox to "Unattempted"
 		m_cmbStatus.SetCurSel(0);
@@ -153,7 +154,7 @@ void FileProcessingAddActionDlg::OnBnClickOK()
 		// Validate the new action name
 		CString zText;
 		m_edActionName.GetWindowTextA( zText );
-		string strNewName = zText.operator LPCTSTR();
+		string strNewName = (LPCTSTR)zText;
 		if (!isValidIdentifier( strNewName ))
 		{
 			// Invalid identifier, throw exception

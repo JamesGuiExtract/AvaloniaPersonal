@@ -5,15 +5,12 @@
 #include <UCLIDException.h>
 #include <COMUtils.h>
 
-// these constants should be moved into UCLIDFileProcessing DLL
-static const string gstrUNATTEMPTED = "Unattempted";
-static const string gstrPENDING = "Pending";
-static const string gstrCOMPLETED = "Completed";
-static const string gstrFAILED = "Failed";
-
 // other constants
-const int giNUM_VALID_STATUSES = 4;
-const EActionStatus gVALID_ACTION_STATUSES[giNUM_VALID_STATUSES] = {kActionUnattempted, kActionPending, kActionCompleted, kActionFailed};
+const int giNUM_VALID_STATUSES = 5;
+const EActionStatus gVALID_ACTION_STATUSES[giNUM_VALID_STATUSES] = {kActionUnattempted,
+		kActionPending, kActionCompleted, kActionFailed, kActionSkipped};
+const string gstrSTATUS_STRINGS[giNUM_VALID_STATUSES] = { "Unattempted",
+		"Pending", "Completed", "Failed", "Skipped" };
 
 //--------------------------------------------------------------------------------------------------
 // CSetActionStatusFileProcessorPP
@@ -114,7 +111,7 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 			for (long i = 0; i < giNUM_VALID_STATUSES; i++)
 			{
 				EActionStatus eTempActionStatus = gVALID_ACTION_STATUSES[i];
-				m_cmbActionStatus.AddString(getActionStatus(eTempActionStatus).c_str());
+				m_cmbActionStatus.AddString(gstrSTATUS_STRINGS[i].c_str());
 				if (eTempActionStatus == eActionStatus)
 				{
 					iDefaultActionStatusIndex = i;
@@ -178,70 +175,5 @@ LRESULT CSetActionStatusFileProcessorPP::OnInitDialog(UINT uMsg, WPARAM wParam, 
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI15129")
 
 	return TRUE;
-}
-
-//--------------------------------------------------------------------------------------------------
-// Private methods
-//--------------------------------------------------------------------------------------------------
-EActionStatus CSetActionStatusFileProcessorPP::getActionStatus(const string& strActionStatus) const
-{
-	// this functionality should really be in the UCLID FileProcessing DLL, but that IDL file
-	// is currently checked out
-	int todo_move_this_functionality_into_uclid_file_processing_dll;
-
-	// return the action status enum corresponding to the action status string
-	if (strActionStatus == gstrUNATTEMPTED)
-	{
-		return kActionUnattempted;
-	}
-	else if (strActionStatus == gstrPENDING)
-	{
-		return kActionPending;
-	}
-	else if (strActionStatus == gstrCOMPLETED)
-	{
-		return kActionCompleted;
-	}
-	else if (strActionStatus == gstrFAILED)
-	{
-		return kActionFailed;
-	}
-	else
-	{
-		UCLIDException ue("ELI15140", "Internal logic error!");
-		ue.addDebugInfo("strActionStatus", strActionStatus);
-		throw ue;
-	}
-}
-//--------------------------------------------------------------------------------------------------
-const std::string& CSetActionStatusFileProcessorPP::getActionStatus(EActionStatus eActionStatus) const
-{
-	// this functionality should really be in the UCLID FileProcessing DLL, but that IDL file
-	// is currently checked out
-	int todo_move_this_functionality_into_uclid_file_processing_dll;
-
-	// return the action status string corresponding to the action status enum
-	switch (eActionStatus)
-	{
-	case kActionUnattempted:
-		return gstrUNATTEMPTED;
-
-	case kActionPending:
-		return gstrPENDING;
-
-	case kActionCompleted:
-		return gstrCOMPLETED;
-
-	case kActionFailed:
-		return gstrFAILED;
-
-	default:
-		{
-			// we should never reach here
-			UCLIDException ue("ELI15139", "Internal logic error!");
-			ue.addDebugInfo("ActionStatus", (long) eActionStatus);
-			throw ue;
-		}
-	}
 }
 //--------------------------------------------------------------------------------------------------

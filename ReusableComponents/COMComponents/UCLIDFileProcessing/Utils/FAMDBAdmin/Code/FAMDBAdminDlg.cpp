@@ -11,6 +11,7 @@
 #include "ManageTagsDlg.h"
 #include "RenameActionDlg.h"
 #include "SetActionStatusDlg.h"
+#include "SetFilePriorityDlg.h"
 #include "..\..\..\code\FPCategories.h"
 #include "..\..\..\..\InputFunnel\IFCore\Code\IFCategories.h"
 
@@ -105,6 +106,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
 	ON_COMMAND(ID_TOOLS_MANAGE_TAGS, &CFAMDBAdminDlg::OnToolsManageTags)
+	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -594,18 +596,15 @@ void CFAMDBAdminDlg::OnActionManuallySetActionStatus()
 
 	try
 	{
-		// Check if there is no action inside the datebase;
+		// Check if there is no action inside the database;
 		if ( notifyNoActions() )
 		{
 			return;
 		}
 
 		// Display the reset action dialog
-		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB);
+		CSetActionStatusDlg dlgSetActionStatus(m_ipFAMDB, this);
 		dlgSetActionStatus.DoModal();
-
-		// Update the summary tab
-		updateSummaryTab();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14868");
 }
@@ -818,6 +817,31 @@ void CFAMDBAdminDlg::OnToolsManageTags()
 		dlg.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27416");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnToolsSetPriority()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new set file priority dialog
+		CSetFilePriorityDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27698");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::NotifyStatusChanged()
+{
+	try
+	{
+		// Update the summary tab
+		updateSummaryTab();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27696");
 }
 
 //-------------------------------------------------------------------------------------------------

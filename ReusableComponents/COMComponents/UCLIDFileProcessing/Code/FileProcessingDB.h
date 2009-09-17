@@ -140,6 +140,7 @@ public:
 	STDMETHOD(GetPriorities)(IVariantVector** ppvecPriorities);
 	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
 	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
+	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

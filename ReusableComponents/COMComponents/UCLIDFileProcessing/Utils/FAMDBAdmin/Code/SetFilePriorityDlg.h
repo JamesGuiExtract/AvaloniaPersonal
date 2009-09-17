@@ -1,5 +1,5 @@
 //-------------------------------------------------------------------------------------------------
-// CExportFileListDlg dialog used for FAMDBAdmin
+// CSetFilePriorityDlg dialog used for FAMDBAdmin
 //-------------------------------------------------------------------------------------------------
 
 #pragma once
@@ -8,46 +8,34 @@
 #include "afxwin.h"
 #include "SelectFileSettings.h"
 
-// ExportFileListDlg.h : header file
-//
-
 //-------------------------------------------------------------------------------------------------
-// CExportFileListDlg dialog
+// CSetFilePriorityDlg dialog
 //-------------------------------------------------------------------------------------------------
-class CExportFileListDlg : public CDialog
+class CSetFilePriorityDlg : public CDialog
 {
 public:
 // Construction
-	CExportFileListDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr pFAMDB);
-	~CExportFileListDlg();
+	CSetFilePriorityDlg(IFileProcessingDBPtr pFAMDB);
+	~CSetFilePriorityDlg();
 
 // Dialog Data
-	//{{AFX_DATA(CExportFileListDlg)
-	enum { IDD = IDD_DLG_EXPORT_FILES };
+	enum { IDD = IDD_DIALOG_SET_PROCESSING_PRIORITY };
 	CEdit m_editSummary;
-	CEdit m_editFileName;
 	CButton m_btnOk;
-	CButton m_btnBrowse;
-	//}}AFX_DATA
+	CComboBox m_comboPriority;
 
 // Overrides
 	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CExportFileListDlg)
 	protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	//}}AFX_VIRTUAL
 
 // Implementation
 protected:
 
-	// Generated message map functions
-	//{{AFX_MSG(CExportFileListDlg)
+	// Message map functions
 	virtual BOOL OnInitDialog();
 	afx_msg void OnClickedSelectFiles();
-	afx_msg void OnClickedBrowseFile();
 	afx_msg void OnClickedOK();
-	afx_msg void OnChangedEditFileName();
-	//}}AFX_MSG
 	DECLARE_MESSAGE_MAP()
 
 private:
@@ -55,17 +43,14 @@ private:
 	//Variables
 	///////////
 	// The file action manager DB pointer
-	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
+	IFileProcessingDBPtr m_ipFAMDB;
 
-	// Settings for the export
+	// Settings for the priorities to modify
 	SelectFileSettings m_settings;
 
 	////////////
 	//Methods
 	///////////
-	// Update controls
-	void updateControls();
+	// Populate the priority combo box
+	void fillPriorityCombo();
 };
-
-//{{AFX_INSERT_LOCATION}}
-// Microsoft Visual C++ will insert additional declarations immediately before the previous line.

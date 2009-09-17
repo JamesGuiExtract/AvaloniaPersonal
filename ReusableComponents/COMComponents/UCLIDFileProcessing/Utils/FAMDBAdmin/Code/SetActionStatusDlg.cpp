@@ -21,10 +21,22 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // CSetActionStatusDlg dialog
 //-------------------------------------------------------------------------------------------------
-CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB)
+CSetActionStatusDlg::CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+										 CFAMDBAdminDlg* pFAMDBAdmin)
 : CDialog(CSetActionStatusDlg::IDD),
-m_ipFAMDB(ipFAMDB)
+m_ipFAMDB(ipFAMDB),
+m_pFAMDBAdmin(pFAMDBAdmin)
 {
+	ASSERT_ARGUMENT("ELI27697", pFAMDBAdmin != NULL);
+}
+//-------------------------------------------------------------------------------------------------
+CSetActionStatusDlg::~CSetActionStatusDlg()
+{
+	try
+	{
+		m_ipFAMDB = NULL;
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27695");
 }
 //-------------------------------------------------------------------------------------------------
 void CSetActionStatusDlg::DoDataExchange(CDataExchange* pDX)
@@ -350,6 +362,9 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 
 		// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
 		uex.log();
+
+		// Alert the FAMDBAdmin to update the status tab
+		m_pFAMDBAdmin->NotifyStatusChanged();
 
 		if(bCloseDialog)
 		{

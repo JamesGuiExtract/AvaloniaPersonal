@@ -20,6 +20,7 @@
 #define IDD_DIALOG_CLEAR_WARNING        134
 #define IDD_DLG_SELECT_FILES			135
 #define IDR_MANAGE_TAG_ACCELERATORS		136
+#define IDD_DIALOG_SET_PROCESSING_PRIORITY 137
 
 // Database Page ID's
 // These ID's need to be the same in every .h project that uses the Database Page object
@@ -100,6 +101,9 @@
 #define IDC_SELECT_LIST_TAGS			2063
 #define IDC_RADIO_FILE_PRIORITY			2064
 #define IDC_CMB_FILE_PRIORITY			2065
+#define IDC_EDIT_FL_SLCT_SMRY_PRIORITY	2066
+#define IDC_BTN_SLCT_FLS_PRIORITY		2067
+#define IDC_CMB_FL_SLCT_PRIORITY		2068
 #define ID_DATABASE_SELECT              32772
 #define ID_DATABASE_CLEAR               32773
 #define ID_DATABASE_RESETLOCK           32774
@@ -118,14 +122,15 @@
 #define ID_TOOLS_REPORTS                32788
 #define ID_TOOLS_CHECKFORNEWCOMPONENTS  32789
 #define ID_TOOLS_MANAGE_TAGS			32790
+#define ID_TOOLS_SETPRIORITY			32791
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        137
-#define _APS_NEXT_COMMAND_VALUE         32791
-#define _APS_NEXT_CONTROL_VALUE         2066
+#define _APS_NEXT_RESOURCE_VALUE        138
+#define _APS_NEXT_COMMAND_VALUE         32792
+#define _APS_NEXT_CONTROL_VALUE         2069
 #define _APS_NEXT_SYMED_VALUE           2000
 #endif
 #endif

@@ -140,7 +140,7 @@ STDMETHODIMP CSetActionStatusFileProcessor::put_ActionStatus(long newVal)
 
 		// verify validity of action status
 		if (newVal != kActionUnattempted && newVal != kActionPending &&
-			newVal != kActionCompleted && newVal != kActionFailed)
+			newVal != kActionCompleted && newVal != kActionFailed && newVal != kActionSkipped)
 		{
 			UCLIDException ue("ELI15137", "Specified action status is not valid!");
 			ue.addDebugInfo("newVal", newVal);

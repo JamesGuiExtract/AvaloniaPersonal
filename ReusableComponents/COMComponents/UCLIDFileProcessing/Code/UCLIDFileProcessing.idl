@@ -811,7 +811,12 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To convert the priority string to its EFilePriority value.
 		[id(67), helpstring("method AsEFilePriority")] HRESULT AsEFilePriority(
 			[in] BSTR bstrPriority, [out, retval] EFilePriority* pePriority);
+
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To execute the specified command query and return the number of affected rows
+		//			(NOTE: This query should not return any results i.e. a SELECT query)
+		[id(68), helpstring("method ExecuteCommandQuery")] HRESULT ExecuteCommandQuery(
+			[in] BSTR bstrQuery, [out, retval] long* pnRecordsAffected);
 	};
 
 	[

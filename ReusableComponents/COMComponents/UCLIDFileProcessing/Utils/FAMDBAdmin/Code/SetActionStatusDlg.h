@@ -7,6 +7,7 @@
 #include "resource.h"
 #include "afxwin.h"
 #include "SelectFileSettings.h"
+#include "FAMDBAdminDlg.h"
 
 // SetActionStatusDlg.h : header file
 //
@@ -18,7 +19,9 @@ class CSetActionStatusDlg : public CDialog
 {
 public:
 // Construction
-	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB);
+	CSetActionStatusDlg(UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr ipFAMDB,
+		CFAMDBAdminDlg* pFAMDBAdmin);
+	~CSetActionStatusDlg();
 
 // Dialog Data
 	//{{AFX_DATA(CSetActionStatusDlg)
@@ -56,6 +59,9 @@ private:
 	CButton m_radioStatusFromAction;
 	CComboBox m_comboNewStatus;
 	CComboBox m_comboStatusFromAction;
+
+	// Used to notify the db admin to update the summary tab
+	CFAMDBAdminDlg* m_pFAMDBAdmin;
 
 	// The file action manager DB pointer
 	UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr m_ipFAMDB;
