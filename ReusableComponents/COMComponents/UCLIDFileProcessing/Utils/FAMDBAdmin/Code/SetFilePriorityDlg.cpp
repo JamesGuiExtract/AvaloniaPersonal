@@ -203,7 +203,7 @@ void CSetFilePriorityDlg::OnClickedOK()
 					strQuery += strConjunction + strTemp;
 				}
 
-				strQuery += ")";
+				strQuery += ") AS TempPriorityUpdater";
 			}
 			break;
 
