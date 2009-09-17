@@ -228,14 +228,11 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void Commit()
         {
-            if (!WarnIfInvalid())
-            {
-                SaveRedactionCounts();
+            SaveRedactionCounts();
 
-                Save();
+            Save();
 
-                AdvanceToNextDocument();
-            }
+            AdvanceToNextDocument();
         }
 
         /// <summary>
@@ -413,7 +410,7 @@ namespace Extract.Redaction.Verification
         bool WarnIfInvalid()
         {
             // Prompt for verification of all pages
-            if (_settings.General.VerifyAllPages && !_pageSummaryView.HasVisitedAllPages())
+            if (_settings.General.VerifyAllPages && !_pageSummaryView.HasVisitedAllPages)
             {
                 MessageBox.Show("Must visit all pages before saving.", "Must visit all pages", 
                     MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
@@ -494,6 +491,54 @@ namespace Extract.Redaction.Verification
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Displays a warning message indicating the current document will be saved and the user 
+        /// is navigating to next document. Allows the user to cancel.
+        /// </summary>
+        /// <returns><see langword="true"/> if there is invalid data or the user chose to cancel; 
+        /// <see langword="false"/> if the data is valid and the user chose to continue.</returns>
+        bool WarnBeforeTabCommit()
+        {
+            // If data is invalid, warn immediately
+            if (WarnIfInvalid())
+            {
+                return true;
+            }
+
+            // Indicate that all sensitive data has been reviewed
+            StringBuilder message = new StringBuilder();
+            if (_redactionGridView.Rows.Count > 0)
+            {
+                message.AppendLine("All found sensitive data and clues have been reviewed.");
+            }
+
+            // Indicate how many pages have been visited
+            message.Append("You have visited ");
+            if (_pageSummaryView.HasVisitedAllPages)
+            {
+                message.Append("all");
+            }
+            else
+            {
+                string visitedPages = _pageSummaryView.VisitedPageCount.ToString(CultureInfo.CurrentCulture);
+                string totalPages = _imageViewer.PageCount.ToString(CultureInfo.CurrentCulture);
+
+                message.Append(visitedPages);
+                message.Append(" of ");
+                message.Append(totalPages);
+            }
+            message.AppendLine(" pages in this document.");
+            message.AppendLine();
+
+            message.Append("Save this document and advance to the next?");
+
+            // Display the message box
+            DialogResult result = MessageBox.Show(message.ToString(), "Save document?", 
+                MessageBoxButtons.OKCancel, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+
+            return result == DialogResult.Cancel;
         }
 
         /// <summary>
@@ -593,7 +638,7 @@ namespace Extract.Redaction.Verification
 
                 // Go to the previous unviewed row (or page) if it exists
                 int previousRow = _redactionGridView.GetPreviousRowIndex();
-                int previousPage = verifyAllPages ? _imageViewer.PageNumber - 1 : -1;
+                int previousPage = verifyAllPages ? GetPreviousPage() : -1;
                 if (GoToPreviousUnviewed(previousRow, previousPage))
                 {
                     return;
@@ -629,7 +674,7 @@ namespace Extract.Redaction.Verification
 
                 // Go to the next unviewed row (or page) if it exists
                 int nextRow = _redactionGridView.GetNextRowIndex();
-                int nextPage = verifyAllPages ? _imageViewer.PageNumber + 1 : -1;
+                int nextPage = verifyAllPages ? GetNextPage() : -1;
                 if (GoToNextUnviewed(nextRow, nextPage))
                 {
                     return;
@@ -645,12 +690,65 @@ namespace Extract.Redaction.Verification
                 if (nextRow >= 0)
                 {
                     _redactionGridView.SelectOnly(nextRow);
+                    return;
+                }
+
+                // Go to next document
+                if (IsInHistory)
+                {
+                    GoToNextDocument();
+                }
+                else
+                {
+                    if (!WarnBeforeTabCommit())
+                    {
+                        Commit();
+                    }
                 }
             }
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27592", ex);
             }
+        }
+
+        /// <summary>
+        /// Gets the page before the currently selected redactions or if no redactions are 
+        /// selected the page before the currently visible page.
+        /// </summary>
+        /// <returns>The page before the currently selected redactions or if no redactions are 
+        /// selected the page before the currently visible page.</returns>
+        int GetPreviousPage()
+        {
+            int row = _redactionGridView.GetFirstSelectedRowIndex();
+            int page = GetActivePageByRowIndex(row) - 1;
+            return page < 1 ? -1 : page;
+        }
+
+        /// <summary>
+        /// Gets the page after the currently selected redactions or if no redactions are 
+        /// selected the page after the currently visible page.
+        /// </summary>
+        /// <returns>The page after the currently selected redactions or if no redactions are 
+        /// selected the page after the currently visible page.</returns>
+        int GetNextPage()
+        {
+            int row = _redactionGridView.GetLastSelectedRowIndex();
+            int page = GetActivePageByRowIndex(row) + 1;
+            return page > _imageViewer.PageCount ? -1 : page;
+        }
+
+        /// <summary>
+        /// Gets the page of the specified row or the current page if the specified row index is 
+        /// negative.
+        /// </summary>
+        /// <param name="row">The row from which to get the page number; or -1 to get the page 
+        /// number of the current page.</param>
+        /// <returns>The page of the specified row or the current page if the specified row index 
+        /// is negative.</returns>
+        int GetActivePageByRowIndex(int row)
+        {
+            return row < 0 ? _imageViewer.PageNumber : _redactionGridView.Rows[row].PageNumber;
         }
 
         /// <summary>
@@ -775,6 +873,50 @@ namespace Extract.Redaction.Verification
             _imageViewer.PageNumber = page;
         }
 
+        /// <summary>
+        /// Moves to the previous document.
+        /// </summary>
+        void GoToPreviousDocument()
+        {
+            // Check if changes have been made before moving away from a history document
+            bool inHistory = IsInHistory;
+            if (!inHistory || !WarnIfDirty())
+            {
+                SaveRedactionCounts();
+
+                if (!inHistory)
+                {
+                    // Preserve the currently processing document
+                    if (_unsavedMemento == null)
+                    {
+                        _unsavedMemento = CreateUnsavedMemento();
+                    }
+
+                    // Save the state of the current document before moving back
+                    _dirty = _redactionGridView.Dirty;
+                    _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
+                }
+
+                // Go to the previous document
+                _historyIndex--;
+                VerificationMemento memento = GetCurrentDocument();
+                _imageViewer.OpenImage(memento.ImageFile, false);
+            }
+        }
+
+        /// <summary>
+        /// Moves to the next document.
+        /// </summary>
+        void GoToNextDocument()
+        {
+            if (!WarnIfDirty())
+            {
+                SaveRedactionCounts();
+
+                AdvanceToNextDocument();
+            }
+        }
+
         #endregion VerificationTaskForm Methods
 
         #region VerificationTaskForm Overrides
@@ -883,7 +1025,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Commit();
+                if (!WarnIfInvalid())
+	            {
+                    Commit();
+	            }
             }
             catch (Exception ex)
             {
@@ -904,7 +1049,10 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Commit();
+                if (!WarnIfInvalid())
+                {
+                    Commit();
+                }
             }
             catch (Exception ex)
             {
@@ -1068,30 +1216,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                // Check if changes have been made before moving away from a history document
-                bool inHistory = IsInHistory;
-                if (!inHistory || !WarnIfDirty())
-                {
-                    SaveRedactionCounts();
-
-                    if (!inHistory)
-                    {
-                        // Preserve the currently processing document
-                        if (_unsavedMemento == null)
-                        {
-                            _unsavedMemento = CreateUnsavedMemento();
-                        }
-
-                        // Save the state of the current document before moving back
-                        _dirty = _redactionGridView.Dirty;
-                        _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
-                    }
-
-                    // Go to the previous document
-                    _historyIndex--;
-                    VerificationMemento memento = GetCurrentDocument();
-                    _imageViewer.OpenImage(memento.ImageFile, false);
-                }
+                GoToPreviousDocument();
             }
             catch (Exception ex)
             {
@@ -1112,12 +1237,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                if (!WarnIfDirty())
-                {
-                    SaveRedactionCounts();
-
-                    AdvanceToNextDocument();
-                }
+                GoToNextDocument();
             }
             catch (Exception ex)
             {
