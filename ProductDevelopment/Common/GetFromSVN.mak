@@ -122,7 +122,7 @@ GetDemo_FLEXIndexRules:
 
 GetDemo_LabDERules:
 	@ECHO Getting Demo_LabDE Rules $(RulesVersion)
-	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Rules" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Rules"
+	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Solution" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Solution"
 	$(BUILD_DRIVE) 
-	@CD "$(RulesDir)\LabDE\Demo_LabDE\Rules"
-    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/LabDE/Demo_LabDE/Rules" "$(RulesDir)\LabDE\Demo_LabDE\Rules" $(SVNOptions)
+	@CD "$(RulesDir)\LabDE\Demo_LabDE\Solution"
+    $(SVN) "$(SVN_REPOSITORY)/tags/$(ProductVersion)/Engineering/Rules/LabDE/Demo_LabDE/Solution" "$(RulesDir)\LabDE\Demo_LabDE\Solution" $(SVNOptions)

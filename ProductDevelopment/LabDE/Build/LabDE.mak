@@ -25,6 +25,7 @@ PDRootDir=$(EngineeringRootDirectory)\ProductDevelopment
 AFRootDirectory=$(PDRootDir)\AttributeFinder
 RCNETDir=$(EngineeringRootDirectory)\RC.Net
 LabDEBleedingEdgeDir=R:\LabDE\Internal\BleedingEdge\$(LabDEVersion)
+RulesDir=$(EngineeringRootDirectory)\Rules
 
 AFInstallRootDir=P:\AttributeFinder
 AFCoreInstallFilesRootDir=$(AFInstallRootDir)\CoreInstallation\Files
@@ -44,7 +45,7 @@ RDTInstallMediaDir=$(RDTInstallProjectRootDir)\Media\CD-ROM\DiskImages\Disk1
 RDTReleaseBleedingEdgeDir=S:\LabDE\Internal\BleedingEdge\$(LabDEVersion)\RDT
 
 LabResultsDir=$(AFRootDirectory)\IndustrySpecific\LabResults
-LabDERulesDir=$(EngineeringRootDirectory)\Rules\LabDE\Demo_LabDE\Rules
+LabDERulesDir=$(RulesDir)\LabDE\Demo_LabDE\Rules
 
 DataEntryApplicationDir=$(RCNETDir)\DataEntry\Utilities\DataEntryApplication\Core\Code
 BinariesFolder=$(EngineeringRootDirectory)\Binaries\$(BuildOutputDir)
@@ -116,6 +117,10 @@ CopyFilesToInstallFolder: ObfuscateFiles
 	@COPY  "$(BinariesFolder)\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Obfuscated\*.pdb" "$(InternalUseBuildFilesArchive)" 
 	@COPY  "$(BinariesFolder)\Map\*.xml" "$(InternalUseBuildFilesArchive)" 
+# Make .nl files to register the COM .NET files
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.LabResultsCustomComponents.dll" /b
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\Extract.DataEntry.dll" /b
+	DIR "$(DataEntryCoreInstallFilesDir)\DotNet\DataEntryApplication.exe" /b
 
 BuildDataEntryMergeModule: CreateVersionISImportFile CopyFilesToInstallFolder BuildLabDEApplication
     @ECHO Building Extract Systems DataEntry Merge Module...
@@ -166,17 +171,13 @@ CreateDemoShieldInstall: CopyLMFolderToInstall CreateLabDEInstallCD
 
 CreateDemo_LabDE: 
 	@ECHO Copying Demo_LabDE files...
-    @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules"
     @IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
 	@IF NOT EXIST "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files" MKDIR "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
 	@XCOPY "$(LabResultsDir)\Utils\LabDEDemo\Files\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE" /v /s /e /y
 	@XCOPY "$(AFInstallRootDir)\Demo_LabDE\Sanitized\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\DemoFiles\Installs\LongDemo\TIF" /v /s /e /y
-	@COPY /v "$(BinariesFolder)\Obfuscated\Extract.LabDE.StandardLabDE.dll" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Bin"
-	@COPY /v "$(LabResultsDir)\CustomerRules\Demo2\*.config" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\"
+	@XCOPY "$(RulesDir)\LabDE\Demo_LabDE\Solution\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution" /v /s /e /y	
 	@COPY /v "$(LabResultsDir)\Corepoint Integration\*.nix" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Corepoint Integration"
-	@COPY /v "$(LabResultsDir)\Miscellaneous\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Database Files"
-	@XCOPY "$(LabDERulesDir)\*.*" "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules" /v /s /e /y
 	@ECHO Encrypting LabDE Demo Rules...
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.dat" 1 1 "$(BinariesFolder)\EncryptFile.exe"
 	@SendFilesAsArgumentToApplication "$(LabDEBleedingEdgeDir)\Demo_LabDE\Solution\Rules\*.rsd" 1 1 "$(BinariesFolder)\EncryptFile.exe"

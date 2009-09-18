@@ -122,8 +122,8 @@ GetDemo_FLEXIndexRules:
 
 GetDemo_LabDERules:
 	@ECHO Getting Demo_LabDE Rules $(RulesVersion)
-	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Rules" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Rules"
+	@IF NOT EXIST "$(RulesDir)\LabDE\Demo_LabDE\Solution" @MKDIR "$(RulesDir)\LabDE\Demo_LabDE\Solution"
 	$(BUILD_DRIVE) 
-	@CD "$(RulesDir)\LabDE\Demo_LabDE\Rules"
-	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE\Rules" $$/Engineering/Rules/LabDE/Demo_LabDE/Rules "$(RulesVersion)"
+	@CD "$(RulesDir)\LabDE\Demo_LabDE\Solution"
+	@$(Get) $(GetOptions) -nonworkingfolder "$(RulesDir)\LabDE\Demo_LabDE\Solution" $$/Engineering/Rules/LabDE/Demo_LabDE/Solution "$(RulesVersion)"
 
