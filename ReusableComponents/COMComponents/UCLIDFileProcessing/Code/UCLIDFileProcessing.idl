@@ -134,6 +134,77 @@ library UCLID_FILEPROCESSINGLib
 	//----------------------------------------------------------------------------------------------
 	[
 		object,
+		uuid(E46D8A95-EA9B-4D90-8703-99621B19E4A0),
+		dual,
+		helpstring("IMathConditionChecker Interface"),
+		pointer_default(unique)
+	]
+	interface IMathConditionChecker : IDispatch
+	{
+		// Returns VARIANT_TRUE if the condition is met and VARIANT_FALSE if it is not met
+		[id(10001), helpstring("method CheckCondition")] HRESULT CheckCondition([in] BSTR bstrFileName,
+			[in] IFileProcessingDB* pFPDB, [out, retval] VARIANT_BOOL* pbResult);
+	};
+
+	[
+		object,
+		uuid(30409BCC-76AF-4C72-940E-7C2E71604B0C),
+		dual,
+		helpstring("IRandomMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IRandomMathCondition : IMathConditionChecker
+	{
+		// Percentage of when the condition is satisfied (must be between 1 and 99 inclusive)
+		[propget, id(1), helpstring("property Percent")] HRESULT Percent([out, retval] long* pnPercent);
+		[propput, id(1), helpstring("property Percent")] HRESULT Percent([in] long nPercent);
+	};
+
+	[
+		object,
+		uuid(5B2A7A6D-665F-41FB-B591-EC3C9902E26E),
+		dual,
+		helpstring("IOnceEveryMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IOnceEveryMathCondition : IMathConditionChecker
+	{
+		// How often each run the condition is satisified (must be greater than 2)
+		[propget, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
+			[out, retval] long* pnTimes);
+		[propput, id(1), helpstring("property NumberOfTimes")] HRESULT NumberOfTimes(
+			[in] long nTimes);
+
+		// A unique ID for this instance of the condition checker. It is recommended
+		// that the caller use a GUID generator to assign this value.
+		[propget, id(2), helpstring("property UsageID")] HRESULT UsageID(
+			[out, retval] BSTR* bstrUsageID);
+		[propput, id(2), helpstring("property UsageID")] HRESULT UsageID(
+			[in] BSTR bstrUsageID);
+	};
+
+	[
+		object,
+		uuid(70C82D6D-69BF-4D4F-83BB-C406FCAB28F1),
+		dual,
+		helpstring("IModulusEqualsMathCondition Interface"),
+		pointer_default(unique)
+	]
+	interface IModulusEqualsMathCondition : IMathConditionChecker
+	{
+		// The modulus value for checking the condition. Must be > 1.
+		[propget, id(1), helpstring("property Modulus")] HRESULT Modulus([out, retval] long* pnModulus);
+		[propput, id(1), helpstring("property Modulus")] HRESULT Modulus([in] long nModulus);
+
+		// The value that the modulus must equal for the condition to be satisfied
+		// Must be >= 0 and < Modulus.
+		[propget, id(2), helpstring("property ModEquals")] HRESULT ModEquals(
+			[out, retval] long* pnValue);
+		[propput, id(2), helpstring("property ModEquals")] HRESULT ModEquals([in] long nValue);
+	};
+
+	[
+		object,
 		uuid(FE7DED54-C988-43f4-A80B-60DA54F5904B),
 		dual,
 		helpstring("IFileProcessingTask Interface"),

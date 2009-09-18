@@ -12,7 +12,7 @@ class ATL_NO_VTABLE CRandomMathCondition :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<CRandomMathCondition, &CLSID_RandomMathCondition>,
 	public ISupportErrorInfo,
-	public IDispatchImpl<IRandomMathCondition, &IID_IRandomMathCondition, &LIBID_EXTRACT_FAMCONDITIONSLib>,
+	public IDispatchImpl<IRandomMathCondition, &IID_IRandomMathCondition, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IMustBeConfiguredObject, &IID_IMustBeConfiguredObject, &LIBID_UCLID_COMUTILSLib>,
@@ -50,7 +50,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IMathConditionChecker
-	STDMETHOD(CheckCondition)(BSTR bstrFileName, IFileProcessingDB* pFPDB,
+	STDMETHOD(raw_CheckCondition)(BSTR bstrFileName, IFileProcessingDB* pFPDB,
 		VARIANT_BOOL* pbResult);
 
 // IRandomMathConditionFAMCondition

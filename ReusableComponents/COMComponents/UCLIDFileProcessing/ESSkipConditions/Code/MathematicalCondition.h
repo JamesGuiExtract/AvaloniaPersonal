@@ -108,7 +108,7 @@ private:
 	bool m_bConsiderConditionMet;
 
 	// Hold the condition checker object to be used to check this condition
-	EXTRACT_FAMCONDITIONSLib::IMathConditionCheckerPtr m_ipConditionChecker;
+	IMathConditionCheckerPtr m_ipConditionChecker;
 
 	/////////////
 	// Methods

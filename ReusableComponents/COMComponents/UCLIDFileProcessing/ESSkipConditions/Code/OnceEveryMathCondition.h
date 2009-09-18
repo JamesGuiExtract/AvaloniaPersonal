@@ -18,7 +18,7 @@ class ATL_NO_VTABLE COnceEveryMathCondition :
 	public CComObjectRootEx<CComMultiThreadModel>,
 	public CComCoClass<COnceEveryMathCondition, &CLSID_OnceEveryMathCondition>,
 	public ISupportErrorInfo,
-	public IDispatchImpl<IOnceEveryMathCondition, &IID_IOnceEveryMathCondition, &LIBID_EXTRACT_FAMCONDITIONSLib>,
+	public IDispatchImpl<IOnceEveryMathCondition, &IID_IOnceEveryMathCondition, &LIBID_UCLID_FILEPROCESSINGLib>,
 	public IDispatchImpl<ILicensedComponent, &IID_ILicensedComponent, &LIBID_UCLID_COMLMLib>,
 	public IDispatchImpl<ICopyableObject, &IID_ICopyableObject, &LIBID_UCLID_COMUTILSLib>,
 	public IDispatchImpl<IClipboardCopyable, &IID_IClipboardCopyable, &LIBID_UCLID_COMUTILSLib>,
@@ -58,7 +58,7 @@ DECLARE_PROTECT_FINAL_CONSTRUCT()
 	STDMETHOD(InterfaceSupportsErrorInfo)(REFIID riid);
 
 // IMathConditionChecker
-	STDMETHOD(CheckCondition)(BSTR bstrFileName, IFileProcessingDB* pFPDB,
+	STDMETHOD(raw_CheckCondition)(BSTR bstrFileName, IFileProcessingDB* pFPDB,
 		VARIANT_BOOL* pbResult);
 
 // IOnceEveryMathConditionFAMCondition

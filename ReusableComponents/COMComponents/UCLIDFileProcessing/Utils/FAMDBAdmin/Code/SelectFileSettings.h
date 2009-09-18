@@ -47,7 +47,7 @@ private:
 
 public:
 	// Default the setting to all files
-	SelectFileSettings() : m_scope(eAllFiles)
+	SelectFileSettings() : m_scope(eAllFiles), m_bNarrowScope(false), m_nRandomPercent(0)
 	{
 	}
 	SelectFileSettings(const SelectFileSettings& settings)
@@ -153,6 +153,12 @@ public:
 
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26906");
+		}
+
+		if (m_bNarrowScope)
+		{
+			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
+				+ asString(m_nRandomPercent) + "% subset.";
 		}
 
 		return strSummary;

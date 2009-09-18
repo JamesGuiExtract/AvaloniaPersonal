@@ -65,6 +65,8 @@ void CSelectFilesDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_EDIT_SQL_QUERY, m_editSelectQuery);
 	DDX_Control(pDX, IDC_RADIO_FILE_PRIORITY, m_radioFilesWithPriority);
 	DDX_Control(pDX, IDC_CMB_FILE_PRIORITY, m_comboPriority);
+	DDX_Control(pDX, IDC_CHECK_LIMIT_SCOPE, m_checkRandomSubset);
+	DDX_Control(pDX, IDC_EDIT_LIMIT_SCOPE, m_editRandomPercent);
 }
 //-------------------------------------------------------------------------------------------------
 BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
@@ -79,6 +81,7 @@ BEGIN_MESSAGE_MAP(CSelectFilesDlg, CDialog)
 	ON_BN_CLICKED(IDC_SELECT_BTN_CANCEL, &CSelectFilesDlg::OnClickedCancel)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_ACTION, &CSelectFilesDlg::OnFilesUnderActionChange)
 	ON_CBN_SELCHANGE(IDC_CMB_FILE_STATUS, &CSelectFilesDlg::OnFilesUnderStatusChange)
+	ON_BN_CLICKED(IDC_CHECK_LIMIT_SCOPE, &CSelectFilesDlg::OnClickedCheckRandomSubset)
 END_MESSAGE_MAP()
 
 //-------------------------------------------------------------------------------------------------
@@ -149,6 +152,9 @@ BOOL CSelectFilesDlg::OnInitDialog()
 		// Select the all file reference radio button and new action status
 		// radio button as default setting
 		m_radioAllFiles.SetCheck(BST_CHECKED);
+
+		// Limit the random percentage edit control to 2 characters
+		m_editRandomPercent.SetLimitText(2);
 
 		// Update the controls
 		updateControls();
@@ -302,6 +308,18 @@ void CSelectFilesDlg::OnFilesUnderStatusChange()
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI26994");
 }
+//-------------------------------------------------------------------------------------------------
+void CSelectFilesDlg::OnClickedCheckRandomSubset()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{
+		// Update the controls
+		updateControls();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27706");
+}
 
 //-------------------------------------------------------------------------------------------------
 // Private Methods
@@ -313,6 +331,33 @@ bool CSelectFilesDlg::saveSettings()
 		// Display a wait-cursor because we are getting information from the DB, 
 		// which may take a few seconds
 		CWaitCursor wait;
+
+		// Check for narrowing scope by random percentage
+		long nRandomPercent = -1;
+		if (m_checkRandomSubset.GetCheck() == BST_CHECKED)
+		{
+			// Get the percentage from the control
+			CString zTemp;
+			m_editRandomPercent.GetWindowText(zTemp);
+
+			if (zTemp.IsEmpty())
+			{
+				MessageBox("Must not leave percentage blank!", "Empty Percentage",
+					MB_OK | MB_ICONERROR);
+				m_editRandomPercent.SetFocus();
+				return false;
+			}
+
+			// Convert string to long
+			nRandomPercent = asLong((LPCTSTR) zTemp);
+			if (nRandomPercent < 1 || nRandomPercent > 99)
+			{
+				MessageBox("Percentage must be between 1 and 99 inclusive!", "Invalid Percentage",
+					MB_OK | MB_ICONERROR);
+				m_editRandomPercent.SetFocus();
+				return false;
+			}
+		}
 
 		// If choose to change that status for all the files
 		if (m_radioAllFiles.GetCheck() == BST_CHECKED)
@@ -381,7 +426,6 @@ bool CSelectFilesDlg::saveSettings()
 			m_settings.setTags(vecTags);
 			m_settings.setScope(eAllFilesTag);
 			m_settings.setAnyTags(m_comboTagsAnyAll.GetCurSel() == giANY_TAG);
-
 		}
 		else if (m_radioFilesFromQuery.GetCheck() == BST_CHECKED)
 		{
@@ -417,6 +461,13 @@ bool CSelectFilesDlg::saveSettings()
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26995");
 		}
 
+		// Set the scope narrowing values
+		m_settings.setNarrowScope(nRandomPercent != -1);
+		if (nRandomPercent != -1)
+		{
+			m_settings.setRandomPercent(nRandomPercent);
+		}
+
 		return true;
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26996")
@@ -432,6 +483,7 @@ void CSelectFilesDlg::updateControls()
 		BOOL bFilesFromSQL = asMFCBool(m_radioFilesFromQuery.GetCheck() == BST_CHECKED);
 		BOOL bFilesWithTags = asMFCBool(m_radioFilesWithTags.GetCheck() == BST_CHECKED);
 		BOOL bFilesWithPriority = asMFCBool(m_radioFilesWithPriority.GetCheck() == BST_CHECKED);
+		BOOL bRandomSubset = asMFCBool(m_checkRandomSubset.GetCheck() == BST_CHECKED);
 
 		// Enable the query edit box based on radio selection
 		m_editSelectQuery.EnableWindow(bFilesFromSQL);
@@ -471,6 +523,9 @@ void CSelectFilesDlg::updateControls()
 
 		// Enable the priority combo box
 		m_comboPriority.EnableWindow(bFilesWithPriority);
+
+		// Enable the random percentage edit control
+		m_editRandomPercent.EnableWindow(bRandomSubset);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI26997");
 }
@@ -598,6 +653,14 @@ void CSelectFilesDlg::setControlsFromSettings()
 
 		default:
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26999");
+		}
+
+		// Check for scope narrowing
+		if (m_settings.getNarrowScope())
+		{
+			// Set the check box and update the text in the edit control
+			m_checkRandomSubset.SetCheck(BST_CHECKED);
+			m_editRandomPercent.SetWindowText(asString(m_settings.getRandomPercent()).c_str());
 		}
 
 		// Set the radio buttons

@@ -178,7 +178,7 @@ STDMETHODIMP COnceEveryMathCondition::raw_CopyFrom(IUnknown *pObject)
 
 	try
 	{
-		EXTRACT_FAMCONDITIONSLib::IOnceEveryMathConditionPtr ipCopyThis(pObject);
+		IOnceEveryMathConditionPtr ipCopyThis(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI27217", ipCopyThis != NULL);
 		
 		// Copy the values from another object
@@ -374,7 +374,7 @@ STDMETHODIMP COnceEveryMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP COnceEveryMathCondition::CheckCondition(BSTR bstrFileName,
+STDMETHODIMP COnceEveryMathCondition::raw_CheckCondition(BSTR bstrFileName,
 														 IFileProcessingDB* pFPDB,
 														 VARIANT_BOOL* pbResult)
 {

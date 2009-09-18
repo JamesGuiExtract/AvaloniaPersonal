@@ -71,7 +71,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 			EXTRACT_FAMCONDITIONSLib::IMathematicalFAMConditionPtr ipMathematicalCondition(m_ppUnk[i]);
 			if (ipMathematicalCondition)
 			{
-				EXTRACT_FAMCONDITIONSLib::IMathConditionCheckerPtr ipChecker = NULL;
+				IMathConditionCheckerPtr ipChecker = NULL;
 
 				// Get the data (validating as we go)
 				if (m_radioRandom.GetCheck() == BST_CHECKED)
@@ -102,8 +102,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 					}
 
 					// Create a new condition and set the percentage
-					EXTRACT_FAMCONDITIONSLib::IRandomMathConditionPtr 
-						ipRandom(CLSID_RandomMathCondition);
+					IRandomMathConditionPtr ipRandom(CLSID_RandomMathCondition);
 					ASSERT_RESOURCE_ALLOCATION("ELI27171", ipRandom != NULL);
 					ipRandom->Percent = nVal;
 
@@ -151,8 +150,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 					string strGuid = asString(gGuid);
 
 					// Create a new condition and set the count and unique ID
-					EXTRACT_FAMCONDITIONSLib::IOnceEveryMathConditionPtr
-						ipOnce(CLSID_OnceEveryMathCondition);
+					IOnceEveryMathConditionPtr ipOnce(CLSID_OnceEveryMathCondition);
 					ASSERT_RESOURCE_ALLOCATION("ELI27173", ipOnce != NULL);
 					ipOnce->NumberOfTimes = nVal;
 					ipOnce->UsageID = strGuid.c_str();
@@ -216,8 +214,7 @@ STDMETHODIMP CMathematicalConditionPP::Apply(void)
 					}
 
 					// Create a new condition and set the modulus and equals values
-					EXTRACT_FAMCONDITIONSLib::IModulusEqualsMathConditionPtr
-						ipMod(CLSID_ModulusEqualsMathCondition);
+					IModulusEqualsMathConditionPtr ipMod(CLSID_ModulusEqualsMathCondition);
 					ASSERT_RESOURCE_ALLOCATION("ELI27174", ipMod != NULL);
 					ipMod->Modulus = nMod;
 					ipMod->ModEquals = nModEquals;
@@ -291,9 +288,9 @@ LRESULT CMathematicalConditionPP::OnInitDialog(UINT uMsg, WPARAM wParam, LPARAM 
 			if (ipChecker != NULL)
 			{
 				// Attempt to get the checker as each type of checker object
-				EXTRACT_FAMCONDITIONSLib::IRandomMathConditionPtr ipRandom = ipChecker;
-				EXTRACT_FAMCONDITIONSLib::IOnceEveryMathConditionPtr ipOnce = ipChecker;
-				EXTRACT_FAMCONDITIONSLib::IModulusEqualsMathConditionPtr ipMod = ipChecker;
+				IRandomMathConditionPtr ipRandom = ipChecker;
+				IOnceEveryMathConditionPtr ipOnce = ipChecker;
+				IModulusEqualsMathConditionPtr ipMod = ipChecker;
 				if (ipRandom != NULL)
 				{
 					// Bools are already defaulted to this case, no need to change them

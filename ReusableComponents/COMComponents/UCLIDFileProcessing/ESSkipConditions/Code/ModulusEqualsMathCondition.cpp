@@ -170,7 +170,7 @@ STDMETHODIMP CModulusEqualsMathCondition::raw_CopyFrom(IUnknown *pObject)
 
 	try
 	{
-		EXTRACT_FAMCONDITIONSLib::IModulusEqualsMathConditionPtr ipCopyThis(pObject);
+		IModulusEqualsMathConditionPtr ipCopyThis(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI27192", ipCopyThis != NULL);
 		
 		// Copy the values from another object
@@ -337,7 +337,7 @@ STDMETHODIMP CModulusEqualsMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CModulusEqualsMathCondition::CheckCondition(BSTR bstrFileName,
+STDMETHODIMP CModulusEqualsMathCondition::raw_CheckCondition(BSTR bstrFileName,
 														 IFileProcessingDB* pFPDB,
 														 VARIANT_BOOL* pbResult)
 {

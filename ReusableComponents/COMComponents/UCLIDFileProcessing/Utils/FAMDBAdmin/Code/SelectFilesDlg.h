@@ -44,6 +44,8 @@ public:
 	CComboBox m_comboPriority;
 	CEdit m_editSelectQuery;
 	CListCtrl m_listTags;
+	CButton m_checkRandomSubset;
+	CEdit m_editRandomPercent;
 
 // Implementation
 protected:
@@ -56,6 +58,7 @@ protected:
 	afx_msg void OnClickedRadioFilesFromQuery();
 	afx_msg void OnClickedRadioFilesWithTags();
 	afx_msg void OnClickedRadioFilesWithPriority();
+	afx_msg void OnClickedCheckRandomSubset();
 	afx_msg void OnFilesUnderActionChange();
 	afx_msg void OnFilesUnderStatusChange();
 	afx_msg void OnCancel();

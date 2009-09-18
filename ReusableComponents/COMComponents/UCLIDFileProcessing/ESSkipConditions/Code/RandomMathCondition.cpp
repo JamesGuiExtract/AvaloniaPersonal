@@ -132,7 +132,7 @@ STDMETHODIMP CRandomMathCondition::raw_CopyFrom(IUnknown *pObject)
 
 	try
 	{
-		EXTRACT_FAMCONDITIONSLib::IRandomMathConditionPtr ipCopyThis(pObject);
+		IRandomMathConditionPtr ipCopyThis(pObject);
 		ASSERT_RESOURCE_ALLOCATION("ELI27237", ipCopyThis != NULL);
 		
 		// Copy the values from another object
@@ -297,7 +297,7 @@ STDMETHODIMP CRandomMathCondition::GetSizeMax(ULARGE_INTEGER *pcbSize)
 //-------------------------------------------------------------------------------------------------
 // IMathConditionChecker
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CRandomMathCondition::CheckCondition(BSTR bstrFileName,
+STDMETHODIMP CRandomMathCondition::raw_CheckCondition(BSTR bstrFileName,
 														 IFileProcessingDB* pFPDB,
 														 VARIANT_BOOL* pbResult)
 {

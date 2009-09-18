@@ -123,7 +123,7 @@ STDMETHODIMP CMathematicalCondition::get_MathematicalCondition(IMathConditionChe
 
 		ASSERT_ARGUMENT("ELI27143", ppCondition != NULL);
 
-		EXTRACT_FAMCONDITIONSLib::IMathConditionCheckerPtr ipShallowCopy = m_ipConditionChecker;
+		IMathConditionCheckerPtr ipShallowCopy = m_ipConditionChecker;
 
 		*ppCondition = (IMathConditionChecker*)ipShallowCopy.Detach();
 
