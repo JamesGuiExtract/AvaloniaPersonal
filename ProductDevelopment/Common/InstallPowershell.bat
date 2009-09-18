@@ -19,17 +19,17 @@ goto finished
 
 :xp
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	WindowsXP-KB926139-v2-x86-ENU.exe /quiet
+	"%~dp0\WindowsXP-KB926139-v2-x86-ENU.exe" /quiet
 )
 
 goto finished
 
 :2003Server
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	WindowsServer2003-KB926139-v2-x86-ENU.exe /quiet
+	"%~dp0\WindowsServer2003-KB926139-v2-x86-ENU.exe" /quiet
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	WindowsServer2003.WindowsXP-KB926139-v2-x64-ENU.exe /quiet
+	"%~dp0\WindowsServer2003.WindowsXP-KB926139-v2-x64-ENU.exe" /quiet
 )
 
 goto finished
@@ -41,10 +41,10 @@ servermanagercmd - install powershell
 if "%errorlevel%" == "0" goto finished
 
 if "%PROCESSOR_ARCHITECTURE%" == "x86" (
-	wusa Windows6.0-KB928439-x86.msu /quiet
+	wusa "%~dp0\Windows6.0-KB928439-x86.msu" /quiet
 )
 if "%PROCESSOR_ARCHITECTURE%" == "AMD64" (
-	wusa Windows6.0-KB928439-x64.msu /quiet
+	wusa "%~dp0\Windows6.0-KB928439-x64.msu" /quiet
 )
 
 goto finished
