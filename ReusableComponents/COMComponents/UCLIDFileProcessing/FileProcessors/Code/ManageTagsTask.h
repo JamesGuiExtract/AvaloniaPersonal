@@ -154,6 +154,10 @@ private:
 	// PROMISE: Throws an exception if this component is not licensed. Runs successfully otherwise.
 	void validateLicense();
 
+	// Checks the list of tags and ensures they still exist in the database before
+	// continuing
+	void validateTags(const IFileProcessingDBPtr& ipDB);
+
 	// Adds all the tags to the specified file
 	void addTagsToFile(const IFileProcessingDBPtr& ipDB, long nFileID);
 

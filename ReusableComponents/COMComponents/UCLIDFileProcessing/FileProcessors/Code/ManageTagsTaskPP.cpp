@@ -107,31 +107,38 @@ STDMETHODIMP CManageTagsTaskPP::Apply()
 					return S_FALSE;
 				}
 
-				// Set the tags
+
+				// Get the appropriate operation
+				UCLID_FILEPROCESSORSLib::EManageTagsOperationType eOpType;
+				if (m_radioAddTags.GetCheck() == BST_CHECKED)
+				{
+					eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationApplyTags;
+				}
+				else if (m_radioRemoveTags.GetCheck() == BST_CHECKED)
+				{
+					eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationRemoveTags;
+				}
+				else if (m_radioToggleTags.GetCheck() == BST_CHECKED)
+				{
+					eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationToggleTags;
+				}
+				else
+				{
+					THROW_LOGIC_ERROR_EXCEPTION("ELI27498");
+				}
+
+				// Set the tags and the operation
 				ipManageTags->Tags = ipVecTags;
-			}
-
-			UCLID_FILEPROCESSORSLib::EManageTagsOperationType eOpType;
-
-			// Set the appropriate operation
-			if (m_radioAddTags.GetCheck() == BST_CHECKED)
-			{
-				eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationApplyTags;
-			}
-			else if (m_radioRemoveTags.GetCheck() == BST_CHECKED)
-			{
-				eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationRemoveTags;
-			}
-			else if (m_radioToggleTags.GetCheck() == BST_CHECKED)
-			{
-				eOpType = (UCLID_FILEPROCESSORSLib::EManageTagsOperationType) kOperationToggleTags;
+				ipManageTags->Operation = eOpType;
 			}
 			else
 			{
-				THROW_LOGIC_ERROR_EXCEPTION("ELI27498");
+				// No tags in the database so list is empty, show message and do not
+				// allow configuration [LRCAU #5448]
+				MessageBox("There are no tags in the database, this task cannot be configured.",
+					"No Tags", MB_OK | MB_ICONINFORMATION);
+				return S_FALSE;
 			}
-
-			ipManageTags->Operation = eOpType;
 		}
 
 		SetDirty(FALSE);

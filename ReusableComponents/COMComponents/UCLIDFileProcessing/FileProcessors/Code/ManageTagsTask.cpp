@@ -262,11 +262,13 @@ STDMETHODIMP CManageTagsTask::raw_ProcessFile(BSTR bstrFileFullName, long nFileI
 	{
 		// Check license
 		validateLicense();
-
 		// Check for NULL parameters
 		IFileProcessingDBPtr ipDB(pDB);
 		ASSERT_ARGUMENT("ELI27461", ipDB != NULL);
 		ASSERT_ARGUMENT("ELI27462", pResult != NULL);
+
+		// Validate the tags [LRCAU #5447]
+		validateTags(ipDB);
 
 		// Default to successful completion
 		*pResult = kProcessingSuccessful;
@@ -556,6 +558,32 @@ void CManageTagsTask::validateLicense()
 {
 	// ensure that add watermark is licensed
 	VALIDATE_LICENSE(gnFILE_ACTION_MANAGER_OBJECTS, "ELI27483", "Manage Tags Task");
+}
+//--------------------------------------------------------------------------------------------------
+void CManageTagsTask::validateTags(const IFileProcessingDBPtr& ipDB)
+{
+	try
+	{
+		// Get the list of tags from the database
+		IVariantVectorPtr ipVecTags = ipDB->GetTagNames();
+		ASSERT_RESOURCE_ALLOCATION("ELI27703", ipVecTags != NULL);
+
+		// Get the size of the tags to operate on
+		long lSize = m_ipVecTags->Size;
+		for (long i=0; i < lSize; i++)
+		{
+			_variant_t vtTagName = m_ipVecTags->Item[i];
+			if (ipVecTags->Contains(vtTagName) == VARIANT_FALSE)
+			{
+				UCLIDException uex("ELI27704", "Invalid tag: Tag no longer exists in database.");
+				uex.addDebugInfo("Database Name", asString(ipDB->GetDatabaseName()));
+				uex.addDebugInfo("Database Server", asString(ipDB->GetDatabaseServer()));
+				uex.addDebugInfo("Tag Name", asString(vtTagName.bstrVal));
+				throw uex;
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27705");
 }
 //--------------------------------------------------------------------------------------------------
 void CManageTagsTask::addTagsToFile(const IFileProcessingDBPtr &ipDB, long nFileID)

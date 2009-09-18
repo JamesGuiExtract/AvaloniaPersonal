@@ -251,7 +251,7 @@ void CExportFileListDlg::OnClickedOK()
 				// Get the conjunction for the where clause
 				string strConjunction = m_settings.getAnyTags() ? "\nUNION\n" : "\nINTERSECT\n";
 
-				strQuery = strMainQueryTemp;
+				strQuery += "(" + strMainQueryTemp;
 				replaceVariable(strQuery, gstrTAG_NAME_VALUE, vecTags[0]);
 
 				// Build the rest of the query
@@ -261,6 +261,8 @@ void CExportFileListDlg::OnClickedOK()
 					replaceVariable(strTemp, gstrTAG_NAME_VALUE, vecTags[i]);
 					strQuery += strConjunction + strTemp;
 				}
+
+				strQuery += ") AS FAMFile";
 			}
 			break;
 

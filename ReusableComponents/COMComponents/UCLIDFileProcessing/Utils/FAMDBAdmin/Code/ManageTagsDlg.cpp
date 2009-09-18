@@ -6,6 +6,7 @@
 
 #include <SuspendWindowUpdates.h>
 #include <UCLIDException.h>
+#include <COMUtils.h>
 
 #include <vector>
 #include <string>
@@ -252,6 +253,17 @@ void CManageTagsDlg::OnBtnAdd()
 			// Add the new tag
 			m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str());
 
+			// Log an application trace about the database change
+			UCLIDException uex("ELI27700", "Application trace: Database change");
+			uex.addDebugInfo("Change", "Add file tag");
+			uex.addDebugInfo("User Name", getCurrentUserName());
+			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+			uex.addDebugInfo("Tag Name", strTagName);
+			uex.addDebugInfo("Tag Description",
+				strDescription.empty() ? "<Empty>" : strDescription);
+			uex.log();
+
 			// Refresh list for new tag
 			refreshTagList();
 		}
@@ -286,9 +298,26 @@ void CManageTagsDlg::OnBtnModify()
 				// Show the wait cursor while updating the dialog
 				CWaitCursor wait;
 
+				string strNewTagName = dlg.getTagName();
+				string strNewDescription = dlg.getDescription();
+
 				// Modify the existing tag
-				m_ipFAMDB->ModifyTag((LPCTSTR)zTagName, dlg.getTagName().c_str(),
-					dlg.getDescription().c_str());
+				m_ipFAMDB->ModifyTag((LPCTSTR)zTagName, strNewTagName.c_str(),
+					strNewDescription.c_str());
+
+				// Log an application trace about the database change
+				UCLIDException uex("ELI27701", "Application trace: Database change");
+				uex.addDebugInfo("Change", "Modify file tag");
+				uex.addDebugInfo("User Name", getCurrentUserName());
+				uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+				uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+				uex.addDebugInfo("Original Tag Name", (LPCTSTR) zTagName);
+				uex.addDebugInfo("Original Tag Description",
+					zDescription.IsEmpty() ? "<Empty>" : (LPCTSTR) zDescription);
+				uex.addDebugInfo("New Tag Name", strNewTagName);
+				uex.addDebugInfo("New Tag Description", 
+					strNewDescription.empty() ? "<Empty>" : strNewDescription);
+				uex.log();
 
 				// Refresh list for modified tag
 				refreshTagList();
@@ -330,11 +359,26 @@ void CManageTagsDlg::OnBtnDelete()
 			}
 		}
 
+		// Log an application trace about the database change
+		UCLIDException uex("ELI27702", "Application trace: Database change");
+		uex.addDebugInfo("Change", "Delete file tag(s)");
+		uex.addDebugInfo("User Name", getCurrentUserName());
+		uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+		uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+		string strTags = "";
 		for (vector<string>::iterator it = vecTagsToDelete.begin();
 			it != vecTagsToDelete.end(); it++)
 		{
 			m_ipFAMDB->DeleteTag(it->c_str());
+
+			if (!strTags.empty())
+			{
+				strTags += ", ";
+			}
+			strTags += (*it);
 		}
+		uex.addDebugInfo("File Tag(s)", strTags);
+		uex.log();
 
 		refreshTagList();
 	}
