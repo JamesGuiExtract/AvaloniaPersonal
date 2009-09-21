@@ -45,6 +45,11 @@ namespace Extract.Redaction.Verification
         #region InitializationSettings Fields
 
         /// <summary>
+        /// Initialization (ini) file containing the settings.
+        /// </summary>
+        readonly InitializationFile _iniFile = new InitializationFile("IDShield.ini");
+
+        /// <summary>
         /// The confidence levels of ID Shield attributes.
         /// </summary>
         readonly ConfidenceLevelsCollection _levels;
@@ -54,18 +59,18 @@ namespace Extract.Redaction.Verification
         /// zoom setting; <see langword="false"/> if zoom setting should be unchanged when 
         /// displaying selected attributes.
         /// </summary>
-        readonly bool _autoZoom;
+        bool _autoZoom;
 
         /// <summary>
         /// The scale at which selected attributes should be displayed if <see cref="_autoZoom"/> 
         /// is <see langword="true"/>.
         /// </summary>
-        readonly int _autoZoomScale;
+        int _autoZoomScale;
 
         /// <summary>
         /// The tool to automatically select after the user manually creates a redaction.
         /// </summary>
-        readonly AutoTool _autoTool;
+        AutoTool _autoTool;
 
         /// <summary>
         /// The color of redactions in redacted images.
@@ -81,13 +86,19 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public InitializationSettings()
         {
-            InitializationFile iniFile = new InitializationFile("IDShield.ini");
-
-            _levels = GetConfidenceLevels(iniFile);
-            _autoZoom = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_KEY) == 1;
-            _autoZoomScale = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_SCALE_KEY);
-            _autoTool = (AutoTool)iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_TOOL_KEY);
-            _outputRedactionColor = GetRedactionColor(iniFile);
+            try
+            {
+                _levels = GetConfidenceLevels(_iniFile);
+                _autoZoom = GetAutoZoom(_iniFile);
+                _autoZoomScale = GetAutoZoomScale(_iniFile);
+                _autoTool = GetAutoTool(_iniFile);
+                _outputRedactionColor = GetRedactionColor(_iniFile);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27719",
+                    "Unable to read IDShield settings.", ex);
+            }
         }
 
         #endregion InitializationSettings Constructors
@@ -107,7 +118,7 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets whether selected attributes should be displayed at a particular zoom setting.
+        /// Get or sets whether selected attributes should be displayed at a particular zoom setting.
         /// </summary>
         /// <value><see langword="true"/> if selected attributes should be displayed at a 
         /// particular zoom setting; <see langword="false"/> if the zoom setting should be 
@@ -118,10 +129,15 @@ namespace Extract.Redaction.Verification
             {
                 return _autoZoom;
             }
+            set
+            {
+                _iniFile.WriteInt32(_GENERAL_SECTION, _AUTO_ZOOM_KEY, value ? 1 : 0);
+                _autoZoom = value;
+            }
         }
 
         /// <summary>
-        /// Gets the scale at which selected attributes should be displayed if 
+        /// Get or sets the scale at which selected attributes should be displayed if 
         /// <see cref="AutoZoom"/> is <see langword="true"/>.
         /// </summary>
         /// <value>The scale at which selected attributes should be displayed if 
@@ -132,10 +148,15 @@ namespace Extract.Redaction.Verification
             {
                 return _autoZoomScale;
             }
+            set
+            {
+                _iniFile.WriteInt32(_GENERAL_SECTION, _AUTO_ZOOM_SCALE_KEY, value);
+                _autoZoomScale = value;
+            }
         }
 
         /// <summary>
-        /// Gets the <see cref="CursorTool"/> to select after manually creating a redaction.
+        /// Get or sets the <see cref="CursorTool"/> to select after manually creating a redaction.
         /// </summary>
         /// <value>The <see cref="CursorTool"/> to select after manually creating a redaction.</value>
         public AutoTool AutoTool
@@ -143,6 +164,11 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _autoTool;
+            }
+            set
+            {
+                _iniFile.WriteInt32(_GENERAL_SECTION, _AUTO_TOOL_KEY, (int)value);
+                _autoTool = value;
             }
         }
         
@@ -232,6 +258,52 @@ namespace Extract.Redaction.Verification
                 ee.AddDebugData("Value", value, false);
                 throw ee;
             }
+        }
+
+        /// <summary>
+        /// Get the auto zoom setting from the specified initialization file.
+        /// </summary>
+        /// <param name="iniFile">The initialization file containing the auto zoom setting.</param>
+        /// <returns>The auto zoom setting from <paramref name="iniFile"/>.</returns>
+        static bool GetAutoZoom(InitializationFile iniFile)
+        {
+            return iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_KEY) == 1;
+        }
+
+        /// <summary>
+        /// Get the auto zoom scale from the specified initialization file.
+        /// </summary>
+        /// <param name="iniFile">The initialization file containing the auto zoom scale.</param>
+        /// <returns>The auto zoom scale from <paramref name="iniFile"/>.</returns>
+        static int GetAutoZoomScale(InitializationFile iniFile)
+        {
+            int scale = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_ZOOM_SCALE_KEY);
+
+            // Auto zoom scale must be a number between 1 and 10
+            if (scale < 1 || scale > 10)
+            {
+                scale = 5;
+            }
+
+            return scale;
+        }
+
+        /// <summary>
+        /// Get the auto tool from the specified initialization file.
+        /// </summary>
+        /// <param name="iniFile">The initialization file containing the auto tool.</param>
+        /// <returns>The auto tool from <paramref name="iniFile"/>.</returns>
+        static AutoTool GetAutoTool(InitializationFile iniFile)
+        {
+            int autoTool = iniFile.ReadInt32(_GENERAL_SECTION, _AUTO_TOOL_KEY);
+
+            // Ensure auto tool has a defined value
+            if (autoTool < 0 || autoTool > 2)
+            {
+                return AutoTool.None;
+            }
+
+            return (AutoTool) autoTool;
         }
 
         /// <summary>

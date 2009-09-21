@@ -120,11 +120,40 @@ namespace Extract.Redaction.Verification
         /// <returns>Options created from the specified <paramref name="settings"/>.</returns>
         public static VerificationOptions ReadFrom(InitializationSettings settings)
         {
-            bool autoZoom = settings.AutoZoom;
-            int autoZoomScale = settings.AutoZoomScale;
-            AutoTool autoTool = settings.AutoTool;
+            try
+            {
+                bool autoZoom = settings.AutoZoom;
+                int autoZoomScale = settings.AutoZoomScale;
+                AutoTool autoTool = settings.AutoTool;
 
-            return new VerificationOptions(autoZoom, autoZoomScale, autoTool);
+                return new VerificationOptions(autoZoom, autoZoomScale, autoTool);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27720",
+                    "Unable to read verification options.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the <see cref="VerificationOptions"/> to the specified 
+        /// <see cref="InitializationSettings"/>.
+        /// </summary>
+        /// <param name="settings">The settings from which to create the options.</param>
+        /// <returns>Options created from the specified <paramref name="settings"/>.</returns>
+        public void WriteTo(InitializationSettings settings)
+        {
+            try
+            {
+                settings.AutoZoom = _autoZoom;
+                settings.AutoZoomScale = _autoZoomScale;
+                settings.AutoTool = _autoTool;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27721",
+                    "Unable to write verification options.", ex);
+            }
         }
 
         #endregion VerificationOptions Methods

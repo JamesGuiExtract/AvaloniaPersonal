@@ -75,9 +75,11 @@ namespace Extract.Redaction.Verification
             this._autoZoomScaleTrackBar.Enabled = false;
             this._autoZoomScaleTrackBar.LargeChange = 3;
             this._autoZoomScaleTrackBar.Location = new System.Drawing.Point(10, 36);
+            this._autoZoomScaleTrackBar.Minimum = 1;
             this._autoZoomScaleTrackBar.Name = "_autoZoomScaleTrackBar";
             this._autoZoomScaleTrackBar.Size = new System.Drawing.Size(224, 45);
             this._autoZoomScaleTrackBar.TabIndex = 2;
+            this._autoZoomScaleTrackBar.Value = 1;
             this._autoZoomScaleTrackBar.ValueChanged += new System.EventHandler(this.HandleAutoZoomScaleTrackBarValueChanged);
             // 
             // _autoZoomScaleTextBox
