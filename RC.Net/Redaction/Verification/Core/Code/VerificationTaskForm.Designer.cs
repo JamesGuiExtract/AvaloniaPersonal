@@ -192,11 +192,13 @@ namespace Extract.Redaction.Verification
             splitContainer1.Panel1.Controls.Add(this._documentTypeTextBox);
             splitContainer1.Panel1.Controls.Add(label1);
             splitContainer1.Panel1.Controls.Add(this._redactionGridView);
+            splitContainer1.Panel1MinSize = 225;
             // 
             // splitContainer1.Panel2
             // 
             splitContainer1.Panel2.Controls.Add(label4);
             splitContainer1.Panel2.Controls.Add(this._pageSummaryView);
+            splitContainer1.Panel2MinSize = 50;
             splitContainer1.Size = new System.Drawing.Size(578, 821);
             splitContainer1.SplitterDistance = 508;
             splitContainer1.TabIndex = 0;
@@ -290,7 +292,7 @@ namespace Extract.Redaction.Verification
             this._pageSummaryView.Location = new System.Drawing.Point(7, 19);
             this._pageSummaryView.MinimumSize = new System.Drawing.Size(100, 100);
             this._pageSummaryView.Name = "_pageSummaryView";
-            this._pageSummaryView.Size = new System.Drawing.Size(564, 304);
+            this._pageSummaryView.Size = new System.Drawing.Size(564, 280);
             this._pageSummaryView.TabIndex = 0;
             this._pageSummaryView.TabStop = false;
             // 
@@ -876,6 +878,7 @@ namespace Extract.Redaction.Verification
             this.Controls.Add(imageViewerToolStripContainer);
             this.Controls.Add(dockContainer);
             this.MainMenuStrip = this._menuStrip;
+            this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "VerificationTaskForm";
             this.ShowIcon = false;
             this.Text = "ID Shield Verification";
