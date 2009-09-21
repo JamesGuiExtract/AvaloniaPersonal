@@ -1304,12 +1304,11 @@ namespace Extract.Redaction.Verification
                 if (dialog.ShowDialog() == DialogResult.OK)
                 {
                     _options = dialog.VerificationOptions;
+                    _options.WriteTo(_iniSettings);
 
                     _redactionGridView.AutoTool = _options.AutoTool;
                     _redactionGridView.AutoZoom = _options.AutoZoom;
                     _redactionGridView.AutoZoomScale = _options.AutoZoomScale;
-
-                    // TODO: Write options to ini file
                 }
             }
             catch (Exception ex)
