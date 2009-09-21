@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -47,6 +48,25 @@ namespace Extract.Utilities
         static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, 
             string lpDefault, StringBuilder lpReturnedString, uint nSize, string lpFileName);
 
+        /// <summary>
+        /// Copies a string into the specified section of an initialization file.
+        /// </summary>
+        /// <param name="lpAppName">The name of the section (case-insensitive) to which the string 
+        /// will be copied. If the section does not exist, it is created.</param>
+        /// <param name="lpKeyName">The name of the key to be associated with a string. If the key 
+        /// does not exist in the specified section, it is created. If <see langword="null"/>, the 
+        /// entire section, including all entries within the section, is deleted.</param>
+        /// <param name="lpString">A string to be written to the file. If <see langword="null"/>, 
+        /// the key pointed to by the <paramref name="lpKeyName"/> is deleted.</param>
+        /// <param name="lpFileName">The name of the initialization file.</param>
+        /// <returns>Nonzero if successful. Zero if the function fails or if it flushes the cached 
+        /// version of the most recently accessed initialization file.</returns>
+        /// <seealso href="http://msdn.microsoft.com/en-us/library/ms725501%28VS.85%29.aspx"/>
+        [DllImport("kernel32.dll", CharSet=CharSet.Unicode, SetLastError=true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        static extern bool WritePrivateProfileString(string lpAppName, string lpKeyName, 
+            string lpString, string lpFileName);
+
         #endregion NativeMethods P/Invokes
 
         #region NativeMethods Methods
@@ -59,7 +79,7 @@ namespace Extract.Utilities
         /// <param name="key">The key to read.</param>
         /// <returns>The value of the <paramref name="key"/> in the specified 
         /// <paramref name="section"/> of the initialization <paramref name="file"/>.</returns>
-        public static string GetPrivateProfileString(string file, string section, string key)
+        public static string ReadIniFileString(string file, string section, string key)
         {
             StringBuilder result = new StringBuilder(_MAX_BUFFER_SIZE);
             uint size = 
@@ -76,6 +96,36 @@ namespace Extract.Utilities
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Writes the specified value to the specified initialization (ini) file.
+        /// </summary>
+        /// <param name="file">The ini file in which to write.</param>
+        /// <param name="section">The section in which to write.</param>
+        /// <param name="key">The key of the value to write.</param>
+        /// <param name="value">The value to write.</param>
+        public static void WriteIniFileString(string file, string section, string key, string value)
+        {
+            try
+            {
+                bool success = WritePrivateProfileString(section, key, value, file);
+
+                if (!success)
+                {
+                    throw new Win32Exception(Marshal.GetLastWin32Error());
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27707",
+                        "Unable to write to ini file.", ex);
+                ee.AddDebugData("Ini file", file, false);
+                ee.AddDebugData("Section", section, false);
+                ee.AddDebugData("Key", key, false);
+                ee.AddDebugData("Value", value, false);
+                throw ee;
+            }
         }
 
         #endregion NativeMethods Methods

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -55,11 +56,29 @@ namespace Extract.Utilities
         {
             try
             {
-                return NativeMethods.GetPrivateProfileString(_file, section, key);
+                return NativeMethods.ReadIniFileString(_file, section, key);
             }
             catch (Exception ex)
             {
                 throw GetReadValueException(section, key, ex);
+            }
+        }
+
+        /// <summary>
+        /// Writes the value of the specified key to the <see cref="InitializationFile"/>.
+        /// </summary>
+        /// <param name="section">The section in which to write the value.</param>
+        /// <param name="key">The key whose value should be written.</param>
+        /// <param name="value">The value to write.</param>
+        public void WriteString(string section, string key, string value)
+        {
+            try
+            {
+                NativeMethods.WriteIniFileString(_file, section, key, value);
+            }
+            catch (Exception ex)
+            {
+                throw GetWriteValueException(section, key, value, ex);
             }
         }
 
@@ -94,6 +113,19 @@ namespace Extract.Utilities
         }
 
         /// <summary>
+        /// Writes the specified value to the <see cref="InitializationFile"/> as an 
+        /// <see cref="Int32"/>.
+        /// </summary>
+        /// <param name="section">The section in which to write the value.</param>
+        /// <param name="key">The key whose value should be written.</param>
+        /// <param name="value">The value to write.</param>
+        public void WriteInt32(string section, string key, int value)
+        {
+            // This is not in a try block, because WriteString generates its own ExtractException
+            WriteString(section, key, value.ToString(CultureInfo.CurrentCulture));
+        }
+
+        /// <summary>
         /// Gets an exception associated with being unable to read value from the 
         /// <see cref="InitializationFile"/>.
         /// </summary>
@@ -108,6 +140,26 @@ namespace Extract.Utilities
             ee.AddDebugData("File", _file, false);
             ee.AddDebugData("Section", section, false);
             ee.AddDebugData("Key", key, false);
+            return ee;
+        }
+
+        /// <summary>
+        /// Gets an exception associated with being unable to write a value to the 
+        /// <see cref="InitializationFile"/>.
+        /// </summary>
+        /// <param name="section">The section to which the write was attempted.</param>
+        /// <param name="key">The key to which the write was attempted.</param>
+        /// <param name="value">The value that was attempted to be written.</param>
+        /// <param name="ex">The inner exception.</param>
+        /// <returns>An exception containing the information provided.</returns>
+        ExtractException GetWriteValueException(string section, string key, string value, Exception ex)
+        {
+            ExtractException ee = new ExtractException("ELI27708",
+                "Unable to read initialization file value.", ex);
+            ee.AddDebugData("File", _file, false);
+            ee.AddDebugData("Section", section, false);
+            ee.AddDebugData("Key", key, false);
+            ee.AddDebugData("Value", value, false);
             return ee;
         }
 
