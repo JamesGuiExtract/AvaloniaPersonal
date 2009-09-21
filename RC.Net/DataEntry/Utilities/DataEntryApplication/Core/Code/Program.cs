@@ -22,8 +22,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI23678",
                     Application.ProductName);
-                
-                Application.EnableVisualStyles();
+
                 Application.SetCompatibleTextRenderingDefault(false);
 
                 string configFileName;
@@ -44,6 +43,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     File.Exists(configFileName));
 
                 mainForm = new DataEntryApplicationForm(configFileName);
+
+                if (mainForm.UseVisualStyles)
+                {
+                    Application.EnableVisualStyles();
+                }
 
                 // TODO: Splash screen?
 

@@ -187,16 +187,24 @@ namespace Extract.DataEntry
                         if ((hint1._horizontal != null && hint1._horizontal.Value) ||
                             (hint1._horizontal == null && !hint2._horizontal.Value))
                         {
-                            return CreateIntersectionHint(hint1._horizontalHintRange.Value,
+                            // Ensure both hint ranges are defined
+                            if (hint1._horizontalHintRange != null && hint2._verticalHintRange != null)
+                            {
+                                return CreateIntersectionHint(hint1._horizontalHintRange.Value,
                                                           hint2._verticalHintRange.Value, hint1._page);
+                            }
                         }
                         // If hint 2 pertains to horizontal coordinates and hint 1 pertains to vertical
                         // coordinates.
                         else if ((hint2._horizontal != null && hint2._horizontal.Value) ||
                                  (hint2._horizontal == null && !hint1._horizontal.Value))
                         {
-                            return CreateIntersectionHint(hint2._horizontalHintRange.Value,
+                            // Ensure both hint ranges are defined
+                            if (hint2._horizontalHintRange != null && hint1._verticalHintRange != null)
+                            {
+                                return CreateIntersectionHint(hint2._horizontalHintRange.Value,
                                                           hint1._verticalHintRange.Value, hint1._page);
+                            }
                             
                         }
                     }

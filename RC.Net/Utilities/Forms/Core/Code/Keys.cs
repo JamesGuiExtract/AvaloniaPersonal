@@ -13,6 +13,17 @@ namespace Extract.Utilities.Forms
     public static class KeyMethods
     {
         /// <summary>
+        /// Characters that have special meaning in SendKeys.
+        /// </summary>
+        static readonly char[] _SPECIAL_SENDKEYS_CHARS =
+            { '^', '%', '(', ')', '+', '~', '{', '}', '[', ']' };
+
+        /// <summary>
+        /// The message ID for a character being posted to a window.
+        /// </summary>
+        const int WM_CHAR = 0x102;
+
+        /// <summary>
         /// Sends the specified key (in combination with the specified modifiers) to the specfied
         /// control.  
         /// <para><b>Note:</b></para>
@@ -20,6 +31,10 @@ namespace Extract.Utilities.Forms
         /// <see paramref="controlToActivate"/> is not <see langword="null"/>, the specified control
         /// will be focused and active following this call. If the key was not able to be mapped,
         /// no change in focus will occur.
+        /// <para><b>Warning:</b></para>
+        /// If this control is being used to propagate a keystroke from one control to another,
+        /// ensure <see paramref="controlToActivate"/> is not <see langword="null"/> or the same
+        /// control that is sending the key to avoid an infinite loop.
         /// </summary>
         /// <param name="keyCode">A virtual-key code representing the pressed key.</param>
         /// <param name="shift"><see langword="true"/> to apply the shift key as a modifier.</param>
@@ -90,7 +105,18 @@ namespace Extract.Utilities.Forms
                             // upper case on the receiving side).
                             if (keyChar != null)
                             {
-                                keyValue += keyChar.Value;
+                                // Escape any special sendKeys chars in braces.
+                                if (Array.IndexOf(_SPECIAL_SENDKEYS_CHARS, keyChar.Value) >= 0)
+                                {
+                                    keyValue += "{" + keyChar.Value + "}";
+                                }
+                                else
+                                {
+                                    keyValue += keyChar.Value;
+                                }
+
+                                // Before sending the value via SendKeys, make it lower case otherwise caps lock
+                                // will reverse the case.
                                 keyValue = keyValue.ToLower(CultureInfo.CurrentCulture);
                             }
                         }
@@ -118,7 +144,14 @@ namespace Extract.Utilities.Forms
                     // Select any specified control before sending the keys.
                     if (controlToActivate != null)
                     {
-                        controlToActivate.Select();
+                        if (!controlToActivate.Focus())
+                        {
+                            // [DataEntry:412] A key can't be sent to the control if it can't
+                            // receive focus. Return false without sending the key so that code
+                            // intended to be directing input to another control doesn't get caught
+                            // in an infinite loop.
+                            return false;
+                        }
                     }
 
                     SendKeys.SendWait(keyValue);
@@ -132,6 +165,25 @@ namespace Extract.Utilities.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26497", ex);
+            }
+        }
+
+        /// <summary>
+        /// Sends the specified character to the specfied control.  
+        /// </summary>
+        /// <param name="character">The character that should be sent to the control.</param>
+        /// <param name="control">The <see cref="Control"/> the character should be sent to.</param>
+        static public void SendCharacterToControl(char character, Control control)
+        {
+            try
+            {
+                ExtractException.Assert("ELI27439", "Null argument exception!", control != null);
+
+                NativeMethods.SendMessage(control.Handle, WM_CHAR, (IntPtr)character, (IntPtr)0);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27440", ex);
             }
         }
     }

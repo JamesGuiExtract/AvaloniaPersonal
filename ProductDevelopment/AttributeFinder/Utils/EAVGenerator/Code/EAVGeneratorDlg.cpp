@@ -956,7 +956,7 @@ void CEAVGeneratorDlg::saveAttributes(const CString& zFileName)
 	else
 	{
 		// Throw exception
-		UCLIDException ue( "ELI07911", "Unable to save file.");
+		UCLIDException ue( "ELI07911", "Unexpected file extension.");
 		ue.addDebugInfo( "File To Save", LPCTSTR(zFileName) );
 		throw ue;
 	}

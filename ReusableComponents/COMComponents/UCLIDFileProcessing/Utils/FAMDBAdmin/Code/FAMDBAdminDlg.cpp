@@ -636,28 +636,33 @@ void CFAMDBAdminDlg::OnHelpFileActionManagerHelp()
 		// remove the Bin folder and FlexIndexComponents folder
 		string strHelpPath = strExtractFolder.substr(0, nBinPos + strExtractSystemFolderName.length() );
 
-		// Check for FLEXIndex Help file
+		// Initialize the paths to possible help files
 		string strFlexHelpPath = strHelpPath + "\\FlexIndex\\Help\\FLEXIndex.chm";
+		string strIDShieldHelpPath = strHelpPath + "\\IDShield\\Help\\IDShield.chm";
+		string strLabDEHelpPath = strHelpPath + "\\LabDE\\Help\\LabDE.chm";
+
+		// Check for FLEXIndex Help file
 		if (isFileOrFolderValid( strFlexHelpPath ))
 		{
 			::runEXE("hh.exe", strFlexHelpPath );
 		}
+		// Look for IDShield Help file
+		else if (isFileOrFolderValid( strIDShieldHelpPath )) 
+		{
+			::runEXE("hh.exe", strIDShieldHelpPath );
+		}
+		else if (isFileOrFolderValid( strLabDEHelpPath )) 
+		{
+			::runEXE("hh.exe", strLabDEHelpPath );
+		}	
 		else
 		{
-			// Look for IDShield Help file
-			string strIDShieldHelpPath = strHelpPath + "\\IDShield\\Help\\IDShield.chm";
-			if (isFileOrFolderValid( strIDShieldHelpPath ))
-			{
-				::runEXE("hh.exe", strIDShieldHelpPath );
-			}
-			else
-			{
-				// Create and throw exception
-				UCLIDException ue( "ELI15220", "Unable to find Help file." );
-				ue.addDebugInfo( "Flex Help Path", strFlexHelpPath );
-				ue.addDebugInfo( "ID Shield Help Path", strIDShieldHelpPath );
-				throw ue;
-			}
+			// Create and throw exception
+			UCLIDException ue( "ELI15220", "Unable to find Help file." );
+			ue.addDebugInfo( "Flex Help Path", strFlexHelpPath );
+			ue.addDebugInfo( "ID Shield Help Path", strIDShieldHelpPath );
+			ue.addDebugInfo( "LabDE Help Path", strLabDEHelpPath );
+			throw ue;
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14869");

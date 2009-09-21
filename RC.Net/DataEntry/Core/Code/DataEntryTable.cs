@@ -1,12 +1,16 @@
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
+using System.Globalization;
+using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -28,11 +32,6 @@ namespace Extract.DataEntry
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         static readonly string _OBJECT_NAME = typeof(DataEntryTable).ToString();
-        
-        /// <summary>
-        /// Characters that cannot be sent using SendKeys because they have special meaning.
-        /// </summary>
-        static char[] _specialSendKeysChars = { '^', '%', '(', ')', '+' };
 
         #endregion Constants
 
@@ -41,7 +40,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Indicates whether swiping should be allowed when an individual cell is selected.
         /// </summary>
-        bool _cellSwipingEnabled;
+        bool _cellSwipingEnabled = true;
 
         /// <summary>
         /// Indicates whether swiping should be allowed when a complete row is selected.
@@ -134,10 +133,12 @@ namespace Extract.DataEntry
         List<DataEntryTableRow> _draggedRows;
 
         /// <summary>
-        /// Whether the <see cref="Control.MouseDown"/> event is currently being suppressed in
-        /// order to maintain row selection for drag and drop operations.
+        /// The point where a <see cref="Control.MouseDown"/> event took place. While the mouse
+        /// remains down, this value will remain set and the base class mouse down event will not
+        /// be raised until the mouse is released in order to maintain row selection for drag and
+        /// drop operations.
         /// </summary>
-        bool _suppressingMouseDown;
+        Point? _rowMouseDownPoint;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode.
@@ -149,6 +150,23 @@ namespace Extract.DataEntry
         /// IPersistStream implementations to/from a stringized byte stream.
         /// </summary>
         MiscUtils _miscUtils;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+
+        /// <summary>
+        /// Indicates which column pressing the active cell should be in after the enter key is
+        /// pressed.
+        /// </summary>
+        int _carriageReturnColumn;
+
+        /// <summary>
+        /// Indicates whether selection is being reset manually while a mouse button is depressed.
+        /// </summary>
+        bool _selectionIsBeingReset;
 
         #endregion Fields
 
@@ -172,8 +190,12 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24490",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24490");
+
+                // Enable smart hints on the rows so that smart hints will work for any column with
+                // smart hints enabled (smart hints need both the row and column to have smart hints
+                // enabled).
+                ((DataEntryTableRow)RowTemplate).SmartHintsEnabled = true;
 
                 InitializeComponent();
             }
@@ -195,6 +217,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the table allows swiping when an individual cell
         /// is selected, <see langword="false"/> if it does not.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(true)]
         public bool CellSwipingEnabled
         {
             get
@@ -216,6 +239,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the table allows swiping when a complete row
         /// is selected, <see langword="false"/> if it does not.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(false)]
         public bool RowSwipingEnabled
         {
             get
@@ -237,6 +261,7 @@ namespace Extract.DataEntry
         /// <value>The filename of the <see cref="IRuleSet"/> to be used.</value>
         /// <returns>The filename of the <see cref="IRuleSet"/> to be used.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(null)]
         public string RowFormattingRuleFile
         {
             get
@@ -270,30 +295,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether GetSpatialHint will attempt to generate a hint using the
-        /// intersection of the row and column occupied by the specified <see cref="IAttribute"/>.
-        /// </summary>
-        /// <value><see langword="true"/> if the table should attempt to generate smart hints when
-        /// possible; <see langword="false"/> if the table should never attempt to generate smart
-        /// hints.</value>
-        /// <returns><see langword="true"/> if the table is configured to generate smart hints when
-        /// possible; <see langword="false"/> if the table is not configured to generate smart
-        /// hints.</returns>
-        [Category("Data Entry Table")]
-        public new bool SmartHintsEnabled
-        {
-            get
-            {
-                return base.SmartHintsEnabled;
-            }
-
-            set
-            {
-                base.SmartHintsEnabled = value;
-            }
-        }
-
-        /// <summary>
         /// Specifies whether GetSpatialHint will attempt to generate a hint by indicating the 
         /// other <see cref="IAttribute"/>s sharing the same row.
         /// </summary>
@@ -304,6 +305,7 @@ namespace Extract.DataEntry
         /// possible; <see langword="false"/> if the table is not configured to generate row
         /// hints.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(true)]
         public new bool RowHintsEnabled
         {
             get
@@ -328,6 +330,7 @@ namespace Extract.DataEntry
         /// possible; <see langword="false"/> if the table is not configured to generate column
         /// hints.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(true)]
         public new bool ColumnHintsEnabled
         {
             get
@@ -348,7 +351,8 @@ namespace Extract.DataEntry
         /// <value>The minimum number of rows the <see cref="DataEntryTable"/> must have.</value>
         /// <returns>The minimum number of rows the <see cref="DataEntryTable"/> must have.
         /// </returns>
-        [Category("Data Entry Table")]  
+        [Category("Data Entry Table")]
+        [DefaultValue(0)]
         public int MinimumNumberOfRows
         {
             get
@@ -519,6 +523,14 @@ namespace Extract.DataEntry
                     // Handle the case that rows collection has been changed so that
                     // _sourceAttributes can be updated as appropriate.
                     base.Rows.CollectionChanged += HandleRowsCollectionChanged;
+
+                    // Disable column header wrap mode, otherwise resizing columns widths can cause
+                    // wrapped text to increse the height of the header column thereby upsetting
+                    // control sizing and possibly hiding data.
+                    base.ColumnHeadersDefaultCellStyle.WrapMode = DataGridViewTriState.False;
+
+                    // Prevent drag operations from accidentally resizing rows.
+                    base.AllowUserToResizeRows = false;
                 }
             }
             catch (Exception ex)
@@ -535,10 +547,37 @@ namespace Extract.DataEntry
         {
             base.ProcessSelectionChange();
 
+            // If a selection change has resulted in a single cell being selected in a column less
+            // than the current _carriageReturnColumn, the current column is now the
+            // _carriageReturnColumn regardless of how selection arrived here.
+            if (base.SelectedCells.Count == 1 && base.CurrentCell != null &&
+                base.CurrentCell.ColumnIndex < _carriageReturnColumn)
+            {
+                _carriageReturnColumn = base.CurrentCell.ColumnIndex;
+            }
+
             // Create a vector to store the attributes in the currently selected row(s).
             IUnknownVector selectedAttributes = (IUnknownVector)new IUnknownVectorClass();
 
+            // [DataEntry:645]
+            // Process selection as a row selection only if there are no cells outside
+            // the selected rows that are selected.
+            bool rowSelectionMode = false;
             if (base.SelectedRows.Count > 0)
+            {
+                rowSelectionMode = true;
+
+                foreach (DataGridViewCell cell in base.SelectedCells)
+                {
+                    if (!base.SelectedRows.Contains(base.Rows[cell.RowIndex]))
+                    {
+                        rowSelectionMode = false;
+                        break;
+                    }
+                }
+            }
+
+            if (rowSelectionMode)
             {
                 // Indicates whether the only selected row is the new row.
                 bool newRowSelection = false;
@@ -686,36 +725,52 @@ namespace Extract.DataEntry
         /// data.</param>
         protected override void OnUserAddedRow(DataGridViewRowEventArgs e)
         {
+            DataGridViewEditMode originalEditMode = base.EditMode;
+
             try
             {
                 base.OnUserAddedRow(e);
-
-                // Add a new attribute for the specified row.
-                ApplyAttributeToRow(e.Row.Index - 1, null, null);
 
                 // Re-enter edit mode so that any changes to the validation list based on triggers
                 // are put into effect. 
                 base.EndEdit();
 
-                // If the value of the control is a standard char that won't cause a problem with
-                // SendKeys, refresh (clear) the value before restarting the edit, then resend the
-                // key again after the edit has started to trigger any relavant auto-complete list.
-                string value = base.CurrentCell.Value.ToString();
-                if (value == null || value.Length != 1 || value[0] < ' ' || value[0] > 'z' ||
-                    Array.IndexOf(_specialSendKeysChars, value[0]) >= 0)
+                // Obtain the initial value before calling ApplyAttributeToRow which may trigger
+                // auto-update queries and cause the value to change.
+                string initialValue = base.CurrentCell.Value.ToString();
+
+                base.CurrentCell.Value = "";
+
+                // Add a new attribute for the specified row.
+                ApplyAttributeToRow(e.Row.Index - 1, null, null);
+
+                // If the initial value was null or empty (can this happen?) there is nothing more
+                // to do.
+                if (string.IsNullOrEmpty(initialValue))
                 {
-                    value = "";
-                }
-                else
-                {
-                    base.CurrentCell.Value = "";
+                    return;
                 }
 
-                base.BeginEdit(false);
-
-                if (!string.IsNullOrEmpty(value))
+                // If the initial value is a single character, assume it is typed and re-send it as
+                // WM_CHAR message via SendCharacterToControl to trigger auto-complete to display.
+                if (initialValue.Length == 1)
                 {
-                    SendKeys.Send(value);
+                    base.BeginEdit(false);
+
+                    KeyMethods.SendCharacterToControl(initialValue[0], base.EditingControl);
+                }
+                // For initial values > 1 char (ie, pasted text), simply re-apply the initial value
+                // and refresh the attribute.
+                else if (initialValue.Length > 1)
+                {
+                    IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+                    if (dataEntryCell != null)
+                    {
+                        base.CurrentCell.Value = initialValue;
+                        base.RefreshAttributes(new IAttribute[] { dataEntryCell.Attribute }, false);
+                    }
+
+                    base.BeginEdit(false);
                 }
             }
             catch (Exception ex)
@@ -723,6 +778,13 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI24244", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
+            }
+            finally
+            {
+                // Edit mode can once again be initiated by the use.
+                base.EditMode = originalEditMode;
+
+                base.OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -850,18 +912,18 @@ namespace Extract.DataEntry
         {
             try
             {
-                _suppressingMouseDown = false;
+                _rowMouseDownPoint = null;
                 HitTestInfo hit = base.HitTest(e.X, e.Y);
 
                 // If row operations are supported for the current selection and shift or control
                 // keys are not pressed, suppress the MouseDown event until the mouse button is
                 // released to maintain the current selection for any potential drag and drop
-                // operation. unless the shift or control modifiers are being used.
+                // operation unless the shift or control modifiers are being used.
                 if ((Control.ModifierKeys & Keys.Shift) == 0 &&
                     (Control.ModifierKeys & Keys.Control) == 0 &&
                     AllowRowTasks(hit.RowIndex, hit.ColumnIndex))
                 {
-                    _suppressingMouseDown = true;
+                    _rowMouseDownPoint = e.Location;
                 }
                 else
                 {
@@ -885,9 +947,16 @@ namespace Extract.DataEntry
         {
             try
             {
-                if (_suppressingMouseDown)
+                // Once a mouse button is released, we no longer need special processing for
+                // manually reset selection.
+                if (_selectionIsBeingReset)
                 {
-                    _suppressingMouseDown = false;
+                    _selectionIsBeingReset = false;
+                }
+
+                if (_rowMouseDownPoint != null)
+                {
+                    _rowMouseDownPoint = null;
 
                     base.OnMouseDown(e);
                 }
@@ -911,9 +980,12 @@ namespace Extract.DataEntry
             try
             {
                 // If a drag event is not currently in progress, the left mouse button is down and
+                // the mouse is in a different location than when the mouse button was pressed and
                 // row tasks are allowed given the current selection, begin a drag and drop
                 // operation.
-                if (!base.DragOverInProgress && (Control.MouseButtons & MouseButtons.Left) != 0)
+                if (!base.DragOverInProgress && _rowMouseDownPoint != null &&
+                    e.Location != _rowMouseDownPoint.Value &&
+                    (Control.MouseButtons & MouseButtons.Left) != 0)
                 {
                     HitTestInfo hit = base.HitTest(e.X, e.Y);
 
@@ -1012,6 +1084,35 @@ namespace Extract.DataEntry
                     drgevent.Effect = DragDropEffects.Move;
                 }
 
+                // [DataEntry:626]
+                // If dragging more than one row, ensure all dragged rows are selected whenever
+                // the cursor is over any of the dragged rows so that dragging behavior doesn't
+                // change after dragging out of the dragged rows and then back into them.
+                if (_draggedRows != null && _draggedRows.Count > 1 &&
+                    _draggedRows.Contains(base.CurrentRow as DataEntryTableRow))
+                {
+                    bool changedSelection = false;
+
+                    // Don't update the selection until all the dragged rows have been selected.
+                    using (new SelectionProcessingSuppressor(this))
+                    {
+                        foreach (DataEntryTableRow row in _draggedRows)
+                        {
+                            if (!row.Selected)
+                            {
+                                row.Selected = true;
+                                changedSelection = true;
+                            }
+                        }
+                    }
+
+                    // As long as selection occured, update the selection now.
+                    if (changedSelection)
+                    {
+                        base.OnSelectionChanged(new EventArgs());
+                    }
+                }
+
                 base.OnDragOver(drgevent);
             }
             catch (Exception ex)
@@ -1075,9 +1176,10 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If a drag and drop operation is in progress, prevent the table from being
-                // scrolled as the results are usually undesireable.
-                if (base.DragOverInProgress)
+                // If a drag and drop operation is in progress or a manual selection reset is in
+                // progress, prevent the table from being scrolled as the results are usually
+                // undesireable.
+                if (_selectionIsBeingReset || base.DragOverInProgress)
                 {
                     e.NewValue = e.OldValue;
                 }
@@ -1116,6 +1218,136 @@ namespace Extract.DataEntry
 
             // Dispose of base class
             base.Dispose(disposing);
+        }
+
+        /// <summary>
+        /// Processes keys used for navigating in the <see cref="DataEntryTable"/>.
+        /// <para><b>Note</b></para>
+        /// This is called when the <see cref="DataGridView"/> is not in edit mode.
+        /// </summary>
+        /// <param name="e">Contains information about the key that was pressed.</param>
+        /// <returns><see langword="true"/> if the key was processed; otherwise,
+        /// <see langword="false"/>. </returns>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        [SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
+        protected override bool ProcessDataGridViewKey(KeyEventArgs e)
+        {
+            bool keyProcessed = false;
+
+            try
+            {
+                // [DataEntry:486]
+                // Handle the enter key manually in order to mimic Excel's behavior.
+                if (e.KeyCode == Keys.Enter && ProcessEnterKey())
+                {
+                    return true;
+                }
+
+                // If the delete key was pressed while not in edit mode and where it won't result in
+                // any rows being deleted, instead delete the contents of all selected cells.
+                if (e.KeyCode == Keys.Delete &&
+                    (base.SelectedRows.Count == 0 || !base.AllowUserToDeleteRows))
+                {
+                    // [DataEntry:641]
+                    // Clear the contents as well as the spatial info of all selected cells.
+                    base.DeleteSelectedCellContents();
+
+                    return true;
+                }
+
+                keyProcessed = base.ProcessDataGridViewKey(e);
+
+                if (keyProcessed)
+                {
+                    // If DataGridViewKey was processed for any key other than Enter or Delete,
+                    // reset the _carriageReturnColumn to the current column as the current
+                    // selection is likely not the result of tabbing.
+                    _carriageReturnColumn =
+                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27274", ex);
+                ee.AddDebugData("Key data", e, false);
+                ee.Display();
+            }
+
+            return keyProcessed;
+        }
+
+        /// <summary>
+        /// Processes a dialog key.
+        /// <para><b>Note</b></para>
+        /// This is called when the <see cref="DataGridView"/> is in edit mode.
+        /// </summary>
+        /// <param name="keyData">One of the <see cref="Keys"/> values that represents the key to
+        /// process.</param>
+        /// <returns><see langword="true"/> if the key was processed by the control; otherwise,
+        /// <see langword="false"/>.</returns>
+        [UIPermission(SecurityAction.LinkDemand, Window = UIPermissionWindow.AllWindows)]
+        protected override bool ProcessDialogKey(Keys keyData)
+        {
+            bool keyProcessed = false;
+
+            try
+            {
+                // [DataEntry:486]
+                // Handle the enter key manually in order to mimic Excel's behavior.
+                if (keyData == Keys.Enter && ProcessEnterKey())
+                {
+                    return true;
+                }
+                // If the delete key is pressed while a combo cell is selected or all text
+                // is selected in a text box cell, delete spatial info.
+                else if (keyData == Keys.Delete && base.EditingControl != null)
+                {
+                    IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+
+                    if (dataEntryCell != null)
+                    {
+                        DataGridViewTextBoxEditingControl textBoxEditingControl =
+                            base.EditingControl as DataGridViewTextBoxEditingControl;
+
+                        if (textBoxEditingControl == null ||
+                            textBoxEditingControl.SelectionLength == textBoxEditingControl.Text.Length)
+                        {
+                            base.DeleteSelectedCellContents();
+                        }
+                    }
+                }
+                
+                keyProcessed = base.ProcessDialogKey(keyData);
+
+                // If any other dialog key was processed, reset the _carriageReturnColumn to the
+                // current column as the current selection is likely not the result of tabbing.
+                if (keyProcessed)
+                {
+                    _carriageReturnColumn =
+                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27275", ex);
+                ee.AddDebugData("Key data", keyData.ToString(), false);
+                ee.Display();
+            }
+
+            return keyProcessed;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.Click"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+
+            // In the event of a click, the selected column is now the _carriageReturnColumn.
+            _carriageReturnColumn =
+                        (base.CurrentCell == null) ? 0 : base.CurrentCell.ColumnIndex;
         }
 
         #endregion Overrides
@@ -1320,13 +1552,7 @@ namespace Extract.DataEntry
 
                 // Since the spatial information for this cell has likely changed, spatial hints need 
                 // to be updated.
-                base.UpdateHints();
-
-                // Selecting all cells makes table look more "disabled".
-                if (base.Disabled)
-                {
-                    base.SelectAll();
-                }
+                base.UpdateHints(false);
 
                 // Highlights the specified attributes in the image viewer and propagates the 
                 // current selection to dependent controls (if appropriate)
@@ -1345,28 +1571,43 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the
         /// recognized text in the swiped image area.</param>
-        /// /// <seealso cref="IDataEntryControl"/>
-        public override void ProcessSwipedText(SpatialString swipedText)
+        /// <returns><see langword="true"/> if the control was able to use the swiped text;
+        /// <see langword="false"/> if it could not be used.</returns>
+        /// <seealso cref="IDataEntryControl"/>
+        public override bool ProcessSwipedText(SpatialString swipedText)
         {
             try
             {
                 // Swiping not supported if control isn't enabled or data isn't loaded.
                 if (!base.Enabled || _sourceAttributes == null)
                 {
-                    return;
+                    return false;
                 }
 
                 if (base.SelectedRows.Count > 0)
                 {
-                    ProcessRowSwipe(swipedText);
+                    return ProcessRowSwipe(swipedText);
                 }
                 else if (base.SelectedCells.Count > 0)
                 {
-                    ProcessCellSwipe(swipedText);
+                    return ProcessCellSwipe(swipedText);
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
+                try
+                {
+                    // If an exception was thrown while processing a swipe, refresh hints for the
+                    // table since the hints may not be valid at this point.
+                    base.UpdateHints(true);
+                }
+                catch (Exception ex2)
+                {
+                    ExtractException.Log("ELI27098", ex2);
+                }
+
                 throw ExtractException.AsExtractException("ELI24240", ex);
             }
         }
@@ -2042,20 +2283,27 @@ namespace Extract.DataEntry
             DataEntryTableRow cachedRow = null;
             if (_activeCachedRows.TryGetValue(attribute, out cachedRow))
             {
-                base.Rows.RemoveAt(rowIndex);
-                base.Rows.Insert(rowIndex, cachedRow);
-
-                // Start by mapping the attribute to the row itself.
-                base.MapAttribute(attribute, base.Rows[rowIndex]);
-
-                // Remap each cell's attribute in the row (may cause the parent row's attribute to
-                // be remapped).
-                foreach (DataGridViewCell cell in cachedRow.Cells)
+                using (new SelectionProcessingSuppressor(this))
                 {
-                    IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
-                    if (dataEntryCell != null)
+                    base.Rows.RemoveAt(rowIndex);
+                    base.Rows.Insert(rowIndex, cachedRow);
+
+                    // Start by mapping the attribute to the row itself.
+                    base.MapAttribute(attribute, base.Rows[rowIndex]);
+
+                    // Remap each cell's attribute in the row (may cause the parent row's attribute to
+                    // be remapped).
+                    foreach (DataGridViewCell cell in cachedRow.Cells)
                     {
-                        base.MapAttribute(dataEntryCell.Attribute, dataEntryCell);
+                        IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+                        if (dataEntryCell != null)
+                        {
+                            base.MapAttribute(dataEntryCell.Attribute, dataEntryCell);
+                        }
+
+                        // The cell style may need to be updated in case the enabled status of the
+                        // table has changed since the cell was last displayed.
+                        UpdateCellStyle(cell);
                     }
                 }
             }
@@ -2108,6 +2356,12 @@ namespace Extract.DataEntry
                                 dataEntryTableColumn.ValidationQuery);
                         }
 
+                        // If not persisting the attribute, mark the attribute accordingly.
+                        if (!dataEntryTableColumn.PersistAttribute)
+                        {
+                            AttributeStatusInfo.SetAttributeAsPersistable(subAttribute, false);
+                        }
+
                         // If the attribute being applied is a hint, it has been copied from elsewhere
                         // and the hint shouldn't apply here-- remove the hint.
                         if (AttributeStatusInfo.GetHintType(subAttribute) != HintType.None)
@@ -2147,10 +2401,17 @@ namespace Extract.DataEntry
                     _activeCachedRows.Remove(attributeToReplace);
                 }
 
-                // If this control does not have any dependent controls, consider each row
-                // propagated.
-                if (!base.HasDependentControls)
+                if (base.HasDependentControls)
                 {
+                    // [DataEntry:679]
+                    // Propagate the attribute right away; otherwise they will not be marked
+                    // as viewable and will not have highlights created for them.
+                    OnPropagateAttributes(DataEntryMethods.AttributeAsVector(attribute));
+                }
+                else
+                {
+                    // If this control does not have any dependent controls, consider each row
+                    // propagated.
                     AttributeStatusInfo.MarkAsPropagated(attribute, true, true);
                 }
 
@@ -2194,7 +2455,7 @@ namespace Extract.DataEntry
         /// </list>
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
-        void ProcessRowSwipe(SpatialString swipedText)
+        bool ProcessRowSwipe(SpatialString swipedText)
         {
             // Row selecton mode. The swipe can only be applied via the results of
             // a row formatting rule.
@@ -2206,8 +2467,17 @@ namespace Extract.DataEntry
                 base.AttributeName, MultipleMatchSelectionMode.All, formattedData, null, this, null,
                 false, null, null, null, null);
 
+            // If no attributes were returned from the rule, return false to indicate formatting
+            // was not successful.
+            if (formattedAttributes.Size() == 0)
+            {
+                return false;
+            }
+
             // Apply the found attributes into the currently selected rows of the table.
             ApplyAttributesToSelectedRows(formattedAttributes);
+
+            return true;
         }
 
         /// <summary>
@@ -2217,11 +2487,11 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
         /// <throws><see cref="ExtractException"/> if more than one cell is selected.</throws>
-        void ProcessCellSwipe(SpatialString swipedText)
+        bool ProcessCellSwipe(SpatialString swipedText)
         {
             ExtractException.Assert("ELI24239",
-                        "Cell swiping is supported only for one cell at a time!", 
-                        base.SelectedCells.Count == 1);
+                "Cell swiping is supported only for one cell at a time!", 
+                base.SelectedCells.Count == 1);
 
             // Obtain the row and column where the swipe occured. (One or both may not
             // apply depending on the selection type).
@@ -2273,12 +2543,14 @@ namespace Extract.DataEntry
 
             // Since the spatial information for this cell has changed, spatial hints need to be
             // updated.
-            base.UpdateHints();
+            base.UpdateHints(false);
 
             // Raise AttributesSelected to update the control's highlight.
             OnAttributesSelected(
                 DataEntryMethods.AttributeAsVector(
                     DataEntryTableBase.GetAttribute(base.CurrentCell)), false, true);
+
+            return true;
         }
 
         /// <summary>
@@ -2399,40 +2671,54 @@ namespace Extract.DataEntry
         /// into the currently selected row(s).</param>
         void PasteRowData(IDataObject dataObject)
         {
-            string dataType = GetDataType(dataObject);
-
-            // If the data on the clipboard is a string, use the row formatting rule to parse the
-            // text into the row.
-            if (_rowFormattingRule != null && dataType == "System.String")
+            try
             {
-                SpatialString spatialString = (SpatialString)new SpatialStringClass();
-                spatialString.CreateNonSpatialString((string)dataObject.GetData(dataType), "");
+                // Delay processing of changes in the control host until PasteRowData is complete.
+                base.OnUpdateStarted(new EventArgs());
 
-                ProcessRowSwipe(spatialString);
-            }
-            // Otherwise the data is attributes from this table or a compatible one.
-            else if (!string.IsNullOrEmpty(dataType))
-            {
-                // Retrieve the data from the clipboard and convert it back into an attribute vector.
-                string stringizedAttributes = (string)dataObject.GetData(dataType);
+                string dataType = GetDataType(dataObject);
 
-                IUnknownVector attributesToPaste = (IUnknownVector)
-                    this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
-
-                int count = attributesToPaste.Size();
-                for (int i = 0; i < count; i++)
+                // If the data on the clipboard is a string, use the row formatting rule to parse the
+                // text into the row.
+                if (_rowFormattingRule != null && dataType == "System.String")
                 {
-                    IAttribute attribute = (IAttribute)attributesToPaste.At(i);
+                    SpatialString spatialString = (SpatialString)new SpatialStringClass();
+                    spatialString.CreateNonSpatialString((string)dataObject.GetData(dataType), "");
 
-                    // If the attributes are not from this table, rename them.
-                    if (dataType != this.RowDataType)
-                    {
-                        attribute.Name = base.AttributeName;
-                    }
+                    ProcessRowSwipe(spatialString);
                 }
+                // Otherwise the data is attributes from this table or a compatible one.
+                else if (!string.IsNullOrEmpty(dataType))
+                {
+                    // Retrieve the data from the clipboard and convert it back into an attribute vector.
+                    string stringizedAttributes = (string)dataObject.GetData(dataType);
 
-                // Apply the attributes into the currently selected rows of the table.
-                ApplyAttributesToSelectedRows(attributesToPaste);
+                    IUnknownVector attributesToPaste = (IUnknownVector)
+                        this.MiscUtils.GetObjectFromStringizedByteStream(stringizedAttributes);
+
+                    int count = attributesToPaste.Size();
+                    for (int i = 0; i < count; i++)
+                    {
+                        IAttribute attribute = (IAttribute)attributesToPaste.At(i);
+
+                        // If the attributes are not from this table, rename them.
+                        if (dataType != this.RowDataType)
+                        {
+                            attribute.Name = base.AttributeName;
+                        }
+                    }
+
+                    // Apply the attributes into the currently selected rows of the table.
+                    ApplyAttributesToSelectedRows(attributesToPaste);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27271", ex);
+            }
+            finally
+            {
+                base.OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -2559,7 +2845,7 @@ namespace Extract.DataEntry
 
                     // Since the spatial information for this cell has likely changed, spatial hints
                     // need to be updated.
-                    base.UpdateHints();
+                    base.UpdateHints(false);
 
                     // If _tabOrderPlaceholderAttribute is being used, make sure it remains the last
                     // attribute in _sourceAttributes.
@@ -2613,6 +2899,16 @@ namespace Extract.DataEntry
 
                 if (!clickedCell.Selected)
                 {
+                    // [DataEntry:653]
+                    // If the current selection is currently being reset manually and a mouse button
+                    // is down, disallow any scrolling until the mouse button is released. Otherwise
+                    // the mouse release may occur over a different cell due to scrolling and result
+                    // in unintended cell selection.
+                    if (Control.MouseButtons != MouseButtons.None)
+                    {
+                        _selectionIsBeingReset = true;
+                    }
+
                     base.CurrentCell = clickedCell;
                 }
             }
@@ -2630,16 +2926,21 @@ namespace Extract.DataEntry
                     selectedRows = new DataGridViewRow[base.SelectedRows.Count];
                     base.SelectedRows.CopyTo(selectedRows, 0);
 
-                    // Set the current cell to the first cell in the clicked row
-                    base.CurrentCell = clickedRow.Cells[0];
-
-                    // Changing the current cell will have cleared the previously selected rows.
-                    // Re-select them now.
-                    if (selectedRows != null)
+                    // Suppress selection while changing the selection to prevent undesirable
+                    // flickering of tests while adjusting the selection.
+                    using (new SelectionProcessingSuppressor(this))
                     {
-                        foreach (DataGridViewRow row in selectedRows)
+                        // Set the current cell to the first cell in the clicked row
+                        base.CurrentCell = clickedRow.Cells[0];
+
+                        // Changing the current cell will have cleared the previously selected rows.
+                        // Re-select them now.
+                        if (selectedRows != null)
                         {
-                            row.Selected = true;
+                            foreach (DataGridViewRow row in selectedRows)
+                            {
+                                row.Selected = true;
+                            }
                         }
                     }
                 }
@@ -2658,6 +2959,30 @@ namespace Extract.DataEntry
             }
 
             return enableRowOptions;
+        }
+
+        /// <summary>
+        /// Manually handles the enter key to mimic navigation as in Excel.
+        /// </summary>
+        /// <returns><see langword="true"/> if the key was processed by the
+        /// <see cref="DataEntryTable"/>; otherwise, <see langword="false"/>.</returns>
+        bool ProcessEnterKey()
+        {
+            if (base.SelectedCells.Count == 1 && base.CurrentCell != null)
+            {
+                int newRowIndex = base.CurrentCell.RowIndex;
+                if (newRowIndex < (base.RowCount - 1))
+                {
+                    newRowIndex++;
+                }
+
+                base.CurrentCell = base.Rows[newRowIndex].Cells[_carriageReturnColumn];
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         #endregion Private Members

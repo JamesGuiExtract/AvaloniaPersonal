@@ -319,6 +319,9 @@ namespace Extract.Imaging.Forms
 
                 // Update the zoom history and raise the zoom changed event
                 UpdateZoom(true, true);
+
+                // Restore the cursor for the active cursor tool.
+                this.Cursor = _toolCursor ?? Cursors.Default;
             }
             catch (Exception e)
             {
@@ -449,6 +452,9 @@ namespace Extract.Imaging.Forms
                         // Raise the image file changed event
                         OnImageFileChanged(new ImageFileChangedEventArgs(""));
                     }
+
+                    // If an image isn't loaded, the cursor for the active cursor tool shouldn't be.
+                    this.Cursor = Cursors.Default;
 
                     return true;
                 }
@@ -2463,14 +2469,29 @@ namespace Extract.Imaging.Forms
         /// <see langword="true"/>.</event>
         private void UpdateZoom(bool updateZoomHistory, bool raiseZoomChanged)
         {
+            // Get the current zoom setting
+            ZoomInfo zoomInfo = GetZoomInfo();
+
+            // [DataEntry:311] Impose limits on the amount one can zoom in or out to prevent errors
+            // rendering the image.
+            if (zoomInfo.FitMode == FitMode.None &&
+                zoomInfo.ScaleFactor > _MAX_ZOOM_IN_SCALE_FACTOR)
+            {
+                zoomInfo.ScaleFactor = _MAX_ZOOM_IN_SCALE_FACTOR;
+                SetZoomInfo(zoomInfo, false);
+            }
+            else if (zoomInfo.FitMode == FitMode.None &&
+                zoomInfo.ScaleFactor < _MAX_ZOOM_OUT_SCALE_FACTOR)
+            {
+                zoomInfo.ScaleFactor = _MAX_ZOOM_OUT_SCALE_FACTOR;
+                SetZoomInfo(zoomInfo, false);
+            }
+
             // If nothing should be updated, we are done
             if (!updateZoomHistory && !raiseZoomChanged)
             {
                 return;
             }
-
-            // Get the current zoom setting
-            ZoomInfo zoomInfo = GetZoomInfo();
 
             // Add the entry to the zoom history for the current page if necessary
             if (updateZoomHistory)
@@ -2711,9 +2732,14 @@ namespace Extract.Imaging.Forms
                             }
                         }
 
-                        // Start a click and drag event
-                        _trackingData = new TrackingData(this, mouseX, mouseY,
-                            GetVisibleImageArea());
+                        // Only start a tracking event if a layer object was clicked or banded
+                        // selection is enabled.
+                        if (layerObjectClicked || _allowBandedSelection)
+                        {
+                            // Start a click and drag event
+                            _trackingData = new TrackingData(this, mouseX, mouseY,
+                                GetVisibleImageArea());
+                        }
 
                         // Invalidate the image viewer to remove any previous grip handles
                         // and to redraw these grip handles
@@ -2974,52 +3000,85 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void EndTracking(int mouseX, int mouseY)
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndTracking(int mouseX, int mouseY, bool cancel)
         {
-            // Update the tracking dependent upon the active cursor tool
-            switch (_cursorTool)
+            try
             {
-                case CursorTool.AngularHighlight:
-                case CursorTool.AngularRedaction:
+                // [DataEntry:632, 624]
+                // Prevent calls from multiple threads from EndTracking at the same time which can
+                // lead to exceptions. There is no need to mutex since a second call wouldn't be
+                // doing anything the first didnt' do.
+                if (_trackingEventEnding)
+                {
+                    return;
+                }
+                _trackingEventEnding = true;
 
-                    EndAngularHighlightOrRedaction(mouseX, mouseY);
-                    break;
+                // Update the tracking dependent upon the active cursor tool
+                switch (_cursorTool)
+                {
+                    case CursorTool.AngularHighlight:
+                    case CursorTool.AngularRedaction:
 
-                case CursorTool.DeleteLayerObjects:
+                        EndAngularHighlightOrRedaction(mouseX, mouseY, cancel);
+                        break;
 
-                    EndDeleteLayerObjects(mouseX, mouseY);
-                    break;
+                    case CursorTool.DeleteLayerObjects:
 
-                case CursorTool.RectangularHighlight:
-                case CursorTool.RectangularRedaction:
+                        EndDeleteLayerObjects(mouseX, mouseY, cancel);
+                        break;
 
-                    EndRectangularHighlightOrRedaction(mouseX, mouseY);
-                    break;
+                    case CursorTool.RectangularHighlight:
+                    case CursorTool.RectangularRedaction:
 
-                case CursorTool.SelectLayerObject:
-                    EndSelectLayerObject(mouseX, mouseY);
-                    break;
+                        EndRectangularHighlightOrRedaction(mouseX, mouseY, cancel);
+                        break;
 
-                case CursorTool.SetHighlightHeight:
+                    case CursorTool.SelectLayerObject:
+                        EndSelectLayerObject(mouseX, mouseY, cancel);
+                        break;
 
-                    EndSetHighlightHeight(mouseX, mouseY);
-                    break;
+                    case CursorTool.SetHighlightHeight:
 
-                default:
+                        EndSetHighlightHeight(mouseX, mouseY, cancel);
+                        break;
 
-                    // There is no interactive region associated with this region OR
-                    // the interactivity is handled by the Leadtools RasterImageViewer
-                    break;
+                    default:
+
+                        // There is no interactive region associated with this region OR
+                        // the interactivity is handled by the Leadtools RasterImageViewer
+                        break;
+                }
+
+                _trackingData.Dispose();
+                _trackingData = null;
+
+                // Restore the original cursor tool
+                this.Cursor = _toolCursor ?? Cursors.Default;
+
+                _trackingEventEnding = false;
             }
+            catch (Exception ex)
+            {
+                _trackingEventEnding = false;
 
-            _trackingData.Dispose();
-            _trackingData = null;
+                throw ExtractException.AsExtractException("ELI27276", ex);
+            }
         }
 
-        private void EndSelectLayerObject(int mouseX, int mouseY)
+        /// <summary>
+        /// Ends the tracking of a select layer object event.
+        /// </summary>
+        /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
+        /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndSelectLayerObject(int mouseX, int mouseY, bool cancel)
         {
             // Check if this is a click and drag to select multiple highlights
-            if (base.Cursor == Cursors.Default)
+            if (!cancel && base.Cursor == Cursors.Default)
             {
                 // Convert the rectangle from client to image coordinates
                 Rectangle rectangle =
@@ -3051,7 +3110,7 @@ namespace Extract.Imaging.Forms
                 // This was a layer object event
 
                 // Check if the layer object event succeeded
-                bool success = CheckIfLayerObjectEventSucceeded(new Point(mouseX, mouseY));
+                bool success = !cancel && CheckIfLayerObjectEventSucceeded(new Point(mouseX, mouseY));
 
                 // Iterate through all layer objects
                 bool containsNonMoveableObjects = false;
@@ -3131,7 +3190,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void EndAngularHighlightOrRedaction(int mouseX, int mouseY)
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndAngularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
             using (Graphics graphics = base.CreateGraphics())
@@ -3145,6 +3206,12 @@ namespace Extract.Imaging.Forms
                 {
                     DrawRegion(_trackingData.Region, graphics, drawColor,
                         NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
+                }
+
+                // If the event was canceled, there is nothing more to do.
+                if (cancel)
+                {
+                    return;
                 }
 
                 // Calculate the new region and rectangle
@@ -3205,12 +3272,20 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void EndDeleteLayerObjects(int mouseX, int mouseY)
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndDeleteLayerObjects(int mouseX, int mouseY, bool cancel)
         {
             // Erase the previous frame if it exists
             Rectangle rectangle = _trackingData.Rectangle;
             ControlPaint.DrawReversibleFrame(base.RectangleToScreen(rectangle),
                     Color.Black, FrameStyle.Thick);
+
+            // If the event was canceled, there is nothing more to do.
+            if (cancel)
+            {
+                return;
+            }
 
             // Recalculate the new line
             _trackingData.UpdateRectangle(mouseX, mouseY);
@@ -3265,7 +3340,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void EndRectangularHighlightOrRedaction(int mouseX, int mouseY)
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndRectangularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
             using (Graphics graphics = base.CreateGraphics())
@@ -3279,6 +3356,12 @@ namespace Extract.Imaging.Forms
                 {
                     DrawRegion(_trackingData.Region, graphics, drawColor,
                         NativeMethods.BinaryRasterOperations.R2_NOTXORPEN);
+                }
+
+                // If the event was canceled, there is nothing more to do.
+                if (cancel)
+                {
+                    return;
                 }
 
                 // Calculate the new region and rectangle
@@ -3325,13 +3408,21 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="mouseX">The physical (client) x coordinate of the mouse.</param>
         /// <param name="mouseY">The physical (client) y coordinate of the mouse.</param>
-        private void EndSetHighlightHeight(int mouseX, int mouseY)
+        /// <param name="cancel"><see langword="true"/> if the tracking event was canceled,
+        /// <see langword="false"/> if the event is to be completed.</param>
+        private void EndSetHighlightHeight(int mouseX, int mouseY, bool cancel)
         {
             // Erase the previous line if it exists
             Point[] line = _trackingData.Line;
             if (line[0] != line[1])
             {
                 ControlPaint.DrawReversibleLine(line[0], line[1], Color.Black);
+            }
+
+            // If the event was canceled, there is nothing more to do.
+            if (cancel)
+            {
+                return;
             }
 
             // Recalculate the new line

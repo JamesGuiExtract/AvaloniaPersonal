@@ -1,8 +1,10 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlServerCe;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using System.Xml;
 using UCLID_AFCORELib;
@@ -327,10 +329,7 @@ namespace Extract.DataEntry
             /// <returns><see langword="true"/> if all required triggers are registered and the
             /// query node can be evaluated, <see langword="false"/> if one or more triggers must
             /// be resolved before the query node can be evaluated.</returns>
-            public abstract bool IsMinimallyResolved
-            {
-                get;
-            }
+            public abstract bool GetIsMinimallyResolved();
 
             /// <summary>
             /// Gets whether the query node is completely resolved and there no more triggers that
@@ -338,14 +337,11 @@ namespace Extract.DataEntry
             /// </summary>
             /// <returns><see langword="true"/> if all triggers are registered,
             /// <see langword="false"/> if one or more triggers are yet be resolved.</returns>
-            public abstract bool IsFullyResolved
-            {
-                get;
-            }
+            public abstract bool GetIsFullyResolved();
 
             /// <summary>
-            /// Causes the values returned by <see cref="IsFullyResolved"/> and
-            /// <see cref="IsMinimallyResolved"/> to be re-calculated.
+            /// Causes the values returned by <see cref="GetIsFullyResolved"/> and
+            /// <see cref="GetIsMinimallyResolved"/> to be re-calculated.
             /// </summary>
             public virtual void UpdateResolvedStatus()
             {
@@ -389,12 +385,9 @@ namespace Extract.DataEntry
             /// Gets whether the query node is resolved enough to be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> since a literal query is always resolved.</returns>
-            public override bool IsMinimallyResolved
+            public override bool GetIsMinimallyResolved()
             {
-                get
-                {
-                    return true;
-                }
+                return true;
             }
 
             /// <summary>
@@ -402,12 +395,9 @@ namespace Extract.DataEntry
             /// registered) and can be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> since a literal query is always resolved.</returns>
-            public override bool IsFullyResolved
+            public override bool GetIsFullyResolved()
             {
-                get
-                {
-                    return true;
-                }
+                return true;
             }
 
             /// <summary>
@@ -417,7 +407,7 @@ namespace Extract.DataEntry
             public override QueryResult Evaluate()
             {
                 ExtractException.Assert("ELI26753", "Cannot evaluate un-resolved query!",
-                    this.IsMinimallyResolved);
+                    this.GetIsMinimallyResolved());
 
                 return new QueryResult(_query);
             }
@@ -429,22 +419,28 @@ namespace Extract.DataEntry
         private class SourceDocNameQueryNode : QueryNode
         {
             /// <summary>
+            /// <see langword="true"/> if the full path of the source doc name should be used or
+            /// <see langword="false"/> to use just the filename.
+            /// </summary>
+            bool _useFullPath;
+
+            /// <summary>
             /// Initializes a new <see cref="SourceDocNameQueryNode"/> instance.
             /// </summary>
-            public SourceDocNameQueryNode()
+            /// <param name="useFullPath"><see langword="true"/> if the full path of the source doc
+            /// name should be used or <see langword="false"/> to use just the filename.</param>
+            public SourceDocNameQueryNode(bool useFullPath)
             {
+                _useFullPath = useFullPath;
             }
 
             /// <summary>
             /// Gets whether the query node is resolved enough to be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> since a SourceDoc query is always resolved.</returns>
-            public override bool IsMinimallyResolved
+            public override bool GetIsMinimallyResolved()
             {
-                get
-                {
-                    return true;
-                }
+                return true;
             }
 
             /// <summary>
@@ -452,12 +448,9 @@ namespace Extract.DataEntry
             /// registered) and can be evaluated.
             /// </summary>
             /// <returns><see langword="true"/> since a SourceDoc query is always resolved.</returns>
-            public override bool IsFullyResolved
+            public override bool GetIsFullyResolved()
             {
-                get
-                {
-                    return true;
-                }
+                return true;
             }
 
             /// <summary>
@@ -466,7 +459,82 @@ namespace Extract.DataEntry
             /// <returns>The current source doc name</returns>
             public override QueryResult Evaluate()
             {
-                return new QueryResult(AttributeStatusInfo.SourceDocName);
+                if (_useFullPath)
+                {
+                    return new QueryResult(AttributeStatusInfo.SourceDocName);
+                }
+                else
+                {
+                    return new QueryResult(Path.GetFileName(AttributeStatusInfo.SourceDocName));
+                }
+            }
+        }
+
+        /// <summary>
+        /// A <see cref="QueryNode"/> to insert the solution directory name.
+        /// </summary>
+        private class SolutionDirectoryQueryNode : QueryNode
+        {
+            /// <summary>
+            /// Cache the solution directory name after it is calculated the first time since
+            /// ConvertToNetworkPath can be slow to run.
+            /// </summary>
+            static string _solutionDirectory;
+
+            /// <summary>
+            /// Used to ensure calculation of _solutionDirectory happens on one thread only.
+            /// </summary>
+            object _lock = new object();
+
+            /// <summary>
+            /// Initializes a new <see cref="SolutionDirectoryQueryNode"/> instance.
+            /// </summary>
+            public SolutionDirectoryQueryNode()
+            {
+            }
+
+            /// <summary>
+            /// Gets whether the query node is resolved enough to be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since this query is always resolved.</returns>
+            public override bool GetIsMinimallyResolved()
+            {
+                return true;
+            }
+
+            /// <summary>
+            /// Gets whether the query node is completely resolved (all required triggers have been
+            /// registered) and can be evaluated.
+            /// </summary>
+            /// <returns><see langword="true"/> since this query is always resolved.</returns>
+            public override bool GetIsFullyResolved()
+            {
+                return true;
+            }
+
+            /// <summary>
+            /// Evaluates the query using the solution directory (as a UNC path, if possible).
+            /// </summary>
+            /// <returns>The query using the solution directory (as a UNC path, if possible).
+            /// </returns>
+            public override QueryResult Evaluate()
+            {
+                if (_solutionDirectory == null)
+                {
+                    // Calculate the solution directory only once for all instances of
+                    // SolutionDirectoryQueryNode to minimize the performance hit of
+                    // ConvertToNetworkPath.
+                    lock (_lock)
+                    {
+                        if (_solutionDirectory == null)
+                        {
+                            _solutionDirectory = DataEntryMethods.ResolvePath(".");
+                            FileSystemMethods.ConvertToNetworkPath(ref _solutionDirectory, true);
+                        }
+                    }
+                }
+
+                return new QueryResult(_solutionDirectory);
             }
         }
 
@@ -492,16 +560,16 @@ namespace Extract.DataEntry
             protected List<QueryNode> _childNodes = new List<QueryNode>();
 
             /// <summary>
-            /// Caches the <see cref="IsFullyResolved"/> status of the query node.
-            /// <see langword="null"/> if there is no cached value and IsFullyResolved needs to be
-            /// re-calculated.
+            /// Caches the <see cref="GetIsFullyResolved"/> status of the query node.
+            /// <see langword="null"/> if there is no cached value and GetIsFullyResolved needs to
+            /// be re-calculated.
             /// </summary>
             bool? _isFullyResolved;
 
             /// <summary>
-            /// Caches the <see cref="IsMinimallyResolved"/> status of the query node.
-            /// <see langword="null"/> if there is no cached value and IsMinimallyResolved needs to be
-            /// re-calculated.
+            /// Caches the <see cref="GetIsMinimallyResolved"/> status of the query node.
+            /// <see langword="null"/> if there is no cached value and GetIsMinimallyResolved needs to
+            /// be re-calculated.
             /// </summary>
             bool? _isMinimallyResolved;
 
@@ -576,7 +644,22 @@ namespace Extract.DataEntry
                         if (childElement.Name.Equals("SourceDocName", 
                                 StringComparison.OrdinalIgnoreCase))
                         {
-                            _childNodes.Add(new SourceDocNameQueryNode());
+                            bool useFullPath = true;
+
+                            // Use the full path of the document unless specified not to.
+                            xmlAttribute = childElement.Attributes["UseFullPath"];
+                            if (xmlAttribute != null && xmlAttribute.Value == "0")
+                            {
+                                useFullPath = false;
+                            }
+
+                            _childNodes.Add(new SourceDocNameQueryNode(useFullPath));
+                        }
+                        // Check for ProgramFilesExtractSystems (which is not a ComplexQueryNode). 
+                        else if (childElement.Name.Equals("SolutionDirectory",
+                            StringComparison.OrdinalIgnoreCase))
+                        {
+                            _childNodes.Add(new SolutionDirectoryQueryNode());
                         }
                         else
                         {
@@ -608,8 +691,8 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Causes the values returned by <see cref="IsFullyResolved"/> and
-            /// <see cref="IsMinimallyResolved"/> to be re-calculated.
+            /// Causes the values returned by <see cref="GetIsFullyResolved"/> and
+            /// <see cref="GetIsMinimallyResolved"/> to be re-calculated.
             /// </summary>
             public override void UpdateResolvedStatus()
             {
@@ -630,31 +713,28 @@ namespace Extract.DataEntry
             /// <returns><see langword="true"/> if all required triggers are registered and the
             /// query node can be evaluated, <see langword="false"/> if one or more triggers must
             /// be resolved before the query node can be evaluated.</returns>
-            public override bool IsMinimallyResolved
+            public override bool GetIsMinimallyResolved()
             {
-                get
+                // If there is a cached minimally resolved status, return it.
+                if (_isMinimallyResolved != null)
                 {
-                    // If there is a cached minimally resolved status, return it.
-                    if (_isMinimallyResolved != null)
-                    {
-                        return _isMinimallyResolved.Value;
-                    }
-
-                    // ...otherwise, re-calculate it. Default to true.
-                    _isMinimallyResolved = true;
-
-                    // If any child not is not minimally resolved, neither is this node.
-                    foreach (QueryNode childNode in _childNodes)
-                    {
-                        if (!childNode.IsMinimallyResolved)
-                        {
-                            _isMinimallyResolved = false;
-                            break;
-                        }
-                    }
-
                     return _isMinimallyResolved.Value;
                 }
+
+                // ...otherwise, re-calculate it. Default to true.
+                _isMinimallyResolved = true;
+
+                // If any child not is not minimally resolved, neither is this node.
+                foreach (QueryNode childNode in _childNodes)
+                {
+                    if (!childNode.GetIsMinimallyResolved())
+                    {
+                        _isMinimallyResolved = false;
+                        break;
+                    }
+                }
+
+                return _isMinimallyResolved.Value;
             }
 
             /// <summary>
@@ -664,31 +744,28 @@ namespace Extract.DataEntry
             /// <returns><see langword="true"/> if all triggers are registered and the query node can
             /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
             /// the query node can be evaluated.</returns>
-            public override bool IsFullyResolved
+            public override bool GetIsFullyResolved()
             {
-                get
+                // If there is a cached fully resolved status, return it.
+                if (_isFullyResolved != null)
                 {
-                    // If there is a cached fully resolved status, return it.
-                    if (_isFullyResolved != null)
-                    {
-                        return _isFullyResolved.Value;
-                    }
-
-                    // ...otherwise, re-calculate it. Default to true.
-                    _isFullyResolved = true;
-
-                    // If any child not is not fully resolved, neither is this node.
-                    foreach (QueryNode childNode in _childNodes)
-                    {
-                        if (!childNode.IsFullyResolved)
-                        {
-                            _isFullyResolved = false;
-                            break;
-                        }
-                    }
-
                     return _isFullyResolved.Value;
                 }
+
+                // ...otherwise, re-calculate it. Default to true.
+                _isFullyResolved = true;
+
+                // If any child not is not fully resolved, neither is this node.
+                foreach (QueryNode childNode in _childNodes)
+                {
+                    if (!childNode.GetIsFullyResolved())
+                    {
+                        _isFullyResolved = false;
+                        break;
+                    }
+                }
+
+                return _isFullyResolved.Value;
             }
 
             /// <summary>
@@ -705,7 +782,7 @@ namespace Extract.DataEntry
                 bool resolvedAttribute = false;
 
                 // If this query isn't fully resolved, attempt to register all child query nodes.
-                if (!this.IsFullyResolved)
+                if (!this.GetIsFullyResolved())
                 {
                     foreach (QueryNode childNode in _childNodes)
                     {
@@ -778,7 +855,7 @@ namespace Extract.DataEntry
                 try
                 {
                     ExtractException.Assert("ELI26754", "Cannot evaluate un-resolved query!",
-                        this.IsMinimallyResolved);
+                        this.GetIsMinimallyResolved());
 
                     StringBuilder sqlQuery = new StringBuilder();
 
@@ -919,21 +996,19 @@ namespace Extract.DataEntry
             /// <returns><see langword="true"/> if all required triggers are registered and the
             /// query node can be evaluated, <see langword="false"/> if one or more triggers must
             /// be resolved before the query node can be evaluated.</returns>
-            public override bool IsMinimallyResolved
+            public override bool GetIsMinimallyResolved()
             {
-                get
+                // If a triggerAttribute was previously registered, but the query used to
+                // register it is no longer resolved, unregister the trigger attribute.
+                if (_triggerAttribute != null && !base.GetIsMinimallyResolved())
                 {
-                    // If a triggerAttribute was previously registered, but the query used to
-                    // register it is no longer resolved, unregister the trigger attribute.
-                    if (!base.IsMinimallyResolved && _triggerAttribute != null)
-                    {
-                        UnregisterTriggerAttribute();
-                    }
-
-                    // The node is minimally resolved if the base is as well and this node either
-                    // has a registered attribute or is marked as not required.
-                    return base.IsMinimallyResolved && (!base.Required || _triggerAttribute != null);
+                    UnregisterTriggerAttribute();
                 }
+
+                // The node is minimally resolved if the base is as well and this node either
+                // has a registered attribute or is marked as not required.
+                return (!base.Required || _triggerAttribute != null) &&
+                        base.GetIsMinimallyResolved();
             }
 
             /// <summary>
@@ -943,19 +1018,16 @@ namespace Extract.DataEntry
             /// <returns><see langword="true"/> if all triggers are registered and the query node can
             /// be evaluated, <see langword="false"/> if one or more triggers must be resolved before
             /// the query node can be evaluated.</returns>
-            public override bool IsFullyResolved
+            public override bool GetIsFullyResolved()
             {
-                get
+                // If a triggerAttribute was previously registered, but the query used to
+                // register it is no longer resolved, unregister the trigger attribute.
+                if (_triggerAttribute != null && !base.GetIsFullyResolved())
                 {
-                    // If a triggerAttribute was previously registered, but the query used to
-                    // register it is no longer resolved, unregister the trigger attribute.
-                    if (!base.IsFullyResolved && _triggerAttribute != null)
-                    {
-                        UnregisterTriggerAttribute();
-                    }
-
-                    return base.IsFullyResolved && _triggerAttribute != null;
+                    UnregisterTriggerAttribute();
                 }
+
+                return _triggerAttribute != null && base.GetIsFullyResolved();
             }
 
             /// <summary>
@@ -967,7 +1039,7 @@ namespace Extract.DataEntry
                 try
                 {
                     ExtractException.Assert("ELI26757", "Cannot evaluate un-resolved query!",
-                        this.IsMinimallyResolved);
+                        this.GetIsMinimallyResolved());
 
                     if (_triggerAttribute != null)
                     {
@@ -1003,7 +1075,7 @@ namespace Extract.DataEntry
                 bool resolved = base.RegisterTriggerCandidate(statusInfo);
 
                 // If all child nodes are resolved, but this node is not, attempt to resolve it.
-                if (!this.IsFullyResolved && base.IsMinimallyResolved)
+                if (!this.GetIsFullyResolved() && base.GetIsMinimallyResolved())
                 {
                     if (string.IsNullOrEmpty(_attributeValueFullPath))
                     {
@@ -1016,20 +1088,19 @@ namespace Extract.DataEntry
                     if (statusInfo == null || statusInfo.FullPath == _attributeValueFullPath)
                     {
                         // Search for candidate triggers.
-                        IUnknownVector candidateTriggers = AttributeStatusInfo.ResolveAttributeQuery(
-                                            _trigger._targetAttribute, base.Evaluate().String);
-
-                        int candidateCount = candidateTriggers.Size();
+                        List<IAttribute> candidateTriggers =
+                            AttributeStatusInfo.ResolveAttributeQuery(
+                                _trigger._targetAttribute, base.Evaluate().String);
 
                         ExtractException.Assert("ELI26117",
                             "Multiple attribute triggers not supported for the auto-update value",
-                            candidateCount <= 1);
+                            candidateTriggers.Count <= 1);
 
                         // If a single candidate was found, register it as the trigger for this term
                         // (even if it wasn't the suggestd candidate).
-                        if (candidateCount == 1)
+                        if (candidateTriggers.Count == 1)
                         {
-                            _triggerAttribute = (IAttribute)candidateTriggers.At(0);
+                            _triggerAttribute = (IAttribute)candidateTriggers[0];
 
                             if (statusInfo == null)
                             {
@@ -1181,7 +1252,7 @@ namespace Extract.DataEntry
                 try
                 {
                     // Ensure the query is resolved.
-                    if (base.IsMinimallyResolved)
+                    if (base.GetIsMinimallyResolved())
                     {
                         // If so, evaluate it.
                         QueryResult queryResult = base.Evaluate();
@@ -1202,10 +1273,12 @@ namespace Extract.DataEntry
 
                             // Parse the file contents into individual list items.
                             string[] listItems = queryResult.String.Split(
-                                new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                                new string[] { Environment.NewLine }, 
+                                StringSplitOptions.RemoveEmptyEntries);
 
                             validator.SetValidationListValues(listItems);
-                            statusInfo.OwningControl.RefreshAttribute(_trigger._targetAttribute);
+                            statusInfo.OwningControl.RefreshAttributes(
+                                new IAttribute[] { _trigger._targetAttribute }, false);
 
                             return true;
                         }
@@ -1214,7 +1287,7 @@ namespace Extract.DataEntry
                         {
                             // If this is a default trigger that is fully resolved, it will
                             // never need to fire again-- clear all triggers.
-                            if (this.IsFullyResolved)
+                            if (this.GetIsFullyResolved())
                             {
                                 _disabled = true;
                                 ClearAllTriggers();
@@ -1229,7 +1302,7 @@ namespace Extract.DataEntry
                                 // If the default query is not fully resolved, flag _updatePending
                                 // to allow it an opportunity to apply its update as query
                                 // components become resolved.
-                                _updatePending = !this.IsFullyResolved;
+                                _updatePending = !this.GetIsFullyResolved();
 
                                 // Apply the default query value.
                                 return ApplyQueryResult(queryResult);
@@ -1258,7 +1331,9 @@ namespace Extract.DataEntry
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI26735", ex);
+                    ExtractException ee = new ExtractException("ELI26735",
+                        "Failed to apply updated value!", ex);
+                    throw ee;
                 }
             }
 
@@ -1350,10 +1425,23 @@ namespace Extract.DataEntry
                             // their updates on top of any default value.
                             _trigger.UpdateValue();
                         }
-                        else
+                        // If not a default auto-update trigger, update using only this query not
+                        // the entire trigger.
+                        // Only update the value if a previous auto-update query hasn't already
+                        // updated the value or this is a validation query.
+                        // NOTE: This logic is dependent upon event delegates (or multicast
+                        // delegates more generally) being called in order. There seems to be
+                        // conflicting information on whether this is actually the case, but MSDN
+                        // indicates it is the case and it is the behavior I am seeing in practice.
+                        else if (_trigger._validationTrigger ||
+                                 !e.AutoUpdatedAttributes.Contains(_trigger._targetAttribute))
                         {
-                            // If no a default auto-update trigger, update using only this query.
-                            UpdateValue();
+                            // Indicate that the target attribute value has been updated by this
+                            // event if this is not a validation trigger.
+                            if (UpdateValue() && !_trigger._validationTrigger)
+                            {
+                                e.AutoUpdatedAttributes.Add(_trigger._targetAttribute);
+                            }
                         }
                     }
                 }
@@ -1361,7 +1449,7 @@ namespace Extract.DataEntry
                 {
                     ExtractException ee = ExtractException.AsExtractException("ELI26115", ex);
                     ee.AddDebugData("Event Data", e, false);
-                    ee.Display();
+                    throw ee;
                 }
             }
 
@@ -1410,7 +1498,8 @@ namespace Extract.DataEntry
                     // After applying the value, direct the control that contains it to
                     // refresh the value.
                     AttributeStatusInfo.GetOwningControl(_trigger._targetAttribute).
-                        RefreshAttribute(_trigger._targetAttribute);
+                        RefreshAttributes(new IAttribute[] { _trigger._targetAttribute },
+                            queryResult.IsSpatial);
 
                     return true;
                 }

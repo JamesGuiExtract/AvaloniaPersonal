@@ -155,6 +155,20 @@ namespace Extract.Redaction.Verification
         #region VerificationTaskForm Properties
 
         /// <summary>
+        /// Gets whether the control styles of the current Windows theme should be used for the
+        /// verification form.
+        /// </summary>
+        /// <returns><see langword="true"/> to use the control styles of the current Windows theme;
+        /// <see langword="false"/> to use Window's classic theme to draw controls.</returns>
+        public bool UseVisualStyles
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Gets whether the currently viewed document is a history document.
         /// </summary>
         /// <value><see langword="true"/> if a document from the history is what is currently viewed;

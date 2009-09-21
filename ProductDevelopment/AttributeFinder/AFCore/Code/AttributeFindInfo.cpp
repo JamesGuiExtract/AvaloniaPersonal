@@ -1,6 +1,7 @@
 
 #include "stdafx.h"
 #include "AFCore.h"
+#include "AFInternalUtils.h"
 #include "AttributeFindInfo.h"
 
 #include <UCLIDException.h>
@@ -264,6 +265,10 @@ STDMETHODIMP CAttributeFindInfo::ExecuteRulesOnText(IAFDocument* pAFDoc,
 					string strSourceDoc = ipText->SourceDocName;
 					ue.addDebugInfo("File", strSourceDoc);
 				}
+
+				// Log the rsd filename currently being executed.
+				addCurrentRSDFileToDebugInfo(ue);
+
 #ifdef _DEBUG
 				ue.display();
 #else

@@ -631,15 +631,20 @@ namespace Extract.Utilities.Forms
         /// delegate instance.
         /// </summary>
         /// <param name="creator">Used to create the <typeparamref name="TForm"/>.</param>
-        /// <returns>A <typeparamref name="TForm"/> using the specified <see cref="CreateForm"/> 
+        /// <returns>A <typeparamref name="TForm"/> using the specified <see cref="CreateForm"/>
         /// delegate instance.</returns>
         static TForm CreateTForm(CreateForm creator)
         {
             // Prepare the application to display the verification form
-            Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            return (TForm)creator();
+            TForm formInstance = (TForm)creator();
+            if (formInstance.UseVisualStyles)
+            {
+                Application.EnableVisualStyles();
+            }
+
+            return formInstance;
         }
 
         /// <summary>

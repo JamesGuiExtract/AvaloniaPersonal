@@ -578,10 +578,24 @@ void CEAVGeneratorDlg::OnBtnSaveas()
 		CFileDialogEx saveFileDlg(FALSE, ".eav", strEAVFileName.c_str(), 
 			OFN_FILEMUSTEXIST | OFN_OVERWRITEPROMPT | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR,
 			gstrSAVE_FILE_FILTER.c_str(), NULL);
+
 		if (saveFileDlg.DoModal() == IDOK)
 		{
 			// Get the selected file complete path
 			CString zFileName = saveFileDlg.GetPathName();
+
+			// [DataEntry:326] Ensure the output filename matches the extension from the selected
+			// filter to prevent confusion concerning why a file failed to save.
+			CString zExt;
+			if (AfxExtractSubString(zExt, saveFileDlg.m_ofn.lpstrFilter,
+					2 * saveFileDlg.m_ofn.nFilterIndex - 1, (TCHAR)'\0'))
+			{
+				zExt.TrimLeft('*');
+				if (zFileName.Right(zExt.GetLength()).CompareNoCase(zExt) != 0)
+				{
+					zFileName += zExt;
+				}
+			}
 
 			// save all attributes accordingly
 			saveAttributes(zFileName);

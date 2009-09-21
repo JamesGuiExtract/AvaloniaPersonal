@@ -2,6 +2,7 @@ using Extract.Drawing;
 using Extract.Licensing;
 using System;
 using System.ComponentModel;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -44,6 +45,11 @@ namespace Extract.DataEntry
         #region Fields
 
         /// <summary>
+        /// Specifies whether the current instance is running in design mode.
+        /// </summary>
+        bool _inDesignMode;
+
+        /// <summary>
         /// The name used to identify the <see cref="IAttribute"/> to be associated with the table.
         /// </summary>
         string _attributeName;
@@ -63,12 +69,6 @@ namespace Extract.DataEntry
         /// Specifies whether the control should remain disabled at all times.
         /// </summary>
         bool _disabled;
-
-        /// <summary>
-        /// Specifies whether the table will attempt to generate a hint using the intersection of 
-        /// the row and column occupied by the specified attribute.
-        /// </summary>
-        bool _smartHintsEnabled = true;
 
         /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other
@@ -134,6 +134,12 @@ namespace Extract.DataEntry
         /// A bold style font to indicate unviewed fields.
         /// </summary>
         Font _boldFont;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        DataGridViewCellStyle _defaultCellStyle;
+
         /// <summary>
         /// The style to use for cells currently being edited.
         /// </summary>
@@ -172,6 +178,17 @@ namespace Extract.DataEntry
         /// currently being dragged.
         /// </summary>
         DataGridViewCellStyle _boldDraggedCellStyle;
+
+        /// <summary>
+        /// The style to use for table cells when the table is disabled.
+        /// </summary>
+        DataGridViewCellStyle _disabledCellStyle;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -275,16 +292,17 @@ namespace Extract.DataEntry
         {
             try
             {
+                _inDesignMode = (LicenseManager.UsageMode == LicenseUsageMode.Designtime);
+
                 // Load licenses in design mode
-                if (LicenseManager.UsageMode == LicenseUsageMode.Designtime)
+                if (_inDesignMode)
                 {
                     // Load the license files from folder
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24495",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24495");
 
                 // Initialize the various cell styles (modifying existing cell styles on-the-fly
                 // causes poor performance. Microsoft recommends sharing DataGridViewCellStyle
@@ -294,14 +312,16 @@ namespace Extract.DataEntry
                 _regularFont = new Font(base.DefaultCellStyle.Font, FontStyle.Regular);
                 _boldFont = new Font(base.DefaultCellStyle.Font, FontStyle.Bold);
 
+                _defaultCellStyle = base.DefaultCellStyle;
+
                 // The style to use for cells currently being edited.
-                _editModeCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _editModeCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _editModeCellStyle.Font = _regularFont;
                 _editModeCellStyle.SelectionForeColor = Color.Black;
 
                 // The style to use for selected cells whose fields have been viewed in the active 
                 // table.
-                _regularActiveCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _regularActiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _regularActiveCellStyle.Font = _regularFont;
                 _regularActiveCellStyle.SelectionForeColor = Color.Black;
 
@@ -309,14 +329,14 @@ namespace Extract.DataEntry
                 // in the active table. A data entry table is going to distinguish between 
                 // "selected-and-active" and "selected-but-inactive".  Initialize the selection 
                 // color for "inactive" with a more subtle color than the default (blue).
-                _regularInactiveCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _regularInactiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _regularInactiveCellStyle.Font = _regularFont;
                 _regularInactiveCellStyle.SelectionForeColor = Color.Black;
                 _regularInactiveCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
 
                 // The style to use for selected cells whose fields have not been viewed in the
                 // active table.
-                _boldActiveCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _boldActiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _boldActiveCellStyle.Font = _boldFont;
                 _boldActiveCellStyle.SelectionForeColor = Color.Black;
 
@@ -324,7 +344,7 @@ namespace Extract.DataEntry
                 // in the active table. A data entry table is going to distinguish between 
                 // "selected-and-active" and "selected-but-inactive".  Initialize the selection
                 // color for "inactive" with a more subtle color than the default (blue).
-                _boldInactiveCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _boldInactiveCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _boldInactiveCellStyle.Font = _boldFont;
                 _boldInactiveCellStyle.SelectionForeColor = Color.Black;
                 _boldInactiveCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
@@ -332,7 +352,7 @@ namespace Extract.DataEntry
                 // The style to use for selected cells whose contents have been viewed and that are
                 // currently being dragged. The inactive selection color is used for the background
                 // to delineate the dragged cells.
-                _regularDraggedCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _regularDraggedCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _regularDraggedCellStyle.Font = _regularFont;
                 _regularDraggedCellStyle.SelectionForeColor = Color.Black;
                 _regularDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
@@ -341,11 +361,16 @@ namespace Extract.DataEntry
                 // The style to use for selected cells whose contents have not been viewed and that
                 // are currently being dragged. The inactive selection color is used for the
                 // background to delineate the dragged cells.
-                _boldDraggedCellStyle = new DataGridViewCellStyle(base.DefaultCellStyle);
+                _boldDraggedCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
                 _boldDraggedCellStyle.Font = _boldFont;
                 _boldDraggedCellStyle.SelectionForeColor = Color.Black;
                 _boldDraggedCellStyle.BackColor = _INACTIVE_SELECTION_COLOR;
                 _boldDraggedCellStyle.SelectionBackColor = _INACTIVE_SELECTION_COLOR;
+
+                // The style to use for table cells when the table is disabled.
+                _disabledCellStyle = new DataGridViewCellStyle(_defaultCellStyle);
+                _disabledCellStyle.SelectionBackColor = SystemColors.Control;
+                _disabledCellStyle.BackColor = SystemColors.Control;
 
                 // Use a DataEntryTableRow instance as the row template.
                 base.RowTemplate = new DataEntryTableRow();
@@ -451,31 +476,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Specifies whether the table will attempt to generate a hint using the intersection of
-        /// the row and column occupied by the specified.
-        /// <see cref="IAttribute"/>.
-        /// </summary>
-        /// <value><see langword="true"/> if the table should attempt to generate smart hints when
-        /// possible; <see langword="false"/> if the table should never attempt to generate smart
-        /// hints.</value>
-        /// <returns><see langword="true"/> if the table is configured to generate smart hints when
-        /// possible; <see langword="false"/> if the table is not configured to generate smart
-        /// hints.</returns>
-        [Category("Data Entry Table")]
-        protected bool SmartHintsEnabled
-        {
-            get
-            {
-                return _smartHintsEnabled;
-            }
-
-            set
-            {
-                _smartHintsEnabled = value;
-            }
-        }
-
-        /// <summary>
         /// Specifies whether the table will attempt to generate a hint by indicating the other 
         /// <see cref="IAttribute"/>s sharing the same row.
         /// </summary>
@@ -536,6 +536,36 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Gets or sets the currently active cell.
+        /// <para><b>NOTE</b></para>
+        /// This property hides and re-implements <see cref="DataGridView.CurrentCell"/>. This
+        /// re-implementation should be used instead because of processing that occurs for
+        /// selection changes. Using the base <see cref="DataGridView.CurrentCell"/>, the
+        /// <see cref="DataGridView.SelectionChanged"/> event will sometimes be raised prior to
+        /// selection changing when a new <see cref="CurrentCell"/> value being assigned.
+        /// This causes problems in code that counts on the <see cref="DataGridView.SelectionChanged"/>
+        /// event to occur after the new selection is in place.
+        /// </summary>
+        /// <value>The <see cref="DataGridViewCell"/> to make active.</value>
+        /// <returns>The currently active <see cref="DataGridViewCell"/>.</returns>
+        new protected DataGridViewCell CurrentCell
+        {
+            get
+            {
+                return base.CurrentCell;
+            }
+
+            set
+            {
+                using (new SelectionProcessingSuppressor(this))
+                {
+                    base.CurrentCell = value;
+                }
+                OnSelectionChanged(new EventArgs());
+            }
+        }
+
         #endregion Properties
 
         #region Methods
@@ -570,10 +600,14 @@ namespace Extract.DataEntry
 
                 DataGridViewCell cell = dataEntryCell.AsDataGridViewCell;
 
+                string data = cell.Value.ToString();
+
                 // Before validating the value, replace the CRLF display substitution with actual
                 // CR/LFs.
-                string data = cell.Value.ToString();
-                data = data.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                if (!dataEntryCell.RemoveNewLineChars)
+                {
+                    data = data.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                }
 
                 if (!dataEntryCell.Validator.Validate(
                         ref data, dataEntryCell.Attribute, throwException))
@@ -597,8 +631,17 @@ namespace Extract.DataEntry
                     // apply the data.
                     cell.ErrorText = "";
 
-                    if (cell.Value.ToString() !=
-                        data.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT))
+                    string cellValue = cell.Value.ToString();
+
+                    // If RemoveNewLineChars and the value has changed, update the value.
+                    if (dataEntryCell.RemoveNewLineChars && cellValue != data)
+                    {
+                        cell.Value = data;
+                    }
+                    // If !RemoveNewLineChars and the value has changed after accounting for
+                    // _CRLF_REPLACEMENT, update the value.
+                    else if (!dataEntryCell.RemoveNewLineChars &&
+                        cellValue != data.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT))
                     {
                         cell.Value = data;
                     }
@@ -632,8 +675,13 @@ namespace Extract.DataEntry
 
                 DataGridViewCellStyle style;
 
+                // Check if we need the disabled style
+                if (!base.Enabled)
+                {
+                    style = _disabledCellStyle;
+                }
                 // Check if we need edit mode style
-                if (dataEntryCell.AsDataGridViewCell.IsInEditMode)
+                else if (dataEntryCell.AsDataGridViewCell.IsInEditMode)
                 {
                     style = _editModeCellStyle;
                 }
@@ -695,8 +743,13 @@ namespace Extract.DataEntry
 
                 DataGridViewCellStyle style;
 
+                // Check if we need the disabled style
+                if (!base.Enabled)
+                {
+                    style = _disabledCellStyle;
+                }
                 // Check if we need edit mode style.
-                if (cell.IsInEditMode)
+                else if (cell.IsInEditMode)
                 {
                     style = _editModeCellStyle;
                 }
@@ -753,97 +806,6 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI24312", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the case that an editing control has been displayed to edit the data in a cell
-        /// in order that the table can register to recieve <see cref="Control.TextChanged"/> events
-        /// as the data is modified.
-        /// </summary>
-        /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="DataGridViewEditingControlShowingEventArgs"/> that
-        /// contains the event data.</param>
-        void HandleEditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
-        {
-            try
-            {
-                // If the current selection does not result in a propagated attribute when dependent
-                // controls are present (ie, selection across multiple rows), don't allow edit mode
-                // since that dependent triggers in the dependent controls wouldn't be updated.
-                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
-                    base.CurrentRow.Index != base.NewRowIndex)
-                {
-                    base.EndEdit();
-                    return;
-                }
-
-                IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
-
-                if (e.Control != null && dataEntryCell != null)
-                {
-                     _editingControl = e.Control;
-
-                    // If a combo box is being used, register for the SelectedIndexChanged event
-                    // to handle changes to the value.
-                    if (base.CurrentCell is DataEntryComboBoxCell)
-                    {
-                        DataGridViewComboBoxEditingControl comboEditingControl =
-                            (DataGridViewComboBoxEditingControl)_editingControl;
-
-                        comboEditingControl.SelectedIndexChanged += 
-                            HandleCellSelectedIndexChanged; 
-                    }
-                    // If a text box is being used, initialize the auto-complete values (if
-                    // applicable) and register for the TextChanged event to handle
-                    // changes to the value.
-                    else
-                    {
-                        DataGridViewTextBoxEditingControl textEditingControl =
-                            (DataGridViewTextBoxEditingControl)_editingControl;
-
-                        textEditingControl.TextChanged += HandleCellTextChanged;
-
-                        DataEntryValidator validator = dataEntryCell.Validator;
-
-                        // If available, use the validation list values to initialize the
-                        // auto-complete values.
-                        if (validator != null)
-                        {
-                            string[] validationListValues = validator.GetValidationListValues();
-                            if (validationListValues != null)
-                            {
-                                // [DataEntry:443]
-                                // Add each item from the validation list to the auto-complete list
-                                // twice, once as it is in the validation list, and the second time
-                                // with a leading space. This way, a user can press space in an
-                                // empty cell to see all possible values.
-                                string[] autoCompleteList = new string[validationListValues.Length * 2];
-                                for (int i = 0; i < validationListValues.Length; i++)
-                                {
-                                    autoCompleteList[i] = " " + validationListValues[i];
-                                }
-                                validationListValues.CopyTo(autoCompleteList, 
-                                    validationListValues.Length);
-
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                                textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                                textEditingControl.AutoCompleteCustomSource.Clear();
-                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
-                            }
-                            else
-                            {
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI24986", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
@@ -935,37 +897,36 @@ namespace Extract.DataEntry
         {
             try
             {
-                // If the enter key was pressed and there is only a single cell currently selected,
-                // set the current cell as the first cell in the next row.
-                if (e.KeyCode == Keys.Enter && base.SelectedCells.Count == 1 &&
-                    base.CurrentCell.RowIndex < (base.RowCount - 1))
-                {
-                    base.CurrentCell = base.Rows[base.CurrentCell.RowIndex + 1].Cells[0];
-
-                    e.Handled = true;
-                }
                 // Otherwise if a delete/cut/copy/paste shortcut is being used on a single cell,
                 // force the current cell into edit mode and re-send the keys to allow the edit
                 // control to handle them.
-                else if (base.SelectedCells.Count == 1 && 
+                if (base.SelectedCells.Count == 1 && 
                          (e.KeyCode == Keys.Delete ||
                             (e.Modifiers == Keys.Control && 
                                 (e.KeyCode == Keys.C || e.KeyCode == Keys.X || e.KeyCode == Keys.V))))
 
                 {
-                    base.BeginEdit(true);
-
-                    // Ensure the editing control has focus before calling SendKeys to ensure
-                    // this won't trigger recursion.
-                    if (_editingControl != null && _editingControl.Focused)
+                    // In case of delete key, call DeleteSelectedCellContents so that any associated
+                    // spatial info is deleted as well.
+                    if (e.KeyCode == Keys.Delete)
                     {
-                        switch (e.KeyCode)
+                        DeleteSelectedCellContents();
+                    }
+                    else
+                    {
+                        base.BeginEdit(true);
+
+                        // Ensure the editing control has focus before calling SendKeys to ensure
+                        // this won't trigger recursion.
+                        if (_editingControl != null && _editingControl.Focused)
                         {
-                            case Keys.Delete:   SendKeys.Send("{DEL}"); break;
-                            case Keys.C:        SendKeys.Send("^c"); break;
-                            case Keys.X:        SendKeys.Send("^x"); break;
-                            case Keys.V:        SendKeys.Send("^v"); break;
-                            default: ExtractException.ThrowLogicException("ELI25452"); break;
+                            switch (e.KeyCode)
+                            {
+                                case Keys.C: SendKeys.Send("^c"); break;
+                                case Keys.X: SendKeys.Send("^x"); break;
+                                case Keys.V: SendKeys.Send("^v"); break;
+                                default: ExtractException.ThrowLogicException("ELI25452"); break;
+                            }
                         }
                     }
 
@@ -1038,45 +999,6 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Raises the <see cref="Control.KeyUp"/> event. Overridden in order to make the current
-        /// cell the first cell in the next row rather than the cell below the current one.
-        /// </summary>
-        /// <param name="e">A <see cref="KeyEventArgs"/> that contains the event data.</param>
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            try
-            {
-                // If the enter key is being released, there is only a single cell currently selected
-                // set the current cell as the first cell in the row.
-                if (e.KeyCode == Keys.Enter && base.SelectedCells.Count == 1)
-                {
-                    // If the current cell isn't in the first column, move it there now (This
-                    // situation will occur when the last cell was in edit mode when the enter key
-                    // was pressed which prevents the OnKeyDown override from being called).
-                    if (base.CurrentCell.ColumnIndex > 0)
-                    {
-                        base.CurrentCell = base.Rows[base.CurrentCell.RowIndex].Cells[0];
-                    }
-
-                    // Ensure ProcessSelectionChange is always called after manually changing
-                    // the current selection.
-                    ProcessSelectionChange();
-
-                    e.Handled = true;
-                }
-                // Otherwise, allow the base class to handle the key
-                else
-                {
-                    base.OnKeyUp(e);
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException.Display("ELI25441", ex);
-            }
-        }
-
-        /// <summary>
         /// Raises the <see cref="Control.DragEnter"/> event.
         /// </summary>
         /// <param name="drgevent">The <see cref="DragEventArgs"/> associated with the event.
@@ -1144,6 +1066,75 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the case that the current selection in the table has changed so that the 
+        /// background color of the cell can be changed to the "active" or "inactive" color
+        /// as appropriate.
+        /// </summary>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnSelectionChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnSelectionChanged(e);
+
+                ExtractException.Assert("ELI25375", "Invalid table state!", _color != null);
+
+                // Repeat the iteration for non-data entry cells to make sure the background color
+                // is updated for all cells in the table.
+                foreach (DataGridViewCell cell in base.SelectedCells)
+                {
+                    UpdateCellStyle(cell);
+                }
+
+                // Command extensions of DataEntryTableBase to process the selection change unless
+                // processing is temporarily suppressed.
+                if (_suppressSelectionProcessingReferenceCount == 0)
+                {
+                    ProcessSelectionChange();
+                }
+
+                base.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI24458", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.EnabledChanged"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnEnabledChanged(EventArgs e)
+        {
+            try
+            {
+                base.OnEnabledChanged(e);
+
+                if (!_inDesignMode)
+                {
+                    // Change the table's default cell style base on the enabled status
+                    base.DefaultCellStyle = base.Enabled ? _defaultCellStyle : _disabledCellStyle;
+
+                    // Update the style of all cells currently displayed.
+                    foreach (DataGridViewRow row in base.Rows)
+                    {
+                        foreach (DataGridViewCell cell in row.Cells)
+                        {
+                            UpdateCellStyle(cell);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27326", ex);
+            }
+        }
+
         #endregion Overrides
 
         #region IDataEntryControl Members
@@ -1182,6 +1173,23 @@ namespace Extract.DataEntry
         public event EventHandler<QueryDraggedDataSupportedEventArgs> QueryDraggedDataSupported;
 
         /// <summary>
+        /// Indicates that a control has begun an update and that the
+        /// <see cref="DataEntryControlHost"/> should not redraw highlights, etc, until the update
+        /// is complete.
+        /// <para><b>NOTE:</b></para>
+        /// This event should only be raised for updates that initiated via user interation with the
+        /// control. It should not be raised for updates triggered by the
+        /// <see cref="DataEntryControlHost"/> such as <see cref="ProcessSwipedText"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateStarted;
+
+        /// <summary>
+        /// Indicates that a control has ended an update and actions that needs to be taken by the
+        /// <see cref="DataEntryControlHost"/> such as re-drawing highlights can now proceed.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateEnded;
+
+        /// <summary>
         /// Gets or sets the <see cref="IDataEntryControl"/> which is mapped to the parent of the 
         /// <see cref="IAttribute"/>(s) to which the current table is to be mapped.  The specified 
         /// <see cref="IDataEntryControl"/> must be contained in the same 
@@ -1217,6 +1225,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the control will remain disabled,
         /// <see langword="false"/> otherwise.</returns>
         [Category("Data Entry Control")]
+        [DefaultValue(false)]
         public bool Disabled
         {
             get
@@ -1227,52 +1236,6 @@ namespace Extract.DataEntry
             set
             {
                 _disabled = value;
-            }
-        }
-
-        /// <summary>
-        /// Handles the case that the current selection in the table has changed so that the 
-        /// background color of the cell can be changed to the "active" or "inactive" color
-        /// as appropriate.
-        /// </summary>
-        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
-        protected override void OnSelectionChanged(EventArgs e)
-        {
-            try
-            {
-                base.OnSelectionChanged(e);
-
-                ExtractException.Assert("ELI25375", "Invalid table state!", _color != null);
-
-                // Loop throught the cells to update the styles using IDataEntryTableCell so that
-                // the attribute's status can be used to determine viewed state and thus font style.
-                foreach (IDataEntryTableCell dataEntryCell in base.SelectedCells)
-                {
-                    // Set the background color depending on whether the table is currently active.
-                    UpdateCellStyle(dataEntryCell);
-                }
-
-                // Repeat the iteration for non-data entry cells to make sure the background color
-                // is updated for all cells in the table.
-                foreach (DataGridViewCell cell in base.SelectedCells)
-                {
-                    UpdateCellStyle(cell);
-                }
-
-                // Command extensions of DataEntryTableBase to process the selection change unless
-                // processing is temporarily suppressed.
-                if (_suppressSelectionProcessingReferenceCount == 0)
-                {
-                    ProcessSelectionChange();
-                }
-
-                base.Invalidate();
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI24458", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
             }
         }
 
@@ -1451,22 +1414,41 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Refreshes the specified <see cref="IAttribute"/>'s value to the text box.
+        /// Refreshes the specified <see cref="IAttribute"/>s' values to the table.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose value should be refreshed.
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed.
         /// </param>
-        public virtual void RefreshAttribute(IAttribute attribute)
+        /// <param name="spatialInfoUpdated"><see langword="true"/> if the attribute's spatial info
+        /// has changed so that hints can be updated; <see langword="false"/> if the attribute's
+        /// spatial info has not changed.</param>
+        public virtual void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
         {
             try
             {
-                object tableElement = null;
-                if (_attributeMap.TryGetValue(attribute, out tableElement))
+                foreach (IAttribute attribute in attributes)
                 {
-                    DataGridViewCell cell = tableElement as DataGridViewCell;
-                    if (cell != null)
+                    object tableElement = null;
+                    if (_attributeMap.TryGetValue(attribute, out tableElement))
                     {
-                        cell.Value = attribute.Value.String;
+                        DataGridViewCell cell = tableElement as DataGridViewCell;
+                        if (cell != null)
+                        {
+                            cell.Value = attribute.Value.String;
+
+                            // If the cell is in edit mode, the value needs to be applied to the edit
+                            // control as well.
+                            if (cell.IsInEditMode)
+                            {
+                                cell.DataGridView.RefreshEdit();
+                            }
+                        }
                     }
+                }
+
+                // [DataEntry:547] Update hints if the spatial info has changed.
+                if (spatialInfoUpdated)
+                {
+                    this.UpdateHints(true);
                 }
             }
             catch (Exception ex)
@@ -1567,8 +1549,10 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the
         /// recognized text in the swiped image area.</param>
+        /// <returns><see langword="true"/> if the control was able to use the swiped text;
+        /// <see langword="false"/> if it could not be used.</returns>
         /// <seealso cref="IDataEntryControl"/>
-        public abstract void ProcessSwipedText(SpatialString swipedText);
+        public abstract bool ProcessSwipedText(SpatialString swipedText);
 
         /// <summary>
         /// Any data that was cached should be cleared;  This is called when a document is unloaded.
@@ -1737,6 +1721,30 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Raises the <see cref="UpdateStarted"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="EventArgs"/> associated with the drag event.</param>
+        protected void OnUpdateStarted(EventArgs e)
+        {
+            if (this.UpdateStarted != null)
+            {
+                UpdateStarted(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="UpdateEnded"/> event.
+        /// </summary>
+        /// <param name="e">The <see cref="EventArgs"/> associated with the drag event.</param>
+        protected void OnUpdateEnded(EventArgs e)
+        {
+            if (this.UpdateEnded != null)
+            {
+                UpdateEnded(this, e);
+            }
+        }
+
+        /// <summary>
         /// Gets the <see cref="IAttribute"/> associated with the provided row or cell.
         /// </summary>
         /// <param name="item">The row or cell for which the corresponding
@@ -1843,14 +1851,37 @@ namespace Extract.DataEntry
         /// were generated, spatial hints will be generated according to the table properties for
         /// all <see cref="IAttribute"/>s in the table that are lacking spatial information.
         /// </summary>
-        protected void UpdateHints()
+        /// <param name="forceRecalculation">If <see langword="true"/>, re-calculate all hints.
+        /// If <see langword="false"/>, hints will only be recalculated if they are dirty.</param>
+        protected void UpdateHints(bool forceRecalculation)
         {
             try
             {
-                if (_hintsAreDirty && 
-                    (_smartHintsEnabled || _rowHintsEnabled || _columnHintsEnabled))
+                if (forceRecalculation || _hintsAreDirty)
                 {
                     _spatialHintGenerator.ClearHintCache();
+
+                    // Compile all rows that are to be used to generate SmartHints
+                    List<DataGridViewRow> smartHintRows = new List<DataGridViewRow>();
+                    foreach (DataGridViewRow row in base.Rows)
+                    {
+                        DataEntryTableRow dataEntryRow = row as DataEntryTableRow;
+                        if (dataEntryRow != null && dataEntryRow.SmartHintsEnabled)
+                        {
+                            smartHintRows.Add(row);
+                        }
+                    }
+
+                    // Compile all columns that are to be used to generate SmartHints
+                    List<DataGridViewColumn> smartHintColumns = new List<DataGridViewColumn>();
+                    foreach (DataGridViewColumn column in base.Columns)
+                    {
+                        DataEntryTableColumn dataEntryColumn = column as DataEntryTableColumn;
+                        if (dataEntryColumn != null && dataEntryColumn.SmartHintsEnabled)
+                        {
+                            smartHintColumns.Add(column);
+                        }
+                    }
 
                     // Loop through all mapped attributes looking for ones that need a spatial hint.
                     foreach (IAttribute attribute in _attributeMap.Keys)
@@ -1867,7 +1898,7 @@ namespace Extract.DataEntry
                             (!attribute.Value.HasSpatialInfo() || 
                              string.IsNullOrEmpty(attribute.Value.String)))
                         {
-                            CreateSpatialHint(attribute, cell);
+                            CreateSpatialHint(attribute, cell, smartHintRows, smartHintColumns);
                         }
                     }
 
@@ -1877,6 +1908,50 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI25148", ex);
+            }
+        }
+
+        /// <summary>
+        /// Clears the contents as well as the spatial info of all selected cells.
+        /// </summary>
+        protected void DeleteSelectedCellContents()
+        {
+            try
+            {
+                // Attributes whose spatial info has been cleared.
+                List<IAttribute> clearedAttributes = new List<IAttribute>();
+
+                // Delay screen redraw until all cells are processed.
+                OnUpdateStarted(new EventArgs());
+
+                foreach (DataGridViewCell cell in base.SelectedCells)
+                {
+                    // Clear the value of each selected cell.
+                    cell.Value = "";
+
+                    // Remove the spatial info of each selected cell.
+                    IDataEntryTableCell dataEntryCell = cell as IDataEntryTableCell;
+                    if (dataEntryCell != null && dataEntryCell.Attribute != null)
+                    {
+                        AttributeStatusInfo.RemoveSpatialInfo(dataEntryCell.Attribute);
+                        clearedAttributes.Add(dataEntryCell.Attribute);
+                    }
+                }
+
+                // As long as spatial info was removed for at least one attribute,
+                // refresh those attributes.
+                if (clearedAttributes.Count > 0)
+                {
+                    RefreshAttributes(clearedAttributes.ToArray(), true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27322", ex);
+            }
+            finally
+            {
+                OnUpdateEnded(new EventArgs());
             }
         }
 
@@ -1967,6 +2042,183 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the case that an editing control has been displayed to edit the data in a cell
+        /// in order that the table can register to recieve <see cref="Control.TextChanged"/> events
+        /// as the data is modified.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="DataGridViewEditingControlShowingEventArgs"/> that
+        /// contains the event data.</param>
+        void HandleEditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        {
+            try
+            {
+                // If the current selection does not result in a propagated attribute when dependent
+                // controls are present (ie, selection across multiple rows), don't allow edit mode
+                // since that dependent triggers in the dependent controls wouldn't be updated.
+                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
+                    base.CurrentRow.Index != base.NewRowIndex)
+                {
+                    base.EndEdit();
+                    return;
+                }
+
+                // [DataEntry:415]
+                // Limit the selection to just the cell being edited to prevent unexpected behavior
+                // when tabbing after the edit.
+                // [DataEntry:664]
+                // Also ensure that the currently selected cell is the CurrentCell (the cell that is
+                // in edit mode).
+                if (base.SelectedCells.Count > 1 || !base.SelectedCells.Contains(base.CurrentCell))
+                {
+                    // Clear all selections first since sometimes trying to select an individual cell 
+                    // in a selected row doesn't clear the row selection otherwise.
+                    base.ClearSelection();
+                    base.ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex,
+                        true);
+                }
+
+                IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+
+                if (e.Control != null && dataEntryCell != null)
+                {
+                    _editingControl = e.Control;
+
+                    // If a combo box is being used, register for the SelectedIndexChanged event
+                    // to handle changes to the value.
+                    if (base.CurrentCell is DataEntryComboBoxCell)
+                    {
+                        DataGridViewComboBoxEditingControl comboEditingControl =
+                            (DataGridViewComboBoxEditingControl)_editingControl;
+
+                        comboEditingControl.SelectedIndexChanged +=
+                            HandleCellSelectedIndexChanged;
+                    }
+                    // If a text box is being used, initialize the auto-complete values (if
+                    // applicable) and register for the TextChanged event to handle
+                    // changes to the value.
+                    else
+                    {
+                        DataGridViewTextBoxEditingControl textEditingControl =
+                            (DataGridViewTextBoxEditingControl)_editingControl;
+
+                        textEditingControl.TextChanged += HandleCellTextChanged;
+
+                        DataEntryValidator validator = dataEntryCell.Validator;
+
+                        // If available, use the validation list values to initialize the
+                        // auto-complete values.
+                        if (validator != null)
+                        {
+                            string[] validationListValues = validator.GetValidationListValues();
+                            if (validationListValues != null)
+                            {
+                                // [DataEntry:443]
+                                // Add each item from the validation list to the auto-complete list
+                                // twice, once as it is in the validation list, and the second time
+                                // with a leading space. This way, a user can press space in an
+                                // empty cell to see all possible values.
+                                string[] autoCompleteList = new string[validationListValues.Length * 2];
+                                for (int i = 0; i < validationListValues.Length; i++)
+                                {
+                                    autoCompleteList[i] = " " + validationListValues[i];
+                                }
+                                validationListValues.CopyTo(autoCompleteList,
+                                    validationListValues.Length);
+
+                                // [DataEntry:621]
+                                // Disabling autocomplete while updating the auto-complete source seems to solve
+                                // the problem access violations.
+                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                                textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                                textEditingControl.AutoCompleteCustomSource.Clear();
+                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
+                                textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                                textEditingControl.PreviewKeyDown += HandleEditingControlPreviewKeyDown;
+                            }
+                            else
+                            {
+                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI24986", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles any <see cref="Control.PreviewKeyDown"/> events raised by an active
+        /// <see cref="DataGridViewTextBoxEditingControl"/> in order to prevent a situation
+        /// where the up and down arrows can apparently cause buffer overrun problems.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="PreviewKeyDownEventArgs"/> that contains the event data.
+        /// </param>
+        void HandleEditingControlPreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            try
+            {
+                // [DataEntry:385]
+                // If the the up or down arrow keys are pressed while the cursor is at the end
+                // of the text and the auto-complete list is not currently displayed, end edit mode
+                // and manually change the selected cell based on the arrow key as should happen.
+                // This prevents apparent memory issues with auto-complete that can otherwise cause
+                // garbage characters to appear at the end of the field.
+                if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) && EditingControl != null)
+                {
+                    DataGridViewTextBoxEditingControl textEditingControl =
+                                (DataGridViewTextBoxEditingControl)EditingControl;
+
+                    if (textEditingControl.AutoCompleteMode != AutoCompleteMode.None &&
+                        textEditingControl.SelectionStart == textEditingControl.Text.Length &&
+                        !NativeMethods.IsAutoCompleteDisplayed())
+                    {
+                        // Ensure the arrow key changes cell selection in this circumstance by first
+                        // ending edit mode...
+                        EndEdit();
+
+                        // Hack: If nothing else is done with respect to edit mode right now, the
+                        // pencil edit icon remains displayed even though the table is no longer in
+                        // edit mode.  Re-entering and exiting edit mode corrects this situation.
+                        BeginEdit(false);
+                        EndEdit();
+
+                        // ... and then manually specifiying the new CurrentCell based on the arrow
+                        // key pressed.
+                        if (e.KeyCode == Keys.Down)
+                        {
+                            if (CurrentCell.RowIndex < base.Rows.Count - 1)
+                            {
+                                CurrentCell = base.Rows[CurrentCell.RowIndex + 1]
+                                    .Cells[CurrentCell.ColumnIndex];
+                            }
+                        }
+                        else if (e.KeyCode == Keys.Up)
+                        {
+                            if (CurrentCell.RowIndex > 0)
+                            {
+                                CurrentCell = base.Rows[CurrentCell.RowIndex - 1]
+                                    .Cells[CurrentCell.ColumnIndex];
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27646", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2013,42 +2265,52 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which raster zones of
         /// <see cref="IAttribute"/>s sharing the same row are needed.</param>
+        /// <param name="columnsToUse">The set of <see cref="DataGridViewColumn"/>s from which
+        /// spatial info will be used.</param>
         /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same row.</returns>
-        List<Extract.Imaging.RasterZone> GetRowRasterZones(DataGridViewCell targetCell)
+        List<Extract.Imaging.RasterZone> GetRowRasterZones(DataGridViewCell targetCell,
+            IEnumerable columnsToUse)
         {
-            List<Extract.Imaging.RasterZone> rowZones =
-                new List<Extract.Imaging.RasterZone>(base.Columns.Count - 1);
-
-            // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
-            if (!(targetCell is IDataEntryTableCell))
+            try
             {
-                return rowZones;
-            }
+                List<Extract.Imaging.RasterZone> rowZones =
+                    new List<Extract.Imaging.RasterZone>(base.Columns.Count - 1);
 
-            // Iterate through every column except the column containing the target
-            // attribute.
-            for (int i = 0; i < base.Columns.Count; i++)
-            {
-                if (i != targetCell.ColumnIndex)
+                // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
+                if (!(targetCell is IDataEntryTableCell))
                 {
-                    IDataEntryTableCell cell =
-                        base.Rows[targetCell.RowIndex].Cells[i] as IDataEntryTableCell;
+                    return rowZones;
+                }
 
-                    // If the cell in the current column is a DataEntry cell, compile
-                    // the RasterZones that describe it's attribute location.
-                    if (cell != null)
+                // Iterate through every column except the column containing the target
+                // attribute.
+                foreach (DataGridViewColumn column in columnsToUse)
+                {
+                    if (column.Index != targetCell.ColumnIndex)
                     {
-                        // But don't use the raster zones from hints 
-                        if (AttributeStatusInfo.GetHintType(cell.Attribute) == HintType.None)
+                        IDataEntryTableCell cell =
+                            base.Rows[targetCell.RowIndex].Cells[column.Index] as IDataEntryTableCell;
+
+                        // If the cell in the current column is a DataEntry cell, compile
+                        // the RasterZones that describe it's attribute location.
+                        if (cell != null && cell.Attribute != null)
                         {
-                            rowZones.AddRange(GetAttributeRasterZones(cell.Attribute));
+                            // But don't use the raster zones from hints 
+                            if (AttributeStatusInfo.GetHintType(cell.Attribute) == HintType.None)
+                            {
+                                rowZones.AddRange(GetAttributeRasterZones(cell.Attribute));
+                            }
                         }
                     }
                 }
-            }
 
-            return rowZones;
+                return rowZones;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27603", ex);
+            }
         }
 
         /// <summary>
@@ -2057,42 +2319,52 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which raster zones of
         /// <see cref="IAttribute"/>s sharing the same column are needed.</param>
+        /// <param name="rowsToUse">The set of <see cref="DataGridViewRow"/>s from which spatial
+        /// info will be used.</param>
         /// <returns>A list of <see cref="Extract.Imaging.RasterZone"/>s describe the location
         /// of other <see cref="IAttribute"/>s in the same column.</returns>
-        List<Extract.Imaging.RasterZone> GetColumnRasterZones(DataGridViewCell targetCell)
+        List<Extract.Imaging.RasterZone> GetColumnRasterZones(DataGridViewCell targetCell,
+            IEnumerable rowsToUse)
         {
-            List<Extract.Imaging.RasterZone> columnZones =
-                new List<Extract.Imaging.RasterZone>(base.Rows.Count - 1);
-
-            // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
-            if (!(targetCell is IDataEntryTableCell))
+            try
             {
-                return columnZones;
-            }
+                List<Extract.Imaging.RasterZone> columnZones =
+                    new List<Extract.Imaging.RasterZone>(base.Rows.Count - 1);
 
-            // Iterate through every row except the row containing the target attribute
-            // and the "new" row (if present).
-            for (int i = 0; i < base.Rows.Count; i++)
-            {
-                if (i != targetCell.RowIndex && i != base.NewRowIndex)
+                // Ensure the target cell is a IDataEntryTableCell; otherwise return an empty list
+                if (!(targetCell is IDataEntryTableCell))
                 {
-                    IDataEntryTableCell cell =
-                        base.Rows[i].Cells[targetCell.ColumnIndex] as IDataEntryTableCell;
+                    return columnZones;
+                }
 
-                    // If the cell in the current row is a DataEntry cell, compile
-                    // the RasterZones that describe it's attribute location.
-                    if (cell != null)
+                // Iterate through every row except the row containing the target attribute
+                // and the "new" row (if present).
+                foreach (DataGridViewRow row in rowsToUse)
+                {
+                    if (row.Index != targetCell.RowIndex)
                     {
-                        // But don't use the raster zones from hints 
-                        if (AttributeStatusInfo.GetHintType(cell.Attribute) == HintType.None)
+                        IDataEntryTableCell cell =
+                            base.Rows[row.Index].Cells[targetCell.ColumnIndex] as IDataEntryTableCell;
+
+                        // If the cell in the current row is a DataEntry cell, compile
+                        // the RasterZones that describe it's attribute location.
+                        if (cell != null && cell.Attribute != null)
                         {
-                            columnZones.AddRange(GetAttributeRasterZones(cell.Attribute));
+                            // But don't use the raster zones from hints 
+                            if (AttributeStatusInfo.GetHintType(cell.Attribute) == HintType.None)
+                            {
+                                columnZones.AddRange(GetAttributeRasterZones(cell.Attribute));
+                            }
                         }
                     }
                 }
-            }
 
-            return columnZones;
+                return columnZones;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27604", ex);
+            }
         }
 
         /// <summary>
@@ -2103,12 +2375,21 @@ namespace Extract.DataEntry
         /// </param>
         /// <param name="targetCell">The <see cref="DataGridViewCell"/> for which a spatial hint
         /// is wanted.</param>
-        protected void CreateSpatialHint(IAttribute attribute, DataGridViewCell targetCell)
+        /// <param name="smartHintRows">The rows for which smart hints are enabled.</param>
+        /// <param name="smartHintColumns">The columns for which smart hints are enabled.</param>
+        // Use lists to have access to the count.
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        protected void CreateSpatialHint(IAttribute attribute, DataGridViewCell targetCell,
+            List<DataGridViewRow> smartHintRows, List<DataGridViewColumn> smartHintColumns)
         {
             try
             {
                 ExtractException.Assert("ELI25232", "Null argument exception!", attribute != null);
                 ExtractException.Assert("ELI25233", "Null argument exception!", targetCell != null);
+                ExtractException.Assert("ELI27631", "Null argument exception!",
+                    smartHintRows != null);
+                ExtractException.Assert("ELI27632", "Null argument exception!",
+                    smartHintColumns != null);
 
                 // Initialize a list of raster zones for hint locations.
                 List<Extract.Imaging.RasterZone> spatialHints = null;
@@ -2122,13 +2403,15 @@ namespace Extract.DataEntry
                 List<Extract.Imaging.RasterZone> columnZones = null;
 
                 // Attempt to generate a hint based on the intersection of row and column data
-                // if there are multiple rows and columns in the table.
-                if (_smartHintsEnabled && base.Rows.Count > 1 && base.Columns.Count > 1)
+                // if both the row and column containing the target cell have smart hints enabled.
+                if (smartHintRows.Count > 1 && smartHintColumns.Count > 1 &&
+                    smartHintRows.Contains(base.Rows[targetCell.RowIndex]) &&
+                    smartHintColumns.Contains(base.Columns[targetCell.ColumnIndex]))
                 {
                     // Compile a set of raster zones representing the other attributes sharing
                     // the same row and column.
-                    rowZones = GetRowRasterZones(targetCell);
-                    columnZones = GetColumnRasterZones(targetCell);
+                    rowZones = GetRowRasterZones(targetCell, smartHintColumns);
+                    columnZones = GetColumnRasterZones(targetCell, smartHintRows);
 
                     // Attempt to generate a spatial hint using the spatial intersection of the
                     // row and column zones.
@@ -2154,28 +2437,15 @@ namespace Extract.DataEntry
                 // If row hints are enabled and there are other attributes sharing the row.
                 if (_rowHintsEnabled && base.Columns.Count > 1)
                 {
-                    // Compile the raster zones of other attributes sharing the row if they
-                    // haven't already been compiled.
-                    if (rowZones == null)
-                    {
-                        spatialHints = GetRowRasterZones(targetCell);
-                    }
-                    // Or just use the raster zones that were already compiled.
-                    else
-                    {
-                        spatialHints = rowZones;
-                    }
+                    // Compile the raster zones of other attributes sharing the row
+                    spatialHints = GetRowRasterZones(targetCell, base.Columns);
                 }
 
                 // If column hints are enabled and there are other attributes sharing the column.
                 if (_columnHintsEnabled && base.Rows.Count > 1)
                 {
-                    // Compile the raster zones of other attributes sharing the column if they
-                    // haven't already been compiled.
-                    if (columnZones == null)
-                    {
-                        columnZones = GetColumnRasterZones(targetCell);
-                    }
+                    // Compile the raster zones of other attributes sharing the column
+                    columnZones = GetColumnRasterZones(targetCell, base.Rows);
 
                     // Assign or append the column zones to the return value.
                     if (spatialHints == null)

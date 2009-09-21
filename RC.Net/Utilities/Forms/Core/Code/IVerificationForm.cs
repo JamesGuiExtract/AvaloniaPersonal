@@ -67,6 +67,17 @@ namespace Extract.Utilities.Forms
         event EventHandler<FileCompleteEventArgs> FileComplete;
 
         /// <summary>
+        /// Gets whether the control styles of the current Windows theme should be used for the
+        /// verification form.
+        /// </summary>
+        /// <returns><see langword="true"/> to use the control styles of the current Windows theme;
+        /// <see langword="false"/> to use Window's classic theme to draw controls.</returns>
+        bool UseVisualStyles
+        {
+            get;
+        }
+
+        /// <summary>
         /// A thread-safe method that opens a document for verification.
         /// </summary>
         /// <param name="fileName">The filename of the document to open.</param>

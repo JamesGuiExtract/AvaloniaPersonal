@@ -126,7 +126,147 @@ namespace Extract.LabResultsCustomComponents
 
         #endregion Constants
 
+        #region LocalDatabaseCopy
+
+        /// <summary>
+        /// A class to manage temporary local copies of remote databases.
+        /// </summary>
+        class LocalDatabaseCopy : IDisposable
+        {
+            /// <summary>
+            /// The TemporaryFile used to store the local database copy.
+            /// </summary>
+            TemporaryFile _localTemporaryFile;
+
+            /// <summary>
+            /// Keeps track of all <see cref="LabDEOrderMapper"/> instances referencing this copy.
+            /// </summary>
+            Dictionary<int, bool> _orderMapperReferences = new Dictionary<int, bool>();
+
+            #region Constructors
+
+            /// <summary>
+            /// Initializes a new <see cref="LocalDatabaseCopy"/> instance.
+            /// </summary>
+            /// <param name="remoteDatabaseFileName"></param>
+            public LocalDatabaseCopy(string remoteDatabaseFileName)
+            {
+                try
+                {
+                    _localTemporaryFile = new TemporaryFile();
+                    File.Copy(remoteDatabaseFileName, _localTemporaryFile.FileName, true);
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27585", ex);
+                }
+            }
+
+            #endregion Constructors
+
+            #region Properties
+
+            /// <summary>
+            /// The filename of the local database copy.
+            /// </summary>
+            public string FileName
+            {
+                get
+                {
+                    return _localTemporaryFile.FileName;
+                }
+            }
+
+            #endregion Properties
+
+            #region Methods
+
+            /// <summary>
+            /// Notifies the <see cref="LocalDatabaseCopy"/> of a <see cref="LabDEOrderMapper"/>
+            /// instance that is referencing it.
+            /// </summary>
+            /// <param name="orderMapperInstance">The <see cref="LabDEOrderMapper"/> that is
+            /// referencing the <see cref="LocalDatabaseCopy"/>.</param>
+            public void AddReference(LabDEOrderMapper orderMapperInstance)
+            {
+                _orderMapperReferences[orderMapperInstance._instanceID] = true;
+            }
+
+            /// <summary>
+            /// Notifies the <see cref="LocalDatabaseCopy"/> of a <see cref="LabDEOrderMapper"/>
+            /// instance that is not longer referencing it.
+            /// </summary>
+            /// <param name="orderMapperInstance">The <see cref="LabDEOrderMapper"/> that is no
+            /// longer referencing the <see cref="LocalDatabaseCopy"/>.</param>
+            /// <returns><see langword="true"/> if there are no more <see cref="LabDEOrderMapper"/>
+            /// instances referencing the <see cref="LocalDatabaseCopy"/>; <see langword="false"/>
+            /// otherwise.</returns>
+            public bool Dereference(LabDEOrderMapper orderMapperInstance)
+            {
+                _orderMapperReferences.Remove(orderMapperInstance._instanceID);
+                return _orderMapperReferences.Count == 0;
+            }
+
+            #endregion Methods
+
+            #region IDisposable Members
+
+            /// <summary>
+            /// Releases all resources used by the <see cref="LocalDatabaseCopy"/>.
+            /// </summary>
+            /// 
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            /// <overloads>Releases resources used by the <see cref="LocalDatabaseCopy"/>.
+            /// </overloads>
+            /// <summary>
+            /// Releases all unmanaged resources used by the <see cref="LocalDatabaseCopy"/>.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
+            /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    // Dispose of managed objects
+                    _localTemporaryFile.Dispose();
+                }
+
+                // Dispose of unmanaged resources
+            }
+
+            #endregion IDisposable Members
+        }
+
+        #endregion LocalDatabaseCopy
+
         #region Fields
+
+        /// <summary>
+        /// Object for mutexing local database copy creation
+        /// </summary>
+        static object _lock = new object();
+
+        /// <summary>
+        /// The filename of a local copy of the database made if the master database resides on
+        /// another machine.
+        /// </summary>
+        static Dictionary<string, LocalDatabaseCopy> _localDatabaseCopies =
+            new Dictionary<string, LocalDatabaseCopy>();
+
+        /// <summary>
+        /// The next OrderMapper instance ID
+        /// </summary>
+        static int _nextInstanceID;
+
+        /// <summary>
+        /// The ID of this OrderMapper instance
+        /// </summary>
+        int _instanceID;
 
         /// <summary>
         /// The name of the database file to use for order mapping.
@@ -159,6 +299,12 @@ namespace Extract.LabResultsCustomComponents
         /// </summary>
         DataTable _alternateTestName;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.LabDECoreObjects, _DEFAULT_OUTPUT_HANDLER_NAME);
+
         #endregion Fields
 
         #region Constructors
@@ -169,6 +315,7 @@ namespace Extract.LabResultsCustomComponents
         public LabDEOrderMapper()
             : this(null)
         {
+            _instanceID = _nextInstanceID++;
         }
 
         /// <summary>
@@ -201,16 +348,14 @@ namespace Extract.LabResultsCustomComponents
             get
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26887",
-                    _DEFAULT_OUTPUT_HANDLER_NAME);
+                _licenseCache.Validate("ELI26887");
 
                 return _databaseFile;
             }
             set
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26895",
-                    _DEFAULT_OUTPUT_HANDLER_NAME);
+                _licenseCache.Validate("ELI26895");
 
                 _databaseFile = value;
                 _dirty = true;
@@ -234,8 +379,7 @@ namespace Extract.LabResultsCustomComponents
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects, "ELI26889",
-                    _DEFAULT_OUTPUT_HANDLER_NAME);
+                _licenseCache.Validate("ELI26889");
 
                 // Expand the tags in the database file name
                 AFUtility afUtility = new AFUtility();
@@ -248,6 +392,28 @@ namespace Extract.LabResultsCustomComponents
                         "Database file does not exist!");
                     ee.AddDebugData("Database File Name", databaseFile, false);
                     throw ee;
+                }
+
+                // [DataEntry:673]
+                // Use a local copy of the database if dataSourcePath points to a remote
+                // machine.
+                if (!FileSystemMethods.IsPathLocal(databaseFile))
+                {
+                    // Lock to ensure multiple copies of the same database aren't created.
+                    lock (_lock)
+                    {
+                        // If there is not an existing local copy available, create a new one.
+                        LocalDatabaseCopy localDatabaseCopy;
+                        if (!_localDatabaseCopies.TryGetValue(databaseFile, out localDatabaseCopy) ||
+                            !File.Exists(localDatabaseCopy.FileName))
+                        {
+                            localDatabaseCopy = new LocalDatabaseCopy(databaseFile);
+                            _localDatabaseCopies[databaseFile] = localDatabaseCopy;
+                        }
+
+                        localDatabaseCopy.AddReference(this);
+                        databaseFile = localDatabaseCopy.FileName;
+                    }
                 }
 
                 // Build the connection string
@@ -525,8 +691,8 @@ namespace Extract.LabResultsCustomComponents
         {
             try
             {
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDECoreObjects,
-                    "ELI26902", _DEFAULT_OUTPUT_HANDLER_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26902");
 
                 // Display the configuration form
                 using (LabDEOrderMapperConfigurationForm configureForm =
@@ -1173,6 +1339,18 @@ namespace Extract.LabResultsCustomComponents
                 {
                     _alternateTestName.Dispose();
                     _alternateTestName = null;
+                }
+
+                // Remove any existing reference to a local database copy. Dispose of the
+                // local database copy if this was the last instance referencing it.
+                LocalDatabaseCopy localDatabaseCopy;
+                if (_localDatabaseCopies.TryGetValue(_databaseFile, out localDatabaseCopy))
+                {
+                    if (localDatabaseCopy.Dereference(this))
+                    {
+                        _localDatabaseCopies.Remove(_databaseFile);
+                        localDatabaseCopy.Dispose();
+                    }
                 }
             }
 

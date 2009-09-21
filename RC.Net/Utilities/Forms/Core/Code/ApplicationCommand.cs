@@ -120,25 +120,27 @@ namespace Extract.Utilities.Forms
             {
                 try
                 {
-                    if (_enabled != value)
+                    // Unless the shortcut keys are always to be enabled regardless of the state
+                    // of the ToolStipItems, enable or disable the shortcuts here.
+                    // Also, don't enable/disable shortcuts if not necessary to avoid a performance
+                    // hit.
+                    if (!_shortcutsAlwaysEnabled && _enabled != value)
                     {
-                        // Unless the shortcut keys are always to be enabled regardless of the state
-                        // of the ToolStipItems, enable or disable the shortcuts here.
-                        if (!_shortcutsAlwaysEnabled)
-                        {
-                            EnableShortcuts(value);
-                        }
-
-                        if (_toolStripItems != null)
-                        {
-                            foreach (ToolStripItem toolStripItem in _toolStripItems)
-                            {
-                                toolStripItem.Enabled = value;
-                            }
-                        }
-
-                        _enabled = value;
+                        EnableShortcuts(value);
                     }
+                    
+                    // [DataEntry:365, 659] Always enable/disable the tool strip items since the
+                    // ImageViewer will sometimes change the state of the items independent of the
+                    // ApplicationCommand.
+                    if (_toolStripItems != null)
+                    {
+                        foreach (ToolStripItem toolStripItem in _toolStripItems)
+                        {
+                             toolStripItem.Enabled = value;
+                        }
+                    }
+
+                    _enabled = value;
                 }
                 catch (Exception ex)
                 {

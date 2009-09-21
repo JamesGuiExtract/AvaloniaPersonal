@@ -198,7 +198,8 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                SetButtonState();
+                // Update only the checked state of the button.
+                SetButtonState(false);
             }
             catch (Exception ex)
             {
@@ -219,7 +220,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                SetButtonState();
+                SetButtonState(true);
             }
             catch (Exception ex)
             {
@@ -337,13 +338,20 @@ namespace Extract.Imaging.Forms
         /// Sets the <see cref="ToolStripItem.Enabled"/> and <see cref="ToolStripButton.Checked"/> 
         /// properties depending on the state of the associated image viewer control.
         /// </summary>
-        private void SetButtonState()
+        /// <param name="updateEnabledStatus"><see langword="true"/> to update the enabled status
+        /// of the button based on whether an image is open; <see langword="false"/> to update only
+        /// the checked state of the button.</param>
+        private void SetButtonState(bool updateEnabledStatus)
         {
             // Check whether an image is open on an associated image viewer control.
             bool imageIsOpen = _imageViewer != null && _imageViewer.IsImageAvailable;
 
-            // Enable the button iff the image is open
-            base.Enabled = imageIsOpen;
+            // Update the enabled state if requested.
+            if (updateEnabledStatus)
+            {
+                // Enable the button iff the image is open
+                base.Enabled = imageIsOpen;
+            }
 
             // Check the button iff the image is open and the current cursor tool is selected
             base.Checked = imageIsOpen && _imageViewer.CursorTool == _cursorTool;
@@ -421,7 +429,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Set the button state
-                    SetButtonState();
+                    SetButtonState(true);
 
                     // Set tool tip text
                     SetToolTipText();

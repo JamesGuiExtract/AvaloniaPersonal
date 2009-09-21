@@ -18,35 +18,36 @@ namespace Extract.DataEntry
         /// all tooltips on-page and to keep them from overlapping themselves or the highlights with
         /// which they are associated.
         /// </summary>
-        class ToolTip : IDisposable, IComparable<ToolTip>
+        class DataEntryToolTip : IDisposable, IComparable<DataEntryToolTip>
         {
             #region Fields
 
             /// <summary>
-            /// The <see cref="DataEntryControlHost"/> to which the <see cref="ToolTip"/> belongs.
+            /// The <see cref="DataEntryControlHost"/> to which the <see cref="DataEntryToolTip"/>
+            /// belongs.
             /// </summary>
             DataEntryControlHost _host;
 
             /// <summary>
-            /// The <see cref="IAttribute"/> the <see cref="ToolTip"/> is associated with.
+            /// The <see cref="IAttribute"/> the <see cref="DataEntryToolTip"/> is associated with.
             /// </summary>
             IAttribute _attribute;
 
             /// <summary>
-            /// Specifies whether <see cref="ToolTip"/>s should be arranged horizontally or
+            /// Specifies whether <see cref="DataEntryToolTip"/>s should be arranged horizontally or
             /// vertically.
             /// </summary>
             bool _horizontal = true;
 
             /// <summary>
             /// The smallest bounding rectangle containing the spatial information associated with
-            /// this <see cref="ToolTip"/>'s <see cref="IAttribute"/>.
+            /// this <see cref="DataEntryToolTip"/>'s <see cref="IAttribute"/>.
             /// </summary>
             Rectangle _attributeBounds;
 
             /// <summary>
-            /// The actual <see cref="TextLayerObject"/> managed by this <see cref="ToolTip"/>
-            /// instance.
+            /// The actual <see cref="TextLayerObject"/> managed by this
+            /// <see cref="DataEntryToolTip"/> instance.
             /// </summary>
             TextLayerObject _textLayerObject;
 
@@ -91,7 +92,7 @@ namespace Extract.DataEntry
             /// The tooltip that immediately preceeds this one (on the same side as this tooltip).
             /// <see langword="null"/> if this is the first tooltip on this side.
             /// </summary>
-            ToolTip _previousTooltip;
+            DataEntryToolTip _previousTooltip;
 
             /// <summary>
             /// The point on the highlight to which the tooltip will be anchored.
@@ -126,25 +127,26 @@ namespace Extract.DataEntry
             #region Constructors
 
             /// <summary>
-            /// Initializes a new <see cref="ToolTip"/> instance.
+            /// Initializes a new <see cref="DataEntryToolTip"/> instance.
             /// <para><b>Note:</b></para>
             /// Do not add the tooltip to the <see cref="ImageViewer"/> if you will call
             /// <see cref="PositionToolTips"/>. <see cref="PositionToolTips"/> will take care of
             /// adding the tooltip to the <see cref="ImageViewer"/>.
             /// </summary>
             /// <param name="host">The <see cref="DataEntryControlHost"/> to which the
-            /// <see cref="ToolTip"/> belongs.</param>
-            /// <param name="attribute">The <see cref="IAttribute"/> the <see cref="ToolTip"/> is
-            /// associated with.</param>
-            /// <param name="horizontal"><see langword="true"/> if <see cref="ToolTip"/>s should be
-            /// arranged horizontally; <see langword="false"/> if they should be arranged vertically.
-            /// </param>
+            /// <see cref="DataEntryToolTip"/> belongs.</param>
+            /// <param name="attribute">The <see cref="IAttribute"/> the
+            /// <see cref="DataEntryToolTip"/> is associated with.</param>
+            /// <param name="horizontal"><see langword="true"/> if <see cref="DataEntryToolTip"/>s
+            /// should be arranged horizontally; <see langword="false"/> if they should be arranged
+            /// vertically.</param>
             /// <param name="attributeBounds">The smallest bounding rectangle containing the spatial
-            /// information associated with this <see cref="ToolTip"/>'s <see cref="IAttribute"/>.
-            /// Can be <see langword="null"/>, in which case the <see cref="ToolTip"/> will not
-            /// prevent other tooltips from overlapping this tooltip's <see cref="IAttribute"/>.
+            /// information associated with this <see cref="DataEntryToolTip"/>'s
+            /// <see cref="IAttribute"/>. Can be <see langword="null"/>, in which case the
+            /// <see cref="DataEntryToolTip"/> will not prevent other tooltips from overlapping this
+            /// tooltip's <see cref="IAttribute"/>.
             /// </param>
-            public ToolTip(DataEntryControlHost host, IAttribute attribute,
+            public DataEntryToolTip(DataEntryControlHost host, IAttribute attribute,
                 bool horizontal, Rectangle? attributeBounds)
             {
                 try
@@ -175,13 +177,13 @@ namespace Extract.DataEntry
             #region Static Members
 
             /// <summary>
-            /// Repositions the specified <see cref="ToolTip"/>s with the goal to prevent the
-            /// tooltips from overlapping with each other or each other's highlights and keep them
-            /// on-page. Also adds the <see cref="TextLayerObject"/> to the
+            /// Repositions the specified <see cref="DataEntryToolTip"/>s with the goal to prevent
+            /// the tooltips from overlapping with each other or each other's highlights and keep
+            /// them on-page. Also adds the <see cref="TextLayerObject"/> to the
             /// <see cref="ImageViewer"/>.
             /// </summary>
-            /// <param name="toolTips">The <see cref="ToolTip"/>s to be positioned.</param>
-            public static void PositionToolTips(List<ToolTip> toolTips)
+            /// <param name="toolTips">The <see cref="DataEntryToolTip"/>s to be positioned.</param>
+            public static void PositionToolTips(List<DataEntryToolTip> toolTips)
             {
                 try
                 {
@@ -191,10 +193,10 @@ namespace Extract.DataEntry
 
                     // Loop through each tooltip to position it. Keep track of the previous tooltip
                     // on each side as well as overall for use in following iterations.
-                    ToolTip lastToolTip = null;
-                    ToolTip lastSide1ToolTip = null;
-                    ToolTip lastSide2ToolTip = null;
-                    foreach (ToolTip toolTip in toolTips)
+                    DataEntryToolTip lastToolTip = null;
+                    DataEntryToolTip lastSide1ToolTip = null;
+                    DataEntryToolTip lastSide2ToolTip = null;
+                    foreach (DataEntryToolTip toolTip in toolTips)
                     {
                         // If the tooltip hasn't been moved to side2, see if it will fit on side1.
                         if (toolTip._usingSide1)
@@ -289,11 +291,11 @@ namespace Extract.DataEntry
             #region Properties
 
             /// <summary>
-            /// The actual <see cref="TextLayerObject"/> managed by this <see cref="ToolTip"/>
-            /// instance.
+            /// The actual <see cref="TextLayerObject"/> managed by this
+            /// <see cref="DataEntryToolTip"/> instance.
             /// </summary>
-            /// <returns>The <see cref="TextLayerObject"/> managed by this <see cref="ToolTip"/>
-            /// instance.</returns>
+            /// <returns>The <see cref="TextLayerObject"/> managed by this
+            /// <see cref="DataEntryToolTip"/> instance.</returns>
             public TextLayerObject TextLayerObject
             {
                 get
@@ -307,11 +309,11 @@ namespace Extract.DataEntry
             #region IComparable Members
 
             /// <summary>
-            /// Compares this <see cref="ToolTip"/> instance with another <see cref="ToolTip"/>
-            /// instance via spatial positioning.
+            /// Compares this <see cref="DataEntryToolTip"/> instance with another
+            /// <see cref="DataEntryToolTip"/> instance via spatial positioning.
             /// </summary>
-            /// <param name="otherToolTip">A <see cref="ToolTip"/> to compare with this instance.
-            /// </param>
+            /// <param name="otherToolTip">A <see cref="DataEntryToolTip"/> to compare with this
+            /// instance.</param>
             /// <returns>Less than zero if this instance's highlight is to the left of (for
             /// horizontally arranged tooltips) or above (for horizontally arranged tooltips)
             /// <see paramref="otherToolTip"/>'s highlight.
@@ -320,7 +322,7 @@ namespace Extract.DataEntry
             /// Greater than zero if this instance's highlight is to the right of (for
             /// horizontally arranged tooltips) or below (for horizontally arranged tooltips)
             /// <see paramref="otherToolTip"/>'s highlight.</returns>
-            public int CompareTo(ToolTip otherToolTip)
+            public int CompareTo(DataEntryToolTip otherToolTip)
             {
                 if (_horizontal)
                 {
@@ -337,7 +339,7 @@ namespace Extract.DataEntry
             #region IDisposable Members
 
             /// <summary>
-            /// Releases all resources used by the <see cref="ToolTip"/>.
+            /// Releases all resources used by the <see cref="DataEntryToolTip"/>.
             /// </summary>
             public void Dispose()
             {
@@ -346,7 +348,7 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Releases all resources used by the <see cref="ToolTip"/>.
+            /// Releases all resources used by the <see cref="DataEntryToolTip"/>.
             /// </summary>
             /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
             /// resources; <see langword="false"/> to release only unmanaged resources.</param> 
@@ -374,8 +376,8 @@ namespace Extract.DataEntry
             #region Private Members
 
             /// <summary>
-            /// The distance this <see cref="ToolTip"/> can be shifted forward (right or down)
-            /// and still be on-page (in ImageViewer coordinates).
+            /// The distance this <see cref="DataEntryToolTip"/> can be shifted forward (right or
+            /// down) and still be on-page (in ImageViewer coordinates).
             /// </summary>
             int ForwardMargin
             {
@@ -411,9 +413,9 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// The distance this <see cref="ToolTip"/> can be shifted backward (left or up) and
-            /// still be on-page and leave room for preceeding <see cref="ToolTip"/>(s).
-            /// (In ImageViewer coordinates).
+            /// The distance this <see cref="DataEntryToolTip"/> can be shifted backward (left or
+            /// up) and still be on-page and leave room for preceeding
+            /// <see cref="DataEntryToolTip"/>(s). (In ImageViewer coordinates)
             /// </summary>
             int BackwardMargin
             {
@@ -529,17 +531,21 @@ namespace Extract.DataEntry
                     // Calculate the initial anchorpoint for the tooltip 
                     double toolTipRotation;
                     _highlightAnchorPoint = GetAnchorPoint(pageOfRasterZones,
-                        highlightAnchorAlignment, tooltipStandoffAngle, out toolTipRotation);
+                        highlightAnchorAlignment, tooltipStandoffAngle, _TOOLTIP_STANDOFF_DISTANCE,
+                        out toolTipRotation);
 
                     // TODO: This isn't the most efficient means of calculating the highlight's
                     // center position given the work that's already been done in the previous call.
                     Point highlightCenterPoint = GetAnchorPoint(pageOfRasterZones,
-                        highlightCenterAlignment, tooltipStandoffAngle, out toolTipRotation);
+                        highlightCenterAlignment, tooltipStandoffAngle, _TOOLTIP_STANDOFF_DISTANCE,
+                        out toolTipRotation);
 
                     // Create the TextLayerObject
                     _textLayerObject = new TextLayerObject(_host.ImageViewer, _page,
                         "ToolTip", toolTipText, _host._toolTipFont, _highlightAnchorPoint,
                         toolTipAnchorAlignment, Color.Yellow, Color.Black, (float)toolTipRotation);
+
+                    _textLayerObject.CanRender = false;
 
                     // Calculate the _referenceOrientation as the closest 90 degree angle to the
                     // negative of the specified tooltip rotation.
@@ -688,15 +694,15 @@ namespace Extract.DataEntry
             /// <summary>
             /// Attempts to fit the specified tooltip into the current side.
             /// </summary>
-            /// <param name="nextToolTip">The <see cref="ToolTip"/> that needs to be fit along the
-            /// current side of the <see cref="IAttribute"/> highlights.</param>
+            /// <param name="nextToolTip">The <see cref="DataEntryToolTip"/> that needs to be fit
+            /// along the current side of the <see cref="IAttribute"/> highlights.</param>
             /// <returns><see langword="true"/> if there was enough room to fit
             /// <see paramref="nextToolTip"/> in or it was fit as best as possible;
             /// <see langword="false"/> if there was not enough room and <see paramref="nextToolTip"/>
             /// was not positioned. (If _usingSide2, it will be positioned as best as possible even
             /// if there is not enough room.
             /// </returns>
-            bool TryFitToolTip(ToolTip nextToolTip)
+            bool TryFitToolTip(DataEntryToolTip nextToolTip)
             {
                 try
                 {
@@ -793,14 +799,14 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Determines how much space is available to scoot this <see cref="ToolTip"/> backward
-            /// without affecting any other tooltips.
+            /// Determines how much space is available to scoot this <see cref="DataEntryToolTip"/>
+            /// backward without affecting any other tooltips.
             /// </summary>
-            /// <param name="nextToolTip">The <see cref="ToolTip"/> that room is being made for.
-            /// </param>
+            /// <param name="nextToolTip">The <see cref="DataEntryToolTip"/> that room is being made
+            /// for.</param>
             /// <returns>The distance (in ImageViewer coordinates) that this tooltip can be shifted
             /// backward without impacting any other tooltips.</returns>
-            int GetFreeSpace(ToolTip nextToolTip)
+            int GetFreeSpace(DataEntryToolTip nextToolTip)
             {
                 int freeSpace;
 
@@ -830,21 +836,21 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Obtains the distance between this <see cref="ToolTip"/> and
+            /// Obtains the distance between this <see cref="DataEntryToolTip"/> and
             /// <see paramref="nextToolTip"/>.
             /// </summary>
-            /// <param name="nextToolTip">The <see cref="ToolTip"/> for which separation is to be
-            /// measured.</param>
-            /// <returns>The distance between this <see cref="ToolTip"/> and
+            /// <param name="nextToolTip">The <see cref="DataEntryToolTip"/> for which separation is
+            /// to be measured.</param>
+            /// <returns>The distance between this <see cref="DataEntryToolTip"/> and
             /// <see paramref="nextToolTip"/>.</returns>
-            int GetSeparation(ToolTip nextToolTip)
+            int GetSeparation(DataEntryToolTip nextToolTip)
             {
                 return nextToolTip._start - _end;
             }
 
             /// <summary>
-            /// Shifts this <see cref="ToolTip"/> forward (positive <see paramref="shiftAmount"/>)
-            /// or backward (negative <see paramref="shiftAmount"/>).
+            /// Shifts this <see cref="DataEntryToolTip"/> forward (positive
+            /// <see paramref="shiftAmount"/>) or backward (negative <see paramref="shiftAmount"/>).
             /// <para><b>Note:</b></para>
             /// Shifting backward may result in previous tooltips being shifted backward as well.
             /// </summary>
@@ -856,8 +862,8 @@ namespace Extract.DataEntry
             }
 
             /// <summary>
-            /// Shifts this <see cref="ToolTip"/> forward (positive <see paramref="shiftAmount"/>)
-            /// or backward (negative <see paramref="shiftAmount"/>).
+            /// Shifts this <see cref="DataEntryToolTip"/> forward (positive
+            /// <see paramref="shiftAmount"/>) or backward (negative <see paramref="shiftAmount"/>).
             /// <para><b>Note:</b></para>
             /// Shifting backward may result in previous tooltips being shifted backward as well.
             /// </summary>

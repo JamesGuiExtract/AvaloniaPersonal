@@ -100,7 +100,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private delegate bool AccessorMethod(IAttribute attribute, AttributeStatusInfo statusInfo, 
+        delegate bool AccessorMethod(IAttribute attribute, AttributeStatusInfo statusInfo, 
             bool value);
 
         #endregion Delegates
@@ -126,7 +126,7 @@ namespace Extract.DataEntry
         /// control more that two generations of attributes.</bullet>
         /// </list>
         /// </summary>
-        private class AttributeScanner
+        class AttributeScanner
         {
             #region Fields
 
@@ -229,7 +229,7 @@ namespace Extract.DataEntry
             /// </param>
             /// <param name="forward"><see langword="true"/> if scanning forward through the 
             /// attribute hierarchy, <see langword="false"/> if scanning backward.</param>
-            private AttributeScanner(IUnknownVector attributes, AccessorMethod accessorMethod,
+            AttributeScanner(IUnknownVector attributes, AccessorMethod accessorMethod,
                 bool value, bool forward, Stack<IAttribute> resultAttributeGenealogy)
             {
                 try
@@ -282,8 +282,7 @@ namespace Extract.DataEntry
                 try
                 {
                     // Validate the license
-                    LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
-                        "ELI26132", _OBJECT_NAME);
+                    _licenseCache.Validate("ELI26132");
 
                     // Create a node in charge of scanning the root-level attributes.
                     AttributeScanner rootScanNode = new AttributeScanner(attributes, accessorMethod,
@@ -331,7 +330,7 @@ namespace Extract.DataEntry
             /// looping back from the beginning of the attribute vector to the specified starting 
             /// point.</param>
             /// <returns>A <see cref="AttributeScanner"/> instance.</returns>
-            private AttributeScanner GetScanNode(IUnknownVector attributes, 
+            AttributeScanner GetScanNode(IUnknownVector attributes, 
                 Stack<IAttribute> startingPoint, bool firstPass)
             {
                 // Create and initialize the child AttributeScanner instance.
@@ -401,7 +400,7 @@ namespace Extract.DataEntry
             /// </param>
             /// <returns>Any <see cref="AttributeStatusInfo.DisplayOrder"/> that was applied during
             /// processing as a result of encountering the starting point.</returns>
-            private string Scan(string cutoffDisplayOrder)
+            string Scan(string cutoffDisplayOrder)
             {
                 // Initialized the applied cutoff value to null.
                 string appliedCutoffDisplayOrder = null;
@@ -505,7 +504,7 @@ namespace Extract.DataEntry
             /// </param>
             /// <returns><see langword="true"/> if the <see cref="IAttribute"/> should be skipped,
             /// <see langword="false"/> if the accessory method should be called.</returns>
-            private bool SkipAttribute(int index, string displayOrder, string cutoffDisplayOrder)
+            bool SkipAttribute(int index, string displayOrder, string cutoffDisplayOrder)
             {
                 // If this is the attribute specified by the starting point, skip it.
                 if (index == _startAttributeIndex)
@@ -542,7 +541,7 @@ namespace Extract.DataEntry
             /// <param name="displayOrder2">The display order to compare against.</param>
             /// <returns>Returns <see langword="true"/> if displayOrder1 comes before displayOrder2,
             /// <see langword="false"/> if they are equal or displayOrder2 comes first.</returns>
-            private bool IsBefore(string displayOrder1, string displayOrder2)
+            bool IsBefore(string displayOrder1, string displayOrder2)
             {
                 if (_forward)
                 {
@@ -568,7 +567,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(AttributeStatusInfo).ToString();
+        static readonly string _OBJECT_NAME = typeof(AttributeStatusInfo).ToString();
 
         /// <summary>
         /// The current version of this object.
@@ -577,7 +576,7 @@ namespace Extract.DataEntry
         /// <para><b>Versions 3:</b></para>
         /// Added persistence of _hintEnabled.
         /// </summary>
-        private const int _CURRENT_VERSION = 3;
+        const int _CURRENT_VERSION = 3;
         
         #endregion Constants
 
@@ -586,57 +585,58 @@ namespace Extract.DataEntry
         /// <summary>
         /// The filename of the currently open document.
         /// </summary>
-        private static string _sourceDocName;
+        static string _sourceDocName;
 
         /// <summary>
         /// The active attribute hierarchy.
         /// </summary>
-        private static IUnknownVector _attributes;
+        static IUnknownVector _attributes;
 
         /// <summary>
         /// A database available for use in validation or auto-update queries.
         /// </summary>
-        private static DbConnection _dbConnection;
+        static DbConnection _dbConnection;
 
         /// <summary>
         /// Caches the info object for each <see cref="IAttribute"/> for quick reference later on.
         /// </summary>
-        private static Dictionary<IAttribute, AttributeStatusInfo> _statusInfoMap =
+        static Dictionary<IAttribute, AttributeStatusInfo> _statusInfoMap =
             new Dictionary<IAttribute, AttributeStatusInfo>();
 
         /// <summary>
         /// A dictionary that keeps track of which attribute collection each attribute belongs to.
         /// Used to help in assigning _parentAttribute fields.
         /// </summary>
-        private static Dictionary<IUnknownVector, IAttribute> _subAttributesToParentMap =
+        static Dictionary<IUnknownVector, IAttribute> _subAttributesToParentMap =
             new Dictionary<IUnknownVector, IAttribute>();
 
         /// <summary>
         /// A dictionary of auto-update triggers that exist on the attributes stored in the keys of
         /// this dictionary.
         /// </summary>
-        private static Dictionary<IAttribute, AutoUpdateTrigger> _autoUpdateTriggers =
+        static Dictionary<IAttribute, AutoUpdateTrigger> _autoUpdateTriggers =
             new Dictionary<IAttribute, AutoUpdateTrigger>();
 
         /// <summary>
         /// A dictionary of validation triggers that exist on the attributes stored in the keys of
         /// this dictionary.
         /// </summary>
-        private static Dictionary<IAttribute, AutoUpdateTrigger> _validationTriggers =
+        static Dictionary<IAttribute, AutoUpdateTrigger> _validationTriggers =
             new Dictionary<IAttribute, AutoUpdateTrigger>();
 
         /// <summary>
         /// Keeps track of the attributes that have been modified since the last time EndEdit was
-        /// called and whether the spatial information for the attribute changed or not in order to
-        /// determine for which attributes an AttributeValueModified event needs to be fired.
+        /// called. Each modified attribute is assiged a KeyValuePair which keeps track of whether
+        /// the spatial information has changed and what the original attribute value was in case
+        /// it needs to be reverted.
         /// </summary>
-        private static Dictionary<IAttribute, bool> _attributesBeingModified =
-            new Dictionary<IAttribute, bool>();
+        static Dictionary<IAttribute, KeyValuePair<bool, SpatialString>> _attributesBeingModified =
+            new Dictionary<IAttribute, KeyValuePair<bool, SpatialString>>();
 
         /// <summary>
         /// Keeps track of whether EndEdit is currently being processed.
         /// </summary>
-        private static bool _endEditInProgress;
+        static bool _endEditInProgress;
 
         /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
@@ -644,112 +644,118 @@ namespace Extract.DataEntry
         /// IPersistStream::IsDirty in order to support COM values of <see cref="HResult.Ok"/> and 
         /// <see cref="HResult.False"/>.
         /// </summary>
-        private int _dirty;
+        int _dirty;
 
         /// <summary>
         /// The control in charge of displaying the attribute.
         /// </summary>
-        private IDataEntryControl _owningControl;
+        IDataEntryControl _owningControl;
 
         /// <summary>
         /// The validator used to validate the attribute's data.
         /// </summary>
-        private IDataEntryValidator _validator;
+        IDataEntryValidator _validator;
 
         /// <summary>
         /// Indicates whether the user has viewed the attribute's data.
         /// </summary>
-        private bool _hasBeenViewed;
+        bool _hasBeenViewed;
 
         /// <summary>
         /// Whether this attribute has been propagated (ie, its children have been mapped to
         /// any dependent child controls.
         /// </summary>
-        private bool _hasBeenPropagated;
+        bool _hasBeenPropagated;
 
         /// <summary>
         /// <see langword="true"/> if the attribute's data is viewable in the DEP, 
         /// <see langword="false"/> otherwise.
         /// </summary>
-        private bool _isViewable;
+        bool _isViewable;
 
         /// <summary>
         /// <see langword="true"/> if the attribute's data is currently know to be valid.
         /// <see langword="false"/> otherwise.
         /// </summary>
-        private bool _dataIsValid = true;
+        bool _dataIsValid = true;
 
         /// <summary>
         /// <see langword="true"/> if data validation should be performed on the attribute,
         /// <see langword="false"/> if the attribute should always be considered valid.
         /// </summary>
-        private bool _validationEnabled = true;
+        bool _validationEnabled = true;
 
         /// <summary>
         /// A string that allows attributes to be sorted by compared to other display order values.
         /// </summary>
-        private string _displayOrder;
+        string _displayOrder;
 
         /// <summary>
         /// Specifies whether the <see cref="IAttribute"/> is a hint and, if so, what type
         /// of hint that it is.
         /// </summary>
-        private HintType _hintType;
+        HintType _hintType;
 
         /// <summary>
         /// Specifies the spatial area that defines a hint.
         /// </summary>
-        private IEnumerable<Extract.Imaging.RasterZone> _hintRasterZones;
+        IEnumerable<Extract.Imaging.RasterZone> _hintRasterZones;
 
         /// <summary>
         /// Specifies whether the user has accepted the highlight associated with the attribute.
         /// </summary>
-        private bool _isAccepted;
+        bool _isAccepted;
 
         /// <summary>
         /// Specifies whether hints are enabled for the attribute. The fact that hints are enabled
         /// doesn't necessarily mean the attribute has one.
         /// </summary>
-        private bool _hintEnabled = true;
+        bool _hintEnabled = true;
 
         /// <summary>
         /// Specifies the parent of this attribute (if one exists).
         /// </summary>
-        private IAttribute _parentAttribute;
+        IAttribute _parentAttribute;
 
         /// <summary>
         /// A query which will cause the attribute's value to automatically be updated using values
         /// from other attributes and/or a database query.
         /// </summary>
-        private string _autoUpdateQuery;
+        string _autoUpdateQuery;
 
         /// <summary>
         /// A query which will cause the validation list to be updated using the values from other
         /// <see cref="IAttribute"/>'s and/or a database query.
         /// </summary>
-        private string _validationQuery;
+        string _validationQuery;
 
         /// <summary>
         /// Keeps track of if an AttributeValueModified value event is currently being raised to
         /// prevent recursion via autoUpdateQueries.
         /// </summary>
-        private bool _raisingAttributeValueModified;
+        bool _raisingAttributeValueModified;
 
         /// <summary>
         /// Specifies the full path (from the attribute hierarchy root).  Used to assist registering
         /// AutoUpdateTrigger attributes more efficiently.
         /// </summary>
-        private string _fullPath;
+        string _fullPath;
         
         /// <summary>
         /// Specifies under what circumstances the attribute should serve as a tab stop.
         /// </summary>
-        private TabStopMode _tabStopMode = TabStopMode.Always;
+        TabStopMode _tabStopMode = TabStopMode.Always;
 
         /// <summary>
         /// Specifies whether the attribute should be persisted in output.
         /// </summary>
-        private bool _persistAttribute = true;
+        bool _persistAttribute = true;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -772,8 +778,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24485",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24485");
             }
             catch (Exception ex)
             {
@@ -978,8 +983,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26109",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26109");
 
                 AttributeStatusInfo statusInfo;
                 if (!_statusInfoMap.TryGetValue(attribute, out statusInfo))
@@ -1020,8 +1024,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26133",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26133");
 
                 _sourceDocName = sourceDocName;
                 _attributes = attributes;
@@ -1086,8 +1089,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26134",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26134");
 
                 // Create a new statusInfo instance (or retrieve an existing one).
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
@@ -1208,7 +1210,7 @@ namespace Extract.DataEntry
 
                 foreach (AutoUpdateTrigger autoUpdateTrigger in _autoUpdateTriggers.Values)
                 {
-                    if (!autoUpdateTrigger.IsFullyResolved)
+                    if (!autoUpdateTrigger.GetIsFullyResolved())
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for RegisterTriggerCandidate to work. When creating a new
@@ -1259,7 +1261,7 @@ namespace Extract.DataEntry
 
                 foreach (AutoUpdateTrigger validationTrigger in _validationTriggers.Values)
                 {
-                    if (!validationTrigger.IsFullyResolved)
+                    if (!validationTrigger.GetIsFullyResolved())
                     {
                         // We need to ensure that the attribute is a part of the sourceAttributes
                         // in order for RegisterTriggerCandidate to work. When creating a new
@@ -1271,14 +1273,10 @@ namespace Extract.DataEntry
                     }
                 }
 
-                // [DataEntry:197]
-                // Empty fields should be considered viewed.
+                // [DataEntry:173] Trim any whitespace from the beginning and end.
                 // [DataEntry:167]
-                // Checking the value also ensure the value is accessed and, thus, created.
-                if (string.IsNullOrEmpty(attribute.Value.String))
-                {
-                    statusInfo._hasBeenViewed = true;
-                }
+                // Accessing the value also ensures the value is accessed and, thus, created.
+                attribute.Value.Trim(" \t\r\n", " \t\r\n");
 
                 // Raise the AttributeInitialized event if it hasn't already been raised for this
                 // attribute.
@@ -1312,8 +1310,18 @@ namespace Extract.DataEntry
         public static void SetValue(IAttribute attribute, SpatialString value,
             bool acceptSpatialInfo, bool endOfEdit)
         {
+            // In case of an error applying the new value, keep track of the original value.
+            SpatialString originalValue = null;
+
             try
             {
+                // Validate the license
+                _licenseCache.Validate("ELI27093");
+
+                // Make a copy of the original value.
+                ICopyableObject copySource = (ICopyableObject)attribute.Value;
+                originalValue = (SpatialString)copySource.Clone();
+
                 attribute.Value = value;
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
@@ -1333,7 +1341,24 @@ namespace Extract.DataEntry
                         statusInfo.OnAttributeValueModified(attribute, true, acceptSpatialInfo, true);
                     }
 
-                    _attributesBeingModified[attribute] = true;
+                    KeyValuePair<bool, SpatialString> existingModification;
+                    if (_attributesBeingModified.TryGetValue(attribute, out existingModification))
+                    {
+                        // If the attribute already exists in _attributesBeingModified, but is
+                        // marked as a non-spatial change, mark it as a spatial change instead.
+                        if (existingModification.Key == false)
+                        {
+                            _attributesBeingModified[attribute] =
+                                new KeyValuePair<bool, SpatialString>(
+                                    true, existingModification.Value);
+                        }
+                    }
+                    else
+                    {
+                        // If the attribute has not been added to _attributesBeingModified, add it.
+                        _attributesBeingModified[attribute] =
+                            new KeyValuePair<bool, SpatialString>(true, originalValue);
+                    }
 
                     // After queing the modification, call EndEdit if directed.
                     if (endOfEdit)
@@ -1344,6 +1369,28 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
+                // If there was an exception applying the value, restore the original value to
+                // prevent exceptions from continuously being generated.
+                if (originalValue != null)
+                {
+                    try
+                    {
+                        attribute.Value = originalValue;
+
+                        // After setting the value, refresh the value and raise
+                        // AttributeValueModified to notify the host of the change.
+                        AttributeStatusInfo statusInfo =
+                            AttributeStatusInfo.GetStatusInfo(attribute);
+                        statusInfo.OwningControl.RefreshAttributes(new IAttribute[] { attribute }, 
+                            true);
+                        statusInfo.OnAttributeValueModified(attribute, false, false, true);
+                    }
+                    catch (Exception ex2)
+                    {
+                        ExtractException.Log("ELI27094", ex2);
+                    }
+                }
+
                 throw ExtractException.AsExtractException("ELI26090", ex);
             }
         }
@@ -1365,15 +1412,21 @@ namespace Extract.DataEntry
         public static void SetValue(IAttribute attribute, string value, bool acceptSpatialInfo,
             bool endOfEdit)
         {
+            // In case of an error applying the new value, keep track of the original value.
+            SpatialString originalValue = null;
+
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26135",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26135");
 
                 // Don't do anything if the specified value matches the existing value.
                 if (attribute.Value.String != value)
                 {
+                    // Make a copy of the original value.
+                    ICopyableObject copySource = (ICopyableObject)attribute.Value;
+                    originalValue = (SpatialString)copySource.Clone();
+
                     // If the attribute doesn't contain any spatial information, just
                     // change the text.
                     if (attribute.Value.GetMode() == ESpatialStringMode.kNonSpatialMode)
@@ -1403,7 +1456,8 @@ namespace Extract.DataEntry
 
                         if (!_attributesBeingModified.ContainsKey(attribute))
                         {
-                            _attributesBeingModified[attribute] = false;
+                            _attributesBeingModified[attribute] =
+                                new KeyValuePair<bool, SpatialString>(false, originalValue);
                         }
                     }
                 }
@@ -1416,6 +1470,28 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
+                // If there was an exception applying the value, restore the original value to
+                // prevent exceptions from continuously being generated.
+                if (originalValue != null)
+                {
+                    try
+                    {
+                        attribute.Value = originalValue;
+
+                        // After setting the value, refresh the value and raise
+                        // AttributeValueModified to notify the host of the change.
+                        AttributeStatusInfo statusInfo =
+                            AttributeStatusInfo.GetStatusInfo(attribute);
+                        statusInfo.OwningControl.RefreshAttributes(new IAttribute[] { attribute },
+                            false);
+                        statusInfo.OnAttributeValueModified(attribute, false, false, false);
+                    }
+                    catch (Exception ex2)
+                    {
+                        ExtractException.Log("ELI27095", ex2);
+                    }
+                }
+
                 throw ExtractException.AsExtractException("ELI26093", ex);
             }
         }
@@ -1431,8 +1507,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26136",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26136");
 
                 AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
 
@@ -2225,6 +2300,54 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Removes all spatial info associated with the <see cref="IAttribute"/> (including any
+        /// hint).
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> whose spatial info is to be
+        /// removed.</param>
+        /// <returns><see langword="true"/> if spatial info was removed, <see langword="false"/>
+        /// if there was no spatial info to remove.</returns>
+        [ComVisible(false)]
+        public static bool RemoveSpatialInfo(IAttribute attribute)
+        {
+            try
+            {
+                AttributeStatusInfo statusInfo = GetStatusInfo(attribute);
+
+                bool spatialInfoRemoved = false;
+
+                // If the attribute has spatial information (a highlight), remove it and
+                // flag the attribute so that hints are not created in its place.
+                if (attribute.Value.HasSpatialInfo())
+                {
+                    attribute.Value.DowngradeToNonSpatialMode();
+
+                    spatialInfoRemoved = true;
+                }
+                // If the attribute has an associated hint, remove the hint and flag the
+                // attribute so that hints are not re-created. 
+                else if (statusInfo._hintType != HintType.None)
+                {
+                    spatialInfoRemoved = true;
+                }
+
+                if (spatialInfoRemoved)
+                {
+                    statusInfo._hintEnabled = false;
+
+                    // Notify listeners that spatial info has changed.
+                    statusInfo.OnAttributeValueModified(attribute, true, false, true);
+                }
+
+                return spatialInfoRemoved;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27320", ex);
+            }
+        }
+
         /// <overloads>Obtains the full path of the <see cref="IAttribute"/> from the root of the
         /// hierarchy.</overloads>
         /// <summary>
@@ -2239,8 +2362,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26138",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26138");
 
                 // If the specified attribute is null, just return blank.
                 if (attribute == null)
@@ -2281,8 +2403,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26139",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26139");
 
                 // Tokenize the query and process each element in order.
                 string[] pathTokens =
@@ -2329,8 +2450,8 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Returns the <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s which match the
-        /// specified query applied to the specified root attribute.
+        /// Returns the a list of the <see cref="IAttribute"/>s which match the specified query
+        /// applied to the specified root attribute.
         /// </summary>
         /// <param name="rootAttribute">The <see cref="IAttribute"/> on which the query is to be
         /// executed.</param>
@@ -2339,11 +2460,13 @@ namespace Extract.DataEntry
         /// <returns>The <see cref="IUnknownVector"/> of all <see cref="IAttribute"/>s matching the
         /// query.</returns>
         [ComVisible(false)]
-        public static IUnknownVector ResolveAttributeQuery(IAttribute rootAttribute, string query)
+        // Returning a list so the count can be checked results can be accessed by index.
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public static List<IAttribute> ResolveAttributeQuery(IAttribute rootAttribute, string query)
         {
             try
             {
-                IUnknownVector results = (IUnknownVector)new IUnknownVectorClass();
+                List<IAttribute> results = new List<IAttribute>();
 
                 // Trim off any leading slash.
                 if (!string.IsNullOrEmpty(query) && query[0] == '/')
@@ -2358,7 +2481,7 @@ namespace Extract.DataEntry
                         rootAttribute != null);
 
                     // Return the rootAttribute if the query is null.
-                    results.PushBack(rootAttribute);
+                    results.Add(rootAttribute);
                     return results;
                 }
                 // If the parent attribute is specified, return the result of running the remaining
@@ -2368,7 +2491,7 @@ namespace Extract.DataEntry
                     ExtractException.Assert("ELI26141", "Invalid attribute query!",
                         rootAttribute != null);
 
-                    results.Append(ResolveAttributeQuery(GetStatusInfo(rootAttribute)._parentAttribute,
+                    results.AddRange(ResolveAttributeQuery(GetStatusInfo(rootAttribute)._parentAttribute,
                         (query.Length > 3) ? query.Substring(3) : null));
                 }
                 // Otherwise, apply the next element of the query.
@@ -2388,16 +2511,16 @@ namespace Extract.DataEntry
                     IUnknownVector attributesToQuery =
                         (rootAttribute == null) ? _attributes : rootAttribute.SubAttributes;
 
-                    // Query the current element.
-                    IUnknownVector attributes = DataEntryMethods.AFUtility.QueryAttributes(
-                        attributesToQuery, query, false);
-
-                    // Apply the remaining query to all results from the current element.
-                    int count = attributes.Size();
+                    // Apply the remaining query to all attributes matching the current query.
+                    int count = attributesToQuery.Size();
                     for (int i = 0; i < count; i++)
                     {
-                        results.Append(
-                            ResolveAttributeQuery((IAttribute)attributes.At(i), nextQuery));
+                        IAttribute attribute = (IAttribute)attributesToQuery.At(i);
+                        if (query.Equals(attribute.Name, StringComparison.OrdinalIgnoreCase))
+                        {
+                            results.AddRange(
+                                ResolveAttributeQuery(attribute, nextQuery));
+                        }
                     }
                 }
 
@@ -2434,12 +2557,12 @@ namespace Extract.DataEntry
                     {
                         _endEditInProgress = true;
 
-                        foreach (KeyValuePair<IAttribute, bool> modifiedAttribute in
-                            _attributesBeingModified)
+                        foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>>
+                            modifiedAttribute in _attributesBeingModified)
                         {
                             AttributeStatusInfo statusInfo = GetStatusInfo(modifiedAttribute.Key);
                             statusInfo.OnAttributeValueModified(modifiedAttribute.Key, false, false,
-                                modifiedAttribute.Value);
+                                modifiedAttribute.Value.Key);
                         }
 
                         _attributesBeingModified.Clear();
@@ -2452,6 +2575,59 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
+                try
+                {
+                    // Keep track of all attributes whose values need to be restored due to a failed
+                    // update.
+                    Dictionary<IDataEntryControl, List<IAttribute>> controlsToRefresh =
+                        new Dictionary<IDataEntryControl, List<IAttribute>>();
+                    bool refreshSpatialInfo = false;
+
+                    // If there was an exception applying any value, restore the original value for
+                    // all modified attributes to prevent exceptions from continuously being
+                    // generated.
+                    foreach (KeyValuePair<IAttribute, KeyValuePair<bool, SpatialString>> 
+                        modifiedAttribute in _attributesBeingModified)
+                    {
+                        IAttribute attribute = modifiedAttribute.Key;
+                        attribute.Value = modifiedAttribute.Value.Value;
+
+                        // Record whether spatial info has changed for any of the attributes.
+                        refreshSpatialInfo |= modifiedAttribute.Value.Key;
+
+                        // After setting the value, refresh the value and raise
+                        // AttributeValueModified to notify the host of the change.
+                        AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+
+                        List<IAttribute> attributeCollection = null;
+                        if (!controlsToRefresh.TryGetValue(statusInfo.OwningControl,
+                            out attributeCollection))
+                        {
+                            attributeCollection = new List<IAttribute>();
+                            controlsToRefresh[statusInfo.OwningControl] = attributeCollection;
+                        }
+
+                        attributeCollection.Add(attribute);
+                        statusInfo.OnAttributeValueModified(attribute, false, false, true);
+                    }
+
+                    // Refresh all attributes whose values have been restored.
+                    foreach (KeyValuePair<IDataEntryControl, List<IAttribute>>
+                        controlToRefresh in controlsToRefresh)
+                    {
+                        controlToRefresh.Key.RefreshAttributes(controlToRefresh.Value.ToArray(),
+                            refreshSpatialInfo);
+                    }
+                }
+                catch (Exception ex2)
+                {
+                    ExtractException.Log("ELI27096", ex2);
+                }
+
+                // If an exception occured, clear any pending modifications so they are not applied
+                // on a subsequent edit event.
+                _attributesBeingModified.Clear();
+
                 throw ExtractException.AsExtractException("ELI26118", ex);
             }  
         }
@@ -2504,7 +2680,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private static bool ConfirmDataViewed(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool ConfirmDataViewed(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             return (!statusInfo._isViewable || statusInfo._hasBeenViewed == value);
@@ -2526,7 +2702,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private static bool ConfirmDataValidity(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool ConfirmDataValidity(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             return (statusInfo._owningControl == null || !statusInfo._isViewable ||
@@ -2545,7 +2721,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private static bool ConfirmHasBeenPropagated(IAttribute attribute,
+        static bool ConfirmHasBeenPropagated(IAttribute attribute,
             AttributeStatusInfo statusInfo, bool value)
         {
             return (statusInfo._owningControl == null || statusInfo._hasBeenPropagated == value);
@@ -2563,7 +2739,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private static bool ConfirmIsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool ConfirmIsTabStop(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             // Default the attribute as not being a tab stop.
@@ -2618,7 +2794,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> to continue traversing the attribute tree, 
         /// <see langword="false"/> to return <see langword="false"/> from an attribute scan 
         /// without traversing any more attributes.</returns>
-        private static bool MarkAsPropagated(IAttribute attribute, AttributeStatusInfo statusInfo,
+        static bool MarkAsPropagated(IAttribute attribute, AttributeStatusInfo statusInfo,
             bool value)
         {
             statusInfo._hasBeenPropagated = value;
@@ -2632,7 +2808,7 @@ namespace Extract.DataEntry
         /// <param name="dataIsViewed"><see langword="true"/> if the <see cref="IAttribute"/>'s data
         /// has now been marked as viewed, <see langword="false"/> if it has now been marked as 
         /// unviewed.</param>
-        private static void OnViewedStateChanged(IAttribute attribute, bool dataIsViewed)
+        static void OnViewedStateChanged(IAttribute attribute, bool dataIsViewed)
         {
             if (AttributeStatusInfo.ViewedStateChanged != null)
             {
@@ -2648,7 +2824,7 @@ namespace Extract.DataEntry
         /// <param name="dataIsValid"><see langword="true"/> if the <see cref="IAttribute"/>'s data
         /// has now been marked as valid, <see langword="false"/> if it has now been marked as 
         /// invalid.</param>
-        private static void OnValidationStateChanged(IAttribute attribute, bool dataIsValid)
+        static void OnValidationStateChanged(IAttribute attribute, bool dataIsValid)
         {
             if (AttributeStatusInfo.ValidationStateChanged != null)
             {
@@ -2665,7 +2841,7 @@ namespace Extract.DataEntry
         /// <see cref="IAttribute"/>s from which the attribute is from.</param>
         /// <param name="dataEntryControl">The <see cref="IDataEntryControl"/> that the
         /// <see cref="IAttribute"/> is associated with.</param>
-        private static void OnAttributeInitialized(IAttribute attribute,
+        static void OnAttributeInitialized(IAttribute attribute,
             IUnknownVector sourceAttributes, IDataEntryControl dataEntryControl)
         {
             if (AttributeStatusInfo.AttributeInitialized != null)
@@ -2688,7 +2864,7 @@ namespace Extract.DataEntry
         /// <param name="spatialInfoChanged"><see langword="true"/> if the spatial info for the
         /// <see cref="IAttribute"/> has changed, <see langword="false"/> if only the text has
         /// changed.</param>
-        private void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
+        void OnAttributeValueModified(IAttribute attribute, bool incrementalUpdate,
             bool acceptSpatialInfo, bool spatialInfoChanged)
         {
             // Don't raise the event if it is already being raised (prevents recursion).
@@ -2713,7 +2889,7 @@ namespace Extract.DataEntry
         /// Raises the AttributeDeleted event.
         /// </summary>
         /// <param name="attribute">The <see cref="IAttribute"/> that was deleted.</param>
-        private void OnAttributeDeleted(IAttribute attribute)
+        void OnAttributeDeleted(IAttribute attribute)
         {
             if (this.AttributeDeleted != null)
             {

@@ -58,6 +58,11 @@ namespace Extract.DataEntry
         private Dictionary<string, string> _validationListValues;
 
         /// <summary>
+        /// Specifies whether validation lists will be checked for matches case-sensitively.
+        /// </summary>
+        private bool _caseSensitive;
+
+        /// <summary>
         /// Specifies whether a value that matches a validation list item case-insensitively but
         /// not case-sensitively will be changed to match the validation list value.
         /// </summary>
@@ -67,6 +72,12 @@ namespace Extract.DataEntry
         /// The error message that should be displayed upon validation failure.
         /// </summary>
         private string _validationErrorMessage = "Invalid value";
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -87,8 +98,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24492",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24492");
             }
             catch (Exception ex)
             {
@@ -228,6 +238,26 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether validation lists will be checked for matches case-sensitively.
+        /// </summary>
+        /// <value><see langword="true"/> to validate against a validation list case-sensitively;
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if validating against a validation list
+        /// case-sensitively; <see langword="false"/> otherwise.</returns>
+        public bool CaseSensitive
+        {
+            get
+            {
+                return _caseSensitive;
+            }
+
+            set
+            {
+                _caseSensitive = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or set the error message that should be displayed upon validation failure. 
         /// If unspecified, a default of "Bad value" will be used.
         /// </summary>
@@ -329,10 +359,22 @@ namespace Extract.DataEntry
                 else if (_validationListValues != null)
                 {
                     string valueTrimmed = value.Trim();
-                    string valueUpper = valueTrimmed.ToUpper(CultureInfo.CurrentCulture);
+                    bool valueIsInList = false;
                     string listValue;
-                    bool valueIsInList = _validationListValues.TryGetValue(valueUpper, out listValue);
-
+                    if (_caseSensitive)
+                    {
+                        // If case-sensitive, keys are assigned with the original casing.
+                        valueIsInList =
+                            _validationListValues.TryGetValue(valueTrimmed, out listValue);
+                    }
+                    else
+                    {
+                        // If checking case-insensitively, keys have been assigned using all caps.
+                        string valueUpper = valueTrimmed.ToUpper(CultureInfo.CurrentCulture);
+                        valueIsInList =
+                            _validationListValues.TryGetValue(valueUpper, out listValue);
+                    }
+                    
                     if (!valueIsInList)
                     {
                         if (validationEnabled)
@@ -440,8 +482,18 @@ namespace Extract.DataEntry
                             trimmedItem = "";
                         }
 
-                        _validationListValues[trimmedItem.ToUpper(CultureInfo.CurrentCulture)] =
-                            trimmedItem;
+                        if (_caseSensitive)
+                        {
+                            // If using case-sensitive validation, the key should use the original
+                            // casing.
+                            _validationListValues[trimmedItem] = trimmedItem;
+                        }
+                        else
+                        {
+                            // If using case-insensitive validation, the key should use all caps.
+                            _validationListValues[trimmedItem.ToUpper(CultureInfo.CurrentCulture)] =
+                                trimmedItem;
+                        }
                     }
                 }
 
@@ -528,6 +580,7 @@ namespace Extract.DataEntry
                     SetValidationListValues(source.GetValidationListValues());
                 }
                 _correctCase = source._correctCase;
+                _caseSensitive = source._caseSensitive;
             }
             catch (Exception ex)
             {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.IO;
 
@@ -24,7 +25,7 @@ namespace Extract.Utilities
         /// <summary>
         /// The name of the temporary file that was generated
         /// </summary>
-        private string _fileName;
+        string _fileName;
 
         #endregion Fields
 
@@ -90,6 +91,24 @@ namespace Extract.Utilities
 
         #endregion Constructors
 
+        #region Destructors
+
+        /// <summary>
+        /// Implement finalize to ensure the temporary file is deleted even when Dispose is not
+        /// called. Though using Finalize is generally not advisable, since COM objects such as
+        /// LabResultsCustomComponents.OrderMapper may not have their dispose method called, this
+        /// ensures files don't get left behind.
+        /// </summary>
+        // I'm not calling Dispose(false) because so Dispose can log failures. Since logging
+        // failures allocates memory, I don't want to do that logging here.
+        [SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
+        ~TemporaryFile()
+        {
+            Dispose(false);
+        }
+
+        #endregion Destructors
+
         #region Properties
 
         /// <summary>
@@ -127,20 +146,44 @@ namespace Extract.Utilities
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
         protected virtual void Dispose(bool disposing)
         {
-            // Dispose of managed resources
             if (disposing)
             {
+                // Dispose of managed resources
+
+            }
+
+            // Dispose of ummanaged resources
+            try
+            {
                 // If the temporary file still exists then delete it.
-                if (File.Exists(_fileName))
+                if (!string.IsNullOrEmpty(_fileName) && File.Exists(_fileName))
                 {
-                    // Try delete and log any exceptions, do not throw exceptions
-                    // from Dispose
-                    ExtractException ex;
-                    if (!FileSystemMethods.TryDeleteFile(_fileName, out ex))
+                    if (disposing)
                     {
-                        ExtractException.Log("ELI25511", ex);
+                        // Try delete and log any exceptions, do not throw exceptions
+                        // from Dispose.
+                        ExtractException ex;
+                        if (FileSystemMethods.TryDeleteFile(_fileName, out ex))
+                        {
+                            _fileName = null;
+                        }
+                        else
+                        {
+                            ExtractException.Log("ELI25511", ex);
+                        }
+                    }
+                    else
+                    {
+                        // Do not use FileSystemMethods.TryDeleteFile since it creates an exception and
+                        // allocating memory in finalizers is not advised.
+                        File.Delete(_fileName);
                     }
                 }
+            }
+            catch
+            {
+                // Just eat any expections... don't use ExtractException to log (which would result
+                // in allocated memory which we don't want to do in a finalizer.
             }
         }
 

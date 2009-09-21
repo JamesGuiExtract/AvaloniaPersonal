@@ -251,6 +251,11 @@ namespace Extract.DataEntry
         const float _TOOLTIP_FONT_SIZE = 13F;
 
         /// <summary>
+        /// The number of image pixels a tooltip or error icon should be placed from the highlight.
+        /// </summary>
+        const int _TOOLTIP_STANDOFF_DISTANCE = (int)_TOOLTIP_FONT_SIZE;
+
+        /// <summary>
         /// The font family used to display data.
         /// </summary>
         static readonly string _DATA_FONT_FAMILY = "Verdana";
@@ -290,8 +295,8 @@ namespace Extract.DataEntry
         /// <summary>
         /// A dictionary to keep track of each attribute's tooltips
         /// </summary>
-        Dictionary<IAttribute, ToolTip> _attributeToolTips =
-            new Dictionary<IAttribute, ToolTip>();
+        Dictionary<IAttribute, DataEntryToolTip> _attributeToolTips =
+            new Dictionary<IAttribute, DataEntryToolTip>();
 
         /// <summary>
         /// A dictionary to keep track of each attribute's error icons
@@ -344,9 +349,9 @@ namespace Extract.DataEntry
         IAttribute _hoverAttribute;
 
         /// <summary>
-        /// The <see cref="ToolTip"/> associated with the active _hoverAttribute.
+        /// The <see cref="DataEntryToolTip"/> associated with the active _hoverAttribute.
         /// </summary>
-        ToolTip _hoverToolTip;
+        DataEntryToolTip _hoverToolTip;
 
         /// <summary>
         /// A list of all data controls contained in this control host.
@@ -535,11 +540,6 @@ namespace Extract.DataEntry
         bool _processingSwipe;
 
         /// <summary>
-        /// Indicates whether the results of the active swipe should be discarded.
-        /// </summary>
-        bool _cancelingSwipe;
-
-        /// <summary>
         /// A database available for use in validation or auto-update queries.
         /// </summary>
         DbConnection _dbConnection;
@@ -593,6 +593,33 @@ namespace Extract.DataEntry
         /// </summary>
         bool _performingAutoZoom;
 
+        /// <summary>
+        /// A <see cref="ToolTip"/> used to display notifications to the user.
+        /// </summary>
+        ToolTip _userNotificationTooltip;
+
+        /// <summary>
+        /// A list of attributes that have been added since the last time DrawHighlights was run.
+        /// </summary>
+        List<IAttribute> _newlyAddedAttributes = new List<IAttribute>();
+
+        /// <summary>
+        /// Indicates whether a control is in the middle of processing an updated.  DrawHighlights
+        /// and other general processing that can be delayed should be until the update is complete.
+        /// </summary>
+        bool _controlUpdateInProgress;
+
+        /// <summary>
+        /// Indicates whether DrawHighlights is currently being processed.
+        /// </summary>
+        bool _drawingHighlights;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Constructors
@@ -614,8 +641,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI23666",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23666");
 
                 InitializeComponent();
 
@@ -1224,6 +1250,7 @@ namespace Extract.DataEntry
                         _imageViewer.MouseDown -= HandleImageViewerMouseDown;
                         _imageViewer.ZoomChanged -= HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged -= HandleImageViewerScrollPositionsChanged;
+                        _imageViewer.PageChanged -= HandleImageViewerPageChanged;
                     }
 
                     // Store the new image viewer internally
@@ -1241,8 +1268,10 @@ namespace Extract.DataEntry
                         _imageViewer.MouseDown += HandleImageViewerMouseDown;
                         _imageViewer.ZoomChanged += HandleImageViewerZoomChanged;
                         _imageViewer.ScrollPositionChanged += HandleImageViewerScrollPositionsChanged;
+                        _imageViewer.PageChanged += HandleImageViewerPageChanged;
 
                         _imageViewer.DefaultHighlightColor = _defaultHighlightColor;
+                        _imageViewer.AllowBandedSelection = false;
                     }
                 }
                 catch (Exception e)
@@ -1301,10 +1330,6 @@ namespace Extract.DataEntry
                         // propagate selection to the next attribute in the tab order.
                         if (m.Msg == _WM_KEYDOWN)
                         {
-                            // Indicate a manual focus event so that HandleControlGotFocus allows the
-                            // new attribute selection rather than overriding it.
-                            _manualFocusEvent = true;
-
                             // Notify AttributeStatusInfo that the current edit is over.
                             // This will also be called as part of a focus change event, but it needs
                             // to be done here first so that any auto-updating that needs to occur
@@ -1318,6 +1343,10 @@ namespace Extract.DataEntry
 
                             if (nextTabStopAttribute != null)
                             {
+                                // Indicate a manual focus event so that HandleControlGotFocus allows the
+                                // new attribute selection rather than overriding it.
+                                _manualFocusEvent = true;
+
                                 PropagateAttributes(nextTabStopAttribute, true);
                             }
 
@@ -1346,14 +1375,14 @@ namespace Extract.DataEntry
                             _imageViewer.ClientRectangle.Contains(
                                 _imageViewer.PointToClient(Control.MousePosition)))
                     {
-                        _imageViewer.Select();
+                        _imageViewer.Focus();
                         return true;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ExtractException.Log("ELI24055", ex);
+                ExtractException.Display("ELI24055", ex);
             }
 
             return false;
@@ -1596,36 +1625,43 @@ namespace Extract.DataEntry
                 // Keep track if any attributes were updated.
                 bool spatialInfoRemoved = false;
 
-                // Loop through every attribute in the active control.
-                List<IAttribute> activeAttributes;
-                if (_activeDataControl != null &&
-                    _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
+                // The selected & active attributes
+                List<IAttribute> activeAttributes = null;
+
+                try
                 {
-                    foreach (IAttribute attribute in activeAttributes)
+                    // Prevent multiple re-draws from being triggered with each cell processed.
+                    _controlUpdateInProgress = true;
+
+                    // Loop through every attribute in the active control.
+                    if (_activeDataControl != null &&
+                        _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes))
                     {
-                        // If the attribute has spatial information (a highlight), remove it and
-                        // flag the attribute so that hints are not created in its place.
-                        if (attribute.Value.HasSpatialInfo())
+                        foreach (IAttribute attribute in activeAttributes)
                         {
-                            RemoveAttributeHighlight(attribute);
-                            AttributeStatusInfo.EnableHint(attribute, false);
-                            attribute.Value.DowngradeToNonSpatialMode();
-                            spatialInfoRemoved = true;
-                        }
-                        // If the attribute has an associated hint, remove the hint and flag the
-                        // attribute so that hints are not re-created. 
-                        else if (AttributeStatusInfo.GetHintType(attribute) != HintType.None)
-                        {
-                            RemoveAttributeHighlight(attribute);
-                            AttributeStatusInfo.EnableHint(attribute, false);
-                            spatialInfoRemoved = true;
+                            // [DataEntry:642] Don't allow spatial info to be removed from attributes
+                            // mapped to dependent controls.
+                            if (AttributeStatusInfo.GetOwningControl(attribute) == _activeDataControl &&
+                                AttributeStatusInfo.RemoveSpatialInfo(attribute))
+                            {
+                                spatialInfoRemoved = true;
+                            }
                         }
                     }
+                }
+                finally
+                {
+                    _controlUpdateInProgress = false;
                 }
 
                 // Re-display the highlights if changes were made.
                 if (spatialInfoRemoved)
                 {
+                    // [DataEntry:547]
+                    // Refresh the attributes so that any hints can be updated.
+                    _activeDataControl.RefreshAttributes(activeAttributes.ToArray(), true);
+                    _refreshActiveControlHighlights = true;
+
                     DrawHighlights(false);
                 }
             }
@@ -1674,6 +1710,12 @@ namespace Extract.DataEntry
                     _hoverToolTip = null;
                 }
 
+                if (_userNotificationTooltip != null)
+                {
+                    _userNotificationTooltip.Dispose();
+                    _userNotificationTooltip = null;
+                }
+
                 // Reset the other attribute mapping fields.
                 _controlAttributes.Clear();
                 _controlToolTipAttributes.Clear();
@@ -1698,6 +1740,12 @@ namespace Extract.DataEntry
                 {
                     dataControl.ClearCachedData();
                 }
+
+                // [DataEntry:576]
+                // Since the data associated with the currently selected control has been cleared,
+                // set _activeDataControl to null so that the next control focus change is processed
+                // re-initializes the current selection even if the same control is still selected.
+                _activeDataControl = null;
 
                 _selectedAttributesWithAcceptedHighlights = 0;
                 _selectedAttributesWithUnacceptedHighlights = 0;
@@ -1861,7 +1909,7 @@ namespace Extract.DataEntry
                     _toolTipFont = null;
                 }
 
-                foreach(ToolTip toolTip in _attributeToolTips.Values)
+                foreach (DataEntryToolTip toolTip in _attributeToolTips.Values)
                 {
                     toolTip.Dispose();
                 }
@@ -2021,6 +2069,7 @@ namespace Extract.DataEntry
                     }
 
                     _refreshActiveControlHighlights = false;
+                    _controlUpdateInProgress = false;
                     _dirty = false;
 
                     _changingImage = false;
@@ -2134,6 +2183,10 @@ namespace Extract.DataEntry
                     return;
                 }
 
+                // If a control update was in progress, consider it complete if a new control is now
+                // active.
+                _controlUpdateInProgress = false;
+
                 // De-activate any existing control that is active
                 if (_activeDataControl != null)
                 {
@@ -2144,9 +2197,13 @@ namespace Extract.DataEntry
                 // non-incremental value modified event can be raised.
                 AttributeStatusInfo.EndEdit();
 
-                // Activate the new control
-                _activeDataControl = newActiveDataControl;
-                _activeDataControl.IndicateActive(true, _imageViewer.DefaultHighlightColor);
+                // If an image is loaded, activate the new control. (Prevent controls from being
+                // active with no loaded document)
+                if (_imageViewer.IsImageAvailable)
+                {
+                    _activeDataControl = newActiveDataControl;
+                    _activeDataControl.IndicateActive(true, _imageViewer.DefaultHighlightColor);
+                }
 
                 // Once a new control gains focus, show tooltips again if they were hidden.
                 _temporarilyHidingTooltips = false;
@@ -2187,10 +2244,22 @@ namespace Extract.DataEntry
             try
             {
                 IDataEntryControl dataControl = (IDataEntryControl)sender;
-
-                // Notify AttributeStatusInfo that the current edit is over so that a
-                // non-incremental value modified event can be raised.
-                AttributeStatusInfo.EndEdit();
+               
+                ExtractException endEditException = null;
+                try
+                {
+                    // Notify AttributeStatusInfo that the current edit is over so that a
+                    // non-incremental value modified event can be raised.
+                    AttributeStatusInfo.EndEdit();
+                }
+                catch (Exception ex)
+                {
+                    // If an exception happens while processing EndEdit, we still need to continue
+                    // processing the selection change--  while EndEdit should have cleaned up any
+                    // bad value, if this method does not run to completion, tab order and
+                    // highlighting will be in a bad state.
+                    endEditException = ExtractException.AsExtractException("ELI27097", ex);
+                }
 
                 // Create lists to store the new active attributes and attributes that need tooltips.
                 // (must be created before the UpdateControlAttributes which is recursive)
@@ -2212,10 +2281,55 @@ namespace Extract.DataEntry
                 }
 
                 OnItemSelectionChanged();
+
+                // If an exception was thrown from EndEdit, throw it here.
+                if (endEditException != null)
+                {
+                    throw endEditException;
+                }
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI24094", ex);
+                throw ExtractException.AsExtractException("ELI24094", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that a <see cref="IDataEntryControl"/> has begun processing an update
+        /// based on user interaction with that control. Calls to <see cref="DrawHighlights"/> will
+        /// be suspended until the update is complete.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleControlUpdateStarted(object sender, EventArgs e)
+        {
+            try
+            {
+                _controlUpdateInProgress = true;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27269", ex);
+            }
+        }
+
+        /// <summary>
+        /// Handles the case that a <see cref="IDataEntryControl"/> has fininshed processing an
+        /// update based on user interaction with that control.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleControlUpdateEnded(object sender, EventArgs e)
+        {
+            try
+            {
+                _controlUpdateInProgress = false;
+
+                DrawHighlights(true);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27270", ex);
             }
         }
 
@@ -2254,7 +2368,8 @@ namespace Extract.DataEntry
                 // [DataEntry:329]
                 // Don't accept the text value if the value modification is happening as a
                 // result of a swipe.
-                if (!_changingImage && !_processingSwipe && e.AcceptSpatialInfo)
+                if (!_changingImage && _activeDataControl != null && !_processingSwipe
+                    && e.AcceptSpatialInfo)
                 {
                     List<IAttribute> activeAttributes;
                     _controlAttributes.TryGetValue(_activeDataControl, out activeAttributes);
@@ -2285,7 +2400,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI24980", ex);
+                throw ExtractException.AsExtractException("ELI24980", ex);
             }
         }
 
@@ -2310,7 +2425,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException.Display("ELI24918", ex);
+                throw ExtractException.AsExtractException("ELI24918", ex);
             }
         }
 
@@ -2324,32 +2439,26 @@ namespace Extract.DataEntry
         /// </param>
         void HandleLayerObjectAdded(object sender, LayerObjectAddedEventArgs e)
         {
+            // Keep track of whether this event kicks off processing of a swipe.
+            bool startedSwipeProcessing = false;
+
             try
             {
-                // [DataEntry:185]
-                // If a swipe was cancelled by pressing the right mouse button, discard the layer
-                // object, clear the cancel flag, and return.
-                if (_cancelingSwipe)
-                {
-                    _cancelingSwipe = false;
-
-                    _imageViewer.LayerObjects.Remove(e.LayerObject);
-                    e.LayerObject.Dispose();
-                    return;
-                }
-
-                if (_activeDataControl != null && _activeDataControl.SupportsSwiping)
+                // Don't attempt to process the event as a swipe if the user cancelled a swipe after
+                // starting it, if a swipe is already being processed, or if the active control does
+                // not support swiping.
+                if (!_processingSwipe && _activeDataControl != null &&
+                    _activeDataControl.SupportsSwiping)
                 {
                     Highlight highlight = e.LayerObject as Highlight;
 
                     if (highlight != null)
                     {
+                        startedSwipeProcessing = true;
                         _processingSwipe = true;
 
-                        // [DataEntry:269] Swipes should trigger document to be marked as dirty.
-                        OnDataChanged();
-
-                        // TODO: Filter out swipes that are too small to limit unnecessary exceptions
+                        _imageViewer.LayerObjects.Remove(e.LayerObject);
+                        e.LayerObject.Dispose();
 
                         // Recognize the text in the highlight's raster zone and send it to the active
                         // data control for processing.
@@ -2357,30 +2466,79 @@ namespace Extract.DataEntry
                         {
                             SpatialString ocrText;
 
-                            // TODO: [DataEntry:194] Temporarily suppress exceptions from the OCR manager
-                            // to prevent possibility of exceptions during demo.
                             try
                             {
-                                // [DataEntry:294] Keep the angle threshold small so long swipes on slightly
-                                // skewed docs don't include more text than intended.
+                                // [DataEntry:294] Keep the angle threshold small so long swipes on
+                                // slightly skewed docs don't include more text than intended.
                                 ocrText = _ocrManager.GetOcrText(
                                     _imageViewer.ImageFile, highlight.ToRasterZone(), 0.2);
                             }
-                            catch (ExtractException ee)
+                            catch (Exception ex)
                             {
-                                ee.Log();
-                                ocrText = new SpatialString();
+                                ExtractException.Log("ELI27101", ex);
+                                
+                                // If the OCR engine errored, display a tooltip and ignore the
+                                // swipe.
+                                ShowUserNotificationTooltip("An error was encountered reading " +
+                                    "the swiped text.");
+                                return;
                             }
 
-                            _activeDataControl.ProcessSwipedText(ocrText);
+                            // If no OCR results were produced, notifiy the user.
+                            if (ocrText == null || string.IsNullOrEmpty(ocrText.String))
+                            {
+                                ShowUserNotificationTooltip("No text was recognized.");
+                                return;
+                            }
 
-                            _imageViewer.LayerObjects.Remove(e.LayerObject);
+                            // [DataEntry:269] Swipes should trigger document to be marked as dirty.
+                            OnDataChanged();
 
-                            e.LayerObject.Dispose();
+                            try
+                            {
+                                // Delay calls to DrawHighlights until processing of the swipe is
+                                // complete.
+                                _controlUpdateInProgress = true;
 
-                            // Notify AttributeStatusInfo that the current edit is over so that a
-                            // non-incremental value modified event can be raised.
-                            AttributeStatusInfo.EndEdit();
+                                // If a swipe did not produce any results usable by the control,
+                                // notify the user.
+                                if (!_activeDataControl.ProcessSwipedText(ocrText))
+                                {
+                                    ShowUserNotificationTooltip("Unable to format swiped text " +
+                                        "into the current selection.");
+                                    return;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                ExtractException.Log("ELI27090", ex);
+
+                                // Notify the user of errors the control encountered processing the 
+                                // swiped text.
+                                ShowUserNotificationTooltip("An error was encountered while " +
+                                    "formatting the swiped text into the current selection.");
+                                return;
+                            }
+                            finally
+                            {
+                                _controlUpdateInProgress = false;
+                            }
+
+                            try
+                            {
+                                // Notify AttributeStatusInfo that the current edit is over so that
+                                // a non-incremental value modified event can be raised.
+                                AttributeStatusInfo.EndEdit();
+                            }
+                            catch (Exception ex)
+                            {
+                                ExtractException.Log("ELI27091", ex);
+
+                                // Notify the user of errors encountered while applying the change
+                                // (likely involves auto-update queries).
+                                ShowUserNotificationTooltip("An error was encountered while " +
+                                    "applying the swiped text to the current selection.");
+                            }
 
                             // It is likely that the spatial information of the selected attributes
                             // changed as a result of the swipe; update the active attribute(s)'
@@ -2394,24 +2552,34 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                try
+                // If this event kicked off processing of a swipe, refresh the image viewer so the
+                // swipe highlight is removed.
+                if (startedSwipeProcessing)
                 {
-                    if (_processingSwipe)
+                    try
                     {
-                        _imageViewer.LayerObjects.Remove(e.LayerObject);
-                        e.LayerObject.Dispose();
+                        _imageViewer.Invalidate();
+                    }
+                    catch (Exception ex2)
+                    {
+                        ExtractException.Display("ELI24089", ex2);
                     }
                 }
-                catch (Exception ex2)
-                {
-                    ExtractException.Log("ELI24089", ex2);
-                }
 
+                // It should be highly unlikely to catch an exception here; most processes
+                // that can result in an exception from swiping should trigger a user notification
+                // tooltip.
                 ExtractException.Display("ELI24090", ex);
             }
             finally
             {
-                _processingSwipe = false;
+                if (startedSwipeProcessing)
+                {
+                    // Only if startedSwipeProcessing is set are we dealing with the original swipe.
+                    // Otherwise, the layer is a side effect of a swipe and the swipe event is still
+                    // in progress.
+                    _processingSwipe = false;
+                }
             }
         }
 
@@ -2462,7 +2630,8 @@ namespace Extract.DataEntry
                     if (!AttributeStatusInfo.IsDataValid(e.Attribute))
                     {
                         AttributeStatusInfo.MarkDataAsValid(e.Attribute, true);
-                        e.DataEntryControl.RefreshAttribute(e.Attribute);
+                        e.DataEntryControl.RefreshAttributes(new IAttribute[] { e.Attribute },
+                            false);
                     }
                 }
 
@@ -2487,6 +2656,13 @@ namespace Extract.DataEntry
                 if (e.Attribute.Value.HasSpatialInfo())
                 {
                     _refreshActiveControlHighlights = true;
+                }
+
+                // Keep track of newly created attributes so that empty ones can be marked as
+                // viewed.
+                if (!_changingImage)
+                {
+                    _newlyAddedAttributes.Add(e.Attribute);
                 }
             }
             catch (Exception ex)
@@ -2720,14 +2896,6 @@ namespace Extract.DataEntry
                         PropagateAttributes(attributesToPropagate, true);
                     }
                 }
-                else if (e.Button == MouseButtons.Right && _imageViewer.Capture && 
-                    (Control.MouseButtons & MouseButtons.Left) != 0)
-                {
-                    // [DataEntry:185], [DataEntry:310]
-                    // Allow the right mouse button to cancel the current swipe rather than allowing
-                    // the swipe to end as if the left mouse button had been released.
-                    _cancelingSwipe = true;
-                }
             }
             catch (Exception ex)
             {
@@ -2802,6 +2970,29 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Handles the case that the  <see cref="ImageViewer"/> has changed pages.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="PageChangedEventArgs"/> that contains the event data.
+        /// </param>
+        void HandleImageViewerPageChanged(object sender, PageChangedEventArgs e)
+        {
+            try
+            {
+                // [DataEntry:661]
+                // After changing pages, draw highlights, otherwise the tooltip for the selected
+                // control will not be visible.
+                DrawHighlights(false);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27586", ex);
+                ee.AddDebugData("Event Data", e, false);
+                throw ee;
+            }
+        }
+
         #endregion Event Handlers
 
         #region Private Members
@@ -2839,6 +3030,8 @@ namespace Extract.DataEntry
                     control.GotFocus += HandleControlGotFocus;
                     dataControl.SwipingStateChanged += HandleSwipingStateChanged;
                     dataControl.AttributesSelected += HandleAttributesSelected;
+                    dataControl.UpdateStarted += HandleControlUpdateStarted;
+                    dataControl.UpdateEnded += HandleControlUpdateEnded;
 
                     // Assign the error provider for the control (if required).
                     IRequiresErrorProvider errorControl = control as IRequiresErrorProvider;
@@ -2886,6 +3079,8 @@ namespace Extract.DataEntry
                 {
                     dataControl.SwipingStateChanged -= HandleSwipingStateChanged;
                     dataControl.AttributesSelected -= HandleAttributesSelected;
+                    dataControl.UpdateStarted -= HandleControlUpdateStarted;
+                    dataControl.UpdateEnded -= HandleControlUpdateEnded;
                 }
             }
             catch (Exception ex)
@@ -2981,269 +3176,329 @@ namespace Extract.DataEntry
         /// unchanged even if the attribute and/or tooltip is not currently in the view.</param>
         void DrawHighlights(bool ensureActiveAttributeVisible)
         {
-            // To avoid unnecessary drawing, wait until we are done loading a document before
-            // attempting to display any layer objects.
-            if (_changingImage)
+            try
             {
-                return;
-            }
-
-            // Refresh the active control highlights if necessary.
-            if (_refreshActiveControlHighlights)
-            {
-                RefreshActiveControlHighlights();
-            }
-
-            // Will be populated with the set of attributes to be highlighted by the end of this call.
-            Dictionary<IAttribute, bool> newDisplayedAttributeHighlights =
-                new Dictionary<IAttribute, bool>();
-
-            // Keep track of the unified bounds of the highlights and any associated tooltip on
-            // each page.
-            Dictionary<int, Rectangle> unifiedBounds = new Dictionary<int, Rectangle>();
-
-            // Reset the selected attribute counts before iterating the attributes
-            _selectedAttributesWithAcceptedHighlights = 0;
-            _selectedAttributesWithUnacceptedHighlights = 0;
-            _selectedAttributesWithDirectHints = 0;
-            _selectedAttributesWithIndirectHints = 0;
-            _selectedAttributesWithoutHighlights = 0;
-
-            int firstPageOfHighlights = -1;
-            int pageToShow = -1;
-
-            // Obtain the list of active attributes.
-            List<IAttribute> attributes;
-            if (_activeDataControl != null && 
-                _controlAttributes.TryGetValue(_activeDataControl, out attributes))
-            {
-                // Obtain the list of highlights that need tooltips.
-                List<IAttribute> activeToolTipAttributes = null;
-                _controlToolTipAttributes.TryGetValue(_activeDataControl, out activeToolTipAttributes);
-
-                // Loop through all active attributes to retrieve their highlights.
-                foreach (IAttribute attribute in attributes)
+                // To avoid unnecessary drawing, wait until we are done loading a document or a
+                // control is done with an update before attempting to display any layer objects.
+                // Also, ensure against resursive calls.
+                if (_changingImage || _controlUpdateInProgress || _drawingHighlights)
                 {
-                    // Find any highlight CompositeHighlightLayerObject that has been created for
-                    // this data entry control.
-                    List<CompositeHighlightLayerObject> highlightList = null;
+                    return;
+                }
 
-                    _attributeHighlights.TryGetValue(attribute, out highlightList);
+                _drawingHighlights = true;
 
-                    // If the attribute has no highlights to display, move on
-                    if (highlightList == null || highlightList.Count == 0)
+                // Refresh the active control highlights if necessary.
+                if (_refreshActiveControlHighlights)
+                {
+                    RefreshActiveControlHighlights();
+                }
+
+                // Update the viewed state of newly added attributes as appropriate.
+                MarkEmptyAttributesAsViewed(_newlyAddedAttributes);
+                _newlyAddedAttributes.Clear();
+
+                // Will be populated with the set of attributes to be highlighted by the end of this
+                // call.
+                Dictionary<IAttribute, bool> newDisplayedAttributeHighlights =
+                    new Dictionary<IAttribute, bool>();
+
+                // Keep track of the unified bounds of the highlights and any associated tooltip on
+                // each page.
+                Dictionary<int, Rectangle> unifiedBounds = new Dictionary<int, Rectangle>();
+
+                // Reset the selected attribute counts before iterating the attributes
+                _selectedAttributesWithAcceptedHighlights = 0;
+                _selectedAttributesWithUnacceptedHighlights = 0;
+                _selectedAttributesWithDirectHints = 0;
+                _selectedAttributesWithIndirectHints = 0;
+                _selectedAttributesWithoutHighlights = 0;
+
+                int firstPageOfHighlights = -1;
+                int pageToShow = -1;
+
+                // Obtain the list of active attributes.
+                List<IAttribute> attributes;
+                if (_activeDataControl != null &&
+                    _controlAttributes.TryGetValue(_activeDataControl, out attributes))
+                {
+                    // Obtain the list of highlights that need tooltips.
+                    List<IAttribute> activeToolTipAttributes = null;
+                    _controlToolTipAttributes.TryGetValue(
+                        _activeDataControl, out activeToolTipAttributes);
+
+                    // Loop through all active attributes to retrieve their highlights.
+                    foreach (IAttribute attribute in attributes)
                     {
-                        _selectedAttributesWithoutHighlights++;
-                        continue;
-                    }
-                    else
-                    {
-                        // Update the selected attribute counts appropriately.
-                        switch(AttributeStatusInfo.GetHintType(attribute))
+                        // Find any highlight CompositeHighlightLayerObject that has been created for
+                        // this data entry control.
+                        List<CompositeHighlightLayerObject> highlightList = null;
+
+                        _attributeHighlights.TryGetValue(attribute, out highlightList);
+
+                        // If the attribute has no highlights to display, move on
+                        if (highlightList == null || highlightList.Count == 0)
                         {
-                            case HintType.None:
-                                {
-                                    if (AttributeStatusInfo.IsAccepted(attribute))
-                                    {
-                                        _selectedAttributesWithAcceptedHighlights++;
-                                    }
-                                    else
-                                    {
-                                        _selectedAttributesWithUnacceptedHighlights++;
-                                    }
-                                }
-                                break;
-
-                            case HintType.Direct:
-                                {
-                                    _selectedAttributesWithDirectHints++; 
-                                }
-                                break;
-
-                            case HintType.Indirect:
-                                {
-                                    _selectedAttributesWithIndirectHints++;
-                                }
-                                break;
+                            _selectedAttributesWithoutHighlights++;
+                            continue;
                         }
-                    }
-
-                    // If the highlight is an in-direct hint, do not display it unless this is the
-                    // only active attribute.
-                    if (attributes.Count > 1 && 
-                        AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
-                    {
-                        continue;
-                    }
-
-                    // Flag each active attribute to be highlighted
-                    newDisplayedAttributeHighlights[attribute] = true;
-
-                    // If this attribute was previously highlighted, remove it from the
-                    // _displayedAttributeHighlights collection whose contents will be hidden at the
-                    // end of this call.
-                    if (_displayedAttributeHighlights.ContainsKey(attribute))
-                    {
-                        _displayedAttributeHighlights.Remove(attribute);
-                    }
-
-                    // Display the attribute's error icon (if it has one).
-                    ShowErrorIcon(attribute, true);
-
-                    // Display a tooltip if directed to by the control and if possible.
-                    if (!_temporarilyHidingTooltips &&
-                        AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
-                        activeToolTipAttributes.Contains(attribute))
-                    {
-                        ShowAttributeToolTip(attribute);
-                    }
-                    // Otherwise, ensure any previous tooltip for the attribute is removed.
-                    else
-                    {
-                        RemoveAttributeToolTip(attribute);
-                    }
-
-                    // Make each highlight for an active attribute visible.
-                    // Also, display an error icon and tooltip if appropriate, as well as adjust
-                    // the view so the entire attribute is visible. (at least the portion on the
-                    // current page)
-                    foreach (CompositeHighlightLayerObject highlight in highlightList)
-                    {
-                        highlight.Visible = true;
-
-                        // Update firstPageOfHighlights if appropriate
-                        if (firstPageOfHighlights == -1 ||
-                            highlight.PageNumber < firstPageOfHighlights)
-                        {
-                            firstPageOfHighlights = highlight.PageNumber;
-                        }
-
-                        // Update pageToShow if appropriate
-                        if (highlight.PageNumber == _imageViewer.PageNumber)
-                        {
-                            pageToShow = highlight.PageNumber;
-                        }
-
-                        // If there is not yet an entry for this page in unifiedBounds, create a
-                        // new one.
-                        if (!unifiedBounds.ContainsKey(highlight.PageNumber))
-                        {
-                            unifiedBounds[highlight.PageNumber] = highlight.GetBounds();
-                        }
-                        // Otherwise add to the existing entry for this page
                         else
                         {
-                            unifiedBounds[highlight.PageNumber] = Rectangle.Union(
-                                unifiedBounds[highlight.PageNumber], highlight.GetBounds());
+                            // Update the selected attribute counts appropriately.
+                            switch (AttributeStatusInfo.GetHintType(attribute))
+                            {
+                                case HintType.None:
+                                    {
+                                        if (AttributeStatusInfo.IsAccepted(attribute))
+                                        {
+                                            _selectedAttributesWithAcceptedHighlights++;
+                                        }
+                                        else
+                                        {
+                                            _selectedAttributesWithUnacceptedHighlights++;
+                                        }
+                                    }
+                                    break;
+
+                                case HintType.Direct:
+                                    {
+                                        _selectedAttributesWithDirectHints++;
+                                    }
+                                    break;
+
+                                case HintType.Indirect:
+                                    {
+                                        _selectedAttributesWithIndirectHints++;
+                                    }
+                                    break;
+                            }
                         }
 
-                        // Combine the highlight bounds with the error icon bounds (if present).
-                        ImageLayerObject errorIcon =
-                            GetErrorIconOnPage(attribute, highlight.PageNumber);
-                        if (errorIcon != null)
+                        // If the highlight is an in-direct hint, do not display it unless this is
+                        // the only active attribute.
+                        if (attributes.Count > 1 &&
+                            AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
                         {
-                            unifiedBounds[highlight.PageNumber] = Rectangle.Union(
-                                unifiedBounds[highlight.PageNumber], errorIcon.GetBounds());
+                            continue;
+                        }
+
+                        // Flag each active attribute to be highlighted
+                        newDisplayedAttributeHighlights[attribute] = true;
+
+                        // If this attribute was previously highlighted, remove it from the
+                        // _displayedAttributeHighlights collection whose contents will be hidden at
+                        // the end of this call.
+                        if (_displayedAttributeHighlights.ContainsKey(attribute))
+                        {
+                            _displayedAttributeHighlights.Remove(attribute);
+                        }
+
+                        // Display the attribute's error icon (if it has one).
+                        ShowErrorIcon(attribute, true);
+
+                        // Display a tooltip if directed to by the control and if possible.
+                        if (!_temporarilyHidingTooltips &&
+                            AttributeStatusInfo.GetHintType(attribute) != HintType.Indirect &&
+                            activeToolTipAttributes.Contains(attribute))
+                        {
+                            ShowAttributeToolTip(attribute);
+                        }
+                        // Otherwise, ensure any previous tooltip for the attribute is removed.
+                        else
+                        {
+                            RemoveAttributeToolTip(attribute);
+                        }
+
+                        // Make each highlight for an active attribute visible.
+                        // Also, display an error icon and tooltip if appropriate, as well as adjust
+                        // the view so the entire attribute is visible. (at least the portion on the
+                        // current page)
+                        foreach (CompositeHighlightLayerObject highlight in highlightList)
+                        {
+                            highlight.Visible = true;
+
+                            // Update firstPageOfHighlights if appropriate
+                            if (firstPageOfHighlights == -1 ||
+                                highlight.PageNumber < firstPageOfHighlights)
+                            {
+                                firstPageOfHighlights = highlight.PageNumber;
+                            }
+
+                            // Update pageToShow if appropriate
+                            if (highlight.PageNumber == _imageViewer.PageNumber)
+                            {
+                                pageToShow = highlight.PageNumber;
+                            }
+
+                            // If there is not yet an entry for this page in unifiedBounds, create a
+                            // new one.
+                            if (!unifiedBounds.ContainsKey(highlight.PageNumber))
+                            {
+                                unifiedBounds[highlight.PageNumber] = highlight.GetBounds();
+                            }
+                            // Otherwise add to the existing entry for this page
+                            else
+                            {
+                                unifiedBounds[highlight.PageNumber] = Rectangle.Union(
+                                    unifiedBounds[highlight.PageNumber], highlight.GetBounds());
+                            }
+
+                            // Combine the highlight bounds with the error icon bounds (if present).
+                            ImageLayerObject errorIcon =
+                                GetErrorIconOnPage(attribute, highlight.PageNumber);
+                            if (errorIcon != null)
+                            {
+                                unifiedBounds[highlight.PageNumber] = Rectangle.Union(
+                                    unifiedBounds[highlight.PageNumber], errorIcon.GetBounds());
+                            }
+                        }
+                    }
+
+                    // If there is a hover attribute that is different from the active attribute with
+                    // a tooltip displayed, display a tooltip for the hover attribute.
+                    if (_hoverAttribute != null && 
+                            (_temporarilyHidingTooltips || 
+                             !activeToolTipAttributes.Contains(_hoverAttribute)))
+                    {
+                        newDisplayedAttributeHighlights[_hoverAttribute] = true;
+
+                        // If this highlight was previously displayed, remove it from the
+                        // _displayedHighlights collection whose contents will be hidden at the end
+                        // of this call.
+                        if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
+                        {
+                            _displayedAttributeHighlights.Remove(_hoverAttribute);
+                        }
+
+                        // Show the hover attribute's highlight and error icon (if one exists).
+                        ShowAttributeHighlights(_hoverAttribute, true);
+
+                        if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
+                        {
+                            // The tooltip should also be displayed for the hover attribute, but
+                            // don't position it along with the tooltips for currently selected
+                            // attributes.
+                            RemoveAttributeToolTip(_hoverAttribute);
+                            _hoverToolTip = new DataEntryToolTip(this, _hoverAttribute, true, null);
+
+                            _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject);
                         }
                     }
                 }
 
-                // If there is a hover attribute that is different from the active attribute with a
-                // tooltip displayed, display a tooltip for the hover attribute.
-                if (_hoverAttribute != null && !activeToolTipAttributes.Contains(_hoverAttribute))
+                // Hide all attribute highlights that were previously visible, but should not
+                // visible anymore.
+                foreach (IAttribute attribute in _displayedAttributeHighlights.Keys)
                 {
-                    newDisplayedAttributeHighlights[_hoverAttribute] = true;
-
-                    // If this highlight was previously displayed, remove it from the
-                    // _displayedHighlights collection whose contents will be hidden at the end
-                    // of this call.
-                    if (_displayedAttributeHighlights.ContainsKey(_hoverAttribute))
+                    if (_showingAllHighlights)
                     {
-                        _displayedAttributeHighlights.Remove(_hoverAttribute);
+                        // If _showingAllHighlights, only indirect hints need to be hidden.
+                        if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
+                        {
+                            ShowAttributeHighlights(attribute, false);
+                        }
+
+                        // But remove tooltips for all attributes not currently active
+                        RemoveAttributeToolTip(attribute);
                     }
-
-                    // Show the hover attribute's highlight and error icon (if one exists).
-                    ShowAttributeHighlights(_hoverAttribute, true);
-
-                    if (!string.IsNullOrEmpty(_hoverAttribute.Value.String))
+                    else
                     {
-                        // The tooltip should also be displayed for the hover attribute, but don't
-                        // position it along with the tooltips for currently selected attributes.
-                        RemoveAttributeToolTip(_hoverAttribute);
-                        _hoverToolTip = new ToolTip(this, _hoverAttribute, true, null);
-
-                        _imageViewer.LayerObjects.Add(_hoverToolTip.TextLayerObject);
-                    }
-                }
-            }
-
-            // Hide all attribute highlights that were previously visible, but should not visible
-            // anymore.
-            foreach (IAttribute attribute in _displayedAttributeHighlights.Keys)
-            {
-                if (_showingAllHighlights)
-                {
-                    // If _showingAllHighlights, only indirect hints need to be hidden.
-                    if (AttributeStatusInfo.GetHintType(attribute) == HintType.Indirect)
-                    {
+                        // Hide the highlights and remove any tooltip.
                         ShowAttributeHighlights(attribute, false);
+                        RemoveAttributeToolTip(attribute);
                     }
-
-                    // But remove tooltips for all attributes not currently active
-                    RemoveAttributeToolTip(attribute);
                 }
-                else
-                {
-                    // Hide the highlights and remove any tooltip.
-                    ShowAttributeHighlights(attribute, false);
-                    RemoveAttributeToolTip(attribute);
-                }
-            }
 
-            // Move the visible error icons to the top of the z-order so that nothing is drawn on
-            // top of them.
-            foreach (List<ImageLayerObject> errorIcons in _attributeErrorIcons.Values)
-            {
-                foreach (ImageLayerObject errorIcon in errorIcons)
+                // Move the visible error icons to the top of the z-order so that nothing is drawn
+                // on top of them.
+                foreach (List<ImageLayerObject> errorIcons in _attributeErrorIcons.Values)
                 {
-                    if (errorIcon.Visible)
+                    foreach (ImageLayerObject errorIcon in errorIcons)
                     {
-                        _imageViewer.LayerObjects.MoveToTop(errorIcon);
+                        if (errorIcon.Visible)
+                        {
+                            _imageViewer.LayerObjects.MoveToTop(errorIcon);
+                        }
                     }
                 }
-            }
 
-            // Move to the appropriate page of the document.
-            if (ensureActiveAttributeVisible &&
-                (pageToShow != -1 || firstPageOfHighlights != -1))
-            {
-                if (pageToShow == -1)
+                // Move to the appropriate page of the document.
+                if (ensureActiveAttributeVisible &&
+                    (pageToShow != -1 || firstPageOfHighlights != -1))
                 {
-                    pageToShow = firstPageOfHighlights;
+                    if (pageToShow == -1)
+                    {
+                        pageToShow = firstPageOfHighlights;
+                    }
+
+                    _imageViewer.SetPageNumber(pageToShow, false, true);
                 }
 
-                _imageViewer.SetPageNumber(pageToShow, false, true);
-            }
+                // Create & position tooltips for the currently selected attribute(s).
+                PositionToolTips();
 
-            // Create & position tooltips for the currently selected attribute(s).
-            PositionToolTips();
-
-            // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
-            if (ensureActiveAttributeVisible && pageToShow != -1)
-            {
-                foreach (KeyValuePair<IAttribute, ToolTip> attributeTooltip in _attributeToolTips)
+                // Make sure the highlight is in view if ensureActiveAttributeVisible is specified.
+                if (ensureActiveAttributeVisible && pageToShow != -1)
                 {
-                    unifiedBounds[pageToShow] = Rectangle.Union(unifiedBounds[pageToShow],
-                        attributeTooltip.Value.TextLayerObject.GetBounds());
+                    foreach (KeyValuePair<IAttribute, DataEntryToolTip> attributeTooltip in
+                        _attributeToolTips)
+                    {
+                        unifiedBounds[pageToShow] = Rectangle.Union(unifiedBounds[pageToShow],
+                            attributeTooltip.Value.TextLayerObject.GetBounds());
+                    }
+
+                    EnforceAutoZoomSettings(unifiedBounds[pageToShow]);
                 }
 
-                EnforceAutoZoomSettings(unifiedBounds[pageToShow]);
+                // Update _displayedHighlights with the new set of highlights.
+                _displayedAttributeHighlights = newDisplayedAttributeHighlights;
+
+                _imageViewer.Invalidate();
             }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27268", ex);
+            }
+            finally
+            {
+                _drawingHighlights = false;
+            }
+        }
 
-            // Update _displayedHighlights with the new set of highlights.
-            _displayedAttributeHighlights = newDisplayedAttributeHighlights;
+        /// <summary>
+        /// Marks any of the specified <see cref="IAttribute"/>s with blank values as viewed.
+        /// </summary>
+        /// <param name="attributes">The attributes whose viewed status should be set according to
+        /// the absence of a value.</param>
+        static void MarkEmptyAttributesAsViewed(List<IAttribute> attributes)
+        {
+            foreach (IAttribute attribute in attributes)
+            {
+                Dictionary<IDataEntryControl, List<IAttribute>> attributesMarkedAsViewed =
+                    new Dictionary<IDataEntryControl, List<IAttribute>>();
 
-            _imageViewer.Invalidate();
+                if (!AttributeStatusInfo.HasBeenViewed(attribute, false) &&
+                    string.IsNullOrEmpty(attribute.Value.String))
+                {
+                    AttributeStatusInfo.MarkAsViewed(attribute, true);
+                    IDataEntryControl owningControl = AttributeStatusInfo.GetOwningControl(attribute);
+
+                    if (!attributesMarkedAsViewed.ContainsKey(owningControl))
+                    {
+                        attributesMarkedAsViewed[owningControl] = new List<IAttribute>();
+                    }
+
+                    attributesMarkedAsViewed[owningControl].Add(attribute);
+                }
+
+                // Refresh any attributes whose viewed status has been changed so that their
+                // appearance reflects the new viewed status.
+                foreach (KeyValuePair<IDataEntryControl, List<IAttribute>> updatedAttributes in 
+                    attributesMarkedAsViewed)
+                {
+                    updatedAttributes.Key.RefreshAttributes(updatedAttributes.Value.ToArray(), false);
+                }
+            }
         }
 
         /// <summary>
@@ -3795,12 +4050,30 @@ namespace Extract.DataEntry
 
                 if (nextUnviewedAttributeGenealogy != null)
                 {
-                    count++;
-
                     // Use the found attribute as the starting point for the search in the next
                     // iteration.
                     startingPoint =
                         CollectionMethods.CopyStack<IAttribute>(nextUnviewedAttributeGenealogy);
+
+                    // TODO: Now that there is a reason to access the last attribute from
+                    // FindNextUnviewedAttribute, FindNextUnviewedAttribute should be ideally be
+                    // changed to return a list.
+                    while (nextUnviewedAttributeGenealogy.Count > 1)
+                    {
+                        nextUnviewedAttributeGenealogy.Pop();
+                    }
+
+                    // [DataEntry:197]
+                    // Empty fields should be considered viewed.
+                    IAttribute unviewedAttribute = nextUnviewedAttributeGenealogy.Peek();
+                    if (string.IsNullOrEmpty(unviewedAttribute.Value.String))
+                    {
+                        AttributeStatusInfo.MarkAsViewed(unviewedAttribute, true);
+                    }
+                    else
+                    {
+                        count++;
+                    }
                 }
             }
             while (nextUnviewedAttributeGenealogy != null);
@@ -4083,6 +4356,7 @@ namespace Extract.DataEntry
                     new CompositeHighlightLayerObject(_imageViewer, page, "", highlightZones[key],
                         isHint ? Color.White : highlightColor);
                 highlight.Selectable = false;
+                highlight.CanRender = false;
 
                 // If the highlight is a hint, specify the outline color.
                 if (isHint)
@@ -4207,26 +4481,27 @@ namespace Extract.DataEntry
                 // Determine whether the attributes appear to be arranged horizontally or vertically.
                 bool horizontal =
                     HasHorizontalOrientation(new List<RasterZone>(attributeBoundingZones.Values));
-                Dictionary<IAttribute, ToolTip> newAttributeToolTips =
-                    new Dictionary<IAttribute, ToolTip>();
+                Dictionary<IAttribute, DataEntryToolTip> newAttributeToolTips =
+                    new Dictionary<IAttribute, DataEntryToolTip>();
 
                 // Create the tooltips
                 foreach (IAttribute attribute in _attributeToolTips.Keys)
                 {
-                    newAttributeToolTips[attribute] = new ToolTip(this, attribute,
+                    newAttributeToolTips[attribute] = new DataEntryToolTip(this, attribute,
                         horizontal, attributeBoundingZones[attribute].GetRectangularBounds());
                 }
 
                 // Position the tooltips.
-                ToolTip.PositionToolTips(new List<ToolTip>(newAttributeToolTips.Values));
-
-                if (_hoverToolTip != null)
-                {
-                    _imageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
-                }
+                DataEntryToolTip.PositionToolTips(
+                    new List<DataEntryToolTip>(newAttributeToolTips.Values));
 
                 // Update _attributeToolTips with a version containing the created tooltips.
                 _attributeToolTips = newAttributeToolTips;
+            }
+
+            if (_hoverToolTip != null)
+            {
+                _imageViewer.LayerObjects.MoveToTop(_hoverToolTip.TextLayerObject);
             }
         }
         
@@ -4359,7 +4634,7 @@ namespace Extract.DataEntry
                 // The anchor point for the error icon should be to the right of attribute.
                 double errorIconRotation;
                 Point errorIconAnchorPoint = GetAnchorPoint(rasterZones, AnchorAlignment.Right, 90,
-                    out errorIconRotation);
+                    _TOOLTIP_STANDOFF_DISTANCE, out errorIconRotation);
 
                 // Create the error icon
                 ImageLayerObject errorIcon = new ImageLayerObject(_imageViewer, page,
@@ -4368,6 +4643,7 @@ namespace Extract.DataEntry
                     _errorIconSizes[page], (float)errorIconRotation);
                 errorIcon.Selectable = false;
                 errorIcon.Visible = makeVisible;
+                errorIcon.CanRender = false;
 
                 _imageViewer.LayerObjects.Add(errorIcon);
 
@@ -4397,6 +4673,8 @@ namespace Extract.DataEntry
         /// appear on the page.</param>
         /// <param name="anchorOffsetAngle">The anchor point will be offset from the anchorAlignment
         /// position at this angle. (relative to the raster zones' orientation, not the page)</param>
+        /// <param name="standoffDistance">The number of image pixels away from the bounds of the
+        /// raster zones the anchor point should be.</param>
         /// <param name="anchoredObjectRotation">Specifies the rotation (in degress) that an
         /// associated <see cref="AnchoredObject"/> should be drawn at to match up with the
         /// orientation of the raster zones.  This will be the average rotation of the zones unless
@@ -4406,24 +4684,28 @@ namespace Extract.DataEntry
         /// </returns>
         static Point GetAnchorPoint(
             List<RasterZone> rasterZones, AnchorAlignment anchorAlignment, double anchorOffsetAngle,
-            out double anchoredObjectRotation)
+            int standoffDistance, out double anchoredObjectRotation)
         {
             // Keep track of the average height of all raster zones as well as all start and end
             // points.
-            int height = 0;
             double firstRasterZoneRotation = 0;
             double averageRotation = 0;
-            Point[] rasterZonePoints = new Point[rasterZones.Count * 2];
+            Point[] rasterZonePoints = new Point[rasterZones.Count * 4];
            
             // Compile the raster zone points as well as the height and rotation from all zones.
             for (int i = 0; i < rasterZones.Count; i++)
             {
-                int startIndex = i * 2;
-                rasterZonePoints[startIndex] = new Point(rasterZones[i].StartX, rasterZones[i].StartY);
-                rasterZonePoints[startIndex + 1] = new Point(rasterZones[i].EndX, rasterZones[i].EndY);
-                height += rasterZones[i].Height;
+                PointF[] currentZoneVertices = rasterZones[i].GetBoundaryPoints();
+                for (int j = 0; j < 4; j++)
+                {
+                    rasterZonePoints[(i * 4) + j] =
+                        new Point((int)Math.Round(currentZoneVertices[j].X),
+                            (int)Math.Round(currentZoneVertices[j].Y));
+                }
+
                 double rasterZoneRotation = GeometryMethods.GetAngle(
-                    rasterZonePoints[startIndex], rasterZonePoints[(startIndex) + 1]);
+                    new Point(rasterZones[i].StartX, rasterZones[i].StartY),
+                    new Point(rasterZones[i].EndX, rasterZones[i].EndY));
 
                 // [DataEntry:352]
                 // Ensure the angle of each zone is relative to the initial raster zone rotation so
@@ -4438,7 +4720,7 @@ namespace Extract.DataEntry
                     // There seem to be cases where some raster zones are backwards. Round the
                     // angle delta to the nearest PI radians.
                     rasterZoneRotation = firstRasterZoneRotation + GeometryMethods.GetAngleDelta(
-                        rasterZoneRotation, firstRasterZoneRotation, Math.PI);
+                        firstRasterZoneRotation, rasterZoneRotation, Math.PI);
                 }
                 averageRotation += rasterZoneRotation;
             }
@@ -4446,8 +4728,7 @@ namespace Extract.DataEntry
             // Convert to degrees
             averageRotation *= (180.0 / Math.PI);
 
-            // Obtain half the average height and the average rotation of the zones.
-            int halfHeight = (height / rasterZones.Count) / 2;
+            // Obtain the average rotation of the zones.
             averageRotation /= rasterZones.Count;
             
             // Rotate the raster zone points into a coordinate system relative to the raster zones'
@@ -4460,14 +4741,13 @@ namespace Extract.DataEntry
 
             // Obtain a bounding rectangle for the raster zone points.
             Rectangle bounds = GeometryMethods.GetBoundingRectangle(rasterZonePoints);
-            bounds.Inflate(0, halfHeight);
 
             // Based on the raster zones' dimensions, calculate how far from level the raster zones
             // can be and still have a level tooltip before the tooltip would overlap with one of the
             // raster zones. This calculation assumes the tooltip will be placed half the height of
             // the raster zone above the raster zone.
             double roundingCuttoffAngle = (180.0 / Math.PI) * GeometryMethods.GetAngle(
-                new Point(0, 0), new Point(bounds.Width, halfHeight));
+                new Point(0, 0), new Point(bounds.Width, standoffDistance));
 
             // Allow a maximum of 5 degress of departure from level even if a greater angle was
             // calculated based on the raster zone dimensions.
@@ -4520,9 +4800,9 @@ namespace Extract.DataEntry
 
             using (Matrix transform = new Matrix())
             {
-                // Offset the anchor point half the average raster zone height in the direction specified.
+                // Offset the anchor point by the standoffDistance in the direction specified.
                 transform.Rotate((float)anchorOffsetAngle);
-                Point[] offset = { new Point(0, -halfHeight) };
+                Point[] offset = { new Point(0, -standoffDistance) };
                 transform.TransformVectors(offset);
                 anchorPoint[0].Offset(offset[0]);
 
@@ -4755,7 +5035,7 @@ namespace Extract.DataEntry
 
             // Check if the attribute is one of the attributes displaying a tooltip; remove and
             // dispose of the tooltip if so.
-            ToolTip toolTip;
+            DataEntryToolTip toolTip;
             if (_attributeToolTips.TryGetValue(attribute, out toolTip))
             {
                 if (toolTip != null)
@@ -5188,6 +5468,34 @@ namespace Extract.DataEntry
             }
 
             OnItemSelectionChanged();
+        }
+
+        /// <summary>
+        /// Displays a message to the user via a tooltip.  The tooltip will be displayed at the
+        /// current cursor location and remain for 5 seconds.
+        /// </summary>
+        /// <param name="message">The message to be displayed to the user.</param>
+        void ShowUserNotificationTooltip(string message)
+        {
+            // Re-create the tooltip every time-- otherwise sometimes the text of the tooltip
+            // doesn't seem to be properly updated and/or the tooltip will disappear really quickly.
+            if (_userNotificationTooltip != null)
+            {
+                _userNotificationTooltip.Dispose();
+            }
+            _userNotificationTooltip = new ToolTip();
+
+            // Since the angular highlight cursor extends above the cursor position and would
+            // otherwise be drawn on top of the tooltip, shift the tooltip below the cursor
+            // position if the angular highlight cursor tool is active.
+            Point toolTipPosition = base.TopLevelControl.PointToClient(MousePosition);
+            if (_imageViewer.CursorTool == CursorTool.AngularHighlight)
+            {
+                toolTipPosition.Offset(0, 35);
+            }
+
+            _userNotificationTooltip.Show(message, (IWin32Window)base.TopLevelControl,
+                toolTipPosition, 5000);
         }
 
         #endregion Private Members

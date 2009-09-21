@@ -4,6 +4,9 @@
 #include "resource.h"       // main symbols
 #include "..\..\AFCore\Code\AFCategories.h"
 
+#include <CachedObjectFromFile.h>
+#include <RegExLoader.h>
+
 #include <string>
 #include <map>
 
@@ -121,8 +124,9 @@ private:
 	// the regular expression pattern
 	std::string m_strPattern;
 
-	// Map containing the Regular Expression strings based on the file name ( allows for <DocType> tag
-	std::map<std::string, std::string> m_mapFileToRegExpString;
+	// Use CachedObjectFromFile so that the regular expression is re-loaded from disk only when the
+	// RegEx file is modified.
+	CachedObjectFromFile<string, RegExLoader> m_cachedRegExLoader;
 
 	void validateLicense();
 	

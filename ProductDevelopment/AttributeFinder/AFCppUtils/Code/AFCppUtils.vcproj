@@ -230,6 +230,10 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
+				RelativePath=".\AFCoreSharedCode.cpp"
+				>
+			</File>
+			<File
 				RelativePath="AFCppUtils.cpp"
 				>
 				<FileConfiguration

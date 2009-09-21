@@ -803,20 +803,10 @@ string CRegExprRule::getRegularExpr(IAFDocumentPtr ipAFDoc)
 		// Expand any tags in the file name
 		string strRegExpFile = getRegExpFileName( ipAFDoc );
 
-		// Check for the regular expression being loaded previously
-		map<string, string>::iterator iter = m_mapFileToRegExpString.find( strRegExpFile );
-		if ( iter != m_mapFileToRegExpString.end() )
-		{
-			if ( getAFUtility()->GetLoadFilePerSession() == VARIANT_TRUE )
-			{
-				// if only loading file once per sesson return the previously loaded RegExp
-				return iter->second;
-			}
-		}
+		// [FlexIDSCore:3642] Load the regular expression from disk if necessary.
+		m_cachedRegExLoader.loadObjectFromFile(strRegExpFile);
 
-		strRegExp = getRegExpFromFile(strRegExpFile, true, gstrAF_AUTO_ENCRYPT_KEY_PATH);
-		// Save value in map with file name
-		m_mapFileToRegExpString[ strRegExpFile ] = strRegExp;
+		strRegExp = (string)m_cachedRegExLoader.m_obj;
 	}
 	return strRegExp;
 }

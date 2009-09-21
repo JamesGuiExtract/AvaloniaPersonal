@@ -750,15 +750,14 @@ namespace Extract.Imaging.Forms
                 // If OutlineColor is non-null, draw a outline using the specified color.
                 if (this.OutlineColor != null)
                 {
-                    // Get the vertices of the highlight in client coordinates
+                    // Get the vertices of the highlight in logical (image) coordinates
                     Point[] vertices = this.GetVertices();
-                    this.ImageViewer.Transform.TransformPoints(vertices);
 
-                    // Get the center of the highlight in client coordinates
+                    // Get the center of the highlight in logical (image) coordinates
                     Point[] center = new Point[] { this.GetCenterPoint() };
-                    this.ImageViewer.Transform.TransformPoints(center);
 
-                    // Inflate each corner by 4 pixels
+                    // Inflate each corner by 4 client pixels
+                    double expandBy = 4.0 * ImageViewer.ScaleFactor;
                     for (int i = 0; i < vertices.Length; i++)
                     {
                         // Get the angle from the center to this vertex
@@ -781,11 +780,12 @@ namespace Extract.Imaging.Forms
                         angleExpansion += (Math.PI / 4.0) + _angle;
 
                         // Use the angle of the expansion to expand this vertex 4 pixels out.
-                        vertices[i].X += (int)Math.Round(4.0 * Math.Cos(angleExpansion));
-                        vertices[i].Y += (int)Math.Round(4.0 * Math.Sin(angleExpansion));
+                        vertices[i].X += (int)Math.Round(expandBy * Math.Cos(angleExpansion));
+                        vertices[i].Y += (int)Math.Round(expandBy * Math.Sin(angleExpansion));
                     }
 
                     // Draw the outline.
+                    this.ImageViewer.Transform.TransformPoints(vertices);
                     graphics.DrawPolygon(
                         ExtractPens.GetThickDashedPen(_outlineColor.Value), vertices);
                 }

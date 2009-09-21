@@ -75,7 +75,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// (<see langref="true"/>) or whether another application has launched 
         /// <see cref="DataEntryApplicationForm"/> via the COM interface (<see langref="false"/>).
         /// </summary>
-        bool _standAloneMode = true;
+        readonly bool _standAloneMode;
 
         /// <summary>
         /// Indicates whether the form has finished loading.
@@ -102,16 +102,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// The ID of the action being processed.
         /// </summary>
         int _actionID;
-
-        /// <summary>
-        /// The open file tool strip button.
-        /// </summary>
-        ToolStripItem _openFileToolStripButton;
-
-        /// <summary>
-        /// The open file command
-        /// </summary>
-        ApplicationCommand _openFileCommand;
 
         /// <summary>
         /// The close file command
@@ -175,6 +165,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         DbConnection _dbConnection;
 
         /// <summary>
+        /// The filename of a local copy of the database made if the master database resides on
+        /// another machine.
+        /// </summary>
+        TemporaryFile _localDBCopy;
+
+        /// <summary>
         /// The user-specified settings for the data entry application.
         /// </summary>
         UserPreferences _userPreferences;
@@ -184,16 +180,79 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         PropertyPageForm _userPreferencesDialog;
 
+        /// <summary>
+        /// Tool strip menu item for opening a new image.
+        /// </summary>
+        OpenImageToolStripMenuItem _openImageToolStripMenuItem;
+
+        /// <summary>
+        /// Tool strip menu item for closing the currently open image.
+        /// </summary>
+        CloseImageToolStripMenuItem _closeImageToolStripMenuItem;
+
+        /// <summary>
+        /// Tool strip menu item for saving and committing the current image.
+        /// </summary>
+        ToolStripMenuItem _saveAndCommitMenuItem = CreateSaveAndCommitMenuItem();
+
+        /// <summary>
+        /// Tool strip menu item for saving the current image.
+        /// </summary>
+        ToolStripMenuItem _saveMenuItem = CreateDisabledMenuItem("Save");
+
+        /// <summary>
+        /// Tool strip menu item for printing the current image.
+        /// </summary>
+        PrintImageToolStripMenuItem _printMenuItem = CreatePrintImageMenuItem();
+
+        /// <summary>
+        /// Tool strip menu item to skip processing the current document.
+        /// </summary>
+        ToolStripMenuItem _skipProcessingMenuItem;
+
+        /// <summary>
+        /// Tool strip menu item to exit the application or stop processing.
+        /// </summary>
+        ToolStripMenuItem _exitToolStripMenuItem = new ToolStripMenuItem("E&xit");
+
+        /// <summary>
+        /// During image load events, updates to the scroll panel will be locked to prevent excess
+        /// scrolling. This flag tracks the fact that the panel needs to be scrolled to the top
+        /// on the next control selection change that occurs (via ItemSelectionChanged).
+        /// </summary>
+        bool _scrollToTopRequired;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Constructors
+
+        /// <overloads>Initializes a new instance of the <see cref="DataEntryApplicationForm"/> 
+        /// class.</overloads>
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DataEntryApplicationForm"/> class in 
+        /// stand alone mode.
+        /// </summary>
+        /// <param name="configFileName">The name of the configuration file used to supply settings
+        /// for the <see cref="DataEntryApplicationForm"/>.</param>
+        public DataEntryApplicationForm(string configFileName)
+            : this(configFileName, true)
+        {
+        }
 
         /// <summary>
         /// Initializes a new <see cref="DataEntryApplicationForm"/> class.
         /// </summary>
         /// <param name="configFileName">The name of the configuration file used to supply settings
         /// for the <see cref="DataEntryApplicationForm"/>.</param>
-        public DataEntryApplicationForm(string configFileName)
+        /// <param name="standAloneMode"><see langref="true"/> if the created as a standalone 
+        /// application; <see langref="false"/> if launched via the COM interface.</param>
+        public DataEntryApplicationForm(string configFileName, bool standAloneMode)
         {
             try
             {
@@ -205,27 +264,44 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI23668", _OBJECT_NAME);
+                _licenseCache.Validate("ELI23668");
 
                 // Initialize the configuration settings.
                 ConfigSettings.Initialize(configFileName);
+
+                _standAloneMode = standAloneMode;
                 
                 InitializeComponent();
 
-                // Read the user preferences object from the registry
-                _userPreferences = UserPreferences.FromRegistry();
-
-                // Need to set _openFileToolStripButton by searching for it.
-                foreach (ToolStripItem item in _fileCommandsToolStrip.Items)
+                // Need to hide _openFileToolStripButton in FAM mode by searching for it.
+                if (!_standAloneMode)
                 {
-                    if (item is OpenImageToolStripSplitButton)
+                    foreach (ToolStripItem item in _fileCommandsToolStrip.Items)
                     {
-                        _openFileToolStripButton = item;
+                        if (item is OpenImageToolStripSplitButton)
+                        {
+                            item.Visible = false;
 
-                        break;
+                            break;
+                        }
                     }
                 }
+
+                // Add the file tool strip items
+                AddFileToolStripItems(_fileToolStripMenuItem.DropDownItems);
+
+                // Change the text on certain controls if not running in stand alone mode
+                if (!_standAloneMode)
+                {
+                    _saveAndCommitMenuItem.Text = "&Save and commit";
+                    _exitToolStripMenuItem.Text = "Stop processing";
+                    _saveAndCommitButton.Text = "Save and commit";
+                    _saveAndCommitButton.ToolTipText = "Save and commit (Ctrl+S)";
+                    _imageViewer.DefaultStatusMessage = "Waiting for next document...";
+                }
+
+                // Read the user preferences object from the registry
+                _userPreferences = UserPreferences.FromRegistry();
 
                 // Retrieve the name of the DEP assembly
                 string dataEntryPanelFileName = 
@@ -244,7 +320,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 this.DataEntryControlHost.AutoZoomContext = _userPreferences.AutoZoomContext;
 
                 base.Icon = _dataEntryControlHost.ApplicationIcon;
-                _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &Help...";
+                _appHelpMenuItem.Text = this.DataEntryControlHost.ApplicationTitle + " &help...";
                 _aboutMenuItem.Text = "&About " + this.DataEntryControlHost.ApplicationTitle + "...";
             }
             catch (Exception ex)
@@ -342,71 +418,134 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         }
 
         /// <summary>
-        /// Gets or sets whether the <see cref="DataEntryApplicationForm"/> is in standalone mode 
-        /// or whether another application has launched.
+        /// Gets whether the control styles of the current Windows theme should be used for the
+        /// verification form.
         /// </summary>
-        /// <returns><see langref="true"/> if the <see cref="DataEntryApplicationForm"/> was
-        /// launched as a standalone application or <see langref="false"/> if the
-        /// <see cref="DataEntryApplicationForm"/> was launched via the COM interface.</returns>
-        /// <value><see langref="true"/> if the <see cref="DataEntryApplicationForm"/> is to be
-        /// run as a standalone application or <see langref="false"/> if the
-        /// <see cref="DataEntryApplicationForm"/> is to be run via the COM interface.</value>
-        public bool StandAloneMode
+        /// <returns><see langword="true"/> to use the control styles of the current Windows theme;
+        /// <see langword="false"/> to use Window's classic theme to draw controls.</returns>
+        public bool UseVisualStyles
         {
             get
             {
-                return _standAloneMode;
-            }
-
-            set
-            {
-                try
+                // [DataEntry:614]
+                // Don't use the Window's theme for Windows Vista or later since the Aero theme
+                // hides the color applied to the active control when the active control is a
+                // drop-list combo box.
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT &&
+                    Environment.OSVersion.Version.Major >= 6)
                 {
-                    // If running in standalone mode, the document will be supplied by the
-                    // caller so hide the open and close file button and menu option. 
-                    // Otherwise, show them.
-                    if (_standAloneMode != value)
-                    {
-                        _standAloneMode = value;
-
-                        if (_openFileCommand != null)
-                        {
-                            _openFileCommand.Visible = _standAloneMode;
-                            _openFileCommand.Enabled = _standAloneMode;
-                        }
-
-                        if (_closeFileCommand != null)
-                        {
-                            _closeFileCommand.Visible = _standAloneMode;
-                            _closeFileCommand.Enabled = _standAloneMode;
-                        }
-
-                        _exitToolStripMenuItem.Text = _standAloneMode ? "Exit" : "Stop Processing";
-                        _saveAndCommitMenuItem.Text = _standAloneMode ? "&Save" : "&Save and Commit";
-                        _saveAndCommitButton.Text = _standAloneMode ? "Save" : "Save and Commit";
-                        _saveAndCommitButton.ToolTipText = _standAloneMode ? "Save" : "Save and Commit";
-
-                        _toolStripSeparator1.Visible = _standAloneMode;
-                        _skipProcessingMenuItem.Visible = !_standAloneMode;
-                        _saveMenuItem.Visible = !_standAloneMode;
-
-                        _imageViewer.DefaultStatusMessage =
-                            _standAloneMode ? "" : "Waiting for next document...";
-                    }
+                    return false;
                 }
-                catch (Exception ex)
-                {
-                    ExtractException ee = new ExtractException("ELI23885",
-                        "Failed to change stand-alone mode.", ex);
-                    ee.AddDebugData("StandAloneMode", value, false);
-                    throw ee;
-                }
+
+                // The Windows XP theme doesn't cause any problems
+                return true;
             }
         }
 
         #endregion Properties
 
         #region Methods
+
+        /// <summary>
+        /// Adds the file tool strip menu items to the specified tool strip item collection.
+        /// </summary>
+        /// <param name="items">The collection to which the file tool strip menu item should be 
+        /// added.</param>
+        void AddFileToolStripItems(ToolStripItemCollection items)
+        {
+            // Only open or close images in stand alone mode
+            if (_standAloneMode)
+            {
+                _openImageToolStripMenuItem = CreateOpenImageMenuItem();
+                _closeImageToolStripMenuItem = CreateCloseImageMenuItem();
+                ToolStripSeparator separator = new ToolStripSeparator();
+
+                items.AddRange(new ToolStripItem[] 
+                    { _openImageToolStripMenuItem, _closeImageToolStripMenuItem, separator });
+            }
+
+            // Add the save and commit menu item (created in constructor)
+            items.Add(_saveAndCommitMenuItem);
+
+            // Only add the save menu item if not running in stand alone
+            if (!_standAloneMode)
+	        {
+                _saveMenuItem = CreateDisabledMenuItem("Save");
+                items.Add(_saveMenuItem);
+	        }
+
+            // Add the print image menu item
+            items.AddRange(new ToolStripItem[] { _printMenuItem, new ToolStripSeparator() });
+
+            // Only add skip processing if not in stand alone mode
+            if (!_standAloneMode)
+	        {
+                _skipProcessingMenuItem = CreateDisabledMenuItem("Skip document");
+                items.Add(_skipProcessingMenuItem);
+	        }
+
+            // Add the exit menu item
+            items.Add(_exitToolStripMenuItem);
+        }
+
+        /// <summary>
+        /// Creates a menu item to open images.
+        /// </summary>
+        /// <returns>A menu item to open images.</returns>
+        static OpenImageToolStripMenuItem CreateOpenImageMenuItem()
+        {
+            OpenImageToolStripMenuItem menuItem = new OpenImageToolStripMenuItem();
+            menuItem.Enabled = false;
+            menuItem.Text = "&Open...";
+            return menuItem;
+        }
+
+        /// <summary>
+        /// Creates a menu item to close images.
+        /// </summary>
+        /// <returns>A menu item to close images.</returns>
+        static CloseImageToolStripMenuItem CreateCloseImageMenuItem()
+        {
+            CloseImageToolStripMenuItem menuItem = new CloseImageToolStripMenuItem();
+            menuItem.Enabled = false;
+            menuItem.Text = "&Close";
+            return menuItem;
+        }
+
+        /// <summary>
+        /// Creates a menu item to print images.
+        /// </summary>
+        /// <returns>A menu item to print images.</returns>
+        static PrintImageToolStripMenuItem CreatePrintImageMenuItem()
+        {
+            PrintImageToolStripMenuItem menuItem = new PrintImageToolStripMenuItem();
+            menuItem.Enabled = false;
+            menuItem.Text = "&Print...";
+            return menuItem;
+        }
+
+        /// <summary>
+        /// Creates a menu item to commit and save images.
+        /// </summary>
+        static ToolStripMenuItem CreateSaveAndCommitMenuItem()
+        {
+            ToolStripMenuItem menuItem = CreateDisabledMenuItem("&Save");
+            menuItem.Image = Resources.SaveImageButtonSmall;
+            menuItem.ShortcutKeyDisplayString = "Ctrl+S";
+            return menuItem;
+        }
+
+        /// <summary>
+        /// Creates a disabled tool strip menu item.
+        /// </summary>
+        /// <param name="text">The text of the tool strip menu item.</param>
+        /// <returns>A disabled tool strip menu item with <paramref name="text"/>.</returns>
+        static ToolStripMenuItem CreateDisabledMenuItem(string text)
+        {
+            ToolStripMenuItem menuItem = new ToolStripMenuItem(text);
+            menuItem.Enabled = false;
+            return menuItem;
+        }
 
         /// <summary>
         /// A thread-safe method that opens the specified document.
@@ -435,13 +574,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _fileID = fileID;
                 _actionID = actionID;
 
-                // TODO: [LegacyRCAndUtils:5382] 
-                // We are not currently receiving a valid action ID, so the comment cannot be
-                // retrieved from the database.
+                _imageViewer.OpenImage(fileName, false);
+
                 _dataEntryControlHost.Comment =
                     _fileProcessingDB.GetFileActionComment(_fileID, _actionID);
-
-                _imageViewer.OpenImage(fileName, false);
             }
             catch (Exception ex)
             {
@@ -471,16 +607,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish shortcut keys
 
                 // Open an image
-                _openFileCommand = new ApplicationCommand(_imageViewer.Shortcuts,
-                    new Keys[] { Keys.O | Keys.Control }, _imageViewer.SelectOpenImage, 
-                    new ToolStripItem[] { _openFileToolStripButton, _openImageToolStripMenuItem },
-                    false, _standAloneMode, _standAloneMode);
+                if (_standAloneMode)
+                {
+                    _imageViewer.Shortcuts[Keys.O | Keys.Control] = _imageViewer.SelectOpenImage;
+                }
 
                 // Close an image
                 _closeFileCommand = new ApplicationCommand(_imageViewer.Shortcuts,
                     new Keys[] { Keys.Control | Keys.F4 }, _imageViewer.CloseImage,
-                    new ToolStripItem[] { _closeImageToolStripMenuItem },
-                    false, _standAloneMode, _standAloneMode);
+                    GetCloseFileToolStripItems(), false, _standAloneMode, _standAloneMode);
 
                 // Save
                 _saveAndCommitFileCommand = new ApplicationCommand(_imageViewer.Shortcuts,
@@ -595,6 +730,19 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Establish connections between the image viewer and all image viewer controls.
                 _imageViewer.EstablishConnections(this);
 
+                // Disable the OpenImageToolStripSplitButton if this is not stand alone mode
+                if (!_standAloneMode)
+                {
+                    foreach (ToolStripItem item in _fileCommandsToolStrip.Items)
+                    {
+                        if (item is OpenImageToolStripSplitButton)
+                        {
+                            item.Enabled = false;
+                            break;
+                        }
+                    }
+                }
+
                 // Register for events.
                 _imageViewer.ImageFileChanged += HandleImageFileChanged;
                 _imageViewer.ImageFileClosing += HandleImageFileClosing;
@@ -604,8 +752,11 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 _dataEntryControlHost.ItemSelectionChanged += HandleItemSelectionChanged;
                 _saveAndCommitMenuItem.Click += HandleSaveAndCommitClick;
                 _saveAndCommitButton.Click += HandleSaveAndCommitClick;
-                _saveMenuItem.Click += HandleSaveClick;
-                _skipProcessingMenuItem.Click += HandleSkipFileClick;
+                if (!_standAloneMode)
+                {
+                    _saveMenuItem.Click += HandleSaveClick;
+                    _skipProcessingMenuItem.Click += HandleSkipFileClick;
+                }
                 _exitToolStripMenuItem.Click += HandleExitToolStripMenuItemClick;
                 _nextUnviewedToolStripButton.Click += HandleGoToNextUnviewedClick;
                 _nextUnviewedToolStripMenuItem.Click += HandleGoToNextUnviewedClick;
@@ -652,6 +803,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 ee.AddDebugData("Event Arguments", e, false);
                 DisplayCriticalException(ee);
             }
+        }
+
+        /// <summary>
+        /// Gets the tool strip items the close files.
+        /// </summary>
+        /// <returns>The tool strip items that close files.</returns>
+        ToolStripItem[] GetCloseFileToolStripItems()
+        {
+            return _standAloneMode ?
+                new ToolStripItem[] { _closeImageToolStripMenuItem } :
+                new ToolStripItem[0];
         }
 
         /// <summary>
@@ -734,6 +896,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                // [DataEntry:316]
+                // Don't allow any shortcuts or menu naviagation via keys while an image viewer
+                // tracking event is in progress.
+                if (_imageViewer.Capture)
+                {
+                    return true;
+                }
+
                 // Allow the image viewer to handle keyboard input for shortcuts.
                 if (_imageViewer.Shortcuts.ProcessKey(keyData))
                 {
@@ -839,7 +1009,47 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                     // Will cause the control host to be disposed of.
                     this.DataEntryControlHost = null;
                 }
+
+                // If we were using a temporary local copy of a remote database, delete it now.
+                if (_localDBCopy != null)
+                {
+                    _localDBCopy.Dispose();
+                    _localDBCopy = null;
+                }
+
+                // Dispose of menu items
+                if (_closeImageToolStripMenuItem != null)
+                {
+                    _closeImageToolStripMenuItem.Dispose();
+                    _closeImageToolStripMenuItem = null;
+                }
+                if (_saveAndCommitMenuItem != null)
+                {
+                    _saveAndCommitMenuItem.Dispose();
+                    _saveAndCommitMenuItem = null;
+                }
+                if (_saveMenuItem != null)
+                {
+                    _saveMenuItem.Dispose();
+                    _saveMenuItem = null;
+                }
+                if (_printMenuItem != null)
+                {
+                    _printMenuItem.Dispose();
+                    _printMenuItem = null;
+                }
+                if (_skipProcessingMenuItem != null)
+                {
+                    _skipProcessingMenuItem.Dispose();
+                    _skipProcessingMenuItem = null;
+                }
+                if (_exitToolStripMenuItem != null)
+                {
+                    _exitToolStripMenuItem.Dispose();
+                    _exitToolStripMenuItem = null;
+                }
             }
+
             base.Dispose(disposing);
         }
 
@@ -957,16 +1167,18 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 // Saving or closing the document or hiding of tooltips should be allowed as long as
                 // a document is available.
                 _saveAndCommitFileCommand.Enabled = _imageViewer.IsImageAvailable;
-                _closeFileCommand.Enabled = _imageViewer.IsImageAvailable;
-                _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _hideToolTipsCommand.Enabled = _imageViewer.IsImageAvailable;
                 _toggleShowAllHighlightsCommand.Enabled = _imageViewer.IsImageAvailable;
 
-                if (!StandAloneMode)
+                if (!_standAloneMode)
                 {
                     _skipProcessingMenuItem.Enabled = _imageViewer.IsImageAvailable;
+                    _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
                 }
-                _saveMenuItem.Enabled = _imageViewer.IsImageAvailable;
+
+                // [DataEntry:414]
+                // A document should only be allowed to be closed in FAM mode
+                _closeFileCommand.Enabled = (_standAloneMode && _imageViewer.IsImageAvailable);
 
                 // If a document is not loaded, the DataEntryApplicationForm has no way of informing
                 // the FAM of a cancel. Therefore, don't allow the form to be closed in FAM mode
@@ -991,13 +1203,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                 if (_imageViewer.IsImageAvailable)
                 {
                     base.Text += " - " + Path.GetFileName(_imageViewer.ImageFile);
-
-                    // Ensure the DEP is scrolled back to the top when a document is loaded.
-                    _scrollPanel.AutoScrollPosition = new Point(_scrollPanel.AutoScrollPosition.X, 0);
                 }
 
-                // TODO: In when standalone mode == false, need to assert that an image is indeed
-                // available.
+                // Ensure the DEP is scrolled back to the top when a document is loaded, but delay
+                // the call to scroll until the next control selection change since the scroll panel
+                // may currently be locked.
+                _scrollToTopRequired = true;
             }
             catch (Exception ex)
             {
@@ -1050,18 +1261,24 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                // Enable/disable and deselect the highlight cursor tools as needed.
-                if (!e.SwipingEnabled &&
-                    (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
-                     _imageViewer.CursorTool == CursorTool.RectangularHighlight))
+                // If an image is not available, the active cursor tool will be disabled
+                // automatically. Don't programatically change the cursor tool-- that way the last
+                // cursor tool will be remembered when the next image is loaded.
+                if (_imageViewer.IsImageAvailable)
                 {
-                    this._imageViewer.CursorTool = CursorTool.None;
-                }
+                    // Enable/disable and deselect the highlight cursor tools as needed.
+                    if (!e.SwipingEnabled &&
+                        (_imageViewer.CursorTool == CursorTool.AngularHighlight ||
+                         _imageViewer.CursorTool == CursorTool.RectangularHighlight))
+                    {
+                        this._imageViewer.CursorTool = CursorTool.None;
+                    }
 
-                // Enable or disable highlight commands as appropriate.
-                _toggleHighlightCommand.Enabled = e.SwipingEnabled;
-                _selectAngularHighlightCommand.Enabled = e.SwipingEnabled;
-                _selectRectangularHighlightCommand.Enabled = e.SwipingEnabled;
+                    // Enable or disable highlight commands as appropriate.
+                    _toggleHighlightCommand.Enabled = e.SwipingEnabled;
+                    _selectAngularHighlightCommand.Enabled = e.SwipingEnabled;
+                    _selectRectangularHighlightCommand.Enabled = e.SwipingEnabled;
+                }
             }
             catch (Exception ex)
             {
@@ -1126,6 +1343,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
+                if (_scrollToTopRequired)
+                {
+                    // [DataEntry:200]
+                    // Execute any request to scroll the panel back to the top now since scroll
+                    // panel updates should not be locked during a selection change.
+                    _scrollPanel.AutoScrollPosition = new Point(_scrollPanel.AutoScrollPosition.X, 0);
+                    _scrollToTopRequired = false;
+                }
+
                 _acceptSpatialInfoCommand.Enabled = e.SelectedItemsWithUnacceptedHighlights > 0;
 
                 _removeSpatialInfoCommand.Enabled =
@@ -1613,6 +1839,17 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
 
                         string dataSourcePath =
                             DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.LocalDataSource);
+
+                        // [DataEntry:399]
+                        // Use a local copy of the database if dataSourcePath points to a remote
+                        // machine.
+                        if (!FileSystemMethods.IsPathLocal(dataSourcePath))
+                        {
+                            _localDBCopy = new TemporaryFile();
+                            File.Copy(dataSourcePath, _localDBCopy.FileName, true);
+                            dataSourcePath = _localDBCopy.FileName;
+                        }
+
                         connectionString = "Data Source='" + dataSourcePath + "';";
                     }
 

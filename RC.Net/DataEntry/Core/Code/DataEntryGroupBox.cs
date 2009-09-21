@@ -310,6 +310,30 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// This event is not raised by <see cref="DataEntryGroupBox"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateStarted
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryControl interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// This event is not raised by <see cref="DataEntryGroupBox"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateEnded
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryControl interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not support swiping; the value of this property
         /// will always be <see langword="false"/>.
         /// </summary>
@@ -369,7 +393,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <throws><see cref="ExtractException"/> if called.</throws>
         /// <param name="swipedText">Unused.</param>
-        public void ProcessSwipedText(SpatialString swipedText)
+        public bool ProcessSwipedText(SpatialString swipedText)
         {
             throw new ExtractException("ELI26038", "DataEntryGroupBox does not support swiping!");
         }
@@ -377,8 +401,9 @@ namespace Extract.DataEntry
         /// <summary>
         /// <see cref="DataEntryGroupBox"/> does not have any implementation for this method.
         /// </summary>
-        /// <param name="attribute">Unused.</param>
-        public virtual void RefreshAttribute(IAttribute attribute)
+        /// <param name="attributes">Unused.</param>
+        /// <param name="spatialInfoUpdated">Unused.</param>
+        public virtual void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
         {
         }
 

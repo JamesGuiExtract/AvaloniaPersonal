@@ -13,6 +13,7 @@
 #include <cppletter.h>
 #include <AFTagManager.h>
 #include <ComponentLicenseIDs.h>
+#include <AFCppUtils.h>
 
 #include <cmath>
 
@@ -68,6 +69,7 @@ CLocateImageRegion::~CLocateImageRegion()
 {
 	 try
 	 {
+		 m_ipSpatialStringSearcher = NULL;
 	 }
 	 CATCH_AND_LOG_ALL_EXCEPTIONS("ELI16346");
 }
@@ -337,6 +339,7 @@ STDMETHODIMP CLocateImageRegion::GetRegionBoundary(EBoundary eRegionBoundary,
 		{
 			UCLIDException ue("ELI07797", "Unable to get region boundary information.");
 			ue.addDebugInfo("EBoundary", eRegionBoundary);
+			addCurrentRSDFileToDebugInfo(ue);
 			throw ue;
 		}
 
@@ -1096,6 +1099,7 @@ long CLocateImageRegion::getPageBoundaryPosition(EBoundary eSide, ISpatialString
 	default:
 		UCLIDException ue("ELI25677", "Unexpected page boundary.");
 		ue.addDebugInfo("Boundary number", eSide);
+		addCurrentRSDFileToDebugInfo(ue);
 		throw ue;
 	}
 }
@@ -1408,6 +1412,9 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 		}
 	}
 
+	// Keep track of any cases where found clues are non-spatial for logging purposes.
+	string strDocumentWithNonSpatialClues;
+
 	// as soon as found all clues on one page, return the page number
 	long nNumOfPages = ipPages->Size();
 	for (long nIndex = lStartIndex; nIndex < nNumOfPages; nIndex++)
@@ -1415,11 +1422,15 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 		// get each page content
 		ISpatialStringPtr ipPageText = ipPages->At(nIndex);
 		ASSERT_RESOURCE_ALLOCATION("ELI07889", ipPageText != NULL);
+
+		long pageLen = (long)ipPageText->String.length();
 		
 		// flag to indicate all clues are found on the same page
 		bool bAllFound = true;
+
 		// how many clue lists are actually searched
 		int nNumOfClueListsSearched = 0;
+
 		// go through all defined clue lists in the order of list 1 to list 4
 		IndexToClueListInfo::iterator itClueLists = m_mapIndexToClueListInfo.begin();
 		for (; itClueLists != m_mapIndexToClueListInfo.end(); itClueLists++)
@@ -1435,35 +1446,55 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 			{
 				nNumOfClueListsSearched++;
 				// start and end position of found text
-				long nStart, nEnd;
-				if (clueListInfo.m_bAsRegExpr)
+				long nStart(0), nEnd(0);
+				// Loop in case the first clue found is not spatial; nSearchStart indicates the
+				// point from which the next search should commence.
+				for (long nSearchStart = 0; nStart != -1 && nSearchStart < pageLen;
+					nSearchStart = nStart + 1)
 				{
-					// treat vector of clues as prioritized. [P16 #1956]
-					ipPageText->FindFirstItemInRegExpVector(
-						clueListInfo.m_ipClues, 
-						asVariantBool(clueListInfo.m_bCaseSensitive), 
-						VARIANT_TRUE, 0, m_ipRegExprParser, &nStart, &nEnd);
+					if (clueListInfo.m_bAsRegExpr)
+					{
+						// treat vector of clues as prioritized. [P16 #1956]
+						ipPageText->FindFirstItemInRegExpVector(
+							clueListInfo.m_ipClues, 
+							asVariantBool(clueListInfo.m_bCaseSensitive), 
+							VARIANT_TRUE, nSearchStart, m_ipRegExprParser, &nStart, &nEnd);
+					}
+					else
+					{
+						// search for current clue lists
+						// treat vector of clues as prioritized. [P16 #1956]
+						ipPageText->FindFirstItemInVector(
+							clueListInfo.m_ipClues, 
+							asVariantBool(clueListInfo.m_bCaseSensitive), 
+							VARIANT_TRUE, nSearchStart, &nStart, &nEnd);
+					}
+					
+					// if can't find any on the page, go onto the next page
+					if (nStart == -1)
+					{
+						// break out of the inner loop
+						bAllFound = false;
+						break;
+					}
+
+					ISpatialStringPtr ipFound = ipPageText->GetSubString(nStart, nEnd);
+					ASSERT_RESOURCE_ALLOCATION("ELI27680", ipFound != NULL);
+
+					if (asCppBool(ipFound->HasSpatialInfo()))
+					{
+						// Store any found string with spatial info and break out of loop.
+						clueListInfo.m_ipFoundString = ipFound;
+						break;
+					}
+					else
+					{
+						// [DataEntry:425]
+						// If the found string is non-spatial, it can't be used to define an image region.
+						// Ignore non-spatial string, but continue to look for more on this page.
+						strDocumentWithNonSpatialClues = asString(ipPageText->SourceDocName);
+					}
 				}
-				else
-				{
-					// search for current clue lists
-					// treat vector of clues as prioritized. [P16 #1956]
-					ipPageText->FindFirstItemInVector(
-						clueListInfo.m_ipClues, 
-						asVariantBool(clueListInfo.m_bCaseSensitive), 
-						VARIANT_TRUE, 0, &nStart, &nEnd);
-				}
-				
-				// if can't find any on the page, go onto the next page
-				if (nStart == -1)
-				{
-					// break out of the inner loop
-					bAllFound = false;
-					break;
-				}
-				
-				// otherwise store the found spatial string
-				clueListInfo.m_ipFoundString = ipPageText->GetSubString(nStart, nEnd);
 			}
 		}
 
@@ -1473,6 +1504,17 @@ long CLocateImageRegion::findCluesOnSamePage(IIUnknownVectorPtr ipPages, long lS
 			nFoundIndex = nIndex;
 			break;
 		}
+	}
+
+	// Whether or not any spatial strings were finally found, log the fact that non-spatial strings
+	// were found and skipped to facilitate tracking down possible problems in rulesets.
+	if (!strDocumentWithNonSpatialClues.empty())
+	{
+		UCLIDException ue("ELI27681",
+			"Application trace: Ignored one or more clues that did not contain spatial info.");
+		addCurrentRSDFileToDebugInfo(ue);
+		ue.addDebugInfo("File", strDocumentWithNonSpatialClues);
+		ue.log();
 	}
 	
 	return nFoundIndex;

@@ -29,6 +29,20 @@ namespace Extract.DataEntry
         DataEntryValidator Validator { get; set; }
 
         /// <summary>
+        /// Gets or sets whether carriage return or new line characters will be replaced with
+        /// spaces.
+        /// <para><b>Note</b></para>
+        /// If <see langword="false"/>, new line characters will be preserved only as long as the
+        /// user does not delete the space in text that represents the new line's location.
+        /// </summary>
+        /// <value><see langword="true"/> to replace carriage return or new line characters;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if carriage return or new line characters will be
+        /// replaced; <see langword="false"/> otherwise.</returns>
+        bool RemoveNewLineChars { get; set; }
+
+        /// <summary>
         /// Provides access to the object as an <see cref="DataGridViewCell"/>.
         /// </summary>
         /// <returns>The object as an <see cref="DataGridViewCell"/>.</returns>

@@ -3,12 +3,13 @@ using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Globalization;
 using System.IO;
+using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -29,7 +30,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryTextBox).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryTextBox).ToString();
 
         #endregion Constants
 
@@ -39,50 +40,50 @@ namespace Extract.DataEntry
         /// The name used to identify the <see cref="IAttribute"/> to be  associated with the text 
         /// box.
         /// </summary>
-        private string _attributeName;
+        string _attributeName;
 
         /// <summary>
         /// Used to specify the data entry control which is mapped to the parent of the attribute 
         /// to which the current textbox is to be mapped.
         /// </summary>
-        private IDataEntryControl _parentDataEntryControl;
+        IDataEntryControl _parentDataEntryControl;
 
         /// <summary>
         /// The selection mode to use when multiple attributes are found which match the attribute 
         /// name for this control.
         /// </summary>
-        private MultipleMatchSelectionMode _multipleMatchSelectionMode = 
+        MultipleMatchSelectionMode _multipleMatchSelectionMode = 
             MultipleMatchSelectionMode.First;
 
         /// <summary>
         /// Specifies whether this control should allow input via image swipe.
         /// </summary>
-        private bool _supportsSwiping = true;
+        bool _supportsSwiping = true;
 
         /// <summary>
         /// Specifies whether the control should remain disabled at all times.
         /// </summary>
-        private bool _disabled;
+        bool _disabled;
 
         /// <summary>
         /// The attribute mapped to this control.
         /// </summary>
-        private IAttribute _attribute;
+        IAttribute _attribute;
 
         /// <summary>
         /// The filename of the rule file to be used to parse swiped data.
         /// </summary>
-        private string _formattingRuleFileName;
+        string _formattingRuleFileName;
 
         /// <summary>
         /// The formatting rule to be used when processing text from image swipes.
         /// </summary>
-        private IRuleSet _formattingRule;
+        IRuleSet _formattingRule;
 
         /// <summary>
         /// The object which will provide validation for cell data.
         /// </summary>
-        private DataEntryValidator _validator = new DataEntryValidator();
+        DataEntryValidator _validator = new DataEntryValidator();
 
         /// <summary>
         /// The error provider to be used to indicate data validation problems to the user.
@@ -93,28 +94,44 @@ namespace Extract.DataEntry
         /// A query which will cause value to automatically be updated using the values from other
         /// <see cref="IAttribute"/>'s and/or a database query.
         /// </summary>
-        private string _autoUpdateQuery;
+        string _autoUpdateQuery;
 
         /// <summary>
         /// A query which will cause the validation list to be updated using the values from other
         /// <see cref="IAttribute"/>'s and/or a database query.
         /// </summary>
-        private string _validationQuery;
+        string _validationQuery;
 
         /// <summary>
         /// Specifies under what circumstances the control's attribute should serve as a tab stop.
         /// </summary>
-        private TabStopMode _tabStopMode = TabStopMode.Always;
+        TabStopMode _tabStopMode = TabStopMode.Always;
+
+        /// <summary>
+        /// Specifies whether the mapped attribute's value should be saved.
+        /// </summary>
+        bool _persistAttribute = true;
+
+        /// <summary>
+        /// Specifies whether carriage return or new line characters will be replaced with spaces.
+        /// </summary>
+        bool _removeNewLineChars = true;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
         /// </summary>
-        private bool _inDesignMode;
+        bool _inDesignMode;
 
         /// <summary>
         /// Indicates whether the text box is currently active.
         /// </summary>
-        private bool _isActive;
+        bool _isActive;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -137,8 +154,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI23689",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23689");
 
                 InitializeComponent();
 
@@ -195,6 +211,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to find the mapped attribute for the
         /// <see cref="DataEntryTextBox"/>.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(MultipleMatchSelectionMode.First)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -215,6 +232,7 @@ namespace Extract.DataEntry
         /// <value>The filename of the <see cref="IRuleSet"/> to be used.</value>
         /// <returns>The filename of the <see cref="IRuleSet"/> to be used.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(null)]
         public string FormattingRuleFile
         {
             get
@@ -258,6 +276,7 @@ namespace Extract.DataEntry
         /// <returns>A regular expression the data entered in a control must match prior to being 
         /// saved. <see langword="null"/> if there is no validation pattern set.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(null)]
         public string ValidationPattern
         {
             get
@@ -301,6 +320,7 @@ namespace Extract.DataEntry
         /// <returns>The name of a file containing list of values. <see langword="null"/> if there 
         /// is no validation list set.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(null)]
         public string ValidationListFileName
         {
             get
@@ -348,6 +368,7 @@ namespace Extract.DataEntry
         /// from other <see cref="IAttribute"/>'s and/or a database query.</returns>
         [Category("Data Entry Text Box")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
+        [DefaultValue(null)]
         public string ValidationQuery
         {
             get
@@ -370,6 +391,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if values will be modified to match the case of list items,
         /// <see langword="false"/> if case-insensitive matches will be left as-is.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(true)]
         public bool ValidationCorrectsCase
         {
             get
@@ -380,6 +402,28 @@ namespace Extract.DataEntry
             set
             {
                 _validator.CorrectCase = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether validation lists will be checked for matches case-sensitively.
+        /// </summary>
+        /// <value><see langword="true"/> to validate against a validation list case-sensitively;
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if validating against a validation list
+        /// case-sensitively; <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Text Box")]
+        [DefaultValue(false)]
+        public bool ValidationIsCaseSensitive
+        {
+            get
+            {
+                return _validator.CaseSensitive;
+            }
+
+            set
+            {
+                _validator.CaseSensitive = value;
             }
         }
 
@@ -436,6 +480,7 @@ namespace Extract.DataEntry
         /// from other <see cref="IAttribute"/>'s and/or a database query.</returns>
         [Category("Data Entry Text Box")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
+        [DefaultValue(null)]
         public string AutoUpdateQuery
         {
             get
@@ -458,6 +503,7 @@ namespace Extract.DataEntry
         /// <returns>A <see cref="TabStopMode"/> value indicating when the attribute will serve as a
         /// tab stop.</returns>
         [Category("Data Entry Text Box")]
+        [DefaultValue(TabStopMode.Always)]
         public TabStopMode TabStopMode
         {
             get
@@ -468,6 +514,70 @@ namespace Extract.DataEntry
             set
             {
                 _tabStopMode = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the mapped <see cref="IAttribute"/>'s value should be saved.
+        /// </summary>
+        /// <value><see langword="true"/> to save the attribute's value; <see langword="false"/>
+        /// otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if the attribute's value will be saved;
+        /// <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Text Box")]
+        [DefaultValue(true)]
+        public bool PersistAttribute
+        {
+            get
+            {
+                return _persistAttribute;
+            }
+
+            set
+            {
+                _persistAttribute = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether carriage return or new line characters will be replaced with
+        /// spaces.
+        /// <para><b>Note</b></para>
+        /// If <see langword="false"/>, new line characters will be preserved only as long as the
+        /// user does not delete the space in text that represents the new line's location.
+        /// </summary>
+        /// <value><see langword="true"/> to replace carriage return or new line characters;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if carriage return or new line characters will be
+        /// replaced; <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Text Box")]
+        [DefaultValue(true)]
+        public bool RemoveNewLineChars
+        {
+            get
+            {
+                return _removeNewLineChars;
+            }
+
+            set
+            {
+                try
+                {
+                    if (!_inDesignMode || base.Visible)
+                    {
+                        ExtractException.Assert("ELI27300",
+                            "RemoveNewLineChars property must be false for multi-line controls.",
+                            (!base.Multiline || !value));
+                    }
+
+                    _removeNewLineChars = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27310", ex);
+                }
             }
         }
 
@@ -542,6 +652,12 @@ namespace Extract.DataEntry
 
                     e.Handled = true;
                 }
+                // If the delete key is pressed while all text is selected, delete spatial info.
+                else if (e.KeyCode == Keys.Delete &&
+                     _attribute != null && base.SelectionLength == base.Text.Length)
+                {
+                    AttributeStatusInfo.RemoveSpatialInfo(_attribute);
+                }
 
                 base.OnKeyDown(e);
                 
@@ -566,6 +682,31 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether this is a multi-line text box.
+        /// </summary>
+        /// <value><see langword="true"/> if the text box should be multi-line,
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if the text box is multi-line,
+        /// <see langword="false"/> otherwise.</returns>
+        public override bool Multiline
+        {
+            get
+            {
+                return base.Multiline;
+            }
+
+            set
+            {
+                if (value)
+                {
+                    _removeNewLineChars = false;
+                }
+
+                base.Multiline = value;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the text associated with this <see cref="DataEntryTextBox"/>.
         /// </summary>
         /// <value>The text associated with this <see cref="DataEntryTextBox"/>.</value>
@@ -576,14 +717,16 @@ namespace Extract.DataEntry
             {
                 try
                 {
+                    string value = base.Text;
+
                     // Add carriage returns back so that caller will not know they were replaced
                     // internally.
-                    if (!base.Multiline)
+                    if (!_removeNewLineChars)
                     {
-                        return base.Text.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                        return value.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
                     }
 
-                    return base.Text;
+                    return value;
                 }
                 catch (Exception ex)
                 {
@@ -595,9 +738,16 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    // Internally replace carriage returns or line feeds with no break spaces to
+                    // Permanently replace newline chars with spaces if specified.
+                    if (_removeNewLineChars && 
+                        value.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                    {
+                        // Replace a group of CRLFs with just a single space.
+                        value = Regex.Replace(value, "(\r\n)+", " ");
+                    }
+                    // Temporarily replace carriage returns or line feeds with no break spaces to
                     // prevent the unprintable "boxes" from appearing.
-                    if (!base.Multiline)
+                    else if (!_removeNewLineChars && !this.Multiline)
                     {
                         value = value.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
                     }
@@ -608,6 +758,64 @@ namespace Extract.DataEntry
                 {
                     throw ExtractException.AsExtractException("ELI26010", ex);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.PreviewKeyDown"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="PreviewKeyDownEventArgs"/> containing the event data.
+        /// </param>
+        // This event handler has undergone a security review.
+        [SuppressMessage("Microsoft.Security", "CA2109:ReviewVisibleEventHandlers", MessageId = "0#")]
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
+        protected override void OnPreviewKeyDown(PreviewKeyDownEventArgs e)
+        {
+            try
+            {
+                // [DataEntry:385]
+                // If the the up or down arrow keys are pressed while the cursor is at the end
+                // of the text and the auto-complete list is not currently displayed, temporarily
+                // disable auto-complete to prevent some apparent memory issues with auto-complete
+                // that can otherwise cause garbage characters to appear at the end of the field.
+                if ((e.KeyCode == Keys.Up || e.KeyCode == Keys.Down) &&
+                    SelectionStart == Text.Length && !NativeMethods.IsAutoCompleteDisplayed())
+                {
+                    AutoCompleteMode = AutoCompleteMode.None;
+                }
+
+                base.OnPreviewKeyDown(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27654", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Control.KeyUp"/> event.
+        /// </summary>
+        /// <param name="e">A <see cref="KeyEventArgs"/> containing the event data.</param>
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            try
+            {
+                base.OnKeyUp(e);
+
+                // If auto-complete was temporarily disabled to prevent arrow keys from exposing
+                // memory issues with auto-complete, re-enable autocomplete now.
+                if (AutoCompleteMode == AutoCompleteMode.None)
+                {
+                    AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27650", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
             }
         }
 
@@ -657,6 +865,37 @@ namespace Extract.DataEntry
             remove { }
         }
 
+        /// <summary>
+        /// Indicates that a control has begun an update and that the
+        /// <see cref="DataEntryControlHost"/> should not redraw highlights, etc, until the update
+        /// is complete.
+        /// <para><b>NOTE:</b></para>
+        /// This event should only be raised for updates that initiated via user interation with the
+        /// control. It should not be raised for updates triggered by the
+        /// <see cref="DataEntryControlHost"/> such as <see cref="ProcessSwipedText"/>.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateStarted
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryControl interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
+        /// <summary>
+        /// Indicates that a control has ended an update and actions that needs to be taken by the
+        /// <see cref="DataEntryControlHost"/> such as re-drawing highlights can now proceed.
+        /// </summary>
+        public event EventHandler<EventArgs> UpdateEnded
+        {
+            // Since this event is not currently used by this class but is needed by the 
+            // IDataEntryControl interface, define it with an empty implementation to prevent
+            // "unused" warnings during compile.
+            add { }
+            remove { }
+        }
+
         #endregion IDataEntryControl Events
 
         #region IDataEntryControl Properties
@@ -672,6 +911,7 @@ namespace Extract.DataEntry
         /// this property must be set to <see langref="null"/>.</summary>
         /// <seealso cref="IDataEntryControl"/>
         [Category("Data Entry Control")]
+        [DefaultValue(null)]
         public IDataEntryControl ParentDataEntryControl
         {
             get
@@ -692,6 +932,7 @@ namespace Extract.DataEntry
         /// text box is active.
         /// </summary>
         [Category("Data Entry Control")]
+        [DefaultValue(true)]
         public bool SupportsSwiping
         {
             get
@@ -724,6 +965,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the control will remain disabled,
         /// <see langword="false"/> otherwise.</returns>
         [Category("Data Entry Control")]
+        [DefaultValue(false)]
         public bool Disabled
         {
             get
@@ -799,6 +1041,12 @@ namespace Extract.DataEntry
                     if (base.ReadOnly)
                     {
                         AttributeStatusInfo.MarkAsViewed(_attribute, true);
+                    }
+
+                    // If not persisting the attribute, mark the attribute accordingly.
+                    if (!_persistAttribute)
+                    {
+                        AttributeStatusInfo.SetAttributeAsPersistable(_attribute, false);
                     }
 
                     // If the attribute has not been viewed, apply bold font.  Otherwise, use
@@ -887,24 +1135,43 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Refreshes the specified <see cref="IAttribute"/>'s value to the text box.
+        /// Refreshes the <see cref="IAttribute"/>'s value to the text box.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose value should be refreshed.
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed.
         /// </param>
-        public virtual void RefreshAttribute(IAttribute attribute)
+        /// <param name="spatialInfoUpdated"><see langword="true"/> if the attribute's spatial info
+        /// has changed so that hints can be updated; <see langword="false"/> if the attribute's
+        /// spatial info has not changed.</param>
+        public virtual void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated)
         {
             try
             {
-                if (_attribute == attribute)
+                if (_attribute == null)
                 {
-                    this.Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+                    return;
+                }
 
-                    // In case the value itself didn't change but the validation list did, explicitly
-                    // check validation here.
-                    if (_errorProvider != null)
+                foreach (IAttribute attribute in attributes)
+                {
+                    if (_attribute == attribute)
                     {
-                        _errorProvider.SetError(this,
-                            Validate(false) ? "" : _validator.ValidationErrorMessage);
+                        this.Text = (_attribute.Value != null) ? _attribute.Value.String : "";
+
+                        // In case the value itself didn't change but the validation list did, explicitly
+                        // check validation here.
+                        if (_errorProvider != null)
+                        {
+                            _errorProvider.SetError(this,
+                                Validate(false) ? "" : _validator.ValidationErrorMessage);
+                        }
+
+                        // Update the font according to the viewed status.
+                        bool hasBeenViewed = AttributeStatusInfo.HasBeenViewed(_attribute, false);
+                        if (base.Font.Bold == hasBeenViewed)
+                        {
+                            base.Font = new Font(base.Font,
+                                hasBeenViewed ? FontStyle.Regular : FontStyle.Bold);
+                        }
                     }
                 }
             }
@@ -919,8 +1186,10 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the
         /// recognized text in the swiped image area.</param>
+        /// <returns><see langword="true"/> if the control was able to use the swiped text;
+        /// <see langword="false"/> if it could not be used.</returns>
         /// <seealso cref="IDataEntryControl"/>
-        public void ProcessSwipedText(SpatialString swipedText)
+        public bool ProcessSwipedText(SpatialString swipedText)
         {
             try
             {
@@ -928,7 +1197,7 @@ namespace Extract.DataEntry
                 // currently supported.
                 if (!base.Enabled || _attribute == null)
                 {
-                    return;
+                    return false;
                 }
 
                 if (_formattingRule != null)
@@ -962,6 +1231,8 @@ namespace Extract.DataEntry
                 // Update text value of this control and raise the events that need to be raised
                 // in conjunction with an attribute change.
                 OnAttributeChanged();
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -1067,7 +1338,7 @@ namespace Extract.DataEntry
         /// in conjunction with an attribute change (<see cref="AttributesSelected"/> and
         /// <see cref="PropagateAttributes"/>).
         /// </summary>
-        private void OnAttributeChanged()
+        void OnAttributeChanged()
         {
             // Display the attribute text.
             this.Text = (_attribute != null && _attribute.Value != null)
@@ -1092,7 +1363,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Raises the <see cref="AttributesSelected"/> event.
         /// </summary>
-        private void OnAttributesSelected()
+        void OnAttributesSelected()
         {
             if (this.AttributesSelected != null)
             {
@@ -1105,7 +1376,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Raises the <see cref="PropagateAttributes"/> event.
         /// </summary>
-        private void OnPropagateAttributes()
+        void OnPropagateAttributes()
         {
             if (this.PropagateAttributes != null)
             {
@@ -1145,7 +1416,7 @@ namespace Extract.DataEntry
         /// <see langword="true"/> if the control either has no validation requirements or 
         /// the data it contains meets the requirements or <see langword="false"/>
         /// otherwise.</returns>
-        private bool Validate(bool correctValue)
+        bool Validate(bool correctValue)
         {
             // If there is no mapped attribute or the control is disabled, the data cannot be invalid.
             if (_disabled || _attribute == null)
@@ -1175,7 +1446,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
-        private void HandleValidationListChanged(object sender, EventArgs e)
+        void HandleValidationListChanged(object sender, EventArgs e)
         {
             try
             {
@@ -1193,7 +1464,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Updates the auto-complete values to reflect the validation list values.
         /// </summary>
-        private void UpdateAutoCompleteValues()
+        void UpdateAutoCompleteValues()
         {
             // If validation list values have been supplied, use them as the auto-complete
             // values.
@@ -1211,8 +1482,13 @@ namespace Extract.DataEntry
                 }
                 validationListValues.CopyTo(autoCompleteList, validationListValues.Length);
 
+                // [DataEntry:621]
+                // Disabling auto-complete while updating the auto-complete source seems to solve
+                // the problem access violations.
+                base.AutoCompleteMode = AutoCompleteMode.None;
                 base.AutoCompleteCustomSource.Clear();
                 base.AutoCompleteCustomSource.AddRange(autoCompleteList);
+                base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
             }
         }
 

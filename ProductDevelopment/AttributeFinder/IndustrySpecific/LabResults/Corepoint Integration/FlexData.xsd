@@ -4,6 +4,13 @@
   <xs:element name="FlexData">
     <xs:complexType>
       <xs:sequence>
+        <xs:element name="MessageSequenceNumberFile">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="FullText" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
         <xs:element name="OperatorComments" minOccurs="0">
           <xs:complexType>
             <xs:sequence>
@@ -138,13 +145,6 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="FullText" type="xs:string" />
-                    <xs:element name="First">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="FullText" type="xs:string" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
                     <xs:element name="Last">
                       <xs:complexType>
                         <xs:sequence>
@@ -152,7 +152,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="Code">
+                    <xs:element name="First">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
@@ -160,6 +160,13 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="Middle" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Code">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
@@ -180,13 +187,6 @@
                 <xs:complexType>
                   <xs:sequence>
                     <xs:element name="FullText" type="xs:string" />
-                    <xs:element name="First">
-                      <xs:complexType>
-                        <xs:sequence>
-                          <xs:element name="FullText" type="xs:string" />
-                        </xs:sequence>
-                      </xs:complexType>
-                    </xs:element>
                     <xs:element name="Last">
                       <xs:complexType>
                         <xs:sequence>
@@ -194,7 +194,7 @@
                         </xs:sequence>
                       </xs:complexType>
                     </xs:element>
-                    <xs:element name="Code">
+                    <xs:element name="First">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />
@@ -202,6 +202,13 @@
                       </xs:complexType>
                     </xs:element>
                     <xs:element name="Middle" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="FullText" type="xs:string" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Code">
                       <xs:complexType>
                         <xs:sequence>
                           <xs:element name="FullText" type="xs:string" />

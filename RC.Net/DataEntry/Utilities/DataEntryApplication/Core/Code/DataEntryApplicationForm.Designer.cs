@@ -23,15 +23,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._toolStripContainer = new System.Windows.Forms.ToolStripContainer();
             this._menuStrip = new System.Windows.Forms.MenuStrip();
             this._fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._openImageToolStripMenuItem = new Extract.Imaging.Forms.OpenImageToolStripMenuItem();
-            this._closeImageToolStripMenuItem = new Extract.Imaging.Forms.CloseImageToolStripMenuItem();
-            this._toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this._saveAndCommitMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._saveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._printImageToolStripMenuItem = new Extract.Imaging.Forms.PrintImageToolStripMenuItem();
-            this._toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this._skipProcessingMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this._exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._fitToPageToolStripMenuItem = new Extract.Imaging.Forms.FitToPageToolStripMenuItem();
@@ -195,90 +186,9 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _fileToolStripMenuItem
             // 
-            this._fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this._openImageToolStripMenuItem,
-            this._closeImageToolStripMenuItem,
-            this._toolStripSeparator1,
-            this._saveAndCommitMenuItem,
-            this._saveMenuItem,
-            this._printImageToolStripMenuItem,
-            this._toolStripSeparator2,
-            this._skipProcessingMenuItem,
-            this._exitToolStripMenuItem});
             this._fileToolStripMenuItem.Name = "_fileToolStripMenuItem";
             this._fileToolStripMenuItem.Size = new System.Drawing.Size(35, 20);
             this._fileToolStripMenuItem.Text = "&File";
-            // 
-            // _openImageToolStripMenuItem
-            // 
-            this._openImageToolStripMenuItem.Enabled = false;
-            this._openImageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_openImageToolStripMenuItem.Image")));
-            this._openImageToolStripMenuItem.ImageViewer = null;
-            this._openImageToolStripMenuItem.Name = "_openImageToolStripMenuItem";
-            this._openImageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._openImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._openImageToolStripMenuItem.Text = "&Open...";
-            // 
-            // _closeImageToolStripMenuItem
-            // 
-            this._closeImageToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this._closeImageToolStripMenuItem.Enabled = false;
-            this._closeImageToolStripMenuItem.ImageViewer = null;
-            this._closeImageToolStripMenuItem.Name = "_closeImageToolStripMenuItem";
-            this._closeImageToolStripMenuItem.ShortcutKeyDisplayString = "Ctrl+F4";
-            this._closeImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._closeImageToolStripMenuItem.Text = "&Close";
-            // 
-            // _toolStripSeparator1
-            // 
-            this._toolStripSeparator1.Name = "_toolStripSeparator1";
-            this._toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
-            // 
-            // _saveAndCommitMenuItem
-            // 
-            this._saveAndCommitMenuItem.Enabled = false;
-            this._saveAndCommitMenuItem.Image = global::Extract.DataEntry.Utilities.DataEntryApplication.Properties.Resources.SaveImageButtonSmall;
-            this._saveAndCommitMenuItem.Name = "_saveAndCommitMenuItem";
-            this._saveAndCommitMenuItem.ShortcutKeyDisplayString = "Ctrl+S";
-            this._saveAndCommitMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._saveAndCommitMenuItem.Text = "&Save";
-            // 
-            // _saveMenuItem
-            // 
-            this._saveMenuItem.Enabled = false;
-            this._saveMenuItem.Name = "_saveMenuItem";
-            this._saveMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._saveMenuItem.Text = "Save";
-            this._saveMenuItem.Visible = false;
-            // 
-            // _printImageToolStripMenuItem
-            // 
-            this._printImageToolStripMenuItem.Enabled = false;
-            this._printImageToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("_printImageToolStripMenuItem.Image")));
-            this._printImageToolStripMenuItem.ImageViewer = null;
-            this._printImageToolStripMenuItem.Name = "_printImageToolStripMenuItem";
-            this._printImageToolStripMenuItem.ShortcutKeyDisplayString = "";
-            this._printImageToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._printImageToolStripMenuItem.Text = "&Print...";
-            // 
-            // _toolStripSeparator2
-            // 
-            this._toolStripSeparator2.Name = "_toolStripSeparator2";
-            this._toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
-            // 
-            // _skipProcessingMenuItem
-            // 
-            this._skipProcessingMenuItem.Enabled = false;
-            this._skipProcessingMenuItem.Name = "_skipProcessingMenuItem";
-            this._skipProcessingMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._skipProcessingMenuItem.Text = "Skip Document";
-            this._skipProcessingMenuItem.Visible = false;
-            // 
-            // _exitToolStripMenuItem
-            // 
-            this._exitToolStripMenuItem.Name = "_exitToolStripMenuItem";
-            this._exitToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
-            this._exitToolStripMenuItem.Text = "E&xit";
             // 
             // _viewToolStripMenuItem
             // 
@@ -650,7 +560,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._saveAndCommitButton.Name = "_saveAndCommitButton";
             this._saveAndCommitButton.Size = new System.Drawing.Size(36, 36);
             this._saveAndCommitButton.Text = "Save";
-            this._saveAndCommitButton.ToolTipText = "Save";
+            this._saveAndCommitButton.ToolTipText = "Save (Ctrl+S)";
             // 
             // _dataEntryOperationsToolStrip
             // 
@@ -718,53 +628,53 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _zoomWindowToolStripButton
             // 
+            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             this._zoomWindowToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._zoomWindowToolStripButton.Enabled = false;
             this._zoomWindowToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._zoomWindowToolStripButton.ImageViewer = null;
             this._zoomWindowToolStripButton.Name = "_zoomWindowToolStripButton";
             this._zoomWindowToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._zoomWindowToolStripButton.BaseToolTipText = "Zoom window";
             // 
             // _panToolStripButton
             // 
+            this._panToolStripButton.BaseToolTipText = "Pan";
             this._panToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._panToolStripButton.Enabled = false;
             this._panToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._panToolStripButton.ImageViewer = null;
             this._panToolStripButton.Name = "_panToolStripButton";
             this._panToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._panToolStripButton.BaseToolTipText = "Pan";
             // 
             // _selectLayerObjectToolStripButton
             // 
+            this._selectLayerObjectToolStripButton.BaseToolTipText = "Review and select";
             this._selectLayerObjectToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._selectLayerObjectToolStripButton.Enabled = false;
             this._selectLayerObjectToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._selectLayerObjectToolStripButton.ImageViewer = null;
             this._selectLayerObjectToolStripButton.Name = "_selectLayerObjectToolStripButton";
             this._selectLayerObjectToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._selectLayerObjectToolStripButton.BaseToolTipText = "Review and select";
             // 
             // _angularHighlightToolStripButton
             // 
+            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone (Alt+S)";
             this._angularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._angularHighlightToolStripButton.Enabled = false;
             this._angularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._angularHighlightToolStripButton.ImageViewer = null;
             this._angularHighlightToolStripButton.Name = "_angularHighlightToolStripButton";
             this._angularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._angularHighlightToolStripButton.BaseToolTipText = "Swipe text in angular zone (Alt+S)";
             // 
             // _rectangularHighlightToolStripButton
             // 
+            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone (Alt+S)";
             this._rectangularHighlightToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._rectangularHighlightToolStripButton.Enabled = false;
             this._rectangularHighlightToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
             this._rectangularHighlightToolStripButton.ImageViewer = null;
             this._rectangularHighlightToolStripButton.Name = "_rectangularHighlightToolStripButton";
             this._rectangularHighlightToolStripButton.Size = new System.Drawing.Size(36, 36);
-            this._rectangularHighlightToolStripButton.BaseToolTipText = "Swipe text in rectangular zone (Alt+S)";
             // 
             // _pageNavigationImageViewerToolStrip
             // 
@@ -784,6 +694,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _firstPageToolStripButton
             // 
+            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             this._firstPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._firstPageToolStripButton.Enabled = false;
             this._firstPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -791,10 +702,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._firstPageToolStripButton.Name = "_firstPageToolStripButton";
             this._firstPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._firstPageToolStripButton.Text = "Go to first page";
-            this._firstPageToolStripButton.BaseToolTipText = "Go to first page";
             // 
             // _previousPageToolStripButton
             // 
+            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             this._previousPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._previousPageToolStripButton.Enabled = false;
             this._previousPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -802,7 +713,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._previousPageToolStripButton.Name = "_previousPageToolStripButton";
             this._previousPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._previousPageToolStripButton.Text = "Go to previous page";
-            this._previousPageToolStripButton.BaseToolTipText = "Go to previous page";
             // 
             // _pageNavigationToolStripTextBox
             // 
@@ -814,6 +724,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             // 
             // _nextPageToolStripButton
             // 
+            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             this._nextPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._nextPageToolStripButton.Enabled = false;
             this._nextPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -821,10 +732,10 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._nextPageToolStripButton.Name = "_nextPageToolStripButton";
             this._nextPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._nextPageToolStripButton.Text = "Go to next page";
-            this._nextPageToolStripButton.BaseToolTipText = "Go to next page";
             // 
             // _lastPageToolStripButton
             // 
+            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             this._lastPageToolStripButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this._lastPageToolStripButton.Enabled = false;
             this._lastPageToolStripButton.ImageTransparentColor = System.Drawing.Color.Magenta;
@@ -832,7 +743,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             this._lastPageToolStripButton.Name = "_lastPageToolStripButton";
             this._lastPageToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._lastPageToolStripButton.Text = "Go to last page";
-            this._lastPageToolStripButton.BaseToolTipText = "Go to last page";
             // 
             // _viewCommandsImageViewerToolStrip
             // 
@@ -957,13 +867,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private Extract.Imaging.Forms.MousePositionToolStripStatusLabel _mousePositionToolStripStatusLabel;
         private System.Windows.Forms.MenuStrip _menuStrip;
         private System.Windows.Forms.ToolStripMenuItem _fileToolStripMenuItem;
-        private Extract.Imaging.Forms.OpenImageToolStripMenuItem _openImageToolStripMenuItem;
-        private Extract.Imaging.Forms.CloseImageToolStripMenuItem _closeImageToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator1;
-        private System.Windows.Forms.ToolStripMenuItem _saveAndCommitMenuItem;
-        private Extract.Imaging.Forms.PrintImageToolStripMenuItem _printImageToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator _toolStripSeparator2;
-        private System.Windows.Forms.ToolStripMenuItem _exitToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _viewToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _zoomToolStripMenuItem;
         private Extract.Imaging.Forms.FitToPageToolStripMenuItem _fitToPageToolStripMenuItem;
@@ -1005,8 +908,6 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         private System.Windows.Forms.ToolStripSeparator _toolStripSeparator7;
         private System.Windows.Forms.ToolStripMenuItem _acceptImageHighlightMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _removeImageHighlightMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _skipProcessingMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem _saveMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _appHelpMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutMenuItem;

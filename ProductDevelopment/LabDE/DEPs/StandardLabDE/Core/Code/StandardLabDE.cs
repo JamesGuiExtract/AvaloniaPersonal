@@ -24,6 +24,16 @@ namespace Extract.LabDE.StandardLabDE
 
         #endregion Constants
 
+        #region Fields
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.LabDEVerificationUIObject, _OBJECT_NAME);
+
+        #endregion Fields
+
         #region Constructors
 
         public StandardLabDEPanel() 
@@ -37,8 +47,8 @@ namespace Extract.LabDE.StandardLabDE
                     LicenseUtilities.LoadLicenseFilesFromFolder(0, new MapLabel());
                 }
 
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI26970", _OBJECT_NAME);
+                // Validate the license
+                _licenseCache.Validate("ELI26970");
 
                 InitializeComponent();
             }

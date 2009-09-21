@@ -11,5 +11,12 @@
 #define EXPIMP_TEMPLATE_AFCPPUTILS extern
 #endif
 
+class UCLIDException;
+
+//--------------------------------------------------------------------------------------------------
+// PURPOSE: Adds the name of the currently executing rule file to the debug info of the specified
+//			UCLIDException.
+EXPORT_AFCppUtils void addCurrentRSDFileToDebugInfo(UCLIDException &ue);
+//--------------------------------------------------------------------------------------------------
 
 #endif

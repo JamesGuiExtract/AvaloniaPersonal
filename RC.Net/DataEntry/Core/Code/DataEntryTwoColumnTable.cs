@@ -24,7 +24,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryTwoColumnTable).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryTwoColumnTable).ToString();
 
         #endregion Constants
 
@@ -33,54 +33,60 @@ namespace Extract.DataEntry
         /// <summary>
         /// The value that appears in the table's only column header.
         /// </summary> 
-        private string _displayName;
+        string _displayName;
 
         /// <summary>
         /// The selection mode to use when multiple attributes are found which match the attribute 
         /// name for this control.
         /// </summary>
-        private MultipleMatchSelectionMode _multipleMatchSelectionMode =
+        MultipleMatchSelectionMode _multipleMatchSelectionMode =
             MultipleMatchSelectionMode.First;
 
         /// <summary>
         /// Indicates whether swiping should be allowed when an individual cell is selected.
         /// </summary>
-        private bool _cellSwipingEnabled;
+        bool _cellSwipingEnabled = true;
 
         /// <summary>
         /// Indicates whether swiping should be allowed when the entire table is selected.
         /// </summary>
-        private bool _tableSwipingEnabled;
+        bool _tableSwipingEnabled;
 
         /// <summary>
         /// 
         /// </summary>
-        private string _tableFormattingRuleFileName;
+        string _tableFormattingRuleFileName;
 
         /// <summary>
         /// The formatting rule to be used when processing text imaging swipes for the entire table.
         /// </summary>
-        private IRuleSet _tableFormattingRule;
+        IRuleSet _tableFormattingRule;
 
         /// <summary>
         /// The domain of attributes to which this control's attribute(s) belong.
         /// </summary>
-        private IUnknownVector _sourceAttributes;
+        IUnknownVector _sourceAttributes;
 
         /// <summary>
         /// The attribute mapped to this control.
         /// </summary>
-        private IAttribute _attribute;
+        IAttribute _attribute;
 
         /// <summary>
         /// The collection of rows that will populate the table.
         /// </summary>
-        private Collection<DataEntryTableRow> _rows = new Collection<DataEntryTableRow>();
+        Collection<DataEntryTableRow> _rows = new Collection<DataEntryTableRow>();
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
         /// </summary>
-        private bool _inDesignMode;
+        bool _inDesignMode;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -104,8 +110,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24491",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24491");
 
                 InitializeComponent();
 
@@ -169,6 +174,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to find the mapped attribute for the
         /// <see cref="DataEntryTwoColumnTable"/>.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(MultipleMatchSelectionMode.First)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -190,6 +196,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the table allows swiping when an individual cell
         /// is selected, <see langword="false"/> if it does not.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(true)]
         public bool CellSwipingEnabled
         {
             get
@@ -211,6 +218,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if the table allows swiping when the entire table
         /// is selected, <see langword="false"/> if it does not.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(false)]
         public bool TableSwipingEnabled
         {
             get
@@ -232,6 +240,7 @@ namespace Extract.DataEntry
         /// <value>The filename of the <see cref="IRuleSet"/> to be used.</value>
         /// <returns>The filename of the <see cref="IRuleSet"/> to be used.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(null)]
         public string TableFormattingRuleFile
         {
             get
@@ -294,6 +303,7 @@ namespace Extract.DataEntry
         /// possible; <see langword="false"/> if the table is not configured to generate column
         /// hints.</returns>
         [Category("Data Entry Table")]
+        [DefaultValue(true)]
         public new bool ColumnHintsEnabled
         {
             get
@@ -384,7 +394,7 @@ namespace Extract.DataEntry
             }
         }
 
-        #endregion Properties
+        #endregion Concealed Properties
 
         #region Overrides
 
@@ -567,7 +577,7 @@ namespace Extract.DataEntry
         /// <param name="sender">The object that sent the event.</param>
         /// <param name="e">A <see cref="ComponentChangedEventArgs"/> that contains the event data.
         /// </param>
-        private void HandleComponentChanged(object sender, ComponentChangedEventArgs e)
+        void HandleComponentChanged(object sender, ComponentChangedEventArgs e)
         {
             try
             {
@@ -711,8 +721,10 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the
         /// recognized text in the swiped image area.</param>
+        /// <returns><see langword="true"/> if the control was able to use the swiped text;
+        /// <see langword="false"/> if it could not be used.</returns>
         /// <seealso cref="IDataEntryControl"/>
-        public override void ProcessSwipedText(SpatialString swipedText)
+        public override bool ProcessSwipedText(SpatialString swipedText)
         {
             try
             {
@@ -720,22 +732,35 @@ namespace Extract.DataEntry
                 // currently supported.
                 if (!base.Enabled || _attribute == null)
                 {
-                    return;
+                    return false;
                 }
 
                 if (base.AreAllCellsSelected(false))
                 {
                     // Table selection mode.
-                    ProcessTableSwipe(swipedText);
+                    return ProcessTableSwipe(swipedText);
                 }
                 else if (base.SelectedCells.Count > 0)
                 {
                     // Cell selection mode.
-                    ProcessCellSwipe(swipedText);
+                    return ProcessCellSwipe(swipedText);
                 }
+
+                return false;
             }
             catch (Exception ex)
             {
+                try
+                {
+                    // If an exception was thrown while processing a swipe, refresh hints for the
+                    // table since the hints may not be valid at this point.
+                    base.UpdateHints(true);
+                }
+                catch (Exception ex2)
+                {
+                    ExtractException.Log("ELI27099", ex2);
+                }
+
                 throw ExtractException.AsExtractException("ELI24274", ex);
             }
         }
@@ -759,7 +784,7 @@ namespace Extract.DataEntry
         /// table.
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
-        private void ProcessTableSwipe(SpatialString swipedText)
+        bool ProcessTableSwipe(SpatialString swipedText)
         {
             ExtractException.Assert("ELI26144", "Uninitialized data!",
                 _sourceAttributes != null && _attribute != null);
@@ -798,6 +823,14 @@ namespace Extract.DataEntry
                 // Fire selection change event to update the highlights to reflect the 
                 // swiped data.
                 OnSelectionChanged(new EventArgs());
+
+                return true;
+            }
+            else
+            {
+                // If no attribute was returned from the rule, return false to indicate formatting
+                // was not successful.
+                return false;
             }
         }
 
@@ -808,7 +841,7 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The OCR'd text from the image swipe.</param>
         /// <throws><see cref="ExtractException"/> if more than one cell is selected.</throws>
-        private void ProcessCellSwipe(SpatialString swipedText)
+        bool ProcessCellSwipe(SpatialString swipedText)
         {
             ExtractException.Assert("ELI24265",
                         "Cell swiping is supported only for one cell at a time!", 
@@ -849,18 +882,20 @@ namespace Extract.DataEntry
 
             // Since the spatial information for this cell has changed, spatial hints need to be 
             // updated.
-            base.UpdateHints();
+            base.UpdateHints(false);
 
             // Raise AttributesSelected to updated the control's highlight.
             OnAttributesSelected(DataEntryMethods.AttributeAsVector(
                     DataEntryTableBase.GetAttribute(selectedDataEntryCell)), false, true);
+
+            return true;
         }
 
         /// <summary>
         /// Updates the underlying <see cref="DataGridView.Rows"/> collection using the 
         /// <see cref="DataEntryTwoColumnTable.Rows"/> collection.
         /// </summary>
-        private void UpdateRows()
+        void UpdateRows()
         {
             // Clear the existing DataGridView row collection.
             base.Rows.Clear();
@@ -883,7 +918,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Uses the primarily mapped <see cref="IAttribute"/> to populate all rows in the table.
         /// </summary>
-        private void ApplyAttribute()
+        void ApplyAttribute()
         {
             // Iterate through all rows to set map attrbute for each.
             foreach (DataEntryTableRow row in base.Rows)
@@ -899,10 +934,10 @@ namespace Extract.DataEntry
                 else if (row.AttributeName == ".")
                 {
                     // "." indicates that the parent attribute should be used in this row.
-                    row.Cells[0].Value = _attribute;
                     AttributeStatusInfo.Initialize(_attribute, _sourceAttributes, this, row.Index,
                         false, row.TabStopMode, dataEntryCell.Validator, row.AutoUpdateQuery,
                         row.ValidationQuery);
+                    row.Cells[0].Value = _attribute;
                 }
                 else
                 {
@@ -913,12 +948,18 @@ namespace Extract.DataEntry
                         row.AutoUpdateQuery, row.ValidationQuery);
                 }
 
+                // If not persisting the attribute, mark the attribute accordingly.
+                if (!row.PersistAttribute)
+                {
+                    AttributeStatusInfo.SetAttributeAsPersistable(dataEntryCell.Attribute, false);
+                }
+
                 base.MapAttribute(dataEntryCell.Attribute, dataEntryCell);
             }
 
             // Since the spatial information for this cell has likely changed, spatial hints need 
             // to be updated.
-            base.UpdateHints();
+            base.UpdateHints(false);
 
             if (_attribute == null)
             {

@@ -50,6 +50,23 @@ namespace Extract.DataEntry
         /// </summary>
         event EventHandler<QueryDraggedDataSupportedEventArgs> QueryDraggedDataSupported;
 
+        /// <summary>
+        /// Indicates that a control has begun an update and that the
+        /// <see cref="DataEntryControlHost"/> should not redraw highlights, etc, until the update
+        /// is complete.
+        /// <para><b>NOTE:</b></para>
+        /// This event should only be raised for updates that initiated via user interation with the
+        /// control. It should not be raised for updates triggered by the
+        /// <see cref="DataEntryControlHost"/> such as <see cref="ProcessSwipedText"/>.
+        /// </summary>
+        event EventHandler<EventArgs> UpdateStarted;
+
+        /// <summary>
+        /// Indicates that a control has ended an update and actions that needs to be taken by the
+        /// <see cref="DataEntryControlHost"/> such as re-drawing highlights can now proceed.
+        /// </summary>
+        event EventHandler<EventArgs> UpdateEnded;
+
         #endregion Events
 
         #region Properties
@@ -145,19 +162,20 @@ namespace Extract.DataEntry
         /// </summary>
         /// <param name="swipedText">The <see cref="SpatialString"/> representing the
         /// recognized text in the swiped image area.</param>
-        void ProcessSwipedText(SpatialString swipedText);
+        /// <returns><see langword="true"/> if the control was able to use the swiped text;
+        /// <see langword="false"/> if it could not be used.</returns>
+        bool ProcessSwipedText(SpatialString swipedText);
 
         /// <summary>
         /// Requests that the <see cref="IDataEntryControl"/> refresh the specified
-        /// <see cref="IAttribute"/>'s value to the screen.
-        /// <para><b>NOTE:</b></para>
-        /// Since it is possible this will be called while attributes are being initialized,
-        /// control's should not throw exceptions if it doesn't currently have the specified
-        /// <see cref="IAttribute"/> available to refresh.
+        /// <see cref="IAttribute"/>s' values to the screen.
         /// </summary>
-        /// <param name="attribute">The <see cref="IAttribute"/> whose value should be refreshed
+        /// <param name="attributes">The <see cref="IAttribute"/>s whose values should be refreshed
         /// in the UI.</param>
-        void RefreshAttribute(IAttribute attribute);
+        /// <param name="spatialInfoUpdated"><see langword="true"/> if the attributes spatial info
+        /// has changed so that hints can be updated; <see langword="false"/> if the attributes'
+        /// spatial info has not changed.</param>
+        void RefreshAttributes(IAttribute[] attributes, bool spatialInfoUpdated);
 
         /// <summary>
         /// Any data that was cached should be cleared;  This is called when a document is unloaded.

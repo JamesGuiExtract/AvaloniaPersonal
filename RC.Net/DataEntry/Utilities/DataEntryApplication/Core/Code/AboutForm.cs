@@ -29,6 +29,12 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         private Assembly thisAssembly = Assembly.GetExecutingAssembly();
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
+
         #endregion Fields
 
         #region Constructors
@@ -43,8 +49,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
-                    "ELI26960", _OBJECT_NAME);
+                _licenseCache.Validate("ELI26960");
 
                 ExtractException.Assert("ELI27009", "Null argument exception!",
                     dataEntryControlHost != null);

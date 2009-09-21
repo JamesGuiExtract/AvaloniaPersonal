@@ -23,7 +23,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME = typeof(DataEntryTableColumn).ToString();
+        static readonly string _OBJECT_NAME = typeof(DataEntryTableColumn).ToString();
 
         #endregion Constants
 
@@ -33,56 +33,78 @@ namespace Extract.DataEntry
         /// The name subattributes to the table's primary attributes must have to be displayed in 
         /// this column.
         /// </summary>
-        private string _attributeName;
+        string _attributeName;
 
         /// <summary>
         /// The selection mode to use when multiple attributes are found which match the attribute 
         /// name for this column.
         /// </summary>
-        private MultipleMatchSelectionMode _multipleMatchSelectionMode =
+        MultipleMatchSelectionMode _multipleMatchSelectionMode =
             MultipleMatchSelectionMode.First;
 
         /// <summary>
         /// 
         /// </summary>
-        private string _formattingRuleFileName;
+        string _formattingRuleFileName;
 
         /// <summary>
         /// The formatting rule to be used when processing text from image swipes in this column.
         /// </summary>
-        private IRuleSet _formattingRule;
+        IRuleSet _formattingRule;
         
         /// <summary>
         /// The object which will provide validation for cell data.
         /// </summary>
-        private DataEntryValidator _validator = new DataEntryValidator();
+        DataEntryValidator _validator = new DataEntryValidator();
 
         /// <summary>
         /// A query which will cause value to automatically be updated using the values from other
         /// <see cref="IAttribute"/>'s and/or a database query.
         /// </summary>
-        private string _autoUpdateQuery;
+        string _autoUpdateQuery;
 
         /// <summary>
         /// Specifies under what circumstances the column's attributes should serve as a tab stop.
         /// </summary>
-        private TabStopMode _tabStopMode = TabStopMode.Always;
+        TabStopMode _tabStopMode = TabStopMode.Always;
+
+        /// <summary>
+        /// Specifies whether the attribute's value should be saved.
+        /// </summary>
+        bool _persistAttribute = true;
 
         /// <summary>
         /// A query which will cause the validation list to be updated using the values from other
         /// <see cref="IAttribute"/>'s and/or a database query.
         /// </summary>
-        private string _validationQuery;
+        string _validationQuery;
 
         /// <summary>
         /// Specifies whether the cells in the column should be edited with a non-editable combo box.
         /// </summary>
-        private bool _useComboBoxCells;
+        bool _useComboBoxCells;
+
+        /// <summary>
+        /// Specifies whether carriage return or new line characters will be replaced with spaces.
+        /// </summary>
+        bool _removeNewLineChars = true;
+
+        /// <summary>
+        /// Specifies whether the table will attempt to generate a hint using the intersection of 
+        /// the row and column occupied by the specified attributes in this column.
+        /// </summary>
+        bool _smartHintsEnabled;
 
         /// <summary>
         /// Specifies whether the current instance is running in design mode
         /// </summary>
-        private bool _inDesignMode;
+        bool _inDesignMode;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -109,8 +131,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24497",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24497");
 
                 // [DataEntry:407]
                 // The DataEntryTable cannot currently support sorting.  Initialize as NotSortable
@@ -156,6 +177,7 @@ namespace Extract.DataEntry
         /// <returns>The selection mode to use to when choosing between multiple candidate attributes
         /// for a cell in a <see cref="DataEntryTableColumn"/>.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(MultipleMatchSelectionMode.First)]
         public MultipleMatchSelectionMode MultipleMatchSelectionMode
         {
             get
@@ -179,6 +201,7 @@ namespace Extract.DataEntry
         /// <returns>The filename of the <see cref="IRuleSet"/> to be used. Can be 
         /// <see langword="null"/> if no rule has been specified.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(null)]
         public string FormattingRuleFile
         {
             get
@@ -242,6 +265,7 @@ namespace Extract.DataEntry
         /// <returns>A regular expression the data entered in a cell must match prior to being 
         /// saved. <see langword="null"/> if there is no validation pattern set.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(null)]
         public string ValidationPattern
         {
             get
@@ -288,6 +312,7 @@ namespace Extract.DataEntry
         /// <returns>The name of a file containing list of values. <see langword="null"/> if there 
         /// is no validation list set.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(null)]
         public string ValidationListFileName
         {
             get
@@ -334,6 +359,7 @@ namespace Extract.DataEntry
         /// from other <see cref="IAttribute"/>'s and/or a database query.</returns>
         [Category("Data Entry Table Column")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
+        [DefaultValue(null)]
         public string ValidationQuery
         {
             get
@@ -365,6 +391,7 @@ namespace Extract.DataEntry
         /// <returns><see langword="true"/> if values will be modified to match the case of list items,
         /// <see langword="false"/> if case-insensitive matches will be left as-is.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(true)]
         public bool ValidationCorrectsCase
         {
             get
@@ -375,6 +402,28 @@ namespace Extract.DataEntry
             set
             {
                 _validator.CorrectCase = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether validation lists will be checked for matches case-sensitively.
+        /// </summary>
+        /// <value><see langword="true"/> to validate against a validation list case-sensitively;
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if validating against a validation list
+        /// case-sensitively; <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Table Column")]
+        [DefaultValue(false)]
+        public bool ValidationIsCaseSensitive
+        {
+            get
+            {
+                return _validator.CaseSensitive;
+            }
+
+            set
+            {
+                _validator.CaseSensitive = value;
             }
         }
 
@@ -432,6 +481,7 @@ namespace Extract.DataEntry
         /// from other <see cref="IAttribute"/>'s and/or a database query.</returns>
         [Category("Data Entry Table Column")]
         [Editor("System.ComponentModel.Design.MultilineStringEditor, System.Design", typeof(UITypeEditor)), Localizable(true)]
+        [DefaultValue(null)]
         public string AutoUpdateQuery
         {
             get
@@ -454,6 +504,7 @@ namespace Extract.DataEntry
         /// <returns>A <see cref="TabStopMode"/> value indicating when the attributes will serve as a
         /// tab stop.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(TabStopMode.Always)]
         public TabStopMode TabStopMode
         {
             get
@@ -468,6 +519,45 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether the <see cref="IAttribute"/>'s value should be saved.
+        /// </summary>
+        /// <value><see langword="true"/> to save the attribute's value; <see langword="false"/>
+        /// otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if the attribute's value will be saved;
+        /// <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Table Column")]
+        [DefaultValue(true)]
+        public bool PersistAttribute
+        {
+            get
+            {
+                return _persistAttribute;
+            }
+
+            set
+            {
+                try
+                {
+                    if (!value && _persistAttribute != value && _inDesignMode && 
+                        base.DataGridView != null && _attributeName == ".")
+                    {
+                        MessageBox.Show(null, "Setting the parent attribute of a column as " +
+                            " non-persistable will prevent all data in this table from being saved!",
+                            "Warning", MessageBoxButtons.OK, MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1, 0);
+                    }
+
+                    _persistAttribute = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27112", ex);
+                }
+            }
+        }
+
+        /// <summary>
         /// Specifies whether the cells in the column should be edited with a non-editable combo box.
         /// </summary>
         /// <value><see langword="true"/> if a <see cref="DataEntryComboBoxCell"/> should be used to
@@ -477,6 +567,7 @@ namespace Extract.DataEntry
         /// edit values in this column, <see langword="false"/> if values are edited with a
         /// <see cref="DataEntryTextBoxCell"/>.</returns>
         [Category("Data Entry Table Column")]
+        [DefaultValue(false)]
         public bool UseComboBoxCells
         {
             get
@@ -488,13 +579,55 @@ namespace Extract.DataEntry
             {
                 try
                 {
-                    _useComboBoxCells = value;
+                    if (_useComboBoxCells != value)
+                    {
+                        _useComboBoxCells = value;
 
-                    UpdateCellTemplate();
+                        UpdateCellTemplate();
+                    }
                 }
                 catch (Exception ex)
                 {
                     throw ExtractException.AsExtractException("ELI26513", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether carriage return or new line characters will be replaced with
+        /// spaces.
+        /// <para><b>Note</b></para>
+        /// If <see langword="false"/>, new line characters will be preserved only as long as the
+        /// user does not delete the space in text that represents the new line's location.
+        /// </summary>
+        /// <value><see langword="true"/> to replace carriage return or new line characters;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if carriage return or new line characters will be
+        /// replaced; <see langword="false"/> otherwise.</returns>
+        [Category("Data Entry Table Column")]
+        [DefaultValue(true)]
+        public bool RemoveNewLineChars
+        {
+            get
+            {
+                return _removeNewLineChars;
+            }
+
+            set
+            {
+                try
+                {
+                    if (_removeNewLineChars != value)
+                    {
+                        _removeNewLineChars = value;
+
+                        UpdateCellTemplate();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27298", ex);
                 }
             }
         }
@@ -523,6 +656,31 @@ namespace Extract.DataEntry
             }
         }
 
+        /// <summary>
+        /// Specifies whether GetSpatialHint will attempt to generate a hint using the
+        /// intersection of the row and column occupied by the specified <see cref="IAttribute"/>.
+        /// </summary>
+        /// <value><see langword="true"/> if the smart hints should be generated for this column
+        /// when possible; <see langword="false"/> if the column should never attempt to generate
+        /// smart hints.</value>
+        /// <returns><see langword="true"/> if the column is configured to generate smart hints when
+        /// possible; <see langword="false"/> if the column is not configured to generate smart
+        /// hints.</returns>
+        [Category("Data Entry Table Column")]
+        [DefaultValue(false)]
+        public bool SmartHintsEnabled
+        {
+            get
+            {
+                return _smartHintsEnabled;
+            }
+
+            set
+            {
+                _smartHintsEnabled = value;
+            }
+        }
+
         #endregion Properties
 
         #region Overrides
@@ -548,7 +706,11 @@ namespace Extract.DataEntry
                 column.UseComboBoxCells = this.UseComboBoxCells;
                 column.AutoUpdateQuery = this.AutoUpdateQuery;
                 column.TabStopMode = this.TabStopMode;
+                column.PersistAttribute = this.PersistAttribute;
                 column.ValidationCorrectsCase = this.ValidationCorrectsCase;
+                column.ValidationIsCaseSensitive = this.ValidationIsCaseSensitive;
+                column.RemoveNewLineChars = this.RemoveNewLineChars;
+                column.SmartHintsEnabled = this.SmartHintsEnabled;
 
                 return column;
             }
@@ -589,7 +751,7 @@ namespace Extract.DataEntry
         /// Updates the cell template to reflect the current _useComboBoxCells and validation
         /// settings.
         /// </summary>
-        private void UpdateCellTemplate()
+        void UpdateCellTemplate()
         {
             // Use a combo box template or text box template depending on the value of 
             // _useComboBoxCells.
@@ -597,6 +759,7 @@ namespace Extract.DataEntry
             {
                 DataEntryComboBoxCell cellTemplate = new DataEntryComboBoxCell();
                 cellTemplate.Validator = (DataEntryValidator)_validator.Clone();
+                cellTemplate.RemoveNewLineChars = _removeNewLineChars;
 
                 string[] validationList = _validator.GetValidationListValues();
                 if (validationList != null)
@@ -610,6 +773,8 @@ namespace Extract.DataEntry
             {
                 DataEntryTextBoxCell cellTemplate = new DataEntryTextBoxCell();
                 cellTemplate.Validator = (DataEntryValidator)_validator.Clone();
+                cellTemplate.RemoveNewLineChars = _removeNewLineChars;
+
                 base.CellTemplate = cellTemplate;
             }
         }

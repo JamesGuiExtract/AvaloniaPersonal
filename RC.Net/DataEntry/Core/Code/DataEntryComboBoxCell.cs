@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
 using UCLID_RASTERANDOCRMGMTLib;
@@ -37,6 +38,11 @@ namespace Extract.DataEntry
         private DataEntryValidator _validator;
 
         /// <summary>
+        /// Specifies whether carriage return or new line characters will be replaced with spaces.
+        /// </summary>
+        private bool _removeNewLineChars = true;
+
+        /// <summary>
         /// The <see cref="DataEntryTable"/> the cell is associated with.
         /// </summary>
         private DataEntryTableBase _dataEntryTable;
@@ -45,6 +51,17 @@ namespace Extract.DataEntry
         /// Indicates whether the cell is being dragged as part of a drag and drop operation.
         /// </summary>
         private bool _isBeingDragged;
+
+        /// <summary>
+        /// Indicates whether the cell's value is in the process of being initialized.
+        /// </summary>
+        private bool _initializingValue;
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -66,8 +83,7 @@ namespace Extract.DataEntry
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI24488",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI24488");
 
                 _dataEntryTable = base.DataGridView as DataEntryTableBase;
             }
@@ -141,6 +157,31 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Gets or sets whether carriage return or new line characters will be replaced with
+        /// spaces.
+        /// <para><b>Note</b></para>
+        /// If <see langword="false"/>, new line characters will be preserved only as long as the
+        /// user does not delete the space in text that represents the new line's location.
+        /// </summary>
+        /// <value><see langword="true"/> to replace carriage return or new line characters;
+        /// <see langword="false"/> otherwise.
+        /// </value>
+        /// <returns><see langword="true"/> if carriage return or new line characters will be
+        /// replaced; <see langword="false"/> otherwise.</returns>
+        public bool RemoveNewLineChars
+        {
+            get
+            {
+                return _removeNewLineChars;
+            }
+
+            set
+            {
+                _removeNewLineChars = value;
+            }
+        }
+
+        /// <summary>
         /// Provides access to the object as an <see cref="DataGridViewCell"/>.
         /// </summary>
         /// <returns>The object as an <see cref="DataGridViewCell"/>.</returns>
@@ -196,6 +237,7 @@ namespace Extract.DataEntry
                 {
                     clone.Validator = (DataEntryValidator)_validator.Clone();
                 }
+                clone.RemoveNewLineChars = _removeNewLineChars;
 
                 return clone;
             }
@@ -231,14 +273,43 @@ namespace Extract.DataEntry
         {
             try
             {
-                // Replace CRLFs in the strings used for display with no break spaces to prevent
-                // the unprintable "boxes" from appearing.
                 object value = base.GetValue(rowIndex);
+                if (_initializingValue)
+                {
+                    return value;
+                }
+
                 string stringValue = (value == null) ? "" : value.ToString();
-                return stringValue.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+
+                // If specified, replace newline chars, and save the new value.
+                if (_removeNewLineChars)
+                {
+                    if (stringValue.IndexOf("\r\n", StringComparison.Ordinal) >= 0)
+                    {
+                        // Replace a group of CRLFs with just a single space.
+                        stringValue = Regex.Replace(stringValue, "(\r\n)+", " ");
+
+                        // Store the new value so that the values are replaced without first
+                        // requiring an edit to the cell's value. (set _initializingValue to
+                        // prevent recursion)
+                        _initializingValue = true;
+                        base.Value = stringValue;
+                        _initializingValue = false;
+                    }
+
+                    return stringValue;
+                }
+                // Otherwise replace CRLFs in the strings used for display with no break spaces to
+                // prevent the unprintable "boxes" from appearing.
+                else
+                {
+                    return stringValue.Replace("\r\n", DataEntryMethods._CRLF_REPLACEMENT);
+                }
             }
             catch (Exception ex)
             {
+                _initializingValue = false;
+
                 throw ExtractException.AsExtractException("ELI26013", ex);
             }
         }
@@ -304,10 +375,13 @@ namespace Extract.DataEntry
                         // If the provided value is null, convert it to an empty string.
                         string stringValue = (value == null) ? "" : value.ToString();
 
-                        // Add CRLFs back so that the replacement value used for display is never
-                        // actually stored.
-                        stringValue =
-                            stringValue.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                        // If preserving newlines, add CRLFs back so that the replacement value used
+                        // for display is never actually stored.
+                        if (!_removeNewLineChars)
+                        {
+                            stringValue =
+                                stringValue.Replace(DataEntryMethods._CRLF_REPLACEMENT, "\r\n");
+                        }
 
                         // Otherwise, used the provided value as a string to replace the text of
                         // the associated attribute.

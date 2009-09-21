@@ -368,6 +368,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\AFCppUtils\Code\AFCoreSharedCode.cpp"
+				>
+			</File>
+			<File
 				RelativePath="AFDocument.cpp"
 				>
 				<FileConfiguration

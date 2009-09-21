@@ -707,12 +707,30 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.AttributeFinder", "
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{4D159D4B-37E4-4188-8490-9D1F2FA476B9}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactExporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj", "{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SqlCompactImporter", "..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj", "{DEDE4275-343B-40C2-B336-040D3D182A44}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 62
+		ProjectCount = 65
 		ProjectRelativeDiskPath1 = ..\..\DEPs\StandardLabDE\Core\Code\StandardLabDE.csproj
 		ProjectRelativeDiskPath2 = ..\..\..\..\RC.Net\DataEntry\Core\Code\Extract.DataEntry.csproj
 		ProjectRelativeDiskPath3 = LabDE.sln
@@ -775,6 +793,9 @@ Global
 		ProjectRelativeDiskPath60 = ..\..\..\AttributeFinder\IndustrySpecific\LabResults\LabResultsCustomComponents\Core\Code\LabResultsCustomComponents.csproj
 		ProjectRelativeDiskPath61 = ..\..\..\..\RC.Net\Interop\Core\Code\Extract.Interop.csproj
 		ProjectRelativeDiskPath62 = ..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
+		ProjectRelativeDiskPath63 = LabDE.sln
+		ProjectRelativeDiskPath64 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactExporter\Core\Code\SqlCompactExporter.csproj
+		ProjectRelativeDiskPath65 = ..\..\..\..\RC.Net\UtilityApplications\SQLCompactUtils\SQLCompactImporter\Core\Code\SqlCompactImporter.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -1658,6 +1679,36 @@ Global
 		{6DD0855C-6031-49F4-874C-667F3A576345}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6DD0855C-6031-49F4-874C-667F3A576345}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
 		{6DD0855C-6031-49F4-874C-667F3A576345}.Testing|Win32.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Testing|Any CPU.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Testing|Any CPU.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2}.Testing|Win32.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Release|Win32.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Any CPU.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Mixed Platforms.Build.0 = Release|Any CPU
+		{DEDE4275-343B-40C2-B336-040D3D182A44}.Testing|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1716,5 +1767,7 @@ Global
 		{DD123185-5805-4DE9-9CA7-B69E2D14F0BA} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{1AF05090-95C1-48BF-8E74-3F05844B63B0} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
 		{A29CD5B4-BFDC-44D4-B3FE-9A73248FCAB3} = {FB0F348E-FB92-4F0E-8A7F-61911BDA41CE}
+		{AFBF5CB6-EF6C-4712-9377-65DFE603A4B2} = {4D159D4B-37E4-4188-8490-9D1F2FA476B9}
+		{DEDE4275-343B-40C2-B336-040D3D182A44} = {4D159D4B-37E4-4188-8490-9D1F2FA476B9}
 	EndGlobalSection
 EndGlobal

@@ -119,7 +119,7 @@ namespace Extract.Utilities.Forms
         /// <returns>The return value specifies the result of the message processing and depends on 
         /// the message sent.</returns>
         [DllImport("user32", CharSet = CharSet.Auto)]
-        private extern static IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
+        internal extern static IntPtr SendMessage(IntPtr hWnd, int msg, IntPtr wParam, IntPtr lParam);
 
         /// <summary>
         /// Maps a virtual-key code into a scan code or character value, or translates a scan code

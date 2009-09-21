@@ -649,6 +649,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\..\AFCore\Code\RegExLoader.cpp"
+				>
+			</File>
+			<File
 				RelativePath="RegExprRule.cpp"
 				>
 				<FileConfiguration
@@ -1043,6 +1047,10 @@
 			</File>
 			<File
 				RelativePath="PatternFileInterpreter.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\AFCore\Code\RegExLoader.h"
 				>
 			</File>
 			<File

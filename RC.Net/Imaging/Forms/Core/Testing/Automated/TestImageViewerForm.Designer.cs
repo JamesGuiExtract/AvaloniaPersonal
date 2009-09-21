@@ -710,7 +710,7 @@ namespace Extract.Imaging.Forms.Test
             this.printImageToolStripButton1.Name = "printImageToolStripButton1";
             this.printImageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.printImageToolStripButton1.Text = "Print image";
-            this.printImageToolStripButton1.ToolTipText = "Print image";
+            this.printImageToolStripButton1.BaseToolTipText = "Print image";
             // 
             // toolStrip3
             // 
@@ -739,7 +739,7 @@ namespace Extract.Imaging.Forms.Test
             this.zoomInToolStripButton1.Name = "zoomInToolStripButton1";
             this.zoomInToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.zoomInToolStripButton1.Text = "Zoom in";
-            this.zoomInToolStripButton1.ToolTipText = "Zoom in";
+            this.zoomInToolStripButton1.BaseToolTipText = "Zoom in";
             // 
             // zoomOutToolStripButton1
             // 
@@ -750,7 +750,7 @@ namespace Extract.Imaging.Forms.Test
             this.zoomOutToolStripButton1.Name = "zoomOutToolStripButton1";
             this.zoomOutToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.zoomOutToolStripButton1.Text = "Zoom out";
-            this.zoomOutToolStripButton1.ToolTipText = "Zoom out";
+            this.zoomOutToolStripButton1.BaseToolTipText = "Zoom out";
             // 
             // zoomPreviousToolStripButton1
             // 
@@ -761,7 +761,7 @@ namespace Extract.Imaging.Forms.Test
             this.zoomPreviousToolStripButton1.Name = "zoomPreviousToolStripButton1";
             this.zoomPreviousToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.zoomPreviousToolStripButton1.Text = "Zoom previous";
-            this.zoomPreviousToolStripButton1.ToolTipText = "Zoom previous";
+            this.zoomPreviousToolStripButton1.BaseToolTipText = "Zoom previous";
             // 
             // zoomNextToolStripButton1
             // 
@@ -772,7 +772,7 @@ namespace Extract.Imaging.Forms.Test
             this.zoomNextToolStripButton1.Name = "zoomNextToolStripButton1";
             this.zoomNextToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.zoomNextToolStripButton1.Text = "Zoom next";
-            this.zoomNextToolStripButton1.ToolTipText = "Zoom next";
+            this.zoomNextToolStripButton1.BaseToolTipText = "Zoom next";
             // 
             // previousTileToolStripButton1
             // 
@@ -783,7 +783,7 @@ namespace Extract.Imaging.Forms.Test
             this.previousTileToolStripButton1.Name = "previousTileToolStripButton1";
             this.previousTileToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.previousTileToolStripButton1.Text = "previousTileToolStripButton1";
-            this.previousTileToolStripButton1.ToolTipText = "Previous tile";
+            this.previousTileToolStripButton1.BaseToolTipText = "Previous tile";
             // 
             // nextTileToolStripButton1
             // 
@@ -794,7 +794,7 @@ namespace Extract.Imaging.Forms.Test
             this.nextTileToolStripButton1.Name = "nextTileToolStripButton1";
             this.nextTileToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.nextTileToolStripButton1.Text = "nextTileToolStripButton1";
-            this.nextTileToolStripButton1.ToolTipText = "Next tile";
+            this.nextTileToolStripButton1.BaseToolTipText = "Next tile";
             // 
             // toolStrip1
             // 
@@ -831,7 +831,7 @@ namespace Extract.Imaging.Forms.Test
             this.selectHighlightToolStripButton1.ImageViewer = null;
             this.selectHighlightToolStripButton1.Name = "selectHighlightToolStripButton1";
             this.selectHighlightToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.selectHighlightToolStripButton1.ToolTipText = "Select highlight";
+            this.selectHighlightToolStripButton1.BaseToolTipText = "Select highlight";
             // 
             // rectangularHighlightToolStripButton1
             // 
@@ -841,7 +841,7 @@ namespace Extract.Imaging.Forms.Test
             this.rectangularHighlightToolStripButton1.ImageViewer = null;
             this.rectangularHighlightToolStripButton1.Name = "rectangularHighlightToolStripButton1";
             this.rectangularHighlightToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.rectangularHighlightToolStripButton1.ToolTipText = "Create rectangular highlight";
+            this.rectangularHighlightToolStripButton1.BaseToolTipText = "Create rectangular highlight";
             // 
             // angularHighlightToolStripButton1
             // 
@@ -851,7 +851,7 @@ namespace Extract.Imaging.Forms.Test
             this.angularHighlightToolStripButton1.ImageViewer = null;
             this.angularHighlightToolStripButton1.Name = "angularHighlightToolStripButton1";
             this.angularHighlightToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.angularHighlightToolStripButton1.ToolTipText = "Create angular highlight";
+            this.angularHighlightToolStripButton1.BaseToolTipText = "Create angular highlight";
             // 
             // setHighlightHeightToolStripButton1
             // 
@@ -861,7 +861,7 @@ namespace Extract.Imaging.Forms.Test
             this.setHighlightHeightToolStripButton1.ImageViewer = null;
             this.setHighlightHeightToolStripButton1.Name = "setHighlightHeightToolStripButton1";
             this.setHighlightHeightToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.setHighlightHeightToolStripButton1.ToolTipText = "Set the default highlight height";
+            this.setHighlightHeightToolStripButton1.BaseToolTipText = "Set the default highlight height";
             // 
             // editHighlightTextToolStripButton1
             // 
@@ -871,7 +871,7 @@ namespace Extract.Imaging.Forms.Test
             this.editHighlightTextToolStripButton1.ImageViewer = null;
             this.editHighlightTextToolStripButton1.Name = "editHighlightTextToolStripButton1";
             this.editHighlightTextToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.editHighlightTextToolStripButton1.ToolTipText = "Edit highlight text";
+            this.editHighlightTextToolStripButton1.BaseToolTipText = "Edit highlight text";
             // 
             // deleteHighlightsToolStripButton1
             // 
@@ -881,7 +881,7 @@ namespace Extract.Imaging.Forms.Test
             this.deleteHighlightsToolStripButton1.ImageViewer = null;
             this.deleteHighlightsToolStripButton1.Name = "deleteHighlightsToolStripButton1";
             this.deleteHighlightsToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.deleteHighlightsToolStripButton1.ToolTipText = "Delete highlights";
+            this.deleteHighlightsToolStripButton1.BaseToolTipText = "Delete highlights";
             // 
             // toolStrip5
             // 
@@ -906,7 +906,7 @@ namespace Extract.Imaging.Forms.Test
             this.firstPageToolStripButton1.Name = "firstPageToolStripButton1";
             this.firstPageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.firstPageToolStripButton1.Text = "firstPageToolStripButton1";
-            this.firstPageToolStripButton1.ToolTipText = "Go To First Page";
+            this.firstPageToolStripButton1.BaseToolTipText = "Go To First Page";
             // 
             // previousPageToolStripButton1
             // 
@@ -917,7 +917,7 @@ namespace Extract.Imaging.Forms.Test
             this.previousPageToolStripButton1.Name = "previousPageToolStripButton1";
             this.previousPageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.previousPageToolStripButton1.Text = "previousPageToolStripButton1";
-            this.previousPageToolStripButton1.ToolTipText = "Go To Previous Page";
+            this.previousPageToolStripButton1.BaseToolTipText = "Go To Previous Page";
             // 
             // pageNavigationToolStripTextBox1
             // 
@@ -936,7 +936,7 @@ namespace Extract.Imaging.Forms.Test
             this.nextPageToolStripButton1.Name = "nextPageToolStripButton1";
             this.nextPageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.nextPageToolStripButton1.Text = "nextPageToolStripButton1";
-            this.nextPageToolStripButton1.ToolTipText = "Go To Next Page";
+            this.nextPageToolStripButton1.BaseToolTipText = "Go To Next Page";
             // 
             // lastPageToolStripButton1
             // 
@@ -947,7 +947,7 @@ namespace Extract.Imaging.Forms.Test
             this.lastPageToolStripButton1.Name = "lastPageToolStripButton1";
             this.lastPageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.lastPageToolStripButton1.Text = "lastPageToolStripButton1";
-            this.lastPageToolStripButton1.ToolTipText = "Go To Last Page";
+            this.lastPageToolStripButton1.BaseToolTipText = "Go To Last Page";
             // 
             // toolStrip6
             // 
@@ -969,7 +969,7 @@ namespace Extract.Imaging.Forms.Test
             this.rotateCounterclockwiseToolStripButton1.Name = "rotateCounterclockwiseToolStripButton1";
             this.rotateCounterclockwiseToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.rotateCounterclockwiseToolStripButton1.Text = "Rotate counterclockwise";
-            this.rotateCounterclockwiseToolStripButton1.ToolTipText = "Rotate counterclockwise";
+            this.rotateCounterclockwiseToolStripButton1.BaseToolTipText = "Rotate counterclockwise";
             // 
             // rotateClockwiseToolStripButton1
             // 
@@ -980,7 +980,7 @@ namespace Extract.Imaging.Forms.Test
             this.rotateClockwiseToolStripButton1.Name = "rotateClockwiseToolStripButton1";
             this.rotateClockwiseToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.rotateClockwiseToolStripButton1.Text = "Rotate clockwise";
-            this.rotateClockwiseToolStripButton1.ToolTipText = "Rotate clockwise";
+            this.rotateClockwiseToolStripButton1.BaseToolTipText = "Rotate clockwise";
             // 
             // toolStrip7
             // 
@@ -1001,7 +1001,7 @@ namespace Extract.Imaging.Forms.Test
             this.panToolStripButton1.ImageViewer = null;
             this.panToolStripButton1.Name = "panToolStripButton1";
             this.panToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.panToolStripButton1.ToolTipText = "Pan";
+            this.panToolStripButton1.BaseToolTipText = "Pan";
             // 
             // zoomWindowToolStripButton1
             // 
@@ -1011,7 +1011,7 @@ namespace Extract.Imaging.Forms.Test
             this.zoomWindowToolStripButton1.ImageViewer = null;
             this.zoomWindowToolStripButton1.Name = "zoomWindowToolStripButton1";
             this.zoomWindowToolStripButton1.Size = new System.Drawing.Size(23, 22);
-            this.zoomWindowToolStripButton1.ToolTipText = "Zoom window";
+            this.zoomWindowToolStripButton1.BaseToolTipText = "Zoom window";
             // 
             // toolStrip4
             // 
@@ -1033,7 +1033,7 @@ namespace Extract.Imaging.Forms.Test
             this.fitToPageToolStripButton1.Name = "fitToPageToolStripButton1";
             this.fitToPageToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.fitToPageToolStripButton1.Text = "Fit to page";
-            this.fitToPageToolStripButton1.ToolTipText = "Fit to page";
+            this.fitToPageToolStripButton1.BaseToolTipText = "Fit to page";
             // 
             // fitToWidthToolStripButton1
             // 
@@ -1044,7 +1044,7 @@ namespace Extract.Imaging.Forms.Test
             this.fitToWidthToolStripButton1.Name = "fitToWidthToolStripButton1";
             this.fitToWidthToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.fitToWidthToolStripButton1.Text = "Fit to width";
-            this.fitToWidthToolStripButton1.ToolTipText = "Fit to width";
+            this.fitToWidthToolStripButton1.BaseToolTipText = "Fit to width";
             // 
             // previousLayerObjectToolStripButton1
             // 
@@ -1055,7 +1055,7 @@ namespace Extract.Imaging.Forms.Test
             this.previousLayerObjectToolStripButton1.Name = "previousLayerObjectToolStripButton1";
             this.previousLayerObjectToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.previousLayerObjectToolStripButton1.Text = "previousLayerObjectToolStripButton1";
-            this.previousLayerObjectToolStripButton1.ToolTipText = "Go To Previous Layer Object";
+            this.previousLayerObjectToolStripButton1.BaseToolTipText = "Go To Previous Layer Object";
             // 
             // nextLayerObjectToolStripButton1
             // 
@@ -1066,7 +1066,7 @@ namespace Extract.Imaging.Forms.Test
             this.nextLayerObjectToolStripButton1.Name = "nextLayerObjectToolStripButton1";
             this.nextLayerObjectToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.nextLayerObjectToolStripButton1.Text = "nextLayerObjectToolStripButton1";
-            this.nextLayerObjectToolStripButton1.ToolTipText = "Go To Next Layer Object";
+            this.nextLayerObjectToolStripButton1.BaseToolTipText = "Go To Next Layer Object";
             // 
             // deleteSelectionToolStripButton1
             // 
@@ -1077,7 +1077,7 @@ namespace Extract.Imaging.Forms.Test
             this.deleteSelectionToolStripButton1.Name = "deleteSelectionToolStripButton1";
             this.deleteSelectionToolStripButton1.Size = new System.Drawing.Size(23, 22);
             this.deleteSelectionToolStripButton1.Text = "Delete selection";
-            this.deleteSelectionToolStripButton1.ToolTipText = "Delete Selection";
+            this.deleteSelectionToolStripButton1.BaseToolTipText = "Delete Selection";
             // 
             // layerObjectsToolStripMenuItem
             // 

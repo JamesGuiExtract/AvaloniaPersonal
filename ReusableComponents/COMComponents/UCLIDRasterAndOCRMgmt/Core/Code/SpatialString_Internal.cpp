@@ -1692,8 +1692,8 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 		CRect rectCurrentLineZone = grectNULL;
 
 		// This loop iterates the entire string character by character to build the raster zones.
-		size_t i = 0;
-		while (i < m_vecLetters.size())
+		size_t j = 0;
+		while (j < m_vecLetters.size())
 		{
 			// Declare properties to apply to the next raster zone.
 			short sCurrentPage = -1;
@@ -1703,13 +1703,13 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 			CRect rectCurrentZone = grectNULL;
 			bool bEndOfLine = false;
 
-			// This loop iterates throught all characters belonging to a single raster zone.
-			while (i < m_vecLetters.size())
+			// This loop iterates through all characters belonging to a single raster zone.
+			while (j < m_vecLetters.size())
 			{
 				// Ignore non-spatial characters.
-				if (!m_vecLetters[i].m_bIsSpatial)
+				if (!m_vecLetters[j].m_bIsSpatial)
 				{
-					i++;
+					j++;
 					continue;
 				}
 
@@ -1717,25 +1717,25 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 				if (sCurrentPage == -1)
 				{
 					// Determine the page the zone will be on.
-					sCurrentPage = m_vecLetters[i].m_usPageNumber;
+					sCurrentPage = m_vecLetters[j].m_usPageNumber;
 
 					// Determine the OCR confidence tier this zone belongs to as well as what the upper
 					// and lower boundaries of the tier are by iterating through each tier in ascending
 					// order until the correct one is found (if none is found, it will be in the top 
 					// tier with a upper OCR bound of 100).
 					unsigned char ucLastBoundary = 0;
-					for (long j = 0; j < nConfidenceTierCount; j++)
+					for (long k = 0; k < nConfidenceTierCount; k++)
 					{
 						// Retrieve the next boundary.
-						unsigned char ucBoundary = vecBoundaries[j];
+						unsigned char ucBoundary = vecBoundaries[k];
 
 						// If the next boundary is greater or equal to the current char confidence, we
 						// have found the appropriate tier.
-						if (m_vecLetters[i].m_ucCharConfidence <= ucBoundary)
+						if (m_vecLetters[j].m_ucCharConfidence <= ucBoundary)
 						{
 							ucLowerConfidenceBounds = ucLastBoundary;
 							ucUpperConfidenceBounds = ucBoundary;
-							nConfidenceTier = j;
+							nConfidenceTier = k;
 							break;
 						}
 						// Otherwise update the ucLowerConfidenceBounds in case there are no more tiers
@@ -1750,36 +1750,36 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 				}
 				// If we have changed pages, this is the end of the raster zone as well as the end of
 				// the current line.
-				else if (sCurrentPage != m_vecLetters[i].m_usPageNumber)
+				else if (sCurrentPage != m_vecLetters[j].m_usPageNumber)
 				{
 					bEndOfLine = true;
 					break;
 				}
 				// If the current letter does not fall within the OCR confidence bounds of the current
 				// raster zone, break out of the current raster zone loop.
-				else if (m_vecLetters[i].m_ucCharConfidence <= ucLowerConfidenceBounds ||
-					m_vecLetters[i].m_ucCharConfidence > ucUpperConfidenceBounds)
+				else if (m_vecLetters[j].m_ucCharConfidence <= ucLowerConfidenceBounds ||
+					m_vecLetters[j].m_ucCharConfidence > ucUpperConfidenceBounds)
 				{
 					break;
 				}
 
 				// Get the spatial area of the current character.
-				CRect rectLetter(m_vecLetters[i].m_usLeft, m_vecLetters[i].m_usTop, 
-					m_vecLetters[i].m_usRight, m_vecLetters[i].m_usBottom);
+				CRect rectLetter(m_vecLetters[j].m_usLeft, m_vecLetters[j].m_usTop, 
+					m_vecLetters[j].m_usRight, m_vecLetters[j].m_usBottom);
 
 				// Combine the character's area with the area of the current raster zone as a whole.
 				rectCurrentZone.UnionRect(rectCurrentZone, rectLetter);
 
 				// If this character is the last of the current line, break off the raster zone (but
 				// move on to the next char).
-				if (getIsEndOfLine(i))
+				if (getIsEndOfLine(j))
 				{
 					bEndOfLine = true;
-					i++;
+					j++;
 					break;
 				}
 
-				i++;
+				j++;
 			}
 
 			// As long as a raster zone was initialized, apply the properties to ipZoneOCRConfidenceTiers,
@@ -1801,7 +1801,9 @@ IIUnknownVectorPtr CSpatialString::getOCRImageRasterZonesGroupedByConfidence(
 				vecCurrentLineZones.push_back(rectCurrentZone);
 
 				// Check to see if the current line's raster zones need to be finalized.
-				if (bEndOfLine)
+				// [LegacyRCAndUtils:5412] getEndOfLine doesn't always end up getting set to true.
+				// If this is the last character, it is the EOL.
+				if (bEndOfLine || j == m_vecLetters.size())
 				{	
 					// If more than one raster zone shares the same line, ensure the top and bottom
 					// borders are all the same.

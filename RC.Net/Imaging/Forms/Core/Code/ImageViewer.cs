@@ -398,6 +398,16 @@ namespace Extract.Imaging.Forms
         private static readonly double _DEFAULT_SCALE_FACTOR = 1.0;
 
         /// <summary>
+        /// The maximum amount one can zoom in (1 image pixel is 50 screen pixels across)
+        /// </summary>
+        private static readonly double _MAX_ZOOM_IN_SCALE_FACTOR = 50;
+
+        /// <summary>
+        /// The maximum amount one can zoom out (1 screen pixel is 50 image pixels across)
+        /// </summary>
+        private static readonly double _MAX_ZOOM_OUT_SCALE_FACTOR = 0.02;
+
+        /// <summary>
         /// The value that the scale factor is multiplied or divided by when zooming in and 
         /// zooming out, respectively. 
         /// </summary>
@@ -617,6 +627,12 @@ namespace Extract.Imaging.Forms
         TrackingData _trackingData;
 
         /// <summary>
+        /// Indicates whether a tracking event is currently ending. Used to prevent calls from
+        /// multiple threads calling EndTracking at the same time which can lead to exceptions.
+        /// </summary>
+        volatile bool _trackingEventEnding;
+
+        /// <summary>
         /// Collection of data associated with each page of currently open image.
         /// </summary>
         /// <remarks>May be <see langword="null"/> if no image is open.</remarks>
@@ -708,12 +724,22 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The default status message that should be displayed when no image is loaded.
         /// </summary>
-        string _defaultStatusMessage;
+        string _defaultStatusMessage = "";
 
         /// <summary>
         /// The file stream for the currently open image.
         /// </summary>
         FileStream _currentOpenFile;
+
+        /// <summary>
+        /// Specifies whether the context menu should be prevented from opening.
+        /// </summary>
+        bool _suppressContextMenu;
+
+        /// <summary>
+        /// Specifies whether selection of multiple layer object via a banded box is enabled.
+        /// </summary>
+        bool _allowBandedSelection = true;
 
         /// <summary>
         /// License cache for validating the core license.
@@ -1997,6 +2023,7 @@ namespace Extract.Imaging.Forms
         /// </value>
         /// <returns>The default status message that should be displayed when no image is loaded.
         /// </returns>
+        [DefaultValue("")]
         public string DefaultStatusMessage
         {
             get
@@ -2005,7 +2032,67 @@ namespace Extract.Imaging.Forms
             }
             set
             {
-                _defaultStatusMessage = value;
+                _defaultStatusMessage = value ?? "";
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether selection of multiple <see cref="LayerObject"/>s via a banded box
+        /// is enabled.
+        /// </summary>
+        /// <value><see langword="true"/> to enable selecting multiple objects via banding,
+        /// <see langword="false"/> otherwise.</value>
+        /// <returns><see langword="true"/> if selecting multiple objects via banding is enabled,
+        /// <see langword="false"/> otherwise.
+        /// </returns>
+        [DefaultValue(true)]
+        public bool AllowBandedSelection
+        {
+            get
+            {
+                return _allowBandedSelection;
+            }
+
+            set
+            {
+                _allowBandedSelection = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the <see cref="ContextMenuStrip"/> the <see cref="ImageViewer"/> is to use.
+        /// </summary>
+        /// <value>The <see cref="ContextMenuStrip"/> to be used.</value>
+        /// <returns>The <see cref="ContextMenuStrip"/> being used.</returns>
+        public override ContextMenuStrip ContextMenuStrip
+        {
+            get
+            {
+                return base.ContextMenuStrip;
+            }
+            set
+            {
+                try
+                {
+                    if (base.ContextMenuStrip != value)
+                    {
+                        if (base.ContextMenuStrip != null)
+                        {
+                            base.ContextMenuStrip.Opening -= HandleContextMenuStripOpening;
+                        }
+
+                        base.ContextMenuStrip = value;
+
+                        if (base.ContextMenuStrip != null)
+                        {
+                            base.ContextMenuStrip.Opening += HandleContextMenuStripOpening;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27115", ex);
+                }
             }
         }
 
@@ -2099,8 +2186,15 @@ namespace Extract.Imaging.Forms
                     else if (_trackingData != null)
                     {
                         // Some other mouse button was clicked, perhaps the right mouse button.
-                        // End the previous mouse tracking event.
-                        EndTracking(e.X, e.Y);
+                        // Cancel the tracking event.
+                        EndTracking(0, 0, true);
+
+                        // If the right mouse button was used to cancel a tracking event, don't
+                        // allow it to show the context menu.
+                        if (e.Button == MouseButtons.Right && base.ContextMenuStrip != null)
+                        {
+                            _suppressContextMenu = true;
+                        }
                     }
                 }
             }
@@ -2137,7 +2231,7 @@ namespace Extract.Imaging.Forms
                     // Update the tracking event
                     this.UpdateTracking(e.X, e.Y);
                 }
-                else if (_cursorTool == CursorTool.SelectLayerObject)
+                else if (this.IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     UpdateActiveLinkedLayerObject(e.X, e.Y);
 
@@ -2166,6 +2260,30 @@ namespace Extract.Imaging.Forms
             // If the mouse has left the image viewer, remove all entries from 
             // _layerObjectsUnderSelectionTool (and raise the SelectionToolLeftLayerObject for each)
             UpdateLayerObjectsUnderSelectionTool(null);
+        }
+
+        /// <summary>
+        /// Handles the <see cref="Control.LostFocus"/> event.
+        /// </summary>
+        /// <param name="e">An <see cref="EventArgs"/> that contains the event data.</param>
+        protected override void OnLostFocus(EventArgs e)
+        {
+            try
+            {
+                base.OnLostFocus(e);
+
+                if (_trackingData != null)
+                {
+                    // If the image viewer has lost focus during a tracking event, cancel the event.
+                    EndTracking(0, 0, true);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27111", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
         }
 
         /// <summary>
@@ -2493,11 +2611,14 @@ namespace Extract.Imaging.Forms
                 if (_trackingData != null && e.Button == MouseButtons.Left)
                 {
                     // Finish tracking this event
-                    this.EndTracking(e.X, e.Y);
+                    this.EndTracking(e.X, e.Y, false);
                 }
 
-                // Restore the original cursor tool
-                this.Cursor = _toolCursor ?? Cursors.Default;
+                if (this.IsImageAvailable)
+                {
+                    // Restore the original cursor tool
+                    this.Cursor = _toolCursor ?? Cursors.Default;
+                }
             }
             catch (Exception ex)
             {
@@ -3076,6 +3197,31 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI22659", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="ToolStripDropDown.Opening"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">The <see cref="CancelEventArgs"/> associated with the event.</param>
+        void HandleContextMenuStripOpening(object sender, CancelEventArgs e)
+        {
+            try
+            {
+                // If the context menu is to be suppressed, cancel the opening event then clear the
+                // _suppressContextMenu flag.
+                if (_suppressContextMenu)
+                {
+                    e.Cancel = true;
+                    _suppressContextMenu = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27117", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }

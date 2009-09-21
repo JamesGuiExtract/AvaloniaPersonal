@@ -68,7 +68,12 @@ namespace Extract.DataEntry
         /// A representation of the carriage return line feed combination so that the unprintable
         /// boxes don't appear in the control.
         /// </summary>
-        internal static readonly string _CRLF_REPLACEMENT = " \xA0 ";
+        internal static readonly string _CRLF_REPLACEMENT = "\xA0";
+
+        /// <summary>
+        /// A tag to represent the Program Files\Extract Systems directory
+        /// </summary>
+        internal static readonly string _PFES_FOLDER = "[PFESFolder]";
 
         #endregion Constants
 
@@ -85,6 +90,12 @@ namespace Extract.DataEntry
         /// </summary>
         private static string _solutionRootDirectory =
             Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents, _OBJECT_NAME);
 
         #endregion Fields
 
@@ -757,7 +768,7 @@ namespace Extract.DataEntry
         {
             try
             {
-                pathName = pathName.Replace("[PFESFolder]", FileSystemMethods.ExtractSystemsPath);
+                pathName = pathName.Replace(_PFES_FOLDER, FileSystemMethods.ExtractSystemsPath);
 
                 return FileSystemMethods.GetAbsolutePath(pathName, _solutionRootDirectory);
             }
@@ -788,8 +799,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26727",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26727");
 
                 ExtractException.Assert("ELI26731", "Null argument exception!",
                     sqlCEConnection != null);
@@ -834,8 +844,7 @@ namespace Extract.DataEntry
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents, "ELI26758",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI26758");
 
                 ExtractException.Assert("ELI26151", "Null argument exception!", dbCommand != null);
 
@@ -859,15 +868,36 @@ namespace Extract.DataEntry
                             result.Append(rowSeparator);
                         }
 
+                        // Keep track of all column delimiters that are appended. They are
+                        // only added once it is confirmed that there is more data in the
+                        // row.
+                        StringBuilder pendingColumnDelimiters = new StringBuilder();
+
                         for (int i = 0; i < sqlReader.FieldCount; i++)
                         {
-                            // If not the first column result, append the column separator
+                            // If not the first column result, a column separator may be needed.
                             if (i > 0)
                             {
-                                result.Append(columnSeparator);
+                                pendingColumnDelimiters.Append(columnSeparator);
                             }
 
-                            result.Append(sqlReader.GetString(i));
+                            // Append a result only if there is a value to append.
+                            if (!sqlReader.IsDBNull(i))
+                            {
+                                string columnValue = sqlReader.GetString(i);
+
+                                if (!string.IsNullOrEmpty(columnValue))
+                                {
+                                    // If there is data to write, go ahead and commit all pending
+                                    // column delimiters.
+                                    result.Append(pendingColumnDelimiters.ToString());
+
+                                    // Reset the pending column delimiters
+                                    pendingColumnDelimiters = new StringBuilder();
+
+                                    result.Append(columnValue);
+                                }
+                            }
                         }
                     }
 
@@ -876,11 +906,27 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI26150", ex);
+                ExtractException ee =
+                    new ExtractException("ELI26150", "Database query failed.", ex);
+
                 if (dbCommand != null)
                 {
                     ee.AddDebugData("Query", dbCommand.CommandText, false);
+
+                    try
+                    {
+                        foreach (DbParameter parameter in dbCommand.Parameters)
+                        {
+                            ee.AddDebugData("Parameter " + parameter.ParameterName,
+                                parameter.Value.ToString(), false);
+                        }
+                    }
+                    catch (Exception ex2)
+                    {
+                        ExtractException.Log("ELI27106", ex2);
+                    }
                 }
+
                 throw ee;
             }
         }

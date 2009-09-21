@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Management;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO;
 using System.Threading;
 
 namespace Extract.Utilities
@@ -391,6 +395,152 @@ namespace Extract.Utilities
             }
         }
 
+        /// <summary>
+        /// Attempts to convert the specified path to a UNC path.
+        /// <para><b>Warning</b></para>
+        /// The performance (speed) of this method may be poor. 
+        /// <para><b>Note</b></para>
+        /// When attempting to generate a UNC for a local path there may be more than one shared
+        /// directory that can be used to generate the UNC. It is indeterminant which will be
+        /// used in this case. Administrative shares will not be used as the basis for a UNC path.
+        /// </summary>
+        /// <param name="path">The path to be converted to a UNC path.</param>
+        /// <param name="convertLocalPath">If <see langword="true"/> paths referencing a file on
+        /// the local system will be converted to a UNC path (if possible), <see langword="false"/>
+        /// if local paths should not be converted.</param>
+        /// <returns><see langword="true"/> if the the path was successfully converted to a UNC
+        /// path, <see langword="false"/> if the path was not converted in which case the path
+        /// remains the same as it was passed in.</returns>
+        [SuppressMessage("Microsoft.Design", "CA1045:DoNotPassTypesByReference", MessageId = "0#")]
+        public static bool ConvertToNetworkPath(ref string path, bool convertLocalPath)
+        {
+            // This method is prone to poor performance. To help identify if it is causing any
+            // serious problems, log an application trace anytime execution takes longer than a
+            // second.
+            DateTime startTime = DateTime.Now;
+
+            try
+            {
+                // Check to see if the path already appears to be a UNC path.
+                if (path.StartsWith("\\\\", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                // Ensure we are working with an absolute path first.
+                string workingPath = GetAbsolutePath(path);
+
+                // Separate the volume from the rest of the path.
+                string[] pathParts = workingPath.Split(Path.VolumeSeparatorChar);
+                string volume = pathParts[0] + Path.VolumeSeparatorChar;
+
+                ExtractException.Assert("ELI27316", "Invalid path", pathParts.Length == 2);
+
+                // Obtain a drive management object associated with the volume name.
+                using (ManagementObject driveObject = new ManagementObject())
+                {
+                    driveObject.Path = new ManagementPath("Win32_LogicalDisk='" + volume + "'");
+
+                    // Check what type of drive it is.
+                    object driveType = driveObject["DriveType"];
+
+                    // If it is a network drive, it can be converted
+                    if (driveType != null &&
+                        Convert.ToUInt32(driveType, CultureInfo.CurrentCulture) == 4)
+                    {
+                        // The ProviderName is the UNC equivalent of the volume name.
+                        object providerName = driveObject["ProviderName"];
+                        if (providerName != null)
+                        {
+                            path = providerName.ToString() + pathParts[1];
+                            return true;
+                        }
+                    }
+                }
+
+                // If local paths are not to be converted, there is nothing more to be attempted.
+                if (!convertLocalPath)
+                {
+                    return false;
+                }
+
+                // If attempting to convert local paths, search all shared directories for one that
+                // the specified path is included in.
+                foreach (ManagementObject sharedDirectory in
+                    SystemMethods.GetWMIObjects("Win32_ShareToDirectory"))
+                {
+                    try
+                    {
+                        // Administrative shares will have the high bit of the Type property set;
+                        // ignore these.
+                        object shareTypeProperty =
+                            SystemMethods.GetWMIProperty(sharedDirectory, "Share.Type");
+                        if (shareTypeProperty != null && ((uint)shareTypeProperty & 0x80000000) != 0)
+                        {
+                            continue;
+                        }
+
+                        // Find the local path of the share.
+                        object localPathProperty =
+                            SystemMethods.GetWMIProperty(sharedDirectory, "Share.Path");
+                        if (localPathProperty == null)
+                        {
+                            continue;
+                        }
+                        string localPath = localPathProperty.ToString();
+
+                        // Test to see if the local path of the share matches the beginning of the
+                        // working path. If so, it can be used to generate a UNC.
+                        if (workingPath.IndexOf(localPath, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            // Generate a UNC address for the share using the local host name combined
+                            // with the share name.
+                            object shareNameProperty =
+                                SystemMethods.GetWMIProperty(sharedDirectory, "Share.Name");
+                            if (shareNameProperty != null)
+                            {
+                                StringBuilder sharePath = new StringBuilder();
+                                sharePath.Append("\\\\");
+                                sharePath.Append(Dns.GetHostName());
+                                sharePath.Append("\\");
+                                sharePath.Append(shareNameProperty.ToString());
+
+                                // Combine the share UNC path with the part of the working path not
+                                // included in the share path.
+                                path = sharePath.ToString() + workingPath.Substring(localPath.Length);
+                                return true;
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        sharedDirectory.Dispose();
+                    }
+                }
+
+                // The path could not be converted.
+                return false;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27313", "UNC path conversion failed.", ex);
+                ee.AddDebugData("Path", path, false);
+                throw ee;
+            }
+            finally
+            {
+                TimeSpan elapsed = DateTime.Now - startTime;
+                if (elapsed.TotalSeconds > 1)
+                {
+                    ExtractException ee = new ExtractException("ELI27699",
+                        "Application trace: Poor performance calculating network path.");
+                    ee.AddDebugData("Elapsed time", elapsed.ToString(), false);
+                    ee.AddDebugData("Path", path, false);
+                    ee.Log();
+                }
+            }
+        }
+
         /// <overloads>Will attempt to delete a specified file and return whether the
         /// operation was successful or not.</overloads>
         /// <summary>
@@ -492,6 +642,59 @@ namespace Extract.Utilities
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI23865", ex);
+            }
+        }
+
+        /// <summary>
+        /// Determines if the specified path references a resource on the local machine.
+        /// </summary>
+        /// <param name="path">The path to check</param>
+        /// <returns><see langword="true"/> if the path references a resource on the local machine;
+        /// <see langword="false"/> otherwise.</returns>
+        public static bool IsPathLocal(string path)
+        {
+            try
+            {
+                // Convert the path to a UNC path and obtain a URI for it.
+                ConvertToNetworkPath(ref path, false);
+
+                // If the result is not a UNC path, we know it is local.
+                if (!path.StartsWith("\\\\", StringComparison.Ordinal))
+                {
+                    return true;
+                }
+
+                // Obtain all IP addresses that reference the host for the specified path as well as
+                // for the local host.
+                IPAddress[] pathHostAddresses = Dns.GetHostAddresses(new Uri(path).Host);
+                IPAddress[] localHostAddresses = Dns.GetHostAddresses(Dns.GetHostName());
+
+                // Check to see if any IPs between the two lists match.
+                foreach (IPAddress pathHostAddress in pathHostAddresses)
+                {
+                    // Check for 127.0.0.1
+                    if (IPAddress.IsLoopback(pathHostAddress))
+                    {
+                        return true;
+                    }
+
+                    // Check to see if this pathHostAddress matches any of the IPs for the local
+                    // host.
+                    foreach (IPAddress localHostAddress in localHostAddresses)
+                    {
+                        if (localHostAddress.Equals(pathHostAddress))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                // No match could be found; the path is not local
+                return false;
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27312", ex);
             }
         }
     }

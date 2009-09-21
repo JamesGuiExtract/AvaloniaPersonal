@@ -64,8 +64,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <see cref="DataEntryApplicationForm"/> instance and be able to route exceptions back to
         /// to the calling thread.
         /// </summary>
-        static VerificationForm<DataEntryApplicationForm> _dataEntryFormManager =
-            new VerificationForm<DataEntryApplicationForm>();
+        static VerificationForm<DataEntryApplicationForm> _dataEntryFormManager;
 
         /// <summary>
         /// Indicates whether the object has been modified since being loaded via the 
@@ -80,6 +79,16 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         string _configFileName;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.DataEntryCoreComponents,
+            _DEFAULT_FILE_ACTION_TASK_NAME);
+
+        // Object for mutexing data entry form manager creation
+        static object _lock = new object();
+
         #endregion Fields
 
         #region Contructors
@@ -89,7 +98,14 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// </summary>
         public ComClass()
         {
-            // Nothing to do.
+            // Mutex over data entry form manager creation
+            lock (_lock)
+            {
+                if (_dataEntryFormManager == null)
+                {
+                    _dataEntryFormManager = new VerificationForm<DataEntryApplicationForm>();
+                }
+            }
         }
 
         #endregion Contructors
@@ -237,7 +253,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         {
             try
             {
-                return LicenseUtilities.IsLicensed(LicenseIdName.LabDEVerificationUIObject);
+                return LicenseUtilities.IsLicensed(LicenseIdName.DataEntryCoreComponents);
             }
             catch (Exception ex)
             {
@@ -281,7 +297,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
+                LicenseUtilities.ValidateLicense(LicenseIdName.DataEntryCoreComponents,
                     "ELI26896", _DEFAULT_FILE_ACTION_TASK_NAME);
 
                 // Ask the manager to create and display the data entry form.
@@ -323,8 +339,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI26897", _DEFAULT_FILE_ACTION_TASK_NAME);
+                _licenseCache.Validate("ELI26897");
 
                 EFileProcessingResult processingResult;
 
@@ -361,8 +376,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI26898", _DEFAULT_FILE_ACTION_TASK_NAME);
+                _licenseCache.Validate("ELI26898");
 
                 _dataEntryFormManager.Cancel();
             }
@@ -381,8 +395,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI26899", _DEFAULT_FILE_ACTION_TASK_NAME);
+                _licenseCache.Validate("ELI26899");
 
                 _dataEntryFormManager.CloseForm();
             }
@@ -456,8 +469,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
             try
             {
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.LabDEVerificationUIObject,
-                    "ELI26900", _DEFAULT_FILE_ACTION_TASK_NAME);
+                _licenseCache.Validate("ELI26900");
 
                 // Create a new configuration form to display the configurable settings to the user.
                 ConfigurationForm configForm = new ConfigurationForm(this);
@@ -575,9 +587,7 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         /// <returns>A <see cref="DataEntryApplicationForm"/> using the current settings.</returns>
         IVerificationForm CreateDataEntryForm()
         {
-            DataEntryApplicationForm form = new DataEntryApplicationForm(_configFileName);
-            form.StandAloneMode = false;
-            return form;
+            return new DataEntryApplicationForm(_configFileName, false);
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Windows.Forms;
 using UCLID_AFCORELib;
@@ -18,19 +19,19 @@ namespace Extract.DataEntry
         /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated
         /// with the <see cref="IDataEntryControl.AttributesSelected"/> event.
         /// </summary>
-        private readonly IUnknownVector _attributes;
+        readonly IUnknownVector _attributes;
 
         /// <summary>
         /// Indicates whether the firing control is to be associated only with the spatial info of
         /// the specific attributes provided, or whether it should be associated with the spatial
         /// info of all descendent attributes as well.
         /// </summary>
-        private readonly bool _includeSubAttributes;
+        readonly bool _includeSubAttributes;
 
         /// <summary>
         /// Indicates whether tooltips should be displayed for the attribute(s)
         /// </summary>
-        private readonly bool _displayToolTips;
+        readonly bool _displayToolTips;
 
         /// <summary>
         /// Initializes a new <see cref="AttributesSelectedEventArgs"/> instance.
@@ -101,7 +102,7 @@ namespace Extract.DataEntry
         /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s associated with the
         /// <see cref="IDataEntryControl.PropagateAttributes"/> event.
         /// </summary>
-        private readonly IUnknownVector _attributes;
+        readonly IUnknownVector _attributes;
 
         /// <summary>
         /// Initializes a new <see cref="PropagateAttributesEventArgs"/> instance.
@@ -136,7 +137,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Specifies whether swiping is being enabled (true) or disabled (false)
         /// </summary>
-        private bool _enabled;
+        bool _enabled;
 
         /// <summary>
         /// Initialized a new <see cref="SwipingStateChangedEventArgs"/> instance.
@@ -212,18 +213,18 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> being initialized.
         /// </summary>
-        private readonly IAttribute _attribute;
+        readonly IAttribute _attribute;
 
         /// <summary>
         /// The <see cref="IUnknownVector"/> of <see cref="IAttribute"/>s from which the attribute
         /// is from.
         /// </summary>
-        private readonly IUnknownVector _sourceAttributes;
+        readonly IUnknownVector _sourceAttributes;
 
         /// <summary>
         /// The <see cref="IDataEntryControl"/> associated with the attribute.
         /// </summary>
-        private readonly IDataEntryControl _dataEntryControl;
+        readonly IDataEntryControl _dataEntryControl;
 
         /// <summary>
         /// Initializes a new <see cref="AttributeInitializedEventArgs"/> instance.
@@ -293,23 +294,29 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> whose value was modified.
         /// </summary>
-        private readonly IAttribute _attribute;
+        readonly IAttribute _attribute;
 
         /// <summary>
         /// Specifies whether the modification is part of an ongoing edit.
         /// </summary>
-        private readonly bool _incrementalUpdate;
+        readonly bool _incrementalUpdate;
 
         /// <summary>
         /// Specifies whether the modification should trigger the attribute's spatial info to be
         /// accepted.
         /// </summary>
-        private readonly bool _acceptSpatialInfo;
+        readonly bool _acceptSpatialInfo;
 
         /// <summary>
         /// Specifies whether the spatial info for the <see cref="IAttribute"/> has changed.
         /// </summary>
         readonly bool _spatialInfoChanged;
+
+        /// <summary>
+        /// A list of all attributes whose values have been updated via an auto-update query as a
+        /// result of this event.
+        /// </summary>
+        List<IAttribute> _autoUpdatedAttributes = new List<IAttribute>();
 
         /// <summary>
         /// Initializes a new <see cref="AttributeValueModifiedEventArgs"/> instance.
@@ -394,6 +401,22 @@ namespace Extract.DataEntry
                 return _spatialInfoChanged;
             }
         }
+
+        /// <summary>
+        /// Gets a list of all <see cref="IAttribute"/>s whose values have been updated via an
+        /// auto-update query as a result of this event.
+        /// </summary>
+        /// <returns>A list of all <see cref="IAttribute"/>s whose values have been updated via an
+        /// auto-update query as a result of this event.</returns>
+        // Using List for its "Contains" method.
+        [SuppressMessage("Microsoft.Design", "CA1002:DoNotExposeGenericLists")]
+        public List<IAttribute> AutoUpdatedAttributes
+        {
+            get
+            {
+                return _autoUpdatedAttributes;
+            }
+        }
     }
 
     /// <summary>
@@ -405,7 +428,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> that was deleted.
         /// </summary>
-        private IAttribute _deletedAttribute;
+        IAttribute _deletedAttribute;
 
         /// <summary>
         /// Initializes a new <see cref="AttributeDeletedEventArgs"/> instance.
@@ -440,12 +463,12 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> for which the viewed/unviewed status has changed.
         /// </summary>
-        private readonly IAttribute _attribute;
+        readonly IAttribute _attribute;
 
         /// <summary>
         /// Specifies whether the attribute has been marked viewed or unviewed.
         /// </summary>
-        private readonly bool _dataIsViewed;
+        readonly bool _dataIsViewed;
 
         /// <summary>
         /// Initializes a new <see cref="ViewedStateChangedEventArgs"/> instance.
@@ -500,12 +523,12 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> for which the data validity has changed.
         /// </summary>
-        private readonly IAttribute _attribute;
+        readonly IAttribute _attribute;
 
         /// <summary>
         /// Specifies whether the <see cref="IAttribute"/>'s data is now valid or invalid.
         /// </summary>
-        private readonly bool _dataIsValid;
+        readonly bool _dataIsValid;
 
         /// <summary>
         /// Initializes a new <see cref="ValidationStateChangedEventArgs"/> instance.
@@ -560,7 +583,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// Specifies whether any unviewed attributes were found in the search.
         /// </summary>
-        private readonly bool _unviewedItemsFound;
+        readonly bool _unviewedItemsFound;
 
         /// <summary>
         /// Initializes a new <see cref="UnviewedItemsFoundEventArgs"/> instance.
@@ -598,7 +621,7 @@ namespace Extract.DataEntry
         /// Specifies whether any <see cref="IAttribute"/>s with invalid data were found in the 
         /// search.
         /// </summary>
-        private readonly bool _invalidItemsFound;
+        readonly bool _invalidItemsFound;
 
         /// <summary>
         /// Initializes a new <see cref="InvalidItemsFoundEventArgs"/> instance.
@@ -638,30 +661,30 @@ namespace Extract.DataEntry
         /// The number of items in the selection with highlights that have been accepted by the
         /// user.
         /// </summary>
-        private readonly int _selectedItemsWithAcceptedHighlights;
+        readonly int _selectedItemsWithAcceptedHighlights;
 
         /// <summary>
         /// The number of items in the selection with highlights that have not been accepted by the
         /// user.
         /// </summary>
-        private readonly int _selectedItemsWithUnacceptedHighlights;
+        readonly int _selectedItemsWithUnacceptedHighlights;
 
         /// <summary>
         /// The number of items in the selection without spatial information but that have a direct
         /// hint indicating where the data may be (if present).
         /// </summary>
-        private readonly int _selectedItemsWithDirectHints;
+        readonly int _selectedItemsWithDirectHints;
 
         /// <summary>
         /// The number of items in the selection without spatial information but that have an indirect
         /// hint indicating data related field.
         /// </summary>
-        private readonly int _selectedItemsWithIndirectHints;
+        readonly int _selectedItemsWithIndirectHints;
 
         /// <summary>
         /// The number of items in the selection without spatial information or hints.
         /// </summary>
-        private readonly int _selectedItemsWithoutHighlights;
+        readonly int _selectedItemsWithoutHighlights;
 
         /// <summary>
         /// Initializes a new <see cref="ItemSelectionChangedEventArgs"/> instance.
@@ -776,7 +799,7 @@ namespace Extract.DataEntry
         /// <summary>
         /// The <see cref="IAttribute"/> for which the viewed/unviewed status has changed.
         /// </summary>
-        private readonly IAttribute _attribute;
+        readonly IAttribute _attribute;
 
 
         /// <summary>

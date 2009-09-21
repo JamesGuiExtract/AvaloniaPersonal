@@ -138,7 +138,9 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI26108", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI26108", ex);
+                ee.AddDebugData("Query", query, false);
+                throw ee;
             }
         }
 
@@ -151,27 +153,24 @@ namespace Extract.DataEntry
         /// </summary>
         /// <returns><see langword="true"/> if the query is completely resolved, <see langword="false"/>
         /// there are still trigger attributes that need to be registered..</returns>
-        public bool IsFullyResolved
+        public bool GetIsFullyResolved()
         {
-            get
+            // Check to see if the default query has been resolved (if one was specifed).
+            if (_defaultQuery != null && !_defaultQuery.GetIsFullyResolved())
             {
-                // Check to see if the default query has been resolved (if one was specifed).
-                if (_defaultQuery != null && !_defaultQuery.IsFullyResolved)
+                return false;
+            }
+
+            // Check to see if any query in the queries list has not yet been resolved.
+            foreach (RootQueryNode query in _queries)
+            {
+                if (!query.GetIsFullyResolved())
                 {
                     return false;
                 }
-
-                // Check to see if any query in the queries list has not yet been resolved.
-                foreach (RootQueryNode query in _queries)
-                {
-                    if (!query.IsFullyResolved)
-                    {
-                        return false;
-                    }
-                }
-
-                return true;
             }
+
+            return true;
         }
 
         #endregion Properties
@@ -202,7 +201,7 @@ namespace Extract.DataEntry
 
                 // Attempt to register the attribute as a trigger for the default query (if one was
                 // specified).
-                if (_defaultQuery != null && !_defaultQuery.IsFullyResolved)
+                if (_defaultQuery != null && !_defaultQuery.GetIsFullyResolved())
                 {
                     if (_defaultQuery.RegisterTriggerCandidate(statusInfo))
                     {
@@ -213,7 +212,7 @@ namespace Extract.DataEntry
                 // Attempt to register the attribute as a trigger with each query.
                 foreach (RootQueryNode query in _queries)
                 {
-                    if (!query.IsFullyResolved)
+                    if (!query.GetIsFullyResolved())
                     {
                         if (query.RegisterTriggerCandidate(statusInfo))
                         {
@@ -248,7 +247,7 @@ namespace Extract.DataEntry
                 // If the attribute's value is empty and a default query has been specified,
                 // update the attribute using the default query.
                 if (_defaultQuery != null && !_defaultQuery.Disabled &&
-                    _defaultQuery.IsMinimallyResolved)
+                    _defaultQuery.GetIsMinimallyResolved())
                 {
                     _defaultQuery.UpdateValue();
                 }
@@ -256,7 +255,7 @@ namespace Extract.DataEntry
                 // Attempt an update with all resolved queries.
                 foreach (RootQueryNode query in _queries)
                 {
-                    if (query.IsMinimallyResolved && query.UpdateValue())
+                    if (query.GetIsMinimallyResolved() && query.UpdateValue())
                     {
                         // Once the target attribute has been updated, don't attempt an update with
                         // any remaining queries.
