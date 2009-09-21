@@ -118,6 +118,17 @@ static const string gstrCREATE_FAM_FILE_TAG_TABLE = "CREATE TABLE [FileTag] ("
 	"[FileID] [int] NOT NULL, "
 	"[TagID] [int] NOT NULL)";
 
+static const string gstrCREATE_PROCESSING_FAM_TABLE = 
+	"CREATE TABLE [ProcessingFAM]([ID] [int] IDENTITY(1,1) NOT NULL CONSTRAINT [PK_ProcessingFAM] PRIMARY KEY CLUSTERED,"
+	"[UPI] [nvarchar](450), "
+	"[LastPingTime] datetime NOT NULL CONSTRAINT [DF_ProcessingFAM_LastPingTime]  DEFAULT (GETDATE()))";
+
+static const string gstrCREATE_LOCKED_FILE_TABLE = 
+	"CREATE TABLE [LockedFile]([FileID] [int] NOT NULL CONSTRAINT [PK_LockedFile] PRIMARY KEY CLUSTERED,"
+	"[ActionID] [int] , "
+	"[UPIID] [int] , "
+	"[StatusBeforeLock] [nvarchar](1) NOT NULL)";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -136,6 +147,9 @@ static const string gstrCREATE_SKIPPED_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED 
 
 static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_File_Tag] ON [FileTag]([FileID], [TagID])";
+
+static const string gstrCREATE_PROCESSING_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
+	"[IX_ProcessingFAM_UPI] ON [ProcessingFAM]([UPI])";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 
@@ -242,6 +256,34 @@ static const string gstrADD_FILE_TAG_TAG_ID_FK =
 	"ALTER TABLE [FileTag] "
 	"WITH CHECK ADD CONSTRAINT [FK_FileTag_Tag] FOREIGN KEY([TagID]) "
 	"REFERENCES [Tag] ([ID]) "
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_LOCKED_FILE_ACTION_FK = 
+	"ALTER TABLE [dbo].[LockedFile]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_Action] FOREIGN KEY([ActionID])"
+	"REFERENCES [dbo].[Action] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_LOCKED_FILE_ACTION_STATE_FK =
+	"ALTER TABLE [dbo].[LockedFile]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ActionState] FOREIGN KEY([StatusBeforeLock])"
+	"REFERENCES [dbo].[ActionState] ([Code])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_LOCKED_FILE_FAMFILE_FK = 
+	"ALTER TABLE [dbo].[LockedFile]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_FAMFile] FOREIGN KEY([FileID])"
+	"REFERENCES [dbo].[FAMFile] ([ID])"
+	"ON UPDATE CASCADE "
+	"ON DELETE CASCADE";
+
+static const string gstrADD_LOCKED_FILE_PROCESSINGFAM_FK =
+	"ALTER TABLE [dbo].[LockedFile]  "
+	"WITH CHECK ADD  CONSTRAINT [FK_LockedFile_ProcessingFAM] FOREIGN KEY([UPIID])"
+	"REFERENCES [dbo].[ProcessingFAM] ([ID])"
 	"ON UPDATE CASCADE "
 	"ON DELETE CASCADE";
 

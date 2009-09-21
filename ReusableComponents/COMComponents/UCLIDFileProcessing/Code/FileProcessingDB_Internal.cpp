@@ -27,7 +27,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 12;
+const long glFAMDBSchemaVersion = 13;
 
 // Table names
 static const string gstrACTION = "Action";
@@ -46,6 +46,8 @@ static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
 static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
 static const string gstrFAM_TAG = "Tag";
 static const string gstrFAM_FILE_TAG = "FileTag";
+static const string gstrPROCESSING_FAM = "ProcessingFAM";
+static const string gstrLOCKED_FILE = "LockedFile";
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -856,6 +858,9 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
+		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
+		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -881,6 +886,10 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrADD_SKIPPED_FILE_ACTION_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_FAM_FILE_FK);
 		vecQueries.push_back(gstrADD_FILE_TAG_TAG_ID_FK);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_FK);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_ACTION_STATE_FK);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_FAMFILE_FK);
+		vecQueries.push_back(gstrADD_LOCKED_FILE_PROCESSINGFAM_FK);
 
 		// Execute all of the queries
 		executeVectorOfSQL(getDBConnection(), vecQueries);
@@ -961,6 +970,21 @@ void CFileProcessingDB::initializeTableValues()
 		// Add Allow Dynamic Tag Creation setting (default to false)
 		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrALLOW_DYNAMIC_TAG_CREATION
 			+ "', '0')";
+		vecQueries.push_back(strSQL);
+
+		// Add AutoRevertLockedFiles setting (default to true)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_LOCKED_FILES
+			+ "', '1')";
+		vecQueries.push_back(strSQL);
+
+		// Add AutoRevertTimeOutInMinutes setting (default to 60 minutes)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_TIME_OUT_IN_MINUTES
+			+ "', '60')";
+		vecQueries.push_back(strSQL);
+		
+		// Add AutoRevertNotifyEmailList setting (default to empy string)
+		strSQL = "INSERT INTO [DBInfo] ([Name], [Value]) VALUES('" + gstrAUTO_REVERT_NOTIFY_EMAIL_LIST
+			+ "', '')";
 		vecQueries.push_back(strSQL);
 
 		// Execute all of the queries
@@ -1775,6 +1799,8 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFAM_SKIPPED_FILE);
 	vecTables.push_back(gstrFAM_FILE_TAG);
 	vecTables.push_back(gstrFAM_TAG);
+	vecTables.push_back(gstrPROCESSING_FAM);
+	vecTables.push_back(gstrLOCKED_FILE);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

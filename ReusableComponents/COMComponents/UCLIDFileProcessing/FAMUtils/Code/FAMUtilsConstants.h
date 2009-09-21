@@ -18,6 +18,9 @@ static const string gstrCONNECTION_RETRY_TIMEOUT = "ConnectionRetryTimeout";
 static const string gstrAUTO_DELETE_FILE_ACTION_COMMENT = "AutoDeleteFileActionCommentOnComplete";
 static const string gstrREQUIRE_PASSWORD_TO_PROCESS_SKIPPED = "RequirePasswordToProcessAllSkippedFiles";
 static const string gstrALLOW_DYNAMIC_TAG_CREATION = "AllowDynamicTagCreation";
+static const string gstrAUTO_REVERT_LOCKED_FILES = "AutoRevertLockedFiles";
+static const string gstrAUTO_REVERT_TIME_OUT_IN_MINUTES = "AutoRevertTimeOutInMinutes";
+static const string gstrAUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailList";
 
 // Default Settings
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;
