@@ -63,6 +63,11 @@ namespace Extract.SqlCompactExporter
             public bool EscapeForRegEx;
 
             /// <summary>
+            /// Specifies the encoding use to use for the output text.
+            /// </summary>
+            public Encoding Encoding = Encoding.Default;
+
+            /// <summary>
             /// Initializes a new <see cref="Settings"/> instance.
             /// </summary>
             /// <param name="args">The command-line arguments the application was launched with.</param>
@@ -105,6 +110,13 @@ namespace Extract.SqlCompactExporter
                         ExtractException.Assert("ELI27129", "Missing file suffix value.", i < args.Length);
 
                         FileSuffix = ParamUnescape(args[i]);
+                    }
+                    else if (args[i].Equals("/enc", StringComparison.OrdinalIgnoreCase))
+                    {
+                        i++;
+                        ExtractException.Assert("ELI27729", "Missing code page name.", i < args.Length);
+
+                        Encoding = Encoding.GetEncoding(args[i]);
                     }
                     else if (args[i].Equals("/esc", StringComparison.OrdinalIgnoreCase))
                     {
@@ -254,7 +266,8 @@ namespace Extract.SqlCompactExporter
 
                             if (readData && sb.Length > 0)
                             {
-                                File.WriteAllText(settings.OutputFile, sb.ToString());
+                                File.WriteAllText(settings.OutputFile, sb.ToString(),
+                                    settings.Encoding);
                             }
 
                             Console.WriteLine("Exported " +
@@ -288,7 +301,7 @@ namespace Extract.SqlCompactExporter
             Console.WriteLine("------------");
             Console.Write("SqlCompactExporter.exe <DatabaseFile> <Query> <OutputFileName> ");
             Console.Write("[/rd <RowDelimiter>] [/cd <ColumnDelimiter>] [/fp <FilePrefix>] ");
-            Console.WriteLine("[/fs <FileSuffix>] [/esc]");
+            Console.WriteLine("[/fs <FileSuffix>] [/enc <CodePageName>] [/esc]");
             Console.WriteLine();
             Console.WriteLine("DatabaseFile: The SQL Compact database to export from.");
             Console.WriteLine("Query: The SQL query that specifies the output data.");
@@ -299,6 +312,9 @@ namespace Extract.SqlCompactExporter
                 "/cd <ColumnDelimiter>: Appears between each field in a row. (default = \\t)");
             Console.WriteLine("/fp <FilePrefix>: The output file will begin with this text.");
             Console.WriteLine("/fs <FileSuffix>: The output file will end with this text.");
+            Console.WriteLine("/enc <CodePageName>: The name of the codepage used to encode the " +
+                "text output. \r\nFor example \"ascii\", \"unicode\", \"utf-8\", or any named " +
+                "code page. If not specified, the default ANSI code page will be used.");
             Console.WriteLine(
                 "/esc: The output for each field will be escaped for use in a regular expression.");
         }
