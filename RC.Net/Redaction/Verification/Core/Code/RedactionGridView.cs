@@ -118,12 +118,18 @@ namespace Extract.Redaction.Verification
         /// The last applied exemption codes or <see langword="null"/> if no exemption code has 
         /// been applied.
         /// </summary>
-        ExemptionCodeList _lastApplied;
+        ExemptionCodeList _lastCodes;
 
         /// <summary>
         /// The master list of valid exemption categories and codes.
         /// </summary>
         MasterExemptionCodeList _masterCodes;
+
+        /// <summary>
+        /// The last applied redaction type or the empty string if no redaction type has been 
+        /// applied.
+        /// </summary>
+        string _lastType = "";
 
         /// <summary>
         /// The confidence levels of attributes in the <see cref="RedactionGridView"/>.
@@ -257,10 +263,10 @@ namespace Extract.Redaction.Verification
                 }
 
                 // Set the last applied exemption code if necessary
-                if (_lastApplied != null)
+                if (_lastCodes != null)
                 {
                     _exemptionsDialog.EnableApplyLast = true;
-                    _exemptionsDialog.LastExemptionCodeList = _lastApplied;
+                    _exemptionsDialog.LastExemptionCodeList = _lastCodes;
                 }
 
                 return _exemptionsDialog;
@@ -295,7 +301,7 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                return _lastApplied != null;
+                return _lastCodes != null;
             }
         }
 
@@ -443,6 +449,19 @@ namespace Extract.Redaction.Verification
         void ResetAutoZoomScale()
         {
             _autoZoomScale = _DEFAULT_AUTO_ZOOM_SCALE;
+        }
+
+        /// <summary>
+        /// Gets whether the currently active cell is in edit mode.
+        /// </summary>
+        /// <value><see langword="true"/> if the currently active cell is in edit mode;
+        /// <see langword="false"/> if the currently active cell is not in edit mode.</value>
+        public bool IsInEditMode
+        {
+            get
+            {
+                return _dataGridView.IsCurrentCellInEditMode;
+            }
         }
 
         /// <summary>
@@ -612,6 +631,17 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
+        /// Determines whether the specified index corresponds to the redaction type column.
+        /// </summary>
+        /// <param name="index">The index to test.</param>
+        /// <returns><see langword="true"/> if <paramref name="index"/> corresponds to the 
+        /// redaction type column; <see langword="false"/> if it does not.</returns>
+        bool IsTypeColumn(int index)
+        {
+            return _typeColumn.Index == index;
+        }
+
+        /// <summary>
         /// Determines whether the specified index corresponds to the exemption code column.
         /// </summary>
         /// <param name="index">The index to test.</param>
@@ -638,7 +668,7 @@ namespace Extract.Redaction.Verification
                     ApplyExemptionsToSelected(result);
 
                     // Store the last applied exemption
-                    _lastApplied = result;
+                    _lastCodes = result;
                 }
             }
             catch (Exception ex)
@@ -915,7 +945,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         public void ApplyLastExemptions()
         {
-            ApplyExemptionsToSelected(_lastApplied);
+            ApplyExemptionsToSelected(_lastCodes);
         }
 
         /// <summary>
@@ -969,6 +999,9 @@ namespace Extract.Redaction.Verification
                         _undisplayedAttributes.Add(attribute);
                     }
 
+                    // Clear the selection
+                    _dataGridView.ClearSelection();
+
                     _dirty = false;
                 }
                 finally
@@ -978,8 +1011,6 @@ namespace Extract.Redaction.Verification
                     _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
                     _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
                 }
-
-                UpdateSelection();
             }
             catch (Exception ex)
             {
@@ -1492,33 +1523,27 @@ namespace Extract.Redaction.Verification
             }
         }
 
-        #endregion RedactionGridView Methods
-
-        #region RedactionGridView Overrides
-
         /// <summary>
-        /// Processes a command key.
+        /// Drops down the redaction type list for the currently selected row.
         /// </summary>
-        /// <param name="msg">The window message to process.</param>
-        /// <param name="keyData">The key to process.</param>
-        /// <returns><see langword="true"/> if the character was processed by the control; 
-        /// otherwise, <see langword="false"/>.</returns>
-        [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
-        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        void SelectDropDownTypeList()
         {
-            if (keyData == Keys.Delete) 
+            // Check if only one row has input focus
+            DataGridViewSelectedRowCollection rows = _dataGridView.SelectedRows;
+            if (rows.Count == 1)
             {
-                // Remove the selected redactions
-                _imageViewer.LayerObjects.RemoveSelected();
-                _imageViewer.Invalidate();
+                // Select the type column
+                _dataGridView.CurrentCell = rows[0].Cells[_typeColumn.Index];
 
-                return true;
+                // Drop down the combo box menu
+                _dataGridView.BeginEdit(true);
+                DataGridViewComboBoxEditingControl control =
+                    (DataGridViewComboBoxEditingControl)_dataGridView.EditingControl;
+                control.DroppedDown = true;
             }
-
-            return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        #endregion RedactionGridView Overrides
+        #endregion RedactionGridView Methods
 
         #region RedactionGridView OnEvents
 
@@ -1571,7 +1596,7 @@ namespace Extract.Redaction.Verification
         {
             try
             {
-                Add(e.LayerObject, "[No text]", "Manual", "");
+                Add(e.LayerObject, "[No text]", "Manual", _lastType);
 
                 if (_autoTool != AutoTool.None)
                 {
@@ -1733,7 +1758,34 @@ namespace Extract.Redaction.Verification
                 ee.Display();
             }
         }
-        
+
+        /// <summary>
+        /// Handles the <see cref="DataGridView.CellValueChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="DataGridView.CellValueChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="DataGridView.CellValueChanged"/> event.</param>
+        void HandleDataGridViewCellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                // Check if the type column changed
+                if (IsTypeColumn(e.ColumnIndex) && e.RowIndex >= 0)
+                {
+                    _dirty = true;
+
+                    _lastType = (string)_dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27725", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
         #endregion RedactionGridView Event Handlers
 
         #region IImageViewerControl Members
@@ -1766,6 +1818,7 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
                         _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
                         _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
+                        _imageViewer.Shortcuts[Keys.T] = null;
                     }
 
                     // Store the new image viewer
@@ -1780,7 +1833,7 @@ namespace Extract.Redaction.Verification
                         _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
                         _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
                         _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
-
+                        _imageViewer.Shortcuts[Keys.T] = SelectDropDownTypeList;
                     }
                 }
                 catch (Exception ex)
