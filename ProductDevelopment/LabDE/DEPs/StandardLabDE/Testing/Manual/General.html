@@ -15,11 +15,13 @@
 	<li><h3>Install</h3>
 	<ul>
 		<li>Start with a clean machine.
-		<LI><b>[DataEntry #345, #350, #440, #512, #589, #590, #609, #610]</b>
+		<LI><b>[DataEntry #345, #350, #440, #512, #568, #589, #590, #609, #610]</b>
 		<ul>
 			<li>Exercise the <b>Demo Shield</b> installation.
 			<li>Confirm that <b>.NET 3.5</b> is the first item listed.
 			<li>Confirm that a <b>LabDE</b> icon is used for the installation.
+			<li>Confirm that <b>LabDE</b> will not install without first installing 
+			<b>.NET 3.5</b>.
 <p>
 			<li>Finish the installation.
 			<li>Check <b>TBD</b> and confirm that the installed version of the Corepoint 
@@ -447,6 +449,8 @@
 	<LI><h3>Data Entry in cells</h3>
 	<ul>
 		<LI>Open image <b>003.tif</b> from Demo_LabDE.
+		<LI><b>[DataEntry #572]</b> Confirm that the LabDE user interface has a 
+		<b>LabDE</b> icon.
 		<LI><b>Comments (for operator's use)</b>
        		<ul>
   	   		<LI>Confirm that the DEP includes a <b>Comments</b> edit box.
@@ -472,14 +476,25 @@
 			<li>Confirm that typing <b>C</b>, <b>F</b>, <b>P</b>, or <b>R</b> into the
 			combo box changes the setting to <b>Complete</b>, <b>Final</b>, <b>Preliminary</b>,
 			or <b>Reviewed</b>, respectively.
+			<LI><b>[DataEntry #683]</b> Result Status Of Delete
+			<ul>
+  	   			<LI>Open a <b>LabDE</b> demo image.
+		  	   	<LI>Confirm that the <b>Result Status</b> field includes a 
+				<b>Delete</b> option.
+		  	   	<LI>Set <b>Result Status</b> to	<b>Delete</b> during second-stage 
+				verification.
+		  	   	<LI>Process the document via <b>SendToEMR</b>.
+		  	   	<LI>Confirm that an HL7 message <b>is not</b> sent for 
+				this document.
+		       	</ul>
 		</ul>
 <p>
 		<li><b>Image Path and Copy button</b>
 		<ul>
-	  	   	<LI>Confirm that the DEP includes a read-only edit box containing the fully 
-			qualified path to the image.
+	  	   	<LI><b>[DataEntry #684]</b> Confirm that the DEP includes a read-only edit 
+			box containing the image filename.
   	   		<LI>Confirm that the DEP includes a <b>Copy</b> button that allows the 
-			image path to be copied to the Clipboard.
+			filename to be copied to the Clipboard.
   		   	<LI>Confirm that the Copy button is disabled during <b>Phase 1</b> verification.
   	   		<LI>Confirm that the Copy button is enabled during <b>Phase 2</b> verification.
 		</ul>
@@ -555,6 +570,19 @@
 			<li>Confirm that entering text into the <b>Code</b> cell for 
 			the starred row creates a new starred row in the <b>Copy To: Physician</b>
 			table.
+			<li><b>[DataEntry #657]</b> Blank Entry As Physician First Name
+			<ul>
+				<li>Open a Demo_LabDE sample image.
+				<li>Remove any found <b>Ordering Physician</b>.
+				<li>Type <b>J</b> in the Last name column for <b>Ordering 
+				Physician</b>.
+				<li>Select <b>Johnson</b> as the Last Name and click <b>Tab</b> 
+				to advance to the <b>First Name</b> column.
+				<li>Click <b>space</b> and confirm that three first names 
+				are provided for selection.
+				<li>Confirm that a blank entry is not included at the beginning of 
+				the drop-down list.
+			</ul>
 		</ul>
 <p>
 		<li><b>Orders</b>
@@ -653,9 +681,22 @@
 			<ul>
 				<li>Select ACL Central Lab in the lab name field.
 				<li>Click in the lab code field.
-				<li>Type "CHW".
-				<li>Press tab.
+				<li>Type <b>CHW</b>.
+				<li>Press <b>Tab</b>.
 				<li>Confirm that the lab name field updates appropriately
+			</ul>
+			<li><b>[DataEntry #668]</b> Lab Name Or Lab Code Too Long
+			<ul>
+				<li>Enter a very long lab name in the appropriate field.
+				<li>Confirm that an <b>ELI27096: COllection was modified; enumeration 
+				operation may not execute</b> error is not seen.
+				<li>Type <b>CHW</b> in the lab code field.
+				<li>Press <b>Tab</b>.
+				<li>Confirm that the lab name field updates appropriately
+				<li>Type a very long string in the lab code field.
+				<li>Press <b>Tab</b>.
+				<li>Confirm that an <b>ELI27096: COllection was modified; enumeration 
+				operation may not execute</b> error is not seen.
 			</ul>
 			<li>Confirm that text can be swiped into the <b>Comment</b> edit box.
 			<li>Confirm that text can be typed into the <b>Comment</b> edit box.
@@ -737,6 +778,27 @@
 	  	   	<LI>Confirm that the background color used for a disabled table row such as 
 			<b>Ordering Physician</b> is different than the color used for a selected 
 			but inactive row.
+	       	</ul>
+<p>
+		<LI><b>[DataEntry #658]</b> Deleting Empty Cell In Starred Row
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select an empty cell in the starred row of any table.
+			<li>Click <b>Delete</b>.
+			<li>Confirm that an <b>ELI24477: Value cannot be null, Parameter name: key</b> 
+			error is not seen.
+	       	</ul>
+<p>
+		<LI><b>[DataEntry #667]</b> Tab Order In Test Table
+       		<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Use the mouse to select a cell in the last populated row of the 
+			<b>Test</b> table.
+			<li>Click <b>Enter</b> and confirm that the active cell is the corresponding 
+			cell in the new row of the <b>Test</b> table.
+			<li>Click <b>Tab</b>. 
+	  	   	<LI>Confirm that the active cell is the next cell in the new row of the 
+			<b>Test</b> table.
 	       	</ul>
 	</ul>
 <p>
