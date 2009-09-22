@@ -591,7 +591,6 @@ namespace Extract.Redaction.Verification
             // 
             // _imageViewer
             // 
-            this._imageViewer.DefaultStatusMessage = null;
             this._imageViewer.Dock = System.Windows.Forms.DockStyle.Fill;
             this._imageViewer.Location = new System.Drawing.Point(0, 0);
             this._imageViewer.Name = "_imageViewer";
@@ -599,8 +598,6 @@ namespace Extract.Redaction.Verification
             this._imageViewer.TabIndex = 0;
             this._imageViewer.TabStop = false;
             this._imageViewer.UseDefaultShortcuts = true;
-            this._imageViewer.Watermark = null;
-            this._imageViewer.ImageFileChanged += new System.EventHandler<Extract.Imaging.Forms.ImageFileChangedEventArgs>(this.HandleImageViewerImageFileChanged);
             // 
             // _basicImageViewerToolStrip
             // 

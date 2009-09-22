@@ -173,11 +173,27 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <value><see langword="true"/> if a document from the history is what is currently viewed;
         /// <see langword="false"/> if the currently processing document is being viewed.</value>
-        public bool IsInHistory
+        bool IsInHistory
         {
             get
             {
                 return _historyIndex < _history.Count;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether shortcuts are enabled.
+        /// </summary>
+        /// <value><see langword="true"/> if shortcut keys are enabled;
+        /// <see langword="false"/> if shortcut keys are disabled.</value>
+        bool ShortcutsEnabled
+        {
+            get
+            {
+                // Disable shortcuts if:
+                // 1) The comments text box is active OR
+                // 2) A cell of the redaction grid view is being edited
+                return !_commentsTextBox.Focused && !_redactionGridView.IsInEditMode;
             }
         }
 
@@ -931,6 +947,59 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Updates the properties of the controls based on the currently open image.
+        /// </summary>
+        void UpdateControls()
+        {
+            if (_imageViewer.IsImageAvailable)
+            {
+                _currentDocumentTextBox.Text = _imageViewer.ImageFile;
+
+                _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
+                _nextDocumentToolStripButton.Enabled = IsInHistory;
+
+                _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
+                _saveToolStripMenuItem.Enabled = !IsInHistory;
+
+                VerificationMemento memento = GetCurrentDocument();
+                _documentTypeTextBox.Text = memento.DocumentType;
+            }
+            else
+            {
+                _currentDocumentTextBox.Text = "";
+
+                _previousDocumentToolStripButton.Enabled = false;
+                _nextDocumentToolStripButton.Enabled = false;
+
+                _skipProcessingToolStripMenuItem.Enabled = false;
+                _saveToolStripMenuItem.Enabled = false;
+
+                _documentTypeTextBox.Text = "";
+            }
+        }
+
+        /// <summary>
+        /// Loads the specified vector of attributes (voa) file.
+        /// </summary>
+        /// <param name="voaFile">The vector of attributes (voa) file to load.</param>
+        void LoadVoa(string voaFile)
+        {
+            _redactionGridView.LoadFrom(voaFile);
+
+            // Go to the first redaction iff:
+            // 1) We are not verifying all pages OR
+            // 2) We are verifying all pages and there is a redaction on page 1
+            if (_redactionGridView.Rows.Count > 0)
+            {
+                if (!_settings.General.VerifyAllPages ||
+                    _redactionGridView.Rows[0].PageNumber == 1)
+                {
+                    _redactionGridView.SelectOnly(0);
+                }
+            }
+        }
+
         #endregion VerificationTaskForm Methods
 
         #region VerificationTaskForm Overrides
@@ -947,6 +1016,10 @@ namespace Extract.Redaction.Verification
             try
             {
                 _imageViewer.EstablishConnections(this);
+
+                // It is important that this line comes AFTER EstablishConnections, 
+                // because the page summary view needs to handle this event FIRST.
+                _imageViewer.ImageFileChanged += HandleImageViewerImageFileChanged;
 
                 // Disable the close image shortcut key
                 _imageViewer.Shortcuts[Keys.Control | Keys.F4] = null;
@@ -998,7 +1071,7 @@ namespace Extract.Redaction.Verification
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             // Allow the image viewer to handle keyboard input for shortcuts.
-            if (_imageViewer.Shortcuts.ProcessKey(keyData))
+            if (ShortcutsEnabled && _imageViewer.Shortcuts.ProcessKey(keyData))
             {
                 return true;
             }
@@ -1408,44 +1481,26 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                UpdateControls();
+
                 if (_imageViewer.IsImageAvailable)
                 {
-                    _currentDocumentTextBox.Text = _imageViewer.ImageFile;
-
-                    _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
-                    _nextDocumentToolStripButton.Enabled = IsInHistory;
-
-                    _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
-                    _saveToolStripMenuItem.Enabled = !IsInHistory;
-
                     // Load the voa, if it exists
                     VerificationMemento memento = GetCurrentDocument();
                     string voaFile = memento.AttributesFile;
                     if (File.Exists(voaFile))
                     {
-                        _redactionGridView.LoadFrom(voaFile);
+                        LoadVoa(voaFile);
                     }
 
+                    // If returning to the currently processing document, reset the dirty flag
                     if (!IsInHistory)
                     {
                         _redactionGridView.Dirty = _dirty;
                     }
 
-                    // Set the document type
-                    _documentTypeTextBox.Text = memento.DocumentType;
-
                     // Start recording the screen time
                     memento.StartScreenTime();
-                }
-                else
-                {
-                    _currentDocumentTextBox.Text = "";
-
-                    _previousDocumentToolStripButton.Enabled = false;
-                    _nextDocumentToolStripButton.Enabled = false;
-
-                    _skipProcessingToolStripMenuItem.Enabled = false;
-                    _saveToolStripMenuItem.Enabled = false;
                 }
             }
             catch (Exception ex)
