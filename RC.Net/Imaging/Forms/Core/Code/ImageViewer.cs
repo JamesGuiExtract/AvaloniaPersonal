@@ -1923,6 +1923,7 @@ namespace Extract.Imaging.Forms
         /// <see langword="null"/> if no watermark should be applied.</value>
         /// <returns>The text of the watermark to apply to saved and printed images or 
         /// <see langword="null"/> if no watermark should be applied.</returns>
+        [DefaultValue(null)]
         public string Watermark
         {
             get
