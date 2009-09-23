@@ -58,6 +58,12 @@ namespace Extract.Redaction.Verification
         ExemptionCodeList _exemptions;
 
         /// <summary>
+        /// <see langword="true"/> if this row has been visited; <see langword="false"/> if it has 
+        /// not been visited.
+        /// </summary>
+        bool _visited;
+
+        /// <summary>
         /// <see langword="true"/> if <see cref="_layerObjects"/> has been modified; 
         /// <see langword="false"/> if it has not been modified.
         /// </summary>
@@ -230,6 +236,23 @@ namespace Extract.Redaction.Verification
 
                     _exemptionsDirty = true;
 	            }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the <see cref="RedactionGridViewRow"/> has been visited.
+        /// </summary>
+        /// <value><see langword="true"/> if the row has been visited;
+        /// <see langword="false"/> if the row has not been visited.</value>
+        public bool Visited
+        {
+            get
+            {
+                return _visited;
+            }
+            set
+            {
+                _visited = value;
             }
         }
 
@@ -420,6 +443,10 @@ namespace Extract.Redaction.Verification
                     if (_layerObjectsDirty)
                     {
                         _attribute.Value = GetSpatialString(sourceDocName, pageInfoMap);
+                    }
+                    else
+                    {
+                        _attribute.Value.SourceDocName = sourceDocName;
                     }
                     if (_typeDirty)
                     {
