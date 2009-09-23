@@ -226,9 +226,6 @@ namespace Extract.Redaction.Verification
         {
             get
             {
-                // Commit any pending changes to the binding list
-                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
-
                 return new ReadOnlyCollection<RedactionGridViewRow>(_redactions);
             }
         }
@@ -857,7 +854,7 @@ namespace Extract.Redaction.Verification
         {
             row.DefaultCellStyle = VisitedCellStyle;
             row.Cells[_pageColumn.Index].Style = VisitedPageCellStyle;
-            row.Tag = new object();
+            _redactions[row.Index].Visited = true;
         }
 
         /// <summary>
@@ -953,7 +950,9 @@ namespace Extract.Redaction.Verification
         /// attributes file.
         /// </summary>
         /// <param name="fileName">A file containing a vector of attributes.</param>
-        public void LoadFrom(string fileName)
+        /// <param name="visitedRows">The rows to mark as visited; or <see langword="null"/> if 
+        /// all rows should be marked as visited.</param>
+        public void LoadFrom(string fileName, VisitedItemsCollection visitedRows)
         {
             try
             {
@@ -962,6 +961,8 @@ namespace Extract.Redaction.Verification
                 _imageViewer.LayerObjects.LayerObjectAdded -= HandleLayerObjectAdded;
                 _imageViewer.LayerObjects.LayerObjectDeleted -= HandleLayerObjectDeleted;
                 _imageViewer.LayerObjects.LayerObjectChanged -= HandleLayerObjectChanged;
+                _imageViewer.LayerObjects.Selection.LayerObjectAdded -= HandleSelectionLayerObjectAdded;
+                _imageViewer.LayerObjects.Selection.LayerObjectDeleted -= HandleSelectionLayerObjectDeleted;
                 _dataGridView.SelectionChanged -= HandleDataGridViewSelectionChanged;
 
                 try
@@ -991,6 +992,21 @@ namespace Extract.Redaction.Verification
                     ArrayList adapter = ArrayList.Adapter(_redactions);
                     adapter.Sort(new RedactionGridViewRowComparer());
 
+                    // Set viewed rows
+                    if (visitedRows != null)
+                    {
+                        DataGridViewRowCollection rows = _dataGridView.Rows;
+                        foreach (int i in visitedRows)
+                        {
+                            if (i >= rows.Count)
+                            {
+                                break;
+                            }
+
+                            MarkAsVisited(rows[i]);
+                        }
+                    }
+
                     // Add any remaining attributes as undisplayed attributes
                     int count = attributes.Size();
                     for (int i = 0; i < count; i++)
@@ -1002,6 +1018,9 @@ namespace Extract.Redaction.Verification
                     // Clear the selection
                     _dataGridView.ClearSelection();
 
+                    // Invalidate the image viewer
+                    _imageViewer.Invalidate();
+
                     _dirty = false;
                 }
                 finally
@@ -1009,6 +1028,8 @@ namespace Extract.Redaction.Verification
                     _imageViewer.LayerObjects.LayerObjectAdded += HandleLayerObjectAdded;
                     _imageViewer.LayerObjects.LayerObjectDeleted += HandleLayerObjectDeleted;
                     _imageViewer.LayerObjects.LayerObjectChanged += HandleLayerObjectChanged;
+                    _imageViewer.LayerObjects.Selection.LayerObjectAdded += HandleSelectionLayerObjectAdded;
+                    _imageViewer.LayerObjects.Selection.LayerObjectDeleted += HandleSelectionLayerObjectDeleted;
                     _dataGridView.SelectionChanged += HandleDataGridViewSelectionChanged;
                 }
             }
@@ -1128,6 +1149,23 @@ namespace Extract.Redaction.Verification
 			    {
                     SetSourceDocument((ComAttribute) subattributes.At(i), sourceDocument);
 			    }
+            }
+        }
+
+        /// <summary>
+        /// Adds the specified type to the list of valid redaction types.
+        /// </summary>
+        /// <param name="type">The type to add.</param>
+        public void AddRedactionType(string type)
+        {
+            try
+            {
+                _typeColumn.Items.Add(type);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27731",
+                    "Unable to add redaction type.", ex);
             }
         }
 
@@ -1304,8 +1342,8 @@ namespace Extract.Redaction.Verification
                 // Iterate backwards starting at the specified row
                 for (int i = startIndex; i >= 0; i--)
                 {
-                    // Return to the first row that is unvisited (visited cells have a tag)
-                    if (_dataGridView.Rows[i].Tag == null)
+                    // Return to the first row that is unvisited
+                    if (!_redactions[i].Visited)
                     {
                         return i;
                     }
@@ -1333,8 +1371,8 @@ namespace Extract.Redaction.Verification
                 // Iterate starting at the specified row
                 for (int i = startIndex; i < _dataGridView.Rows.Count; i++)
                 {
-                    // Return to the first row that is unvisited (visited cells have a tag)
-                    if (_dataGridView.Rows[i].Tag == null)
+                    // Return to the first row that is unvisited
+                    if (!_redactions[i].Visited)
                     {
                         return i;
                     }
@@ -1540,6 +1578,56 @@ namespace Extract.Redaction.Verification
                 DataGridViewComboBoxEditingControl control =
                     (DataGridViewComboBoxEditingControl)_dataGridView.EditingControl;
                 control.DroppedDown = true;
+            }
+        }
+
+        /// <summary>
+        /// Creates a collection representing the rows that have been visited.
+        /// </summary>
+        /// <returns>A collection representing the rows that have been visited.</returns>
+        // Complex operations are better suited as methods.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public VisitedItemsCollection GetVisitedRows()
+        {
+            try
+            {
+                // Sort a copy of the grid rows
+                RedactionGridViewRow[] rows = new RedactionGridViewRow[_redactions.Count];
+                _redactions.CopyTo(rows, 0);
+                Array.Sort<RedactionGridViewRow>(rows, new RedactionGridViewRowComparer());
+
+                // Construct a visited rows collection from the sorted rows
+                VisitedItemsCollection items = new VisitedItemsCollection(rows.Length);
+                for (int i = 0; i < rows.Length; i++)
+                {
+                    if (rows[i].Visited)
+                    {
+                        items[i] = true;
+                    }
+                }
+
+                return items;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27736",
+                    "Unable to determine visited rows.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Commits any pending user changes.
+        /// </summary>
+        public void CommitChanges()
+        {
+            try
+            {
+                _dataGridView.CommitEdit(DataGridViewDataErrorContexts.Commit);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27741",
+                    "Unable to commit user changes.", ex);
             }
         }
 
