@@ -1,3 +1,4 @@
+using Extract.Imaging.Forms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,6 +37,16 @@ namespace Extract.Redaction.Verification
         /// The amount of time the verify has spent on the document
         /// </summary>
         readonly Stopwatch _screenTime = new Stopwatch();
+
+        /// <summary>
+        /// A collection of the visited 0-based page numbers.
+        /// </summary>
+        VisitedItemsCollection _visitedPages;
+
+        /// <summary>
+        /// A collection of the visited 0-based redaction indices.
+        /// </summary>
+        VisitedItemsCollection _visitedRedactions;
 
         #endregion VerificationMemento Fields
 
@@ -102,6 +113,38 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _feedbackImage;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the 0-based visited page numbers.
+        /// </summary>
+        /// <value>The 0-based visited page numbers.</value>
+        public VisitedItemsCollection VisitedPages
+        {
+            get
+            {
+                return _visitedPages;
+            }
+            set
+            {
+                _visitedPages = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the 0-based visited redaction indexes.
+        /// </summary>
+        /// <value>The 0-based visited redaction indexes.</value>
+        public VisitedItemsCollection VisitedRedactions
+        {
+            get
+            {
+                return _visitedRedactions;
+            }
+            set
+            {
+                _visitedRedactions = value;
             }
         }
 
