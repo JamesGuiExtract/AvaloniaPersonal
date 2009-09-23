@@ -313,6 +313,78 @@ namespace Extract.Imaging.Forms
             return row * CELLS_PER_ROW + column + 1;
         }
 
+        /// <summary>
+        /// Creates a collection representing the 0-based pages that have been visited.
+        /// </summary>
+        /// <returns>A collection representing the 0-based pages that have been visited.</returns>
+        // Complex operations are better suited as methods.
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
+        public VisitedItemsCollection GetVisitedPages()
+        {
+            try
+            {
+                // Iterate over each page
+                VisitedItemsCollection items = new VisitedItemsCollection(_imageViewer.PageCount);
+                for (int i = 0; i < _imageViewer.PageCount; i++)
+                {
+                    // If this page is visited (ie. tagged) mark it in the visited items collection
+                    DataGridViewCell cell = GetCellByPageNumber(i + 1);
+                    if (cell.Tag != null)
+                    {
+                        items[i] = true;
+                    }
+                }
+
+                return items;
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27733",
+                    "Unable to determine visited pages.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Marks the specified pages as visited.
+        /// </summary>
+        /// <param name="pages">A collection of 0-based page numbers representing the visited 
+        /// pages.</param>
+        public void SetVisitedPages(VisitedItemsCollection pages)
+        {
+            try
+            {
+                if (pages != null)
+                {
+                    // Mark each page as visited
+                    foreach (int page in pages)
+                    {
+                        DataGridViewCell cell = GetCellByPageNumber(page + 1);
+                        MarkAsVisited(cell);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27734",
+                    "Unable to set visited pages.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Marks the specified cell has having been visited.
+        /// </summary>
+        /// <param name="currentCell">The cell to mark as visited.</param>
+        void MarkAsVisited(DataGridViewCell currentCell)
+        {
+            if (currentCell.Tag == null)
+            {
+                currentCell.Tag = new object();
+                currentCell.Style = VisitedPageStyle;
+
+                _visitedPageCount++;
+            }
+        }
+
         #endregion PageSummaryView Methods
 
         #region PageSummaryView Overrides
@@ -398,13 +470,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Tag the cell as visited, unless it is already tagged
-                if (currentCell.Tag == null)
-                {
-                    currentCell.Tag = new object();
-                    currentCell.Style = VisitedPageStyle;
-
-                    _visitedPageCount++;
-                }
+                MarkAsVisited(currentCell);
             }
             catch (Exception ex)
             {
@@ -479,7 +545,7 @@ namespace Extract.Imaging.Forms
                 ee.Display();
             }
         }
-        
+
         #endregion PageSummaryView Event Handlers
 
         #region IImageViewerControl Members
