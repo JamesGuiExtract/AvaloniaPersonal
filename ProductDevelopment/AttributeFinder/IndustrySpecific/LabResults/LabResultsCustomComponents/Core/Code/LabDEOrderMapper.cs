@@ -134,9 +134,14 @@ namespace Extract.LabResultsCustomComponents
         class LocalDatabaseCopy : IDisposable
         {
             /// <summary>
-            /// The TemporaryFile used to store the local database copy.
+            /// Used to store a local copy of the database if necessary.
             /// </summary>
             TemporaryFile _localTemporaryFile;
+
+            /// <summary>
+            /// The filename of the original database.
+            /// </summary>
+            string _originalDatabaseFileName;
 
             /// <summary>
             /// Keeps track of all <see cref="LabDEOrderMapper"/> instances referencing this copy.
@@ -148,13 +153,26 @@ namespace Extract.LabResultsCustomComponents
             /// <summary>
             /// Initializes a new <see cref="LocalDatabaseCopy"/> instance.
             /// </summary>
-            /// <param name="remoteDatabaseFileName"></param>
-            public LocalDatabaseCopy(string remoteDatabaseFileName)
+            /// <param name="originalDatabaseFileName"></param>
+            public LocalDatabaseCopy(string originalDatabaseFileName)
             {
                 try
                 {
-                    _localTemporaryFile = new TemporaryFile();
-                    File.Copy(remoteDatabaseFileName, _localTemporaryFile.FileName, true);
+                    _originalDatabaseFileName = originalDatabaseFileName;
+
+                    // Use ConvertToNetworkPath to tell if the DB is being accesseed via a
+                    // network share.
+                    FileSystemMethods.ConvertToNetworkPath(ref _originalDatabaseFileName, false);
+
+                    // [DataEntry:688]
+                    // Whether or not the file is local, if it is being accessed via a network share
+                    // a local copy must be used since SQL Compact does not support multiple
+                    // connections via a network share.
+                    if (_originalDatabaseFileName.StartsWith(@"\\", StringComparison.Ordinal))
+                    {
+                        _localTemporaryFile = new TemporaryFile();
+                        File.Copy(originalDatabaseFileName, _localTemporaryFile.FileName, true);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -167,13 +185,16 @@ namespace Extract.LabResultsCustomComponents
             #region Properties
 
             /// <summary>
-            /// The filename of the local database copy.
+            /// The filename of the local database copy to use. This will be the original database
+            /// name if the original database is not accessed via a network share (UNC path).
             /// </summary>
+            /// <returns>The filename of the local database copy to use.</returns>
             public string FileName
             {
                 get
                 {
-                    return _localTemporaryFile.FileName;
+                    return (_localTemporaryFile == null) ? _originalDatabaseFileName :
+                        _localTemporaryFile.FileName;
                 }
             }
 
@@ -233,7 +254,11 @@ namespace Extract.LabResultsCustomComponents
                 if (disposing)
                 {
                     // Dispose of managed objects
-                    _localTemporaryFile.Dispose();
+                    if (_localTemporaryFile != null)
+                    {
+                        _localTemporaryFile.Dispose();
+                        _localTemporaryFile = null;
+                    }
                 }
 
                 // Dispose of unmanaged resources
@@ -252,8 +277,9 @@ namespace Extract.LabResultsCustomComponents
         static object _lock = new object();
 
         /// <summary>
-        /// The filename of a local copy of the database made if the master database resides on
-        /// another machine.
+        /// Keeps track of the local copy of each database to use. This will be the original
+        /// database if it resides on the same machine or it will be a local copy if the original
+        /// resides on a remote machine.
         /// </summary>
         static Dictionary<string, LocalDatabaseCopy> _localDatabaseCopies =
             new Dictionary<string, LocalDatabaseCopy>();
@@ -381,74 +407,9 @@ namespace Extract.LabResultsCustomComponents
                 // Validate the license
                 _licenseCache.Validate("ELI26889");
 
-                // Expand the tags in the database file name
-                AFUtility afUtility = new AFUtility();
-                string databaseFile = afUtility.ExpandTagsAndFunctions(_databaseFile, pDoc);
-
-                // Check for the database files existence
-                if (!File.Exists(databaseFile))
-                {
-                    ExtractException ee = new ExtractException("ELI26170",
-                        "Database file does not exist!");
-                    ee.AddDebugData("Database File Name", databaseFile, false);
-                    throw ee;
-                }
-
-                // [DataEntry:673]
-                // Use a local copy of the database if dataSourcePath points to a remote
-                // machine.
-                if (!FileSystemMethods.IsPathLocal(databaseFile))
-                {
-                    // Lock to ensure multiple copies of the same database aren't created.
-                    lock (_lock)
-                    {
-                        // If there is not an existing local copy available, create a new one.
-                        LocalDatabaseCopy localDatabaseCopy;
-                        if (!_localDatabaseCopies.TryGetValue(databaseFile, out localDatabaseCopy) ||
-                            !File.Exists(localDatabaseCopy.FileName))
-                        {
-                            localDatabaseCopy = new LocalDatabaseCopy(databaseFile);
-                            _localDatabaseCopies[databaseFile] = localDatabaseCopy;
-                        }
-
-                        localDatabaseCopy.AddReference(this);
-                        databaseFile = localDatabaseCopy.FileName;
-                    }
-                }
-
-                // Build the connection string
-                string connectionString = "Data Source='" + databaseFile + "';";
-
-                // Try to open the database connection, if there is a sqlce exception,
-                // just increment retry count, sleep, and try again
-                int retryCount = 0;
-                Exception tempEx = null;
-                while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
-                {
-                    try
-                    {
-                        dbConnection = new SqlCeConnection(connectionString);
-                    }
-                    catch (SqlCeException ex)
-                    {
-                        tempEx = ex;
-                        retryCount++;
-                        System.Threading.Thread.Sleep(100);
-                    }
-                    catch (Exception ex)
-                    {
-                        throw ExtractException.AsExtractException("ELI26651", ex);
-                    }
-                }
-
-                // If all the retries failed and the connection is still null, throw an exception
-                if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
-                {
-                    ExtractException ee = new ExtractException("ELI26652",
-                        "Unable to open database connection!", tempEx);
-                    ee.AddDebugData("Retries", retryCount, false);
-                    throw ee;
-                }
+                // Get a database connection for processing (creating a local copy of the database
+                // first, if necessary).
+                dbConnection = GetDatabaseConnection(pDoc);
 
                 // Build a new vector of attributes that have been mapped to orders
                 IUnknownVector newAttributes = new IUnknownVector();
@@ -944,45 +905,52 @@ namespace Extract.LabResultsCustomComponents
         /// <param name="dbConnection">The database connection to use to load the data sets.</param>
         void LoadDataTables(SqlCeConnection dbConnection)
         {
-            if (_labOrder == null)
+            try
             {
-                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                    "SELECT * FROM [LabOrder]", dbConnection))
+                if (_labOrder == null)
                 {
-                    _labOrder = new DataTable();
-                    _labOrder.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_labOrder);
+                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
+                        "SELECT * FROM [LabOrder]", dbConnection))
+                    {
+                        _labOrder = new DataTable();
+                        _labOrder.Locale = CultureInfo.InvariantCulture;
+                        adapter.Fill(_labOrder);
+                    }
+                }
+                if (_labOrderTest == null)
+                {
+                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
+                        "SELECT * FROM [LabOrderTest]", dbConnection))
+                    {
+                        _labOrderTest = new DataTable();
+                        _labOrderTest.Locale = CultureInfo.InvariantCulture;
+                        adapter.Fill(_labOrderTest);
+                    }
+                }
+                if (_labTest == null)
+                {
+                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
+                        "SELECT * FROM [LabTest]", dbConnection))
+                    {
+                        _labTest = new DataTable();
+                        _labTest.Locale = CultureInfo.InvariantCulture;
+                        adapter.Fill(_labTest);
+                    }
+                }
+                if (_alternateTestName == null)
+                {
+                    using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
+                        "SELECT * FROM [AlternateTestName]", dbConnection))
+                    {
+                        _alternateTestName = new DataTable();
+                        _alternateTestName.Locale = CultureInfo.InvariantCulture;
+                        adapter.Fill(_alternateTestName);
+                    }
                 }
             }
-            if (_labOrderTest == null)
+            catch (Exception ex)
             {
-                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                    "SELECT * FROM [LabOrderTest]", dbConnection))
-                {
-                    _labOrderTest = new DataTable();
-                    _labOrderTest.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_labOrderTest);
-                }
-            }
-            if (_labTest == null)
-            {
-                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                    "SELECT * FROM [LabTest]", dbConnection))
-                {
-                    _labTest = new DataTable();
-                    _labTest.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_labTest);
-                }
-            }
-            if (_alternateTestName == null)
-            {
-                using (SqlCeDataAdapter adapter = new SqlCeDataAdapter(
-                    "SELECT * FROM [AlternateTestName]", dbConnection))
-                {
-                    _alternateTestName = new DataTable();
-                    _alternateTestName.Locale = CultureInfo.InvariantCulture;
-                    adapter.Fill(_alternateTestName);
-                }
+                throw new ExtractException("ELI27742", "Error loading data tables!", ex);
             }
         }
 
@@ -1293,6 +1261,93 @@ namespace Extract.LabResultsCustomComponents
                         dt.Rows.Count == 1, "TestCode", testCode ?? "null");
                     return (string)dt.Rows[0][0];
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the database connection to use for processing, creating a local copy if necessary.
+        /// </summary>
+        /// <param name="pDoc">The document object.</param>
+        /// <returns>The <see cref="SqlCeConnection"/> to use for processing.</returns>
+        SqlCeConnection GetDatabaseConnection(AFDocument pDoc)
+        {
+            try
+            {
+                // Expand the tags in the database file name
+                AFUtility afUtility = new AFUtility();
+                string databaseFile = afUtility.ExpandTagsAndFunctions(_databaseFile, pDoc);
+
+                // Check for the database files existence
+                if (!File.Exists(databaseFile))
+                {
+                    ExtractException ee = new ExtractException("ELI26170",
+                        "Database file does not exist!");
+                    ee.AddDebugData("Database File Name", databaseFile, false);
+                    throw ee;
+                }
+
+                // Lock to ensure multiple copies of the same database aren't created.
+                LocalDatabaseCopy localDatabaseCopy = null;
+                lock (_lock)
+                {
+                    // If there is not an existing LocalDatabaseCopy instance available for the
+                    // specified database, create a new one.                    
+                    if (!_localDatabaseCopies.TryGetValue(databaseFile, out localDatabaseCopy) ||
+                        !File.Exists(localDatabaseCopy.FileName))
+                    {
+                        localDatabaseCopy = new LocalDatabaseCopy(databaseFile);
+                        _localDatabaseCopies[databaseFile] = localDatabaseCopy;
+                    }
+                    else
+                    {
+                        // Otherwise, reference the existing LocalDatabaseCopy instance.
+                        localDatabaseCopy.AddReference(this);
+                    }
+                }
+
+                // Build the connection string
+                string connectionString = "Data Source='" + localDatabaseCopy.FileName + "';";
+
+                // Try to open the database connection, if there is a sqlce exception,
+                // just increment retry count, sleep, and try again
+                int retryCount = 0;
+                Exception tempEx = null;
+                SqlCeConnection dbConnection = null;
+                while (dbConnection == null && retryCount < _DB_CONNECTION_RETRIES)
+                {
+                    try
+                    {
+                        dbConnection = new SqlCeConnection(connectionString);
+                    }
+                    catch (SqlCeException ex)
+                    {
+                        tempEx = ex;
+                        retryCount++;
+                        System.Threading.Thread.Sleep(100);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ExtractException.AsExtractException("ELI26651", ex);
+                    }
+                }
+
+                // If all the retries failed and the connection is still null, throw an exception
+                if (retryCount >= _DB_CONNECTION_RETRIES && dbConnection == null)
+                {
+                    ExtractException ee = new ExtractException("ELI26652",
+                        "Unable to open database connection!", tempEx);
+                    ee.AddDebugData("Retries", retryCount, false);
+                    throw ee;
+                }
+
+                return dbConnection;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27743", 
+                    "Failed to obtain a database connection!", ex);
+                ee.AddDebugData("Database", _databaseFile, false);
+                throw ee;
             }
         }
 

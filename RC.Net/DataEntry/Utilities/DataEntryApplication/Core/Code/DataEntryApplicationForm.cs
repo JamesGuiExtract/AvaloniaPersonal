@@ -1840,10 +1840,15 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
                         string dataSourcePath =
                             DataEntryMethods.ResolvePath(ConfigSettings.AppSettings.LocalDataSource);
 
-                        // [DataEntry:399]
-                        // Use a local copy of the database if dataSourcePath points to a remote
-                        // machine.
-                        if (!FileSystemMethods.IsPathLocal(dataSourcePath))
+                        // Use ConvertToNetworkPath to tell if the DB is being accesseed via a
+                        // network share.
+                        FileSystemMethods.ConvertToNetworkPath(ref dataSourcePath, false);
+
+                        // [DataEntry:399, 688]
+                        // Whether or not the file is local, if it is being accessed via a network share
+                        // a local copy must be created since SQL Compact does not support multiple
+                        // connections via a network share.
+                        if (dataSourcePath.StartsWith(@"\\", StringComparison.Ordinal))
                         {
                             _localDBCopy = new TemporaryFile();
                             File.Copy(dataSourcePath, _localDBCopy.FileName, true);
