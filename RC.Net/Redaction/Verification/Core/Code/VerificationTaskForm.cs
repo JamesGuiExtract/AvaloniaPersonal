@@ -133,8 +133,12 @@ namespace Extract.Redaction.Verification
                 InitializeComponent();
 
                 // Add the default redaction types
-                string[] types = GetRedactionTypes();
+                string[] types = _iniSettings.GetRedactionTypes();
                 _redactionGridView.AddRedactionTypes(types);
+                if (!_settings.General.RequireTypes)
+                {
+                    _redactionGridView.AddRedactionType("");
+                }
 
                 _imageViewer.DefaultRedactionFillColor = _iniSettings.OutputRedactionColor;
 
@@ -202,37 +206,6 @@ namespace Extract.Redaction.Verification
         #region VerificationTaskForm Methods
 
         /// <summary>
-        /// Gets an array of the default redaction types.
-        /// </summary>
-        /// <returns>An array of the default redaction types.</returns>
-        static string[] GetRedactionTypes()
-        {
-            // Get the number of types from the ini file
-            InitializationFile iniFile = GetInitializationFile();
-            int typeCount = iniFile.ReadInt32("RedactionDataTypes", "NumRedactionDataTypes");
-            string[] types = new string[typeCount];
-
-            // Get each type
-            for (int i = 1; i <= typeCount; i++)
-            {
-                string key = "RedactionDataType" + i.ToString(CultureInfo.InvariantCulture);
-                types[i-1] = iniFile.ReadString("RedactionDataTypes", key);
-            }
-
-            return types;
-        }
-
-        /// <summary>
-        /// Gets the ID Shield initialization file.
-        /// </summary>
-        /// <returns>The ID Shield initialization file.</returns>
-        static InitializationFile GetInitializationFile()
-        {
-            string path = FileSystemMethods.GetAbsolutePath("IDShield.ini");
-            return new InitializationFile(path);
-        }
-
-        /// <summary>
         /// Gets the document type of the specified vector of attributes (VOA) file.
         /// </summary>
         /// <param name="voaFile">The vector of attributes (VOA) file.</param>
@@ -278,6 +251,18 @@ namespace Extract.Redaction.Verification
             Console.WriteLine(elapsedSeconds.ToString(CultureInfo.CurrentCulture));
         }
 
+
+        /// <summary>
+        /// Updates the visited redactions and pages in the current verification memento.
+        /// </summary>
+        void UpdateMemento()
+        {
+            // Update the visited pages and rows
+            VerificationMemento memento = GetCurrentDocument();
+            memento.VisitedPages = _pageSummaryView.GetVisitedPages();
+            memento.VisitedRedactions = _redactionGridView.GetVisitedRows();
+        }
+
         /// <summary>
         /// Saves the currently viewed voa file.
         /// </summary>
@@ -290,14 +275,17 @@ namespace Extract.Redaction.Verification
 	        }
 
             // Save the voa
-            string voaFile = GetDestinationVoa();
-            _redactionGridView.SaveTo(voaFile);
-
+            VerificationMemento memento = GetSavedMemento();
+            _redactionGridView.SaveTo(memento.AttributesFile);
+            
             // Clear the unsaved state
             if (!IsInHistory)
             {
                 ResetUnsavedMemento();
             }
+
+            // Update visited pages and rows
+            UpdateMemento();
         }
 
         /// <summary>
@@ -519,6 +507,10 @@ namespace Extract.Redaction.Verification
                     }
                 }
             }
+            else
+            {
+                UpdateMemento();
+            }
 
             return false;
         }
@@ -572,9 +564,10 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the current document to view from the history.
+        /// Gets the current document to view from the history. This may be the unsaved memento.
         /// </summary>
-        /// <returns>The current document to view from the history.</returns>
+        /// <returns>The current document to view from the history. This may be the unsaved 
+        /// memento.</returns>
         VerificationMemento GetCurrentDocument()
         {
             if (IsInHistory)
@@ -588,14 +581,13 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Gets the voa file to use as the destination voa.
+        /// Gets the memento representing the document to save.
         /// </summary>
-        /// <returns>The voa file to use as the destination voa.</returns>
-        string GetDestinationVoa()
+        /// <returns>The memento representing the document to save.</returns>
+        VerificationMemento GetSavedMemento()
         {
             // Return either the history VOA or the currently processing VOA
-            VerificationMemento memento = IsInHistory ? _history[_historyIndex] : _savedMemento;
-            return memento.AttributesFile;
+            return IsInHistory ? _history[_historyIndex] : _savedMemento;
         }
 
         /// <summary>
@@ -730,6 +722,8 @@ namespace Extract.Redaction.Verification
                 }
                 else
                 {
+                    _redactionGridView.CommitChanges();
+
                     if (!WarnBeforeTabCommit())
                     {
                         Commit();
@@ -908,6 +902,8 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToPreviousDocument()
         {
+            _redactionGridView.CommitChanges();
+
             // Check if changes have been made before moving away from a history document
             bool inHistory = IsInHistory;
             if (!inHistory || !WarnIfDirty())
@@ -925,7 +921,10 @@ namespace Extract.Redaction.Verification
                     // Save the state of the current document before moving back
                     _dirty = _redactionGridView.Dirty;
                     _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
+
+                    UpdateMemento();
                 }
+
 
                 // Go to the previous document
                 _historyIndex--;
@@ -939,6 +938,8 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToNextDocument()
         {
+            _redactionGridView.CommitChanges();
+
             if (!WarnIfDirty())
             {
                 SaveRedactionCounts();
@@ -980,23 +981,16 @@ namespace Extract.Redaction.Verification
         }
 
         /// <summary>
-        /// Loads the specified vector of attributes (voa) file.
+        /// Loads the specified verification user interface state.
         /// </summary>
-        /// <param name="voaFile">The vector of attributes (voa) file to load.</param>
-        void LoadVoa(string voaFile)
+        /// <param name="memento">The verification user interface state to load.</param>
+        void LoadMemento(VerificationMemento memento)
         {
-            _redactionGridView.LoadFrom(voaFile);
-
-            // Go to the first redaction iff:
-            // 1) We are not verifying all pages OR
-            // 2) We are verifying all pages and there is a redaction on page 1
-            if (_redactionGridView.Rows.Count > 0)
+            string voaFile = memento.AttributesFile;
+            if (File.Exists(voaFile))
             {
-                if (!_settings.General.VerifyAllPages ||
-                    _redactionGridView.Rows[0].PageNumber == 1)
-                {
-                    _redactionGridView.SelectOnly(0);
-                }
+                 _redactionGridView.LoadFrom(voaFile, memento.VisitedRedactions);
+                 _pageSummaryView.SetVisitedPages(memento.VisitedPages);
             }
         }
 
@@ -1048,6 +1042,8 @@ namespace Extract.Redaction.Verification
 
             try
             {
+                _redactionGridView.CommitChanges();
+
                 // TODO: Also check if the main document is dirty, but not in view.
                 if (WarnIfDirty())
                 {
@@ -1112,6 +1108,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _redactionGridView.CommitChanges();
+
                 if (!WarnIfInvalid())
 	            {
                     Commit();
@@ -1136,6 +1134,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _redactionGridView.CommitChanges();
+
                 if (!WarnIfInvalid())
                 {
                     Commit();
@@ -1162,6 +1162,8 @@ namespace Extract.Redaction.Verification
             {
                 if (!IsInHistory)
                 {
+                    _redactionGridView.CommitChanges();
+
                     Save();
                 }
             }
@@ -1184,6 +1186,8 @@ namespace Extract.Redaction.Verification
         {
             try
             {
+                _redactionGridView.CommitChanges();
+
                 if (!WarnIfDirty())
                 {
                     OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
@@ -1238,8 +1242,8 @@ namespace Extract.Redaction.Verification
                     }
 
                     // Load the original voa
-                    string voaFile = GetDestinationVoa();
-                    _redactionGridView.LoadFrom(voaFile);
+                    VerificationMemento memento = GetSavedMemento();
+                    LoadMemento(memento);
                 }
             }
             catch (Exception ex)
@@ -1487,10 +1491,18 @@ namespace Extract.Redaction.Verification
                 {
                     // Load the voa, if it exists
                     VerificationMemento memento = GetCurrentDocument();
-                    string voaFile = memento.AttributesFile;
-                    if (File.Exists(voaFile))
+                    LoadMemento(memento);
+
+                    // Go to the first redaction iff:
+                    // 1) We are not verifying all pages OR
+                    // 2) We are verifying all pages and there is a redaction on page 1
+                    if (_redactionGridView.Rows.Count > 0)
                     {
-                        LoadVoa(voaFile);
+                        if (!_settings.General.VerifyAllPages ||
+                            _redactionGridView.Rows[0].PageNumber == 1)
+                        {
+                            _redactionGridView.SelectOnly(0);
+                        }
                     }
 
                     // If returning to the currently processing document, reset the dirty flag
