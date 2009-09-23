@@ -6,6 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Extract.Redaction.Verification
 {
@@ -40,6 +41,12 @@ namespace Extract.Redaction.Verification
 
         static readonly string _OUTPUT_KEY = "Output";
 
+        static readonly string _REDACTION_TYPES_SECTION = "RedactionDataTypes";
+
+        static readonly string _REDACTION_TYPE_COUNT_KEY = "NumRedactionDataTypes";
+
+        static readonly string _REDACTION_TYPE_KEY_PREFIX = "RedactionDataType";
+
         #endregion InitializationSettings Constants
 
         #region InitializationSettings Fields
@@ -53,6 +60,11 @@ namespace Extract.Redaction.Verification
         /// The confidence levels of ID Shield attributes.
         /// </summary>
         readonly ConfidenceLevelsCollection _levels;
+
+        /// <summary>
+        /// A list of valid redaction types.
+        /// </summary>
+        readonly string[] _types;
 
         /// <summary>
         /// <see langword="true"/> if selected attributes should be displayed at a particular 
@@ -89,6 +101,7 @@ namespace Extract.Redaction.Verification
             try
             {
                 _levels = GetConfidenceLevels(_iniFile);
+                _types = GetRedactionTypes(_iniFile);
                 _autoZoom = GetAutoZoom(_iniFile);
                 _autoZoomScale = GetAutoZoomScale(_iniFile);
                 _autoTool = GetAutoTool(_iniFile);
@@ -187,6 +200,35 @@ namespace Extract.Redaction.Verification
         #endregion InitializationSettings Properties
 
         #region InitializationSettings Methods
+
+        /// <summary>
+        /// Gets an array of the default redaction types.
+        /// </summary>
+        /// <returns>An array of the default redaction types.</returns>
+        public string[] GetRedactionTypes()
+        {
+            return (string[])_types.Clone();
+        }
+
+        /// <summary>
+        /// Gets an array of the default redaction types.
+        /// </summary>
+        /// <returns>An array of the default redaction types.</returns>
+        static string[] GetRedactionTypes(InitializationFile iniFile)
+        {
+            // Get the number of types from the ini file
+            int typeCount = iniFile.ReadInt32(_REDACTION_TYPES_SECTION, _REDACTION_TYPE_COUNT_KEY);
+            string[] types = new string[typeCount];
+
+            // Get each type
+            for (int i = 1; i <= typeCount; i++)
+            {
+                string key = _REDACTION_TYPE_KEY_PREFIX + i.ToString(CultureInfo.InvariantCulture);
+                types[i - 1] = iniFile.ReadString(_REDACTION_TYPES_SECTION, key);
+            }
+
+            return types;
+        }
 
         /// <summary>
         /// Gets the confidence levels contained in the specified initialization file.
