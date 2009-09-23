@@ -21,9 +21,7 @@ static char THIS_FILE[] = __FILE__;
 //-------------------------------------------------------------------------------------------------
 // Constants
 //-------------------------------------------------------------------------------------------------
-const string gstrPRIORITY_PLACEHOLDER = "<PriorityValue>";
-const string gstrSQL_QUERY_STRING = "UPDATE FAMFile SET FAMFile.Priority = "
- + gstrPRIORITY_PLACEHOLDER + " FROM ";
+const string gstrSQL_SELECT_VALUE = "FAMFile.ID, FAMFile.Priority";
 
 //-------------------------------------------------------------------------------------------------
 // CSetFilePriorityDlg dialog
@@ -100,7 +98,7 @@ void CSetFilePriorityDlg::OnClickedSelectFiles()
 	try
 	{
 		CSelectFilesDlg dlg(m_ipFAMDB, "Select files to modify priority", 
-			gstrSQL_QUERY_STRING, m_settings);
+			"SELECT " + gstrSQL_SELECT_VALUE + " FROM ", m_settings);
 
 		// Display the dialog and save changes if user clicked OK
 		if (dlg.DoModal() == IDOK)
@@ -125,113 +123,33 @@ void CSetFilePriorityDlg::OnClickedOK()
 		// which may take a few seconds
 		CWaitCursor wait;
 
-		string strQuery = gstrSQL_QUERY_STRING;
+		// Build the query for setting priority
+		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUE);
 
-		switch(m_settings.getScope())
-		{
-			// Query based on the action status
-		case eAllFilesForWhich:
-			{
-				strQuery += "FAMFile ";
-
-				// Check if comparing skipped status
-				if (m_settings.getStatus() == kActionSkipped)
-				{
-					strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
-						"(SkippedFile.ActionID = " + m_settings.getActionID();
-					string strUser = m_settings.getUser();
-					if (strUser != gstrANY_USER)
-					{
-						strQuery += " AND SkippedFile.UserName = '" + strUser + "'";
-					}
-					strQuery += ")";
-				}
-				else
-				{
-					// Get the status as a string
-					string strStatus = m_ipFAMDB->AsStatusString(
-						(UCLID_FILEPROCESSINGLib::EActionStatus)m_settings.getStatus());
-				
-					strQuery += "WHERE (ASC_" + m_settings.getAction() + " = '"
-						+ strStatus + "')";
-				}
-			}
-			break;
-
-			// Query to export all the files
-		case eAllFiles:
-			{
-				strQuery += "FAMFile";
-			}
-			break;
-
-			// Export based on customer query
-		case eAllFilesQuery:
-			{
-				// Get the query input by the user
-				strQuery += m_settings.getSQLString();
-			}
-			break;
-
-		case eAllFilesTag:
-			{
-				// Get the vector of tags
-				vector<string> vecTags = m_settings.getTags();
-
-				// Get the size and ensure there is at least 1 tag
-				size_t nSize = vecTags.size();
-				if (nSize == 0)
-				{
-					MessageBox("No tags selected!", "No Tags", MB_OK | MB_ICONERROR);
-					return;
-				}
-
-				string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
-				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT, "FAMFile.FileName");
-
-				// Get the conjunction for the where clause
-				string strConjunction = m_settings.getAnyTags() ? "\nUNION\n" : "\nINTERSECT\n";
-
-				strQuery += "(" + strMainQueryTemp;
-				replaceVariable(strQuery, gstrTAG_NAME_VALUE, vecTags[0]);
-
-				// Build the rest of the query
-				for (size_t i=1; i < nSize; i++)
-				{
-					string strTemp = strMainQueryTemp;
-					replaceVariable(strTemp, gstrTAG_NAME_VALUE, vecTags[i]);
-					strQuery += strConjunction + strTemp;
-				}
-
-				strQuery += ") AS TempPriorityUpdater";
-			}
-			break;
-
-		case eAllFilesPriority:
-			{
-				strQuery += "FAMFile WHERE FAMFile.Priority = "
-					+ asString((long)m_settings.getPriority());
-			}
-			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI27690");
-		}
-
-		// Set the priority value in the query
-		replaceVariable(strQuery, gstrPRIORITY_PLACEHOLDER,
-			asString(m_comboPriority.GetCurSel() + 1)); 
+		// Get the priority string
+		CString zPriority;
+		m_comboPriority.GetWindowText(zPriority);
 
 		// Execute the update query
-		long nNumRecords = m_ipFAMDB->ExecuteCommandQuery(strQuery.c_str());
+		long nNumRecords = m_ipFAMDB->SetPriorityForFiles(strQuery.c_str(),
+			(EFilePriority)(m_comboPriority.GetCurSel()+1), m_settings.getRandomCondition());
 
 		// Prompt the users that the priority has been changed.
-		CString zPrompt, zPriority;
-		m_comboPriority.GetWindowText(zPriority);
+		CString zPrompt;
 		zPrompt.Format("A total of %ld files have had their priority set to '", nNumRecords);
 		zPrompt.Append(zPriority); 
 		zPrompt.Append("'.");
 		MessageBox(zPrompt, "Success", MB_ICONINFORMATION);
+
+		// Build an application trace for the database change
+		UCLIDException uex("ELI27700", "Application trace: Database change");
+		uex.addDebugInfo("Change", "Set file priority");
+		uex.addDebugInfo("User Name", getCurrentUserName());
+		uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
+		uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
+		uex.addDebugInfo("New Priority", (LPCTSTR)zPriority);
+		uex.addDebugInfo("Query", strQuery);
+		uex.log();
 
 		CDialog::OnOK();
 	}

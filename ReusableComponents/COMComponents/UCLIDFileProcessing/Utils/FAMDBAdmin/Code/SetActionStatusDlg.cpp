@@ -234,6 +234,7 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 
 		// Check whether setting a new status or copying from existing action status
 		long lFromActionID = -1;
+		CString zFromAction = "";
 		EActionStatus eNewStatus = kActionUnattempted;
 		if (m_radioNewStatus.GetCheck() == BST_CHECKED)
 		{
@@ -246,27 +247,13 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 		{
 			long lIndex = m_comboStatusFromAction.GetCurSel();
 			lFromActionID = m_comboStatusFromAction.GetItemData(lIndex);
+			m_comboStatusFromAction.GetWindowText(zFromAction);
 			uex.addDebugInfo("Copy From Action", lFromActionID); 
 		}
 
+		// Check the scope for logging application trace
 		switch(m_settings.getScope())
 		{
-		// If choose to change that status for all the files
-		case eAllFiles:
-			{
-				if (lFromActionID == -1)
-				{
-					// Call SetStatusForAllFiles() to set the new status for the selected action
-					m_ipFAMDB->SetStatusForAllFiles(_bstr_t(zToActionName), eNewStatus);
-				}
-				else
-				{
-					// Call CopyActionStatusFromAction() to set the new status for the selected action
-					m_ipFAMDB->CopyActionStatusFromAction(lFromActionID, lToActionID);
-				}
-			}
-			break;
-
 		case eAllFilesForWhich:
 		// If choose to change the status for the files according another action's status 
 		{
@@ -287,78 +274,48 @@ void CSetActionStatusDlg::applyActionStatusChanges(bool bCloseDialog)
 				// Get the user name from the settings
 				strUser = m_settings.getUser();
 				uex.addDebugInfo("Skipped By User", strUser);
-
-				// If user is any user set user string to ""
-				if (strUser == gstrANY_USER)
-				{
-					// Set status for all skipped files
-					strUser = "";
-				}
 			}
-
-			// Call SearchAndModifyFileStatus() to set the new status for the selected action
-			m_ipFAMDB->SearchAndModifyFileStatus(lWhereActionID, eWhereStatus,
-				lToActionID, eNewStatus, strUser.c_str(), lFromActionID);
 		}
 		break;
 
-		case eAllFilesTag:
-			{
-				// Get the tags and add them to an IVariantVector
-				vector<string> vecTagNames = m_settings.getTags();
-				IVariantVectorPtr ipVecTags(CLSID_VariantVector);
-				for (vector<string>::iterator it = vecTagNames.begin();
-					it != vecTagNames.end(); it++)
-				{
-					_variant_t vtTemp(it->c_str());
-					ipVecTags->PushBack(vtTemp);
-				}
-
-				m_ipFAMDB->SetStatusForFilesWithTags(ipVecTags, asVariantBool(!m_settings.getAnyTags()),
-					lToActionID, eNewStatus, lFromActionID);
-			}
-			break;
-
-		case eAllFilesQuery:
-			{
-				string strSQL = m_settings.getSQLString();
-				uex.addDebugInfo("SQL Query", strSQL);
-				CString zFromAction = "";
-				if (lFromActionID != -1)
-				{
-					// Get the action name from the combo box
-					m_comboStatusFromAction.GetWindowText(zFromAction);
-				}
-
-				// Modify the action status from the specified query
-				m_ipFAMDB->ModifyActionStatusForQuery(strSQL.c_str(),
-					(LPCTSTR)zToActionName, eNewStatus, (LPCTSTR)zFromAction);
-			}
-			break;
-
 		case eAllFilesPriority:
 			{
-				long lPriority = (long) m_settings.getPriority();
-
 				uex.addDebugInfo("Priority String", m_settings.getPriorityString());
-				uex.addDebugInfo("Priority", lPriority);
-
-				string strQuery = "FAMFile WHERE FAMFile.Priority = " + asString(lPriority);
-
-				CString zFromAction = "";
-				if (lFromActionID != -1)
-				{
-					m_comboStatusFromAction.GetWindowText(zFromAction);
-				}
-
-				m_ipFAMDB->ModifyActionStatusForQuery(strQuery.c_str(), (LPCTSTR)zToActionName,
-					eNewStatus, (LPCTSTR)zFromAction);
 			}
 			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI26911");
 		}
+
+		// If not processing all files or limiting the scope by a random subset
+		// then the operation must be performed a file at a time, otherwise
+		// just set the status for all files
+		if (m_settings.getScope() != eAllFiles || m_settings.getLimitByRandomCondition())
+		{
+			// Get the query for updating files
+			string strSelect = "FAMFile.ID";
+			if (lFromActionID != -1)
+			{
+				strSelect += ", ASC_";
+				strSelect += (LPCTSTR)zFromAction;
+			}
+			string strQuery = m_settings.buildQuery(m_ipFAMDB, strSelect);
+			uex.addDebugInfo("Query", strQuery);
+
+			// Modify the file status
+			m_ipFAMDB->ModifyActionStatusForQuery(strQuery.c_str(), (LPCTSTR)zToActionName,
+				eNewStatus, (LPCTSTR)zFromAction, m_settings.getRandomCondition());
+		}
+		else
+		{
+			if (lFromActionID == -1)
+			{
+				m_ipFAMDB->SetStatusForAllFiles((LPCTSTR)zToActionName, eNewStatus);
+			}
+			else
+			{
+				m_ipFAMDB->CopyActionStatusFromAction(lFromActionID, lToActionID);
+			}
+		}
+
 
 		// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
 		uex.log();

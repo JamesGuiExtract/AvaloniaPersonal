@@ -993,7 +993,7 @@ void CFileProcessingDB::initializeTableValues()
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27606")
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
+void CFileProcessingDB::copyActionStatus( const _ConnectionPtr& ipConnection, const string& strFrom, 
 										 string strTo, bool bAddTransRecords, long nToActionID)
 {
 	try
@@ -1036,7 +1036,7 @@ void CFileProcessingDB::copyActionStatus( ADODB::_ConnectionPtr ipConnection, st
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27054");
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::addActionColumn(string strAction)
+void CFileProcessingDB::addActionColumn(const _ConnectionPtr& ipConnection, const string& strAction)
 {
 
 	// Add new Column to FAMFile table
@@ -1044,20 +1044,16 @@ void CFileProcessingDB::addActionColumn(string strAction)
 	string strAddColSQL = "Alter Table FAMFile Add ASC_" + strAction + " nvarchar(1)";
 
 	// Run the SQL to add column to FAMFile
-	executeCmdQuery(getDBConnection(), strAddColSQL);
-
-	// Set the default value to Unattempted
-	// Set the from statement
-	string strFrom = "FROM FAMFile";
+	executeCmdQuery(ipConnection, strAddColSQL);
 
 	// Create the query and update the file status for all files to unattempted
-	string strUpdateSQL = "UPDATE FAMFile SET ASC_" + strAction + " = 'U' " + strFrom;
-	executeCmdQuery(getDBConnection(), strUpdateSQL);
+	string strUpdateSQL = "UPDATE FAMFile SET ASC_" + strAction + " = 'U' FROM FAMFile";
+	executeCmdQuery(ipConnection, strUpdateSQL);
 
 	// Create index on the new column
 	string strCreateIDX = "Create Index IX_ASC_" + strAction + " on FAMFile ( ASC_" 
 		+ strAction + ")";
-	executeCmdQuery(getDBConnection(), strCreateIDX);
+	executeCmdQuery(ipConnection, strCreateIDX);
 
 	// Add foreign key contraint for the new column to reference the ActionState table
 	string strAddContraint = "ALTER TABLE FAMFile WITH CHECK ADD CONSTRAINT FK_ASC_" 
@@ -1065,29 +1061,30 @@ void CFileProcessingDB::addActionColumn(string strAction)
 		strAction + ") REFERENCES ActionState(Code)";
 
 	// Create the foreign key
-	executeCmdQuery(getDBConnection(), strAddContraint);
+	executeCmdQuery(ipConnection, strAddContraint);
 
 	// Add the default contraint for the column
 	string strDefault = "ALTER TABLE FAMFile ADD CONSTRAINT DF_ASC_" 
 		+ strAction + " DEFAULT 'U' FOR ASC_" + strAction;
-	executeCmdQuery(getDBConnection(), strDefault);
+	executeCmdQuery(ipConnection, strDefault);
 }
 //--------------------------------------------------------------------------------------------------
-void CFileProcessingDB::removeActionColumn(string strAction)
+void CFileProcessingDB::removeActionColumn(const _ConnectionPtr& ipConnection,
+										   const string& strAction)
 {
 	// Remove the Foreign key relationship
-	dropConstraint(getDBConnection(), gstrFAM_FILE, "FK_ASC_" + strAction);
+	dropConstraint(ipConnection, gstrFAM_FILE, "FK_ASC_" + strAction);
 
 	// Drop index on the action column
 	string strSQL = "Drop Index IX_ASC_" + strAction + " ON FAMFile";
-	executeCmdQuery(getDBConnection(), strSQL);
+	executeCmdQuery(ipConnection, strSQL);
 
 	// Remove the default contraint
-	dropConstraint(getDBConnection(), gstrFAM_FILE, "DF_ASC_" + strAction);
+	dropConstraint(ipConnection, gstrFAM_FILE, "DF_ASC_" + strAction);
 
 	// Drop the column
 	strSQL = "ALTER TABLE FAMFile DROP COLUMN ASC_" + strAction;
-	executeCmdQuery(getDBConnection(), strSQL);
+	executeCmdQuery(ipConnection, strSQL);
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::updateStats( ADODB::_ConnectionPtr ipConnection, long nActionID, 

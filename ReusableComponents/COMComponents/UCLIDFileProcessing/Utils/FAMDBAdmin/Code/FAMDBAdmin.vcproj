@@ -267,6 +267,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SelectFileSettings.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\SetActionStatusDlg.cpp"
 				>
 			</File>

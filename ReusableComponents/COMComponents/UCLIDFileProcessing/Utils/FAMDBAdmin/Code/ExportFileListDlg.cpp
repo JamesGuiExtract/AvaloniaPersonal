@@ -21,7 +21,7 @@ static char THIS_FILE[] = __FILE__;
 
 //-------------------------------------------------------------------------------------------------
 // Constant
-const string gstrSQL_QUERY_STRING = "SELECT FAMFile.FileName FROM ";
+const string gstrSQL_SELECT_VALUES = "FAMFile.FileName";
 
 //-------------------------------------------------------------------------------------------------
 // CExportFileListDlg dialog
@@ -133,7 +133,7 @@ void CExportFileListDlg::OnClickedSelectFiles()
 	try
 	{
 		CSelectFilesDlg dlg(m_ipFAMDB, "Select filenames to export", 
-			gstrSQL_QUERY_STRING, m_settings);
+			"SELECT " + gstrSQL_SELECT_VALUES + " FROM ", m_settings);
 
 		// Display the dialog and save changes if user clicked OK
 		if (dlg.DoModal() == IDOK)
@@ -184,104 +184,12 @@ void CExportFileListDlg::OnClickedOK()
 		// which may take a few seconds
 		CWaitCursor wait;
 
-		string strQuery = gstrSQL_QUERY_STRING;
+		// Build the query from the settings
+		string strQuery = m_settings.buildQuery(m_ipFAMDB, gstrSQL_SELECT_VALUES);
 
-		switch(m_settings.getScope())
-		{
-			// Query based on the action status
-		case eAllFilesForWhich:
-			{
-				strQuery += "FAMFile ";
-
-				// Check if comparing skipped status
-				if (m_settings.getStatus() == kActionSkipped)
-				{
-					strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
-						"(SkippedFile.ActionID = " + m_settings.getActionID();
-					string strUser = m_settings.getUser();
-					if (strUser != gstrANY_USER)
-					{
-						strQuery += " AND SkippedFile.UserName = '" + strUser + "'";
-					}
-					strQuery += ")";
-				}
-				else
-				{
-					// Get the status as a string
-					string strStatus = m_ipFAMDB->AsStatusString(
-						(UCLID_FILEPROCESSINGLib::EActionStatus)m_settings.getStatus());
-				
-					strQuery += "WHERE (ASC_" + m_settings.getAction() + " = '"
-						+ strStatus + "')";
-				}
-			}
-			break;
-
-			// Query to export all the files
-		case eAllFiles:
-			{
-				strQuery += "FAMFile";
-			}
-			break;
-
-			// Export based on customer query
-		case eAllFilesQuery:
-			{
-				// Get the query input by the user
-				strQuery += m_settings.getSQLString();
-			}
-			break;
-
-		case eAllFilesTag:
-			{
-				// Get the vector of tags
-				vector<string> vecTags = m_settings.getTags();
-
-				// Get the size and ensure there is at least 1 tag
-				size_t nSize = vecTags.size();
-				if (nSize == 0)
-				{
-					MessageBox("No tags selected!", "No Tags", MB_OK | MB_ICONERROR);
-					return;
-				}
-
-				string strMainQueryTemp = gstrQUERY_FILES_WITH_TAGS;
-				replaceVariable(strMainQueryTemp, gstrTAG_QUERY_SELECT, "FAMFile.FileName");
-
-				// Get the conjunction for the where clause
-				string strConjunction = m_settings.getAnyTags() ? "\nUNION\n" : "\nINTERSECT\n";
-
-				strQuery += "(" + strMainQueryTemp;
-				replaceVariable(strQuery, gstrTAG_NAME_VALUE, vecTags[0]);
-
-				// Build the rest of the query
-				for (size_t i=1; i < nSize; i++)
-				{
-					string strTemp = strMainQueryTemp;
-					replaceVariable(strTemp, gstrTAG_NAME_VALUE, vecTags[i]);
-					strQuery += strConjunction + strTemp;
-				}
-
-				strQuery += ") AS FAMFile";
-			}
-			break;
-
-		case eAllFilesPriority:
-			{
-				strQuery += "FAMFile WHERE FAMFile.Priority = "
-					+ asString((long)m_settings.getPriority());
-			}
-			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI14879");
-		}
-
-		// Define how many file has been exported 
-		long lNumFilesExported;
-
-		// Call ExportFileList() to export the file list
-		lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName);
+		// Call ExportFileList() to export the file list and get a count of exported files
+		long lNumFilesExported = m_ipFAMDB->ExportFileList(strQuery.c_str(), _bstrFileName,
+			m_settings.getRandomCondition());
 
 		// Prompt the users that epxorting files is finished and
 		// if they want to open the file contains the file list

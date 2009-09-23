@@ -664,8 +664,11 @@ library UCLID_FILEPROCESSINGLib
 
 		// PROMISE: To output all of the FileName values found by the query strQuery to a file named strOutputFileName
 		//			and return the number of records that were exported
+		//			If pRandomCondition == NULL then all files returned by the query will be exported,
+		//			if pRandomComdition != NULL then before each file is exported the condition
+		//			will be checked and the file will only be exported if the condition returns true.
 		[id(23), helpstring("method ExportFileList")] HRESULT ExportFileList([in] BSTR strQuery, [in] BSTR strOutputFileName,
-			[out,retval] long *pnNumRecordsOutput);
+			[in] IRandomMathCondition* pRandomCondition, [out,retval] long *pnNumRecordsOutput);
 
 		// PROMISE: To clear any existing DB lock - clears all records in the LockTable
 		[id(24), helpstring("method ResetDBLock")] HRESULT ResetDBLock(void);
@@ -788,9 +791,13 @@ library UCLID_FILEPROCESSINGLib
 		//			eaNewStatus -	The status to set for the action (ignored if bstrFromAction
 		//							is specified)
 		//			bstrFromAction - The action to copy the status from for the specified file
+		//			pRandomCondition - If NULL will just be ignored, if not NULL then the files
+		//							   will only have their status modified if pRandomCondition
+		//							   returns TRUE
 		[id(51), helpstring("method ModifyActionStatusForQuery")] HRESULT ModifyActionStatusForQuery(
 			[in] BSTR bstrQueryFrom, [in] BSTR bstrToAction, [in] EActionStatus eaNewStatus,
-			[in] BSTR bstrFromAction);
+			[in] BSTR bstrFromAction, [in] IRandomMathCondition* pRandomCondition,
+			[out,retval] long *pnNumRecordsModified);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to file tagging
@@ -888,6 +895,15 @@ library UCLID_FILEPROCESSINGLib
 		//			(NOTE: This query should not return any results i.e. a SELECT query)
 		[id(68), helpstring("method ExecuteCommandQuery")] HRESULT ExecuteCommandQuery(
 			[in] BSTR bstrQuery, [out, retval] long* pnRecordsAffected);
+		// -----------------------------------------------------------------------------------------------
+		// PROMISE: To set the priority of all files found by the query strSelectQuery to the specified
+		//			priority and return the number of records that were modified.
+		//			If pRandomCondition == NULL then all files returned by the query will be modified,
+		//			if pRandomComdition != NULL then before each file is modified the condition
+		//			will be checked and the file will only be modified if the condition returns true.
+		[id(69), helpstring("method SetPriorityForFiles")] HRESULT SetPriorityForFiles([in] BSTR strSelectQuery,
+			[in] EFilePriority eNewPriority, [in] IRandomMathCondition* pRandomCondition, [out,retval] long *pnNumRecordsModified);
+		// -----------------------------------------------------------------------------------------------
 	};
 
 	[

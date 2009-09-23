@@ -242,7 +242,7 @@ STDMETHODIMP CFileProcessingDB::DefineNewAction( BSTR strAction,  long * pnID)
 		*pnID = getLastTableID(ipConnection, "Action");
 
 		// Add column to the FAMFile table
-		addActionColumn(strActionName);
+		addActionColumn(ipConnection, strActionName);
 
 		// Commit this transaction
 		tg.CommitTrans();
@@ -306,7 +306,7 @@ STDMETHODIMP CFileProcessingDB::DeleteAction( BSTR strAction)
 			ipActionSet->Delete( adAffectCurrent );
 
 			// Remove column from FAMFile
-			removeActionColumn(strActionName);
+			removeActionColumn(ipConnection, strActionName);
 
 			// Commit the change to the database
 			tg.CommitTrans();
@@ -1008,9 +1008,6 @@ STDMETHODIMP CFileProcessingDB::SearchAndModifyFileStatus( long nWhereActionID, 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
 
-		// Get a vector of FileIDS to modify
-		vector<long> vecFileIDs;
-
 		string strSQL = "SELECT FAMFile.ID AS FAMFileID";
 		if (!strFromActionCol.empty())
 		{
@@ -1536,7 +1533,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction( long nActionID, BSTR strNewActionN
 		TransactionGuard tg(ipConnection);
 
 		// Add a new column to the FMPFile table
-		addActionColumn(strNew);
+		addActionColumn(ipConnection, strNew);
 
 		// Copy status from the old column without transition records (and without update skipped table)
 		copyActionStatus(ipConnection, strOld, strNew, false);
@@ -1546,7 +1543,7 @@ STDMETHODIMP CFileProcessingDB::RenameAction( long nActionID, BSTR strNewActionN
 		executeCmdQuery(ipConnection, strSQL);
 
 		// Remove the old action column from FMPFile table
-		removeActionColumn(strOld);
+		removeActionColumn(ipConnection, strOld);
 
 		// Commit the transaction
 		tg.CommitTrans();
@@ -1575,7 +1572,8 @@ STDMETHODIMP CFileProcessingDB::Clear()
 	return S_OK;
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFileName, long *pnNumRecordsOutput)
+STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFileName,
+											   IRandomMathCondition* pRandomCondition, long *pnNumRecordsOutput)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -1601,6 +1599,9 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		// Check License
 		validateLicense();
 
+		// Wrap the random math condition in smart pointer
+		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
+
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
 		
@@ -1622,6 +1623,7 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		// get the recordset with the top nMaxFiles 
 		ipFileSet->Open(strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
 			adLockReadOnly, adCmdText );
+
 		// Open the output file
 		ofstream ofsOutput(strOutFileName.c_str(), ios::out | ios::trunc);
 
@@ -1631,12 +1633,15 @@ STDMETHODIMP CFileProcessingDB::ExportFileList(BSTR strQuery, BSTR strOutputFile
 		// Fill the ipFiles collection
 		while ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
-			// Get the FileName
-			string strFile = getStringField( ipFileSet->Fields, "FileName" );
-			ofsOutput << strFile << endl;
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
+			{
+				// Get the FileName
+				string strFile = getStringField( ipFileSet->Fields, "FileName" );
+				ofsOutput << strFile << endl;
 
-			// increment the number of records
-			nNumRecords++;
+				// increment the number of records
+				nNumRecords++;
+			}
 			ipFileSet->MoveNext();
 		}
 		ofsOutput.flush();
@@ -2564,7 +2569,9 @@ STDMETHODIMP CFileProcessingDB::ClearFileActionComment(long nFileID, long nActio
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, BSTR bstrToAction,
-														   EActionStatus eaStatus, BSTR bstrFromAction)
+														   EActionStatus eaStatus, BSTR bstrFromAction,
+														   IRandomMathCondition* pRandomCondition,
+														   long* pnNumRecordsModified)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -2586,16 +2593,18 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 		string strStatus = "";
 		if (bFromSpecified)
 		{
-			strFromAction = "FAMFile.ASC_" + strFromAction;
-			strFileQuery += ", " + strFromAction;
+			strFromAction = "ASC_" + strFromAction;
+			strFileQuery += ", FAMFile." + strFromAction;
 		}
 		else
 		{
 			// Get the new status as a string
 			strStatus = asStatusString(eaStatus);
 		}
-		strFileQuery += " FROM " + strQueryFrom;
+		strFileQuery += " FROM (" + strQueryFrom + ") AS FAMFile";
 
+		// Wrap the random condition (if there is one, in a smart pointer)
+		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -2621,22 +2630,27 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 			adOpenForwardOnly, adLockReadOnly, adCmdText);
 
 		// Loop through each record
+		long nNumRecordsModified = 0;
 		while (ipFileSet->adoEOF == VARIANT_FALSE)
 		{
-			FieldsPtr ipFields = ipFileSet->Fields;
-			ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
-
-			// Get the file ID
-			long nFileID = getLongField(ipFields, "ID");
-
-			// If copying from an action, get the status for the action
-			if (bFromSpecified)
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
 			{
-				strStatus = getStringField(ipFields, strFromAction);
-			}
+				FieldsPtr ipFields = ipFileSet->Fields;
+				ASSERT_RESOURCE_ALLOCATION("ELI27040", ipFields != NULL);
 
-			// Set the file action state
-			setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", -1, false);
+				// Get the file ID
+				long nFileID = getLongField(ipFields, "ID");
+
+				// If copying from an action, get the status for the action
+				if (bFromSpecified)
+				{
+					strStatus = getStringField(ipFields, strFromAction);
+				}
+
+				// Set the file action state
+				setFileActionState(ipConnection, nFileID, strToAction, strStatus, "", -1, false);
+				nNumRecordsModified++;
+			}
 
 			// Move to next record
 			ipFileSet->MoveNext();
@@ -2644,6 +2658,12 @@ STDMETHODIMP CFileProcessingDB::ModifyActionStatusForQuery(BSTR bstrQueryFrom, B
 
 		// Commit the transaction
 		tg.CommitTrans();
+
+		// Set the return value if it is specified
+		if (pnNumRecordsModified != NULL)
+		{
+			*pnNumRecordsModified = nNumRecordsModified;
+		}
 
 		END_CONNECTION_RETRY(ipConnection, "ELI27041");
 
@@ -3668,6 +3688,86 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFilePriority eNewPriority,
+													IRandomMathCondition *pRandomCondition,
+													long *pnNumRecordsModified)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		// Get the query string and ensure it is not empty
+		string strQuery = asString(bstrSelectQuery);
+		ASSERT_ARGUMENT("ELI27710", !strQuery.empty());
+
+		// Wrap the random condition (if there is one, in a smart pointer)
+		UCLID_FILEPROCESSINGLib::IRandomMathConditionPtr ipRandomCondition(pRandomCondition);
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Recordset to modify priority for
+		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27711", ipFileSet != NULL );
+
+		// Get the recordset for the specified select query
+		ipFileSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		// Setup the counter for the number of records
+		long nNumRecords = 0;
+
+		// Loop through the returned files setting the new priority
+		long nPriority =
+			eNewPriority == kPriorityDefault ? glDEFAULT_FILE_PRIORITY : (long)eNewPriority;
+		while ( ipFileSet->adoEOF == VARIANT_FALSE )
+		{
+			if (ipRandomCondition == NULL || ipRandomCondition->CheckCondition("", NULL) == VARIANT_TRUE)
+			{
+				// Update the priority
+				setLongField(ipFileSet->Fields, "Priority", nPriority);
+				ipFileSet->Update();
+
+				// increment the number of records
+				nNumRecords++;
+			}
+
+			ipFileSet->MoveNext();
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		// If returning the number of modified records, set the return value
+		if (pnNumRecordsModified != NULL)
+		{
+			*pnNumRecordsModified = nNumRecords;
+		}
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27712");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27713");
+
 }
 
 //-------------------------------------------------------------------------------------------------

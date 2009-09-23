@@ -462,7 +462,7 @@ bool CSelectFilesDlg::saveSettings()
 		}
 
 		// Set the scope narrowing values
-		m_settings.setNarrowScope(nRandomPercent != -1);
+		m_settings.setLimitByRandomCondition(nRandomPercent != -1);
 		if (nRandomPercent != -1)
 		{
 			m_settings.setRandomPercent(nRandomPercent);
@@ -655,8 +655,8 @@ void CSelectFilesDlg::setControlsFromSettings()
 			THROW_LOGIC_ERROR_EXCEPTION("ELI26999");
 		}
 
-		// Check for scope narrowing
-		if (m_settings.getNarrowScope())
+		// Check for limiting by random condition
+		if (m_settings.getLimitByRandomCondition())
 		{
 			// Set the check box and update the text in the edit control
 			m_checkRandomSubset.SetCheck(BST_CHECKED);

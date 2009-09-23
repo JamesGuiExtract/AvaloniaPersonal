@@ -92,7 +92,8 @@ public:
 	STDMETHOD(Clear)();
 	STDMETHOD(CopyActionStatusFromAction)( /*[in]*/ long  nFromAction, /*[in]*/ long nToAction );
 	STDMETHOD(RenameAction)(/*[in]*/ long  nActionID, /*[in]*/ BSTR strNewActionName );
-	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName, long *pnNumRecordsOutput);
+	STDMETHOD(ExportFileList)(BSTR strQuery, BSTR strOutputFileName,
+		IRandomMathCondition* pRandomCondition,long *pnNumRecordsOutput);
 	STDMETHOD(ResetDBLock)(void);
 	STDMETHOD(GetActionID)(/*[in]*/ BSTR bstrActionName, /*[out, retval]*/ long* pnActionID);
 	STDMETHOD(ResetDBConnection)(void);
@@ -121,7 +122,8 @@ public:
 	STDMETHOD(GetFileActionComment)(long nFileID, long nActionID, BSTR* pbstrComment);
 	STDMETHOD(ClearFileActionComment)(long nFileID, long nActionID);
 	STDMETHOD(ModifyActionStatusForQuery)(BSTR bstrQueryFrom, BSTR bstrToAction,
-		EActionStatus eaStatus, BSTR bstrFromAction);
+		EActionStatus eaStatus, BSTR bstrFromAction, IRandomMathCondition* pRandomCondition,
+		long* pnNumRecordsModified);
 	STDMETHOD(GetTags)(IStrToStrMap** ppTags);
 	STDMETHOD(GetTagNames)(IVariantVector** ppTagNames);
 	STDMETHOD(HasTags)(VARIANT_BOOL* pvbVal);
@@ -141,6 +143,8 @@ public:
 	STDMETHOD(AsPriorityString)(EFilePriority ePriority, BSTR* pbstrPriority);
 	STDMETHOD(AsEFilePriority)(BSTR bstrPriority, EFilePriority* pePriority);
 	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
+	STDMETHOD(SetPriorityForFiles)(BSTR bstrSelectQuery, EFilePriority eNewPriority,
+		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -331,14 +335,14 @@ private:
 	// PROMISE: To copy the status from the strFrom action to the strTo action
 	//			if bAddTransRecords is true records will be added to the transition table
 	//			using the connection provided.
-	void copyActionStatus( ADODB::_ConnectionPtr ipConnection, string strFrom, 
+	void copyActionStatus( const _ConnectionPtr& ipConnection, const string& strFrom, 
 		string strTo, bool bAddTransRecords, long nToActionID = -1);
 
 	// PROMISE:	To add action related columns and indexes to the FPMFile table
-	void addActionColumn(string strAction);
+	void addActionColumn(const _ConnectionPtr& ipConnection, const string& strAction);
 
 	// PROMISE: To remove action related columns and indexes from the FPMFile table
-	void removeActionColumn(string strAction);
+	void removeActionColumn(const _ConnectionPtr& ipConnection, const string& strAction);
 
 	// PROMISE: To update totals in the ActionStatistics table using the connection provided
 	//			The FileSize and Pages from the ipNewRecord are added to the eToStatus's totals and

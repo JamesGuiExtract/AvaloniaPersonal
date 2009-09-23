@@ -504,12 +504,15 @@ void CFAMDBAdminDlg::OnActionRemove()
 		ASSERT_RESOURCE_ALLOCATION("ELI14914", ipFAMDBUtils != NULL );
 
 		// Get the action's name from the dialog
-		string strActionName = ipFAMDBUtils->PromptForActionSelection(m_ipFAMDB, "Remove Action", "");
+		_bstr_t bstrActionName = ipFAMDBUtils->PromptForActionSelection(m_ipFAMDB, "Remove Action", "");
 
 		// Remove the action selected if strActionName is not empty
-		if (strActionName != "")
+		if (bstrActionName.length() > 0)
 		{
-			m_ipFAMDB->DeleteAction(get_bstr_t(strActionName.c_str()));
+			// Display the wait cursor wheil action is deleted
+			CWaitCursor cursor;
+
+			m_ipFAMDB->DeleteAction(bstrActionName);
 
 			// Add application trace whenever a database modification is made
 			// [LRCAU #5052 - JDS - 12/18/2008]
@@ -518,7 +521,7 @@ void CFAMDBAdminDlg::OnActionRemove()
 			uex.addDebugInfo("User Name", getCurrentUserName());
 			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));
 			uex.addDebugInfo("Database", asString(m_ipFAMDB->DatabaseName));
-			uex.addDebugInfo("Action To Remove", strActionName);
+			uex.addDebugInfo("Action To Remove", asString(bstrActionName));
 			uex.log();
 
 			// Update the summary tab
@@ -576,15 +579,15 @@ void CFAMDBAdminDlg::OnActionRename()
 					// Log application trace [LRCAU #5052 - JDS - 12/18/2008]
 					uex.log();
 
+					// Update the summary tab
+					updateSummaryTab();
+
 					// Display the message that the action is renamed
 					string strPrompt = "The action '" + strOldName + "' has been renamed to '"
 										+ strNewName + "'.";
 					MessageBox( strPrompt.c_str(), "Success", MB_OK|MB_ICONINFORMATION );
 				}
 			}
-
-			// Update the summary tab
-			updateSummaryTab();
 		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI14867");

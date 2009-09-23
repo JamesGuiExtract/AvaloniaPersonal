@@ -4,8 +4,8 @@
 // 
 // Contains the definition of the SelectFileSettings class
 //-------------------------------------------------------------------------------------------------
-#include <UCLIDException.h>
 #include <COMUtils.h>
+#include <UCLIDException.h>
 
 #include <string>
 #include <vector>
@@ -42,18 +42,13 @@ private:
 	string m_strPriority;
 
 	// Values for the random subset selection restriction
-	bool m_bNarrowScope; // Whether to narrow the selection
+	bool m_bLimitByRandomCondition; // Whether to narrow the selection
 	int m_nRandomPercent; // The random percentage to narrow it by
 
 public:
 	// Default the setting to all files
-	SelectFileSettings() : m_scope(eAllFiles), m_bNarrowScope(false), m_nRandomPercent(0)
-	{
-	}
-	SelectFileSettings(const SelectFileSettings& settings)
-	{
-		*this = settings;
-	}
+	SelectFileSettings();
+	SelectFileSettings(const SelectFileSettings& settings);
 
 	~SelectFileSettings() {};
 
@@ -93,8 +88,8 @@ public:
 	EFilePriority getPriority() { return m_ePriority; }
 	string getPriorityString() { return m_strPriority; }
 
-	void setNarrowScope(bool bNarrowScope) { m_bNarrowScope = bNarrowScope; }
-	bool getNarrowScope() { return m_bNarrowScope; }
+	void setLimitByRandomCondition(bool bLimitByRandomCondition) { m_bLimitByRandomCondition = bLimitByRandomCondition; }
+	bool getLimitByRandomCondition() { return m_bLimitByRandomCondition; }
 
 	void setRandomPercent(int nRandomPercent)
 	{
@@ -105,62 +100,13 @@ public:
 	int getRandomPercent() { return m_nRandomPercent; }
 
 	// Builds the summary string
-	string getSummaryString()
-	{
-		string strSummary = "All files ";
-		switch (m_scope)
-		{
-		case eAllFiles:
-			strSummary += "in the database";
-			break;
+	string getSummaryString();
 
-		case eAllFilesForWhich:
-			{
-				strSummary += "for which the \"" + m_strAction + "\" action's status is \""
-					+ m_strStatus + "\"";
-				if (m_nStatus == kActionSkipped)
-				{
-					strSummary += " by " + m_strUser;
-				}
-			}
-			break;
+	// Builds a select query with the specified values selected for the current settings.
+	// NOTE: strSelect should contain only the values to be selected by the query, for
+	// example strSelect = "FAMFile.ID, FAMFile.FileName" or
+	// strSelect = "FAMFile.ID, FAMFile.Priority", etc
+	string buildQuery(const IFileProcessingDBPtr& ipFAMDB, const string& strSelect);
 
-		case eAllFilesTag:
-			{
-				strSummary += "associated with ";
-				strSummary += (m_bAnyTags ? "any" : "all");
-				strSummary += " of the following tags: ";
-				string strTagString = "";
-				for (vector<string>::iterator it = m_vecTags.begin(); it != m_vecTags.end(); it++)
-				{
-					if (!strTagString.empty())
-					{
-						strTagString += ", ";
-					}
-					strTagString += (*it);
-				}
-				strSummary += strTagString;
-			}
-			break;
-
-		case eAllFilesQuery:
-			strSummary += "selected by this custom query: SELECT FAMFile.ID FROM " + m_strSQL;
-			break;
-
-		case eAllFilesPriority:
-			strSummary += "with a file processing priority of " + m_strPriority;
-			break;
-
-		default:
-			THROW_LOGIC_ERROR_EXCEPTION("ELI26906");
-		}
-
-		if (m_bNarrowScope)
-		{
-			strSummary += ".\r\nThe scope of files will be further narrowed to a random "
-				+ asString(m_nRandomPercent) + "% subset.";
-		}
-
-		return strSummary;
-	}
+	IRandomMathConditionPtr getRandomCondition();
 };
