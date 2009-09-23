@@ -15,8 +15,10 @@
 <ol>
 	<li><h2>File Menu</h2>
   	<ul>
-    		<li>Confirm that the <b>Open</b> menu item displays standard Windows <b>Open</b> dialog.
+    		<li><u><b>Open</b></u>
       		<ul>
+	    		<li>Confirm that the <b>Open</b> menu item displays standard Windows 
+			<b>Open</b> dialog.
  			<li>Confirm that the default file extension in <b>.uss</b>.
         		<li>Confirm that contents of the opened file are displayed in a 
 			read-only edit box.
@@ -35,14 +37,19 @@
 			meaningful error message.
       		</ul>
 <p>
-    		<li>Confirm that the <b>Close</b> menu item clears the read-only edit box.
-    		<li>Confirm that after <b>Close</b>, the window caption shows <b>USS File Viewer</b>.
-       		<li><b>[LegacyRCAndUtils #4295]</b> Confirm that after closing a file, selecting the 
-		<b>Properties...</b> menu item displays a <b>No source document information is 
-		available!</b> message.
-<p>
-    		<li>Confirm that the <b>Properties</b> menu item displays a Properties dialog.
+    		<li><u><b>Close</b></u>
       		<ul>
+	    		<li>Confirm that the <b>Close</b> menu item clears the read-only edit box.
+    			<li>Confirm that after <b>Close</b>, the window caption shows <b>USS 
+			File Viewer</b>.
+       			<li><b>[LegacyRCAndUtils #4295]</b> Confirm that after closing a file, 
+			selecting the <b>Properties...</b> menu item displays a <b>No source 
+			document information is available!</b> message.
+      		</ul>
+<p>
+    		<li><u><b>Properties</b></u>
+      		<ul>
+	    		<li>Confirm that the <b>Properties</b> menu item displays a Properties dialog.
  			<li>Confirm presence of the selectable path to the <b>Source Document:</b>.
  			<li>Confirm presence of the selectable path to the <b>Original Source 
 			Document:</b>.
@@ -52,7 +59,10 @@
 			<b>Width</b>, <b>Deskew</b> and <b>Orientation</b>.
       		</ul>
 <p>
-    		<li>Confirm that the <b>Exit</b> menu item closes the application.
+    		<li><u><b>Exit</b></u>
+      		<ul>
+	    		<li>Confirm that the <b>Exit</b> menu item closes the application.
+      		</ul>
   	</ul>
 <p>
   	<li><h2>Drag and Drop</h2>
@@ -77,9 +87,10 @@
   <p>
     	<li><h2>Tools Menu</h2>
       	<ul>
-        	<li>Confirm that the <b>Find...</b> menu item displays the <b>Find</b> dialog.
-        	<li>Confirm that <b>Ctrl + F</b> also displays the <b>Find</b> dialog.
-          	<ul>
+    		<li><u><b>Find</b></u>
+      		<ul>
+	        	<li>Confirm that the <b>Find...</b> menu item displays the <b>Find</b> dialog.
+	        	<li>Confirm that <b>Ctrl + F</b> also displays the <b>Find</b> dialog.
             		<li>Confirm that the <b>Find what:</b> edit box is editable.
             		<li>Confirm that the <b>Find</b> button searches the main 
 			read-only edit box for the text contained in the local edit box.
@@ -90,12 +101,14 @@
             		<li>Confirm that the <b>Regular Expression</b> check box is checkable.
 			<li>Confirm that search strings are treated as regular expressions 
 			when checked.</li>
- 					<li><b>[LegacyRCAndUtils #5006]</b> Confirm that the <b>Treat each line as a regular expression</b>
-						check box is checkable.</li>
-					<ul>
-						<li>Confirm that each line in the edit box is treated as a separate regular expression when checked.</li>
-						<li>Confirm that the entire edit box is treated as a single regular expression when unchecked.</li>
-					</ul>
+			<li><b>[LegacyRCAndUtils #5006]</b> Confirm that the <b>Treat each line 
+			as a regular expression</b> check box is checkable.</li>
+			<ul>
+				<li>Confirm that each line in the edit box is treated as a 
+				separate regular expression when checked.</li>
+				<li>Confirm that the entire edit box is treated as a single 
+				regular expression when unchecked.</li>
+			</ul>
            		<li>Confirm that the <b>Case Sensitive</b> check box is checkable.
                 	<li>Confirm that searches are case sensitive when checked.
 <p>
@@ -116,7 +129,7 @@
                         	<li>Confirm that input in the <b>First</b> edit box is 
 				restricted to numbers between 0-99.
                     		<li>Confirm that input in the <b>Second</b> edit box is restricted 
-				to numbers between 1-100.
+				to numbers 1-100.
 				<li>Confirm that only the restricted area of the document is searched.
 <p>
 				<li>Confirm that the <b>Find in font sizes</b> check box is selectable.
@@ -135,11 +148,12 @@
         		<li>Confirm that the <b>X</b> button exits the dialog.
           	</ul>
 <p>
-		<li>Confirm that the <b>Character Info</b> menu item displays 
-		the <b>Character Information</b> dialog.
-		<li>Confirm that <b>Ctrl + I</b> also displays the <b>Character 
-		Information</b> dialog.
+    		<li><u><b>Character Info</b></u>
           	<ul>
+			<li>Confirm that the <b>Character Info</b> menu item displays 
+			the <b>Character Information</b> dialog.
+			<li>Confirm that <b>Ctrl + I</b> also displays the <b>Character 
+			Information</b> dialog.
 			<li>Confirm that the <b>Guess 1</b>, <b>Guess 2</b> and <b>Guess 3</b> 
 			edit boxes display the ASCII character following the cursor position.
             		<li>Place the cursor immediately before the last character in a paragraph.  
@@ -188,9 +202,10 @@
 	          	</ul>
           	</ul>
 <p>
-		<li>Confirm that the <b>Font Size Distribution</b> menu item displays 
-		the <b>Font Size Distribution</b> dialog.
+    		<li><u><b>Font Size Distribution</b></u>
           	<ul>
+			<li>Confirm that the <b>Font Size Distribution</b> menu item displays 
+			the <b>Font Size Distribution</b> dialog.
 			<li>Confirm that the total number of non-whitespace characters is displayed 
 			at the top of the dialog.
             		<li>Confirm that the <b>Font Size</b> column displays a list of font 
@@ -203,6 +218,18 @@
 			<b>Font Size</b> as read from this dialog, should be displayed in the 
 			<b>Font Size:</b> field in the status bar of the main dialog.</li>
           	</ul>
+<p>
+    		<li><u><b>Word Length Distribution</b></u>
+          	<ul>
+			<li>Confirm that the <b>Word Length Distribution</b> menu item displays 
+			the <b>Word Lengths</b> dialog.
+			<li>Confirm that the <b>Total Number of Words</b> is displayed 
+			at the top of the dialog.
+            		<li>Confirm that a three-column list is displayed with <b>Word Length</b>, 
+			<b>Count</b> and <b>Percentage</b> columns.
+			<li>Confirm that a vertical scrollbar is provided if necessary.
+			<li>Confirm that the <b>OK</b> button closes the dialog.
+          	</ul>
       	</ul>
 <p>
   	<li><h2>Status Bar</h2>
@@ -213,13 +240,13 @@
 <p>
 	  	<li>Confirm that the <b>Start Pos:</b> item displays the index of the character 
 	  	at the beginning of the selected text.
-          	<li>Confirm that if no text is selected it displays the zero-based index of the character 
-		  following the cursor.
+          	<li>Confirm that if no text is selected it displays the zero-based index of the 
+		character following the cursor.
 <p>
 	  	<li>Confirm that the <b>End Pos:</b> item displays the index of the character 
 	  	at the end of the selected text.
           	<li>Confirm that if no text is selected it displays the index of the character 
-		  following the cursor.
+		following the cursor.
 <p>
 	  	<li>Confirm that the <b>%</b> item displays the percentage of the document 
 		before the current cursor position.
@@ -242,7 +269,7 @@
     	<ul>
        		<li>Confirm that if a USS file name is provided as an argument, e.g. 
 		<b>USSFileViewer.exe filename.uss</b>, the specified file is opened.
-       		<li>Confirm that if two or more arguments are provided, a usage messagebox is 
+       		<li>Confirm that if two or more arguments are provided, a usage message is 
 		displayed and the application exits smoothly.
    	</ul>
 </ol>
