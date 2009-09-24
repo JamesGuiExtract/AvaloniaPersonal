@@ -167,8 +167,11 @@
 <p>
 	<LI><h2>Support Bates Numbers In Automated, Verification And Hybrid Redaction (#20)</h2>
        	<ul>
-  	   	<LI><b>SCRs:</b> TBD
-  	   	<LI><b>Details:</b> TBD
+  	   	<LI><b>SCRs:</b> LegacyRC #5461, #5462, #5463, #5464
+  	   	<LI><b>Details:</b> This feature is similar to the <b>Bates Number</b> 
+		functionality included in <b>ID Shield Office</b>.  A small enhancement to 
+		support user-specified database counters allows for multiple distinct 
+		Bates number sequences to be used in parallel.
   	   	<LI><b>Main Checklists Updated:</b> TBD
   	   	<LI><b>Tested By:</b>
 	       	<ul>
@@ -176,7 +179,158 @@
 	       	</ul>
   	   	<LI><b>Testing:</b> 
 	       	<ul>
-	      		<li>TBD
+	      		<li><u><b>DB Admin</b></u>
+		       	<ul>
+		      		<li>Confirm presence of a <b>Tools - Manage Counters...</b> 
+				menu item.
+		      		<li>Confirm that <b>Tools - Manage Counters...</b> displays 
+				a <b>Manage Counters</b> dialog.
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				a list with columns for <b>Counter</b> and <b>Value</b>.
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				an <b>Add...</b> button.
+				<ul>
+					<li>Confirm that an <b>Add Counter</b> dialog is 
+					displayed.
+					<li>Confirm that counter names must be unique in 
+					the database.
+				</ul>
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				a <b>Remove</b> button.
+				<li>Confirm that a confirmation prompt is provided before 
+				deleting the counter.
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				a <b>Rename...</b> button.
+				<ul>
+					<li>Confirm that a <b>Rename Counter</b> dialog is 
+					displayed.
+					<li>Confirm that counter names must be unique in 
+					the database.
+				</ul>
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				a <b>Set value...</b> button.
+				<ul>
+					<li>Confirm that a <b>Set Counter Value</b> dialog is 
+					displayed.
+					<li>Confirm that the <b>Counter name</b> edit box 
+					is read-only.
+					<li>Confirm that a <b>New value for counter</b> edit 
+					box is provided.
+					<li>Confirm that the default value in the <b>New value 
+					for counter</b> edit box is the current value.
+				</ul>
+		      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+				a <b>Refresh</b> button.
+		      		<li>Confirm that <b>Refresh</b> updates the list of counters 
+				and values.
+		       	</ul>
+<p>
+	      		<li><u><b>File Action Manager</b></u>
+		       	<ul>
+		      		<li>Confirm that an <b>Apply Bates number</b> task exists.
+		      		<li>Confirm that the <b>Apply Bates number</b> task requires 
+				an <b>ID Shield</b> license.
+		      		<li>Confirm that the <b>Apply Bates number</b> task requires 
+				only a <b>general</b> Extract Systems license.
+<p>
+		      		<li>Confirm that the property page includes a <b>Filename</b> 
+				group box.
+		      		<li>Confirm that the group box contains an <b>Image file on 
+				which to apply Bates number</b> edit box.
+		      		<li>Confirm that the group box contains an associated button 
+				for tags.
+		      		<li>Confirm that the <b>tags</b> button works as expected.
+		      		<li>Confirm that the group box contains an associated <b>...</b> 
+				button for browsing.
+		      		<li>Confirm that the <b>browse</b> button works as expected.
+<p>
+		      		<li>Confirm that the property page includes a <b>Next number</b> 
+				group box.
+		      		<li>Confirm that the group box contains a <b>Counter to use for 
+				the next number</b> combo box.
+		      		<li>Confirm that the combo box displays each defined counter.
+		      		<li>Confirm that the specified counter is used to provide the 
+				next number.
+		      		<li>Confirm that the group box contains a check box and spinner 
+				control for zero-padding the number to a specified number of 
+				digits.
+		      		<li>Confirm that zero-padding is not used if not selected.
+		      		<li>Confirm that zero-padding is used properly if selected.
+<p>
+		      		<li>Confirm that the property page includes a <b>Bates number 
+				format</b> group box.
+		      		<li>Confirm that the group box contains a <b>Prefix</b> edit box.
+		      		<li>Confirm that the group box contains a <b>Suffix</b> edit box.
+		      		<li>Confirm that the group box contains a <b>Use next number for 
+				each document and add separator with page number</b> radio button.
+		      		<li>Confirm that the radio button includes an associated 
+				<b>Page number separator</b> edit box.
+		      		<li>Confirm that the radio button includes an associated check box 
+				and spinner control for zero-padding the page number to a specified 
+				number of digits.
+		      		<li>Confirm that the page number separator is not used if 
+				not selected.
+		      		<li>Confirm that the page number separator is used properly if 
+				selected.
+		      		<li>Confirm that zero-padding is not used if not selected.
+		      		<li>Confirm that zero-padding is used properly if selected.
+		      		<li>Confirm that the group box contains a <b>Use next number for 
+				every page</b> radio button.
+		      		<li>Confirm that if this radio button is selected then each page 
+				contains a different number.
+<p>
+		      		<li>Confirm that the property page includes a <b>Sample Bates 
+				number</b> group box.
+		      		<li>Confirm that the group box contains a read-only edit box.
+		      		<li>Confirm that the edit box contains an example Bates number 
+				using the <b>Prefix</b>, <b>Suffix</b>, <b>Separator</b> and 
+				<b>zero-padding</b> settings defined above.
+<p>
+		      		<li>Confirm that the property page includes a <b>Position and  
+				appearance</b> group box.
+		      		<li>Confirm that the group box contains a read-only edit box.
+		      		<li>Confirm that the edit box contains <b>Font</b> and 
+				<b>Position</b> settings.
+		      		<li>Confirm that the group box contains a <b>Change...</b> 
+				button.
+		      		<li>Confirm that the <b>Change...</b> button displays a 
+				<b>Change Bates number default position and appearance</b> dialog.
+<p>
+		      		<li>Confirm that the dialog includes an <b>Appearance</b> 
+				group box.
+		      		<li>Confirm that the group box contains a read-only edit box 
+				for <b>Font</b>.
+		      		<li>Confirm that the group box contains an associated <b>...</b> 
+				button for browsing.
+		      		<li>Confirm that the <b>browse</b> button displays a <b>Select 
+				Font</b> dialog.
+		      		<li>Confirm that the chosen <b>Name</b>, <b>Size</b>, and 
+				<b>Intensity</b> settings are displayed in the edit box.
+		      		<li>Confirm that the dialog includes a <b>Default anchor position 
+				for Bates number</b> group box.
+		      		<li>Confirm that the group box contains an edit box and combo box 
+				for number of inches from the <b>right</b> or <b>left</b> of 
+				the page.
+		      		<li>Confirm that the group box contains an edit box and combo box 
+				for number of inches from the <b>top</b> or <b>bottom</b> of 
+				the page.
+		      		<li>Confirm that the dialog includes a <b>Select alignment of Bates 
+				number relative to above anchor position</b> group box.
+		      		<li>Confirm that the group box contains a <b>TEXT</b> graphic with 
+				nine selectable anchor points.
+		      		<li>Confirm that the group box contains a label specifying the 
+				selected anchor point.
+		      		<li>Confirm that <b>Font</b> settings are persistent.
+		      		<li>Confirm that <b>Anchor position</b> settings are persistent.
+		      		<li>Confirm that <b>Alignment</b> settings are persistent.
+		       	</ul>
+<p>
+	      		<li><u><b>Database Schema</b></u>
+		       	<ul>
+		      		<li>Confirm that a <b>UserCreatedCounter</b> table exists.
+		      		<li>Confirm that entries and values exist for each counter 
+				created during testing.
+		       	</ul>
 	       	</ul>
        	</ul>
 </OL>
