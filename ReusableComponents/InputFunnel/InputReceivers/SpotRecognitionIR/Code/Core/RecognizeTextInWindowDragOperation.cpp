@@ -39,32 +39,45 @@ void RecognizeTextInWindowDragOperation::processDragOperation(const Cartographic
 {
 	try
 	{
-		// copy the CartographicPoints and limit (modifying if necessary)
-		// [p13 #4726]
-		CartographicPoint cpLocalp1 = p1;
-		CartographicPoint cpLocalp2 = p2;
-		limitAndModifyCartographicPoints(cpLocalp1, cpLocalp2);
-
-		// convert the two cartographic points that are in world coordinates into
-		// image pixel coordinates.
-		POINT imagePoint1, imagePoint2;
-		long nPageNumber = m_UCLIDGenericDisplayCtrl.getCurrentPageNumber();
-		m_UCLIDGenericDisplayCtrl.convertWorldToImagePixelCoords(cpLocalp1.m_dX, cpLocalp1.m_dY, 
-			&imagePoint1.x, &imagePoint1.y, nPageNumber);
-		m_UCLIDGenericDisplayCtrl.convertWorldToImagePixelCoords(cpLocalp2.m_dX, cpLocalp2.m_dY, 
-			&imagePoint2.x, &imagePoint2.y, nPageNumber);
-
 		// get original image file that contains the zone
 		string strOriginImageFile(m_UCLIDGenericDisplayCtrl.getImageName());
 
-		RECT rect;
-		rect.left = min(imagePoint1.x, imagePoint2.x);
-		rect.top = min(imagePoint1.y, imagePoint2.y);
-		rect.right = max(imagePoint1.x, imagePoint2.x);
-		rect.bottom = max(imagePoint1.y, imagePoint2.y);
+		try
+		{
+			try
+			{
+				// copy the CartographicPoints and limit (modifying if necessary)
+				// [p13 #4726]
+				CartographicPoint cpLocalp1 = p1;
+				CartographicPoint cpLocalp2 = p2;
+				limitAndModifyCartographicPoints(cpLocalp1, cpLocalp2);
 
-		m_pSpotRecDlg->processImageForParagraphText(strOriginImageFile, nPageNumber, nPageNumber,
-			true, 0, 0, &rect);
+				// convert the two cartographic points that are in world coordinates into
+				// image pixel coordinates.
+				POINT imagePoint1, imagePoint2;
+				long nPageNumber = m_UCLIDGenericDisplayCtrl.getCurrentPageNumber();
+				m_UCLIDGenericDisplayCtrl.convertWorldToImagePixelCoords(cpLocalp1.m_dX, cpLocalp1.m_dY, 
+					&imagePoint1.x, &imagePoint1.y, nPageNumber);
+				m_UCLIDGenericDisplayCtrl.convertWorldToImagePixelCoords(cpLocalp2.m_dX, cpLocalp2.m_dY, 
+					&imagePoint2.x, &imagePoint2.y, nPageNumber);
+
+				RECT rect;
+				rect.left = min(imagePoint1.x, imagePoint2.x);
+				rect.top = min(imagePoint1.y, imagePoint2.y);
+				rect.right = max(imagePoint1.x, imagePoint2.x);
+				rect.bottom = max(imagePoint1.y, imagePoint2.y);
+
+				m_pSpotRecDlg->processImageForParagraphText(strOriginImageFile, nPageNumber, nPageNumber,
+					true, 0, 0, &rect);
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27714")
+		}
+		catch(UCLIDException& ue)
+		{
+			// Add the image file as debug data
+			ue.addDebugInfo("Original Image File", strOriginImageFile);
+			throw ue;
+		}
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI02388")
 }

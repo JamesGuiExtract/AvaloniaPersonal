@@ -154,7 +154,6 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		bool bCloseAll = false;
 
 		bool bFileNameSpecified = false;
-		string strFileName = "";
 
 		m_bWindowCreated = false;
 
@@ -169,22 +168,19 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		// quotes were omitted by the calling application.
 		
 		// compute the concatenation of all arguments
-		string strTemp;
-		int i;
-		for (i = 1; i < __argc; i++)
+		string strArgs;
+		for (int i = 1; i < __argc; i++)
 		{
 			// add a space if needed
-			if (!strTemp.empty())
+			if (!strArgs.empty())
 			{
-				strTemp += " ";
+				strArgs += " ";
 			}
 
 			// append
-			strTemp += __argv[i];
+			strArgs += __argv[i];
 		}
-
-		// Build the absolute path to the file [LRCAU #5343]
-		strFileName = buildAbsolutePath(strTemp);
+		string strFileName = strArgs;
 
 		// if the args all put together represent a valid filename,
 		// then assume that the caller just wants to open the file
@@ -200,7 +196,7 @@ BOOL CSRIRImageViewerApp::InitInstance()
 			// if appropriate command line arguments have been provided
 			// register or unregister TIF file related settings
 			// as appropriate, and return
-			for (i = 1; i < __argc; i++)
+			for (int i = 1; i < __argc; i++)
 			{
 				string strArg = __argv[i];
 				if (strArg == gstrCmdLineRegister)
@@ -413,7 +409,9 @@ BOOL CSRIRImageViewerApp::InitInstance()
 		if (bFileNameSpecified)
 		{
 			m_uiMsgToSend = m_uiMsgLoadImage;
-			m_strMessageFileName = strFileName;
+
+			// Build the absolute path to the file [LRCAU #5343]
+			m_strMessageFileName = buildAbsolutePath(strFileName);
 			unsigned int ui;
 			for (ui = 0; ui < m_vecWindowHandles.size(); ui++)
 			{
