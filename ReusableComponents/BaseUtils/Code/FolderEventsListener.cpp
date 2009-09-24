@@ -66,26 +66,30 @@ void FolderEventsListener::startListening(const std::string strFolder, bool bRec
 //-------------------------------------------------------------------------------------------------
 void FolderEventsListener::stopListening()
 {
-	CSingleLock lg( &m_mutexFolderListen, TRUE );
-	if ( m_eventListeningExited.isSignaled() ) 
+	try
 	{
-		// Thread has stopped and so this has already been deleted
-		m_pCurrThreadData = NULL;
-	}
-	if(m_pCurrThreadData)
-	{
+		CSingleLock lg( &m_mutexFolderListen, TRUE );
+		if ( m_eventListeningExited.isSignaled() ) 
 		{
-			m_pCurrThreadData->m_eventKillThread.signal();
+			// Thread has stopped and so this has already been deleted
+			m_pCurrThreadData = NULL;
 		}
-		m_pCurrThreadData = NULL;
-	}
+		if(m_pCurrThreadData)
+		{
+			{
+				m_pCurrThreadData->m_eventKillThread.signal();
+			}
+			m_pCurrThreadData = NULL;
+		}
 
-	if(m_pthreadDispatch)
-	{
-		m_eventKillDispatchThread.signal();
-		m_eventDispatchThreadExit.wait(2000);
-		m_pthreadDispatch = NULL;
+		if(m_pthreadDispatch)
+		{
+			m_eventKillDispatchThread.signal();
+			m_eventDispatchThreadExit.wait(2000);
+			m_pthreadDispatch = NULL;
+		}
 	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27786");
 }
 //-------------------------------------------------------------------------------------------------
 UINT FolderEventsListener::threadFuncListen(LPVOID pParam)

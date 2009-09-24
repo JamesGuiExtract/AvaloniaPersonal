@@ -33,7 +33,8 @@ CFolderFS::CFolderFS()
 	m_ipTarget(NULL),
 	m_eventSupplyingStarted(),
 	m_strExpandFolderName(""),
-	m_eventResume()
+	m_eventResume(),
+	m_pSearchThread(NULL)
 {
 }
 
@@ -218,7 +219,9 @@ STDMETHODIMP CFolderFS::raw_Start(IFileSupplierTarget * pTarget, IFAMTagManager 
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFolderFS::raw_Stop()
 {
-	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	INIT_EXCEPTION_AND_TRACING("MLI03269");
 
 	try
 	{
@@ -228,25 +231,33 @@ STDMETHODIMP CFolderFS::raw_Stop()
 
 		// If this is the search thread, run this method in a new thread to avoid deadlock.
 		// [FlexIDSCore #3463]
-		if (m_pSearchThread->m_nThreadID == GetCurrentThreadId())
+		_lastCodePos = "10";
+		if (m_pSearchThread != NULL && m_pSearchThread->m_nThreadID == GetCurrentThreadId())
 		{
 			AfxBeginThread(stopSearchFileThread, this);
 			return S_OK;
 		}
 
 		// Signal Search threads to stop
+		_lastCodePos = "20";
 		m_StopEvent.signal();
 
 		// Stop listening if it is enabled
 		if ( m_bAddedFiles || m_bModifiedFiles || m_bTargetOfMoveOrRename )
 		{
+			_lastCodePos = "30";
 			stopListening();
 		}
+		_lastCodePos = "40";
+
 		if ( !m_bNoExistingFiles )
 		{
+			_lastCodePos = "50";
 			// Wait for search thread to exit
 			m_eventSearchingExited.wait();
 		}
+		_lastCodePos = "60";
+
 		// reset the Suppling started event
 		m_eventSupplyingStarted.reset();
 	}
