@@ -1476,12 +1476,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms", "..
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.FileProcessors", "..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj", "{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 111
+		ProjectCount = 112
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1593,6 +1602,7 @@ Global
 		ProjectRelativeDiskPath109 = ..\..\..\..\..\RC.Net\Redaction\Verification\Core\Code\Extract.Redaction.Verification.csproj
 		ProjectRelativeDiskPath110 = ..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
 		ProjectRelativeDiskPath111 = ..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
+		ProjectRelativeDiskPath112 = ..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2715,6 +2725,16 @@ Global
 		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{9D9996E1-50BE-4506-B4A6-08F6B9D3F839}.Release|Win32.ActiveCfg = Release|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
