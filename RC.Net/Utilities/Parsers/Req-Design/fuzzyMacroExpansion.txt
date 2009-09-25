@@ -1,0 +1,389 @@
+FUZZY REGULAR EXPRESSION MACRO:
+
+PURPOSE: To allow for a simple, readable, expandable syntax to create regular expressions that
+         account for OCR error.
+
+USAGE: A literal search string (could include escape sequences) specified with a special syntax
+       including options is used instead of or included as a part of a regular expression pattern
+       in the configuration of a rule object that supports regular expressions.
+
+SYNTAX: (given as a .NET regex):
+    (?snx)
+    [(] [?] [~] [<]
+    (?'options'[^>]+?)
+    [>]
+    (?'search_string'[^)]{2}.*?)
+    (?<=
+      (?<![\\])
+      ([\\]{2})*
+    )
+    [)]
+
+  E.g., (?~<method=fast,error=5>Social\sSecurity\sNumber)
+
+EXPANSION: Before a pattern string is turned into a .NET regular expression any fuzzy macros are
+           expanded into valid .NET regular expression patterns according the given options.
+           The resulting regex should work by it self or as part of a larger regex that might
+           contain other fuzzy regexes. This means that care must be taken to avoid group name
+           collision or in-line options specified inside the expression to leak out of its scope.
+
+The basic idea is to use the so-called 'balancing groups' feature of the .NET regex engine to keep
+a tally of errors (insertions, deletions, substitutions) while matching a pattern to an input
+string, failing the match if the number of errors exceeds a specified limit.
+E.g., the pattern string "foo" could be expanded to:
+  (?'err'){1}(f|(?'-err').)
+             (o|(?'-err').)
+             (o|(?'-err').)
+
+to allow for up to one substituted character in the match. The expansion gets only slightly more
+complicated in order to handle missing or added characters. This, with the addition of some
+additional restrictions gives the 'fast' method outlined below.
+
+This method is fine for validation or document classification but leaves much to be desired when
+trying to 'cleanly' match a substring (without extra leading characters). For this the best method
+I have devised is the 'better_fit' method which uses lookahead groups to fail a potential match at
+a given point if it has n > 1 inserted characters and a match with < n inserted characters exists 
+starting 1 to n positions ahead of the current position.
+
+DETAILS:
+
+The following roughly outlines the method that I would use to expand a macro (group names refer to
+parts of the pattern listed above under SYNTAX):
+
+The string matched by the group named 'options' should be parsed for supported, comma-delimited
+key=value pairs, e.g.:
+  /method=(fast|better_fit)/            default is "fast"
+  /error=[1-9]\d*/                      default is 1
+  /xtra_ws=\d*/                         default is 0
+
+The string matched by the group named 'search_string' should be translated as follows:
+  All occurrences of allowed escape sequences should be replaced with the characters they represent.
+    e.g., "\\" => "\", "\s" or "\x20" => " ", "\)" => ")", etc.
+
+  Let search_tokens be a list containing each single-character length substring of search_string.
+  The size of the list being less than or equal to the numeric value of the 'error' option should
+    trigger an exception as this would not make any sense.
+  Each string in search_tokens that is a .NET regex meta-character should be escaped.
+
+  (NOTE: For the following, <i> is replaced by some string in order to prevent name collision
+    , e.g., an incremented digit)
+
+
+METHOD=FAST:
+
+  If the value of the 'method' option is "fast"
+    Construct a list of strings, expanded_search_tokens, based on search_tokens
+      Where each search_token becomes:
+        (
+          search_token
+          | (?'-__error_stack<i>')(?'__missed_stack<i>')
+          | (?>.
+              (
+                (?'-__missed_stack<i>')
+                | (?'-__error_stack<i>')
+              )
+            )+?
+            (?'-__extra_space_stack<i>'\s)*?
+            search_token
+        )
+
+      If not the last token then add:
+        (?'-__extra_space_stack<i>'\s)*?
+
+    The output then consists of the prefix:
+      (?nx:
+        (?'__error_stack<i>'){<error>}
+        (?'__extra_space_stack<i>'){<xtra_ws>}
+
+    (Where <error> is the value of the 'error' option and <xtra_ws> is the value of the 'xtra_ws'
+      option.)
+    Concatenated with the elements of expanded_search_tokens and a closing parenthesis.
+      
+
+METHOD=BETTER_FIT:
+
+  If the value of the 'method' option is "better_fit"
+    Construct a list of strings, initial_expanded_search_tokens, based on search_tokens
+      Where each search_token becomes:
+        If this is the first token:
+          (
+              search_token
+            | (?'-__initial_error_stack<i>')(?'__initial_missed_stack<i>')(?'__final_error_stack<i>')
+            | (?>.
+                (
+                  (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
+                    (?'__allowable_lookahead_stack<i>')
+                )
+              )+?
+              search_token
+          )
+          ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
+
+        Else if this is the last token:
+          (
+              search_token
+            | (?>.
+                (
+                  (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
+                    (?'__allowable_lookahead_stack<i>')
+                )
+              )+?
+              ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
+              search_token
+            | (?'-__initial_error_stack<i>')(?'__initial_missed_stack<i>')(?'__final_error_stack<i>')
+          )
+
+        Else:
+          (
+              search_token
+            | (?'-__initial_error_stack<i>')(?'__initial_missed_stack<i>')(?'__final_error_stack<i>')
+            | (?>.
+                (
+                  (?'-__initial_missed_stack<i>')
+                  | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>')
+                    (?'__allowable_lookahead_stack<i>')
+                )
+              )+?
+              ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
+              search_token
+          )
+          ((?'-__initial_extra_space_stack<i>')(?'__final_extra_space_stack<i>')\s)*?
+
+    And another list of strings, final_expanded_search_tokens, based on search_tokens
+      Where each search_token becomes:
+        If this is the first token:
+          (
+              search_token
+            | (?'-__final_error_stack<i>')(?'__final_missed_stack<i>')
+            | (?>.
+                (
+                  (?'-__final_missed_stack<i>')
+                  | (?'-__final_error_stack<i>')
+                )
+              )+?
+              search_token
+          )
+          (?'-__final_extra_space_stack<i>'\s)*?
+
+        Else if the last token:
+          (
+              search_token
+            | (?>.
+                (
+                  (?'-__final_missed_stack<i>')
+                  | (?'-__final_error_stack<i>')
+                )
+              )+?
+              (?'-__final_extra_space_stack<i>'\s)*?
+              search_token
+            | (?'-__final_error_stack<i>')(?'__final_missed_stack<i>')
+          )
+
+        Else:
+          (
+              search_token
+            | (?'-__final_error_stack<i>')(?'__final_missed_stack<i>')
+            | (?>.
+                (
+                  (?'-__final_missed_stack<i>')
+                  | (?'-__final_error_stack<i>')
+                )
+              )+?
+              (?'-__final_extra_space_stack<i>'\s)*?
+              search_token
+          )
+          (?'-__final_extra_space_stack<i>'\s)*?
+
+    Let whole_pattern_prefix =
+      (?nx:
+        (?'__initial_error_stack<i>'){<error>}
+        (?'__initial_extra_space_stack<i>'){<xtra_ws>}
+
+    (Where <error> is the value of the 'error' option and <xtra_ws> is the value of the 'xtra_ws'
+      option.)
+    
+    If the first element of search_tokens represents a 'word character' then:
+      Let initial_pattern_prefix =
+
+        (?=
+          (?'__actual_matched_string'
+          (?>\b | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>'))
+
+      Let initial_pattern_suffix =
+          (?>\b | (?'-__initial_error_stack<i>')(?'__final_error_stack<i>'))
+          )
+        )
+
+      Let final_pattern_prefix =
+        (?!
+          (?'-__final_error_stack<i>')
+          (?>(?'-__allowable_lookahead_stack<i>')\s*\S\s*)+?
+          (?>
+
+            (?>\b | (?'-__final_error_stack<i>'))
+
+      Let final_pattern_suffix =
+            (?>\b | (?'-__final_error_stack<i>'))
+            )
+          )
+
+    Else:
+      Let initial_pattern_prefix =
+        (?=
+          (?'__actual_matched_string'
+
+      Let initial_pattern_suffix =
+          )
+        )
+
+      Let final_pattern_prefix =
+        (?!
+          (?'-__final_error_stack<i>')
+          (?>(?'-__allowable_lookahead_stack<i>')\s*\S\s*)+?
+          (?>
+
+      Let final_pattern_suffix =
+          )
+        )
+
+    Let whole_pattern_suffix =
+        \k'__actual_matched_string'
+      )
+
+    The output then consists of:
+      whole_pattern_prefix
+      + initial_pattern_prefix
+      + initial_expanded_search_tokens
+      + initial_pattern_suffix
+      + final_pattern_prefix
+      + final_expanded_search_tokens
+      + final_pattern_suffix
+      + whole_pattern_suffix
+
+
+EXAMPLES:
+
+  FAST METHOD:
+    If the 'regular expression' looks like:
+      ((?~<method=fast,error=1,xtra_ws=6>Drivers)\s*)?(?~<method=fast,error=2,xtra_ws=11>License\sNumber)
+
+    It should be expanded to something like:
+
+      ((?nx:
+        (?'__error_stack1'){1}
+        (?'__extra_space_stack1'){6}
+        (D|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?D)((?'-__extra_space_stack1')\s)*?
+        (r|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?r)((?'-__extra_space_stack1')\s)*?
+        (i|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?i)((?'-__extra_space_stack1')\s)*?
+        (v|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?v)((?'-__extra_space_stack1')\s)*?
+        (e|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?e)((?'-__extra_space_stack1')\s)*?
+        (r|(?'-__error_stack1')(?'__missed_stack1')|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?((?'-__extra_space_stack1')\s)*?r)((?'-__extra_space_stack1')\s)*?
+        (s|(?>.((?'-__missed_stack1')|(?'-__error_stack1')))+?s|(?'-__error_stack1')(?'__missed_stack1'))((?'-__extra_space_stack1')\s)*?
+      )\s*)?(?nx:
+        (?'__error_stack2'){2}
+        (?'__extra_space_stack2'){11}
+        (L|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?L)((?'-__extra_space_stack2')\s)*?
+        (i|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?i)((?'-__extra_space_stack2')\s)*?
+        (c|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?c)((?'-__extra_space_stack2')\s)*?
+        (e|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?e)((?'-__extra_space_stack2')\s)*?
+        (n|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?n)((?'-__extra_space_stack2')\s)*?
+        (s|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?s)((?'-__extra_space_stack2')\s)*?
+        (e|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?e)((?'-__extra_space_stack2')\s)*?
+        (\x20|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?\x20)((?'-__extra_space_stack2')\s)*?
+        (N|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?N)((?'-__extra_space_stack2')\s)*?
+        (u|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?u)((?'-__extra_space_stack2')\s)*?
+        (m|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?m)((?'-__extra_space_stack2')\s)*?
+        (b|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?b)((?'-__extra_space_stack2')\s)*?
+        (e|(?'-__error_stack2')(?'__missed_stack2')|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?((?'-__extra_space_stack2')\s)*?e)((?'-__extra_space_stack2')\s)*?
+        (r|(?>.((?'-__missed_stack2')|(?'-__error_stack2')))+?r|(?'-__error_stack2')(?'__missed_stack2')((?'-__extra_space_stack2')\s)*?)
+      )
+
+
+  BETTER_FIT METHOD:
+    
+    If the 'regular expression' looks like:
+      ((?~<method=better_fit,error=1,xtra_ws=6>Drivers)\s*)?(?~<method=better_fit,error=2,xtra_ws=11>License\sNumber)
+
+    It should be expanded to something like:
+
+      ((?nx:
+        (?'__initial_error_stack1'){1}
+        (?'__initial_extra_space_stack1'){6}
+        (?=
+          (?'__actual_matched_string1'
+            (?>\b|(?'-__initial_error_stack1')(?'__final_error_stack1'))
+            (D|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?D)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (r|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?r)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (i|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?i)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (v|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?v)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (e|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?e)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (r|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1')|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?r)((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (s|(?>.((?'-__initial_missed_stack1')|(?'-__initial_error_stack1')(?'__final_error_stack1')(?'__allowable_lookahead_stack1')))+?s|(?'-__initial_error_stack1')(?'__initial_missed_stack1')(?'__final_error_stack1'))((?'-__initial_extra_space_stack1')(?'__final_extra_space_stack1')\s)*?
+            (?>\b|(?'-__initial_error_stack1')(?'__final_error_stack1'))
+          )
+        )
+        (?!
+          (?'-__final_error_stack1')
+          (?>(?'-__allowable_lookahead_stack1')\s*\S\s*)+?
+          (?>
+              (?>\b|(?'-__final_error_stack1'))
+              (D|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?D)((?'-__final_extra_space_stack1')\s)*?
+              (r|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?r)((?'-__final_extra_space_stack1')\s)*?
+              (i|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?i)((?'-__final_extra_space_stack1')\s)*?
+              (v|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?v)((?'-__final_extra_space_stack1')\s)*?
+              (e|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?e)((?'-__final_extra_space_stack1')\s)*?
+              (r|(?'-__final_error_stack1')(?'__final_missed_stack1')|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?((?'-__final_extra_space_stack1')\s)*?r)((?'-__final_extra_space_stack1')\s)*?
+              (s|(?>.((?'-__final_missed_stack1')|(?'-__final_error_stack1')))+?s|(?'-__final_error_stack1')(?'__final_missed_stack1'))((?'-__final_extra_space_stack1')\s)*?
+              (?>\b|(?'-__final_error_stack1'))
+          )
+        )
+        \k'__actual_matched_string1'
+      )\s*)?(?nx:
+      (?'__initial_error_stack2'){2}
+      (?'__initial_extra_space_stack2'){11}
+      (?=
+        (?'__actual_matched_string2'
+          (?>\b|(?'-__initial_error_stack2')(?'__final_error_stack2'))
+          (L|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?L)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (i|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?i)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (c|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?c)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (e|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?e)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (n|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?n)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (s|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?s)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (e|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?e)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (\x20|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?\x20)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (N|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?N)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (u|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?u)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (m|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?m)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (b|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?b)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (e|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2')|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?e)((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (r|(?>.((?'-__initial_missed_stack2')|(?'-__initial_error_stack2')(?'__final_error_stack2')(?'__allowable_lookahead_stack2')))+?r|(?'-__initial_error_stack2')(?'__initial_missed_stack2')(?'__final_error_stack2'))((?'-__initial_extra_space_stack2')(?'__final_extra_space_stack2')\s)*?
+          (?>\b|(?'-__initial_error_stack2')(?'__final_error_stack2'))
+        )
+      )
+      (?!
+        (?'-__final_error_stack2')
+        (?>(?'-__allowable_lookahead_stack2')\s*\S\s*)+?
+        (?>
+            (?>\b|(?'-__final_error_stack2'))
+            (L|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?L)((?'-__final_extra_space_stack2')\s)*?
+            (i|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?i)((?'-__final_extra_space_stack2')\s)*?
+            (c|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?c)((?'-__final_extra_space_stack2')\s)*?
+            (e|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?e)((?'-__final_extra_space_stack2')\s)*?
+            (n|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?n)((?'-__final_extra_space_stack2')\s)*?
+            (s|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?s)((?'-__final_extra_space_stack2')\s)*?
+            (e|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?e)((?'-__final_extra_space_stack2')\s)*?
+            (\x20|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?\x20)((?'-__final_extra_space_stack2')\s)*?
+            (N|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?N)((?'-__final_extra_space_stack2')\s)*?
+            (u|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?u)((?'-__final_extra_space_stack2')\s)*?
+            (m|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?m)((?'-__final_extra_space_stack2')\s)*?
+            (b|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?b)((?'-__final_extra_space_stack2')\s)*?
+            (e|(?'-__final_error_stack2')(?'__final_missed_stack2')|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?((?'-__final_extra_space_stack2')\s)*?e)((?'-__final_extra_space_stack2')\s)*?
+            (r|(?>.((?'-__final_missed_stack2')|(?'-__final_error_stack2')))+?r|(?'-__final_error_stack2')(?'__final_missed_stack2'))((?'-__final_extra_space_stack2')\s)*?
+            (?>\b|(?'-__final_error_stack2'))
+        )
+      )
+      \k'__actual_matched_string2'
+    )
