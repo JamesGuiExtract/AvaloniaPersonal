@@ -255,6 +255,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ManageUserCountersDlg.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\RenameActionDlg.cpp"
 				>
 			</File>
@@ -338,6 +342,10 @@
 			</File>
 			<File
 				RelativePath=".\ManageTagsDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ManageUserCountersDlg.h"
 				>
 			</File>
 			<File

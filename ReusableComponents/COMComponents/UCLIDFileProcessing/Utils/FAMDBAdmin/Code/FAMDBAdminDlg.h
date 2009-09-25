@@ -53,6 +53,7 @@ protected:
 	afx_msg void OnToolsReports();
 	afx_msg void OnToolsCheckForNewComponents();
 	afx_msg void OnToolsManageTags();
+	afx_msg void OnToolsManageCounters();
 	afx_msg void OnToolsSetPriority();
 	DECLARE_MESSAGE_MAP()
 

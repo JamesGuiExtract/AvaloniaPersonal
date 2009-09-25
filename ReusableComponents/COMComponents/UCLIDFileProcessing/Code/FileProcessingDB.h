@@ -30,6 +30,27 @@ using namespace std;
 // User name for FAM DB Admin access
 const string gstrADMIN_USER = "admin";
 
+// Table names
+static const string gstrACTION = "Action";
+static const string gstrACTION_STATE = "ActionState";
+static const string gstrACTION_STATISTICS = "ActionStatistics";
+static const string gstrDB_INFO = "DBInfo";
+static const string gstrFAM_FILE = "FAMFile";
+static const string gstrFILE_ACTION_STATE_TRANSITION = "FileActionStateTransition";
+static const string gstrLOCK_TABLE = "LockTable";
+static const string gstrLOGIN = "Login";
+static const string gstrQUEUE_EVENT = "QueueEvent";
+static const string gstrQUEUE_EVENT_CODE = "QueueEventCode";
+static const string gstrMACHINE = "Machine";
+static const string gstrFAM_USER = "FAMUser";
+static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
+static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
+static const string gstrFAM_TAG = "Tag";
+static const string gstrFAM_FILE_TAG = "FileTag";
+static const string gstrPROCESSING_FAM = "ProcessingFAM";
+static const string gstrLOCKED_FILE = "LockedFile";
+static const string gstrUSER_CREATED_COUNTER = "UserCreatedCounter";
+
 //-------------------------------------------------------------------------------------------------
 // CFileProcessingDB
 //-------------------------------------------------------------------------------------------------
@@ -145,6 +166,13 @@ public:
 	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
 	STDMETHOD(SetPriorityForFiles)(BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
+	STDMETHOD(AddUserCounter)(BSTR bstrCounterName, long nInitialValue);
+	STDMETHOD(RemoveUserCounter)(BSTR bstrCounterName);
+	STDMETHOD(RenameUserCounter)(BSTR bstrCounterName, BSTR bstrNewCounterName);
+	STDMETHOD(SetUserCounterValue)(BSTR bstrCounterName, long nNewValue);
+	STDMETHOD(GetUserCounterValue)(BSTR bstrCounterName, long* pnValue);
+	STDMETHOD(GetUserCounterNames)(IVariantVector** ppvecNames);
+	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);

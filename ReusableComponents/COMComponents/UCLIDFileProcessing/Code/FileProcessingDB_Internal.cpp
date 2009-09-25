@@ -27,27 +27,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 13;
-
-// Table names
-static const string gstrACTION = "Action";
-static const string gstrACTION_STATE = "ActionState";
-static const string gstrACTION_STATISTICS = "ActionStatistics";
-static const string gstrDB_INFO = "DBInfo";
-static const string gstrFAM_FILE = "FAMFile";
-static const string gstrFILE_ACTION_STATE_TRANSITION = "FileActionStateTransition";
-static const string gstrLOCK_TABLE = "LockTable";
-static const string gstrLOGIN = "Login";
-static const string gstrQUEUE_EVENT = "QueueEvent";
-static const string gstrQUEUE_EVENT_CODE = "QueueEventCode";
-static const string gstrMACHINE = "Machine";
-static const string gstrFAM_USER = "FAMUser";
-static const string gstrFAM_FILE_ACTION_COMMENT = "FileActionComment";
-static const string gstrFAM_SKIPPED_FILE = "SkippedFile";
-static const string gstrFAM_TAG = "Tag";
-static const string gstrFAM_FILE_TAG = "FileTag";
-static const string gstrPROCESSING_FAM = "ProcessingFAM";
-static const string gstrLOCKED_FILE = "LockedFile";
+const long glFAMDBSchemaVersion = 14;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -861,6 +841,8 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_TABLE);
 		vecQueries.push_back(gstrCREATE_PROCESSING_FAM_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_LOCKED_FILE_TABLE);
+		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_TABLE);
+		vecQueries.push_back(gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX);
 
 		// Only create the login table if it does not already exist
 		if ( !doesTableExist( getDBConnection(), "Login"))
@@ -1798,6 +1780,7 @@ void CFileProcessingDB::getExpectedTables(std::vector<string>& vecTables)
 	vecTables.push_back(gstrFAM_TAG);
 	vecTables.push_back(gstrPROCESSING_FAM);
 	vecTables.push_back(gstrLOCKED_FILE);
+	vecTables.push_back(gstrUSER_CREATED_COUNTER);
 }
 //--------------------------------------------------------------------------------------------------
 bool CFileProcessingDB::isExtractTable(const string& strTable)

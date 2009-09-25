@@ -28,7 +28,7 @@ static const string gstrCREATE_FAM_FILE_TABLE = "CREATE TABLE [FAMFile]("
 	"[FileName] [nvarchar](255) NULL,"
 	"[FileSize] [bigint] NOT NULL CONSTRAINT [DF_FAMFile_FileSize]  DEFAULT ((0)),"
 	"[Pages] [int] NOT NULL CONSTRAINT [DF_FAMFile_Pages]  DEFAULT ((0)),"
-	"[Priority] [int] NOT NULL DEFAULT((3)))";
+	"[Priority] [int] NOT NULL CONSTRAINT [DF_FAMFile_Priority] DEFAULT((3)))";
 
 static const string gstrCREATE_QUEUE_EVENT_CODE_TABLE = "CREATE TABLE [QueueEventCode]("
 	"[Code] [nvarchar](1) NOT NULL CONSTRAINT [PK_QueueEventCode] PRIMARY KEY CLUSTERED ,"
@@ -129,6 +129,11 @@ static const string gstrCREATE_LOCKED_FILE_TABLE =
 	"[UPIID] [int] , "
 	"[StatusBeforeLock] [nvarchar](1) NOT NULL)";
 
+static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
+	"CREATE TABLE [UserCreatedCounter] ("
+	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedConter] PRIMARY KEY CLUSTERED,"
+	"[Value] [int] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
+
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "
 	"ON [FAMFile]([Priority] DESC, [ID] ASC)";
@@ -150,6 +155,9 @@ static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDE
 
 static const string gstrCREATE_PROCESSING_FAM_UPI_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_ProcessingFAM_UPI] ON [ProcessingFAM]([UPI])";
+
+static const string gstrCREATE_USER_CREATED_COUNTER_VALUE_INDEX = "CREATE NONCLUSTERED INDEX "
+	"[IX_UserCreatedCounter_Value] ON [UserCreatedCounter]([Value])";
 
 // Add foreign keys SQL
 static const string gstrADD_STATISTICS_ACTION_FK = 

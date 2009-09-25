@@ -903,6 +903,42 @@ library UCLID_FILEPROCESSINGLib
 		//			will be checked and the file will only be modified if the condition returns true.
 		[id(69), helpstring("method SetPriorityForFiles")] HRESULT SetPriorityForFiles([in] BSTR strSelectQuery,
 			[in] EFilePriority eNewPriority, [in] IRandomMathCondition* pRandomCondition, [out,retval] long *pnNumRecordsModified);
+		
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to UserCounters
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add a new user counter to the UserCreatedCounter table.  Sets the initial
+		//			value for the counter to nInitialValue.
+		[id(70), helpstring("method AddUserCounter")] HRESULT AddUserCounter([in] BSTR bstrCounterName,
+			[in] long nInitialValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the specified counter from the UserCreatedCounter table.  If
+		//			bstrCounterName is not found in the database an exception will be thrown.
+		[id(71), helpstring("method RemoveUserCounter")] HRESULT RemoveUserCounter(
+			[in] BSTR bstrCounterName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To rename the specified counter in the UserCreatedCounterTable.  If bstrCounterName
+		//			is not found in the database an exception will be thrown.
+		[id(72), helpstring("method RenameUserCounter")] HRESULT RenameUserCounter(
+			[in] BSTR bstrCounterName, [in] BSTR bstrNewCounterName);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To set the value for the specified counter.  If bstrCounterName is not found
+		//			in the database an an exception will be thrown.
+		[id(73), helpstring("method SetUserCounterValue")] HRESULT SetUserCounterValue(
+			[in] BSTR bstrCounterName, [in] long nNewValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To get the value for the specified counter. If bstrCounterName is not found
+		//			in the database an exception will be thrown.
+		[id(74), helpstring("method GetUserCounterValue")] HRESULT GetUserCounterValue(
+			[in] BSTR bstrCounterName, [out, retval] long* pnValue);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return a collection of all user counters names.
+		[id(75), helpstring("method GetUserCounterNames")] HRESULT GetUserCounterNames(
+			[out, retval] IVariantVector** ppvecNames);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To return a collection of all user counter names and values.
+		[id(76), helpstring("method GetUserCounterNamesAndValues")] HRESULT GetUserCounterNamesAndValues(
+			[out, retval] IStrToStrMap** ppmapUserCounters);
 		// -----------------------------------------------------------------------------------------------
 	};
 

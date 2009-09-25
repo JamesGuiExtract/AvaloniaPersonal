@@ -8,6 +8,7 @@
 #include "ClearWarningDlg.h"
 #include "ExportFileListDlg.h"
 #include "FileProcessingAddActionDlg.h"
+#include "ManageUserCountersDlg.h"
 #include "ManageTagsDlg.h"
 #include "RenameActionDlg.h"
 #include "SetActionStatusDlg.h"
@@ -106,6 +107,7 @@ BEGIN_MESSAGE_MAP(CFAMDBAdminDlg, CDialog)
 	ON_COMMAND(ID_TOOLS_REPORTS, &CFAMDBAdminDlg::OnToolsReports)
 	ON_COMMAND(ID_TOOLS_CHECKFORNEWCOMPONENTS, &CFAMDBAdminDlg::OnToolsCheckForNewComponents)
 	ON_COMMAND(ID_TOOLS_MANAGE_TAGS, &CFAMDBAdminDlg::OnToolsManageTags)
+	ON_COMMAND(ID_TOOLS_MANAGE_COUNTERS, &CFAMDBAdminDlg::OnToolsManageCounters)
 	ON_COMMAND(ID_TOOLS_SETPRIORITY, &CFAMDBAdminDlg::OnToolsSetPriority)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -825,6 +827,21 @@ void CFAMDBAdminDlg::OnToolsManageTags()
 		dlg.DoModal();
 	}
 	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27416");
+}
+//-------------------------------------------------------------------------------------------------
+void CFAMDBAdminDlg::OnToolsManageCounters()
+{
+	AFX_MANAGE_STATE( AfxGetModuleState() );
+
+	try
+	{	
+		// Create a new counter manager dialog
+		CManageUserCountersDlg dlg(m_ipFAMDB);
+
+		// Display the dialog
+		dlg.DoModal();
+	}
+	CATCH_AND_DISPLAY_ALL_EXCEPTIONS("ELI27787");
 }
 //-------------------------------------------------------------------------------------------------
 void CFAMDBAdminDlg::OnToolsSetPriority()
