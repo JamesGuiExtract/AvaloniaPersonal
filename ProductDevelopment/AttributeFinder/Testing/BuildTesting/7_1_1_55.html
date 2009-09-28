@@ -1,0 +1,474 @@
+<HTML>
+
+<HEAD>
+<TITLE>FLEX Index 7.1.1.55 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> FLEX Index / ID Shield 7.1.1.55 Testing <br>
+<IMG src="../../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<OL>
+	<LI><h3>Descriptions of Changes</h3>
+       	<ul>
+  	   	<LI><b>[FlexIDSCore #3604]</b> Demo Shield Installs SQL Server 2008
+	       	<ul>
+	      		<li>Install the software via <b>Launch.exe</b> from FlexInstall 
+			or IDShieldInstall.
+	      		<li>Confirm that the DemoShield installation includes an option 
+			for <b>SQL Server 2008</b>.
+	      		<li>Confirm that <b>SQL Server 2008</b> installs correctly.
+	      		<li>Confirm that the DemoShield installation includes an option 
+			for <b>SQL Server 2008 Management Studio</b>. 
+	      		<li>Confirm that <b>SQL Server 2008 Management Studio</b> 
+			installs correctly.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3659]</b> Flex Data Entry Includes INI File
+	       	<ul>
+	      		<li>Install and license <b>FLEX Index</b>.
+	      		<li>Copy the <b>FLEX Data Entry</b> folder to the test machine.
+	      		<li>Conform that <b>FlexDataEntry.exe</b> runs without a missing 
+			INI file error.
+	       	</ul>
+<p>
+  	   	<LI><b>[FlexIDSCore #3669]</b> Spatialness Column In VOA Viewer
+	       	<ul>
+	      		<li>Exercise the <b>VOA Viewer</b> utility.
+	      		<li>Confirm that a <b>Spatialness</b> column is provided.
+	      		<li>Confirm that <b>Spatial</b> data is displayed properly.
+	      		<li>Confirm that <b>Hybrid</b> data is displayed properly.
+	      		<li>Confirm that <b>Non-spatial</b> data is displayed properly.
+	       	</ul>
+<p>
+  	   	<LI><b>.NET Verification</b> - Exercise <b>Verify redactions two</b>
+	       	<ul>
+	  	   	<LI>Confirm that the verification UI has a minimum size.
+      			<li>Confirm that splitter panels in the verification UI have 
+			a minimum height.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3652]</b> Confirm that redactions 
+			<b>printed</b> from the verification UI are output in the color 
+			specified in the <b>IDShield.ini</b> file.
+      			<li>Confirm that <b>RedactionColorInOutputFile</b> supports 
+			<b>Black</b> and <b>White</b>.
+      			<li>Confirm that without a <b>RedactionColorInOutputFile</b> 
+			setting, redactions are output as <b>Black</b> by default.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3654]</b> Confirm that clicking on a row of 
+			the redaction grid will cause the <b>Image Viewer</b> to 
+			automatically navigate to the appropriate page if not already 
+			displaying the page.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3655]</b> Confirm that unviewed redactions 
+			are displayed in <b>Bold</b> font.
+      			<li>Confirm that viewed redactions are displayed in 
+			<b>normal</b> font.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3656]</b> Confirm that an <b>Options</b> 
+			dialog is available from a toolbar button.
+      			<li>Confirm that the <b>Automatic Zoom</b> settings are read 
+			from and written to <b>IDShield.ini</b>.
+      			<li>Confirm that the <b>Auto Tool</b> settings are read 
+			from and written to <b>IDShield.ini</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3661]</b> Confirm that <b>Options</b> 
+			supports <b>Selection Tool</b>, <b>Pan Tool</b>, or <b>no 
+			automatic tool change</b> after creation of a manual redaction.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3662]</b> Confirm that with <b>Auto Zoom</b> 
+			enabled, all selected redactions on the current page are within view.
+      			<li>Confirm that with a higher <b>Auto Zoom</b> setting, the view 
+			is further out from the redactions.
+      			<li>Confirm that selecting a single redaction does not change the zoom.
+      			<li>Confirm that drawing a manual redaction does not change the zoom.
+      			<li>Confirm that with <b>Auto Zoom</b> disabled, the zoom does 
+			not change when redactions are selected.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3666]</b> Confirm that redactions are listed in 
+			the <b>Grid View</b> in sorted order, form top to bottom and left 
+			to right.
+      			<li>Confirm that a new manual redaction is inserted into the <b>Grid 
+			View</b> in sorted order.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3667]</b> Confirm that the <b>Next redaction</b> 
+			button moves to the next unviewed row if <b>Review All Pages</b> is 
+			disabled.
+      			<li>Confirm that the <b>Next redaction</b> button moves to the next 
+			unviewed page if <b>Review All Pages</b> is enabled and the last 
+			redaction on the current page is already selected.
+      			<li>Confirm that the <b>Next redaction</b> button prompts the user 
+			about moving to the next document if the last redaction is already 
+			selected.
+      			<li>Confirm that the <b>Next redaction</b> button does not prompt 
+			the user about moving to the next document if a history document 
+			is being viewed unless a change has been made to that document.
+			<li>Confirm that the <b>Previous redaction</b> button moves to the 
+			previous unviewed row if <b>Review All Pages</b> is disabled.
+      			<li>Confirm that the <b>Previous redaction</b> button moves to the 
+			previous unviewed page if <b>Review All Pages</b> is enabled and the 
+			first redaction on the current page is already selected.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3671]</b> Confirm that settings are read from 
+			<b>IDShield.ini</b> when the verification UI is first opened.
+      			<li>Confirm that changes made to the settings are written back to 
+			<b>IDShield.ini</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3672]</b> Confirm that changing a redaction type 
+			prompts the user to save changes.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3673]</b> Confirm that <b>T</b> works as a 
+			shortcut key to drop down the list of supported redaction types.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3674]</b> Confirm that manual redactions default 
+			to using the last applied redaction type.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3675]</b> Confirm that the verification UI opens 
+			a document to the first page or the first redaction depending on the 
+			<b>Review All Pages</b> setting.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3676]</b> Confirm that keyboard shortcuts are 
+			disabled while adding text to the <b>Comments</b> edit box.
+      			<li>Confirm that keyboard shortcuts are disabled while the 
+			redaction type combo box has focus.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3679]</b> Redaction type must be saved 
+			<ul>
+	      			<li>Disable the <b>Require users to specify redaction type 
+				for redactions</b> setting.
+	      			<li>Open a document.
+	      			<li>Draw one manual redaction and give it a type.
+	      			<li>Advance to the next document.
+	      			<li>Return to the previous document.
+	      			<li>Confirm that the manual redaction still has the 
+				specified type.
+			</ul>
+<p>
+	  	   	<LI><b>[FlexIDSCore #3681]</b> Confirm that <b>Edit - Discard changes</b> 
+			allows the user to discard all changes made since the last <b>File - 
+			Save</b> and does not throw an exception.
+      			<li>Confirm that interim changes that were saved via <b>File - Save</b> 
+			are still retained after <b>Edit - Discard changes</b>.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3685]</b> Confirm that information about <b>viewed 
+			redactions</b> is saved during navigation to a history document.
+	  	   	<LI>Confirm that information about <b>viewed pages</b> is saved during 
+			navigation to a history document.
+<p>
+	  	   	<LI><b>[FlexIDSCore #3686]</b> Confirm that with <b>Require users to 
+			specify redaction type for redactions</b> disabled, a blank type 
+			is available from the drop-down list and accepted as valid.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5420, #5421, #5422, #5423, #5424, #5425, #5426, #5431]</b> 
+		Support For Tags
+	       	<ul>
+	  	   	<LI>Confirm that the <b>DB Admin</b> utility includes a <b>Tools - 
+			Manage Tags...</b> menu item.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			two-column list of tags and associated descriptions.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			button to <b>Add</b> a new tag.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			button to <b>Modify</b> an existing tag.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			button to <b>Delete</b> an existing tag.
+	      		<li>Confirm that deleting a tag requires confirmation.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			button to <b>Refresh</b> the list of tags.
+	      		<li>Confirm that the <b>Manage Tags</b> dialog includes a 
+			button to <b>Close</b> the dialog.
+	      		<li>Confirm that tags must begin with a letter, number or 
+			underscore character.
+	      		<li>Confirm that tags can contain spaces allowing for 
+			multiple-word strings.
+<p>
+	      		<li>Confirm that the <b>Select Files</b> dialog includes an 
+			option for <b>any</b> or <b>all</b> of the following tags.
+	      		<li>Confirm that the list of tags supports selection of one 
+			of more tags.
+	      		<li>Confirm that the tag-related controls are disabled unless 
+			the appropriate option is selected. 
+<p>
+	      		<li>Confirm presence of a <b>Manage tags</b> task.
+	      		<li>Confirm that the property page includes options to 
+			<b>Apply the tags selected below</b>, <b>Remove the tags 
+			selected below</b>, and <b>Toggle the state of the tags 
+			selected below</b>.
+	      		<li>Confirm that the property page includes a checked list 
+			of defined tags.
+	      		<li>Confirm that property page settings are persistent. 
+	      		<li>Confirm that the task functions as expected. 
+			<li><b>[LegacyRC #5447]</b> Do not partially complete a task
+			<ul>
+				<li>Create three tags in the <b>DB Admin</b> utility.
+				<li>Configure a FAM task to apply all three tags.
+				<li>Delete one of the tags via <b>DB Admin</b>.
+				<li>Start processing.
+				<li>Confirm that each processed file fails.
+				<li>Confirm that neither of the two remaining tags 
+				are applied to any of the processed documents.
+			</ul>
+			<li><b>[LegacyRC #5448]</b> Tag must exist for configuration
+			<ul>
+				<li>Create a tag in the <b>DB Admin</b> utility.
+				<li>Configure a FAM task to apply the tag.
+				<li>Delete the tag via <b>DB Admin</b>.
+				<li>Open the property page for the previously configured 
+				task and click <b>Ok</b>.
+				<li>Confirm that an error message is presented about 
+				the missing tag.
+				<li>Confirm that the user must <b>Cancel</b> out of the 
+				property page.
+			</ul>
+			<li><b>[LegacyRC #5453]</b> Log exception when tags are changed
+			<ul>
+				<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+				trace:</b> exception when a tag is added to the database.
+				<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+				trace:</b> exception when a tag is modified in the database.
+				<li>Confirm that <b>DB Admin</b> logs an <b>Application 
+				trace:</b> exception when a tag is removed from the database.
+			</ul>
+<p>
+	      		<li>Confirm presence of a <b>Tag condition</b> object.
+	      		<li>Confirm that the property page includes a combo box for  
+			considering the condition <b>met</b>, or <b>not met</b>.
+	      		<li>Confirm that the property page includes a combo box for  
+			if the document is tagged with <b>any</b>, or <b>all</b> of 
+			the following conditions.
+	      		<li>Confirm that the property page includes a checked list 
+			of defined tags.
+	      		<li>Confirm that property page settings are persistent. 
+	      		<li>Confirm that the condition object functions as expected. 
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5343]</b> OCR image opened via relative path
+	       	<ul>
+	      		<li>Open a command prompt in a folder with an image file.
+	      		<li>Confirm that the image opens with the following 
+			command-line argument:<br>
+			<b>C:\Program Files\Extract Systems\CommonComponents\ImageViewer.exe 
+			&lt;filename&gt;</b>
+	      		<li>Confirm that the <b>Recognize text and process</b> commands 
+			also work without error.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5351]</b> Lead Tools 16.5
+	       	<ul>
+	      		<li>Confirm that Lead Tools is licensed and that the <b>NAG DLL 
+			message</b> is not seen.
+	      		<li>Confirm that the <b>Image Format Converter</b> works.
+	      		<li>Confirm that <b>auto-redaction</b> works with TIF images.
+	      		<li>Confirm that <b>auto-redaction</b> works with PDF images.
+	      		<li>Confirm that <b>verification</b> works with TIF images, including 
+			adding manual redactions.
+	      		<li>Confirm that <b>verification</b> works with PDF images, including 
+			adding manual redactions.
+	      		<li>Confirm that the <b>Add Watermark</b> task works.
+	      		<li>Confirm that the <b>Image Viewer</b> can open files of various types.
+	      		<li>Confirm that the <b>Image Viewer</b> can open files with various 
+			rotations and view perspectives.
+	      		<li>Confirm that text can be recognized via rectangular region in the 
+			<b>Image Viewer</b>.
+	      		<li>Confirm that text can be recognized via page in the <b>Image Viewer</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5403]</b> Do not process currently skipped files
+	       	<ul>
+	      		<li>Modify the <b>MaxFilesFromDB</b> registry entry to a small number 
+			such as 3.
+	      		<li>Process and skip a larger number of files such as 10.
+	      		<li>Process skipped files.
+	      		<li>Confirm that files that are skipped again are not repeatedly 
+			presented for processing.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5414]</b> DB setting for requiring password before 
+		processing all skipped files
+	       	<ul>
+	      		<li>Confirm that a <b>DBInfo</b> setting for 
+			<b>RequirePasswordToProcessAllSkippedFiles</b> exists.
+	      		<li>Confirm that the default setting is enabled.
+	      		<li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> 
+			is enabled, the DB Admin password <b>is required</b> in order 
+			to process all skipped files.
+	      		<li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> 
+			is disabled, the DB Admin password <b>is not required</b> in order 
+			to process all skipped files.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5434]</b> Mathematical condition object
+	       	<ul>
+	      		<li>Confirm that the property page is keyboard navigable.
+	      		<li>Confirm that property pages for other condition objects are 
+			also keyboard navigable.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5435, #5449]</b> Actions and Skipped status
+	       	<ul>
+	      		<li>Confirm that adding an action within DB Admin allows status 
+			to default to <b>Skipped</b>.
+	      		<li>Confirm that <b>Set File Action Status</b> allows status to 
+			be set to <b>Skipped</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5437, #5442, #5443, #5444, #5445, #5454]</b> File priority
+	       	<ul>
+	      		<li>Confirm that a <b>Priority</b> column is available in the 
+			<b>Queue Setup</b> tab.
+	      		<li>Confirm that a <b>Priority</b> column is available in the 
+			<b>Queue Log</b> tab.
+	      		<li>Confirm that a <b>Priority</b> column is available in the 
+			<b>Processing Log</b> tab.
+	      		<li>Confirm that in the <b>File Processing Scope</b> group box 
+			in the <b>Processing Setup</b> tab contains a radio button for 
+			<b>Process all files in the queue</b>.
+<p>
+			<li>Confirm that the <b>DB Admin</b> utility contains a 
+			<b>Tools - Manually set file processing priority</b> menu item.
+			<li>Confirm that the menu item displays a <b>Manually Set 
+			File Processing Priority</b> dialog.
+			<li>Confirm that the dialog contains a multi-line read-only 
+			edit box that describes the selected files.
+			<li>Confirm that the dialog contains an associated <b>Select 
+			files...</b> button.
+			<li>Confirm that clicking the button displays the <b>Select 
+			Files</b> dialog.
+			<li>Confirm that the <b>Select Files</b> dialog includes a radio 
+			button for selecting <b>All files that have the file processing 
+			priority of</b>.
+			<li>Confirm that the <b>Select Files</b> dialog includes an 
+			associated combo box with supported priorities of <b>Low</b>, 
+			<b>Below Normal</b>, <b>Normal</b>, <b>Above Normal</b>, and 
+			<b>High</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5454, #5455]</b> Select Files
+	       	<ul>
+			<li>From the <b>Manually Set File Processing Priority</b> 
+			dialog, use the <b>Select Files</b> dialog to choose some files 
+			based on tags.
+			<li>Confirm that file priority can be set on the selected files.
+<p>
+			<li>Confirm that the <b>Select Files</b> dialog supports 
+			<b>Further narrow the above selected scope of files to a random 
+			% subset</b>.
+			<li>Confirm that the <b>Select Files</b> dialog includes an 
+			associated edit box for a percentage.
+			<li>Confirm that the edit box allows only numbers between 
+			<b>1</b> and <b>99</b>.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5459]</b> Set File Action Status
+	       	<ul>
+			<li>Use <b>DB Admin</b> to set one action's status from the 
+			status of another action by using a query for file selection.
+			<li>Confirm that the operation succeeds without an <b>ELI15290: 
+			Item cannot be found in the collection corresponding to the 
+			requested name or ordinal</b> exception.
+	       	</ul>
+<p>
+  	   	<LI><b>[LegacyRC #5463]</b> User Counters
+	       	<ul>
+			<li>Confirm that the <b>DB Admin</b> utility contains a 
+			<b>Tools - Manage counters...</b> menu item.
+			<li>Confirm that the menu item displays a <b>Manage User 
+			Counters</b> dialog.
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a list with columns for <b>Counter</b> and <b>Value</b>.
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			an <b>Add...</b> button.
+			<ul>
+				<li>Confirm that an <b>Add Counter</b> dialog is 
+				displayed.
+				<li>Confirm that counter names must be unique in 
+				the database.
+			</ul>
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a <b>Delete</b> button.
+			<li>Confirm that a confirmation prompt is provided before 
+			deleting the counter.
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a <b>Rename...</b> button.
+			<ul>
+				<li>Confirm that a <b>Rename Counter</b> dialog is 
+				displayed.
+				<li>Confirm that counter names must be unique in 
+				the database.
+			</ul>
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a <b>Set value...</b> button.
+			<ul>
+				<li>Confirm that a <b>Set Counter Value</b> dialog is 
+				displayed.
+				<li>Confirm that the <b>Counter name</b> edit box 
+				is read-only.
+				<li>Confirm that a <b>New value for counter</b> edit 
+				box is provided.
+				<li>Confirm that the default value in the <b>New value 
+				for counter</b> edit box is the current value.
+			</ul>
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a <b>Refresh</b> button.
+	      		<li>Confirm that <b>Refresh</b> updates the list of counters 
+			and values.
+	      		<li>Confirm that the <b>Manage Counters</b> dialog includes 
+			a <b>Close</b> button.
+	      		<li>Confirm that <b>Close</b> closes the dialog.
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Automated Testing</h3>
+       	<ul>
+  	   	<LI>Automated Tests
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Document Classification
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+  	   	<LI>National Ruleset : Grantor-Grantee
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Redaction
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+		<LI>National Ruleset : Indexing
+	       	<ul>
+	      		<li>Date, Test Machine, Number of Failures
+	      		<li>Notes
+	       	</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><h3>Sanity Testing</h3>
+	<ul>
+		<li>32-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+<p>
+		<li>64-bit Operating System</li>
+		<ul>
+	      		<li>Date, Tester, Test Machine
+	      		<li>Notes
+		</ul>						 
+	</ul>						 
+	</LI>
+</OL>
+</BODY>
+</HTML>
