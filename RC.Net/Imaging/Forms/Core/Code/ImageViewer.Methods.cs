@@ -1,4 +1,3 @@
-using Extract;
 using Extract.Drawing;
 using Extract.Licensing;
 using Extract.Utilities;
@@ -12,15 +11,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
@@ -173,7 +168,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Refresh the image viewer before opening the file [IDSD #145 - JDS]
-                base.Invalidate();
+                Invalidate();
                 Application.DoEvents();
 
                 // TODO: what should final state be if exceptions are thrown in different sections.
@@ -238,36 +233,22 @@ namespace Extract.Imaging.Forms
                         _validAnnotations = true;
 
                         // Initialize a new RasterCodecs object
-                        _codecs = new RasterCodecs();
-                        _codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
-                        _codecs.Options.Pdf.Save.UseImageResolution = true;
-                        _codecs.Options.Pdf.InitialPath = GetPdfInitializationDirectory();
+                        _codecs = GetCodecs();
 
-                        // Leadtools does not support anti-aliasing for non-bitonal pdfs.
-                        // If anti-aliasing is set, load pdfs as a bitonal image with high dpi.
-                        if (_useAntiAliasing)
-                        {
-                            // Load as bitonal for anti-aliasing
-                            _codecs.Options.Pdf.Load.DisplayDepth = 1;
-
-                            // Use high dpi to preserve image quality
-                            _codecs.Options.Pdf.Load.XResolution = 300;
-                            _codecs.Options.Pdf.Load.YResolution = 300;
-                        }
-
-                        // Get a stream of bytes from the file
-                        // Load the new image file
-                        RasterImage newImage = _codecs.Load(_currentOpenFile);
+                        // Get the page count
+                        CodecsImageInfo info = _codecs.GetInformation(_currentOpenFile, true);
+                        _pageCount = info.TotalPages;
 
                         // Create the page data for this image
-                        _imagePages = new List<ImagePageData>(newImage.PageCount);
-                        for (int i = 0; i < newImage.PageCount; i++)
+                        _imagePages = new List<ImagePageData>(_pageCount);
+                        for (int i = 0; i < _pageCount; i++)
                         {
                             _imagePages.Add(new ImagePageData());
                         }
 
                         // Display the first page
-                        base.Image = newImage;
+                        _pageNumber = 1;
+                        base.Image = GetPage(1);
 
                         // Store the image file name
                         _imageFile = fileName;
@@ -315,13 +296,13 @@ namespace Extract.Imaging.Forms
                 OnImageFileChanged(new ImageFileChangedEventArgs(fileName));
 
                 // Raise the on page changed event
-                OnPageChanged(new PageChangedEventArgs(base.Image.Page));
+                OnPageChanged(new PageChangedEventArgs(_pageNumber));
 
                 // Update the zoom history and raise the zoom changed event
                 UpdateZoom(true, true);
 
                 // Restore the cursor for the active cursor tool.
-                this.Cursor = _toolCursor ?? Cursors.Default;
+                Cursor = _toolCursor ?? Cursors.Default;
             }
             catch (Exception e)
             {
@@ -358,6 +339,53 @@ namespace Extract.Imaging.Forms
                     throw ee2;
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the codecs used to manipulate images.
+        /// </summary>
+        /// <value>The codecs used to manipulate images.</value>
+        RasterCodecs GetCodecs()
+        {
+            // Start up the raster codecs if necessary.
+            if (!_codecsStarted)
+            {
+                RasterCodecs.Startup();
+                _codecsStarted = true;
+            }
+
+            // Load the codecs
+            RasterCodecs codecs = null;
+            try
+            {
+                codecs = new RasterCodecs();
+                codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
+                codecs.Options.Pdf.Save.UseImageResolution = true;
+                codecs.Options.Pdf.InitialPath = GetPdfInitializationDirectory();
+
+                // Leadtools does not support anti-aliasing for non-bitonal pdfs.
+                // If anti-aliasing is set, load pdfs as a bitonal image with high dpi.
+                if (_useAntiAliasing)
+                {
+                    // Load as bitonal for anti-aliasing
+                    codecs.Options.Pdf.Load.DisplayDepth = 1;
+
+                    // Use high dpi to preserve image quality
+                    codecs.Options.Pdf.Load.XResolution = 300;
+                    codecs.Options.Pdf.Load.YResolution = 300;
+                }
+            }
+            catch (Exception)
+            {
+                if (codecs != null)
+                {
+                    codecs.Dispose();
+                }
+
+                throw;
+            }
+
+            return codecs;
         }
 
         /// <summary>
@@ -454,7 +482,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // If an image isn't loaded, the cursor for the active cursor tool shouldn't be.
-                    this.Cursor = Cursors.Default;
+                    Cursor = Cursors.Default;
 
                     return true;
                 }
@@ -483,7 +511,7 @@ namespace Extract.Imaging.Forms
         {
             TemporaryWaitCursor waitCursor = null;
             RasterImage image = null;
-            int originalPage = base.Image.Page;
+            int originalPage = _pageNumber;
             Matrix transform = null;
             IntPtr hdc = IntPtr.Zero;
             Graphics graphics = null;
@@ -506,16 +534,15 @@ namespace Extract.Imaging.Forms
                 {
                     // Prepare to store tiff tags
                     annCodecs = new AnnCodecs();
-                    tags = new Dictionary<int, RasterTagMetadata>(base.Image.PageCount);
+                    tags = new Dictionary<int, RasterTagMetadata>(_pageCount);
                 }
 
                 // Iterate through each page of the image
                 ColorResolutionCommand command = null; // Used to change bpp of image
-                for (int i = 1; i <= base.Image.PageCount; i++)
+                for (int i = 1; i <= _pageCount; i++)
                 {
                     // Go to the specified page
-                    base.Image.Page = i;
-                    UpdateAnnotations();
+                    SetPageNumber(i, false, false);
 
                     // Clone the image
                     RasterImage page = base.Image.Clone();
@@ -592,7 +619,7 @@ namespace Extract.Imaging.Forms
                         RotateAnnotations();
 
                         // Check whether the output image is a tiff
-                        if (isTiff)
+                        if (annCodecs != null)
                         {
                             // Save annotations in a tiff tag
                             RasterTagMetadata tag =
@@ -649,7 +676,7 @@ namespace Extract.Imaging.Forms
                     CodecsSavePageMode.Overwrite);
 
                 // Check if tiff annotation tags should be added
-                if (isTiff && _displayAnnotations)
+                if (tags != null)
                 {
                     // Write each tag to its respective page
                     foreach (KeyValuePair<int, RasterTagMetadata> pageToTag in tags)
@@ -665,8 +692,7 @@ namespace Extract.Imaging.Forms
             finally
             {
                 // Restore the original page number
-                base.Image.Page = originalPage;
-                UpdateAnnotations();
+                SetPageNumber(originalPage, false, false);
 
                 // Dispose of the resources
                 if (image != null)
@@ -708,7 +734,7 @@ namespace Extract.Imaging.Forms
                 // Add info about current image if available
                 if (base.Image != null)
                 {
-                    ee.AddDebugData("Total pages", base.Image.PageCount, false);
+                    ee.AddDebugData("Total pages", _pageCount, false);
                     ee.AddDebugData("Original bpp", base.Image.BitsPerPixel, false);
                 }
 
@@ -746,7 +772,7 @@ namespace Extract.Imaging.Forms
         {
             // Get the amount to translate the origin
             PointF offset = PointF.Empty;
-            int orientation = _imagePages[base.Image.Page - 1].Orientation;
+            int orientation = _imagePages[_pageNumber - 1].Orientation;
             switch (orientation)
             {
                 case 0:
@@ -939,15 +965,14 @@ namespace Extract.Imaging.Forms
                         if (deltaY < _TILE_EDGE_DISTANCE)
                         {
                             // Ensure this is not the first tile
-                            int currentPage = base.Image.Page;
-                            if (currentPage == 1)
+                            if (_pageNumber == 1)
                             {
                                 throw new ExtractException("ELI21855",
                                     "Cannot move before first tile.");
                             }
 
                             // Go to the previous page
-                            SetPageNumber(currentPage - 1, false, true);
+                            SetPageNumber(_pageNumber - 1, false, true);
 
                             // Move the tile area to the bottom right of new page
                             imageArea = base.PhysicalViewRectangle;
@@ -1021,15 +1046,14 @@ namespace Extract.Imaging.Forms
                         if (deltaY < _TILE_EDGE_DISTANCE)
                         {
                             // Ensure this is not the last tile
-                            int currentPage = base.Image.Page;
-                            if (currentPage == base.Image.PageCount)
+                            if (_pageNumber == _pageCount)
                             {
                                 throw new ExtractException("ELI21846",
                                     "Cannot advance past last tile.");
                             }
 
                             // Go to the next page
-                            SetPageNumber(currentPage + 1, false, true);
+                            SetPageNumber(_pageNumber + 1, false, true);
 
                             // Move the tile area to the top-left of the new page
                             tileArea.Offset(base.PhysicalViewRectangle.Location);
@@ -1213,7 +1237,7 @@ namespace Extract.Imaging.Forms
                             GetTransformedRectangle(GetVisibleImageArea(), true);
 
                         // Check if the object is in view
-                        if (!layerObject.IsContained(viewRectangle, base.Image.Page))
+                        if (!layerObject.IsContained(viewRectangle, _pageNumber))
                         {
                             // Object is not in view, adjust the zoom so that the object
                             // is in view (also change fit mode if necessary)
@@ -1707,7 +1731,7 @@ namespace Extract.Imaging.Forms
                     CanZoomPrevious);
 
                 // Get the previous zoom history entry
-                ZoomInfo zoomInfo = _imagePages[base.Image.Page - 1].ZoomPrevious();
+                ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomPrevious();
 
                 // Set the new zoom setting without updating the zoom history
                 SetZoomInfo(zoomInfo, false);
@@ -1741,7 +1765,7 @@ namespace Extract.Imaging.Forms
                     CanZoomNext);
 
                 // Get the previous zoom history entry
-                ZoomInfo zoomInfo = _imagePages[base.Image.Page - 1].ZoomNext();
+                ZoomInfo zoomInfo = _imagePages[_pageNumber - 1].ZoomNext();
 
                 // Set the new zoom setting without updating the zoom history
                 SetZoomInfo(zoomInfo, false);
@@ -1767,124 +1791,87 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Ensure an image is open
-                ExtractException.Assert("ELI21106", "No image is open.", base.Image != null);
-
-                // Rotate the current page
-                Rotate(angle, base.Image.Page);
-            }
-            catch (Exception e)
-            {
-                throw new ExtractException("ELI21122", "Cannot rotate image.", e);
-            }
-        }
-
-        /// <summary>
-        /// Rotates the specified page number the specified number of degrees.
-        /// <para><b>Requirements</b></para>
-        /// <para>An image must be open.</para>
-        /// </summary>
-        /// <param name="angle">The angle to rotate the image in degrees. Must be a multiple of 
-        /// 90.</param>
-        /// <param name="pageNumber">The one-based page number to rotate.</param>
-        /// <exception cref="ExtractException">No image is open.</exception>
-        /// <exception cref="ExtractException"><paramref name="angle"/> is not a multiple of 90.
-        /// </exception>
-        /// <exception cref="ExtractException"><paramref name="pageNumber"/> is not valid.
-        /// </exception>
-        public void Rotate(int angle, int pageNumber)
-        {
-            try
-            {
-                // Ensure an image is open
                 ExtractException.Assert("ELI21108", "No image is open.", base.Image != null);
 
                 // Ensure the angle is valid
                 ExtractException.Assert("ELI21107", "Rotation angle must be a multiple of 90.",
                     angle % 90 == 0);
 
-                // Ensure the page is valid
-                ExtractException.Assert("ELI21109", "Invalid page number.",
-                    (pageNumber > 0 && pageNumber <= base.Image.PageCount));
-
-                // Check if the view perspectives are licensed (ID Annotation feature)
-                bool viewPerspectiveLicensed = !RasterSupport.IsLocked(RasterSupportType.Document);
-
                 // Calulate the new orientation
-                _imagePages[pageNumber - 1].RotateOrientation(angle);
-
-                // Store the current page
-                int originalPage = base.Image.Page;
+                ImagePageData page = _imagePages[_pageNumber - 1];
+                page.RotateOrientation(angle);
 
                 // Postpone the paint event until all changes have been made
                 base.BeginUpdate();
                 try
                 {
-                    // Switch to a different page if necessary
-                    if (pageNumber != originalPage)
-                    {
-                        base.Image.Page = pageNumber;
-                    }
-
                     // Get the center of the visible image in logical (image) coordinates
                     Point[] center = new Point[] { GetVisibleImageCenter() };
 
-                    // Rotate the image
-                    // NOTE: It is faster to rotate using the view perspective, so rotate that 
-                    // way if it is licensed. Otherwise, use the slower rotate command.
-                    if (viewPerspectiveLicensed)
+                    try
                     {
-                        // Fast rotation
-                        base.Image.RotateViewPerspective(angle % 360);
+                        // Check if the view perspectives are licensed (ID Annotation feature)
+                        RotateImageByDegrees(base.Image, angle);
                     }
-                    else
+                    catch (Exception)
                     {
-                        // Not as fast rotation
-                        RotateCommand rotate = new RotateCommand((angle % 360) * 100,
-                            RotateCommandFlags.Resize,
-                            RasterColor.FromGdiPlusColor(Color.White));
-                        rotate.Run(base.Image);
+                        // Reverse the orientation change
+                        page.RotateOrientation(-angle);
+
+                        throw;
                     }
 
+                    // Convert the center to client coordinates
+                    _transform.TransformPoints(center);
 
-                    // Check if the zoom needs to be updated
-                    if (pageNumber == originalPage)
-                    {
-                        // Convert the center to client coordinates
-                        _transform.TransformPoints(center);
-
-                        // Center at the same point as prior to rotation
-                        base.CenterAtPoint(center[0]);
-                    }
-                }
-                catch
-                {
-                    // Reverse the orientation change
-                    _imagePages[pageNumber - 1].RotateOrientation(-angle);
-
-                    throw;
+                    // Center at the same point as prior to rotation
+                    base.CenterAtPoint(center[0]);
                 }
                 finally
                 {
-                    // Switch back to original page if necessary
-                    if (pageNumber != originalPage)
-                    {
-                        base.Image.Page = originalPage;
-                    }
-
                     base.EndUpdate();
                 }
 
                 // Raise the OrientationChanged event
                 OnOrientationChanged(
-                    new OrientationChangedEventArgs(_imagePages[pageNumber - 1].Orientation));
+                    new OrientationChangedEventArgs(page.Orientation));
             }
             catch (Exception e)
             {
                 ExtractException ee = new ExtractException("ELI21123",
                     "Cannot rotate image.", e);
                 ee.AddDebugData("Rotation", angle, false);
-                ee.AddDebugData("Page number", pageNumber, false);
+                ee.AddDebugData("Page number", _pageNumber, false);
                 throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Rotates the specified image by the specified number of degrees.
+        /// </summary>
+        /// <param name="image">The image to rotate.</param>
+        /// <param name="angle">The number of degrees to rotate the image.</param>
+        static void RotateImageByDegrees(RasterImage image, int angle)
+        {
+            if (angle != 0)
+            {
+                bool viewPerspectiveLicensed = !RasterSupport.IsLocked(RasterSupportType.Document);
+
+                // Rotate the image.
+                // It is faster to rotate using the view perspective, so rotate that 
+                // way if it is licensed. Otherwise, use the slower rotate command.
+                if (viewPerspectiveLicensed)
+                {
+                    // Fast rotation
+                    image.RotateViewPerspective(angle % 360);
+                }
+                else
+                {
+                    // Not as fast rotation
+                    RotateCommand rotate = new RotateCommand((angle % 360) * 100,
+                        RotateCommandFlags.Resize, RasterColor.FromGdiPlusColor(Color.White));
+                    rotate.Run(image);
+                }
             }
         }
 
@@ -1976,7 +1963,7 @@ namespace Extract.Imaging.Forms
                             + Environment.NewLine
                             + Environment.NewLine + "The following printers have been disallowed:"
                             + Environment.NewLine + "-------------------------------------"
-                            + Environment.NewLine + sb.ToString(), " Printer",
+                            + Environment.NewLine + sb, " Printer",
                             MessageBoxButtons.OK, MessageBoxIcon.Error,
                             MessageBoxDefaultButton.Button1, 0);
 
@@ -2082,7 +2069,7 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Set the start page to the current page
-                    _printPreview.PrintPreviewControl.StartPage = base.Image.Page - 1;
+                    _printPreview.PrintPreviewControl.StartPage = _pageNumber - 1;
 
                     // Replace the print button on the toolstrip with our own special print button
 
@@ -2169,8 +2156,8 @@ namespace Extract.Imaging.Forms
             if (_printDocument == null)
             {
                 _printDocument = new PrintDocument();
-                _printDocument.PrintPage += new PrintPageEventHandler(HandlePrintPage);
-                _printDocument.BeginPrint += new PrintEventHandler(HandleBeginPrint);
+                _printDocument.PrintPage += HandlePrintPage;
+                _printDocument.BeginPrint += HandleBeginPrint;
                 _printDocument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
                 _printDocument.DefaultPageSettings.Color = true;
                 _printDocument.PrinterSettings.DefaultPageSettings.Landscape = false;
@@ -2180,8 +2167,8 @@ namespace Extract.Imaging.Forms
             PrinterSettings settings = _printDocument.PrinterSettings;
             settings.MinimumPage = 1;
             settings.FromPage = 1;
-            settings.MaximumPage = base.Image.PageCount;
-            settings.ToPage = base.Image.PageCount;
+            settings.MaximumPage = _pageCount;
+            settings.ToPage = _pageCount;
 
             // Ensure selection of a valid printer
             if (_disallowedPrinters.Contains(settings.PrinterName.ToUpperInvariant()))
@@ -2305,7 +2292,7 @@ namespace Extract.Imaging.Forms
                 foreach (LayerObject layerObject in _layerObjects)
                 {
                     // Check if this layer object should be rendered
-                    if (layerObject.PageNumber == base.Image.Page && layerObject.CanRender)
+                    if (layerObject.PageNumber == _pageNumber && layerObject.CanRender)
                     {
                         // Render the layer object
                         layerObject.Render(e.Graphics, imageToPrinter);
@@ -2398,20 +2385,20 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Load annotations from file
-                RasterTagMetadata tag = _codecs.ReadTag(_currentOpenFile, base.Image.Page,
+                RasterTagMetadata tag = _codecs.ReadTag(_currentOpenFile, _pageNumber,
                     RasterTagMetadata.AnnotationTiff);
                 if (tag != null)
                 {
                     // Initialize a new annotations container and associate it with the image viewer.
                     _annotations = new AnnContainer();
 
-                    // Note: Use original image bounds for rotated images [DotNetRCAndUtils #54]
+                    // Use original image bounds for rotated images [DotNetRCAndUtils #54]
                     _annotations.Bounds =
                         new AnnRectangle(0, 0, base.Image.Width, base.Image.Height, AnnUnit.Pixel);
                     _annotations.Visible = true;
 
                     // Ensure the unit converter is the same DPI as the image viewer itself.
-                    using (Graphics g = base.CreateGraphics())
+                    using (Graphics g = CreateGraphics())
                     {
                         _annotations.UnitConverter = new AnnUnitConverter(g.DpiX, g.DpiY);
                     }
@@ -2496,7 +2483,7 @@ namespace Extract.Imaging.Forms
             // Add the entry to the zoom history for the current page if necessary
             if (updateZoomHistory)
             {
-                _imagePages[base.Image.Page - 1].ZoomInfo = zoomInfo;
+                _imagePages[_pageNumber - 1].ZoomInfo = zoomInfo;
             }
 
             // Raise the ZoomChanged event
@@ -2638,7 +2625,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.SelectLayerObject:
                     {
                         // Get modifier keys immediately
-                        Keys modifiers = Control.ModifierKeys;
+                        Keys modifiers = ModifierKeys;
 
                         // Check if the mouse clicked on a link arrow
                         if (_activeLinkedLayerObject != null)
@@ -2657,7 +2644,7 @@ namespace Extract.Imaging.Forms
                         foreach (LayerObject layerObject in _layerObjects.Selection)
                         {
                             // Skip this layerObject if it is on a different page
-                            if (layerObject.PageNumber != base.Image.Page)
+                            if (layerObject.PageNumber != _pageNumber)
                             {
                                 continue;
                             }
@@ -2725,7 +2712,7 @@ namespace Extract.Imaging.Forms
                             // Start a tracking event for all selected layer objects on the active page
                             foreach (LayerObject layerObject in _layerObjects.Selection)
                             {
-                                if (layerObject.PageNumber == base.Image.Page)
+                                if (layerObject.PageNumber == _pageNumber)
                                 {
                                     layerObject.StartTrackingSelection(mouseX, mouseY);
                                 }
@@ -2861,7 +2848,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.AngularRedaction:
 
                     // Get a drawing surface for the interactive highlight
-                    using (Graphics graphics = base.CreateGraphics())
+                    using (Graphics graphics = CreateGraphics())
                     {
                         // Get the appropriate color for drawing the object
                         Color drawColor = (_cursorTool == CursorTool.AngularHighlight ?
@@ -2896,7 +2883,7 @@ namespace Extract.Imaging.Forms
                     {
                         rectangle.Height = 1;
                     }
-                    ControlPaint.DrawReversibleFrame(base.RectangleToScreen(rectangle),
+                    ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
                             Color.Black, FrameStyle.Thick);
 
                     // Recalculate and redraw the new frame
@@ -2910,7 +2897,7 @@ namespace Extract.Imaging.Forms
                     {
                         rectangle.Height = 1;
                     }
-                    ControlPaint.DrawReversibleFrame(base.RectangleToScreen(rectangle),
+                    ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
                             Color.Black, FrameStyle.Thick);
                     break;
 
@@ -2918,7 +2905,7 @@ namespace Extract.Imaging.Forms
                 case CursorTool.RectangularRedaction:
 
                     // Get a drawing surface for the interactive highlight
-                    using (Graphics graphics = base.CreateGraphics())
+                    using (Graphics graphics = CreateGraphics())
                     {
                         // Get the appropriate color for drawing the object
                         Color drawColor = (_cursorTool == CursorTool.RectangularHighlight ?
@@ -2948,12 +2935,12 @@ namespace Extract.Imaging.Forms
                         // This is a click and drag multiple layer objects event
 
                         // Erase the previous frame if it exists
-                        ControlPaint.DrawReversibleFrame(base.RectangleToScreen(_trackingData.Rectangle),
+                        ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
                                 Color.Black, FrameStyle.Thick);
 
                         // Recalculate and redraw the new frame
                         _trackingData.UpdateRectangle(mouseX, mouseY);
-                        ControlPaint.DrawReversibleFrame(base.RectangleToScreen(_trackingData.Rectangle),
+                        ControlPaint.DrawReversibleFrame(RectangleToScreen(_trackingData.Rectangle),
                                 Color.Black, FrameStyle.Thick);
                     }
                     else
@@ -3056,7 +3043,7 @@ namespace Extract.Imaging.Forms
                 _trackingData = null;
 
                 // Restore the original cursor tool
-                this.Cursor = _toolCursor ?? Cursors.Default;
+                Cursor = _toolCursor ?? Cursors.Default;
 
                 _trackingEventEnding = false;
             }
@@ -3085,7 +3072,7 @@ namespace Extract.Imaging.Forms
                     GetTransformedRectangle(_trackingData.Rectangle, true);
 
                 // Deselect previous layerObject unless modifier key is pressed
-                if (Control.ModifierKeys != Keys.Shift)
+                if (ModifierKeys != Keys.Shift)
                 {
                     _layerObjects.Selection.Clear();
                 }
@@ -3103,7 +3090,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Refresh the image
-                base.Invalidate();
+                Invalidate();
             }
             else
             {
@@ -3150,7 +3137,7 @@ namespace Extract.Imaging.Forms
             }
 
             // Refresh the image viewer
-            base.Invalidate();
+            Invalidate();
 
             // Reset the selection cursor
             base.Cursor = GetSelectionCursor(mouseX, mouseY);
@@ -3195,7 +3182,7 @@ namespace Extract.Imaging.Forms
         private void EndAngularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
-            using (Graphics graphics = base.CreateGraphics())
+            using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
                 Color drawColor = (_cursorTool == CursorTool.AngularHighlight ?
@@ -3250,7 +3237,7 @@ namespace Extract.Imaging.Forms
                             Redaction redaction = new Redaction(this, PageNumber, 
                                 LayerObject.ManualComment,
                                 new RasterZone[] { new RasterZone(points[0], points[1],
-                                    _defaultHighlightHeight, base.Image.Page) },
+                                    _defaultHighlightHeight, _pageNumber) },
                                     _defaultRedactionFillColor);
                             _layerObjects.Add(redaction);
                         }
@@ -3278,7 +3265,7 @@ namespace Extract.Imaging.Forms
         {
             // Erase the previous frame if it exists
             Rectangle rectangle = _trackingData.Rectangle;
-            ControlPaint.DrawReversibleFrame(base.RectangleToScreen(rectangle),
+            ControlPaint.DrawReversibleFrame(RectangleToScreen(rectangle),
                     Color.Black, FrameStyle.Thick);
 
             // If the event was canceled, there is nothing more to do.
@@ -3308,28 +3295,24 @@ namespace Extract.Imaging.Forms
             // Get all the layer objects in this region
             LinkedList<long> layerObjectIds = new LinkedList<long>();
 
-            // Create a graphics object
-            using (Graphics graphics = base.CreateGraphics())
+            foreach (LayerObject layerObject in _layerObjects)
             {
-                foreach (LayerObject layerObject in _layerObjects)
+                // Check if this layer object intersects the rectangle
+                if (layerObject.IsVisible(rectangle))
                 {
-                    // Check if this layer object intersects the rectangle
-                    if (layerObject.IsVisible(rectangle))
-                    {
-                        // Add this layer object's id to the list to delete
-                        layerObjectIds.AddLast(layerObject.Id);
-                    }
+                    // Add this layer object's id to the list to delete
+                    layerObjectIds.AddLast(layerObject.Id);
                 }
-
-                // Delete any layer objects that intersected
-                foreach (int id in layerObjectIds)
-                {
-                    _layerObjects.Remove(id);
-                }
-
-                // Refresh the image
-                base.Invalidate();
             }
+
+            // Delete any layer objects that intersected
+            foreach (int id in layerObjectIds)
+            {
+                _layerObjects.Remove(id);
+            }
+
+            // Refresh the image
+            Invalidate();
 
             // Restore the last continuous use cursor tool
             CursorTool = _lastContinuousUseTool;
@@ -3345,7 +3328,7 @@ namespace Extract.Imaging.Forms
         private void EndRectangularHighlightOrRedaction(int mouseX, int mouseY, bool cancel)
         {
             // Get a drawing surface for the interactive highlight
-            using (Graphics graphics = base.CreateGraphics())
+            using (Graphics graphics = CreateGraphics())
             {
                 // Get the appropriate color for drawing the object
                 Color drawColor = (_cursorTool == CursorTool.RectangularHighlight) ?
@@ -3387,7 +3370,7 @@ namespace Extract.Imaging.Forms
                         // Add a new redaction to _layerObjects
                         RasterZone[] rasterZones = new RasterZone[] 
                         {
-                            new RasterZone(points[0], points[1], height, base.Image.Page)
+                            new RasterZone(points[0], points[1], height, _pageNumber)
                         };
                         _layerObjects.Add(new Redaction(this, PageNumber, 
                             LayerObject.ManualComment, rasterZones, _defaultRedactionFillColor));
@@ -3427,7 +3410,6 @@ namespace Extract.Imaging.Forms
 
             // Recalculate the new line
             _trackingData.UpdateLine(mouseX, mouseY);
-            line = _trackingData.Line;
 
             // Convert the line from screen to client coordinates
             line = new Point[] { _trackingData.StartPoint, PointToClient(_trackingData.Line[1]) };
@@ -3469,7 +3451,7 @@ namespace Extract.Imaging.Forms
             int reverseValue = reverseRotation ? -1 : 1;
 
             // Get the current orientation
-            int orientation = _imagePages[base.Image.Page - 1].Orientation;
+            int orientation = _imagePages[_pageNumber - 1].Orientation;
 
             // Rotate the matrix
             Matrix rotatedMatrix = matrix.Clone();
@@ -4176,11 +4158,11 @@ namespace Extract.Imaging.Forms
         /// <param name="requiredTypes">The <see cref="IEnumerable{T}"/> of
         /// <see cref="Type"/> to include.</param>
         /// <param name="requiredTypesArgumentRequirement">The <see cref="ArgumentRequirement"/>
-        /// specifying how to treat the <paramref name="requiredType"/> collection.</param>
+        /// specifying how to treat the <paramref name="requiredTypes"/> collection.</param>
         /// <param name="excludeTypes">The <see cref="IEnumerable{T}"/> of
         /// <see cref="Type"/> to exclude.</param>
         /// <param name="excludeTypesArgumentRequirement">The <see cref="ArgumentRequirement"/>
-        /// specifying how to treat the <paramref name="excludedType"/> collection.</param>
+        /// specifying how to treat the <paramref name="excludedTypes"/> collection.</param>
         /// <returns><see langword="true"/> if the <see cref="LayerObject"/> meets the
         /// requirements and <see langword="false"/> if it does not.</returns>
         private static bool LayeredObjectIsProperType(LayerObject layerObject,
@@ -4394,7 +4376,7 @@ namespace Extract.Imaging.Forms
             base.ScrollPosition = _scrollPosition;
 
             // Refresh the image viewer
-            base.Invalidate();
+            Invalidate();
             Application.DoEvents();
         }
 
@@ -4698,11 +4680,10 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Ensure this is not the first page
-                    int page = base.Image.Page;
-                    if (page > 1)
+                    if (_pageNumber > 1)
                     {
                         // Go to the previous page
-                        PageNumber = page - 1;
+                        PageNumber = _pageNumber - 1;
                     }
                 }
             }
@@ -4723,11 +4704,10 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Ensure this is not the last page
-                    int page = base.Image.Page;
-                    if (page < base.Image.PageCount)
+                    if (_pageNumber < _pageCount)
                     {
                         // Go to the next page
-                        PageNumber = page + 1;
+                        PageNumber = _pageNumber + 1;
                     }
                 }
             }
@@ -4747,7 +4727,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 if (base.Image != null)
                 {
-                    PageNumber = base.Image.PageCount;
+                    PageNumber = _pageCount;
                 }
             }
             catch (Exception e)
@@ -4766,7 +4746,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 90 degrees
-                    Rotate(90, base.Image.Page);
+                    Rotate(90);
                 }
             }
             catch (Exception ex)
@@ -4785,7 +4765,7 @@ namespace Extract.Imaging.Forms
                 if (base.Image != null)
                 {
                     // Rotate 270 degrees
-                    Rotate(270, base.Image.Page);
+                    Rotate(270);
                 }
             }
             catch (Exception ex)
@@ -4926,10 +4906,10 @@ namespace Extract.Imaging.Forms
                     }
 
                     // Check if the selected layer object is on the visible page
-                    if (layerObject.PageNumber == base.Image.Page)
+                    if (layerObject.PageNumber == _pageNumber)
                     {
                         // Check if the layer object is contained in the current view
-                        if (!layerObject.IsContained(clientArea, base.Image.Page))
+                        if (!layerObject.IsContained(clientArea, _pageNumber))
                         {
                             layerObjectOutOfViewOnVisiblePage = true;
                         }
@@ -5051,7 +5031,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Refresh the image viewer
-                base.Invalidate();
+                Invalidate();
 
                 if (nonDeletableObjectSelected)
                 {
@@ -5117,7 +5097,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 _layerObjects.SelectAll();
-                base.Invalidate();
+                Invalidate();
             }
             catch (Exception ex)
             {
@@ -5133,7 +5113,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Increase the highlight height if an image is open
-                Point mousePosition = base.PointToClient(
+                Point mousePosition = PointToClient(
                     new Point(Cursor.Position.X, Cursor.Position.Y));
                 AdjustHighlightHeight(mousePosition.X, mousePosition.Y, true);
             }
@@ -5151,7 +5131,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Decrease the highlight height
-                Point mousePosition = base.PointToClient(
+                Point mousePosition = PointToClient(
                     new Point(Cursor.Position.X, Cursor.Position.Y));
                 AdjustHighlightHeight(mousePosition.X, mousePosition.Y, false);
             }
@@ -5509,7 +5489,7 @@ namespace Extract.Imaging.Forms
         /// <returns>The vertical scale factor of the 3x3 affine matrix.</returns>
         private static double GetScaleFactorY(Matrix matrix)
         {
-            // NOTE: Formula derived by transforming a vertical unit 
+            // Formula derived by transforming a vertical unit 
             // vector using an arbitrary transformation matrix:
             //
             // [0 0 1][a b 0]   [ e   f  1]
@@ -5519,8 +5499,7 @@ namespace Extract.Imaging.Forms
             // And then applying the distance formula:
             //
             // Sqrt(((c+e)-e)^2 + ((d+f)-f)^2) = Sqrt(c^2 + d^2)
-            return Math.Sqrt(Math.Pow((double)matrix.Elements[2], 2) +
-                Math.Pow((double)matrix.Elements[3], 2));
+            return Math.Sqrt(Math.Pow(matrix.Elements[2], 2) + Math.Pow(matrix.Elements[3], 2));
         }
 
         /// <summary>
@@ -5532,7 +5511,7 @@ namespace Extract.Imaging.Forms
             // If _parentForm is null attempt to get it
             if (_parentForm == null)
             {
-                _parentForm = base.TopLevelControl as Form;
+                _parentForm = TopLevelControl as Form;
             }
 
             // If there is a parent form just refresh the parent

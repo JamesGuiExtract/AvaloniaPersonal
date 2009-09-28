@@ -1,27 +1,18 @@
 using Extract.Licensing;
-using Extract.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
 using Leadtools.Codecs;
-using Leadtools.ImageProcessing;
 using Leadtools.WinForms;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
-using System.Globalization;
 using System.IO;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Security.Permissions;
-using System.Text;
 using System.Windows.Forms;
 
 namespace Extract.Imaging.Forms
@@ -312,13 +303,13 @@ namespace Extract.Imaging.Forms
             /// The normal <see cref="Cursor"/> to be displayed by the
             /// <see cref="CursorTool"/>.
             /// </summary>
-            private Cursor _tool;
+            Cursor _tool;
 
             /// <summary>
             /// The <see cref="Cursor"/> to be displayed by the
             /// <see cref="CursorTool"/> when it has been activated (i.e. mouse down).
             /// </summary>
-            private Cursor _active;
+            Cursor _active;
 
             /// <summary>
             /// Gets and sets the normal <see cref="Cursor"/>
@@ -363,22 +354,22 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Leadtools document (annotations and view perspective) support key constant.
         /// </summary>
-        private static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
+        static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
 
         /// <summary>
         /// Leadtools pdf save support key constant.
         /// </summary>
-        private static readonly string _PDF_SAVE_SUPPORT_KEY = "8ksiHnPymr";
+        static readonly string _PDF_SAVE_SUPPORT_KEY = "8ksiHnPymr";
 
         /// <summary>
         /// Leadtools pdf read support key constant.
         /// </summary>
-        private static readonly string _PDF_READ_SUPPORT_KEY = "xrzGPkmYui";
+        static readonly string _PDF_READ_SUPPORT_KEY = "xrzGPkmYui";
 
         /// <summary>
         /// Image file types constant for the open file dialog.
         /// </summary>
-        private static readonly string[] _IMAGE_FILE_TYPES = new string[] {
+        static readonly string[] _IMAGE_FILE_TYPES = new string[] {
             "BMP files (*.bmp;*.rle;*.dib)|*.bmp;*.rle;*.dib|",
             "GIF files (*.gif)|*.gif|",
             "JFIF files (*.jpg;*.jpeg)|*.jpg;*.jpeg|",
@@ -395,17 +386,17 @@ namespace Extract.Imaging.Forms
         /// The default scale factor. Value corresponds to no zoom (image pixels and client pixels 
         /// are the same size).
         /// </summary>
-        private static readonly double _DEFAULT_SCALE_FACTOR = 1.0;
+        const double _DEFAULT_SCALE_FACTOR = 1.0;
 
         /// <summary>
         /// The maximum amount one can zoom in (1 image pixel is 50 screen pixels across)
         /// </summary>
-        private static readonly double _MAX_ZOOM_IN_SCALE_FACTOR = 50;
+        const double _MAX_ZOOM_IN_SCALE_FACTOR = 50;
 
         /// <summary>
         /// The maximum amount one can zoom out (1 screen pixel is 50 image pixels across)
         /// </summary>
-        private static readonly double _MAX_ZOOM_OUT_SCALE_FACTOR = 0.02;
+        const double _MAX_ZOOM_OUT_SCALE_FACTOR = 0.02;
 
         /// <summary>
         /// The value that the scale factor is multiplied or divided by when zooming in and 
@@ -413,26 +404,26 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="ZoomIn"/>
         /// <seealso cref="ZoomOut"/>
-        private static readonly double _ZOOM_FACTOR = 1.2;
+        const double _ZOOM_FACTOR = 1.2;
 
         /// <summary>
         /// The scroll value multiplier applied to 
         /// <see cref="RasterImageViewer.AutoScrollSmallChange"/> during a mousewheel scroll event.
         /// </summary>
         /// <seealso cref="OnMouseWheel"/>
-        private static readonly int _MOUSEWHEEL_SCROLL_FACTOR = 2;
+        const int _MOUSEWHEEL_SCROLL_FACTOR = 2;
 
         /// <summary>
         /// The amount the <see cref="DefaultHighlightHeight"/> is incremented or decremeneted 
         /// during a mousewheel adjust highlight height event.
         /// </summary>
         /// <seealso cref="OnMouseWheel"/>
-        private static readonly int _MOUSEWHEEL_HEIGHT_INCREMENT = 4;
+        const int _MOUSEWHEEL_HEIGHT_INCREMENT = 4;
 
         /// <summary>
         /// The default height of an angular highlight in logical (image) pixels.
         /// </summary>
-        private static readonly int _DEFAULT_HIGHLIGHT_HEIGHT = 40;
+        const int _DEFAULT_HIGHLIGHT_HEIGHT = 40;
 
         /// <summary>
         /// The maximum distance a tile viewing area can be from the edge of the image area to be 
@@ -441,40 +432,39 @@ namespace Extract.Imaging.Forms
         /// <remarks>The Leadtools properties for determining the image area and the zoom setting 
         /// are occasionally imprecise by a few pixels. This value establishes a margin of error 
         /// for proper functionality of zoom tiling.</remarks>
-        private static readonly int _TILE_EDGE_DISTANCE = 4;
+        const int _TILE_EDGE_DISTANCE = 4;
 
         /// <summary>
         /// The amount of padding space to add to the left and right of a layer object when zooming
         /// it into view.
         /// </summary>
-        private static readonly int _ZOOM_TO_OBJECT_WIDTH_PADDING = 21;
+        const int _ZOOM_TO_OBJECT_WIDTH_PADDING = 21;
 
         /// <summary>
         /// The amount of padding space to add to the top and bottom of a layer object when zooming
         /// it into view.
         /// </summary>
-        private static readonly int _ZOOM_TO_OBJECT_HEIGHT_PADDING = 21;
+        const int _ZOOM_TO_OBJECT_HEIGHT_PADDING = 21;
 
         /// <summary>
         /// The default color that redactions will be printed as.
         /// </summary>
-        internal static readonly RedactionColor _DEFAULT_REDACTION_FILL_COLOR = RedactionColor.Black;
+        const RedactionColor _DEFAULT_REDACTION_FILL_COLOR = RedactionColor.Black;
 
         /// <summary>
         /// The default color that redactions will be painted as.
         /// </summary>
-        internal static readonly Color _DEFAULT_REDACTION_PAINT_COLOR = Redaction._BLACK_PAINT;
+        static readonly Color _DEFAULT_REDACTION_PAINT_COLOR = Redaction.BlackPaint;
 
         /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
-            typeof(ImageViewer).ToString();
+        static readonly string _OBJECT_NAME = typeof(ImageViewer).ToString();
 
         /// <summary>
         /// The number of times to retry acquring the device context for saving.
         /// </summary>
-        private static readonly int _SAVE_RETRY_COUNT = RegistryManager.SaveRetries;
+        static readonly int _SAVE_RETRY_COUNT = RegistryManager.SaveRetries;
 
         #endregion
 
@@ -483,7 +473,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Contains the <see cref="ImageViewerCursors"/> for each <see cref="CursorTool"/>.
         /// </summary>
-        private static Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
+        static Dictionary<CursorTool, ImageViewerCursors> _cursorsForCursorTools =
             LoadCursorsForCursorTools();
 
         /// <summary>
@@ -491,7 +481,7 @@ namespace Extract.Imaging.Forms
         /// image files option.
         /// </summary>
         /// <seealso cref="_IMAGE_FILE_TYPES"/>
-        private static readonly int _IMAGE_FILE_TYPE_DEFAULT_INDEX = 9;
+        static readonly int _IMAGE_FILE_TYPE_DEFAULT_INDEX = 9;
 
         #endregion
 
@@ -502,6 +492,16 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="ImageFile"/>
         string _imageFile = "";
+
+        /// <summary>
+        /// The 1-based page number of the image currently being displayed.
+        /// </summary>
+        int _pageNumber;
+
+        /// <summary>
+        /// The number of pages in the currently displayed image.
+        /// </summary>
+        int _pageCount;
 
         /// <summary>
         /// The currently activated cursor tool.
@@ -556,7 +556,7 @@ namespace Extract.Imaging.Forms
         /// mouse event is occurring.
         /// </summary>
         /// <seealso cref="Shortcuts"/>
-        ShortcutsManager _mainShortcuts = new ShortcutsManager();
+        readonly ShortcutsManager _mainShortcuts = new ShortcutsManager();
 
         /// <summary>
         /// The collection of shortcut keys and shortcut handlers during an interactive mouse 
@@ -564,7 +564,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso cref="Shortcuts"/>
         /// <seealso cref="Control.Capture"/>
-        ShortcutsManager _captureShortcuts = new ShortcutsManager();
+        readonly ShortcutsManager _captureShortcuts = new ShortcutsManager();
 
         /// <summary>
         /// Whether to load the default shortcuts.
@@ -646,6 +646,12 @@ namespace Extract.Imaging.Forms
         RasterCodecs _codecs;
 
         /// <summary>
+        /// <see langword="true"/> if the codecs have been started; <see langword="false"/> if 
+        /// they have not yet been started.
+        /// </summary>
+        bool _codecsStarted;
+
+        /// <summary>
         /// Collection of annotation objects.
         /// </summary>
         AnnContainer _annotations;
@@ -704,7 +710,7 @@ namespace Extract.Imaging.Forms
         /// The list of strings that should be displayed in the open file dialog file type
         /// drop down list.
         /// </summary>
-        List<string> _openImageFileTypeFilter = new List<string>(_IMAGE_FILE_TYPES);
+        readonly List<string> _openImageFileTypeFilter = new List<string>(_IMAGE_FILE_TYPES);
 
         /// <summary>
         /// The default index for the open file dialog file type filter.
@@ -714,7 +720,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The list of printers that the <see cref="ImageViewer"/> should not print to.
         /// </summary>
-        List<string> _disallowedPrinters = new List<string>();
+        readonly List<string> _disallowedPrinters = new List<string>();
 
         /// <summary>
         /// The parent form containing the <see cref="ImageViewer"/> control.
@@ -744,19 +750,19 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// License cache for validating the core license.
         /// </summary>
-        static LicenseStateCache _licenseCore =
+        static readonly LicenseStateCache _licenseCore =
             new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
 
         /// <summary>
         /// License cache for validating the annotation license.
         /// </summary>
-        static LicenseStateCache _licenseAnnotation =
+        static readonly LicenseStateCache _licenseAnnotation =
             new LicenseStateCache(LicenseIdName.AnnotationFeature, "Annotation Objects");
 
         /// <summary>
         /// License cache for validating the anti-alias license.
         /// </summary>
-        static LicenseStateCache _licenseAntiAlias =
+        static readonly LicenseStateCache _licenseAntiAlias =
             new LicenseStateCache(LicenseIdName.AntiAliasingFeature, "Anti-aliasing Component");
 
         #endregion
@@ -859,9 +865,6 @@ namespace Extract.Imaging.Forms
                 // LoadLicenseFilesFromFolder for design mode is now called in 
                 // LoadCursorsForCursorTools (ie, the static constructor)
                 InitializeComponent();
-
-                // Startup the raster codecs framework
-                RasterCodecs.Startup();
 
                 _licenseCore.Validate("ELI23109");
 
@@ -992,7 +995,7 @@ namespace Extract.Imaging.Forms
                             if (_cursorTool == CursorTool.SelectLayerObject)
                             {
                                 _layerObjects.Selection.Clear();
-                                base.Invalidate();
+                                Invalidate();
                             }
 
                             // Store this as the last active continuous use cursor tool
@@ -1008,7 +1011,7 @@ namespace Extract.Imaging.Forms
                             if (_cursorTool == CursorTool.SelectLayerObject)
                             {
                                 _layerObjects.Selection.Clear();
-                                base.Invalidate();
+                                Invalidate();
                             }
 
                             // Store this as the last active continuous use cursor tool
@@ -1025,7 +1028,7 @@ namespace Extract.Imaging.Forms
                             if (_cursorTool == CursorTool.SelectLayerObject)
                             {
                                 _layerObjects.Selection.Clear();
-                                base.Invalidate();
+                                Invalidate();
                             }
                             break;
 
@@ -1043,7 +1046,7 @@ namespace Extract.Imaging.Forms
                             if (_cursorTool == CursorTool.SelectLayerObject)
                             {
                                 _layerObjects.Selection.Clear();
-                                base.Invalidate();
+                                Invalidate();
                             }
 
                             // Store this as the last active continuous use cursor tool
@@ -1087,7 +1090,7 @@ namespace Extract.Imaging.Forms
                     _activeCursor = cursors.Active;
 
                     // Set the current cursor
-                    this.Cursor = _toolCursor ?? Cursors.Default;
+                    Cursor = _toolCursor ?? Cursors.Default;
 
                     // If the cursor tool has changed to one of the highlight tools then
                     // set the appropriate selection tool value in the registry
@@ -1168,7 +1171,7 @@ namespace Extract.Imaging.Forms
                     {
                         // If this is design-time, do not check licensing, but also do not unlock
                         // LeadTools support
-                        if (!this.DesignMode)
+                        if (!DesignMode)
                         {
                             _licenseAnnotation.Validate("ELI21920");
                         }
@@ -1231,7 +1234,7 @@ namespace Extract.Imaging.Forms
                     {
                         // If this is design-time, do not check licensing, but also do not unlock
                         // LeadTools support
-                        if (!this.DesignMode)
+                        if (!DesignMode)
                         {
                             _licenseAntiAlias.Validate("ELI21921");
 
@@ -1271,7 +1274,7 @@ namespace Extract.Imaging.Forms
             get
             {
                 // The first page must be visible for this to be the first zone
-                if (base.Image == null || base.Image.Page != 1)
+                if (base.Image == null || _pageNumber != 1)
                 {
                     return false;
                 }
@@ -1299,7 +1302,7 @@ namespace Extract.Imaging.Forms
             get
             {
                 // The last page must be visible for this to be the last zone
-                if (base.Image == null || base.Image.Page != base.Image.PageCount)
+                if (base.Image == null || _pageNumber != _pageCount)
                 {
                     return false;
                 }
@@ -1327,7 +1330,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Image != null && this.GetNextVisibleLayerObjectIndex() != -1;
+                return base.Image != null && GetNextVisibleLayerObjectIndex() != -1;
             }
         }
 
@@ -1341,7 +1344,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Image != null && this.GetPreviousVisibleLayerObjectIndex() != -1;
+                return base.Image != null && GetPreviousVisibleLayerObjectIndex() != -1;
             }
         }
 
@@ -1355,7 +1358,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Image != null && _imagePages[base.Image.Page - 1].CanZoomPrevious;
+                return base.Image != null && _imagePages[_pageNumber - 1].CanZoomPrevious;
             }
         }
 
@@ -1369,7 +1372,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Image != null && _imagePages[base.Image.Page - 1].CanZoomNext;
+                return base.Image != null && _imagePages[_pageNumber - 1].CanZoomNext;
             }
         }
 
@@ -1396,7 +1399,7 @@ namespace Extract.Imaging.Forms
                     // Ensure an image has been opened
                     ExtractException.Assert("ELI21205", "No image is open.", base.Image != null);
 
-                    return _imagePages[base.Image.Page - 1].ZoomInfo;
+                    return _imagePages[_pageNumber - 1].ZoomInfo;
                 }
                 catch (Exception e)
                 {
@@ -1442,7 +1445,7 @@ namespace Extract.Imaging.Forms
                     ExtractException.Assert("ELI21916", "No image is open.", base.Image != null);
 
                     // Return the zoom history count for the current page
-                    return _imagePages[base.Image.Page - 1].ZoomHistoryCount;
+                    return _imagePages[_pageNumber - 1].ZoomHistoryCount;
                 }
                 catch (Exception ex)
                 {
@@ -1478,7 +1481,7 @@ namespace Extract.Imaging.Forms
                     ExtractException.Assert("ELI21143", "No image is open.", base.Image != null);
 
                     // Return the current page number
-                    return base.Image.Page;
+                    return _pageNumber;
                 }
                 catch (Exception e)
                 {
@@ -1515,8 +1518,8 @@ namespace Extract.Imaging.Forms
 
                 // Ensure the page number is valid
                 ExtractException.Assert("ELI21786", "Invalid page number.",
-                    pageNumber >= 1 && pageNumber <= base.Image.PageCount);
-
+                    pageNumber >= 1 && pageNumber <= _pageCount);
+                
                 // Prepare variable for whether the zoom history should be stored
                 bool updateZoomHistory = false;
 
@@ -1525,7 +1528,8 @@ namespace Extract.Imaging.Forms
                 try
                 {
                     // Go to the specified page
-                    base.Image.Page = pageNumber;
+                    _pageNumber = pageNumber;
+                    base.Image = GetPage(pageNumber);
 
                     // Check whether the zoom setting should be updated, too.
                     if (updateZoom)
@@ -1616,10 +1620,39 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
+        /// Gets an image for the specified page of the currently open image.
+        /// </summary>
+        /// <param name="pageNumber">The 1-based page number to open.</param>
+        /// <returns>The image with <paramref name="pageNumber"/> from the currently open image.
+        /// </returns>
+        RasterImage GetPage(int pageNumber)
+        {
+            RasterImage image = null;
+            try
+            {
+                image = _codecs.Load(_currentOpenFile, 0, CodecsLoadByteOrder.BgrOrGray, 
+                    pageNumber, pageNumber);
+
+                int rotation = _imagePages[pageNumber - 1].Orientation;
+                RotateImageByDegrees(image, rotation);
+            }
+            catch (Exception)
+            {
+                if (image != null)
+                {
+                    image.Dispose();
+                }                
+                throw;
+            }
+
+            return image;
+        }
+
+        /// <summary>
         /// Displays the current page fit exactly within the <see cref="ImageViewer"/>.
         /// </summary>
         /// <remarks>This method does not change the fit mode.</remarks>
-        private void ShowFitToPage()
+        void ShowFitToPage()
         {
             base.SizeMode = RasterPaintSizeMode.FitAlways;
             base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
@@ -1631,7 +1664,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="ImageViewer"/>.
         /// </summary>
         /// <remarks>This method does not change the fit mode.</remarks>
-        private void ShowFitToWidth()
+        void ShowFitToWidth()
         {
             base.SizeMode = RasterPaintSizeMode.FitWidth;
             base.ScaleFactor = _DEFAULT_SCALE_FACTOR;
@@ -1649,7 +1682,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Image == null ? 0 : base.Image.PageCount;
+                return base.Image == null ? 0 : _pageCount;
             }
         }
 
@@ -1666,7 +1699,7 @@ namespace Extract.Imaging.Forms
         {
             get
             {
-                return base.Capture ? _captureShortcuts : _mainShortcuts;
+                return Capture ? _captureShortcuts : _mainShortcuts;
             }
         }
 
@@ -1761,7 +1794,7 @@ namespace Extract.Imaging.Forms
 
                 // Update the redaction paint color when updating the fill color
                 _defaultRedactionPaintColor =
-                    value == RedactionColor.Black ? Redaction._BLACK_PAINT : Redaction._WHITE_PAINT;
+                    value == RedactionColor.Black ? Redaction.BlackPaint : Redaction.WhitePaint;
             }
         }
 
@@ -1834,7 +1867,7 @@ namespace Extract.Imaging.Forms
                 ExtractException.Assert("ELI21220", "Cannot get orientation. No image is open.",
                     base.Image != null);
 
-                return _imagePages[base.Image.Page - 1].Orientation;
+                return _imagePages[_pageNumber - 1].Orientation;
             }
             set
             {
@@ -1848,7 +1881,7 @@ namespace Extract.Imaging.Forms
                         value % 90 == 0);
 
                     // Rotate the orientation
-                    this.Rotate(_imagePages[base.Image.Page - 1].Orientation - value);
+                    Rotate(_imagePages[_pageNumber - 1].Orientation - value);
                 }
                 catch (Exception e)
                 {
@@ -1893,7 +1926,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21503", "No image is open.", base.Image != null);
 
-                return _imagePages[base.Image.Page - 1].Orientation % 180 == 0 ?
+                return _imagePages[_pageNumber - 1].Orientation % 180 == 0 ?
                     base.Image.ImageHeight : base.Image.ImageWidth;
             }
         }
@@ -1911,7 +1944,7 @@ namespace Extract.Imaging.Forms
                 // Ensure an image is open
                 ExtractException.Assert("ELI21504", "No image is open.", base.Image != null);
 
-                return _imagePages[base.Image.Page - 1].Orientation % 180 == 0 ?
+                return _imagePages[_pageNumber - 1].Orientation % 180 == 0 ?
                     base.Image.ImageWidth : base.Image.ImageHeight;
             }
         }
@@ -1998,7 +2031,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <value>The name of the last used printer.</value>
         /// <returns>The name of the last used printer.</returns>
-        private string LastPrinter
+        string LastPrinter
         {
             get
             {
@@ -2114,7 +2147,7 @@ namespace Extract.Imaging.Forms
                 if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     // Upate the mouse cursor
-                    base.Cursor = GetSelectionCursor(this.PointToClient(MousePosition));
+                    base.Cursor = GetSelectionCursor(PointToClient(MousePosition));
                 }
             }
             catch (Exception ex)
@@ -2138,7 +2171,7 @@ namespace Extract.Imaging.Forms
                 if (_trackingData == null && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     // Update the mouse cursor
-                    base.Cursor = GetSelectionCursor(this.PointToClient(MousePosition));
+                    base.Cursor = GetSelectionCursor(PointToClient(MousePosition));
                 }
             }
             catch (Exception ex)
@@ -2172,7 +2205,7 @@ namespace Extract.Imaging.Forms
                         // Activate the mouse cursor
                         if (_activeCursor != null)
                         {
-                            this.Cursor = _activeCursor;
+                            Cursor = _activeCursor;
                         }
 
                         StartTracking(e.X, e.Y);
@@ -2230,9 +2263,9 @@ namespace Extract.Imaging.Forms
                 if (_trackingData != null && e.Button == MouseButtons.Left)
                 {
                     // Update the tracking event
-                    this.UpdateTracking(e.X, e.Y);
+                    UpdateTracking(e.X, e.Y);
                 }
-                else if (this.IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
+                else if (IsImageAvailable && _cursorTool == CursorTool.SelectLayerObject)
                 {
                     UpdateActiveLinkedLayerObject(e.X, e.Y);
 
@@ -2296,12 +2329,12 @@ namespace Extract.Imaging.Forms
         /// that contains infomation about the mouse event that triggered this call. If
         /// <see langword="null"/>, <see cref="SelectionToolLeftLayerObject"/> will be raised for
         /// all <see cref="LayerObject"/>s previously under the selection tool.</param>
-        private void UpdateLayerObjectsUnderSelectionTool(MouseEventArgs e)
+        void UpdateLayerObjectsUnderSelectionTool(MouseEventArgs e)
         {
             // Determine whether the method should look for any layer objects under the selection
             // tool. (If false, all current _layerObjectsUnderSelectionTool members will be removed).
             bool lookForLayerObjectsUnderSelectionTool =
-                (e != null && _cursorTool == CursorTool.SelectLayerObject && this.IsImageAvailable);
+                (e != null && _cursorTool == CursorTool.SelectLayerObject && IsImageAvailable);
 
             // If looking for new layer objects, initialize _layerObjectsUnderSelectionTool if
             // necessary.
@@ -2344,7 +2377,7 @@ namespace Extract.Imaging.Forms
                     // is no longer found under the selection tool.
                     if (!lookForLayerObjectsUnderSelectionTool ||
                         !_layerObjects.Contains(layerObject) ||
-                        layerObject.PageNumber != base.Image.Page ||
+                        layerObject.PageNumber != _pageNumber ||
                         !layerObject.HitTest(imagePoint))
                     {
                         removedLayerObjects.Add(layerObject);
@@ -2361,7 +2394,7 @@ namespace Extract.Imaging.Forms
                 foreach (LayerObject layerObject in _layerObjects)
                 {
                     // Skip this layer object if it is on a different page
-                    if (layerObject.PageNumber != base.Image.Page)
+                    if (layerObject.PageNumber != _pageNumber)
                     {
                         continue;
                     }
@@ -2403,7 +2436,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="x">The physical (client) x-coordinate of the mouse.</param>
         /// <param name="y">The physical (client) y-coordinate of the mouse.</param>
-        private void UpdateActiveLinkedLayerObject(int x, int y)
+        void UpdateActiveLinkedLayerObject(int x, int y)
         {
             Point mousePoint = new Point(x, y);
 
@@ -2418,7 +2451,7 @@ namespace Extract.Imaging.Forms
                 else
                 {
                     // The linked layer object is no longer active
-                    base.Invalidate(_activeLinkedLayerObject.GetLinkArea());
+                    Invalidate(_activeLinkedLayerObject.GetLinkArea());
                     _activeLinkedLayerObject = null;
                 }
             }
@@ -2434,7 +2467,7 @@ namespace Extract.Imaging.Forms
                     if (layerObject.IsLinked && layerObject.Visible)
                     {
                         _activeLinkedLayerObject = layerObject;
-                        base.Invalidate(layerObject.GetLinkArea());
+                        Invalidate(layerObject.GetLinkArea());
                         return;
                     }
                 }
@@ -2458,7 +2491,7 @@ namespace Extract.Imaging.Forms
                         layerObject.HitTest(hitPoint[0]))
                     {
                         _activeLinkedLayerObject = layerObject;
-                        base.Invalidate(layerObject.GetLinkArea());
+                        Invalidate(layerObject.GetLinkArea());
                         return;
                     }
                 }
@@ -2472,7 +2505,7 @@ namespace Extract.Imaging.Forms
         /// physical (client) x and y coordinates of the mouse.</param>
         /// <returns>The cursor for the select layerObject tool based on the mouse position.
         /// </returns>
-        private Cursor GetSelectionCursor(Point mouse)
+        Cursor GetSelectionCursor(Point mouse)
         {
             return GetSelectionCursor(mouse.X, mouse.Y);
         }
@@ -2500,7 +2533,7 @@ namespace Extract.Imaging.Forms
             foreach (LayerObject layerObject in _layerObjects.Selection)
             {
                 // Skip this layer object if it is on a different page
-                if (layerObject.PageNumber != base.Image.Page)
+                if (layerObject.PageNumber != _pageNumber)
                 {
                     continue;
                 }
@@ -2565,7 +2598,7 @@ namespace Extract.Imaging.Forms
         /// rectangle in image coordinates.</param>
         /// <param name="height">The distance in image pixels between two sides of the rectangle 
         /// measured perpendicular to the line formed by <paramref name="points"/>.</param>
-        private void GetSpatialDataFromClientRectangle(Rectangle rectangle, out Point[] points, out int height)
+        void GetSpatialDataFromClientRectangle(Rectangle rectangle, out Point[] points, out int height)
         {
             // Calculate the points of the raster zone's bisecting line
             int rasterLineY = rectangle.Top + rectangle.Height / 2;
@@ -2612,13 +2645,13 @@ namespace Extract.Imaging.Forms
                 if (_trackingData != null && e.Button == MouseButtons.Left)
                 {
                     // Finish tracking this event
-                    this.EndTracking(e.X, e.Y, false);
+                    EndTracking(e.X, e.Y, false);
                 }
 
-                if (this.IsImageAvailable)
+                if (IsImageAvailable)
                 {
                     // Restore the original cursor tool
-                    this.Cursor = _toolCursor ?? Cursors.Default;
+                    Cursor = _toolCursor ?? Cursors.Default;
                 }
             }
             catch (Exception ex)
@@ -2684,7 +2717,7 @@ namespace Extract.Imaging.Forms
                     // Draw each layerObject in order of the layer object collection's z-order.
                     foreach (LayerObject layerObject in _layerObjects.InZOrder)
                     {
-                        if (layerObject.Visible && layerObject.PageNumber == base.Image.Page)
+                        if (layerObject.Visible && layerObject.PageNumber == _pageNumber)
                         {
                             layerObject.Paint(e.Graphics, clip);
                         }
@@ -2900,7 +2933,7 @@ namespace Extract.Imaging.Forms
                     // No interactive tracking event.
 
                     // Check which modifier keys are being pressed
-                    switch (Control.ModifierKeys)
+                    switch (ModifierKeys)
                     {
                         // Zoom in/out
                         case Keys.Control:
@@ -2939,7 +2972,7 @@ namespace Extract.Imaging.Forms
                         case Keys.Shift:
 
                             // Check if a horizontal scroll bar is visible
-                            if (base.HScroll)
+                            if (HScroll)
                             {
                                 // Scroll horizontally
                                 Point scroll = base.ScrollPosition;
@@ -2953,7 +2986,7 @@ namespace Extract.Imaging.Forms
                         default:
 
                             // Check if a vertical scroll bar is visible
-                            if (base.VScroll)
+                            if (VScroll)
                             {
                                 // Scroll vertically
                                 Point scroll = base.ScrollPosition;
@@ -3024,7 +3057,7 @@ namespace Extract.Imaging.Forms
                     // Open the file in the image viewer
                     if (fileNames.Length == 1)
                     {
-                        this.OpenImage(fileNames[0], true);
+                        OpenImage(fileNames[0], true);
                     }
                     else if(fileNames.Length > 1)
                     {
@@ -3054,7 +3087,7 @@ namespace Extract.Imaging.Forms
                 base.OnScrollPositionChanged(e);
 
                 // Store the scroll position [DNRCAU #262 - JDS]
-                _scrollPosition = this.ScrollPosition;
+                _scrollPosition = ScrollPosition;
             }
             catch (Exception ex)
             {
@@ -3075,7 +3108,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="PrintDocument.BeginPrint"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="PrintDocument.BeginPrint"/> event.</param>
-        private void HandleBeginPrint(object sender, PrintEventArgs e)
+        void HandleBeginPrint(object sender, PrintEventArgs e)
         {
             // Reset the print page
             _printPage = 0;
@@ -3086,7 +3119,7 @@ namespace Extract.Imaging.Forms
                 // Invalidate the print preview dialog and the image viewer and call do events so
                 // that the toolstrip will draw
                 _printPreview.Invalidate();
-                this.Invalidate();
+                Invalidate();
                 Application.DoEvents();
             }
         }
@@ -3098,7 +3131,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="PrintDocument.PrintPage"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="PrintDocument.PrintPage"/> event.</param>
-        private void HandlePrintPage(object sender, PrintPageEventArgs e)
+        void HandlePrintPage(object sender, PrintPageEventArgs e)
         {
             // Print the image
             PrinterSettings settings = e.PageSettings.PrinterSettings;
@@ -3111,7 +3144,7 @@ namespace Extract.Imaging.Forms
                     _printPage += _printPage == 0 ? settings.FromPage : 1;
 
                     // Check if we are printing the current page
-                    if (_printPage == base.Image.Page)
+                    if (_printPage == _pageNumber)
                     {
                         // Print the current page
                         PrintPage(e);
@@ -3119,19 +3152,12 @@ namespace Extract.Imaging.Forms
                     else
                     {
                         // Store the current page and suppress the paint event
-                        int originalPage = base.Image.Page;
-                        AnnContainer originalAnnotations = _annotations;
+                        int originalPage = _pageNumber;
                         base.BeginUpdate();
                         try
                         {
-                            // Clear the annotations
-                            _annotations = null;
-
                             // Switch to the page being printed
-                            base.Image.Page = _printPage;
-
-                            // Update the annotations
-                            UpdateAnnotations();
+                            SetPageNumber(_printPage, false, false);
 
                             // Print the current page
                             PrintPage(e);
@@ -3139,14 +3165,7 @@ namespace Extract.Imaging.Forms
                         finally
                         {
                             // Restore the original page
-                            base.Image.Page = originalPage;
-
-                            // Restore the original annotations
-                            if (_annotations != null)
-                            {
-                                _annotations.Dispose();
-                            }
-                            _annotations = originalAnnotations;
+                            SetPageNumber(originalPage, false, false);
 
                             // Unsuppress the paint event
                             base.EndUpdate();
@@ -3185,7 +3204,7 @@ namespace Extract.Imaging.Forms
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
         /// <param name="e">The event data associated with the 
         /// <see cref="LayerObjectsCollection.LayerObjectDeleted"/> event.</param>
-        private void HandleLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
+        void HandleLayerObjectDeleted(object sender, LayerObjectDeletedEventArgs e)
         {
             try
             {
@@ -3233,11 +3252,11 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        private void HandlePrintPreviewLoad(object sender, EventArgs e)
+        void HandlePrintPreviewLoad(object sender, EventArgs e)
         {
             try
             {
-                Form parent = base.TopLevelControl as Form;
+                Form parent = TopLevelControl as Form;
 
                 // If found the parent form for the image viewer, use its coordinates
                 // as the coordinates and size of the print preview dialog
@@ -3253,7 +3272,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Invalidate the image viewer before displaying the form
-                this.RefreshImageViewerAndParent();
+                RefreshImageViewerAndParent();
             }
             catch (Exception ex)
             {
@@ -3269,7 +3288,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="sender">The object which sent the event.</param>
         /// <param name="e">The data associated with the event.</param>
-        private void HandlePrintPreviewPrintButtonClick(object sender, EventArgs e)
+        void HandlePrintPreviewPrintButtonClick(object sender, EventArgs e)
         {
             try
             {
@@ -3282,7 +3301,7 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Call print and do not raise the DisplayingPrintDialog event
-                this.Print(false);
+                Print(false);
             }
             catch (Exception ex)
             {
