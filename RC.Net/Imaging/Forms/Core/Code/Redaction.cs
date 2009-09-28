@@ -41,12 +41,12 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The color that black redactions will be painted on the screen.
         /// </summary>
-        internal static readonly Color _BLACK_PAINT = Color.DimGray;
+        internal static readonly Color BlackPaint = Color.DimGray;
 
         /// <summary>
         /// The color that white redactions will be painted on the screen.
         /// </summary>
-        internal static readonly Color _WHITE_PAINT = Color.LightGray;
+        internal static readonly Color WhitePaint = Color.LightGray;
         
         /// <summary>
         /// The color that black redactions will be rendered on a hard copy.
@@ -180,7 +180,7 @@ namespace Extract.Imaging.Forms
         public Redaction(ImageViewer imageViewer, int pageNumber, string comment,
             IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, comment, rasterZones,
-            fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT)
+            fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)
         {
             try
             {
@@ -216,7 +216,7 @@ namespace Extract.Imaging.Forms
         public Redaction(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, tags, rasterZones,
-            fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT)
+            fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)
         {
             try
             {
@@ -254,7 +254,7 @@ namespace Extract.Imaging.Forms
         public Redaction(ImageViewer imageViewer, int pageNumber, IEnumerable<string> tags,
             string comment, IEnumerable<RasterZone> rasterZones, RedactionColor fillColor)
             : base(imageViewer, pageNumber, tags, comment, rasterZones,
-            fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT)
+            fillColor == RedactionColor.Black ? BlackPaint : WhitePaint)
         {
             try
             {
@@ -429,7 +429,7 @@ namespace Extract.Imaging.Forms
             _fillColor = fillColor;
 
             // Set the appropriate highlight color
-            Color color = _fillColor == RedactionColor.Black ? _BLACK_PAINT : _WHITE_PAINT;
+            Color color = _fillColor == RedactionColor.Black ? BlackPaint : WhitePaint;
             base.SetColor(color, markAsDirty);
         }
 
