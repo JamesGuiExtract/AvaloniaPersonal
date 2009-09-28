@@ -1,4 +1,4 @@
-namespace IDShieldOffice
+namespace Extract.Imaging
 {
     partial class BatesNumberManagerAppearancePropertyPage
     {

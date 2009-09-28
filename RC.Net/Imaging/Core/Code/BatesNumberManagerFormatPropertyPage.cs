@@ -12,7 +12,7 @@ using System.Globalization;
 using Extract.Utilities.Forms;
 using System.IO;
 
-namespace IDShieldOffice
+namespace Extract.Imaging
 {
     /// <summary>
     /// Represents the property page for the format of Bates numbers.
@@ -36,11 +36,6 @@ namespace IDShieldOffice
         #region BatesNumberManagerFormatPropertyPage Fields
 
         /// <summary>
-        /// The <see cref="BatesNumberManager"/> to which settings will be applied.
-        /// </summary>
-        readonly BatesNumberManager _batesNumberManager;
-
-        /// <summary>
         /// Whether or not the settings on the property page have been modified.
         /// </summary>
         private bool _dirty;
@@ -49,6 +44,11 @@ namespace IDShieldOffice
         /// A dialog that allows the user to select the next number file to use.
         /// </summary>
         OpenFileDialog _nextNumberFileDialog;
+
+        /// <summary>
+        /// The format object that will be modified by this dialog
+        /// </summary>
+        BatesNumberFormat _format;
 
         #endregion BatesNumberManagerFormatPropertyPage Fields
 
@@ -66,9 +66,10 @@ namespace IDShieldOffice
         /// <summary>
         /// Initializes a new <see cref="BatesNumberManagerFormatPropertyPage"/> class.
         /// </summary>
+        /// <param name="format">The <see cref="BatesNumberFormat"/> to save the settings to.</param>
         // Don't fight with auto-generated code.
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        internal BatesNumberManagerFormatPropertyPage(BatesNumberManager batesNumberManager)
+        internal BatesNumberManagerFormatPropertyPage(BatesNumberFormat format)
         {
             try
             {
@@ -80,13 +81,12 @@ namespace IDShieldOffice
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23186",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23186",
                     _OBJECT_NAME);
 
                 InitializeComponent();
 
-                // Store the Bates number manager
-                _batesNumberManager = batesNumberManager;
+                _format = format;
             }
             catch (Exception ex)
             {
@@ -99,14 +99,13 @@ namespace IDShieldOffice
         #region BatesNumberManagerFormatPropertyPage Methods
 
         /// <summary>
-        /// Resets all the values to the values stored in <see cref="_batesNumberManager"/> and 
+        /// Resets all the values to the values stored in <see cref="_format"/> and 
         /// resets the dirty flag to <see langword="false"/>.
         /// </summary>
         private void RefreshSettings()
         {
             // Next number UI elements
-            BatesNumberFormat format = _batesNumberManager.Format;
-            if (format.UseNextNumberFile)
+            if (_format.UseNextNumberFile)
 	        {
                 _nextNumberFileRadioButton.Checked = true;
 	        }
@@ -115,16 +114,16 @@ namespace IDShieldOffice
                 _nextNumberSpecifiedRadioButton.Checked = true;
             }
             _nextNumberSpecifiedTextBox.Text = 
-                format.NextNumber.ToString(CultureInfo.CurrentCulture);
-            _nextNumberFileTextBox.Text = format.NextNumberFile;
-            _zeroPadCheckBox.Checked = format.ZeroPad;
-            _digitsUpDown.Value = format.Digits;
+                _format.NextNumber.ToString(CultureInfo.CurrentCulture);
+            _nextNumberFileTextBox.Text = _format.NextNumberFile;
+            _zeroPadCheckBox.Checked = _format.ZeroPad;
+            _digitsUpDown.Value = _format.Digits;
 
             // Update the sample next number
-            UpdateSampleNextNumber();
+            UpdateSampleNextNumber(_format);
 
             // Bates number format UI elements
-            if (format.AppendPageNumber)
+            if (_format.AppendPageNumber)
             {
                 _usePageNumberRadioButton.Checked = true;
             }
@@ -132,13 +131,13 @@ namespace IDShieldOffice
             {
                 _useBatesForEachPageRadioButton.Checked = true;
             }
-            _zeroPadPageNumberCheckBox.Checked = format.ZeroPadPage;
-            _pageDigitsUpDown.Value = format.PageDigits;
-            _pageNumberSeparatorTextBox.Text = format.PageNumberSeparator;
+            _zeroPadPageNumberCheckBox.Checked = _format.ZeroPadPage;
+            _pageDigitsUpDown.Value = _format.PageDigits;
+            _pageNumberSeparatorTextBox.Text = _format.PageNumberSeparator;
 
             // Prefixes and suffixes UI elements
-            _prefixTextBox.Text = format.Prefix;
-            _suffixTextBox.Text = format.Suffix;
+            _prefixTextBox.Text = _format.Prefix;
+            _suffixTextBox.Text = _format.Suffix;
 
             // Update the sample Bates number
             UpdateSampleBatesNumber();
@@ -154,7 +153,20 @@ namespace IDShieldOffice
         private void UpdateSampleNextNumber()
         {
             // Get the next Bates number
-            long nextNumber = BatesNumberGenerator.PeekNextNumberFromFile(ToBatesNumberFormat());
+            using (BatesNumberFormat format = GetSettingsAsFormat())
+            {
+                UpdateSampleNextNumber(format);
+            }
+        }
+
+        /// <summary>
+        /// Updates the <see cref="_sampleNextNumberTextBox"/> with the next Bates number. Does 
+        /// not increment the file.
+        /// </summary>
+        /// <param name="format">The format object to use to create the sample number.</param>
+        private void UpdateSampleNextNumber(BatesNumberFormat format)
+        {
+            long nextNumber = BatesNumberGenerator.PeekNextNumberFromFile(format);
 
             // Set the text to the next number if valid, else to the empty string
             _sampleNextNumberTextBox.Text = nextNumber >= 0 ? 
@@ -167,8 +179,11 @@ namespace IDShieldOffice
         /// </summary>
         private void UpdateSampleBatesNumber()
         {
-            _sampleBatesNumberTextBox.Text = 
-                BatesNumberGenerator.PeekNextNumberString(1, ToBatesNumberFormat());
+            using (BatesNumberFormat format = GetSettingsAsFormat())
+            {
+                _sampleBatesNumberTextBox.Text =
+                    BatesNumberGenerator.PeekNextNumberString(1, format);
+            }
         }
 
         /// <summary>
@@ -183,12 +198,34 @@ namespace IDShieldOffice
         }
 
         /// <summary>
-        /// Retrieves the user specified settings as a Bates number format object.
+        /// Stores the user specified settings to the <see cref="BatesNumberFormat"/> object.
         /// </summary>
-        /// <returns>The user specified settings as a Bates number format object.</returns>
-        private BatesNumberFormat ToBatesNumberFormat()
+        private void SaveSettingsToFormat()
         {
-            // Create the Bates number format object
+            // Store the next number settings
+            _format.UseNextNumberFile = _nextNumberFileRadioButton.Checked;
+            _format.NextNumber = GetNextSpecifiedNumber();
+            _format.NextNumberFile = _nextNumberFileTextBox.Text;
+            _format.ZeroPad = _zeroPadCheckBox.Checked;
+            _format.Digits = (int)_digitsUpDown.Value;
+
+            // Store the Bates number format settings
+            _format.AppendPageNumber = _usePageNumberRadioButton.Checked;
+            _format.ZeroPadPage = _zeroPadPageNumberCheckBox.Checked;
+            _format.PageDigits = (int)_pageDigitsUpDown.Value;
+            _format.PageNumberSeparator = _pageNumberSeparatorTextBox.Text;
+
+            // Store the prefixes and suffixes settings
+            _format.Prefix = _prefixTextBox.Text;
+            _format.Suffix = _suffixTextBox.Text;
+        }
+
+        /// <summary>
+        /// Retrieves the user specified settings as a <see cref="BatesNumberFormat"/> object.
+        /// </summary>
+        /// <returns>The user specified settings as a <see cref="BatesNumberFormat"/> object.</returns>
+        BatesNumberFormat GetSettingsAsFormat()
+        {
             BatesNumberFormat format = new BatesNumberFormat();
 
             // Store the next number settings
@@ -312,15 +349,18 @@ namespace IDShieldOffice
             if (File.Exists(_nextNumberFileTextBox.Text))
             {
                 // Check that the file contains a valid Bates number
-                if (BatesNumberGenerator.PeekNextNumberFromFile(ToBatesNumberFormat()) < 0)
+                using (BatesNumberFormat format = GetSettingsAsFormat())
                 {
-                    MessageBox.Show("File does not contain a valid Bates number!",
-                        "Invalid Bates Number File", MessageBoxButtons.OK,
-                        MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
-                }
+                    if (BatesNumberGenerator.PeekNextNumberFromFile(format) < 0)
+                    {
+                        MessageBox.Show("File does not contain a valid Bates number!",
+                            "Invalid Bates Number File", MessageBoxButtons.OK,
+                            MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, 0);
+                    }
 
-                // Update the sample number
-                UpdateSampleNextNumber();
+                    // Update the sample number
+                    UpdateSampleNextNumber(format);
+                }
             }
 
             // Raise the PropertyPageModified event
@@ -538,34 +578,29 @@ namespace IDShieldOffice
         #region IPropertyPage Members
 
         /// <summary>
-        /// Applies the changes to the <see cref="BatesNumberManager"/>.
+        /// Applies the changes to the <see cref="BatesNumberFormat"/>.
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!this.IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Ensure the settings are valid
+                if (!this.IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                SaveSettingsToFormat();
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            BatesNumberFormat format = ToBatesNumberFormat();
-
-            // [IDSD #71] - Check that the Bates number will be on the page
-            if (!BatesNumberManager.CheckValidBatesNumberLocation(_batesNumberManager.ImageViewer,
-                _batesNumberManager.HorizontalInches, _batesNumberManager.VerticalInches,
-                _batesNumberManager.AnchorAlignment, _batesNumberManager.PageAnchorAlignment,
-                _batesNumberManager.Font, format))
+            catch (Exception ex)
             {
-                return;
+                throw ExtractException.AsExtractException("ELI27840", ex);
             }
-
-            // Store the changes
-            _batesNumberManager.Format = format;
-
-            // Reset the dirty flag
-            _dirty = false;
         }
 
         /// <summary>
@@ -596,12 +631,15 @@ namespace IDShieldOffice
                     // Ensure the file is valid and contains a valid next number [IDSD #201 - JDS]
                     if (File.Exists(_nextNumberFileTextBox.Text))
                     {
-                        // Get the next Bates number
-                        long nextNumber =
-                            BatesNumberGenerator.PeekNextNumberFromFile(ToBatesNumberFormat());
+                        using (BatesNumberFormat format = GetSettingsAsFormat())
+                        {
+                            // Get the next Bates number
+                            long nextNumber =
+                                BatesNumberGenerator.PeekNextNumberFromFile(format);
 
-                        // Check that the number from the file is valid
-                        return nextNumber >= 0;
+                            // Check that the number from the file is valid
+                            return nextNumber >= 0;
+                        }
                     }
 
                     return false;

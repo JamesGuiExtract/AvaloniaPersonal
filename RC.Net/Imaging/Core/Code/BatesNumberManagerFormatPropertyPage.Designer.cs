@@ -1,4 +1,4 @@
-namespace IDShieldOffice
+namespace Extract.Imaging
 {
     partial class BatesNumberManagerFormatPropertyPage
     {
@@ -26,7 +26,6 @@ namespace IDShieldOffice
                 {
                     _nextNumberFileDialog.Dispose();
                 }
-
             }
 
             // Release unmanaged resources

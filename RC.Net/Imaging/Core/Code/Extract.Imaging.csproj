@@ -60,10 +60,25 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BatesNumberFormat.cs" />
+    <Compile Include="BatesNumberGenerator.cs" />
+    <Compile Include="BatesNumberManagerAppearancePropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BatesNumberManagerAppearancePropertyPage.designer.cs">
+      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+    </Compile>
+    <Compile Include="BatesNumberManagerFormatPropertyPage.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="BatesNumberManagerFormatPropertyPage.designer.cs">
+      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+    </Compile>
     <Compile Include="ImageMethods.cs" />
     <Compile Include="AsynchronousOcrManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RasterZone.cs" />
+    <Compile Include="RegistryManager.cs" />
     <Compile Include="SynchronousOcrManager.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -82,6 +97,10 @@
     <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Utilities.csproj">
       <Project>{0D4AD6D3-B177-4E6D-BA6D-D8E0F42FC653}</Project>
       <Name>Extract.Utilities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Forms\Core\Code\Extract.Utilities.Forms.csproj">
+      <Project>{76781DE2-21D2-470C-B41D-598DC0C2640B}</Project>
+      <Name>Extract.Utilities.Forms</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -117,6 +136,16 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="BatesNumberManagerAppearancePropertyPage.resx">
+      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BatesNumberManagerFormatPropertyPage.resx">
+      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

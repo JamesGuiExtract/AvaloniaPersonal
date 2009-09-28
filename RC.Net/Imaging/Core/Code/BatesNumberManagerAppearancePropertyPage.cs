@@ -11,7 +11,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Globalization;
 
-namespace IDShieldOffice
+namespace Extract.Imaging
 {
     /// <summary>
     /// Represents the property page for the appearance of Bates numbers.
@@ -41,11 +41,6 @@ namespace IDShieldOffice
         #region BatesNumberManagerAppearancePropertyPage Fields
 
         /// <summary>
-        /// The <see cref="BatesNumberManager"/> to which settings will be applied.
-        /// </summary>
-        readonly BatesNumberManager _batesNumberManager;
-
-        /// <summary>
         /// Whether or not the settings on the property page have been modified.
         /// </summary>
         private bool _dirty;
@@ -59,6 +54,11 @@ namespace IDShieldOffice
         /// A dialog that allows the user to select a font for the Bates number.
         /// </summary>
         FontDialog _fontDialog;
+
+        /// <summary>
+        /// The format object that will be modified by this dialog
+        /// </summary>
+        BatesNumberFormat _format;
 
         #endregion BatesNumberManagerAppearancePropertyPage Fields
 
@@ -78,7 +78,7 @@ namespace IDShieldOffice
         /// </summary>
         // Don't fight with auto-generated code.
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        internal BatesNumberManagerAppearancePropertyPage(BatesNumberManager batesNumberManager)
+        internal BatesNumberManagerAppearancePropertyPage(BatesNumberFormat format)
         {
             try
             {
@@ -90,13 +90,12 @@ namespace IDShieldOffice
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23184",
+                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23184",
                     _OBJECT_NAME);
 
                 InitializeComponent();
 
-                // Store the Bates number manager
-                _batesNumberManager = batesNumberManager;
+                _format = format;
             }
             catch (Exception ex)
             {
@@ -109,21 +108,21 @@ namespace IDShieldOffice
         #region BatesNumberManagerAppearancePropertyPage Methods
 
         /// <summary>
-        /// Resets all the values to the values stored in <see cref="_batesNumberManager"/> and 
+        /// Resets all the values to the values stored in <see cref="_format"/> and 
         /// resets the dirty flag to <see langword="false"/>.
         /// </summary>
         private void RefreshSettings()
         {
             // Set the UI elements
-            _font = _batesNumberManager.Font;
+            _font = _format.Font;
             _horizontalInchesTextBox.Text = 
-                _batesNumberManager.HorizontalInches.ToString(CultureInfo.CurrentCulture);
+                _format.HorizontalInches.ToString(CultureInfo.CurrentCulture);
             _verticalInchesTextBox.Text =
-                _batesNumberManager.VerticalInches.ToString(CultureInfo.CurrentCulture);
-            _anchorAlignmentControl.AnchorAlignment = _batesNumberManager.AnchorAlignment;
+                _format.VerticalInches.ToString(CultureInfo.CurrentCulture);
+            _anchorAlignmentControl.AnchorAlignment = _format.AnchorAlignment;
             UpdateFontText();
 
-            switch (_batesNumberManager.PageAnchorAlignment)
+            switch (_format.PageAnchorAlignment)
             {
                 case AnchorAlignment.LeftBottom:
                     _horizontalPositionComboBox.Text = "left";
@@ -148,7 +147,7 @@ namespace IDShieldOffice
                 default:
                     ExtractException ee = new ExtractException("ELI22242",
                         "Unexpected page anchor alignment.");
-                    ee.AddDebugData("Alignment", _batesNumberManager.PageAnchorAlignment, false);
+                    ee.AddDebugData("Alignment", _format.PageAnchorAlignment, false);
                     throw ee;
             }
 
@@ -350,50 +349,49 @@ namespace IDShieldOffice
         #region IPropertyPage Members
 
         /// <summary>
-        /// Applies the changes to the <see cref="BatesNumberManager"/>.
+        /// Applies the changes to the <see cref="BatesNumberFormat"/>.
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!this.IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Ensure the settings are valid
+                if (!this.IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                float horizontalInches =
+                    Convert.ToSingle(_horizontalInchesTextBox.Text, CultureInfo.CurrentCulture);
+                float verticalInches =
+                    Convert.ToSingle(_verticalInchesTextBox.Text, CultureInfo.CurrentCulture);
+
+                AnchorAlignment pageAnchorAlignment = 0;
+                if (_horizontalPositionComboBox.Text == "right")
+                {
+                    pageAnchorAlignment += 2;
+                }
+                if (_verticalPositionComboBox.Text == "top")
+                {
+                    pageAnchorAlignment += 6;
+                }
+
+                // Store the settings
+                _format.Font = _font;
+                _format.HorizontalInches = horizontalInches;
+                _format.VerticalInches = verticalInches;
+                _format.AnchorAlignment = _anchorAlignmentControl.AnchorAlignment;
+                _format.PageAnchorAlignment = pageAnchorAlignment;
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            float horizontalInches = 
-                Convert.ToSingle(_horizontalInchesTextBox.Text, CultureInfo.CurrentCulture);
-            float verticalInches = 
-                Convert.ToSingle(_verticalInchesTextBox.Text, CultureInfo.CurrentCulture);
-
-            AnchorAlignment pageAnchorAlignment = 0;
-            if (_horizontalPositionComboBox.Text == "right")
+            catch (Exception ex)
             {
-                pageAnchorAlignment += 2;
+                ExtractException.Display("ELI27839", ex);
             }
-            if (_verticalPositionComboBox.Text == "top")
-            {
-                pageAnchorAlignment += 6;
-            }
-
-            // [IDSD #71] - Check that the Bates number will be on the page
-            if (!BatesNumberManager.CheckValidBatesNumberLocation(_batesNumberManager.ImageViewer,
-                horizontalInches, verticalInches, _anchorAlignmentControl.AnchorAlignment,
-                pageAnchorAlignment, _font, _batesNumberManager.Format))
-            {
-                return;
-            }
-
-            // Store the settings
-            _batesNumberManager.Font = _font;
-            _batesNumberManager.HorizontalInches = horizontalInches;
-            _batesNumberManager.VerticalInches = verticalInches;
-            _batesNumberManager.AnchorAlignment = _anchorAlignmentControl.AnchorAlignment;
-            _batesNumberManager.PageAnchorAlignment = pageAnchorAlignment;
-
-            // Reset the dirty flag
-            _dirty = false;
         }
 
         /// <summary>

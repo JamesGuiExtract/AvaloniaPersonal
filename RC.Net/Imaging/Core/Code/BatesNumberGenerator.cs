@@ -6,7 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-namespace IDShieldOffice
+namespace Extract.Imaging
 {
     /// <summary>
     /// Generates Bates numbers for a single document.
@@ -56,7 +56,7 @@ namespace IDShieldOffice
         public BatesNumberGenerator(BatesNumberFormat format)
         {
             // Validate the license
-            LicenseUtilities.ValidateLicense(LicenseIdName.IdShieldOfficeObject, "ELI23182",
+            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23182",
                 _OBJECT_NAME);
 
             _format = format;
