@@ -1,5 +1,5 @@
 using Leadtools.Codecs;
-using System;
+
 namespace Extract.Imaging.Forms
 {
     partial class ImageViewer
@@ -19,7 +19,7 @@ namespace Extract.Imaging.Forms
         {
             if (disposing)
             {
-                if(components != null)
+                if (components != null)
                 {
                     components.Dispose();
                 }
@@ -27,6 +27,11 @@ namespace Extract.Imaging.Forms
                 {
                     _codecs.Dispose();
                     _codecs = null;
+                }
+                if (_codecsStarted)
+                {
+                    RasterCodecs.Shutdown();
+                    _codecsStarted = false;
                 }
                 if (_layerObjects != null)
                 {
@@ -64,7 +69,6 @@ namespace Extract.Imaging.Forms
                     _currentOpenFile = null;
                 }
 
-                RasterCodecs.Shutdown();
             }
             base.Dispose(disposing);
         }
