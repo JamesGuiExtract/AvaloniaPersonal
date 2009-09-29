@@ -1,0 +1,152 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.0 Beta 6 Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.0 Beta 6 Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a Beta 6 / 1.0 
+	release candidate is to explicitly exercise these otherwise untested recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>[DataEntry #583]</b> Tooltips And Image Areas
+	<ul>
+		<li>Supply and Verify the two images located at 
+		<b>I:\Common\Testing\PVCS_Testing\DataEntry\583</b>.
+		<li>Select the <b>Lab Name</b> field for <b>001.tif</b>.
+		<li>Confirm that the tooltip is properly placed relative to the highlight.
+		<li>Select the <b>Lab Name</b> field for <b>008.tif</b>.
+		<li>Confirm that the tooltip is properly placed relative to the highlight.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #645]</b> Highlights With Mixed Row And Cell Selection
+	<ul>
+		<li>Open a Demo_LabDE sample image that contains an order with multiple tests.
+		<li>Click in the row header of the first test to select the first test row.
+		<li>Scroll to the bottom of the test table.
+		<li>Holding the <b>Shift</b> key, click in the comment cell of the last test row.
+		<li>Confirm that the first row is highlighted in the image.
+		<li>Confirm that the other selected cells are also highlighted in the image.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #653]</b> Clicking On Last Visible Order Row
+       	<ul>
+		<li>Open a Demo_LabDE sample image such as <b>413.tif</b> that contains 
+		multiple orders.
+  	   	<LI>Click on the last visible <b>Order</b> in the Order table.
+  	   	<LI>Confirm that the chosen <b>Order</b> is properly selected.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #654]</b> Ordering Physician Table And DEP Resize
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Resize the DEP smaller.
+		<li>Confirm that the <b>Ordering Physician</b> table never gets smaller 
+		such that information is inappropriately hidden.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #659]</b> Enabling Of Swiping Tools
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Select the <b>Lab Name</b> field.
+  	   	<LI>Confirm that the swiping tools are disabled in the toolbar.
+		<li>Select the <b>Zoom</b>, <b>Pan</b> or <b>Review</b> tool.
+  	   	<LI>Confirm that the swiping tools are still disabled in the toolbar.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #660]</b> Empty Lab Fields Not Persistent
+       	<ul>
+		<li>Open a Demo_LabDE sample image that contains <b>Lab Name</b> 
+		information.
+		<li>Clear the <b>Lab Name</b> fields.
+		<li><b>Stop processing</b> and save changes.
+		<li>Re-open the image.
+		<li>Confirm that the <b>Lab Name</b> fields remain cleared.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #661]</b> Missing Tooltip
+       	<ul>
+		<li>Open <b>352.tif</b> and click <b>F10</b> to show all highlights.
+  	   	<LI>Select an item on <b>page 1</b>.
+  	   	<LI>Confirm that the appropriate tooltip is shown.
+  	   	<LI>Navigate to <b>page 2</b>.
+		<li>Click <b>F10</b> twice so that show all highlights is on again.
+  	   	<LI>Navigate back to <b>page 1</b>.
+  	   	<LI>Confirm that the original tooltip is still visible.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #662]</b> Swiping Backwards
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+		<li>Use the <b>angular swiping</b> tool to swipe a test row backwards.
+		<li>Confirm that the test information is properly formatted.
+		<li>Confirm that <b>ELI25004: Nullable object must have a value.</b> 
+		exceptions are not seen. 
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #663]</b> Installation Of Message Queuing
+       	<ul>
+		<li>Open <b>Add or Remove Programs</b> from the COntrol Panel.
+		<li>Click on <b>Add/Remove Windows Components</b>.
+		<li>Confirm that <b>Message Queuing</b> is installed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #677]</b> Hint In Wrong Location
+       	<ul>
+		<li>Open Demo_LabDE sample image <b>003.tif</b>.
+		<li>Add the comment paragraph starting with <b>10/13/2008...</b> as 
+		the comment to the <b>GFR African American</b> test.
+		<li>Click on the <b>Ref Range</b> column for that test.
+  	   	<LI>Confirm that the <b>hint</b> is appropriately placed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #679]</b> Show All Highlights And New Swipes
+       	<ul>
+		<li>Select a Demo_LabDE sample image that contains a lot of tests.
+		<li>Delete or rename the VOA file.
+		<li>Open the image.
+		<li>Select the new row in the <b>Order</b> table.
+  	   	<LI>Swipe as many tests as possible with a single swipe.
+  	   	<LI>Click <b>F10</b> to show all highlights.
+  	   	<LI>Confirm that highlights are shown for the recent swipe.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #680]</b> Highlighting Error
+       	<ul>
+		<li>Open a Demo_LabDE sample image that contains a lot of tests.
+		<li>Change the name of each order to <b>B12</b> or something else 
+		such that all of the tests are invalid.
+  	   	<LI>Activate the <b>Review and select</b> tool.
+  	   	<LI>Click <b>Esc</b> to hide any visible tooltips.
+  	   	<LI>Hover the mouse over a test name such that the tooltip will 
+		overlap with an error icon in the image.
+  	   	<LI>Confirm that the error icon <b>is not</b> on top of the tooltip.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
