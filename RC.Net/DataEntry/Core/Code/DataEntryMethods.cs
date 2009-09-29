@@ -392,6 +392,11 @@ namespace Extract.DataEntry
                     sourceAttributes.RemoveValue((IAttribute)removedMatches.At(i));
                 }
 
+                // [DataEntry:693]
+                // Since these attributes will no longer be accessed by the DataEntry, they need
+                // to be released with FinalReleaseComObject to prevent handle leaks.
+                AttributeStatusInfo.ReleaseAttributes(removedMatches);
+
                 attributeCount = attributes.Size();
                 for (int i = 0; i < attributeCount; i++)
                 {

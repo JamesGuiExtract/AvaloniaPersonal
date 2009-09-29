@@ -1688,6 +1688,8 @@ namespace Extract.DataEntry
 
                 _activeCachedRows = null;
 
+                _tabOrderPlaceholderAttribute = null;
+
                 // [DataEntry:378]
                 // Prevent copying and pasting table data between different documents.
                 string rowDataType = GetDataType(Clipboard.GetDataObject());

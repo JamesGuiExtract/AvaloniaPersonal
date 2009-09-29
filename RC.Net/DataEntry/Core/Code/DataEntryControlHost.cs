@@ -16,6 +16,7 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Drawing2D;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
@@ -1502,6 +1503,12 @@ namespace Extract.DataEntry
                             // If all attributes passed validation, save the data.
                             dataCopy.SaveTo(_imageViewer.ImageFile + ".voa", true);
 
+                            // [DataEntry:693]
+                            // Since these attributes will no longer be accessed by the DataEntry,
+                            // they need to be released with FinalReleaseComObject to prevent handle
+                            // leaks.
+                            AttributeStatusInfo.ReleaseAttributes(dataCopy);
+
                             _dirty = false;
                         }
                         else
@@ -1723,22 +1730,28 @@ namespace Extract.DataEntry
                 _displayedAttributeHighlights.Clear();
                 _attributeHighlights.Clear();
 
-                if (_attributes != null && _attributes.Size() != 0)
+                // Clear any existing data in the controls.
+                foreach (IDataEntryControl dataControl in _rootLevelControls)
                 {
-                    // Clear any existing attributes.
-                    _attributes = (IUnknownVector)new IUnknownVectorClass();
-
-                    // Clear any existing data in the controls.
-                    foreach (IDataEntryControl dataControl in _rootLevelControls)
-                    {
-                        dataControl.SetAttributes(null);
-                    }
+                    dataControl.SetAttributes(null);
                 }
 
                 // Clear any data the controls have cached.
                 foreach (IDataEntryControl dataControl in _dataControls)
                 {
                     dataControl.ClearCachedData();
+                }
+
+                // AttributeStatusInfo cannot persist any data from one document to the next as it can
+                // cause COM threading exceptions in FAM mode. Unload its data now.
+                AttributeStatusInfo.ResetData(null, null, null);
+
+                if (_attributes != null)
+                {
+                    AttributeStatusInfo.ReleaseAttributes(_attributes);
+
+                    // Clear any existing attributes.
+                    _attributes = (IUnknownVector)new IUnknownVectorClass();
                 }
 
                 // [DataEntry:576]
@@ -1772,10 +1785,6 @@ namespace Extract.DataEntry
 
                 // Reset the map of error icon sizes to use.
                 _errorIconSizes.Clear();
-
-                // AttributeStatusInfo cannot persist any data from one document to the next as it can
-                // cause COM threading exceptions in FAM mode. Unload its data now.
-                AttributeStatusInfo.ResetData(null, null, null);
             }
             catch (Exception ex)
             {
@@ -5381,6 +5390,12 @@ namespace Extract.DataEntry
                     attributes.Remove(i);
                     count--;
                     i--;
+
+                    // [DataEntry:693]
+                    // Since these attributes will no longer be accessed by the DataEntry,
+                    // they need to be released with FinalReleaseComObject to prevent handle
+                    // leaks.
+                    Marshal.FinalReleaseComObject(attribute);
                 }
             }
         }

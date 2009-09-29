@@ -1554,6 +1554,11 @@ namespace Extract.DataEntry
                 // Raise the AttributeDeleted event last otherwise it can cause the hosts' count
                 // of invalid and unviewed attributes to be off.
                 statusInfo.OnAttributeDeleted(attribute);
+
+                // [DataEntry:693]
+                // Since the attribute will no longer be accessed by the DataEntry, it needs to be
+                // released with FinalReleaseComObject to prevent handle leaks.
+                Marshal.FinalReleaseComObject(attribute);
             }
             catch (Exception ex)
             {
@@ -2630,6 +2635,39 @@ namespace Extract.DataEntry
 
                 throw ExtractException.AsExtractException("ELI26118", ex);
             }  
+        }
+
+        /// <summary>
+        /// Releases all <see cref="IAttribute"/> COM objects in the supplied vectory by calling
+        /// FinalReleaseComObject on each. This needs to be done due to the assignment of
+        /// <see cref="AttributeStatusInfo"/> objects as the DataObject member of an attribute.
+        /// (If this is not done, handles are leaked).
+        /// </summary>
+        /// <param name="attributes">The <see cref="IUnknownVector"/> containing the
+        /// <see cref="IAttribute"/>s that need to be freed.
+        /// </param>
+        [ComVisible(false)]
+        [SuppressMessage("Microsoft.Design", "CA1011:ConsiderPassingBaseTypesAsParameters")]
+        public static void ReleaseAttributes(IUnknownVector attributes)
+        {
+            try
+            {
+                int count = attributes.Size();
+                for (int i = 0; i < count; i++)
+                {
+                    IAttribute attribute = (IAttribute)attributes.At(i);
+                    if (attribute.SubAttributes.Size() != 0)
+                    {
+                        ReleaseAttributes(attribute.SubAttributes);
+                    }
+
+                    Marshal.FinalReleaseComObject(attribute);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27846", ex);
+            }
         }
 
         #endregion Static Members

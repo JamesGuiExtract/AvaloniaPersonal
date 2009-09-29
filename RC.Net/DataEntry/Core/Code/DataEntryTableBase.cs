@@ -1802,6 +1802,12 @@ namespace Extract.DataEntry
 
                 _attributeMap[attribute] = tableElement;
 
+                // Register for the AttributeDeleted event so the attribute is removed from the
+                // map once it is deleted. It is important to do this because FinalReleaseComObject
+                // will be called on the attribute after deletion to prevent handle leaks.
+                AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                statusInfo.AttributeDeleted += HandleAttributeDeleted;
+
                 if (base.Visible)
                 {
                     // Only attributes mapped to a IDataEntryTableCell will be viewable.
@@ -1824,6 +1830,43 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
+        /// Un-maps a <see cref="IAttribute"/> from a table element.
+        /// </summary>
+        /// <param name="attribute">The <see cref="IAttribute"/> to un-map.</param>
+        // I can't find a way to case "UnMap" in a way that makes FX cop happy.
+        [SuppressMessage("Microsoft.Naming", "CA1709:IdentifiersShouldBeCasedCorrectly", MessageId = "Un")]
+        protected void UnMapAttribute(IAttribute attribute)
+        {
+            try
+            {
+                object tableElement = null;
+                if (_attributeMap.TryGetValue(attribute, out tableElement))
+                {
+                    _attributeMap.Remove(attribute);
+
+                    // Unregister from the HandleAttributeDeleted event.
+                    AttributeStatusInfo statusInfo = AttributeStatusInfo.GetStatusInfo(attribute);
+                    statusInfo.AttributeDeleted -= HandleAttributeDeleted;
+
+                    if (base.Visible)
+                    {
+                        // If the attribute was mapped to a dataEntryCell, unregister the 
+                        // HandleCellSpatialInfoChanged that was previously registered.
+                        IDataEntryTableCell dataEntryCell = tableElement as IDataEntryTableCell;
+                        if (dataEntryCell != null)
+                        {
+                            dataEntryCell.CellSpatialInfoChanged -= HandleCellSpatialInfoChanged;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27848", ex);
+            }
+        }
+
+        /// <summary>
         /// Clears <see cref="DataEntryTableBase"/>'s internal attribute map and resets selection
         /// to the first displayed table cell.
         /// </summary>
@@ -1835,7 +1878,11 @@ namespace Extract.DataEntry
                 _hintsAreDirty = true;
 
                 // Clear the attribute map
-                _attributeMap.Clear();
+                List<IAttribute> attributeList = new List<IAttribute>(_attributeMap.Keys);
+                foreach (IAttribute attribute in attributeList)
+                {
+                    UnMapAttribute(attribute);
+                }
 
                 // Reset selection back to the first displayed cell.
                 base.CurrentCell = base.FirstDisplayedCell;
@@ -2216,6 +2263,25 @@ namespace Extract.DataEntry
                 ExtractException ee = ExtractException.AsExtractException("ELI27646", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Handles the <see cref="AttributeStatusInfo.AttributeDeleted"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the event.</param>
+        /// <param name="e">An <see cref="AttributeDeletedEventArgs"/> that contains the event data.
+        /// </param>
+        void HandleAttributeDeleted(object sender, AttributeDeletedEventArgs e)
+        {
+            try
+            {
+                // Remove any deleted attributes from the _attributeMap
+                UnMapAttribute(e.DeletedAttribute);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27847", ex);
             }
         }
 
