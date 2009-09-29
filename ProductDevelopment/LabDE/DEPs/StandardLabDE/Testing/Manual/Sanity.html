@@ -15,8 +15,8 @@
 	<LI><h3>Installation and Licensing</h3>
 	<ul>
 		<LI>Confirm that <b>LabDE</b> installs successfully on this operating system.
-		<LI>Create individual license files for <b>FLEX Index Server</b> and <b>LabDE</b>.  
-		Include support for <b>PDF</b> images.
+		<LI>Create individual license files for <b>FLEX Index Server</b>, <b>LabDE 
+		Server</b> and <b>LabDE Client</b>.  Include support for <b>PDF</b> images.
 		<ul>
 			<LI>Confirm that LabDE <b>does not</b> run in stand-alone mode with only 
 			the <b>FLEX Index Server</b> license.
@@ -26,6 +26,8 @@
 			the <b>FLEX Index Server</b> license.
 			<LI>Confirm that LabDE <b>does</b> run in FAM mode with only 
 			the <b>LabDE</b> license.
+			<LI><b>[DataEntry #694]</b> Confirm that the FAM <b>does</b> run with only 
+			a <b>LabDE Client</b> license.
 		</ul>
 		<LI><b>[DataEntry #649]</b> Confirm that <b>Extract Systems LabDE</b> is a supported 
 		software product in the <b>User License</b> utility.
@@ -44,7 +46,7 @@
 			<LI>Confirm that no unexpected errors are noted.
 <p>
 			<LI>Queue and process the images using <b>Demo_LabDE/FPS/ExtractData.fps</b>.
-			<LI>Confirm that the FPS file is not listening for more documents.
+			<LI>Confirm that the FPS file <b>is</b> listening for more documents.
 			<LI>Confirm that no exceptions are logged.
 			<LI>Verify the images using <b>Demo_LabDE/FPS/Verify.fps</b>.
 			<ul>
@@ -57,8 +59,8 @@
 				<LI>Confirm that the <b>DB Admin Summary tab</b> is updated properly.
 			</ul>
 			<li>Mark the <b>Demo_LabDE Check Table</b> while you verify the documents.
-			<LI>Confirm that the document closes and the <b>FAM</b> stops processing 
-			when the last document is processed.
+			<LI>Confirm that the document <b>does</b> close and that the <b>FAM</b> 
+			<b>does not</b> stop processing when the last document is processed.
 		</ul>
 <p>
 		<LI><b>Second-stage verification</b>
