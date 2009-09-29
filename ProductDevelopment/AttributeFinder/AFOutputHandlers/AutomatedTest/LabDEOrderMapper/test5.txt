@@ -1,0 +1,3182 @@
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|06:40
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|16.2
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|11.8
+.Component|HCT
+..Range|36.0-48.0
+..Units|%
+..Value|36.8
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|318
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.6
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.94
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|93.4
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|29.9
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.1
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.3
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|74.7
+.Component|LYMPH
+..Range|15.0-45.0
+..Units|%
+..Value|15.1
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|8.1
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|1.8
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.3
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|12.1
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|2.4
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.3
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.3
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.1
+.Component|D-DIMER QUANT.
+..Flag|H
+..Range|< 400
+..Units|NG/ML
+..Value|3060
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|195
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|14
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.9
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.0
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|389
+.Component|AST
+..Range|9-36
+..Units|U/L
+..Value|20
+.Component|ALK PHOS
+..Flag|H
+..Range|35-104
+..Units|U/L
+..Value|248
+.Component|ALT
+..Range|7-49
+..Units|U/L
+..Value|13
+.Component|BILI TOTAL
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.4
+.Component|TOTAL PROTEIN
+..Range|6.3-8.3
+..Units|G/DL
+..Value|6.9
+.Component|ALBUMIN
+..Range|3.4-4.8
+..Units|G/DL
+..Value|3.5
+.Component|GFR AFRO AMER
+..Value|84
+.Component|GFR OTHER
+..Value|69
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|145
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.0
+.Component|CHLORIDE
+..Flag|H
+..Range|98-107
+..Units|MMOL/L
+..Value|110
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|27
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|8
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|05:05
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|10.7
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.3
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|32.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|282
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.38
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|96.2
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.5
+.Component|MCHC
+..Flag|L
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|31.7
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.3
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|65.7
+.Component|LYMPH
+..Range|15.0-45.0
+..Units|%
+..Value|19.6
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|11.0
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|3.1
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.6
+.Component|ABS# NEUT
+..Range|1.6-7.6
+..Units|K/UL
+..Value|7.1
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|2.1
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.2
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.3
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.1
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|111
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|12
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.3
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|485
+.Component|GFR AFRO AMER
+..Value|73
+.Component|GFR OTHER
+..Value|61
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|141
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.8
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|105
+.Component|TOTAL CO2
+..Flag|H
+..Range|23-29
+..Units|MMOL/L
+..Value|32
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|4
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|05:40
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|12.1
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.7
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|33.0
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|269
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.5
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.51
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|94.0
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.5
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.4
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.3
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|73.1
+.Component|LYMPH
+..Range|15.0-45.0
+..Units|%
+..Value|15.8
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|8.1
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|2.8
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.2
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|8.9
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.9
+.Component|ABS# MONO
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.0
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.3
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|288
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|19
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.1
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|270
+.Component|GFR AFRO AMER
+..Value|84
+.Component|GFR OTHER
+..Value|69
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|138
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.7
+.Component|CHLORIDE
+..Flag|L
+..Range|98-107
+..Units|MMOL/L
+..Value|97
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|27
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|14
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|05:05
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|12.9
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.1
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|31.6
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|286
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|11.0
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.32
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|95.2
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.4
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.0
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|47.7
+.Component|NEUT
+..Flag|H
+..Range|42.0-76.0
+..Units|%
+..Value|80.4
+.Component|LYMPH
+..Flag|L
+..Range|15.0-45.0
+..Units|%
+..Value|11.2
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|7.0
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|1.2
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.2
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|10.4
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.4
+.Component|ABS# MONO
+..Range|0.3-1.0
+..Units|K/UL
+..Value|0.9
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.2
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|166
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|23
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.7
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.3
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.0
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|533
+.Component|AST
+..Range|9-36
+..Units|U/L
+..Value|16
+.Component|ALK PHOS
+..Flag|H
+..Range|35-104
+..Units|U/L
+..Value|197
+.Component|ALT
+..Range|7-49
+..Units|U/L
+..Value|11
+.Component|BILI TOTAL
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.4
+.Component|BILI DIRECT
+..Range|0.1-0.2
+..Units|MG/DL
+..Value|0.1
+.Component|TOTAL PROTEIN
+..Flag|L
+..Range|6.3-8.3
+..Units|G/DL
+..Value|5.5
+.Component|ALBUMIN
+..Flag|L
+..Range|3.4-4.8
+..Units|G/DL
+..Value|2.8
+.Component|GFR AFRO AMER
+..Value|98
+.Component|GFR OTHER
+..Value|81
+.Component|CHOLESTEROL
+..Range|< 200
+..Units|MG/DL
+..Value|172
+.Component|TRIGLYCERIDES
+..Range|< 150
+..Units|MG/DL
+..Value|60
+.Component|HDL CHOLESTEROL
+..Range|< 40
+..Units|MG/DL
+..Value|61
+.Component|LDL CHOL,CALC
+..Range|< 130
+..Units|MG/DL
+..Value|99
+.Component|CHOL/HDL
+..Range|< 6.0
+..Value|2.8
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|139
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.0
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|99
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|27
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|13
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|05:20
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|10.5
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.1
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|31.7
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|275
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.5
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.40
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|93.2
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|29.7
+.Component|MCHC
+..Flag|L
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|31.9
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.2
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|71.7
+.Component|LYMPH
+..Flag|L
+..Range|15.0-45.0
+..Units|%
+..Value|13.8
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|11.9
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|2.3
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.3
+.Component|ABS# NEUT
+..Range|1.6-7.6
+..Units|K/UL
+..Value|7.5
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.5
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.3
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.2
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|164
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.8
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.1
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|652
+.Component|GFR AFRO AMER
+..Value|84
+.Component|GFR OTHER
+..Value|69
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|141
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.7
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|102
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|29
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|10
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|04:55
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|11.3
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.8
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|33.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|280
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.8
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.53
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|94.9
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.6
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.2
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|48.7
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|73.2
+.Component|LYMPH
+..Flag|L
+..Range|15.0-45.0
+..Units|%
+..Value|13.7
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|10.8
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|1.9
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.4
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|8.3
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.5
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.2
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.2
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|155
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|22
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.4
+.Component|B-NATRIURETIC P
+..Flag|H
+..Range|< 100
+..Units|PG/ML
+..Value|431
+.Component|GFR AFRO AMER
+..Value|73
+.Component|GFR OTHER
+..Value|61
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|139
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.8
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|99
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|27
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|13
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|04:50
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|10.7
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.1
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|31.3
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|268
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.33
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|94.0
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.3
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.3
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.4
+.Component|NEUT
+..Range|42.0-76.0
+..Units|%
+..Value|65.9
+.Component|LYMPH
+..Range|15.0-45.0
+..Units|%
+..Value|20.2
+.Component|MONO
+..Range|4.0-12.0
+..Units|%
+..Value|10.9
+.Component|EOS
+..Range|0.0-6.0
+..Units|%
+..Value|2.5
+.Component|BASOS
+..Range|0.0-2.0
+..Units|%
+..Value|0.5
+.Component|ABS# NEUT
+..Range|1.6-7.6
+..Units|K/UL
+..Value|7.1
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|2.2
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.2
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.3
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.1
+.Component|INR
+..Flag|H
+..Range|0.88-1.12
+..Value|1.18
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|123
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|22
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.5
+.Component|GFR AFRO AMER
+..Value|73
+.Component|GFR OTHER
+..Value|61
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|141
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|101
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|29
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|11
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|18:50
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|7.7
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|23.8
+.Component|GLUCOSE
+..Range|70-99
+..Units|MG/DL
+..Value|83
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|98
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.6
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.8
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|02:00
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|11.5
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|34.2
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.8
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|04:00
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|17.0
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.4
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|31.1
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|214
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.4
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.40
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|91.5
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.6
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|33.4
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|47.3
+.Component|BANDS
+..Range|%
+..Value|4
+.Component|SEGS
+..Flag|H
+..Range|42-70
+..Units|%
+..Value|89
+.Component|LYMPHS
+..Flag|L
+..Range|15-45
+..Units|%
+..Value|3
+.Component|MONOS
+..Range|4-12
+..Units|%
+..Value|4
+.Component|EOS
+..Range|0-6
+..Units|%
+..Value|0
+.Component|BASOS
+..Range|0-2
+..Units|%
+..Value|0
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|15.8
+.Component|ABS# LYMPH
+..Flag|L
+..Range|1.1-4.0
+..Units|K/UL
+..Value|0.5
+.Component|ABS# MONO
+..Range|0.3-1.0
+..Units|K/UL
+..Value|0.7
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.0
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|RBC MORPHOLOGY
+..Value|NORMAL
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|151
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.9
+.Component|CALCIUM
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.9
+.Component|MAGNESIUM
+..Range|1.5-2.7
+..Units|MG/DL
+..Value|2.1
+.Component|GFR AFRO AMER
+..Value|73
+.Component|GFR OTHER
+..Value|61
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|143
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.0
+.Component|CHLORIDE
+..Flag|H
+..Range|98-107
+..Units|MMOL/L
+..Value|110
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|26
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|7
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|12:00
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|11.2
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|33.5
+.Name|HEMATOLOGY
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|17:30
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|11.7
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|35.4
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.0
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|04:15
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|19.1
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.6
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|32.5
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|203
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|10.7
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.55
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|91.5
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|29.9
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.6
+.Component|RDW
+..Flag|H
+..Range|38.0-50.0
+..Units|FL
+..Value|51.0
+.Component|BANDS
+..Flag|H
+..Range|0-6
+..Value|7
+.Component|SEGS
+..Flag|H
+..Range|42-70
+..Units|%
+..Value|82
+.Component|LYMPHS
+..Flag|L
+..Range|15-45
+..Units|%
+..Value|6
+.Component|MONOS
+..Range|4-12
+..Units|%
+..Value|5
+.Component|EOS
+..Range|0-6
+..Units|%
+..Value|0
+.Component|BASOS
+..Range|0-2
+..Units|%
+..Value|0
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|17.0
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.1
+.Component|ABS# MONO
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.0
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.0
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|RBC MORPHOLOGY
+..Value|NORMAL
+.Name|MORPHOLOGY
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|03:29
+.Component|WBC
+..Flag|H
+..Range|4.0-10.0
+..Units|K/UL
+..Value|17.2
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.4
+.Component|HCT
+..Flag|L
+..Range|36.0-48.0
+..Units|%
+..Value|31.8
+.Component|PLT
+..Range|150-400
+..Units|K/UL
+..Value|210
+.Component|MPV
+..Range|9.0-13.0
+..Units|FL
+..Value|11.3
+.Component|RBC
+..Flag|L
+..Range|4.00-5.30
+..Units|M/UL
+..Value|3.41
+.Component|MCV
+..Range|79.0-99.0
+..Units|FL
+..Value|93.3
+.Component|MCH
+..Range|26.0-34.0
+..Units|PG
+..Value|30.5
+.Component|MCHC
+..Range|32.0-36.0
+..Units|GM/DL
+..Value|32.7
+.Component|RDW
+..Range|38.0-50.0
+..Units|FL
+..Value|49.4
+.Component|SEGS
+..Flag|H
+..Range|42-70
+..Units|%
+..Value|80
+.Component|LYMPHS
+..Flag|L
+..Range|15-45
+..Units|%
+..Value|10
+.Component|MONOS
+..Range|4-12
+..Units|%
+..Value|10
+.Component|EOS
+..Range|0-6
+..Units|%
+..Value|0
+.Component|BASOS
+..Range|0-2
+..Units|%
+..Value|0
+.Component|ABS# NEUT
+..Flag|H
+..Range|1.6-7.6
+..Units|K/UL
+..Value|13.8
+.Component|ABS# LYMPH
+..Range|1.1-4.0
+..Units|K/UL
+..Value|1.7
+.Component|ABS# MONO
+..Flag|H
+..Range|0.3-1.0
+..Units|K/UL
+..Value|1.7
+.Component|ABS# EOS
+..Range|0.0-0.6
+..Units|K/UL
+..Value|0.0
+.Component|ABS# BASO
+..Range|0.0-0.2
+..Units|K/UL
+..Value|0.0
+.Component|RBC MORPHOLOGY
+..Value|NORMAL
+.Component|WBC MORPHOLOGY
+..Value|NORMAL
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|138
+.Component|BUN
+..Flag|H
+..Range|8-21
+..Units|MG/DL
+..Value|34
+.Component|CREATININE
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|1.0
+.Component|CALCIUM
+..Flag|L
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|8.2
+.Component|GFR AFRO AMER
+..Value|65
+.Component|GFR OTHER
+..Value|54
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|139
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.6
+.Component|CHLORIDE
+..Range|98-107
+..Units|MMOL/L
+..Value|107
+.Component|TOTAL CO2
+..Range|23-29
+..Units|MMOL/L
+..Value|28
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|4
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|13:09
+.Component|POC HCT
+..Flag|L
+..Range|36-48
+..Units|%PCV
+..Value|31
+.Component|POC HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|10.5
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|102
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|139
+.Component|POC POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.8
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|14:30
+.Component|POC HCT
+..Flag|L
+..Range|36-48
+..Units|%PCV
+..Value|27
+.Component|POC HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|9.2
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|113
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|138
+.Component|POC POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.7
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|15:54
+.Component|POC HCT
+..Flag|L
+..Range|36-48
+..Units|%PCV
+..Value|20
+.Component|POC HGB
+..Flag|P
+..Range|12.0-16.0
+..Units|G/DL
+..Value|6.8
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|117
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|139
+.Component|POC POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|16:35
+.Component|POC HCT
+..Flag|L
+..Range|36-48
+..Units|%PCV
+..Value|22
+.Component|POC HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|7.5
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|134
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|140
+.Component|POC POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|17:52
+.Component|POC HCT
+..Flag|P
+..Range|36-48
+..Units|%PCV
+..Value|19
+.Component|POC HGB
+..Flag|P
+..Range|12.0-16.0
+..Units|G/DL
+..Value|6.5
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|107
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|141
+.Component|POC POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.5
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|18:14
+.Component|POC HCT
+..Flag|L
+..Range|36-48
+..Units|%PCV
+..Value|21
+.Component|POC HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|G/DL
+..Value|7.1
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|107
+.Component|POC SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|144
+.Component|POC POTASSIUM
+..Flag|L
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.2
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|22:30
+.Component|INR
+..Flag|H
+..Range|0.88-1.12
+..Value|1.14
+.Component|HEP B SURF Ag
+..Range|NON REAC
+..Value|NON REAC
+.Component|HIV 1/2 AB
+..Range|NON REAC
+..Value|NON REAC
+.Name|HIV TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|07:10
+.Component|PT FASTING?
+..Value|UNKNOWN
+.Component|GLUCOSE
+..Flag|H
+..Range|70-99
+..Units|MG/DL
+..Value|138
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|145
+.Component|BUN
+..Range|8-21
+..Units|MG/DL
+..Value|20
+.Component|CREATININE
+..Flag|L
+..Range|0.7-1.3
+..Units|MG/DL
+..Value|0.6
+.Component|CALCIUM
+..Flag|P
+..Range|8.4-10.2
+..Units|MG/DL
+..Value|5.8
+.Component|GFR AFRO AMER
+..Value|117
+.Component|GFR OTHER
+..Value|97
+.Component|SODIUM
+..Range|136-145
+..Units|MMOL/L
+..Value|144
+.Component|POTASSIUM
+..Flag|P
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|2.7
+.Component|CHLORIDE
+..Flag|H
+..Range|98-107
+..Units|MMOL/L
+..Value|114
+.Component|TOTAL CO2
+..Flag|L
+..Range|23-29
+..Units|MMOL/L
+..Value|18
+.Component|ANION GAP
+..Range|4-14
+..Units|MMOL/L
+..Value|12
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|10:10
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|209
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|12:09
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|161
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|15:09
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|93
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|16:01
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|99
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|19:19
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|93
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|02:01
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|53
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|02:31
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|91
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|06:50
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|127
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|09:04
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|201
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|11:08
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|245
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|16:42
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|120
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/22/2008
+.CollectionTime|20:55
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|148
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|02:06
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|169
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|07:14
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|338
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|09:29
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|395
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|10:57
+.Component|POC GLUCOSE
+..Flag|P
+..Range|70-105
+..Units|MG/DL
+..Value|406
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|13:08
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|252
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|14:07
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|187
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|16:12
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|216
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|20:02
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|173
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/23/2008
+.CollectionTime|23:58
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|99
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|02:09
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|132
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|06:58
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|184
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|08:26
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|251
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|09:14
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|257
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|10:18
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|232
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|11:00
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|209
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|12:16
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|205
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|13:30
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|203
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|14:24
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|191
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|16:47
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|261
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|21:23
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|353
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|22:53
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|372
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|23:38
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|355
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|01:32
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|275
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|03:35
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|235
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|06:47
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|170
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|11:07
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|391
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|13:49
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|294
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|15:53
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|298
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|16:57
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|306
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|17:58
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|295
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|19:26
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|253
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|21:16
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|245
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/25/2008
+.CollectionTime|23:29
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|163
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|05:23
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|189
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|06:51
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|172
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|07:58
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|182
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|10:49
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|317
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|12:36
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|222
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|15:12
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|307
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|16:39
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|230
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|17:26
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|289
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|19:23
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|231
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|20:53
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|144
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|00:23
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|90
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|04:13
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|145
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|07:01
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|171
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|11:20
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|210
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|14:21
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|254
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|16:04
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|184
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/27/2008
+.CollectionTime|20:17
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|152
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|00:11
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|73
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|02:58
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|123
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|07:06
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|138
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|10:32
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|198
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|12:25
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|305
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|13:48
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|178
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|16:02
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|180
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|18:01
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|79
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|20:39
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|167
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/28/2008
+.CollectionTime|23:58
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|53
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|00:31
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|95
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|01:57
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|104
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|06:15
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|187
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|07:21
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|245
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|08:41
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|262
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|09:57
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|218
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|11:20
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|106
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|12:35
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|57
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|19:57
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|88
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|21:08
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|109
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|22:19
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|91
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|23:14
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|127
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|01:02
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|210
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|01:56
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|198
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|03:09
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|185
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|03:53
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|144
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|05:14
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|128
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|06:08
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|88
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|07:15
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|62
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|07:40
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|66
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|08:10
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|82
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|09:05
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|124
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|09:51
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|178
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|10:56
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|177
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|12:10
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|138
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|13:10
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|89
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|13:59
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|50
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|14:24
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|76
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|15:01
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|72
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|16:00
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|121
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|17:28
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|205
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|18:25
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|157
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|19:30
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|140
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|21:09
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|91
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|22:08
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|68
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/30/2008
+.CollectionTime|23:01
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|87
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|00:09
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|116
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|01:03
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|137
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|02:45
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|113
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|04:21
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|88
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|05:13
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|129
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|06:13
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|200
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|10:06
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|337
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|11:47
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|281
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|15:28
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|174
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|18:47
+.Component|POC GLUCOSE
+..Flag|P
+..Range|70-105
+..Units|MG/DL
+..Value|418
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|21:01
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|387
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|22:09
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|327
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|00:56
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|229
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|03:25
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|145
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|05:13
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|135
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|07:16
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|127
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|10:55
+.Component|POC GLUCOSE
+..Flag|P
+..Range|70-105
+..Units|MG/DL
+..Value|455
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|12:35
+.Component|POC GLUCOSE
+..Flag|P
+..Range|70-105
+..Units|MG/DL
+..Value|405
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|13:36
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|369
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|15:36
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|243
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|18:21
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|144
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|19:44
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|103
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/03/2008
+.CollectionTime|00:54
+.Component|POC GLUCOSE
+..Flag|L
+..Range|70-105
+..Units|MG/DL
+..Value|53
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/03/2008
+.CollectionTime|02:40
+.Component|POC GLUCOSE
+..Range|70-105
+..Units|MG/DL
+..Value|103
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/03/2008
+.CollectionTime|09:47
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|183
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|10/03/2008
+.CollectionTime|11:27
+.Component|POC GLUCOSE
+..Flag|H
+..Range|70-105
+..Units|MG/DL
+..Value|109
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/21/2008
+.CollectionTime|09:14
+.Component|POC CKMB
+..Range|< 10.0
+..Units|NG/ML
+..Value|2.3
+.Component|POC TROPONIN
+..Range|0.00-0.09
+..Units|NG/ML
+..Value|<0.05
+.Name|CHEMISTRY
+Test|N/A
+.CollectionDate|09/29/2008
+.CollectionTime|23:20
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.1
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|11:10
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.9
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|17:00
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|4.5
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|10/02/2008
+.CollectionTime|18:05
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|3.7
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|10/03/2008
+.CollectionTime|03:39
+.Component|POTASSIUM
+..Range|3.5-5.1
+..Units|MMOL/L
+..Value|5.0
+.Name|ELECTROLYTES - BLOOD GASES
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|15:45
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.4
+.Component|HGB
+..Flag|L
+..Range|12.0-16.0
+..Units|GM/DL
+..Value|10.3
+.Name|POINT OF CARE TESTING
+Test|N/A
+.CollectionDate|09/26/2008
+.CollectionTime|11:45
+.Component|TYPE URINE
+..Value|UNKNOWN
+.Component|COLOR
+..Value|YELLOW
+.Component|CLARITY
+..Flag|*
+..Range|CLEAR
+..Value|SLCLDY
+.Component|SPEC GRAVITY
+..Range|1.000-1.030
+..Value|1.010
+.Component|GLUCOSE
+..Range|NEG
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|KETONES
+..Range|NEG
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|PH
+..Range|5.0-7.0
+..Value|5.0
+.Component|PROTEIN
+..Range|<30
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|BLOOD
+..Flag|*
+..Range|NEG
+..Value|SMALL
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTER
+..Flag|*
+..Range|NEG
+..Value|LARGE
+.Component|BACT/HPF
+..Flag|*
+..Range|NOT SEEN
+..Value|MANY
+.Component|WBC/HPF
+..Range|0-5
+..Value|11-20
+.Component|RBC/HPF
+..Range|0-2
+..Value|0-2
+.Component|SQ EPI/LPF
+..Range|0-10
+..Units|/LPF
+..Value|6-10
+.Name|MICROSCOPIC EXAMINATION
+Test|N/A
+.CollectionDate|10/01/2008
+.CollectionTime|18:00
+.Component|TYPE URINE
+..Value|UNKNOWN
+.Component|COLOR
+..Value|YELLOW
+.Component|CLARITY
+..Range|CLEAR
+..Value|CLEAR
+.Component|SPEC GRAVITY
+..Range|1.000-1.030
+..Value|1.020
+.Component|GLUCOSE
+..Range|NEG
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|KETONES
+..Flag|*
+..Range|NEG
+..Units|MG/DL
+..Value|10
+.Component|PH
+..Range|5.0-7.0
+..Value|5.0
+.Component|PROTEIN
+..Flag|*
+..Range|<30
+..Units|MG/DL
+..Value|50
+.Component|BLOOD
+..Flag|*
+..Range|NEG
+..Value|MODERATE
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTER
+..Range|NEG
+..Value|NEGATIVE
+.Component|BACT/HPF
+..Flag|*
+..Range|NOT SEEN
+..Value|FEW
+.Component|WBC/HPF
+..Range|0-5
+..Value|3-5
+.Component|RBC/HPF
+..Range|0-2
+..Value|0-2
+.Component|SQ EPI/LPF
+..Flag|*
+..Range|0-10
+..Units|/LPF
+..Value|11-20
+.Component|HYALINE/LPF
+..Flag|*
+..Range|0-2
+..Value|11-20
+.Name|MICROSCOPIC EXAMINATION
+Test|N/A
+.CollectionDate|09/24/2008
+.CollectionTime|18:25
+.Component|TYPE URINE
+..Value|VOIDED
+.Component|COLOR
+..Value|COLRLES
+.Component|CLARITY
+..Flag|*
+..Range|CLEAR
+..Value|SLCLDY
+.Component|SPEC GRAVITY
+..Range|<=1.030
+..Value|<1.005
+.Component|GLUCOSE
+..Range|NEG
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|KETONES
+..Range|NEG
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|PH
+..Range|5.0-7.0
+..Value|6.0
+.Component|PROTEIN
+..Range|<30
+..Units|MG/DL
+..Value|NEGATIVE
+.Component|BLOOD
+..Range|NEG
+..Value|NEGATIVE
+.Component|BILIRUBIN
+..Range|NEG
+..Value|NEGATIVE
+.Component|UROBILINOGEN
+..Range|0.2-1.0
+..Units|MG/DL
+..Value|0.2
+.Component|NITRITE
+..Range|NEG
+..Value|NEGATIVE
+.Component|LEUKOCYTE ESTER
+..Flag|*
+..Range|NEG
+..Value|TRC
+.Component|BACT/HPF
+..Flag|*
+..Range|NOT SEEN
+..Value|MANY
+.Component|WBC/HPF
+..Range|0-5
+..Value|3-5
+.Component|RBC/HPF
+..Range|0-2
+..Value|0-2
+.Component|SQ EPI/LPF
+..Range|0-10
+..Units|/LPF
+..Value|3-5
+.Name|MICROSCOPIC EXAMINATION

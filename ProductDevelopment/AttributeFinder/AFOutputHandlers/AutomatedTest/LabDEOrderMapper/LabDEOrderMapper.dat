@@ -1,0 +1,14 @@
+// Map one to one
+<TESTCASE>;Test.rsd;test1.txt;;test1.eav
+
+// Map one to two
+<TESTCASE>;Test.rsd;test2.txt;;test2&3.eav
+
+// Map two to two
+<TESTCASE>;Test.rsd;test3.txt;;test2&3.eav
+
+// Ensure unknown order is created
+<TESTCASE>;Test.rsd;test4.txt;;test4.eav
+
+// Map many to many
+<TESTCASE>;Test.rsd;test5.txt;;test5.eav
