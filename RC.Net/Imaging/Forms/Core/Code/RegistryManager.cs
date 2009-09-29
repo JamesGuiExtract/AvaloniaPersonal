@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 
 namespace Extract.Imaging.Forms
@@ -17,13 +16,13 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The current user registry subkey for the spot recognition input receiver.
         /// </summary>
-        static readonly string _SPOT_RECOGNITION_IR_SUBKEY =
+        const string _SPOT_RECOGNITION_IR_SUBKEY =
             @"Software\Extract Systems\InputFunnel\InputReceivers\SpotRecIR";
 
         /// <summary>
         /// The current user registry subkey for the most recently used images list.
         /// </summary>
-        static readonly string _MRU_LIST_USER_SUBKEY = _SPOT_RECOGNITION_IR_SUBKEY
+        const string _MRU_LIST_USER_SUBKEY = _SPOT_RECOGNITION_IR_SUBKEY
             + @"\MRUList";
 
         #endregion RegistryManager Subkeys
@@ -33,28 +32,28 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The registry key that contains whether to display percentages.
         /// </summary>
-        static readonly string _DISPLAY_PERCENTAGES_USER_KEY = "DisplayPercentageEnabled";
+        const string _DISPLAY_PERCENTAGES_USER_KEY = "DisplayPercentageEnabled";
 
         /// <summary>
         /// The key that contains the last used selection tool.
         /// </summary>
-        static readonly string _SELECTION_TOOL_USER_KEY = "SelectionTool";
+        const string _SELECTION_TOOL_USER_KEY = "SelectionTool";
 
         /// <summary>
         /// The key that contains the last fit to mode.
         /// </summary>
-        static readonly string _FIT_TO_MODE_KEY = "FitToStatus";
+        const string _FIT_TO_MODE_KEY = "FitToStatus";
 
         /// <summary>
         /// The key that contains the last used printer.
         /// </summary>
-        static readonly string _LAST_PRINTER_KEY = "LastPrinter";
+        const string _LAST_PRINTER_KEY = "LastPrinter";
 
         /// <summary>
         /// The key that contains the maximum number of times save should retry if it fails
         /// to get a device context [IDSD #331]
         /// </summary>
-        static readonly string _SAVE_RETRY = "SaveRetries";
+        const string _SAVE_RETRY = "SaveRetries";
 
         #endregion RegistryManager Keys
 
@@ -63,32 +62,32 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// The maximum number of items in the most recently used items list.
         /// </summary>
-        static readonly int _MAX_MRU_IMAGES = 8;
+        const int _MAX_MRU_IMAGES = 8;
 
         /// <summary>
         /// Value to store in the registry for the Angular selection tool.
         /// </summary>
-        static readonly string _ANGULAR_SELECTION_TOOL_VALUE = "8";
+        const string _ANGULAR_SELECTION_TOOL_VALUE = "8";
 
         /// <summary>
         /// Value to store in the registry for the Rectangular selection tool.
         /// </summary>
-        static readonly string _RECTANGULAR_SELECTION_TOOL_VALUE = "16";
+        const string _RECTANGULAR_SELECTION_TOOL_VALUE = "16";
 
         /// <summary>
         /// Value to store in the registry for fit to width mode.
         /// </summary>
-        static readonly string _FIT_TO_WIDTH_VALUE = "0";
+        const string _FIT_TO_WIDTH_VALUE = "0";
 
         /// <summary>
         /// Value to store in the registry for the fit to page mode.
         /// </summary>
-        static readonly string _FIT_TO_PAGE_VALUE = "1";
+        const string _FIT_TO_PAGE_VALUE = "1";
 
         /// <summary>
         /// Value to store in the registry for no fit mode.
         /// </summary>
-        static readonly string _NO_FIT_VALUE = "2";
+        const string _NO_FIT_VALUE = "2";
 
         #endregion RegistryManager Values
 
@@ -105,7 +104,7 @@ namespace Extract.Imaging.Forms
         /// <summary>
         /// Mutex used to make access to the MRU image list in the registry thread safe.
         /// </summary>
-        private static Mutex _mruMutex = 
+        static readonly Mutex _mruMutex = 
             new Mutex(false, @"Global\D7AFD341-3D38-4C57-BEBA-52DD56EC7E5A");
 
         #endregion RegistryManager Fields
@@ -157,7 +156,7 @@ namespace Extract.Imaging.Forms
             {
                 try
                 {
-                    string registryValue = null;
+                    string registryValue;
                     switch (value)
                     {
                         case FitMode.None:
@@ -226,7 +225,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                string registryValue = null;
+                string registryValue;
                 switch (cursorTool)
                 {
                     case CursorTool.AngularHighlight:
@@ -267,24 +266,26 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Get the most recently used image list
-                RegistryKey key = Registry.CurrentUser.OpenSubKey(_MRU_LIST_USER_SUBKEY);
-                if (key != null)
+                using (RegistryKey key = Registry.CurrentUser.OpenSubKey(_MRU_LIST_USER_SUBKEY))
                 {
-                    // Iterate through each file in the key
-                    for (int i = 1; i <= _MAX_MRU_IMAGES; i++)
+                    if (key != null)
                     {
-                        // Check if this value exists
-                        object value = key.GetValue("File_" +
-                            i.ToString(CultureInfo.InvariantCulture));
-                        if (value == null)
+                        // Iterate through each file in the key
+                        for (int i = 1; i <= _MAX_MRU_IMAGES; i++)
                         {
-                            // The value doesn't exist in the registry, we are done.
-                            break;
-                        }
-                        else
-                        {
-                            // Add this file to the most recently used image list
-                            mruList.Add(value.ToString());
+                            // Check if this value exists
+                            object value = key.GetValue("File_" + 
+                                i.ToString(CultureInfo.InvariantCulture));
+                            if (value == null)
+                            {
+                                // The value doesn't exist in the registry, we are done.
+                                break;
+                            }
+                            else
+                            {
+                                // Add this file to the most recently used image list
+                                mruList.Add(value.ToString());
+                            }
                         }
                     }
                 }
@@ -308,7 +309,7 @@ namespace Extract.Imaging.Forms
         /// used image files to the registry.
         /// </summary>
         /// <param name="mruList">Most recently used image file list.</param>
-        static void SetMostRecentlyUsedImageFiles(List<string> mruList)
+        static void SetMostRecentlyUsedImageFiles(IList<string> mruList)
         {
             // Ensure thread safety over this section
             _mruMutex.WaitOne();
@@ -319,15 +320,15 @@ namespace Extract.Imaging.Forms
                 Registry.CurrentUser.DeleteSubKey(_MRU_LIST_USER_SUBKEY, false);
 
                 // Get write access to the most recently used image list from the registry
-                RegistryKey key = Registry.CurrentUser.CreateSubKey(_MRU_LIST_USER_SUBKEY);
-
-                // Iterate through each file in the most recently used image list drop down
-                int fileCount = Math.Min(mruList.Count, RegistryManager._MAX_MRU_IMAGES);
-                for (int i = 1; i <= fileCount; i++)
+                using (RegistryKey key = Registry.CurrentUser.CreateSubKey(_MRU_LIST_USER_SUBKEY))
                 {
-                    // Store this file in the registry
-                    key.SetValue("File_" + i.ToString(CultureInfo.InvariantCulture),
-                        mruList[i - 1]);
+                    int fileCount = Math.Min(mruList.Count, _MAX_MRU_IMAGES);
+                    for (int i = 1; i <= fileCount; i++)
+                    {
+                        // Store this file in the registry
+                        key.SetValue("File_" + i.ToString(CultureInfo.InvariantCulture), 
+                            mruList[i - 1]);
+                    }
                 }
             }
             catch (Exception ex)
@@ -393,7 +394,7 @@ namespace Extract.Imaging.Forms
             List<string> mruList = GetMostRecentlyUsedImageFiles();
 
             // Search for the file name in the MRU list
-            // (Note: returns -1 if not found)
+            // (returns -1 if not found)
             int index = IndexOfImageFile(fileName, mruList);
 
             // If fileName exists in mruList, remove it
@@ -414,7 +415,7 @@ namespace Extract.Imaging.Forms
         /// </param>
         /// <returns>The index of <paramref name="fileName"/> in <paramref name="mruList"/>; or -1 
         /// if <paramref name="fileName"/> does not exist in <paramref name="mruList"/>.</returns>
-        static int IndexOfImageFile(string fileName, List<string> mruList)
+        static int IndexOfImageFile(string fileName, IList<string> mruList)
         {
             for (int i = 0; i < mruList.Count; i++)
             {
