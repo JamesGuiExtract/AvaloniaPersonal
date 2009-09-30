@@ -186,6 +186,8 @@
 		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{2124E4F3-D821-48C7-AD99-01BC8E9CE602}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.labde.standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{39AF42D5-575F-4A4F-8BF0-0C3319DAE366}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>extract.labresultscu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>41</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{6FAF55FF-9DD1-47DA-8247-FEAC88D0111E}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>interop.uclid_afoutp.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows dynamic link library.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{F38C653C-E9E2-4967-A08C-CBA86D45DBE2}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>sqlcompactexporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>{2D329D6E-A7A7-476D-86FB-740D397F8F83}</td><td>COMMON_COMPONENTS.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>8</td><td/><td>sqlcompactimporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>9</td><td>This component consists of a Windows executable.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
 	<table name="Condition">
@@ -362,6 +364,8 @@
 		<row><td>extract.labde.standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.LabDE.StandardLabDE.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabDE.StandardLabDE.dll</td><td>1</td><td/></row>
 		<row><td>extract.labresultscu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>EXTRAC~1.DLL|Extract.LabResultsCustomComponents.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Extract.LabResultsCustomComponents.dll</td><td>1</td><td/></row>
 		<row><td>interop.uclid_afoutp.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>INTERO~1.DLL|Interop.UCLID_AFOUTPUTHANDLERSLib.dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\Interop.UCLID_AFOUTPUTHANDLERSLib.dll</td><td>1</td><td/></row>
+		<row><td>sqlcompactexporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SQLCOM~1.EXE|SqlCompactExporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\SqlCompactExporter.exe</td><td>1</td><td/></row>
+		<row><td>sqlcompactimporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>SQLCOM~1.EXE|SqlCompactImporter.exe</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;DATA_ENTRY_CORE_FILES&gt;\SqlCompactImporter.exe</td><td>1</td><td/></row>
 	</table>
 
 	<table name="Font">
@@ -453,6 +457,8 @@
 		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_289B4052_0DE8_4907_BA40_F09ACBE814E1_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_778BE2D2_CB4F_4383_9D0D_3A3DDEE5587C_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_191157CD_8DA3_4B03_8EF0_3DF0B1D382DE_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_7D6272D9_0FCF_4947_B0C2_12C95A793D5B_FILTER</td><td/><td/><td/><td/></row>
+		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td/><td/><td>_7F4980AA_043E_4BFB_B139_0A73437E720E_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
 	<table name="ISCustomActionReference">
@@ -939,6 +945,8 @@ QwBEAC0AUgBPAE0AAQBNAGUAZABpAGEA
 		<row><td>Extract.LabDE.Standa.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Extract.LabResultsCu.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 		<row><td>Interop.UCLID_AFOUTP.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
+		<row><td>SqlCompactExporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
+		<row><td>SqlCompactImporter.e.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>DataEntry.6EB06D30_59B9_4713_A16B_FCAECC9D1695</td><td>0</td></row>
 	</table>
 
 	<table name="ModuleConfiguration">
