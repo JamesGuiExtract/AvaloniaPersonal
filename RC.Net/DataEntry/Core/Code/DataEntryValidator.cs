@@ -144,7 +144,7 @@ namespace Extract.DataEntry
                             "A validation pattern cannot be specified at the same time as a validation list!",
                             _validationListValues == null);
 
-                        _validationRegex = new Regex(value, RegexOptions.Compiled);
+                        _validationRegex = new Regex(value);
                     }
                     else
                     {

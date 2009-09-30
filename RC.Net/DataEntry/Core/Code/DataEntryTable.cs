@@ -1494,6 +1494,11 @@ namespace Extract.DataEntry
                     // If no data is being assigned, clear the existing attribute mappings and do not
                     // attempt to map a new attribute.
                     base.ClearAttributeMappings();
+
+                    // Ensure _tabOrderPlaceholderAttribute is cleared when propagating null so that
+                    // if a parent attribute is deleted, we don't try to use a deleted
+                    // _tabOrderPlaceholderAttribute
+                    _tabOrderPlaceholderAttribute = null;
                 }
                 else
                 {
