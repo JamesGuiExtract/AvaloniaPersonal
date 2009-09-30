@@ -21,17 +21,17 @@
 <ul>
   	<li>Start with a clean test machine or virtual machine.
   	<li>Create the usual drive mappings for <b>I</b> and <b>K</b>.
-	<LI>Confirm that COMLicenseGenerator.exe displays an error message that 
+	<LI>Confirm that <b>COMLicenseGenerator.exe</b> displays an error message that 
 	<b>Mscal.ocx</b> is not installed.</li>
    	<li>Install the calendar control via <b>ocx-install.bat</b> and confirm that 
-	COMLicenseGenerator.exe starts without error.</li>
+	<b>COMLicenseGenerator.exe</b> starts without error.</li>
 <p>
   	<li>Remove the drive mappings for <b>I</b> and <b>K</b>.
-   	<li>Navigate to COMLicenseGenerator.exe via UNC path (not mapped drive).  Confirm that an 
-	error message is displayed <b>"Unable to run License Generator Utility"</b>.</li>
+   	<li>Navigate to <b>COMLicenseGenerator.exe</b> via UNC path (not mapped drive).  Confirm 
+	that an error message is displayed <b>Unable to run License Generator Utility</b>.</li>
    	<li>Copy the contents of a specific COMLicense folder to a local folder on the 
-	test machine.  Confirm that an error message is displayed <b>"Unable to run License 
-	Generator Utility"</b>.</li>
+	test machine.  Confirm that an error message is displayed <b>Unable to run License 
+	Generator Utility</b>.</li>
 <p>
    	<li>Confirm that the package group names such as FLEX Index, ID Shield, FLEX Index / ID Shield 
 	Utilities cannot be selected in the <b>Packages</b> list.</li>
@@ -59,7 +59,7 @@
 	or disabled state of the associated <b>Paste</b> button.</li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h3>License Generator - Functionality</h3>
@@ -87,7 +87,8 @@
 	of the new license file.</li>
 <p>
    	<li>Confirm that the License Password edit box contains <b>&ltUCLID Password&gt</b> and the OEM 
-	Password edit box contains <b>&ltUCLID OEM&gt</b> after creating a license file with UCLID passwords.</li>
+	Password edit box contains <b>&ltUCLID OEM&gt</b> after creating a license file with default 
+	Extract Systems passwords.</li>
    	<li>Confirm that the License Password edit box and the OEM Password edit box contain updated values 
 	after creating a license file with Random passwords.</li>
    	<li>Confirm that the user is prompted to save a password file (*.pwd) after creating a license file 
@@ -101,7 +102,7 @@
 	the same value as stored in the password file.</li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h3>License Evaluator - Functionality</h3>
@@ -156,18 +157,19 @@
 	and special passwords of type 2, confirm that Evaluate Code updates the Licensed Components list with 
 	meaningful information.</li>
 <p>
-   	<li>Create a license file with known passwords or with saved random passwords.</li>
+   	<li>Create a license file with known passwords or with saved random passwords and use this 
+	license file for the following test cases.</li>
 	<ul>
-		<li>Use this license file for the following test cases.</li>
-		<li>*Meaningful information in the <b>Licensed Components</b> list includes one column of 
-		component IDs and one column of component names.  The list shall be sorted by component ID.</li>
+		<li>*Meaningful information in the <b>Licensed Components</b> list includes one 
+		column of component IDs and one column of component names.  The list shall be sorted 
+		by component ID.</li>
+	   	<li>For <b>User String</b> selection and nonsense passwords (i.e. 1,2,3,4), confirm 
+		that Evaluate Code displays a error message suggesting that passwords are incorrect.</li>
+	   	<li>For <b>User String</b> selection and the correct passwords, confirm that Evaluate 
+		Code updates the Licensed Components list with meaningful information.</li>
+	   	<li>For <b>UCLID String</b> selection and with or without passwords, confirm that 
+		Evaluate Code updates the Licensed Components list with meaningful information.</li>
 	</ul>
-   	<li>For <b>User String</b> selection and nonsense passwords (i.e. 1,2,3,4), confirm that Evaluate 
-	Code displays a error message suggesting that passwords are incorrect.</li>
-   	<li>For <b>User String</b> selection and the correct passwords, confirm that Evaluate Code updates 
-	the Licensed Components list with meaningful information.</li>
-   	<li>For <b>UCLID String</b> selection and with or without passwords, confirm that Evaluate Code 
-	updates the Licensed Components list with meaningful information.</li>
 <p>
    	<li>Test a non-expiring license file and confirm that Licensing Mode = Fully Licensed.</li>
    	<li>Test an expiring license file and confirm that Licensing Mode = Evaluation License and the 
@@ -180,15 +182,19 @@
 	are updated properly.</li>
 </ul>
 </li>
-<br />
+<p>
 
 <!-- *********************************************** -->
 <li><h3>License Evaluator - Version Compatibility</h3>
 <ul>
+	<li>For the testing below, use <b>COMLicenseEval.exe</b> from the appropriate 
+	<b>I:\Common\Engineering\Tools\SecureClients\COMLicense</b> folder.</li>
+	<li>Create a license file using each available version of <b>COMLicenseGenerator.exe</b>.
 	<li>Confirm that the license files marked <b>Yes</b> on the table can be evaluated with the 
-	specified COMLicenseEval version.</li>
+	specified <b>COMLicenseEval.exe</b> version.</li>
 	<li>Confirm that the license files marked <b>No</b> on the table cannot be evaluated with 
-	the specified COMLicenseEval version.  <b>*</b>Failure provides an informative error message.</li>
+	the specified <b>COMLicenseEval.exe</b> version.<br>
+	<b>*</b>Failure provides an informative error message.</li>
 <p>
 	<table border=1 cellpadding="5" cellspacing="0">
 	<tr>
@@ -197,15 +203,23 @@
 		<th><font size="2">FLEX Index 5.0</font></th>
 		<th><font size="2">FLEX Index 6.0</font></th>
 		<th><font size="2">FLEX Index 7.0</font></th>
+		<th><font size="2">FLEX Index 8.0</font></th>
 		<th><font size="2">IcoMap 4.0</font></th>
 		<th><font size="2">IcoMap 4.2</font></th>
+		<th><font size="2">ID Shield Office 1.0</font></th>
+		<th><font size="2">ID Shield Laserfiche 1.0</font></th>
+		<th><font size="2">LabDE 1.0</font></th>
 	<tr align="center">
 		<th><font size="2">FlexIndex3_2
 		<td><font size="2"><li>Yes
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 	</tr>
 	<tr align="center">
@@ -215,7 +229,11 @@
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 	</tr>
 	<tr align="center">
 		<th><font size="2">FlexIndex6_0
@@ -224,6 +242,10 @@
 		<td><font size="2"><li>Yes
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>Yes
 		<td><font size="2"><li>No
 	</tr>
 	<tr align="center">
@@ -234,6 +256,23 @@
 		<td><font size="2"><li>Yes
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+	</tr>
+	<tr align="center">
+		<th><font size="2">FlexIndex8_0
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 	</tr>
 	<tr align="center">
 		<th><font size="2">IcoMap4_0
@@ -241,13 +280,60 @@
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 	</tr>
 	<tr align="center">
 		<th><font size="2">IcoMap4_2
 		<td><font size="2"><li>No
 		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+	</tr>
+	<tr align="center">
+		<th><font size="2">IDShieldOffice1_0
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+	</tr>
+	<tr align="center">
+		<th><font size="2">Laserfiche1_0
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>Yes
+		<td><font size="2"><li>No
+	</tr>
+	<tr align="center">
+		<th><font size="2">LabDE1_0
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
+		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
 		<td><font size="2"><li>No
