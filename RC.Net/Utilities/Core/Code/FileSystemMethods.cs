@@ -530,7 +530,7 @@ namespace Extract.Utilities
             finally
             {
                 TimeSpan elapsed = DateTime.Now - startTime;
-                if (elapsed.TotalSeconds > 1)
+                if (elapsed.TotalSeconds > 5)
                 {
                     ExtractException ee = new ExtractException("ELI27699",
                         "Application trace: Poor performance calculating network path.");

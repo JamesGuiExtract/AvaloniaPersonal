@@ -1475,20 +1475,14 @@ namespace Extract.DataEntry
                 // Add each item from the validation list to the auto-complete list twice, once
                 // as it is in the validation list, and the second time with a leading space.
                 // This way, a user can press space in an empty cell to see all possible values.
-                string[] autoCompleteList = new string[validationListValues.Length * 2];
+                AutoCompleteStringCollection autoCompleteList = new AutoCompleteStringCollection();
                 for (int i = 0; i < validationListValues.Length; i++)
                 {
-                    autoCompleteList[i] = " " + validationListValues[i];
+                    autoCompleteList.Add(" " + validationListValues[i]);
                 }
-                validationListValues.CopyTo(autoCompleteList, validationListValues.Length);
-
-                // [DataEntry:621]
-                // Disabling auto-complete while updating the auto-complete source seems to solve
-                // the problem access violations.
-                base.AutoCompleteMode = AutoCompleteMode.None;
-                base.AutoCompleteCustomSource.Clear();
-                base.AutoCompleteCustomSource.AddRange(autoCompleteList);
-                base.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                autoCompleteList.AddRange(validationListValues);
+                
+                base.AutoCompleteCustomSource = autoCompleteList;
             }
         }
 

@@ -378,8 +378,6 @@ namespace Extract.DataEntry
                 base.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
 
                 base.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
-
-                base.EditingControlShowing += HandleEditingControlShowing;
             }
             catch (Exception ex)
             {
@@ -1132,6 +1130,112 @@ namespace Extract.DataEntry
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI27326", ex);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="DataGridView.EditingControlShowing"/> to display the control to 
+        /// edit the data in a cell.
+        /// </summary>
+        /// <param name="e">An <see cref="DataGridViewEditingControlShowingEventArgs"/> that
+        /// contains the event data.</param>
+        protected override void OnEditingControlShowing(DataGridViewEditingControlShowingEventArgs e)
+        {
+            try
+            {
+                base.OnEditingControlShowing(e);
+
+                // If the current selection does not result in a propagated attribute when dependent
+                // controls are present (ie, selection across multiple rows), don't allow edit mode
+                // since that dependent triggers in the dependent controls wouldn't be updated.
+                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
+                    base.CurrentRow.Index != base.NewRowIndex)
+                {
+                    base.EndEdit();
+                    return;
+                }
+
+                // [DataEntry:415]
+                // Limit the selection to just the cell being edited to prevent unexpected behavior
+                // when tabbing after the edit.
+                // [DataEntry:664]
+                // Also ensure that the currently selected cell is the CurrentCell (the cell that is
+                // in edit mode).
+                if (base.SelectedCells.Count > 1 || !base.SelectedCells.Contains(base.CurrentCell))
+                {
+                    // Clear all selections first since sometimes trying to select an individual cell 
+                    // in a selected row doesn't clear the row selection otherwise.
+                    base.ClearSelection();
+                    base.ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex,
+                        true);
+                }
+
+                IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
+
+                if (e.Control != null && dataEntryCell != null)
+                {
+                    _editingControl = e.Control;
+
+                    // If a combo box is being used, register for the SelectedIndexChanged event
+                    // to handle changes to the value.
+                    if (base.CurrentCell is DataEntryComboBoxCell)
+                    {
+                        DataGridViewComboBoxEditingControl comboEditingControl =
+                            (DataGridViewComboBoxEditingControl)_editingControl;
+
+                        comboEditingControl.SelectedIndexChanged +=
+                            HandleCellSelectedIndexChanged;
+                    }
+                    // If a text box is being used, initialize the auto-complete values (if
+                    // applicable) and register for the TextChanged event to handle
+                    // changes to the value.
+                    else
+                    {
+                        DataGridViewTextBoxEditingControl textEditingControl =
+                            (DataGridViewTextBoxEditingControl)_editingControl;
+
+                        textEditingControl.TextChanged += HandleCellTextChanged;
+
+                        DataEntryValidator validator = dataEntryCell.Validator;
+
+                        // If available, use the validation list values to initialize the
+                        // auto-complete values.
+                        if (validator != null)
+                        {
+                            string[] validationListValues = validator.GetValidationListValues();
+                            if (validationListValues != null)
+                            {
+                                // [DataEntry:443]
+                                // Add each item from the validation list to the auto-complete list
+                                // twice, once as it is in the validation list, and the second time
+                                // with a leading space. This way, a user can press space in an
+                                // empty cell to see all possible values.
+                                string[] autoCompleteList =
+                                    new string[validationListValues.Length * 2];
+                                for (int i = 0; i < validationListValues.Length; i++)
+                                {
+                                    autoCompleteList[i] = " " + validationListValues[i];
+                                }
+                                validationListValues.CopyTo(autoCompleteList,
+                                    validationListValues.Length);
+
+                                textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
+                                textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
+                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
+                                textEditingControl.PreviewKeyDown += HandleEditingControlPreviewKeyDown;
+                                textEditingControl.VisibleChanged += HandleEditingControlVisibleChanged;
+                            }
+                            else
+                            {
+                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI24986", ex);
             }
         }
 
@@ -2090,111 +2194,37 @@ namespace Extract.DataEntry
         }
 
         /// <summary>
-        /// Handles the case that an editing control has been displayed to edit the data in a cell
-        /// in order that the table can register to recieve <see cref="Control.TextChanged"/> events
-        /// as the data is modified.
+        /// Handles the <see cref="Control.VisibleChanged"/> event of the editing control in order
+        /// to clear the auto-complete list which, in turn, prevents handle and memory leaks.
         /// </summary>
         /// <param name="sender">The object that sent the event.</param>
-        /// <param name="e">An <see cref="DataGridViewEditingControlShowingEventArgs"/> that
-        /// contains the event data.</param>
-        void HandleEditingControlShowing(object sender, DataGridViewEditingControlShowingEventArgs e)
+        /// <param name="e">A <see cref="EventArgs"/> that contains the event data.</param>
+        void HandleEditingControlVisibleChanged(object sender, EventArgs e)
         {
             try
             {
-                // If the current selection does not result in a propagated attribute when dependent
-                // controls are present (ie, selection across multiple rows), don't allow edit mode
-                // since that dependent triggers in the dependent controls wouldn't be updated.
-                if (this.PropagateAttributes != null && _currentlyPropagatedAttribute == null &&
-                    base.CurrentRow.Index != base.NewRowIndex)
+                // If the editing control is being hidden.
+                if (!base.EditingControl.Visible)
                 {
-                    base.EndEdit();
-                    return;
-                }
+                    DataGridViewTextBoxEditingControl textEditingControl =
+                                    _editingControl as DataGridViewTextBoxEditingControl;
 
-                // [DataEntry:415]
-                // Limit the selection to just the cell being edited to prevent unexpected behavior
-                // when tabbing after the edit.
-                // [DataEntry:664]
-                // Also ensure that the currently selected cell is the CurrentCell (the cell that is
-                // in edit mode).
-                if (base.SelectedCells.Count > 1 || !base.SelectedCells.Contains(base.CurrentCell))
-                {
-                    // Clear all selections first since sometimes trying to select an individual cell 
-                    // in a selected row doesn't clear the row selection otherwise.
-                    base.ClearSelection();
-                    base.ClearSelection(base.CurrentCell.ColumnIndex, base.CurrentCell.RowIndex,
-                        true);
-                }
-
-                IDataEntryTableCell dataEntryCell = base.CurrentCell as IDataEntryTableCell;
-
-                if (e.Control != null && dataEntryCell != null)
-                {
-                    _editingControl = e.Control;
-
-                    // If a combo box is being used, register for the SelectedIndexChanged event
-                    // to handle changes to the value.
-                    if (base.CurrentCell is DataEntryComboBoxCell)
+                    // Clear an auto-complete list before closing to prevent handle and memory leaks.
+                    if (textEditingControl != null &&
+                        textEditingControl.AutoCompleteMode != AutoCompleteMode.None)
                     {
-                        DataGridViewComboBoxEditingControl comboEditingControl =
-                            (DataGridViewComboBoxEditingControl)_editingControl;
+                        textEditingControl.AutoCompleteCustomSource.Clear();
+                        textEditingControl.AutoCompleteSource = AutoCompleteSource.None;
+                        textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
 
-                        comboEditingControl.SelectedIndexChanged +=
-                            HandleCellSelectedIndexChanged;
-                    }
-                    // If a text box is being used, initialize the auto-complete values (if
-                    // applicable) and register for the TextChanged event to handle
-                    // changes to the value.
-                    else
-                    {
-                        DataGridViewTextBoxEditingControl textEditingControl =
-                            (DataGridViewTextBoxEditingControl)_editingControl;
-
-                        textEditingControl.TextChanged += HandleCellTextChanged;
-
-                        DataEntryValidator validator = dataEntryCell.Validator;
-
-                        // If available, use the validation list values to initialize the
-                        // auto-complete values.
-                        if (validator != null)
-                        {
-                            string[] validationListValues = validator.GetValidationListValues();
-                            if (validationListValues != null)
-                            {
-                                // [DataEntry:443]
-                                // Add each item from the validation list to the auto-complete list
-                                // twice, once as it is in the validation list, and the second time
-                                // with a leading space. This way, a user can press space in an
-                                // empty cell to see all possible values.
-                                string[] autoCompleteList = new string[validationListValues.Length * 2];
-                                for (int i = 0; i < validationListValues.Length; i++)
-                                {
-                                    autoCompleteList[i] = " " + validationListValues[i];
-                                }
-                                validationListValues.CopyTo(autoCompleteList,
-                                    validationListValues.Length);
-
-                                // [DataEntry:621]
-                                // Disabling autocomplete while updating the auto-complete source seems to solve
-                                // the problem access violations.
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
-                                textEditingControl.AutoCompleteSource = AutoCompleteSource.CustomSource;
-                                textEditingControl.AutoCompleteCustomSource.Clear();
-                                textEditingControl.AutoCompleteCustomSource.AddRange(autoCompleteList);
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.SuggestAppend;
-                                textEditingControl.PreviewKeyDown += HandleEditingControlPreviewKeyDown;
-                            }
-                            else
-                            {
-                                textEditingControl.AutoCompleteMode = AutoCompleteMode.None;
-                            }
-                        }
+                        textEditingControl.PreviewKeyDown -= HandleEditingControlPreviewKeyDown;
+                        textEditingControl.VisibleChanged -= HandleEditingControlVisibleChanged;
                     }
                 }
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI24986", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI27849", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
