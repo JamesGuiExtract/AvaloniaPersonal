@@ -104,7 +104,8 @@ m_bUpdateFASTTable(true),
 m_bAutoDeleteFileActionComment(false),
 m_iNumberOfRetries(giDEFAULT_RETRY_COUNT),
 m_ipParser(NULL),
-m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT)
+m_dRetryTimeout(gdDEFAULT_RETRY_TIMEOUT),
+m_nUPIID(0)
 {
 	try
 	{
@@ -1282,12 +1283,17 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 			
 		// create query to select top records;
 		string strSelectSQL = "SELECT " + strTop
-			+ " FAMFile.ID, FileName, Pages, FileSize, Priority " + strFrom;
+			+ " FAMFile.ID, FileName, Pages, FileSize, Priority, " + strActionCol + " " + strFrom;
 
 		// Create the query to update the status to processing
 		string strUpdateSQL = "UPDATE FAMFile SET " + strActionCol + " = 'R' FROM (SELECT "
 			+ strTop + " FAMFile.ID AS ID2 FROM FAMFile " + strWhere
 			+ ") AS Temp INNER JOIN FAMFile ON Temp.ID2 = FAMFile.ID";
+
+		// Create query to create records in the LockedFile table
+		string strLockedTableSQL = "INSERT INTO LockedFile SELECT ID, " + asString(nActionID) +
+			" AS ActionID, " + asString(m_nUPIID) + " AS UPIID, " + strActionCol + " FROM ( " +
+			strSelectSQL + ") AS Processing";
 
 		// IUnknownVector to hold the FileRecords to return
 		IIUnknownVectorPtr ipFiles( CLSID_IUnknownVector );
@@ -1295,6 +1301,11 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 
 		// Begin a transaction
 		TransactionGuard tg(ipConnection);
+
+		if (m_bAutoRevertLockedFiles)
+		{
+			revertTimedOutProcessingFAMs(ipConnection);
+		}
 
 		// Recordset to contain the files to process
 		_RecordsetPtr ipFileSet(__uuidof( Recordset ));
@@ -1319,6 +1330,9 @@ STDMETHODIMP CFileProcessingDB::GetFilesToProcess( BSTR strAction,  long nMaxFil
 		}
 		// Add transition records for the state change to Processing
 		addASTransFromSelect( ipConnection, strActionName, nActionID, "R", "", "", strWhere, strTop );
+
+		// Update the LockedFile table
+		executeCmdQuery(ipConnection, strLockedTableSQL);
 
 		// Update the status of the selected FAMFiles records
 		executeCmdQuery(ipConnection, strUpdateSQL);
@@ -3688,6 +3702,62 @@ STDMETHODIMP CFileProcessingDB::ExecuteCommandQuery(BSTR bstrQuery, long* pnReco
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27686");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::RegisterProcessingFAM()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+
+		// This creates a record in the ProcessingFAM table and the LastPingTime
+		// is set to the current time by default.
+		m_nUPIID = getKeyID(getDBConnection(), "ProcessingFAM", "UPI", m_strUPI);
+
+		m_eventStopPingThread.reset();
+		m_eventPingThreadExited.reset();
+
+		// Start thread here
+		AfxBeginThread(maintainLastPingTimeForRevert, this);
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27726");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::UnregisterProcessingFAM()
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState())
+
+	try
+	{
+		validateLicense();
+		
+		// Stop thread here
+		m_eventStopPingThread.signal();
+
+		// Wait for exit event at least the Ping timeout 
+		if (m_eventPingThreadExited.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+		{
+			UCLIDException ue("ELI27857", "Application Trace: Timed out waiting for thread to exit.");
+			ue.log();
+		}
+
+		// Set the transaction guard
+		TransactionGuard tg(getDBConnection());
+
+		// Make sure there are no linked records in the LockedFile table 
+		// and if there are records reset there status to StatusBeforeLock if there current
+		// state for the action is processing.
+		revertLockedFilesToPreviousState(getDBConnection(), m_nUPIID);
+
+		// Reset m_nUPIID to 0 to specify that it is not registered.
+		m_nUPIID = 0;
+
+		// Commit the transaction
+		tg.CommitTrans();
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27728");
 }
 //-------------------------------------------------------------------------------------------------
 STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFilePriority eNewPriority,

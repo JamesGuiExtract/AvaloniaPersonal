@@ -940,6 +940,13 @@ library UCLID_FILEPROCESSINGLib
 		[id(76), helpstring("method GetUserCounterNamesAndValues")] HRESULT GetUserCounterNamesAndValues(
 			[out, retval] IStrToStrMap** ppmapUserCounters);
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add a new record to the ProcessingFAM table with the current processes UPI
+		//			and start a thread to update the LastPingTime at a regular interval.
+		[id(77), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM();
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To remove the record for in the ProcessingFAM table and stop the thread updating
+		//			the LastPingTime
+		[id(78), helpstring("method UnregisterProcessingFAM")] HRESULT UnregisterProcessingFAM();
 	};
 
 	[

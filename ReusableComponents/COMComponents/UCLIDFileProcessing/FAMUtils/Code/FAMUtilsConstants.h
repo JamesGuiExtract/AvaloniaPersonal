@@ -26,6 +26,7 @@ static const string gstrAUTO_REVERT_NOTIFY_EMAIL_LIST = "AutoRevertNotifyEmailLi
 static const long glDEFAULT_COMMAND_TIMEOUT = 120;
 static const int giDEFAULT_RETRY_COUNT = 10;
 static const double gdDEFAULT_RETRY_TIMEOUT = 120.0;  // seconds
+static const long gnPING_TIMEOUT = 60000; // 60 seconds
 
 // Local machine as database host
 static const string gstrLOCAL_STRING = "(local)";

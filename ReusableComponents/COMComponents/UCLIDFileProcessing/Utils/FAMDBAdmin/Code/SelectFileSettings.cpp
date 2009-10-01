@@ -98,7 +98,7 @@ string SelectFileSettings::buildQuery(const IFileProcessingDBPtr& ipFAMDB, const
 			if (m_nStatus == kActionSkipped)
 			{
 				strQuery += "INNER JOIN SkippedFile ON FAMFile.ID = SkippedFile.FileID WHERE "
-					"(SkippedFile.ActionID = " + m_nActionID;
+					"(SkippedFile.ActionID = " + asString(m_nActionID);
 				string strUser = m_strUser;
 				if (strUser != gstrANY_USER)
 				{

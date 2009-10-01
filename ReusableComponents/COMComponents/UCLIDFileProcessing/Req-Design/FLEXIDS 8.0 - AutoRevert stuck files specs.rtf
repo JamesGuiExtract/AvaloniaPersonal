@@ -1,41 +1,81 @@
-{\rtf1\ansi\ansicpg1252\deff0\deflang1033{\fonttbl{\f0\fswiss\fprq2\fcharset0 Calibri;}{\f1\froman\fprq2\fcharset0 Times New Roman;}{\f2\fswiss\fcharset0 Arial;}}
-{\colortbl ;\red255\green0\blue0;}
-{\*\generator Msftedit 5.41.21.2509;}\viewkind4\uc1\pard\nowidctlpar\qc\ul\b\f0\fs22 Specifications surrounding the ability to auto detect stuck files and revert their status\par
-\pard\nowidctlpar\par
-\pard\fi-360\li720\sa200\sl276\slmult1\ulnone\b0 1.\tab\f1 Add a new table called \ldblquote ProcessingFAM\rdblquote  in the database.  Each row in this table shall represent an actual instance of a FAM that is currently processing files (regardless of whether that FAM is supplying files).  The \ldblquote ProcessingFAM\rdblquote  table shall contain the following columns:\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 ID (auto increment, primary key) \endash  An auto incremented ID automatically assigned by the database.  This ID shall be referred to as the UPIID in the rest of this document.\par
-\f0 b.\tab\f1 UPI (string, must be unique) \endash  The Unique Process Identifier, a string that uniquely identifies a process on the network.  [Note: per comments at the engineering  team meeting discussing these specs, it is OK to use the Unique FAM session identifier instead of the UPI here]\par
-\f0 c.\tab\f1 LastPingTime (DateTime) \endash  The last date/time that the FAM instance called \par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 2.\tab\f1 Add a new table called \ldblquote LockedFile\rdblquote  in the database.  Each row in this table shall represent a file that has been \ldblquote locked\rdblquote  by a FAM instance for a particular action.  By \ldblquote locked\rdblquote  we mean that the file is in that FAM instance\rquote s memory queue and therefore no other FAM instance can operate on that file for that action.  The \ldblquote LockedFile\rdblquote  table shall contain the following columns: \par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 FileID (foreign key)\par
-\f0 b.\tab\f1 ActionID (foreign key)\par
-\f0 c.\tab\f1 UPIID (foreign key)\par
-\f0 d.\tab\f1 StatusBeforeLock (char, \lquote P\rquote  or \lquote S\rquote ) \endash  Represents the status of the file for the specified action before the file was locked by the FAM instance associated with UPIID.\par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 3.\tab\f1 The IFileProcessingDB interface shall be enhanced with the following methods:\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 RegisterProcessingFAM([in] string strUPI, [out, retval] long *pID).  This method will add a new record to the ProcessingFAM table, update that record\rquote s UPI and LastPingTime, and return that record\rquote s ID.\par
-\f0 b.\tab\f1 RecordPingForProcessingFAM([in] long nUPIID).  This method shall update the LastPingTime column for the FAM instance represented by nID.\par
-\f0 c.\tab\f1 UnregisterProcessingFAM([in] long nUPIID).  This method will remove the record in the ProcessingFAM table that corresponds to the specified UPIID.\par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 4.\tab\f1 The RegisterProcessingFAM() and UnRegisterProcessingFAM() methods shall be called immediately upon starting of processing and immediately before ending of processing respectively.\par
-\f0 5.\tab\f1 The FileProcessingMgmtRole class shall be enhanced to spawm off a thread to call RecordPingForProcessingFAM once per minute while the FAM is running in processing mode, regardless of whether the FAM is actually actively processing (in the context of \ldblquote scheduled processing\rdblquote ).  While updating the last ping time during \ldblquote Inactive\rdblquote  times doesn\rquote t give us any benefits in the context of auto reverting locked files, it does help us know for sure (by looking at the database tables) that the \ldblquote Inactive\rdblquote  FAMs are still \ldblquote alive\rdblquote  processes.\par
-\f0 6.\tab\f1 FileProcessingDB.GetFilesToProcess() shall be enhanced to consume an additional UPIID argument.\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 GetFilesToProcess\cf1 ([in] long nUPIID\cf0 , [in] BSTR strAction, [in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles, [in] BSTR bstrSkippedForUserName, [out, retval] IIUnknownVector* *pvecFileRecords);\par
-\f0 b.\tab\f1 The implementation of GetFilesToProcess() shall add a new row to the LockedFile table for each file returned in pvecFileRecords.\par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 7.\tab\f1 The following FileProcessingDB.NotifyXXX() methods shall be enhanced to remove the row from the LockedFile table that corresponds to the UPIID, FileID and ActionID passed in\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 NotifyFileProcessed([in] long nFileID, [in] BSTR strAction);\par
-\f0 b.\tab\f1 NotifyFileFailed([in] long nFileID, [in] BSTR strAction, [in] BSTR strException);\par
-\f0 c.\tab\f1 NotifyFileSkipped([in] long nFileID, [in] long nActionID);\par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 8.\tab\f1 The \ldblquote DBInfo\rdblquote  table shall be enhanced with rows for the following settings:\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 AutoRevertLockedFiles \endash  shall contain a value of 1 or 0.  A value of 1 (default) indicates that the feature to automatically revert locked files to their original status is enabled.\par
-\f0 b.\tab\f1 AutoRevertTimeOutInMinutes \endash  the number of minutes that can elapse from the last ping time of a particular FAM instance before which files locked by that FAM instance will automatically revert back to their original status if AutoRevertLockedFiles is set to 1.  The default value for this setting shall be 60 (one hour).  This value must be greater than or equal to 5.  If this value is less than 5 when the user attempts to start processing, the value shall be reset to 5 and an exception shall be logged to indicate this automatic value change.\par
-\f0 c.\tab\f1 AutoRevertNotifyEmailList \endash  a comma separated list of email recipients who should be notified when files are automatically reverted back to their original status.  This field can be left empty if email notifications of automatic reverts is not desired.\par
-\pard\fi-360\li720\sa200\sl276\slmult1\f0 9.\tab\f1 The implementation of FileProcessingDB.GetFilesToProcess() shall be enhanced to do the following:\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 a.\tab\f1 Before checking for either pending or skipped files in the database, the GetFilesToProcess() method shall first check to see if there are any \ldblquote dead\rdblquote  FAM instances.  A FAM instance shall be considered \ldblquote dead\rdblquote  if the number of minutes elapsed since its last ping time is greater than or equal to \{AutoRevertTimeOutInMinutes\} minutes. A FAM instance shall also be considered \ldblquote dead\rdblquote  if it is an instance on the local machine and no process is currently executing on the local machine with the same name and process ID that are associated with the \ldblquote dead\rdblquote  instance.\par
-\f0 b.\tab\f1 For each \ldblquote dead\rdblquote  FAM instance detected, the files locked by that FAM instance shall be reverted back to its original status and that file\rquote s entry (for the particular action) from the LockedFile table shall be removed.  The record in the FileActionStateTransition table that corresponds back to the reverting shall have \ldblquote Auto reverted after \{X\} minutes\rdblquote  in the comment column.\par
-\f0 c.\tab\f1 If at least one file was reverted back its original status, an exception shall be logged indicating that files were reverted to their original status.  That exception shall contain the following as debug information:\par
-\pard\fi-180\li2160\sa200\sl276\slmult1\f0 i.\tab\f1 Minutes elapsed before auto revert was initiated\par
-\f0 ii.\tab\f1 One or more debug entries where the name of the debug parameter is CountOf_\{ActionName\}_RevertedTo_\{StatusCode\} and the value is the number of files for which the status of a particular action was reverted to a particular status.\par
-\pard\fi-360\li1440\sa200\sl276\slmult1\f0 d.\tab\f1 If at least one file was reverted back to its original status, and \{AutoRevertNotifyEmailList\} is not empty, then an email shall be sent to the specified recipients notifying them of the auto-revert operation.  All information logged in the exception above shall also be included in the notification email.\par
-\pard\sa200\sl276\slmult1\par
-\pard\f2\fs20\par
-}
- 
+{\rtf1\ansi\ansicpg1252\uc1 \deff0\deflang1033\deflangfe1033{\fonttbl{\f0\froman\fcharset0\fprq2{\*\panose 02020603050405020304}Times New Roman;}{\f1\fswiss\fcharset0\fprq2{\*\panose 020b0604020202020204}Arial;}
+{\f28\fswiss\fcharset0\fprq2{\*\panose 020f0502020204030204}Calibri;}{\f221\froman\fcharset238\fprq2 Times New Roman CE;}{\f222\froman\fcharset204\fprq2 Times New Roman Cyr;}{\f224\froman\fcharset161\fprq2 Times New Roman Greek;}
+{\f225\froman\fcharset162\fprq2 Times New Roman Tur;}{\f226\froman\fcharset177\fprq2 Times New Roman (Hebrew);}{\f227\froman\fcharset178\fprq2 Times New Roman (Arabic);}{\f228\froman\fcharset186\fprq2 Times New Roman Baltic;}
+{\f229\fswiss\fcharset238\fprq2 Arial CE;}{\f230\fswiss\fcharset204\fprq2 Arial Cyr;}{\f232\fswiss\fcharset161\fprq2 Arial Greek;}{\f233\fswiss\fcharset162\fprq2 Arial Tur;}{\f234\fswiss\fcharset177\fprq2 Arial (Hebrew);}
+{\f235\fswiss\fcharset178\fprq2 Arial (Arabic);}{\f236\fswiss\fcharset186\fprq2 Arial Baltic;}{\f445\fswiss\fcharset238\fprq2 Calibri CE;}{\f446\fswiss\fcharset204\fprq2 Calibri Cyr;}{\f448\fswiss\fcharset161\fprq2 Calibri Greek;}
+{\f449\fswiss\fcharset162\fprq2 Calibri Tur;}{\f452\fswiss\fcharset186\fprq2 Calibri Baltic;}}{\colortbl;\red0\green0\blue0;\red0\green0\blue255;\red0\green255\blue255;\red0\green255\blue0;\red255\green0\blue255;\red255\green0\blue0;
+\red255\green255\blue0;\red255\green255\blue255;\red0\green0\blue128;\red0\green128\blue128;\red0\green128\blue0;\red128\green0\blue128;\red128\green0\blue0;\red128\green128\blue0;\red128\green128\blue128;\red192\green192\blue192;}{\stylesheet{
+\ql \li0\ri0\widctlpar\aspalpha\aspnum\faauto\adjustright\rin0\lin0\itap0 \fs24\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 \snext0 Normal;}{\*\cs10 \additive Default Paragraph Font;}}{\*\listtable{\list\listtemplateid55603088\listhybrid{\listlevel
+\levelnfc4\levelnfcn4\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid-77573714\'02\'00.;}{\levelnumbers\'01;}\b0\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1\fbias0 \fi-360\li1440\jclisttab\tx1440 }
+{\listlevel\levelnfc4\levelnfcn4\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698713\'02\'01.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-360\li2160\jclisttab\tx2160 }
+{\listlevel\levelnfc2\levelnfcn2\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698715\'02\'02.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-180\li2880\jclisttab\tx2880 }
+{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698703\'02\'03.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-360\li3600\jclisttab\tx3600 }
+{\listlevel\levelnfc4\levelnfcn4\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698713\'02\'04.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-360\li4320\jclisttab\tx4320 }
+{\listlevel\levelnfc2\levelnfcn2\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698715\'02\'05.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-180\li5040\jclisttab\tx5040 }
+{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698703\'02\'06.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-360\li5760\jclisttab\tx5760 }
+{\listlevel\levelnfc4\levelnfcn4\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698713\'02\'07.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-360\li6480\jclisttab\tx6480 }
+{\listlevel\levelnfc2\levelnfcn2\leveljc2\leveljcn2\levelfollow0\levelstartat1\levelspace0\levelindent0{\leveltext\leveltemplateid67698715\'02\'08.;}{\levelnumbers\'01;}\chbrdr\brdrnone\brdrcf1 \chshdng0\chcfpat1\chcbpat1 \fi-180\li7200\jclisttab\tx7200 }
+{\listname ;}\listid1151366724}}{\*\listoverridetable{\listoverride\listid1151366724\listoverridecount0\ls1}}{\info{\title Specifications surrounding the ability to auto detect stuck files and revert their status}{\author William Parr}
+{\operator William Parr}{\creatim\yr2009\mo9\dy21\hr9\min50}{\revtim\yr2009\mo9\dy28\hr14\min15}{\printim\yr2009\mo9\dy23\hr9\min44}{\version3}{\edmins8405}{\nofpages3}{\nofwords884}{\nofchars5039}{\*\company Extract Systems LLC}{\nofcharsws0}{\vern8269}}
+\widowctrl\ftnbj\aenddoc\noxlattoyen\expshrtn\noultrlspc\dntblnsbdb\nospaceforul\hyphcaps0\horzdoc\dghspace120\dgvspace120\dghorigin1701\dgvorigin1984\dghshow0\dgvshow3\jcompress\viewkind4\viewscale100\nolnhtadjtbl \fet0\sectd \linex0\sectdefaultcl 
+{\*\pnseclvl1\pnucrm\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl2\pnucltr\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl3\pndec\pnstart1\pnindent720\pnhang{\pntxta .}}{\*\pnseclvl4\pnlcltr\pnstart1\pnindent720\pnhang{\pntxta )}}{\*\pnseclvl5
+\pndec\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl6\pnlcltr\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl7\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}{\*\pnseclvl8\pnlcltr\pnstart1\pnindent720\pnhang
+{\pntxtb (}{\pntxta )}}{\*\pnseclvl9\pnlcrm\pnstart1\pnindent720\pnhang{\pntxtb (}{\pntxta )}}\pard\plain \qc \li0\ri0\nowidctlpar\faauto\rin0\lin0\itap0 \fs24\lang1033\langfe1033\cgrid\langnp1033\langfenp1033 {\b\f28\fs22\ul 
+Specifications surrounding the ability to auto detect stuck files and revert their status
+\par }\pard \ql \li0\ri0\nowidctlpar\faauto\rin0\lin0\itap0 {\b\f28\fs22\ul 
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 1.\tab }{\fs22 Add a new table called \'93ProcessingFAM\'94
+ in the database.  Each row in this table shall represent an actual instance of a FAM that is currently processing files (regardless of whether that FAM is supplying files).  The \'93ProcessingFAM\'94 table shall contain the following columns:
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\fs22 ID (auto increment, primary key) \endash 
+ An auto incremented ID automatically assigned by the database.  This ID shall be referred to as the UPIID in the rest of this document.
+\par }{\f28\fs22 b.\tab }{\fs22 UPI (string, must be unique) \endash  The Unique Process Identifier, a string that uniquely identifies a process on the network.  [Note: per comments at the engineering  team meeting discussing these specs, it is OK to use the U
+nique FAM session identifier instead of the UPI here]
+\par }{\f28\fs22 c.\tab }{\fs22 LastPingTime (DateTime) \endash  The last date/time that the FAM instance called 
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 2.\tab }{\fs22 Add a new table called \'93LockedFile\'94 in the database.  Each row in this table shall represent a file that has been \'93locked\'94
+ by a FAM instance for a particular action.  By \'93locked\'94 we mean that the file is in that FAM instance\rquote s memory queue and therefore no other FAM instance can operate on that file for that action.  The \'93LockedFile\'94
+ table shall contain the following columns: 
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\fs22 FileID (foreign key)
+\par }{\f28\fs22 b.\tab }{\fs22 ActionID (foreign key)
+\par }{\f28\fs22 c.\tab }{\fs22 UPIID (foreign key)
+\par }{\f28\fs22 d.\tab }{\fs22 StatusBeforeLock (char, \lquote P\rquote  or \lquote S\rquote ) \endash  Represents the status of the file for the specified action before the file was locked by the FAM instance associated with UPIID.
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 3.\tab }{\fs22 The IFileProcessingDB interface shall be enhanced with the following methods:
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\b\f28\fs22 [Modified by WP 9/23/2009]}{\f28\fs22  }{\fs22 
+RegisterProcessingFAM().  This method will add a new record to the ProcessingFAM table with the UPI used internally by the DB and the LastPingTime and star
+ts a thread to update the LastPingTime regularly until the thread is terminated in the UnregisterProcessingFAM.
+\par }{\f28\fs22 b.\tab }{\b\f28\fs22 [Removed by WP 9/23/2009] 
+\par }{\f28\fs22 c.\tab }{\b\f28\fs22 [Modified by WP 9/23/2009]}{\f28\fs22  }{\fs22 UnregisterProcessingFAM().  This method will remove the record in the ProcessingFAM 
+table that corresponds to current registered FAM and terminates the thread updating the LastPingTime.
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 4.\tab }{\fs22 
+The RegisterProcessingFAM() and UnRegisterProcessingFAM() methods shall be called immediately upon starting of processing and immediately before ending of processing respectively.
+\par }{\f28\fs22 5.\tab }{\b\f28\fs22 [Removed by WP 9/23/2009] }{\fs22 
+\par }{\f28\fs22 6.\tab }{\fs22 FileProcessingDB.GetFilesToProcess() shall be enhanced to consume an additional UPIID argument.
+\par {\listtext\pard\plain\f28\fs22 \hich\af28\dbch\af0\loch\f28 a.\tab}}\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\jclisttab\tx1440\faauto\ls1\rin0\lin1440\itap0 {\b\f28\fs22 [Removed by WP 9/28/2009] 
+\par {\listtext\pard\plain\fs22 \hich\af0\dbch\af0\loch\f0 b.\tab}}{\fs22 The implementation of GetFilesToProcess() shall add a new row to the LockedFile table for each file returned in pvecFileRecords.
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 7.\tab }{\fs22 
+The following FileProcessingDB.NotifyXXX() methods shall be enhanced to remove the row from the LockedFile table that corresponds to the UPIID, FileID and ActionID passed in
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\fs22 NotifyFileProcessed([in] long nFileID, [in] BSTR strAction);
+\par }{\f28\fs22 b.\tab }{\fs22 NotifyFileFailed([in] long nFileID, [in] BSTR strAction, [in] BSTR strException);
+\par }{\f28\fs22 c.\tab }{\fs22 NotifyFileSkipped([in] long nFileID, [in] long nActionID);
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 8.\tab }{\fs22 The \'93DBInfo\'94 table shall be enhanced with rows for the following settings:
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\fs22 AutoRevertLockedFiles \endash 
+ shall contain a value of 1 or 0.  A value of 1 (default) indicates that the feature to automatically revert locked files to their original status is enabled.
+\par }{\f28\fs22 b.\tab }{\fs22 AutoRevertTimeOutInMinutes \endash  the number of minutes that 
+can elapse from the last ping time of a particular FAM instance before which files locked by that FAM instance will automatically revert back to their original status if AutoRevertLockedFiles is set to 1.  The default value for this setting shall be 60 (o
+ne hour).  This value must be greater than or equal to 5.  If this value is less than 5 when the user attempts to start processing, the value shall be reset to 5 and an exception shall be logged to indicate this automatic value change.
+\par }{\f28\fs22 c.\tab }{\fs22 AutoRevertNotifyEmailList \endash 
+ a comma separated list of email recipients who should be notified when files are automatically reverted back to their original status.  This field can be left empty if email notifications of automatic reverts is not desired.
+\par }\pard \ql \fi-360\li720\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin720\itap0 {\f28\fs22 9.\tab }{\fs22 The implementation of FileProcessingDB.GetFilesToProcess() shall be enhanced to do the following:
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 a.\tab }{\fs22 
+Before checking for either pending or skipped files in the database, the GetFilesToProcess() method shall first check to see if there are any \'93dead\'94 FAM instances.  A FAM instance shall be considered \'93dead\'94
+ if the number of minutes elapsed since its last ping time is greater than or equal to \{AutoRevertTimeOutInMinutes\} minutes. A FAM instance shall also be considered \'93dead\'94 if it is an instance on the local machine and no pr
+ocess is currently executing on the local machine with the same name and process ID that are associated with the \'93dead\'94 instance.
+\par }{\f28\fs22 b.\tab }{\fs22 For each \'93dead\'94 FAM instance detected, the files locked by that FAM instance shall be reverted back to its original status and that file\rquote 
+s entry (for the particular action) from the LockedFile table shall be removed.  The record in the FileActionStateTransition table that corresponds back to the reverting shall have \'93Auto reverted after \{X\} minutes\'94 in the comment column.
+\par }{\f28\fs22 c.\tab }{\fs22 If at least one file was reverted back its original status, an exception shall be logged indicating that files were reverted to their original status.  That exception shall contain the following as debug information:
+\par }\pard \ql \fi-180\li2160\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin2160\itap0 {\f28\fs22 i.\tab }{\fs22 Minutes elapsed before auto revert was initiated
+\par }{\f28\fs22 ii.\tab }{\fs22 One or more debug entries where the name of the debug parameter is CountOf_\{ActionName\}_RevertedTo_\{StatusCode\}
+ and the value is the number of files for which the status of a particular action was reverted to a particular status.
+\par }\pard \ql \fi-360\li1440\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin1440\itap0 {\f28\fs22 d.\tab }{\fs22 If at least one file was reverted back to its original status, and \{AutoRevertNotifyEmailList\}
+ is not empty, then an email shall be sent to the specified recipients notifying them of the auto-revert operation.  All information logged in the exception above shall also be included in the notification email.
+\par }\pard \ql \li0\ri0\sa200\sl276\slmult1\nowidctlpar\faauto\rin0\lin0\itap0 {\fs22 
+\par }\pard \ql \li0\ri0\nowidctlpar\faauto\rin0\lin0\itap0 {\f1\fs20 
+\par }}

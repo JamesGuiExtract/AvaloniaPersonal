@@ -11,6 +11,7 @@
 #include <RegistryPersistenceMgr.h>
 #include <FileProcessingConfigMgr.h>
 #include <LockGuard.h>
+#include <Win32Event.h>
 
 #include <string>
 #include <map>
@@ -173,6 +174,8 @@ public:
 	STDMETHOD(GetUserCounterValue)(BSTR bstrCounterName, long* pnValue);
 	STDMETHOD(GetUserCounterNames)(IVariantVector** ppvecNames);
 	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
+	STDMETHOD(RegisterProcessingFAM)();
+	STDMETHOD(UnregisterProcessingFAM)();
 
 // ILicensedComponent Methods
 	STDMETHOD(raw_IsLicensed)(VARIANT_BOOL * pbValue);
@@ -202,6 +205,10 @@ private:
 
 	// This contains the UniqueProcess Identifier (UPI)
 	string m_strUPI;
+
+	// This contains the ID for the registered UPI in the ProcessFAM table in the DB
+	// If 0 there is not a registered UPI
+	int m_nUPIID;
 
 	// Flag indicating that this instance has the lock on the DB
 	bool m_bDBLocked;
@@ -251,8 +258,17 @@ private:
 	// Flag indicating if records should be added to the FileActionStatusTransition table
 	bool m_bUpdateFASTTable;
 
-	// Flag inidicating whether file action comments should be deleted when files are completed
+	// Flag indicating whether file action comments should be deleted when files are completed
 	bool m_bAutoDeleteFileActionComment;
+
+	// Flag indicating whether to automatically revert files whose FAM is no longer processing
+	bool m_bAutoRevertLockedFiles;
+
+	// Timeout value for automatically reverting files
+	int m_nAutoRevertTimeOutInMinutes;
+
+	// List of email addresses to send email when files are reverted.
+	string m_strAutoRevertNotifyEmailList;
 
 	// Contains the number of times an attempt to reconnect. Each
 	// time the reconnect attempt times out an exception will be logged.
@@ -263,6 +279,10 @@ private:
 
 	// Regular expression parser to validate tag names
 	IRegularExprParserPtr m_ipParser;
+
+	// Events used for the LastPingThread
+	Win32Event m_eventStopPingThread;
+	Win32Event m_eventPingThreadExited;
 
 	//-------------------------------------------------------------------------------------------------
 	// Methods
@@ -343,7 +363,8 @@ private:
 	//			then the skipped file table will not be updated.
 	EActionStatus setFileActionState( ADODB::_ConnectionPtr ipConnection, long nFileID,
 		string strAction, const string& strState, const string& strException,
-		long nActionID = -1, bool bLockDB = true, const string& strUniqueProcessID = "");
+		long nActionID = -1, bool bLockDB = true, const string& strUniqueProcessID = "", 
+		const string& strFASTComment = "");
 
 	// PROMISE: Recalculates the statistics for the given Action ID using the connection provided.
 	void reCalculateStats( ADODB::_ConnectionPtr ipConnection, long nActionID );
@@ -506,6 +527,21 @@ private:
 
 	// Internal function for getting DB info settings
 	string getDBInfoSetting(const _ConnectionPtr& ipConnection, const string& strSettingName);
+
+	// Reverts file in the LockedFile table to the previous status if the current
+	// status is still processing.
+	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nUPIID, 
+		const string& strFASTComment = "", UCLIDException *pUE = NULL);
+
+	// Method checks for timed out FAM's and reverts file status for ones that are found.
+	void revertTimedOutProcessingFAMs( const _ConnectionPtr& ipConnection);
+
+	// Thread function that maintains the LastPingtime in the ProcessingFAM table in
+	// the database pData should be a pointer to the database object
+	static UINT maintainLastPingTimeForRevert(void *pData);
+
+	// Method updates the ProcessingFAM LastPingTime for the currently registered FAM
+	void pingDB();
 
 	void validateLicense();
 };

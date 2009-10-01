@@ -18,6 +18,7 @@
 
 #include <string>
 #include <memory>
+#include <map>
 
 using namespace std;
 using namespace ADODB;
@@ -97,7 +98,8 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 													string strAction, const string& strState,
 													const string& strException,
 													long nActionID, bool bLockDB,
-													const string& strUniqueProcessID)
+													const string& strUniqueProcessID,
+													const string& strFASTComment)
 {
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
 	auto_ptr<TransactionGuard> apTG;
@@ -195,6 +197,10 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 					{
 						easStatsFrom = kActionSkipped;
 					}
+
+					// Remove record from the LockedFileTable
+					executeCmdQuery(ipConnection, "DELETE FROM LockedFile WHERE FileID = " + 
+						asString(nFileID));
 				}
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strState),
 					ipCurrRecord, ipCurrRecord);
@@ -203,7 +209,7 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 				if (m_bUpdateFASTTable)
 				{
 					addFileActionStateTransition( ipConnection, nFileID, nActionID, strPrevStatus, 
-						strState, strException, "" );
+						strState, strException, strFASTComment );
 				}
 
 				if (!strUniqueProcessID.empty())
@@ -1926,6 +1932,24 @@ void CFileProcessingDB::loadDBInfoSettings(ADODB::_ConnectionPtr ipConnection)
 
 						m_bAutoDeleteFileActionComment = getStringField(ipFields, "Value") == "1";
 					}
+					else if (strValue == gstrAUTO_REVERT_LOCKED_FILES )
+					{
+						_lastCodePos = "180";
+
+						m_bAutoRevertLockedFiles = getStringField(ipFields, "Value") == "1";
+					}
+					else if (strValue == gstrAUTO_REVERT_TIME_OUT_IN_MINUTES)
+					{
+						_lastCodePos = "190";
+
+						m_nAutoRevertTimeOutInMinutes =  asLong(getStringField(ipFields, "Value"));
+					}
+					else if (strValue == gstrAUTO_REVERT_NOTIFY_EMAIL_LIST)
+					{
+						_lastCodePos = "200";
+
+						m_strAutoRevertNotifyEmailList = getStringField(ipFields, "Value");
+					}
 				}
 				else if (ipField->Name == _bstr_t("FAMDBSchemaVersion"))
 				{
@@ -2448,5 +2472,178 @@ long CFileProcessingDB::getTagID(const _ConnectionPtr &ipConnection, string &rst
 		return getKeyID(ipConnection, gstrFAM_TAG, "TagName", rstrTagName, false);
 	}
 	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27389");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, 
+														 long nUPIID, const string& strFASTComment, 
+														 UCLIDException *pUE)
+{
+	try
+	{
+		// Setup Setting Query
+		string strSQL = "SELECT FileID, ActionID, UPI, StatusBeforeLock, ASCName " 
+			" FROM LockedFile INNER JOIN ProcessingFAM ON LockedFile.UPIID = ProcessingFAM.ID"
+			" INNER JOIN Action ON LockedFile.ActionID = Action.ID"
+			" WHERE LockedFile.UPIID = " + asString(nUPIID);
+
+		// Open a recordset that has the action names that need to have files reset
+		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27737", ipFileSet != NULL );
+
+		ipFileSet->Open( strSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+			adOpenForwardOnly, adLockReadOnly, adCmdText );
+
+		// Map to track the number of files for each action that are being reset
+		map<string, map<string, int>> map_StatusCounts;
+		map_StatusCounts.clear();
+
+		// Step through all of the file records in the LockedFile table for the dead UPI
+		while(ipFileSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipFileSet->Fields;
+
+			// Get the action name and previous status
+			string strActionName = getStringField(ipFields, "ASCName");
+			string strRevertToStatus = getStringField(ipFields, "StatusBeforeLock");
+
+			// Add to the count
+			map_StatusCounts[strActionName][strRevertToStatus] = 
+				map_StatusCounts[strActionName][strRevertToStatus] + 1;
+
+			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
+				strActionName, strRevertToStatus, 
+				"Error reverting status", getLongField(ipFields, "ActionID"), false, 
+				getStringField(ipFields, "UPI"), strFASTComment);
+
+			ipFileSet->MoveNext();
+		}
+
+		// Delete the UPI record from the ProcessingFAM table
+		string strQuery = "DELETE FROM ProcessingFAM WHERE ID = " + asString(nUPIID); 
+		executeCmdQuery(getDBConnection(), strQuery);
+
+		// Set up the logged exception if it is not null
+		if (pUE != NULL)
+		{
+			bool bAtLeastOneReset = false;
+
+			map<string, map<string,int>>::iterator itMap = map_StatusCounts.begin();
+			for(; itMap != map_StatusCounts.end(); itMap++)
+			{
+				
+				map<string,int>::iterator itCounts = itMap->second.begin();
+				for (; itCounts != itMap->second.end(); itCounts++)
+				{
+					string strAction = itMap->first;
+					string strDebugInfo = "CountOf_" + strAction + "_RevertedTo_" + itCounts->first;
+					pUE->addDebugInfo(strDebugInfo, itCounts->second);
+					bAtLeastOneReset = true;
+				}
+			}
+			
+			// Only log the reset exception if one or more files were reset
+			if (bAtLeastOneReset)
+			{
+				pUE->log();
+			}
+		}
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27738");
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::pingDB()
+{
+	// Always call the getKeyID so that if the record was removed by another
+	// instance because this instance lost the DB for a while
+	long nUPIID = getKeyID(getDBConnection(), "ProcessingFAM", "UPI", m_strUPI);
+	if (nUPIID != m_nUPIID)
+	{
+		UCLIDException ue("ELI27785", "Application Trace: UPIID has changed.");
+		ue.addDebugInfo("Expected", m_nUPIID);
+		ue.addDebugInfo("New UPIID", nUPIID);
+		ue.log();
+
+		// Update the UPIID
+		m_nUPIID = nUPIID;
+	}
+	else
+	{
+		// Update the ping record. 
+		executeCmdQuery(getDBConnection(), 
+			"UPDATE ProcessingFAM SET LastPingTime=GETDATE() WHERE ID = " + asString(nUPIID));
+	}
+}
+//--------------------------------------------------------------------------------------------------
+UINT CFileProcessingDB::maintainLastPingTimeForRevert(void *pData)
+{
+	try
+	{
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+		CFileProcessingDB *pDB = static_cast<CFileProcessingDB *>(pData);
+		ASSERT_ARGUMENT("ELI27746", pDB != NULL);
+
+		// Enclose so that the exited event can always be signaled if it can be.
+		try
+		{
+			while (pDB->m_eventStopPingThread.wait(gnPING_TIMEOUT) == WAIT_TIMEOUT)
+			{
+				try
+				{
+					pDB->pingDB();
+				}
+				CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27747");
+			}
+		}
+		CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27858");
+
+		// Signal that the thread has exited
+		pDB->m_eventPingThreadExited.signal();
+
+		CoUninitialize();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27745");
+
+	return 0;
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::revertTimedOutProcessingFAMs( const _ConnectionPtr& ipConnection)
+{
+	// Query to show the elapsed time since last ping for all ProcessingFAM records
+	string strElapsedSQL = "SELECT [ID], DATEDIFF( minute,[LastPingTime],GetDate()) as Elapsed "
+			"FROM [ProcessingFAM]";
+
+	_RecordsetPtr ipFileSet( __uuidof( Recordset ));
+	ASSERT_RESOURCE_ALLOCATION("ELI27813", ipFileSet != NULL );
+
+	ipFileSet->Open( strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+		adOpenForwardOnly, adLockReadOnly, adCmdText );
+	
+	// Step through all of the ProcessingFAM records to find dead FAM's
+	while(ipFileSet->adoEOF == VARIANT_FALSE)
+	{
+		FieldsPtr ipFields = ipFileSet->Fields;
+		
+		// Get the Elapsed time since the last ping
+		long nElapsed = getLongField(ipFields,"Elapsed");
+		
+		// Check for a dead FAM
+		if (nElapsed > m_nAutoRevertTimeOutInMinutes)
+		{
+			long nUPIID = getLongField(ipFields, "ID");
+			long nMinutesSinceLastPing = getLongField(ipFields, "Elapsed");
+
+			UCLIDException ue("ELI27814", "Application Trace: Files were reverted to original status.");
+			ue.addDebugInfo("Minutes files locked", nMinutesSinceLastPing);
+
+			// Build the comment for the FAST table
+			string strRevertComment = "Auto reverted after " + asString(nMinutesSinceLastPing) + " minutes.";
+
+			// Revert the files for this dead FAM to there previous status
+			revertLockedFilesToPreviousState(ipConnection, nUPIID, strRevertComment, &ue);
+		}
+		// move to next Processing FAM record
+		ipFileSet->MoveNext();
+	}
 }
 //--------------------------------------------------------------------------------------------------

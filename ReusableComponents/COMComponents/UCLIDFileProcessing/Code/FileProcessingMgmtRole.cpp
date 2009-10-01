@@ -263,6 +263,9 @@ STDMETHODIMP CFileProcessingMgmtRole::Start(IFileProcessingDB *pDB, BSTR bstrAct
 
 			// start the processing
 			m_bProcessing = true;
+
+			// Register this processing FAM for auto revert
+			m_pDB->RegisterProcessingFAM();
 			
 			// begin the threads to process files in parallel
 			for (int i = 0; i < nNumThreads; i++)
@@ -1219,6 +1222,9 @@ UINT CFileProcessingMgmtRole::fileProcessingThreadsWatcherThread(void *pData)
 		// Release the memory for the Thread objects since they will not be needed
 		// This should be done before the notification that processing is complete
 		pFPM->releaseProcessingThreadDataObjects();
+
+		// Unregister Processing FAM to reset file back to previous state if any remaining
+		pFPM->getFPMDB()->UnregisterProcessingFAM();
 
 		// Set the processing flag to false
 		pFPM->m_bProcessing = false;
