@@ -49,6 +49,8 @@
   <ItemGroup>
     <Compile Include="DrawingMethods.cs" />
     <Compile Include="ExtractPens.cs" />
+    <Compile Include="NativeMethods.cs" />
+    <Compile Include="SafeGdiHandle.cs" />
     <Compile Include="GeometryMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
