@@ -2364,6 +2364,8 @@ namespace Extract.DataEntry
 
                     SetAttributeHighlight(e.Attribute, false);
 
+                    _refreshActiveControlHighlights = true;
+
                     // Update the highlights as long as image is not currently loading or a swipe
                     // is not currently in progress.
                     if (!_changingImage && !_processingSwipe)

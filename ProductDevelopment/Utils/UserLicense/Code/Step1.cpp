@@ -34,6 +34,10 @@ static const string gstrLASERFICHE_KEY_FILE = "\\ESLaserficheCC.dll";
 static const string gstrIDSO_GUID = "{A8DDFDC1-069D-42DE-AF69-A78FC232A86A}";
 static const string gstrIDSO_KEY_FILE = "\\IDShieldOffice.exe";
 
+static const string gstrLABDE_GUID = "{0E412937-E4FA-4737-A321-00AED69497C7}";
+static const string gstrLABDE_KEY_FILE = "\\Extract.LabResultsCustomComponents.dll";
+static const string gstrLABDE_VERSION_FILE = "\\Extract.DataEntry.dll";
+
 static const string gstrICOMAP_GUID = "{0B7B53B1-B2F3-4EA0-97F9-D1280C11A892}";
 static const string gstrICOMAP_KEY_FILE = gstrRELATIVE_PATH_TO_ICOMAP_APP_DLL;
 
@@ -197,8 +201,8 @@ BOOL CStep1::OnInitDialog()
 		vecLaserficheTypes.push_back("Desktop redaction");
 		vecLaserficheTypes.push_back("Server redaction");
 
-		// Check for IcoMap, FLEX Index, ID Shield and ID Shield for Laserfiche, and 
-		// ID Shield Office installations
+		// Check for IcoMap, FLEX Index, ID Shield and ID Shield for Laserfiche, 
+		// ID Shield Office and LabDE installations
 		checkForProduct(gstrICOMAP_GUID, gstrICOMAP_KEY_FILE, gstrDEST_EMAIL_ADDRESS_ICOMAP, 
 						true);
 		checkForProduct(gstrFLEXINDEX_GUID, gstrFLEXINDEX_KEY_FILE, gstrDEST_EMAIL_ADDRESS_NON_ICOMAP,
@@ -208,6 +212,8 @@ BOOL CStep1::OnInitDialog()
 		checkForProduct(gstrLASERFICHE_GUID, gstrLASERFICHE_KEY_FILE, gstrDEST_EMAIL_ADDRESS_NON_ICOMAP,
 						false, vecLaserficheTypes);
 		checkForProduct(gstrIDSO_GUID, gstrIDSO_KEY_FILE, gstrDEST_EMAIL_ADDRESS_IDSO, false);
+		checkForProduct(gstrLABDE_GUID, gstrLABDE_KEY_FILE, gstrDEST_EMAIL_ADDRESS_NON_ICOMAP, false,
+						vecClientServerTypes);
 		
 		// If no products appear to be installed, create a generic default entry
 		if (m_comboProductName.GetCount() == 0)
@@ -404,6 +410,12 @@ void CStep1::checkForProduct(const string &strGUID, const string &strKeyFile,
 
 			// Verify we can find the specified key file.
 			validateFileOrFolderExistence(strKeyFileFullPath);
+
+			// For LabDE, use the version of DataEntry dll instead.
+			if (strKeyFile == gstrLABDE_KEY_FILE)
+			{
+				strKeyFileFullPath = strPath + gstrLABDE_VERSION_FILE;
+			}
 
 			// Retrieve the product version from the key file.
 			productInfo.strVersion = ::getFileVersion(strKeyFileFullPath);
