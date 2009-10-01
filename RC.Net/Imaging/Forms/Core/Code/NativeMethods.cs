@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Security;
+using Extract.Drawing;
 
 namespace Extract.Imaging.Forms
 {
@@ -16,7 +16,7 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <seealso href="http://msdn.microsoft.com/en-us/library/ms534907(VS.85).aspx">
         /// BinaryRasterOperations</seealso>
-        public enum BinaryRasterOperations : int
+        public enum BinaryRasterOperations
         {
             /// <summary>
             /// Pixel is always 0.
@@ -116,7 +116,7 @@ namespace Extract.Imaging.Forms
         /// <seealso href="http://msdn.microsoft.com/en-us/library/ms532387.aspx">CreateSolidBrush
         /// </seealso>
         [DllImport("gdi32.dll", SetLastError=true)]
-        public static extern IntPtr CreateSolidBrush(int color);
+        public static extern SafeGdiHandle CreateSolidBrush(int color);
 
         /// <summary>
         /// Sets the current foreground mix mode.
@@ -143,22 +143,6 @@ namespace Extract.Imaging.Forms
         /// </seealso>
         [DllImport("gdi32.dll", SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool FillRgn(IntPtr deviceContext, IntPtr region, IntPtr brush);
-
-        /// <summary>
-        /// Deletes a logical pen, brush, font, bitmap, region, or palette, freeing all system 
-        /// resources associated with the object.
-        /// </summary>
-        /// <param name="obj">Handle to a logical pen, brush, font, bitmap, region, or palette.
-        /// </param>
-        /// <returns>If the function succeeds, the return value is <see langword="true"/>. If the 
-        /// specified handle is not valid or is currently selected into a DC, the return value is 
-        /// <see langword="false"/>.
-        /// </returns>
-        /// <seealso href="http://msdn.microsoft.com/en-us/library/ms533225.aspx">DeleteObject
-        /// </seealso>
-        [DllImport("gdi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool DeleteObject(IntPtr obj);
+        public static extern bool FillRgn(IntPtr deviceContext, IntPtr region, SafeGdiHandle brush);
     }
 }

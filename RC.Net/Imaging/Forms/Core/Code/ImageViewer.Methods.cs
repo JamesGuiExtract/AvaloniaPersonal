@@ -3530,7 +3530,7 @@ namespace Extract.Imaging.Forms
         [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate")]
         public Rectangle GetVisibleImageArea()
         {
-            return Rectangle.Intersect(base.PhysicalViewRectangle, base.ClientRectangle);
+            return Rectangle.Intersect(base.PhysicalViewRectangle, ClientRectangle);
         }
 
         /// <summary>
@@ -4162,7 +4162,7 @@ namespace Extract.Imaging.Forms
         /// <param name="excludeTypes">The <see cref="IEnumerable{T}"/> of
         /// <see cref="Type"/> to exclude.</param>
         /// <param name="excludeTypesArgumentRequirement">The <see cref="ArgumentRequirement"/>
-        /// specifying how to treat the <paramref name="excludedTypes"/> collection.</param>
+        /// specifying how to treat the <paramref name="excludeTypes"/> collection.</param>
         /// <returns><see langword="true"/> if the <see cref="LayerObject"/> meets the
         /// requirements and <see langword="false"/> if it does not.</returns>
         private static bool LayeredObjectIsProperType(LayerObject layerObject,
@@ -4884,7 +4884,7 @@ namespace Extract.Imaging.Forms
                 bool nonDeletableObjectSelected = deleteMe.Count != _layerObjects.Selection.Count;
 
                 // Get the client area in logical (image) coordinates
-                Rectangle clientArea = GetTransformedRectangle(base.ClientRectangle, true);
+                Rectangle clientArea = GetTransformedRectangle(ClientRectangle, true);
 
                 // Iterate through the selected layer objects and:
                 // 1) set layerObjectOnNonVisiblePage to true if any layer object resides on a 
@@ -5328,7 +5328,7 @@ namespace Extract.Imaging.Forms
             NativeMethods.BinaryRasterOperations drawMode)
         {
             // Create handles for the the brush, region, and device context
-            IntPtr brush = IntPtr.Zero;
+            SafeGdiHandle brush = null;
             IntPtr regionHandle = IntPtr.Zero;
             IntPtr deviceContext = IntPtr.Zero;
 
@@ -5337,7 +5337,7 @@ namespace Extract.Imaging.Forms
             {
                 // Create a colored brush to draw highlights
                 brush = NativeMethods.CreateSolidBrush(ColorTranslator.ToWin32(color));
-                if (brush == IntPtr.Zero)
+                if (brush.IsInvalid)
                 {
                     throw new ExtractException("ELI21591", "Unable to create brush for region.",
                        new Win32Exception(Marshal.GetLastWin32Error()));
@@ -5366,15 +5366,9 @@ namespace Extract.Imaging.Forms
             finally
             {
                 // Release the handles
-                if (brush != IntPtr.Zero)
+                if (brush != null)
                 {
-                    if (!NativeMethods.DeleteObject(brush))
-                    {
-                        ExtractException ee = new ExtractException("ELI21593",
-                            "Unable to delete brush.",
-                            new Win32Exception(Marshal.GetLastWin32Error()));
-                        ee.Display();
-                    }
+                    brush.Dispose();
                 }
                 if (regionHandle != IntPtr.Zero)
                 {
