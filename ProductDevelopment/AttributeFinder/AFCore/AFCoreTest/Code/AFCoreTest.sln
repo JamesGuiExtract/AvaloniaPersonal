@@ -1485,12 +1485,33 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.FileActionManager.F
 		{2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9} = {2BB6C6E0-02AE-4BB0-AA61-BCE9F226FBC9}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Test", "..\..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj", "{376C679B-8B03-445A-9B63-D0B5261EC533}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{E7889662-1B92-485D-AFF2-AC673DD433BC} = {E7889662-1B92-485D-AFF2-AC673DD433BC}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Imaging.Forms.Test", "..\..\..\..\..\RC.Net\Imaging\Forms\Core\Testing\Automated\Extract.Imaging.Forms.Test.csproj", "{79F901A9-5F51-4343-9516-4871461A680B}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extract.Testing.Utilities", "..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj", "{F3314BBE-B008-488D-A2E0-351C49D914D7}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(VaultVsipSolution-v2) = preSolution
 		VaultHost = http://white.extract.local/VaultService
 		VaultRepositoryID = 2
 		VaultRepositoryGUID = 90e7e9e3-28c7-40d0-8bce-ee4d99f2ce41
-		ProjectCount = 112
+		ProjectCount = 115
 		ProjectRelativeDiskPath1 = ..\..\..\AFConditions\Code\AFConditions.vcproj
 		ProjectRelativeDiskPath2 = ..\..\Code\AFCore.vcproj
 		ProjectRelativeDiskPath3 = AFCoreTest.vcproj
@@ -1603,6 +1624,9 @@ Global
 		ProjectRelativeDiskPath110 = ..\..\..\..\..\RC.Net\AttributeFinder\Core\Code\Extract.AttributeFinder.csproj
 		ProjectRelativeDiskPath111 = ..\..\..\..\..\RC.Net\Imaging\Forms\Core\Code\Extract.Imaging.Forms.csproj
 		ProjectRelativeDiskPath112 = ..\..\..\..\..\RC.Net\FileActionManager\FileProcessors\Core\Code\Extract.FileActionManager.FileProcessors.csproj
+		ProjectRelativeDiskPath113 = ..\..\..\..\..\RC.Net\Core\Testing\Automated\Extract.Test.csproj
+		ProjectRelativeDiskPath114 = ..\..\..\..\..\RC.Net\Imaging\Forms\Core\Testing\Automated\Extract.Imaging.Forms.Test.csproj
+		ProjectRelativeDiskPath115 = ..\..\..\..\..\RC.Net\Core\Testing\Utilities\Core\Code\Extract.Testing.Utilities.csproj
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -2735,6 +2759,36 @@ Global
 		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{D9A9CCA5-EAA8-40FE-9039-CAEB793DB854}.Release|Win32.ActiveCfg = Release|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Release|Any CPU.Build.0 = Release|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{376C679B-8B03-445A-9B63-D0B5261EC533}.Release|Win32.ActiveCfg = Release|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{79F901A9-5F51-4343-9516-4871461A680B}.Release|Win32.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{F3314BBE-B008-488D-A2E0-351C49D914D7}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
