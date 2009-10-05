@@ -69,6 +69,7 @@ namespace Extract.Redaction.Verification
             System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
             System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+            TD.SandDock.DockContainer dockContainer1;
             this._commentsTextBox = new System.Windows.Forms.TextBox();
             this._currentDocumentTextBox = new System.Windows.Forms.TextBox();
             this._documentTypeTextBox = new System.Windows.Forms.TextBox();
@@ -121,6 +122,8 @@ namespace Extract.Redaction.Verification
             this._fitToWidthToolStripButton = new Extract.Imaging.Forms.FitToWidthToolStripButton();
             this._rotateCounterclockwiseToolStripButton = new Extract.Imaging.Forms.RotateCounterclockwiseToolStripButton();
             this._rotateClockwiseToolStripButton = new Extract.Imaging.Forms.RotateClockwiseToolStripButton();
+            this._thumbnailDockableWindow = new TD.SandDock.DockableWindow();
+            this._thumbnailViewer = new Extract.Imaging.Forms.ThumbnailViewer();
             dataGridToolStripContainer = new System.Windows.Forms.ToolStripContainer();
             splitContainer1 = new System.Windows.Forms.SplitContainer();
             label3 = new System.Windows.Forms.Label();
@@ -137,6 +140,7 @@ namespace Extract.Redaction.Verification
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            dockContainer1 = new TD.SandDock.DockContainer();
             dataGridToolStripContainer.ContentPanel.SuspendLayout();
             dataGridToolStripContainer.TopToolStripPanel.SuspendLayout();
             dataGridToolStripContainer.SuspendLayout();
@@ -154,6 +158,8 @@ namespace Extract.Redaction.Verification
             this._basicImageViewerToolStrip.SuspendLayout();
             this._pageNavigationToolStrip.SuspendLayout();
             this._viewCommandsToolStrip.SuspendLayout();
+            this._thumbnailDockableWindow.SuspendLayout();
+            dockContainer1.SuspendLayout();
             this.SuspendLayout();
             // 
             // dataGridToolStripContainer
@@ -566,7 +572,7 @@ namespace Extract.Redaction.Verification
             // 
             this._sandDockManager.DockSystemContainer = this;
             this._sandDockManager.MaximumDockContainerSize = 2000;
-            this._sandDockManager.MinimumDockContainerSize = 575;
+            this._sandDockManager.MinimumDockContainerSize = 220;
             this._sandDockManager.OwnerForm = this;
             // 
             // imageViewerToolStripContainer
@@ -867,12 +873,46 @@ namespace Extract.Redaction.Verification
             this._rotateClockwiseToolStripButton.Size = new System.Drawing.Size(36, 36);
             this._rotateClockwiseToolStripButton.Text = "Rotate clockwise";
             // 
+            // _thumbnailDockableWindow
+            // 
+            this._thumbnailDockableWindow.Controls.Add(this._thumbnailViewer);
+            this._thumbnailDockableWindow.Guid = new System.Guid("ae627741-717d-48f0-8e85-071b39098d21");
+            this._thumbnailDockableWindow.Location = new System.Drawing.Point(4, 18);
+            this._thumbnailDockableWindow.Name = "_thumbnailDockableWindow";
+            this._thumbnailDockableWindow.Size = new System.Drawing.Size(200, 884);
+            this._thumbnailDockableWindow.TabIndex = 0;
+            this._thumbnailDockableWindow.Text = "Page thumbnails";
+            // 
+            // _thumbnailViewer
+            // 
+            this._thumbnailViewer.Dock = System.Windows.Forms.DockStyle.Fill;
+            this._thumbnailViewer.ImageViewer = null;
+            this._thumbnailViewer.Location = new System.Drawing.Point(0, 0);
+            this._thumbnailViewer.Name = "_thumbnailViewer";
+            this._thumbnailViewer.Size = new System.Drawing.Size(200, 884);
+            this._thumbnailViewer.TabIndex = 0;
+            // 
+            // dockContainer1
+            // 
+            dockContainer1.ContentSize = 200;
+            dockContainer1.Controls.Add(this._thumbnailDockableWindow);
+            dockContainer1.Dock = System.Windows.Forms.DockStyle.Right;
+            dockContainer1.LayoutSystem = new TD.SandDock.SplitLayoutSystem(new System.Drawing.SizeF(250F, 400F), System.Windows.Forms.Orientation.Horizontal, new TD.SandDock.LayoutSystemBase[] {
+            ((TD.SandDock.LayoutSystemBase)(new TD.SandDock.ControlLayoutSystem(new System.Drawing.SizeF(250F, 400F), new TD.SandDock.DockControl[] {
+                        ((TD.SandDock.DockControl)(this._thumbnailDockableWindow))}, this._thumbnailDockableWindow)))});
+            dockContainer1.Location = new System.Drawing.Point(1388, 0);
+            dockContainer1.Manager = this._sandDockManager;
+            dockContainer1.Name = "dockContainer1";
+            dockContainer1.Size = new System.Drawing.Size(204, 926);
+            dockContainer1.TabIndex = 2;
+            // 
             // VerificationTaskForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1592, 926);
             this.Controls.Add(imageViewerToolStripContainer);
+            this.Controls.Add(dockContainer1);
             this.Controls.Add(dockContainer);
             this.MainMenuStrip = this._menuStrip;
             this.MinimumSize = new System.Drawing.Size(800, 600);
@@ -908,6 +948,8 @@ namespace Extract.Redaction.Verification
             this._pageNavigationToolStrip.PerformLayout();
             this._viewCommandsToolStrip.ResumeLayout(false);
             this._viewCommandsToolStrip.PerformLayout();
+            this._thumbnailDockableWindow.ResumeLayout(false);
+            dockContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -966,5 +1008,7 @@ namespace Extract.Redaction.Verification
         private System.Windows.Forms.ToolStripMenuItem _idShieldHelpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _aboutIDShieldToolStripMenuItem;
         private Extract.Imaging.Forms.PageSummaryView _pageSummaryView;
+        private TD.SandDock.DockableWindow _thumbnailDockableWindow;
+        private Extract.Imaging.Forms.ThumbnailViewer _thumbnailViewer;
     }
 }
