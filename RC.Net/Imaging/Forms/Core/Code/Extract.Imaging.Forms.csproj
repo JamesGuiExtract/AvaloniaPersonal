@@ -547,6 +547,16 @@
       <DependentUpon>UserActionToolStripStatusLabel.cs</DependentUpon>
     </Compile>
     <Compile Include="TextLayerObject.cs" />
+    <Compile Include="ThumbnailViewer.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ThumbnailViewer.Designer.cs">
+      <DependentUpon>ThumbnailViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ThumbnailWorker.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ThumbnailWorkerProgress.cs" />
     <Compile Include="ToolStripButtonConstants.cs" />
     <Compile Include="Controls\ZoomInToolStripButton.cs">
       <SubType>Component</SubType>
@@ -809,6 +819,13 @@
       <DependentUpon>PageSummaryView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\OpenImageButtonSmall.png" />
+    <EmbeddedResource Include="ThumbnailViewer.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ThumbnailViewer.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Loading.png" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
