@@ -16,14 +16,12 @@
 <hr>
 
 <h2>Licensing</h2>
-
 <ul>
 	<li><b>File Action Manager Database Administration</b> can be opened when using a full license</li>
 	<li><b>File Action Manager Database Administration</b> can be opened when using an evaluation license</li>
 </ul>
 
 <h2>Database Selection - Part 1</h2>
-
 <ul>
 	<li>A <b>Database server name</b> combo box is presented.
 	<li><b>[LegacyRC #4552]</b> If both a <b>Server</b> and a <b>Database name</b> has been 
@@ -63,7 +61,6 @@
 </ul>
 
 <h2>Database Creation</h2>
-
 <ul>
 	<li>Select <b>(local)</b> as the database server name.
 	<li>Browse for existing database names on the local machine.
@@ -93,19 +90,20 @@
 	the <b>Select database to administer</b> dialog without error.
 	<li>Select <b>log to existing database</b> and click the <b>Next</b> button.
 	<li>Confirm that a <b>Set Admin Password message box</b> is presented.
-	<li>Confirm that after providing matching passwords, the main <b>File Action Manager Database Administration</b> window appears.
+	<li>Confirm that after providing matching passwords, the main <b>File Action Manager 
+	Database Administration</b> window appears.
 <p>
 	<li><b>[LegacyRC #4666]</b> Create multiple databases
 	<ul>
 		<li><b>Log out</b> of a newly created database.
-		<li><b>[LegacyRC #4551]</b> Confirm that <b>Login to existing database</b> is selected.
+		<li><b>[LegacyRC #4551]</b> Confirm that <b>Login to existing database</b> 
+		is selected.
 		<li>Select <b>Create new database</b> and specify a different new name.
 		<li>Confirm that the second new database is successfully created.
 	</ul>
 </ul>
 
 <h2>Database Selection - Part 2</h2>
-
 <ul>
 	<li>Select <b>(local)</b> as the database server name.
 	<li>Select an existing database name on the local machine.
@@ -126,7 +124,6 @@
 </ul>
 
 <h2>FAM DB Admin Database Tab</h2>
-
 <ul>
 	<li>Confirm that the Database tab contains edit boxes for <b>Database Server</b>, 
 	<b>Database Name</b>, and <b>Connection Status</b>.
@@ -139,7 +136,6 @@
 </ul>
 
 <h2>FAM DB Admin Summary Tab</h2>
-
 <ul>
 	<li>Confirm that the Summary tab contains an edit box for <b>Total number 
 	of files referenced in the database</b>.
@@ -252,7 +248,8 @@
 	<li>Confirm that all menu items are enabled.
 <p>
 	<li>Connect to the database using <b>Microsoft SQL Server Management Studio 
-	Express</b>. Files queued by the File Action Manager can be found under 	Databases\&lt;DatabaseName&gt;\Tables\dbo.FAMFile. 
+	Express</b>. Files queued by the File Action Manager can be found 
+	under Databases\&lt;DatabaseName&gt;\Tables\dbo.FAMFile. 
 	Right click <b>dbo.FAMFile</b> and select <b>Open table</b> to view files 
 	added to the database by the File Action Manager. The table will need to 
 	be closed and reopened each time an action is added or removed in order 
@@ -284,8 +281,9 @@
 		</ul>
 		<li>Confirm that an exception is thrown when attempting to 
 		add an action where the first character is a digit.
-		<li><b>[LegacyRCAndUtils #5107]</b>Confirm that an exception is thrown and action is not added to DB when attempting to copy the default status from an action when no actions exist 
-		in the database.
+		<li><b>[LegacyRCAndUtils #5107]</b>Confirm that an exception is thrown and an 
+		action is not added to DB when attempting to copy the default status from an 
+		action when no actions exist in the database.
 		<li>Confirm that adding an action and clicking <b>No</b> 
 		in the confirmation dialog does not add an action to the database.
 		<li>Confirm that adding an action and clicking <b>Cancel</b> 
@@ -305,9 +303,13 @@
 			information matches that seen previously.
 		</ul>
 <p>
-		<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown if the user attempts to add an action	to the database that differs from an existing action only in case. I.E. "test" and "TEST".
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after a new action is added.
-		<li><b>[LegacyRCAndUtils #5106]</b>Confirm that "Copy From" radio button can be selected by using Tab and Arrow keys.
+		<li><b>[LegacyRCAndUtils #3857]</b> Confirm that an error message is shown if the 
+		user attempts to add an action	to the database that differs from an existing action 
+		only in case (i.e. "test" and "TEST").
+		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
+		latest after a new action is added.
+		<li><b>[LegacyRCAndUtils #5106]</b>Confirm that <b>Copy From</b> radio button can 
+		be selected by using Tab and Arrow keys.
 	</ul>
 <p>
 	<li><b>Remove...</b></li>
@@ -315,11 +317,15 @@
 		<li>Confirm that all actions listed in the database appear in the 
 		<b>Remove Action</b> drop down menu and vice-versa.
 		<li>Confirm that removing an action and clicking <b>No</b> in the 
-		confirmation dialog does not remove an action from the database and return to <b>FAM DB</b> main window.
-		<li>Confirm that removing an action and clicking <b>Cancel</b> in 
-		the confirmation dialog does not remove an action from the database and return to <b>Remove Action</b> dialog.
-		<li>Confirm that removing an action removes the corresponding column 				ASC_&lt;ActionName&gt; from <b>dbo.FAMFile</b>.
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after an action is removed.
+		confirmation dialog does not remove an action from the database and return to the 
+		<b>FAM DB</b> main window.
+		<li>Confirm that removing an action and clicking <b>Cancel</b> in the 
+		confirmation dialog does not remove an action from the database and return to 
+		<b>Remove Action</b> dialog.
+		<li>Confirm that removing an action removes the corresponding 
+		column ASC_&lt;ActionName&gt; from <b>dbo.FAMFile</b>.
+		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
+		latest after an action is removed.
 	</ul>
 <p>
 	<li><b>Rename...</b></li>
@@ -336,7 +342,8 @@
 		confirmation dialog does not rename an action.
 		<li>Confirm that renaming an action and clicking <b>Cancel</b> in 
 		the confirmation dialog does not rename an action.
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after an action is renamed.
+		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the 
+		latest after an action is renamed.
 	</ul>
 <p>
 	<li><b>Manually Set Action Status</b>
@@ -356,36 +363,36 @@
 		updates the status of all files for the selected action.
 		<li>Confirm that updating a single <b>action status</b> for an 
 		action updates only that action status.
-		<li>Confirm that it is possible to update the action status of files that were <b>skipped</b>
-		for a particular action.
+		<li>Confirm that it is possible to update the action status of files that were 
+		<b>skipped</b> for a particular action.
 		<ul>
-			<li>Confirm that selecting <b>Skipped</b> in the <b>Status is</b> dropdown box enables
-			the <b>By</b> dropdown box.
-			<li>Confirm that the <b>By</b> dropdown box contains options for <b>&lt;any user&gt;</b> and
-			for any user other than Administrator who has skipped files in the database.
+			<li>Confirm that selecting <b>Skipped</b> in the <b>Status is</b> dropdown 
+			box enables the <b>By</b> dropdown box.
+			<li>Confirm that the <b>By</b> dropdown box contains options for 
+			<b>&lt;any user&gt;</b> and for any user other than Administrator who has 
+			skipped files in the database.
 			<li>Confirm that selecting these options works as expected.
 		</ul>
 		<li>Confirm that <b>CTRL+M</b> performs the same function as selecting 
 		<b>Manually Set Action Status</b> from the <b>Action</b> menu.
-		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to the latest after an action status is manually set.
-		<li><b>[LegacyRCAndUtils #5106]</b>Confirm that "Status of Action" radio button can be selected by using Tab and Arrow key.
-		</ul>
-<p>
+		<li><b>[LegacyRC #4851]</b> Confirm that the <b>Summary</b> tab is refreshed to 
+		the latest after an action status is manually set.
+		<li><b>[LegacyRC #5106]</b>Confirm that "Status of Action" radio button can 
+		be selected by using Tab and Arrow key.
 	</ul>
 <p>
-	<h2><b>[LegacyRC #5052]</b> Exceptions logged with FAMDBAdmin database changes</h2>
-		<ul>
-			<li>Confirm that <b>Application trace</b> exceptions are logged for the following actions.
-			<ul>
-				<li>Database - Clear
-				<li>Database - Reset lock
-				<li>Database - Change password
-				<li>Action - Add
-				<li>Action - Remove
-				<li>Action - Rename
-				<li>Action - Manually set action status
-			</ul>
-		</ul>
+	<li><b>[LegacyRC #5052]</b> Confirm that <b>Application trace</b> exceptions are logged 
+	for the following actions
+	<ul>
+		<li>Database - Clear
+		<li>Database - Reset lock
+		<li>Database - Change password
+		<li>Action - Add
+		<li>Action - Remove
+		<li>Action - Rename
+		<li>Action - Manually set action status
+	</ul>
+</ul>
 	
 <h2>Tools Menu</h2>
 <ul>
@@ -440,25 +447,29 @@
 			<li>Start the application.
 			<li>Confirm that the active database contains images and actions.
 			<li>Export a file list.
-			<li>Confirm that providing a relative path for the output file <b>is not</b> accepted.
+			<li>Confirm that providing a relative path for the output file <b>is 
+			not</b> accepted.
 		</ul>
 	</ul>
 <p>
 	<li><b>File Action Manager</b>
 	<ul>
 		<li>Confirm that the <b>File Action Manager</b> window appears.
-		<li><b>[LegacyRC #4558]</b> Confirm that the <b>Database Server</b> and <b>Database Name</b> 
-		settings are retained.
-		<li><b>[LegacyRC #5124]</b> Confirm that the FAM can be started from the Tools menu for 
-		a <b>Database Name</b> containing a space.
+		<li><b>[LegacyRC #4558]</b> Confirm that the <b>Database Server</b> and 
+		<b>Database Name</b> settings are retained.
+		<li><b>[LegacyRC #5124]</b> Confirm that the FAM can be started from the Tools 
+		menu for a <b>Database Name</b> containing a space.
 	</ul>
 <p>
 	<li><b>Reports</b>
 	<ul>
-		<li>Confirm that the menu item is disabled if <b>ID Shield</b> is 
-		not licensed.
-		<li>Confirm that the menu item is enabled if <b>ID Shield</b> is 
-		licensed.
+		<li>Confirm that the menu item displays a <b>Report Viewer</b> window with 
+		an <b>Open Report</b> dialog.
+		<li>Confirm that the <b>Open Report</b> dialog includes a pane for <b>Standard 
+		reports</b> and <b>Saved reports</b>.
+		<li>Confirm that the <b>Standard reports</b> are displayed by default.
+		<li>Confirm that the <b>Open Report</b> dialog includes a pane for <b>Report 
+		preview</b>.
 	</ul>
 </ul>
 <p>
@@ -469,7 +480,7 @@
 	<li>Confirm that all menu items are enabled.
 <p>
 	<li>Confirm that clicking on <b>File Action Manager Help</b> 
-	displays the FLEX Index or ID Shield help file.
+	displays the <b>FLEX Index</b> or <b>ID Shield</b> or <b>LabDE</b> help file.
 	<li>Confirm that clicking on <b>About this application...</b> 
 	displays the <b>About FAMDBAdmin</b> dialog box.
 	<li>Confirm that the <b>About FAMDBAdmin</b> dialog box displays 
@@ -484,7 +495,5 @@
 	the FAM DB Admin utility using <b>Alt+Tab</b>.
 	
 </ul>
-
 </body>
-
 </html>
