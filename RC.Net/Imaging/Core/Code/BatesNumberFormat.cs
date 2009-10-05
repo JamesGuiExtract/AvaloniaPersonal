@@ -194,6 +194,8 @@ namespace Extract.Imaging
                 _pageNumberSeparator = info.GetString("PageNumberSeparator");
                 _prefix = info.GetString("Prefix");
                 _suffix = info.GetString("Suffix");
+                _anchorAlignment = 
+                    (AnchorAlignment)info.GetValue("AnchorAlignment", typeof(AnchorAlignment));
                 _pageAnchorAlignment =
                     (AnchorAlignment)info.GetValue("PageAnchorAlignment", typeof(AnchorAlignment));
                 _font = (Font)info.GetValue("Font", typeof(Font));
@@ -782,6 +784,7 @@ namespace Extract.Imaging
                 info.AddValue("PageNumberSeparator", _pageNumberSeparator);
                 info.AddValue("Prefix", _prefix);
                 info.AddValue("Suffix", _suffix);
+                info.AddValue("AnchorAlignment", _anchorAlignment, typeof(AnchorAlignment));
                 info.AddValue("PageAnchorAlignment", _pageAnchorAlignment, typeof(AnchorAlignment));
                 info.AddValue("Font", _font, typeof(Font));
                 info.AddValue("HorizontalInches", _horizontalInches);

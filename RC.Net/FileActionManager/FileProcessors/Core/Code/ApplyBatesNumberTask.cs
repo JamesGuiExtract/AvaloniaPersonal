@@ -19,8 +19,9 @@ namespace Extract.FileActionManager.FileProcessors
     [ComVisible(true)]
     [Guid("8DD63918-D299-48DB-BA54-FD1CFAAAF0E2")]
     [ProgId("Extract.FileActionManager.FileProcessors.ApplyBatesNumberTask")]
-    public class ApplyBatesNumberTask : ICategorizedComponent, IConfigurableObject, ICopyableObject,
-        IFileProcessingTask, ILicensedComponent, IPersistStream, IDisposable
+    public class ApplyBatesNumberTask : ICategorizedComponent, IConfigurableObject,
+        IMustBeConfiguredObject, ICopyableObject, IFileProcessingTask, ILicensedComponent,
+        IPersistStream, IDisposable
     {
         #region Constants
 
@@ -149,6 +150,40 @@ namespace Extract.FileActionManager.FileProcessors
 
         #endregion IConfigurableObject Members
 
+        #region IMustBeConfiguredObject Members
+
+        /// <summary>
+        /// Checks whether this object has been configured properly.
+        /// </summary>
+        /// <returns><see langword="true"/> if the object has been configured properly
+        /// and <see langword="false"/> if it has not.
+        /// </returns>
+        public bool IsConfigured()
+        {
+            try
+            {
+                // Get a db manager and connect to the database
+                FileProcessingDBClass databaseManager = new FileProcessingDBClass();
+                databaseManager.ConnectLastUsedDBThisProcess();
+
+                // This object is configured properly iff:
+                // 1. There is a file name specified (this does not validate the name, it
+                //    may contain file tags.
+                // 2. A database counter has been specified.
+                // 3. The specified database counter is a valid counter in the current database.
+                return !string.IsNullOrEmpty(_fileName)
+                    && !string.IsNullOrEmpty(_format.DatabaseCounter)
+                    && databaseManager.IsUserCounterValid(_format.DatabaseCounter);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI27938",
+                    "Failed while checking configuration.", ex);
+            }
+        }
+
+        #endregion IMustBeConfiguredObject Members
+
         #region ICopyableObject Members
 
         /// <summary>
@@ -199,6 +234,8 @@ namespace Extract.FileActionManager.FileProcessors
                 }
 
                 _format = task._format.Clone();
+
+                _fileName = task._fileName;
 
                 _dirty = true;
             }

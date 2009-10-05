@@ -59,6 +59,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         string _fileName;
 
+        /// <summary>
+        /// The <see cref="BatesNumberFormatPropertyPage"/> for setting the format of
+        /// the Bates number.
+        /// </summary>
+        BatesNumberFormatPropertyPage _batesFormat;
+
         #endregion Fields
 
         #region Constructors
@@ -123,14 +129,74 @@ namespace Extract.FileActionManager.FileProcessors
                 if (!string.IsNullOrEmpty(_fileName))
                 {
                     _fileNameTextBox.Text = _fileName;
+
+                    // Set the cursor to the end of the file name
+                    _fileNameTextBox.Select(_fileNameTextBox.Text.Length, 0);
                 }
 
                 // Add the filter string to the browse button
                 _browseButton.FileFilter = _FILE_FILTERS;
+
+                // Update the description for the appearance
+                _appearanceSummaryText.Text = "Font: "
+                    + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
+                    + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format);
             }
             catch (Exception ex)
             {
                 ExtractException ee = ExtractException.AsExtractException("ELI27882", ex);
+                ee.AddDebugData("Event Data", e, false);
+                ee.Display();
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Form.Closing"/> event.
+        /// </summary>
+        /// <param name="e">The data associated with the event.</param>
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            try
+            {
+                if (DialogResult == DialogResult.OK)
+                {
+                    // Ensure a file name has been specified
+                    if (string.IsNullOrEmpty(_fileNameTextBox.Text))
+                    {
+                        // Prompt the user, set the focus to the file name control and
+                        // set cancel to true (stops the closing of the form)
+                        MessageBox.Show("The file name field may not be left blank.",
+                            "Invalid Settings", MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _fileNameTextBox.Select();
+                        e.Cancel = true;
+                    }
+                    // Check if the bates format is valid
+                    else if (!_batesFormat.IsValid)
+                    {
+                        // Invalid format, prompt the user, set focus to the bates format control
+                        // and set cancel to true (stops the closing of the form)
+                        MessageBox.Show("Bates format settings are not valid, please check.",
+                            "Invalid Settings", MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
+                        _batesFormat.SetFocusToFirstControl();
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                        // Save the format settings
+                        _batesFormat.Apply();
+
+                        // Store the file name
+                        _fileName = _fileNameTextBox.Text;
+                    }
+                }
+
+                base.OnClosing(e);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI0", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
             }
@@ -151,12 +217,17 @@ namespace Extract.FileActionManager.FileProcessors
                 PropertyPageForm appearanceForm = new PropertyPageForm(
                     "Change Bates Number Default Position And Appearance",
                     new BatesNumberAppearancePropertyPage(_generator.Format));
-                appearanceForm.ShowDialog(this);
 
-                // Update the description for the appearance
-                _appearanceSummaryText.Text = "Font: "
-                    + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
-                    + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format);
+                // Show the dialog
+                DialogResult result = appearanceForm.ShowDialog(this);
+
+                if (result == DialogResult.OK)
+                {
+                    // Update the description for the appearance
+                    _appearanceSummaryText.Text = "Font: "
+                        + FontMethods.GetUserFriendlyFontString(_generator.Format.Font)
+                        + Environment.NewLine + "Position: " + GetPositionOfFont(_generator.Format);
+                }
             }
             catch (Exception ex)
             {
@@ -255,18 +326,22 @@ namespace Extract.FileActionManager.FileProcessors
                 counterNames.Add(name);
             }
 
+            // Sort the list
+            counterNames.Sort();
+
             // Create the bates number format control and add it to the form
-            BatesNumberFormatPropertyPage batesFormat = new BatesNumberFormatPropertyPage(
-                _generator.Format, _generator, counterNames);
-            batesFormat.Location = new Point(_fileNameGroupBox.Left - batesFormat.Margin.Left,
+            _batesFormat = new BatesNumberFormatPropertyPage(_generator.Format,
+                _generator, counterNames);
+            _batesFormat.Location = new Point(_fileNameGroupBox.Left - _batesFormat.Margin.Left,
                 _fileNameGroupBox.Bottom + _fileNameGroupBox.Margin.Top);
-            Controls.Add(batesFormat);
-            batesFormat.TabIndex = 1;
+            Controls.Add(_batesFormat);
+            _batesFormat.TabIndex = 1;
 
             // Compute the new size of the form
-            int width = batesFormat.Width + (2 * batesFormat.Location.X)
-                + (2 * batesFormat.Margin.Right);
-            int height = Height + Margin.Vertical + batesFormat.Height + batesFormat.Margin.Vertical;
+            int width = _batesFormat.Width + (2 * _batesFormat.Location.X)
+                + _batesFormat.Margin.Horizontal;
+            int height = Height + Margin.Vertical + _batesFormat.Height +
+                _batesFormat.Margin.Vertical;
 
             // Resize the form appropriately
             Size = new Size(width, height);

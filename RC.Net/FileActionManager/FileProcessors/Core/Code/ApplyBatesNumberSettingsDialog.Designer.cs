@@ -143,6 +143,7 @@ namespace Extract.FileActionManager.FileProcessors
             this._fileTagsButton.Size = new System.Drawing.Size(18, 20);
             this._fileTagsButton.TabIndex = 2;
             this._fileTagsButton.UseVisualStyleBackColor = true;
+            this._fileTagsButton.TagSelected += new System.EventHandler<Extract.Utilities.Forms.TagSelectedEventArgs>(this.HandlePathTagsButtonClick);
             // 
             // _browseButton
             // 

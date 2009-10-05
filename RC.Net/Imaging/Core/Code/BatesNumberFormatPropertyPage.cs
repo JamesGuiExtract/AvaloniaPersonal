@@ -156,26 +156,25 @@ namespace Extract.Imaging
             if (_counters.Count > 0)
             {
                 // Select the appropriate item (if it exists) in the combo box
+                // otherwise just select the first item in the list
+                int index = 0;
                 if (!string.IsNullOrEmpty(_format.DatabaseCounter))
                 {
-                    int index = _counterToUseCombo.FindString(_format.DatabaseCounter);
+                    index = _counterToUseCombo.FindString(_format.DatabaseCounter);
                     if (index == -1)
                     {
                         // Prompt the user about non-existent counter
                         MessageBox.Show("Counter: " + _format.DatabaseCounter + " was not found.",
                             "Counter Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information,
                             MessageBoxDefaultButton.Button1, 0);
-                    }
-                    else
-                    {
-                        _counterToUseCombo.SelectedIndex = index;
+
+                        // Set the index to 0 so that the first counter is selected
+                        index = 0;
                     }
                 }
-                else
-                {
-                    // Just select the first counter
-                    _counterToUseCombo.SelectedIndex = 0;
-                }
+
+                // Just select the first counter
+                _counterToUseCombo.SelectedIndex = index;
             }
             else
             {
@@ -287,6 +286,10 @@ namespace Extract.Imaging
         /// </summary>
         private void SaveSettingsToFormat()
         {
+            // Set whether the format should be using a database counter
+            _format.UseDatabaseCounter = _counterToUseCombo.Visible;
+            _format.DatabaseCounter = _counterToUseCombo.Visible ? _counterToUseCombo.Text : "";
+
             // Store the next number settings
             _format.UseNextNumberFile = _nextNumberFileRadioButton.Checked;
             _format.NextNumber = GetNextSpecifiedNumber();
