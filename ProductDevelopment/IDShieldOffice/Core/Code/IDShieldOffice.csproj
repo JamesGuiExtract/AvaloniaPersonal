@@ -138,21 +138,7 @@
     <Compile Include="AboutIDShieldOfficeForm.Designer.cs">
       <DependentUpon>AboutIDShieldOfficeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="BatesNumberFormat.cs" />
-    <Compile Include="BatesNumberGenerator.cs" />
     <Compile Include="BatesNumberManager.cs" />
-    <Compile Include="BatesNumberManagerAppearancePropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BatesNumberManagerAppearancePropertyPage.Designer.cs">
-      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
-    </Compile>
-    <Compile Include="BatesNumberManagerFormatPropertyPage.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="BatesNumberManagerFormatPropertyPage.Designer.cs">
-      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
-    </Compile>
     <Compile Include="BatesNumberManagerPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -331,14 +317,6 @@
     <EmbeddedResource Include="AboutIDShieldOfficeForm.resx">
       <SubType>Designer</SubType>
       <DependentUpon>AboutIDShieldOfficeForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BatesNumberManagerAppearancePropertyPage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BatesNumberManagerFormatPropertyPage.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="BatesNumberManagerPropertyPage.resx">
       <SubType>Designer</SubType>

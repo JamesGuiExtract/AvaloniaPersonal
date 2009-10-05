@@ -498,52 +498,59 @@ namespace IDShieldOffice
         /// </summary>
         public void Apply()
         {
-            // Get the property page interface of the Bates Number Manager
-            IPropertyPage propertyPage = 
-                (IPropertyPage) _userPreferences.BatesNumberManager.PropertyPage;
-
-            // Ensure the settings are valid
-            if (!this.IsValid || !propertyPage.IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Get the property page interface of the Bates Number Manager
+                IPropertyPage propertyPage =
+                    (IPropertyPage)_userPreferences.BatesNumberManager.PropertyPage;
+
+                // Ensure the settings are valid
+                if (!this.IsValid || !propertyPage.IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                // Apply the changes to the Bates number manager
+                propertyPage.Apply();
+
+                // Ensure the changes were applied
+                if (propertyPage.IsDirty)
+                {
+                    // No need to display a message. The Apply() method has already done this.
+                    return;
+                }
+
+                // Store the settings
+                _userPreferences.OcrTradeoff = (OcrTradeoff)_ocrTradeoffTrackBar.Value;
+                _userPreferences.RedactionFillColor = (RedactionColor)Enum.Parse(typeof(RedactionColor),
+                    _redactionFillColorComboBox.Text, true);
+                _userPreferences.SaveIdsoWithImage = _saveIdsoWithImageCheckBox.Checked;
+                _userPreferences.OutputPath = _outputPathTextBox.Text;
+                _userPreferences.UseOutputPath = _useOutputPath.Checked;
+                _userPreferences.VerifyAllPages = _verifyAllPagesCheckBox.Checked;
+
+                if (_outputFormatComboBox.Text == "TIF")
+                {
+                    _userPreferences.OutputFormat = OutputFormat.Tif;
+                }
+                else if (_outputFormatComboBox.Text == "PDF")
+                {
+                    _userPreferences.OutputFormat = OutputFormat.Pdf;
+                }
+                else
+                {
+                    _userPreferences.OutputFormat = OutputFormat.Idso;
+                }
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            // Apply the changes to the Bates number manager
-            propertyPage.Apply();
-
-            // Ensure the changes were applied
-            if (propertyPage.IsDirty)
+            catch (Exception ex)
             {
-                // No need to display a message. The Apply() method has already done this.
-                return;
+                throw ExtractException.AsExtractException("ELI27927", ex);
             }
-
-            // Store the settings
-            _userPreferences.OcrTradeoff = (OcrTradeoff) _ocrTradeoffTrackBar.Value;
-            _userPreferences.RedactionFillColor = (RedactionColor)Enum.Parse(typeof(RedactionColor),
-                _redactionFillColorComboBox.Text, true);
-            _userPreferences.SaveIdsoWithImage = _saveIdsoWithImageCheckBox.Checked;
-            _userPreferences.OutputPath = _outputPathTextBox.Text;
-            _userPreferences.UseOutputPath = _useOutputPath.Checked;
-            _userPreferences.VerifyAllPages = _verifyAllPagesCheckBox.Checked;
-
-            if (_outputFormatComboBox.Text == "TIF")
-            {
-                _userPreferences.OutputFormat = OutputFormat.Tif;
-            }
-            else if (_outputFormatComboBox.Text == "PDF")
-            {
-                _userPreferences.OutputFormat = OutputFormat.Pdf;
-            }
-            else
-            {
-                _userPreferences.OutputFormat = OutputFormat.Idso;
-            }
-
-            // Reset the dirty flag
-            _dirty = false;
         }
 
         /// <summary>

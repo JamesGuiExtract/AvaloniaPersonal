@@ -12,7 +12,7 @@ namespace Extract.Imaging
     /// <summary>
     /// Generates Bates numbers for a single document.
     /// </summary>
-    internal class BatesNumberGenerator : IBatesNumberGenerator
+    public class BatesNumberGenerator : IBatesNumberGenerator
     {
         #region Constants
 
@@ -87,69 +87,76 @@ namespace Extract.Imaging
         /// </summary>
         public void Commit()
         {
-            // Check if there are any changes to commit
-            if (_nextNumber == null)
+            try
             {
-                return;
-            }
+                // Check if there are any changes to commit
+                if (_nextNumber == null)
+                {
+                    return;
+                }
 
-            // Check whether only one Bates number was used for the entire document
-            if (_format.AppendPageNumber)
+                // Check whether only one Bates number was used for the entire document
+                if (_format.AppendPageNumber)
+                {
+                    if (_nextNumber == long.MaxValue)
+                    {
+                        _nextNumber = 0;
+                    }
+
+                    _nextNumber++;
+                }
+
+                // Check whether to use the next number file
+                if (_format.UseNextNumberFile)
+                {
+                    if (_stream == null)
+                    {
+                        // This is a logic error
+                        throw new ExtractException("ELI22488",
+                            "Cannot commit changes to unopened next number file.");
+                    }
+
+                    // Reset the stream to the start
+                    // Note: If the reader were null, it would be a non-serious logic error
+                    if (_reader != null)
+                    {
+                        // Note: It would be a bad idea to reader.Close() now, 
+                        // because this would close the underlying stream.
+                        _reader.DiscardBufferedData();
+                    }
+                    _stream.Seek(0, SeekOrigin.Begin);
+
+                    // Store the next value in the file
+                    using (StreamWriter writer = new StreamWriter(_stream))
+                    {
+                        writer.WriteLine(_nextNumber);
+                    }
+
+                    // It is now safe to dispose of the reader and stream
+                    if (_reader != null)
+                    {
+                        _reader.Dispose();
+                        _reader = null;
+                    }
+                    _stream.Dispose();
+                    _stream = null;
+                }
+                else
+                {
+                    // Commit the changes to the registry
+                    RegistryManager.SetAndReleaseNextBatesNumber(_nextNumber.Value);
+
+                    // Commit the changes to format settings
+                    _format.NextNumber = _nextNumber.Value;
+                }
+
+                // Reset the next number
+                _nextNumber = null;
+            }
+            catch (Exception ex)
             {
-                if (_nextNumber == long.MaxValue)
-                {
-                    _nextNumber = 0;
-                }
-
-                _nextNumber++;
+                throw ExtractException.AsExtractException("ELI27928", ex);
             }
-
-            // Check whether to use the next number file
-            if (_format.UseNextNumberFile)
-            {
-                if (_stream == null)
-                {
-                    // This is a logic error
-                    throw new ExtractException("ELI22488", 
-                        "Cannot commit changes to unopened next number file.");
-                }
-
-                // Reset the stream to the start
-                // Note: If the reader were null, it would be a non-serious logic error
-                if (_reader != null)
-                {
-                    // Note: It would be a bad idea to reader.Close() now, 
-                    // because this would close the underlying stream.
-                    _reader.DiscardBufferedData();
-                }
-                _stream.Seek(0, SeekOrigin.Begin);
-
-                // Store the next value in the file
-                using (StreamWriter writer = new StreamWriter(_stream))
-                {
-                    writer.WriteLine(_nextNumber);
-                }
-
-                // It is now safe to dispose of the reader and stream
-                if (_reader != null)
-                {
-                    _reader.Dispose();
-                    _reader = null;
-                }
-                _stream.Dispose();
-                _stream = null;
-            }
-            else
-            {
-                // Commit the changes to the registry
-                RegistryManager.SetAndReleaseNextBatesNumber(_nextNumber.Value);
-
-                // Commit the changes to format settings
-                _format.NextNumber = _nextNumber.Value;
-            }
-
-            // Reset the next number
-            _nextNumber = null;
         }
 
         /// <summary>
@@ -198,19 +205,26 @@ namespace Extract.Imaging
         /// <returns>The next number without incrementing it.</returns>
         public long PeekNextNumber()
         {
-            // Return the next number from the file or the next specified number
-            if (_format.UseNextNumberFile)
+            try
             {
-                return GetNextNumberFromFile(true);
+                // Return the next number from the file or the next specified number
+                if (_format.UseNextNumberFile)
+                {
+                    return GetNextNumberFromFile(true);
+                }
+                else if (!_format.UseDatabaseCounter)
+                {
+                    return _format.NextNumber;
+                }
+                else
+                {
+                    throw new ExtractException("ELI27841",
+                        "This implementation of the BatesNumberGenerator does not support using a database counter.");
+                }
             }
-            else if (string.IsNullOrEmpty(_format.DatabaseCounter))
+            catch (Exception ex)
             {
-                return _format.NextNumber;
-            }
-            else
-            {
-                throw new ExtractException("ELI27841",
-                    "This implementation of the BatesNumberGenerator does not support using a database counter.");
+                throw ExtractException.AsExtractException("ELI27930", ex);
             }
         }
 
@@ -292,17 +306,24 @@ namespace Extract.Imaging
         /// <returns>The next Bates number as text.</returns>
         public string GetNextNumberString(int pageNumber)
         {
-            // Get the next Bates number. 
-            // Increment if there is a separate Bates number for each page
-            long nextNumber = GetNextNumber(!_format.AppendPageNumber);
-            if (nextNumber < 0)
+            try
             {
-                ExtractException ee = new ExtractException("ELI22457", "Invalid Bates number.");
-                ee.AddDebugData("Bates number", nextNumber, false);
-                throw ee;
-            }
+                // Get the next Bates number. 
+                // Increment if there is a separate Bates number for each page
+                long nextNumber = GetNextNumber(!_format.AppendPageNumber);
+                if (nextNumber < 0)
+                {
+                    ExtractException ee = new ExtractException("ELI22457", "Invalid Bates number.");
+                    ee.AddDebugData("Bates number", nextNumber, false);
+                    throw ee;
+                }
 
-            return BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber);
+                return BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27929", ex);
+            }
         }
 
         /// <summary>
@@ -312,13 +333,20 @@ namespace Extract.Imaging
         /// <returns>The next Bates numbers as text.</returns>
         public ReadOnlyCollection<string> GetNextNumberStrings(int totalPages)
         {
-            List<string> nextNumbers = new List<string>(totalPages);
-            for (int i=1; i <= totalPages; i++)
+            try
             {
-                nextNumbers.Add(GetNextNumberString(i));
+                List<string> nextNumbers = new List<string>(totalPages);
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    nextNumbers.Add(GetNextNumberString(i));
+                }
+
+                return nextNumbers.AsReadOnly();
             }
-            
-            return nextNumbers.AsReadOnly();
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27931", ex);
+            }
         }
 
         /// <summary>
@@ -329,10 +357,17 @@ namespace Extract.Imaging
         /// invalid.</returns>
         public string PeekNextNumberString(int pageNumber)
         {
-            // Return the empty string if the next Bates number is invalid
-            long nextNumber = PeekNextNumber();
-            return nextNumber >= 0 ?
-                BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber) : "";
+            try
+            {
+                // Return the empty string if the next Bates number is invalid
+                long nextNumber = PeekNextNumber();
+                return nextNumber >= 0 ?
+                    BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber) : "";
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27932", ex);
+            }
         }
 
         /// <summary>
@@ -342,9 +377,16 @@ namespace Extract.Imaging
         /// <returns>The next Bates number or -1 if the Bates number was invalid.</returns>
         public static long PeekNextNumberFromFile(BatesNumberFormat format)
         {
-            using (BatesNumberGenerator generator = new BatesNumberGenerator(format))
+            try
             {
-                return generator.GetNextNumberFromFile(true);
+                using (BatesNumberGenerator generator = new BatesNumberGenerator(format))
+                {
+                    return generator.GetNextNumberFromFile(true);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27933", ex);
             }
         }
 

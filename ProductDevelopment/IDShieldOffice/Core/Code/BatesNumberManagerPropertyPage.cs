@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Imaging;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
@@ -98,8 +99,11 @@ namespace IDShieldOffice
             _requireBatesCheckBox.Checked = _batesNumberManager.RequireBates;           
             
             // Set the sample Bates number
-            _sampleBatesNumberTextBox.Text = 
-                BatesNumberGenerator.PeekNextNumberString(1, _batesNumberManager.Format);
+            if (_batesNumberManager.Generator != null)
+            {
+                _sampleBatesNumberTextBox.Text =
+                    _batesNumberManager.Generator.PeekNextNumberString(1);
+            }
 
             // Reset the dirty flag
             _dirty = false;
@@ -177,19 +181,26 @@ namespace IDShieldOffice
         /// </summary>
         public void Apply()
         {
-            // Ensure the settings are valid
-            if (!this.IsValid)
+            try
             {
-                MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
-                    MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
-                return;
+                // Ensure the settings are valid
+                if (!this.IsValid)
+                {
+                    MessageBox.Show("Cannot apply changes. Settings are invalid.", "Invalid settings",
+                        MessageBoxButtons.OK, MessageBoxIcon.None, MessageBoxDefaultButton.Button1, 0);
+                    return;
+                }
+
+                // Store the settings
+                _batesNumberManager.RequireBates = _requireBatesCheckBox.Checked;
+
+                // Reset the dirty flag
+                _dirty = false;
             }
-
-            // Store the settings
-            _batesNumberManager.RequireBates = _requireBatesCheckBox.Checked;
-
-            // Reset the dirty flag
-            _dirty = false;
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27926", ex);
+            }
         }
 
         /// <summary>
@@ -234,7 +245,8 @@ namespace IDShieldOffice
             if (_formatDialog == null)
             {
                 _formatDialog = new PropertyPageForm("Change Bates number format",
-                    new BatesNumberManagerFormatPropertyPage(_batesNumberManager));
+                    new BatesNumberFormatPropertyPage(_batesNumberManager.Format,
+                    _batesNumberManager.Generator));
                 ComponentResourceManager resources =
                     new ComponentResourceManager(typeof(IDShieldOfficeForm));
                 _formatDialog.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -254,7 +266,7 @@ namespace IDShieldOffice
             {
                 _appearanceDialog = new PropertyPageForm(
                     "Change Bates number default position and appearance",
-                    new BatesNumberManagerAppearancePropertyPage(_batesNumberManager));
+                    new BatesNumberAppearancePropertyPage(_batesNumberManager.Format));
                 ComponentResourceManager resources =
                     new ComponentResourceManager(typeof(IDShieldOfficeForm));
                 _appearanceDialog.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));

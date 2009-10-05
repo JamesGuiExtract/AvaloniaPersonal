@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Imaging;
 using Extract.Imaging.Forms;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
@@ -100,6 +101,11 @@ namespace IDShieldOffice
         /// </summary>
         ImageViewer _imageViewer;
 
+        /// <summary>
+        /// The bates number generator to use.
+        /// </summary>
+        BatesNumberGenerator _generator;
+
         #endregion BatesNumberManager Fields
 
         #region BatesNumberManager Constructors
@@ -156,7 +162,33 @@ namespace IDShieldOffice
             }
             set
             {
-                _format = value;
+                if (_format != value)
+                {
+                    if (_format != null)
+                    {
+                        _format.Dispose();
+                    }
+
+                    _format = value;
+
+                    if (_generator != null)
+                    {
+                        _generator.Dispose();
+                    }
+                    _generator = new BatesNumberGenerator(value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="BatesNumberGenerator"/> for this object.
+        /// </summary>
+        /// <returns>The <see cref="BatesNumberGenerator"/>.</returns>
+        public BatesNumberGenerator Generator
+        {
+            get
+            {
+                return _generator;
             }
         }
 
@@ -306,11 +338,13 @@ namespace IDShieldOffice
             {
                 // Store the original page number
                 int originalPageNumber = _imageViewer.PageNumber;
-                BatesNumberGenerator generator = null;
                 try
                 {
                     // Create the Bates number generator
-                    generator = new BatesNumberGenerator(_format);
+                    if (_generator == null)
+                    {
+                        _generator = new BatesNumberGenerator(_format);
+                    }
 
                     // Create a Bates number for each page
                     bool prompted = false;
@@ -323,7 +357,7 @@ namespace IDShieldOffice
 
                         // Add and increment Bates number
                         TextLayerObject batesNumber = new TextLayerObject(_imageViewer, i, 
-                            "Bates number", generator.GetNextNumberString(i), (Font)_font.Clone(), 
+                            "Bates number", _generator.GetNextNumberString(i), (Font)_font.Clone(), 
                             GetAnchorPoint(), _anchorAlignment);
                         batesNumber.Tags.Add(_BATES_NUMBER_TAG);
                         batesNumbers.Add(batesNumber);
@@ -368,16 +402,10 @@ namespace IDShieldOffice
                     }
 
                     // Commit the changes to the next Bates number
-                    generator.Commit();
+                    _generator.Commit();
                 }
                 finally
                 {
-                    // Dispose of the Bates number generator
-                    if (generator != null)
-                    {
-                        generator.Dispose();
-                    }
-
                     // Restore the original page number
                     _imageViewer.SetPageNumber(originalPageNumber, false, false);
                 }
@@ -584,62 +612,6 @@ namespace IDShieldOffice
             _requireBates = RegistryManager._REQUIRE_BATES_DEFAULT;
         }
 
-        /// <summary>
-        /// Checks whether or not the specified Bates number settings will produce a Bates number
-        /// that is completely on the image.
-        /// </summary>
-        /// <param name="imageViewer">The <see cref="ImageViewer"/> where the Bates number
-        /// will be applied.</param>
-        /// <param name="horizontalInches">The number of horizontal inches from the side
-        /// of the page where the Bates number is placed.</param>
-        /// <param name="verticalInches">The number of vertical inches from the side of
-        /// the page where the Bates number is placed.</param>
-        /// <param name="anchorAlignment">The alignment of the anchor point for this Bates
-        /// number.</param>
-        /// <param name="pageAnchorAlignment">The alignment of the anchor point for
-        /// the page.</param>
-        /// <param name="font">The font to use to display the Bates number.</param>
-        /// <param name="format">The format settings for the Bates number.</param>
-        /// <returns><see langword="true"/> if the specified settings will produce
-        /// a Bates number that is completely contained on the current image.
-        /// <see langword="false"/> if the specified settings will produce a Bates
-        /// number that is not completely contained on the current image.</returns>
-        public static bool CheckValidBatesNumberLocation(ImageViewer imageViewer,
-            float horizontalInches, float verticalInches, AnchorAlignment anchorAlignment,
-            AnchorAlignment pageAnchorAlignment, Font font, BatesNumberFormat format)
-        {
-            // [IDSD #71] Warn if there is an open image and the Bates number would be off the page
-            if (imageViewer != null && imageViewer.IsImageAvailable)
-            {
-                // Create a bates number (do not apply it to the image viewer)
-                TextLayerObject batesNumber = new TextLayerObject(imageViewer,
-                    imageViewer.PageNumber, "Bates number",
-                    BatesNumberGenerator.PeekNextNumberString(imageViewer.PageNumber,
-                    format), (Font)font.Clone(),
-                    BatesNumberManager.GetAnchorPoint(pageAnchorAlignment, horizontalInches,
-                    verticalInches, imageViewer), anchorAlignment);
-
-                // Check if it would appear off of the page
-                if (!imageViewer.Contains(batesNumber))
-                {
-                    // Warn the user
-                    if (MessageBox.Show("The current settings would apply Bates numbers "
-                        + "that are only partially contained on the current image."
-                        + Environment.NewLine + Environment.NewLine
-                        + "Do you wish to use the current settings?",
-                        "Bates Numbers Off Page", MessageBoxButtons.YesNo, MessageBoxIcon.Warning,
-                        MessageBoxDefaultButton.Button2, 0) == DialogResult.No)
-                    {
-                        // User canceled, return false
-                        return false;
-                    }
-                }
-            }
-
-            // Return true
-            return true;
-        }
-
         #endregion BatesNumberManager Methods
 
         #region IUserConfigurableComponent Members
@@ -689,10 +661,22 @@ namespace IDShieldOffice
                 if (_font != null)
                 {
                     _font.Dispose();
+                    _font = null;
                 }
                 if (_propertyPage != null)
                 {
                     _propertyPage.Dispose();
+                    _propertyPage = null;
+                }
+                if (_generator != null)
+                {
+                    _generator.Dispose();
+                    _generator = null;
+                }
+                if (_format != null)
+                {
+                    _format.Dispose();
+                    _format = null;
                 }
             }
 
