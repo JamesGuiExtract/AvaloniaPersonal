@@ -51,6 +51,7 @@
     <Compile Include="FormMethods.cs" />
     <Compile Include="GeneralMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SerializationTester.cs" />
     <Compile Include="TestFileManager.cs" />
   </ItemGroup>
   <ItemGroup>

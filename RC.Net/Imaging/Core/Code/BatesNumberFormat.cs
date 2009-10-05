@@ -1,25 +1,34 @@
+using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Globalization;
+using System.Runtime.Serialization;
+using System.Security.Permissions;
+using System.Text;
 
 namespace Extract.Imaging
 {
     /// <summary>
     /// Represents the format settings for Bates numbers.
     /// </summary>
-    public class BatesNumberFormat : IDisposable, ICloneable
+    [Serializable]
+    public sealed class BatesNumberFormat : IDisposable, ICloneable, ISerializable
     {
         #region Constants
 
         /// <summary>
+        /// The current version number for this object
+        /// </summary>
+        const int _CURRENT_VERSION = 1;
+
+        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
-        private static readonly string _OBJECT_NAME =
+        static readonly string _OBJECT_NAME =
             typeof(BatesNumberFormat).ToString();
 
         #endregion Constants
@@ -40,6 +49,16 @@ namespace Extract.Imaging
         /// The file name containing the next Bates number.
         /// </summary>
         string _nextNumberFile = RegistryManager._NEXT_NUMBER_FILE_DEFAULT;
+
+        /// <summary>
+        /// Whether or not to use the database counter to get the next Bates number.
+        /// </summary>
+        bool _useDatabaseCounter;
+
+        /// <summary>
+        /// The name of the database counter to use for getting the Bates number.
+        /// </summary>
+        string _databaseCounterName;
 
         /// <summary>
         /// Whether to zero pad the Bates number.
@@ -110,18 +129,83 @@ namespace Extract.Imaging
         /// </summary>
         AnchorAlignment _anchorAlignment = RegistryManager._BATES_ANCHOR_ALIGNMENT_DEFAULT;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
+            _OBJECT_NAME);
+
         #endregion BatesNumberFormat Fields
 
         #region BatesNumberFormat Constructors
 
+        /// <overloads>Initializes a new instance of <see cref="BatesNumberFormat"/> class.</overloads>
         /// <summary>
         /// Initializes a new instance of the <see cref="BatesNumberFormat"/> class.
         /// </summary>
         public BatesNumberFormat()
+            : this(false)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BatesNumberFormat"/> class.
+        /// </summary>
+        /// <param name="useDatabaseCounter">If <see langword="true"/> then this
+        /// formatter will default to using a database counter.</param>
+        public BatesNumberFormat(bool useDatabaseCounter)
         {       
             // Validate the license
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23181",
-                _OBJECT_NAME);
+            _licenseCache.Validate("ELI27862");
+
+            _useDatabaseCounter = useDatabaseCounter;
+        }
+
+        /// <summary>
+        /// Intializes a new instance of <see cref="BatesNumberFormat"/> class.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> object to use
+        /// to de-serialize this object.</param>
+        /// <param name="context">The streaming context for the de-serialization.</param>
+        private BatesNumberFormat(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                _licenseCache.Validate("ELI27863");
+
+                int version = info.GetInt32("Version");
+                if (version > _CURRENT_VERSION)
+                {
+                    ExtractException ee = new ExtractException("ELI27864",
+                        "Cannot load newer version of " + _OBJECT_NAME);
+                    ee.AddDebugData("Current Version", _CURRENT_VERSION, false);
+                    ee.AddDebugData("Version To Load", version, false);
+                    throw ee;
+                }
+
+                _nextNumber = info.GetInt64("NextNumber");
+                _useNextNumberFile = info.GetBoolean("UseNextNumberFile");
+                _nextNumberFile = info.GetString("NextNumberFile");
+                _zeroPad = info.GetBoolean("ZeroPad");
+                _numDigits = info.GetInt32("NumDigits");
+                _appendPageNumber = info.GetBoolean("AppendPageNumber");
+                _zeroPadPage = info.GetBoolean("ZeroPadPage");
+                _numPageDigits = info.GetInt32("NumPageDigits");
+                _pageNumberSeparator = info.GetString("PageNumberSeparator");
+                _prefix = info.GetString("Prefix");
+                _suffix = info.GetString("Suffix");
+                _pageAnchorAlignment =
+                    (AnchorAlignment)info.GetValue("PageAnchorAlignment", typeof(AnchorAlignment));
+                _font = (Font)info.GetValue("Font", typeof(Font));
+                _horizontalInches = info.GetSingle("HorizontalInches");
+                _verticalInches = info.GetSingle("VerticalInches");
+                _useDatabaseCounter = info.GetBoolean("UseDatabaseCounter");
+                _databaseCounterName = info.GetString("DatabaseCounterName");
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27865", ex);
+            }
         }
 
         #endregion BatesNumberFormat Constructors
@@ -189,6 +273,42 @@ namespace Extract.Imaging
             get
             {
                 return _nextNumber.ToString(CultureInfo.CurrentCulture);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether a datbase counter is being used.
+        /// </summary>
+        /// <value><see langword="true"/> if a database counter is being used; 
+        /// <see langword="false"/> if it is not being used.</value>
+        /// <returns><see langword="true"/> if a database counter is being used; 
+        /// <see langword="false"/> if it is not being used.</returns>
+        public bool UseDatabaseCounter
+        {
+            get
+            {
+                return _useDatabaseCounter;
+            }
+            set
+            {
+                _useDatabaseCounter = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the database counter containing the next Bates number.
+        /// </summary>
+        /// <value>The database counter containing the next Bates number.</value>
+        /// <returns>The database counter containing the next Bates number.</returns>
+        public string DatabaseCounter
+        {
+            get
+            {
+                return _databaseCounterName;
+            }
+            set
+            {
+                _databaseCounterName = value;
             }
         }
 
@@ -362,7 +482,7 @@ namespace Extract.Imaging
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI27835", ex);
+                    throw ExtractException.AsExtractException("ELI27866", ex);
                 }
             }
         }
@@ -482,13 +602,15 @@ namespace Extract.Imaging
                 _pageAnchorAlignment = RegistryManager.BatesPageAnchorAlignment;
                 _horizontalInches = RegistryManager.BatesHorizontalInches;
                 _verticalInches = RegistryManager.BatesVerticalInches;
+                _useDatabaseCounter = RegistryManager.UseDatabaseCounter;
+                _databaseCounterName = RegistryManager.DatabaseCounterName;
 
                 // Use the property to ensure dispose is handled correctly
                 Font = RegistryManager.BatesFont;
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27836", ex);
+                throw ExtractException.AsExtractException("ELI27867", ex);
             }
         }
 
@@ -516,10 +638,12 @@ namespace Extract.Imaging
                 RegistryManager.BatesFont = _font;
                 RegistryManager.BatesHorizontalInches = _horizontalInches;
                 RegistryManager.BatesVerticalInches = _verticalInches;
+                RegistryManager.UseDatabaseCounter = _useDatabaseCounter;
+                RegistryManager.DatabaseCounterName = _databaseCounterName;
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27838", ex);
+                throw ExtractException.AsExtractException("ELI27868", ex);
             }
         }
 
@@ -545,6 +669,8 @@ namespace Extract.Imaging
                 _pageAnchorAlignment = RegistryManager._BATES_PAGE_ANCHOR_ALIGNMENT_DEFAULT;
                 _horizontalInches = RegistryManager._BATES_HORIZONTAL_INCHES_DEFAULT;
                 _verticalInches = RegistryManager._BATES_VERTICAL_INCHES_DEFAULT;
+                _useDatabaseCounter = false;
+                _databaseCounterName = "";
 
                 // Use the property to ensure dispose is handled correctly
                 Font = new Font(RegistryManager._BATES_FONT_FAMILY_DEFAULT,
@@ -552,7 +678,7 @@ namespace Extract.Imaging
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI27837", ex);
+                throw ExtractException.AsExtractException("ELI27869", ex);
             }
         }
 
@@ -575,7 +701,7 @@ namespace Extract.Imaging
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -598,7 +724,7 @@ namespace Extract.Imaging
         /// Creates a clone of the current <see cref="BatesNumberFormat"/> object.
         /// </summary>
         /// <returns>A clone of the current <see cref="BatesNumberFormat"/> object.</returns>
-        Object ICloneable.Clone()
+        object ICloneable.Clone()
         {
             return GetClone();
         }
@@ -616,7 +742,7 @@ namespace Extract.Imaging
         /// Creates a clone of the current <see cref="BatesNumberFormat"/> object.
         /// </summary>
         /// <returns>A clone of the current <see cref="BatesNumberFormat"/> object.</returns>
-        BatesNumberFormat GetClone()
+        private BatesNumberFormat GetClone()
         {
             // Performs a memberwise clone of the object
             BatesNumberFormat format = (BatesNumberFormat) this.MemberwiseClone();
@@ -629,5 +755,46 @@ namespace Extract.Imaging
         }
 
         #endregion ICloneable
+
+        #region ISerializable Members
+
+        /// <summary>
+        /// Serializes the object to the specified <see cref="SerializationInfo"/> stream.
+        /// </summary>
+        /// <param name="info">The <see cref="SerializationInfo"/> stream to serialize the
+        /// object to.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> for the
+        /// serialization stream.</param>
+        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                info.AddValue("Version", _CURRENT_VERSION);
+                info.AddValue("NextNumber", _nextNumber);
+                info.AddValue("UseNextNumberFile", _useNextNumberFile);
+                info.AddValue("NextNumberFile", _nextNumberFile);
+                info.AddValue("ZeroPad", _zeroPad);
+                info.AddValue("NumDigits", _numDigits);
+                info.AddValue("AppendPageNumber", _appendPageNumber);
+                info.AddValue("ZeroPadPage", _zeroPadPage);
+                info.AddValue("NumPageDigits", _numPageDigits);
+                info.AddValue("PageNumberSeparator", _pageNumberSeparator);
+                info.AddValue("Prefix", _prefix);
+                info.AddValue("Suffix", _suffix);
+                info.AddValue("PageAnchorAlignment", _pageAnchorAlignment, typeof(AnchorAlignment));
+                info.AddValue("Font", _font, typeof(Font));
+                info.AddValue("HorizontalInches", _horizontalInches);
+                info.AddValue("VerticalInches", _verticalInches);
+                info.AddValue("UseDatabaseCounter", _useDatabaseCounter);
+                info.AddValue("DatabaseCounterName", _databaseCounterName);
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27870", ex);
+            }
+        }
+
+        #endregion
     }
 }

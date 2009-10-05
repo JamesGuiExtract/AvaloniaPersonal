@@ -132,7 +132,7 @@ static const string gstrCREATE_LOCKED_FILE_TABLE =
 static const string gstrCREATE_USER_CREATED_COUNTER_TABLE =
 	"CREATE TABLE [UserCreatedCounter] ("
 	"[CounterName] [nvarchar](50) NOT NULL CONSTRAINT [PK_UserCreatedConter] PRIMARY KEY CLUSTERED,"
-	"[Value] [int] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
+	"[Value] [bigint] NOT NULL CONSTRAINT [DF_UserCreatedCounter_Value] DEFAULT((0)))";
 
 // Create table indexes SQL
 static const string gstrCREATE_FAM_FILE_ID_PRIORITY_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX [IX_Files_PriorityID] "

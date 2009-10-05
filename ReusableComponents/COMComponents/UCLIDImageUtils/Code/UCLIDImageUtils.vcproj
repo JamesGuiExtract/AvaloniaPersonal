@@ -261,6 +261,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\PDFInputOutputManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="StdAfx.cpp"
 				>
 				<FileConfiguration
@@ -376,6 +380,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\PDFInputOutputManager.h"
+				>
+			</File>
+			<File
 				RelativePath="Resource.h"
 				>
 			</File>
@@ -398,6 +406,10 @@
 			</File>
 			<File
 				RelativePath="ImageUtils.rgs"
+				>
+			</File>
+			<File
+				RelativePath=".\PDFInputOutputManager.rgs"
 				>
 			</File>
 		</Filter>

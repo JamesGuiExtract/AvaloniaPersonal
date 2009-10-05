@@ -17,7 +17,7 @@ namespace Extract.Imaging
     /// <summary>
     /// Represents the property page for the format of Bates numbers.
     /// </summary>
-    public partial class BatesNumberManagerFormatPropertyPage : UserControl, IPropertyPage
+    public partial class BatesNumberFormatPropertyPage : UserControl, IPropertyPage
     {
         #region BatesNumberManagerFormatPropertyPage Constants
 
@@ -29,7 +29,7 @@ namespace Extract.Imaging
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         private static readonly string _OBJECT_NAME =
-            typeof(BatesNumberManagerFormatPropertyPage).ToString();
+            typeof(BatesNumberFormatPropertyPage).ToString();
 
         #endregion BatesNumberManagerFormatPropertyPage Constants
 
@@ -50,6 +50,22 @@ namespace Extract.Imaging
         /// </summary>
         BatesNumberFormat _format;
 
+        /// <summary>
+        /// The <see cref="IBatesNumberGenerator"/> object to use.
+        /// </summary>
+        IBatesNumberGenerator _generator;
+
+        /// <summary>
+        /// The list of values for the counter combo box
+        /// </summary>
+        List<string> _counters = new List<string>();
+
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
+            _OBJECT_NAME);
+
         #endregion BatesNumberManagerFormatPropertyPage Fields
 
         #region BatesNumberManagerFormatPropertyPage Events
@@ -64,12 +80,31 @@ namespace Extract.Imaging
         #region BatesNumberManagerFormatPropertyPage Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="BatesNumberManagerFormatPropertyPage"/> class.
+        /// Initializes a new <see cref="BatesNumberFormatPropertyPage"/> class.
         /// </summary>
         /// <param name="format">The <see cref="BatesNumberFormat"/> to save the settings to.</param>
+        /// <param name="generator">The <see cref="IBatesNumberGenerator"/> object to use
+        /// when updating the sample bates number.</param>
+        public BatesNumberFormatPropertyPage(BatesNumberFormat format,
+            IBatesNumberGenerator generator) : this(format, generator, null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new <see cref="BatesNumberFormatPropertyPage"/> class.
+        /// </summary>
+        /// <param name="format">The <see cref="BatesNumberFormat"/> to save the settings to.</param>
+        /// <param name="generator">The <see cref="IBatesNumberGenerator"/> to use when
+        /// updating the sample boxes on the property page.</param>
+        /// <param name="counters">Specifies the values to show in the counters combo box.
+        /// <para><b>Note:</b></para>
+        /// If <paramref name="counters"/> is <see langword="null"/> then the counters combo
+        /// box will be hidden. If <paramref name="counters"/> is not <see lanword="null"/>
+        /// then the radion buttons for specifying a file or next number value will be hidden.</param>
         // Don't fight with auto-generated code.
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        internal BatesNumberManagerFormatPropertyPage(BatesNumberFormat format)
+        public BatesNumberFormatPropertyPage(BatesNumberFormat format,
+            IBatesNumberGenerator generator, IEnumerable<string> counters)
         {
             try
             {
@@ -81,10 +116,20 @@ namespace Extract.Imaging
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23186",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23186");
+
+                ExtractException.Assert("ELI27842", "Bates number generator must not be NULL.",
+                    generator != null);
 
                 InitializeComponent();
+
+                // If counters has been specified, load the list
+                if (counters != null)
+                {
+                    _counters.AddRange(counters);
+                }
+
+                _generator = generator;
 
                 _format = format;
             }
@@ -104,23 +149,49 @@ namespace Extract.Imaging
         /// </summary>
         private void RefreshSettings()
         {
-            // Next number UI elements
-            if (_format.UseNextNumberFile)
-	        {
-                _nextNumberFileRadioButton.Checked = true;
-	        }
-            else
-            {
-                _nextNumberSpecifiedRadioButton.Checked = true;
-            }
-            _nextNumberSpecifiedTextBox.Text = 
-                _format.NextNumber.ToString(CultureInfo.CurrentCulture);
-            _nextNumberFileTextBox.Text = _format.NextNumberFile;
             _zeroPadCheckBox.Checked = _format.ZeroPad;
             _digitsUpDown.Value = _format.Digits;
 
-            // Update the sample next number
-            UpdateSampleNextNumber(_format);
+            // Update the values based on the counter list
+            if (_counters.Count > 0)
+            {
+                // Select the appropriate item (if it exists) in the combo box
+                if (!string.IsNullOrEmpty(_format.DatabaseCounter))
+                {
+                    int index = _counterToUseCombo.FindString(_format.DatabaseCounter);
+                    if (index == -1)
+                    {
+                        // Prompt the user about non-existent counter
+                        MessageBox.Show("Counter: " + _format.DatabaseCounter + " was not found.",
+                            "Counter Not Found", MessageBoxButtons.OK, MessageBoxIcon.Information,
+                            MessageBoxDefaultButton.Button1, 0);
+                    }
+                    else
+                    {
+                        _counterToUseCombo.SelectedIndex = index;
+                    }
+                }
+                else
+                {
+                    // Just select the first counter
+                    _counterToUseCombo.SelectedIndex = 0;
+                }
+            }
+            else
+            {
+                // Next number UI elements
+                if (_format.UseNextNumberFile)
+                {
+                    _nextNumberFileRadioButton.Checked = true;
+                }
+                else
+                {
+                    _nextNumberSpecifiedRadioButton.Checked = true;
+                }
+                _nextNumberSpecifiedTextBox.Text =
+                    _format.NextNumber.ToString(CultureInfo.CurrentCulture);
+                _nextNumberFileTextBox.Text = _format.NextNumberFile;
+            }
 
             // Bates number format UI elements
             if (_format.AppendPageNumber)
@@ -181,8 +252,22 @@ namespace Extract.Imaging
         {
             using (BatesNumberFormat format = GetSettingsAsFormat())
             {
-                _sampleBatesNumberTextBox.Text =
-                    BatesNumberGenerator.PeekNextNumberString(1, format);
+                // Store the current format object
+                BatesNumberFormat originalFormat = _generator.Format;
+                try
+                {
+                    // Set the generator to use the new format
+                    _generator.Format = format;
+
+                    // Update the number
+                    _sampleBatesNumberTextBox.Text =
+                        _generator.PeekNextNumberString(1);
+                }
+                finally
+                {
+                    // Reset generator to old format
+                    _generator.Format = originalFormat;
+                }
             }
         }
 
@@ -228,6 +313,10 @@ namespace Extract.Imaging
         {
             BatesNumberFormat format = new BatesNumberFormat();
 
+            // Set whether the format should be using a database counter
+            format.UseDatabaseCounter = _counterToUseCombo.Visible;
+            format.DatabaseCounter = _counterToUseCombo.Visible ? _counterToUseCombo.Text : "";
+
             // Store the next number settings
             format.UseNextNumberFile = _nextNumberFileRadioButton.Checked;
             format.NextNumber = GetNextSpecifiedNumber();
@@ -248,6 +337,36 @@ namespace Extract.Imaging
             return format;
         }
 
+        /// <summary>
+        /// Moves the zero pad check box and control and shrinks the next number
+        /// group box as well as the entire property page when using the
+        /// database counter as opposed to a file or specified counter value.
+        /// </summary>
+        private void MoveZeroPadAndResizeForDatabase()
+        {
+            // Move the controls up (store the distance moved)
+            int distance = _zeroPadCheckBox.Top - (_counterToUseCombo.Bottom
+                + _counterToUseLabel.Margin.Bottom + _zeroPadCheckBox.Margin.Top);
+            _zeroPadCheckBox.Location = new Point(_zeroPadCheckBox.Left, _zeroPadCheckBox.Top - distance);
+            _digitsUpDown.Location = new Point(_digitsUpDown.Left, _digitsUpDown.Top - distance);
+            _digitsLabel.Location = new Point(_digitsLabel.Left, _digitsLabel.Top - distance);
+
+            // Resize the group box accordingly
+            _nextNumberGroupBox.Size = new Size(_nextNumberGroupBox.Size.Width,
+                _nextNumberGroupBox.Size.Height - distance);
+
+            // Move each group box
+            _formatGroupBox.Location = new Point(_formatGroupBox.Left,
+                _formatGroupBox.Top - distance);
+            _prefixesGroupBox.Location = new Point(_prefixesGroupBox.Left,
+                _prefixesGroupBox.Top - distance);
+            _sampleGroupBox.Location = new Point(_sampleGroupBox.Left,
+                _sampleGroupBox.Top - distance);
+
+            // Resize the property page accordingly
+            Size = new Size(Size.Width, Size.Height - distance);
+        }
+
         #endregion BatesNumberManagerFormatPropertyPage Methods
 
         #region BatesNumberManagerFormatPropertyPage Overrides
@@ -260,6 +379,29 @@ namespace Extract.Imaging
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
+
+            // Show/hide controls based on the counters list
+            if (_counters.Count > 0)
+            {
+                // Fill the combo box with the counters list
+                _counterToUseCombo.Items.AddRange(_counters.ToArray());
+
+                // Hide the other controls and resize the group box
+                _nextNumberFileRadioButton.Visible = false;
+                _nextNumberFileTextBox.Visible = false;
+                _nextNumberFileButton.Visible = false;
+                _nextNumberSpecifiedRadioButton.Visible = false;
+                _nextNumberSpecifiedTextBox.Visible = false;
+                _nextNumberLabel.Visible = false;
+                _sampleNextNumberTextBox.Visible = false;
+
+                MoveZeroPadAndResizeForDatabase();
+            }
+            else
+            {
+                _counterToUseLabel.Visible = false;
+                _counterToUseCombo.Visible = false;
+            }
 
             // Refresh the UI elements
             RefreshSettings();
@@ -573,6 +715,17 @@ namespace Extract.Imaging
             OnPropertyPageModified(new EventArgs());
         }
 
+        /// <summary>
+        /// Handles <see cref="ComboBox.SelectedIndexChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object which sent the event.</param>
+        /// <param name="e">The data associated with the event.</param>
+        private void HandleUserCounterComboChanged(object sender, EventArgs e)
+        {
+            // Get the new name
+            OnPropertyPageModified(new EventArgs());
+        }
+
         #endregion BatesNumberManagerFormatPropertyPage Event Handlers
 
         #region IPropertyPage Members
@@ -626,7 +779,7 @@ namespace Extract.Imaging
             get
             {
                 // Check whether a next number file is used
-                if (_nextNumberFileRadioButton.Checked)
+                if (_nextNumberFileRadioButton.Visible && _nextNumberFileRadioButton.Checked)
                 {
                     // Ensure the file is valid and contains a valid next number [IDSD #201 - JDS]
                     if (File.Exists(_nextNumberFileTextBox.Text))
@@ -644,9 +797,16 @@ namespace Extract.Imaging
 
                     return false;
                 }
-
-                // Ensure the next specified number is a non-negative integer
-                return GetNextSpecifiedNumber() >= 0;
+                else if (_nextNumberSpecifiedRadioButton.Visible && _nextNumberSpecifiedRadioButton.Checked)
+                {
+                    // Ensure the next specified number is a non-negative integer
+                    return GetNextSpecifiedNumber() >= 0;
+                }
+                else
+                {
+                    // Ensure a counter is selected
+                    return _counterToUseCombo.SelectedIndex >= 0;
+                }
             }
         }
 

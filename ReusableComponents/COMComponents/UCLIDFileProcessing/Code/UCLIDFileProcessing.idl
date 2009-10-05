@@ -910,7 +910,7 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To add a new user counter to the UserCreatedCounter table.  Sets the initial
 		//			value for the counter to nInitialValue.
 		[id(70), helpstring("method AddUserCounter")] HRESULT AddUserCounter([in] BSTR bstrCounterName,
-			[in] long nInitialValue);
+			[in] LONGLONG llInitialValue);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To remove the specified counter from the UserCreatedCounter table.  If
 		//			bstrCounterName is not found in the database an exception will be thrown.
@@ -925,12 +925,12 @@ library UCLID_FILEPROCESSINGLib
 		// PURPOSE: To set the value for the specified counter.  If bstrCounterName is not found
 		//			in the database an an exception will be thrown.
 		[id(73), helpstring("method SetUserCounterValue")] HRESULT SetUserCounterValue(
-			[in] BSTR bstrCounterName, [in] long nNewValue);
+			[in] BSTR bstrCounterName, [in] LONGLONG llNewValue);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To get the value for the specified counter. If bstrCounterName is not found
 		//			in the database an exception will be thrown.
 		[id(74), helpstring("method GetUserCounterValue")] HRESULT GetUserCounterValue(
-			[in] BSTR bstrCounterName, [out, retval] long* pnValue);
+			[in] BSTR bstrCounterName, [out, retval] LONGLONG* pllValue);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To return a collection of all user counters names.
 		[id(75), helpstring("method GetUserCounterNames")] HRESULT GetUserCounterNames(
@@ -940,13 +940,27 @@ library UCLID_FILEPROCESSINGLib
 		[id(76), helpstring("method GetUserCounterNamesAndValues")] HRESULT GetUserCounterNamesAndValues(
 			[out, retval] IStrToStrMap** ppmapUserCounters);
 		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To check if the specified counter exists in the database
+		[id(77), helpstring("method IsUserCounterValid")] HRESULT IsUserCounterValid(
+			[in] BSTR bstrCounterName, [out, retval] VARIANT_BOOL* pvbCounterValid);
+		// -----------------------------------------------------------------------------------------------
+		// PURPOSE: To add the specified offset value to the specified counter and return the
+		//			new counter value.  If bstrCounterName is not found in the database an
+		//			exception will be thrown.
+		[id(78), helpstring("method OffsetUserCounter")] HRESULT OffsetUserCounter(
+			[in] BSTR bstrCounterName, [in] LONGLONG llOffsetValue, [out, retval] LONGLONG*pllNewValue); 
+
+		// -----------------------------------------------------------------------------------------------
+		// Methods related to auto-resetting of files stuck in processing
+		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To add a new record to the ProcessingFAM table with the current processes UPI
 		//			and start a thread to update the LastPingTime at a regular interval.
-		[id(77), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM();
+		[id(79), helpstring("method RegisterProcessingFAM")] HRESULT RegisterProcessingFAM();
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To remove the record for in the ProcessingFAM table and stop the thread updating
 		//			the LastPingTime
-		[id(78), helpstring("method UnregisterProcessingFAM")] HRESULT UnregisterProcessingFAM();
+		[id(80), helpstring("method UnregisterProcessingFAM")] HRESULT UnregisterProcessingFAM();
+		// -----------------------------------------------------------------------------------------------
 	};
 
 	[

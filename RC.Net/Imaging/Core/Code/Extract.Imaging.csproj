@@ -62,18 +62,20 @@
   <ItemGroup>
     <Compile Include="BatesNumberFormat.cs" />
     <Compile Include="BatesNumberGenerator.cs" />
-    <Compile Include="BatesNumberManagerAppearancePropertyPage.cs">
+    <Compile Include="BatesNumberAppearancePropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BatesNumberManagerAppearancePropertyPage.designer.cs">
-      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+    <Compile Include="BatesNumberAppearancePropertyPage.designer.cs">
+      <DependentUpon>BatesNumberAppearancePropertyPage.cs</DependentUpon>
     </Compile>
-    <Compile Include="BatesNumberManagerFormatPropertyPage.cs">
+    <Compile Include="BatesNumberFormatPropertyPage.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="BatesNumberManagerFormatPropertyPage.designer.cs">
-      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+    <Compile Include="BatesNumberFormatPropertyPage.designer.cs">
+      <DependentUpon>BatesNumberFormatPropertyPage.cs</DependentUpon>
     </Compile>
+    <Compile Include="BatesNumberHelper.cs" />
+    <Compile Include="IBatesNumberGenerator.cs" />
     <Compile Include="ImageMethods.cs" />
     <Compile Include="AsynchronousOcrManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -89,6 +91,10 @@
     <ProjectReference Include="..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
       <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
       <Name>Extract.Drawing</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
@@ -138,12 +144,12 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BatesNumberManagerAppearancePropertyPage.resx">
-      <DependentUpon>BatesNumberManagerAppearancePropertyPage.cs</DependentUpon>
+    <EmbeddedResource Include="BatesNumberAppearancePropertyPage.resx">
+      <DependentUpon>BatesNumberAppearancePropertyPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="BatesNumberManagerFormatPropertyPage.resx">
-      <DependentUpon>BatesNumberManagerFormatPropertyPage.cs</DependentUpon>
+    <EmbeddedResource Include="BatesNumberFormatPropertyPage.resx">
+      <DependentUpon>BatesNumberFormatPropertyPage.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>

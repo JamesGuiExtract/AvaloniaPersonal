@@ -1,0 +1,26 @@
+HKCR
+{
+	UCLIDImageUtils.PDFInputOutputManager.1 = s 'PDFInputOutputManager Class'
+	{
+		CLSID = s '{718551D9-2C11-4FC4-9F61-6E7FFFBE5028}'
+	}
+	UCLIDImageUtils.PDFInputOutputManager = s 'PDFInputOutputManager Class'
+	{
+		CLSID = s '{718551D9-2C11-4FC4-9F61-6E7FFFBE5028}'
+		CurVer = s 'UCLIDImageUtils.PDFInputOutputManager.1'
+	}
+	NoRemove CLSID
+	{
+		ForceRemove {718551D9-2C11-4FC4-9F61-6E7FFFBE5028} = s 'PDFInputOutputManager Class'
+		{
+			ProgID = s 'UCLIDImageUtils.PDFInputOutputManager.1'
+			VersionIndependentProgID = s 'UCLIDImageUtils.PDFInputOutputManager'
+			ForceRemove 'Programmable'
+			InprocServer32 = s '%MODULE%'
+			{
+				val ThreadingModel = s 'Both'
+			}
+			'TypeLib' = s '{D46831E6-669C-423F-8209-D6A7A80C2ADD}'
+		}
+	}
+}

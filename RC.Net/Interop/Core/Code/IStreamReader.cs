@@ -1,6 +1,7 @@
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices.ComTypes;
 using System.Runtime.Serialization;
@@ -110,8 +111,40 @@ namespace Extract.Interop
         #region IStreamReader Methods
 
         /// <summary>
-        /// Reads a string from the <see cref="IStream"/> object.
+        /// Reads a {T} from the <see cref="IStream"/> object.
         /// </summary>
+        /// <typeparam name="T">The type of object to read from the stream.</typeparam>
+        /// <returns>The serialized object or <see langword="null"/> if the original
+        /// streamed object was <see langword="null"/>.</returns>
+        // In order to ensure type safety it is acceptable to require the user to declare the
+        // type for this method.  An alternative design would be to add an out parameter and
+        // have this method not return any objects, but this would generate another
+        // FxCop warning about avoiding out parameters. This syntax is cleaner and easier
+        // to use than a method with out parameters and so this message is being suppressed.
+        [SuppressMessage("Microsoft.Design", "CA1004:GenericMethodsShouldProvideTypeParameter")]
+        public T ReadObject<T>() where T : class, ISerializable
+        {
+            try
+            {
+                bool hasValue = (bool)_formatter.Deserialize(_stream);
+                if (!hasValue)
+                {
+                    return null;
+                }
+                return (T)_formatter.Deserialize(_stream);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee =  new ExtractException("ELI27871", "Unable to read object.", ex);
+                ee.AddDebugData("Object Type", typeof(T).ToString(), false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Reads a <see cref="String"/> from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>A <see cref="String"/>.</returns>
         public string ReadString()
         {
             try
@@ -135,6 +168,7 @@ namespace Extract.Interop
         /// <summary>
         /// Reads a <see cref="Boolean"/> from the <see cref="IStream"/> object.
         /// </summary>
+        /// <returns>A <see cref="Boolean"/>.</returns>
         public bool ReadBoolean()
         {
             try
@@ -151,6 +185,7 @@ namespace Extract.Interop
         /// <summary>
         /// Reads a <see cref="Int32"/> from the <see cref="IStream"/> object.
         /// </summary>
+        /// <returns>A <see cref="Int32"/>.</returns>
         public int ReadInt32()
         {
             try
@@ -161,6 +196,54 @@ namespace Extract.Interop
             {
                 throw new ExtractException("ELI26482",
                     "Unable to read integer.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reads a <see cref="Int64"/> from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>A <see cref="Int64"/>.</returns>
+        public long ReadInt64()
+        {
+            try
+            {
+                return (long)_formatter.Deserialize(_stream);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27872", "Unable to read long integer.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reads a <see cref="Single"/> from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>A <see cref="Single"/>.</returns>
+        public float ReadSingle()
+        {
+            try
+            {
+                return (float)_formatter.Deserialize(_stream);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27873", "Unable to read float.", ex);
+            }
+        }
+
+        /// <summary>
+        /// Reads a <see cref="Double"/> from the <see cref="IStream"/> object.
+        /// </summary>
+        /// <returns>A <see cref="Double"/>.</returns>
+        public double ReadDouble()
+        {
+            try
+            {
+                return (double)_formatter.Deserialize(_stream);
+            }
+            catch (Exception ex)
+            {
+                throw new ExtractException("ELI27874", "Unable to read double.", ex);
             }
         }
 

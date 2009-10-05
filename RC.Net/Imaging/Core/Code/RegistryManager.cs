@@ -117,6 +117,16 @@ namespace Extract.Imaging
         /// </summary>
         static readonly string _BATES_SUFFIX_KEY = "Bates suffix";
 
+        /// <summary>
+        /// The key for the use database counter for Bates number
+        /// </summary>
+        static readonly string _BATES_USE_DATABASE_COUNTER = "Use database counter";
+
+        /// <summary>
+        /// The key for the database counter to use for the Bates number
+        /// </summary>
+        static readonly string _BATES_DATABASE_COUNTER_NAME = "Database counter name";
+
         #endregion RegistryManager Keys
 
         #region RegistryManager Values
@@ -605,6 +615,44 @@ namespace Extract.Imaging
             set 
             { 
                 _userExtractImaging.SetValue(_BATES_SUFFIX_KEY, value, 
+                    RegistryValueKind.String);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the whether to use a datbase counter or not
+        /// </summary>
+        /// <value>Whether to use a databsae counter.</value>
+        /// <returns>Whether to use a datbase counter.</returns>
+        public static bool UseDatabaseCounter
+        {
+            get
+            {
+                int registryValue = (int)_userExtractImaging.GetValue(
+                    _BATES_USE_DATABASE_COUNTER, 1);
+                return registryValue == 1;
+            }
+            set
+            {
+                _userExtractImaging.SetValue(_BATES_USE_DATABASE_COUNTER, value,
+                    RegistryValueKind.DWord);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the database counter name for the Bates number
+        /// </summary>
+        /// <value>The database counter name for the Bates number.</value>
+        /// <returns>The database counter name for the Bates number.</returns>
+        public static string DatabaseCounterName
+        {
+            get 
+            { 
+                return (string) _userExtractImaging.GetValue(_BATES_DATABASE_COUNTER_NAME, "");
+            }
+            set 
+            { 
+                _userExtractImaging.SetValue(_BATES_DATABASE_COUNTER_NAME, value, 
                     RegistryValueKind.String);
             }
         }

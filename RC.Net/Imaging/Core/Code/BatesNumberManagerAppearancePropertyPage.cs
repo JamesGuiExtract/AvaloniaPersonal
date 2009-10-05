@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Drawing;
 using Extract.Licensing;
 using Extract.Utilities.Forms;
 using System;
@@ -16,7 +17,7 @@ namespace Extract.Imaging
     /// <summary>
     /// Represents the property page for the appearance of Bates numbers.
     /// </summary>
-    public partial class BatesNumberManagerAppearancePropertyPage : UserControl, IPropertyPage
+    public partial class BatesNumberAppearancePropertyPage : UserControl, IPropertyPage
     {
         #region BatesNumberManagerAppearancePropertyPage Constants
 
@@ -26,15 +27,10 @@ namespace Extract.Imaging
         readonly static string _ANCHOR_ALIGNMENT_BASE_TEXT = "Selected alignment: ";
 
         /// <summary>
-        /// The format string for font description label.
-        /// </summary>
-        readonly static string _FONT_TEXT_FORMAT = "{0} {1}pt; {2}";
-
-        /// <summary>
         /// The name of the object to be used in the validate license calls.
         /// </summary>
         private static readonly string _OBJECT_NAME =
-            typeof(BatesNumberManagerAppearancePropertyPage).ToString();
+            typeof(BatesNumberAppearancePropertyPage).ToString();
 
         #endregion BatesNumberManagerAppearancePropertyPage Constants
 
@@ -60,6 +56,12 @@ namespace Extract.Imaging
         /// </summary>
         BatesNumberFormat _format;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache = new LicenseStateCache(LicenseIdName.ExtractCoreObjects,
+            _OBJECT_NAME);
+
         #endregion BatesNumberManagerAppearancePropertyPage Fields
 
         #region BatesNumberManagerAppearancePropertyPage Events
@@ -74,11 +76,11 @@ namespace Extract.Imaging
         #region BatesNumberManagerAppearancePropertyPage Constructors
 
         /// <summary>
-        /// Initializes a new <see cref="BatesNumberManagerAppearancePropertyPage"/> class.
+        /// Initializes a new <see cref="BatesNumberAppearancePropertyPage"/> class.
         /// </summary>
         // Don't fight with auto-generated code.
         //[SuppressMessage("Microsoft.Performance", "CA1805:DoNotInitializeUnnecessarily")]
-        internal BatesNumberManagerAppearancePropertyPage(BatesNumberFormat format)
+        public BatesNumberAppearancePropertyPage(BatesNumberFormat format)
         {
             try
             {
@@ -90,8 +92,7 @@ namespace Extract.Imaging
                 }
 
                 // Validate the license
-                LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23184",
-                    _OBJECT_NAME);
+                _licenseCache.Validate("ELI23184");
 
                 InitializeComponent();
 
@@ -160,8 +161,7 @@ namespace Extract.Imaging
         /// </summary>
         private void UpdateFontText()
         {
-            _fontTextBox.Text = String.Format(CultureInfo.CurrentCulture, _FONT_TEXT_FORMAT,
-                _font.Name, _font.SizeInPoints, _font.Style.ToString());
+            _fontTextBox.Text = FontMethods.GetUserFriendlyFontString(_font);
         }
 
         #endregion BatesNumberManagerAppearancePropertyPage Methods

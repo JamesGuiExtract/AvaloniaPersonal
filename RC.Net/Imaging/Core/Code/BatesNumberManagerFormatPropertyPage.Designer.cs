@@ -1,15 +1,15 @@
 namespace Extract.Imaging
 {
-    partial class BatesNumberManagerFormatPropertyPage
+    partial class BatesNumberFormatPropertyPage
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <overloads>Releases resources used by the <see cref="BatesNumberManagerFormatPropertyPage"/>.</overloads>
+        /// <overloads>Releases resources used by the <see cref="BatesNumberFormatPropertyPage"/>.</overloads>
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="BatesNumberManagerFormatPropertyPage"/>.
+        /// Releases all unmanaged resources used by the <see cref="BatesNumberFormatPropertyPage"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>
@@ -42,16 +42,18 @@ namespace Extract.Imaging
         /// </summary>
         private void InitializeComponent()
         {
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this._prefixesGroupBox = new System.Windows.Forms.GroupBox();
             this._suffixTextBox = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this._prefixTextBox = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label4 = new System.Windows.Forms.Label();
+            this._nextNumberGroupBox = new System.Windows.Forms.GroupBox();
+            this._counterToUseCombo = new System.Windows.Forms.ComboBox();
+            this._counterToUseLabel = new System.Windows.Forms.Label();
+            this._digitsLabel = new System.Windows.Forms.Label();
             this._digitsUpDown = new System.Windows.Forms.NumericUpDown();
             this._nextNumberFileButton = new System.Windows.Forms.Button();
-            this.label3 = new System.Windows.Forms.Label();
+            this._nextNumberLabel = new System.Windows.Forms.Label();
             this._sampleNextNumberTextBox = new System.Windows.Forms.TextBox();
             this._nextNumberSpecifiedTextBox = new System.Windows.Forms.TextBox();
             this._zeroPadCheckBox = new System.Windows.Forms.CheckBox();
@@ -59,37 +61,37 @@ namespace Extract.Imaging
             this._nextNumberFileRadioButton = new System.Windows.Forms.RadioButton();
             this._nextNumberSpecifiedRadioButton = new System.Windows.Forms.RadioButton();
             this._pageNumberSeparatorTextBox = new System.Windows.Forms.TextBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this._formatGroupBox = new System.Windows.Forms.GroupBox();
             this.label5 = new System.Windows.Forms.Label();
             this._pageDigitsUpDown = new System.Windows.Forms.NumericUpDown();
             this._useBatesForEachPageRadioButton = new System.Windows.Forms.RadioButton();
             this.label1 = new System.Windows.Forms.Label();
             this._zeroPadPageNumberCheckBox = new System.Windows.Forms.CheckBox();
             this._usePageNumberRadioButton = new System.Windows.Forms.RadioButton();
-            this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this._sampleGroupBox = new System.Windows.Forms.GroupBox();
             this._sampleBatesNumberTextBox = new System.Windows.Forms.TextBox();
-            this.groupBox3.SuspendLayout();
-            this.groupBox1.SuspendLayout();
+            this._prefixesGroupBox.SuspendLayout();
+            this._nextNumberGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._digitsUpDown)).BeginInit();
-            this.groupBox2.SuspendLayout();
+            this._formatGroupBox.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pageDigitsUpDown)).BeginInit();
-            this.groupBox4.SuspendLayout();
+            this._sampleGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
-            // groupBox3
+            // _prefixesGroupBox
             // 
-            this.groupBox3.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._prefixesGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox3.Controls.Add(this._suffixTextBox);
-            this.groupBox3.Controls.Add(this.label6);
-            this.groupBox3.Controls.Add(this._prefixTextBox);
-            this.groupBox3.Controls.Add(this.label2);
-            this.groupBox3.Location = new System.Drawing.Point(3, 258);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(424, 51);
-            this.groupBox3.TabIndex = 2;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Prefixes and suffixes";
+            this._prefixesGroupBox.Controls.Add(this._suffixTextBox);
+            this._prefixesGroupBox.Controls.Add(this.label6);
+            this._prefixesGroupBox.Controls.Add(this._prefixTextBox);
+            this._prefixesGroupBox.Controls.Add(this.label2);
+            this._prefixesGroupBox.Location = new System.Drawing.Point(3, 258);
+            this._prefixesGroupBox.Name = "_prefixesGroupBox";
+            this._prefixesGroupBox.Size = new System.Drawing.Size(424, 51);
+            this._prefixesGroupBox.TabIndex = 2;
+            this._prefixesGroupBox.TabStop = false;
+            this._prefixesGroupBox.Text = "Prefixes and suffixes";
             // 
             // _suffixTextBox
             // 
@@ -125,35 +127,56 @@ namespace Extract.Imaging
             this.label2.TabIndex = 0;
             this.label2.Text = "Prefix";
             // 
-            // groupBox1
+            // _nextNumberGroupBox
             // 
-            this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._nextNumberGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.label4);
-            this.groupBox1.Controls.Add(this._digitsUpDown);
-            this.groupBox1.Controls.Add(this._nextNumberFileButton);
-            this.groupBox1.Controls.Add(this.label3);
-            this.groupBox1.Controls.Add(this._sampleNextNumberTextBox);
-            this.groupBox1.Controls.Add(this._nextNumberSpecifiedTextBox);
-            this.groupBox1.Controls.Add(this._zeroPadCheckBox);
-            this.groupBox1.Controls.Add(this._nextNumberFileTextBox);
-            this.groupBox1.Controls.Add(this._nextNumberFileRadioButton);
-            this.groupBox1.Controls.Add(this._nextNumberSpecifiedRadioButton);
-            this.groupBox1.Location = new System.Drawing.Point(3, 3);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(424, 124);
-            this.groupBox1.TabIndex = 0;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Next number";
+            this._nextNumberGroupBox.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this._nextNumberGroupBox.Controls.Add(this._counterToUseCombo);
+            this._nextNumberGroupBox.Controls.Add(this._counterToUseLabel);
+            this._nextNumberGroupBox.Controls.Add(this._digitsLabel);
+            this._nextNumberGroupBox.Controls.Add(this._digitsUpDown);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberFileButton);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberLabel);
+            this._nextNumberGroupBox.Controls.Add(this._sampleNextNumberTextBox);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberSpecifiedTextBox);
+            this._nextNumberGroupBox.Controls.Add(this._zeroPadCheckBox);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberFileTextBox);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberFileRadioButton);
+            this._nextNumberGroupBox.Controls.Add(this._nextNumberSpecifiedRadioButton);
+            this._nextNumberGroupBox.Location = new System.Drawing.Point(3, 3);
+            this._nextNumberGroupBox.Name = "_nextNumberGroupBox";
+            this._nextNumberGroupBox.Size = new System.Drawing.Size(424, 124);
+            this._nextNumberGroupBox.TabIndex = 0;
+            this._nextNumberGroupBox.TabStop = false;
+            this._nextNumberGroupBox.Text = "Next number";
             // 
-            // label4
+            // _counterToUseCombo
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(123, 97);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(31, 13);
-            this.label4.TabIndex = 9;
-            this.label4.Text = "digits";
+            this._counterToUseCombo.FormattingEnabled = true;
+            this._counterToUseCombo.Location = new System.Drawing.Point(180, 17);
+            this._counterToUseCombo.Name = "_counterToUseCombo";
+            this._counterToUseCombo.Size = new System.Drawing.Size(238, 21);
+            this._counterToUseCombo.TabIndex = 7;
+            this._counterToUseCombo.SelectedIndexChanged += new System.EventHandler(this.HandleUserCounterComboChanged);
+            // 
+            // _counterToUseLabel
+            // 
+            this._counterToUseLabel.AutoSize = true;
+            this._counterToUseLabel.Location = new System.Drawing.Point(4, 20);
+            this._counterToUseLabel.Name = "_counterToUseLabel";
+            this._counterToUseLabel.Size = new System.Drawing.Size(170, 13);
+            this._counterToUseLabel.TabIndex = 10;
+            this._counterToUseLabel.Text = "Counter to use for the next number";
+            // 
+            // _digitsLabel
+            // 
+            this._digitsLabel.AutoSize = true;
+            this._digitsLabel.Location = new System.Drawing.Point(123, 97);
+            this._digitsLabel.Name = "_digitsLabel";
+            this._digitsLabel.Size = new System.Drawing.Size(31, 13);
+            this._digitsLabel.TabIndex = 9;
+            this._digitsLabel.Text = "digits";
             // 
             // _digitsUpDown
             // 
@@ -170,7 +193,7 @@ namespace Extract.Imaging
             0});
             this._digitsUpDown.Name = "_digitsUpDown";
             this._digitsUpDown.Size = new System.Drawing.Size(34, 20);
-            this._digitsUpDown.TabIndex = 8;
+            this._digitsUpDown.TabIndex = 9;
             this._digitsUpDown.Value = new decimal(new int[] {
             1,
             0,
@@ -190,15 +213,15 @@ namespace Extract.Imaging
             this._nextNumberFileButton.UseVisualStyleBackColor = true;
             this._nextNumberFileButton.Click += new System.EventHandler(this.HandleNextNumberFileButtonClick);
             // 
-            // label3
+            // _nextNumberLabel
             // 
-            this.label3.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(308, 46);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(67, 13);
-            this.label3.TabIndex = 3;
-            this.label3.Text = "Next number";
+            this._nextNumberLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this._nextNumberLabel.AutoSize = true;
+            this._nextNumberLabel.Location = new System.Drawing.Point(308, 46);
+            this._nextNumberLabel.Name = "_nextNumberLabel";
+            this._nextNumberLabel.Size = new System.Drawing.Size(67, 13);
+            this._nextNumberLabel.TabIndex = 3;
+            this._nextNumberLabel.Text = "Next number";
             // 
             // _sampleNextNumberTextBox
             // 
@@ -226,7 +249,7 @@ namespace Extract.Imaging
             this._zeroPadCheckBox.Location = new System.Drawing.Point(7, 95);
             this._zeroPadCheckBox.Name = "_zeroPadCheckBox";
             this._zeroPadCheckBox.Size = new System.Drawing.Size(81, 17);
-            this._zeroPadCheckBox.TabIndex = 7;
+            this._zeroPadCheckBox.TabIndex = 8;
             this._zeroPadCheckBox.Text = "Zero pad to";
             this._zeroPadCheckBox.UseVisualStyleBackColor = true;
             this._zeroPadCheckBox.CheckedChanged += new System.EventHandler(this.HandleZeroPadCheckBoxCheckedChanged);
@@ -273,24 +296,24 @@ namespace Extract.Imaging
             this._pageNumberSeparatorTextBox.TabIndex = 5;
             this._pageNumberSeparatorTextBox.TextChanged += new System.EventHandler(this.HandlePageNumberSeparatorTextBoxTextChanged);
             // 
-            // groupBox2
+            // _formatGroupBox
             // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._formatGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this._pageNumberSeparatorTextBox);
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this._pageDigitsUpDown);
-            this.groupBox2.Controls.Add(this._useBatesForEachPageRadioButton);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Controls.Add(this._zeroPadPageNumberCheckBox);
-            this.groupBox2.Controls.Add(this._usePageNumberRadioButton);
-            this.groupBox2.Location = new System.Drawing.Point(3, 133);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.groupBox2.Size = new System.Drawing.Size(424, 119);
-            this.groupBox2.TabIndex = 1;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Bates number format";
+            this._formatGroupBox.Controls.Add(this._pageNumberSeparatorTextBox);
+            this._formatGroupBox.Controls.Add(this.label5);
+            this._formatGroupBox.Controls.Add(this._pageDigitsUpDown);
+            this._formatGroupBox.Controls.Add(this._useBatesForEachPageRadioButton);
+            this._formatGroupBox.Controls.Add(this.label1);
+            this._formatGroupBox.Controls.Add(this._zeroPadPageNumberCheckBox);
+            this._formatGroupBox.Controls.Add(this._usePageNumberRadioButton);
+            this._formatGroupBox.Location = new System.Drawing.Point(3, 133);
+            this._formatGroupBox.Name = "_formatGroupBox";
+            this._formatGroupBox.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this._formatGroupBox.Size = new System.Drawing.Size(424, 119);
+            this._formatGroupBox.TabIndex = 1;
+            this._formatGroupBox.TabStop = false;
+            this._formatGroupBox.Text = "Bates number format";
             // 
             // label5
             // 
@@ -369,17 +392,17 @@ namespace Extract.Imaging
             this._usePageNumberRadioButton.UseVisualStyleBackColor = true;
             this._usePageNumberRadioButton.CheckedChanged += new System.EventHandler(this.HandleUsePageNumberRadioButtonCheckedChanged);
             // 
-            // groupBox4
+            // _sampleGroupBox
             // 
-            this.groupBox4.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this._sampleGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox4.Controls.Add(this._sampleBatesNumberTextBox);
-            this.groupBox4.Location = new System.Drawing.Point(3, 315);
-            this.groupBox4.Name = "groupBox4";
-            this.groupBox4.Size = new System.Drawing.Size(424, 51);
-            this.groupBox4.TabIndex = 3;
-            this.groupBox4.TabStop = false;
-            this.groupBox4.Text = "Sample Bates number";
+            this._sampleGroupBox.Controls.Add(this._sampleBatesNumberTextBox);
+            this._sampleGroupBox.Location = new System.Drawing.Point(3, 315);
+            this._sampleGroupBox.Name = "_sampleGroupBox";
+            this._sampleGroupBox.Size = new System.Drawing.Size(424, 51);
+            this._sampleGroupBox.TabIndex = 3;
+            this._sampleGroupBox.TabStop = false;
+            this._sampleGroupBox.Text = "Sample Bates number";
             // 
             // _sampleBatesNumberTextBox
             // 
@@ -390,41 +413,42 @@ namespace Extract.Imaging
             this._sampleBatesNumberTextBox.Name = "_sampleBatesNumberTextBox";
             this._sampleBatesNumberTextBox.Size = new System.Drawing.Size(411, 20);
             this._sampleBatesNumberTextBox.TabIndex = 0;
+            this._sampleBatesNumberTextBox.TabStop = false;
             // 
-            // BatesNumberManagerFormatPropertyPage
+            // BatesNumberFormatPropertyPage
             // 
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox1);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox4);
-            this.Name = "BatesNumberManagerFormatPropertyPage";
+            this.Controls.Add(this._prefixesGroupBox);
+            this.Controls.Add(this._nextNumberGroupBox);
+            this.Controls.Add(this._formatGroupBox);
+            this.Controls.Add(this._sampleGroupBox);
+            this.Name = "BatesNumberFormatPropertyPage";
             this.Size = new System.Drawing.Size(430, 366);
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
+            this._prefixesGroupBox.ResumeLayout(false);
+            this._prefixesGroupBox.PerformLayout();
+            this._nextNumberGroupBox.ResumeLayout(false);
+            this._nextNumberGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._digitsUpDown)).EndInit();
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
+            this._formatGroupBox.ResumeLayout(false);
+            this._formatGroupBox.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this._pageDigitsUpDown)).EndInit();
-            this.groupBox4.ResumeLayout(false);
-            this.groupBox4.PerformLayout();
+            this._sampleGroupBox.ResumeLayout(false);
+            this._sampleGroupBox.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox _prefixesGroupBox;
         private System.Windows.Forms.TextBox _suffixTextBox;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.TextBox _prefixTextBox;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.GroupBox _nextNumberGroupBox;
+        private System.Windows.Forms.Label _digitsLabel;
         private System.Windows.Forms.NumericUpDown _digitsUpDown;
         private System.Windows.Forms.Button _nextNumberFileButton;
-        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label _nextNumberLabel;
         private System.Windows.Forms.TextBox _sampleNextNumberTextBox;
         private System.Windows.Forms.TextBox _nextNumberSpecifiedTextBox;
         private System.Windows.Forms.CheckBox _zeroPadCheckBox;
@@ -432,14 +456,16 @@ namespace Extract.Imaging
         private System.Windows.Forms.RadioButton _nextNumberFileRadioButton;
         private System.Windows.Forms.RadioButton _nextNumberSpecifiedRadioButton;
         private System.Windows.Forms.TextBox _pageNumberSeparatorTextBox;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox _formatGroupBox;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.NumericUpDown _pageDigitsUpDown;
         private System.Windows.Forms.RadioButton _useBatesForEachPageRadioButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox _zeroPadPageNumberCheckBox;
         private System.Windows.Forms.RadioButton _usePageNumberRadioButton;
-        private System.Windows.Forms.GroupBox groupBox4;
+        private System.Windows.Forms.GroupBox _sampleGroupBox;
         private System.Windows.Forms.TextBox _sampleBatesNumberTextBox;
+        private System.Windows.Forms.Label _counterToUseLabel;
+        private System.Windows.Forms.ComboBox _counterToUseCombo;
     }
 }

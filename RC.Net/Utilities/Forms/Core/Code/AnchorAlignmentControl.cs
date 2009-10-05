@@ -370,10 +370,13 @@ namespace Extract.Utilities.Forms
             e.Graphics.DrawRectangle(Pens.Black, rectangle);
 
             // Draw the text
-            StringFormat stringFormat = new StringFormat();
-            stringFormat.Alignment = StringAlignment.Center;
-            stringFormat.LineAlignment = StringAlignment.Center;
-            e.Graphics.DrawString(base.Text, base.Font, Brushes.Black, GetTextArea(), stringFormat);
+            using (StringFormat stringFormat = new StringFormat())
+            {
+                stringFormat.Alignment = StringAlignment.Center;
+                stringFormat.LineAlignment = StringAlignment.Center;
+                e.Graphics.DrawString(base.Text, base.Font, Brushes.Black, GetTextArea(),
+                    stringFormat);
+            }
 
             // Draw the anchor points
             AnchorAlignment i = 0;

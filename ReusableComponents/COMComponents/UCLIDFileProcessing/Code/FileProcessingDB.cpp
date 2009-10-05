@@ -3840,7 +3840,7 @@ STDMETHODIMP CFileProcessingDB::SetPriorityForFiles(BSTR bstrSelectQuery, EFileP
 
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, long nInitialValue)
+STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, LONGLONG llInitialValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -3856,7 +3856,7 @@ STDMETHODIMP CFileProcessingDB::AddUserCounter(BSTR bstrCounterName, long nIniti
 		// Build the query for adding the new counter
 		string strQuery = "INSERT INTO " + gstrUSER_CREATED_COUNTER
 			+ "([CounterName], [Value]) VALUES ('" + strCounterName
-			+ "', " + asString(nInitialValue) + ")";
+			+ "', " + asString(llInitialValue) + ")";
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -4007,7 +4007,7 @@ STDMETHODIMP CFileProcessingDB::RenameUserCounter(BSTR bstrCounterName, BSTR bst
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27761");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, long nNewValue)
+STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, LONGLONG llNewValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -4022,7 +4022,7 @@ STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, long n
 
 		// Build the query for setting the counter value
 		string strQuery = "UPDATE " + gstrUSER_CREATED_COUNTER + " SET [Value] = "
-			+ asString(nNewValue) + " WHERE [CounterName] = '" + strCounterName + "'";
+			+ asString(llNewValue) + " WHERE [CounterName] = '" + strCounterName + "'";
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;
@@ -4060,7 +4060,7 @@ STDMETHODIMP CFileProcessingDB::SetUserCounterValue(BSTR bstrCounterName, long n
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27765");
 }
 //-------------------------------------------------------------------------------------------------
-STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, long *pnValue)
+STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, LONGLONG *pllValue)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
@@ -4068,7 +4068,7 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, long *
 	{
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27766", pnValue != NULL);
+		ASSERT_ARGUMENT("ELI27766", pllValue != NULL);
 
 		// Get the counter name and ensure it is not empty
 		string strCounterName = asString(bstrCounterName);
@@ -4105,7 +4105,7 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterValue(BSTR bstrCounterName, long *
 		if (ipCounterSet->adoEOF == VARIANT_FALSE)
 		{
 			// Get the return value
-			*pnValue = getLongField(ipCounterSet->Fields, "Value");
+			*pllValue = getLongLongField(ipCounterSet->Fields, "Value");
 		}
 		else
 		{
@@ -4224,7 +4224,7 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNamesAndValues(IStrToStrMap** ppma
 
 			// Get the name and value from the record
 			string strCounterName = getStringField(ipFields, "CounterName");
-			string strCounterValue = asString(getLongField(ipFields, "Value"));
+			string strCounterValue = asString(getLongLongField(ipFields, "Value"));
 			
 			// Add name and value to the collection
 			ipmapUserCounters->Set(strCounterName.c_str(), strCounterValue.c_str());
@@ -4240,6 +4240,137 @@ STDMETHODIMP CFileProcessingDB::GetUserCounterNamesAndValues(IStrToStrMap** ppma
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27784");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::IsUserCounterValid(BSTR bstrCounterName,
+												   VARIANT_BOOL* pbCounterValid)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27907", pbCounterValid != NULL);
+
+		// Get the counter name and ensure it is not empty
+		string strCounterName = asString(bstrCounterName);
+		ASSERT_ARGUMENT("ELI27908", !strCounterName.empty());
+		replaceVariable(strCounterName, "'", "''");
+
+		string strQuery = "SELECT [Value] FROM " + gstrUSER_CREATED_COUNTER
+			+ " WHERE [CounterName] = '" + strCounterName + "'";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Recordset to get
+		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27909", ipCounterSet != NULL );
+
+		// Get the recordset for the specified select query
+		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenForwardOnly, 
+			adLockReadOnly, adCmdText );
+
+		// Set true if there is a record found false otherwise
+		*pbCounterValid = asVariantBool(ipCounterSet->adoEOF == VARIANT_FALSE);
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27910");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27911");
+}
+//-------------------------------------------------------------------------------------------------
+STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG llOffsetValue,
+												   LONGLONG* pllNewValue)
+{
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	try
+	{
+		validateLicense();
+
+		ASSERT_ARGUMENT("ELI27715", pllNewValue != NULL);
+
+		// Get the counter name and ensure it is not empty
+		string strCounterName = asString(bstrCounterName);
+		ASSERT_ARGUMENT("ELI27716", !strCounterName.empty());
+		replaceVariable(strCounterName, "'", "''");
+
+		// Build the query
+		string strQuery = "SELECT [Value] FROM " + gstrUSER_CREATED_COUNTER
+			+ " WHERE [CounterName] = ' " + strCounterName + "'";
+
+		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
+		ADODB::_ConnectionPtr ipConnection = NULL;
+		
+		BEGIN_CONNECTION_RETRY();
+
+		// Get the connection for the thread and save it locally.
+		ipConnection = getDBConnection();
+
+		// Lock the database
+		LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr> dblg(getThisAsCOMPtr());
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+
+		// Set the transaction guard
+		TransactionGuard tg(ipConnection);
+
+		// Recordset to get the counters and values from
+		_RecordsetPtr ipCounterSet(__uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI27717", ipCounterSet != NULL );
+
+		// Get the recordset for the specified select query
+		ipCounterSet->Open(strQuery.c_str(), _variant_t((IDispatch *)ipConnection, true), adOpenDynamic, 
+			adLockOptimistic, adCmdText );
+
+		if (ipCounterSet->adoEOF == VARIANT_FALSE)
+		{
+			FieldsPtr ipFields = ipCounterSet->Fields;
+			ASSERT_RESOURCE_ALLOCATION("ELI27718", ipFields != NULL);
+
+			// Get the counter value
+			LONGLONG llValue = getLongLongField(ipFields, "Value");
+
+			// Modify the value
+			llValue += llOffsetValue;
+
+			// Update the value
+			setLongLongField(ipFields, "Value", llValue);
+			ipCounterSet->Update();
+
+			// Set the return value
+			*pllNewValue = llValue;
+		}
+		else
+		{
+			UCLIDException uex("ELI27815", "User counter name specified does not exist.");
+			uex.addDebugInfo("User Counter Name", asString(bstrCounterName));
+			throw uex;
+		}
+
+		// Commit the transaction
+		tg.CommitTrans();
+
+		END_CONNECTION_RETRY(ipConnection, "ELI27816");
+
+		return S_OK;
+	}
+	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI27817");
 }
 
 //-------------------------------------------------------------------------------------------------

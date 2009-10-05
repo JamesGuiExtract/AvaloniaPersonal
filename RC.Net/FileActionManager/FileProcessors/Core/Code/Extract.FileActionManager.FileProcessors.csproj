@@ -58,16 +58,37 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplyBatesNumberSettingsDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ApplyBatesNumberSettingsDialog.Designer.cs">
+      <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="ApplyBatesNumberTask.cs" />
+    <Compile Include="BatesNumberGeneratorWithDatabase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Core\Code\Extract.csproj">
+      <Project>{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}</Project>
+      <Name>Extract</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Drawing\Core\Code\Extract.Drawing.csproj">
+      <Project>{865B9A25-1D27-4445-9CC7-7BF88D736BA8}</Project>
+      <Name>Extract.Drawing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\..\Imaging\Core\Code\Extract.Imaging.csproj">
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Interop\Core\Code\Extract.Interop.csproj">
+      <Project>{4F37507C-6CE8-4C68-A54B-EFCCE96A99EA}</Project>
+      <Name>Extract.Interop</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\..\Licensing\Core\Code\Extract.Licensing.vcproj">
       <Project>{212E31D9-5F02-43AA-8625-BCB86B15CF8F}</Project>
@@ -115,6 +136,12 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="ApplyBatesNumberSettingsDialog.resx">
+      <SubType>Designer</SubType>
+      <DependentUpon>ApplyBatesNumberSettingsDialog.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -167,13 +167,15 @@ public:
 	STDMETHOD(ExecuteCommandQuery)(BSTR bstrQuery, long* pnRecordsAffected);
 	STDMETHOD(SetPriorityForFiles)(BSTR bstrSelectQuery, EFilePriority eNewPriority,
 		IRandomMathCondition* pRandomCondition, long* pnNumRecordsModified);
-	STDMETHOD(AddUserCounter)(BSTR bstrCounterName, long nInitialValue);
+	STDMETHOD(AddUserCounter)(BSTR bstrCounterName, LONGLONG llInitialValue);
 	STDMETHOD(RemoveUserCounter)(BSTR bstrCounterName);
 	STDMETHOD(RenameUserCounter)(BSTR bstrCounterName, BSTR bstrNewCounterName);
-	STDMETHOD(SetUserCounterValue)(BSTR bstrCounterName, long nNewValue);
-	STDMETHOD(GetUserCounterValue)(BSTR bstrCounterName, long* pnValue);
+	STDMETHOD(SetUserCounterValue)(BSTR bstrCounterName, LONGLONG llNewValue);
+	STDMETHOD(GetUserCounterValue)(BSTR bstrCounterName, LONGLONG* pllValue);
 	STDMETHOD(GetUserCounterNames)(IVariantVector** ppvecNames);
 	STDMETHOD(GetUserCounterNamesAndValues)(IStrToStrMap** ppmapUserCounters);
+	STDMETHOD(IsUserCounterValid)(BSTR bstrCounterName, VARIANT_BOOL* pbCounterValid);
+	STDMETHOD(OffsetUserCounter)(BSTR bstrCounterName, LONGLONG llOffsetValue, LONGLONG* pllNewValue);
 	STDMETHOD(RegisterProcessingFAM)();
 	STDMETHOD(UnregisterProcessingFAM)();
 

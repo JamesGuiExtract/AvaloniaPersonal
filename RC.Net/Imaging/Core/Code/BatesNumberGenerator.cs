@@ -2,6 +2,7 @@ using Extract;
 using Extract.Licensing;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -11,7 +12,7 @@ namespace Extract.Imaging
     /// <summary>
     /// Generates Bates numbers for a single document.
     /// </summary>
-    internal class BatesNumberGenerator : IDisposable
+    internal class BatesNumberGenerator : IBatesNumberGenerator
     {
         #region Constants
 
@@ -46,6 +47,12 @@ namespace Extract.Imaging
         /// </summary>
         StreamReader _reader;
 
+        /// <summary>
+        /// License cache for validating the license.
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, _OBJECT_NAME);
+
         #endregion BatesNumberGenerator Fields
 
         #region BatesNumberGenerator Constructors
@@ -53,11 +60,20 @@ namespace Extract.Imaging
         /// <summary>
         /// Initializes a new instance of the <see cref="BatesNumberGenerator"/> class.
         /// </summary>
+        public BatesNumberGenerator()
+            : this(null)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BatesNumberGenerator"/> class.
+        /// </summary>
+        /// <param name="format">The underlying <see cref="BatesNumberFormat"/> object.
+        /// Caller is responsible for disposing of the format object.</param>
         public BatesNumberGenerator(BatesNumberFormat format)
         {
             // Validate the license
-            LicenseUtilities.ValidateLicense(LicenseIdName.ExtractCoreObjects, "ELI23182",
-                _OBJECT_NAME);
+            _licenseCache.Validate("ELI23182");
 
             _format = format;
         }
@@ -180,10 +196,22 @@ namespace Extract.Imaging
         /// Retrieves the next number without incrementing it.
         /// </summary>
         /// <returns>The next number without incrementing it.</returns>
-        long PeekNextNumber()
+        public long PeekNextNumber()
         {
             // Return the next number from the file or the next specified number
-            return _format.UseNextNumberFile ? GetNextNumberFromFile(true) : _format.NextNumber;
+            if (_format.UseNextNumberFile)
+            {
+                return GetNextNumberFromFile(true);
+            }
+            else if (string.IsNullOrEmpty(_format.DatabaseCounter))
+            {
+                return _format.NextNumber;
+            }
+            else
+            {
+                throw new ExtractException("ELI27841",
+                    "This implementation of the BatesNumberGenerator does not support using a database counter.");
+            }
         }
 
         /// <summary>
@@ -274,54 +302,37 @@ namespace Extract.Imaging
                 throw ee;
             }
 
-            return GetStringFromNumber(nextNumber, pageNumber);
+            return BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber);
         }
 
         /// <summary>
-        /// Generates the Bates number as text using the specified Bates number and page number.
+        /// Retrieves the next Bates numbers as text using the total page count.
         /// </summary>
-        /// <param name="batesNumber">The Bates number to use.</param>
-        /// <param name="pageNumber">The page number on which the Bates number appears.</param>
-        /// <returns>The Bates number as text.</returns>
-        private string GetStringFromNumber(long batesNumber, int pageNumber)
+        /// <param name="totalPages">The total number of pages for the Bates number.</param>
+        /// <returns>The next Bates numbers as text.</returns>
+        public ReadOnlyCollection<string> GetNextNumberStrings(int totalPages)
         {
-            // Start the string builder with the prefix
-            StringBuilder builder = new StringBuilder(_format.Prefix);
-
-            // Append zero padding as necessary
-            string nextNumberString = batesNumber.ToString(CultureInfo.CurrentCulture);
-            if (_format.ZeroPad && nextNumberString.Length < _format.Digits)
+            List<string> nextNumbers = new List<string>(totalPages);
+            for (int i=1; i <= totalPages; i++)
             {
-                builder.Append('0', _format.Digits - nextNumberString.Length);
+                nextNumbers.Add(GetNextNumberString(i));
             }
+            
+            return nextNumbers.AsReadOnly();
+        }
 
-            // Append the Bates number
-            builder.Append(nextNumberString);
-
-            // Append page number if necessary
-            if (_format.AppendPageNumber)
-            {
-                // Append page separator
-                builder.Append(_format.PageNumberSeparator);
-
-                // Get the page number as a string
-                string pageNumberString = pageNumber.ToString(CultureInfo.CurrentCulture);
-
-                // Append page zero padding as necessary
-                if (_format.ZeroPadPage)
-                {
-                    builder.Append('0', _format.PageDigits - pageNumberString.Length);
-                }
-
-                // Append the page number
-                builder.Append(pageNumberString);
-            }
-
-            // Add the suffix
-            builder.Append(_format.Suffix);
-
-            // Return the result
-            return builder.ToString();
+        /// <summary>
+        /// Retrieves the next Bates number as text without incrementing the Bates number.
+        /// </summary>
+        /// <param name="pageNumber">The page number on which the Bates number appears.</param>
+        /// <returns>The next Bates number as text or the empty string if the Bates number was 
+        /// invalid.</returns>
+        public string PeekNextNumberString(int pageNumber)
+        {
+            // Return the empty string if the next Bates number is invalid
+            long nextNumber = PeekNextNumber();
+            return nextNumber >= 0 ?
+                BatesNumberHelper.GetStringFromNumber(_format, nextNumber, pageNumber) : "";
         }
 
         /// <summary>
@@ -337,24 +348,38 @@ namespace Extract.Imaging
             }
         }
 
+        #endregion BatesNumberGenerator Methods
+
+        #region Properties
+
         /// <summary>
-        /// Retrieves the next Bates number as text without incrementing the Bates number.
+        /// Gets/sets the underlying Bates number format object.
         /// </summary>
-        /// <param name="pageNumber">The page number on which the Bates number appears.</param>
-        /// <param name="format">The format settings to use for the Bates number.</param>
-        /// <returns>The next Bates number as text or the empty string if the Bates number was 
-        /// invalid.</returns>
-        public static string PeekNextNumberString(int pageNumber, BatesNumberFormat format)
+        /// <returns>The <see cref="BatesNumberFormat"/> object.</returns>
+        /// <value>The <see cref="BatesNumberFormat"/> object.</value>
+        public BatesNumberFormat Format
         {
-            using (BatesNumberGenerator generator = new BatesNumberGenerator(format))
+            get
             {
-                // Return the empty string if the next Bates number is invalid
-                long nextNumber = generator.PeekNextNumber();
-                return nextNumber >= 0 ? generator.GetStringFromNumber(nextNumber, pageNumber) : "";
+                return _format;
+            }
+            set
+            {
+                try
+                {
+                    ExtractException.Assert("ELI27844", "Bates number format must not be null.",
+                        value != null);
+
+                    _format = value;
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI27845", ex);
+                }
             }
         }
 
-        #endregion BatesNumberGenerator Methods
+        #endregion Properties
 
         #region IDisposable Members
 

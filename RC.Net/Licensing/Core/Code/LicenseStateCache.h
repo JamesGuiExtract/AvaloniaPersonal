@@ -16,8 +16,6 @@ namespace Extract
 			// componentName - The name of the component to check licensing for
 			LicenseStateCache(LicenseIdName id, String^ componentName);
 
-			~LicenseStateCache() {};
-
 			// Performs the validation check with the specified ELI code
 			// eliCode - The ELI code to use if the license fails validation
 			void Validate(String^ eliCode);

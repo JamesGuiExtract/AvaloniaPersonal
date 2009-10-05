@@ -1,3 +1,4 @@
+using Extract.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -7,7 +8,7 @@ using System.Text;
 namespace Extract.Drawing
 {
     /// <summary>
-    /// Represents a container for mouse cursors common to Extract Systems applications.
+    /// Represents a container for <see cref="Pen"/>'s. 
     /// </summary>
     public static class ExtractPens
     {
@@ -33,6 +34,21 @@ namespace Extract.Drawing
         /// </summary>
         static Pen _dottedBlack;
 
+        /// <summary>
+        /// Mutex object to provide exclusive access to the dashed and dotted pens
+        /// </summary>
+        static object _lockDashedAndDotted = new object();
+
+        /// <summary>
+        /// Mutex object to provide exclusive access to the pens collections
+        /// </summary>
+        static object _lockPens = new object();
+
+        /// <summary>
+        /// Mutex object to provide exclusive access to the thick dashed pens collections
+        /// </summary>
+        static object _lockThickDashed = new object();
+
         #endregion ExtractPens Fields
 
         #region ExtractPens Properties
@@ -47,8 +63,14 @@ namespace Extract.Drawing
             {
                 if (_dashedBlack == null)
                 {
-                    _dashedBlack = new Pen(Color.Black, 1);
-                    _dashedBlack.DashStyle = DashStyle.Dash;
+                    lock (_lockDashedAndDotted)
+                    {
+                        if (_dashedBlack == null)
+                        {
+                            _dashedBlack = new Pen(Color.Black, 1);
+                            _dashedBlack.DashStyle = DashStyle.Dash;
+                        }
+                    }
                 }
 
                 return _dashedBlack;
@@ -65,8 +87,14 @@ namespace Extract.Drawing
             {
                 if (_dottedBlack == null)
                 {
-                    _dottedBlack = new Pen(Color.Black, 1);
-                    _dottedBlack.DashStyle = DashStyle.Dot;
+                    lock (_lockDashedAndDotted)
+                    {
+                        if (_dottedBlack == null)
+                        {
+                            _dottedBlack = new Pen(Color.Black, 1);
+                            _dottedBlack.DashStyle = DashStyle.Dot;
+                        }
+                    }
                 }
 
                 return _dottedBlack;
@@ -82,13 +110,17 @@ namespace Extract.Drawing
         {
             try
             {
-                // Check if the pen has already been created
+                // Mutex around collection to prevent multiple reads and writes
                 Pen pen;
-                if (!_pens.TryGetValue(color, out pen))
+                lock (_lockPens)
                 {
-                    // Create the pen
-                    pen = new Pen(color);
-                    _pens.Add(color, pen);
+                    // Check if the pen has already been created
+                    if (!_pens.TryGetValue(color, out pen))
+                    {
+                        // Create the pen
+                        pen = new Pen(color);
+                        _pens.Add(color, pen);
+                    }
                 }
 
                 return pen;
@@ -108,14 +140,18 @@ namespace Extract.Drawing
         {
             try
             {
-                // Check if the pen has already been created
+                // Mutex around collection to prevent multiple reads and writes
                 Pen dashedPen;
-                if (!_thickDashedPens.TryGetValue(color, out dashedPen))
+                lock (_lockThickDashed)
                 {
-                    // Create the pen
-                    dashedPen = new Pen(color, 2);
-                    dashedPen.DashStyle = DashStyle.Dash;
-                    _thickDashedPens.Add(color, dashedPen);
+                    // Check if the pen has already been created
+                    if (!_thickDashedPens.TryGetValue(color, out dashedPen))
+                    {
+                        // Create the pen
+                        dashedPen = new Pen(color, 2);
+                        dashedPen.DashStyle = DashStyle.Dash;
+                        _thickDashedPens.Add(color, dashedPen);
+                    }
                 }
 
                 return dashedPen;
@@ -123,6 +159,43 @@ namespace Extract.Drawing
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI26492", ex);
+            }
+        }
+
+        /// <summary>
+        /// Disposes of all cached pen objects and clears out the collections.
+        /// </summary>
+        public static void ClearAndDisposeAllPens()
+        {
+            try
+            {
+                lock (_lockDashedAndDotted)
+                {
+                    if (_dashedBlack != null)
+                    {
+                        _dashedBlack.Dispose();
+                        _dashedBlack = null;
+                    }
+                    if (_dottedBlack != null)
+                    {
+                        _dottedBlack.Dispose();
+                        _dottedBlack = null;
+                    }
+                }
+
+                lock (_lockThickDashed)
+                {
+                    CollectionMethods.ClearAndDispose(_thickDashedPens);
+                }
+
+                lock (_lockPens)
+                {
+                    CollectionMethods.ClearAndDispose(_pens);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27859", ex);
             }
         }
 

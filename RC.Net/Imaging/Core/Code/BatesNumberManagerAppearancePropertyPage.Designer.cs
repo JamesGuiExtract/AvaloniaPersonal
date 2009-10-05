@@ -1,15 +1,15 @@
 namespace Extract.Imaging
 {
-    partial class BatesNumberManagerAppearancePropertyPage
+    partial class BatesNumberAppearancePropertyPage
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <overloads>Releases resources used by the <see cref="BatesNumberManagerAppearancePropertyPage"/>.</overloads>
+        /// <overloads>Releases resources used by the <see cref="BatesNumberAppearancePropertyPage"/>.</overloads>
         /// <summary>
-        /// Releases all unmanaged resources used by the <see cref="BatesNumberManagerAppearancePropertyPage"/>.
+        /// Releases all unmanaged resources used by the <see cref="BatesNumberAppearancePropertyPage"/>.
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>
@@ -262,12 +262,12 @@ namespace Extract.Imaging
             this._verticalInchesTextBox.TabIndex = 4;
             this._verticalInchesTextBox.TextChanged += new System.EventHandler(this.HandleVerticalInchesTextBoxTextChanged);
             // 
-            // BatesNumberManagerAppearancePropertyPage
+            // BatesNumberAppearancePropertyPage
             // 
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.groupBox2);
-            this.Name = "BatesNumberManagerAppearancePropertyPage";
+            this.Name = "BatesNumberAppearancePropertyPage";
             this.Size = new System.Drawing.Size(417, 242);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();

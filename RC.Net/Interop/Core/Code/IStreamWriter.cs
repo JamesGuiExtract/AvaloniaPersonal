@@ -71,9 +71,35 @@ namespace Extract.Interop
         #region IStreamWriter Methods
 
         /// <summary>
-        /// Writes a string to the <see cref="IStream"/> object.
+        /// Writes a {T} to the stream.
         /// </summary>
-        /// <param name="value">The string to write.</param>
+        /// <typeparam name="T">The type of object to write to the stream.</typeparam>
+        /// <param name="value">The object to write to the stream.</param>
+        public void WriteObject<T>(T value) where T : class, ISerializable
+        {
+            try
+            {
+                bool hasValue = value != null;
+                _formatter.Serialize(_stream, hasValue);
+
+                if (hasValue)
+                {
+                    _formatter.Serialize(_stream, value);
+                }
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27875",
+                    "Unable to write object.", ex);
+                ee.AddDebugData("Value", value == null ? "Null" : value.ToString(), false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="String"/> to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="String"/> to write.</param>
         public void Write(string value)
         {
             try
@@ -129,6 +155,63 @@ namespace Extract.Interop
             {
                 ExtractException ee = new ExtractException("ELI26486",
                     "Unable to write integer.", ex);
+                ee.AddDebugData("Value", value, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Int64"/> to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Int64"/> to write.</param>
+        public void Write(long value)
+        {
+            try
+            {
+                _formatter.Serialize(_stream, value);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27876",
+                    "Unable to write long integer.", ex);
+                ee.AddDebugData("Value", value, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Single"/> to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Single"/> to write.</param>
+        public void Write(float value)
+        {
+            try
+            {
+                _formatter.Serialize(_stream, value);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27877",
+                    "Unable to write float.", ex);
+                ee.AddDebugData("Value", value, false);
+                throw ee;
+            }
+        }
+
+        /// <summary>
+        /// Writes a <see cref="Double"/> to the <see cref="IStream"/> object.
+        /// </summary>
+        /// <param name="value">The <see cref="Double"/> to write.</param>
+        public void Write(double value)
+        {
+            try
+            {
+                _formatter.Serialize(_stream, value);
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = new ExtractException("ELI27878",
+                    "Unable to write double.", ex);
                 ee.AddDebugData("Value", value, false);
                 throw ee;
             }
