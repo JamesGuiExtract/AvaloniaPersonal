@@ -1,0 +1,88 @@
+<HTML>
+
+<HEAD>
+<TITLE>LabDE 1.0 Final SCR Testing</TITLE>
+<link type="text/css" rel="stylesheet" href="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/UCLIDTesting.css">
+</HEAD>
+
+<BODY>
+
+<h1> LabDE 1.0 Final SCR Testing <br>
+<IMG src="../../../ReusableComponents/COMComponents/UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h3>Purpose and Details</h3>
+<ul>
+   	<LI><b>Purpose:</b> Exercise recent fixed SCRs
+   	<LI><b>Details:</b> Recently added SCRs generally do not have official test cases 
+	present within the collected checklists.  One part of validating a 1.0 
+	release candidate is to explicitly exercise these otherwise untested recent changes.
+</ul>
+<p>
+<h3>SCRs</h3>
+<OL>
+	<LI><b>Stress Testing with various images, builds, rules, O/S</b>
+       	<ul>
+		<li>Review the various <b>LogProcessStats / Stress Test</b> results 
+		executed on post-Beta 5 builds.
+  	   	<LI>Confirm that no unusual memory leaks are present.
+		<ul>
+			<li>Compare results for the same image sets, rules and build exercised 
+			on different operating systems.
+			<li>Compare results for different image sets but the same rules, 
+			build and operating systems.
+			<li>Compare results for the same image sets, build and operating system 
+			exercised on different rules.
+			<li>Compare results for the same image sets, rules and operating system 
+			exercised on different builds.
+		</ul>
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>Miscellaneous</b>
+       	<ul>
+		<li>Confirm that all table columns are now fully resizable.
+  	   	<LI>Confirm that <b>Result date</b> is a required field for 
+		first-stage verification.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #693]</b> Verify Extracted Data Memory Leak Test #1
+	<ul>
+		<li>Confirm that a recent memory leak test has been run and that no 
+		unexpected results are seen.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #695]</b> User License Shows LabDE Version Number
+	<ul>
+		<li>Run the <b>User License</b> utility.
+		<li>Confirm that <b>Extract Systems LabDE</b> is available as the <b>Product</b>.
+		<li>Confirm that the proper version number is displayed.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #696]</b> Deleting Spatial Info And Indirect Hints
+       	<ul>
+		<li>Open a Demo_LabDE sample image.
+  	   	<LI>Select a <b>Test - Comment</b> cell.
+  	   	<LI>Confirm that the indirect hint shows dotted-line boxes around other items 
+		in the row.
+  	   	<LI>Select a populated cell in the same row and press <b>Delete</b>.
+  	   	<LI>Select the <b>Test - Comment</b> cell again.
+  	   	<LI>Confirm that the indirect hint does not show a dotted-line boxes around the 
+		information from the deleted cell.
+       	</ul>
+   	</LI>
+<p>
+	<LI><b>[DataEntry #697]</b> Deleting All Orders
+       	<ul>
+		<li>Open a Demo_LabDE sample image containing multiple <b>Orders</b>.
+		<li>Select all the Orders and press <b>Delete</b>.
+		<li>Confirm that all of the <b>Orders</b> are deleted without an exception.
+       	</ul>
+   	</LI>
+</OL>
+</BODY>
+</HTML>
