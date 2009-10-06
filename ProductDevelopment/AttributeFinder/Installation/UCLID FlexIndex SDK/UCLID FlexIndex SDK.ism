@@ -314,7 +314,6 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>ClearImage</td><td>{360A61B5-15DC-4AED-AC50-94984A011457}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td>_11111111.dll</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{A9BD080B-7CB4-4954-8BBF-32EA6DADF977}</td><td>TARGET_HELP</td><td>0</td><td/><td>flexindex.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Redist</td><td>{EE4C3899-3218-4C52-A42A-33FD36B7160F}</td><td>TARGET_REDIST</td><td>0</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>SDKComponents</td><td>{520CC137-57D4-420C-AF6E-B3F95C8BD13B}</td><td>COMMON_COMPONENTS</td><td>8</td><td/><td/><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
@@ -1153,7 +1152,6 @@
 		<row><td>Documentation</td><td>Help</td></row>
 		<row><td>Documentation</td><td>Tutorial</td></row>
 		<row><td>Redist</td><td>Redist</td></row>
-		<row><td>SDKMain</td><td>ClearImage</td></row>
 		<row><td>SDKMain</td><td>SDKComponents</td></row>
 	</table>
 
@@ -1169,7 +1167,6 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
-		<row><td>_11111111.dll</td><td>ClearImage</td><td>_11111~1.DLL|_11111111.Dll</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;CLEAR_IMAGE_PATH&gt;\_11111111.Dll</td><td>1</td><td/></row>
 		<row><td>flexindex.chm</td><td>Help</td><td>FLEXIN~1.CHM|FLEXIndex.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_HELP_FILES&gt;\FLEXIndex.chm</td><td>1</td><td/></row>
 	</table>
 
@@ -1383,7 +1380,6 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
-		<row><td>ClearImage</td><td/><td/><td>_7691BC11_C729_4DB9_B2E6_3956F2A7CD0A_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_4E568C81_CDF3_4602_9111_7E1D69E11C19_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Redist</td><td/><td/><td>_87C1C298_20D3_413C_9D4F_5496D89762B6_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>SDKComponents</td><td/><td/><td>_194782D1_93CC_4676_B268_CA86FF42B50D_FILTER</td><td/><td/><td/><td/></row>
