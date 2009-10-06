@@ -104,7 +104,7 @@ static const string gstrCREATE_FAM_SKIPPED_FILE_TABLE = "CREATE TABLE [SkippedFi
 	"[UserName] [nvarchar](50) NULL, "
 	"[FileID] [int] NULL, "
 	"[ActionID] [int] NULL, "
-	"[UniqueFAMID] [nvarchar](50) NULL, "
+	"[UPIID] [int] NOT NULL DEFAULT(0), "
 	"CONSTRAINT [PK_FAMSkippedFile] PRIMARY KEY CLUSTERED ([ID] ASC))";
 
 static const string gstrCREATE_FAM_TAG_TABLE = "CREATE TABLE [Tag] ("
@@ -149,6 +149,9 @@ static const string gstrCREATE_FILE_ACTION_COMMENT_INDEX = "CREATE UNIQUE NONCLU
 
 static const string gstrCREATE_SKIPPED_FILE_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_Skipped_File] ON [SkippedFile]([FileID], [ActionID])";
+
+static const string gstrCREATE_SKIPPED_FILE_UPI_INDEX = "CREATE NONCLUSTERED INDEX "
+	"[IX_Skipped_File_UPI] ON [SkippedFile]([UPIID])";
 
 static const string gstrCREATE_FILE_TAG_INDEX = "CREATE UNIQUE NONCLUSTERED INDEX "
 	"[IX_File_Tag] ON [FileTag]([FileID], [TagID])";

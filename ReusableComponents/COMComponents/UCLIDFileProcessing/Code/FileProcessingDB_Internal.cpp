@@ -28,7 +28,7 @@ using namespace ADODB;
 //--------------------------------------------------------------------------------------------------
 // Define constant for the current DB schema version
 // This must be updated when the DB schema changes
-const long glFAMDBSchemaVersion = 15;
+const long glFAMDBSchemaVersion = 16;
 
 // Define four UCLID passwords used for encrypting the password
 // NOTE: These passwords were not exposed at the header file level because
@@ -98,9 +98,11 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 													string strAction, const string& strState,
 													const string& strException,
 													long nActionID, bool bLockDB,
-													const string& strUniqueProcessID,
+													bool bRemovePreviousSkipped,
 													const string& strFASTComment)
 {
+	INIT_EXCEPTION_AND_TRACING("MLI03270");
+
 	auto_ptr<LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>> apDBlg;
 	auto_ptr<TransactionGuard> apTG;
 	try
@@ -108,137 +110,188 @@ EActionStatus CFileProcessingDB::setFileActionState( ADODB::_ConnectionPtr ipCon
 		ASSERT_ARGUMENT("ELI26796", ipConnection != NULL);
 		ASSERT_ARGUMENT("ELI26795", !strAction.empty() || nActionID != -1);
 
+		_lastCodePos = "10";
 		EActionStatus easRtn = kActionUnattempted;
-
-		// Set up the select query to select the file to change
-		string strFileSQL = "SELECT * FROM FAMFile WHERE ID = " + asString (nFileID);
 
 		if (bLockDB)
 		{
+			_lastCodePos = "20";
 			// Lock the database for this instance
 			apDBlg.reset(
 				new LockGuard<UCLID_FILEPROCESSINGLib::IFileProcessingDBPtr>(getThisAsCOMPtr()));
 		}
 
-		// Make sure the DB Schema is the expected version
-		validateDBSchemaVersion();
-
-		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
-		ASSERT_RESOURCE_ALLOCATION("ELI13542", ipFileSet != NULL );
-		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
-			adOpenDynamic, adLockOptimistic, adCmdText );
-
-		if (bLockDB)
-		{
-			// Begin a transaction
-			apTG.reset(new TransactionGuard(ipConnection));
-		}
-
 		// Update action ID/Action name
 		if (!strAction.empty() && nActionID == -1)
-		{
+		{	
+			_lastCodePos = "30";
 			nActionID = getActionID(ipConnection, strAction);
 		}
 		else if (strAction.empty() && nActionID != -1)
 		{
+			_lastCodePos = "40";
 			strAction = getActionName(ipConnection, nActionID);
 		}
+		_lastCodePos = "50";
 
 		// Action Column to update
 		string strActionCol = "ASC_" + strAction;
 
+		// Set up the select query to select the file to change and include and skipped file data
+		// If there is no skipped file record the SkippedActionID will be -1
+		string strFileSQL = "SELECT FAMFile.ID as ID, FileName, FileSize, Pages, Priority, " + 
+			strActionCol + ", COALESCE(SkippedFile.ActionID, -1) AS SkippedActionID " +
+			"FROM SkippedFile RIGHT OUTER JOIN FAMFile ON SkippedFile.FileID = FAMFile.ID AND " +
+			"SkippedFile.ActionID = " + asString(nActionID) + " WHERE FAMFile.ID = " + asString (nFileID);
+		
+		_lastCodePos = "60";
+
+		// Make sure the DB Schema is the expected version
+		validateDBSchemaVersion();
+		_lastCodePos = "70";
+
+		_RecordsetPtr ipFileSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI13542", ipFileSet != NULL );
+		_lastCodePos = "80";
+
+		ipFileSet->Open( strFileSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
+			adOpenStatic, adLockReadOnly, adCmdText );
+		
+		_lastCodePos = "90";
+		if (bLockDB)
+		{
+			_lastCodePos = "100";
+			// Begin a transaction
+			apTG.reset(new TransactionGuard(ipConnection));
+		}
+		_lastCodePos = "110";
+
 		// Find the file if it exists
 		if ( ipFileSet->adoEOF == VARIANT_FALSE )
 		{
+			_lastCodePos = "120";
 			FieldsPtr ipFileSetFields = ipFileSet->Fields;
 			ASSERT_RESOURCE_ALLOCATION("ELI26867", ipFileSetFields != NULL);
 
+			_lastCodePos = "130";
 			// Get the previous state
 			string strPrevStatus = getStringField(ipFileSetFields, strActionCol ); 
+			_lastCodePos = "140";
+
 			easRtn = asEActionStatus ( strPrevStatus );
+			_lastCodePos = "150";
 
 			// Get the current record
 			UCLID_FILEPROCESSINGLib::IFileRecordPtr ipCurrRecord;
 			ipCurrRecord = getFileRecordFromFields(ipFileSetFields);
+			_lastCodePos = "160";
 
-			// set the new state
-			setStringField( ipFileSetFields, strActionCol, strState );
+			// Get the skipped ActionID
+			long nSkippedActionID = getLongField(ipFileSetFields, "SkippedActionID");
+			_lastCodePos = "170";
+
+			// Update the state of the file in the FAMFile table
+			executeCmdQuery(ipConnection, "Update FAMFile Set " + strActionCol + " = '" + 
+				strState + "' WHERE ID = " + asString(nFileID));
+			_lastCodePos = "180";
 
 			// If transition to complete and AutoDeleteFileActionComment == true
 			// then clear the file action comment for this file
 			if (strState == "C" && m_bAutoDeleteFileActionComment)
 			{
+				_lastCodePos = "190";
 				clearFileActionComment(ipConnection, nFileID, nActionID);
 			}
-
-			// Update the file record
-			ipFileSet->Update();
+			_lastCodePos = "200";
 
 			// if the old status does not equal the new status add transition records
-			if ( strPrevStatus != strState )
+			if ( strPrevStatus != strState || bRemovePreviousSkipped)
 			{
+				_lastCodePos = "210";
 				// update the statistics
 				EActionStatus easStatsFrom = easRtn;
 				if (easRtn == kActionProcessing)
 				{
-					// If moving from processing, check for record in skipped file table
-					string strTempSQL = "SELECT [ID] FROM [SkippedFile] WHERE ([FileID] = "
-						+ asString(nFileID) + " AND [ActionID] = " + asString(nActionID) + ")";
-
-					// Get the record set
-					_RecordsetPtr ipSkippedSet(__uuidof(Recordset));
-					ASSERT_RESOURCE_ALLOCATION("ELI26949", ipSkippedSet != NULL);
-					ipSkippedSet->Open(strTempSQL.c_str(), _variant_t((IDispatch *)ipConnection, true),
-						adOpenForwardOnly, adLockReadOnly, adCmdText );
-
+					_lastCodePos = "220";
 					// If there is a record in the skipped table, call update stats with
 					// Skipped as the previous state
-					if (ipSkippedSet->adoEOF == VARIANT_FALSE)
+					if (nSkippedActionID != -1)
 					{
+						_lastCodePos = "230";
 						easStatsFrom = kActionSkipped;
 					}
+					_lastCodePos = "240";
 
 					// Remove record from the LockedFileTable
 					executeCmdQuery(ipConnection, "DELETE FROM LockedFile WHERE FileID = " + 
 						asString(nFileID));
 				}
+				_lastCodePos = "250";
 				updateStats(ipConnection, nActionID, easStatsFrom, asEActionStatus(strState),
 					ipCurrRecord, ipCurrRecord);
 
+				_lastCodePos = "260";
 				// Only update FileActionStateTransition table if required
 				if (m_bUpdateFASTTable)
 				{
+					_lastCodePos = "270";
 					addFileActionStateTransition( ipConnection, nFileID, nActionID, strPrevStatus, 
 						strState, strException, strFASTComment );
 				}
+				_lastCodePos = "280";
 
-				if (!strUniqueProcessID.empty())
+				// Determine if existing skipped record should be removed
+				bool bSkippedRemoved = nSkippedActionID != -1 && (bRemovePreviousSkipped || strState != "S");
+
+				// These calls are order dependent.
+				// Remove the skipped record (if any) and add a new
+				// skipped file record if the new state is skipped
+				if (bSkippedRemoved)
 				{
-					// These calls are order dependent.
-					// Remove the skipped record (if any) and add a new
-					// skipped file record if the new state is skipped
+					_lastCodePos = "290";
 					removeSkipFileRecord(ipConnection, nFileID, nActionID);
-					if (strState == "S")
+				}
+				_lastCodePos = "300";
+
+				if (strState == "S")
+				{
+					if (nSkippedActionID == -1 || bSkippedRemoved)
 					{
+						_lastCodePos = "310";
+
 						// Add a record to the skipped table
-						addSkipFileRecord(ipConnection, nFileID, nActionID, strUniqueProcessID);
+						addSkipFileRecord(ipConnection, nFileID, nActionID);
+					}
+					else 
+					{
+						_lastCodePos = "320";
+						// Update the UPIID so to current process so it will be not be selected
+						// again as a skipped file for the current process
+						executeCmdQuery(ipConnection, "Update SkippedFile Set UPIID = " + 
+							asString(m_nUPIID) + " WHERE FileID = " + asString(nFileID));
 					}
 				}
 			}
+			_lastCodePos = "330";
 
 			// If there is a transaction guard then commit the transaction
 			if (apTG.get() != NULL)
 			{
+				_lastCodePos = "340";
 				apTG->CommitTrans();
 			}
+			_lastCodePos = "350";
 		}
 		else
 		{
+			_lastCodePos = "360";
+
 			// No file with the given id
 			UCLIDException ue("ELI13543", "File ID was not found." );
 			ue.addDebugInfo ( "File ID", nFileID );
 			throw ue;
 		}
+		_lastCodePos = "370";
 
 		return easRtn;
 	}
@@ -841,6 +894,7 @@ void CFileProcessingDB::addTables()
 		vecQueries.push_back(gstrCREATE_FILE_ACTION_COMMENT_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_SKIPPED_FILE_TABLE);
 		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_INDEX);
+		vecQueries.push_back(gstrCREATE_SKIPPED_FILE_UPI_INDEX);
 		vecQueries.push_back(gstrCREATE_FAM_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FAM_FILE_TAG_TABLE);
 		vecQueries.push_back(gstrCREATE_FILE_TAG_INDEX);
@@ -1009,9 +1063,10 @@ void CFileProcessingDB::copyActionStatus( const _ConnectionPtr& ipConnection, co
 			string strDeleteSkipped = "DELETE FROM SkippedFile WHERE ActionID = " + strToActionID;
 
 			// Need to add any new skipped records (files may be entering skipped status)
-			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName) SELECT "
+			string strAddSkipped = "INSERT INTO SkippedFile (FileID, ActionID, UserName, UPIID) SELECT "
 				" FAMFile.ID, " + strToActionID + " AS NewActionID, '" + getCurrentUserName()
-				+ "' AS NewUserName FROM FAMFile WHERE ASC_" + strFrom + " = 'S'";
+				+ "' AS NewUserName " + asString(m_nUPIID) + " AS UPIID FROM FAMFile WHERE ASC_" 
+				+ strFrom + " = 'S'";
 
 			// Delete the existing skipped records for this action and insert any new ones
 			executeCmdQuery(ipConnection, strDeleteSkipped);
@@ -2139,8 +2194,7 @@ bool CFileProcessingDB::reConnectDatabase()
 }
 //--------------------------------------------------------------------------------------------------
 void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnection,
-										  long nFileID, long nActionID,
-										  const string& strUniqueProcessID)
+										  long nFileID, long nActionID)
 {
 	try
 	{
@@ -2176,7 +2230,7 @@ void CFileProcessingDB::addSkipFileRecord(const ADODB::_ConnectionPtr &ipConnect
 			setStringField(ipFields, "UserName", strUserName);
 			setLongField(ipFields, "FileID", nFileID);
 			setLongField(ipFields, "ActionID", nActionID);
-			setStringField(ipFields, "UniqueFAMID", strUniqueProcessID);
+			setLongField(ipFields, "UPIID", m_nUPIID);
 
 			// Update the row
 			ipSkippedSet->Update();
@@ -2512,8 +2566,8 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 
 			setFileActionState(ipConnection, getLongField(ipFields, "FileID"), 
 				strActionName, strRevertToStatus, 
-				"Error reverting status", getLongField(ipFields, "ActionID"), false, 
-				getStringField(ipFields, "UPI"), strFASTComment);
+				"Error reverting status", getLongField(ipFields, "ActionID"), false, false,
+				strFASTComment);
 
 			ipFileSet->MoveNext();
 		}

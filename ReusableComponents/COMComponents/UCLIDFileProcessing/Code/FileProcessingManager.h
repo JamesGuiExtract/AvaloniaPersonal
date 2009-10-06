@@ -183,9 +183,6 @@ private:
 		kEndStop
 	};
 
-	// Counter used to increment the unique process ID with each processing run
-	int m_iUPICounter;
-
 	///////////
 	// Methods
 	///////////

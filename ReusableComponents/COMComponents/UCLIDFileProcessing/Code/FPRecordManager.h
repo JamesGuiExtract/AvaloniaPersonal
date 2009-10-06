@@ -129,9 +129,6 @@ public:
 	//			current user if bSkippedForCurrentUser == true, and process files skipped
 	//			by any user if bSkippedForCurrentUser == false
 	void setSkippedForCurrentUser(bool bSkippedForCurrentUser = true);
-	//---------------------------------------------------------------------------------------------
-	// PROMISE: To set the unique process ID string (used when setting files to skipped status)
-	void setUniqueProcessID(const string& strUniqueProcessID);
 
 private:
 
@@ -208,11 +205,6 @@ private:
 	// skipped files whether to process those skipped by all users or just current user
 	bool m_bProcessSkippedFiles;
 	bool m_bSkippedFilesForCurrentUser;
-
-	// Used when notifying the database of a file being skipped so that the ID can be updated.
-	// It is also usesd when getting files that have been skipped so that files skipped by this
-	// session are not re-processed.
-	string m_strUniqueProcessID;
 
 	////////////////
 	// Methods

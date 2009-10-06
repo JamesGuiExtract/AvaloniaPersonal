@@ -632,10 +632,10 @@ library UCLID_FILEPROCESSINGLib
 		//			(up to nMaxFiles), if bstrSkippedForUserName is not NULL or "" then will only
 		//			return files that have been skipped for the specified action by the specified
 		//			user (up to nMaxFiles). If bGetSkippedFiles == true then the list of skipped files
-		//			will not contain any file with a UniqueFAMID == bstrUniqueProcessID.
+		//			will not contain any file that was skipped in the current run.
 		[id(14), helpstring("method GetFilesToProcess")] HRESULT GetFilesToProcess([in] BSTR strAction, 
 			[in] long nMaxFiles, [in] VARIANT_BOOL bGetSkippedFiles,
-			[in] BSTR bstrSkippedForUserName, [in] BSTR bstrUniqueProcessID,
+			[in] BSTR bstrSkippedForUserName,
 			[out, retval] IIUnknownVector* *pvecFileRecords);
 
 		// -----------------------------------------------------------------------------------------------
@@ -761,7 +761,7 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nActionID, [out, retval] BSTR* pbstrActionName);
 		// -----------------------------------------------------------------------------------------------
 		[id(46), helpstring("method NotifyFileSkipped")] HRESULT NotifyFileSkipped([in] long nFileID,
-			[in] long nActionID, [in] BSTR bstrUniqueProcessID);
+			[in] long nActionID);
 
 		// -----------------------------------------------------------------------------------------------
 		// Methods related to comment strings
@@ -776,12 +776,12 @@ library UCLID_FILEPROCESSINGLib
 			[in] long nFileID, [in] long nActionID);
 
 		// -----------------------------------------------------------------------------------------------
-		// PURPOSE: To set the specified file to skipped status for the specified action. If
-		//			bstrUniqueProcessID == "" then the skipped file table will
-		//			not be updated for the particular record, otherwise the skipped file table
-		//			will be updated with the new UniqueProcessID assigned to it.
+		// PURPOSE: To set the specified file to skipped status for the specified action. 
+		//			If bRemovePreviousSkipped is VARIANT_FALSE the SkippedFileTable will only
+		//			update the UPIID in an existing record, if VARIANT_TRUE then any record in the
+		//			skipped table will be replaced with a new record.
 		[id(50), helpstring("method SetFileStatusToSkipped")] HRESULT SetFileStatusToSkipped(
-			[in] long nFileID, [in] BSTR bstrAction, [in] BSTR bstrUniqueProcessID);
+			[in] long nFileID, [in] BSTR bstrAction, VARIANT_BOOL bRemovePreviousSkipped);
 		// -----------------------------------------------------------------------------------------------
 		// PURPOSE: To set all files which match the specified query to the specified status
 		//			for the specified action.
