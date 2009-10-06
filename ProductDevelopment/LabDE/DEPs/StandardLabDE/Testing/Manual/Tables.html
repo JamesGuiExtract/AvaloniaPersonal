@@ -525,6 +525,22 @@
 			row to just the cell you're editing.
 		</ul>
 <p>
+		<LI><b>[DataEntry #497]</b> Selecting the new row of the Order table
+	       	<ul>
+			<li>Open a Demo_LabDE sample image with multiple pages.
+			<li>Navigate to a page without any orders.
+			<li>Click on the <b>new</b> row of the <b>Order</b> table.
+			<li>Confirm that the active page does not change.
+       		</ul>
+<p>
+		<LI><b>[DataEntry #611]</b> Too much text
+	       	<ul>
+			<li>Open a Demo_LabDE sample image.
+			<li>Select the <b>Name</b> cell of a test row.
+			<li>Paste a large paragraph of text into the cell.
+			<li>Confirm that no exception is thrown.
+       		</ul>
+<p>
 		<LI><b>[DataEntry #641]</b> Cell selection and Delete
 	       	<ul>
 			<li>Open a Demo_LabDE sample image.
@@ -551,6 +567,14 @@
 			<b>Test Name</b> cell.
   	   		<LI>Confirm that <b>BMP1</b> (for BASIC METABOLIC PANEL) is accepted as 
 			an entry in the <b>Order Name</b> cell.
+       		</ul>
+<p>
+		<LI><b>[DataEntry #651]</b> Test name conflict
+       		<ul>
+			<li>Open an image with a <b>CBC</b> order (i.e. <b>004.tif</b>).
+	  	   	<LI>Select a <b>Test Name</b> cell.
+	  	   	<LI>Type <b>SEG</b> in the cell.
+  	   		<LI>Confirm that the name does not get updated to <b>SEGS</b>.
        		</ul>
 <p>
 		<LI><b>[DataEntry #679]</b> Show all highlights and new swipes
