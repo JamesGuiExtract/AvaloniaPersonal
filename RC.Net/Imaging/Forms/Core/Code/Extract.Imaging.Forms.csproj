@@ -554,9 +554,7 @@
       <DependentUpon>ThumbnailViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="ThumbnailWorker.cs">
-      <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ThumbnailWorkerProgress.cs" />
     <Compile Include="ToolStripButtonConstants.cs" />
     <Compile Include="Controls\ZoomInToolStripButton.cs">
       <SubType>Component</SubType>
