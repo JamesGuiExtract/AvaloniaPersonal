@@ -3116,6 +3116,7 @@ namespace Extract.Imaging.Forms
             // If there is a print preview dialog, need to invalidate it
             if (_printPreview != null)
             {
+                // TODO: Look into removing DoEvents, will Refresh work?
                 // Invalidate the print preview dialog and the image viewer and call do events so
                 // that the toolstrip will draw
                 _printPreview.Invalidate();

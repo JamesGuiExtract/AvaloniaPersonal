@@ -168,8 +168,7 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Refresh the image viewer before opening the file [IDSD #145 - JDS]
-                Invalidate();
-                Application.DoEvents();
+                Refresh();
 
                 // TODO: what should final state be if exceptions are thrown in different sections.
 
@@ -236,8 +235,10 @@ namespace Extract.Imaging.Forms
                         _codecs = GetCodecs();
 
                         // Get the page count
-                        CodecsImageInfo info = _codecs.GetInformation(_currentOpenFile, true);
-                        _pageCount = info.TotalPages;
+                        using (CodecsImageInfo info = _codecs.GetInformation(_currentOpenFile, true))
+                        {
+                            _pageCount = info.TotalPages;
+                        }
 
                         // Create the page data for this image
                         _imagePages = new List<ImagePageData>(_pageCount);
@@ -4377,7 +4378,6 @@ namespace Extract.Imaging.Forms
 
             // Refresh the image viewer
             Invalidate();
-            Application.DoEvents();
         }
 
         /// <overloads>Checks whether the specified object is contained on the current page.
