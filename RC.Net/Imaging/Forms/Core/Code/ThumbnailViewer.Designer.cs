@@ -17,19 +17,20 @@ namespace Extract.Imaging.Forms
         {
             if (disposing)
             {
+                // Release managed resources
+                StopThumbnailWorker();
+
                 DisposeThumbnails();
 
-                // Release managed resources
                 if (components != null)
                 {
                     components.Dispose();
                 }
-                if (_worker != null)
+                if (_timer != null)
                 {
-                    _worker.Dispose();
-                    _worker = null;
+                    _timer.Dispose();
+                    _timer = null;
                 }
-                
             }
 
             // Release unmanaged resources
@@ -46,7 +47,9 @@ namespace Extract.Imaging.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this._imageList = new Leadtools.WinForms.RasterImageList();
+            this._timer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // _imageList
@@ -60,7 +63,11 @@ namespace Extract.Imaging.Forms
             this._imageList.Size = new System.Drawing.Size(225, 400);
             this._imageList.TabIndex = 0;
             this._imageList.SelectedIndexChanged += new System.EventHandler(this.HandleImageListSelectedIndexChanged);
-            this._imageList.Scroll += new System.EventHandler(this.HandleImageListScroll);
+            // 
+            // _timer
+            // 
+            this._timer.Interval = 1000;
+            this._timer.Tick += new System.EventHandler(this.HandleTimerTick);
             // 
             // ThumbnailViewer
             // 
@@ -74,5 +81,6 @@ namespace Extract.Imaging.Forms
         #endregion
 
         private Leadtools.WinForms.RasterImageList _imageList;
+        private System.Windows.Forms.Timer _timer;
     }
 }

@@ -1,7 +1,6 @@
 using Leadtools;
 using Leadtools.WinForms;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Globalization;
@@ -99,15 +98,10 @@ namespace Extract.Imaging.Forms
         void Clear()
         {
             // Stop and dispose of the worker thread
-            if (_worker != null)
-            {
-                _worker.Dispose();
-                _worker = null;
-            }
+            StopThumbnailWorker();
 
             // Dispose and clear the thumbnails
             DisposeThumbnails();
-            _imageList.Items.Clear();
         }
 
         /// <summary>
@@ -118,7 +112,7 @@ namespace Extract.Imaging.Forms
             if (_imageList != null)
             {
                 RasterImageListItemCollection items = _imageList.Items;
-                if (items != null)
+                if (items != null && items.Count > 0)
                 {
                     foreach (RasterImageListItem item in items)
                     {
@@ -131,6 +125,7 @@ namespace Extract.Imaging.Forms
                             }
                         }
                     }
+                    items.Clear();
                 }
             }
         }
@@ -159,38 +154,37 @@ namespace Extract.Imaging.Forms
             _worker = new ThumbnailWorker(_imageViewer.ImageFile, _imageViewer.PageCount, 
                                           _imageList.ItemImageSize);
 
-            _worker.WorkerReportsProgress = true;
-            _worker.WorkerSupportsCancellation = true;
+            _worker.BeginLoading();
 
-            _worker.ProgressChanged += HandleWorkerProgressChanged;
-            _worker.RunWorkerCompleted += HandleWorkerRunWorkerCompleted;
-
-            _worker.RunWorkerAsync();
+            _timer.Start();
         }
 
         /// <summary>
-        /// Determines if the thumbnail corresponding to the specified page is visible.
+        /// Stops and destroys the worker thread.
         /// </summary>
-        /// <param name="page">The page to check for visibility.</param>
-        /// <returns>
-        /// <see langword="true"/> if the thumbnail for <paramref name="page"/> is visible;
-        /// <see langword="false"/> if the thumbnail for <paramref name="page"/> is not visible.
-        /// </returns>
-        bool IsVisiblePage(int page)
+        void StopThumbnailWorker()
         {
-            return page > _imageList.TopIndex && page <= GetBottomIndex() + 1;
+            if (_timer != null)
+            {
+                _timer.Stop();
+            }
+            if (_worker != null)
+            {
+                _worker.Dispose();
+                _worker = null;
+            }
         }
 
         /// <summary>
-        /// Updates any visible pages that are displaying the default image with the actual 
+        /// Updates any visible thumbnails that are displaying the default image with the actual 
         /// thumbnail image loaded from the <see cref="ThumbnailWorker"/>.
         /// </summary>
         /// <returns><see langword="true"/> if the <see cref="ThumbnailWorker"/> has loaded all 
         /// the visible pages for the specified</returns>
-        bool UpdateVisiblePagesFromWorker()
+        bool UpdateThumbnailsFromWorker(int startIndex, int endIndex)
         {
             bool success = true;
-            foreach (int i in GetVisibleItemIndices())
+            for (int i = startIndex; i <= endIndex; i++)
             {
                 RasterImageListItem item = _imageList.Items[i];
                 if (item.Image == _LOADING_IMAGE)
@@ -209,19 +203,6 @@ namespace Extract.Imaging.Forms
             }
 
             return success;
-        }
-
-        /// <summary>
-        /// Iterates the indices of the visible items.
-        /// </summary>
-        /// <returns>The indices of the visible items.</returns>
-        IEnumerable<int> GetVisibleItemIndices()
-        {
-            int bottomIndex = GetBottomIndex();
-            for (int i = _imageList.TopIndex; i <= bottomIndex; i++)
-            {
-                yield return i;
-            }
         }
 
         /// <summary>
@@ -258,71 +239,6 @@ namespace Extract.Imaging.Forms
         #endregion ThumbnailViewer Methods
 
         #region ThumbnailViewer Event Handlers
-
-        /// <summary>
-        /// Handles the <see cref="BackgroundWorker.ProgressChanged"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="BackgroundWorker.ProgressChanged"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="BackgroundWorker.ProgressChanged"/> event.</param>
-        void HandleWorkerProgressChanged(object sender, ProgressChangedEventArgs e)
-        {
-            try
-            {
-                // Check the last loaded page is visible
-                ThumbnailWorkerProgress progress = (ThumbnailWorkerProgress)e.UserState;
-                if (IsVisiblePage(progress.PageNumber))
-                {
-                    // It is visible. Display it.
-                    RasterImageListItem item = _imageList.Items[progress.PageNumber - 1];
-                    item.Image = progress.Image;
-                    item.Invalidate();
-                }
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27916", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="BackgroundWorker.RunWorkerCompleted"/> event.
-        /// </summary>
-        /// <param name="sender">The object that sent the 
-        /// <see cref="BackgroundWorker.RunWorkerCompleted"/> event.</param>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="BackgroundWorker.RunWorkerCompleted"/> event.</param>
-        void HandleWorkerRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
-            try
-            {
-                // Get all the loaded thumbnails
-                RasterImage[] result = (RasterImage[])e.Result;
-
-                _imageList.BeginUpdate();
-
-                // Replace the default image for all images that have not yet been replaced.
-                for (int i = 0; i < result.Length; i++)
-                {
-                    RasterImageListItem item = _imageList.Items[i];
-                    if (item.Image == _LOADING_IMAGE)
-                    {
-                        item.Image = result[i];
-                    }
-                }
-
-                _imageList.EndUpdate();
-            }
-            catch (Exception ex)
-            {
-                ExtractException ee = ExtractException.AsExtractException("ELI27917", ex);
-                ee.AddDebugData("Event data", e, false);
-                ee.Display();
-            }
-        }
 
         /// <summary>
         /// Handles the <see cref="Extract.Imaging.Forms.ImageViewer.ImageFileChanged"/> event.
@@ -414,27 +330,44 @@ namespace Extract.Imaging.Forms
         }
 
         /// <summary>
-        /// Handles the <see cref="ScrollableControl.Scroll"/> event.
+        /// Handles the <see cref="Timer.Tick"/> event.
         /// </summary>
         /// <param name="sender">The object that sent the 
-        /// <see cref="ScrollableControl.Scroll"/> event.</param>
+        /// <see cref="Timer.Tick"/> event.</param>
         /// <param name="e">The event data associated with the 
-        /// <see cref="ScrollableControl.Scroll"/> event.</param>
-        void HandleImageListScroll(object sender, EventArgs e)
+        /// <see cref="Timer.Tick"/> event.</param>
+        void HandleTimerTick(object sender, EventArgs e)
         {
             try
             {
-                // Attempt to update the default image for any visible pages
-                bool success = UpdateVisiblePagesFromWorker();
+                // Determine the page range of the thumbnails to update
+                int startIndex;
+                int endIndex;
+                if (_worker.IsRunning)
+                {
+                    // Update visible thumbnails only
+                    startIndex = _imageList.TopIndex;
+                    endIndex = GetBottomIndex();
+                }
+                else
+                {
+                    // Update all thumbnails
+                    _timer.Stop();
+                    startIndex = 0;
+                    endIndex = _imageList.Items.Count - 1;
+                }
+
+                // Attempt to update default images
+                bool success = UpdateThumbnailsFromWorker(startIndex, endIndex);
                 if (!success)
                 {
                     // If there are still visible default images, mark them as a priority to load
-                    _worker.SetPriorityThumbnails(_imageList.TopIndex + 1, GetBottomIndex() + 1);
+                    _worker.SetPriorityThumbnails(startIndex + 1, endIndex + 1);
                 }
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI27921", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI27965", ex);
                 ee.AddDebugData("Event data", e, false);
                 ee.Display();
             }
