@@ -313,6 +313,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
+		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>processfiles.exe.manifest</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1122,6 +1123,7 @@
 	<table name="FeatureComponents">
 		<col key="yes" def="s38">Feature_</col>
 		<col key="yes" def="s72">Component_</col>
+		<row><td>DefaultFeature</td><td>AllOtherFiles</td></row>
 		<row><td>DefaultFeature</td><td>Help</td></row>
 	</table>
 
@@ -1138,6 +1140,7 @@
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
+		<row><td>processfiles.exe.manifest</td><td>AllOtherFiles</td><td>PROCES~1.MAN|ProcessFiles.exe.manifest</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\ProcessFiles.exe.manifest</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
@@ -1349,6 +1352,7 @@
 		<col def="S0">FTPLocation</col>
 		<col def="S0">HTTPLocation</col>
 		<col def="S0">Miscellaneous</col>
+		<row><td>AllOtherFiles</td><td/><td/><td>_2609E52D_0837_45AF_AB4E_609D37B72624_FILTER</td><td/><td/><td/><td/></row>
 		<row><td>Help</td><td/><td/><td>_10883AA1_60F1_460D_A0E0_D91F6169AF21_FILTER</td><td/><td/><td/><td/></row>
 	</table>
 
@@ -1674,6 +1678,7 @@
 		<row><td>PATH_TO_COMMON_SCRIPT_FILES</td><td>&lt;ISPROJECTDIR&gt;..\..\..\Common\InstallScripts</td><td/><td>2</td></row>
 		<row><td>PATH_TO_COREPOINT_INSTALL</td><td>\\jake\Applications\CorePoint Integration Engine</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CRYSTAL_REPORTS_INSTALL</td><td>P:\AttributeFinder\RequiredInstalls\CrystalReports12</td><td/><td>2</td></row>
+		<row><td>PATH_TO_DATAENTRY_MISC</td><td>P:\DataEntry\CoreInstallation\Files\Misc</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOT_NET_35</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 3.5 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_DOT_NET_INSTALLS</td><td>P:\AttributeFinder\RequiredInstalls\DotNet 2.0 Framework</td><td/><td>2</td></row>
 		<row><td>PATH_TO_INLITE_INSTALL</td><td>P:\AttributeFinder\InliteInstall</td><td/><td>2</td></row>

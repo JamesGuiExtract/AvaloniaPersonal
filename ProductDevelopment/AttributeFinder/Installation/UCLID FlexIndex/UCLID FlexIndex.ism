@@ -856,9 +856,9 @@
 		<col def="i4">Type</col>
 		<row><td>CLEAR_IMAGE_PATH</td><td>P:\AttributeFinder\ClearImageFiles</td><td/><td>2</td></row>
 		<row><td>CommonFilesFolder</td><td/><td/><td>1</td></row>
-		<row><td>ISPROJECTDIR</td><td/><td/><td>1</td></row>
+		<row><td>ISPROJECTDIR</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProductFolder</td><td/><td/><td>1</td></row>
-		<row><td>ISProjectDataFolder</td><td/><td/><td>1</td></row>
+		<row><td>ISProjectDataFolder</td><td>1</td><td/><td>1</td></row>
 		<row><td>ISProjectFolder</td><td/><td/><td>1</td></row>
 		<row><td>PATH_DOTNET_GAC_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\DotNetGAC</td><td/><td>2</td></row>
 		<row><td>PATH_TO_CLEARIMAGEFILES_FILES</td><td>P:\AttributeFinder\CoreInstallation\Files\ClearImageFiles</td><td/><td>2</td></row>
