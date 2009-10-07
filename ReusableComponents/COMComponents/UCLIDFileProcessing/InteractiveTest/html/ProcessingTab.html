@@ -84,7 +84,21 @@
 		<li>Confirm that selecting the <b>Process all files that skipped</b> radio button enables
 		the drop-down box.
 		<li>Confirm that the drop-down box contains the options <b>I</b> and <b>all users</b>.
+  	   	<LI><b>[LegacyRC #5413, #5414]</b> DB setting for requiring password before 
+		processing all skipped files
+	       	<ul>
+	      		<li>Confirm that a <b>DBInfo</b> setting for 
+			<b>RequirePasswordToProcessAllSkippedFiles</b> exists.
+	      		<li>Confirm that the default setting is enabled.
+	      		<li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> 
+			is enabled, the DB Admin password <b>is required</b> in order 
+			to process all skipped files.
+	      		<li>Confirm that when <b>RequirePasswordToProcessAllSkippedFiles</b> 
+			is disabled, the DB Admin password <b>is not required</b> in order 
+			to process all skipped files.
+	       	</ul>
 	</ul>
+<p>
    	<li>Confirm the Processing Setup tab has a <b>Threads for processing</b> groupbox with two 
 	radio buttons.</li>
    	<ul> 
