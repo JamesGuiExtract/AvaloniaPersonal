@@ -1,8 +1,5 @@
 using Extract.Imaging.Forms;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
 
 namespace Extract.Redaction.Verification
 {
@@ -17,6 +14,16 @@ namespace Extract.Redaction.Verification
         /// The image file associated with the verified document.
         /// </summary>
         readonly string _imageFile;
+
+        /// <summary>
+        /// The id of the file.
+        /// </summary>
+        readonly int _fileId;
+
+        /// <summary>
+        /// The id of the action associated with the file.
+        /// </summary>
+        readonly int _actionId;
 
         /// <summary>
         /// The voa file with the current (perhaps uncommitted) redactions.
@@ -55,10 +62,12 @@ namespace Extract.Redaction.Verification
         /// <summary>
         /// Initializes a new instance of the <see cref="VerificationMemento"/> class.
         /// </summary>
-        public VerificationMemento(string imageFile, string attributesFile, string documentType,
-            string feedbackImage)
+        public VerificationMemento(string imageFile, int fileId, int actionId, 
+            string attributesFile, string documentType, string feedbackImage)
         {
             _imageFile = imageFile;
+            _fileId = fileId;
+            _actionId = actionId;
             _voaFile = attributesFile;
             _documentType = documentType;
             _feedbackImage = feedbackImage;
@@ -77,6 +86,30 @@ namespace Extract.Redaction.Verification
             get
             {
                 return _imageFile;
+            }
+        }
+
+        /// <summary>
+        /// Gets the file id associated with the document.
+        /// </summary>
+        /// <value>The file id associated with the document.</value>
+        public int FileId
+        {
+            get
+            {
+                return _fileId;
+            }
+        }
+
+        /// <summary>
+        /// Gets the action id associated with the document.
+        /// </summary>
+        /// <value>The action id associated with the document.</value>
+        public int ActionId
+        {
+            get
+            {
+                return _actionId;
             }
         }
 

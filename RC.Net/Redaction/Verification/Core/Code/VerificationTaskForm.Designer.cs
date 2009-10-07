@@ -2,7 +2,7 @@ using System;
 
 namespace Extract.Redaction.Verification
 {
-    partial class VerificationTaskForm
+    sealed partial class VerificationTaskForm
     {
         /// <summary>
         /// Required designer variable.
@@ -218,6 +218,7 @@ namespace Extract.Redaction.Verification
             this._commentsTextBox.Name = "_commentsTextBox";
             this._commentsTextBox.Size = new System.Drawing.Size(564, 58);
             this._commentsTextBox.TabIndex = 6;
+            this._commentsTextBox.TextChanged += new System.EventHandler(this.HandleCommentsTextBoxTextChanged);
             // 
             // label3
             // 

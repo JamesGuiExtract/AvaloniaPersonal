@@ -6,16 +6,12 @@ using Extract.Utilities.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
-using UCLID_COMUTILSLib;
 using UCLID_FILEPROCESSINGLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
@@ -26,7 +22,7 @@ namespace Extract.Redaction.Verification
     /// Represents a dialog that allows the user to verify redactions.
     /// </summary>
     [CLSCompliant(false)]
-    public partial class VerificationTaskForm : Form, IVerificationForm
+    public sealed partial class VerificationTaskForm : Form, IVerificationForm
     {
         #region VerificationTaskForm Constants
 
@@ -55,6 +51,11 @@ namespace Extract.Redaction.Verification
         readonly InitializationSettings _iniSettings = new InitializationSettings();
 
         /// <summary>
+        /// The file processing database.
+        /// </summary>
+        FileProcessingDB _database;
+
+        /// <summary>
         /// The settings for the user interface.
         /// </summary>
         VerificationOptions _options;
@@ -77,9 +78,15 @@ namespace Extract.Redaction.Verification
         bool _dirty;
 
         /// <summary>
+        /// <see langword="true"/> if the comment text box has been modified;
+        /// <see langword="false"/> if the comment text box has not been modified.
+        /// </summary>
+        bool _commentChanged;
+
+        /// <summary>
         /// The previously verified documents.
         /// </summary>
-        List<VerificationMemento> _history = new List<VerificationMemento>(_MAX_DOCUMENT_HISTORY);
+        readonly List<VerificationMemento> _history = new List<VerificationMemento>(_MAX_DOCUMENT_HISTORY);
 
         /// <summary>
         /// Represents the index in <see cref="_history"/> of the currently displayed document. 
@@ -251,7 +258,6 @@ namespace Extract.Redaction.Verification
             Console.WriteLine(elapsedSeconds.ToString(CultureInfo.CurrentCulture));
         }
 
-
         /// <summary>
         /// Updates the visited redactions and pages in the current verification memento.
         /// </summary>
@@ -259,8 +265,11 @@ namespace Extract.Redaction.Verification
         {
             // Update the visited pages and rows
             VerificationMemento memento = GetCurrentDocument();
-            memento.VisitedPages = _pageSummaryView.GetVisitedPages();
-            memento.VisitedRedactions = _redactionGridView.GetVisitedRows();
+            if (memento != null) 
+            {
+                memento.VisitedPages = _pageSummaryView.GetVisitedPages();
+                memento.VisitedRedactions = _redactionGridView.GetVisitedRows();
+            }
         }
 
         /// <summary>
@@ -356,8 +365,7 @@ namespace Extract.Redaction.Verification
         /// <param name="sourceDocument">The source document.</param>
         /// <param name="fileId">The id in the database that corresponds to this file.</param>
         /// <returns>The fully expanded path of the feedback image file.</returns>
-        string GetFeedbackImageFileName(FileActionManagerPathTags tags, string sourceDocument, 
-            int fileId)
+        string GetFeedbackImageFileName(IPathTags tags, string sourceDocument, int fileId)
         {
             // If feedback settings aren't being collected, this is irrelevant
             FeedbackSettings settings = _settings.Feedback;
@@ -390,6 +398,8 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void AdvanceToNextDocument()
         {
+            CommitComment();
+
             if (IsInHistory)
             {
                 // Advance the history index
@@ -594,18 +604,21 @@ namespace Extract.Redaction.Verification
         /// Creates a memento to store the last saved state of the processing document.
         /// </summary>
         /// <param name="imageFile">The name of the processing document.</param>
-        /// <param name="fileID">The file Id of the <paramref name="imageFile"/> in File Action 
+        /// <param name="fileId">The file id of the <paramref name="imageFile"/> in File Action 
         /// Manager database.</param>
+        /// <param name="actionId">The action id associated with <paramref name="imageFile"/> in 
+        /// the File Action Manager database.</param>
         /// <param name="pathTags">Expands File Action Manager path tags.</param>
         /// <returns>A memento to store the last saved state of the processing document.</returns>
-        VerificationMemento CreateSavedMemento(string imageFile, int fileID, 
-            FileActionManagerPathTags pathTags)
+        VerificationMemento CreateSavedMemento(string imageFile, int fileId, int actionId,
+            IPathTags pathTags)
         {
             string attributesFile = pathTags.Expand(_settings.InputFile);
             string documentType = GetDocumentType(attributesFile);
-            string feedbackImage = GetFeedbackImageFileName(pathTags, imageFile, fileID);
+            string feedbackImage = GetFeedbackImageFileName(pathTags, imageFile, fileId);
 
-            return new VerificationMemento(imageFile, attributesFile, documentType, feedbackImage);
+            return new VerificationMemento(imageFile, fileId, actionId, attributesFile, 
+                documentType, feedbackImage);
         }
 
         /// <summary>
@@ -616,11 +629,14 @@ namespace Extract.Redaction.Verification
         VerificationMemento CreateUnsavedMemento()
         {
             string imageFile = _savedMemento.ImageFile;
+            int fileId = _savedMemento.FileId;
+            int actionId = _savedMemento.ActionId;
             string attributesFile = FileSystemMethods.GetTemporaryFileName(".voa");
             string documentType = _savedMemento.DocumentType;
             string feedbackImage = _savedMemento.FeedbackImage;
 
-            return new VerificationMemento(imageFile, attributesFile, documentType, feedbackImage);
+            return new VerificationMemento(imageFile, fileId, actionId, attributesFile, 
+                documentType, feedbackImage);
         }
 
         /// <summary>
@@ -902,34 +918,38 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToPreviousDocument()
         {
-            _redactionGridView.CommitChanges();
-
-            // Check if changes have been made before moving away from a history document
-            bool inHistory = IsInHistory;
-            if (!inHistory || !WarnIfDirty())
+            if (_historyIndex > 0)
             {
-                SaveRedactionCounts();
+                _redactionGridView.CommitChanges();
 
-                if (!inHistory)
+                // Check if changes have been made before moving away from a history document
+                bool inHistory = IsInHistory;
+                if (!inHistory || !WarnIfDirty())
                 {
-                    // Preserve the currently processing document
-                    if (_unsavedMemento == null)
+                    SaveRedactionCounts();
+
+                    if (!inHistory)
                     {
-                        _unsavedMemento = CreateUnsavedMemento();
+                        // Preserve the currently processing document
+                        if (_unsavedMemento == null)
+                        {
+                            _unsavedMemento = CreateUnsavedMemento();
+                        }
+
+                        // Save the state of the current document before moving back
+                        _dirty = _redactionGridView.Dirty;
+                        _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
+
+                        UpdateMemento();
                     }
 
-                    // Save the state of the current document before moving back
-                    _dirty = _redactionGridView.Dirty;
-                    _redactionGridView.SaveTo(_unsavedMemento.AttributesFile);
+                    CommitComment();
 
-                    UpdateMemento();
+                    // Go to the previous document
+                    _historyIndex--;
+                    VerificationMemento memento = GetCurrentDocument();
+                    _imageViewer.OpenImage(memento.ImageFile, false);
                 }
-
-
-                // Go to the previous document
-                _historyIndex--;
-                VerificationMemento memento = GetCurrentDocument();
-                _imageViewer.OpenImage(memento.ImageFile, false);
             }
         }
 
@@ -938,13 +958,16 @@ namespace Extract.Redaction.Verification
         /// </summary>
         void GoToNextDocument()
         {
-            _redactionGridView.CommitChanges();
-
-            if (!WarnIfDirty())
+            if (IsInHistory)
             {
-                SaveRedactionCounts();
+                _redactionGridView.CommitChanges();
 
-                AdvanceToNextDocument();
+                if (!WarnIfDirty())
+                {
+                    SaveRedactionCounts();
+
+                    AdvanceToNextDocument();
+                }
             }
         }
 
@@ -957,26 +980,29 @@ namespace Extract.Redaction.Verification
             {
                 _currentDocumentTextBox.Text = _imageViewer.ImageFile;
 
+                VerificationMemento memento = GetCurrentDocument();
+                _documentTypeTextBox.Text = memento.DocumentType;
+                _commentsTextBox.Text = GetFileActionComment(memento);
+
                 _previousDocumentToolStripButton.Enabled = _historyIndex > 0;
                 _nextDocumentToolStripButton.Enabled = IsInHistory;
 
                 _skipProcessingToolStripMenuItem.Enabled = !IsInHistory;
                 _saveToolStripMenuItem.Enabled = !IsInHistory;
 
-                VerificationMemento memento = GetCurrentDocument();
-                _documentTypeTextBox.Text = memento.DocumentType;
             }
             else
             {
                 _currentDocumentTextBox.Text = "";
+
+                _documentTypeTextBox.Text = "";
+                _commentsTextBox.Text = "";
 
                 _previousDocumentToolStripButton.Enabled = false;
                 _nextDocumentToolStripButton.Enabled = false;
 
                 _skipProcessingToolStripMenuItem.Enabled = false;
                 _saveToolStripMenuItem.Enabled = false;
-
-                _documentTypeTextBox.Text = "";
             }
         }
 
@@ -992,6 +1018,30 @@ namespace Extract.Redaction.Verification
                  _redactionGridView.LoadFrom(voaFile, memento.VisitedRedactions);
                  _pageSummaryView.SetVisitedPages(memento.VisitedPages);
             }
+        }
+
+        /// <summary>
+        /// Commits the user specified comment for the current document to the database.
+        /// </summary>
+        void CommitComment()
+        {
+            if (_commentChanged && _database != null)
+            {
+                VerificationMemento memento = GetCurrentDocument();
+                string comment = _commentsTextBox.Text;
+                _database.SetFileActionComment(memento.FileId, memento.ActionId, comment);
+                _commentChanged = false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the comment from database that corresponds to specified memento.
+        /// </summary>
+        /// <param name="memento">The memento for which to retrieve a comment.</param>
+        string GetFileActionComment(VerificationMemento memento)
+        {
+            return _database == null ? 
+                "" : _database.GetFileActionComment(memento.FileId, memento.ActionId);
         }
 
         #endregion VerificationTaskForm Methods
@@ -1048,7 +1098,10 @@ namespace Extract.Redaction.Verification
                 if (WarnIfDirty())
                 {
                     e.Cancel = true;
+                    return;
                 }
+
+                CommitComment();
             }
             catch (Exception ex)
             {
@@ -1066,14 +1119,23 @@ namespace Extract.Redaction.Verification
         [SecurityPermission(SecurityAction.LinkDemand, Flags=SecurityPermissionFlag.UnmanagedCode)]
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            // Allow the image viewer to handle keyboard input for shortcuts.
-            if (ShortcutsEnabled && _imageViewer.Shortcuts.ProcessKey(keyData))
+            try
             {
-                return true;
+                // Allow the image viewer to handle keyboard input for shortcuts.
+                if (ShortcutsEnabled && _imageViewer.Shortcuts.ProcessKey(keyData))
+                {
+                    return true;
+                }
+
+                // This key was not processed, bubble it up to the base class.
+                return base.ProcessCmdKey(ref msg, keyData);
+            }
+            catch (Exception ex)
+            {
+                ExtractException.Display("ELI27744", ex);
             }
 
-            // This key was not processed, bubble it up to the base class.
-            return base.ProcessCmdKey(ref msg, keyData);
+            return true;
         }
 
         #endregion VerificationTaskForm Overrides
@@ -1085,7 +1147,7 @@ namespace Extract.Redaction.Verification
         /// </summary>
         /// <param name="e">The event data associated with the <see cref="FileComplete"/> 
         /// event.</param>
-        protected virtual void OnFileComplete(FileCompleteEventArgs e)
+        void OnFileComplete(FileCompleteEventArgs e)
         {
             if (FileComplete != null)
             {
@@ -1190,6 +1252,8 @@ namespace Extract.Redaction.Verification
 
                 if (!WarnIfDirty())
                 {
+                    CommitComment();
+
                     OnFileComplete(new FileCompleteEventArgs(EFileProcessingResult.kProcessingSkipped));
                 }
             }
@@ -1573,6 +1637,27 @@ namespace Extract.Redaction.Verification
             }
         }
 
+        /// <summary>
+        /// Handles the <see cref="Control.TextChanged"/> event.
+        /// </summary>
+        /// <param name="sender">The object that sent the 
+        /// <see cref="Control.TextChanged"/> event.</param>
+        /// <param name="e">The event data associated with the 
+        /// <see cref="Control.TextChanged"/> event.</param>
+        void HandleCommentsTextBoxTextChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                _commentChanged = true;
+            }
+            catch (Exception ex)
+            {
+                ExtractException ee = ExtractException.AsExtractException("ELI27936", ex);
+                ee.AddDebugData("Event data", e, false);
+                ee.Display();
+            }
+        }
+
         #endregion VerificationTaskForm Event Handlers
 
         #region IVerificationForm Members
@@ -1597,6 +1682,16 @@ namespace Extract.Redaction.Verification
                     return;
                 }
 
+                // Store the file processing database
+                if (_database == null)
+                {
+                    _database = fileProcessingDB;
+                }
+                else if (_database != fileProcessingDB)
+                {
+                    throw new ExtractException("ELI27972", "File processing database mismatch.");
+                }
+
                 // Get the full path of the source document
                 string fullPath = Path.GetFullPath(fileName);
                 
@@ -1605,7 +1700,7 @@ namespace Extract.Redaction.Verification
                     new FileActionManagerPathTags(fullPath, tagManager.FPSFileDir);
 
                 // Create the saved memento
-                _savedMemento = CreateSavedMemento(fullPath, fileID, pathTags);
+                _savedMemento = CreateSavedMemento(fullPath, fileID, actionID, pathTags);
 
                 // Reset the unsaved memento
                 ResetUnsavedMemento();
