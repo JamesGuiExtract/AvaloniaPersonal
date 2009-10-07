@@ -1,7 +1,6 @@
 using Leadtools;
 using Leadtools.Codecs;
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Threading;
 
@@ -10,14 +9,14 @@ namespace Extract.Imaging.Forms
     /// <summary>
     /// Represents a background thread that loads thumbnails for the pages of an image.
     /// </summary>
-    public class ThumbnailWorker : BackgroundWorker
+    public sealed class ThumbnailWorker : IDisposable
     {
         #region ThumbnailWorker Constants
 
         /// <summary>
         /// The maximum amount of time to wait in the Dispose method for the worker to cancel.
         /// </summary>
-        const int _DISPOSE_TIMEOUT = 60000;
+        const int _DISPOSE_TIMEOUT = 10000;
 
         /// <summary>
         /// The maximum interval to wait before checking the time out status.
@@ -27,6 +26,11 @@ namespace Extract.Imaging.Forms
         #endregion ThumbnailWorker Constants
 
         #region ThumbnailWorker Fields
+
+        /// <summary>
+        /// The thread in which the loading is performed.
+        /// </summary>
+        readonly Thread _thread;
 
         /// <summary>
         /// The name of the file from which to load thumbnails.
@@ -65,15 +69,22 @@ namespace Extract.Imaging.Forms
         RasterImage[] _thumbnails;
 
         /// <summary>
-        /// The number of pages successfully loaded.
+        /// <see langword="true"/> if thumbnails are being loaded;
+        /// <see langword="false"/> if thumbnails are not being loaded.
         /// </summary>
-        int _pagesComplete;
+        bool _running;
+
+        /// <summary>
+        /// <see langword="true"/> if loading thumbnails has been signaled to stop;
+        /// <see langword="false"/> if loading thumbanils has not been signaled to stop.
+        /// </summary>
+        volatile bool _cancelling;
 
         /// <summary>
         /// <see langword="true"/> if loading thumbnails has been cancelled; 
         /// <see langword="false"/> if loading thumbnails has not been cancelled.
         /// </summary>
-        volatile bool _cancelled;
+        bool _cancelled;
 
         /// <summary>
         /// Protects access to shared resources.
@@ -95,12 +106,31 @@ namespace Extract.Imaging.Forms
             _thumbnails = new RasterImage[_pageCount];
             _priorityEndPage = _pageCount;
 
+            _thread = new Thread(LoadThumbnails);
+
             RasterCodecs.Startup();
             _codecs = new RasterCodecs();
             _codecs.Options.Tiff.Load.IgnoreViewPerspective = true;
         }
 
         #endregion ThumbnailWorker Constructors
+
+        #region ThumbnailWorker Properties
+
+        /// <summary>
+        /// Gets whether the <see cref="ThumbnailWorker"/> is loading thumbnails.
+        /// </summary>
+        /// <value><see langword="true"/> if the <see cref="ThumbnailWorker"/> is loading 
+        /// thumbnails; <see langword="false"/> if it is not loading thumbnails.</value>
+        public bool IsRunning
+        {
+            get
+            {
+                return _running;
+            }
+        }
+
+        #endregion ThumbnailWorker Properties
 
         #region ThumbnailWorker Methods
 
@@ -115,10 +145,10 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Signal the worker to stop
-                CancelAsync();
+                _cancelling = true;
 
                 // Wait up to the specified time out for the worker to stop
-                if (IsBusy && !_cancelled)
+                if (_running && !_cancelled)
                 {
                     int remaining = timeout;
                     while (remaining > _TIMEOUT_INTERVAL)
@@ -134,13 +164,14 @@ namespace Extract.Imaging.Forms
 
                     if (remaining > 0)
                     {
-                        Thread.Sleep(_TIMEOUT_INTERVAL);
+                        Thread.Sleep(remaining);
+                    }
 
-                        if (!_cancelled)
-                        {
-                            throw new ExtractException("ELI27934",
-                                "Thumbnail thread cancellation timed out.");
-                        }
+                    if (!_cancelled)
+                    {
+                        _thread.Abort();
+                        throw new ExtractException("ELI27934",
+                            "Thumbnail thread cancellation timed out.");
                     }
                 }
             }
@@ -215,7 +246,7 @@ namespace Extract.Imaging.Forms
         /// </returns>
         int GetNextPageToLoad()
         {
-            if (_pagesComplete >= _pageCount)
+            if (_cancelling)
             {
                 return -1;
             }
@@ -269,9 +300,13 @@ namespace Extract.Imaging.Forms
         RasterImage CreateThumbnail(int page)
         {
             // Get the dimensions of this page.
-            CodecsImageInfo info = _codecs.GetInformation(_fileName, false, page);
-            int width = info.Width;
-            int height = info.Height;
+            int width;
+            int height;
+            using (CodecsImageInfo info = _codecs.GetInformation(_fileName, false, page))
+            {
+                width = info.Width;
+                height = info.Height;
+            }
 
             // Calculate how far from the desired size the original image is
             double scale = Math.Min(_thumbnailSize.Width / (double)width,
@@ -281,64 +316,72 @@ namespace Extract.Imaging.Forms
             width = (int)(width * scale);
             height = (int)(height * scale);
 
-            return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic, 
+            return _codecs.Load(_fileName, width, height, 24, RasterSizeFlags.Bicubic,
                 CodecsLoadByteOrder.BgrOrGray, page, page);
+        }
+
+        /// <summary>
+        /// Asynchronously starts loading thumbnail images.
+        /// </summary>
+        public void BeginLoading()
+        {
+            _thread.Start();
+        }
+
+        /// <summary>
+        /// Loads and stores thumbnail representation of the pages of the image.
+        /// </summary>
+        void LoadThumbnails()
+        {
+            try
+            {
+                _cancelled = false;
+                _running = true;
+
+                // Iterate through each unloaded thumbnail
+                int page = GetNextPageToLoad();
+                while (page > 0)
+                {
+                    // Load the thumbnail for this page
+                    RasterImage thumbnail = CreateThumbnail(page);
+                    lock (_lock)
+                    {
+                        _thumbnails[page - 1] = thumbnail;
+                    }
+
+                    page = GetNextPageToLoad();
+                }
+
+                if (_cancelling)
+                {
+                    // The loading has been cancelled
+                    _cancelled = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                _cancelled = true;
+                ExtractException.Display("ELI27937", ex);
+            }
+            finally
+            {
+                _running = false;
+                _cancelling = false;
+            }
         }
 
         #endregion ThumbnailWorker Methods
 
-        /// <summary>
-        /// Raises the <see cref="BackgroundWorker.DoWork"/> event.
-        /// </summary>
-        /// <param name="e">The event data associated with the 
-        /// <see cref="BackgroundWorker.DoWork"/> event.</param>
-        protected override void OnDoWork(DoWorkEventArgs e)
-        {
-            _cancelled = false;
-
-            base.OnDoWork(e);
-
-            // Iterate through each unloaded thumbnail
-            int page = GetNextPageToLoad();
-            while (page > 0 && !CancellationPending)
-            {
-                // Load the thumbnail for this page
-                RasterImage thumbnail = CreateThumbnail(page);
-                lock (_lock)
-                {
-                    _thumbnails[page - 1] = thumbnail;
-                }
-                _pagesComplete++;
-                
-                // Report progress as necessary
-                if (WorkerReportsProgress)
-                {
-                    if (CancellationPending)
-                    {
-                        break;
-                    }
-
-                    ThumbnailWorkerProgress progress = new ThumbnailWorkerProgress(page, thumbnail);
-                    ReportProgress(_pagesComplete * 100 / _pageCount, progress);
-                }
-
-                page = GetNextPageToLoad();
-            }
-
-            if (CancellationPending)
-            {
-                // The loading has been cancelled
-                e.Cancel = true;
-                _cancelled = true;
-            }
-            else
-            {
-                // Loading completed successfully
-                e.Result = _thumbnails;
-            }
-        }
-
         #region IDisposable Members
+
+        /// <summary>
+        /// Releases all resources used by the <see cref="ThumbnailWorker"/>.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         /// <overloads>Releases resources used by the <see cref="ThumbnailWorker"/>.</overloads>
         /// <summary>
@@ -346,21 +389,18 @@ namespace Extract.Imaging.Forms
         /// </summary>
         /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged 
         /// resources; <see langword="false"/> to release only unmanaged resources.</param>        
-        protected override void Dispose(bool disposing)
+        void Dispose(bool disposing)
         {
             if (disposing)
             {
                 // Stop processing before disposing of resources
-                if (IsBusy)
+                try
                 {
-                    try
-                    {
-                        Cancel(_DISPOSE_TIMEOUT);
-                    }
-                    catch (Exception ex)
-                    {
-                        ExtractException.Log("ELI27935", ex);
-                    }
+                    Cancel(_DISPOSE_TIMEOUT);
+                }
+                catch (Exception ex)
+                {
+                    ExtractException.Log("ELI27935", ex);
                 }
 
                 // Dispose of managed resources
@@ -384,9 +424,6 @@ namespace Extract.Imaging.Forms
             }
 
             // Dispose of unmanaged resources
-
-            // Dispose of base class
-            base.Dispose(disposing);
         }
 
         #endregion IDisposable Members
