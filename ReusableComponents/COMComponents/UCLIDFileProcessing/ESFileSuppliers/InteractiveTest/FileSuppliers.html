@@ -1,5 +1,6 @@
 <html>
 <head>
+<title>FAM Queuing and File Suppliers</title>
 <link type="text/css" rel="stylesheet" href="../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
 </HEAD>
 <body>
@@ -147,53 +148,53 @@
 <p>
 <b>File Suppliers</b>
 <ol> 
-   	<li><b>Select File from dynamic list</b> as the file supplier in Select File Supplier 
+   	<li>Select <b>Files from dynamic list</b> as the file supplier in Select File Supplier 
       	dialog, then press the Configure button.</li>
    	<ul> 
       		<li>Confirm it brings up <b>Configure Files from dynamic list</b> dialog.</li> 
-      		<li>Confirm the dialog has an edit box for Dynamic list file name:, 
-          	a Tag Selector button and an Browse button to the right of the edit box                  
-          	and that both are enabled.</li> 
-      		<li>Confirm that the dialog has OK and Cancel buttons and both are enabled.</li> 
-      		<li>Confirm that the Tag Selector button opens a Tags and Functions context 
-          	menu to the immediate right of the button.</li>
-      		<li>Confirm the items in Tags and Functions context menu include
-          	&ltFPSFileDir&gt, and a set of functions that start with $.  
+      		<li>Confirm the dialog has an edit box for <b>Dynamic list file name:</b>, 
+          	a <b>Tag Selector</b> button and a <b>Browse</b> button to the right of the 
+		edit box and that both are enabled.</li> 
+      		<li>Confirm that the dialog has <b>OK</b> and <b>Cancel</b> buttons and that 
+		both are enabled.</li> 
+      		<li>Confirm that the <b>Tag Selector</b> button opens a <b>Tags and Functions</b> 
+		context menu to the immediate right of the button.</li>
+      		<li>Confirm the items in <b>Tags and Functions</b> context menu include
+          	<b>&ltFPSFileDir&gt</b>, and a set of functions that start with <b>$</b>.  
       		<li>Confirm that when an item is chosen it either inserts text at the current cursor 
           	position or replaces selected text in the edit box.</li> 
-      		<li>Confirm that pressing the Browse button to the immediate right of the 
-          	Tag Selector button brings up an Open file dialog with default file 
-          	type <b>*.txt</b>.</li> 
+      		<li>Confirm that pressing the <b>Browse</b> button brings up an <b>Open file</b> 
+		dialog with default file type <b>*.txt</b>.</li> 
       		<li>Confirm that when a file is chosen it replaces the text in the edit box 
-          	of <b>Configure files from dynamic list</b> dialog.</li>
+          	of the <b>Configure files from dynamic list</b> dialog.</li>
       		<li>Confirm that if the file name and/or folder name(s) in the editbox contain
           	the dollar sign $ and/or the two parentheses (), they can be processed
           	without causing any exception. E.g. Valid$(file), Valid$(folder).    
-      		<li>Confirm pressing the OK button in Select File Supplier dialog adds a 
-          	new queue to the Queue Setup tab with initial state of Enabled checkbox 
+      		<li>Confirm that pressing the OK button in Select File Supplier dialog adds a 
+          	new item to the Queue Setup tab with initial state of Enabled checkbox 
           	checked, Force Processing checkbox unchecked and Status inactive.</li>
          	<ul>
-            		<li>Confirm clearing the checkbox for Enabled prevents the file supplier
-                	from queuing files.</li>
-            		<li>Confirm checking the checkbox for Enabled allows the file supplier to 
-                	queue files.</li>
-            		<li>Confirm once processing starts, the Status value changes from Inactive 
+            		<li>Confirm clearing the checkbox for <b>Enabled</b> prevents the file 
+			supplier from queuing files.</li>
+            		<li>Confirm checking the checkbox for <b>Enabled</b> allows the file supplier 
+                	to queue files.</li>
+            		<li>Confirm once processing starts, the <b>Status</b> value changes from Inactive 
 			to active.</li>
-            		<li>Confirm when Processing is paused, the Status value is set to Paused.</li>
-            		<li>Confirm when Processing is stopped, the Status value is set to Stopped.</li>
-            		<li>Confirm Status value is set to Done when the file supplier finishes 
-			supplying files.</li>
+            		<li>Confirm when Processing is paused, the <b>Status</b> value is set to Paused.</li>
+            		<li>Confirm when Processing is stopped, the <b>Status</b> value is set to Stopped.</li>
+            		<li>Confirm that the <b>Status</b> value is set to Done when the file supplier 
+			finishes supplying files.</li>
          	</ul>       
    	</ul> 
 <p>
-   	<li>Select <b>File from folder</b> as the file supplier in Select File Supplier dialog, 
+   	<li>Select <b>Files from folder</b> as the file supplier in Select File Supplier dialog, 
        	then press the Configure button.</li>
    	<ul> 
       		<li>Confirm it brings up the <b>Configure Files from folder</b> dialog.</li> 
       		<li>Confirm that there is a combo box associated with <b>Specify folder from which 
           	to supply files</b>.</li> 
-      		<li>Confirm that the combo box includes an edit box, a Tag Selector button, 
-          	and a Browse button. The initial states of all of them are enabled.</li> 
+      		<li>Confirm that the combo box includes an edit box, a <b>Tag Selector</b> button, 
+          	and a <b>Browse</b> button. The initial states of all of them are enabled.</li> 
       		<li>Confirm the droplist of the <b>Folder Name</b> combo box maintains a history 
           	of the last eight folders that were used.</li> 
       		<li>Confirm the <b>Folder Name</b> history is updated when the settings are saved 
@@ -249,35 +250,35 @@
          	</ul>
    	</ul>
 <p>
-   	<li>Select Configure Files from static list as the file supplier in Select File 
+   	<li>Select <b>Files from static list</b> as the file supplier in Select File 
        	Supplier dialog, then press the Configure button.</li>
    	<ul> 
       		<li>Confirm it brings up the Configure Files from static list dialog.</li> 
-      		<li>Confirm there is a Add button in Configure Files from static list 
+      		<li>Confirm there is an <b>Add</b> button in Configure Files from static list 
           	dialog and the initial state is active.</li> 
-      		<li>Confirm the Add button brings up the Open file dialog.</li> 
+      		<li>Confirm that the <b>Add</b> button brings up the Open file dialog.</li> 
       		<li>Confirm the Open file dialog allows for the selection of multiple files 
           	for opening.</li> 
       		<li>Confirm each file selected for opening in the Open File dialog is added 
           	to the file list.</li> 
       		<li>Confirm that if the Open File dialog is cancelled no files are added to the 
           	file list.</li> 
-      		<li>Confirm there is a Remove button in Configure Files from static list 
+      		<li>Confirm that there is a <b>Remove</b> button in Configure Files from static list 
           	dialog and the initial state is disabled.</li> 
-      		<li>Confirm the Remove button is only enabled if at least one item in the 
+      		<li>Confirm that the <b>Remove</b> button is only enabled if at least one item in the 
           	file list is selected.</li> 
-      		<li>Confirm that when an item is selected in File List,  pressing the Remove 
+      		<li>Confirm that when an item is selected in File List,  pressing the <b>Remove</b> 
 		button removes it from the file list.</li> 
-      		<li>Confirm that there is a Clear button in Configure Files from static list dialog 
+      		<li>Confirm that there is a <b>Clear</b> button in Configure Files from static list dialog 
           	and the initial state is disabled.</li> 
-      		<li>Confirm the Clear button is only enabled if at least one item exists in the 
+      		<li>Confirm the <b>Clear</b> button is only enabled if at least one item exists in the 
           	file list.</li> 
-      		<li>Confirm when Clear button is pressed all files are removed from the 
+      		<li>Confirm that when the <b>Clear</b> button is pressed all files are removed from the 
           	file list.</li> 
-      		<li>Confirm there is a Load List button in the Configure Files from static 
+      		<li>Confirm that there is a <b>Load List</b> button in the Configure Files from static 
           	list dialog.</li> 
-      		<li>Confirm the initial state of Load List button is enabled.</li> 
-      		<li>Confirm when the Load List button is pressed it brings up an Open File 
+      		<li>Confirm the initial state of the <b>Load List</b> button is enabled.</li> 
+      		<li>Confirm that when the <b>Load List</b> button is pressed it brings up an Open File 
           	dialog.</li> 
       		<li>Confirm Open file dialog allows the selection of a text file for loading.</li> 
       		<li>Confirm each filename specified in the text file (one per line) is added to 
@@ -287,9 +288,9 @@
           	Force Processing checkbox enabled but unchecked, and Status 
           	as inactive.</li>
           	<ul>
-            		<li>Confirm clearing the checkbox for Enabled prevents the file supplier
-                	from being queued.</li>
-            		<li>Confirm checking the checkbox for Enabled allows the file supplier to 
+            		<li>Confirm that clearing the checkbox for <b>Enabled</b> prevents the file 
+			supplier from being queued.</li>
+            		<li>Confirm checking the checkbox for <b>Enabled</b> allows the files to 
                 	be queued.</li>
           	</ul> 
       		<li>Confirm the persistence of files in the static list.</li>
@@ -306,7 +307,8 @@
 			<li>Enable listening for new files.
 			<li>Add more files at least once while the test is running.
 		</ul>
-		<li>Confirm that <b>file access</b> or other caching-related erros are not seen in the exception log.
+		<li>Confirm that <b>file access</b> or other caching-related erros are not seen 
+		in the exception log.
 	</ul>
 <p>
 	<li><b>[LegacyRCAndUtils #5168]</b> Queueing should stop if action name is changed
