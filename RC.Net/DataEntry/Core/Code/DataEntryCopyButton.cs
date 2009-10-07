@@ -146,7 +146,22 @@ namespace Extract.DataEntry
                 ExtractException.Assert("ELI26980", "Cannot find control to copy from!",
                     _copySourceControl != null);
 
-                Clipboard.SetText(_copySourceControl.Text);
+                try
+                {
+                    Clipboard.SetText(_copySourceControl.Text);
+                }
+                catch (Exception ex)
+                {
+                    // From time to time (especially in the case of a lot of successive clicks),
+                    // the SetText call will throw an exception. I have found that even when an
+                    // exception is thrown, the text seems to have been applied to the clipboard.
+                    // Even if it hasn't, just log the exception. The user can re-press the button
+                    // if need be.
+                    ExtractException ee = ExtractException.AsExtractException("ELI27955", ex);
+                    ee.AddDebugData("Copied text", _copySourceControl.Text, false);
+                    ee.Log();
+                    return;
+                }
 
                 _errorProvider.SetError(this, "");
                 AttributeStatusInfo.MarkDataAsValid(_attribute, true);
@@ -155,7 +170,7 @@ namespace Extract.DataEntry
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI26979", ex);
+                ExtractException.Display("ELI26979", ex);
             }
         }
 

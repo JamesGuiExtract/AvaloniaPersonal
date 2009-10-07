@@ -1713,7 +1713,13 @@ namespace Extract.DataEntry.Utilities.DataEntryApplication
         static void DisplayCriticalException(ExtractException ee)
         {
             ee.Display();
-            throw ee;
+            
+            // TODO:
+            // At one point an event was used here to pass the critical exception out to the thread
+            // the file is being processed on in the FAM in order to fail the file. For the time
+            // being, nothing will happen after the exception is dismissed and the user will have
+            // to exit another way (This could mean the UI is in a bad state or the file was not
+            // properly loaded or saved).
         }
 
         /// <summary>

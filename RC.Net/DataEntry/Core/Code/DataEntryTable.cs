@@ -2892,6 +2892,16 @@ namespace Extract.DataEntry
                 return false;
             }
 
+            // [DataEntry:653]
+            // If the current selection is currently being reset manually and a mouse button
+            // is down, disallow any scrolling until the mouse button is released. Otherwise
+            // the mouse release may occur over a different cell due to scrolling and result
+            // in unintended cell selection.
+            if (Control.MouseButtons != MouseButtons.None)
+            {
+                _selectionIsBeingReset = true;
+            }
+
             // Determine if row-level options are to be available based on the clicked location
             // and the current selection.
             bool enableRowOptions = (originRowIndex >= 0 &&
@@ -2906,16 +2916,6 @@ namespace Extract.DataEntry
 
                 if (!clickedCell.Selected)
                 {
-                    // [DataEntry:653]
-                    // If the current selection is currently being reset manually and a mouse button
-                    // is down, disallow any scrolling until the mouse button is released. Otherwise
-                    // the mouse release may occur over a different cell due to scrolling and result
-                    // in unintended cell selection.
-                    if (Control.MouseButtons != MouseButtons.None)
-                    {
-                        _selectionIsBeingReset = true;
-                    }
-
                     base.CurrentCell = clickedCell;
                 }
             }
