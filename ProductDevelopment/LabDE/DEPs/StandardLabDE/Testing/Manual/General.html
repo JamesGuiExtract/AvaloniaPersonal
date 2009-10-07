@@ -24,8 +24,6 @@
 			<b>.NET 3.5</b>.
 <p>
 			<li>Finish the installation.
-			<li>Check <b>TBD</b> and confirm that the installed version of the Corepoint 
-			software is 4.0.1.
 			<li>Confirm that <b>Verify extracted data</b> is available as a processing task.
 <p>
 			<li>Confirm that installing LabDE (and not FLEX Index or ID Shield) is
@@ -56,6 +54,9 @@
 		title bar and the <b>task bar</b>.
 		<LI>Exercise LabDE in <b>FAM</b> mode.
 		<LI>Confirm that the specified title is visible in the <b>Image Viewer</b> title bar.
+		<LI><b>[DataEntry #560]</b> Confirm that the config files include 
+		<b>[PFESFolder]</b> settings allowing paths to be specified relative to the 
+		installation folder instead of the Solution folder.
 <p>
 		<li>Modify <b>StandardLabDE_Phase1.config</b> in the appropriate Solution
 		folder so that <b>DisabledControls</b> is set to the name(s) of one or more
@@ -142,13 +143,14 @@
   	   		<LI>Confirm appropriate tooltip text for the <b>Rectangular Highlight</b> tool.
 	       	</ul>
 <p>
-		<LI><b>[DataEntry #659]</b> Enabling of swiping tools
+		<LI><b>[DataEntry #365, #659]</b> Enabling of swiping tools
        		<ul>
 			<li>Open a Demo_LabDE sample image.
+  		   	<LI>Confirm that the swiping tools are initially disabled in the toolbar.
 			<li>Select the <b>Lab Name</b> field.
-  		   	<LI>Confirm that the swiping tools are disabled in the toolbar.
+  		   	<LI>Confirm that the swiping tools are still disabled.
 			<li>Select the <b>Zoom</b>, <b>Pan</b> or <b>Review</b> tool.
-	  	   	<LI>Confirm that the swiping tools are still disabled in the toolbar.
+	  	   	<LI>Confirm that the swiping tools are still disabled.
        		</ul>
 	   	</LI>
 <p>
@@ -681,6 +683,12 @@
 			edit box is empty.
 			<li>Confirm that typing into the <b>Lab Name</b> combo box cycles through
 			available lab names.
+			<li><b>[DataEntry #513]</b> Hybrid data for auto-updated values
+			<ul>
+				<li>Open an image where the <b>Lab Name</b> is found.
+				<li>Confirm that selecting the cell provides a menaingful highlight 
+				on the image.
+			</ul>
 			<li><b>[DataEntry #613]</b>
 			<ul>
 				<li>Select the lab name field in a document.
@@ -714,7 +722,7 @@
 			<li><b>[DataEntry #668]</b> Lab Name Or Lab Code Too Long
 			<ul>
 				<li>Enter a very long lab name in the appropriate field.
-				<li>Confirm that an <b>ELI27096: COllection was modified; enumeration 
+				<li>Confirm that an <b>ELI27096: Collection was modified; enumeration 
 				operation may not execute</b> error is not seen.
 				<li>Type <b>CHW</b> in the lab code field.
 				<li>Press <b>Tab</b>.
@@ -747,10 +755,29 @@
 			<li>Confirm that text can be typed into the <b>Ref. Range</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 
 			<b>Ref. Range</b> cell is empty.
+			<li><b>[DataEntry #463]</b> Validation for numeric results
+			<ul>
+				<li>Open a Demo_LabDE image.
+				<li>Select a <b>Ref. Range</b> cell.
+				<li>Confirm that <b>&lt;60</b> is a valid entry.
+				<li>Confirm that <b>1.1.1.1</b> is an invalid entry.
+			</ul>
 			<li>Confirm that text can be swiped into the <b>Flag</b> cell.
 			<li>Confirm that text can be typed into the <b>Flag</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 
 			<b>Flag</b> cell is empty.
+			<li><b>[DataEntry #577]</b> Map * as A
+			<ul>
+				<li>Make a local copy of the following image.
+				<li>I:\Common\Engineering\ProductDevelopment\AttributeFinder\
+				NationalRuleSet\LabDE\TestingFiles\TestResults\CHW_CC-a.tif
+				<li>Copy the existing VOA file or process the image 
+				using Demo_LabDE rules.
+				<li>Open the image for verification.
+				<li>Confirm that asterisk characters for the <b>URINE 
+				KETONES</b> and the <b>URINE BLOOD</b> tests are displayed 
+				as <b>A</b> in the corresponding Flags cells.
+			</ul>
 			<li>Confirm that text can be swiped into the <b>Comment</b> cell.
 			<li>Confirm that text can be typed into the <b>Comment</b> cell.
 			<li>Confirm that a validation icon is not displayed even if the 

@@ -43,6 +43,15 @@
 		<LI>Swipe text into the <b>Comment</b> field.
 		<LI>Select <b>File - Close</b>.  Confirm that a <b>Data Not Saved</b> prompt is displayed.
 		<LI>Confirm that <b>Yes</b> closes the document and <b>does</b> update the VOA file.
+<p>
+		<li><b>[DataEntry #605]</b> Application crash without write permission
+		<ul>
+			<LI>Open a LabDE demo image.
+			<LI>Modify the VOA file permission to read-only.
+			<li>Confirm that a meaningful error message is presented when the user 
+			attempts to save changes.
+			<li>Confirm that the application <b>does not</b> crash.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Prompt For Save : FAM mode</h3>
@@ -116,6 +125,14 @@
 			<li>Confirm that processing continues as usual.
 		</ul>
 <p>
+		<li><b>[DataEntry #605]</b> Application crash without write permission
+		<ul>
+			<LI>Open a LabDE demo image.
+			<LI>Modify the VOA file permission to read-only.
+			<li>Confirm that a meaningful error message is presented when the user 
+			attempts to save changes.
+			<li>Confirm that the application <b>does not</b> crash.
+		</ul>
 	</ul>
 <p>
 	<LI><h3>Load &amp; Save : stand-alone mode</h3>
@@ -147,6 +164,9 @@
 		is present.
 		<LI>Re-open the image.
 		<LI>Confirm that the swiped data is still present and the new highlight is provided.
+		<li>Zoom in before closing the document.
+		<LI>Close this image and open another image.
+		<LI><b>[DataEntry #576]</b> Confirm that the new image is not zoomed in.
 	</ul>
 <p>
 	<LI><h3>Load &amp; Save : FAM mode</h3>
@@ -178,6 +198,9 @@
 		<LI>Reset verification status to <b>Pending</b>.
 		<LI>Re-verify the image.
 		<LI>Confirm that the swiped data is still present and the new highlight is provided.
+		<li>Zoom in before saving / closing the document.
+		<LI>Save this image and open another image.
+		<LI><b>[DataEntry #576]</b> Confirm that the new image is not zoomed in.
 <p>
 		<LI><b>[DataEntry #148]</b> Default cell marked as viewed on click
 		<ul>

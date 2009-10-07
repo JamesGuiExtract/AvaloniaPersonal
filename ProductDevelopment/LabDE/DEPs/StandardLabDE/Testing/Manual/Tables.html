@@ -56,11 +56,18 @@
 			<LI>Confirm that the <b>Selected Order Details</b> data has been cleared.
 		</ul>
 <p>
+		<li><b>[DataEntry #263]</b> Tab navigation and empty tables
+		<ul>
+			<LI>Open an image that does not find an <b>Ordering Physician</b> 
+			such as 1270.tif, 151.tif, 350.tif, ot 403.tif.
+			<li>Confirm that the user can navigate to the <b>Ordering 
+			Physician</b> table even though the table is empty.
+		</ul>
+		<li><b>[DataEntry #407]</b> Confirm that tables cannot be sorted by column.
 		<li><b>[DataEntry #433]</b> Select the starred row of the <b>Order</b> table.
 		<ul>
 			<li>Confirm that it is possible to enter data into the row using the keyboard.
 		</ul>
-		<li><b>[DataEntry #407]</b> Confirm that tables cannot be sorted by column.
 	</ul>
 <p>
 	<LI><h3>Row Swiping</h3>
@@ -513,6 +520,18 @@
 			<LI>Rename the VOA file for <b>151.tif</b> from Demo_LabDE.
 			<LI>Open image <b>151.tif</b> from Demo_LabDE.
 			<LI>Confirm that the <b>Selected Order Details</b> controls are disabled. 
+		</ul>
+<p>
+		<LI><b>[DataEntry #385]</b> Strangeness with Units
+		<ul>
+			<LI>Open image <b>003.tif</b> from Demo_LabDE.
+			<LI>Select the <b>Units</b> cell from one of the <b>GFR</b> tests.
+			<LI>Click <b>F2</b> to enter edit mode.
+			<LI>Click <b>space</b> once and <b>backspace</b> once.
+			<LI>Press the <b>down arrow</b> a few times.
+			<LI>Confirm that a succession of strange characters is not seen.
+			<LI>Confirm that LabDE does not abort with an <b>ELI 23674: Attempted 
+			to read or write protected memory</b> exception.
 		</ul>
 <p>
 		<li><b>[DataEntry #415]</b> Edit mode with multiple cells selected
