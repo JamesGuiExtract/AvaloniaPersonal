@@ -25,6 +25,7 @@
 
 prototype RegisterDataEntryApp();
 prototype InstallMSMQ();
+prototype DisableVistaThemes();
 
 ///////////////////////////////////////////////////////////////////////////////
 //                                                                           
@@ -133,7 +134,10 @@ begin
 	if (gbInstalled) then
 		// Removed Corepoint install because not sure if silent install works properley
    		//InstallCorepoint();
-   		InstallMSMQ();
+   		InstallMSMQ();       
+   		
+   		// Disable Vista themes if this is Vista.
+   		DisableVistaThemes();
 
 	   	// Rename the uex file
  	  	RenameUEXFile();
@@ -209,5 +213,18 @@ begin
 	SdShowMsg("Setup is Configuring MSMQ", FALSE);
 end;
              
-
-        
+///////////////////////////////////////////////////////////////////////////////
+//
+// Function: DisableVistaThemes
+//
+//  Purpose: This function disables themes on Vista and Windows 2008 for
+//			 ProcessFiles.exe and DataEntryApplication.exe
+//	Returns 0 if no errors
+///////////////////////////////////////////////////////////////////////////////
+function DisableVistaThemes()
+begin
+	if (SYSINFO.nOSMajor = 6 ) then
+		LaunchAppAndWait("sbinst.exe", "DisabledThemes.sdb",
+			LAAW_OPTION_WAIT | LAAW_OPTION_SHOW_HOURGLASS);
+	endif;
+end;

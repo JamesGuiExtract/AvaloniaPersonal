@@ -313,7 +313,7 @@
 		<col def="S0">ISDotNetInstallerArgsCommit</col>
 		<col def="S0">ISDotNetInstallerArgsUninstall</col>
 		<col def="S0">ISDotNetInstallerArgsRollback</col>
-		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>processfiles.exe.manifest</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
+		<row><td>AllOtherFiles</td><td>{BF13F1DD-ACE5-414A-97D2-8A7CEE2DAC71}</td><td>COMMON_COMPONENTS</td><td>8</td><td>VersionNT&gt;=600</td><td>disabledthemes.sdb</td><td>9</td><td>This component consists of files not belonging to other components.</td><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 		<row><td>Help</td><td>{1F3E50FE-C4F2-4F31-9D92-25BDCDA6EED2}</td><td>LABDE_HELP</td><td>8</td><td/><td>labde.chm</td><td>17</td><td/><td/><td/><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td><td>/LogFile=</td></row>
 	</table>
 
@@ -1139,8 +1139,8 @@
 		<col def="S255">ISBuildSourcePath</col>
 		<col def="I4">ISAttributes</col>
 		<col def="S72">ISComponentSubFolder_</col>
+		<row><td>disabledthemes.sdb</td><td>AllOtherFiles</td><td>DISABL~1.SDB|DisabledThemes.sdb</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\DisabledThemes.sdb</td><td>1</td><td/></row>
 		<row><td>labde.chm</td><td>Help</td><td>LabDE.chm</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_LABDE_HELP_FILES&gt;\LabDE.chm</td><td>1</td><td/></row>
-		<row><td>processfiles.exe.manifest</td><td>AllOtherFiles</td><td>PROCES~1.MAN|ProcessFiles.exe.manifest</td><td>0</td><td/><td/><td/><td>1</td><td>&lt;PATH_TO_DATAENTRY_MISC&gt;\ProcessFiles.exe.manifest</td><td>1</td><td/></row>
 	</table>
 
 	<table name="FileSFPCatalog">
