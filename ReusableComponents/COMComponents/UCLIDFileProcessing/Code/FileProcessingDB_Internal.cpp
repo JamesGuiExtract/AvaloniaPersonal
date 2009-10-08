@@ -15,6 +15,7 @@
 #include <FAMUtilsConstants.h>
 #include <ADOUtils.h>
 #include <StopWatch.h>
+#include <StringTokenizer.h>
 
 #include <string>
 #include <memory>
@@ -2580,17 +2581,23 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 		if (pUE != NULL)
 		{
 			bool bAtLeastOneReset = false;
+			string strEmailMessage = "";
 
 			map<string, map<string,int>>::iterator itMap = map_StatusCounts.begin();
 			for(; itMap != map_StatusCounts.end(); itMap++)
 			{
-				
 				map<string,int>::iterator itCounts = itMap->second.begin();
 				for (; itCounts != itMap->second.end(); itCounts++)
 				{
 					string strAction = itMap->first;
 					string strDebugInfo = "CountOf_" + strAction + "_RevertedTo_" + itCounts->first;
+					if (!bAtLeastOneReset)
+					{
+						// If this is the first item added to the message, add the FAST comment
+						strEmailMessage = strFASTComment;
+					}
 					pUE->addDebugInfo(strDebugInfo, itCounts->second);
+					strEmailMessage += "\r\n    " + strDebugInfo + ": " + asString(itCounts->second);
 					bAtLeastOneReset = true;
 				}
 			}
@@ -2599,6 +2606,12 @@ void CFileProcessingDB::revertLockedFilesToPreviousState(const _ConnectionPtr& i
 			if (bAtLeastOneReset)
 			{
 				pUE->log();
+				
+				// Send the email message if list is setup and message to send
+				if (!m_strAutoRevertNotifyEmailList.empty() && !strEmailMessage.empty())
+				{
+					emailMessage(strEmailMessage);
+				}
 			}
 		}
 	}
@@ -2672,7 +2685,7 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs( const _ConnectionPtr& ipCo
 
 	ipFileSet->Open( strElapsedSQL.c_str(), _variant_t((IDispatch *)ipConnection, true), 
 		adOpenForwardOnly, adLockReadOnly, adCmdText );
-	
+
 	// Step through all of the ProcessingFAM records to find dead FAM's
 	while(ipFileSet->adoEOF == VARIANT_FALSE)
 	{
@@ -2699,5 +2712,88 @@ void CFileProcessingDB::revertTimedOutProcessingFAMs( const _ConnectionPtr& ipCo
 		// move to next Processing FAM record
 		ipFileSet->MoveNext();
 	}
+}
+//--------------------------------------------------------------------------------------------------
+void CFileProcessingDB::emailMessage(const string & strMessage)
+{
+	AfxBeginThread(emailMessageThread, 
+		new EmailThreadData(m_strAutoRevertNotifyEmailList, strMessage)); 
+}
+//--------------------------------------------------------------------------------------------------
+UINT CFileProcessingDB::emailMessageThread(void *pData)
+{
+	try
+	{
+		// Put the emailThreadData pointer passed in to an auto pointer.
+		auto_ptr<EmailThreadData> apEmailThreadData(static_cast<EmailThreadData *>(pData));
+		ASSERT_RESOURCE_ALLOCATION("ELI27999", apEmailThreadData.get() != NULL);
+
+		CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+		try
+		{
+			try
+			{
+				// Email Settings
+				IEmailSettingsPtr ipEmailSettings(CLSID_EmailSettings);
+				ASSERT_RESOURCE_ALLOCATION("ELI27962", ipEmailSettings != NULL );
+
+				IObjectSettingsPtr ipSettings = ipEmailSettings;
+				ASSERT_RESOURCE_ALLOCATION("ELI27963", ipSettings != NULL );
+
+				ipSettings->LoadFromRegistry( gstrEMAIL_REG_PATH.c_str() );
+
+				// If there is no SMTP server set the UI needs to be displayed to enter that information
+				string strServer = ipEmailSettings->SMTPServer;
+				if ( strServer.empty())
+				{
+					UCLIDException ue("ELI27969", 
+						"Email settings have not been specified. Unable to send auto-revert message.");
+					ue.log();
+					return 0;
+				}
+
+				// Email Message 
+				IESMessagePtr ipMessage(CLSID_ESMessage);
+				ASSERT_RESOURCE_ALLOCATION("ELI27964", ipMessage != NULL );
+
+				ipMessage->EmailSettings = ipEmailSettings;
+
+				vector<string> vecRecipients;
+				StringTokenizer::sGetTokens(apEmailThreadData->m_strRecipients, ",;", vecRecipients, true);
+
+				IVariantVectorPtr ipRecipients(CLSID_VariantVector);
+				ASSERT_RESOURCE_ALLOCATION("ELI27966", ipRecipients != NULL );
+
+				for (unsigned int i = 0; i < vecRecipients.size(); i++)
+				{
+					ipRecipients->PushBack(vecRecipients[i].c_str());
+				}
+
+				// Add Recipients list to email message
+				ipMessage->Recipients = ipRecipients;
+
+				ipMessage->Subject = "Files were reverted to previous status."; 
+
+				ipMessage->BodyText = apEmailThreadData->m_strMessage.c_str();
+
+				// Send  the message
+				ipMessage->Send();
+			}
+			CATCH_ALL_AND_RETHROW_AS_UCLID_EXCEPTION("ELI27971")
+		}
+		catch(UCLIDException ue)
+		{
+			UCLIDException uex("ELI27970", "Unable to send email.", ue);
+			uex.addDebugInfo("Recipients", apEmailThreadData->m_strRecipients);
+			uex.addDebugInfo("Message", apEmailThreadData->m_strMessage);
+			uex.log();
+		}		
+
+		CoUninitialize();
+	}
+	CATCH_AND_LOG_ALL_EXCEPTIONS("ELI27998");
+
+	return 0;
 }
 //--------------------------------------------------------------------------------------------------

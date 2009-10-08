@@ -532,7 +532,7 @@ private:
 
 	// Reverts file in the LockedFile table to the previous status if the current
 	// status is still processing.
-	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nUPIID, 
+	void revertLockedFilesToPreviousState(const _ConnectionPtr& ipConnection, long nUPIID,
 		const string& strFASTComment = "", UCLIDException *pUE = NULL);
 
 	// Method checks for timed out FAM's and reverts file status for ones that are found.
@@ -544,6 +544,24 @@ private:
 
 	// Method updates the ProcessingFAM LastPingTime for the currently registered FAM
 	void pingDB();
+
+	// Method that creates a thread to send the mail message
+	void emailMessage(const string& strMessage);
+
+	// Class to contain the thread data for the emailMessageThread
+	class EmailThreadData
+	{
+	public:
+		string m_strRecipients;
+		string m_strMessage;
+
+		EmailThreadData(const string& strRecipients, const string& strMessage):
+		  m_strRecipients(strRecipients), m_strMessage(strMessage){};
+	};
+
+	// Thread function to email message, pData should be allocated with new and be a pointer to
+	// emailThreadData
+	static UINT emailMessageThread(void *pData);
 
 	void validateLicense();
 };
