@@ -1,4 +1,5 @@
 using Extract;
+using Extract.Drawing;
 using Extract.Imaging;
 using Extract.Utilities;
 using Extract.Utilities.Forms;
@@ -278,7 +279,7 @@ namespace Extract.Imaging
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI23239", ex);
+                    throw ExtractException.AsExtractException("ELI28002", ex);
                 }
                 finally
                 {
@@ -296,7 +297,7 @@ namespace Extract.Imaging
                 }
                 catch (Exception ex)
                 {
-                    throw ExtractException.AsExtractException("ELI23238", ex);
+                    throw ExtractException.AsExtractException("ELI28003", ex);
                 }
                 finally
                 {
@@ -705,7 +706,7 @@ namespace Extract.Imaging
                 _nextNumberMutex.ReleaseMutex();
 
                 // Wrap the exception as an extract exception and rethrow
-                throw ExtractException.AsExtractException("ELI23439", ex);
+                throw ExtractException.AsExtractException("ELI28004", ex);
             }
         }
 
@@ -724,7 +725,7 @@ namespace Extract.Imaging
             catch (Exception ex)
             {
                 // Wrap the exception as an extract exception and rethrow
-                throw ExtractException.AsExtractException("ELI23440", ex);
+                throw ExtractException.AsExtractException("ELI28005", ex);
             }
             finally
             {
@@ -762,7 +763,7 @@ namespace Extract.Imaging
                         BitConverter.GetBytes(nextBatesNumber));
 
                     // Log an exception
-                    ExtractException ee = new ExtractException("ELI23442",
+                    ExtractException ee = new ExtractException("ELI28006",
                         "Next Bates number was corrupted, reinitializing to 1");
                     ee.AddDebugData("Bates number file", _nextBatesNumberAppDataFile, false);
                     ee.AddDebugData("Number of bytes found", nextBatesBytes.Length, false);
@@ -831,7 +832,7 @@ namespace Extract.Imaging
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI23441", ex);
+                throw ExtractException.AsExtractException("ELI28007", ex);
             }
             finally
             {

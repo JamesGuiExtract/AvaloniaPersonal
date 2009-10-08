@@ -297,43 +297,6 @@ library UCLID_IMAGEUTILSLib
 		//-----------------------------------------------------------------------------------------
 	};
 
-	[
-		object,
-		uuid(0B746C51-A272-41F9-9AA1-0CD6759371D8),
-		dual,
-		nonextensible,
-		helpstring("IPDFInputOutputManager Interface"),
-		pointer_default(unique)
-	]
-	interface IPDFInputOutputManager : IDispatch
-	{
-		//-----------------------------------------------------------------------------------------
-		// This interface serves as a wrapper to the PDFInputOutputMgr class in LeadUtils, this
-		// allows our .Net objects to make use of the PDFInputOutputMgr
-		//-----------------------------------------------------------------------------------------
-
-		//-----------------------------------------------------------------------------------------
-		// Sets the file data for the PDF manager
-		[id(1), helpstring("method SetFileData")] HRESULT SetFileData([in] BSTR bstrOriginalFileName,
-			[in] VARIANT_BOOL bFileUsedAsInput);
-		//-----------------------------------------------------------------------------------------
-		// Returns VARIANT_TRUE if the manager is managing an input file and VARIANT_FALSE
-		// if it is managing an output file		
-		[id(2), helpstring("method IsInputFile")] HRESULT IsInputFile(
-			[out, retval] VARIANT_BOOL* pbIsInputFile);
-		//-----------------------------------------------------------------------------------------
-		// Returns the name of the file to operate on (if the input file is a PDF returns the
-		// name of the temporary tif)
-		[propget, id(3), helpstring("property FileName")] HRESULT FileName(
-			[out, retval] BSTR* pbstrFileName);
-		//-----------------------------------------------------------------------------------------
-		// Returns the name of the original file, or if the file has been converted
-		// returns a string of the format "Original: <orig> As: <converted>"
-		[propget, id(4), helpstring("property FileNameInfomationString")] HRESULT
-			FileNameInformationString([out, retval] BSTR* pbstrFileNameInformationString);
-		//-----------------------------------------------------------------------------------------
-	};
-
 	//----------------------------------------------------------------------------------------------
 	//-C O C L A S S E S ---------------------------------------------------------------------------
 	//----------------------------------------------------------------------------------------------
@@ -367,13 +330,4 @@ library UCLID_IMAGEUTILSLib
 		interface ILicensedComponent;
 	};
 
-	[
-		uuid(718551D9-2C11-4FC4-9F61-6E7FFFBE5028),
-		helpstring("PDFInputOutputManager Class")
-	]
-	coclass PDFInputOutputManager
-	{
-		[default] interface IPDFInputOutputManager;
-		interface ILicensedComponent;
-	};
 };

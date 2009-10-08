@@ -4303,7 +4303,7 @@ STDMETHODIMP CFileProcessingDB::OffsetUserCounter(BSTR bstrCounterName, LONGLONG
 
 		// Build the query
 		string strQuery = "SELECT [Value] FROM " + gstrUSER_CREATED_COUNTER
-			+ " WHERE [CounterName] = ' " + strCounterName + "'";
+			+ " WHERE [CounterName] = '" + strCounterName + "'";
 
 		// This needs to be allocated outside the BEGIN_CONNECTION_RETRY
 		ADODB::_ConnectionPtr ipConnection = NULL;

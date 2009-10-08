@@ -196,7 +196,7 @@ namespace Extract.FileActionManager.FileProcessors
             }
             catch (Exception ex)
             {
-                ExtractException ee = ExtractException.AsExtractException("ELI0", ex);
+                ExtractException ee = ExtractException.AsExtractException("ELI27985", ex);
                 ee.AddDebugData("Event Data", e, false);
                 ee.Display();
             }

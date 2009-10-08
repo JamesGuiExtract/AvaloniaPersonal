@@ -48,7 +48,7 @@ namespace Extract.Imaging.Forms
         private void LoadMruList()
         {
             // Clear the drop down list
-            CollectionMethods.ClearAndDispose(base.DropDownItems);
+            CollectionMethods.ClearAndDisposeObjects(base.DropDownItems);
 
             // Get the MRU list from the registry
             List<string> mruList = RegistryManager.GetMostRecentlyUsedImageFiles();

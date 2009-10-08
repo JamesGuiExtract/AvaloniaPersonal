@@ -177,7 +177,7 @@ namespace Extract.Imaging.Forms
             }
             catch (Exception ex)
             {
-                throw new ExtractException("ELI27647",
+                throw new ExtractException("ELI28016",
                     "Unable to get next unvisited page.", ex);
             }
         }

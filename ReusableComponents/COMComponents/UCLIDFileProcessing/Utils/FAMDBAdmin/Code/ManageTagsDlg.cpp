@@ -254,7 +254,7 @@ void CManageTagsDlg::OnBtnAdd()
 			m_ipFAMDB->AddTag(strTagName.c_str(), strDescription.c_str());
 
 			// Log an application trace about the database change
-			UCLIDException uex("ELI27700", "Application trace: Database change");
+			UCLIDException uex("ELI28017", "Application trace: Database change");
 			uex.addDebugInfo("Change", "Add file tag");
 			uex.addDebugInfo("User Name", getCurrentUserName());
 			uex.addDebugInfo("Server Name", asString(m_ipFAMDB->DatabaseServer));

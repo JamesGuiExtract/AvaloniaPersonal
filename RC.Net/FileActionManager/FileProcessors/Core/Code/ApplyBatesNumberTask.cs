@@ -1,8 +1,15 @@
+using Extract.Drawing;
 using Extract.Imaging;
+using Extract.Imaging.Utilities;
 using Extract.Interop;
 using Extract.Licensing;
+using Extract.Utilities;
+using Leadtools;
+using Leadtools.Codecs;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.ComTypes;
 using System.Text;
@@ -35,6 +42,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         static readonly string _COMPONENT_DESCRIPTION = "Apply Bates number";
 
+        /// <summary>
+        /// The total number of times the apply bates number task will retry applying the
+        /// Bates number.
+        /// </summary>
+        const int _MAX_RETRIES = 3;
+
         #endregion Constants
 
         #region Fields
@@ -59,6 +72,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// Indicates whether this task object is dirty or not
         /// </summary>
         bool _dirty;
+
+        /// <summary>
+        /// Indicates whether the raster codecs have been started or not
+        /// </summary>
+        bool _codecsStarted;
 
         #endregion Fields
 
@@ -166,12 +184,16 @@ namespace Extract.FileActionManager.FileProcessors
                 FileProcessingDBClass databaseManager = new FileProcessingDBClass();
                 databaseManager.ConnectLastUsedDBThisProcess();
 
+                // Create a FAM tag manager to check the file name tags
+                FAMTagManagerClass manager = new FAMTagManagerClass();
+
                 // This object is configured properly iff:
-                // 1. There is a file name specified (this does not validate the name, it
-                //    may contain file tags.
-                // 2. A database counter has been specified.
-                // 3. The specified database counter is a valid counter in the current database.
+                // 1. There is a file name specified
+                // 2. The file name contains only valid tags
+                // 3. A database counter has been specified.
+                // 4. The specified database counter is a valid counter in the current database.
                 return !string.IsNullOrEmpty(_fileName)
+                    && !manager.StringContainsInvalidTags(_fileName)
                     && !string.IsNullOrEmpty(_format.DatabaseCounter)
                     && databaseManager.IsUserCounterValid(_format.DatabaseCounter);
             }
@@ -228,12 +250,8 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 ExtractException.Assert("ELI27891", "Task cannot be NULL.", task != null);
 
-                if (_format != null)
-                {
-                    _format.Dispose();
-                }
-
-                _format = task._format.Clone();
+                // Use the property to ensure dispose is handled correctly for the format
+                Format = task._format.Clone();
 
                 _fileName = task._fileName;
 
@@ -254,7 +272,7 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Cancel()
         {
-            // Nothing to do (this task is not cancellable
+            // Nothing to do (this task is not cancellable)
         }
 
         /// <summary>
@@ -262,7 +280,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Close()
         {
-            // Nothing to do to close this task
+            if (_codecsStarted)
+            {
+                // Shutdown the raster codecs
+                RasterCodecs.Shutdown();
+                _codecsStarted = false;
+            }
         }
 
         /// <summary>
@@ -270,7 +293,12 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Init()
         {
-            // Nothing to do to initiliaze the task
+            if (!_codecsStarted)
+            {
+                // Start the raster codecs
+                RasterCodecs.Startup();
+                _codecsStarted = true;
+            }
         }
 
         /// <summary>
@@ -292,17 +320,51 @@ namespace Extract.FileActionManager.FileProcessors
             int nActionID, FAMTagManager pFAMTM, FileProcessingDB pDB,
             ProgressStatus pProgressStatus, bool bCancelRequested)
         {
+            string fileName = null;
             try
             {
                 // Validate the license
                 _licenseCache.Validate("ELI27893");
 
-                // TODO: Actually apply the bates number
+                // Create a tag manager and expand the tags in the file name
+                FileActionManagerPathTags tags = new FileActionManagerPathTags(
+                    Path.GetFullPath(bstrFileFullName), pFAMTM.FPSFileDir);
+                fileName = tags.Expand(_fileName);
+
+                // Ensure the database counter exists
+                if (!pDB.IsUserCounterValid(_format.DatabaseCounter))
+                {
+                    ExtractException ee = new ExtractException("ELI27986",
+                        "The user counter specified no longer exists in the database.");
+                    throw ee;
+                }
+
+                // Apply the bates number based on the format settings
+                using (BatesNumberGeneratorWithDatabase generator =
+                    new BatesNumberGeneratorWithDatabase(_format, pDB))
+                {
+                    ApplyBatesNumbers(fileName, pProgressStatus, generator);
+                }
+
+                // If we reached this point then processing was successful
                 return EFileProcessingResult.kProcessingSuccessful;
             }
             catch (Exception ex)
             {
-                throw ExtractException.CreateComVisible("ELI27894", "Unable to process the file.", ex);
+                // Wrap the exception as an extract exception and add debug data
+                ExtractException ee = ExtractException.AsExtractException("ELI27987", ex);
+                if (fileName != null)
+                {
+                    ee.AddDebugData("File Being Processed", fileName, false);
+                }
+                ee.AddDebugData("File ID", nFileID, false);
+                ee.AddDebugData("Action ID", nActionID, false);
+                ee.AddDebugData("User Counter", string.IsNullOrEmpty(_format.DatabaseCounter)
+                    ? "<Empty String>" : _format.DatabaseCounter, false);
+
+                // Throw the extract exception as a COM visible exception
+                throw ExtractException.CreateComVisible("ELI27894",
+                    "Unable to process the file.", ee);
             }
         }
 
@@ -452,7 +514,443 @@ namespace Extract.FileActionManager.FileProcessors
             ComMethods.UnregisterTypeInCategory(type, ExtractGuids.FileProcessors);
         }
 
+        /// <summary>
+        /// Applies the Bates numbers to the specified image file.
+        /// </summary>
+        /// <param name="fileName">The file to apply the Bates numbers to.</param>
+        /// <param name="progressStatus">The progress status to update.</param>
+        /// <param name="generator">The <see cref="BatesNumberGeneratorWithDatabase"/>
+        /// object to use to generate the Bates numbers.</param>
+        void ApplyBatesNumbers(string fileName, ProgressStatus progressStatus,
+            BatesNumberGeneratorWithDatabase generator)
+        {
+            if (progressStatus != null)
+            {
+                // TODO: Update progress status per page
+            }
+
+            // Ensure the file exists
+            ExtractException.Assert("ELI27988", "File no longer exists.", File.Exists(fileName),
+                "Image File Name", fileName);
+
+            // Get the file extension from the file name
+            string extension = Path.GetExtension(fileName);
+
+            int retryCount = 0;
+            int pageCount = 0;
+            List<string> batesNumbers = null;
+            using (ExtractPdfManager inputFile = new ExtractPdfManager(fileName, true))
+            {
+                try
+                {
+                    bool success = false;
+                    while (retryCount < _MAX_RETRIES)
+                    {
+                        TemporaryFile tempFile = null;
+                        ExtractPdfManager outFile = null;
+                        RasterCodecs codecs = null;
+                        CodecsImageInfo info = null;
+                        try
+                        {
+                            retryCount++;
+
+                            // Create a temporary file to apply the Bates number to
+                            // and wrap it in a PDF manager
+                            tempFile = new TemporaryFile(extension);
+                            outFile = new ExtractPdfManager(tempFile.FileName, false);
+
+                            // Get a new raster codecs object
+                            codecs = new RasterCodecs();
+
+                            // Get the file info along with the page information
+                            info = codecs.GetInformation(inputFile.FileName, true);
+
+                            // If the bates numbers have not been generated yet, generate them
+                            if (batesNumbers == null)
+                            {
+                                batesNumbers = new List<string>(
+                                    generator.GetNextNumberStrings(info.TotalPages));
+                            }
+
+                            pageCount = info.TotalPages;
+                            int bitsPerPixel = info.BitsPerPixel;
+                            RasterImageFormat format = info.Format;
+                            for (int i = 1; i <= pageCount; i++)
+                            {
+                                ApplyBatesNumberToPage(batesNumbers[i - 1], i, codecs, bitsPerPixel,
+                                    format, inputFile, outFile);
+                            }
+
+                            // Ensure the page counts are the same for both images
+                            if (ImageMethods.GetImagePageCount(outFile.FileName) == pageCount)
+                            {
+                                // Dispose of the out file so that the image is written to the temp
+                                // file location, then copy the temp file to the actual destination
+                                outFile.Dispose();
+                                outFile = null;
+                                File.Copy(tempFile.FileName, fileName, true);
+
+                                // Set success to true and break from loop
+                                success = true;
+                                break;
+                            }
+                        }
+                        finally
+                        {
+                            if (tempFile != null)
+                            {
+                                tempFile.Dispose();
+                                tempFile = null;
+                            }
+                            if (info != null)
+                            {
+                                info.Dispose();
+                                info = null;
+                            }
+                            if (codecs != null)
+                            {
+                                codecs.Dispose();
+                                codecs = null;
+                            }
+                            if (outFile != null)
+                            {
+                                outFile.Dispose();
+                                outFile = null;
+                            }
+                        }
+
+                        // Page counts did not match, sleep and retry
+                        if (retryCount < _MAX_RETRIES)
+                        {
+                            System.Threading.Thread.Sleep(100);
+                        }
+                    }
+
+                    if (!success)
+                    {
+                        ExtractException ee = new ExtractException("ELI27989",
+                            "Unable to apply Bates number to image.");
+                        throw ee;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ExtractException ee = ExtractException.AsExtractException("ELI27990", ex);
+                    ee.AddDebugData("PDF Manager File Information",
+                        inputFile.FileNameInformationString, false);
+                    ee.AddDebugData("Total Pages", pageCount, false);
+                    if (batesNumbers != null)
+                    {
+                        ee.AddDebugData("Last Bates Number", generator.LastBatesNumber, false);
+                    }
+                    throw ee;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the specified Bates number string to the specified page of the output file.
+        /// </summary>
+        /// <param name="batesNumber">The Bates number string to apply.</param>
+        /// <param name="pageNumber">The page to apply the string on.</param>
+        /// <param name="codecs">The <see cref="RasterCodecs"/> to use to load 
+        /// and save the page.</param>
+        /// <param name="bitsPerPixel">The bits per pixel for the image.</param>
+        /// <param name="format">The <see cref="RasterImageFormat"/> for the image.</param>
+        /// <param name="inputFile">The input file to load.</param>
+        /// <param name="outputFile">The file to write the modified image page to.</param>
+        void ApplyBatesNumberToPage(string batesNumber, int pageNumber, RasterCodecs codecs,
+            int bitsPerPixel, RasterImageFormat format, ExtractPdfManager inputFile,
+            ExtractPdfManager outputFile)
+        {
+            // Get the input and output file names
+            string inFile = inputFile.FileName;
+            string outFile = outputFile.FileName;
+
+            int retryCount = 0;
+            while (retryCount < _MAX_RETRIES)
+            {
+                retryCount++;
+
+                bool wontFitOnPage = false;
+                RasterImage image = null;
+                Font pixelFont = null;
+                RasterImageGdiPlusGraphicsContainer container = null;
+                try
+                {
+                    // Load the image page
+                    image = codecs.Load(inFile, bitsPerPixel, CodecsLoadByteOrder.BgrOrGray,
+                        pageNumber, pageNumber);
+
+                    // Check for GDI+ compatibility
+                    if (image.TestGdiPlusCompatible(true) !=
+                        RasterGdiPlusIncompatibleReason.Compatible)
+                    {
+                        // Try to make the image GDI+ compatible
+                        image.MakeGdiPlusCompatible(image.NearestGdiPlusPixelFormat, true);
+                    }
+
+                    // Compute the anchor point for the text
+                    Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
+                        _format.HorizontalInches, _format.VerticalInches, image);
+
+                    // Load the existing annotation objects
+                    RasterTagMetadata tag = codecs.ReadTag(inFile, pageNumber,
+                        RasterTagMetadata.AnnotationTiff);
+
+                    // Compute the appropriate font size
+                    pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
+                    image.YResolution, GraphicsUnit.Pixel);
+
+                    // Create a graphics object to draw on
+                    container = image.CreateGdiPlusGraphics();
+
+                    // Compute the bounds for the string
+                    Rectangle bounds = DrawingMethods.ComputeStringBounds(batesNumber,
+                        container.Graphics, pixelFont, 0, 0F, anchorPoint,
+                        _format.AnchorAlignment);
+
+                    // Ensure the Bates number fits on the image page
+                    Rectangle pageBounds = new Rectangle(new Point(0, 0), image.ImageSize);
+
+                    if (!pageBounds.Contains(bounds))
+                    {
+                        wontFitOnPage = true;
+
+                        // Throw exception
+                        ExtractException ee = new ExtractException("ELI27991",
+                            "Bates number will appear off of the page with current settings.");
+                        ee.AddDebugData("Bates Number String", batesNumber, false);
+                        ee.AddDebugData("Bounds For Bates Number", bounds, false);
+                        ee.AddDebugData("Bates Number Anchor Point", anchorPoint, false);
+                        ee.AddDebugData("Page Number", pageNumber, false);
+                        ee.AddDebugData("Image Bounds", pageBounds, false);
+                        ee.AddDebugData("Image File Name",
+                            inputFile.FileNameInformationString, false);
+                        throw ee;
+                    }
+
+                    // Draw the Bates number on the image
+                    DrawingMethods.DrawString(batesNumber, container.Graphics,
+                        container.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
+
+                    // Save the image page (use append to add it to the end of the file)
+                    codecs.Save(image, outFile, format, bitsPerPixel, 1, 1, pageNumber,
+                        CodecsSavePageMode.Append);
+
+                    // If there were annotation tags, save those as well
+                    if (tag != null)
+                    {
+                        codecs.WriteTag(outFile, pageNumber, tag);
+                    }
+
+                    // Successfully completed, break from loop
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    if (wontFitOnPage)
+                    {
+                        throw ExtractException.AsExtractException("ELI27992", ex);
+                    }
+                    else if (retryCount < _MAX_RETRIES)
+                    {
+                        ExtractException ee = new ExtractException("ELI27993",
+                            "Application Trace: Could not apply Bates number on page, retrying.", ex);
+                        ee.AddDebugData("Retry Count", retryCount, false);
+                        ee.AddDebugData("Page Number", pageNumber, false);
+                        ee.AddDebugData("Image File Name",
+                            inputFile.FileNameInformationString, false);
+                        ee.Log();
+                        System.Threading.Thread.Sleep(100);
+                    }
+                    else
+                    {
+                        ExtractException ee = new ExtractException("ELI27994",
+                            "Could not apply Bates number on page.", ex);
+                        ee.AddDebugData("Number Of Retries", retryCount, false);
+                        ee.AddDebugData("Page Number", pageNumber, false);
+                        ee.AddDebugData("Bates Number String", batesNumber, false);
+                        ee.AddDebugData("Image File Name",
+                            inputFile.FileNameInformationString, false);
+                        throw ee;
+                    }
+                }
+                finally
+                {
+                    if (pixelFont != null)
+                    {
+                        pixelFont.Dispose();
+                    }
+                    if (container != null)
+                    {
+                        container.Dispose();
+                    }
+                    if (image != null)
+                    {
+                        image.Dispose();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Computes the anchor point for the Bates number string.
+        /// </summary>
+        /// <param name="pageAnchorAlignment">The <see cref="AnchorAlignment"/> value
+        /// with respect to the page.</param>
+        /// <param name="horizontalInches">The horizontal offset from the specified
+        /// <see cref="AnchorAlignment"/>.</param>
+        /// <param name="verticalInches">The vertical offset from the specified
+        /// <see cref="AnchorAlignment"/>.</param>
+        /// <param name="image">The image page that the number will be applied to.</param>
+        /// <returns>The anchor point for the Bates number string.</returns>
+        static Point GetAnchorPoint(AnchorAlignment pageAnchorAlignment,
+            float horizontalInches, float verticalInches, RasterImage image)
+        {
+            // Calculate the positive offset in logical (image) coordinates
+            Size offset = GetAnchorPointOffset(horizontalInches, verticalInches, image);
+
+            // Calculate the top left coordinate based on the anchor alignment
+            Point anchorPoint;
+            switch (pageAnchorAlignment)
+            {
+                case AnchorAlignment.LeftBottom:
+                    anchorPoint = new Point(offset.Width, image.Height - offset.Height);
+                    break;
+
+                case AnchorAlignment.RightBottom:
+                    anchorPoint = new Point(image.Width - offset.Width,
+                        image.Height - offset.Height);
+                    break;
+
+                case AnchorAlignment.LeftTop:
+                    anchorPoint = new Point(offset);
+                    break;
+
+                case AnchorAlignment.RightTop:
+                    anchorPoint = new Point(image.Width - offset.Width, offset.Height);
+                    break;
+
+                default:
+                    ExtractException ee = new ExtractException("ELI27995",
+                        "Unexpected anchor alignment.");
+                    ee.AddDebugData("Anchor alignment", pageAnchorAlignment, false);
+                    throw ee;
+            }
+
+            return anchorPoint;
+        }
+
+        /// <summary>
+        /// Computes the offset value for the anchor point based on the resolution
+        /// of the image page.
+        /// </summary>
+        /// <param name="horizontalInches">The horizontal offset value.</param>
+        /// <param name="verticalInches">The vertical offset value.</param>
+        /// <param name="image">The image page the Bates number will be applied to.</param>
+        /// <returns>The offset value for the Bates number anchor position.</returns>
+        static Size GetAnchorPointOffset(float horizontalInches, float verticalInches,
+            RasterImage image)
+        {
+            return new Size((int)(horizontalInches * image.XResolution + 0.5),
+                (int)(verticalInches * image.YResolution + 0.5));
+        }
+
         #endregion Methods
+
+        #region Properties
+
+        /// <summary>
+        /// Gets/sets the <see cref="BatesNumberFormat"/> for this task.
+        /// <para><b>Note:</b></para>
+        /// This task only supports <see cref="BatesNumberFormat"/> objects
+        /// where <see cref="BatesNumberFormat.UseDatabaseCounter"/> is
+        /// <see langword="true"/>.
+        /// </summary>
+        /// <value>The <see cref="BatesNumberFormat"/> to use for this task.</value>
+        /// <returns>The <see cref="BatesNumberFormat"/> to use for this task.</returns>
+        public BatesNumberFormat Format
+        {
+            get
+            {
+                return _format;
+            }
+            set
+            {
+                try
+                {
+                    if (value != null)
+                    {
+                        // Ensure the new format uses database counters
+                        if (!value.UseDatabaseCounter)
+                        {
+                            throw new ExtractException("ELI27996",
+                                "This task only supports using database counters.");
+                        }
+                    }
+
+                    // If the new format is not the same as the old format
+                    // store the new format and set the dirty flag
+                    if (value != _format)
+                    {
+                        // Dispose of old format if it exists
+                        if (_format != null)
+                        {
+                            _format.Dispose();
+                        }
+                        _format = value;
+
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28001", ex);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets/sets the file name for this task.
+        /// </summary>
+        /// <value>The file name that this task will operate on.</value>
+        /// <returns>The file name that this task will operate on.</returns>
+        public string FileName
+        {
+            get
+            {
+                return _fileName;
+            }
+            set
+            {
+                try
+                {
+                    // If there is a string specified, check for invalid file tags
+                    if (!string.IsNullOrEmpty(value))
+                    {
+                        // Create a tag manager to validate the file tags
+                        FAMTagManagerClass manager = new FAMTagManagerClass();
+                        ExtractException.Assert("ELI27997", "File name contains invalid file tags.",
+                            !manager.StringContainsInvalidTags(value), "File Name With Invalid Tags",
+                            value);
+                    }
+
+                    // If file names are different, store the value and set the dirty flag
+                    if (!value.Equals(_fileName, StringComparison.OrdinalIgnoreCase))
+                    {
+                        _fileName = value;
+                        _dirty = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ExtractException.AsExtractException("ELI28000", ex);
+                }
+            }
+        }
+
+        #endregion Properties
 
         #region IDisposable
 
@@ -475,6 +973,11 @@ namespace Extract.FileActionManager.FileProcessors
         {
             if (disposing)
             {
+                if (_codecsStarted)
+                {
+                    RasterCodecs.Shutdown();
+                    _codecsStarted = false;
+                }
                 if (_format != null)
                 {
                     _format.Dispose();

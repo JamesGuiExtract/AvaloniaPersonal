@@ -431,7 +431,9 @@ namespace Extract.Imaging.Forms
         {
             if (_pixelFont == null)
             {
-                _pixelFont = base.ImageViewer.ConvertFontToUnits(_font, GraphicsUnit.Pixel);
+                // Get the Y resolution from the image viewer
+                int yResolution = (int) base.ImageViewer.ImageDpiY;
+                _pixelFont = FontMethods.ConvertFontToUnits(_font, yResolution, GraphicsUnit.Pixel);
             }
 
             return _pixelFont;
@@ -483,59 +485,9 @@ namespace Extract.Imaging.Forms
                     return;
                 }
 
-                // Store the original graphics settings
-                Matrix originalTransform = graphics.Transform;
-                SmoothingMode originalSmoothingMode = graphics.SmoothingMode;
-                TextRenderingHint originalTextRenderingHint = graphics.TextRenderingHint;
-
-                try
-                {
-                    // Set a new transformation matrix, so that the text 
-                    // will be drawn with the same orientation as the page.
-                    graphics.Transform = transform;
-                    graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                    graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-
-                    // Apply any specified rotation to the to the graphics object.
-                    graphics.RotateTransform(_orientation);
-
-                    // The location to draw the text will be based off the bounds location (but may be 
-                    // offset to account for a border.
-                    Point textLocation = _bounds.Location;
-
-                    // Check to see if a background color needs to be filled in.
-                    if (_backgroundColor != null)
-                    {
-                        // Use the highlight's region
-                        using (Region region = new Region(_bounds))
-                        {
-                            // Draw the highlight (use copypen to make the highlight opaque)
-                            ImageViewer.DrawRegion(region, graphics, _backgroundColor.Value,
-                                NativeMethods.BinaryRasterOperations.R2_COPYPEN);
-                        }
-                    }
-
-                    // Check to see if a border needs to be drawn
-                    if (_borderColor != null)
-                    {
-                        graphics.DrawPolygon(ExtractPens.GetPen(_borderColor.Value), GetVertices(false));
-
-                        // The location the text is drawn is offset from the padded bounds so that the text
-                        // is centered properly.
-                        textLocation.Offset(_BORDER_PADDING, _BORDER_PADDING);
-                    }
-
-                    // Draw the text
-                    graphics.DrawString(_text, GetPixelFont(), Brushes.Black, textLocation,
-                        StringFormat.GenericTypographic);
-                }
-                finally
-                {
-                    // Restore the original graphics settings.
-                    graphics.Transform = originalTransform;
-                    graphics.SmoothingMode = originalSmoothingMode;
-                    graphics.TextRenderingHint = originalTextRenderingHint;
-                }
+                // Draw the text on the specified graphics object
+                DrawingMethods.DrawString(_text, graphics, transform, GetPixelFont(),
+                    _BORDER_PADDING, _orientation, _bounds, _backgroundColor, _borderColor);
             }
             catch (Exception ex)
             {
@@ -594,7 +546,8 @@ namespace Extract.Imaging.Forms
             try
             {
                 // Return the bounds of the text layer object
-                return GeometryMethods.GetBoundingRectangle(GetVertices(true));
+                return GeometryMethods.GetBoundingRectangle(
+                    DrawingMethods.GetVertices(_bounds, _orientation));
             }
             catch (Exception ex)
             {
@@ -612,7 +565,7 @@ namespace Extract.Imaging.Forms
         {
             try
             {
-                return GetVertices(true);
+                return DrawingMethods.GetVertices(_bounds, _orientation);
             }
             catch (Exception ex)
             {
@@ -746,116 +699,12 @@ namespace Extract.Imaging.Forms
         private void UpdateBounds()
         {
             // Calculate the size and position of the text layer object's bounds.
-            Point location;
-            Size size;
             using (Graphics graphics = base.ImageViewer.CreateGraphics())
             {
-                graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                size = Size.Round(graphics.MeasureString(_text, GetPixelFont(), PointF.Empty,
-                    StringFormat.GenericTypographic));
-
-                // If a border is being used, pad the size needed to allow for a gap of
-                // _BORDER_PADDING pixels on each side.
-                if (_borderColor != null)
-                {
-                    size.Height += _BORDER_PADDING * 2;
-                    size.Width += _BORDER_PADDING * 2;
-                }
-
-                // Calculate the top left coordinate based on the anchor alignment
-                Point[] anchorPoint = { base.AnchorPoint };
-
-                // The text layer object may be drawn in a rotated coordinate system.  Rotate the
-                // anchor point into that coordinate system.
-                using (Matrix transform = new Matrix())
-                {
-                    transform.Rotate(-_orientation);
-                    transform.TransformPoints(anchorPoint);
-                }
-
-                location = anchorPoint[0];
+                // Update the bounds
+                _bounds = DrawingMethods.ComputeStringBounds(_text, graphics, GetPixelFont(),
+                    _BORDER_PADDING, _orientation, base.AnchorPoint, base.AnchorAlignment);
             }
-
-            switch (base.AnchorAlignment)
-            {
-                case AnchorAlignment.LeftBottom:
-                    location.Offset(0, -size.Height);
-                    break;
-
-                case AnchorAlignment.Bottom:
-                    location.Offset(-size.Width / 2, -size.Height);
-                    break;
-
-                case AnchorAlignment.RightBottom:
-                    location -= size;
-                    break;
-
-                case AnchorAlignment.Left:
-                    location.Offset(0, -size.Height / 2);
-                    break;
-
-                case AnchorAlignment.Center:
-                    location.Offset(-size.Width / 2, -size.Height / 2);
-                    break;
-
-                case AnchorAlignment.Right:
-                    location.Offset(-size.Width, -size.Height / 2);
-                    break;
-
-                case AnchorAlignment.LeftTop:
-                    // Do nothing - anchor point is the left top coordinate
-                    break;
-
-                case AnchorAlignment.Top:
-                    location.Offset(-size.Width / 2, 0);
-                    break;
-
-                case AnchorAlignment.RightTop:
-                    location.Offset(-size.Width, 0);
-                    break;
-
-                default:
-                    ExtractException ee = new ExtractException("ELI22265",
-                        "Unexpected anchor alignment.");
-                    ee.AddDebugData("Anchor alignment", base.AnchorAlignment, false);
-                    throw ee;
-            }
-
-            // Update the bounds
-            _bounds = new Rectangle(location, size);
-        }
-
-        /// <summary>
-        /// Retrieves the vertices of the <see cref="TextLayerObject"/> in either internal
-        /// (possibly rotated) coordinate system or in logical (image) coordinates.
-        /// </summary>
-        /// <param name="useImageCoordinates"><see langword="true"/> to get the vertices in image
-        /// coordinates or <see langword="false"/> to get the vertices in the internal
-        /// coordinate system.</param>
-        /// <returns>The vertices of the <see cref="TextLayerObject"/>in the specified coordinate
-        /// system.</returns>
-        private Point[] GetVertices(bool useImageCoordinates)
-        {
-            // Construct the vertices using the bounds of the text layer object
-            Point[] vertices =
-            {
-                new Point(_bounds.Left, _bounds.Top),
-                new Point(_bounds.Right, _bounds.Top),
-                new Point(_bounds.Right, _bounds.Bottom),
-                new Point(_bounds.Left, _bounds.Bottom)
-            };
-
-            // Rotate the coordinates into the image coordinate system if specified.
-            if (useImageCoordinates)
-            {
-                using (Matrix transform = new Matrix())
-                {
-                    transform.Rotate(_orientation);
-                    transform.TransformPoints(vertices);
-                }
-            }
-
-            return vertices;
         }
 
         #endregion Private Members

@@ -1,3 +1,4 @@
+using Extract.Drawing;
 using Extract.Interop;
 using Extract.Licensing;
 using Extract.Utilities.Forms;

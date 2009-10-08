@@ -23,6 +23,11 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         IFileProcessingDB _databaseManager;
 
+        /// <summary>
+        /// The last Bates number retrieved from the database.
+        /// </summary>
+        long _lastBatesNumber;
+
         #endregion Fields
 
         #region Constructors
@@ -157,10 +162,10 @@ namespace Extract.FileActionManager.FileProcessors
         /// <returns>The next Bates number using the current settings.</returns>
         long GetLastNumber(long offset)
         {
-            long lastNumber = _databaseManager.OffsetUserCounter(_format.DatabaseCounter,
+            _lastBatesNumber = _databaseManager.OffsetUserCounter(_format.DatabaseCounter,
                 offset);
 
-            return lastNumber;
+            return _lastBatesNumber;
         }
 
         /// <summary>
@@ -210,6 +215,19 @@ namespace Extract.FileActionManager.FileProcessors
             get
             {
                 return _databaseManager;
+            }
+        }
+
+        /// <summary>
+        /// Gets the last Bates number that was retrieved from the database. (This value
+        /// is set when a call to GetNextNumberStrings is made).
+        /// </summary>
+        /// <returns>The last Bates number that was retrieved from the database.</returns>
+        public long LastBatesNumber
+        {
+            get
+            {
+                return _lastBatesNumber;
             }
         }
 

@@ -100,7 +100,7 @@ namespace Extract.Imaging.Forms
                 base.Text = ToolStripButtonConstants._REDACTION_SPLIT_BUTTON_TEXT;
 
                 // Clear the collection
-                CollectionMethods.ClearAndDispose(base.DropDownItems);
+                CollectionMethods.ClearAndDisposeObjects(base.DropDownItems);
 
                 // Add the angular and rectangular redaction images into the button
                 base.DropDownItems.Add(ToolStripButtonConstants._ANGULAR_REDACTION_BUTTON_TOOL_TIP,

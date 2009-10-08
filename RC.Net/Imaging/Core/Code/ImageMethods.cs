@@ -1,5 +1,7 @@
 using Extract.Drawing;
+using Extract.Licensing;
 using Leadtools;
+using Leadtools.Codecs;
 using Leadtools.ImageProcessing;
 using System;
 using System.Collections.Generic;
@@ -15,6 +17,16 @@ namespace Extract.Imaging
     /// </summary>
     public static class ImageMethods
     {
+        #region Fields
+
+        /// <summary>
+        /// License cache object used to validate the license
+        /// </summary>
+        static LicenseStateCache _licenseCache =
+            new LicenseStateCache(LicenseIdName.ExtractCoreObjects, typeof(ImageMethods).ToString());
+
+        #endregion Fields
+
         /// <overloads>Generates a thumbnail of a specified scale size from a specified
         /// original image.</overloads>
         /// <summary>
@@ -110,6 +122,9 @@ namespace Extract.Imaging
             Bitmap thumbnail = null;
             try
             {
+                // Validate the license
+                _licenseCache.Validate("ELI28012");
+
                 // Ensure that the image object is not null and that the percentage is
                 // greater than 0
                 ExtractException.Assert("ELI23771", "Image must not be null!", original != null);
@@ -184,6 +199,9 @@ namespace Extract.Imaging
         {
             try
             {
+                // Validate the license
+                _licenseCache.Validate("ELI28013");
+
                 // Move to the raster zone's page.
                 image.Page = rasterZone.PageNumber;
 
@@ -336,6 +354,53 @@ namespace Extract.Imaging
                 ExtractException ee = new ExtractException("ELI24087",
                     "Failed to extract raster zone image!", ex);
                 throw ee;
+            }
+        }
+
+        /// <overloads>Gets the total count of pages from the specified image file.</overloads>
+        /// <summary>
+        /// Gets the total count of pages from the specified image file.
+        /// <para><b>Require:</b></para>
+        /// This method requires that RasterCodecs.Startup() has been called.
+        /// </summary>
+        /// <param name="fileName">The name of the image file to get the page count for.</param>
+        /// <returns>The page count for the specified image.</returns>
+        public static int GetImagePageCount(string fileName)
+        {
+            try
+            {
+                using (RasterCodecs codecs = new RasterCodecs())
+                {
+                    return GetImagePageCount(fileName, codecs);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27967", ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the total count of pages from the specified image file.
+        /// </summary>
+        /// <param name="fileName">The name of the image file to get the page count for.</param>
+        /// <param name="codecs">The raster codecs to use to get the page count.</param>
+        /// <returns>The page count for the specified image.</returns>
+        public static int GetImagePageCount(string fileName, RasterCodecs codecs)
+        {
+            try
+            {
+                // Validate the license
+                _licenseCache.Validate("ELI28014");
+
+                using (CodecsImageInfo info = codecs.GetInformation(fileName, true))
+                {
+                    return info.TotalPages;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27968", ex);
             }
         }
     }

@@ -817,7 +817,7 @@ namespace Extract.Imaging.Forms
             SizeF fontSize = new SizeF(minPixels, minPixels);
 
             // Get the font that will fit exactly within the minimum font size
-            using (Font font = GetFontThatFits(_watermark, graphics, fontSize))
+            using (Font font = FontMethods.GetFontThatFits(_watermark, graphics, fontSize))
             {
                 // Calculate the center point of the watermark in image coordinates
                 SizeF size = graphics.MeasureString(_watermark, font);
@@ -831,39 +831,6 @@ namespace Extract.Imaging.Forms
                 // Draw the watermark
                 DrawingMethods.DrawRotatedString(graphics, _watermark, font, Brushes.DimGray,
                     center, -45);
-            }
-        }
-
-        /// <summary>
-        /// Gets a font the fits exactly within the specified size.
-        /// </summary>
-        /// <param name="text">The text to fit.</param>
-        /// <param name="graphics">The graphics object that will draw the font.</param>
-        /// <param name="size">The size into which the font should fit.</param>
-        /// <returns>A font that fits exactly within the specified size.</returns>
-        static Font GetFontThatFits(string text, Graphics graphics, SizeF size)
-        {
-            // Guess the size needed
-            float guess = Math.Min(size.Width, size.Height) * 1.2F / text.Length;
-
-            // Create a font to use to test the guess
-            using (Font font = new Font(FontFamily.GenericSerif, guess, FontStyle.Bold, 
-                GraphicsUnit.Pixel))
-            {
-                // Measure the size of the font
-                SizeF guessSize = graphics.MeasureString(text, font);
-
-                // Calculate how far from the desired size the guess was
-                SizeF scale = new SizeF(size.Width / guessSize.Width,
-                    size.Height / guessSize.Height);
-
-                // Calculate the actual font size
-                float actual = (scale.Height < scale.Width) ?
-                    scale.Height * guess : scale.Width * guess;
-
-                // Return the actual font
-                return new Font(FontFamily.GenericSerif, actual, FontStyle.Bold, 
-                    GraphicsUnit.Pixel);
             }
         }
 
@@ -4257,113 +4224,6 @@ namespace Extract.Imaging.Forms
             catch (Exception ex)
             {
                 throw ExtractException.AsExtractException("ELI22507", ex);
-            }
-        }
-
-        /// <summary>
-        /// Creates a new font in the specified units from another font.
-        /// </summary>
-        /// <param name="font">The font from which to create a new font.</param>
-        /// <param name="unit">The unit of measure for the new font.</param>
-        /// <returns>A new font measured by <paramref name="unit"/> from <paramref name="font"/>.
-        /// </returns>
-        /// <remarks>This method does not dispose of the input font or the output font.</remarks>
-        public Font ConvertFontToUnits(Font font, GraphicsUnit unit)
-        {
-            try
-            {
-                // Get the input font size in pixels
-                float fontSize = GetFontSizeInPixels(font);
-
-                // Get the input font size in the specified units
-                fontSize = ConvertPixelsToEmUnits(fontSize, unit);
-
-                // Create the new font with the specified units
-                return new Font(font.FontFamily, fontSize, font.Style, unit, font.GdiCharSet,
-                    font.GdiVerticalFont);
-            }
-            catch (Exception ex)
-            {
-                throw ExtractException.AsExtractException("ELI23220", ex);
-            }
-        }
-
-        /// <summary>
-        /// Calculates the font size in logical (image) pixels.
-        /// </summary>
-        /// <param name="font">The font from which to retrieve the font size.</param>
-        /// <returns>The font size in logical (image) pixels.</returns>
-        float GetFontSizeInPixels(Font font)
-        {
-            switch (font.Unit)
-            {
-                case GraphicsUnit.Document:
-                    // (1 inch = 300 document units)
-                    return font.Size * base.Image.YResolution / 300F;
-
-                case GraphicsUnit.Inch:
-                    return font.Size * base.Image.YResolution;
-
-                case GraphicsUnit.Millimeter:
-                    // (1 inch = 25.4 millimeters)
-                    return font.Size * base.Image.YResolution / 25.4F;
-
-                case GraphicsUnit.Pixel:
-                    return font.Size;
-
-                case GraphicsUnit.Point:
-                    // (1 inch = 72 points)
-                    return font.Size * base.Image.YResolution / 72F;
-
-                case GraphicsUnit.Display:
-                case GraphicsUnit.World:
-                    throw new NotImplementedException();
-
-                default:
-                    ExtractException ee = 
-                        new ExtractException("ELI23218", "Unexpected graphics unit.");
-                    ee.AddDebugData("Unit", font.Unit, false);
-                    throw ee;
-            }
-        }
-
-        /// <summary>
-        /// Calculates font size in the units specified.
-        /// </summary>
-        /// <param name="pixels">The font size in logical (image) pixels.</param>
-        /// <param name="unit">The </param>
-        /// <returns></returns>
-        float ConvertPixelsToEmUnits(float pixels, GraphicsUnit unit)
-        {
-            switch (unit)
-            {
-                case GraphicsUnit.Document:
-                    // (1 inch = 300 document units)
-                    return pixels * 300F / base.Image.YResolution;
-
-                case GraphicsUnit.Inch:
-                    return pixels / base.Image.YResolution;
-
-                case GraphicsUnit.Millimeter:
-                    // (1 inch = 25.4 millimeters)
-                    return pixels * 25.4F / base.Image.YResolution;
-
-                case GraphicsUnit.Pixel:
-                    return pixels;
-
-                case GraphicsUnit.Point:
-                    // (1 inch = 72 points)
-                    return pixels * 72F / base.Image.YResolution;
-
-                case GraphicsUnit.Display:
-                case GraphicsUnit.World:
-                    throw new NotImplementedException();
-
-                default:
-                    ExtractException ee = 
-                        new ExtractException("ELI23219", "Unexpected graphics unit.");
-                    ee.AddDebugData("Unit", unit, false);
-                    throw ee;
             }
         }
 

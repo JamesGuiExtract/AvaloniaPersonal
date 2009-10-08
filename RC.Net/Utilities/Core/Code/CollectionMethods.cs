@@ -15,7 +15,7 @@ namespace Extract.Utilities
         /// on all items that implement <see cref="IDisposable"/>.
         /// </summary>
         /// <param name="list">The list of items to be cleared and disposed.</param>
-        public static void ClearAndDispose(IList list)
+        public static void ClearAndDisposeObjects(IList list)
         {
             try
             {
@@ -41,25 +41,24 @@ namespace Extract.Utilities
 
         /// <summary>
         /// Removes all elements of the specified dictionary and calls
-        /// <see cref="IDisposable.Dispose"/> on all values that implement <see cref="IDisposable"/>.
+        /// <see cref="IDisposable.Dispose"/> on all values that
+        /// implement <see cref="IDisposable"/>.
         /// <para><b>Note:</b></para>
         /// This will not call <see cref="IDisposable.Dispose"/> on the keys. The caller is
         /// responsible to dispose of the keys (must do this before calling ClearAndDispose
         /// as this function will clear the collection).
         /// </summary>
         /// <param name="dictionary">The dictionary of items to be cleared and disposed.</param>
-        public static void ClearAndDispose(IDictionary dictionary)
+        public static void ClearAndDisposeObjects(IDictionary dictionary)
         {
             try
             {
                 // Iterate through all of the values in the dictionary
-                foreach (Object value in dictionary.Values)
+                foreach (object value in dictionary.Values)
                 {
-                    // Check for IDisposable interface
                     IDisposable item = value as IDisposable;
                     if (item != null)
                     {
-                        // Dispose of the item
                         item.Dispose();
                     }
                 }
@@ -69,7 +68,110 @@ namespace Extract.Utilities
             }
             catch (Exception ex)
             {
-                throw ExtractException.AsExtractException("ELI22673", ex);
+                throw ExtractException.AsExtractException("ELI27957", ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes all elements of the specified list and calls <see cref="IDisposable.Dispose"/>
+        /// on each element before removing it
+        /// </summary>
+        /// <typeparam name="T">The type stored in the list.</typeparam>
+        /// <param name="list">The list of items to be cleared and disposed.</param>
+        public static void ClearAndDispose<T>(IList<T> list) where T : class, IDisposable
+        {
+            try
+            {
+                for (int i = list.Count - 1; i >= 0; i--)
+                {
+                    T item = list[i];
+                    if (item != null)
+                    {
+                        item.Dispose();
+                    }
+
+                    list.RemoveAt(i);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27973", ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes all elements of the specified dictionary and calls
+        /// <see cref="IDisposable.Dispose"/> on all values.
+        /// <para><b>Note:</b></para>
+        /// This will not call <see cref="IDisposable.Dispose"/> on the keys. The caller is
+        /// responsible to dispose of the keys (must do this before calling ClearAndDispose
+        /// as this function will clear the collection).
+        /// </summary>
+        /// <param name="dictionary">The dictionary of items to be cleared and disposed.</param>
+        /// <typeparam name="TKey">The key type in the dictionary</typeparam>
+        /// <typeparam name="TValue">The value type in the dictionary. This type
+        /// must implement <see cref="IDisposable"/>.</typeparam>
+        public static void ClearAndDispose<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
+            where TValue : class, IDisposable
+        {
+            try
+            {
+                // Iterate through all of the values in the dictionary
+                foreach (TValue value in dictionary.Values)
+                {
+                    if (value != null)
+                    {
+                        value.Dispose();
+                    }
+                }
+
+                // Clear the dictionary
+                dictionary.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI28008", ex);
+            }
+        }
+
+        /// <summary>
+        /// Removes all elements of the specified dictionary and calls
+        /// <see cref="IDisposable.Dispose"/> on all keys and values in the collection.
+        /// </summary>
+        /// <typeparam name="TKey">The key type in the dictionary. This type
+        /// must implement <see cref="IDisposable"/>.</typeparam>
+        /// <typeparam name="TValue">The value type in the dictionary. This type
+        /// must implement <see cref="IDisposable"/>.</typeparam>
+        /// <param name="dictionary">The dictionary of items to be cleared and disposed.</param>
+        public static void ClearAndDisposeKeysAndValues<TKey, TValue>(
+            IDictionary<TKey, TValue> dictionary)
+            where TKey : class, IDisposable
+            where TValue : class, IDisposable
+        {
+            try
+            {
+                // Loop through each key value pair
+                foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+                {
+                    // Dispose of the key
+                    if (pair.Key != null)
+                    {
+                        pair.Key.Dispose();
+                    }
+
+                    // Dispose of the value
+                    if (pair.Value != null)
+                    {
+                        pair.Value.Dispose();
+                    }
+                }
+
+                // Clear the collection
+                dictionary.Clear();
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.AsExtractException("ELI27974", ex);
             }
         }
 

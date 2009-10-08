@@ -284,7 +284,7 @@ STDMETHODIMP CFileSupplierData::get_Priority(EFilePriority *pVal)
 		// Check license
 		validateLicense();
 
-		ASSERT_ARGUMENT("ELI27586", pVal != NULL);
+		ASSERT_ARGUMENT("ELI28015", pVal != NULL);
 
 		// Return priority
 		*pVal = m_ePriority;
