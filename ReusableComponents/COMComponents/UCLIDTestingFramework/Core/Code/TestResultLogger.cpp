@@ -802,9 +802,15 @@ HRESULT CTestResultLogger::raw_AddTestCaseCompareData (BSTR strTitle, BSTR strLa
 			// write the end tag for the test case memo
 			m_outputFile << getEndTag(gstrTEST_CASE_COMPARE) << endl;
 		}
-		// update the UI
-		m_pDlg->addTestCaseCompareData(stdstrTitle, stdstrLabel1, stdstrInput1,
-									   stdstrLabel2, stdstrInput2);
+
+		// Only update the UI if adding entries to the log window
+		if (m_bAddEntriesInLogWindow)
+		{
+			// update the UI
+			m_pDlg->addTestCaseCompareData(stdstrTitle, stdstrLabel1, stdstrInput1,
+										   stdstrLabel2, stdstrInput2);
+		}
+
 		return S_OK;
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19314")
