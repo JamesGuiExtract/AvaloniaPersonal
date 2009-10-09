@@ -403,5 +403,149 @@ namespace Extract.Imaging
                 throw ExtractException.AsExtractException("ELI27968", ex);
             }
         }
+
+        /// <summary>
+        /// Attempts to create a lead tools device context handle that can be used
+        /// to create a graphics object for drawing on/manipulating an image. The
+        /// method will retry the specified number of times and either return a
+        /// handle or throw an exception if it was unsuccessful after retrying.
+        /// </summary>
+        /// <param name="imageToClone">The image object that will be cloned.  This should
+        /// be a single page <see cref="RasterImage"/>.</param>
+        /// <param name="retryCount">The number of times to attempt to create the
+        /// device context.</param>
+        /// <param name="command">A <see cref="ColorResolutionCommand"/> to use to
+        /// convert the cloned page. If <see langword="null"/> the cloned page
+        /// will be left as is.  If not <see langword="null"/> the page will
+        /// be modified if its bits per pixel are less than the bits per pixel
+        /// property of the ColorResolutionCommand.</param>
+        /// <param name="pageNumber">The page that is being worked on (used for exception
+        /// debug information).</param>
+        /// <param name="clonedPage">The image object that the returned device
+        /// context relates to.</param>
+        /// <returns>A device context (which must be freed via a call to
+        /// <see cref="RasterImage.DeleteLeadDC"/>) for the image.</returns>
+        // An out parameter is necessary since the Device context that is created is
+        // related to the image that it is created from which means we need to return the image
+        // for the returned device context.
+        [SuppressMessage("Microsoft.Design", "CA1021:AvoidOutParameters", MessageId="4#")]
+        public static IntPtr GetLeadDCWithRetries(RasterImage imageToClone, int retryCount,
+            ColorResolutionCommand command, int pageNumber, out RasterImage clonedPage)
+        {
+            RasterImage page = null;
+            try
+            {
+                // Validate the license
+                _licenseCache.Validate("ELI28054");
+
+                // Sometimes the call to CreateLeadDC can return an IntPtr.Zero, in this
+                // case we should dispose of the page, call garbage collection, reclone
+                // the page and retry the CreateLeadDC call [IDSD #331]
+                IntPtr hdc = IntPtr.Zero;
+                int retries = 0;
+                for (; retries < retryCount; retries++)
+                {
+                    // Clone the page before manipulating it
+                    page = imageToClone.Clone();
+
+                    // Run the resolution command (if it exists) on any image that
+                    // is less than the commands bits per pixel
+                    if (command != null && page.BitsPerPixel < command.BitsPerPixel)
+                    {
+                        command.Run(page);
+                    }
+
+                    // Get a handle to a device context
+                    hdc = page.CreateLeadDC();
+
+                    // If successful, just break from loop
+                    if (hdc != IntPtr.Zero)
+                    {
+                        break;
+                    }
+
+                    // Dispose of the page and call garbage collector
+                    page.Dispose();
+                    page = null;
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
+
+                // If it was successful, but only after a retry, log an exception
+                if (hdc != IntPtr.Zero && retries > 0)
+                {
+                    ExtractException ee = new ExtractException("ELI28020",
+                        "Application Trace: Device context created successfully after retry.");
+                    ee.AddDebugData("Retries attempted", retries, false);
+                    AddImageDebugInfo(ee, imageToClone, pageNumber);
+                    ee.Log();
+                }
+                else if (hdc == IntPtr.Zero)
+                {
+                    // Dispose of the page if it exists
+                    if (page != null)
+                    {
+                        page.Dispose();
+                        page = null;
+                    }
+
+                    // Throw an exception
+                    ExtractException ee = new ExtractException("ELI28050",
+                        "Unable to create device context.");
+                    ee.AddDebugData("Memory before reclaim", GC.GetTotalMemory(false), false);
+                    ee.AddDebugData("Memory after reclaim", GC.GetTotalMemory(true), false);
+                    ee.AddDebugData("Retry count", retryCount, false);
+                    AddImageDebugInfo(ee, imageToClone, pageNumber);
+                    throw ee;
+                }
+
+                clonedPage = page;
+                return hdc;
+            }
+            catch (Exception ex)
+            {
+                // Dispose of the page if an exception occurred
+                if (page != null)
+                {
+                    page.Dispose();
+                    page = null;
+                }
+
+                throw ExtractException.AsExtractException("ELI28051", ex);
+            }
+        }
+
+        /// <summary>
+        /// Adds debug information about an image to the specified exception.
+        /// </summary>
+        /// <param name="ee">The exception to add the debug information to.</param>
+        /// <param name="image">The image to get the information from.</param>
+        /// <param name="pageNumber">The page number of the image that the image
+        /// object relates to.</param>
+        static void AddImageDebugInfo(ExtractException ee, RasterImage image, int pageNumber)
+        {
+            try
+            {
+                ee.AddDebugData("Image Page", pageNumber, false);
+                if (image != null)
+                {
+                    ee.AddDebugData("Image Bits Per Pixel", image.BitsPerPixel, false);
+                    ee.AddDebugData("Image Width", image.Width, false);
+                    ee.AddDebugData("Image Height", image.Height, false);
+                }
+                else
+                {
+                    ee.AddDebugData("Image Object", "NULL", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Since this is used to add debug information in an exception handler, we
+                // should just log exceptions rather than rethrowing them.
+                ExtractException ee2 =
+                    new ExtractException("ELI28049", "Error adding image debug information.", ex);
+                ee2.Log();
+            }
+        }
     }
 }

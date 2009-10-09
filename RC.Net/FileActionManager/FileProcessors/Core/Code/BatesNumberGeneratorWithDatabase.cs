@@ -80,12 +80,27 @@ namespace Extract.FileActionManager.FileProcessors
             {
                 List<string> batesNumbers = new List<string>(totalPages);
 
-                // Compute the first number: (Last - Total) + 1
-                long firstNumber =
-                    (GetLastNumber(_format.AppendPageNumber ? 1 : totalPages) - totalPages) + 1;
+                // Compute the first page number
+                // If same number for every page, just get the next number
+                // If different number for each page then first number is (Last - Total) + 1
+                long nextNumber;
+                if (_format.AppendPageNumber)
+                {
+                    nextNumber = GetLastNumber(1);
+                }
+                else
+                {
+                    nextNumber = (GetLastNumber(totalPages) - totalPages);
+                }
+
                 for (int i = 1; i <= totalPages; i++)
                 {
-                    batesNumbers.Add(BatesNumberHelper.GetStringFromNumber(_format, firstNumber, i));
+                    // If using a new number for each page, then increment the number
+                    if (!_format.AppendPageNumber)
+                    {
+                        nextNumber++;
+                    }
+                    batesNumbers.Add(BatesNumberHelper.GetStringFromNumber(_format, nextNumber, i));
                 }
 
                 // Return the collection of bates numbers

@@ -280,11 +280,18 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Close()
         {
-            if (_codecsStarted)
+            try
             {
-                // Shutdown the raster codecs
-                RasterCodecs.Shutdown();
-                _codecsStarted = false;
+                if (_codecsStarted)
+                {
+                    // Shutdown the raster codecs
+                    RasterCodecs.Shutdown();
+                    _codecsStarted = false;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI28055", "Error closing task.", ex);
             }
         }
 
@@ -293,11 +300,25 @@ namespace Extract.FileActionManager.FileProcessors
         /// </summary>
         public void Init()
         {
-            if (!_codecsStarted)
+            try
             {
-                // Start the raster codecs
-                RasterCodecs.Startup();
-                _codecsStarted = true;
+                // Unlock the document support toolkit
+                ExtractException ee = UnlockLeadtools.UnlockDocumentSupport(true);
+                if (ee != null)
+                {
+                    throw ee;
+                }
+
+                if (!_codecsStarted)
+                {
+                    // Start the raster codecs
+                    RasterCodecs.Startup();
+                    _codecsStarted = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExtractException.CreateComVisible("ELI28056", "Failed to initialize task.", ex);
             }
         }
 
@@ -674,21 +695,15 @@ namespace Extract.FileActionManager.FileProcessors
 
                 bool wontFitOnPage = false;
                 RasterImage image = null;
+                RasterImage clonedPage = null;
                 Font pixelFont = null;
-                RasterImageGdiPlusGraphicsContainer container = null;
+                IntPtr hdc = IntPtr.Zero;
+                Graphics graphics = null;
                 try
                 {
                     // Load the image page
                     image = codecs.Load(inFile, bitsPerPixel, CodecsLoadByteOrder.BgrOrGray,
                         pageNumber, pageNumber);
-
-                    // Check for GDI+ compatibility
-                    if (image.TestGdiPlusCompatible(true) !=
-                        RasterGdiPlusIncompatibleReason.Compatible)
-                    {
-                        // Try to make the image GDI+ compatible
-                        image.MakeGdiPlusCompatible(image.NearestGdiPlusPixelFormat, true);
-                    }
 
                     // Compute the anchor point for the text
                     Point anchorPoint = GetAnchorPoint(_format.PageAnchorAlignment,
@@ -702,12 +717,17 @@ namespace Extract.FileActionManager.FileProcessors
                     pixelFont = FontMethods.ConvertFontToUnits(_format.Font,
                     image.YResolution, GraphicsUnit.Pixel);
 
-                    // Create a graphics object to draw on
-                    container = image.CreateGdiPlusGraphics();
+                    // Get a device context handle from the lead tools image
+                    // (also returns a clone of the image page to operate on)
+                    hdc = ImageMethods.GetLeadDCWithRetries(image, 5, null, pageNumber,
+                        out clonedPage);
 
+                    // Create a graphics object from the handle
+                    graphics = Graphics.FromHdc(hdc);
+                    
                     // Compute the bounds for the string
                     Rectangle bounds = DrawingMethods.ComputeStringBounds(batesNumber,
-                        container.Graphics, pixelFont, 0, 0F, anchorPoint,
+                        graphics, pixelFont, 0, 0F, anchorPoint,
                         _format.AnchorAlignment);
 
                     // Ensure the Bates number fits on the image page
@@ -731,11 +751,11 @@ namespace Extract.FileActionManager.FileProcessors
                     }
 
                     // Draw the Bates number on the image
-                    DrawingMethods.DrawString(batesNumber, container.Graphics,
-                        container.Graphics.Transform, pixelFont, 0, 0F, bounds, null, null);
+                    DrawingMethods.DrawString(batesNumber, graphics, graphics.Transform,
+                        pixelFont, 0, 0F, bounds, null, null);
 
                     // Save the image page (use append to add it to the end of the file)
-                    codecs.Save(image, outFile, format, bitsPerPixel, 1, 1, pageNumber,
+                    codecs.Save(clonedPage, outFile, format, bitsPerPixel, 1, 1, pageNumber,
                         CodecsSavePageMode.Append);
 
                     // If there were annotation tags, save those as well
@@ -782,13 +802,21 @@ namespace Extract.FileActionManager.FileProcessors
                     {
                         pixelFont.Dispose();
                     }
-                    if (container != null)
+                    if (graphics != null)
                     {
-                        container.Dispose();
+                        graphics.Dispose();
+                    }
+                    if (hdc != IntPtr.Zero)
+                    {
+                        RasterImage.DeleteLeadDC(hdc);
                     }
                     if (image != null)
                     {
                         image.Dispose();
+                    }
+                    if (clonedPage != null)
+                    {
+                        clonedPage.Dispose();
                     }
                 }
             }

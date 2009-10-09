@@ -646,6 +646,10 @@
       <Project>{B2D07DE4-9192-4531-8854-DE03CE9B0B57}</Project>
       <Name>Extract.Imaging</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\..\Utilities\Core\Code\Extract.Imaging.Utilities.vcproj">
+      <Project>{E610E652-0891-40D4-B5CA-A622B87C7979}</Project>
+      <Name>Extract.Imaging.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EditHighlightTextForm.resx">

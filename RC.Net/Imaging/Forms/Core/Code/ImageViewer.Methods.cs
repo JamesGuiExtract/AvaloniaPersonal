@@ -539,72 +539,15 @@ namespace Extract.Imaging.Forms
                 }
 
                 // Iterate through each page of the image
-                ColorResolutionCommand command = null; // Used to change bpp of image
+                ColorResolutionCommand command = GetSixteenBppConverter(); // Used to change bpp of image
                 for (int i = 1; i <= _pageCount; i++)
                 {
                     // Go to the specified page
                     SetPageNumber(i, false, false);
 
-                    // Clone the image
-                    RasterImage page = base.Image.Clone();
-
-                    // Sometimes the call to CreateLeadDC can return an IntPtr.Zero, in this
-                    // case we should dispose of the page, call garbage collection, reclone
-                    // the page and retry the CreateLeadDC call [IDSD #331]
-                    int retries = 0;
-                    for (; retries < _SAVE_RETRY_COUNT; retries++)
-                    {
-                        // Convert any image that is less than 16 bpp to 16 bpp
-                        if (page.BitsPerPixel < 16)
-                        {
-                            if (command == null)
-                            {
-                                command = GetSixteenBppConverter();
-                            }
-
-                            command.Run(page);
-                        }
-
-                        // Get a handle to a device context
-                        hdc = page.CreateLeadDC();
-
-                        // If successful, just break from loop
-                        if (hdc != IntPtr.Zero)
-                        {
-                            break;
-                        }
-
-                        // Dispose of the page and call garbage collector
-                        page.Dispose();
-                        page = null;
-                        GC.Collect();
-                        GC.WaitForPendingFinalizers();
-
-                        // TODO: This isn't disposed after last failure...
-                        // Reclone the page and convert as necessary
-                        page = base.Image.Clone();
-                    }
-
-                    // If it was successful, but only after a retry, log an exception
-                    if (hdc != IntPtr.Zero && retries > 0)
-                    {
-                        ExtractException ee = new ExtractException("ELI23377",
-                            "Device context created successfully after retry.");
-                        ee.AddDebugData("Retries attempted", retries, false);
-                        AddImageDebugInfo(ee, page, i);
-                        ee.Log();
-                    }
-                    else if(hdc == IntPtr.Zero)
-                    {
-                        // Throw an exception
-                        ExtractException ee = new ExtractException("ELI23378",
-                            "Unable to create device context.");
-                        AddImageDebugInfo(ee, page, i);
-                        ee.AddDebugData("Memory before reclaim", GC.GetTotalMemory(false), false);
-                        ee.AddDebugData("Memory after reclaim", GC.GetTotalMemory(true), false);
-                        ee.AddDebugData("Retry count", _SAVE_RETRY_COUNT, false);
-                        throw ee;
-                    }
+                    RasterImage page = null;
+                    hdc = ImageMethods.GetLeadDCWithRetries(base.Image, _SAVE_RETRY_COUNT,
+                        command, i, out page);
 
                     // Create a graphics object from the handle
                     graphics = Graphics.FromHdc(hdc);

@@ -1,4 +1,5 @@
 using Extract.Licensing;
+using Extract.Imaging.Utilities;
 using Extract.Utilities.Forms;
 using Leadtools;
 using Leadtools.Annotations;
@@ -350,21 +351,6 @@ namespace Extract.Imaging.Forms
         #endregion
 
         #region Image Viewer Constants
-
-        /// <summary>
-        /// Leadtools document (annotations and view perspective) support key constant.
-        /// </summary>
-        static readonly string _DOCUMENT_SUPPORT_KEY = "vhG42tyuh9";
-
-        /// <summary>
-        /// Leadtools pdf save support key constant.
-        /// </summary>
-        static readonly string _PDF_SAVE_SUPPORT_KEY = "8ksiHnPymr";
-
-        /// <summary>
-        /// Leadtools pdf read support key constant.
-        /// </summary>
-        static readonly string _PDF_READ_SUPPORT_KEY = "xrzGPkmYui";
 
         /// <summary>
         /// Image file types constant for the open file dialog.
@@ -868,39 +854,17 @@ namespace Extract.Imaging.Forms
 
                 _licenseCore.Validate("ELI23109");
 
-                // Check if PDF Read and Write is licensed
-                if (LicenseUtilities.IsLicensed(LicenseIdName.PdfReadWriteFeature))
+                // Attempt to unlock PDF support (returns an extract exception if unlocking failed).
+                ExtractException ee = UnlockLeadtools.UnlockPdfSupport(false);
+                if (ee != null)
                 {
-                    // Unlock pdf read and write support
-                    RasterSupport.Unlock(RasterSupportType.PdfRead, _PDF_READ_SUPPORT_KEY);
-                    RasterSupport.Unlock(RasterSupportType.PdfSave, _PDF_SAVE_SUPPORT_KEY);
-
-                    // Ensure pdf support was unlocked
-                    bool pdfReadLocked = RasterSupport.IsLocked(RasterSupportType.PdfRead);
-                    bool pdfWriteLocked = RasterSupport.IsLocked(RasterSupportType.PdfSave);
-                    if (pdfReadLocked || pdfWriteLocked)
-                    {
-                        ExtractException ee = new ExtractException("ELI21229",
-                            "Unable to unlock pdf support. Pdf support will be limited.");
-                        ee.AddDebugData("Pdf reading",
-                            pdfReadLocked ? "Locked" : "Unlocked", false);
-                        ee.AddDebugData("Pdf writing",
-                            pdfWriteLocked ? "Locked" : "Unlocked", false);
-                        ee.Display();
-                    }
+                    ee.Display();
                 }
 
-                // Check if Annotations are licensed
-                if (LicenseUtilities.IsLicensed(LicenseIdName.AnnotationFeature))
+                // Attempt to unlock document support
+                if (UnlockLeadtools.UnlockDocumentSupport(false) != null)
                 {
-                    // Unlock document (ie. annotations) support
-                    RasterSupport.Unlock(RasterSupportType.Document, _DOCUMENT_SUPPORT_KEY);
-
-                }
-
-                // Turn off display of annotation if document support is locked
-                if (RasterSupport.IsLocked(RasterSupportType.Document))
-                {
+                    // Turn off display of annotation if document support is locked
                     _displayAnnotations = false;
                 }
 

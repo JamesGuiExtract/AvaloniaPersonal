@@ -205,6 +205,10 @@
 			RelativePath="System.Windows.Forms.dll"
 			AssemblyName="System.Windows.Forms, Version=2.0.0.0, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL"
 		/>
+		<AssemblyReference
+			RelativePath="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.dll"
+			AssemblyName="Leadtools, Version=16.5.0.0, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86"
+		/>
 	</References>
 	<Files>
 		<Filter
@@ -240,6 +244,10 @@
 					/>
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath=".\UnlockLeadtools.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -252,6 +260,10 @@
 			</File>
 			<File
 				RelativePath=".\Stdafx.h"
+				>
+			</File>
+			<File
+				RelativePath=".\UnlockLeadtools.h"
 				>
 			</File>
 		</Filter>

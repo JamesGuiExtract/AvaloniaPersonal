@@ -91,6 +91,9 @@ ExtractPdfManager::ExtractPdfManager(System::String ^fileName, bool fileUsedAsIn
 		// Validate the license
 		_licenseCache->Validate("ELI27943");
 
+		ExtractException::Assert("ELI28065", "File name cannot be null or empty",
+			!String::IsNullOrEmpty(fileName));
+
 		// Set the internal PDF manager
 		_pdfFile = new PDFInputOutputMgr(asString(fileName), fileUsedAsInput);
 
