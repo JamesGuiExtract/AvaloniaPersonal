@@ -209,6 +209,10 @@
 			RelativePath="..\..\..\..\..\ReusableComponents\APIs\LeadTools_16.5\Dotnet\Leadtools.dll"
 			AssemblyName="Leadtools, Version=16.5.0.0, PublicKeyToken=9cf889f53ea9b907, processorArchitecture=x86"
 		/>
+		<ProjectReference
+			ReferencedProjectIdentifier="{7C37B0FB-81B8-4AA2-BC14-B21028C7AB9F}"
+			RelativePathToProject="..\..\..\..\Core\Code\Extract.csproj"
+		/>
 	</References>
 	<Files>
 		<Filter
