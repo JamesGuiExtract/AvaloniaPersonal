@@ -1,0 +1,1371 @@
+<html>
+
+<head>
+<title>Report Viewer - ID Shield Testing Checklist</title>
+<link type="text/css" rel="stylesheet" href="../../../../UCLIDTestingFramework/Misc/UCLIDTesting.css">
+<style type="text/css">
+  .hor {font-size:xx-small}
+  .ver {font-size:xx-small; white-space: nowrap; text-align:right; writing-mode:tb-rl}
+  .first {height:200}
+  .page-break   { display:block; page-break-before:always; }
+</style>
+</head>
+
+<body>
+<h1>Report Viewer - ID Shield<br>
+	<img src="../../../../UCLIDTestingFramework/Misc/TestingChecklistHeader.gif">
+</h1>
+<hr>
+
+<h2>ID Shield Specific Reports</h2>
+<ul>
+	<li><b>ID Shield data types and document counts</b>
+	<li><b>ID Shield detailed report for specific document</b>
+	<li><b>ID Shield list of documents processed but not verified</b>
+	<li><b>ID Shield list of documents verified by specific user</b>
+	<li><b>ID Shield project summary</b>
+	<li><b>ID Shield redaction counts (by document)</b>
+	<li><b>ID Shield verification document, page, and redaction counts (by user)</b>
+	<li><b>ID Shield verification times and rates (by user)</b>
+</ul>
+
+<div class="page-break"></div>
+
+<h2>Common features</h2>
+<ol>
+<ul>
+      	<li><b>Reporting period</b></li>
+<p>
+	<table border=0 cellpadding="2" cellspacing="0">
+		<tr class="first">
+			<th class="ver">ID Shield data types and document counts</th>
+			<th class="ver">Documents processed on machines</th>
+			<th class="ver">ID Shield list of documents processed but not verified</th>
+			<th class="ver">ID Shield list of documents verified by specific user</th>
+                        <th class="ver">ID Shield project summary</th>
+                        <th class="ver">ID Shield redaction counts (by document)</th>
+                        <th class="ver">ID Shield verification document, page, and redaction counts (by user)</th>
+                        <th class="ver">ID Shield verification times and rates (by user)</th>
+                </tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a <b>ReportingPeriod</b> parameter is required.</td>
+		</tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>All</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>All</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Previous Week</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Previous Week</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Previous month</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Previous month</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Previous year</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Previous year</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last 30 days</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last 30 days</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last 7 days</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last 7 days</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last hour</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last hour</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last 2 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last 2 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last 5 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last 5 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Last 10 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Last 10 hours</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Current week</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Current week</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Current month</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Current month</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Current year</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Current year</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Today</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Today</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a meaningful report is generated when
+                        <b>Range</b> is <b>Yesterday</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Create a saved report and confirm that the
+                        associated XML file contains a <b>DateRangeParameter</b>
+                        node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b> when
+                        <b>Range</b> is <b>Yesterday</b></td>
+                </tr>
+
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"> Create a saved report with a <b>Custom</b>
+                        date range and confirm that the associated XML file contains
+                        a <b>DateRangeParameter</b> node with <b>Name = 
+                        &quot;ReportingPeriod&quot;</b>, <b>Default = &quot;Custom&quot;</b>,
+                        <b>Min = &quot;&lt;start time&gt;&quot;</b>, <b>Max =
+                        &quot;&lt;end time&gt;&quot;</b>.</td>
+                </tr>
+        </table>
+
+<div class="page-break"></div>
+
+      	<li><b>Test with meaningful data</b></li>
+<p>
+	<table border=0 cellpadding="2" cellspacing="0">
+		<tr class="first">
+			<th class="ver">ID Shield data types and document counts</th>
+			<th class="ver">Documents processed on machines</th>
+			<th class="ver">ID Shield detailed report for specific document</th>
+			<th class="ver">ID Shield list of documents processed but not verified</th>
+			<th class="ver">ID Shield list of documents verified by specific user</th>
+                        <th class="ver">ID Shield project summary</th>
+                        <th class="ver">ID Shield redaction counts (by document)</th>
+                        <th class="ver">ID Shield verification document, page, and redaction counts (by user)</th>
+                        <th class="ver">ID Shield verification times and rates (by user)</th>
+                </tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that a shadowed heading is provided at the top of the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the first line is <b>Extract Systems</b>.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the second line is the title of the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that there is a distinct background color.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the <b>Database Information</b> table and
+                        contents are formatted properly even at 400% zoom factor.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the <b>Database server</b> information is correct.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the <b>Database name</b> information is correct.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the details table and contents are formatted properly even at 400% zoom factor.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a shadowed footer is provided at the bottom of each page.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the left side of the first line is <b>Printed</b>
+                        along with a date and time of printing.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the left side of the second line is <b>By</b>
+                        along with the user name of the person who generated the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the right side of the first line is the name of
+                        the report, identical to the second line of the header.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the right side of the second line is <b>Page <i>M</i> of <i>N</i></b>.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that there is a distinct background color.</td>
+		</tr>
+        </table>
+
+<div class="page-break"></div>
+
+      	<li><b>Test with empty database</b></li>
+<p>
+	<table border=0 cellpadding="2" cellspacing="0">
+		<tr class="first">
+			<th class="ver">ID Shield data types and document counts</th>
+			<th class="ver">Documents processed on machines</th>
+			<th class="ver">ID Shield detailed report for specific document</th>
+			<th class="ver">ID Shield list of documents processed but not verified</th>
+			<th class="ver">ID Shield list of documents verified by specific user</th>
+                        <th class="ver">ID Shield project summary</th>
+                        <th class="ver">ID Shield redaction counts (by document)</th>
+                        <th class="ver">ID Shield verification document, page, and redaction counts (by user)</th>
+                        <th class="ver">ID Shield verification times and rates (by user)</th>
+                </tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that a shadowed heading is provided at the top of the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the first line is <b>Extract Systems</b>.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the second line is the title of the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that there is a distinct background color.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the <b>Database Information</b> table and
+                        contents are formatted properly even at 400% zoom factor.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the <b>Database server</b> information is correct.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the <b>Database name</b> information is correct.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the details table and contents are formatted properly even at 400% zoom factor.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that a shadowed footer is provided at the bottom of each page.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the left side of the first line is <b>Printed</b>
+                        along with a date and time of printing.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the left side of the second line is <b>By</b>
+                        along with the user name of the person who generated the report.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor">Confirm that the right side of the first line is the name of
+                        the report, identical to the second line of the header.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that the right side of the second line is <b>Page <i>M</i> of <i>N</i></b>.</td>
+		</tr>
+		<tr>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+                        <td class="hor"><input type="checkbox"></td>
+			<td class="hor">Confirm that there is a distinct background color.</td>
+		</tr>
+        </table>
+</ol>
+<h2>Report specific features</h2>
+<ol>
+ 
+	<li><b>ID Shield data types and document counts</b> 
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Types and Counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>Data types*</b> column information is correct.
+			<ul>
+				<li>HC Data
+				<li>MC Data
+				<li>LC Data
+				<li>Clues
+				<li>HC or MC Data
+				<li>HC or LC Data
+				<li>Clues or HC Data
+				<li>MC or LC Data
+				<li>Clues or MC Data
+				<li>Clues or LC Data
+				<li>HC, MC or LC Data
+				<li>Clues or HC or MC Data
+				<li>Clues or HC or LC Data
+				<li>Clues or MC or LC Data
+				<li>Clues or HC or MC or LC Data
+			</ul>
+			<li>Confirm that the <b>Count of files with specified data types</b> column 
+			information is correct.
+<p>
+			<li>Confirm that after the <b>Types and Counts</b> table is text for 
+			<b>*HC Data = High confidence data, MC Data = Medium confidence data, LC 
+			Data = Low confidence data</b>.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Types and Counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the <b>Data types*</b> column information is correct.
+			<li>Confirm that the <b>Count of files with specified data types</b> column 
+			information is correct with <b>0</b> entries for each row.
+		</ul>
+	</ul>
+
+<p>
+
+	<li><b>ID Shield detailed report for specific document</b>
+	<ul>
+		<li>Confirm that a <b>DocumentName</b> parameter is required. 
+		<li>Confirm that a meaningful report is presented when a fully-qualified path 
+		to a processed file is provided.
+		<li>Create a saved report and confirm that the associated XML file contains a 
+		<b>TextParameter</b> node with <b>Name = &quot;DocumentName&quot;</b> 
+		and <b>Default = &quot;&lt;path&gt;&quot;</b>.
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is correct.
+			<li>Confirm that the <b>File size (bytes)</b> information is correct.
+			<li>Confirm that the <b>Number of pages</b> information is correct.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>action</b> and that action 
+			status is correct.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that a <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that a <b>From status</b> column is provided.
+			<li>Confirm that a <b>To status</b> column is provided.
+			<li>Confirm that a <b>Machine</b> column is provided.
+			<li>Confirm that a <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided for each <b>event</b> and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that the <b>Redaction summary</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that a <b>Time stamp</b> column is provided.
+			<li>Confirm that a <b>Mode</b> column is provided.
+			<li>Confirm that an <b>HC*</b> column is provided.
+			<li>Confirm that an <b>MC*</b> column is provided.
+			<li>Confirm that an <b>LC*</b> column is provided.
+			<li>Confirm that an <b>Clues</b> column is provided.
+			<li>Confirm that an <b>Manual</b> column is provided.
+			<li>Confirm that an <b>Total</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided and that each entry 
+			is appropriate.
+<p>
+			<li>Confirm that after the <b>Redaction summary</b> table is text for 
+			<b>*HC Data = High confidence data, *MC Data = Medium confidence data, *LC 
+			Data = Low confidence data</b>.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<li><b>Test with nonsense filename</b> 
+		<ul>
+			<li>Confirm that the <b>Document Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Document name</b> information is as specified.
+			<li>Confirm that the <b>File size (bytes)</b> information is empty.
+			<li>Confirm that the <b>Number of pages</b> information is empty.
+<p>
+			<li>Confirm that the <b>Summary of status</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>Status</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
+<p>
+			<li>Confirm that the <b>Queuing events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Event time stamp</b> column is provided.
+			<li>Confirm that an <b>Event type</b> column is provided.
+			<li>Confirm that an <b>File modify time</b> column is provided.
+			<li>Confirm that an <b>File size (bytes)</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>N/A</b> in each cell.
+<p>
+			<li>Confirm that the <b>Status change events</b> 
+			table and contents are formatted properly even at 400% zoom factor.
+			<li>Confirm that an <b>Time stamp</b> column is provided.
+			<li>Confirm that an <b>Action</b> column is provided.
+			<li>Confirm that an <b>From status</b> column is provided.
+			<li>Confirm that an <b>To status</b> column is provided.
+			<li>Confirm that an <b>Machine</b> column is provided.
+			<li>Confirm that an <b>User</b> column is provided.
+			<li>Confirm that the column headings are displayed with a distinct background color.
+			<li>Confirm that one row is provided with <b>empty</b> cells.
+		</ul>
+	</ul>
+
+<p>
+	<li><b>ID Shield list of documents processed but not verified</b> 
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that the single <b>File</b> column correctly displays the full path to 
+			each image.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+	</ul>
+
+<p>
+
+	<li><b>ID Shield list of documents verified by specific user</b> 
+	<ul>
+		<li>Confirm that a <b>VerifyUserName</b> parameter is required. 
+		<li>For a particular user name and <b>Range</b> option:
+		<ul>
+			<li>Confirm that a meaningful report is presented.
+			<li>Create a saved report and confirm that the associated XML file 
+			contains a <b>DateRangeParameter</b> node with <b>Name = &quot;ReportingPeriod&quot;</b> 
+			and <b>Default = &quot;&lt;Range&gt;&quot;</b>.
+			<li>Confirm that the associated XML file also contains a <b>TextParameter</b> 
+			node with <b>Name = &quot;VerifyUserName&quot;</b> 
+			and <b>Default = &quot;&lt;name&gt;&quot;</b>.
+		</ul>
+<p>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>&lt;name&gt;</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that the single <b>File</b> column correctly displays the full path to 
+			each image.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>N/A</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+<p>
+		<li><b>Test with &quot;ABC&quot; (nonsense) user (can be added to an empty database)</b> 
+		<ul>
+			<li>Confirm that a shadowed heading is provided at the top of the report.
+			<li>Confirm that the first line is <b>Extract Systems</b>.
+			<li>Confirm that the second line is <b>ID Shield List Of Documents 
+			Verified By Specific User</b>.
+			<li>Confirm that there is a distinct background color.
+<p>
+			<li>Confirm that the <b>Database Information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Database server</b> information is correct.
+			<li>Confirm that the <b>Database name</b> information is correct.
+<p>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Specific user</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table contains one row with <b>User:</b> in the first column 
+			and <b>ABC</b> in the second column.
+<p>
+			<li>Confirm that the <b>File Information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column header is displayed in a distinct background color.
+			<li>Confirm that there are no entries under the column header.
+		</ul>
+	</ul>
+
+<p>
+
+	<li><b>ID Shield redaction counts (by document)</b> 
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Redaction counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headers are displayed in a distinct background color.
+			<li>Confirm that a column exists for <b>File ID</b>.
+			<li>Confirm that a column exists for <b>File</b>.
+			<li>Confirm that a column exists for <b>Clues</b>.
+			<li>Confirm that a column exists for <b>HCData</b>.
+			<li>Confirm that a column exists for <b>MCData</b>.
+			<li>Confirm that a column exists for <b>LCData</b>.
+			<li>Confirm that a column exists for <b>Manual</b>.
+			<li>Confirm that a column exists for <b>Total Redactions</b>.
+			<li>Confirm that the <b>File</b> column correctly displays the full path to 
+			each image.
+			<li>Confirm that the <b>Total Redactions</b> column correctly displays the sum of 
+			the actual redactions applied to the image.  This may be equal to but will <b>not</b> 
+			be larger than the sum of HCData, MCData, LCData, and Manual.
+<p>
+			<li>Confirm that after the last listed file a row is included for <b>Average:</b>.
+			<li>Confirm that the <b>Average:</b> counts are provided with one decimal place for 
+			the Clues, HCData, MCData, LCData, Manual and Total columns.
+			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
+			<li>Confirm that the <b>Average</b> counts are provided without digits to the right 
+			of the decimal point for the Clues, HCData, MCData, LCData, Manual and Total columns.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Redaction counts</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headers are displayed in a distinct background color.
+			<li>Confirm that a column exists for <b>File ID</b> and the content is <b>N/A</b>.
+			<li>Confirm that a column exists for <b>File</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Clues</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>HCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>MCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>LCData</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Manual</b> and the cell is empty.
+			<li>Confirm that a column exists for <b>Total Redactions</b> and the cell is empty.
+<p>
+			<li>Confirm that after the last listed file a row is included for <b>Average:</b>.
+			<li>Confirm that the <b>Average:</b> counts are all empty.
+			<li>Confirm that after the <b>Average</b> row, a row is included for <b>Total:</b>.
+			<li>Confirm that the <b>Average</b> counts are all empty.
+		</ul>
+	</ul>
+
+<p>
+
+	<li><b>ID Shield verification document, page, and redaction counts (by user)</b>
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time:</b> information is correct.
+			<li>Confirm that the <b>End time:</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b># documents verified</b>.
+			<li>Confirm that a column exists for <b># pages in verified documents</b>.
+			<li>Confirm that a column exists for <b># documents redacted</b>.
+			<li>Confirm that a column exists for <b># pages in redacted documents</b>.
+			<li>Confirm that a column exists for <b># redactions made (including manual)</b>.
+			<li>Confirm that a column exists for <b># manual redactions made</b>.
+			<li>Confirm that a row exists for each user.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time:</b> information is correct.
+			<li>Confirm that the <b>End time:</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification information</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b># documents verified</b>.
+			<li>Confirm that a column exists for <b># pages in verified documents</b>.
+			<li>Confirm that a column exists for <b># documents redacted</b>.
+			<li>Confirm that a column exists for <b># pages in redacted documents</b>.
+			<li>Confirm that a column exists for <b># redactions made (including manual)</b>.
+			<li>Confirm that a column exists for <b># manual redactions made</b>.
+			<li>Confirm that a single user row exists and is empty.
+			<li>Confirm that the counts are either <b>0</b> or <b>empty</b>.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b> and that the appropriate counts are 
+			<b>0</b>.
+		</ul>
+	</ul>
+
+<p>
+
+	<li><b>ID Shield verification times and rates (by user)</b>
+	<ul>
+		<li><b>Test with meaningful data</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification time information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b>Screen verification time</b> and that 
+			information is formatted as <b>1h 12m 34s</b>.
+			<li>Confirm that a column exists for <b>Screen verification rate</b> and that 
+			information is formatted as <b>1,234 pages/hr</b>.
+			<li>Confirm that a column exists for <b>Project verification time*</b> and that 
+			information is formatted as <b>1h 12m 34s</b>.
+			<li>Confirm that a column exists for <b>Project verification rate*</b> and that 
+			information is formatted as <b>1,234 pages/hr</b>.
+			<li>Confirm that one row is provided for each <b>User</b> and that they are 
+			presented in alphabetical order.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+			<li>Confirm that after the <b>Verification time information</b> table is 
+			text for <b>*These times are estimates</b>.
+		</ul>
+<p>
+		<li><b>Test with empty database</b> 
+		<ul>
+			<li>Confirm that the <b>Reporting period</b> table and contents are formatted 
+			properly even at 400% zoom factor.
+			<li>Confirm that the <b>Start time</b> information is correct.
+			<li>Confirm that the <b>End time</b> information is correct.
+<p>
+			<li>Confirm that the <b>Verification time information</b> table and contents are 
+			formatted properly even at 400% zoom factor.
+			<li>Confirm that the table title is displayed in white text on a black background.
+			<li>Confirm that the column headings are displayed in a 
+			distinct background color.
+			<li>Confirm that a column exists for <b>User</b>.
+			<li>Confirm that a column exists for <b>Screen verification time</b>.
+			<li>Confirm that a column exists for <b>Screen verification rate</b>.
+			<li>Confirm that a column exists for <b>Project verification time*</b>.
+			<li>Confirm that a column exists for <b>Project verification rate*</b>.
+			<li>Confirm that one row is provided with an empty user, 
+			<b>0m 0s</b> for each verification time, and <b>0 pages/hr</b> for each 
+			verification rate.
+<p>
+			<li>Confirm that a row exists for <b>Average</b> and that the 
+			associated counts are displayed with two digits to the right of the decimal place.
+			<li>Confirm that a row exists for <b>Total</b>.
+			<li>Confirm that after the <b>Verification time information</b> table is 
+			text for <b>*These times are estimates</b>.
+		</ul>
+	</ul>
+</ol>
+</body>
+</html>
