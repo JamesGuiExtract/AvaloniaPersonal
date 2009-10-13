@@ -545,11 +545,6 @@ namespace Extract.FileActionManager.FileProcessors
         void ApplyBatesNumbers(string fileName, ProgressStatus progressStatus,
             BatesNumberGeneratorWithDatabase generator)
         {
-            if (progressStatus != null)
-            {
-                // TODO: Update progress status per page
-            }
-
             // Ensure the file exists
             ExtractException.Assert("ELI27988", "File no longer exists.", File.Exists(fileName),
                 "Image File Name", fileName);
@@ -557,20 +552,37 @@ namespace Extract.FileActionManager.FileProcessors
             // Get the file extension from the file name
             string extension = Path.GetExtension(fileName);
 
-            int retryCount = 0;
-            int pageCount = 0;
-            List<string> batesNumbers = null;
             using (ExtractPdfManager inputFile = new ExtractPdfManager(fileName, true))
             {
+                int retryCount = 0;
+                int pageCount = 0;
+                List<string> batesNumbers = null;
+                CodecsImageInfo info = null;
+                RasterCodecs codecs = null;
                 try
                 {
+                    // Get a new raster codecs object
+                    codecs = new RasterCodecs();
+
+                    // Get the file info along with the page information
+                    info = codecs.GetInformation(inputFile.FileName, true);
+
+                    // Get the image information
+                    pageCount = info.TotalPages;
+                    int bitsPerPixel = info.BitsPerPixel;
+                    RasterImageFormat format = info.Format;
+
+                    if (progressStatus != null)
+                    {
+                        progressStatus.InitProgressStatus("Applying Bates numbers...", 0,
+                            (pageCount / 4) + 1, true);
+                    }
+
                     bool success = false;
                     while (retryCount < _MAX_RETRIES)
                     {
                         TemporaryFile tempFile = null;
                         ExtractPdfManager outFile = null;
-                        RasterCodecs codecs = null;
-                        CodecsImageInfo info = null;
                         try
                         {
                             retryCount++;
@@ -580,12 +592,6 @@ namespace Extract.FileActionManager.FileProcessors
                             tempFile = new TemporaryFile(extension);
                             outFile = new ExtractPdfManager(tempFile.FileName, false);
 
-                            // Get a new raster codecs object
-                            codecs = new RasterCodecs();
-
-                            // Get the file info along with the page information
-                            info = codecs.GetInformation(inputFile.FileName, true);
-
                             // If the bates numbers have not been generated yet, generate them
                             if (batesNumbers == null)
                             {
@@ -593,13 +599,24 @@ namespace Extract.FileActionManager.FileProcessors
                                     generator.GetNextNumberStrings(info.TotalPages));
                             }
 
-                            pageCount = info.TotalPages;
-                            int bitsPerPixel = info.BitsPerPixel;
-                            RasterImageFormat format = info.Format;
+                            // Apply the bates number to each page
                             for (int i = 1; i <= pageCount; i++)
                             {
+                                // Start a new progress status group every 4 pages
+                                if (progressStatus != null && i % 4 == 1)
+                                {
+                                    progressStatus.StartNextItemGroup("", 1);
+                                }
+
                                 ApplyBatesNumberToPage(batesNumbers[i - 1], i, codecs, bitsPerPixel,
                                     format, inputFile, outFile);
+                            }
+
+                            // Ensure if progress status is being updated
+                            // that the last item is completed
+                            if (progressStatus != null && progressStatus.NumItemsInCurrentGroup > 0)
+                            {
+                                progressStatus.CompleteCurrentItemGroup();
                             }
 
                             // Ensure the page counts are the same for both images
@@ -623,16 +640,6 @@ namespace Extract.FileActionManager.FileProcessors
                                 tempFile.Dispose();
                                 tempFile = null;
                             }
-                            if (info != null)
-                            {
-                                info.Dispose();
-                                info = null;
-                            }
-                            if (codecs != null)
-                            {
-                                codecs.Dispose();
-                                codecs = null;
-                            }
                             if (outFile != null)
                             {
                                 outFile.Dispose();
@@ -643,6 +650,13 @@ namespace Extract.FileActionManager.FileProcessors
                         // Page counts did not match, sleep and retry
                         if (retryCount < _MAX_RETRIES)
                         {
+                            // Update the progress status if retrying
+                            if (progressStatus != null)
+                            {
+                                progressStatus.InitProgressStatus("Retry Applying Bates numbers...",
+                                    0, (pageCount / 4) + 1, true);
+                            }
+
                             System.Threading.Thread.Sleep(100);
                         }
                     }
@@ -652,6 +666,12 @@ namespace Extract.FileActionManager.FileProcessors
                         ExtractException ee = new ExtractException("ELI27989",
                             "Unable to apply Bates number to image.");
                         throw ee;
+                    }
+
+                    // Update the progress status
+                    if (progressStatus != null)
+                    {
+                        progressStatus.CompleteCurrentItemGroup();
                     }
                 }
                 catch (Exception ex)
@@ -665,6 +685,19 @@ namespace Extract.FileActionManager.FileProcessors
                         ee.AddDebugData("Last Bates Number", generator.LastBatesNumber, false);
                     }
                     throw ee;
+                }
+                finally
+                {
+                    if (info != null)
+                    {
+                        info.Dispose();
+                        info = null;
+                    }
+                    if (codecs != null)
+                    {
+                        codecs.Dispose();
+                        codecs = null;
+                    }
                 }
             }
         }
