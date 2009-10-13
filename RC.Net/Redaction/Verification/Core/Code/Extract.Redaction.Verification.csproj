@@ -263,6 +263,14 @@
       <WrapperTool>tlbimp</WrapperTool>
       <Isolated>False</Isolated>
     </COMReference>
+    <COMReference Include="UCLID_REDACTIONCUSTOMCOMPONENTSLib">
+      <Guid>{18CF5BEC-2929-43DD-86E0-7D50F152663A}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
     <COMReference Include="UCLID_TESTINGFRAMEWORKINTERFACESLib">
       <Guid>{B12E5F5E-6EC2-4D38-A57A-D55C4BE683C8}</Guid>
       <VersionMajor>1</VersionMajor>

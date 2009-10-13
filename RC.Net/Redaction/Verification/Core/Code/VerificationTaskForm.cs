@@ -13,6 +13,7 @@ using System.Text;
 using System.Windows.Forms;
 using TD.SandDock;
 using UCLID_FILEPROCESSINGLib;
+using UCLID_REDACTIONCUSTOMCOMPONENTSLib;
 
 using ComAttribute = UCLID_AFCORELib.Attribute;
 
@@ -254,8 +255,20 @@ namespace Extract.Redaction.Verification
             VerificationMemento memento = GetCurrentDocument();
             double elapsedSeconds = memento.StopScreenTime();
 
-            // TODO: Actually store data in database
-            Console.WriteLine(elapsedSeconds.ToString(CultureInfo.CurrentCulture));
+            // Check for null database manager (only add counts to database if it is not null)
+            // [FlexIDSCore #3627]
+            if (_database != null)
+            {
+                // Get the redaction counts
+                RedactionCounts counts = _redactionGridView.GetRedactionCounts();
+
+                // Create the IDShieldDB manager and add the data
+                IDShieldProductDBMgrClass idShieldDB = new IDShieldProductDBMgrClass();
+                idShieldDB.FAMDB = _database;
+                idShieldDB.AddIDShieldData(memento.FileId, true, elapsedSeconds, counts.HighConfidence,
+                    counts.MediumConfidence, counts.LowConfidence, counts.Clues, counts.Total,
+                    counts.Manual);
+            }
         }
 
         /// <summary>

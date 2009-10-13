@@ -11,6 +11,7 @@
 #include <COMUtils.h>
 #include <LockGuard.h>
 #include <FAMUtilsConstants.h>
+#include <TransactionGuard.h>
 
 using namespace ADODB;
 using namespace std;
@@ -20,7 +21,7 @@ using namespace std;
 //-------------------------------------------------------------------------------------------------
 
 // This must be updated when the DB schema changes
-const long glIDShieldDBSchemaVersion = 1;
+const long glIDShieldDBSchemaVersion = 2;
 const string gstrID_SHIELD_SCHEMA_VERSION_NAME = "IDShieldSchemaVersion";
 static const string gstrSTORE_IDSHIELD_PROCESSING_HISTORY = "StoreIDShieldProcessingHistory";
 static const string gstrSTORE_HISTORY_DEFAULT_SETTING = "1"; // TRUE
@@ -219,29 +220,62 @@ STDMETHODIMP CIDShieldProductDBMgr::AddIDShieldData(long lFileID, VARIANT_BOOL v
 
 		long nUserID = getKeyID( getDBConnection(), "FAMUser", "UserName", getCurrentUserName());
 		long nMachineID = getKeyID( getDBConnection(), "Machine", "MachineName", getComputerName());
+		
+		// Get the file ID as a string
+		string strFileId = asString(lFileID);
+		string strVerified = vbVerified == VARIANT_TRUE ? "1" : "0";
+
+		// -------------------------------------------
+		// Need to get the current TotalDuration value
+		// -------------------------------------------
+		double dTotalDuration = lDuration;
+		string strSql = "SELECT TOP 1 [TotalDuration] FROM IDShieldData WHERE [FileID] = "
+			+ strFileId + " AND [Verified] = " + strVerified + " ORDER BY [ID] DESC";
+
+		// Create a pointer to a recordset
+		_RecordsetPtr ipSet( __uuidof( Recordset ));
+		ASSERT_RESOURCE_ALLOCATION("ELI28069", ipSet != NULL );
+
+		// Open the recordset
+		ipSet->Open( strSql.c_str(), _variant_t((IDispatch *)getDBConnection(), true),
+			adOpenStatic, adLockReadOnly, adCmdText );
+
+		// If there is an entry, then get the total duration from it
+		if (ipSet->adoEOF == VARIANT_FALSE)
+		{
+			// Get the total duration from the datbase
+			dTotalDuration += getDoubleField(ipSet->Fields, "TotalDuration");
+		}
+
+		// Build insert SQL query 
+		string strInsertSQL = gstrINSERT_IDSHIELD_DATA_RCD + "(" + strFileId
+			+ ", " + strVerified + ", " + asString(nUserID) + ", "
+			+ asString(nMachineID) + ", GETDATE(), " + asString(lDuration)
+			+ ", " + asString(dTotalDuration) + ", " + asString(lNumHCDataFound) + ", "
+			+ asString(lNumMCDataFound) + ", " + asString(lNumLCDataFound) + ", "
+			+ asString(lNumCluesDataFound) + ", " + asString(lTotalRedactions) + ", "
+			+ asString(lTotalManualRedactions) + ")";
+
+		// Get the connetion pointer and create a transaction guard
+		_ConnectionPtr ipConnection = getDBConnection();
+		TransactionGuard tg(ipConnection);
 
 		// If not storing previous history need to delete it
 		if (!m_bStoreIDShieldProcessingHistory)
 		{
-			// Delete previous records with the fileID
-			executeCmdQuery(getDBConnection(), gstrDELETE_PREVIOUS_STATUS_FOR_FILEID + asString(lFileID));
-		}
-		else
-		{
-			// Update the status of IsMostRecentUpdate for all previous records for FileID to 0
-			executeCmdQuery(getDBConnection(), gstrUPDATE_MOST_RECENT_STATUS + asString(lFileID));
-		}
+			string strDeleteQuery = gstrDELETE_PREVIOUS_STATUS_FOR_FILEID;
+			replaceVariable(strDeleteQuery, "<FileID>", strFileId);
+			replaceVariable(strDeleteQuery, "<Verified>", strVerified);
 
-		// Build insert SQL query 
-		string strInsertSQL = gstrINSERT_IDSHIELD_DATA_RCD + "(" + asString(lFileID) + 
-			", 1, " + (asCppBool(vbVerified) ? "1":"0") + ", " + asString(nUserID) + ", " + 
-			asString(nMachineID) + ", GETDATE(), " + asString(lDuration) + 
-			", " + asString(lNumHCDataFound) + ", " + asString(lNumMCDataFound) + ", " +
-			asString(lNumLCDataFound) + ", " + asString(lNumCluesDataFound) + ", " +
-			asString(lTotalRedactions) + ", " + asString(lTotalManualRedactions) + ")";
+			// Delete previous records with the fileID
+			executeCmdQuery(ipConnection, strDeleteQuery);
+		}
 
 		// Insert the record
-		executeCmdQuery(getDBConnection(), strInsertSQL);
+		executeCmdQuery(ipConnection, strInsertSQL);
+
+		// Commit the transactions
+		tg.CommitTrans();
 	}
 	CATCH_ALL_AND_RETURN_AS_COM_ERROR("ELI19037");
 
@@ -342,31 +376,34 @@ ADODB::_ConnectionPtr CIDShieldProductDBMgr::getDBConnection()
 		throw ue;
 	}
 
-	// Get database server from FAMDB
-	string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
-
-	// Get DatabaseName from FAMDB
-	string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
-
-	// create the connection string
-	string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
-
 	// if closed and Database server and database name are defined,  open the database connection
-	if ( m_ipDBConnection->State == adStateClosed && !strDatabaseServer.empty() && !strDatabaseName.empty() )
+	if ( m_ipDBConnection->State == adStateClosed)
 	{
-		m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
-		
-		// Get the command timeout from the FAMDB DBInfo table
-		string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str()));
+		// Get database server from FAMDB
+		string strDatabaseServer = asString(m_ipFAMDB->DatabaseServer);
 
-		// Set the command timeout
-		m_ipDBConnection->CommandTimeout = asLong(strValue);
+		// Get DatabaseName from FAMDB
+		string strDatabaseName = asString(m_ipFAMDB->DatabaseName);
 
-		// Get the setting for storeing IDShield processing history
-		strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str()));
+		// create the connection string
+		string strConnectionString = createConnectionString(strDatabaseServer, strDatabaseName);
+		if (!strDatabaseServer.empty() && !strDatabaseName.empty())
+		{
+			m_ipDBConnection->Open( strConnectionString.c_str(), "", "", adConnectUnspecified );
 
-		// Set the local setting for storing history
-		m_bStoreIDShieldProcessingHistory = strValue == asString(TRUE);
+			// Get the command timeout from the FAMDB DBInfo table
+			string strValue = asString(m_ipFAMDB->GetDBInfoSetting(gstrCOMMAND_TIMEOUT.c_str()));
+
+			// Set the command timeout
+			m_ipDBConnection->CommandTimeout = asLong(strValue);
+
+			// Get the setting for storeing IDShield processing history
+			strValue = asString(m_ipFAMDB->GetDBInfoSetting(
+				gstrSTORE_IDSHIELD_PROCESSING_HISTORY.c_str()));
+
+			// Set the local setting for storing history
+			m_bStoreIDShieldProcessingHistory = strValue == asString(TRUE);
+		}
 	}
 	
 	return m_ipDBConnection;
